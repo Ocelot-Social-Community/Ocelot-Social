@@ -1,0 +1,844 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UserTeaser given an user user is deleted even if the current user is a moderator renders anonymous user 1`] = `
+<div>
+  <div
+    class="user-teaser"
+  >
+    <div
+      class="profile-avatar --small --no-image"
+    >
+      <span
+        class="initials"
+      >
+        
+      </span>
+       
+      <span
+        class="base-icon"
+      >
+        <!---->
+      </span>
+       
+      <!---->
+    </div>
+     
+    <span
+      class="info anonymous"
+    >
+      profile.userAnonym
+    </span>
+  </div>
+</div>
+`;
+
+exports[`UserTeaser given an user user is deleted renders anonymous user 1`] = `
+<div>
+  <div
+    class="user-teaser"
+  >
+    <div
+      class="profile-avatar --small --no-image"
+    >
+      <span
+        class="initials"
+      >
+        
+      </span>
+       
+      <span
+        class="base-icon"
+      >
+        <!---->
+      </span>
+       
+      <!---->
+    </div>
+     
+    <span
+      class="info anonymous"
+    >
+      profile.userAnonym
+    </span>
+  </div>
+</div>
+`;
+
+exports[`UserTeaser given an user user is disabled current user is a moderator renders user name 1`] = `
+<div>
+  <div
+    class="disabled-content"
+    placement="top-start"
+  >
+    <v-popover-stub
+      autohide="true"
+      class="user-teaser"
+      container="body"
+      delay="0"
+      handleresize="true"
+      offset="16"
+      openclass="open"
+      opengroup="0"
+      placement="bottom-end"
+      popoverarrowclass="tooltip-arrow popover-arrow"
+      popoverbaseclass="tooltip popover"
+      popoverclass="vue-popover-theme"
+      popoverinnerclass="tooltip-inner popover-inner"
+      popoverwrapperclass="wrapper"
+      popperoptions="[object Object]"
+      trigger="manual"
+    >
+      <a>
+        <div
+          class="profile-avatar --small --no-image"
+        >
+          <span
+            class="initials"
+          >
+            TS
+          </span>
+           
+          <!---->
+           
+          <!---->
+        </div>
+      </a>
+       
+      <div
+        class="info flex-direction-column"
+      >
+        <div
+          class="flex-direction-column"
+        >
+          <a>
+            <span
+              class="text"
+            >
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
+               
+              <span
+                class="name"
+              >
+                Tilda Swinton
+              </span>
+            </span>
+          </a>
+           
+          <!---->
+           
+          <!---->
+        </div>
+         
+        <!---->
+      </div>
+       
+      <div />
+    </v-popover-stub>
+  </div>
+</div>
+`;
+
+exports[`UserTeaser given an user user is disabled renders anonymous user 1`] = `
+<div>
+  <div
+    class="user-teaser"
+  >
+    <div
+      class="profile-avatar --small --no-image"
+    >
+      <span
+        class="initials"
+      >
+        
+      </span>
+       
+      <span
+        class="base-icon"
+      >
+        <!---->
+      </span>
+       
+      <!---->
+    </div>
+     
+    <span
+      class="info anonymous"
+    >
+      profile.userAnonym
+    </span>
+  </div>
+</div>
+`;
+
+exports[`UserTeaser given an user with linkToProfile, on desktop renders 1`] = `
+<div>
+  <div
+    class=""
+    placement="top-start"
+  >
+    <v-popover-stub
+      autohide="true"
+      class="user-teaser"
+      container="body"
+      delay="0"
+      handleresize="true"
+      offset="16"
+      openclass="open"
+      opengroup="0"
+      placement="bottom-end"
+      popoverarrowclass="tooltip-arrow popover-arrow"
+      popoverbaseclass="tooltip popover"
+      popoverclass="vue-popover-theme"
+      popoverinnerclass="tooltip-inner popover-inner"
+      popoverwrapperclass="wrapper"
+      popperoptions="[object Object]"
+      trigger="manual"
+    >
+      <a>
+        <div
+          class="profile-avatar --small --no-image"
+        >
+          <span
+            class="initials"
+          >
+            TS
+          </span>
+           
+          <!---->
+           
+          <!---->
+        </div>
+      </a>
+       
+      <div
+        class="info flex-direction-column"
+      >
+        <div
+          class="flex-direction-column"
+        >
+          <a>
+            <span
+              class="text"
+            >
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
+               
+              <span
+                class="name"
+              >
+                Tilda Swinton
+              </span>
+            </span>
+          </a>
+           
+          <!---->
+           
+          <!---->
+        </div>
+         
+        <!---->
+      </div>
+       
+      <div />
+    </v-popover-stub>
+  </div>
+</div>
+`;
+
+exports[`UserTeaser given an user with linkToProfile, on desktop when hovering the user name renders the popover 1`] = `
+<div>
+  <div
+    class=""
+    placement="top-start"
+  >
+    <v-popover-stub
+      autohide="true"
+      class="user-teaser"
+      container="body"
+      delay="0"
+      handleresize="true"
+      offset="16"
+      open="true"
+      openclass="open"
+      opengroup="0"
+      placement="bottom-end"
+      popoverarrowclass="tooltip-arrow popover-arrow"
+      popoverbaseclass="tooltip popover"
+      popoverclass="vue-popover-theme"
+      popoverinnerclass="tooltip-inner popover-inner"
+      popoverwrapperclass="wrapper"
+      popperoptions="[object Object]"
+      trigger="manual"
+    >
+      <a>
+        <div
+          class="profile-avatar --small --no-image"
+        >
+          <span
+            class="initials"
+          >
+            TS
+          </span>
+           
+          <!---->
+           
+          <!---->
+        </div>
+      </a>
+       
+      <div
+        class="info flex-direction-column"
+      >
+        <div
+          class="flex-direction-column"
+        >
+          <a>
+            <span
+              class="text"
+            >
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
+               
+              <span
+                class="name"
+              >
+                Tilda Swinton
+              </span>
+            </span>
+          </a>
+           
+          <!---->
+           
+          <!---->
+        </div>
+         
+        <!---->
+      </div>
+       
+      <div>
+        <user-teaser-popover-stub
+          link-to-profile="true"
+          user="[object Object]"
+          userlink="[object Object]"
+        />
+      </div>
+    </v-popover-stub>
+  </div>
+</div>
+`;
+
+exports[`UserTeaser given an user with linkToProfile, on touch screen renders 1`] = `
+<div>
+  <div
+    class=""
+    placement="top-start"
+  >
+    <v-popover-stub
+      autohide="true"
+      class="user-teaser"
+      container="body"
+      delay="0"
+      handleresize="true"
+      offset="16"
+      openclass="open"
+      opengroup="0"
+      placement="bottom-end"
+      popoverarrowclass="tooltip-arrow popover-arrow"
+      popoverbaseclass="tooltip popover"
+      popoverclass="vue-popover-theme"
+      popoverinnerclass="tooltip-inner popover-inner"
+      popoverwrapperclass="wrapper"
+      popperoptions="[object Object]"
+      trigger="manual"
+    >
+      <a>
+        <div
+          class="profile-avatar --small --no-image"
+        >
+          <span
+            class="initials"
+          >
+            TS
+          </span>
+           
+          <!---->
+           
+          <!---->
+        </div>
+      </a>
+       
+      <div
+        class="info flex-direction-column"
+      >
+        <div
+          class="flex-direction-column"
+        >
+          <a>
+            <span
+              class="text"
+            >
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
+               
+              <span
+                class="name"
+              >
+                Tilda Swinton
+              </span>
+            </span>
+          </a>
+           
+          <!---->
+           
+          <!---->
+        </div>
+         
+        <!---->
+      </div>
+       
+      <div />
+    </v-popover-stub>
+  </div>
+</div>
+`;
+
+exports[`UserTeaser given an user with linkToProfile, on touch screen when clicking the user name renders the popover 1`] = `
+<div>
+  <div
+    class=""
+    placement="top-start"
+  >
+    <v-popover-stub
+      autohide="true"
+      class="user-teaser"
+      container="body"
+      delay="0"
+      handleresize="true"
+      offset="16"
+      openclass="open"
+      opengroup="0"
+      placement="bottom-end"
+      popoverarrowclass="tooltip-arrow popover-arrow"
+      popoverbaseclass="tooltip popover"
+      popoverclass="vue-popover-theme"
+      popoverinnerclass="tooltip-inner popover-inner"
+      popoverwrapperclass="wrapper"
+      popperoptions="[object Object]"
+      trigger="manual"
+    >
+      <a>
+        <div
+          class="profile-avatar --small --no-image"
+        >
+          <span
+            class="initials"
+          >
+            TS
+          </span>
+           
+          <!---->
+           
+          <!---->
+        </div>
+      </a>
+       
+      <div
+        class="info flex-direction-column"
+      >
+        <div
+          class="flex-direction-column"
+        >
+          <a>
+            <span
+              class="text"
+            >
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
+               
+              <span
+                class="name"
+              >
+                Tilda Swinton
+              </span>
+            </span>
+          </a>
+           
+          <!---->
+           
+          <!---->
+        </div>
+         
+        <!---->
+      </div>
+       
+      <div />
+    </v-popover-stub>
+  </div>
+</div>
+`;
+
+exports[`UserTeaser given an user without linkToProfile, on desktop renders 1`] = `
+<div>
+  <div
+    class=""
+    placement="top-start"
+  >
+    <v-popover-stub
+      autohide="true"
+      class="user-teaser"
+      container="body"
+      delay="0"
+      handleresize="true"
+      offset="16"
+      openclass="open"
+      opengroup="0"
+      placement="bottom-end"
+      popoverarrowclass="tooltip-arrow popover-arrow"
+      popoverbaseclass="tooltip popover"
+      popoverclass="vue-popover-theme"
+      popoverinnerclass="tooltip-inner popover-inner"
+      popoverwrapperclass="wrapper"
+      popperoptions="[object Object]"
+      trigger="manual"
+    >
+      <span>
+        <div
+          class="profile-avatar --small --no-image"
+        >
+          <span
+            class="initials"
+          >
+            TS
+          </span>
+           
+          <!---->
+           
+          <!---->
+        </div>
+      </span>
+       
+      <div
+        class="info flex-direction-column"
+      >
+        <div
+          class="flex-direction-column"
+        >
+          <span>
+            <span
+              class="text"
+            >
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
+               
+              <span
+                class="name"
+              >
+                Tilda Swinton
+              </span>
+            </span>
+          </span>
+           
+          <!---->
+           
+          <!---->
+        </div>
+         
+        <!---->
+      </div>
+       
+      <div />
+    </v-popover-stub>
+  </div>
+</div>
+`;
+
+exports[`UserTeaser given an user without linkToProfile, on desktop when hovering the user name renders the popover 1`] = `
+<div>
+  <div
+    class=""
+    placement="top-start"
+  >
+    <v-popover-stub
+      autohide="true"
+      class="user-teaser"
+      container="body"
+      delay="0"
+      handleresize="true"
+      offset="16"
+      open="true"
+      openclass="open"
+      opengroup="0"
+      placement="bottom-end"
+      popoverarrowclass="tooltip-arrow popover-arrow"
+      popoverbaseclass="tooltip popover"
+      popoverclass="vue-popover-theme"
+      popoverinnerclass="tooltip-inner popover-inner"
+      popoverwrapperclass="wrapper"
+      popperoptions="[object Object]"
+      trigger="manual"
+    >
+      <span>
+        <div
+          class="profile-avatar --small --no-image"
+        >
+          <span
+            class="initials"
+          >
+            TS
+          </span>
+           
+          <!---->
+           
+          <!---->
+        </div>
+      </span>
+       
+      <div
+        class="info flex-direction-column"
+      >
+        <div
+          class="flex-direction-column"
+        >
+          <span>
+            <span
+              class="text"
+            >
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
+               
+              <span
+                class="name"
+              >
+                Tilda Swinton
+              </span>
+            </span>
+          </span>
+           
+          <!---->
+           
+          <!---->
+        </div>
+         
+        <!---->
+      </div>
+       
+      <div>
+        <user-teaser-popover-stub
+          user="[object Object]"
+          userlink="[object Object]"
+        />
+      </div>
+    </v-popover-stub>
+  </div>
+</div>
+`;
+
+exports[`UserTeaser given an user without linkToProfile, on touch screen renders 1`] = `
+<div>
+  <div
+    class=""
+    placement="top-start"
+  >
+    <v-popover-stub
+      autohide="true"
+      class="user-teaser"
+      container="body"
+      delay="0"
+      handleresize="true"
+      offset="16"
+      openclass="open"
+      opengroup="0"
+      placement="bottom-end"
+      popoverarrowclass="tooltip-arrow popover-arrow"
+      popoverbaseclass="tooltip popover"
+      popoverclass="vue-popover-theme"
+      popoverinnerclass="tooltip-inner popover-inner"
+      popoverwrapperclass="wrapper"
+      popperoptions="[object Object]"
+      trigger="manual"
+    >
+      <span>
+        <div
+          class="profile-avatar --small --no-image"
+        >
+          <span
+            class="initials"
+          >
+            TS
+          </span>
+           
+          <!---->
+           
+          <!---->
+        </div>
+      </span>
+       
+      <div
+        class="info flex-direction-column"
+      >
+        <div
+          class="flex-direction-column"
+        >
+          <span>
+            <span
+              class="text"
+            >
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
+               
+              <span
+                class="name"
+              >
+                Tilda Swinton
+              </span>
+            </span>
+          </span>
+           
+          <!---->
+           
+          <!---->
+        </div>
+         
+        <!---->
+      </div>
+       
+      <div />
+    </v-popover-stub>
+  </div>
+</div>
+`;
+
+exports[`UserTeaser given an user without linkToProfile, on touch screen when clicking the user name renders the popover 1`] = `
+<div>
+  <div
+    class=""
+    placement="top-start"
+  >
+    <v-popover-stub
+      autohide="true"
+      class="user-teaser"
+      container="body"
+      delay="0"
+      handleresize="true"
+      offset="16"
+      openclass="open"
+      opengroup="0"
+      placement="bottom-end"
+      popoverarrowclass="tooltip-arrow popover-arrow"
+      popoverbaseclass="tooltip popover"
+      popoverclass="vue-popover-theme"
+      popoverinnerclass="tooltip-inner popover-inner"
+      popoverwrapperclass="wrapper"
+      popperoptions="[object Object]"
+      trigger="manual"
+    >
+      <span>
+        <div
+          class="profile-avatar --small --no-image"
+        >
+          <span
+            class="initials"
+          >
+            TS
+          </span>
+           
+          <!---->
+           
+          <!---->
+        </div>
+      </span>
+       
+      <div
+        class="info flex-direction-column"
+      >
+        <div
+          class="flex-direction-column"
+        >
+          <span>
+            <span
+              class="text"
+            >
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
+               
+              <span
+                class="name"
+              >
+                Tilda Swinton
+              </span>
+            </span>
+          </span>
+           
+          <!---->
+           
+          <!---->
+        </div>
+         
+        <!---->
+      </div>
+       
+      <div />
+    </v-popover-stub>
+  </div>
+</div>
+`;
+
+exports[`UserTeaser renders anonymous user 1`] = `
+<div>
+  <div
+    class="user-teaser"
+  >
+    <div
+      class="profile-avatar --small --no-image"
+    >
+      <span
+        class="initials"
+      >
+        
+      </span>
+       
+      <span
+        class="base-icon"
+      >
+        <!---->
+      </span>
+       
+      <!---->
+    </div>
+     
+    <span
+      class="info anonymous"
+    >
+      profile.userAnonym
+    </span>
+  </div>
+</div>
+`;
