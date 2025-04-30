@@ -4,22 +4,22 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { sendMail } from '@middleware/helpers/email/sendMail'
 import {
-  signupTemplate,
   resetPasswordTemplate,
   wrongAccountTemplate,
   emailVerificationTemplate,
 } from '@middleware/helpers/email/templateBuilder'
+import { sendRegistrationMail } from '@src/emails/sendEmail'
 
 const sendSignupMail = async (resolve, root, args, context, resolveInfo) => {
-  const { inviteCode } = args
+  const { inviteCode, locale } = args
   const response = await resolve(root, args, context, resolveInfo)
   const { email, nonce } = response
   if (nonce) {
     // emails that already exist do not have a nonce
     if (inviteCode) {
-      await sendMail(signupTemplate({ email, variables: { nonce, inviteCode } }))
+      await sendRegistrationMail({ email, nonce, locale, inviteCode })
     } else {
-      await sendMail(signupTemplate({ email, variables: { nonce } }))
+      await sendRegistrationMail({ email, nonce, locale })
     }
   }
   delete response.nonce
