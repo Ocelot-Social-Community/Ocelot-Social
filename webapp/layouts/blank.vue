@@ -17,11 +17,11 @@ export default {
 </script>
 
 <style lang="scss">
-.ds-container > div {
+.layout-blank > .ds-container > div {
   padding: 5rem 2rem;
 }
 @media only screen and (max-width: 500px) {
-  .ds-container > div {
+  .layout-blank > .ds-container > div {
     padding: 3rem 0;
   }
 }
