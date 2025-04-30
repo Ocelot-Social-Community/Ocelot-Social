@@ -12,7 +12,16 @@
     "userJoinedGroup": "User joined group",
     "userLeftGroup": "User left group"
   },
+  "registration": {
+    "introduction": "Thank you for joining our cause – it's awesome to have you on board. There's just one tiny step missing before we can start shaping the world together … Please confirm your e-mail address by clicking the button below:",
+    "codeHint": "If the above button doesn't work, you can also copy the following code into your browser window: ",
+    "codeHintException": "However, this only works if you have registered through our website.",
+    "notYouStart": "If you didn't sign up for ",
+    "notYouEnd": " we recommend you to check it out! It's a social network from people for people who want to connect and change the world together.",
+    "ps": "PS: If you ignore this e-mail we will not create an account for you. ;)"
+  },
   "buttons": {
+    "confirmEmail": "Confirm your e-mail address",
     "viewChat": "Show Chat",
     "viewComment": "View comment",
     "viewGroup": "View group",
@@ -23,7 +32,8 @@
     "seeYou": "See you soon on ",
     "yourTeam": "– The {team} Team",
     "settingsHint": "PS: If you don't want to receive e-mails anymore, change your ",
-    "settingsName": "notification settings"
+    "settingsName": "notification settings",
+    "welcome": "Welcome to"
   },
   "changedGroupMemberRole": "your role in the group “{groupName}” has been changed. Click on this button to view this group:",
   "chatMessageStart": "you have received a new chat message from ",

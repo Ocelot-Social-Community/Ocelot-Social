@@ -28,6 +28,7 @@ const defaultParams = {
   ORGANIZATION_URL: CONFIG.ORGANIZATION_URL,
   supportUrl: CONFIG.SUPPORT_URL,
   settingsUrl,
+  renderSettingsUrl: true,
 }
 
 export const transport = createTransport({
@@ -194,6 +195,48 @@ export const sendChatMessageMail = async (
         chattingUser: senderUser.name,
         chattingUserUrl: new URL(`/user/${senderUser.id}/${senderUser.slug}`, CONFIG.CLIENT_URI),
         chatUrl: new URL('/chat', CONFIG.CLIENT_URI),
+      },
+    })
+    return originalMessage as OriginalMessage
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+interface RegistrationMailInput {
+  email: string
+  nonce: string
+  locale: string
+  inviteCode?: string
+}
+
+export const sendRegistrationMail = async (
+  data: RegistrationMailInput,
+): Promise<OriginalMessage> => {
+  const { nonce, locale, inviteCode } = data
+  const to = data.email
+  const actionUrl = new URL('/registration', CONFIG.CLIENT_URI)
+  actionUrl.searchParams.set('email', to)
+  actionUrl.searchParams.set('nonce', nonce)
+  if (inviteCode) {
+    actionUrl.searchParams.set('inviteCode', inviteCode)
+    actionUrl.searchParams.set('method', 'invite-code')
+  } else {
+    actionUrl.searchParams.set('method', 'invite-mail')
+  }
+
+  try {
+    const { originalMessage } = await email.send({
+      template: path.join(__dirname, 'templates', 'registration'),
+      message: {
+        to,
+      },
+      locals: {
+        ...defaultParams,
+        locale,
+        actionUrl,
+        nonce,
+        renderSettingsUrl: false,
       },
     })
     return originalMessage as OriginalMessage

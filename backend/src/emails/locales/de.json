@@ -12,7 +12,16 @@
     "userJoinedGroup": "Nutzer tritt Gruppe bei",
     "userLeftGroup": "Nutzer verlässt Gruppe"
   },
+  "registration": {
+    "introduction": "Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können … Bitte bestätige Deine E-Mail Adresse:",
+    "codeHint": "Sollte der Button für Dich nicht funktionieren, kannst Du auch folgenden Code in Dein Browserfenster kopieren: ",
+    "codeHintException": "Das funktioniert allerdings nur, wenn du Dich über unsere Website registriert hast.",
+    "notYouStart": "Falls Du Dich nicht selbst bei ",
+    "notYouEnd": " angemeldet hast, schau doch mal vorbei! Wir sind ein gemeinnütziges Aktionsnetzwerk – von Menschen für Menschen.",
+    "ps": "PS: Wenn Du keinen Account bei uns möchtest, kannst Du diese E-Mail einfach ignorieren. ;)"
+  },
   "buttons": {
+    "confirmEmail": "Bestätige Deine E-Mail Adresse",
     "viewChat": "Chat anzeigen",
     "viewComment": "Kommentar ansehen",
     "viewGroup": "Gruppe ansehen",
@@ -23,7 +32,8 @@
     "seeYou": "Bis bald bei ",
     "yourTeam": "– Dein {team} Team",
     "settingsHint": "PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine ",
-    "settingsName": "Benachrichtigungseinstellungen"
+    "settingsName": "Benachrichtigungseinstellungen",
+    "welcome": "Willkommen bei"
   },
   "changedGroupMemberRole": "deine Rolle in der Gruppe  „{groupName}“ wurde geändert. Klicke auf diesen Knopf, um diese Gruppe zu sehen:",
   "chatMessageStart": "du hast eine neue Chat-Nachricht von ",
