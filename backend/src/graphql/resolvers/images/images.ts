@@ -20,7 +20,7 @@ import CONFIG from '@config/index'
 import { getDriver } from '@db/neo4j'
 
 // const widths = [34, 160, 320, 640, 1024]
-const { AWS_ENDPOINT: endpoint, AWS_REGION: region, AWS_BUCKET: Bucket, S3_CONFIGURED } = CONFIG
+const { AWS_BUCKET: Bucket, S3_CONFIGURED } = CONFIG
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function deleteImage(resource, relationshipType, opts: any = {}) {
