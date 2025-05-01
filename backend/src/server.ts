@@ -18,10 +18,10 @@ import Redis from 'ioredis'
 
 import CONFIG from './config'
 import { getNeode, getDriver } from './db/neo4j'
+import schema from './graphql/schema'
 import decode from './jwt/decode'
 // eslint-disable-next-line import/no-cycle
 import middleware from './middleware'
-import schema from './schema'
 
 export const NOTIFICATION_ADDED = 'NOTIFICATION_ADDED'
 export const CHAT_MESSAGE_ADDED = 'CHAT_MESSAGE_ADDED'
