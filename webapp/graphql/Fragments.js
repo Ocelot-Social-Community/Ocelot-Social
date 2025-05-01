@@ -51,6 +51,19 @@ export const userCountsFragment = gql`
   }
 `
 
+export const userTeaserFragment = (lang) => gql`
+  ${badgesFragment}
+  ${locationFragment(lang)}
+
+  fragment userTeaser on User {
+    followedByCount
+    contributionsCount
+    commentedCount
+    ...badges
+    ...location
+  }
+`
+
 export const postFragment = gql`
   fragment post on Post {
     id

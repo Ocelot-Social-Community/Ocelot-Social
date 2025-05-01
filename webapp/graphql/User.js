@@ -7,6 +7,7 @@ import {
   postFragment,
   commentFragment,
   groupFragment,
+  userTeaserFragment,
 } from './Fragments'
 
 export const profileUserQuery = (i18n) => {
@@ -125,12 +126,14 @@ export const mapUserQuery = (i18n) => {
   `
 }
 
-export const notificationQuery = (_i18n) => {
+export const notificationQuery = (i18n) => {
+  const lang = i18n.locale().toUpperCase()
   return gql`
     ${userFragment}
     ${commentFragment}
     ${postFragment}
     ${groupFragment}
+    ${userTeaserFragment(lang)}
 
     query ($read: Boolean, $orderBy: NotificationOrdering, $first: Int, $offset: Int) {
       notifications(read: $read, orderBy: $orderBy, first: $first, offset: $offset) {
@@ -141,6 +144,7 @@ export const notificationQuery = (_i18n) => {
         updatedAt
         to {
           ...user
+          ...userTeaser
         }
         from {
           __typename
@@ -148,17 +152,20 @@ export const notificationQuery = (_i18n) => {
             ...post
             author {
               ...user
+              ...userTeaser
             }
           }
           ... on Comment {
             ...comment
             author {
               ...user
+              ...userTeaser
             }
             post {
               ...post
               author {
                 ...user
+                ...userTeaser
               }
             }
           }
@@ -168,6 +175,7 @@ export const notificationQuery = (_i18n) => {
         }
         relatedUser {
           ...user
+          ...userTeaser
         }
       }
     }
