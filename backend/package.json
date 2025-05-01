@@ -27,16 +27,10 @@
     "prod:db:data:branding": "node build/src/db/data-branding.js"
   },
   "dependencies": {
-    "@babel/core": "^7.26.10",
-    "@babel/node": "~7.26.0",
-    "@babel/plugin-proposal-throw-expressions": "^7.25.9",
-    "@babel/preset-env": "~7.26.9",
     "@sentry/node": "^5.15.4",
-    "apollo-client": "~2.6.10",
     "apollo-server": "~2.14.2",
     "apollo-server-express": "^2.14.2",
     "aws-sdk": "^2.1692.0",
-    "babel-jest": "~29.7.0",
     "bcryptjs": "~3.0.2",
     "body-parser": "^1.20.3",
     "cheerio": "~1.0.0",
