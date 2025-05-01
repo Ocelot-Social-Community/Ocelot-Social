@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -9,6 +10,7 @@ import {
   ROOM_COUNT_UPDATED,
   CHAT_MESSAGE_ADDED,
 } from '@constants/subscriptions'
+import { getUnreadRoomsCount } from '@graphql/resolvers/rooms'
 import { sendMail } from '@middleware/helpers/email/sendMail'
 import {
   chatMessageTemplate,
@@ -16,7 +18,6 @@ import {
 } from '@middleware/helpers/email/templateBuilder'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
-import { getUnreadRoomsCount } from '@schema/resolvers/rooms'
 
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 

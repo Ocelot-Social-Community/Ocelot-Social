@@ -7,19 +7,18 @@
 /* eslint-disable import/no-named-as-default-member */
 import http from 'node:http'
 
+import databaseContext from '@context/database'
+import pubsubContext from '@context/pubsub'
 import { ApolloServer } from 'apollo-server-express'
 import bodyParser from 'body-parser'
 import express from 'express'
 import { graphqlUploadExpress } from 'graphql-upload'
 import helmet from 'helmet'
 
-import databaseContext from '@context/database'
-import pubsubContext from '@context/pubsub'
-
 import CONFIG from './config'
+import schema from './graphql/schema'
 import decode from './jwt/decode'
 import middleware from './middleware'
-import schema from './schema'
 
 const serverDatabase = databaseContext()
 const serverPubsub = pubsubContext()
