@@ -61,6 +61,13 @@ export default {
   min-width: 200px;
 }
 
+@media (max-height: 800px) {
+  .user-teaser-popover {
+    padding: 0;
+    gap: 0;
+  }
+}
+
 .location-info {
   margin-bottom: 12px;
 }
