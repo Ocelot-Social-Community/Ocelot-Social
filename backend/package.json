@@ -12,7 +12,7 @@
     "build": "tsc && tsc-alias && ./scripts/build.copy.files.sh",
     "dev": "nodemon --exec ts-node --require tsconfig-paths/register src/index.ts -e js,ts,gql",
     "dev:debug": "nodemon --exec babel-node --inspect=0.0.0.0:9229 build/src/index.js -e js,ts,gql",
-    "lint": "eslint --max-warnings=0 --report-unused-disable-directives --ext .js,.ts .",
+    "lint": "eslint --max-warnings=0 --report-unused-disable-directives --ext .js,.ts,.cjs .",
     "test": "cross-env NODE_ENV=test NODE_OPTIONS=--max-old-space-size=8192 jest --runInBand --coverage --forceExit --detectOpenHandles",
     "db:reset": "ts-node --require tsconfig-paths/register src/db/reset.ts",
     "db:reset:withmigrations": "ts-node --require tsconfig-paths/register src/db/reset-with-migrations.ts",
