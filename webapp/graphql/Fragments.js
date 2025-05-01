@@ -15,12 +15,12 @@ export const userFragment = gql`
 
 export const locationFragment = (lang) => gql`
   fragment location on User {
-    distanceToMe
     locationName
     location {
       name: name${lang}
       lng
       lat
+      distanceToMe
     }
   }
 `
