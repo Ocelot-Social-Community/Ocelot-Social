@@ -11,7 +11,7 @@
           size="small"
           @mouseover.native="() => showPopover && openMenu(true)"
           @mouseleave.native="closeMenu(true)"
-          @click.native="openMenuOnMobile(openMenu)"
+          @click.prevent="() => openMenuOnMobile(openMenu)"
         />
       </component>
       <div class="info flex-direction-column">
@@ -19,12 +19,13 @@
           <component
             :is="linkToProfile && !isTouchDevice ? 'nuxt-link' : 'span'"
             :to="linkToProfile && !isTouchDevice ? userLink : undefined"
+            ref="linkElement"
           >
             <span
               class="text"
               @mouseover="() => showPopover && openMenu(true)"
               @mouseleave="closeMenu(true)"
-              @click="openMenuOnMobile(openMenu)"
+              @click.prevent="() => openMenuOnMobile(openMenu)"
             >
               <span class="slug">{{ userSlug }}</span>
               <span class="name">{{ userName }}</span>
@@ -129,12 +130,12 @@ export default {
     },
   },
   methods: {
-    openMenuOnMobile: (openMenu) => (event) => {
-      if (!this.showPopover || !this.isTouchDevice) return
+    openMenuOnMobile(openMenu) {
+      if (!this.isTouchDevice || !this.showPopover) {
+        this.$refs.linkElement.$el.dispatchEvent(new Event('click', { bubbles: false }))
+        return
+      }
 
-      event.preventDefault()
-      event.stopPropagation()
-      event.stopImmediatePropagation()
       openMenu(true)
     },
     closeMenu() {
