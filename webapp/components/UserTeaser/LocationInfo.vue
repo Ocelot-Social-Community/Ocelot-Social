@@ -2,7 +2,7 @@
   <div class="location-info">
     <div class="location">
       <base-icon name="map-marker" />
-      {{ location.name }}
+      {{ locationData.name }}
     </div>
     <div v-if="distance" class="distance">{{ distance }}</div>
   </div>
@@ -12,13 +12,13 @@
 export default {
   name: 'LocationInfo',
   props: {
-    location: { type: Object, default: null },
+    locationData: { type: Object, default: null },
   },
   computed: {
     distance() {
-      return !this.location.distanceToMe
+      return !this.locationData.distanceToMe
         ? null
-        : this.$t('location.distance', { distance: this.location.distanceToMe })
+        : this.$t('location.distance', { distance: this.locationData.distanceToMe })
     },
   },
 }

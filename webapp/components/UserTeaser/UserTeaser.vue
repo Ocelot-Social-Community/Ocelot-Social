@@ -4,86 +4,33 @@
     <span class="info anonymous">{{ $t('profile.userAnonym') }}</span>
   </div>
   <div v-else :class="[{ 'disabled-content': user.disabled }]" placement="top-start">
-    <dropdown class="user-teaser">
-      <template #default="{ openMenu, closeMenu }">
-        <component
-          v-if="showAvatar"
-          :is="linkToProfile && !isTouchDevice ? 'nuxt-link' : 'span'"
-          :to="linkToProfile && !isTouchDevice ? userLink : undefined"
-        >
-          <profile-avatar
-            :profile="user"
-            size="small"
-            @mouseover.native="() => showPopover && openMenu(true)"
-            @mouseleave.native="closeMenu(true)"
-            @click.native.prevent="() => showPopover && openMenu(true)"
-          />
-        </component>
-        <div class="info flex-direction-column">
-          <div :class="wide ? 'flex-direction-row' : 'flex-direction-column'">
-            <component
-              :is="linkToProfile && !isTouchDevice ? 'nuxt-link' : 'span'"
-              :to="linkToProfile && !isTouchDevice ? userLink : undefined"
-            >
-              <span
-                class="text"
-                @mouseover="() => showPopover && openMenu(true)"
-                @mouseleave="closeMenu(true)"
-                @click.prevent="() => showPopover && openMenu(true)"
-              >
-                <span class="slug">{{ userSlug }}</span>
-                <span class="name">{{ userName }}</span>
-              </span>
-            </component>
-            <span v-if="wide">&nbsp;</span>
-            <span v-if="group">
-              <span class="text">
-                {{ $t('group.in') }}
-              </span>
-              <nuxt-link :to="groupLink">
-                <span class="text">
-                  <span class="slug">{{ groupSlug }}</span>
-                  <span v-if="!userOnly" class="name">{{ groupName }}</span>
-                </span>
-              </nuxt-link>
-            </span>
-          </div>
-          <span v-if="!userOnly && dateTime" class="text">
-            <base-icon name="clock" />
-            <date-time :date-time="dateTime" />
-            <slot name="dateTime"></slot>
-          </span>
-        </div>
-      </template>
-      <template #popover="{ isOpen }" v-if="showPopover">
-        <user-teaser-popover
-          v-if="isOpen"
-          :user="user"
-          :link-to-profile="linkToProfile"
-          :user-link="userLink"
-          @close="closeMenu(true)"
-        />
-      </template>
-    </dropdown>
+    <!-- isTouchDevice only supported on client-->
+    <client-only>
+      <user-teaser-non-anonymous
+        v-if="user"
+        :link-to-profile="linkToProfile"
+        :user="user"
+        :group="group"
+        :wide="wide"
+        :show-avatar="showAvatar"
+        :date-time="dateTime"
+        @close="closeMenu"
+      />
+    </client-only>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 
-import DateTime from '~/components/DateTime'
-import Dropdown from '~/components/Dropdown'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
-import UserTeaserPopover from './UserTeaserPopover'
-import { isTouchDevice } from '../utils/isTouchDevice'
+import UserTeaserNonAnonymous from './UserTeaserNonAnonymous'
 
 export default {
   name: 'UserTeaser',
   components: {
-    Dropdown,
-    DateTime,
     ProfileAvatar,
-    UserTeaserPopover,
+    UserTeaserNonAnonymous,
   },
   props: {
     linkToProfile: { type: Boolean, default: true },
@@ -98,44 +45,14 @@ export default {
     ...mapGetters({
       isModerator: 'auth/isModerator',
     }),
-    isTouchDevice() {
-      return isTouchDevice()
-    },
-    itsMe() {
-      return this.user.slug === this.$store.getters['auth/user'].slug
-    },
     displayAnonymous() {
       const { user, isModerator } = this
       return !user || user.deleted || (user.disabled && !isModerator)
     },
-    userLink() {
-      const { id, slug } = this.user
-      if (!(id && slug)) return ''
-      return { name: 'profile-id-slug', params: { slug, id } }
-    },
-    userSlug() {
-      const { slug } = this.user || {}
-      return slug && `@${slug}`
-    },
-    userName() {
-      const { name } = this.user || {}
-      return name || this.$t('profile.userAnonym')
-    },
-    userOnly() {
-      return !this.dateTime && !this.group
-    },
-    groupLink() {
-      const { id, slug } = this.group
-      if (!(id && slug)) return ''
-      return { name: 'groups-id-slug', params: { slug, id } }
-    },
-    groupSlug() {
-      const { slug } = this.group || {}
-      return slug && `&${slug}`
-    },
-    groupName() {
-      const { name } = this.group || {}
-      return name || this.$t('profile.userAnonym')
+  },
+  methods: {
+    closeMenu() {
+      this.$emit('close')
     },
   },
 }
