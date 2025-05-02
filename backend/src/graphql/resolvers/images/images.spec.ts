@@ -13,6 +13,9 @@ import { getNeode, getDriver } from '@db/neo4j'
 
 import { deleteImage, mergeImage } from './images'
 
+import type { ImageInput } from './images'
+import type { FileUpload } from 'graphql-upload'
+
 const driver = getDriver()
 const neode = getNeode()
 const uuid = '[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}'
@@ -114,7 +117,7 @@ describe('deleteImage', () => {
 })
 
 describe('mergeImage', () => {
-  let imageInput
+  let imageInput: ImageInput
   let post
   beforeEach(() => {
     imageInput = {
@@ -124,18 +127,19 @@ describe('mergeImage', () => {
 
   describe('given image.upload', () => {
     beforeEach(() => {
+      const createReadStream: FileUpload['createReadStream'] = (() => ({
+        pipe: () => ({
+          on: (_, callback) => callback(),
+        }),
+      })) as unknown as FileUpload['createReadStream']
       imageInput = {
         ...imageInput,
-        upload: {
+        upload: Promise.resolve({
           filename: 'image.jpg',
           mimetype: 'image/jpeg',
           encoding: '7bit',
-          createReadStream: () => ({
-            pipe: () => ({
-              on: (_, callback) => callback(),
-            }),
-          }),
-        },
+          createReadStream,
+        }),
       }
     })
 
@@ -178,21 +182,6 @@ describe('mergeImage', () => {
           mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback }),
         ).resolves.toMatchObject({
           url: expect.stringMatching(new RegExp(`^/uploads/${uuid}-foo-bar-avatar.jpg`)),
-        })
-      })
-
-      // eslint-disable-next-line jest/no-disabled-tests
-      it.skip('automatically creates different image sizes', async () => {
-        await expect(
-          mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback }),
-        ).resolves.toEqual({
-          url: expect.any(String),
-          alt: expect.any(String),
-          urlW34: expect.stringMatching(new RegExp(`^/uploads/W34/${uuid}-image.jpg`)),
-          urlW160: expect.stringMatching(new RegExp(`^/uploads/W160/${uuid}-image.jpg`)),
-          urlW320: expect.stringMatching(new RegExp(`^/uploads/W320/${uuid}-image.jpg`)),
-          urlW640: expect.stringMatching(new RegExp(`^/uploads/W640/${uuid}-image.jpg`)),
-          urlW1024: expect.stringMatching(new RegExp(`^/uploads/W1024/${uuid}-image.jpg`)),
         })
       })
 

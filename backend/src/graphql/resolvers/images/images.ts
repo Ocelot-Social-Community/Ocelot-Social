@@ -27,7 +27,7 @@ type FileDeleteCallback = (url: string) => Promise<void>
 type FileUploadCallback = (
   upload: Pick<FileUpload, 'createReadStream' | 'mimetype'> & { uniqueFilename: string },
 ) => Promise<string>
-interface ImageInput {
+export interface ImageInput {
   upload?: Promise<FileUpload>
   alt?: string
   sensitive?: boolean
@@ -141,6 +141,7 @@ const deleteImageFile = (image, deleteCallback: FileDeleteCallback | undefined) 
     deleteCallback = S3_CONFIGURED ? s3Delete : localFileDelete
   }
   const { url } = image
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   deleteCallback(url)
   return url
 }
@@ -153,6 +154,7 @@ const uploadImageFile = async (
   if (!uploadCallback) {
     uploadCallback = S3_CONFIGURED ? s3Upload : localFileUpload
   }
+  // eslint-disable-next-line @typescript-eslint/unbound-method
   const { createReadStream, filename, mimetype } = await upload
   const { name, ext } = path.parse(filename)
   const uniqueFilename = `${uuid()}-${slug(name)}${ext}`
