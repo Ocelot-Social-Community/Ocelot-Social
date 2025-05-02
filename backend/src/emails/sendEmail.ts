@@ -66,7 +66,7 @@ const email = new Email({
       disable: false,
     },
   },
-  send: true,
+  send: CONFIG.SEND_MAIL,
   preview: false,
   // This is very useful to see the emails sent by the unit tests
   /*
