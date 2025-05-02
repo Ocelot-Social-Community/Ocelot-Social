@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { mergeWith, isArray } from 'lodash'
 
-import { getMutedUsers } from '@schema/resolvers/users'
+import { getMutedUsers } from '@graphql/resolvers/users'
 
 export const filterForMutedUsers = async (params, context) => {
   if (!context.user) return params
