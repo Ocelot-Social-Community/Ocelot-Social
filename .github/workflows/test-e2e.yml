@@ -3,8 +3,49 @@ name: ocelot.social end-to-end test CI
 on: push
 
 jobs:
-  docker_preparation:
-    name: Fullstack test preparation
+  prepare_neo4j_image:
+    name: Fullstack: prepare neo4j
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
+
+      - name: Build docker image
+        run: |
+          docker build --target community -t "ocelotsocialnetwork/neo4j-community:test" neo4j/
+          docker save "ocelotsocialnetwork/neo4j-community:test" > /tmp/neo4j.tar
+      
+      - name: Cache docker image
+        id: cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
+        with:
+          path: /tmp/neo4j.tar
+          key: ${{ github.run_id }}-e2e-neo4j-cache
+
+  prepare_backend_image:
+    name: Fullstack: prepare backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
+
+      - name: Copy env files
+        run: cp backend/.env.template backend/.env
+
+      - name: Build docker image
+        run: |
+          docker build --target test -t "ocelotsocialnetwork/backend:test" backend/
+          docker save "ocelotsocialnetwork/backend:test" > /tmp/backend.tar
+      
+      - name: Cache docker image
+        id: cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
+        with:
+          path: /tmp/backend.tar
+          key: ${{ github.run_id }}-e2e-backend-cache
+
+  prepare_webapp_image:
+    name: Fullstack: prepare webapp
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -13,18 +54,31 @@ jobs:
       - name: Copy env files
         run: |
           cp webapp/.env.template webapp/.env
-          cp frontend/.env.dist frontend/.env
-          cp backend/.env.template backend/.env
 
-      - name: Build docker images
+      - name: Build docker image
         run: |
-          mkdir /tmp/images
-          docker build --target community -t "ocelotsocialnetwork/neo4j-community:test" neo4j/
-          docker save "ocelotsocialnetwork/neo4j-community:test" > /tmp/images/neo4j.tar
-          docker build --target test -t "ocelotsocialnetwork/backend:test" backend/
-          docker save "ocelotsocialnetwork/backend:test" > /tmp/images/backend.tar
           docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
-          docker save "ocelotsocialnetwork/webapp:test" > /tmp/images/webapp.tar
+          docker save "ocelotsocialnetwork/webapp:test" > /tmp/webapp.tar
+      
+      - name: Cache docker image
+        id: cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
+        with:
+          path: /tmp/webapp.tar
+          key: ${{ github.run_id }}-e2e-webapp-cache
+
+  prepare_cypress:
+    name: Fullstack: prepare cypress
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
+
+      # - name: Copy env files
+      #   run: |
+      #     cp webapp/.env.template webapp/.env
+      #     cp frontend/.env.dist frontend/.env
+      #     cp backend/.env.template backend/.env
 
       - name: Install cypress requirements
         run: |
@@ -35,7 +89,7 @@ jobs:
           cd ..
           yarn install
       
-      - name: Cache docker images
+      - name: Cache docker image
         id: cache
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
@@ -43,13 +97,12 @@ jobs:
             /opt/cucumber-json-formatter
             /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
-            /tmp/images/
-          key: ${{ github.run_id }}-e2e-preparation-cache
+          key: ${{ github.run_id }}-e2e-cypress
 
   fullstack_tests:
     name: Fullstack tests
     if: success()
-    needs: docker_preparation
+    needs: [prepare_neo4j_image, prepare_backend_image, prepare_webapp_image, prepare_cypress]
     runs-on: ubuntu-latest
     env:
       jobs: 8
@@ -66,17 +119,17 @@ jobs:
             /opt/cucumber-json-formatter
             /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
-            /tmp/images/
-          key: ${{ github.run_id }}-e2e-preparation-cache
+            /tmp/
+          key: ${{ github.run_id }}-e2e-*
           fail-on-cache-miss: true
 
       - name: Boot up test system | docker compose
         run: |
           chmod +x /opt/cucumber-json-formatter
           sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
-          docker load < /tmp/images/neo4j.tar
-          docker load < /tmp/images/backend.tar
-          docker load < /tmp/images/webapp.tar
+          docker load < /tmp/neo4j.tar
+          docker load < /tmp/backend.tar
+          docker load < /tmp/webapp.tar
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp neo4j backend --build
           sleep 90s
 
