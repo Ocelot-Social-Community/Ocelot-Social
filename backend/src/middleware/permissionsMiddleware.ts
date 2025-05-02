@@ -8,8 +8,8 @@ import { rule, shield, deny, allow, or, and } from 'graphql-shield'
 
 import CONFIG from '@config/index'
 import { getNeode } from '@db/neo4j'
+import { validateInviteCode } from '@graphql/resolvers/transactions/inviteCodes'
 import SocialMedia from '@models/SocialMedia'
-import { validateInviteCode } from '@schema/resolvers/transactions/inviteCodes'
 
 const debug = !!CONFIG.DEBUG
 const allowExternalErrors = true

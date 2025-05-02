@@ -1,14 +1,14 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable security/detect-object-injection */
+import { sendNotificationMail, sendChatMessageMail } from '@src/emails/sendEmail'
+import { getUnreadRoomsCount } from '@graphql/resolvers/rooms'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
-// eslint-disable-next-line import/no-cycle
-import { getUnreadRoomsCount } from '@schema/resolvers/rooms'
-import { sendNotificationMail, sendChatMessageMail } from '@src/emails/sendEmail'
 import { pubsub, NOTIFICATION_ADDED, ROOM_COUNT_UPDATED, CHAT_MESSAGE_ADDED } from '@src/server'
 
 import extractMentionedUsers from './mentions/extractMentionedUsers'
