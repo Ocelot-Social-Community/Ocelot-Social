@@ -17,7 +17,13 @@ enum ReportRule {
 }
 
 type Query {
-  reports(orderBy: ReportOrdering, first: Int, offset: Int, reviewed: Boolean, closed: Boolean): [Report]
+  reports(
+    orderBy: ReportOrdering
+    first: Int
+    offset: Int
+    reviewed: Boolean
+    closed: Boolean
+  ): [Report]
 }
 
 enum ReportOrdering {

@@ -50,9 +50,11 @@ type Comment {
   isPostObservedByMe: Boolean!
     @cypher(
       statement: "MATCH (this)-[:COMMENTS]->(:Post)<-[obs:OBSERVES]-(u:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(u) >= 1"
-  )
-  postObservingUsersCount: Int! 
-    @cypher(statement: "MATCH (this)-[:COMMENTS]->(:Post)<-[obs:OBSERVES]-(u:User) WHERE obs.active = true AND NOT u.disabled = true AND NOT u.deleted = true RETURN COUNT(DISTINCT u)")
+    )
+  postObservingUsersCount: Int!
+    @cypher(
+      statement: "MATCH (this)-[:COMMENTS]->(:Post)<-[obs:OBSERVES]-(u:User) WHERE obs.active = true AND NOT u.disabled = true AND NOT u.deleted = true RETURN COUNT(DISTINCT u)"
+    )
 }
 
 type Query {
@@ -69,16 +71,7 @@ type Query {
 }
 
 type Mutation {
-  CreateComment(
-    id: ID
-    postId: ID!
-    content: String!
-    contentExcerpt: String
-  ): Comment
-  UpdateComment(
-    id: ID!
-    content: String!
-    contentExcerpt: String
-  ): Comment
+  CreateComment(id: ID, postId: ID!, content: String!, contentExcerpt: String): Comment
+  UpdateComment(id: ID!, content: String!, contentExcerpt: String): Comment
   DeleteComment(id: ID!): Comment
 }

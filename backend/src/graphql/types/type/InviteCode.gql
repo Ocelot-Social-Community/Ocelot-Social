@@ -6,7 +6,6 @@ type InviteCode {
   expiresAt: String
 }
 
-
 type Mutation {
   GenerateInviteCode(expiresAt: String = null): InviteCode
 }
