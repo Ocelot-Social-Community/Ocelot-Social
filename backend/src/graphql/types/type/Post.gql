@@ -1,3 +1,7 @@
+input _CategoryFilter {
+  AND: [_CategoryFilter!]
+  OR: [_CategoryFilter!]
+}
 input _PostFilter {
   AND: [_PostFilter!]
   OR: [_PostFilter!]
