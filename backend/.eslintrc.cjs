@@ -14,7 +14,6 @@ module.exports = {
     'plugin:import/recommended',
     'plugin:import/typescript',
     'plugin:promise/recommended',
-    'plugin:security/recommended-legacy',
     'plugin:@eslint-community/eslint-comments/recommended',
     'prettier',
   ],
@@ -175,6 +174,10 @@ module.exports = {
     '@eslint-community/eslint-comments/require-description': 'off',
   },
   overrides: [
+    {
+      files: ['*.js', '+.cjs', '*.ts', '*.tsx'],
+      extends: ['plugin:security/recommended-legacy']
+    },
     // only for ts files
     {
       files: ['*.ts', '*.tsx'],
@@ -221,6 +224,17 @@ module.exports = {
         'jest/valid-expect': 'error',
         '@typescript-eslint/unbound-method': 'off',
         'jest/unbound-method': 'error',
+      },
+    },
+    {
+      files: ['*.graphql', '*.gql'],
+      parser: '@graphql-eslint/eslint-plugin',
+      plugins: ['@graphql-eslint'],
+      extends: ['plugin:@graphql-eslint/schema-recommended'],
+      rules: {},
+      parserOptions: {
+        schema: './src/graphql/types/**/*.gql',
+        assumeValid: true,
       },
     },
   ],
