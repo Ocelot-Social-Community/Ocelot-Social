@@ -133,7 +133,7 @@ module.exports = {
       'error',
       { allowModules: ['apollo-server-testing', 'rosie', '@faker-js/faker', 'ts-jest'] },
     ], // part of n/recommended
-    // 'n/no-unpublished-require': 'error', // part of n/recommended
+    'n/no-unpublished-require': ['error', { allowModules: ['ts-jest', 'require-json5'] }], // part of n/recommended
     // 'n/no-unsupported-features/es-builtins': 'error', // part of n/recommended
     // 'n/no-unsupported-features/es-syntax': 'error', // part of n/recommended
     // 'n/no-unsupported-features/node-builtins': 'error', // part of n/recommended
@@ -204,7 +204,6 @@ module.exports = {
         tsconfigRootDir: __dirname,
         project: ['./tsconfig.json'],
         // this is to properly reference the referenced project database without requirement of compiling it
-        // eslint-disable-next-line camelcase
         EXPERIMENTAL_useSourceOfProjectReferenceRedirect: true,
       },
     },
