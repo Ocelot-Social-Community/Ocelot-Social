@@ -10,7 +10,7 @@ import { Factory } from 'rosie'
 import slugify from 'slug'
 import { v4 as uuid } from 'uuid'
 
-import generateInviteCode from '@schema/resolvers/helpers/generateInviteCode'
+import generateInviteCode from '@graphql/resolvers/helpers/generateInviteCode'
 
 import { getDriver, getNeode } from './neo4j'
 
