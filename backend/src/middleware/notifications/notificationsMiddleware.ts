@@ -5,10 +5,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable security/detect-object-injection */
-import { sendNotificationMail, sendChatMessageMail } from '@src/emails/sendEmail'
 import { getUnreadRoomsCount } from '@graphql/resolvers/rooms'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
+import { sendNotificationMail, sendChatMessageMail } from '@src/emails/sendEmail'
 import { pubsub, NOTIFICATION_ADDED, ROOM_COUNT_UPDATED, CHAT_MESSAGE_ADDED } from '@src/server'
 
 import extractMentionedUsers from './mentions/extractMentionedUsers'
