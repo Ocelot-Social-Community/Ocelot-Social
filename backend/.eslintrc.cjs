@@ -176,7 +176,7 @@ module.exports = {
   overrides: [
     {
       files: ['*.js', '+.cjs', '*.ts', '*.tsx'],
-      extends: ['plugin:security/recommended-legacy']
+      extends: ['plugin:security/recommended-legacy'],
     },
     // only for ts files
     {
@@ -236,7 +236,24 @@ module.exports = {
       parser: '@graphql-eslint/eslint-plugin',
       plugins: ['@graphql-eslint'],
       extends: ['plugin:@graphql-eslint/schema-recommended'],
-      rules: {},
+      rules: {
+        '@graphql-eslint/description-style': ['error', { style: 'inline' }],
+        '@graphql-eslint/require-description': 'off',
+        '@graphql-eslint/naming-convention': 'off',
+        '@graphql-eslint/strict-id-in-types': 'off',
+        '@graphql-eslint/no-typename-prefix': 'off',
+        // incompatible: `depends on a GraphQL validation rule "XXX" but it's not available in the "graphql" version you are using. Skipping…`
+        '@graphql-eslint/known-directives': 'off',
+        '@graphql-eslint/known-argument-names': 'off',
+        '@graphql-eslint/known-type-names': 'off',
+        '@graphql-eslint/lone-schema-definition': 'off',
+        '@graphql-eslint/provided-required-arguments': 'off',
+        '@graphql-eslint/unique-directive-names': 'off',
+        '@graphql-eslint/unique-directive-names-per-location': 'off',
+        '@graphql-eslint/unique-field-definition-names': 'off',
+        '@graphql-eslint/unique-operation-types': 'off',
+        '@graphql-eslint/unique-type-names': 'off',
+      },
       parserOptions: {
         schema: './src/graphql/types/**/*.gql',
         assumeValid: true,

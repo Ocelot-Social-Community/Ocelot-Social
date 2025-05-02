@@ -1,11 +1,14 @@
+# directive @MutationMeta on FIELD_DEFINITION
+# directive @isAuthenticated on FIELD_DEFINITION
+# directive @hasRole on FIELD_DEFINITION
+# directive @hasScope on FIELD_DEFINITION
+# directive @additionalLabels on FIELD_DEFINITION
+
 directive @cypher(statement: String) on FIELD_DEFINITION
 directive @relation(
-    name: String
-    direction: String
+  name: String
+  from: String
+  to: String
+  direction: String
 ) on FIELD_DEFINITION | OBJECT
-directive @MutationMeta on FIELD_DEFINITION
 directive @neo4j_ignore on FIELD_DEFINITION
-directive @isAuthenticated on FIELD_DEFINITION
-directive @hasRole on FIELD_DEFINITION
-directive @hasScope on FIELD_DEFINITION
-directive @additionalLabels on FIELD_DEFINITION

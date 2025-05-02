@@ -1,19 +1,19 @@
-enum _GroupOrdering {
-  id_asc
-  id_desc
-  name_asc
-  name_desc
-  slug_asc
-  slug_desc
-  locationName_asc
-  locationName_desc
-  about_asc
-  about_desc
-  createdAt_asc
-  createdAt_desc
-  updatedAt_asc
-  updatedAt_desc
-}
+# enum _GroupOrdering {
+#   id_asc
+#   id_desc
+#   name_asc
+#   name_desc
+#   slug_asc
+#   slug_desc
+#   locationName_asc
+#   locationName_desc
+#   about_asc
+#   about_desc
+#   createdAt_asc
+#   createdAt_desc
+#   updatedAt_asc
+#   updatedAt_desc
+# }
 
 type Group {
   id: ID!
@@ -41,7 +41,6 @@ type Group {
   membersCount: Int! @cypher(statement: "MATCH (this)<-[:MEMBER_OF]-(r:User) RETURN COUNT(DISTINCT r)")
 
   myRole: GroupMemberRole # if 'null' then the current user is no member
-
   posts: [Post] @relation(name: "IN", direction: "IN")
 
   isMutedByMe: Boolean! @cypher(statement: "MATCH (this) RETURN EXISTS( (this)<-[:MUTED]-(:User {id: $cypherParams.currentUserId}) )")
@@ -49,7 +48,6 @@ type Group {
   "inviteCodes to this group the current user has generated"
   inviteCodes: [InviteCode]! @neo4j_ignore
 }
-
 
 input _GroupFilter {
   AND: [_GroupFilter!]
@@ -74,9 +72,9 @@ type Query {
     slug: String
     first: Int
     offset: Int
-    # orderBy: [_GroupOrdering] # not implemented yet
-    # filter: _GroupFilter # not implemented yet
   ): [Group]
+  # orderBy: [_GroupOrdering] # not implemented yet
+  # filter: _GroupFilter # not implemented yet
 
   GroupMembers(
     id: ID!
@@ -87,7 +85,7 @@ type Query {
   ): [User]
 
   GroupCount(isMember: Boolean): Int
-  
+
   # AvailableGroupTypes: [GroupType]!
 
   # AvailableGroupActionRadii: [GroupActionRadius]!
@@ -105,7 +103,9 @@ type Mutation {
     groupType: GroupType!
     actionRadius: GroupActionRadius!
     categoryIds: [ID]
+
     # avatar: ImageInput # a group can not be created with an avatar
+
     locationName: String # empty string '' sets it to null
   ): Group
 
@@ -115,7 +115,9 @@ type Mutation {
     slug: String
     about: String
     description: String
+
     # groupType: GroupType # is not possible at the moment and has to be discussed. may be in the stronger direction: public → closed → hidden
+
     actionRadius: GroupActionRadius
     categoryIds: [ID]
     avatar: ImageInput # test this as result
@@ -124,27 +126,14 @@ type Mutation {
 
   # DeleteGroup(id: ID!): Group
 
-  JoinGroup(
-    groupId: ID!
-    userId: ID!
-  ): User
+  JoinGroup(groupId: ID!, userId: ID!): User
 
-  LeaveGroup(
-    groupId: ID!
-    userId: ID!
-  ): User
+  LeaveGroup(groupId: ID!, userId: ID!): User
 
-  ChangeGroupMemberRole(
-    groupId: ID!
-    userId: ID!
-    roleInGroup: GroupMemberRole!
-  ): User
+  ChangeGroupMemberRole(groupId: ID!, userId: ID!, roleInGroup: GroupMemberRole!): User
 
-  RemoveUserFromGroup(
-    groupId: ID!
-    userId: ID!
-  ): User
+  RemoveUserFromGroup(groupId: ID!, userId: ID!): User
 
   muteGroup(groupId: ID!): Group
-  unmuteGroup(groupId: ID!): Group  
+  unmuteGroup(groupId: ID!): Group
 }

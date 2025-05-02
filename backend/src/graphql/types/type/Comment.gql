@@ -77,16 +77,7 @@ type Query {
 }
 
 type Mutation {
-  CreateComment(
-    id: ID
-    postId: ID!
-    content: String!
-    contentExcerpt: String
-  ): Comment
-  UpdateComment(
-    id: ID!
-    content: String!
-    contentExcerpt: String
-  ): Comment
+  CreateComment(id: ID, postId: ID!, content: String!, contentExcerpt: String): Comment
+  UpdateComment(id: ID!, content: String!, contentExcerpt: String): Comment
   DeleteComment(id: ID!): Comment
 }

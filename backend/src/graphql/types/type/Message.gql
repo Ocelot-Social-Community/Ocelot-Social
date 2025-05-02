@@ -19,8 +19,11 @@ type Message {
 
   senderId: String! @cypher(statement: "MATCH (this)<-[:CREATED]-(user:User) RETURN user.id")
   username: String! @cypher(statement: "MATCH (this)<-[:CREATED]-(user:User) RETURN user.name")
-  avatar: String @cypher(statement: "MATCH (this)<-[:CREATED]-(:User)-[:AVATAR_IMAGE]->(image:Image) RETURN image.url")
-  date: String!  @cypher(statement: "RETURN this.createdAt")
+  avatar: String
+    @cypher(
+      statement: "MATCH (this)<-[:CREATED]-(:User)-[:AVATAR_IMAGE]->(image:Image) RETURN image.url"
+    )
+  date: String! @cypher(statement: "RETURN this.createdAt")
 
   saved: Boolean
   distributed: Boolean
@@ -39,12 +42,7 @@ type Mutation {
 }
 
 type Query {
-  Message(
-    roomId: ID!,
-    first: Int
-    offset: Int
-    orderBy: [_MessageOrdering]
-  ): [Message]
+  Message(roomId: ID!, first: Int, offset: Int, orderBy: [_MessageOrdering]): [Message]
 }
 
 type Subscription {

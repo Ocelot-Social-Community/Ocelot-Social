@@ -1,21 +1,23 @@
 type Image {
   url: ID!,
   transform(width: Int, height: Int): String
+
   # urlW34: String,
   # urlW160: String,
   # urlW320: String,
   # urlW640: String,
   # urlW1024: String,
-  alt: String,
-  sensitive: Boolean,
-  aspectRatio: Float,
-  type: String,
+
+  alt: String
+  sensitive: Boolean
+  aspectRatio: Float
+  type: String
 }
 
 input ImageInput {
-  alt: String,
-  upload: Upload,
-  sensitive: Boolean,
-  aspectRatio: Float,
-  type: String,
+  alt: String
+  upload: Upload
+  sensitive: Boolean
+  aspectRatio: Float
+  type: String
 }
