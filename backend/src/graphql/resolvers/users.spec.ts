@@ -8,8 +8,8 @@ import gql from 'graphql-tag'
 
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
+import User from '@db/models/User'
 import { getNeode, getDriver } from '@db/neo4j'
-import User from '@models/User'
 import createServer from '@src/server'
 
 const categoryIds = ['cat9']
