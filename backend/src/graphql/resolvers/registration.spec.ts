@@ -7,9 +7,9 @@ import gql from 'graphql-tag'
 
 import CONFIG from '@config/index'
 import Factory, { cleanDatabase } from '@db/factories'
+import EmailAddress from '@db/models/EmailAddress'
+import User from '@db/models/User'
 import { getDriver, getNeode } from '@db/neo4j'
-import EmailAddress from '@models/EmailAddress'
-import User from '@models/User'
 import createServer from '@src/server'
 
 const neode = getNeode()

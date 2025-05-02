@@ -4,9 +4,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { UserInputError } from 'apollo-server'
+import { hash } from 'bcryptjs'
 
 import { getNeode } from '@db/neo4j'
-import encryptPassword from '@helpers/encryptPassword'
 
 import existingEmailAddress from './helpers/existingEmailAddress'
 import generateNonce from './helpers/generateNonce'
@@ -46,7 +46,8 @@ export default {
       delete args.nonce
       delete args.email
       delete args.inviteCode
-      args = encryptPassword(args)
+      args.encryptedPassword = await hash(args.password, 10)
+      delete args.password
 
       const { driver } = context
       const session = driver.session()

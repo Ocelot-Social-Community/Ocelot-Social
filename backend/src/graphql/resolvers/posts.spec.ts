@@ -8,9 +8,9 @@ import gql from 'graphql-tag'
 
 import CONFIG from '@config/index'
 import Factory, { cleanDatabase } from '@db/factories'
+import Image from '@db/models/Image'
 import { getNeode, getDriver } from '@db/neo4j'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
-import Image from '@models/Image'
 import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = true

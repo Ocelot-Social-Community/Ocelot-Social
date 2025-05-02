@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
+import User from '@db/models/User'
 import { getDriver, getNeode } from '@db/neo4j'
-import User from '@models/User'
 
 import decode from './decode'
 import encode from './encode'
