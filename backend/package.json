@@ -79,7 +79,7 @@
     "nodemailer-html-to-text": "^3.2.0",
     "request": "~2.88.2",
     "sanitize-html": "~2.16.0",
-    "slug": "~9.1.0",
+    "slug": "~10.0.0",
     "trunc-html": "~1.1.2",
     "uuid": "~9.0.1",
     "validator": "^13.15.0",
