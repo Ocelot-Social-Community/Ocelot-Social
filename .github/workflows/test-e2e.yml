@@ -125,19 +125,19 @@ jobs:
       - name: Restore neo4j cache
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
-          path: /tmp/
+          path: /tmp/neo4j.tar
           key: ${{ github.run_id }}-e2e-neo4j-cache
 
       - name: Restore backend cache
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
-          path: /tmp/
+          path: /tmp/backend.tar
           key: $${{ github.run_id }}-e2e-backend-cache
 
       - name: Restore webapp cache
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
-          path: /tmp/
+          path: /tmp/webapp.tar
           key: ${{ github.run_id }}-e2e-webapp-cache
           
       - name: Boot up test system | docker compose
