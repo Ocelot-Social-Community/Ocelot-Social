@@ -7,6 +7,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable promise/avoid-new */
 /* eslint-disable security/detect-non-literal-fs-filename */
+
 import { existsSync, unlinkSync, createWriteStream } from 'node:fs'
 import path from 'node:path'
 
@@ -19,11 +20,40 @@ import { v4 as uuid } from 'uuid'
 import CONFIG from '@config/index'
 import { getDriver } from '@db/neo4j'
 
+import type { FileUpload } from 'graphql-upload'
+import type { Transaction } from 'neo4j-driver'
+
+type FileDeleteCallback = (url: string) => Promise<void>
+type FileUploadCallback = (
+  upload: Pick<FileUpload, 'createReadStream' | 'mimetype'> & { uniqueFilename: string },
+) => Promise<string>
+interface ImageInput {
+  upload?: Promise<FileUpload>
+  alt?: string
+  sensitive?: boolean
+  aspectRatio?: number
+  type?: string
+}
+
 // const widths = [34, 160, 320, 640, 1024]
 const { AWS_BUCKET: Bucket, S3_CONFIGURED } = CONFIG
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function deleteImage(resource, relationshipType, opts: any = {}) {
+const createS3Client = () => {
+  return new S3Client({
+    credentials: {
+      accessKeyId: CONFIG.AWS_ACCESS_KEY_ID,
+      secretAccessKey: CONFIG.AWS_SECRET_ACCESS_KEY,
+    },
+    endpoint: CONFIG.AWS_ENDPOINT,
+    forcePathStyle: true,
+  })
+}
+
+interface DeleteImageOpts {
+  transaction?: Transaction
+  deleteCallback?: FileDeleteCallback
+}
+export async function deleteImage(resource, relationshipType, opts: DeleteImageOpts = {}) {
   sanitizeRelationshipType(relationshipType)
   const { transaction, deleteCallback } = opts
   if (!transaction) return wrapTransaction(deleteImage, [resource, relationshipType], opts)
@@ -45,8 +75,18 @@ export async function deleteImage(resource, relationshipType, opts: any = {}) {
   return image
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function mergeImage(resource, relationshipType, imageInput, opts: any = {}) {
+interface MergeImageOpts {
+  transaction?: Transaction
+  uploadCallback?: FileUploadCallback
+  deleteCallback?: FileDeleteCallback
+}
+
+export async function mergeImage(
+  resource,
+  relationshipType,
+  imageInput: ImageInput | null | undefined,
+  opts: MergeImageOpts = {},
+) {
   if (typeof imageInput === 'undefined') return
   if (imageInput === null) return deleteImage(resource, relationshipType, opts)
   sanitizeRelationshipType(relationshipType)
@@ -96,7 +136,7 @@ const wrapTransaction = async (wrappedCallback, args, opts) => {
   }
 }
 
-const deleteImageFile = (image, deleteCallback) => {
+const deleteImageFile = (image, deleteCallback: FileDeleteCallback | undefined) => {
   if (!deleteCallback) {
     deleteCallback = S3_CONFIGURED ? s3Delete : localFileDelete
   }
@@ -105,7 +145,10 @@ const deleteImageFile = (image, deleteCallback) => {
   return url
 }
 
-const uploadImageFile = async (upload, uploadCallback) => {
+const uploadImageFile = async (
+  upload: Promise<FileUpload> | undefined,
+  uploadCallback: FileUploadCallback | undefined,
+) => {
   if (!upload) return undefined
   if (!uploadCallback) {
     uploadCallback = S3_CONFIGURED ? s3Upload : localFileUpload
@@ -124,7 +167,7 @@ const sanitizeRelationshipType = (relationshipType) => {
   }
 }
 
-const localFileUpload = ({ createReadStream, uniqueFilename }) => {
+const localFileUpload: FileUploadCallback = ({ createReadStream, uniqueFilename }) => {
   const destination = `/uploads/${uniqueFilename}`
   return new Promise((resolve, reject) =>
     createReadStream().pipe(
@@ -135,7 +178,7 @@ const localFileUpload = ({ createReadStream, uniqueFilename }) => {
   )
 }
 
-const s3Upload = async ({ createReadStream, uniqueFilename, mimetype }) => {
+const s3Upload: FileUploadCallback = async ({ createReadStream, uniqueFilename, mimetype }) => {
   const s3Location = `original/${uniqueFilename}`
   const params = {
     Bucket,
@@ -144,27 +187,23 @@ const s3Upload = async ({ createReadStream, uniqueFilename, mimetype }) => {
     ContentType: mimetype,
     Body: createReadStream(),
   }
-  const s3 = new S3Client({
-    credentials: {
-      accessKeyId: CONFIG.AWS_ACCESS_KEY_ID,
-      secretAccessKey: CONFIG.AWS_SECRET_ACCESS_KEY,
-    },
-    endpoint: CONFIG.AWS_ENDPOINT,
-    forcePathStyle: true,
-  })
+  const s3 = createS3Client()
   const command = new Upload({ client: s3, params })
   const data = await command.done()
   const { Location } = data
+  if (!Location) {
+    throw new Error('File upload did not return `Location`')
+  }
   return Location
 }
 
-const localFileDelete = async (url) => {
+const localFileDelete: FileDeleteCallback = async (url) => {
   const location = `public${url}`
   // eslint-disable-next-line n/no-sync
   if (existsSync(location)) unlinkSync(location)
 }
 
-const s3Delete = async (url) => {
+const s3Delete: FileDeleteCallback = async (url) => {
   let { pathname } = new URL(url, 'http://example.org') // dummy domain to avoid invalid URL error
   pathname = pathname.substring(1) // remove first character '/'
   const prefix = `${Bucket}/`
@@ -175,13 +214,6 @@ const s3Delete = async (url) => {
     Bucket,
     Key: pathname,
   }
-  const s3 = new S3Client({
-    credentials: {
-      accessKeyId: CONFIG.AWS_ACCESS_KEY_ID,
-      secretAccessKey: CONFIG.AWS_SECRET_ACCESS_KEY,
-    },
-    endpoint: CONFIG.AWS_ENDPOINT,
-    forcePathStyle: true,
-  })
+  const s3 = createS3Client()
   await s3.send(new DeleteObjectCommand(params))
 }

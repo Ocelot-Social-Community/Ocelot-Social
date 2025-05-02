@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/await-thenable */
+
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -55,7 +55,7 @@ describe('deleteImage', () => {
       user = await user.toJson()
     })
 
-    it('soft deletes `Image` node', async () => {
+    it('deletes `Image` node', async () => {
       await expect(neode.all('Image')).resolves.toHaveLength(1)
       await deleteImage(user, 'AVATAR_IMAGE', { deleteCallback })
       await expect(neode.all('Image')).resolves.toHaveLength(0)
@@ -71,7 +71,7 @@ describe('deleteImage', () => {
     describe('given a transaction parameter', () => {
       it('executes cypher statements within the transaction', async () => {
         const session = driver.session()
-        let someString
+        let someString: string
         try {
           someString = await session.writeTransaction(async (transaction) => {
             await deleteImage(user, 'AVATAR_IMAGE', {
@@ -86,7 +86,7 @@ describe('deleteImage', () => {
           await session.close()
         }
         await expect(neode.all('Image')).resolves.toHaveLength(0)
-        await expect(someString).toEqual('Hello')
+        expect(someString).toEqual('Hello')
       })
 
       it('rolls back the transaction in case of errors', async () => {
