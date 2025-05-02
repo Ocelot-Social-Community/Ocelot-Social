@@ -25,15 +25,15 @@
     "settingsHint": "PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine ",
     "settingsName": "Benachrichtigungseinstellungen"
   },
-  "changedGroupMemberRole": "deine Rolle in der Gruppe  „{groupName}“ wurde geändert. Klicke auf diesen Knopf, um diese Gruppe zu sehen:",
+  "changedGroupMemberRole": "deine Rolle in der Gruppe „{groupName}“ wurde geändert. Klicke auf den Knopf, um diese Gruppe zu sehen:",
   "chatMessageStart": "du hast eine neue Chat-Nachricht von ",
   "chatMessageEnd": " erhalten.",
-  "commentedOnPost": " hat einen Beitrag den du beobachtest mit dem Titel „{postTitle}“ kommentiert. Klicke auf diesen Knopf, um diesen Kommentar zu sehen:",
-  "followedUserPosted": ", ein Nutzer dem du folgst, hat einen neuen Beitrag mit dem Titel „{postTitle}“ geschrieben. Klicke auf diesen Knopf, um diesen Beitrag zu sehen:",
-  "mentionedInComment": " hat dich in einem Kommentar zu dem Beitrag mit dem Titel „{postTitle}“ erwähnt. Klicke auf diesen Knopf, um diesen Kommentar zu sehen:",
-  "mentionedInPost": " hat Dich in einem Beitrag mit dem Titel „{postTitle}“ erwähnt. Klicke auf diesen Knopf, um diesen Beitrag zu sehen:",
-  "postInGroup": "jemand hat einen neuen Beitrag mit dem Titel „{postTitle}“ in einer deiner Gruppen geschrieben. Klicke auf diesen Knopf, um diesen Beitrag zu sehen:",
+  "commentedOnPost": " hat einen Beitrag den du beobachtest mit dem Titel „{postTitle}“ kommentiert. Klicke auf den Knopf, um diesen Kommentar zu sehen:",
+  "followedUserPosted": ", ein Nutzer dem du folgst, hat einen neuen Beitrag mit dem Titel „{postTitle}“ geschrieben. Klicke auf den Knopf, um diesen Beitrag zu sehen:",
+  "mentionedInComment": " hat dich in einem Kommentar zu dem Beitrag mit dem Titel „{postTitle}“ erwähnt. Klicke auf den Knopf, um den Kommentar zu sehen:",
+  "mentionedInPost": " hat Dich in einem Beitrag mit dem Titel „{postTitle}“ erwähnt. Klicke auf den Knopf, um den Beitrag zu sehen:",
+  "postInGroup": "jemand hat einen neuen Beitrag mit dem Titel „{postTitle}“ in einer deiner Gruppen geschrieben. Klicke auf den Knopf, um diesen Beitrag zu sehen:",
   "removedUserFromGroup": "du wurdest aus der Gruppe „{groupName}“ entfernt.",
-  "userJoinedGroup": " ist der Gruppe „{groupName}“ beigetreten. Klicke auf diesen Knopf, um diese Gruppe zu sehen:",
-  "userLeftGroup": " hat die Gruppe „{groupName}“ verlassen. Klicke auf diesen Knopf, um diese Gruppe zu sehen:"
+  "userJoinedGroup": " ist der Gruppe „{groupName}“ beigetreten. Klicke auf den Knopf, um diese Gruppe zu sehen:",
+  "userLeftGroup": " hat die Gruppe „{groupName}“ verlassen. Klicke auf den Knopf, um diese Gruppe zu sehen:"
 }
