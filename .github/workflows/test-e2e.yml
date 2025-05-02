@@ -16,7 +16,7 @@ jobs:
           docker save "ocelotsocialnetwork/neo4j-community:test" > /tmp/neo4j.tar
       
       - name: Cache docker image
-        Fullstack |
+        
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
           path: /tmp/neo4j.tar
@@ -38,7 +38,7 @@ jobs:
           docker save "ocelotsocialnetwork/backend:test" > /tmp/backend.tar
       
       - name: Cache docker image
-        Fullstack |
+        
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
           path: /tmp/backend.tar
@@ -61,7 +61,7 @@ jobs:
           docker save "ocelotsocialnetwork/webapp:test" > /tmp/webapp.tar
       
       - name: Cache docker image
-        Fullstack |
+        
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
           path: /tmp/webapp.tar
@@ -90,7 +90,7 @@ jobs:
           yarn install
       
       - name: Cache docker image
-        Fullstack |
+        
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
           path: |
@@ -113,7 +113,7 @@ jobs:
     steps:
       - name: Restore cypress cache
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
-        Fullstack |
+        
         with:
           path: |
             /opt/cucumber-json-formatter
