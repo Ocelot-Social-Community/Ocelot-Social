@@ -157,7 +157,7 @@ jobs:
 
   cleanup:
     name: Cleanup
-    needs: [prepare_neo4j_image, prepare_backend_image, prepare_webapp_image, prepare_cypress, fullstack_tests]
+    needs: fullstack_tests
     runs-on: ubuntu-latest
     permissions: write-all
     continue-on-error: true
