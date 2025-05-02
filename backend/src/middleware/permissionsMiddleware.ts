@@ -483,6 +483,9 @@ export default shield(
       email: or(isMyOwn, isAdmin),
       emailNotificationSettings: isMyOwn,
     },
+    Location: {
+      distanceToMe: isAuthenticated,
+    },
     Report: isModerator,
   },
   {
