@@ -120,6 +120,7 @@ jobs:
             /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
             /tmp/
+          key: ${{ github.run_id }}-e2e-*
           restore-keys: |
             ${{ github.run_id }}-e2e-neo4j-cache
             ${{ github.run_id }}-e2e-backend-cache
