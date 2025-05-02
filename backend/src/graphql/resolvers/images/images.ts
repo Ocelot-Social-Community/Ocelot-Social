@@ -39,12 +39,16 @@ export interface ImageInput {
 const { AWS_BUCKET: Bucket, S3_CONFIGURED } = CONFIG
 
 const createS3Client = () => {
+  const { AWS_ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = CONFIG
+  if (!(AWS_ENDPOINT && AWS_ACCESS_KEY_ID && AWS_SECRET_ACCESS_KEY)) {
+    throw new Error('Missing AWS credentials.')
+  }
   return new S3Client({
     credentials: {
-      accessKeyId: CONFIG.AWS_ACCESS_KEY_ID,
-      secretAccessKey: CONFIG.AWS_SECRET_ACCESS_KEY,
+      accessKeyId: AWS_ACCESS_KEY_ID,
+      secretAccessKey: AWS_SECRET_ACCESS_KEY,
     },
-    endpoint: CONFIG.AWS_ENDPOINT,
+    endpoint: AWS_ENDPOINT,
     forcePathStyle: true,
   })
 }
