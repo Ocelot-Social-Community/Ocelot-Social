@@ -4,7 +4,7 @@ on: push
 
 jobs:
   prepare_neo4j_image:
-    name: Fullstack: prepare neo4j
+    name: Fullstack | prepare neo4j
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -23,7 +23,7 @@ jobs:
           key: ${{ github.run_id }}-e2e-neo4j-cache
 
   prepare_backend_image:
-    name: Fullstack: prepare backend
+    name: Fullstack | prepare backend
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -45,7 +45,7 @@ jobs:
           key: ${{ github.run_id }}-e2e-backend-cache
 
   prepare_webapp_image:
-    name: Fullstack: prepare webapp
+    name: Fullstack | prepare webapp
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -68,7 +68,7 @@ jobs:
           key: ${{ github.run_id }}-e2e-webapp-cache
 
   prepare_cypress:
-    name: Fullstack: prepare cypress
+    name: Fullstack | prepare cypress
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
