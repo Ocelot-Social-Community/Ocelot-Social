@@ -111,7 +111,7 @@ jobs:
         # run copies of the current job in parallel
         job: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
-      - name: Restore cache
+      - name: Restore cypress cache
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         id: cache
         with:
@@ -119,14 +119,27 @@ jobs:
             /opt/cucumber-json-formatter
             /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
-            /tmp/
           key: ${{ github.run_id }}-e2e-*
-          restore-keys: |
-            ${{ github.run_id }}-e2e-neo4j-cache
-            ${{ github.run_id }}-e2e-backend-cache
-            ${{ github.run_id }}-e2e-webapp-cache
-            ${{ github.run_id }}-e2e-cypress
+          restore-keys: ${{ github.run_id }}-e2e-cypress
 
+      - name: Restore neo4j cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
+        with:
+          path: /tmp/
+          key: ${{ github.run_id }}-e2e-neo4j-cache
+
+      - name: Restore backend cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
+        with:
+          path: /tmp/
+          key: $${{ github.run_id }}-e2e-backend-cache
+
+      - name: Restore webapp cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
+        with:
+          path: /tmp/
+          key: ${{ github.run_id }}-e2e-webapp-cache
+          
       - name: Boot up test system | docker compose
         run: |
           chmod +x /opt/cucumber-json-formatter
