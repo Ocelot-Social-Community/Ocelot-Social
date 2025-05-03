@@ -132,7 +132,7 @@ jobs:
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
           path: /tmp/backend.tar
-          key: $${{ github.run_id }}-e2e-backend-cache
+          key: ${{ github.run_id }}-e2e-backend-cache
 
       - name: Restore webapp cache
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
