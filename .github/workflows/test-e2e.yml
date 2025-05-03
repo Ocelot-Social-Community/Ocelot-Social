@@ -14,7 +14,7 @@ jobs:
         run: |
           cp webapp/.env.template webapp/.env
           cp frontend/.env.dist frontend/.env
-          cp backend/.env.template backend/.env
+          cp backend/.env.test_e2e backend/.env
 
       - name: Build docker images
         run: |
@@ -77,7 +77,7 @@ jobs:
           docker load < /tmp/images/neo4j.tar
           docker load < /tmp/images/backend.tar
           docker load < /tmp/images/webapp.tar
-          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp neo4j backend --build
+          docker compose -f docker-compose.yml -f docker-compose.test.yml up --build --detach --no-deps webapp neo4j backend mailserver
           sleep 90s
 
       - name: Full stack tests | run tests

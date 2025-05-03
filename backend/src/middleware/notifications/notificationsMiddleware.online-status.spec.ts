@@ -12,9 +12,9 @@ import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
-const sendMailMock: (notification) => void = jest.fn()
-jest.mock('@middleware/helpers/email/sendMail', () => ({
-  sendMail: (notification) => sendMailMock(notification),
+const sendNotificationMailMock: (notification) => void = jest.fn()
+jest.mock('@src/emails/sendEmail', () => ({
+  sendNotificationMail: (notification) => sendNotificationMailMock(notification),
 }))
 
 let isUserOnlineMock = jest.fn().mockReturnValue(false)
@@ -109,7 +109,7 @@ describe('online status and sending emails', () => {
       })
 
       it('sends NO email to the other user', () => {
-        expect(sendMailMock).not.toBeCalled()
+        expect(sendNotificationMailMock).not.toBeCalled()
       })
     })
   })
@@ -135,7 +135,7 @@ describe('online status and sending emails', () => {
       })
 
       it('sends email to the other user', () => {
-        expect(sendMailMock).toBeCalledTimes(1)
+        expect(sendNotificationMailMock).toBeCalledTimes(1)
       })
     })
   })

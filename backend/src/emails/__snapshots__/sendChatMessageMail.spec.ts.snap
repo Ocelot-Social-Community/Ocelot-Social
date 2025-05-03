@@ -1,0 +1,247 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`sendChatMessageMail English chat_message template 1`] = `
+{
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>.wf-force-outline-none[tabindex="-1"]:focus{outline:none;}</style>
+    <style>body{
+  display: block;
+  font-family: Lato, sans-serif;
+  font-size: 17px;
+  text-align: left;
+  text-align: -webkit-left;
+  justify-content: center;
+  padding: 15px;
+  margin: 0px;
+}
+
+h2 {
+  margin-top: 25px;
+  font-size: 25px;
+  font-weight: normal;
+  line-height: 22px;
+  color: #333333;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  display: block;
+}
+
+.head-logo {
+  width: 60%;
+  height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+a {
+  color: #17b53e;
+}
+
+a.button {
+  background: #17b53e;
+  font-family: Lato, sans-serif;
+  font-size: 16px;
+  line-height: 15px;
+  text-decoration: none;
+  text-align:center;
+  padding: 13px 17px;
+  color: #ffffff;
+  display: table;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 4px;
+}
+
+.text-block {
+  margin-top: 20px;
+  color: #000000;
+}
+
+footer {
+  padding: 20px;
+  font-family: Lato, sans-serif;
+  font-size: 12px;
+  line-height: 15px;
+  text-align: center;
+  color: #888888;
+}
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        </div>
+      </header>
+      <h2>Hello chatReceiver,</h2>
+      <div class="wrapper">
+        <div class="content"></div>
+        <p>you have received a new chat message from <a class="user" href="http://webapp:3000/user/chatSender/chatsender">chatSender</a>.
+        </p><a class="button" href="http://webapp:3000/chat">Show Chat</a>
+        <div class="text-block">
+          <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p>– The ocelot.social Team</p><br>
+          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+        </div>
+      </div>
+      <footer>
+        <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
+      </footer>
+    </div>
+  </body>
+</html>",
+  "subject": "ocelot.social  – Notification: New chat message",
+  "text": "HELLO CHATRECEIVER,
+
+you have received a new chat message from chatSender
+[http://webapp:3000/user/chatSender/chatsender].
+
+Show Chat [http://webapp:3000/chat]
+
+See you soon on ocelot.social [https://ocelot.social]!
+
+– The ocelot.social Team
+
+
+PS: If you don't want to receive e-mails anymore, change your notification
+settings [http://webapp:3000/settings/notifications]!
+
+
+ocelot.social Community [https://ocelot.social]",
+  "to": "user@example.org",
+}
+`;
+
+exports[`sendChatMessageMail German chat_message template 1`] = `
+{
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>.wf-force-outline-none[tabindex="-1"]:focus{outline:none;}</style>
+    <style>body{
+  display: block;
+  font-family: Lato, sans-serif;
+  font-size: 17px;
+  text-align: left;
+  text-align: -webkit-left;
+  justify-content: center;
+  padding: 15px;
+  margin: 0px;
+}
+
+h2 {
+  margin-top: 25px;
+  font-size: 25px;
+  font-weight: normal;
+  line-height: 22px;
+  color: #333333;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  display: block;
+}
+
+.head-logo {
+  width: 60%;
+  height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+a {
+  color: #17b53e;
+}
+
+a.button {
+  background: #17b53e;
+  font-family: Lato, sans-serif;
+  font-size: 16px;
+  line-height: 15px;
+  text-decoration: none;
+  text-align:center;
+  padding: 13px 17px;
+  color: #ffffff;
+  display: table;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 4px;
+}
+
+.text-block {
+  margin-top: 20px;
+  color: #000000;
+}
+
+footer {
+  padding: 20px;
+  font-family: Lato, sans-serif;
+  font-size: 12px;
+  line-height: 15px;
+  text-align: center;
+  color: #888888;
+}
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        </div>
+      </header>
+      <h2>Hallo chatReceiver,</h2>
+      <div class="wrapper">
+        <div class="content"></div>
+        <p>du hast eine neue Chat-Nachricht von <a class="user" href="http://webapp:3000/user/chatSender/chatsender">chatSender</a> erhalten.
+        </p><a class="button" href="http://webapp:3000/chat">Chat anzeigen</a>
+        <div class="text-block">
+          <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p>– Dein ocelot.social Team</p><br>
+          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+        </div>
+      </div>
+      <footer>
+        <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
+      </footer>
+    </div>
+  </body>
+</html>",
+  "subject": "ocelot.social  – Benachrichtigung: Neue Chat Nachricht",
+  "text": "HALLO CHATRECEIVER,
+
+du hast eine neue Chat-Nachricht von chatSender
+[http://webapp:3000/user/chatSender/chatsender] erhalten.
+
+Chat anzeigen [http://webapp:3000/chat]
+
+Bis bald bei ocelot.social [https://ocelot.social]!
+
+– Dein ocelot.social Team
+
+
+PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine
+Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
+
+
+ocelot.social Community [https://ocelot.social]",
+  "to": "user@example.org",
+}
+`;
