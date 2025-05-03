@@ -1,10 +1,14 @@
-/* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable security/detect-object-injection */
+import {
+  NOTIFICATION_ADDED,
+  ROOM_COUNT_UPDATED,
+  CHAT_MESSAGE_ADDED,
+} from '@constants/subscriptions'
 import { getUnreadRoomsCount } from '@graphql/resolvers/rooms'
 import { sendMail } from '@middleware/helpers/email/sendMail'
 import {
@@ -13,7 +17,6 @@ import {
 } from '@middleware/helpers/email/templateBuilder'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
-import { pubsub, NOTIFICATION_ADDED, ROOM_COUNT_UPDATED, CHAT_MESSAGE_ADDED } from '@src/server'
 
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 
@@ -25,7 +28,7 @@ const publishNotifications = async (
 ): Promise<string[]> => {
   const notifications = await notificationsPromise
   notifications.forEach((notificationAdded) => {
-    pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
+    context.pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
     if (
       notificationAdded.email && // no primary email was found
       (notificationAdded.to[emailNotificationSetting] ?? true) &&
@@ -482,11 +485,11 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
       // send subscriptions
       const roomCountUpdated = await getUnreadRoomsCount(recipientUser.id, session)
 
-      void pubsub.publish(ROOM_COUNT_UPDATED, {
+      void context.pubsub.publish(ROOM_COUNT_UPDATED, {
         roomCountUpdated,
         userId: recipientUser.id,
       })
-      void pubsub.publish(CHAT_MESSAGE_ADDED, {
+      void context.pubsub.publish(CHAT_MESSAGE_ADDED, {
         chatMessageAdded: message,
         userId: recipientUser.id,
       })
