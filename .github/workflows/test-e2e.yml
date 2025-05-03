@@ -157,17 +157,21 @@ jobs:
           name: ocelot-e2e-test-report-pr${{ needs.docker_preparation.outputs.pr-number }}
           path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
 
-  cleanup:
-    name: Cleanup
+  cleanup_cache:
+    name: Cleanup Cache
     needs: fullstack_tests
     runs-on: ubuntu-latest
-    permissions: write-all
     continue-on-error: true
     steps:
-      - name: Delete cache
+      - name: Full stack tests | cleanup cache
+        run: |
+          cacheKeys=$(gh cache list --json key --jq '.[] | select(.key | startswith("${{ github.run_id }}-e2e-")) | .key')
+          set +e
+          echo "Deleting caches..."
+          for cacheKey in $cacheKeys
+          do
+            gh cache delete "$cacheKey"
+          done
+          echo "Done"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh extension install actions/gh-actions-cache
-          KEY="${{ github.run_id }}-e2e-preparation-cache"
-          gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
