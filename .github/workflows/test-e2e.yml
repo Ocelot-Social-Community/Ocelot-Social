@@ -162,6 +162,9 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
+      
       - name: Full stack tests | cleanup cache
         run: |
           cacheKeys=$(gh cache list --json key --jq '.[] | select(.key | startswith("${{ github.run_id }}-e2e-")) | .key')
