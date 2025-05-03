@@ -177,7 +177,12 @@ describe('mergeImage', () => {
       })
 
       it('creates a url safe name', async () => {
-        imageInput.upload.filename = '/path/to/awkward?/ file-location/?foo- bar-avatar.jpg'
+        if (!imageInput.upload) {
+          throw new Error('Test imageInput was not setup correctly.')
+        }
+        const upload = await imageInput.upload
+        upload.filename = '/path/to/awkward?/ file-location/?foo- bar-avatar.jpg'
+        imageInput.upload = Promise.resolve(upload)
         await expect(
           mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback }),
         ).resolves.toMatchObject({
