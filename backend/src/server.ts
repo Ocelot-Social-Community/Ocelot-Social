@@ -102,3 +102,4 @@ const createServer = (options?) => {
 }
 
 export default createServer
+export type Context = Awaited<ReturnType<ReturnType<typeof getContext>>>

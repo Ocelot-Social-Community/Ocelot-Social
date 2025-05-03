@@ -12,6 +12,7 @@ import CONFIG from '@config/index'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '@constants/groups'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
+import type { Context } from '@src/server'
 
 import Resolver, {
   removeUndefinedNullValuesFromObject,
@@ -22,7 +23,7 @@ import { createOrUpdateLocations } from './users/location'
 
 export default {
   Query: {
-    Group: async (_object, params, context, _resolveInfo) => {
+    Group: async (_object, params, context: Context, _resolveInfo) => {
       const { isMember, id, slug, first, offset } = params
       let pagination = ''
       const orderBy = 'ORDER BY group.createdAt DESC'
@@ -75,10 +76,10 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    GroupMembers: async (_object, params, context, _resolveInfo) => {
+    GroupMembers: async (_object, params, context: Context, _resolveInfo) => {
       const { id: groupId } = params
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (txc) => {
@@ -96,7 +97,7 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     GroupCount: async (_object, params, context, _resolveInfo) => {
@@ -134,7 +135,7 @@ export default {
     },
   },
   Mutation: {
-    CreateGroup: async (_parent, params, context, _resolveInfo) => {
+    CreateGroup: async (_parent, params, context: Context, _resolveInfo) => {
       const { categoryIds } = params
       delete params.categoryIds
       params.locationName = params.locationName === '' ? null : params.locationName
@@ -182,7 +183,7 @@ export default {
           `,
           { userId: context.user.id, categoryIds, params },
         )
-        const [group] = await ownerCreateGroupTransactionResponse.records.map((record) =>
+        const [group] = ownerCreateGroupTransactionResponse.records.map((record) =>
           record.get('group'),
         )
         return group
@@ -197,10 +198,10 @@ export default {
           throw new UserInputError('Group with this slug already exists!')
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    UpdateGroup: async (_parent, params, context, _resolveInfo) => {
+    UpdateGroup: async (_parent, params, context: Context, _resolveInfo) => {
       const { categoryIds } = params
       delete params.categoryIds
       const { id: groupId, avatar: avatarInput } = params
@@ -257,7 +258,7 @@ export default {
           categoryIds,
           params,
         })
-        const [group] = await transactionResponse.records.map((record) => record.get('group'))
+        const [group] = transactionResponse.records.map((record) => record.get('group'))
         if (avatarInput) {
           await mergeImage(group, 'AVATAR_IMAGE', avatarInput, { transaction })
         }
@@ -273,10 +274,10 @@ export default {
           throw new UserInputError('Group with this slug already exists!')
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    JoinGroup: async (_parent, params, context, _resolveInfo) => {
+    JoinGroup: async (_parent, params, context: Context, _resolveInfo) => {
       const { groupId, userId } = params
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -294,7 +295,7 @@ export default {
           RETURN member {.*, myRoleInGroup: membership.role}
         `
         const transactionResponse = await transaction.run(joinGroupCypher, { groupId, userId })
-        const [member] = await transactionResponse.records.map((record) => record.get('member'))
+        const [member] = transactionResponse.records.map((record) => record.get('member'))
         return member
       })
       try {
@@ -302,10 +303,10 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    LeaveGroup: async (_parent, params, context, _resolveInfo) => {
+    LeaveGroup: async (_parent, params, context: Context, _resolveInfo) => {
       const { groupId, userId } = params
       const session = context.driver.session()
       try {
@@ -313,10 +314,10 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    ChangeGroupMemberRole: async (_parent, params, context, _resolveInfo) => {
+    ChangeGroupMemberRole: async (_parent, params, context: Context, _resolveInfo) => {
       const { groupId, userId, roleInGroup } = params
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -353,7 +354,7 @@ export default {
           userId,
           roleInGroup,
         })
-        const [member] = await transactionResponse.records.map((record) => record.get('member'))
+        const [member] = transactionResponse.records.map((record) => record.get('member'))
         return member
       })
       try {
@@ -361,10 +362,10 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    RemoveUserFromGroup: async (_parent, params, context, _resolveInfo) => {
+    RemoveUserFromGroup: async (_parent, params, context: Context, _resolveInfo) => {
       const { groupId, userId } = params
       const session = context.driver.session()
       try {
@@ -372,10 +373,10 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    muteGroup: async (_parent, params, context, _resolveInfo) => {
+    muteGroup: async (_parent, params, context: Context, _resolveInfo) => {
       const { groupId } = params
       const userId = context.user.id
       const session = context.driver.session()
@@ -393,7 +394,7 @@ export default {
             userId,
           },
         )
-        const [group] = await transactionResponse.records.map((record) => record.get('group'))
+        const [group] = transactionResponse.records.map((record) => record.get('group'))
         return group
       })
       try {
@@ -401,10 +402,10 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    unmuteGroup: async (_parent, params, context, _resolveInfo) => {
+    unmuteGroup: async (_parent, params, context: Context, _resolveInfo) => {
       const { groupId } = params
       const userId = context.user.id
       const session = context.driver.session()
@@ -422,7 +423,7 @@ export default {
             userId,
           },
         )
-        const [group] = await transactionResponse.records.map((record) => record.get('group'))
+        const [group] = transactionResponse.records.map((record) => record.get('group'))
         return group
       })
       try {
@@ -430,7 +431,7 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
