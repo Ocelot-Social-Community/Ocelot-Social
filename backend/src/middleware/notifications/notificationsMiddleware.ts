@@ -13,6 +13,7 @@ import { getUnreadRoomsCount } from '@graphql/resolvers/rooms'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
 import { sendNotificationMail, sendChatMessageMail } from '@src/emails/sendEmail'
+
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 
 const publishNotifications = async (
