@@ -4,11 +4,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
+import databaseContext from '@context/database'
+import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { createMessageMutation } from '@graphql/queries/createMessageMutation'
@@ -16,18 +18,13 @@ import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
-import createServer, { pubsub } from '@src/server'
+import createServer, { getContext } from '@src/server'
 
-const sendMailMock: (notification) => void = jest.fn()
-jest.mock('@middleware/helpers/email/sendMail', () => ({
-  sendMail: (notification) => sendMailMock(notification),
-}))
-
-const chatMessageTemplateMock = jest.fn()
-const notificationTemplateMock = jest.fn()
-jest.mock('../helpers/email/templateBuilder', () => ({
-  chatMessageTemplate: () => chatMessageTemplateMock(),
-  notificationTemplate: () => notificationTemplateMock(),
+const sendChatMessageMailMock: (notification) => void = jest.fn()
+const sendNotificationMailMock: (notification) => void = jest.fn()
+jest.mock('@src/emails/sendEmail', () => ({
+  sendChatMessageMail: (notification) => sendChatMessageMailMock(notification),
+  sendNotificationMail: (notification) => sendNotificationMailMock(notification),
 }))
 
 let isUserOnlineMock = jest.fn()
@@ -35,12 +32,12 @@ jest.mock('../helpers/isUserOnline', () => ({
   isUserOnline: () => isUserOnlineMock(),
 }))
 
+const database = databaseContext()
+const pubsub = pubsubContext()
 const pubsubSpy = jest.spyOn(pubsub, 'publish')
 
-let server, query, mutate, notifiedUser, authenticatedUser
+let query, mutate, notifiedUser, authenticatedUser
 
-const driver = getDriver()
-const neode = getNeode()
 const categoryIds = ['cat9']
 const createPostMutation = gql`
   mutation ($id: ID, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
@@ -68,19 +65,16 @@ const createCommentMutation = gql`
   }
 `
 
+let server: ApolloServer
+
 beforeAll(async () => {
   await cleanDatabase()
 
-  const createServerResult = createServer({
-    context: () => {
-      return {
-        user: authenticatedUser,
-        neode,
-        driver,
-      }
-    },
-  })
-  server = createServerResult.server
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database, pubsub })
+
+  server = createServer({ context }).server
+
   const createTestClientResult = createTestClient(server)
   query = createTestClientResult.query
   mutate = createTestClientResult.mutate
@@ -88,7 +82,9 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 beforeEach(async () => {
@@ -104,7 +100,7 @@ beforeEach(async () => {
       password: '1234',
     },
   )
-  await neode.create('Category', {
+  await database.neode.create('Category', {
     id: 'cat9',
     name: 'Democracy & Politics',
     icon: 'university',
@@ -239,8 +235,13 @@ describe('notifications', () => {
             )
 
             // Mail
-            expect(sendMailMock).toHaveBeenCalledTimes(1)
-            expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
+            expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+            expect(sendNotificationMailMock).toHaveBeenCalledWith(
+              expect.objectContaining({
+                reason: 'commented_on_post',
+                email: 'test@example.org',
+              }),
+            )
           })
 
           describe('if I have disabled `emailNotificationsCommentOnObservedPost`', () => {
@@ -275,8 +276,7 @@ describe('notifications', () => {
               )
 
               // No Mail
-              expect(sendMailMock).not.toHaveBeenCalled()
-              expect(notificationTemplateMock).not.toHaveBeenCalled()
+              expect(sendNotificationMailMock).not.toHaveBeenCalled()
             })
           })
 
@@ -397,8 +397,13 @@ describe('notifications', () => {
           })
 
           // Mail
-          expect(sendMailMock).toHaveBeenCalledTimes(1)
-          expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              reason: 'mentioned_in_post',
+              email: 'test@example.org',
+            }),
+          )
         })
 
         describe('if I have disabled `emailNotificationsMention`', () => {
@@ -433,8 +438,7 @@ describe('notifications', () => {
             })
 
             // Mail
-            expect(sendMailMock).not.toHaveBeenCalled()
-            expect(notificationTemplateMock).not.toHaveBeenCalled()
+            expect(sendNotificationMailMock).not.toHaveBeenCalled()
           })
         })
 
@@ -940,8 +944,7 @@ describe('notifications', () => {
           userId: 'chatReceiver',
         })
 
-        expect(sendMailMock).not.toHaveBeenCalled()
-        expect(chatMessageTemplateMock).not.toHaveBeenCalled()
+        expect(sendChatMessageMailMock).not.toHaveBeenCalled()
       })
     })
 
@@ -976,8 +979,20 @@ describe('notifications', () => {
           userId: 'chatReceiver',
         })
 
-        expect(sendMailMock).toHaveBeenCalledTimes(1)
-        expect(chatMessageTemplateMock).toHaveBeenCalledTimes(1)
+        expect(sendChatMessageMailMock).toHaveBeenCalledTimes(1)
+        expect(sendChatMessageMailMock).toHaveBeenCalledWith({
+          email: 'user@example.org',
+          senderUser: expect.objectContaining({
+            name: 'chatSender',
+            slug: 'chatsender',
+            id: 'chatSender',
+          }),
+          recipientUser: expect.objectContaining({
+            name: 'chatReceiver',
+            slug: 'chatreceiver',
+            id: 'chatReceiver',
+          }),
+        })
       })
     })
 
@@ -997,8 +1012,7 @@ describe('notifications', () => {
         expect(pubsubSpy).not.toHaveBeenCalled()
         expect(pubsubSpy).not.toHaveBeenCalled()
 
-        expect(sendMailMock).not.toHaveBeenCalled()
-        expect(chatMessageTemplateMock).not.toHaveBeenCalled()
+        expect(sendChatMessageMailMock).not.toHaveBeenCalled()
       })
     })
 
@@ -1018,8 +1032,7 @@ describe('notifications', () => {
         expect(pubsubSpy).not.toHaveBeenCalled()
         expect(pubsubSpy).not.toHaveBeenCalled()
 
-        expect(sendMailMock).not.toHaveBeenCalled()
-        expect(chatMessageTemplateMock).not.toHaveBeenCalled()
+        expect(sendChatMessageMailMock).not.toHaveBeenCalled()
       })
     })
 
@@ -1055,8 +1068,7 @@ describe('notifications', () => {
           userId: 'chatReceiver',
         })
 
-        expect(sendMailMock).not.toHaveBeenCalled()
-        expect(chatMessageTemplateMock).not.toHaveBeenCalled()
+        expect(sendChatMessageMailMock).not.toHaveBeenCalled()
       })
     })
   })
@@ -1136,8 +1148,13 @@ describe('notifications', () => {
         })
 
         // Mail
-        expect(sendMailMock).toHaveBeenCalledTimes(1)
-        expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
+        expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            reason: 'user_joined_group',
+            email: 'owner@example.org',
+          }),
+        )
       })
 
       describe('if the group owner has disabled `emailNotificationsGroupMemberJoined`', () => {
@@ -1169,8 +1186,7 @@ describe('notifications', () => {
           })
 
           // Mail
-          expect(sendMailMock).not.toHaveBeenCalled()
-          expect(notificationTemplateMock).not.toHaveBeenCalled()
+          expect(sendNotificationMailMock).not.toHaveBeenCalled()
         })
       })
     })
@@ -1239,8 +1255,19 @@ describe('notifications', () => {
         })
 
         // Mail
-        expect(sendMailMock).toHaveBeenCalledTimes(2)
-        expect(notificationTemplateMock).toHaveBeenCalledTimes(2)
+        expect(sendNotificationMailMock).toHaveBeenCalledTimes(2)
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            reason: 'user_joined_group',
+            email: 'owner@example.org',
+          }),
+        )
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            reason: 'user_left_group',
+            email: 'owner@example.org',
+          }),
+        )
       })
 
       describe('if the group owner has disabled `emailNotificationsGroupMemberLeft`', () => {
@@ -1284,8 +1311,7 @@ describe('notifications', () => {
           })
 
           // Mail
-          expect(sendMailMock).toHaveBeenCalledTimes(1)
-          expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
         })
       })
     })
@@ -1344,8 +1370,13 @@ describe('notifications', () => {
         })
 
         // Mail
-        expect(sendMailMock).toHaveBeenCalledTimes(1)
-        expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
+        expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            reason: 'changed_group_member_role',
+            email: 'test@example.org',
+          }),
+        )
       })
 
       describe('if the group member has disabled `emailNotificationsGroupMemberRoleChanged`', () => {
@@ -1377,8 +1408,7 @@ describe('notifications', () => {
           })
 
           // Mail
-          expect(sendMailMock).not.toHaveBeenCalled()
-          expect(notificationTemplateMock).not.toHaveBeenCalled()
+          expect(sendNotificationMailMock).not.toHaveBeenCalled()
         })
       })
     })
@@ -1436,8 +1466,13 @@ describe('notifications', () => {
         })
 
         // Mail
-        expect(sendMailMock).toHaveBeenCalledTimes(1)
-        expect(notificationTemplateMock).toHaveBeenCalledTimes(1)
+        expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            reason: 'removed_user_from_group',
+            email: 'test@example.org',
+          }),
+        )
       })
 
       describe('if the previous group member has disabled `emailNotificationsGroupMemberRemoved`', () => {
@@ -1469,8 +1504,7 @@ describe('notifications', () => {
           })
 
           // Mail
-          expect(sendMailMock).not.toHaveBeenCalled()
-          expect(notificationTemplateMock).not.toHaveBeenCalled()
+          expect(sendNotificationMailMock).not.toHaveBeenCalled()
         })
       })
     })

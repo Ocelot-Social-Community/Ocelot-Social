@@ -26,6 +26,8 @@ if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
   throw new Error(`You cannot seed the database in a non-staging and real production environment!`)
 }
 
+CONFIG.SEND_MAIL = true
+
 const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
 ;(async function () {

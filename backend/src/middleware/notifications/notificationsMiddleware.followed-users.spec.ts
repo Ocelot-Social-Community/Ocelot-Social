@@ -1,30 +1,27 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
+import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import CONFIG from '@src/config'
-import createServer from '@src/server'
+import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
-const sendMailMock: (notification) => void = jest.fn()
-jest.mock('@middleware/helpers/email/sendMail', () => ({
-  sendMail: (notification) => sendMailMock(notification),
+const sendNotificationMailMock: (notification) => void = jest.fn()
+jest.mock('@src/emails/sendEmail', () => ({
+  sendNotificationMail: (notification) => sendNotificationMailMock(notification),
 }))
 
-let server, query, mutate, authenticatedUser
+let query, mutate, authenticatedUser
 
 let postAuthor, firstFollower, secondFollower, thirdFollower, emaillessFollower
-
-const driver = getDriver()
-const neode = getNeode()
 
 const createPostMutation = gql`
   mutation ($id: ID, $title: String!, $content: String!, $groupId: ID) {
@@ -71,22 +68,19 @@ const followUserMutation = gql`
   }
 `
 
+const database = databaseContext()
+
+let server: ApolloServer
+
 beforeAll(async () => {
   await cleanDatabase()
 
-  const createServerResult = createServer({
-    context: () => {
-      return {
-        user: authenticatedUser,
-        neode,
-        driver,
-        cypherParams: {
-          currentUserId: authenticatedUser ? authenticatedUser.id : null,
-        },
-      }
-    },
-  })
-  server = createServerResult.server
+  // eslint-disable-next-line @typescript-eslint/require-await
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database })
+
+  server = createServer({ context }).server
+
   const createTestClientResult = createTestClient(server)
   query = createTestClientResult.query
   mutate = createTestClientResult.mutate
@@ -94,7 +88,9 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('following users notifications', () => {
@@ -147,7 +143,7 @@ describe('following users notifications', () => {
         password: '1234',
       },
     )
-    emaillessFollower = await neode.create('User', {
+    emaillessFollower = await database.neode.create('User', {
       id: 'email-less-follower',
       name: 'Email-less Follower',
       slug: 'email-less-follower',
@@ -272,17 +268,17 @@ describe('following users notifications', () => {
     })
 
     it('sends only two emails, as second follower has emails disabled and email-less follower has no email', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(2)
-      expect(sendMailMock).toHaveBeenCalledWith(
+      expect(sendNotificationMailMock).toHaveBeenCalledTimes(2)
+      expect(sendNotificationMailMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          html: expect.stringContaining('Hello First Follower'),
-          to: 'first-follower@example.org',
+          email: 'first-follower@example.org',
+          reason: 'followed_user_posted',
         }),
       )
-      expect(sendMailMock).toHaveBeenCalledWith(
+      expect(sendNotificationMailMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          html: expect.stringContaining('Hello Third Follower'),
-          to: 'third-follower@example.org',
+          email: 'third-follower@example.org',
+          reason: 'followed_user_posted',
         }),
       )
     })

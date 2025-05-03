@@ -1,28 +1,27 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import CONFIG from '@config/index'
+import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
-import createServer from '@src/server'
+import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
-const sendMailMock: (notification) => void = jest.fn()
-jest.mock('@middleware/helpers/email/sendMail', () => ({
-  sendMail: (notification) => sendMailMock(notification),
+const sendNotificationMailMock: (notification) => void = jest.fn()
+jest.mock('@src/emails/sendEmail', () => ({
+  sendNotificationMail: (notification) => sendNotificationMailMock(notification),
 }))
 
-let server, query, mutate, authenticatedUser
+let query, mutate, authenticatedUser
 
 let postAuthor, firstCommenter, secondCommenter, emaillessObserver
-
-const driver = getDriver()
-const neode = getNeode()
 
 const createPostMutation = gql`
   mutation ($id: ID, $title: String!, $content: String!) {
@@ -78,23 +77,18 @@ const toggleObservePostMutation = gql`
     }
   }
 `
+const database = databaseContext()
+
+let server: ApolloServer
 
 beforeAll(async () => {
   await cleanDatabase()
 
-  const createServerResult = createServer({
-    context: () => {
-      return {
-        user: authenticatedUser,
-        neode,
-        driver,
-        cypherParams: {
-          currentUserId: authenticatedUser ? authenticatedUser.id : null,
-        },
-      }
-    },
-  })
-  server = createServerResult.server
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database })
+
+  server = createServer({ context }).server
+
   const createTestClientResult = createTestClient(server)
   query = createTestClientResult.query
   mutate = createTestClientResult.mutate
@@ -102,7 +96,9 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('notifications for users that observe a post', () => {
@@ -143,7 +139,7 @@ describe('notifications for users that observe a post', () => {
         password: '1234',
       },
     )
-    emaillessObserver = await neode.create('User', {
+    emaillessObserver = await database.neode.create('User', {
       id: 'email-less-observer',
       name: 'Email-less Observer',
       slug: 'email-less-observer',
@@ -217,10 +213,11 @@ describe('notifications for users that observe a post', () => {
     })
 
     it('sends one email', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(1)
-      expect(sendMailMock).toHaveBeenCalledWith(
+      expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+      expect(sendNotificationMailMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          to: 'post-author@example.org',
+          email: 'post-author@example.org',
+          reason: 'commented_on_post',
         }),
       )
     })
@@ -307,15 +304,17 @@ describe('notifications for users that observe a post', () => {
       })
 
       it('sends two emails', () => {
-        expect(sendMailMock).toHaveBeenCalledTimes(2)
-        expect(sendMailMock).toHaveBeenCalledWith(
+        expect(sendNotificationMailMock).toHaveBeenCalledTimes(2)
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
           expect.objectContaining({
-            to: 'post-author@example.org',
+            email: 'post-author@example.org',
+            reason: 'commented_on_post',
           }),
         )
-        expect(sendMailMock).toHaveBeenCalledWith(
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
           expect.objectContaining({
-            to: 'first-commenter@example.org',
+            email: 'first-commenter@example.org',
+            reason: 'commented_on_post',
           }),
         )
       })
@@ -421,10 +420,11 @@ describe('notifications for users that observe a post', () => {
       })
 
       it('sends one email', () => {
-        expect(sendMailMock).toHaveBeenCalledTimes(1)
-        expect(sendMailMock).toHaveBeenCalledWith(
+        expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
           expect.objectContaining({
-            to: 'second-commenter@example.org',
+            email: 'second-commenter@example.org',
+            reason: 'commented_on_post',
           }),
         )
       })
