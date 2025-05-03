@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 /* eslint-disable n/no-process-env */
 import { config } from 'dotenv'
 
@@ -13,16 +13,17 @@ config()
 // Use Cypress env or process.env
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Cypress: any | undefined
-const env = typeof Cypress !== 'undefined' ? Cypress.env() : process.env
+const env = (typeof Cypress !== 'undefined' ? Cypress.env() : process.env) as typeof process.env
 
 const environment = {
-  NODE_ENV: env.NODE_ENV || process.env.NODE_ENV,
+  NODE_ENV: env.NODE_ENV ?? process.env.NODE_ENV,
   DEBUG: env.NODE_ENV !== 'production' && env.DEBUG,
   TEST: env.NODE_ENV === 'test',
   PRODUCTION: env.NODE_ENV === 'production',
   // used for staging enviroments if 'PRODUCTION=true' and 'PRODUCTION_DB_CLEAN_ALLOW=true'
   PRODUCTION_DB_CLEAN_ALLOW: env.PRODUCTION_DB_CLEAN_ALLOW === 'true' || false, // default = false
-  DISABLED_MIDDLEWARES: ['test', 'development'].includes(env.NODE_ENV as string)
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  DISABLED_MIDDLEWARES: ['test', 'development'].includes(env.NODE_ENV!)
     ? (env.DISABLED_MIDDLEWARES?.split(',') ?? [])
     : [],
   SEND_MAIL: env.NODE_ENV !== 'test',
@@ -35,16 +36,16 @@ const required = {
 }
 
 const server = {
-  CLIENT_URI: env.CLIENT_URI || 'http://localhost:3000',
-  GRAPHQL_URI: env.GRAPHQL_URI || 'http://localhost:4000',
-  JWT_EXPIRES: env.JWT_EXPIRES || '2y',
+  CLIENT_URI: env.CLIENT_URI ?? 'http://localhost:3000',
+  GRAPHQL_URI: env.GRAPHQL_URI ?? 'http://localhost:4000',
+  JWT_EXPIRES: env.JWT_EXPIRES ?? '2y',
 }
 
 const hasDKIMData = env.SMTP_DKIM_DOMAINNAME && env.SMTP_DKIM_KEYSELECTOR && env.SMTP_DKIM_PRIVATKEY
 
 const smtp = {
   SMTP_HOST: env.SMTP_HOST,
-  SMTP_PORT: env.SMTP_PORT,
+  SMTP_PORT: (env.SMTP_PORT && parseInt(env.SMTP_PORT)) || undefined,
   SMTP_IGNORE_TLS: env.SMTP_IGNORE_TLS !== 'false', // default = true
   SMTP_SECURE: env.SMTP_SECURE === 'true',
   SMTP_USERNAME: env.SMTP_USERNAME,
@@ -52,15 +53,16 @@ const smtp = {
   SMTP_DKIM_DOMAINNAME: hasDKIMData && env.SMTP_DKIM_DOMAINNAME,
   SMTP_DKIM_KEYSELECTOR: hasDKIMData && env.SMTP_DKIM_KEYSELECTOR,
   // PEM format: https://docs.progress.com/bundle/datadirect-hybrid-data-pipeline-installation-46/page/PEM-file-format.html
-  SMTP_DKIM_PRIVATKEY: hasDKIMData && env.SMTP_DKIM_PRIVATKEY.replace(/\\n/g, '\n'), // replace all "\n" in .env string by real line break
-  SMTP_MAX_CONNECTIONS: env.SMTP_MAX_CONNECTIONS || 5,
-  SMTP_MAX_MESSAGES: env.SMTP_MAX_MESSAGES || 100,
+  SMTP_DKIM_PRIVATKEY:
+    hasDKIMData && env.SMTP_DKIM_PRIVATKEY && env.SMTP_DKIM_PRIVATKEY.replace(/\\n/g, '\n'), // replace all "\n" in .env string by real line break
+  SMTP_MAX_CONNECTIONS: (env.SMTP_MAX_CONNECTIONS && parseInt(env.SMTP_MAX_CONNECTIONS)) || 5,
+  SMTP_MAX_MESSAGES: (env.SMTP_MAX_MESSAGES && parseInt(env.SMTP_MAX_MESSAGES)) || 100,
 }
 
 const neo4j = {
-  NEO4J_URI: env.NEO4J_URI || 'bolt://localhost:7687',
-  NEO4J_USERNAME: env.NEO4J_USERNAME || 'neo4j',
-  NEO4J_PASSWORD: env.NEO4J_PASSWORD || 'neo4j',
+  NEO4J_URI: env.NEO4J_URI ?? 'bolt://localhost:7687',
+  NEO4J_USERNAME: env.NEO4J_USERNAME ?? 'neo4j',
+  NEO4J_PASSWORD: env.NEO4J_PASSWORD ?? 'neo4j',
 }
 
 const sentry = {
@@ -70,7 +72,7 @@ const sentry = {
 
 const redis = {
   REDIS_DOMAIN: env.REDIS_DOMAIN,
-  REDIS_PORT: env.REDIS_PORT,
+  REDIS_PORT: (env.REDIS_PORT && parseInt(env.REDIS_PORT)) || undefined,
   REDIS_PASSWORD: env.REDIS_PASSWORD,
 }
 

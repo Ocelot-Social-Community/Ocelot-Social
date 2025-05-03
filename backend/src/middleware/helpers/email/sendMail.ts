@@ -9,30 +9,11 @@ import { htmlToText } from 'nodemailer-html-to-text'
 
 import CONFIG from '@config/index'
 import { cleanHtml } from '@middleware/helpers/cleanHtml'
+import { transportOptions } from '@src/emails/transportOptions'
 
 const hasEmailConfig = CONFIG.SMTP_HOST && CONFIG.SMTP_PORT
-const hasAuthData = CONFIG.SMTP_USERNAME && CONFIG.SMTP_PASSWORD
-const hasDKIMData =
-  CONFIG.SMTP_DKIM_DOMAINNAME && CONFIG.SMTP_DKIM_KEYSELECTOR && CONFIG.SMTP_DKIM_PRIVATKEY
 
-const transporter = createTransport({
-  host: CONFIG.SMTP_HOST,
-  port: CONFIG.SMTP_PORT,
-  ignoreTLS: CONFIG.SMTP_IGNORE_TLS,
-  secure: CONFIG.SMTP_SECURE, // true for 465, false for other ports
-  pool: true,
-  maxConnections: CONFIG.SMTP_MAX_CONNECTIONS,
-  maxMessages: CONFIG.SMTP_MAX_MESSAGES,
-  auth: hasAuthData && {
-    user: CONFIG.SMTP_USERNAME,
-    pass: CONFIG.SMTP_PASSWORD,
-  },
-  dkim: hasDKIMData && {
-    domainName: CONFIG.SMTP_DKIM_DOMAINNAME,
-    keySelector: CONFIG.SMTP_DKIM_KEYSELECTOR,
-    privateKey: CONFIG.SMTP_DKIM_PRIVATKEY,
-  },
-})
+const transporter = createTransport(transportOptions)
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-function
 let sendMailCallback: any = async () => {}

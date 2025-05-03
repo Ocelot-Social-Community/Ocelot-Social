@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable import/no-named-as-default-member */
 import neo4j, { Driver } from 'neo4j-driver'
 import Neode from 'neode'
