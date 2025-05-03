@@ -1,0 +1,39 @@
+{
+  "notification": "Notification",
+  "subjects": {
+    "changedGroupMemberRole": "Role in group changed",
+    "chatMessage": "New chat message",
+    "commentedOnPost": "New comment on post",
+    "followedUserPosted": "New post by followd user",
+    "mentionedInComment": "Mentioned in comment",
+    "mentionedInPost": "Mentioned in post",
+    "removedUserFromGroup": "Removed from group",
+    "postInGroup": "New post in group",
+    "userJoinedGroup": "User joined group",
+    "userLeftGroup": "User left group"
+  },
+  "buttons": {
+    "viewChat": "Show Chat",
+    "viewComment": "View comment",
+    "viewGroup": "View group",
+    "viewPost": "View post"
+  },
+  "general": {
+    "greeting": "Hello",
+    "seeYou": "See you soon on ",
+    "yourTeam": "– The {team} Team",
+    "settingsHint": "PS: If you don't want to receive e-mails anymore, change your ",
+    "settingsName": "notification settings"
+  },
+  "changedGroupMemberRole": "your role in the group “{groupName}” has been changed. Click on the button to view this group:",
+  "chatMessageStart": "you have received a new chat message from ",
+  "chatMessageEnd": ".",
+  "commentedOnPost": " commented on a post that you are observing with the title “{postTitle}”. Click on the button to view this comment:",
+  "followedUserPosted": ", a user you are following, wrote a new post with the title “{postTitle}”. Click on the button to view this post:",
+  "mentionedInComment": " mentioned you in a comment to the post with the title “{postTitle}”. Click on the button to view this comment:",
+  "mentionedInPost": " mentioned you in a post with the title “{postTitle}”. Click on the button to view this post:",
+  "removedUserFromGroup": "you have been removed from the group “{groupName}”.",
+  "postInGroup": "someone wrote a new post with the title “{postTitle}” in one of your groups. Click on the button to view this post:",
+  "userJoinedGroup": " joined the group “{groupName}”. Click on the button to view this group:",
+  "userLeftGroup": " left the group “{groupName}”. Click on the button to view this group:"
+}

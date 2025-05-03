@@ -14,9 +14,9 @@ import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
-const sendMailMock: (notification) => void = jest.fn()
-jest.mock('@middleware/helpers/email/sendMail', () => ({
-  sendMail: (notification) => sendMailMock(notification),
+const sendNotificationMailMock: (notification) => void = jest.fn()
+jest.mock('@src/emails/sendEmail', () => ({
+  sendNotificationMail: (notification) => sendNotificationMailMock(notification),
 }))
 
 let query, mutate, authenticatedUser
@@ -268,17 +268,17 @@ describe('following users notifications', () => {
     })
 
     it('sends only two emails, as second follower has emails disabled and email-less follower has no email', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(2)
-      expect(sendMailMock).toHaveBeenCalledWith(
+      expect(sendNotificationMailMock).toHaveBeenCalledTimes(2)
+      expect(sendNotificationMailMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          html: expect.stringContaining('Hello First Follower'),
-          to: 'first-follower@example.org',
+          email: 'first-follower@example.org',
+          reason: 'followed_user_posted',
         }),
       )
-      expect(sendMailMock).toHaveBeenCalledWith(
+      expect(sendNotificationMailMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          html: expect.stringContaining('Hello Third Follower'),
-          to: 'third-follower@example.org',
+          email: 'third-follower@example.org',
+          reason: 'followed_user_posted',
         }),
       )
     })

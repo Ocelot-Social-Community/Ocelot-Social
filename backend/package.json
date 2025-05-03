@@ -36,6 +36,7 @@
     "cheerio": "~1.0.0",
     "cross-env": "~7.0.3",
     "dotenv": "~16.5.0",
+    "email-templates": "^12.0.2",
     "express": "^5.1.0",
     "graphql": "^14.6.0",
     "graphql-middleware": "~4.0.2",
@@ -77,6 +78,8 @@
     "node-fetch": "^2.7.0",
     "nodemailer": "^6.10.1",
     "nodemailer-html-to-text": "^3.2.0",
+    "preview-email": "^3.1.0",
+    "pug": "^3.0.3",
     "request": "~2.88.2",
     "sanitize-html": "~2.16.0",
     "slug": "~9.1.0",
@@ -88,6 +91,7 @@
   "devDependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "^4.5.0",
     "@faker-js/faker": "9.7.0",
+    "@types/email-templates": "^10.0.4",
     "@types/jest": "^29.5.14",
     "@types/lodash": "^4.17.16",
     "@types/node": "^22.15.3",
@@ -119,7 +123,10 @@
   },
   "resolutions": {
     "**/**/fs-capacitor": "^6.2.0",
-    "**/graphql-upload": "^11.0.0"
+    "**/graphql-upload": "^11.0.0",
+    "**/strip-ansi": "6.0.1",
+    "**/string-width": "4.2.0",
+    "**/wrap-ansi": "7.0.0"
   },
   "engines": {
     "node": ">=20.12.1"

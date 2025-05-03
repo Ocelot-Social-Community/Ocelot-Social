@@ -10,13 +10,9 @@ import {
   CHAT_MESSAGE_ADDED,
 } from '@constants/subscriptions'
 import { getUnreadRoomsCount } from '@graphql/resolvers/rooms'
-import { sendMail } from '@middleware/helpers/email/sendMail'
-import {
-  chatMessageTemplate,
-  notificationTemplate,
-} from '@middleware/helpers/email/templateBuilder'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
+import { sendNotificationMail, sendChatMessageMail } from '@src/emails/sendEmail'
 
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 
@@ -35,12 +31,7 @@ const publishNotifications = async (
       !isUserOnline(notificationAdded.to) &&
       !emailsSent.includes(notificationAdded.email)
     ) {
-      sendMail(
-        notificationTemplate({
-          email: notificationAdded.email,
-          variables: { notification: notificationAdded },
-        }),
-      )
+      void sendNotificationMail(notificationAdded)
       emailsSent.push(notificationAdded.email)
     }
   })
@@ -496,7 +487,7 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
 
       // Send EMail if we found a user(not blocked) and he is not considered online
       if (recipientUser.emailNotificationsChatMessage !== false && !isUserOnline(recipientUser)) {
-        void sendMail(chatMessageTemplate({ email, variables: { senderUser, recipientUser } }))
+        void sendChatMessageMail({ email, senderUser, recipientUser })
       }
     }
 

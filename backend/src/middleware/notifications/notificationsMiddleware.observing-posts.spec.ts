@@ -14,9 +14,9 @@ import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
-const sendMailMock: (notification) => void = jest.fn()
-jest.mock('@middleware/helpers/email/sendMail', () => ({
-  sendMail: (notification) => sendMailMock(notification),
+const sendNotificationMailMock: (notification) => void = jest.fn()
+jest.mock('@src/emails/sendEmail', () => ({
+  sendNotificationMail: (notification) => sendNotificationMailMock(notification),
 }))
 
 let query, mutate, authenticatedUser
@@ -213,10 +213,11 @@ describe('notifications for users that observe a post', () => {
     })
 
     it('sends one email', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(1)
-      expect(sendMailMock).toHaveBeenCalledWith(
+      expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+      expect(sendNotificationMailMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          to: 'post-author@example.org',
+          email: 'post-author@example.org',
+          reason: 'commented_on_post',
         }),
       )
     })
@@ -303,15 +304,17 @@ describe('notifications for users that observe a post', () => {
       })
 
       it('sends two emails', () => {
-        expect(sendMailMock).toHaveBeenCalledTimes(2)
-        expect(sendMailMock).toHaveBeenCalledWith(
+        expect(sendNotificationMailMock).toHaveBeenCalledTimes(2)
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
           expect.objectContaining({
-            to: 'post-author@example.org',
+            email: 'post-author@example.org',
+            reason: 'commented_on_post',
           }),
         )
-        expect(sendMailMock).toHaveBeenCalledWith(
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
           expect.objectContaining({
-            to: 'first-commenter@example.org',
+            email: 'first-commenter@example.org',
+            reason: 'commented_on_post',
           }),
         )
       })
@@ -417,10 +420,11 @@ describe('notifications for users that observe a post', () => {
       })
 
       it('sends one email', () => {
-        expect(sendMailMock).toHaveBeenCalledTimes(1)
-        expect(sendMailMock).toHaveBeenCalledWith(
+        expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
           expect.objectContaining({
-            to: 'second-commenter@example.org',
+            email: 'second-commenter@example.org',
+            reason: 'commented_on_post',
           }),
         )
       })

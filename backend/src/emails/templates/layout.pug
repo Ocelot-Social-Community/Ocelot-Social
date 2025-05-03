@@ -1,0 +1,26 @@
+doctype html
+html(lang=locale)
+  head
+    meta(
+      content="multipart/html; charset=UTF-8"
+      http-equiv="content-type"
+      )
+    meta(
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+      )
+    style.
+      .wf-force-outline-none[tabindex="-1"]:focus{outline:none;}
+    style
+      include includes/webflow.css
+  
+  body
+    div.container
+      include includes/header.pug
+      include includes/salutation.pug
+
+      .wrapper
+        block content
+        include includes/greeting.pug
+
+      include includes/footer.pug

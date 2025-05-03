@@ -17,9 +17,9 @@ import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
-const sendMailMock: (notification) => void = jest.fn()
-jest.mock('@middleware/helpers/email/sendMail', () => ({
-  sendMail: (notification) => sendMailMock(notification),
+const sendNotificationMailMock: (notification) => void = jest.fn()
+jest.mock('@src/emails/sendEmail', () => ({
+  sendNotificationMail: (notification) => sendNotificationMailMock(notification),
 }))
 
 let query, mutate, authenticatedUser
@@ -394,7 +394,25 @@ describe('mentions in groups', () => {
     })
 
     it('sends only 3 emails, one for each user with an email', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(3)
+      expect(sendNotificationMailMock).toHaveBeenCalledTimes(3)
+      expect(sendNotificationMailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: 'group.member@example.org',
+          reason: 'mentioned_in_post',
+        }),
+      )
+      expect(sendNotificationMailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: 'no.member@example.org',
+          reason: 'mentioned_in_post',
+        }),
+      )
+      expect(sendNotificationMailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: 'pending.member@example.org',
+          reason: 'mentioned_in_post',
+        }),
+      )
     })
   })
 
@@ -490,7 +508,13 @@ describe('mentions in groups', () => {
     })
 
     it('sends only 1 email', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(1)
+      expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+      expect(sendNotificationMailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: 'group.member@example.org',
+          reason: 'mentioned_in_post',
+        }),
+      )
     })
   })
 
@@ -586,7 +610,13 @@ describe('mentions in groups', () => {
     })
 
     it('sends only 1 email', () => {
-      expect(sendMailMock).toHaveBeenCalledTimes(1)
+      expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+      expect(sendNotificationMailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: 'group.member@example.org',
+          reason: 'mentioned_in_post',
+        }),
+      )
     })
   })
 
@@ -670,7 +700,19 @@ describe('mentions in groups', () => {
       })
 
       it('sends 2 emails', () => {
-        expect(sendMailMock).toHaveBeenCalledTimes(3)
+        expect(sendNotificationMailMock).toHaveBeenCalledTimes(3)
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            email: 'group.member@example.org',
+            reason: 'mentioned_in_comment',
+          }),
+        )
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            email: 'no.member@example.org',
+            reason: 'mentioned_in_comment',
+          }),
+        )
       })
     })
 
@@ -761,7 +803,13 @@ describe('mentions in groups', () => {
       })
 
       it('sends 1 email', () => {
-        expect(sendMailMock).toHaveBeenCalledTimes(1)
+        expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            email: 'group.member@example.org',
+            reason: 'mentioned_in_comment',
+          }),
+        )
       })
     })
 
@@ -852,7 +900,13 @@ describe('mentions in groups', () => {
       })
 
       it('sends 1 email', () => {
-        expect(sendMailMock).toHaveBeenCalledTimes(1)
+        expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+        expect(sendNotificationMailMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            email: 'group.member@example.org',
+            reason: 'mentioned_in_comment',
+          }),
+        )
       })
     })
   })
