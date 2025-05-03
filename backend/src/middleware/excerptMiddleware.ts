@@ -5,17 +5,20 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import trunc from 'trunc-html'
 
-import { DESCRIPTION_EXCERPT_HTML_LENGTH } from '@constants/groups'
+import CONFIG from '@config/config'
 
 export default {
   Mutation: {
     CreateGroup: async (resolve, root, args, context, info) => {
-      args.descriptionExcerpt = trunc(args.description, DESCRIPTION_EXCERPT_HTML_LENGTH).html
+      args.descriptionExcerpt = trunc(args.description, CONFIG.DESCRIPTION_EXCERPT_HTML_LENGTH).html
       return resolve(root, args, context, info)
     },
     UpdateGroup: async (resolve, root, args, context, info) => {
       if (args.description)
-        args.descriptionExcerpt = trunc(args.description, DESCRIPTION_EXCERPT_HTML_LENGTH).html
+        args.descriptionExcerpt = trunc(
+          args.description,
+          CONFIG.DESCRIPTION_EXCERPT_HTML_LENGTH,
+        ).html
       return resolve(root, args, context, info)
     },
     CreatePost: async (resolve, root, args, context, info) => {

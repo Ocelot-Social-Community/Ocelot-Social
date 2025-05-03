@@ -7,7 +7,7 @@
 import bcrypt from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
 
-import registrationConstants from '@constants/registrationBranded'
+import CONFIG from '@config/config'
 
 import createPasswordReset from './helpers/createPasswordReset'
 
@@ -15,7 +15,7 @@ export default {
   Mutation: {
     requestPasswordReset: async (_parent, { email }, { driver }) => {
       // TODO: why this is generated differntly from 'backend/src/schema/resolvers/helpers/generateNonce.js'?
-      const nonce = uuid().substring(0, registrationConstants.NONCE_LENGTH)
+      const nonce = uuid().substring(0, CONFIG.NONCE_LENGTH)
       return createPasswordReset({ driver, nonce, email })
     },
     resetPassword: async (_parent, { email, nonce, newPassword }, { driver }) => {

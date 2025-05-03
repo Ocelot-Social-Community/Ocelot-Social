@@ -6,7 +6,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { rule, shield, deny, allow, or, and } from 'graphql-shield'
 
-import CONFIG from '@config/index'
+import CONFIG from '@config/config'
 import SocialMedia from '@db/models/SocialMedia'
 import { getNeode } from '@db/neo4j'
 import { validateInviteCode } from '@graphql/resolvers/transactions/inviteCodes'

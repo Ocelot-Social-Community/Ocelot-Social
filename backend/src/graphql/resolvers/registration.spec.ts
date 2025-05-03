@@ -5,7 +5,7 @@
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import CONFIG from '@config/index'
+import CONFIG from '@config/config'
 import Factory, { cleanDatabase } from '@db/factories'
 import EmailAddress from '@db/models/EmailAddress'
 import User from '@db/models/User'

@@ -10,7 +10,7 @@ import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 import jwt from 'jsonwebtoken'
 
-import CONFIG from '@config/index'
+import CONFIG from '@config/config'
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'

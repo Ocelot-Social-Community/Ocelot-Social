@@ -15,7 +15,7 @@ import { S3 } from 'aws-sdk'
 import slug from 'slug'
 import { v4 as uuid } from 'uuid'
 
-import CONFIG from '@config/index'
+import CONFIG from '@config/config'
 import { getDriver } from '@db/neo4j'
 
 // const widths = [34, 160, 320, 640, 1024]

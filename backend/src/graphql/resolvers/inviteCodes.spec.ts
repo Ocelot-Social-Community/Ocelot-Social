@@ -5,7 +5,7 @@
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import registrationConstants from '@constants/registrationBranded'
+import CONFIG from '@config/config'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
 import createServer from '@src/server'
@@ -115,9 +115,7 @@ describe('inviteCodes', () => {
           data: {
             GenerateInviteCode: {
               code: expect.stringMatching(
-                new RegExp(
-                  `^[0-9A-Z]{${registrationConstants.INVITE_CODE_LENGTH},${registrationConstants.INVITE_CODE_LENGTH}}$`,
-                ),
+                new RegExp(`^[0-9A-Z]{${CONFIG.INVITE_CODE_LENGTH},${CONFIG.INVITE_CODE_LENGTH}}$`),
               ),
               expiresAt: null,
               createdAt: expect.any(String),
@@ -141,9 +139,7 @@ describe('inviteCodes', () => {
           data: {
             GenerateInviteCode: {
               code: expect.stringMatching(
-                new RegExp(
-                  `^[0-9A-Z]{${registrationConstants.INVITE_CODE_LENGTH},${registrationConstants.INVITE_CODE_LENGTH}}$`,
-                ),
+                new RegExp(`^[0-9A-Z]{${CONFIG.INVITE_CODE_LENGTH},${CONFIG.INVITE_CODE_LENGTH}}$`),
               ),
               expiresAt: nextWeek.toISOString(),
               createdAt: expect.any(String),

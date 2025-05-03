@@ -7,7 +7,7 @@
 import nodemailer from 'nodemailer'
 import { htmlToText } from 'nodemailer-html-to-text'
 
-import CONFIG from '@config/index'
+import CONFIG from '@config/config'
 import { cleanHtml } from '@middleware/helpers/cleanHtml'
 
 const hasEmailConfig = CONFIG.SMTP_HOST && CONFIG.SMTP_PORT

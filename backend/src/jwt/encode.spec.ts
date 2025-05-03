@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import jwt from 'jsonwebtoken'
 
-import CONFIG from '@config/index'
+import CONFIG from '@config/config'
 
 import encode from './encode'
 

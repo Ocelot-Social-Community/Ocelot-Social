@@ -8,9 +8,7 @@
 import { UserInputError } from 'apollo-server'
 import { v4 as uuid } from 'uuid'
 
-import CONFIG from '@config/index'
-import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'
-import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '@constants/groups'
+import CONFIG from '@config/config'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 
 import Resolver, {
@@ -138,16 +136,19 @@ export default {
       const { categoryIds } = params
       delete params.categoryIds
       params.locationName = params.locationName === '' ? null : params.locationName
-      if (CONFIG.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
+      if (
+        CONFIG.CATEGORIES_ACTIVE &&
+        (!categoryIds || categoryIds.length < CONFIG.CATEGORIES_MIN)
+      ) {
         throw new UserInputError('Too few categories!')
       }
-      if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > CATEGORIES_MAX) {
+      if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > CONFIG.CATEGORIES_MAX) {
         throw new UserInputError('Too many categories!')
       }
       if (
         params.description === undefined ||
         params.description === null ||
-        removeHtmlTags(params.description).length < DESCRIPTION_WITHOUT_HTML_LENGTH_MIN
+        removeHtmlTags(params.description).length < CONFIG.DESCRIPTION_WITHOUT_HTML_LENGTH_MIN
       ) {
         throw new UserInputError('Description too short!')
       }
@@ -208,16 +209,16 @@ export default {
       params.locationName = params.locationName === '' ? null : params.locationName
 
       if (CONFIG.CATEGORIES_ACTIVE && categoryIds) {
-        if (categoryIds.length < CATEGORIES_MIN) {
+        if (categoryIds.length < CONFIG.CATEGORIES_MIN) {
           throw new UserInputError('Too few categories!')
         }
-        if (categoryIds.length > CATEGORIES_MAX) {
+        if (categoryIds.length > CONFIG.CATEGORIES_MAX) {
           throw new UserInputError('Too many categories!')
         }
       }
       if (
         params.description &&
-        removeHtmlTags(params.description).length < DESCRIPTION_WITHOUT_HTML_LENGTH_MIN
+        removeHtmlTags(params.description).length < CONFIG.DESCRIPTION_WITHOUT_HTML_LENGTH_MIN
       ) {
         throw new UserInputError('Description too short!')
       }
