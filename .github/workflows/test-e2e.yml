@@ -4,7 +4,7 @@ on: push
 
 jobs:
   prepare_neo4j_image:
-    name: Fullstack | prepare neo4j
+    name: Fullstack | prepare neo4j image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -22,7 +22,7 @@ jobs:
           key: ${{ github.run_id }}-e2e-neo4j-cache
 
   prepare_backend_image:
-    name: Fullstack | prepare backend
+    name: Fullstack | prepare backend image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -40,7 +40,7 @@ jobs:
           key: ${{ github.run_id }}-e2e-backend-cache
 
   prepare_webapp_image:
-    name: Fullstack | prepare webapp
+    name: Fullstack | prepare webapp image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -89,7 +89,7 @@ jobs:
           key: ${{ github.run_id }}-e2e-cypress
 
   fullstack_tests:
-    name: Fullstack tests
+    name: Fullstack | tests
     if: success()
     needs: [prepare_neo4j_image, prepare_backend_image, prepare_webapp_image, prepare_cypress]
     runs-on: ubuntu-latest
@@ -102,7 +102,6 @@ jobs:
     steps:
       - name: Restore cypress cache
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
-        
         with:
           path: |
             /opt/cucumber-json-formatter
