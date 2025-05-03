@@ -1,19 +1,19 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
+import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import CONFIG from '@src/config'
-import createServer from '@src/server'
+import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
@@ -22,12 +22,9 @@ jest.mock('@src/emails/sendEmail', () => ({
   sendNotificationMail: (notification) => sendNotificationMailMock(notification),
 }))
 
-let server, query, mutate, authenticatedUser
+let query, mutate, authenticatedUser
 
 let postAuthor, groupMember, pendingMember, noMember, emaillessMember
-
-const driver = getDriver()
-const neode = getNeode()
 
 const mentionString = `
   <a class="mention" data-mention-id="no-member" href="/profile/no-member/no-member">@no-member</a>
@@ -93,22 +90,18 @@ const markAllAsRead = async () =>
     `,
   })
 
+const database = databaseContext()
+
+let server: ApolloServer
+
 beforeAll(async () => {
   await cleanDatabase()
 
-  const createServerResult = createServer({
-    context: () => {
-      return {
-        user: authenticatedUser,
-        neode,
-        driver,
-        cypherParams: {
-          currentUserId: authenticatedUser ? authenticatedUser.id : null,
-        },
-      }
-    },
-  })
-  server = createServerResult.server
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database })
+
+  server = createServer({ context }).server
+
   const createTestClientResult = createTestClient(server)
   query = createTestClientResult.query
   mutate = createTestClientResult.mutate
@@ -116,7 +109,9 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('mentions in groups', () => {
@@ -169,7 +164,7 @@ describe('mentions in groups', () => {
         password: '1234',
       },
     )
-    emaillessMember = await neode.create('User', {
+    emaillessMember = await database.neode.create('User', {
       id: 'email-less-member',
       name: 'Email-less Member',
       slug: 'email-less-member',

@@ -6,13 +6,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { withFilter } from 'graphql-subscriptions'
 
-import { pubsub, NOTIFICATION_ADDED } from '@src/server'
+import { NOTIFICATION_ADDED } from '@constants/subscriptions'
 
 export default {
   Subscription: {
     notificationAdded: {
       subscribe: withFilter(
-        () => pubsub.asyncIterator(NOTIFICATION_ADDED),
+        (_, __, context) => context.pubsub.asyncIterator(NOTIFICATION_ADDED),
         (payload, variables, context) => {
           return payload.notificationAdded.to.id === context.user?.id
         },

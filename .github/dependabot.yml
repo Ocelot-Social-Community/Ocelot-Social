@@ -57,19 +57,10 @@ updates:
       applies-to: version-updates
       patterns:
         - "*apollo-server*"
-    babel:
-      applies-to: version-updates
-      patterns:
-        - "@babel*"
     metascraper:
       applies-to: version-updates
       patterns:
         - "metascraper*"
-    typescript:
-      applies-to: version-updates
-      patterns:
-        - "ts*"
-        - "*types?"
 
 # webapp
 - package-ecosystem: docker

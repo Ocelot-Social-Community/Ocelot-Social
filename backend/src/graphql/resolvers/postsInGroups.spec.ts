@@ -2,11 +2,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 
 import CONFIG from '@config/index'
+import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
 import { createCommentMutation } from '@graphql/queries/createCommentMutation'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
@@ -17,7 +18,7 @@ import { postQuery } from '@graphql/queries/postQuery'
 import { profilePagePosts } from '@graphql/queries/profilePagePosts'
 import { searchPosts } from '@graphql/queries/searchPosts'
 import { signupVerificationMutation } from '@graphql/queries/signupVerificationMutation'
-import createServer from '@src/server'
+import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
@@ -27,9 +28,6 @@ jest.mock('@constants/groups', () => {
     DESCRIPTION_WITHOUT_HTML_LENGTH_MIN: 5,
   }
 })
-
-const driver = getDriver()
-const neode = getNeode()
 
 let query
 let mutate
@@ -42,28 +40,26 @@ let hiddenUser
 let authenticatedUser
 let newUser
 
+const database = databaseContext()
+
+let server: ApolloServer
 beforeAll(async () => {
   await cleanDatabase()
 
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode,
-        user: authenticatedUser,
-        cypherParams: {
-          currentUserId: authenticatedUser ? authenticatedUser.id : null,
-        },
-      }
-    },
-  })
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database })
+
+  server = createServer({ context }).server
   query = createTestClient(server).query
   mutate = createTestClient(server).mutate
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('Posts in Groups', () => {

@@ -3,14 +3,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import { categories } from '@constants/categories'
+import databaseContext from '@context/database'
+import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import User from '@db/models/User'
-import { getNeode, getDriver } from '@db/neo4j'
-import createServer from '@src/server'
+import createServer, { getContext } from '@src/server'
 
 const categoryIds = ['cat9']
 let user
@@ -21,8 +23,7 @@ let query
 let mutate
 let variables
 
-const driver = getDriver()
-const neode = getNeode()
+const pubsub = pubsubContext()
 
 const deleteUserMutation = gql`
   mutation ($id: ID!, $resource: [Deletable]) {
@@ -108,25 +109,28 @@ const resetTrophyBadgesSelected = gql`
   }
 `
 
+const database = databaseContext()
+
+let server: ApolloServer
+
 beforeAll(async () => {
   await cleanDatabase()
 
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode,
-        user: authenticatedUser,
-      }
-    },
-  })
-  query = createTestClient(server).query
-  mutate = createTestClient(server).mutate
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database, pubsub })
+
+  server = createServer({ context }).server
+
+  const createTestClientResult = createTestClient(server)
+  query = createTestClientResult.query
+  mutate = createTestClientResult.mutate
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
@@ -540,10 +544,10 @@ describe('Delete a User as admin', () => {
 
       describe('connected `EmailAddress` nodes', () => {
         it('will be removed completely', async () => {
-          await expect(neode.all('EmailAddress')).resolves.toHaveLength(2)
+          await expect(database.neode.all('EmailAddress')).resolves.toHaveLength(2)
           await mutate({ mutation: deleteUserMutation, variables })
 
-          await expect(neode.all('EmailAddress')).resolves.toHaveLength(1)
+          await expect(database.neode.all('EmailAddress')).resolves.toHaveLength(1)
         })
       })
 
@@ -554,9 +558,9 @@ describe('Delete a User as admin', () => {
         })
 
         it('will be removed completely', async () => {
-          await expect(neode.all('SocialMedia')).resolves.toHaveLength(1)
+          await expect(database.neode.all('SocialMedia')).resolves.toHaveLength(1)
           await mutate({ mutation: deleteUserMutation, variables })
-          await expect(neode.all('SocialMedia')).resolves.toHaveLength(0)
+          await expect(database.neode.all('SocialMedia')).resolves.toHaveLength(0)
         })
       })
     })
@@ -1041,8 +1045,8 @@ describe('updateOnlineStatus', () => {
         )
 
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
-        const result = await neode.cypher(cypher, { id: authenticatedUser.id })
-        const dbUser = neode.hydrateFirst(result, 'u', neode.model('User'))
+        const result = await database.neode.cypher(cypher, { id: authenticatedUser.id })
+        const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
         await expect(dbUser.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'online',
         })
@@ -1067,8 +1071,8 @@ describe('updateOnlineStatus', () => {
         )
 
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
-        const result = await neode.cypher(cypher, { id: authenticatedUser.id })
-        const dbUser = neode.hydrateFirst(result, 'u', neode.model('User'))
+        const result = await database.neode.cypher(cypher, { id: authenticatedUser.id })
+        const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
         await expect(dbUser.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
           awaySince: expect.any(String),
@@ -1083,8 +1087,12 @@ describe('updateOnlineStatus', () => {
         )
 
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
-        const result = await neode.cypher(cypher, { id: authenticatedUser.id })
-        const dbUser = neode.hydrateFirst<typeof User>(result, 'u', neode.model('User'))
+        const result = await database.neode.cypher(cypher, { id: authenticatedUser.id })
+        const dbUser = database.neode.hydrateFirst<typeof User>(
+          result,
+          'u',
+          database.neode.model('User'),
+        )
         await expect(dbUser.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
           awaySince: expect.any(String),
@@ -1098,8 +1106,8 @@ describe('updateOnlineStatus', () => {
           }),
         )
 
-        const result2 = await neode.cypher(cypher, { id: authenticatedUser.id })
-        const dbUser2 = neode.hydrateFirst(result2, 'u', neode.model('User'))
+        const result2 = await database.neode.cypher(cypher, { id: authenticatedUser.id })
+        const dbUser2 = database.neode.hydrateFirst(result2, 'u', database.neode.model('User'))
         await expect(dbUser2.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
           awaySince,

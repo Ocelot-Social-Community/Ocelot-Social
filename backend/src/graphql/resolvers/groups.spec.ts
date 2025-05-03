@@ -6,8 +6,8 @@
 import { createTestClient } from 'apollo-server-testing'
 
 import CONFIG from '@config/index'
+import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { groupMembersQuery } from '@graphql/queries/groupMembersQuery'
@@ -16,10 +16,7 @@ import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
 import { updateGroupMutation } from '@graphql/queries/updateGroupMutation'
-import createServer from '@src/server'
-
-const driver = getDriver()
-const neode = getNeode()
+import createServer, { getContext } from '@src/server'
 
 let authenticatedUser
 let user
@@ -35,15 +32,12 @@ const descriptionAdditional100 =
   ' 123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789'
 let variables = {}
 
-const { server } = createServer({
-  context: () => {
-    return {
-      driver,
-      neode,
-      user: authenticatedUser,
-    }
-  },
-})
+const database = databaseContext()
+// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+const contextUser = async (_req) => authenticatedUser
+const context = getContext({ user: contextUser, database })
+
+const { server } = createServer({ context })
 const { mutate, query } = createTestClient(server)
 
 const seedBasicsAndClearAuthentication = async () => {
@@ -60,25 +54,25 @@ const seedBasicsAndClearAuthentication = async () => {
     },
   )
   await Promise.all([
-    neode.create('Category', {
+    database.neode.create('Category', {
       id: 'cat4',
       name: 'Environment & Nature',
       slug: 'environment-nature',
       icon: 'tree',
     }),
-    neode.create('Category', {
+    database.neode.create('Category', {
       id: 'cat9',
       name: 'Democracy & Politics',
       slug: 'democracy-politics',
       icon: 'university',
     }),
-    neode.create('Category', {
+    database.neode.create('Category', {
       id: 'cat15',
       name: 'Consumption & Sustainability',
       slug: 'consumption-sustainability',
       icon: 'shopping-cart',
     }),
-    neode.create('Category', {
+    database.neode.create('Category', {
       id: 'cat27',
       name: 'Animal Protection',
       slug: 'animal-protection',
@@ -241,7 +235,9 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('in mode', () => {
