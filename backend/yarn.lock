@@ -1533,6 +1533,11 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
+"@types/slug@^5.0.9":
+  version "5.0.9"
+  resolved "https://registry.yarnpkg.com/@types/slug/-/slug-5.0.9.tgz#e5b213a9d7797d40d362ba85e2a7bbcd4df4ed40"
+  integrity sha512-6Yp8BSplP35Esa/wOG1wLNKiqXevpQTEF/RcL/NV6BBQaMmZh4YlDwCgrrFSoUE4xAGvnKd5c+lkQJmPrBAzfQ==
+
 "@types/stack-utils@^2.0.0":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-2.0.1.tgz#20f18294f797f2209b5f65c8e3b5c8e8261d127c"
