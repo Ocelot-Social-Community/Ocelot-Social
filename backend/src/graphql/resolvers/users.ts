@@ -8,7 +8,7 @@
 import { UserInputError, ForbiddenError } from 'apollo-server'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
-import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
+import CONFIG from '@config/config'
 import { getNeode } from '@db/neo4j'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
@@ -394,9 +394,9 @@ export default {
         user: { id: userId },
       } = context
 
-      if (slot >= TROPHY_BADGES_SELECTED_MAX || slot < 0) {
+      if (slot >= CONFIG.TROPHY_BADGES_SELECTED_MAX || slot < 0) {
         throw new Error(
-          `Invalid slot! There is only ${TROPHY_BADGES_SELECTED_MAX} badge-slots to fill`,
+          `Invalid slot! There is only ${CONFIG.TROPHY_BADGES_SELECTED_MAX} badge-slots to fill`,
         )
       }
 
@@ -539,7 +539,7 @@ export default {
       })
       try {
         const badgesSelected = await query
-        const result = Array(TROPHY_BADGES_SELECTED_MAX).fill(defaultTrophyBadge)
+        const result = Array(CONFIG.TROPHY_BADGES_SELECTED_MAX).fill(defaultTrophyBadge)
         badgesSelected.map((record) => {
           result[record.get('slot')] = record.get('badge')
           return true

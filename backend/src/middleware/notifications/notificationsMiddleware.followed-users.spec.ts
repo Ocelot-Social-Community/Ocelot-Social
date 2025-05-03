@@ -6,10 +6,10 @@
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
+import CONFIG from '@config/config'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
-import CONFIG from '@src/config'
 import createServer from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-import CONFIG from './config'
+
+import CONFIG from './config/config'
 import createServer from './server'
 
 const { server, httpServer } = createServer()

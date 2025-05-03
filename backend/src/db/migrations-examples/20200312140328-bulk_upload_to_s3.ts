@@ -11,7 +11,7 @@ import path from 'node:path'
 import { S3 } from 'aws-sdk'
 import mime from 'mime-types'
 
-import s3Configs from '@config/index'
+import s3Configs from '@config/config'
 import { getDriver } from '@db/neo4j'
 
 export const description = `

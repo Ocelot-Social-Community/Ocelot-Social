@@ -4,8 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import CONFIG from '@config/index'
-import logosWebapp from '@config/logos'
+import CONFIG from '@config/config'
 
 import {
   signupTemplate,
@@ -17,7 +16,7 @@ import {
 } from './templateBuilder'
 
 const englishHint = 'English version below!'
-const welcomeImageUrl = new URL(logosWebapp.LOGO_WELCOME_PATH, CONFIG.CLIENT_URI)
+const welcomeImageUrl = new URL(CONFIG.LOGO_WELCOME_PATH, CONFIG.CLIENT_URI)
 const supportUrl = CONFIG.SUPPORT_URL.toString()
 let actionUrl, name, settingsUrl
 

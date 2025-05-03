@@ -16,7 +16,7 @@ import { graphqlUploadExpress } from 'graphql-upload'
 import helmet from 'helmet'
 import Redis from 'ioredis'
 
-import CONFIG from './config'
+import CONFIG from './config/config'
 import { getNeode, getDriver } from './db/neo4j'
 import schema from './graphql/schema'
 import decode from './jwt/decode'

@@ -11,7 +11,7 @@
 import { UserInputError } from 'apollo-server'
 import request from 'request'
 
-import CONFIG from '@config/index'
+import CONFIG from '@config/config'
 
 const fetch = (url) => {
   return new Promise((resolve, reject) => {

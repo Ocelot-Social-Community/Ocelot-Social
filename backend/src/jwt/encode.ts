@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import jwt from 'jsonwebtoken'
 
-import CONFIG from '@config/index'
+import CONFIG from '@config/config'
 
 // Generate an Access Token for the given User ID
 export default function encode(user) {

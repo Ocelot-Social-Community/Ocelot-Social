@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { applyMiddleware, IMiddleware } from 'graphql-middleware'
 
-import CONFIG from '@config/index'
+import CONFIG from '@config/config'
 
 // eslint-disable-next-line import/no-cycle
 import brandingMiddlewares from './branding/brandingMiddlewares'

@@ -7,7 +7,7 @@ import { faker } from '@faker-js/faker'
 import { createTestClient } from 'apollo-server-testing'
 import sample from 'lodash/sample'
 
-import CONFIG from '@config/index'
+import CONFIG from '@config/config'
 import { categories } from '@constants/categories'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
 import { createCommentMutation } from '@graphql/queries/createCommentMutation'

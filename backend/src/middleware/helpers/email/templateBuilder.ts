@@ -6,21 +6,19 @@
 /* eslint-disable import/no-namespace */
 import mustache from 'mustache'
 
-import CONFIG from '@config/index'
-import logosWebapp from '@config/logos'
-import metadata from '@config/metadata'
+import CONFIG from '@config/config'
 
 import * as templates from './templates'
 import * as templatesDE from './templates/de'
 import * as templatesEN from './templates/en'
 
 const from = CONFIG.EMAIL_DEFAULT_SENDER
-const welcomeImageUrl = new URL(logosWebapp.LOGO_WELCOME_PATH, CONFIG.CLIENT_URI)
+const welcomeImageUrl = new URL(CONFIG.LOGO_WELCOME_PATH, CONFIG.CLIENT_URI)
 
 const defaultParams = {
   welcomeImageUrl,
   APPLICATION_NAME: CONFIG.APPLICATION_NAME,
-  ORGANIZATION_NAME: metadata.ORGANIZATION_NAME,
+  ORGANIZATION_NAME: CONFIG.ORGANIZATION_NAME,
   ORGANIZATION_URL: CONFIG.ORGANIZATION_URL,
   supportUrl: CONFIG.SUPPORT_URL,
 }

@@ -5,7 +5,7 @@
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import CONFIG from '@config/index'
+import CONFIG from '@config/config'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import createServer from '@src/server'
