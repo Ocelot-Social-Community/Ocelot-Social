@@ -1,5 +1,5 @@
-import { When } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-When("I submit the form", () => {
-  cy.get("form").submit();
-});
+defineStep('I submit the form', () => {
+  cy.get('form').submit()
+})

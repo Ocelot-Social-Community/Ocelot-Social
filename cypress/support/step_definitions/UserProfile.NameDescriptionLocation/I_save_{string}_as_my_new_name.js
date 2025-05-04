@@ -1,6 +1,6 @@
-import { When } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-When('I save {string} as my new name', name => {
+defineStep('I save {string} as my new name', name => {
   cy.get('input[id=name]')
     .clear()
     .type(name)

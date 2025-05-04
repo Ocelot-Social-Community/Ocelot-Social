@@ -1,5 +1,5 @@
-import { Then } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-Then("I click save", () => {
-  cy.get(".save-button").click()
+defineStep('I click save', () => {
+  cy.get('.save-button').click()
 })

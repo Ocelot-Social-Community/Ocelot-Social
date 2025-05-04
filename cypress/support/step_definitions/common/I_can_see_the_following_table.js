@@ -1,6 +1,6 @@
-import { Then } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-Then('I can see the following table:', table => {
+defineStep('I can see the following table:', table => {
   const headers = table.raw()[0]
   headers.forEach((expected, i) => {
     cy.get('thead th')
