@@ -1,4 +1,4 @@
-import { Given } from '@badeball/cypress-cucumber-preprocessor'
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 import './../../factories'
 
 defineStep('{string} wrote a post {string}', (author, title) => {

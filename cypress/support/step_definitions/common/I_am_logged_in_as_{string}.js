@@ -1,4 +1,4 @@
-import { Given } from '@badeball/cypress-cucumber-preprocessor'
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 import encode from '../../../../backend/build/src/jwt/encode'
 
 defineStep('I am logged in as {string}', slug => {
