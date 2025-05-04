@@ -107,7 +107,7 @@ jobs:
             /opt/cucumber-json-formatter
             /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
-          key: ${{ github.run_id }}-e2e-*
+          key: ${{ github.run_id }}-e2e-cypress
           restore-keys: ${{ github.run_id }}-e2e-cypress
 
       - name: Restore neo4j cache
