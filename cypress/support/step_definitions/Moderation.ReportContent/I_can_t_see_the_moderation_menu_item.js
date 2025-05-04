@@ -1,6 +1,6 @@
-import { Then } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-Then(`I can't see the moderation menu item`, () => {
+defineStep(`I can't see the moderation menu item`, () => {
   cy.get('.avatar-menu-popover')
     .find('a[href="/settings"]', 'Settings')
     .should('exist') // OK, the dropdown is actually open

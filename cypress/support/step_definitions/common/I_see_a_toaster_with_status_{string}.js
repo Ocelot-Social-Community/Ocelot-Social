@@ -1,9 +1,9 @@
-import { Then } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-Then("I see a toaster with status {string}", (status) => {
+defineStep('I see a toaster with status {string}', (status) => {
   switch (status) {
-    case "success":
-      cy.get(".iziToast.iziToast-color-green").should("be.visible");
-      break;
+    case 'success':
+      cy.get('.iziToast.iziToast-color-green').should('be.visible')
+      break
   }
 })
