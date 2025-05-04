@@ -4,6 +4,7 @@ When("I log out", () => {
   cy.get(".avatar-menu").then(($menu) => {
     if (!$menu.is(':visible')){
       cy.scrollTo("top");
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(500);
     }
   })

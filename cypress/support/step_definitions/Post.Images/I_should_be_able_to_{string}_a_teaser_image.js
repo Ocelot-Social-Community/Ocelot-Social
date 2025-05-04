@@ -1,3 +1,5 @@
+/* eslint-disable cypress/unsafe-to-chain-command */
+/* eslint-disable cypress/no-unnecessary-waiting */
 import { Then } from "@badeball/cypress-cucumber-preprocessor";
 
 Then("I should be able to {string} a teaser image", condition => {
