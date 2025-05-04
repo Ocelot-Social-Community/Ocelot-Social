@@ -67,7 +67,7 @@ jobs:
       - name: Copy env files
         run: |
           cp webapp/.env.template webapp/.env
-          cp backend/.env.template backend/.env
+          cp backend/.env.test_e2e backend/.env
 
       - name: Install cypress requirements
         run: |
