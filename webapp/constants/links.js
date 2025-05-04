@@ -22,7 +22,7 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
 const DONATE = defaultPageParamsPages.DONATE.overwrite({
   // if defined it's dominating
   externalLink: {
-    url: 'https://busfaktor.org/en/spenden',
+    url: 'https://ocelot.social/en/donate/',
     target: '_blank',
   },
 
@@ -38,7 +38,7 @@ const DONATE = defaultPageParamsPages.DONATE.overwrite({
 })
 const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
   externalLink: {
-    url: 'http://ocelot.social/en/impressum',
+    url: 'https://ocelot.social/en/imprint/',
     target: '_blank',
   },
 

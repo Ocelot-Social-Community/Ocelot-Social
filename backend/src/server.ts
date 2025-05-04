@@ -11,62 +11,55 @@ import http from 'node:http'
 import { ApolloServer } from 'apollo-server-express'
 import bodyParser from 'body-parser'
 import express from 'express'
-import { RedisPubSub } from 'graphql-redis-subscriptions'
-import { PubSub } from 'graphql-subscriptions'
 import { graphqlUploadExpress } from 'graphql-upload'
 import helmet from 'helmet'
-import Redis from 'ioredis'
+
+import databaseContext from '@context/database'
+import pubsubContext from '@context/pubsub'
 
 import CONFIG from './config'
-import { getNeode, getDriver } from './db/neo4j'
+import schema from './graphql/schema'
 import decode from './jwt/decode'
-// eslint-disable-next-line import/no-cycle
 import middleware from './middleware'
-import schema from './schema'
 
-export const NOTIFICATION_ADDED = 'NOTIFICATION_ADDED'
-export const CHAT_MESSAGE_ADDED = 'CHAT_MESSAGE_ADDED'
-export const ROOM_COUNT_UPDATED = 'ROOM_COUNT_UPDATED'
-const { REDIS_DOMAIN, REDIS_PORT, REDIS_PASSWORD } = CONFIG
-let prodPubsub, devPubsub
-const options = {
-  host: REDIS_DOMAIN,
-  port: REDIS_PORT,
-  password: REDIS_PASSWORD,
-  retryStrategy: (times) => {
-    return Math.min(times * 50, 2000)
-  },
-}
-if (options.host && options.port && options.password) {
-  prodPubsub = new RedisPubSub({
-    publisher: new Redis(options),
-    subscriber: new Redis(options),
-  })
-} else {
-  devPubsub = new PubSub()
-}
-export const pubsub = prodPubsub || devPubsub
-const driver = getDriver()
-const neode = getNeode()
+const serverDatabase = databaseContext()
+const serverPubsub = pubsubContext()
 
-const getContext = async (req) => {
-  const user = await decode(driver, req.headers.authorization)
-  return {
-    driver,
-    neode,
-    user,
-    req,
-    cypherParams: {
-      currentUserId: user ? user.id : null,
-    },
+const databaseUser = async (req) => decode(serverDatabase.driver, req.headers.authorization)
+
+export const getContext =
+  (
+    {
+      database = serverDatabase,
+      pubsub = serverPubsub,
+      user = databaseUser,
+    }: {
+      database?: ReturnType<typeof databaseContext>
+      pubsub?: ReturnType<typeof pubsubContext>
+      user?: (any) => Promise<any>
+    } = { database: serverDatabase, pubsub: serverPubsub, user: databaseUser },
+  ) =>
+  async (req) => {
+    const u = await user(req)
+    return {
+      database,
+      driver: database.driver,
+      neode: database.neode,
+      pubsub,
+      user: u,
+      req,
+      cypherParams: {
+        currentUserId: u ? u.id : null,
+      },
+    }
   }
-}
+
 export const context = async (options) => {
   const { connection, req } = options
   if (connection) {
     return connection.context
   } else {
-    return getContext(req)
+    return getContext()(req)
   }
 }
 
@@ -75,9 +68,7 @@ const createServer = (options?) => {
     context,
     schema: middleware(schema),
     subscriptions: {
-      onConnect: (connectionParams, _webSocket) => {
-        return getContext(connectionParams)
-      },
+      onConnect: (connectionParams) => getContext()(connectionParams),
     },
     debug: !!CONFIG.DEBUG,
     uploads: false,
@@ -89,11 +80,10 @@ const createServer = (options?) => {
       return error
     },
   }
-  const server = new ApolloServer(Object.assign({}, defaults, options))
+  const server = new ApolloServer(Object.assign(defaults, options))
 
   const app = express()
 
-  app.set('driver', driver)
   // TODO: this exception is required for the graphql playground, since the playground loads external resources
   // See: https://github.com/graphql/graphql-playground/issues/1283
   app.use(
@@ -113,3 +103,4 @@ const createServer = (options?) => {
 }
 
 export default createServer
+export type Context = Awaited<ReturnType<ReturnType<typeof getContext>>>

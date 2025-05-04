@@ -2,40 +2,41 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
+import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
-import createServer from '@src/server'
+import createServer, { getContext } from '@src/server'
 
-const driver = getDriver()
-const neode = getNeode()
+const database = databaseContext()
 
 let variables, mutate, authenticatedUser, commentAuthor, newlyCreatedComment
 
+let server: ApolloServer
 beforeAll(async () => {
   await cleanDatabase()
 
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        user: authenticatedUser,
-      }
-    },
-  })
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database })
+
+  server = createServer({ context }).server
+
   mutate = createTestClient(server).mutate
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 beforeEach(async () => {
   variables = {}
-  await neode.create('Category', {
+  await database.neode.create('Category', {
     id: 'cat9',
     name: 'Democracy & Politics',
     icon: 'university',
@@ -103,7 +104,7 @@ describe('CreateComment', () => {
 
   describe('authenticated', () => {
     beforeEach(async () => {
-      const user = await neode.create('User', { name: 'Author' })
+      const user = await database.neode.create('User', { name: 'Author' })
       authenticatedUser = await user.toJson()
     })
 

@@ -25,6 +25,7 @@ const environment = {
   DISABLED_MIDDLEWARES: ['test', 'development'].includes(env.NODE_ENV as string)
     ? (env.DISABLED_MIDDLEWARES?.split(',') ?? [])
     : [],
+  SEND_MAIL: env.NODE_ENV !== 'test',
 }
 
 const required = {

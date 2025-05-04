@@ -7,9 +7,9 @@
 import { rule, shield, deny, allow, or, and } from 'graphql-shield'
 
 import CONFIG from '@config/index'
+import SocialMedia from '@db/models/SocialMedia'
 import { getNeode } from '@db/neo4j'
-import SocialMedia from '@models/SocialMedia'
-import { validateInviteCode } from '@schema/resolvers/transactions/inviteCodes'
+import { validateInviteCode } from '@graphql/resolvers/transactions/inviteCodes'
 
 const debug = !!CONFIG.DEBUG
 const allowExternalErrors = true
@@ -482,6 +482,9 @@ export default shield(
     User: {
       email: or(isMyOwn, isAdmin),
       emailNotificationSettings: isMyOwn,
+    },
+    Location: {
+      distanceToMe: isAuthenticated,
     },
     Report: isModerator,
   },

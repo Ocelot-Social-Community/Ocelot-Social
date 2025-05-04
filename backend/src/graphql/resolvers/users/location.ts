@@ -12,7 +12,6 @@ import { UserInputError } from 'apollo-server'
 import request from 'request'
 
 import CONFIG from '@config/index'
-import asyncForEach from '@helpers/asyncForEach'
 
 const fetch = (url) => {
   return new Promise((resolve, reject) => {
@@ -119,7 +118,7 @@ export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, s
     }
 
     if (data.context) {
-      await asyncForEach(data.context, async (ctx) => {
+      for await (const ctx of data.context) {
         await createLocation(session, ctx)
         await session.writeTransaction((transaction) => {
           return transaction.run(
@@ -135,7 +134,7 @@ export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, s
           )
         })
         parent = ctx
-      })
+      }
     }
 
     locationId = data.id
