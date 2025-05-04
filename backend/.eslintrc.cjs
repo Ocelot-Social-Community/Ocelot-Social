@@ -175,7 +175,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['*.js', '+.cjs', '*.ts', '*.tsx'],
+      files: ['*.js', '*.cjs', '*.ts', '*.tsx'],
       extends: ['plugin:security/recommended-legacy'],
     },
     // only for ts files
