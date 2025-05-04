@@ -13,6 +13,7 @@ When("I click on {string}", element => {
     'Moderation': 'a[href="/moderation"]',
   }
 
+  // eslint-disable-next-line cypress/no-unnecessary-waiting, cypress/unsafe-to-chain-command
   cy.get(elementSelectors[element])
     .click()
     .wait(750);

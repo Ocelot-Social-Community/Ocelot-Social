@@ -1,6 +1,7 @@
 import { Given } from "@badeball/cypress-cucumber-preprocessor";
 
 Given('I have added a social media link', () => {
+  // eslint-disable-next-line cypress/unsafe-to-chain-command
   cy.visit('/settings/my-social-media')
     .get('button')
     .contains('Add link')

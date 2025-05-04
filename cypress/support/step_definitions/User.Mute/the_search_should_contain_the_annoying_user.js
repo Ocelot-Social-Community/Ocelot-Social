@@ -7,6 +7,7 @@ Then("the search should contain the annoying user", () => {
     })
   cy.get(".ds-select-dropdown .user-teaser .slug")
     .should("contain", '@annoying-user');
+  // eslint-disable-next-line cypress/unsafe-to-chain-command
   cy.get(".searchable-input .ds-select input")
     .focus()
     .type("{esc}");

@@ -4,6 +4,7 @@ Then('I can see my new name {string} when I click on my profile picture in the t
   cy.get(".avatar-menu").then(($menu) => {
     if (!$menu.is(':visible')){
       cy.scrollTo("top");
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(500);
     }
   })
