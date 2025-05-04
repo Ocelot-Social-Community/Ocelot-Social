@@ -1,4 +1,3 @@
-import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('the search should contain the annoying user', () => {
   cy.get('.searchable-input .ds-select-dropdown')

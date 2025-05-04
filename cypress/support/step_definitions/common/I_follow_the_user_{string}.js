@@ -1,4 +1,3 @@
-import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I follow the user {string}', name => {
   cy.neode()

@@ -1,4 +1,3 @@
-import { Given } from '@badeball/cypress-cucumber-preprocessor'
 import './../../commands'
 import './../../factories'
 import 'cypress-network-idle'

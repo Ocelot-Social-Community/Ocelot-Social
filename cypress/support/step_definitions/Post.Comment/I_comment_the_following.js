@@ -1,4 +1,3 @@
-import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I comment the following:', text => {
   const comment = text.replace('\n', ' ')

@@ -1,4 +1,3 @@
-import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I can see the following table:', table => {
   const headers = table.raw()[0]

@@ -1,4 +1,3 @@
-import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I have the following self-description:', text => {
     cy.get('textarea[id=about]')

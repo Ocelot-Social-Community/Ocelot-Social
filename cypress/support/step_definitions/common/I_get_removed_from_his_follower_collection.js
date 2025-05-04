@@ -1,4 +1,3 @@
-import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I get removed from his follower collection', () => {
   cy.get('.base-card')

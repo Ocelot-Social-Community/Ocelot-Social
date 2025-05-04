@@ -1,4 +1,3 @@
-import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I can visit the post page', () => {
   cy.contains('Fake news').click()

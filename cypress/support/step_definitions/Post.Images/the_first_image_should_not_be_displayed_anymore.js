@@ -1,4 +1,3 @@
-import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('the first image should not be displayed anymore', () => {
   cy.get('.hero-image')

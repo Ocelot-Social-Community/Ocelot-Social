@@ -1,4 +1,3 @@
-import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I am logged in with username {string}', name => {
   cy.get('.avatar-menu').click()

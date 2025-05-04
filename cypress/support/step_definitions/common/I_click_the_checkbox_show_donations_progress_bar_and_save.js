@@ -1,4 +1,3 @@
-import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 import 'cypress-network-idle'
 
 defineStep('I click the checkbox show donations progress bar and save', () => {

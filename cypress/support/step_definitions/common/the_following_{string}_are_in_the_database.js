@@ -1,4 +1,3 @@
-import { Given } from '@badeball/cypress-cucumber-preprocessor'
 import './../../factories'
 
 defineStep('the following {string} are in the database:', (table,data) => {

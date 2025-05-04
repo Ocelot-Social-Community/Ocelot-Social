@@ -1,4 +1,3 @@
-import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('the post was saved successfully with the {string} teaser image', condition => {
   cy.get('.base-card > .title')

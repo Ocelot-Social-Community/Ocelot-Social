@@ -1,4 +1,3 @@
-import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I save {string} as my new name', name => {
   cy.get('input[id=name]')

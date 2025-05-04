@@ -1,4 +1,3 @@
-import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I click on "Report Post" from the content menu of the post', () => {
   cy.contains('.base-card', 'The Truth about the Holocaust')

@@ -1,4 +1,3 @@
-import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I navigate to my {string} settings page', settingsPage => {
   cy.get('.avatar-menu-trigger').click()

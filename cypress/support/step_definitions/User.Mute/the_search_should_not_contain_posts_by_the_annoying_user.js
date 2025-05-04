@@ -1,4 +1,3 @@
-import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('the search should not contain posts by the annoying user', () => {
   cy.get('.searchable-input .ds-select-dropdown').should($li => {

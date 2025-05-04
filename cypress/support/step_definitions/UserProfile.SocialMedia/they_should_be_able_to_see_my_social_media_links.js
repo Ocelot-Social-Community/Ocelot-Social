@@ -1,4 +1,3 @@
-import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('they should be able to see my social media links', () => {
   cy.get('[data-test="social-media-list-headline"]')
