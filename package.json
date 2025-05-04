@@ -30,6 +30,7 @@
     "docs:dev": "NODE_OPTIONS=--openssl-legacy-provider vuepress dev .",
     "cypress:run": "cypress run --e2e --browser electron --config-file ./cypress/cypress.config.js",
     "cypress:open": "cypress open --e2e --browser electron --config-file ./cypress/cypress.config.js",
+    "lint:cypress": "eslint ./cypress/",
     "release": "./scripts/release.sh"
   },
   "devDependencies": {
@@ -47,6 +48,8 @@
     "cypress-network-idle": "^1.15.0",
     "date-fns": "^3.6.0",
     "dotenv": "^16.5.0",
+    "eslint": "^9.26.0",
+    "eslint-plugin-cypress": "^4.3.0",
     "expect": "^29.6.4",
     "graphql-request": "^2.0.0",
     "import": "^0.0.6",
