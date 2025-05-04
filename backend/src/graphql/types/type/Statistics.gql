@@ -11,4 +11,3 @@ type Statistics {
   countFollows: Int!
   countShouts: Int!
 }
-

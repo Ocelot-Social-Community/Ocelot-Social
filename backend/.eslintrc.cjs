@@ -14,7 +14,6 @@ module.exports = {
     'plugin:import/recommended',
     'plugin:import/typescript',
     'plugin:promise/recommended',
-    'plugin:security/recommended-legacy',
     'plugin:@eslint-community/eslint-comments/recommended',
     'prettier',
   ],
@@ -175,6 +174,10 @@ module.exports = {
     '@eslint-community/eslint-comments/require-description': 'off',
   },
   overrides: [
+    {
+      files: ['*.js', '*.cjs', '*.ts', '*.tsx'],
+      extends: ['plugin:security/recommended-legacy'],
+    },
     // only for ts files
     {
       files: ['*.ts', '*.tsx'],
@@ -221,6 +224,34 @@ module.exports = {
         'jest/valid-expect': 'error',
         '@typescript-eslint/unbound-method': 'off',
         'jest/unbound-method': 'error',
+      },
+    },
+    {
+      files: ['*.graphql', '*.gql'],
+      parser: '@graphql-eslint/eslint-plugin',
+      plugins: ['@graphql-eslint'],
+      extends: ['plugin:@graphql-eslint/schema-recommended'],
+      rules: {
+        '@graphql-eslint/description-style': ['error', { style: 'inline' }],
+        '@graphql-eslint/require-description': 'off',
+        '@graphql-eslint/naming-convention': 'off',
+        '@graphql-eslint/strict-id-in-types': 'off',
+        '@graphql-eslint/no-typename-prefix': 'off',
+        // incompatible: `depends on a GraphQL validation rule "XXX" but it's not available in the "graphql" version you are using. Skipping…`
+        '@graphql-eslint/known-directives': 'off',
+        '@graphql-eslint/known-argument-names': 'off',
+        '@graphql-eslint/known-type-names': 'off',
+        '@graphql-eslint/lone-schema-definition': 'off',
+        '@graphql-eslint/provided-required-arguments': 'off',
+        '@graphql-eslint/unique-directive-names': 'off',
+        '@graphql-eslint/unique-directive-names-per-location': 'off',
+        '@graphql-eslint/unique-field-definition-names': 'off',
+        '@graphql-eslint/unique-operation-types': 'off',
+        '@graphql-eslint/unique-type-names': 'off',
+      },
+      parserOptions: {
+        schema: './src/graphql/types/**/*.gql',
+        assumeValid: true,
       },
     },
   ],

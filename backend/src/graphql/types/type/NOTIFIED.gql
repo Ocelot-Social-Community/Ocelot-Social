@@ -33,7 +33,7 @@ enum NotificationReason {
 type Query {
   notifications(read: Boolean, orderBy: NotificationOrdering, first: Int, offset: Int): [NOTIFIED]
 }
-  
+
 type Mutation {
   markAsRead(id: ID!): NOTIFIED
   markAllAsRead: [NOTIFIED]
