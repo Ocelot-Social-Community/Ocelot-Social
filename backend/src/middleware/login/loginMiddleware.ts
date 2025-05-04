@@ -6,9 +6,8 @@ import { sendMail } from '@middleware/helpers/email/sendMail'
 import {
   resetPasswordTemplate,
   wrongAccountTemplate,
-  emailVerificationTemplate,
 } from '@middleware/helpers/email/templateBuilder'
-import { sendRegistrationMail } from '@src/emails/sendEmail'
+import { sendRegistrationMail, sendEmailVerification } from '@src/emails/sendEmail'
 
 const sendSignupMail = async (resolve, root, args, context, resolveInfo) => {
   const { inviteCode, locale } = args
@@ -36,9 +35,9 @@ const sendPasswordResetMail = async (resolve, root, args, context, resolveInfo) 
 
 const sendEmailVerificationMail = async (resolve, root, args, context, resolveInfo) => {
   const response = await resolve(root, args, context, resolveInfo)
-  const { email, nonce, name } = response
+  const { email, nonce, name, locale } = response
   if (nonce) {
-    await sendMail(emailVerificationTemplate({ email, variables: { nonce, name } }))
+    await sendEmailVerification({ email, nonce, name, locale })
   }
   delete response.nonce
   return response
