@@ -7,6 +7,7 @@
     "followedUserPosted": "Neuer Beitrag von gefolgtem Nutzer",
     "mentionedInComment": "Erwähnung in Kommentar",
     "mentionedInPost": "Erwähnung in Beitrag",
+    "newEmail": "Neue E-Mail Addresse",
     "removedUserFromGroup": "Aus Gruppe entfernt",
     "postInGroup": "Neuer Beitrag in Gruppe",
     "userJoinedGroup": "Nutzer tritt Gruppe bei",
@@ -20,8 +21,14 @@
     "notYouEnd": " angemeldet hast, schau doch mal vorbei! Wir sind ein gemeinnütziges Aktionsnetzwerk – von Menschen für Menschen.",
     "ps": "PS: Wenn Du keinen Account bei uns möchtest, kannst Du diese E-Mail einfach ignorieren. ;)"
   },
+  "emailVerification": {
+    "codeHint": "Sollte der Button für Dich nicht funktionieren, kannst Du auch folgenden Code in Dein Browserfenster kopieren: ",
+    "introduction": "Du möchtest also deine E-Mail ändern? Kein Problem! Mit Klick auf diesen Button kannst Du Deine neue E-Mail Adresse bestätigen:",
+    "doNotChange": "Falls Du deine E-Mail Adresse doch nicht ändern möchtest, kannst du diese Nachricht einfach ignorieren. "    
+  },
   "buttons": {
     "confirmEmail": "Bestätige Deine E-Mail Adresse",
+    "verifyEmail": "E-Mail Adresse bestätigen",
     "viewChat": "Chat anzeigen",
     "viewComment": "Kommentar ansehen",
     "viewGroup": "Gruppe ansehen",

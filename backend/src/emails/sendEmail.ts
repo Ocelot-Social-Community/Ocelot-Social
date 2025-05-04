@@ -204,10 +204,13 @@ export const sendChatMessageMail = async (
   }
 }
 
-interface RegistrationMailInput {
+interface VerifyMailInput {
   email: string
   nonce: string
   locale: string
+}
+
+interface RegistrationMailInput extends VerifyMailInput {
   inviteCode?: string
 }
 
@@ -237,6 +240,40 @@ export const sendRegistrationMail = async (
         locale,
         actionUrl,
         nonce,
+        renderSettingsUrl: false,
+      },
+    })
+    return originalMessage as OriginalMessage
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+interface EmailVerificationInput extends VerifyMailInput {
+  name: string
+}
+
+export const sendEmailVerification = async (
+  data: EmailVerificationInput,
+): Promise<OriginalMessage> => {
+  const { nonce, locale, name } = data
+  const to = data.email
+  const actionUrl = new URL('/settings/my-email-address/verify', CONFIG.CLIENT_URI)
+  actionUrl.searchParams.set('email', to)
+  actionUrl.searchParams.set('nonce', nonce)
+
+  try {
+    const { originalMessage } = await email.send({
+      template: path.join(__dirname, 'templates', 'emailVerification'),
+      message: {
+        to,
+      },
+      locals: {
+        ...defaultParams,
+        locale,
+        actionUrl,
+        nonce,
+        name,
         renderSettingsUrl: false,
       },
     })

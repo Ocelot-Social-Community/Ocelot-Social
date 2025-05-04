@@ -7,6 +7,7 @@
     "followedUserPosted": "New post by followd user",
     "mentionedInComment": "Mentioned in comment",
     "mentionedInPost": "Mentioned in post",
+    "newEmail": "New E-Mail Address",
     "removedUserFromGroup": "Removed from group",
     "postInGroup": "New post in group",
     "userJoinedGroup": "User joined group",
@@ -20,8 +21,14 @@
     "notYouEnd": " we recommend you to check it out! It's a social network from people for people who want to connect and change the world together.",
     "ps": "PS: If you ignore this e-mail we will not create an account for you. ;)"
   },
+  "emailVerification": {
+    "codeHint": "If the above button doesn't work, you can also copy the following code into your browser window: ",
+    "introduction": "So, you want to change your e-mail? No problem! Just click the button below to verify your new address:",
+    "doNotChange": "If you don't want to change your e-mail address feel free to ignore this message. "
+  },
   "buttons": {
     "confirmEmail": "Confirm your e-mail address",
+    "verifyEmail": "Verify e-mail address",
     "viewChat": "Show Chat",
     "viewComment": "View comment",
     "viewGroup": "View group",
