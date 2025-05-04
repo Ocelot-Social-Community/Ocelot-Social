@@ -1,3 +1,4 @@
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I click on {string} from the content menu in the user info box',
   button => {

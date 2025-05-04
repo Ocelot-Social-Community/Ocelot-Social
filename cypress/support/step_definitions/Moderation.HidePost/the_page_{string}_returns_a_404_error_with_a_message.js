@@ -1,3 +1,4 @@
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('the page {string} returns a 404 error with a message:', (route, message) => {
   cy.request({

@@ -1,3 +1,4 @@
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I search for {string}', value => {
   cy.intercept({

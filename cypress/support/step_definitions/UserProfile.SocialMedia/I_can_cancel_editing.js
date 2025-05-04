@@ -1,3 +1,4 @@
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I can cancel editing', () => {
   cy.get('button#cancel')

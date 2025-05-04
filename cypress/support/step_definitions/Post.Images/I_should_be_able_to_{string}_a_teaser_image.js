@@ -1,3 +1,4 @@
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I should be able to {string} a teaser image', condition => {
   let postTeaserImage = ''

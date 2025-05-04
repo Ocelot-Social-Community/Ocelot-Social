@@ -1,3 +1,4 @@
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I see all the reported posts including the one from above', () => {
   cy.intercept({

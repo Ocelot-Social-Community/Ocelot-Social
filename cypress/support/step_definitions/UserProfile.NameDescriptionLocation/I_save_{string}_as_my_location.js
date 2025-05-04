@@ -1,3 +1,4 @@
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I save {string} as my location', location => {
     cy.get('input[id=city]').type(location)

@@ -1,3 +1,4 @@
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I log out', () => {
   cy.get('.avatar-menu').then(($menu) => {

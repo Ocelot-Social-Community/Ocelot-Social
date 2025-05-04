@@ -1,3 +1,4 @@
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I have added the social media link {string}', (link) => {
   cy.visit('/settings/my-social-media')

@@ -1,3 +1,4 @@
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I see a toaster with status {string}', (status) => {
   switch (status) {

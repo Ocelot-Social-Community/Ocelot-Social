@@ -1,3 +1,4 @@
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I delete the social media link {string}', (link) => {
   cy.get('[data-test="delete-button"]')

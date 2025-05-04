@@ -1,3 +1,4 @@
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('open the notification menu and click on the first item', () => {
   cy.get('.notifications-menu')

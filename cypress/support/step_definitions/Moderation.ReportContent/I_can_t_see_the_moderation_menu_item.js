@@ -1,3 +1,4 @@
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep(`I can't see the moderation menu item`, () => {
   cy.get('.avatar-menu-popover')

@@ -1,3 +1,4 @@
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('there is an annoying user who has muted me', () => {
   cy.neode()

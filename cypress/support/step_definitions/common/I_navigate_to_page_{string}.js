@@ -1,3 +1,4 @@
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 import 'cypress-network-idle'
 
 defineStep('I navigate to page {string}', page => {
