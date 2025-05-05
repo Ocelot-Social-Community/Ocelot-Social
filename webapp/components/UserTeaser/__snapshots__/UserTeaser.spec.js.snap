@@ -151,7 +151,9 @@ exports[`UserTeaser given an user user is disabled current user is a moderator r
         popperoptions="[object Object]"
         trigger="manual"
       >
-        <a>
+        <a
+          data-test="avatarUserLink"
+        >
           <div
             class="profile-avatar --small"
           >
@@ -264,7 +266,9 @@ exports[`UserTeaser given an user with linkToProfile, on desktop renders 1`] = `
         popperoptions="[object Object]"
         trigger="manual"
       >
-        <a>
+        <a
+          data-test="avatarUserLink"
+        >
           <div
             class="profile-avatar --small"
           >
@@ -346,7 +350,9 @@ exports[`UserTeaser given an user with linkToProfile, on desktop when hovering t
         popperoptions="[object Object]"
         trigger="manual"
       >
-        <a>
+        <a
+          data-test="avatarUserLink"
+        >
           <div
             class="profile-avatar --small"
           >
@@ -432,7 +438,9 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen renders 1`
         popperoptions="[object Object]"
         trigger="manual"
       >
-        <button>
+        <button
+          data-test="avatarUserLink"
+        >
           <div
             class="profile-avatar --small"
           >
@@ -514,7 +522,9 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen when click
         popperoptions="[object Object]"
         trigger="manual"
       >
-        <button>
+        <button
+          data-test="avatarUserLink"
+        >
           <div
             class="profile-avatar --small"
           >
@@ -600,7 +610,9 @@ exports[`UserTeaser given an user without linkToProfile, on desktop renders 1`] 
         popperoptions="[object Object]"
         trigger="manual"
       >
-        <span>
+        <span
+          data-test="avatarUserLink"
+        >
           <div
             class="profile-avatar --small"
           >
@@ -682,7 +694,9 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
         popperoptions="[object Object]"
         trigger="manual"
       >
-        <span>
+        <span
+          data-test="avatarUserLink"
+        >
           <div
             class="profile-avatar --small"
           >
@@ -768,7 +782,9 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
         popperoptions="[object Object]"
         trigger="manual"
       >
-        <span>
+        <span
+          data-test="avatarUserLink"
+        >
           <div
             class="profile-avatar --small"
           >
@@ -853,7 +869,9 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen renders
         popperoptions="[object Object]"
         trigger="manual"
       >
-        <button>
+        <button
+          data-test="avatarUserLink"
+        >
           <div
             class="profile-avatar --small"
           >
@@ -935,7 +953,9 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
         popperoptions="[object Object]"
         trigger="manual"
       >
-        <button>
+        <button
+          data-test="avatarUserLink"
+        >
           <div
             class="profile-avatar --small"
           >
@@ -1021,7 +1041,9 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
         popperoptions="[object Object]"
         trigger="manual"
       >
-        <button>
+        <button
+          data-test="avatarUserLink"
+        >
           <div
             class="profile-avatar --small"
           >

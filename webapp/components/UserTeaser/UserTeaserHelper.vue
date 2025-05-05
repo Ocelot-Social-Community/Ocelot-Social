@@ -4,7 +4,7 @@
   </button>
   <span
     v-else-if="!linkToProfile || !userLink"
-    @mouseenter="() => showPopover && openMenu()"
+    @mouseover="() => showPopover && openMenu()"
     @mouseleave="closeMenu"
   >
     <slot />
@@ -12,7 +12,7 @@
   <nuxt-link
     v-else
     :to="userLink"
-    @mouseenter.native="() => showPopover && openMenu()"
+    @mouseover.native="() => showPopover && openMenu()"
     @mouseleave.native="closeMenu"
   >
     <slot />
