@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`sendChatMessageMail English chat_message template 1`] = `
+exports[`sendWrongEmail English renders correctly 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -88,15 +88,15 @@ footer {
         <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
         </div>
       </header>
-      <h2>Hello chatReceiver,</h2>
+      <h2>Welcome to ocelot.social!</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>you have received a new chat message from <a class="user" href="http://webapp:3000/user/chatSender/chatsender">chatSender</a>.
-        </p><a class="button" href="http://webapp:3000/chat">Show Chat</a>
+        <p>You requested a password reset but unfortunately we couldn't find an account associated with your e-mail address. Did you maybe use another one when you signed up?</p><a class="button" href="http://webapp:3000/password-reset/request">Try a different e-mail</a>
+        <p>If you don't have an account at <a>ocelot.social</a> yet or if you didn't want to reset your password, please ignore this e-mail.
+        </p>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p>– The ocelot.social Team</p>
         </div>
       </div>
       <footer>
@@ -105,21 +105,21 @@ footer {
     </div>
   </body>
 </html>",
-  "subject": "ocelot.social  – Notification: New chat message",
-  "text": "HELLO CHATRECEIVER,
+  "subject": "Wrong E-mail? ocelot.social",
+  "text": "WELCOME TO OCELOT.SOCIAL!
 
-you have received a new chat message from chatSender
-[http://webapp:3000/user/chatSender/chatsender].
+You requested a password reset but unfortunately we couldn't find an account
+associated with your e-mail address. Did you maybe use another one when you
+signed up?
 
-Show Chat [http://webapp:3000/chat]
+Try a different e-mail [http://webapp:3000/password-reset/request]
+
+If you don't have an account at ocelot.social yet or if you didn't want to reset
+your password, please ignore this e-mail.
 
 See you soon on ocelot.social [https://ocelot.social]!
 
 – The ocelot.social Team
-
-
-PS: If you don't want to receive e-mails anymore, change your notification
-settings [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -127,7 +127,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendChatMessageMail German chat_message template 1`] = `
+exports[`sendWrongEmail German renders correctly 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -215,15 +215,15 @@ footer {
         <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
         </div>
       </header>
-      <h2>Hallo chatReceiver,</h2>
+      <h2>Willkommen bei ocelot.social!</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>du hast eine neue Chat-Nachricht von <a class="user" href="http://webapp:3000/user/chatSender/chatsender">chatSender</a> erhalten.
-        </p><a class="button" href="http://webapp:3000/chat">Chat anzeigen</a>
+        <p>Du hast bei uns ein neues Passwort angefordert – leider haben wir aber keinen Account mit deiner E-Mailadresse gefunden. Kann es sein, dass du mit einer anderen Adresse bei uns angemeldet bist?</p><a class="button" href="http://webapp:3000/password-reset/request">Versuch' es mit einer anderen E-Mail</a>
+        <p>Wenn du noch keinen Account bei <a>ocelot.social</a> hast oder dein Password gar nicht ändern willst, kannst du diese E-Mail einfach ignorieren!
+        </p>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p>– Dein ocelot.social Team</p>
         </div>
       </div>
       <footer>
@@ -232,21 +232,21 @@ footer {
     </div>
   </body>
 </html>",
-  "subject": "ocelot.social  – Benachrichtigung: Neue Chat Nachricht",
-  "text": "HALLO CHATRECEIVER,
+  "subject": "Falsche Mailaddresse? ocelot.social",
+  "text": "WILLKOMMEN BEI OCELOT.SOCIAL!
 
-du hast eine neue Chat-Nachricht von chatSender
-[http://webapp:3000/user/chatSender/chatsender] erhalten.
+Du hast bei uns ein neues Passwort angefordert – leider haben wir aber keinen
+Account mit deiner E-Mailadresse gefunden. Kann es sein, dass du mit einer
+anderen Adresse bei uns angemeldet bist?
 
-Chat anzeigen [http://webapp:3000/chat]
+Versuch' es mit einer anderen E-Mail [http://webapp:3000/password-reset/request]
+
+Wenn du noch keinen Account bei ocelot.social hast oder dein Password gar nicht
+ändern willst, kannst du diese E-Mail einfach ignorieren!
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 
 – Dein ocelot.social Team
-
-
-PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine
-Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",

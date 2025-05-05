@@ -13,11 +13,15 @@ html(lang=locale)
       .wf-force-outline-none[tabindex="-1"]:focus{outline:none;}
     style
       include includes/webflow.css
-  
+
+  - var name = name
   body
     div.container
       include includes/header.pug
-      include includes/salutation.pug
+      if name
+        include includes/salutation.pug
+      else
+        include includes/welcome.pug
 
       .wrapper
         block content
