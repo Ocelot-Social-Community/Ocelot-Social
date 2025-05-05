@@ -282,3 +282,58 @@ export const sendEmailVerification = async (
     throw new Error(error)
   }
 }
+
+export const sendResetPasswordMail = async (
+  data: EmailVerificationInput,
+): Promise<OriginalMessage> => {
+  const { nonce, locale, name } = data
+  const to = data.email
+  const actionUrl = new URL('/password-reset/change-password', CONFIG.CLIENT_URI)
+  actionUrl.searchParams.set('email', to)
+  actionUrl.searchParams.set('nonce', nonce)
+  try {
+    const { originalMessage } = await email.send({
+      template: path.join(__dirname, 'templates', 'resetPassword'),
+      message: {
+        to,
+      },
+      locals: {
+        ...defaultParams,
+        locale,
+        actionUrl,
+        nonce,
+        name,
+        renderSettingsUrl: false,
+      },
+    })
+    return originalMessage as OriginalMessage
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+export const sendWrongEmail = async (data: {
+  locale: string
+  email: string
+}): Promise<OriginalMessage> => {
+  const { locale } = data
+  const to = data.email
+  const actionUrl = new URL('/password-reset/request', CONFIG.CLIENT_URI)
+  try {
+    const { originalMessage } = await email.send({
+      template: path.join(__dirname, 'templates', 'wrongEmail'),
+      message: {
+        to,
+      },
+      locals: {
+        ...defaultParams,
+        locale,
+        actionUrl,
+        renderSettingsUrl: false,
+      },
+    })
+    return originalMessage as OriginalMessage
+  } catch (error) {
+    throw new Error(error)
+  }
+}

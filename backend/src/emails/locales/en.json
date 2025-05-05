@@ -10,8 +10,10 @@
     "newEmail": "New E-Mail Address",
     "removedUserFromGroup": "Removed from group",
     "postInGroup": "New post in group",
+    "resetPassword": "Reset Password",
     "userJoinedGroup": "User joined group",
-    "userLeftGroup": "User left group"
+    "userLeftGroup": "User left group",
+    "wrongEmail": "Wrong E-mail?"
   },
   "registration": {
     "introduction": "Thank you for joining our cause – it's awesome to have you on board. There's just one tiny step missing before we can start shaping the world together … Please confirm your e-mail address by clicking the button below:",
@@ -28,6 +30,8 @@
   },
   "buttons": {
     "confirmEmail": "Confirm your e-mail address",
+    "resetPassword": "Reset password",
+    "tryAgain": "Try a different e-mail",
     "verifyEmail": "Verify e-mail address",
     "viewChat": "Show Chat",
     "viewComment": "View comment",
@@ -41,6 +45,16 @@
     "settingsHint": "PS: If you don't want to receive e-mails anymore, change your ",
     "settingsName": "notification settings",
     "welcome": "Welcome to"
+  },
+  "resetPassword": {
+      "codeHint": "If the above button doesn't work you can also copy the following code into your browser window: ",
+    "ignore": "If you didn't request a new password feel free to ignore this e-mail.",
+    "introduction": "So, you forgot your password? No problem! Just click the button below to reset it within the next 24 hours:"
+  },
+  "wrongEmail": {
+    "ignoreEnd": " yet or if you didn't want to reset your password, please ignore this e-mail.",
+    "ignoreStart": "If you don't have an account at ",
+    "introduction": "You requested a password reset but unfortunately we couldn't find an account associated with your e-mail address. Did you maybe use another one when you signed up?"
   },
   "changedGroupMemberRole": "your role in the group “{groupName}” has been changed. Click on the button to view this group:",
   "chatMessageStart": "you have received a new chat message from ",

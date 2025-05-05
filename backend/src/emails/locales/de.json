@@ -10,8 +10,10 @@
     "newEmail": "Neue E-Mail Addresse",
     "removedUserFromGroup": "Aus Gruppe entfernt",
     "postInGroup": "Neuer Beitrag in Gruppe",
+    "resetPassword": "Neues Passwort",
     "userJoinedGroup": "Nutzer tritt Gruppe bei",
-    "userLeftGroup": "Nutzer verlässt Gruppe"
+    "userLeftGroup": "Nutzer verlässt Gruppe",
+    "wrongEmail": "Falsche Mailaddresse?"
   },
   "registration": {
     "introduction": "Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können … Bitte bestätige Deine E-Mail Adresse:",
@@ -28,6 +30,8 @@
   },
   "buttons": {
     "confirmEmail": "Bestätige Deine E-Mail Adresse",
+    "resetPassword": "Passwort zurücksetzen",
+    "tryAgain": "Versuch' es mit einer anderen E-Mail",
     "verifyEmail": "E-Mail Adresse bestätigen",
     "viewChat": "Chat anzeigen",
     "viewComment": "Kommentar ansehen",
@@ -41,6 +45,17 @@
     "settingsHint": "PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine ",
     "settingsName": "Benachrichtigungseinstellungen",
     "welcome": "Willkommen bei"
+  },
+  "resetPassword": {
+      "codeHint": "Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in Dein Browserfenster kopieren: ",
+    "ignore": "Falls du kein neues Passwort angefordert hast, kannst du diese E-Mail einfach ignorieren.",
+    "introduction": "Du hast also dein Passwort vergessen? Kein Problem! Mit Klick auf diesen Button kannst du innerhalb der nächsten 24 Stunden dein Passwort zurücksetzen:"
+  },
+  "wrongEmail": {
+    "codeHint": "Sollte der Button für Dich nicht funktionieren, kannst Du auch folgenden Code in Dein Browserfenster kopieren: ",
+    "ignoreEnd": " hast oder dein Password gar nicht ändern willst, kannst du diese E-Mail einfach ignorieren!",
+    "ignoreStart": "Wenn du noch keinen Account bei ",
+    "introduction": "Du hast bei uns ein neues Passwort angefordert – leider haben wir aber keinen Account mit deiner E-Mailadresse gefunden. Kann es sein, dass du mit einer anderen Adresse bei uns angemeldet bist?"
   },
   "changedGroupMemberRole": "deine Rolle in der Gruppe „{groupName}“ wurde geändert. Klicke auf den Knopf, um diese Gruppe zu sehen:",
   "chatMessageStart": "du hast eine neue Chat-Nachricht von ",
