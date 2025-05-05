@@ -4,6 +4,7 @@
       <user-teaser
         :user="isGroup ? notification.relatedUser : from.author"
         :date-time="from.createdAt"
+        :show-popover="false"
       />
     </client-only>
     <p class="description">{{ $t(`notifications.reason.${notification.reason}`) }}</p>
