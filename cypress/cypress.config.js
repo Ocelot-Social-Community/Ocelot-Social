@@ -1,6 +1,7 @@
-const dotenv = require('dotenv')
+import dotenv from 'dotenv'
 const { defineConfig } = require('cypress');
-const browserify = require('@cypress/browserify-preprocessor');
+//const browserify = require('@cypress/browserify-preprocessor');
+import browserify from '@cypress/browserify-preprocessor'
 const {
   addCucumberPreprocessorPlugin,
 } = require('@badeball/cypress-cucumber-preprocessor');

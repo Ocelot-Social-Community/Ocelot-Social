@@ -1,0 +1,20 @@
+{
+  "name": "ocelot-social-cypress",
+  "version": "3.4.0",
+  "description": "End-to-end testing via Cypress for ocelot.social",
+  "repository": "https://github.com/Ocelot-Social-Community/Ocelot-Social",
+  "author": "ocelot.social Community",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "@eslint/js": "^9.26.0",
+    "eslint": "^9.26.0",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-cypress": "^4.3.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.6",
+    "eslint-plugin-security": "^3.0.1",
+    "globals": "^16.0.0",
+    "prettier": "^3.5.3"
+  }
+}
