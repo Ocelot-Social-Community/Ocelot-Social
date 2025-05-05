@@ -1,4 +1,4 @@
-FROM node:20.12.1-alpine3.19 AS base
+FROM node:23.11.0-alpine AS base
 LABEL org.label-schema.name="ocelot.social:backend"
 LABEL org.label-schema.description="Backend of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
@@ -10,7 +10,7 @@ LABEL maintainer="devops@ocelot.social"
 ENV NODE_ENV="production"
 ENV PORT="4000"
 EXPOSE ${PORT}
-RUN apk --no-cache add git python3 make g++ bash
+RUN apk --no-cache add git python3 make g++ bash linux-headers
 RUN mkdir -p /app
 WORKDIR /app
 CMD ["/bin/bash", "-c", "yarn run start"]

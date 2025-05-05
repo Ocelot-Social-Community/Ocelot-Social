@@ -1,32 +1,29 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
+import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import CONFIG from '@src/config'
-import createServer from '@src/server'
+import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
-const sendMailMock: (notification) => void = jest.fn()
-jest.mock('@middleware/helpers/email/sendMail', () => ({
-  sendMail: (notification) => sendMailMock(notification),
+const sendNotificationMailMock: (notification) => void = jest.fn()
+jest.mock('@src/emails/sendEmail', () => ({
+  sendNotificationMail: (notification) => sendNotificationMailMock(notification),
 }))
 
-let server, query, mutate, authenticatedUser, emaillessMember
+let query, mutate, authenticatedUser, emaillessMember
 
 let postAuthor, groupMember
-
-const driver = getDriver()
-const neode = getNeode()
 
 const mentionString = `
   <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member">@group-member</a>
@@ -97,22 +94,18 @@ const markAllAsRead = async () =>
     `,
   })
 
+const database = databaseContext()
+
+let server: ApolloServer
+
 beforeAll(async () => {
   await cleanDatabase()
 
-  const createServerResult = createServer({
-    context: () => {
-      return {
-        user: authenticatedUser,
-        neode,
-        driver,
-        cypherParams: {
-          currentUserId: authenticatedUser ? authenticatedUser.id : null,
-        },
-      }
-    },
-  })
-  server = createServerResult.server
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database })
+
+  server = createServer({ context }).server
+
   const createTestClientResult = createTestClient(server)
   query = createTestClientResult.query
   mutate = createTestClientResult.mutate
@@ -120,7 +113,9 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('emails sent for notifications', () => {
@@ -149,7 +144,7 @@ describe('emails sent for notifications', () => {
         password: '1234',
       },
     )
-    emaillessMember = await neode.create('User', {
+    emaillessMember = await database.neode.create('User', {
       id: 'email-less-member',
       name: 'Email-less Member',
       slug: 'email-less-member',
@@ -213,7 +208,13 @@ describe('emails sent for notifications', () => {
         })
 
         it('sends only one email', () => {
-          expect(sendMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              reason: 'mentioned_in_post',
+              email: 'group.member@example.org',
+            }),
+          )
         })
 
         it('sends 3 notifications', async () => {
@@ -285,7 +286,13 @@ describe('emails sent for notifications', () => {
         })
 
         it('sends only one email', () => {
-          expect(sendMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              reason: 'followed_user_posted',
+              email: 'group.member@example.org',
+            }),
+          )
         })
 
         it('sends 3 notifications', async () => {
@@ -358,7 +365,13 @@ describe('emails sent for notifications', () => {
         })
 
         it('sends only one email', () => {
-          expect(sendMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              reason: 'post_in_group',
+              email: 'group.member@example.org',
+            }),
+          )
         })
 
         it('sends 3 notifications', async () => {
@@ -432,7 +445,7 @@ describe('emails sent for notifications', () => {
         })
 
         it('sends NO email', () => {
-          expect(sendMailMock).not.toHaveBeenCalled()
+          expect(sendNotificationMailMock).not.toHaveBeenCalled()
         })
 
         it('sends 3 notifications', async () => {
@@ -526,7 +539,13 @@ describe('emails sent for notifications', () => {
         })
 
         it('sends only one email', () => {
-          expect(sendMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              reason: 'mentioned_in_comment',
+              email: 'group.member@example.org',
+            }),
+          )
         })
 
         it('sends 2 notifications', async () => {
@@ -608,7 +627,13 @@ describe('emails sent for notifications', () => {
         })
 
         it('sends only one email', () => {
-          expect(sendMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
+          expect(sendNotificationMailMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              reason: 'mentioned_in_comment',
+              email: 'group.member@example.org',
+            }),
+          )
         })
 
         it('sends 2 notifications', async () => {
@@ -691,7 +716,7 @@ describe('emails sent for notifications', () => {
         })
 
         it('sends NO email', () => {
-          expect(sendMailMock).not.toHaveBeenCalled()
+          expect(sendNotificationMailMock).not.toHaveBeenCalled()
         })
 
         it('sends 2 notifications', async () => {

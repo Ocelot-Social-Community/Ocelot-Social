@@ -14,6 +14,7 @@ type Location {
   lat: Float
   lng: Float
   parent: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
+  distanceToMe: Int
 }
 
 # This is not smart - we need one location for everything - use the same type everywhere!
