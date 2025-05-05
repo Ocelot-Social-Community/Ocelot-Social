@@ -85,13 +85,13 @@ export default {
     },
     async handleSubmit() {
       const mutation = gql`
-        mutation ($email: String!) {
-          requestPasswordReset(email: $email)
+        mutation ($email: String!, $locale: String!) {
+          requestPasswordReset(email: $email, locale: $locale)
         }
       `
       try {
         const { email } = this
-        await this.$apollo.mutate({ mutation, variables: { email } })
+        await this.$apollo.mutate({ mutation, variables: { email, locale: this.$i18n.locale() } })
         this.submitted = true
 
         setTimeout(() => {

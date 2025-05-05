@@ -177,8 +177,8 @@ describe('authorization', () => {
 
     describe('access Signup', () => {
       const signupMutation = gql`
-        mutation ($email: String!, $inviteCode: String) {
-          Signup(email: $email, inviteCode: $inviteCode) {
+        mutation ($email: String!, $locale: String!, $inviteCode: String) {
+          Signup(email: $email, locale: $locale, inviteCode: $inviteCode) {
             email
           }
         }
@@ -189,6 +189,7 @@ describe('authorization', () => {
           variables = {
             email: 'some@email.org',
             inviteCode: 'ABCDEF',
+            locale: 'de',
           }
           CONFIG.INVITE_REGISTRATION = false
           CONFIG.PUBLIC_REGISTRATION = false
@@ -231,6 +232,7 @@ describe('authorization', () => {
           variables = {
             email: 'some@email.org',
             inviteCode: 'ABCDEF',
+            locale: 'de',
           }
           CONFIG.INVITE_REGISTRATION = false
           CONFIG.PUBLIC_REGISTRATION = true
@@ -269,6 +271,7 @@ describe('authorization', () => {
             variables = {
               email: 'some@email.org',
               inviteCode: 'ABCDEF',
+              locale: 'de',
             }
             authenticatedUser = null
           })
@@ -288,6 +291,7 @@ describe('authorization', () => {
             variables = {
               email: 'some@email.org',
               inviteCode: 'no valid invite code',
+              locale: 'de',
             }
             authenticatedUser = null
           })
