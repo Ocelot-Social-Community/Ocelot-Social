@@ -41,7 +41,7 @@ export default {
     LocationInfo,
   },
   props: {
-    userId: { type: Number },
+    userId: { type: String },
     userLink: { type: Object },
   },
   computed: {
