@@ -16,13 +16,19 @@
 </template>
 
 <script>
+import { isTouchDevice } from '../utils/isTouchDevice'
+
 export default {
   name: 'UserTeaserHelper',
   props: {
     userLink: { type: Object },
     linkToProfile: { type: Boolean, default: true },
     showPopover: { type: Boolean, default: false },
-    isTouchDevice: { type: Boolean, default: false },
+  },
+  computed: {
+    isTouchDevice() {
+      return isTouchDevice()
+    },
   },
   methods: {
     openMenu() {

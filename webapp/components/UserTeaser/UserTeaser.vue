@@ -14,6 +14,7 @@
         :wide="wide"
         :show-avatar="showAvatar"
         :date-time="dateTime"
+        :show-popover="showPopover"
         @close="closeMenu"
       />
     </client-only>

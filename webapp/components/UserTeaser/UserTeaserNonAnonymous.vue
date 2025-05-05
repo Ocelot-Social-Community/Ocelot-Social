@@ -2,9 +2,9 @@
   <dropdown class="user-teaser">
     <template #default="{ openMenu, closeMenu }">
       <user-teaser-helper
+        v-if="showAvatar"
         :link-to-profile="linkToProfile"
         :show-popover="showPopover"
-        :is-touch-device="isTouchDevice"
         :user-link="userLink"
         @open-menu="openMenu"
         @close-menu="closeMenu"
@@ -16,7 +16,6 @@
           <user-teaser-helper
             :link-to-profile="linkToProfile"
             :show-popover="showPopover"
-            :is-touch-device="isTouchDevice"
             :user-link="userLink"
             @open-menu="openMenu"
             @close-menu="closeMenu"
@@ -63,7 +62,6 @@ import DateTime from '~/components/DateTime'
 import Dropdown from '~/components/Dropdown'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import UserTeaserPopover from './UserTeaserPopover'
-import { isTouchDevice } from '../utils/isTouchDevice'
 import UserTeaserHelper from './UserTeaserHelper.vue'
 
 export default {
@@ -88,9 +86,7 @@ export default {
     ...mapGetters({
       isModerator: 'auth/isModerator',
     }),
-    isTouchDevice() {
-      return isTouchDevice()
-    },
+
     itsMe() {
       return this.user.slug === this.$store.getters['auth/user'].slug
     },
@@ -125,14 +121,6 @@ export default {
     },
   },
   methods: {
-    openMenuOnMobile(openMenu) {
-      if (!this.isTouchDevice || !this.showPopover) {
-        this.$refs.linkElement.$el.dispatchEvent(new Event('click', { bubbles: false }))
-        return
-      }
-
-      openMenu(true)
-    },
     closeMenu() {
       this.$emit('close')
     },
