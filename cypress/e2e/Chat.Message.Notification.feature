@@ -4,7 +4,6 @@ Feature: Notifications for Chat Messages via E-Mail
   To be informed promptly about recent activities in their chats
 
   For chat messages from muted or blocked users no emails are send.
-  # Online users just get the chat room list and chat notification list.
   Online users do not receive any chat related emails.
   For chat messages from muted users no emails are send.
 
