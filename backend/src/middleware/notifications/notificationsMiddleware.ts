@@ -4,16 +4,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable security/detect-object-injection */
-import { sendMail } from '@middleware/helpers/email/sendMail'
 import {
-  chatMessageTemplate,
-  notificationTemplate,
-} from '@middleware/helpers/email/templateBuilder'
+  NOTIFICATION_ADDED,
+  ROOM_COUNT_UPDATED,
+  CHAT_MESSAGE_ADDED,
+} from '@constants/subscriptions'
+import { getUnreadRoomsCount } from '@graphql/resolvers/rooms'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
-// eslint-disable-next-line import/no-cycle
-import { getUnreadRoomsCount } from '@schema/resolvers/rooms'
-import { pubsub, NOTIFICATION_ADDED, ROOM_COUNT_UPDATED, CHAT_MESSAGE_ADDED } from '@src/server'
+import { sendNotificationMail, sendChatMessageMail } from '@src/emails/sendEmail'
 
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 
@@ -25,19 +24,14 @@ const publishNotifications = async (
 ): Promise<string[]> => {
   const notifications = await notificationsPromise
   notifications.forEach((notificationAdded) => {
-    pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
+    context.pubsub.publish(NOTIFICATION_ADDED, { notificationAdded })
     if (
       notificationAdded.email && // no primary email was found
       (notificationAdded.to[emailNotificationSetting] ?? true) &&
       !isUserOnline(notificationAdded.to) &&
       !emailsSent.includes(notificationAdded.email)
     ) {
-      sendMail(
-        notificationTemplate({
-          email: notificationAdded.email,
-          variables: { notification: notificationAdded },
-        }),
-      )
+      void sendNotificationMail(notificationAdded)
       emailsSent.push(notificationAdded.email)
     }
   })
@@ -482,18 +476,18 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
       // send subscriptions
       const roomCountUpdated = await getUnreadRoomsCount(recipientUser.id, session)
 
-      void pubsub.publish(ROOM_COUNT_UPDATED, {
+      void context.pubsub.publish(ROOM_COUNT_UPDATED, {
         roomCountUpdated,
         userId: recipientUser.id,
       })
-      void pubsub.publish(CHAT_MESSAGE_ADDED, {
+      void context.pubsub.publish(CHAT_MESSAGE_ADDED, {
         chatMessageAdded: message,
         userId: recipientUser.id,
       })
 
       // Send EMail if we found a user(not blocked) and he is not considered online
       if (recipientUser.emailNotificationsChatMessage !== false && !isUserOnline(recipientUser)) {
-        void sendMail(chatMessageTemplate({ email, variables: { senderUser, recipientUser } }))
+        void sendChatMessageMail({ email, senderUser, recipientUser })
       }
     }
 

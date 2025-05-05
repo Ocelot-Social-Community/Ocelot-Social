@@ -1,10 +1,10 @@
-import { Then } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-Then('I can see my new name {string} when I click on my profile picture in the top right', name => {
+defineStep('I can see my new name {string} when I click on my profile picture in the top right', name => {
   cy.get(".avatar-menu").then(($menu) => {
     if (!$menu.is(':visible')){
-      cy.scrollTo("top");
-      cy.wait(500);
+      cy.scrollTo("top")
+      cy.wait(500)
     }
   })
   cy.get('.avatar-menu').click() // open

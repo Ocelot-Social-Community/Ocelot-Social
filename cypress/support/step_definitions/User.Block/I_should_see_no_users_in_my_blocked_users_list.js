@@ -1,6 +1,6 @@
-import { Then } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-Then("I should see no users in my blocked users list", () => {
+defineStep('I should see no users in my blocked users list', () => {
   cy.get('.ds-placeholder')
-    .should('contain', "So far, you have not blocked anybody.")
+    .should('contain', 'So far, you have not blocked anybody.')
 })

@@ -1,6 +1,6 @@
-import { When } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-When('I save {string} as my location', location => {
+defineStep('I save {string} as my location', location => {
     cy.get('input[id=city]').type(location)
     cy.get('.ds-select-option')
       .contains(location)

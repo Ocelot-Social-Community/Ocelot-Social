@@ -1,15 +1,15 @@
-import { When } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-When("I log out", () => {
-  cy.get(".avatar-menu").then(($menu) => {
+defineStep('I log out', () => {
+  cy.get('.avatar-menu').then(($menu) => {
     if (!$menu.is(':visible')){
-      cy.scrollTo("top");
-      cy.wait(500);
+      cy.scrollTo('top')
+      cy.wait(500)
     }
   })
-  cy.get(".avatar-menu")
-    .click();
-  cy.get(".avatar-menu-popover")
+  cy.get('.avatar-menu')
+    .click()
+  cy.get('.avatar-menu-popover')
     .find('a[href="/logout"]')
-    .click();
-});
+    .click()
+})
