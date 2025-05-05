@@ -14,9 +14,11 @@ describe('uniqueSlug', () => {
   })
 
   it('slugify null string', async () => {
-    const string = null
+    const nullString = null
     const isUnique = jest.fn().mockResolvedValue(true)
-    await expect(uniqueSlug(string, isUnique)).resolves.toEqual('anonymous')
+    await expect(uniqueSlug(nullString as unknown as string, isUnique)).resolves.toEqual(
+      'anonymous',
+    )
   })
 
   it('Converts umlaut to a two letter equivalent', async () => {

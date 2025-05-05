@@ -32,12 +32,12 @@
     "paths": {                                           /* Specify a set of entries that re-map imports to additional lookup locations. */
       "@config/*": ["./src/config/*"],
       "@constants/*": ["./src/constants/*"],
+      "@context/*": ["./src/context/*"],
       "@db/*": ["./src/db/*"],
       "@graphql/*": ["./src/graphql/*"],
       "@helpers/*": ["./src/helpers/*"],
       "@jwt/*": ["./src/jwt/*"],
       "@middleware/*": ["./src/middleware/*"],
-      "@models/*": ["./src/models/*"],
       "@src/*": ["./src/*"],
       "@root/*": ["./*"]
     },

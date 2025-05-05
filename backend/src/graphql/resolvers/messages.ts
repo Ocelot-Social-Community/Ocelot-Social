@@ -7,7 +7,7 @@
 import { withFilter } from 'graphql-subscriptions'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
-import { pubsub, CHAT_MESSAGE_ADDED } from '@src/server'
+import { CHAT_MESSAGE_ADDED } from '@constants/subscriptions'
 
 import Resolver from './helpers/Resolver'
 
@@ -30,7 +30,7 @@ export default {
   Subscription: {
     chatMessageAdded: {
       subscribe: withFilter(
-        () => pubsub.asyncIterator(CHAT_MESSAGE_ADDED),
+        (_, __, context) => context.pubsub.asyncIterator(CHAT_MESSAGE_ADDED),
         (payload, variables, context) => {
           return payload.userId === context.user?.id
         },

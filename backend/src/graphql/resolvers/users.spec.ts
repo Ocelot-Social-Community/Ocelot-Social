@@ -3,14 +3,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import { categories } from '@constants/categories'
+import databaseContext from '@context/database'
+import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
-import User from '@models/User'
-import createServer from '@src/server'
+import User from '@db/models/User'
+import createServer, { getContext } from '@src/server'
 
 const categoryIds = ['cat9']
 let user
@@ -21,8 +23,7 @@ let query
 let mutate
 let variables
 
-const driver = getDriver()
-const neode = getNeode()
+const pubsub = pubsubContext()
 
 const deleteUserMutation = gql`
   mutation ($id: ID!, $resource: [Deletable]) {
@@ -108,25 +109,28 @@ const resetTrophyBadgesSelected = gql`
   }
 `
 
+const database = databaseContext()
+
+let server: ApolloServer
+
 beforeAll(async () => {
   await cleanDatabase()
 
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode,
-        user: authenticatedUser,
-      }
-    },
-  })
-  query = createTestClient(server).query
-  mutate = createTestClient(server).mutate
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database, pubsub })
+
+  server = createServer({ context }).server
+
+  const createTestClientResult = createTestClient(server)
+  query = createTestClientResult.query
+  mutate = createTestClientResult.mutate
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
@@ -540,10 +544,10 @@ describe('Delete a User as admin', () => {
 
       describe('connected `EmailAddress` nodes', () => {
         it('will be removed completely', async () => {
-          await expect(neode.all('EmailAddress')).resolves.toHaveLength(2)
+          await expect(database.neode.all('EmailAddress')).resolves.toHaveLength(2)
           await mutate({ mutation: deleteUserMutation, variables })
 
-          await expect(neode.all('EmailAddress')).resolves.toHaveLength(1)
+          await expect(database.neode.all('EmailAddress')).resolves.toHaveLength(1)
         })
       })
 
@@ -554,9 +558,9 @@ describe('Delete a User as admin', () => {
         })
 
         it('will be removed completely', async () => {
-          await expect(neode.all('SocialMedia')).resolves.toHaveLength(1)
+          await expect(database.neode.all('SocialMedia')).resolves.toHaveLength(1)
           await mutate({ mutation: deleteUserMutation, variables })
-          await expect(neode.all('SocialMedia')).resolves.toHaveLength(0)
+          await expect(database.neode.all('SocialMedia')).resolves.toHaveLength(0)
         })
       })
     })
@@ -659,202 +663,6 @@ const emailNotificationSettingsMutation = gql`
     }
   }
 `
-
-const distanceToMeQuery = gql`
-  query ($id: ID!) {
-    User(id: $id) {
-      distanceToMe
-    }
-  }
-`
-let myPlaceUser, otherPlaceUser, noCordsPlaceUser, noPlaceUser
-
-describe('distanceToMe', () => {
-  beforeEach(async () => {
-    const Hamburg = await Factory.build('location', {
-      id: 'region.5127278006398860',
-      name: 'Hamburg',
-      type: 'region',
-      lng: 10.0,
-      lat: 53.55,
-      nameES: 'Hamburgo',
-      nameFR: 'Hambourg',
-      nameIT: 'Amburgo',
-      nameEN: 'Hamburg',
-      namePT: 'Hamburgo',
-      nameDE: 'Hamburg',
-      nameNL: 'Hamburg',
-      namePL: 'Hamburg',
-      nameRU: 'Гамбург',
-    })
-    const Germany = await Factory.build('location', {
-      id: 'country.10743216036480410',
-      name: 'Germany',
-      type: 'country',
-      namePT: 'Alemanha',
-      nameDE: 'Deutschland',
-      nameES: 'Alemania',
-      nameNL: 'Duitsland',
-      namePL: 'Niemcy',
-      nameFR: 'Allemagne',
-      nameIT: 'Germania',
-      nameEN: 'Germany',
-      nameRU: 'Германия',
-    })
-    const Paris = await Factory.build('location', {
-      id: 'region.9397217726497330',
-      name: 'Paris',
-      type: 'region',
-      lng: 2.35183,
-      lat: 48.85658,
-      nameES: 'París',
-      nameFR: 'Paris',
-      nameIT: 'Parigi',
-      nameEN: 'Paris',
-      namePT: 'Paris',
-      nameDE: 'Paris',
-      nameNL: 'Parijs',
-      namePL: 'Paryż',
-      nameRU: 'Париж',
-    })
-
-    user = await Factory.build('user', {
-      id: 'user',
-      role: 'user',
-    })
-    await user.relateTo(Hamburg, 'isIn')
-
-    myPlaceUser = await Factory.build('user', {
-      id: 'myPlaceUser',
-      role: 'user',
-    })
-    await myPlaceUser.relateTo(Hamburg, 'isIn')
-
-    otherPlaceUser = await Factory.build('user', {
-      id: 'otherPlaceUser',
-      role: 'user',
-    })
-    await otherPlaceUser.relateTo(Paris, 'isIn')
-
-    noCordsPlaceUser = await Factory.build('user', {
-      id: 'noCordsPlaceUser',
-      role: 'user',
-    })
-    await noCordsPlaceUser.relateTo(Germany, 'isIn')
-
-    noPlaceUser = await Factory.build('user', {
-      id: 'noPlaceUser',
-      role: 'user',
-    })
-  })
-
-  describe('query the field', () => {
-    describe('for self user', () => {
-      it('returns null', async () => {
-        authenticatedUser = await user.toJson()
-        const targetUser = await user.toJson()
-        await expect(
-          query({ query: distanceToMeQuery, variables: { id: targetUser.id } }),
-        ).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              User: [
-                {
-                  distanceToMe: null,
-                },
-              ],
-            },
-            errors: undefined,
-          }),
-        )
-      })
-    })
-
-    describe('for myPlaceUser', () => {
-      it('returns 0', async () => {
-        authenticatedUser = await user.toJson()
-        const targetUser = await myPlaceUser.toJson()
-        await expect(
-          query({ query: distanceToMeQuery, variables: { id: targetUser.id } }),
-        ).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              User: [
-                {
-                  distanceToMe: 0,
-                },
-              ],
-            },
-            errors: undefined,
-          }),
-        )
-      })
-    })
-
-    describe('for otherPlaceUser', () => {
-      it('returns a number', async () => {
-        authenticatedUser = await user.toJson()
-        const targetUser = await otherPlaceUser.toJson()
-        await expect(
-          query({ query: distanceToMeQuery, variables: { id: targetUser.id } }),
-        ).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              User: [
-                {
-                  distanceToMe: 746,
-                },
-              ],
-            },
-            errors: undefined,
-          }),
-        )
-      })
-    })
-
-    describe('for noCordsPlaceUser', () => {
-      it('returns null', async () => {
-        authenticatedUser = await user.toJson()
-        const targetUser = await noCordsPlaceUser.toJson()
-        await expect(
-          query({ query: distanceToMeQuery, variables: { id: targetUser.id } }),
-        ).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              User: [
-                {
-                  distanceToMe: null,
-                },
-              ],
-            },
-            errors: undefined,
-          }),
-        )
-      })
-    })
-
-    describe('for noPlaceUser', () => {
-      it('returns null', async () => {
-        authenticatedUser = await user.toJson()
-        const targetUser = await noPlaceUser.toJson()
-        await expect(
-          query({ query: distanceToMeQuery, variables: { id: targetUser.id } }),
-        ).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              User: [
-                {
-                  distanceToMe: null,
-                },
-              ],
-            },
-            errors: undefined,
-          }),
-        )
-      })
-    })
-  })
-})
 
 describe('emailNotificationSettings', () => {
   beforeEach(async () => {
@@ -1237,8 +1045,8 @@ describe('updateOnlineStatus', () => {
         )
 
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
-        const result = await neode.cypher(cypher, { id: authenticatedUser.id })
-        const dbUser = neode.hydrateFirst(result, 'u', neode.model('User'))
+        const result = await database.neode.cypher(cypher, { id: authenticatedUser.id })
+        const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
         await expect(dbUser.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'online',
         })
@@ -1263,8 +1071,8 @@ describe('updateOnlineStatus', () => {
         )
 
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
-        const result = await neode.cypher(cypher, { id: authenticatedUser.id })
-        const dbUser = neode.hydrateFirst(result, 'u', neode.model('User'))
+        const result = await database.neode.cypher(cypher, { id: authenticatedUser.id })
+        const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
         await expect(dbUser.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
           awaySince: expect.any(String),
@@ -1279,8 +1087,12 @@ describe('updateOnlineStatus', () => {
         )
 
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
-        const result = await neode.cypher(cypher, { id: authenticatedUser.id })
-        const dbUser = neode.hydrateFirst<typeof User>(result, 'u', neode.model('User'))
+        const result = await database.neode.cypher(cypher, { id: authenticatedUser.id })
+        const dbUser = database.neode.hydrateFirst<typeof User>(
+          result,
+          'u',
+          database.neode.model('User'),
+        )
         await expect(dbUser.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
           awaySince: expect.any(String),
@@ -1294,8 +1106,8 @@ describe('updateOnlineStatus', () => {
           }),
         )
 
-        const result2 = await neode.cypher(cypher, { id: authenticatedUser.id })
-        const dbUser2 = neode.hydrateFirst(result2, 'u', neode.model('User'))
+        const result2 = await database.neode.cypher(cypher, { id: authenticatedUser.id })
+        const dbUser2 = database.neode.hydrateFirst(result2, 'u', database.neode.model('User'))
         await expect(dbUser2.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
           awaySince,

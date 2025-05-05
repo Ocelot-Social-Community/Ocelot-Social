@@ -3,49 +3,47 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 
+import databaseContext from '@context/database'
+import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { createMessageMutation } from '@graphql/queries/createMessageMutation'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { markMessagesAsSeen } from '@graphql/queries/markMessagesAsSeen'
 import { messageQuery } from '@graphql/queries/messageQuery'
 import { roomQuery } from '@graphql/queries/roomQuery'
-import createServer, { pubsub } from '@src/server'
-
-const driver = getDriver()
-const neode = getNeode()
+import createServer, { getContext } from '@src/server'
 
 let query
 let mutate
 let authenticatedUser
 let chattingUser, otherChattingUser, notChattingUser
 
+const database = databaseContext()
+const pubsub = pubsubContext()
 const pubsubSpy = jest.spyOn(pubsub, 'publish')
 
+let server: ApolloServer
 beforeAll(async () => {
   await cleanDatabase()
 
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode,
-        user: authenticatedUser,
-        cypherParams: {
-          currentUserId: authenticatedUser ? authenticatedUser.id : null,
-        },
-      }
-    },
-  })
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database, pubsub })
+
+  server = createServer({ context }).server
+
   query = createTestClient(server).query
   mutate = createTestClient(server).mutate
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('Message', () => {

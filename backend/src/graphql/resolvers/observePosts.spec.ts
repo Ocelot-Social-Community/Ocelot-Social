@@ -1,19 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import CONFIG from '@config/index'
+import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
-import createServer from '@src/server'
+import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
-
-const driver = getDriver()
-const neode = getNeode()
 
 let query
 let mutate
@@ -40,28 +38,27 @@ const postQuery = gql`
   }
 `
 
+const database = databaseContext()
+
+let server: ApolloServer
 beforeAll(async () => {
   await cleanDatabase()
 
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode,
-        user: authenticatedUser,
-        cypherParams: {
-          currentUserId: authenticatedUser ? authenticatedUser.id : null,
-        },
-      }
-    },
-  })
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database })
+
+  server = createServer({ context }).server
+
   query = createTestClient(server).query
   mutate = createTestClient(server).mutate
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('observing posts', () => {

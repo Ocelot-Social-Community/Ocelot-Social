@@ -12,7 +12,7 @@
     "build": "tsc && tsc-alias && ./scripts/build.copy.files.sh",
     "dev": "nodemon --exec ts-node --require tsconfig-paths/register src/index.ts -e js,ts,gql",
     "dev:debug": "nodemon --exec node --inspect=0.0.0.0:9229 build/src/index.js -e js,ts,gql",
-    "lint": "eslint --max-warnings=0 --report-unused-disable-directives --ext .js,.ts .",
+    "lint": "eslint --max-warnings=0 --report-unused-disable-directives --ext .js,.ts,.cjs .",
     "test": "cross-env NODE_ENV=test NODE_OPTIONS=--max-old-space-size=8192 jest --runInBand --coverage --forceExit --detectOpenHandles",
     "db:reset": "ts-node --require tsconfig-paths/register src/db/reset.ts",
     "db:reset:withmigrations": "ts-node --require tsconfig-paths/register src/db/reset-with-migrations.ts",
@@ -36,6 +36,7 @@
     "cheerio": "~1.0.0",
     "cross-env": "~7.0.3",
     "dotenv": "~16.5.0",
+    "email-templates": "^12.0.2",
     "express": "^5.1.0",
     "graphql": "^14.6.0",
     "graphql-middleware": "~4.0.2",
@@ -77,6 +78,8 @@
     "node-fetch": "^2.7.0",
     "nodemailer": "^6.10.1",
     "nodemailer-html-to-text": "^3.2.0",
+    "preview-email": "^3.1.0",
+    "pug": "^3.0.3",
     "request": "~2.88.2",
     "sanitize-html": "~2.16.0",
     "slug": "~9.1.0",
@@ -88,9 +91,11 @@
   "devDependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "^4.5.0",
     "@faker-js/faker": "9.7.0",
+    "@types/email-templates": "^10.0.4",
     "@types/jest": "^29.5.14",
     "@types/lodash": "^4.17.16",
-    "@types/node": "^22.15.2",
+    "@types/node": "^22.15.3",
+    "@types/slug": "^5.0.9",
     "@types/uuid": "~9.0.1",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
@@ -119,7 +124,10 @@
   },
   "resolutions": {
     "**/**/fs-capacitor": "^6.2.0",
-    "**/graphql-upload": "^11.0.0"
+    "**/graphql-upload": "^11.0.0",
+    "**/strip-ansi": "6.0.1",
+    "**/string-width": "4.2.0",
+    "**/wrap-ansi": "7.0.0"
   },
   "engines": {
     "node": ">=20.12.1"
