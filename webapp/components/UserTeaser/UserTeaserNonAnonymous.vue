@@ -8,6 +8,7 @@
         :user-link="userLink"
         @open-menu="openMenu(false)"
         @close-menu="closeMenu(false)"
+        data-test="avatarUserLink"
       >
         <profile-avatar :profile="user" size="small" />
       </user-teaser-helper>
