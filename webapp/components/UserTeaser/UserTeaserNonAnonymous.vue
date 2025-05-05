@@ -6,8 +6,8 @@
         :link-to-profile="linkToProfile"
         :show-popover="showPopover"
         :user-link="userLink"
-        @open-menu="openMenu"
-        @close-menu="closeMenu"
+        @open-menu="openMenu(false)"
+        @close-menu="closeMenu(false)"
       >
         <profile-avatar :profile="user" size="small" />
       </user-teaser-helper>
@@ -17,8 +17,8 @@
             :link-to-profile="linkToProfile"
             :show-popover="showPopover"
             :user-link="userLink"
-            @open-menu="openMenu"
-            @close-menu="closeMenu"
+            @open-menu="openMenu(false)"
+            @close-menu="closeMenu(false)"
           >
             <span class="slug">{{ userSlug }}</span>
             <span class="name">{{ userName }}</span>
@@ -48,7 +48,6 @@
         v-if="isOpen"
         :user-id="user.id"
         :user-link="linkToProfile ? userLink : null"
-        @close="closeMenu(true)"
       />
     </template>
   </dropdown>
@@ -117,11 +116,6 @@ export default {
     groupName() {
       const { name } = this.group || {}
       return name || this.$t('profile.userAnonym')
-    },
-  },
-  methods: {
-    closeMenu() {
-      this.$emit('close')
     },
   },
 }

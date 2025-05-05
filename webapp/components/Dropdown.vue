@@ -47,19 +47,15 @@ export default {
       handler(isOpen) {
         try {
           if (isOpen) {
-            this.$nextTick(() => {
-              setTimeout(() => {
-                const paddingRightStyle = `${
-                  window.innerWidth - document.documentElement.clientWidth
-                }px`
-                const navigationElement = document.querySelector('.main-navigation')
-                document.body.style.paddingRight = paddingRightStyle
-                document.body.classList.add('dropdown-open')
-                if (navigationElement) {
-                  navigationElement.style.paddingRight = paddingRightStyle
-                }
-              }, 20)
-            })
+            const paddingRightStyle = `${
+              window.innerWidth - document.documentElement.clientWidth
+            }px`
+            const navigationElement = document.querySelector('.main-navigation')
+            document.body.style.paddingRight = paddingRightStyle
+            document.body.classList.add('dropdown-open')
+            if (navigationElement) {
+              navigationElement.style.paddingRight = paddingRightStyle
+            }
           } else {
             const navigationElement = document.querySelector('.main-navigation')
             document.body.style.paddingRight = null
