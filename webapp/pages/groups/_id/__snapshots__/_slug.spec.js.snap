@@ -513,6 +513,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -592,6 +593,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -671,6 +673,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -750,6 +753,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -2380,6 +2384,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -2459,6 +2464,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -2538,6 +2544,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -2617,6 +2624,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -3329,6 +3337,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -3408,6 +3417,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -3487,6 +3497,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -3566,6 +3577,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -4144,6 +4156,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -4223,6 +4236,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -4302,6 +4316,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -4381,6 +4396,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -4957,6 +4973,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -5036,6 +5053,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -5115,6 +5133,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -5194,6 +5213,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -5839,6 +5859,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -5918,6 +5939,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -5997,6 +6019,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -6076,6 +6099,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -6835,6 +6859,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -6914,6 +6939,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -6993,6 +7019,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -7072,6 +7099,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -7805,6 +7833,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -7884,6 +7913,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -7963,6 +7993,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
@@ -8042,6 +8073,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                     trigger="manual"
                   >
                     <nuxt-link-stub
+                      data-test="avatarUserLink"
                       to="[object Object]"
                     >
                       <div
