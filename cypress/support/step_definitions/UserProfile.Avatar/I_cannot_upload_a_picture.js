@@ -1,8 +1,8 @@
-import { Then } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-Then("I cannot upload a picture", () => {
-  cy.get(".base-card")
+defineStep('I cannot upload a picture', () => {
+  cy.get('.base-card')
     .children()
-    .should("not.have.id", "customdropzone")
-    .should("have.class", "profile-avatar");
-});
+    .should('not.have.id', 'customdropzone')
+    .should('have.class', 'profile-avatar')
+})

@@ -1,6 +1,6 @@
-import { Then } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-Then('the {string} post was saved successfully without a teaser image', condition => {
+defineStep('the {string} post was saved successfully without a teaser image', condition => {
   cy.get(".base-card > .title")
     .should("contain", condition === 'updated' ? 'to be updated' : 'new post')
     .get(".content")

@@ -1,6 +1,6 @@
-import { When } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-When('I have the following self-description:', text => {
+defineStep('I have the following self-description:', text => {
     cy.get('textarea[id=about]')
       .clear()
       .type(text)

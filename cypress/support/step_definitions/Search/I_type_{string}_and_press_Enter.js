@@ -1,8 +1,8 @@
-import { When } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-When("I type {string} and press Enter", value => {
-  cy.get(".searchable-input .ds-select input")
+defineStep('I type {string} and press Enter', value => {
+  cy.get('.searchable-input .ds-select input')
     .focus()
     .type(value)
-    .type("{enter}", { force: true });
-});
+    .type('{enter}', { force: true })
+})

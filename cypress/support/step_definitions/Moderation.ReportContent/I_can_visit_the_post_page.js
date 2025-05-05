@@ -1,6 +1,6 @@
-import { Then } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-Then('I can visit the post page', () => {
+defineStep('I can visit the post page', () => {
   cy.contains('Fake news').click()
   cy.location('pathname').should('contain', '/post')
     .get('.base-card .title').should('contain', 'Fake news')
