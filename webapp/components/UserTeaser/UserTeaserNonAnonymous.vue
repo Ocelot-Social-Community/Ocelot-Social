@@ -1,36 +1,29 @@
 <template>
   <dropdown class="user-teaser">
     <template #default="{ openMenu, closeMenu }">
-      <component
-        v-if="showAvatar"
-        :is="linkToProfile && !isTouchDevice ? 'nuxt-link' : 'span'"
-        :to="linkToProfile && !isTouchDevice ? userLink : undefined"
+      <user-teaser-helper
+        :link-to-profile="linkToProfile"
+        :show-popover="showPopover"
+        :is-touch-device="isTouchDevice"
+        :user-link="userLink"
+        @open-menu="openMenu"
+        @close-menu="closeMenu"
       >
-        <profile-avatar
-          :profile="user"
-          size="small"
-          @mouseover.native="() => showPopover && openMenu(true)"
-          @mouseleave.native="closeMenu(true)"
-          @click.prevent="() => openMenuOnMobile(openMenu)"
-        />
-      </component>
+        <profile-avatar :profile="user" size="small" />
+      </user-teaser-helper>
       <div class="info flex-direction-column">
         <div :class="wide ? 'flex-direction-row' : 'flex-direction-column'">
-          <component
-            :is="linkToProfile && !isTouchDevice ? 'nuxt-link' : 'span'"
-            :to="linkToProfile && !isTouchDevice ? userLink : undefined"
-            ref="linkElement"
+          <user-teaser-helper
+            :link-to-profile="linkToProfile"
+            :show-popover="showPopover"
+            :is-touch-device="isTouchDevice"
+            :user-link="userLink"
+            @open-menu="openMenu"
+            @close-menu="closeMenu"
           >
-            <span
-              class="text"
-              @mouseover="() => showPopover && openMenu(true)"
-              @mouseleave="closeMenu(true)"
-              @click.prevent="() => openMenuOnMobile(openMenu)"
-            >
-              <span class="slug">{{ userSlug }}</span>
-              <span class="name">{{ userName }}</span>
-            </span>
-          </component>
+            <span class="slug">{{ userSlug }}</span>
+            <span class="name">{{ userName }}</span>
+          </user-teaser-helper>
           <span v-if="wide">&nbsp;</span>
           <span v-if="group">
             <span class="text">
@@ -71,12 +64,14 @@ import Dropdown from '~/components/Dropdown'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import UserTeaserPopover from './UserTeaserPopover'
 import { isTouchDevice } from '../utils/isTouchDevice'
+import UserTeaserHelper from './UserTeaserHelper.vue'
 
 export default {
   name: 'UserTeaser',
   components: {
     ProfileAvatar,
     UserTeaserPopover,
+    UserTeaserHelper,
     Dropdown,
     DateTime,
   },
