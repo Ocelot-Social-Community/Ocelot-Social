@@ -1,6 +1,6 @@
-import { Then } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-Then('I see all the reported posts including the one from above', () => {
+defineStep('I see all the reported posts including the one from above', () => {
   cy.intercept({
     method: 'POST',
     url: '/api',

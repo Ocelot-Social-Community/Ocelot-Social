@@ -1,6 +1,6 @@
-import { Then } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-Then("the unread counter is removed", () => {
+defineStep('the unread counter is removed', () => {
   cy.get('.notifications-menu .counter-icon')
-    .should('not.exist');
-});
+    .should('not.exist')
+})

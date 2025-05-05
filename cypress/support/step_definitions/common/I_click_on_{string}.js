@@ -1,6 +1,6 @@
-import { When } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-When("I click on {string}", element => {
+defineStep('I click on {string}', element => {
   const elementSelectors = {
     'submit button': 'button[name=submit]',
     'create post button': '.post-add-button',
@@ -15,5 +15,5 @@ When("I click on {string}", element => {
 
   cy.get(elementSelectors[element])
     .click()
-    .wait(750);
-});
+    .wait(750)
+})

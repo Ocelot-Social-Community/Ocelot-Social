@@ -1,9 +1,9 @@
-import { Given } from '@badeball/cypress-cucumber-preprocessor'
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 import './../../commands'
 import './../../factories'
 import 'cypress-network-idle'
 
-Given('somebody reported the following posts:', table => {
+defineStep('somebody reported the following posts:', table => {
   const reportIdRegex = /^[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}$/
   cy.intercept({
     method: 'POST',

@@ -1,15 +1,15 @@
-import { When } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-When("a user has blocked me", () => {
+defineStep('a user has blocked me', () => {
   cy.neode()
-    .firstOf("User", {
-      name: "Peter Pan"
+    .firstOf('User', {
+      name: 'Peter Pan'
     })
     .then(blockedUser => {
       cy.neode()
-        .firstOf("User", {
+        .firstOf('User', {
           name: 'Harassing User'
         })
-        .relateTo(blockedUser, "blocked");
-    });
-});
+        .relateTo(blockedUser, 'blocked')
+    })
+})

@@ -1,6 +1,6 @@
-import { When } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-When('I delete the social media link {string}', (link) => {
+defineStep('I delete the social media link {string}', (link) => {
   cy.get('[data-test="delete-button"]')
     .click()
   cy.get('[data-test="confirm-modal"]')
