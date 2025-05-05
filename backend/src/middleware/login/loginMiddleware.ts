@@ -6,7 +6,6 @@ import {
   sendRegistrationMail,
   sendEmailVerification,
   sendResetPasswordMail,
-  sendWrongEmail,
 } from '@src/emails/sendEmail'
 
 const sendSignupMail = async (resolve, root, args, context, resolveInfo) => {
@@ -15,11 +14,7 @@ const sendSignupMail = async (resolve, root, args, context, resolveInfo) => {
   const { email, nonce } = response
   if (nonce) {
     // emails that already exist do not have a nonce
-    if (inviteCode) {
-      await sendRegistrationMail({ email, nonce, locale, inviteCode })
-    } else {
-      await sendRegistrationMail({ email, nonce, locale })
-    }
+    await sendRegistrationMail({ email, nonce, locale, inviteCode })
   }
   delete response.nonce
   return response
@@ -31,7 +26,8 @@ const sendPasswordResetMail = async (resolve, root, args, context, resolveInfo) 
   if (userFound) {
     await sendResetPasswordMail({ email, nonce, name, locale })
   } else {
-    await sendWrongEmail({ email, locale })
+    // this is an antifeature allowing unauthenticated users to spam any email with wrong-email notifications
+    // await sendWrongEmail({ email, locale })
   }
   return true
 }
