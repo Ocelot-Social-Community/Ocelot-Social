@@ -47,7 +47,7 @@
     "welcome": "Welcome to"
   },
   "resetPassword": {
-      "codeHint": "If the above button doesn't work you can also copy the following code into your browser window: ",
+    "codeHint": "If the above button doesn't work you can also copy the following code into your browser window: ",
     "ignore": "If you didn't request a new password feel free to ignore this e-mail.",
     "introduction": "So, you forgot your password? No problem! Just click the button below to reset it within the next 24 hours:"
   },
