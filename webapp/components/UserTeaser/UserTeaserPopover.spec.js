@@ -5,6 +5,7 @@ import UserTeaserPopover from './UserTeaserPopover.vue'
 const localVue = global.localVue
 
 const user = {
+  id: 'id',
   name: 'Tilda Swinton',
   slug: 'tilda-swinton',
   badgeVerification: {
@@ -49,9 +50,12 @@ describe('UserTeaserPopover', () => {
     return render(UserTeaserPopover, {
       localVue,
       propsData: {
-        user,
+        userId: 'id',
         userLink: withUserLink ? userLink : null,
       },
+      data: () => ({
+        User: [user],
+      }),
       stubs: {
         NuxtLink: RouterLinkStub,
       },
