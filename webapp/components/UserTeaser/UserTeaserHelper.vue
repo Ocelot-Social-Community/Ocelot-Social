@@ -3,7 +3,7 @@
     <slot />
   </button>
   <span
-    v-else-if="!linkToProfile"
+    v-else-if="!linkToProfile || !userLink"
     @mouseover="() => showPopover && openMenu()"
     @mouseleave="closeMenu"
   >
@@ -25,7 +25,7 @@ import { isTouchDevice } from '../utils/isTouchDevice'
 export default {
   name: 'UserTeaserHelper',
   props: {
-    userLink: { type: Object },
+    userLink: { type: Object, default: null },
     linkToProfile: { type: Boolean, default: true },
     showPopover: { type: Boolean, default: false },
   },

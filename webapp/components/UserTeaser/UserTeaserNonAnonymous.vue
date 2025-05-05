@@ -91,7 +91,7 @@ export default {
     },
     userLink() {
       const { id, slug } = this.user
-      if (!(id && slug)) return ''
+      if (!(id && slug)) return null
       return { name: 'profile-id-slug', params: { slug, id } }
     },
     userSlug() {

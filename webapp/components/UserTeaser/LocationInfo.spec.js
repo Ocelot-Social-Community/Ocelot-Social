@@ -8,7 +8,7 @@ describe('LocationInfo', () => {
     return render(LocationInfo, {
       localVue,
       propsData: {
-        location: {
+        locationData: {
           name: 'Paris',
           distanceToMe: withDistance ? 100 : null,
         },
