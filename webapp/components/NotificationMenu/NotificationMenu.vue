@@ -127,7 +127,7 @@ export default {
   apollo: {
     notifications: {
       query() {
-        return notificationQuery(this.$i18n)
+        return notificationQuery()
       },
       variables() {
         return {
