@@ -40,7 +40,7 @@ export default {
   apollo: {
     GroupMembers: {
       query() {
-        return groupMembersQuery(this.$i18n)
+        return groupMembersQuery()
       },
       variables() {
         return {

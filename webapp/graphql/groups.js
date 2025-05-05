@@ -200,10 +200,7 @@ export const groupQuery = (i18n) => {
   `
 }
 
-export const groupMembersQuery = (i18n) => {
-  // TODO i18n should never be undefined - investigate!
-  const lang = !i18n ? 'EN' : i18n.locale().toUpperCase()
-
+export const groupMembersQuery = () => {
   return gql`
     query ($id: ID!) {
       GroupMembers(id: $id) {
@@ -214,23 +211,6 @@ export const groupMembersQuery = (i18n) => {
         avatar {
           url
         }
-        badgeTrophiesSelected {
-          id
-          icon
-          description
-        }
-        badgeVerification {
-          id
-          icon
-          description
-        }
-        location {
-          name: name${lang}
-          distanceToMe
-        }
-        followedByCount
-        contributionsCount
-        commentedCount
       }
     }
   `

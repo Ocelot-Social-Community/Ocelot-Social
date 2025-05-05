@@ -17,6 +17,7 @@ export const locationFragment = (lang) => gql`
   fragment location on User {
     locationName
     location {
+      id
       name: name${lang}
       lng
       lat

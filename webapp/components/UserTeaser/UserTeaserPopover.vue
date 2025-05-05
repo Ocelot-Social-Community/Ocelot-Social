@@ -1,7 +1,7 @@
 <template>
-  <div class="user-teaser-popover">
+  <div class="user-teaser-popover" v-if="user">
     <badges
-      v-if="$env.BADGES_ENABLED"
+      v-if="$env.BADGES_ENABLED && user.badgeVerification"
       :badges="[user.badgeVerification, ...user.badgeTrophiesSelected]"
     />
     <location-info v-if="user.location" :location-data="user.location" class="location-info" />
@@ -32,6 +32,7 @@
 import Badges from '~/components/Badges.vue'
 import LocationInfo from '~/components/UserTeaser/LocationInfo.vue'
 import { isTouchDevice } from '~/components/utils/isTouchDevice'
+import { userTeaserQuery } from '~/graphql/User.js'
 
 export default {
   name: 'UserTeaserPopover',
@@ -40,12 +41,25 @@ export default {
     LocationInfo,
   },
   props: {
-    user: { type: Object, default: null },
+    userId: { type: Number },
     userLink: { type: Object },
   },
   computed: {
     isTouchDevice() {
       return isTouchDevice()
+    },
+    user() {
+      return (this.User && this.User[0]) ?? null
+    },
+  },
+  apollo: {
+    User: {
+      query() {
+        return userTeaserQuery(this.$i18n)
+      },
+      variables() {
+        return { id: this.userId }
+      },
     },
   },
 }

@@ -126,14 +126,12 @@ export const mapUserQuery = (i18n) => {
   `
 }
 
-export const notificationQuery = (i18n) => {
-  const lang = i18n.locale().toUpperCase()
+export const notificationQuery = () => {
   return gql`
     ${userFragment}
     ${commentFragment}
     ${postFragment}
     ${groupFragment}
-    ${userTeaserFragment(lang)}
 
     query ($read: Boolean, $orderBy: NotificationOrdering, $first: Int, $offset: Int) {
       notifications(read: $read, orderBy: $orderBy, first: $first, offset: $offset) {
@@ -144,7 +142,6 @@ export const notificationQuery = (i18n) => {
         updatedAt
         to {
           ...user
-          ...userTeaser
         }
         from {
           __typename
@@ -152,20 +149,17 @@ export const notificationQuery = (i18n) => {
             ...post
             author {
               ...user
-              ...userTeaser
             }
           }
           ... on Comment {
             ...comment
             author {
               ...user
-              ...userTeaser
             }
             post {
               ...post
               author {
                 ...user
-                ...userTeaser
               }
             }
           }
@@ -175,7 +169,6 @@ export const notificationQuery = (i18n) => {
         }
         relatedUser {
           ...user
-          ...userTeaser
         }
       }
     }
@@ -486,6 +479,18 @@ export const userDataQuery = (i18n) => {
             ...comment
           }
         }
+      }
+    }
+  `
+}
+
+export const userTeaserQuery = (i18n) => {
+  const lang = i18n.locale().toUpperCase()
+  return gql`
+    ${userTeaserFragment(lang)}
+    query ($id: ID!) {
+      User(id: $id) {
+        ...userTeaser
       }
     }
   `
