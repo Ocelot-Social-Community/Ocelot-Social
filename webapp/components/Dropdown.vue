@@ -43,7 +43,6 @@ export default {
   },
   watch: {
     isPopoverOpen: {
-      immediate: true,
       handler(isOpen) {
         if (isOpen) {
           document.body.classList.add('dropdown-open')
