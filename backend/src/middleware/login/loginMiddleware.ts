@@ -2,12 +2,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { sendMail } from '@middleware/helpers/email/sendMail'
 import {
-  resetPasswordTemplate,
-  wrongAccountTemplate,
-} from '@middleware/helpers/email/templateBuilder'
-import { sendRegistrationMail, sendEmailVerification } from '@src/emails/sendEmail'
+  sendRegistrationMail,
+  sendEmailVerification,
+  sendResetPasswordMail,
+  sendWrongEmail,
+} from '@src/emails/sendEmail'
 
 const sendSignupMail = async (resolve, root, args, context, resolveInfo) => {
   const { inviteCode, locale } = args
@@ -26,10 +26,13 @@ const sendSignupMail = async (resolve, root, args, context, resolveInfo) => {
 }
 
 const sendPasswordResetMail = async (resolve, root, args, context, resolveInfo) => {
-  const { email } = args
+  const { email, locale } = args
   const { email: userFound, nonce, name } = await resolve(root, args, context, resolveInfo)
-  const template = userFound ? resetPasswordTemplate : wrongAccountTemplate
-  await sendMail(template({ email, variables: { nonce, name } }))
+  if (userFound) {
+    await sendResetPasswordMail({ email, nonce, name, locale })
+  } else {
+    await sendWrongEmail({ email, locale })
+  }
   return true
 }
 

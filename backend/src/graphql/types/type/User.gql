@@ -245,7 +245,7 @@ type Mutation {
   
   updateOnlineStatus(status: OnlineStatus!): Boolean!
 
-  requestPasswordReset(email: String!): Boolean!
+  requestPasswordReset(email: String!, locale: String!): Boolean!
   resetPassword(email: String!, nonce: String!, newPassword: String!): Boolean!
   changePassword(oldPassword: String!, newPassword: String!): String!
 
