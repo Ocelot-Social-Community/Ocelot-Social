@@ -8,6 +8,6 @@ defineStep('I should see my comment', () => {
     .get('.profile-avatar img')
     .should('have.attr', 'src')
     .and('contain', 'https://') // some url
-    .get('.user-teaser > .info > .text')
+    .get('.user-teaser .info > .text')
     .should('contain', 'today at')
 })
