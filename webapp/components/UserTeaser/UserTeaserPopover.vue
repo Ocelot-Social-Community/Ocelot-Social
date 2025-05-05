@@ -1,5 +1,6 @@
 <template>
-  <div class="user-teaser-popover" v-if="user">
+  <div class="placeholder" v-if="!user" />
+  <div class="user-teaser-popover" v-else>
     <badges
       v-if="$env.BADGES_ENABLED && user.badgeVerification"
       :badges="[user.badgeVerification, ...user.badgeTrophiesSelected]"
@@ -66,6 +67,10 @@ export default {
 </script>
 
 <style scoped>
+.placeholder {
+  height: 200px;
+  width: 200px;
+}
 .user-teaser-popover {
   display: flex;
   flex-direction: column;
