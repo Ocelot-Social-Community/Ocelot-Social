@@ -47,8 +47,7 @@
       <user-teaser-popover
         v-if="isOpen"
         :user-id="user.id"
-        :link-to-profile="linkToProfile"
-        :user-link="userLink"
+        :user-link="linkToProfile ? userLink : null"
         @close="closeMenu(true)"
       />
     </template>

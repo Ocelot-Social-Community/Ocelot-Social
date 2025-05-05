@@ -6,36 +6,34 @@ exports[`UserTeaser given an user avatar is disabled does not render the avatar 
     class=""
     placement="top-start"
   >
-    <v-popover-stub
-      autohide="true"
-      class="user-teaser"
-      container="body"
-      delay="0"
-      handleresize="true"
-      offset="16"
-      openclass="open"
-      opengroup="0"
-      placement="bottom-end"
-      popoverarrowclass="tooltip-arrow popover-arrow"
-      popoverbaseclass="tooltip popover"
-      popoverclass="vue-popover-theme"
-      popoverinnerclass="tooltip-inner popover-inner"
-      popoverwrapperclass="wrapper"
-      popperoptions="[object Object]"
-      trigger="manual"
-    >
-      <!---->
-       
-      <div
-        class="info flex-direction-column"
+    <client-only-stub>
+      <v-popover-stub
+        autohide="true"
+        class="user-teaser"
+        container="body"
+        delay="0"
+        handleresize="true"
+        offset="16"
+        openclass="open"
+        opengroup="0"
+        placement="bottom-end"
+        popoverarrowclass="tooltip-arrow popover-arrow"
+        popoverbaseclass="tooltip popover"
+        popoverclass="vue-popover-theme"
+        popoverinnerclass="tooltip-inner popover-inner"
+        popoverwrapperclass="wrapper"
+        popperoptions="[object Object]"
+        trigger="manual"
       >
+        <!---->
+         
         <div
-          class="flex-direction-column"
+          class="info flex-direction-column"
         >
-          <a>
-            <span
-              class="text"
-            >
+          <div
+            class="flex-direction-column"
+          >
+            <a>
               <span
                 class="slug"
               >
@@ -47,19 +45,19 @@ exports[`UserTeaser given an user avatar is disabled does not render the avatar 
               >
                 Tilda Swinton
               </span>
-            </span>
-          </a>
-           
-          <!---->
+            </a>
+             
+            <!---->
+             
+            <!---->
+          </div>
            
           <!---->
         </div>
          
-        <!---->
-      </div>
-       
-      <div />
-    </v-popover-stub>
+        <div />
+      </v-popover-stub>
+    </client-only-stub>
   </div>
 </div>
 `;
@@ -134,55 +132,53 @@ exports[`UserTeaser given an user user is disabled current user is a moderator r
     class="disabled-content"
     placement="top-start"
   >
-    <v-popover-stub
-      autohide="true"
-      class="user-teaser"
-      container="body"
-      delay="0"
-      handleresize="true"
-      offset="16"
-      openclass="open"
-      opengroup="0"
-      placement="bottom-end"
-      popoverarrowclass="tooltip-arrow popover-arrow"
-      popoverbaseclass="tooltip popover"
-      popoverclass="vue-popover-theme"
-      popoverinnerclass="tooltip-inner popover-inner"
-      popoverwrapperclass="wrapper"
-      popperoptions="[object Object]"
-      trigger="manual"
-    >
-      <a>
-        <div
-          class="profile-avatar --small"
-        >
-          <span
-            class="initials"
-          >
-            TS
-          </span>
-           
-          <!---->
-           
-          <img
-            alt="Tilda Swinton"
-            class="image"
-            src="/api/avatars/tilda-swinton"
-            title="Tilda Swinton"
-          />
-        </div>
-      </a>
-       
-      <div
-        class="info flex-direction-column"
+    <client-only-stub>
+      <v-popover-stub
+        autohide="true"
+        class="user-teaser"
+        container="body"
+        delay="0"
+        handleresize="true"
+        offset="16"
+        openclass="open"
+        opengroup="0"
+        placement="bottom-end"
+        popoverarrowclass="tooltip-arrow popover-arrow"
+        popoverbaseclass="tooltip popover"
+        popoverclass="vue-popover-theme"
+        popoverinnerclass="tooltip-inner popover-inner"
+        popoverwrapperclass="wrapper"
+        popperoptions="[object Object]"
+        trigger="manual"
       >
-        <div
-          class="flex-direction-column"
-        >
-          <a>
+        <a>
+          <div
+            class="profile-avatar --small"
+          >
             <span
-              class="text"
+              class="initials"
             >
+              TS
+            </span>
+             
+            <!---->
+             
+            <img
+              alt="Tilda Swinton"
+              class="image"
+              src="/api/avatars/tilda-swinton"
+              title="Tilda Swinton"
+            />
+          </div>
+        </a>
+         
+        <div
+          class="info flex-direction-column"
+        >
+          <div
+            class="flex-direction-column"
+          >
+            <a>
               <span
                 class="slug"
               >
@@ -194,19 +190,19 @@ exports[`UserTeaser given an user user is disabled current user is a moderator r
               >
                 Tilda Swinton
               </span>
-            </span>
-          </a>
-           
-          <!---->
+            </a>
+             
+            <!---->
+             
+            <!---->
+          </div>
            
           <!---->
         </div>
          
-        <!---->
-      </div>
-       
-      <div />
-    </v-popover-stub>
+        <div />
+      </v-popover-stub>
+    </client-only-stub>
   </div>
 </div>
 `;
@@ -249,55 +245,53 @@ exports[`UserTeaser given an user with linkToProfile, on desktop renders 1`] = `
     class=""
     placement="top-start"
   >
-    <v-popover-stub
-      autohide="true"
-      class="user-teaser"
-      container="body"
-      delay="0"
-      handleresize="true"
-      offset="16"
-      openclass="open"
-      opengroup="0"
-      placement="bottom-end"
-      popoverarrowclass="tooltip-arrow popover-arrow"
-      popoverbaseclass="tooltip popover"
-      popoverclass="vue-popover-theme"
-      popoverinnerclass="tooltip-inner popover-inner"
-      popoverwrapperclass="wrapper"
-      popperoptions="[object Object]"
-      trigger="manual"
-    >
-      <a>
-        <div
-          class="profile-avatar --small"
-        >
-          <span
-            class="initials"
-          >
-            TS
-          </span>
-           
-          <!---->
-           
-          <img
-            alt="Tilda Swinton"
-            class="image"
-            src="/api/avatars/tilda-swinton"
-            title="Tilda Swinton"
-          />
-        </div>
-      </a>
-       
-      <div
-        class="info flex-direction-column"
+    <client-only-stub>
+      <v-popover-stub
+        autohide="true"
+        class="user-teaser"
+        container="body"
+        delay="0"
+        handleresize="true"
+        offset="16"
+        openclass="open"
+        opengroup="0"
+        placement="bottom-end"
+        popoverarrowclass="tooltip-arrow popover-arrow"
+        popoverbaseclass="tooltip popover"
+        popoverclass="vue-popover-theme"
+        popoverinnerclass="tooltip-inner popover-inner"
+        popoverwrapperclass="wrapper"
+        popperoptions="[object Object]"
+        trigger="manual"
       >
-        <div
-          class="flex-direction-column"
-        >
-          <a>
+        <a>
+          <div
+            class="profile-avatar --small"
+          >
             <span
-              class="text"
+              class="initials"
             >
+              TS
+            </span>
+             
+            <!---->
+             
+            <img
+              alt="Tilda Swinton"
+              class="image"
+              src="/api/avatars/tilda-swinton"
+              title="Tilda Swinton"
+            />
+          </div>
+        </a>
+         
+        <div
+          class="info flex-direction-column"
+        >
+          <div
+            class="flex-direction-column"
+          >
+            <a>
               <span
                 class="slug"
               >
@@ -309,19 +303,19 @@ exports[`UserTeaser given an user with linkToProfile, on desktop renders 1`] = `
               >
                 Tilda Swinton
               </span>
-            </span>
-          </a>
-           
-          <!---->
+            </a>
+             
+            <!---->
+             
+            <!---->
+          </div>
            
           <!---->
         </div>
          
-        <!---->
-      </div>
-       
-      <div />
-    </v-popover-stub>
+        <div />
+      </v-popover-stub>
+    </client-only-stub>
   </div>
 </div>
 `;
@@ -332,56 +326,54 @@ exports[`UserTeaser given an user with linkToProfile, on desktop when hovering t
     class=""
     placement="top-start"
   >
-    <v-popover-stub
-      autohide="true"
-      class="user-teaser"
-      container="body"
-      delay="0"
-      handleresize="true"
-      offset="16"
-      open="true"
-      openclass="open"
-      opengroup="0"
-      placement="bottom-end"
-      popoverarrowclass="tooltip-arrow popover-arrow"
-      popoverbaseclass="tooltip popover"
-      popoverclass="vue-popover-theme"
-      popoverinnerclass="tooltip-inner popover-inner"
-      popoverwrapperclass="wrapper"
-      popperoptions="[object Object]"
-      trigger="manual"
-    >
-      <a>
-        <div
-          class="profile-avatar --small"
-        >
-          <span
-            class="initials"
-          >
-            TS
-          </span>
-           
-          <!---->
-           
-          <img
-            alt="Tilda Swinton"
-            class="image"
-            src="/api/avatars/tilda-swinton"
-            title="Tilda Swinton"
-          />
-        </div>
-      </a>
-       
-      <div
-        class="info flex-direction-column"
+    <client-only-stub>
+      <v-popover-stub
+        autohide="true"
+        class="user-teaser"
+        container="body"
+        delay="0"
+        handleresize="true"
+        offset="16"
+        open="true"
+        openclass="open"
+        opengroup="0"
+        placement="bottom-end"
+        popoverarrowclass="tooltip-arrow popover-arrow"
+        popoverbaseclass="tooltip popover"
+        popoverclass="vue-popover-theme"
+        popoverinnerclass="tooltip-inner popover-inner"
+        popoverwrapperclass="wrapper"
+        popperoptions="[object Object]"
+        trigger="manual"
       >
-        <div
-          class="flex-direction-column"
-        >
-          <a>
+        <a>
+          <div
+            class="profile-avatar --small"
+          >
             <span
-              class="text"
+              class="initials"
             >
+              TS
+            </span>
+             
+            <!---->
+             
+            <img
+              alt="Tilda Swinton"
+              class="image"
+              src="/api/avatars/tilda-swinton"
+              title="Tilda Swinton"
+            />
+          </div>
+        </a>
+         
+        <div
+          class="info flex-direction-column"
+        >
+          <div
+            class="flex-direction-column"
+          >
+            <a>
               <span
                 class="slug"
               >
@@ -393,25 +385,24 @@ exports[`UserTeaser given an user with linkToProfile, on desktop when hovering t
               >
                 Tilda Swinton
               </span>
-            </span>
-          </a>
-           
-          <!---->
+            </a>
+             
+            <!---->
+             
+            <!---->
+          </div>
            
           <!---->
         </div>
          
-        <!---->
-      </div>
-       
-      <div>
-        <user-teaser-popover-stub
-          link-to-profile="true"
-          user="[object Object]"
-          userlink="[object Object]"
-        />
-      </div>
-    </v-popover-stub>
+        <div>
+          <user-teaser-popover-stub
+            user-id="user1"
+            user-link="[object Object]"
+          />
+        </div>
+      </v-popover-stub>
+    </client-only-stub>
   </div>
 </div>
 `;
@@ -422,55 +413,53 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen renders 1`
     class=""
     placement="top-start"
   >
-    <v-popover-stub
-      autohide="true"
-      class="user-teaser"
-      container="body"
-      delay="0"
-      handleresize="true"
-      offset="16"
-      openclass="open"
-      opengroup="0"
-      placement="bottom-end"
-      popoverarrowclass="tooltip-arrow popover-arrow"
-      popoverbaseclass="tooltip popover"
-      popoverclass="vue-popover-theme"
-      popoverinnerclass="tooltip-inner popover-inner"
-      popoverwrapperclass="wrapper"
-      popperoptions="[object Object]"
-      trigger="manual"
-    >
-      <a>
-        <div
-          class="profile-avatar --small"
-        >
-          <span
-            class="initials"
-          >
-            TS
-          </span>
-           
-          <!---->
-           
-          <img
-            alt="Tilda Swinton"
-            class="image"
-            src="/api/avatars/tilda-swinton"
-            title="Tilda Swinton"
-          />
-        </div>
-      </a>
-       
-      <div
-        class="info flex-direction-column"
+    <client-only-stub>
+      <v-popover-stub
+        autohide="true"
+        class="user-teaser"
+        container="body"
+        delay="0"
+        handleresize="true"
+        offset="16"
+        openclass="open"
+        opengroup="0"
+        placement="bottom-end"
+        popoverarrowclass="tooltip-arrow popover-arrow"
+        popoverbaseclass="tooltip popover"
+        popoverclass="vue-popover-theme"
+        popoverinnerclass="tooltip-inner popover-inner"
+        popoverwrapperclass="wrapper"
+        popperoptions="[object Object]"
+        trigger="manual"
       >
-        <div
-          class="flex-direction-column"
-        >
-          <a>
+        <button>
+          <div
+            class="profile-avatar --small"
+          >
             <span
-              class="text"
+              class="initials"
             >
+              TS
+            </span>
+             
+            <!---->
+             
+            <img
+              alt="Tilda Swinton"
+              class="image"
+              src="/api/avatars/tilda-swinton"
+              title="Tilda Swinton"
+            />
+          </div>
+        </button>
+         
+        <div
+          class="info flex-direction-column"
+        >
+          <div
+            class="flex-direction-column"
+          >
+            <button>
               <span
                 class="slug"
               >
@@ -482,19 +471,19 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen renders 1`
               >
                 Tilda Swinton
               </span>
-            </span>
-          </a>
-           
-          <!---->
+            </button>
+             
+            <!---->
+             
+            <!---->
+          </div>
            
           <!---->
         </div>
          
-        <!---->
-      </div>
-       
-      <div />
-    </v-popover-stub>
+        <div />
+      </v-popover-stub>
+    </client-only-stub>
   </div>
 </div>
 `;
@@ -505,55 +494,54 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen when click
     class=""
     placement="top-start"
   >
-    <v-popover-stub
-      autohide="true"
-      class="user-teaser"
-      container="body"
-      delay="0"
-      handleresize="true"
-      offset="16"
-      openclass="open"
-      opengroup="0"
-      placement="bottom-end"
-      popoverarrowclass="tooltip-arrow popover-arrow"
-      popoverbaseclass="tooltip popover"
-      popoverclass="vue-popover-theme"
-      popoverinnerclass="tooltip-inner popover-inner"
-      popoverwrapperclass="wrapper"
-      popperoptions="[object Object]"
-      trigger="manual"
-    >
-      <a>
-        <div
-          class="profile-avatar --small"
-        >
-          <span
-            class="initials"
-          >
-            TS
-          </span>
-           
-          <!---->
-           
-          <img
-            alt="Tilda Swinton"
-            class="image"
-            src="/api/avatars/tilda-swinton"
-            title="Tilda Swinton"
-          />
-        </div>
-      </a>
-       
-      <div
-        class="info flex-direction-column"
+    <client-only-stub>
+      <v-popover-stub
+        autohide="true"
+        class="user-teaser"
+        container="body"
+        delay="0"
+        handleresize="true"
+        offset="16"
+        open="true"
+        openclass="open"
+        opengroup="0"
+        placement="bottom-end"
+        popoverarrowclass="tooltip-arrow popover-arrow"
+        popoverbaseclass="tooltip popover"
+        popoverclass="vue-popover-theme"
+        popoverinnerclass="tooltip-inner popover-inner"
+        popoverwrapperclass="wrapper"
+        popperoptions="[object Object]"
+        trigger="manual"
       >
-        <div
-          class="flex-direction-column"
-        >
-          <a>
+        <button>
+          <div
+            class="profile-avatar --small"
+          >
             <span
-              class="text"
+              class="initials"
             >
+              TS
+            </span>
+             
+            <!---->
+             
+            <img
+              alt="Tilda Swinton"
+              class="image"
+              src="/api/avatars/tilda-swinton"
+              title="Tilda Swinton"
+            />
+          </div>
+        </button>
+         
+        <div
+          class="info flex-direction-column"
+        >
+          <div
+            class="flex-direction-column"
+          >
+            <button>
               <span
                 class="slug"
               >
@@ -565,19 +553,24 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen when click
               >
                 Tilda Swinton
               </span>
-            </span>
-          </a>
-           
-          <!---->
+            </button>
+             
+            <!---->
+             
+            <!---->
+          </div>
            
           <!---->
         </div>
          
-        <!---->
-      </div>
-       
-      <div />
-    </v-popover-stub>
+        <div>
+          <user-teaser-popover-stub
+            user-id="user1"
+            user-link="[object Object]"
+          />
+        </div>
+      </v-popover-stub>
+    </client-only-stub>
   </div>
 </div>
 `;
@@ -588,55 +581,53 @@ exports[`UserTeaser given an user without linkToProfile, on desktop renders 1`] 
     class=""
     placement="top-start"
   >
-    <v-popover-stub
-      autohide="true"
-      class="user-teaser"
-      container="body"
-      delay="0"
-      handleresize="true"
-      offset="16"
-      openclass="open"
-      opengroup="0"
-      placement="bottom-end"
-      popoverarrowclass="tooltip-arrow popover-arrow"
-      popoverbaseclass="tooltip popover"
-      popoverclass="vue-popover-theme"
-      popoverinnerclass="tooltip-inner popover-inner"
-      popoverwrapperclass="wrapper"
-      popperoptions="[object Object]"
-      trigger="manual"
-    >
-      <span>
-        <div
-          class="profile-avatar --small"
-        >
-          <span
-            class="initials"
-          >
-            TS
-          </span>
-           
-          <!---->
-           
-          <img
-            alt="Tilda Swinton"
-            class="image"
-            src="/api/avatars/tilda-swinton"
-            title="Tilda Swinton"
-          />
-        </div>
-      </span>
-       
-      <div
-        class="info flex-direction-column"
+    <client-only-stub>
+      <v-popover-stub
+        autohide="true"
+        class="user-teaser"
+        container="body"
+        delay="0"
+        handleresize="true"
+        offset="16"
+        openclass="open"
+        opengroup="0"
+        placement="bottom-end"
+        popoverarrowclass="tooltip-arrow popover-arrow"
+        popoverbaseclass="tooltip popover"
+        popoverclass="vue-popover-theme"
+        popoverinnerclass="tooltip-inner popover-inner"
+        popoverwrapperclass="wrapper"
+        popperoptions="[object Object]"
+        trigger="manual"
       >
-        <div
-          class="flex-direction-column"
-        >
-          <span>
+        <span>
+          <div
+            class="profile-avatar --small"
+          >
             <span
-              class="text"
+              class="initials"
             >
+              TS
+            </span>
+             
+            <!---->
+             
+            <img
+              alt="Tilda Swinton"
+              class="image"
+              src="/api/avatars/tilda-swinton"
+              title="Tilda Swinton"
+            />
+          </div>
+        </span>
+         
+        <div
+          class="info flex-direction-column"
+        >
+          <div
+            class="flex-direction-column"
+          >
+            <span>
               <span
                 class="slug"
               >
@@ -649,18 +640,18 @@ exports[`UserTeaser given an user without linkToProfile, on desktop renders 1`] 
                 Tilda Swinton
               </span>
             </span>
-          </span>
-           
-          <!---->
+             
+            <!---->
+             
+            <!---->
+          </div>
            
           <!---->
         </div>
          
-        <!---->
-      </div>
-       
-      <div />
-    </v-popover-stub>
+        <div />
+      </v-popover-stub>
+    </client-only-stub>
   </div>
 </div>
 `;
@@ -671,56 +662,54 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
     class=""
     placement="top-start"
   >
-    <v-popover-stub
-      autohide="true"
-      class="user-teaser"
-      container="body"
-      delay="0"
-      handleresize="true"
-      offset="16"
-      open="true"
-      openclass="open"
-      opengroup="0"
-      placement="bottom-end"
-      popoverarrowclass="tooltip-arrow popover-arrow"
-      popoverbaseclass="tooltip popover"
-      popoverclass="vue-popover-theme"
-      popoverinnerclass="tooltip-inner popover-inner"
-      popoverwrapperclass="wrapper"
-      popperoptions="[object Object]"
-      trigger="manual"
-    >
-      <span>
-        <div
-          class="profile-avatar --small"
-        >
-          <span
-            class="initials"
-          >
-            TS
-          </span>
-           
-          <!---->
-           
-          <img
-            alt="Tilda Swinton"
-            class="image"
-            src="/api/avatars/tilda-swinton"
-            title="Tilda Swinton"
-          />
-        </div>
-      </span>
-       
-      <div
-        class="info flex-direction-column"
+    <client-only-stub>
+      <v-popover-stub
+        autohide="true"
+        class="user-teaser"
+        container="body"
+        delay="0"
+        handleresize="true"
+        offset="16"
+        open="true"
+        openclass="open"
+        opengroup="0"
+        placement="bottom-end"
+        popoverarrowclass="tooltip-arrow popover-arrow"
+        popoverbaseclass="tooltip popover"
+        popoverclass="vue-popover-theme"
+        popoverinnerclass="tooltip-inner popover-inner"
+        popoverwrapperclass="wrapper"
+        popperoptions="[object Object]"
+        trigger="manual"
       >
-        <div
-          class="flex-direction-column"
-        >
-          <span>
+        <span>
+          <div
+            class="profile-avatar --small"
+          >
             <span
-              class="text"
+              class="initials"
             >
+              TS
+            </span>
+             
+            <!---->
+             
+            <img
+              alt="Tilda Swinton"
+              class="image"
+              src="/api/avatars/tilda-swinton"
+              title="Tilda Swinton"
+            />
+          </div>
+        </span>
+         
+        <div
+          class="info flex-direction-column"
+        >
+          <div
+            class="flex-direction-column"
+          >
+            <span>
               <span
                 class="slug"
               >
@@ -733,23 +722,22 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
                 Tilda Swinton
               </span>
             </span>
-          </span>
-           
-          <!---->
+             
+            <!---->
+             
+            <!---->
+          </div>
            
           <!---->
         </div>
          
-        <!---->
-      </div>
-       
-      <div>
-        <user-teaser-popover-stub
-          user="[object Object]"
-          userlink="[object Object]"
-        />
-      </div>
-    </v-popover-stub>
+        <div>
+          <user-teaser-popover-stub
+            user-id="user1"
+          />
+        </div>
+      </v-popover-stub>
+    </client-only-stub>
   </div>
 </div>
 `;
@@ -760,56 +748,54 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
     class=""
     placement="top-start"
   >
-    <v-popover-stub
-      autohide="true"
-      class="user-teaser"
-      container="body"
-      delay="0"
-      handleresize="true"
-      offset="16"
-      open="true"
-      openclass="open"
-      opengroup="0"
-      placement="bottom-end"
-      popoverarrowclass="tooltip-arrow popover-arrow"
-      popoverbaseclass="tooltip popover"
-      popoverclass="vue-popover-theme"
-      popoverinnerclass="tooltip-inner popover-inner"
-      popoverwrapperclass="wrapper"
-      popperoptions="[object Object]"
-      trigger="manual"
-    >
-      <span>
-        <div
-          class="profile-avatar --small"
-        >
-          <span
-            class="initials"
-          >
-            TS
-          </span>
-           
-          <!---->
-           
-          <img
-            alt="Tilda Swinton"
-            class="image"
-            src="/api/avatars/tilda-swinton"
-            title="Tilda Swinton"
-          />
-        </div>
-      </span>
-       
-      <div
-        class="info flex-direction-column"
+    <client-only-stub>
+      <v-popover-stub
+        autohide="true"
+        class="user-teaser"
+        container="body"
+        delay="0"
+        handleresize="true"
+        offset="16"
+        open="true"
+        openclass="open"
+        opengroup="0"
+        placement="bottom-end"
+        popoverarrowclass="tooltip-arrow popover-arrow"
+        popoverbaseclass="tooltip popover"
+        popoverclass="vue-popover-theme"
+        popoverinnerclass="tooltip-inner popover-inner"
+        popoverwrapperclass="wrapper"
+        popperoptions="[object Object]"
+        trigger="manual"
       >
-        <div
-          class="flex-direction-column"
-        >
-          <span>
+        <span>
+          <div
+            class="profile-avatar --small"
+          >
             <span
-              class="text"
+              class="initials"
             >
+              TS
+            </span>
+             
+            <!---->
+             
+            <img
+              alt="Tilda Swinton"
+              class="image"
+              src="/api/avatars/tilda-swinton"
+              title="Tilda Swinton"
+            />
+          </div>
+        </span>
+         
+        <div
+          class="info flex-direction-column"
+        >
+          <div
+            class="flex-direction-column"
+          >
+            <span>
               <span
                 class="slug"
               >
@@ -822,23 +808,22 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
                 Tilda Swinton
               </span>
             </span>
-          </span>
-           
-          <!---->
+             
+            <!---->
+             
+            <!---->
+          </div>
            
           <!---->
         </div>
          
-        <!---->
-      </div>
-       
-      <div>
-        <user-teaser-popover-stub
-          user="[object Object]"
-          userlink="[object Object]"
-        />
-      </div>
-    </v-popover-stub>
+        <div>
+          <user-teaser-popover-stub
+            user-id="user1"
+          />
+        </div>
+      </v-popover-stub>
+    </client-only-stub>
   </div>
 </div>
 `;
@@ -849,55 +834,53 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen renders
     class=""
     placement="top-start"
   >
-    <v-popover-stub
-      autohide="true"
-      class="user-teaser"
-      container="body"
-      delay="0"
-      handleresize="true"
-      offset="16"
-      openclass="open"
-      opengroup="0"
-      placement="bottom-end"
-      popoverarrowclass="tooltip-arrow popover-arrow"
-      popoverbaseclass="tooltip popover"
-      popoverclass="vue-popover-theme"
-      popoverinnerclass="tooltip-inner popover-inner"
-      popoverwrapperclass="wrapper"
-      popperoptions="[object Object]"
-      trigger="manual"
-    >
-      <span>
-        <div
-          class="profile-avatar --small"
-        >
-          <span
-            class="initials"
-          >
-            TS
-          </span>
-           
-          <!---->
-           
-          <img
-            alt="Tilda Swinton"
-            class="image"
-            src="/api/avatars/tilda-swinton"
-            title="Tilda Swinton"
-          />
-        </div>
-      </span>
-       
-      <div
-        class="info flex-direction-column"
+    <client-only-stub>
+      <v-popover-stub
+        autohide="true"
+        class="user-teaser"
+        container="body"
+        delay="0"
+        handleresize="true"
+        offset="16"
+        openclass="open"
+        opengroup="0"
+        placement="bottom-end"
+        popoverarrowclass="tooltip-arrow popover-arrow"
+        popoverbaseclass="tooltip popover"
+        popoverclass="vue-popover-theme"
+        popoverinnerclass="tooltip-inner popover-inner"
+        popoverwrapperclass="wrapper"
+        popperoptions="[object Object]"
+        trigger="manual"
       >
-        <div
-          class="flex-direction-column"
-        >
-          <span>
+        <button>
+          <div
+            class="profile-avatar --small"
+          >
             <span
-              class="text"
+              class="initials"
             >
+              TS
+            </span>
+             
+            <!---->
+             
+            <img
+              alt="Tilda Swinton"
+              class="image"
+              src="/api/avatars/tilda-swinton"
+              title="Tilda Swinton"
+            />
+          </div>
+        </button>
+         
+        <div
+          class="info flex-direction-column"
+        >
+          <div
+            class="flex-direction-column"
+          >
+            <button>
               <span
                 class="slug"
               >
@@ -909,19 +892,19 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen renders
               >
                 Tilda Swinton
               </span>
-            </span>
-          </span>
-           
-          <!---->
+            </button>
+             
+            <!---->
+             
+            <!---->
+          </div>
            
           <!---->
         </div>
          
-        <!---->
-      </div>
-       
-      <div />
-    </v-popover-stub>
+        <div />
+      </v-popover-stub>
+    </client-only-stub>
   </div>
 </div>
 `;
@@ -932,56 +915,54 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
     class=""
     placement="top-start"
   >
-    <v-popover-stub
-      autohide="true"
-      class="user-teaser"
-      container="body"
-      delay="0"
-      handleresize="true"
-      offset="16"
-      open="true"
-      openclass="open"
-      opengroup="0"
-      placement="bottom-end"
-      popoverarrowclass="tooltip-arrow popover-arrow"
-      popoverbaseclass="tooltip popover"
-      popoverclass="vue-popover-theme"
-      popoverinnerclass="tooltip-inner popover-inner"
-      popoverwrapperclass="wrapper"
-      popperoptions="[object Object]"
-      trigger="manual"
-    >
-      <span>
-        <div
-          class="profile-avatar --small"
-        >
-          <span
-            class="initials"
-          >
-            TS
-          </span>
-           
-          <!---->
-           
-          <img
-            alt="Tilda Swinton"
-            class="image"
-            src="/api/avatars/tilda-swinton"
-            title="Tilda Swinton"
-          />
-        </div>
-      </span>
-       
-      <div
-        class="info flex-direction-column"
+    <client-only-stub>
+      <v-popover-stub
+        autohide="true"
+        class="user-teaser"
+        container="body"
+        delay="0"
+        handleresize="true"
+        offset="16"
+        open="true"
+        openclass="open"
+        opengroup="0"
+        placement="bottom-end"
+        popoverarrowclass="tooltip-arrow popover-arrow"
+        popoverbaseclass="tooltip popover"
+        popoverclass="vue-popover-theme"
+        popoverinnerclass="tooltip-inner popover-inner"
+        popoverwrapperclass="wrapper"
+        popperoptions="[object Object]"
+        trigger="manual"
       >
-        <div
-          class="flex-direction-column"
-        >
-          <span>
+        <button>
+          <div
+            class="profile-avatar --small"
+          >
             <span
-              class="text"
+              class="initials"
             >
+              TS
+            </span>
+             
+            <!---->
+             
+            <img
+              alt="Tilda Swinton"
+              class="image"
+              src="/api/avatars/tilda-swinton"
+              title="Tilda Swinton"
+            />
+          </div>
+        </button>
+         
+        <div
+          class="info flex-direction-column"
+        >
+          <div
+            class="flex-direction-column"
+          >
+            <button>
               <span
                 class="slug"
               >
@@ -993,24 +974,23 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
               >
                 Tilda Swinton
               </span>
-            </span>
-          </span>
-           
-          <!---->
+            </button>
+             
+            <!---->
+             
+            <!---->
+          </div>
            
           <!---->
         </div>
          
-        <!---->
-      </div>
-       
-      <div>
-        <user-teaser-popover-stub
-          user="[object Object]"
-          userlink="[object Object]"
-        />
-      </div>
-    </v-popover-stub>
+        <div>
+          <user-teaser-popover-stub
+            user-id="user1"
+          />
+        </div>
+      </v-popover-stub>
+    </client-only-stub>
   </div>
 </div>
 `;
@@ -1021,56 +1001,54 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
     class=""
     placement="top-start"
   >
-    <v-popover-stub
-      autohide="true"
-      class="user-teaser"
-      container="body"
-      delay="0"
-      handleresize="true"
-      offset="16"
-      open="true"
-      openclass="open"
-      opengroup="0"
-      placement="bottom-end"
-      popoverarrowclass="tooltip-arrow popover-arrow"
-      popoverbaseclass="tooltip popover"
-      popoverclass="vue-popover-theme"
-      popoverinnerclass="tooltip-inner popover-inner"
-      popoverwrapperclass="wrapper"
-      popperoptions="[object Object]"
-      trigger="manual"
-    >
-      <span>
-        <div
-          class="profile-avatar --small"
-        >
-          <span
-            class="initials"
-          >
-            TS
-          </span>
-           
-          <!---->
-           
-          <img
-            alt="Tilda Swinton"
-            class="image"
-            src="/api/avatars/tilda-swinton"
-            title="Tilda Swinton"
-          />
-        </div>
-      </span>
-       
-      <div
-        class="info flex-direction-column"
+    <client-only-stub>
+      <v-popover-stub
+        autohide="true"
+        class="user-teaser"
+        container="body"
+        delay="0"
+        handleresize="true"
+        offset="16"
+        open="true"
+        openclass="open"
+        opengroup="0"
+        placement="bottom-end"
+        popoverarrowclass="tooltip-arrow popover-arrow"
+        popoverbaseclass="tooltip popover"
+        popoverclass="vue-popover-theme"
+        popoverinnerclass="tooltip-inner popover-inner"
+        popoverwrapperclass="wrapper"
+        popperoptions="[object Object]"
+        trigger="manual"
       >
-        <div
-          class="flex-direction-column"
-        >
-          <span>
+        <button>
+          <div
+            class="profile-avatar --small"
+          >
             <span
-              class="text"
+              class="initials"
             >
+              TS
+            </span>
+             
+            <!---->
+             
+            <img
+              alt="Tilda Swinton"
+              class="image"
+              src="/api/avatars/tilda-swinton"
+              title="Tilda Swinton"
+            />
+          </div>
+        </button>
+         
+        <div
+          class="info flex-direction-column"
+        >
+          <div
+            class="flex-direction-column"
+          >
+            <button>
               <span
                 class="slug"
               >
@@ -1082,24 +1060,23 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
               >
                 Tilda Swinton
               </span>
-            </span>
-          </span>
-           
-          <!---->
+            </button>
+             
+            <!---->
+             
+            <!---->
+          </div>
            
           <!---->
         </div>
          
-        <!---->
-      </div>
-       
-      <div>
-        <user-teaser-popover-stub
-          user="[object Object]"
-          userlink="[object Object]"
-        />
-      </div>
-    </v-popover-stub>
+        <div>
+          <user-teaser-popover-stub
+            user-id="user1"
+          />
+        </div>
+      </v-popover-stub>
+    </client-only-stub>
   </div>
 </div>
 `;

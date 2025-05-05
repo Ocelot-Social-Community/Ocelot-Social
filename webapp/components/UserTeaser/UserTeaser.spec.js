@@ -10,7 +10,12 @@ Object.assign(Math, {
   random: () => 0,
 })
 
-const waitForPopover = async () => await new Promise((resolve) => setTimeout(resolve, 600))
+const waitForPopover = async () => await new Promise((resolve) => setTimeout(resolve, 1000))
+
+let mockIsTouchDevice
+jest.mock('../utils/isTouchDevice', () => ({
+  isTouchDevice: jest.fn(() => mockIsTouchDevice),
+}))
 
 const userTilda = {
   name: 'Tilda Swinton',
@@ -52,11 +57,10 @@ describe('UserTeaser', () => {
     onTouchScreen = false,
     withAvatar = true,
     user = userTilda,
+    withPopoverEnabled = true,
   }) => {
-    const mockIsTouchDevice = onTouchScreen
-    jest.mock('../utils/isTouchDevice', () => ({
-      isTouchDevice: jest.fn(() => mockIsTouchDevice),
-    }))
+    mockIsTouchDevice = onTouchScreen
+
     const store = new Vuex.Store({
       getters: {
         'auth/user': () => {
@@ -72,6 +76,7 @@ describe('UserTeaser', () => {
         user,
         linkToProfile: withLinkToProfile,
         showAvatar: withAvatar,
+        showPopover: withPopoverEnabled,
       },
       stubs: {
         NuxtLink: RouterLinkStub,

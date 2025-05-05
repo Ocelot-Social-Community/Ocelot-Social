@@ -1,10 +1,14 @@
 <template>
-  <span v-if="!linkToProfile">
-    <slot />
-  </span>
-  <button v-else-if="linkToProfile && showPopover && isTouchDevice" @click.prevent="openMenu">
+  <button v-if="showPopover && isTouchDevice" @click.prevent="openMenu">
     <slot />
   </button>
+  <span
+    v-else-if="!linkToProfile"
+    @mouseover="() => showPopover && openMenu()"
+    @mouseleave="closeMenu"
+  >
+    <slot />
+  </span>
   <nuxt-link
     v-else
     :to="userLink"
