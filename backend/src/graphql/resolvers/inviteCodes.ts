@@ -136,55 +136,55 @@ export default {
         })
       ).records[0].get('inviteCode')
     },
-  },
-  generateGroupInviteCode: async (_parent, args, context: Context, _resolveInfo) => {
-    const userInviteCodeAmount = (
-      await context.database.query({
-        query: `
+    generateGroupInviteCode: async (_parent, args, context: Context, _resolveInfo) => {
+      const userInviteCodeAmount = (
+        await context.database.query({
+          query: `
       MATCH (inviteCode:InviteCode)<-[:GENERATED]-(user:user {id: $user.id})
       WHERE (inviteCode)-[:INVITES_TO]-(:Group)
       RETURN COUNT(inviteCode) as count
       `,
-        variables: { user: context.user },
-      })
-    ).records[0].get('count')
+          variables: { user: context.user },
+        })
+      ).records[0].get('count')
 
-    if (CONFIG.INVITE_CODES_GROUP_PER_USER >= userInviteCodeAmount) {
-      throw new Error('You have reached the maximum of Group Invite Codes you can generate')
-    }
+      if (CONFIG.INVITE_CODES_GROUP_PER_USER >= userInviteCodeAmount) {
+        throw new Error('You have reached the maximum of Group Invite Codes you can generate')
+      }
 
-    let code = generateInviteCode()
-    while (!(await uniqueInviteCode(context, code))) {
-      code = generateInviteCode()
-    }
+      let code = generateInviteCode()
+      while (!(await uniqueInviteCode(context, code))) {
+        code = generateInviteCode()
+      }
 
-    const { groupId } = args
+      const { groupId } = args
 
-    return (
-      await context.database.write({
-        query: `MATCH (user:User {id: $user.id})
+      return (
+        await context.database.write({
+          query: `MATCH (user:User {id: $user.id})
          MERGE (user)-[:GENERATED]->(inviteCode:InviteCode { code: $code })-[:INVITES_TO]->(group:Group {id: $groupId})
          ON CREATE SET
          inviteCode.createdAt = toString(datetime()),
          inviteCode.expiresAt = $expiresAt
          RETURN inviteCode {.*}`,
-        variables: { user: context.user, code, expiresAt: args.expiresAt, groupId },
-      })
-    ).records[0].get('inviteCode')
-  },
-  invalidateInviteCode: async (_parent, args, context: Context, _resolveInfo) => {
-    return (
-      await context.database.write({
-        query: `
+          variables: { user: context.user, code, expiresAt: args.expiresAt, groupId },
+        })
+      ).records[0].get('inviteCode')
+    },
+    invalidateInviteCode: async (_parent, args, context: Context, _resolveInfo) => {
+      return (
+        await context.database.write({
+          query: `
         MATCH (user:User {id: $user.id})-[rel:GENERATED]-(inviteCode:InviteCode {code: $args.code})
         SET inviteCode.expiresAt = toString(datetime())
         RETURN inviteCode {.*}`,
-        variables: { args, user: context.user },
-      })
-    ).records[0].get('inviteCode')
-  },
-  redeemInviteCode: async (_parent, args, context: Context, _resolveInfo) => {
-    return redeemInviteCode(context, args.inviteCode)
+          variables: { args, user: context.user },
+        })
+      ).records[0].get('inviteCode')
+    },
+    redeemInviteCode: async (_parent, args, context: Context, _resolveInfo) => {
+      return redeemInviteCode(context, args.inviteCode)
+    },
   },
   InviteCode: {
     invitedTo: async (parent, _args, context: Context, _resolveInfo) => {
