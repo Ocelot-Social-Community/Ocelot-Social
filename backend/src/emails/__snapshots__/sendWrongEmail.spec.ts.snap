@@ -1,0 +1,255 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`sendWrongEmail English renders correctly 1`] = `
+{
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>.wf-force-outline-none[tabindex="-1"]:focus{outline:none;}</style>
+    <style>body{
+  display: block;
+  font-family: Lato, sans-serif;
+  font-size: 17px;
+  text-align: left;
+  text-align: -webkit-left;
+  justify-content: center;
+  padding: 15px;
+  margin: 0px;
+}
+
+h2 {
+  margin-top: 25px;
+  font-size: 25px;
+  font-weight: normal;
+  line-height: 22px;
+  color: #333333;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  display: block;
+}
+
+.head-logo {
+  width: 60%;
+  height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+a {
+  color: #17b53e;
+}
+
+a.button {
+  background: #17b53e;
+  font-family: Lato, sans-serif;
+  font-size: 16px;
+  line-height: 15px;
+  text-decoration: none;
+  text-align:center;
+  padding: 13px 17px;
+  color: #ffffff;
+  display: table;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 4px;
+}
+
+span {
+  color: #17b53e;
+}
+
+.text-block {
+  margin-top: 20px;
+  color: #000000;
+}
+
+footer {
+  padding: 20px;
+  font-family: Lato, sans-serif;
+  font-size: 12px;
+  line-height: 15px;
+  text-align: center;
+  color: #888888;
+}
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        </div>
+      </header>
+      <h2>Welcome to ocelot.social!</h2>
+      <div class="wrapper">
+        <div class="content"></div>
+        <p>You requested a password reset but unfortunately we couldn't find an account associated with your e-mail address. Did you maybe use another one when you signed up?</p><a class="button" href="http://webapp:3000/password-reset/request">Try a different e-mail</a>
+        <p>If you don't have an account at <a>ocelot.social</a> yet or if you didn't want to reset your password, please ignore this e-mail.
+        </p>
+        <div class="text-block">
+          <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p>– The ocelot.social Team</p>
+        </div>
+      </div>
+      <footer>
+        <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
+      </footer>
+    </div>
+  </body>
+</html>",
+  "subject": "Wrong E-mail? ocelot.social",
+  "text": "WELCOME TO OCELOT.SOCIAL!
+
+You requested a password reset but unfortunately we couldn't find an account
+associated with your e-mail address. Did you maybe use another one when you
+signed up?
+
+Try a different e-mail [http://webapp:3000/password-reset/request]
+
+If you don't have an account at ocelot.social yet or if you didn't want to reset
+your password, please ignore this e-mail.
+
+See you soon on ocelot.social [https://ocelot.social]!
+
+– The ocelot.social Team
+
+
+ocelot.social Community [https://ocelot.social]",
+  "to": "user@example.org",
+}
+`;
+
+exports[`sendWrongEmail German renders correctly 1`] = `
+{
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>.wf-force-outline-none[tabindex="-1"]:focus{outline:none;}</style>
+    <style>body{
+  display: block;
+  font-family: Lato, sans-serif;
+  font-size: 17px;
+  text-align: left;
+  text-align: -webkit-left;
+  justify-content: center;
+  padding: 15px;
+  margin: 0px;
+}
+
+h2 {
+  margin-top: 25px;
+  font-size: 25px;
+  font-weight: normal;
+  line-height: 22px;
+  color: #333333;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  display: block;
+}
+
+.head-logo {
+  width: 60%;
+  height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+a {
+  color: #17b53e;
+}
+
+a.button {
+  background: #17b53e;
+  font-family: Lato, sans-serif;
+  font-size: 16px;
+  line-height: 15px;
+  text-decoration: none;
+  text-align:center;
+  padding: 13px 17px;
+  color: #ffffff;
+  display: table;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 4px;
+}
+
+span {
+  color: #17b53e;
+}
+
+.text-block {
+  margin-top: 20px;
+  color: #000000;
+}
+
+footer {
+  padding: 20px;
+  font-family: Lato, sans-serif;
+  font-size: 12px;
+  line-height: 15px;
+  text-align: center;
+  color: #888888;
+}
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        </div>
+      </header>
+      <h2>Willkommen bei ocelot.social!</h2>
+      <div class="wrapper">
+        <div class="content"></div>
+        <p>Du hast bei uns ein neues Passwort angefordert – leider haben wir aber keinen Account mit deiner E-Mailadresse gefunden. Kann es sein, dass du mit einer anderen Adresse bei uns angemeldet bist?</p><a class="button" href="http://webapp:3000/password-reset/request">Versuch' es mit einer anderen E-Mail</a>
+        <p>Wenn du noch keinen Account bei <a>ocelot.social</a> hast oder dein Password gar nicht ändern willst, kannst du diese E-Mail einfach ignorieren!
+        </p>
+        <div class="text-block">
+          <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p>– Dein ocelot.social Team</p>
+        </div>
+      </div>
+      <footer>
+        <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
+      </footer>
+    </div>
+  </body>
+</html>",
+  "subject": "Falsche Mailaddresse? ocelot.social",
+  "text": "WILLKOMMEN BEI OCELOT.SOCIAL!
+
+Du hast bei uns ein neues Passwort angefordert – leider haben wir aber keinen
+Account mit deiner E-Mailadresse gefunden. Kann es sein, dass du mit einer
+anderen Adresse bei uns angemeldet bist?
+
+Versuch' es mit einer anderen E-Mail [http://webapp:3000/password-reset/request]
+
+Wenn du noch keinen Account bei ocelot.social hast oder dein Password gar nicht
+ändern willst, kannst du diese E-Mail einfach ignorieren!
+
+Bis bald bei ocelot.social [https://ocelot.social]!
+
+– Dein ocelot.social Team
+
+
+ocelot.social Community [https://ocelot.social]",
+  "to": "user@example.org",
+}
+`;

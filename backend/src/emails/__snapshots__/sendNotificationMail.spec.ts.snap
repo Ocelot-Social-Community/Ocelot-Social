@@ -62,6 +62,10 @@ a.button {
   border-radius: 4px;
 }
 
+span {
+  color: #17b53e;
+}
+
 .text-block {
   margin-top: 20px;
   color: #000000;
@@ -182,6 +186,10 @@ a.button {
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
+}
+
+span {
+  color: #17b53e;
 }
 
 .text-block {
@@ -308,6 +316,10 @@ a.button {
   border-radius: 4px;
 }
 
+span {
+  color: #17b53e;
+}
+
 .text-block {
   margin-top: 20px;
   color: #000000;
@@ -430,6 +442,10 @@ a.button {
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
+}
+
+span {
+  color: #17b53e;
 }
 
 .text-block {
@@ -556,6 +572,10 @@ a.button {
   border-radius: 4px;
 }
 
+span {
+  color: #17b53e;
+}
+
 .text-block {
   margin-top: 20px;
   color: #000000;
@@ -677,6 +697,10 @@ a.button {
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
+}
+
+span {
+  color: #17b53e;
 }
 
 .text-block {
@@ -801,6 +825,10 @@ a.button {
   border-radius: 4px;
 }
 
+span {
+  color: #17b53e;
+}
+
 .text-block {
   margin-top: 20px;
   color: #000000;
@@ -918,6 +946,10 @@ a.button {
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
+}
+
+span {
+  color: #17b53e;
 }
 
 .text-block {
@@ -1043,6 +1075,10 @@ a.button {
   border-radius: 4px;
 }
 
+span {
+  color: #17b53e;
+}
+
 .text-block {
   margin-top: 20px;
   color: #000000;
@@ -1166,6 +1202,10 @@ a.button {
   border-radius: 4px;
 }
 
+span {
+  color: #17b53e;
+}
+
 .text-block {
   margin-top: 20px;
   color: #000000;
@@ -1286,6 +1326,10 @@ a.button {
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
+}
+
+span {
+  color: #17b53e;
 }
 
 .text-block {
@@ -1412,6 +1456,10 @@ a.button {
   border-radius: 4px;
 }
 
+span {
+  color: #17b53e;
+}
+
 .text-block {
   margin-top: 20px;
   color: #000000;
@@ -1534,6 +1582,10 @@ a.button {
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
+}
+
+span {
+  color: #17b53e;
 }
 
 .text-block {
@@ -1660,6 +1712,10 @@ a.button {
   border-radius: 4px;
 }
 
+span {
+  color: #17b53e;
+}
+
 .text-block {
   margin-top: 20px;
   color: #000000;
@@ -1781,6 +1837,10 @@ a.button {
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
+}
+
+span {
+  color: #17b53e;
 }
 
 .text-block {
@@ -1905,6 +1965,10 @@ a.button {
   border-radius: 4px;
 }
 
+span {
+  color: #17b53e;
+}
+
 .text-block {
   margin-top: 20px;
   color: #000000;
@@ -2022,6 +2086,10 @@ a.button {
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
+}
+
+span {
+  color: #17b53e;
 }
 
 .text-block {
@@ -2145,6 +2213,10 @@ a.button {
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
+}
+
+span {
+  color: #17b53e;
 }
 
 .text-block {

@@ -17,9 +17,11 @@ export const locationFragment = (lang) => gql`
   fragment location on User {
     locationName
     location {
+      id
       name: name${lang}
       lng
       lat
+      distanceToMe
     }
   }
 `
@@ -47,6 +49,19 @@ export const userCountsFragment = gql`
     followedByCount
     followingCount
     followedByCurrentUser
+  }
+`
+
+export const userTeaserFragment = (lang) => gql`
+  ${badgesFragment}
+  ${locationFragment(lang)}
+
+  fragment userTeaser on User {
+    followedByCount
+    contributionsCount
+    commentedCount
+    ...badges
+    ...location
   }
 `
 

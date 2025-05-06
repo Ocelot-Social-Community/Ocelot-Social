@@ -50,14 +50,14 @@ afterEach(async () => {
 
 describe('Signup', () => {
   const mutation = gql`
-    mutation ($email: String!, $inviteCode: String) {
-      Signup(email: $email, inviteCode: $inviteCode) {
+    mutation ($email: String!, $locale: String!, $inviteCode: String) {
+      Signup(email: $email, locale: $locale, inviteCode: $inviteCode) {
         email
       }
     }
   `
   beforeEach(() => {
-    variables = { ...variables, email: 'someuser@example.org' }
+    variables = { ...variables, email: 'someuser@example.org', locale: 'de' }
   })
 
   describe('unauthenticated', () => {

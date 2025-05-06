@@ -1,0 +1,261 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`sendEmailVerification English renders correctly 1`] = `
+{
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>.wf-force-outline-none[tabindex="-1"]:focus{outline:none;}</style>
+    <style>body{
+  display: block;
+  font-family: Lato, sans-serif;
+  font-size: 17px;
+  text-align: left;
+  text-align: -webkit-left;
+  justify-content: center;
+  padding: 15px;
+  margin: 0px;
+}
+
+h2 {
+  margin-top: 25px;
+  font-size: 25px;
+  font-weight: normal;
+  line-height: 22px;
+  color: #333333;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  display: block;
+}
+
+.head-logo {
+  width: 60%;
+  height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+a {
+  color: #17b53e;
+}
+
+a.button {
+  background: #17b53e;
+  font-family: Lato, sans-serif;
+  font-size: 16px;
+  line-height: 15px;
+  text-decoration: none;
+  text-align:center;
+  padding: 13px 17px;
+  color: #ffffff;
+  display: table;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 4px;
+}
+
+span {
+  color: #17b53e;
+}
+
+.text-block {
+  margin-top: 20px;
+  color: #000000;
+}
+
+footer {
+  padding: 20px;
+  font-family: Lato, sans-serif;
+  font-size: 12px;
+  line-height: 15px;
+  text-align: center;
+  color: #888888;
+}
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        </div>
+      </header>
+      <h2>Hello User,</h2>
+      <div class="wrapper">
+        <div class="content"></div>
+        <p>So, you want to change your e-mail? No problem! Just click the button below to verify your new address:</p><a class="button" href="http://webapp:3000/settings/my-email-address/verify?email=user%40example.org&amp;nonce=123456">Verify e-mail address</a>
+        <p>If you don't want to change your e-mail address feel free to ignore this message. </p>
+        <p>If the above button doesn't work, you can also copy the following code into your browser window: <span>123456</span></p>
+        <div class="text-block">
+          <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p>– The ocelot.social Team</p>
+        </div>
+      </div>
+      <footer>
+        <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
+      </footer>
+    </div>
+  </body>
+</html>",
+  "subject": "New E-Mail Address ocelot.social",
+  "text": "HELLO USER,
+
+So, you want to change your e-mail? No problem! Just click the button below to
+verify your new address:
+
+Verify e-mail address
+[http://webapp:3000/settings/my-email-address/verify?email=user%40example.org&nonce=123456]
+
+If you don't want to change your e-mail address feel free to ignore this
+message.
+
+If the above button doesn't work, you can also copy the following code into your
+browser window: 123456
+
+See you soon on ocelot.social [https://ocelot.social]!
+
+– The ocelot.social Team
+
+
+ocelot.social Community [https://ocelot.social]",
+  "to": "user@example.org",
+}
+`;
+
+exports[`sendEmailVerification German renders correctly 1`] = `
+{
+  "attachments": [],
+  "from": "ocelot.social",
+  "html": "<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta content="multipart/html; charset=UTF-8" http-equiv="content-type">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>.wf-force-outline-none[tabindex="-1"]:focus{outline:none;}</style>
+    <style>body{
+  display: block;
+  font-family: Lato, sans-serif;
+  font-size: 17px;
+  text-align: left;
+  text-align: -webkit-left;
+  justify-content: center;
+  padding: 15px;
+  margin: 0px;
+}
+
+h2 {
+  margin-top: 25px;
+  font-size: 25px;
+  font-weight: normal;
+  line-height: 22px;
+  color: #333333;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  display: block;
+}
+
+.head-logo {
+  width: 60%;
+  height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+a {
+  color: #17b53e;
+}
+
+a.button {
+  background: #17b53e;
+  font-family: Lato, sans-serif;
+  font-size: 16px;
+  line-height: 15px;
+  text-decoration: none;
+  text-align:center;
+  padding: 13px 17px;
+  color: #ffffff;
+  display: table;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 4px;
+}
+
+span {
+  color: #17b53e;
+}
+
+.text-block {
+  margin-top: 20px;
+  color: #000000;
+}
+
+footer {
+  padding: 20px;
+  font-family: Lato, sans-serif;
+  font-size: 12px;
+  line-height: 15px;
+  text-align: center;
+  color: #888888;
+}
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        </div>
+      </header>
+      <h2>Hallo User,</h2>
+      <div class="wrapper">
+        <div class="content"></div>
+        <p>Du möchtest also deine E-Mail ändern? Kein Problem! Mit Klick auf diesen Button kannst Du Deine neue E-Mail Adresse bestätigen:</p><a class="button" href="http://webapp:3000/settings/my-email-address/verify?email=user%40example.org&amp;nonce=123456">E-Mail Adresse bestätigen</a>
+        <p>Falls Du deine E-Mail Adresse doch nicht ändern möchtest, kannst du diese Nachricht einfach ignorieren. </p>
+        <p>Sollte der Button für Dich nicht funktionieren, kannst Du auch folgenden Code in Dein Browserfenster kopieren: <span>123456</span></p>
+        <div class="text-block">
+          <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p>– Dein ocelot.social Team</p>
+        </div>
+      </div>
+      <footer>
+        <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
+      </footer>
+    </div>
+  </body>
+</html>",
+  "subject": "Neue E-Mail Addresse ocelot.social",
+  "text": "HALLO USER,
+
+Du möchtest also deine E-Mail ändern? Kein Problem! Mit Klick auf diesen Button
+kannst Du Deine neue E-Mail Adresse bestätigen:
+
+E-Mail Adresse bestätigen
+[http://webapp:3000/settings/my-email-address/verify?email=user%40example.org&nonce=123456]
+
+Falls Du deine E-Mail Adresse doch nicht ändern möchtest, kannst du diese
+Nachricht einfach ignorieren.
+
+Sollte der Button für Dich nicht funktionieren, kannst Du auch folgenden Code in
+Dein Browserfenster kopieren: 123456
+
+Bis bald bei ocelot.social [https://ocelot.social]!
+
+– Dein ocelot.social Team
+
+
+ocelot.social Community [https://ocelot.social]",
+  "to": "user@example.org",
+}
+`;
