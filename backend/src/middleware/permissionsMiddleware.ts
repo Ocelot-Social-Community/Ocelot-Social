@@ -44,6 +44,14 @@ const isMyOwn = rule({
   return user && user.id === parent.id
 })
 
+const isMyOwnInviteCode = rule({
+  cache: 'no_cache',
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+})(async (parent, _args, { user }, _info) => {
+  // TODO
+  return true
+})
+
 const isMySocialMedia = rule({
   cache: 'no_cache',
 })(async (_, args, { user }) => {
@@ -415,6 +423,7 @@ export default shield(
       Room: isAuthenticated,
       Message: isAuthenticated,
       UnreadRooms: isAuthenticated,
+      InviteCode: allow, // TODO
     },
     Mutation: {
       '*': deny,
@@ -484,6 +493,9 @@ export default shield(
       email: or(isMyOwn, isAdmin),
       emailNotificationSettings: isMyOwn,
       inviteCodes: isMyOwn,
+    },
+    Group: {
+      inviteCodes: isMyOwnInviteCode,
     },
     Location: {
       distanceToMe: isAuthenticated,
