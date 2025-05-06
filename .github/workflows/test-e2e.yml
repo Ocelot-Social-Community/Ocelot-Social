@@ -30,7 +30,7 @@ jobs:
 
       - name: Build docker image
         run: |
-          docker build --target test -t "ocelotsocialnetwork/backend:test" backend/
+          docker build --target production -t "ocelotsocialnetwork/backend:test" backend/
           docker save "ocelotsocialnetwork/backend:test" > /tmp/backend.tar
       
       - name: Cache docker image
@@ -48,7 +48,7 @@ jobs:
 
       - name: Build docker image
         run: |
-          docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
+          docker build --target production -t "ocelotsocialnetwork/webapp:test" webapp/
           docker save "ocelotsocialnetwork/webapp:test" > /tmp/webapp.tar
       
       - name: Cache docker image        
