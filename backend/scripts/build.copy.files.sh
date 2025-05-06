@@ -5,10 +5,10 @@ cp -r public/ build/public/
 
 # email files
 mkdir -p build/src/emails/templates/
-cp -r src/emails/templates/ build/src/emails/templates/
+cp -r src/emails/templates/ build/src/emails/
 
 mkdir -p build/src/emails/locales/
-cp -r src/emails/locales/ build/src/emails/locales/
+cp -r src/emails/locales/ build/src/emails/
 
 # gql files
 mkdir -p build/src/graphql/types/
