@@ -9,8 +9,8 @@ import { rule, shield, deny, allow, or, and } from 'graphql-shield'
 import CONFIG from '@config/index'
 import SocialMedia from '@db/models/SocialMedia'
 import { getNeode } from '@db/neo4j'
-import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
 // eslint-disable-next-line import/no-cycle
+import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
 import { Context } from '@src/server'
 
 const debug = !!CONFIG.DEBUG

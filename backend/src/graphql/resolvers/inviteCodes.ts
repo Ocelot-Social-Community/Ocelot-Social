@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import CONFIG from '@config/index'
 import registrationConstants from '@constants/registrationBranded'
+// eslint-disable-next-line import/no-cycle
 import { Context } from '@src/server'
 
 import Resolver from './helpers/Resolver'

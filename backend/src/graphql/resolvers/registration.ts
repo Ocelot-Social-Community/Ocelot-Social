@@ -7,12 +7,12 @@ import { UserInputError } from 'apollo-server'
 import { hash } from 'bcryptjs'
 
 import { getNeode } from '@db/neo4j'
+import { Context } from '@src/server'
 
 import existingEmailAddress from './helpers/existingEmailAddress'
 import generateNonce from './helpers/generateNonce'
 import normalizeEmail from './helpers/normalizeEmail'
 import { redeemInviteCode } from './inviteCodes'
-import { Context } from '@src/server'
 
 const neode = getNeode()
 
@@ -54,12 +54,37 @@ export default {
       const { driver } = context
       const session = driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const createUserTransactionResponse = await transaction.run(signupCypher(inviteCode), {
-          args,
-          nonce,
-          email,
-          inviteCode,
-        })
+        const createUserTransactionResponse = await transaction.run(
+          `
+            MATCH (email:EmailAddress {nonce: $nonce, email: $email})
+            WHERE NOT (email)-[:BELONGS_TO]->()
+            CREATE (user:User)
+            MERGE (user)-[:PRIMARY_EMAIL]->(email)
+            MERGE (user)<-[:BELONGS_TO]-(email)
+            SET user += $args
+            SET user.id = randomUUID()
+            SET user.role = 'user'
+            SET user.createdAt = toString(datetime())
+            SET user.updatedAt = toString(datetime())
+            SET user.allowEmbedIframes = false
+            SET user.showShoutsPublicly = false
+            SET email.verifiedAt = toString(datetime())
+            WITH user
+            OPTIONAL MATCH (post:Post)-[:IN]->(group:Group)
+              WHERE NOT group.groupType = 'public'
+            WITH user, collect(post) AS invisiblePosts
+            FOREACH (invisiblePost IN invisiblePosts |
+              MERGE (user)-[:CANNOT_SEE]->(invisiblePost)
+            )
+            RETURN user {.*}
+          `,
+          {
+            args,
+            nonce,
+            email,
+            inviteCode,
+          },
+        )
         const [user] = createUserTransactionResponse.records.map((record) => record.get('user'))
         if (!user) throw new UserInputError('Invalid email or nonce')
 
@@ -75,35 +100,8 @@ export default {
           throw new UserInputError('User with this slug already exists!')
         throw new UserInputError(e.message)
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
-}
-
-const signupCypher = () => {
-  const cypher = `
-      MATCH (email:EmailAddress {nonce: $nonce, email: $email})
-      WHERE NOT (email)-[:BELONGS_TO]->()
-      CREATE (user:User)
-      MERGE (user)-[:PRIMARY_EMAIL]->(email)
-      MERGE (user)<-[:BELONGS_TO]-(email)
-      SET user += $args
-      SET user.id = randomUUID()
-      SET user.role = 'user'
-      SET user.createdAt = toString(datetime())
-      SET user.updatedAt = toString(datetime())
-      SET user.allowEmbedIframes = false
-      SET user.showShoutsPublicly = false
-      SET email.verifiedAt = toString(datetime())
-      WITH user
-      OPTIONAL MATCH (post:Post)-[:IN]->(group:Group)
-        WHERE NOT group.groupType = 'public'
-      WITH user, collect(post) AS invisiblePosts
-      FOREACH (invisiblePost IN invisiblePosts |
-        MERGE (user)-[:CANNOT_SEE]->(invisiblePost)
-      )
-      RETURN user {.*}
-    `
-  return cypher
 }
