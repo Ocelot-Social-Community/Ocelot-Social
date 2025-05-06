@@ -9,23 +9,23 @@ Feature: Notifications for Chat Messages via E-Mail
 
   Background:
     Given the following "users" are in the database:
-      | name               | slug               | email                 | password | id   |  termsAndConditionsAgreedVersion |
-      | Bob der Baumeister | bob-der-baumeister | moderator@example.org | 1234     | u2   |  0.0.4                           |
-      | Jenny Rostock      | jenny-rostock      | user@example.org      | 1234     | u3   |  0.0.4                           |
-      | Nathan Narrator    | nathan-narrator    | narrator@example.org  | abcd     | u_nn |  0.0.4                           |
-      | Billy Block        | billy-block        | billy@example.org     | 4321     | u_bb |  0.0.4                           |
-    And "Bob der Baumeister" mutes "Nathan Narrator"
-    And "Bob der Baumeister" blocks "Billy Block"
+      | name           | slug           | email                      | password | id   | termsAndConditionsAgreedVersion |
+      | Chilly Chatter | chilly-chatter | chilly.chatter@example.org | 1234     | u_cc | 0.0.4                           |
+      | Michi Mute     | michi-mute     | michi.mute@example.org     | 1234     | u_mm | 0.0.4                           |
+      | Billy Block    | billy-block    | billy.block@example.org    | 1234     | u_bb | 0.0.4                           |
+      | Anna Absent    | anna-absent    | anna.absent@example.org    | 1234     | u_aa | 0.0.4                           |
+    And "Anna Absent" mutes "Michi Mute"
+    And "Anna Absent" blocks "Billy Block"
     And the mailserver inbox is empty
 
   Scenario: Receive Chat Notification Email only when Online
-    When "Jenny Rostock" sends a chat message to "Bob der Baumeister"
-    And "Nathan Narrator" sends a chat message to "Bob der Baumeister"
-    And "Billy Block" sends a chat message to "Bob der Baumeister"
-    Then "moderator@example.org" should receive "1" chat notification email referencing "Jenny Rostock"
+    When "Chilly Chatter" sends a chat message to "Anna Absent"
+    And "Michi Mute" sends a chat message to "Anna Absent"
+    And "Billy Block" sends a chat message to "Anna Absent"
+    Then "moderator@example.org" should receive "1" chat notification email referencing "Chilly Chatter"
     When I am logged in as "bob-der-baumeister"
-    And "Jenny Rostock" sends a chat message to "Bob der Baumeister"
-    And "Nathan Narrator" sends a chat message to "Bob der Baumeister"
-    And "Billy Block" sends a chat message to "Bob der Baumeister"
-    Then "moderator@example.org" should receive no chat notification email
+    And "Chilly Chatter" sends a chat message to "Anna Absent"
+    And "Michi Mute" sends a chat message to "Anna Absent"
+    And "Billy Block" sends a chat message to "Anna Absent"
+    Then "anna.absent@example.org" should receive no chat notification email
   
