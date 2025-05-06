@@ -2,43 +2,41 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { sendMail } from '@middleware/helpers/email/sendMail'
 import {
-  signupTemplate,
-  resetPasswordTemplate,
-  wrongAccountTemplate,
-  emailVerificationTemplate,
-} from '@middleware/helpers/email/templateBuilder'
+  sendRegistrationMail,
+  sendEmailVerification,
+  sendResetPasswordMail,
+} from '@src/emails/sendEmail'
 
 const sendSignupMail = async (resolve, root, args, context, resolveInfo) => {
-  const { inviteCode } = args
+  const { inviteCode, locale } = args
   const response = await resolve(root, args, context, resolveInfo)
   const { email, nonce } = response
   if (nonce) {
     // emails that already exist do not have a nonce
-    if (inviteCode) {
-      await sendMail(signupTemplate({ email, variables: { nonce, inviteCode } }))
-    } else {
-      await sendMail(signupTemplate({ email, variables: { nonce } }))
-    }
+    await sendRegistrationMail({ email, nonce, locale, inviteCode })
   }
   delete response.nonce
   return response
 }
 
 const sendPasswordResetMail = async (resolve, root, args, context, resolveInfo) => {
-  const { email } = args
+  const { email, locale } = args
   const { email: userFound, nonce, name } = await resolve(root, args, context, resolveInfo)
-  const template = userFound ? resetPasswordTemplate : wrongAccountTemplate
-  await sendMail(template({ email, variables: { nonce, name } }))
+  if (userFound) {
+    await sendResetPasswordMail({ email, nonce, name, locale })
+  } else {
+    // this is an antifeature allowing unauthenticated users to spam any email with wrong-email notifications
+    // await sendWrongEmail({ email, locale })
+  }
   return true
 }
 
 const sendEmailVerificationMail = async (resolve, root, args, context, resolveInfo) => {
   const response = await resolve(root, args, context, resolveInfo)
-  const { email, nonce, name } = response
+  const { email, nonce, name, locale } = response
   if (nonce) {
-    await sendMail(emailVerificationTemplate({ email, variables: { nonce, name } }))
+    await sendEmailVerification({ email, nonce, name, locale })
   }
   delete response.nonce
   return response

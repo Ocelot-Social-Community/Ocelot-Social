@@ -43,32 +43,12 @@ export default {
   },
   watch: {
     isPopoverOpen: {
-      immediate: true,
       handler(isOpen) {
-        try {
-          if (isOpen) {
-            this.$nextTick(() => {
-              setTimeout(() => {
-                const paddingRightStyle = `${
-                  window.innerWidth - document.documentElement.clientWidth
-                }px`
-                const navigationElement = document.querySelector('.main-navigation')
-                document.body.style.paddingRight = paddingRightStyle
-                document.body.classList.add('dropdown-open')
-                if (navigationElement) {
-                  navigationElement.style.paddingRight = paddingRightStyle
-                }
-              }, 20)
-            })
-          } else {
-            const navigationElement = document.querySelector('.main-navigation')
-            document.body.style.paddingRight = null
-            document.body.classList.remove('dropdown-open')
-            if (navigationElement) {
-              navigationElement.style.paddingRight = null
-            }
-          }
-        } catch (err) {}
+        if (isOpen) {
+          document.body.classList.add('dropdown-open')
+        } else {
+          document.body.classList.remove('dropdown-open')
+        }
       },
     },
   },

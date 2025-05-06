@@ -70,8 +70,8 @@ import { SweetalertIcon } from 'vue-sweetalert-icons'
 import translateErrorMessage from '~/components/utils/TranslateErrorMessage'
 
 export const SignupMutation = gql`
-  mutation ($email: String!, $inviteCode: String) {
-    Signup(email: $email, inviteCode: $inviteCode) {
+  mutation ($email: String!, $locale: String!, $inviteCode: String) {
+    Signup(email: $email, locale: $locale, inviteCode: $inviteCode) {
       email
     }
   }
@@ -121,7 +121,7 @@ export default {
       try {
         const response = await this.$apollo.mutate({
           mutation: SignupMutation,
-          variables: { email, inviteCode: null },
+          variables: { email, locale: this.$i18n.locale(), inviteCode: null },
         })
         this.data = response.data
         setTimeout(() => {

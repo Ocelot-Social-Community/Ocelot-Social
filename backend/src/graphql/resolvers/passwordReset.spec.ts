@@ -71,14 +71,14 @@ describe('passwordReset', () => {
 
     describe('requestPasswordReset', () => {
       const mutation = gql`
-        mutation ($email: String!) {
-          requestPasswordReset(email: $email)
+        mutation ($email: String!, $locale: String!) {
+          requestPasswordReset(email: $email, locale: $locale)
         }
       `
 
       describe('with invalid email', () => {
         beforeEach(() => {
-          variables = { ...variables, email: 'non-existent@example.org' }
+          variables = { ...variables, email: 'non-existent@example.org', locale: 'de' }
         })
 
         it('resolves anyways', async () => {
@@ -96,7 +96,7 @@ describe('passwordReset', () => {
 
       describe('with a valid email', () => {
         beforeEach(() => {
-          variables = { ...variables, email: 'user@example.org' }
+          variables = { ...variables, email: 'user@example.org', locale: 'de' }
         })
 
         it('resolves', async () => {
