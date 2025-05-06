@@ -4,7 +4,7 @@ services:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ghcr.io/ocelot-social-community/ocelot-social/webapp:test
     build:
-      target: test
+      target: production
     environment:
       - NODE_ENV="test"
     volumes:
@@ -14,7 +14,7 @@ services:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ghcr.io/ocelot-social-community/ocelot-social/backend:test
     build:
-      target: test
+      target: production
     environment:
       - NODE_ENV="test"
     volumes:
@@ -23,6 +23,8 @@ services:
   maintenance:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
     image: ghcr.io/ocelot-social-community/ocelot-social/maintenance:test
+    build:
+      target: production
 
   neo4j:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
