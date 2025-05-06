@@ -9,7 +9,9 @@ import { rule, shield, deny, allow, or, and } from 'graphql-shield'
 import CONFIG from '@config/index'
 import SocialMedia from '@db/models/SocialMedia'
 import { getNeode } from '@db/neo4j'
-import { validateInviteCode } from '@graphql/resolvers/transactions/inviteCodes'
+import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
+// eslint-disable-next-line import/no-cycle
+import { Context } from '@src/server'
 
 const debug = !!CONFIG.DEBUG
 const allowExternalErrors = true
@@ -370,11 +372,10 @@ const noEmailFilter = rule({
 
 const publicRegistration = rule()(() => CONFIG.PUBLIC_REGISTRATION)
 
-const inviteRegistration = rule()(async (_parent, args, { _user, driver }) => {
+const inviteRegistration = rule()(async (_parent, args, context: Context) => {
   if (!CONFIG.INVITE_REGISTRATION) return false
   const { inviteCode } = args
-  const session = driver.session()
-  return validateInviteCode(session, inviteCode)
+  return validateInviteCode(context, inviteCode)
 })
 
 // Permissions
@@ -413,7 +414,6 @@ export default shield(
       VerifyNonce: allow,
       queryLocations: isAuthenticated,
       availableRoles: isAdmin,
-      getInviteCode: isAuthenticated, // and inviteRegistration
       Room: isAuthenticated,
       Message: isAuthenticated,
       UnreadRooms: isAuthenticated,
@@ -465,7 +465,10 @@ export default shield(
       pinPost: isAdmin,
       unpinPost: isAdmin,
       UpdateDonations: isAdmin,
-      GenerateInviteCode: isAuthenticated,
+      generatePersonalInviteCode: isAuthenticated,
+      generateGroupInviteCode: and(isAuthenticated, isAllowedToChangeGroupMemberRole),
+      invalidateInviteCode: isAuthenticated,
+      redeemInviteCode: isAuthenticated,
       switchUserRole: isAdmin,
       markTeaserAsViewed: allow,
       saveCategorySettings: isAuthenticated,
@@ -482,6 +485,7 @@ export default shield(
     User: {
       email: or(isMyOwn, isAdmin),
       emailNotificationSettings: isMyOwn,
+      inviteCodes: isMyOwn,
     },
     Location: {
       distanceToMe: isAuthenticated,

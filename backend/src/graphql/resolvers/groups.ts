@@ -436,6 +436,28 @@ export default {
     },
   },
   Group: {
+    inviteCodes: async (parent, args, context: Context, _resolveInfo) => {
+      if (!parent.code) {
+        throw new Error('Can not identify selected Group!')
+      }
+      const {
+        user: { id: userId },
+      } = context
+
+      return (
+        await context.database.query({
+          query: `
+          MATCH (user:User {id: $userId})-[:GENERATED]->(inviteCodes:InviteCode)-[:INVITES_TO]->(g:Group {code: $parent.code})
+          WHERE (inviteCodes)
+          RETURN inviteCodes {.*}
+          `,
+          variables: {
+            userId,
+            parent,
+          },
+        })
+      ).records.map((r) => r.get('inviteCodes'))
+    },
     ...Resolver('Group', {
       undefinedToNull: ['deleted', 'disabled', 'locationName', 'about'],
       hasMany: {

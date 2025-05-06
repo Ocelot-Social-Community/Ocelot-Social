@@ -24,6 +24,9 @@ export default {
       ],
     }),
     distanceToMe: async (parent, _params, context, _resolveInfo) => {
+      if (!parent.id) {
+        throw new Error('Can not identify selected Group!')
+      }
       const session = context.driver.session()
 
       const query = session.readTransaction(async (transaction) => {

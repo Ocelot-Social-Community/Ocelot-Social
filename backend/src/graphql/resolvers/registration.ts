@@ -11,6 +11,8 @@ import { getNeode } from '@db/neo4j'
 import existingEmailAddress from './helpers/existingEmailAddress'
 import generateNonce from './helpers/generateNonce'
 import normalizeEmail from './helpers/normalizeEmail'
+import { redeemInviteCode } from './inviteCodes'
+import { Context } from '@src/server'
 
 const neode = getNeode()
 
@@ -33,7 +35,7 @@ export default {
         throw new UserInputError(e.message)
       }
     },
-    SignupVerification: async (_parent, args, context) => {
+    SignupVerification: async (_parent, args, context: Context) => {
       const { termsAndConditionsAgreedVersion } = args
       const regEx = /^[0-9]+\.[0-9]+\.[0-9]+$/g
       if (!regEx.test(termsAndConditionsAgreedVersion)) {
@@ -60,6 +62,9 @@ export default {
         })
         const [user] = createUserTransactionResponse.records.map((record) => record.get('user'))
         if (!user) throw new UserInputError('Invalid email or nonce')
+
+        // join Group via invite Code
+        await redeemInviteCode({ ...context, user }, inviteCode)
         return user
       })
       try {
@@ -76,29 +81,13 @@ export default {
   },
 }
 
-const signupCypher = (inviteCode) => {
-  let optionalMatch = ''
-  let optionalMerge = ''
-  if (inviteCode) {
-    optionalMatch = `
-      OPTIONAL MATCH
-      (inviteCode:InviteCode {code: $inviteCode})<-[:GENERATED]-(host:User)
-      `
-    optionalMerge = `
-      MERGE (user)-[:REDEEMED { createdAt: toString(datetime()) }]->(inviteCode)
-      MERGE (host)-[:INVITED { createdAt: toString(datetime()) }]->(user)
-      MERGE (user)-[:FOLLOWS { createdAt: toString(datetime()) }]->(host)
-      MERGE (host)-[:FOLLOWS { createdAt: toString(datetime()) }]->(user)
-      `
-  }
+const signupCypher = () => {
   const cypher = `
       MATCH (email:EmailAddress {nonce: $nonce, email: $email})
       WHERE NOT (email)-[:BELONGS_TO]->()
-      ${optionalMatch}
       CREATE (user:User)
       MERGE (user)-[:PRIMARY_EMAIL]->(email)
       MERGE (user)<-[:BELONGS_TO]-(email)
-      ${optionalMerge}
       SET user += $args
       SET user.id = randomUUID()
       SET user.role = 'user'

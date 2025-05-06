@@ -10,6 +10,7 @@ import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
 import { getNeode } from '@db/neo4j'
+import { Context } from '@src/server'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import Resolver from './helpers/Resolver'
@@ -467,6 +468,22 @@ export default {
     },
   },
   User: {
+    inviteCodes: async (_parent, _args, context: Context, _resolveInfo) => {
+      const {
+        user: { id: userId },
+      } = context
+
+      return (
+        await context.database.query({
+          query: `
+          MATCH (user:User {id: $userId})-[:GENERATED]->(inviteCodes:InviteCode)
+          WHERE NOT (inviteCodes)-[:INVITES_TO]->(:Group)
+          RETURN inviteCodes {.*}
+          `,
+          variables: { userId },
+        })
+      ).records
+    },
     emailNotificationSettings: async (parent, _params, _context, _resolveInfo) => {
       return [
         {

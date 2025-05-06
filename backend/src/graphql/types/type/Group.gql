@@ -43,6 +43,9 @@ type Group {
   posts: [Post] @relation(name: "IN", direction: "IN")
 
   isMutedByMe: Boolean! @cypher(statement: "MATCH (this) RETURN EXISTS( (this)<-[:MUTED]-(:User {id: $cypherParams.currentUserId}) )")
+
+  "inviteCodes to this group the current user has generated"
+  inviteCodes: [InviteCode]! @neo4j_ignore
 }
 
 
