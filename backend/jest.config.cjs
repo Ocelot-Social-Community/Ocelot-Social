@@ -23,5 +23,7 @@ module.exports = {
   },
   testMatch: ['**/src/**/?(*.)+(spec|test).ts?(x)'],
   setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
+  globalSetup: '<rootDir>/test/globalSetup.ts',
+  globalTeardown: '<rootDir>/test/globalTeardown.ts',
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
 }

@@ -1,21 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import CONFIG from '@config/index'
-import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
-import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
 
-let query
-let mutate
-let authenticatedUser
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const { authenticateUser, client } = global as any
+
 let user
 let otherUser
 
@@ -37,28 +33,8 @@ const postQuery = gql`
     }
   }
 `
-
-const database = databaseContext()
-
-let server: ApolloServer
 beforeAll(async () => {
   await cleanDatabase()
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database })
-
-  server = createServer({ context }).server
-
-  query = createTestClient(server).query
-  mutate = createTestClient(server).mutate
-})
-
-afterAll(async () => {
-  await cleanDatabase()
-  void server.stop()
-  void database.driver.close()
-  database.neode.close()
 })
 
 describe('observing posts', () => {
@@ -73,13 +49,13 @@ describe('observing posts', () => {
       name: 'Other User',
       about: 'I am another user',
     })
-    authenticatedUser = await user.toJson()
+    authenticateUser(await user.toJson())
   })
 
   describe('creating posts', () => {
     it('has the author of the post observing the post', async () => {
       await expect(
-        mutate({
+        client.mutate({
           mutation: createPostMutation(),
           variables: {
             id: 'p2',
@@ -101,12 +77,12 @@ describe('observing posts', () => {
 
   describe('commenting posts', () => {
     beforeAll(async () => {
-      authenticatedUser = await otherUser.toJson()
+      authenticateUser(await otherUser.toJson())
     })
 
     it('has another user NOT observing the post BEFORE commenting it', async () => {
       await expect(
-        query({
+        client.query({
           query: postQuery,
           variables: { id: 'p2' },
         }),
@@ -125,7 +101,7 @@ describe('observing posts', () => {
 
     it('has another user observing the post AFTER commenting it', async () => {
       await expect(
-        mutate({
+        client.mutate({
           mutation: createCommentMutation,
           variables: {
             postId: 'p2',
@@ -142,7 +118,7 @@ describe('observing posts', () => {
       })
 
       await expect(
-        query({
+        client.query({
           query: postQuery,
           variables: { id: 'p2' },
         }),
@@ -162,7 +138,7 @@ describe('observing posts', () => {
 
   describe('toggle observe post', () => {
     beforeAll(async () => {
-      authenticatedUser = await otherUser.toJson()
+      authenticateUser(await otherUser.toJson())
     })
 
     const toggleObservePostMutation = gql`
@@ -177,7 +153,7 @@ describe('observing posts', () => {
     describe('switch off observation', () => {
       it('does not observe the post anymore', async () => {
         await expect(
-          mutate({
+          client.mutate({
             mutation: toggleObservePostMutation,
             variables: {
               id: 'p2',
@@ -199,7 +175,7 @@ describe('observing posts', () => {
     describe('comment the post again', () => {
       it('does NOT alter the observation state', async () => {
         await expect(
-          mutate({
+          client.mutate({
             mutation: createCommentMutation,
             variables: {
               postId: 'p2',
@@ -217,7 +193,7 @@ describe('observing posts', () => {
         })
 
         await expect(
-          query({
+          client.query({
             query: postQuery,
             variables: { id: 'p2' },
           }),
@@ -238,7 +214,7 @@ describe('observing posts', () => {
     describe('switch on observation', () => {
       it('does observe the post again', async () => {
         await expect(
-          mutate({
+          client.mutate({
             mutation: toggleObservePostMutation,
             variables: {
               id: 'p2',
