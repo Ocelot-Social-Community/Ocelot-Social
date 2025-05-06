@@ -45,6 +45,7 @@ module.exports = defineConfig({
     baseUrl: 'http://localhost:3000',
     specPattern: '**/*.feature',
     supportFile: false,
+    includeShadowDom: true,
     retries:  0,
     video: false,
     viewportHeight: 720,
