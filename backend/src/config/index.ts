@@ -3,6 +3,8 @@
 
 /* eslint-disable n/no-process-env */
 import { config } from 'dotenv'
+// eslint-disable-next-line import/no-namespace
+import * as SMTPTransport from 'nodemailer/lib/smtp-pool'
 
 import emails from './emails'
 import metadata from './metadata'
@@ -41,22 +43,40 @@ const server = {
   JWT_EXPIRES: env.JWT_EXPIRES ?? '2y',
 }
 
-const hasDKIMData = env.SMTP_DKIM_DOMAINNAME && env.SMTP_DKIM_KEYSELECTOR && env.SMTP_DKIM_PRIVATKEY
+const SMTP_HOST = env.SMTP_HOST
+const SMTP_PORT = (env.SMTP_PORT && parseInt(env.SMTP_PORT)) || undefined
+const SMTP_IGNORE_TLS = env.SMTP_IGNORE_TLS !== 'false' // default = true
+const SMTP_SECURE = env.SMTP_SECURE === 'true'
+const SMTP_USERNAME = env.SMTP_USERNAME
+const SMTP_PASSWORD = env.SMTP_PASSWORD
+const SMTP_DKIM_DOMAINNAME = env.SMTP_DKIM_DOMAINNAME
+const SMTP_DKIM_KEYSELECTOR = env.SMTP_DKIM_KEYSELECTOR
+// PEM format = https://docs.progress.com/bundle/datadirect-hybrid-data-pipeline-installation-46/page/PEM-file-format.html
+const SMTP_DKIM_PRIVATKEY = env.SMTP_DKIM_PRIVATKEY?.replace(/\\n/g, '\n') // replace all "\n" in .env string by real line break
+const SMTP_MAX_CONNECTIONS = (env.SMTP_MAX_CONNECTIONS && parseInt(env.SMTP_MAX_CONNECTIONS)) || 5
+const SMTP_MAX_MESSAGES = (env.SMTP_MAX_MESSAGES && parseInt(env.SMTP_MAX_MESSAGES)) || 100
 
-const smtp = {
-  SMTP_HOST: env.SMTP_HOST,
-  SMTP_PORT: (env.SMTP_PORT && parseInt(env.SMTP_PORT)) || undefined,
-  SMTP_IGNORE_TLS: env.SMTP_IGNORE_TLS !== 'false', // default = true
-  SMTP_SECURE: env.SMTP_SECURE === 'true',
-  SMTP_USERNAME: env.SMTP_USERNAME,
-  SMTP_PASSWORD: env.SMTP_PASSWORD,
-  SMTP_DKIM_DOMAINNAME: hasDKIMData && env.SMTP_DKIM_DOMAINNAME,
-  SMTP_DKIM_KEYSELECTOR: hasDKIMData && env.SMTP_DKIM_KEYSELECTOR,
-  // PEM format: https://docs.progress.com/bundle/datadirect-hybrid-data-pipeline-installation-46/page/PEM-file-format.html
-  SMTP_DKIM_PRIVATKEY:
-    hasDKIMData && env.SMTP_DKIM_PRIVATKEY && env.SMTP_DKIM_PRIVATKEY.replace(/\\n/g, '\n'), // replace all "\n" in .env string by real line break
-  SMTP_MAX_CONNECTIONS: (env.SMTP_MAX_CONNECTIONS && parseInt(env.SMTP_MAX_CONNECTIONS)) || 5,
-  SMTP_MAX_MESSAGES: (env.SMTP_MAX_MESSAGES && parseInt(env.SMTP_MAX_MESSAGES)) || 100,
+const nodemailerTransportOptions: SMTPTransport.Options = {
+  host: SMTP_HOST,
+  port: SMTP_PORT,
+  ignoreTLS: SMTP_IGNORE_TLS,
+  secure: SMTP_SECURE, // true for 465, false for other ports
+  pool: true,
+  maxConnections: SMTP_MAX_CONNECTIONS,
+  maxMessages: SMTP_MAX_MESSAGES,
+}
+if (SMTP_USERNAME && SMTP_PASSWORD) {
+  nodemailerTransportOptions.auth = {
+    user: SMTP_USERNAME,
+    pass: SMTP_PASSWORD,
+  }
+}
+if (SMTP_DKIM_DOMAINNAME && SMTP_DKIM_KEYSELECTOR && SMTP_DKIM_PRIVATKEY) {
+  nodemailerTransportOptions.dkim = {
+    domainName: SMTP_DKIM_DOMAINNAME,
+    keySelector: SMTP_DKIM_KEYSELECTOR,
+    privateKey: SMTP_DKIM_PRIVATKEY,
+  }
 }
 
 const neo4j = {
@@ -112,10 +132,11 @@ export default {
   ...environment,
   ...server,
   ...required,
-  ...smtp,
   ...neo4j,
   ...sentry,
   ...redis,
   ...s3,
   ...options,
 }
+
+export { nodemailerTransportOptions }

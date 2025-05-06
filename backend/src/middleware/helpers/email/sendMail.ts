@@ -7,13 +7,12 @@
 import { createTransport } from 'nodemailer'
 import { htmlToText } from 'nodemailer-html-to-text'
 
-import CONFIG from '@config/index'
+import CONFIG, { nodemailerTransportOptions } from '@config/index'
 import { cleanHtml } from '@middleware/helpers/cleanHtml'
-import { transportOptions } from '@src/emails/transportOptions'
 
-const hasEmailConfig = CONFIG.SMTP_HOST && CONFIG.SMTP_PORT
+const hasEmailConfig = nodemailerTransportOptions.host && nodemailerTransportOptions.port
 
-const transporter = createTransport(transportOptions)
+const transporter = createTransport(nodemailerTransportOptions)
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-function
 let sendMailCallback: any = async () => {}

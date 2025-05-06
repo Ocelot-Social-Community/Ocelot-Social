@@ -10,12 +10,10 @@ import { createTransport } from 'nodemailer'
 
 // import type Email as EmailType from '@types/email-templates'
 
-import CONFIG from '@config/index'
+import CONFIG, { nodemailerTransportOptions } from '@config/index'
 import logosWebapp from '@config/logos'
 import metadata from '@config/metadata'
 import { UserDbProperties } from '@db/types/User'
-
-import { transportOptions } from './transportOptions'
 
 const welcomeImageUrl = new URL(logosWebapp.LOGO_WELCOME_PATH, CONFIG.CLIENT_URI)
 const settingsUrl = new URL('/settings/notifications', CONFIG.CLIENT_URI)
@@ -29,7 +27,7 @@ const defaultParams = {
   settingsUrl,
 }
 
-export const transport = createTransport(transportOptions)
+export const transport = createTransport(nodemailerTransportOptions)
 
 const email = new Email({
   message: {
