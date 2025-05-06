@@ -3,15 +3,12 @@
 # public
 cp -r public/ build/public/
 
-# html files
-mkdir -p build/src/middleware/helpers/email/templates/
-cp -r src/middleware/helpers/email/templates/*.html build/src/middleware/helpers/email/templates/
+# email files
+mkdir -p build/src/emails/templates/
+cp -r src/emails/templates/ build/src/emails/templates/
 
-mkdir -p build/src/middleware/helpers/email/templates/en/
-cp -r src/middleware/helpers/email/templates/en/*.html build/src/middleware/helpers/email/templates/en/
-
-mkdir -p build/src/middleware/helpers/email/templates/de/
-cp -r src/middleware/helpers/email/templates/de/*.html build/src/middleware/helpers/email/templates/de/
+mkdir -p build/src/emails/locales/
+cp -r src/emails/locales/ build/src/emails/locales/
 
 # gql files
 mkdir -p build/src/graphql/types/
