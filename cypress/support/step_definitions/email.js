@@ -2,6 +2,13 @@ import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 const emailClientList = '.email-list'
 
+
+defineStep('the mailserver inbox is empty', () => {
+  cy.request('DELETE', 'localhost:1080/email/all')
+    .its('status')
+    .should('equal', 200)
+})
+
 defineStep('{string} should receive no chat notification email', (recipientEmailAddress) => {
   const emailTitle = 'Neue Chat-Nachricht | New chat message'
   

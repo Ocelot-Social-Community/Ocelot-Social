@@ -16,6 +16,7 @@ Feature: Notifications for Chat Messages via E-Mail
       | Billy Block        | billy-block        | billy@example.org     | 4321     | u_bb |  0.0.4                           |
     And "Bob der Baumeister" mutes "Nathan Narrator"
     And "Bob der Baumeister" blocks "Billy Block"
+    And the mailserver inbox is empty
 
   Scenario: Receive Chat Notification Email only when Online
     When "Jenny Rostock" sends a chat message to "Bob der Baumeister"
