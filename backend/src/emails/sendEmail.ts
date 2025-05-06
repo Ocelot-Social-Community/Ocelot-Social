@@ -28,7 +28,7 @@ const defaultParams = {
   renderSettingsUrl: true,
 }
 
-export const transport = createTransport(nodemailerTransportOptions)
+const transport = createTransport(nodemailerTransportOptions)
 
 const email = new Email({
   message: {
