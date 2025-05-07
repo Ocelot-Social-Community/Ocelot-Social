@@ -4,7 +4,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
@@ -17,36 +16,11 @@ import {
 } from '@graphql/queries/validateInviteCode'
 import createServer, { getContext } from '@src/server'
 
-const generateInviteCodeMutation = gql`
-  mutation ($expiresAt: String = null) {
-    GenerateInviteCode(expiresAt: $expiresAt) {
-      code
-      createdAt
-      expiresAt
-    }
-  }
-`
-const myInviteCodesQuery = gql`
-  query {
-    MyInviteCodes {
-      code
-      createdAt
-      expiresAt
-    }
-  }
-`
-const isValidInviteCodeQuery = gql`
-  query ($code: ID!) {
-    isValidInviteCode(code: $code)
-  }
-`
-
 const database = databaseContext()
 
 let server: ApolloServer
 let authenticatedUser
-let query
-let mutate
+let query, mutate
 
 beforeAll(async () => {
   await cleanDatabase()
