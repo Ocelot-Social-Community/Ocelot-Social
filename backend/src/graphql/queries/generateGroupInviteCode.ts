@@ -1,8 +1,8 @@
 import gql from 'graphql-tag'
 
-export const generatePersonalInviteCode = gql`
-  mutation generatePersonalInviteCode($expiresAt: String, $comment: String) {
-    generatePersonalInviteCode(expiresAt: $expiresAt, comment: $comment) {
+export const generateGroupInviteCode = gql`
+  mutation generateGroupInviteCode($groupId: ID!, $expiresAt: String, $comment: String) {
+    generateGroupInviteCode(groupId: $groupId, expiresAt: $expiresAt, comment: $comment) {
       code
       createdAt
       generatedBy {

@@ -17,6 +17,8 @@ import {
   unauthenticatedValidateInviteCode,
 } from '@graphql/queries/validateInviteCode'
 import createServer, { getContext } from '@src/server'
+import { generateGroupInviteCode } from '@graphql/queries/generateGroupInviteCode'
+import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 
 const generateInviteCodeMutation = gql`
   mutation ($expiresAt: String = null) {
@@ -113,7 +115,6 @@ describe('validateInviteCode', () => {
         categoryIds: ['cat4', 'cat5', 'cat17'],
       },
     })
-    // authenticatedUser = null
 
     await Factory.build(
       'inviteCode',
@@ -360,7 +361,7 @@ describe('validateInviteCode', () => {
   })
 })
 
-describe.only('generatePersonalInviteCode', () => {
+describe('generatePersonalInviteCode', () => {
   let invitingUser
   beforeEach(async () => {
     await cleanDatabase()
@@ -411,95 +412,365 @@ describe.only('generatePersonalInviteCode', () => {
         errors: undefined,
       })
     })
-  })
 
-  it('returns a new invite code with comment', async () => {
-    await expect(
-      mutate({ mutation: generatePersonalInviteCode, variables: { comment: 'some text' } }),
-    ).resolves.toMatchObject({
-      data: {
-        generatePersonalInviteCode: {
-          code: expect.any(String),
-          comment: 'some text',
-          createdAt: expect.any(String),
-          expiresAt: null,
-          generatedBy: {
-            avatar: {
-              url: expect.any(String),
+    it('returns a new invite code with comment', async () => {
+      await expect(
+        mutate({ mutation: generatePersonalInviteCode, variables: { comment: 'some text' } }),
+      ).resolves.toMatchObject({
+        data: {
+          generatePersonalInviteCode: {
+            code: expect.any(String),
+            comment: 'some text',
+            createdAt: expect.any(String),
+            expiresAt: null,
+            generatedBy: {
+              avatar: {
+                url: expect.any(String),
+              },
+              id: 'inviting-user',
+              name: 'Inviting User',
             },
-            id: 'inviting-user',
-            name: 'Inviting User',
+            invitedTo: null,
+            isValid: true,
+            redeemedBy: [],
           },
-          invitedTo: null,
-          isValid: true,
-          redeemedBy: [],
         },
-      },
-      errors: undefined,
+        errors: undefined,
+      })
+    })
+
+    it('returns a new invite code with expireDate', async () => {
+      const date = new Date()
+      date.setFullYear(date.getFullYear() + 1)
+      await expect(
+        mutate({
+          mutation: generatePersonalInviteCode,
+          variables: { expiresAt: date.toISOString() },
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          generatePersonalInviteCode: {
+            code: expect.any(String),
+            comment: null,
+            createdAt: expect.any(String),
+            expiresAt: date.toISOString(),
+            generatedBy: {
+              avatar: {
+                url: expect.any(String),
+              },
+              id: 'inviting-user',
+              name: 'Inviting User',
+            },
+            invitedTo: null,
+            isValid: true,
+            redeemedBy: [],
+          },
+        },
+        errors: undefined,
+      })
+    })
+
+    it('returns a new invalid invite code with expireDate in the past', async () => {
+      const date = new Date()
+      date.setFullYear(date.getFullYear() - 1)
+      await expect(
+        mutate({
+          mutation: generatePersonalInviteCode,
+          variables: { expiresAt: date.toISOString() },
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          generatePersonalInviteCode: {
+            code: expect.any(String),
+            comment: null,
+            createdAt: expect.any(String),
+            expiresAt: date.toISOString(),
+            generatedBy: {
+              avatar: {
+                url: expect.any(String),
+              },
+              id: 'inviting-user',
+              name: 'Inviting User',
+            },
+            invitedTo: null,
+            isValid: false,
+            redeemedBy: [],
+          },
+        },
+        errors: undefined,
+      })
     })
   })
 
-  it('returns a new invite code with expireDate', async () => {
-    const date = new Date()
-    date.setFullYear(date.getFullYear() + 1)
-    await expect(
-      mutate({
-        mutation: generatePersonalInviteCode,
-        variables: { expiresAt: date.toISOString() },
-      }),
-    ).resolves.toMatchObject({
-      data: {
-        generatePersonalInviteCode: {
-          code: expect.any(String),
-          comment: null,
-          createdAt: expect.any(String),
-          expiresAt: date.toISOString(),
-          generatedBy: {
-            avatar: {
-              url: expect.any(String),
-            },
-            id: 'inviting-user',
-            name: 'Inviting User',
-          },
-          invitedTo: null,
-          isValid: true,
-          redeemedBy: [],
-        },
+  // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
+  it.skip('code collision', () => {})
+  // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
+  it.skip('max amount used', () => {})
+})
+
+describe.only('generateGroupInviteCode', () => {
+  let invitingUser, notMemberUser, pendingMemberUser
+  let publicGroup, hiddenGroup
+  beforeEach(async () => {
+    await cleanDatabase()
+    invitingUser = await Factory.build('user', {
+      id: 'inviting-user',
+      role: 'user',
+      name: 'Inviting User',
+    })
+
+    notMemberUser = await Factory.build('user', {
+      id: 'not-member-user',
+      role: 'user',
+      name: 'Not a Member User',
+    })
+
+    pendingMemberUser = await Factory.build('user', {
+      id: 'pending-member-user',
+      role: 'user',
+      name: 'Pending Member User',
+    })
+
+    authenticatedUser = await invitingUser.toJson()
+    hiddenGroup = 'g0'
+    await mutate({
+      mutation: createGroupMutation(),
+      variables: {
+        id: hiddenGroup,
+        name: 'Hidden Group',
+        about: 'We are hidden',
+        description: 'anything',
+        groupType: 'hidden',
+        actionRadius: 'global',
+        categoryIds: ['cat6', 'cat12', 'cat16'],
+        locationName: 'Hamburg, Germany',
       },
-      errors: undefined,
+    })
+
+    publicGroup = 'g2'
+    await mutate({
+      mutation: createGroupMutation(),
+      variables: {
+        id: publicGroup,
+        name: 'Public Group',
+        about: 'We are public',
+        description: 'anything',
+        groupType: 'public',
+        actionRadius: 'interplanetary',
+        categoryIds: ['cat4', 'cat5', 'cat17'],
+      },
+    })
+
+    // TODO
+    // pendingMemberUser.relateTo(hiddenGroup, 'memberOf', { role: 'pending' })
+  })
+
+  describe('as unauthenticated user', () => {
+    beforeEach(() => {
+      authenticatedUser = null
+    })
+
+    it('throws authorization error', async () => {
+      await expect(
+        mutate({ mutation: generateGroupInviteCode, variables: { groupId: publicGroup } }),
+      ).resolves.toMatchObject({
+        data: null,
+        errors: [{ message: 'Not Authorized!' }],
+      })
+    })
+  })
+  describe('as authenticated user', () => {
+    beforeEach(async () => {
+      authenticatedUser = await invitingUser.toJson()
+    })
+
+    it('returns a new group invite code', async () => {
+      await expect(
+        mutate({ mutation: generateGroupInviteCode, variables: { groupId: publicGroup } }),
+      ).resolves.toMatchObject({
+        data: {
+          generateGroupInviteCode: {
+            code: expect.any(String),
+            comment: null,
+            createdAt: expect.any(String),
+            expiresAt: null,
+            generatedBy: {
+              avatar: {
+                url: expect.any(String),
+              },
+              id: 'inviting-user',
+              name: 'Inviting User',
+            },
+            invitedTo: {
+              id: publicGroup,
+              groupType: 'public',
+              name: 'Public Group',
+              about: 'We are public',
+              avatar: null,
+            },
+            isValid: true,
+            redeemedBy: [],
+          },
+        },
+        errors: undefined,
+      })
+    })
+
+    it('returns a new group invite code with comment', async () => {
+      await expect(
+        mutate({
+          mutation: generateGroupInviteCode,
+          variables: { groupId: publicGroup, comment: 'some text' },
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          generateGroupInviteCode: {
+            code: expect.any(String),
+            comment: 'some text',
+            createdAt: expect.any(String),
+            expiresAt: null,
+            generatedBy: {
+              avatar: {
+                url: expect.any(String),
+              },
+              id: 'inviting-user',
+              name: 'Inviting User',
+            },
+            invitedTo: {
+              id: publicGroup,
+              groupType: 'public',
+              name: 'Public Group',
+              about: 'We are public',
+              avatar: null,
+            },
+            isValid: true,
+            redeemedBy: [],
+          },
+        },
+        errors: undefined,
+      })
+    })
+
+    it('returns a new group invite code with expireDate', async () => {
+      const date = new Date()
+      date.setFullYear(date.getFullYear() + 1)
+      await expect(
+        mutate({
+          mutation: generateGroupInviteCode,
+          variables: { groupId: publicGroup, expiresAt: date.toISOString() },
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          generateGroupInviteCode: {
+            code: expect.any(String),
+            comment: null,
+            createdAt: expect.any(String),
+            expiresAt: date.toISOString(),
+            generatedBy: {
+              avatar: {
+                url: expect.any(String),
+              },
+              id: 'inviting-user',
+              name: 'Inviting User',
+            },
+            invitedTo: {
+              id: publicGroup,
+              groupType: 'public',
+              name: 'Public Group',
+              about: 'We are public',
+              avatar: null,
+            },
+            isValid: true,
+            redeemedBy: [],
+          },
+        },
+        errors: undefined,
+      })
+    })
+
+    it('returns a new invalid group invite code with expireDate in the past', async () => {
+      const date = new Date()
+      date.setFullYear(date.getFullYear() - 1)
+      await expect(
+        mutate({
+          mutation: generateGroupInviteCode,
+          variables: { groupId: publicGroup, expiresAt: date.toISOString() },
+        }),
+      ).resolves.toMatchObject({
+        data: {
+          generateGroupInviteCode: {
+            code: expect.any(String),
+            comment: null,
+            createdAt: expect.any(String),
+            expiresAt: date.toISOString(),
+            generatedBy: {
+              avatar: {
+                url: expect.any(String),
+              },
+              id: 'inviting-user',
+              name: 'Inviting User',
+            },
+            invitedTo: {
+              id: publicGroup,
+              groupType: 'public',
+              name: 'Public Group',
+              about: 'We are public',
+              avatar: null,
+            },
+            isValid: false,
+            redeemedBy: [],
+          },
+        },
+        errors: undefined,
+      })
     })
   })
 
-  it('returns a new invalid invite code with expireDate in the past', async () => {
-    const date = new Date()
-    date.setFullYear(date.getFullYear() - 1)
-    await expect(
-      mutate({
-        mutation: generatePersonalInviteCode,
-        variables: { expiresAt: date.toISOString() },
-      }),
-    ).resolves.toMatchObject({
-      data: {
-        generatePersonalInviteCode: {
-          code: expect.any(String),
-          comment: null,
-          createdAt: expect.any(String),
-          expiresAt: date.toISOString(),
-          generatedBy: {
-            avatar: {
-              url: expect.any(String),
-            },
-            id: 'inviting-user',
-            name: 'Inviting User',
-          },
-          invitedTo: null,
-          isValid: false,
-          redeemedBy: [],
-        },
-      },
-      errors: undefined,
+  describe('as not-member user', () => {
+    beforeEach(async () => {
+      authenticatedUser = await notMemberUser.toJson()
+    })
+
+    it('throws authorization error', async () => {
+      const date = new Date()
+      date.setFullYear(date.getFullYear() - 1)
+      await expect(
+        mutate({
+          mutation: generateGroupInviteCode,
+          variables: { groupId: publicGroup },
+        }),
+      ).resolves.toMatchObject({
+        data: null,
+        errors: [{ message: 'Not Authorized!' }],
+      })
     })
   })
+
+  // eslint-disable-next-line jest/no-disabled-tests
+  describe.skip('as pending-member user', () => {
+    beforeEach(async () => {
+      authenticatedUser = await pendingMemberUser.toJson()
+    })
+
+    it('throws authorization error', async () => {
+      const date = new Date()
+      date.setFullYear(date.getFullYear() - 1)
+      await expect(
+        mutate({
+          mutation: generateGroupInviteCode,
+          variables: { groupId: hiddenGroup },
+        }),
+      ).resolves.toMatchObject({
+        data: null,
+        errors: [{ message: 'Not Authorized!' }],
+      })
+    })
+  })
+
+  // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
+  it.skip('code collision', () => {})
+  // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
+  it.skip('max amount used', () => {})
 })
 
 // --- old tests

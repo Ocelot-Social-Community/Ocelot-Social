@@ -128,13 +128,13 @@ export default {
           query: `
         MATCH (inviteCode:InviteCode)<-[:GENERATED]-(user:user {id: $user.id})
         WHERE NOT (inviteCode)-[:INVITES_TO]-(:Group)
-        RETURN COUNT(inviteCode) as count
+        RETURN toString(count(inviteCode)) as count
         `,
           variables: { user: context.user },
         })
       ).records[0].get('count')
 
-      if (userInviteCodeAmount >= CONFIG.INVITE_CODES_PERSONAL_PER_USER) {
+      if (parseInt(userInviteCodeAmount as string) >= CONFIG.INVITE_CODES_PERSONAL_PER_USER) {
         throw new Error('You have reached the maximum of Invite Codes you can generate')
       }
 
@@ -165,15 +165,15 @@ export default {
       const userInviteCodeAmount = (
         await context.database.query({
           query: `
-      MATCH (inviteCode:InviteCode)<-[:GENERATED]-(user:user {id: $user.id})
-      WHERE (inviteCode)-[:INVITES_TO]-(group:Group {id: $args.groupId})
-      RETURN COUNT(inviteCode) as count
-      `,
+          MATCH (inviteCode:InviteCode)<-[:GENERATED]-(user:user {id: $user.id})
+          WHERE (inviteCode)-[:INVITES_TO]->(:Group {id: $args.groupId})
+          RETURN toString(count(inviteCode)) as count
+          `,
           variables: { user: context.user, args },
         })
       ).records[0].get('count')
 
-      if (userInviteCodeAmount >= CONFIG.INVITE_CODES_GROUP_PER_USER) {
+      if (parseInt(userInviteCodeAmount as string) >= CONFIG.INVITE_CODES_GROUP_PER_USER) {
         throw new Error(
           'You have reached the maximum of Invite Codes you can generate for this group.',
         )
@@ -184,18 +184,31 @@ export default {
         code = generateInviteCode()
       }
 
-      return (
+      const inviteCode = (
         await context.database.write({
-          query: `MATCH (user:User {id: $user.id})
-         MERGE (user)-[:GENERATED]->(inviteCode:InviteCode { code: toUpper($code) })-[:INVITES_TO]->(group:Group {id: $args.groupId})
-         ON CREATE SET
-         inviteCode.createdAt = toString(datetime()),
-         inviteCode.expiresAt = $args.expiresAt,
-         inviteCode.comment = $args.comment
-         RETURN inviteCode {.*}`,
+          query: `
+          MATCH
+            (user:User {id: $user.id})-[membership:MEMBER_OF]->(group:Group {id: $args.groupId})
+          WHERE NOT membership.role = 'pending'
+          OPTIONAL MATCH (oldInviteCode:InviteCode { code: toUpper($code) })
+          DETACH DELETE oldInviteCode
+          MERGE (user)-[:GENERATED]->(inviteCode:InviteCode { code: toUpper($code) })-[:INVITES_TO]->(group)
+          ON CREATE SET
+            inviteCode.code = toUpper($code),
+            inviteCode.createdAt = toString(datetime()),
+            inviteCode.expiresAt = $args.expiresAt,
+            inviteCode.comment = $args.comment
+          RETURN inviteCode {.*}`,
           variables: { user: context.user, code, args },
         })
-      ).records[0].get('inviteCode')
+      ).records
+
+      if (inviteCode.length !== 1) {
+        // Not a member
+        throw new Error('Not Authorized!')
+      }
+
+      return inviteCode[0].get('inviteCode')
     },
     invalidateInviteCode: async (_parent, args, context: Context, _resolveInfo) => {
       return (
@@ -233,21 +246,6 @@ export default {
       }
       return result[0].get('group')
     },
-    /* invitedFrom: async (parent, _args, context: Context, _resolveInfo) => {
-      if (!parent.code) {
-        return null
-      }
-
-      return (
-        await context.database.query({
-          query: `
-        MATCH (inviteCode:InviteCode {code: toUpper($parent.code)})<-[:GENERATED]->(user:User)
-        RETURN user {.*}
-        `,
-          variables: { parent },
-        })
-      ).records[0].get('user')
-    }, */
     isValid: async (parent, _args, context: Context, _resolveInfo) => {
       if (!parent.code) {
         return false
