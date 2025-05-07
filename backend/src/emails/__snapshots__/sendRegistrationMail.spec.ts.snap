@@ -3,7 +3,7 @@
 exports[`sendRegistrationMail with invite code English renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -142,7 +142,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendRegistrationMail with invite code German renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -282,7 +282,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendRegistrationMail without invite code English renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -421,7 +421,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendRegistrationMail without invite code German renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
