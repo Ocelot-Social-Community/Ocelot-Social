@@ -20,16 +20,16 @@ export const generateInviteCode = () => {
   ).join('')
 }
 
-const uniqueInviteCode = async (context: Context, code) => {
+const uniqueInviteCode = async (context: Context, code: string) => {
   return (
     (
       await context.database.query({
         query: `MATCH (inviteCode:InviteCode { code: toUpper($code) })
         WHERE inviteCode.expiresAt >= datetime()
-        RETURN count(inviteCode) AS count`,
+        RETURN toString(count(inviteCode)) AS count`,
         variables: { code },
       })
-    ).records[0].get('count') === 0
+    ).records[0].get('count') === '0'
   )
 }
 
@@ -134,7 +134,7 @@ export default {
         })
       ).records[0].get('count')
 
-      if (CONFIG.INVITE_CODES_PERSONAL_PER_USER >= userInviteCodeAmount) {
+      if (userInviteCodeAmount >= CONFIG.INVITE_CODES_PERSONAL_PER_USER) {
         throw new Error('You have reached the maximum of Invite Codes you can generate')
       }
 
@@ -147,15 +147,17 @@ export default {
         await context.database.write({
           // We delete a potential old invite code if there is a collision on an expired code
           query: `
-          MATCH (inviteCode:InviteCode { code: toUpper($code) })
-          DETACH DELETE inviteCode
           MATCH (user:User {id: $user.id})
-           MERGE (user)-[:GENERATED]->(inviteCode)
-           ON CREATE SET
-           inviteCode.createdAt = toString(datetime()),
-           inviteCode.expiresAt = $expiresAt
-           RETURN inviteCode {.*}`,
-          variables: { user: context.user, code, expiresAt: args.expiresAt },
+          OPTIONAL MATCH (oldInviteCode:InviteCode { code: toUpper($code) })
+          DETACH DELETE oldInviteCode
+          MERGE (user)-[:GENERATED]->(inviteCode:InviteCode)
+          ON CREATE SET
+            inviteCode.code = toUpper($code),
+            inviteCode.createdAt = toString(datetime()),
+            inviteCode.expiresAt = $args.expiresAt,
+            inviteCode.comment = $args.comment
+          RETURN inviteCode {.*}`,
+          variables: { user: context.user, code, args },
         })
       ).records[0].get('inviteCode')
     },
@@ -171,7 +173,7 @@ export default {
         })
       ).records[0].get('count')
 
-      if (CONFIG.INVITE_CODES_GROUP_PER_USER >= userInviteCodeAmount) {
+      if (userInviteCodeAmount >= CONFIG.INVITE_CODES_GROUP_PER_USER) {
         throw new Error(
           'You have reached the maximum of Invite Codes you can generate for this group.',
         )
@@ -188,7 +190,8 @@ export default {
          MERGE (user)-[:GENERATED]->(inviteCode:InviteCode { code: toUpper($code) })-[:INVITES_TO]->(group:Group {id: $args.groupId})
          ON CREATE SET
          inviteCode.createdAt = toString(datetime()),
-         inviteCode.expiresAt = $args.expiresAt
+         inviteCode.expiresAt = $args.expiresAt,
+         inviteCode.comment = $args.comment
          RETURN inviteCode {.*}`,
           variables: { user: context.user, code, args },
         })
@@ -253,7 +256,7 @@ export default {
     },
     ...Resolver('InviteCode', {
       idAttribute: 'code',
-      undefinedToNull: ['expiresAt'],
+      undefinedToNull: ['expiresAt', 'comment'],
       hasOne: {
         generatedBy: '<-[:GENERATED]-(related:User)',
       },

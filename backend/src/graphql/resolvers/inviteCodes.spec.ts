@@ -10,12 +10,13 @@ import gql from 'graphql-tag'
 import registrationConstants from '@constants/registrationBranded'
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
+import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { generatePersonalInviteCode } from '@graphql/queries/generatePersonalInviteCode'
 import {
   authenticatedValidateInviteCode,
   unauthenticatedValidateInviteCode,
 } from '@graphql/queries/validateInviteCode'
 import createServer, { getContext } from '@src/server'
-import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 
 const generateInviteCodeMutation = gql`
   mutation ($expiresAt: String = null) {
@@ -62,100 +63,98 @@ beforeAll(async () => {
   mutate = createTestClientResult.mutate
 })
 
-afterAll(async () => {
-  // await cleanDatabase()
+afterAll(() => {
   void server.stop()
   void database.driver.close()
   database.neode.close()
 })
 
-let invitingUser, user
-beforeEach(async () => {
-  await cleanDatabase()
-  invitingUser = await Factory.build('user', {
-    id: 'inviting-user',
-    role: 'user',
-    name: 'Inviting User',
-  })
-  user = await Factory.build('user', {
-    id: 'normal-user',
-    role: 'user',
-    name: 'Normal User',
-  })
+describe('validateInviteCode', () => {
+  let invitingUser, user
+  beforeEach(async () => {
+    await cleanDatabase()
+    invitingUser = await Factory.build('user', {
+      id: 'inviting-user',
+      role: 'user',
+      name: 'Inviting User',
+    })
+    user = await Factory.build('user', {
+      id: 'normal-user',
+      role: 'user',
+      name: 'Normal User',
+    })
 
-  authenticatedUser = await invitingUser.toJson()
-  const hiddenGroup = 'g0'
-  await mutate({
-    mutation: createGroupMutation(),
-    variables: {
-      id: hiddenGroup,
-      name: 'Hidden Group',
-      about: 'We are hidden',
-      description: 'anything',
-      groupType: 'hidden',
-      actionRadius: 'global',
-      categoryIds: ['cat6', 'cat12', 'cat16'],
-      locationName: 'Hamburg, Germany',
-    },
+    authenticatedUser = await invitingUser.toJson()
+    const hiddenGroup = 'g0'
+    await mutate({
+      mutation: createGroupMutation(),
+      variables: {
+        id: hiddenGroup,
+        name: 'Hidden Group',
+        about: 'We are hidden',
+        description: 'anything',
+        groupType: 'hidden',
+        actionRadius: 'global',
+        categoryIds: ['cat6', 'cat12', 'cat16'],
+        locationName: 'Hamburg, Germany',
+      },
+    })
+
+    const publicGroup = 'g2'
+    await mutate({
+      mutation: createGroupMutation(),
+      variables: {
+        id: publicGroup,
+        name: 'Public Group',
+        about: 'We are public',
+        description: 'anything',
+        groupType: 'public',
+        actionRadius: 'interplanetary',
+        categoryIds: ['cat4', 'cat5', 'cat17'],
+      },
+    })
+    // authenticatedUser = null
+
+    await Factory.build(
+      'inviteCode',
+      {
+        code: 'EXPIRD',
+        expiresAt: new Date(1970, 1).toISOString(),
+      },
+      {
+        generatedBy: invitingUser,
+      },
+    )
+    await Factory.build(
+      'inviteCode',
+      {
+        code: 'PERSNL',
+      },
+      {
+        generatedBy: invitingUser,
+      },
+    )
+    await Factory.build(
+      'inviteCode',
+      {
+        code: 'GRPPBL',
+      },
+      {
+        generatedBy: invitingUser,
+        groupId: publicGroup,
+      },
+    )
+    await Factory.build(
+      'inviteCode',
+      {
+        code: 'GRPHDN',
+      },
+      {
+        generatedBy: invitingUser,
+        groupId: hiddenGroup,
+      },
+    )
   })
-
-  const publicGroup = 'g2'
-  await mutate({
-    mutation: createGroupMutation(),
-    variables: {
-      id: publicGroup,
-      name: 'Public Group',
-      about: 'We are public',
-      description: 'anything',
-      groupType: 'public',
-      actionRadius: 'interplanetary',
-      categoryIds: ['cat4', 'cat5', 'cat17'],
-    },
-  })
-  // authenticatedUser = null
-
-  await Factory.build(
-    'inviteCode',
-    {
-      code: 'EXPIRD',
-      expiresAt: new Date(1970, 1).toISOString(),
-    },
-    {
-      generatedBy: invitingUser,
-    },
-  )
-  await Factory.build(
-    'inviteCode',
-    {
-      code: 'PERSNL',
-    },
-    {
-      generatedBy: invitingUser,
-    },
-  )
-  await Factory.build(
-    'inviteCode',
-    {
-      code: 'GRPPBL',
-    },
-    {
-      generatedBy: invitingUser,
-      groupId: publicGroup,
-    },
-  )
-  await Factory.build(
-    'inviteCode',
-    {
-      code: 'GRPHDN',
-    },
-    {
-      generatedBy: invitingUser,
-      groupId: hiddenGroup,
-    },
-  )
-})
-
-describe.only('validateInviteCode', () => {
   describe('as unauthenticated user', () => {
     beforeEach(() => {
       authenticatedUser = null
@@ -356,9 +355,154 @@ describe.only('validateInviteCode', () => {
       })
     })
 
+    // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
     it.skip('throws no authorization error when querying extended hidden group fields as member', async () => {})
   })
 })
+
+describe.only('generatePersonalInviteCode', () => {
+  let invitingUser
+  beforeEach(async () => {
+    await cleanDatabase()
+    invitingUser = await Factory.build('user', {
+      id: 'inviting-user',
+      role: 'user',
+      name: 'Inviting User',
+    })
+  })
+  describe('as unauthenticated user', () => {
+    beforeEach(() => {
+      authenticatedUser = null
+    })
+
+    it('throws authorization error', async () => {
+      await expect(mutate({ mutation: generatePersonalInviteCode })).resolves.toMatchObject({
+        data: null,
+        errors: [{ message: 'Not Authorized!' }],
+      })
+    })
+  })
+
+  describe('as authenticated user', () => {
+    beforeEach(async () => {
+      authenticatedUser = await invitingUser.toJson()
+    })
+
+    it('returns a new invite code', async () => {
+      await expect(mutate({ mutation: generatePersonalInviteCode })).resolves.toMatchObject({
+        data: {
+          generatePersonalInviteCode: {
+            code: expect.any(String),
+            comment: null,
+            createdAt: expect.any(String),
+            expiresAt: null,
+            generatedBy: {
+              avatar: {
+                url: expect.any(String),
+              },
+              id: 'inviting-user',
+              name: 'Inviting User',
+            },
+            invitedTo: null,
+            isValid: true,
+            redeemedBy: [],
+          },
+        },
+        errors: undefined,
+      })
+    })
+  })
+
+  it('returns a new invite code with comment', async () => {
+    await expect(
+      mutate({ mutation: generatePersonalInviteCode, variables: { comment: 'some text' } }),
+    ).resolves.toMatchObject({
+      data: {
+        generatePersonalInviteCode: {
+          code: expect.any(String),
+          comment: 'some text',
+          createdAt: expect.any(String),
+          expiresAt: null,
+          generatedBy: {
+            avatar: {
+              url: expect.any(String),
+            },
+            id: 'inviting-user',
+            name: 'Inviting User',
+          },
+          invitedTo: null,
+          isValid: true,
+          redeemedBy: [],
+        },
+      },
+      errors: undefined,
+    })
+  })
+
+  it('returns a new invite code with expireDate', async () => {
+    const date = new Date()
+    date.setFullYear(date.getFullYear() + 1)
+    await expect(
+      mutate({
+        mutation: generatePersonalInviteCode,
+        variables: { expiresAt: date.toISOString() },
+      }),
+    ).resolves.toMatchObject({
+      data: {
+        generatePersonalInviteCode: {
+          code: expect.any(String),
+          comment: null,
+          createdAt: expect.any(String),
+          expiresAt: date.toISOString(),
+          generatedBy: {
+            avatar: {
+              url: expect.any(String),
+            },
+            id: 'inviting-user',
+            name: 'Inviting User',
+          },
+          invitedTo: null,
+          isValid: true,
+          redeemedBy: [],
+        },
+      },
+      errors: undefined,
+    })
+  })
+
+  it('returns a new invalid invite code with expireDate in the past', async () => {
+    const date = new Date()
+    date.setFullYear(date.getFullYear() - 1)
+    await expect(
+      mutate({
+        mutation: generatePersonalInviteCode,
+        variables: { expiresAt: date.toISOString() },
+      }),
+    ).resolves.toMatchObject({
+      data: {
+        generatePersonalInviteCode: {
+          code: expect.any(String),
+          comment: null,
+          createdAt: expect.any(String),
+          expiresAt: date.toISOString(),
+          generatedBy: {
+            avatar: {
+              url: expect.any(String),
+            },
+            id: 'inviting-user',
+            name: 'Inviting User',
+          },
+          invitedTo: null,
+          isValid: false,
+          redeemedBy: [],
+        },
+      },
+      errors: undefined,
+    })
+  })
+})
+
+// --- old tests
 
 describe('inviteCodes', () => {
   describe('as unauthenticated user', () => {

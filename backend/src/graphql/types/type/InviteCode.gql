@@ -17,8 +17,8 @@ type Query {
 }
 
 type Mutation {
-  generatePersonalInviteCode(expiresAt: String = null): InviteCode!
-  generateGroupInviteCode(groupId: ID!, expiresAt: String = null): InviteCode!
+  generatePersonalInviteCode(expiresAt: String = null, comment: String = null): InviteCode!
+  generateGroupInviteCode(groupId: ID!, expiresAt: String = null, comment: String = null): InviteCode!
   invalidateInviteCode(code: String!): InviteCode
   redeemInviteCode(code: String!): Boolean!
 }
