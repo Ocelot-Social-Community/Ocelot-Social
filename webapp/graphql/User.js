@@ -406,6 +406,13 @@ export const currentUserQuery = gql`
   query {
     currentUser {
       ...user
+      inviteCodes {
+        code
+        isValid
+        redeemedBy {
+          id
+        }
+      }
       badgeTrophiesSelected {
         id
         icon

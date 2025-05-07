@@ -38,7 +38,7 @@
 
 <script>
 import Dropdown from '~/components/Dropdown'
-import gql from 'graphql-tag'
+import { mapGetters } from 'vuex'
 import BaseCard from '../_new/generic/BaseCard/BaseCard.vue'
 
 export default {
@@ -51,14 +51,20 @@ export default {
   },
   data() {
     return {
-      inviteCode: null,
       canCopy: false,
     }
   },
   created() {
     this.canCopy = !!navigator.clipboard
+    console.log(this.inviteCode)
   },
   computed: {
+    ...mapGetters({
+      user: 'auth/user',
+    }),
+    inviteCode() {
+      return this.user.inviteCodes[0] || null
+    },
     inviteLink() {
       return (
         'https://' +
@@ -72,23 +78,6 @@ export default {
     async copyInviteLink() {
       await navigator.clipboard.writeText(this.inviteLink)
       this.$toast.success(this.$t('invite-codes.copy-success'))
-    },
-  },
-  apollo: {
-    inviteCode: {
-      query() {
-        return gql`
-          query {
-            getInviteCode {
-              code
-            }
-          }
-        `
-      },
-      variables() {},
-      update({ getInviteCode }) {
-        return getInviteCode
-      },
     },
   },
 }
