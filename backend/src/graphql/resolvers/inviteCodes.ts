@@ -34,17 +34,21 @@ const uniqueInviteCode = async (context: Context, code: string) => {
 }
 
 export const validateInviteCode = async (context: Context, inviteCode) => {
-  return !!(
+  const result = (
     await context.database.query({
-      query: `MATCH (inviteCode:InviteCode { code: toUpper($inviteCode) })
-       RETURN
-       CASE
-       WHEN inviteCode.expiresAt IS NULL THEN true
-       WHEN datetime(inviteCode.expiresAt) >=  datetime() THEN true
-       ELSE false END AS result`,
+      query: `
+      OPTIONAL MATCH (inviteCode:InviteCode { code: toUpper($inviteCode) })
+      RETURN
+        CASE
+        WHEN inviteCode IS NULL THEN false
+        WHEN inviteCode.expiresAt IS NULL THEN true
+        WHEN datetime(inviteCode.expiresAt) >=  datetime() THEN true
+        ELSE false END AS result
+      `,
       variables: { inviteCode },
     })
-  ).records[0].get('result')
+  ).records
+  return result[0].get('result') === true
 }
 
 export const redeemInviteCode = async (context: Context, code) => {
