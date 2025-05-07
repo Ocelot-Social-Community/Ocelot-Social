@@ -2,23 +2,20 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable security/detect-non-literal-regexp */
 import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import registrationConstants from '@constants/registrationBranded'
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { generateGroupInviteCode } from '@graphql/queries/generateGroupInviteCode'
 import { generatePersonalInviteCode } from '@graphql/queries/generatePersonalInviteCode'
 import {
   authenticatedValidateInviteCode,
   unauthenticatedValidateInviteCode,
 } from '@graphql/queries/validateInviteCode'
 import createServer, { getContext } from '@src/server'
-import { generateGroupInviteCode } from '@graphql/queries/generateGroupInviteCode'
-import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 
 const generateInviteCodeMutation = gql`
   mutation ($expiresAt: String = null) {
