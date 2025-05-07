@@ -138,6 +138,9 @@ const s3Upload = async ({ createReadStream, uniqueFilename, mimetype }) => {
   const s3 = new S3({ region, endpoint })
   const s3Location = `original/${uniqueFilename}`
 
+  if (!Bucket) {
+    throw new Error('AWS_BUCKET is undefined')
+  }
   const params = {
     Bucket,
     Key: s3Location,
@@ -160,6 +163,9 @@ const s3Delete = async (url) => {
   const s3 = new S3({ region, endpoint })
   let { pathname } = new URL(url, 'http://example.org') // dummy domain to avoid invalid URL error
   pathname = pathname.substring(1) // remove first character '/'
+  if (!Bucket) {
+    throw new Error('AWS_BUCKET is undefined')
+  }
   const params = {
     Bucket,
     Key: pathname,

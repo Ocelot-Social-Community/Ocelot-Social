@@ -7,16 +7,13 @@ import path from 'node:path'
 
 import Email from 'email-templates'
 import { createTransport } from 'nodemailer'
+
 // import type Email as EmailType from '@types/email-templates'
 
-import CONFIG from '@config/index'
+import CONFIG, { nodemailerTransportOptions } from '@config/index'
 import logosWebapp from '@config/logos'
 import metadata from '@config/metadata'
 import { UserDbProperties } from '@db/types/User'
-
-const hasAuthData = CONFIG.SMTP_USERNAME && CONFIG.SMTP_PASSWORD
-const hasDKIMData =
-  CONFIG.SMTP_DKIM_DOMAINNAME && CONFIG.SMTP_DKIM_KEYSELECTOR && CONFIG.SMTP_DKIM_PRIVATKEY
 
 const welcomeImageUrl = new URL(logosWebapp.LOGO_WELCOME_PATH, CONFIG.CLIENT_URI)
 const settingsUrl = new URL('/settings/notifications', CONFIG.CLIENT_URI)
@@ -31,24 +28,7 @@ const defaultParams = {
   renderSettingsUrl: true,
 }
 
-export const transport = createTransport({
-  host: CONFIG.SMTP_HOST,
-  port: CONFIG.SMTP_PORT,
-  ignoreTLS: CONFIG.SMTP_IGNORE_TLS,
-  secure: CONFIG.SMTP_SECURE, // true for 465, false for other ports
-  pool: true,
-  maxConnections: CONFIG.SMTP_MAX_CONNECTIONS,
-  maxMessages: CONFIG.SMTP_MAX_MESSAGES,
-  auth: hasAuthData && {
-    user: CONFIG.SMTP_USERNAME,
-    pass: CONFIG.SMTP_PASSWORD,
-  },
-  dkim: hasDKIMData && {
-    domainName: CONFIG.SMTP_DKIM_DOMAINNAME,
-    keySelector: CONFIG.SMTP_DKIM_KEYSELECTOR,
-    privateKey: CONFIG.SMTP_DKIM_PRIVATKEY,
-  },
-})
+const transport = createTransport(nodemailerTransportOptions)
 
 const email = new Email({
   message: {
