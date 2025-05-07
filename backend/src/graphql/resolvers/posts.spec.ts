@@ -1,54 +1,50 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import CONFIG from '@config/index'
+import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import Image from '@db/models/Image'
-import { getNeode, getDriver } from '@db/neo4j'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
-import createServer from '@src/server'
+import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = true
 
-const driver = getDriver()
-const neode = getNeode()
-
-let query
-let mutate
-let authenticatedUser
 let user
 
-const categoryIds = ['cat9', 'cat4', 'cat15']
-let variables
+const database = databaseContext()
+
+let server: ApolloServer
+let authenticatedUser
+let query, mutate
 
 beforeAll(async () => {
   await cleanDatabase()
 
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode,
-        user: authenticatedUser,
-        cypherParams: {
-          currentUserId: authenticatedUser ? authenticatedUser.id : null,
-        },
-      }
-    },
-  })
-  query = createTestClient(server).query
-  mutate = createTestClient(server).mutate
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database })
+
+  server = createServer({ context }).server
+
+  const createTestClientResult = createTestClient(server)
+  mutate = createTestClientResult.mutate
+  query = createTestClientResult.query
 })
 
-afterAll(async () => {
-  await cleanDatabase()
-  await driver.close()
+afterAll(() => {
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
+
+const categoryIds = ['cat9', 'cat4', 'cat15']
+let variables
 
 beforeEach(async () => {
   variables = {}
@@ -64,22 +60,22 @@ beforeEach(async () => {
     },
   )
   await Promise.all([
-    neode.create('Category', {
+    database.neode.create('Category', {
       id: 'cat9',
       name: 'Democracy & Politics',
       icon: 'university',
     }),
-    neode.create('Category', {
+    database.neode.create('Category', {
       id: 'cat4',
       name: 'Environment & Nature',
       icon: 'tree',
     }),
-    neode.create('Category', {
+    database.neode.create('Category', {
       id: 'cat15',
       name: 'Consumption & Sustainability',
       icon: 'shopping-cart',
     }),
-    neode.create('Category', {
+    database.neode.create('Category', {
       id: 'cat27',
       name: 'Animal Protection',
       icon: 'paw',
@@ -88,7 +84,6 @@ beforeEach(async () => {
   authenticatedUser = null
 })
 
-// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
@@ -233,7 +228,6 @@ describe('Post', () => {
           Post(filter: $filter) {
             id
             author {
-              id
               name
             }
           }
@@ -249,7 +243,7 @@ describe('Post', () => {
           Post: [
             {
               id: 'post-by-followed-user',
-              author: { id: 'followed-by-me', name: 'Followed User' },
+              author: { name: 'Followed User' },
             },
           ],
         },
@@ -976,11 +970,11 @@ describe('UpdatePost', () => {
         })
         it('updates the image', async () => {
           await expect(
-            neode.first<typeof Image>('Image', { sensitive: true }, undefined),
+            database.neode.first<typeof Image>('Image', { sensitive: true }, undefined),
           ).resolves.toBeFalsy()
           await mutate({ mutation: updatePostMutation, variables })
           await expect(
-            neode.first<typeof Image>('Image', { sensitive: true }, undefined),
+            database.neode.first<typeof Image>('Image', { sensitive: true }, undefined),
           ).resolves.toBeTruthy()
         })
       })
@@ -990,9 +984,9 @@ describe('UpdatePost', () => {
           variables = { ...variables, image: null }
         })
         it('deletes the image', async () => {
-          await expect(neode.all('Image')).resolves.toHaveLength(6)
+          await expect(database.neode.all('Image')).resolves.toHaveLength(6)
           await mutate({ mutation: updatePostMutation, variables })
-          await expect(neode.all('Image')).resolves.toHaveLength(5)
+          await expect(database.neode.all('Image')).resolves.toHaveLength(5)
         })
       })
 
@@ -1002,11 +996,11 @@ describe('UpdatePost', () => {
         })
         it('keeps the image unchanged', async () => {
           await expect(
-            neode.first<typeof Image>('Image', { sensitive: true }, undefined),
+            database.neode.first<typeof Image>('Image', { sensitive: true }, undefined),
           ).resolves.toBeFalsy()
           await mutate({ mutation: updatePostMutation, variables })
           await expect(
-            neode.first<typeof Image>('Image', { sensitive: true }, undefined),
+            database.neode.first<typeof Image>('Image', { sensitive: true }, undefined),
           ).resolves.toBeFalsy()
         })
       })
@@ -1253,18 +1247,18 @@ describe('pin posts', () => {
 
       it('removes previous `pinned` attribute', async () => {
         const cypher = 'MATCH (post:Post) WHERE post.pinned IS NOT NULL RETURN post'
-        pinnedPost = await neode.cypher(cypher, {})
+        pinnedPost = await database.neode.cypher(cypher, {})
         expect(pinnedPost.records).toHaveLength(1)
         variables = { ...variables, id: 'only-pinned-post' }
         await mutate({ mutation: pinPostMutation, variables })
-        pinnedPost = await neode.cypher(cypher, {})
+        pinnedPost = await database.neode.cypher(cypher, {})
         expect(pinnedPost.records).toHaveLength(1)
       })
 
       it('removes previous PINNED relationship', async () => {
         variables = { ...variables, id: 'only-pinned-post' }
         await mutate({ mutation: pinPostMutation, variables })
-        pinnedPost = await neode.cypher(
+        pinnedPost = await database.neode.cypher(
           `MATCH (:User)-[pinned:PINNED]->(post:Post) RETURN post, pinned`,
           {},
         )
@@ -1593,7 +1587,7 @@ describe('emotions', () => {
   `
 
   beforeEach(async () => {
-    author = await neode.create('User', { id: 'u257' })
+    author = await database.neode.create('User', { id: 'u257' })
     postToEmote = await Factory.build(
       'post',
       {
@@ -1628,7 +1622,7 @@ describe('emotions', () => {
     `
     let postsEmotionsQueryVariables
 
-    beforeEach(async () => {
+    beforeEach(() => {
       postsEmotionsQueryVariables = { id: 'p1376' }
     })
 
