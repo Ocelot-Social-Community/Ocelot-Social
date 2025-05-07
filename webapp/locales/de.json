@@ -244,7 +244,9 @@
             "length": "muss genau {inviteCodeLength} Buchstaben lang sein",
             "success": "Gültiger Einladungs-Code <b>{inviteCode}</b>!"
           }
-        }
+        },
+        "invited-by-and-to": "Eingeladen von {invitedBy}, der Grupppe {invitedTo} beizutreten.",
+        "invited-by": "Eingeladen von {invitedBy}."
       },
       "no-public-registrstion": {
         "title": "Keine öffentliche Registrierung möglich"

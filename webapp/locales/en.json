@@ -244,7 +244,9 @@
             "length": "must be {inviteCodeLength} characters long",
             "success": "Valid invite code <b>{inviteCode}</b>!"
           }
-        }
+        },
+        "invited-by-and-to": "Invited by {invitedBy} to group {invitedTo}.",
+        "invited-by": "Invited by {invitedBy}."
       },
       "no-public-registrstion": {
         "title": "No Public Registration"

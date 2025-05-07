@@ -56,7 +56,6 @@ export default {
   },
   created() {
     this.canCopy = !!navigator.clipboard
-    console.log(this.inviteCode)
   },
   computed: {
     ...mapGetters({
