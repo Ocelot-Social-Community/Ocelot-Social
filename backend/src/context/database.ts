@@ -4,7 +4,7 @@ import type { Driver } from 'neo4j-driver'
 
 export const query =
   (driver: Driver) =>
-  async ({ query, variables = {} }: { query: string; variables: object }) => {
+  async ({ query, variables = {} }: { query: string; variables?: object }) => {
     const session = driver.session()
 
     const result = session.readTransaction(async (transaction) => {
@@ -21,7 +21,7 @@ export const query =
 
 export const mutate =
   (driver: Driver) =>
-  async ({ query, variables = {} }: { query: string; variables: object }) => {
+  async ({ query, variables = {} }: { query: string; variables?: object }) => {
     const session = driver.session()
 
     const result = session.writeTransaction(async (transaction) => {
