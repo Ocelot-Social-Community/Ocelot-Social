@@ -475,9 +475,15 @@ export default {
     }),
     name: async (parent, _args, context: Context, _resolveInfo) => {
       if (!context.user) {
-        return parent.groupType === 'hidden' ? '<hidden>' : parent.name
+        return parent.groupType === 'hidden' ? '' : parent.name
       }
       return parent.name
+    },
+    about: async (parent, _args, context: Context, _resolveInfo) => {
+      if (!context.user) {
+        return parent.groupType === 'hidden' ? '' : parent.about
+      }
+      return parent.about
     },
   },
 }

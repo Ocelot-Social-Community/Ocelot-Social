@@ -521,10 +521,12 @@ export default shield(
       inviteCodes: isMyOwn,
     },
     Group: {
-      '*': isAuthenticated,
+      '*': isAuthenticated, // TODO - is allowed to see group
       inviteCodes: isMyOwnInviteCode,
       avatar: allow,
       name: allow,
+      about: allow,
+      groupType: allow,
     },
     InviteCode: {
       redeemedBy: isMyOwnInviteCode,

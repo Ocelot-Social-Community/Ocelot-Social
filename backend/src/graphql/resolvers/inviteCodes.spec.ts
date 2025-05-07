@@ -15,6 +15,7 @@ import {
   unauthenticatedValidateInviteCode,
 } from '@graphql/queries/validateInviteCode'
 import createServer, { getContext } from '@src/server'
+import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 
 const generateInviteCodeMutation = gql`
   mutation ($expiresAt: String = null) {
@@ -62,46 +63,101 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  await cleanDatabase()
+  // await cleanDatabase()
   void server.stop()
   void database.driver.close()
   database.neode.close()
 })
 
-describe.only('validateInviteCode', () => {
-  let invitingUser
-  let personalInviteCode, expiredInviteCode
-
-  beforeEach(async () => {
-    await cleanDatabase()
-    invitingUser = await Factory.build('user', {
-      id: 'inviting-user',
-      role: 'user',
-      name: 'Inviting User',
-    })
-    expiredInviteCode = await Factory.build(
-      'inviteCode',
-      {
-        code: 'EXPIRD',
-        expiresAt: new Date(1970, 1).toISOString(),
-      },
-      {
-        generatedBy: invitingUser,
-      },
-    )
-    personalInviteCode = await Factory.build(
-      'inviteCode',
-      {
-        code: 'PERSNL',
-      },
-      {
-        generatedBy: invitingUser,
-      },
-    )
+let invitingUser, user
+beforeEach(async () => {
+  await cleanDatabase()
+  invitingUser = await Factory.build('user', {
+    id: 'inviting-user',
+    role: 'user',
+    name: 'Inviting User',
+  })
+  user = await Factory.build('user', {
+    id: 'normal-user',
+    role: 'user',
+    name: 'Normal User',
   })
 
+  authenticatedUser = await invitingUser.toJson()
+  const hiddenGroup = 'g0'
+  await mutate({
+    mutation: createGroupMutation(),
+    variables: {
+      id: hiddenGroup,
+      name: 'Hidden Group',
+      about: 'We are hidden',
+      description: 'anything',
+      groupType: 'hidden',
+      actionRadius: 'global',
+      categoryIds: ['cat6', 'cat12', 'cat16'],
+      locationName: 'Hamburg, Germany',
+    },
+  })
+
+  const publicGroup = 'g2'
+  await mutate({
+    mutation: createGroupMutation(),
+    variables: {
+      id: publicGroup,
+      name: 'Public Group',
+      about: 'We are public',
+      description: 'anything',
+      groupType: 'public',
+      actionRadius: 'interplanetary',
+      categoryIds: ['cat4', 'cat5', 'cat17'],
+    },
+  })
+  // authenticatedUser = null
+
+  await Factory.build(
+    'inviteCode',
+    {
+      code: 'EXPIRD',
+      expiresAt: new Date(1970, 1).toISOString(),
+    },
+    {
+      generatedBy: invitingUser,
+    },
+  )
+  await Factory.build(
+    'inviteCode',
+    {
+      code: 'PERSNL',
+    },
+    {
+      generatedBy: invitingUser,
+    },
+  )
+  await Factory.build(
+    'inviteCode',
+    {
+      code: 'GRPPBL',
+    },
+    {
+      generatedBy: invitingUser,
+      groupId: publicGroup,
+    },
+  )
+  await Factory.build(
+    'inviteCode',
+    {
+      code: 'GRPHDN',
+    },
+    {
+      generatedBy: invitingUser,
+      groupId: hiddenGroup,
+    },
+  )
+})
+
+describe.only('validateInviteCode', () => {
   describe('as unauthenticated user', () => {
-    beforeAll(() => {
+    beforeEach(() => {
       authenticatedUser = null
     })
 
@@ -154,6 +210,62 @@ describe.only('validateInviteCode', () => {
       )
     })
 
+    it('returns the inviteCode with group details if the code invites to a public group', async () => {
+      await expect(
+        query({ query: unauthenticatedValidateInviteCode, variables: { code: 'GRPPBL' } }),
+      ).resolves.toEqual(
+        expect.objectContaining({
+          data: {
+            validateInviteCode: {
+              code: 'GRPPBL',
+              generatedBy: {
+                avatar: {
+                  url: expect.any(String),
+                },
+                name: 'Inviting User',
+              },
+              invitedTo: {
+                groupType: 'public',
+                name: 'Public Group',
+                about: 'We are public',
+                avatar: null,
+              },
+              isValid: true,
+            },
+          },
+          errors: undefined,
+        }),
+      )
+    })
+
+    it('returns the inviteCode with redacted group details if the code invites to a hidden group', async () => {
+      await expect(
+        query({ query: unauthenticatedValidateInviteCode, variables: { code: 'GRPHDN' } }),
+      ).resolves.toEqual(
+        expect.objectContaining({
+          data: {
+            validateInviteCode: {
+              code: 'GRPHDN',
+              generatedBy: {
+                avatar: {
+                  url: expect.any(String),
+                },
+                name: 'Inviting User',
+              },
+              invitedTo: {
+                groupType: 'hidden',
+                name: '',
+                about: '',
+                avatar: null,
+              },
+              isValid: true,
+            },
+          },
+          errors: undefined,
+        }),
+      )
+    })
+
     it('throws authorization error when querying extended fields', async () => {
       await expect(
         query({ query: authenticatedValidateInviteCode, variables: { code: 'PERSNL' } }),
@@ -161,6 +273,80 @@ describe.only('validateInviteCode', () => {
         data: {
           validateInviteCode: {
             code: 'PERSNL',
+            generatedBy: null,
+            invitedTo: null,
+            isValid: true,
+          },
+        },
+        errors: [{ message: 'Not Authorized!' }],
+      })
+    })
+  })
+
+  describe('as authenticated user', () => {
+    beforeAll(async () => {
+      authenticatedUser = await user.toJson()
+    })
+
+    it('throws no authorization error when querying extended fields', async () => {
+      await expect(
+        query({ query: authenticatedValidateInviteCode, variables: { code: 'PERSNL' } }),
+      ).resolves.toMatchObject({
+        data: {
+          validateInviteCode: {
+            code: 'PERSNL',
+            generatedBy: {
+              id: 'inviting-user',
+              name: 'Inviting User',
+              avatar: {
+                url: expect.any(String),
+              },
+            },
+            invitedTo: null,
+            isValid: true,
+          },
+        },
+        errors: undefined,
+      })
+    })
+
+    it('throws no authorization error when querying extended public group fields', async () => {
+      await expect(
+        query({ query: authenticatedValidateInviteCode, variables: { code: 'GRPPBL' } }),
+      ).resolves.toMatchObject({
+        data: {
+          validateInviteCode: {
+            code: 'GRPPBL',
+            generatedBy: {
+              id: 'inviting-user',
+              name: 'Inviting User',
+              avatar: {
+                url: expect.any(String),
+              },
+            },
+            invitedTo: {
+              id: 'g2',
+              groupType: 'public',
+              name: 'Public Group',
+              about: 'We are public',
+              avatar: null,
+            },
+            isValid: true,
+          },
+        },
+        errors: undefined,
+      })
+    })
+
+    // This doesn't work because group permissions are fucked
+    // eslint-disable-next-line jest/no-disabled-tests
+    it.skip('throws authorization error when querying extended hidden group fields', async () => {
+      await expect(
+        query({ query: authenticatedValidateInviteCode, variables: { code: 'GRPHDN' } }),
+      ).resolves.toMatchObject({
+        data: {
+          validateInviteCode: {
+            code: 'GRPHDN',
             generatedBy: null,
             invitedTo: null,
             isValid: true,

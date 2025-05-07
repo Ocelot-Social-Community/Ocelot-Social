@@ -5,7 +5,9 @@ export const unauthenticatedValidateInviteCode = gql`
     validateInviteCode(code: $code) {
       code
       invitedTo {
+        groupType
         name
+        about
         avatar {
           url
         }
@@ -27,7 +29,9 @@ export const authenticatedValidateInviteCode = gql`
       code
       invitedTo {
         id
+        groupType
         name
+        about
         avatar {
           url
         }
