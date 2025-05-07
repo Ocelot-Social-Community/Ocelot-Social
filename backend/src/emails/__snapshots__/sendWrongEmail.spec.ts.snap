@@ -99,6 +99,9 @@ footer {
           <p>– The ocelot.social Team</p>
         </div>
       </div>
+      <div class="support">
+        <p>If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+      </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
       </footer>
@@ -120,6 +123,9 @@ your password, please ignore this e-mail.
 See you soon on ocelot.social [https://ocelot.social]!
 
 – The ocelot.social Team
+
+If you have questions or problems, feel free to contact our support:
+devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -226,6 +232,9 @@ footer {
           <p>– Dein ocelot.social Team</p>
         </div>
       </div>
+      <div class="support">
+        <p>Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+      </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
       </footer>
@@ -247,6 +256,9 @@ Wenn du noch keinen Account bei ocelot.social hast oder dein Password gar nicht
 Bis bald bei ocelot.social [https://ocelot.social]!
 
 – Dein ocelot.social Team
+
+Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden:
+devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",

@@ -18,11 +18,12 @@ import { UserDbProperties } from '@db/types/User'
 const welcomeImageUrl = new URL(logosWebapp.LOGO_WELCOME_PATH, CONFIG.CLIENT_URI)
 const settingsUrl = new URL('/settings/notifications', CONFIG.CLIENT_URI)
 
-const defaultParams = {
+export const defaultParams = {
   welcomeImageUrl,
   APPLICATION_NAME: CONFIG.APPLICATION_NAME,
   ORGANIZATION_NAME: metadata.ORGANIZATION_NAME,
   ORGANIZATION_URL: CONFIG.ORGANIZATION_URL,
+  SUPPORT_EMAIL: CONFIG.SUPPORT_EMAIL,
   supportUrl: CONFIG.SUPPORT_URL,
   settingsUrl,
   renderSettingsUrl: true,

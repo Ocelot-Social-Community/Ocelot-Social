@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`sendRegistrationMail with invite code English renders correctly 1`] = `
+exports[`sendResetPasswordMail with support English renders correctly 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -88,22 +88,19 @@ footer {
         <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
         </div>
       </header>
-      <h2>Welcome to ocelot.social!</h2>
+      <h2>Hello Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>Thank you for joining our cause – it's awesome to have you on board. There's just one tiny step missing before we can start shaping the world together … Please confirm your e-mail address by clicking the button below:</p><a class="button" href="http://webapp:3000/registration?email=user%40example.org&amp;nonce=123456&amp;inviteCode=welcome&amp;method=invite-code">Confirm your e-mail address</a>
-        <p>If the above button doesn't work, you can also copy the following code into your browser window: <span>123456</span></p>
-        <p>However, this only works if you have registered through our website.</p>
-        <p>If you didn't sign up for <a>ocelot.social</a> we recommend you to check it out! It's a social network from people for people who want to connect and change the world together.
-        </p>
-        <p>PS: If you ignore this e-mail we will not create an account for you. ;)</p>
+        <p>So, you forgot your password? No problem! Just click the button below to reset it within the next 24 hours:</p><a class="button" href="http://webapp:3000/password-reset/change-password?email=user%40example.org&amp;nonce=123456">Confirm your e-mail address</a>
+        <p>If you didn't request a new password feel free to ignore this e-mail.</p>
+        <p>If the above button doesn't work you can also copy the following code into your browser window: <span>123456</span></p>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– The ocelot.social Team</p>
         </div>
       </div>
       <div class="support">
-        <p>If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p>If you have questions or problems, feel free to contact our support: <a href="mailto:support@example.org">support@example.org</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -111,33 +108,26 @@ footer {
     </div>
   </body>
 </html>",
-  "subject": "Welcome to ocelot.social",
-  "text": "WELCOME TO OCELOT.SOCIAL!
+  "subject": "Reset Password ocelot.social",
+  "text": "HELLO JENNY ROSTOCK,
 
-Thank you for joining our cause – it's awesome to have you on board. There's
-just one tiny step missing before we can start shaping the world together …
-Please confirm your e-mail address by clicking the button below:
+So, you forgot your password? No problem! Just click the button below to reset
+it within the next 24 hours:
 
 Confirm your e-mail address
-[http://webapp:3000/registration?email=user%40example.org&nonce=123456&inviteCode=welcome&method=invite-code]
+[http://webapp:3000/password-reset/change-password?email=user%40example.org&nonce=123456]
 
-If the above button doesn't work, you can also copy the following code into your
+If you didn't request a new password feel free to ignore this e-mail.
+
+If the above button doesn't work you can also copy the following code into your
 browser window: 123456
-
-However, this only works if you have registered through our website.
-
-If you didn't sign up for ocelot.social we recommend you to check it out! It's a
-social network from people for people who want to connect and change the world
-together.
-
-PS: If you ignore this e-mail we will not create an account for you. ;)
 
 See you soon on ocelot.social [https://ocelot.social]!
 
 – The ocelot.social Team
 
 If you have questions or problems, feel free to contact our support:
-devops@ocelot.social [devops@ocelot.social]
+support@example.org [support@example.org]
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -145,7 +135,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendRegistrationMail with invite code German renders correctly 1`] = `
+exports[`sendResetPasswordMail with support German renders correctly 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -233,22 +223,19 @@ footer {
         <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
         </div>
       </header>
-      <h2>Willkommen bei ocelot.social!</h2>
+      <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können … Bitte bestätige Deine E-Mail Adresse:</p><a class="button" href="http://webapp:3000/registration?email=user%40example.org&amp;nonce=123456&amp;inviteCode=welcome&amp;method=invite-code">Bestätige Deine E-Mail Adresse</a>
-        <p>Sollte der Button für Dich nicht funktionieren, kannst Du auch folgenden Code in Dein Browserfenster kopieren: <span>123456</span></p>
-        <p>Das funktioniert allerdings nur, wenn du Dich über unsere Website registriert hast.</p>
-        <p>Falls Du Dich nicht selbst bei <a>ocelot.social</a> angemeldet hast, schau doch mal vorbei! Wir sind ein gemeinnütziges Aktionsnetzwerk – von Menschen für Menschen.
-        </p>
-        <p>PS: Wenn Du keinen Account bei uns möchtest, kannst Du diese E-Mail einfach ignorieren. ;)</p>
+        <p>Du hast also dein Passwort vergessen? Kein Problem! Mit Klick auf diesen Button kannst du innerhalb der nächsten 24 Stunden dein Passwort zurücksetzen:</p><a class="button" href="http://webapp:3000/password-reset/change-password?email=user%40example.org&amp;nonce=123456">Bestätige Deine E-Mail Adresse</a>
+        <p>Falls du kein neues Passwort angefordert hast, kannst du diese E-Mail einfach ignorieren.</p>
+        <p>Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in Dein Browserfenster kopieren: <span>123456</span></p>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p>
         </div>
       </div>
       <div class="support">
-        <p>Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p>Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:support@example.org">support@example.org</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -256,34 +243,27 @@ footer {
     </div>
   </body>
 </html>",
-  "subject": "Willkommen bei ocelot.social",
-  "text": "WILLKOMMEN BEI OCELOT.SOCIAL!
+  "subject": "Neues Passwort ocelot.social",
+  "text": "HALLO JENNY ROSTOCK,
 
-Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt
-fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können
-… Bitte bestätige Deine E-Mail Adresse:
+Du hast also dein Passwort vergessen? Kein Problem! Mit Klick auf diesen Button
+kannst du innerhalb der nächsten 24 Stunden dein Passwort zurücksetzen:
 
 Bestätige Deine E-Mail Adresse
-[http://webapp:3000/registration?email=user%40example.org&nonce=123456&inviteCode=welcome&method=invite-code]
+[http://webapp:3000/password-reset/change-password?email=user%40example.org&nonce=123456]
 
-Sollte der Button für Dich nicht funktionieren, kannst Du auch folgenden Code in
+Falls du kein neues Passwort angefordert hast, kannst du diese E-Mail einfach
+ignorieren.
+
+Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in
 Dein Browserfenster kopieren: 123456
-
-Das funktioniert allerdings nur, wenn du Dich über unsere Website registriert
-hast.
-
-Falls Du Dich nicht selbst bei ocelot.social angemeldet hast, schau doch mal
-vorbei! Wir sind ein gemeinnütziges Aktionsnetzwerk – von Menschen für Menschen.
-
-PS: Wenn Du keinen Account bei uns möchtest, kannst Du diese E-Mail einfach
-ignorieren. ;)
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 
 – Dein ocelot.social Team
 
 Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden:
-devops@ocelot.social [devops@ocelot.social]
+support@example.org [support@example.org]
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -291,7 +271,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendRegistrationMail without invite code English renders correctly 1`] = `
+exports[`sendResetPasswordMail without support English renders correctly 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -379,22 +359,16 @@ footer {
         <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
         </div>
       </header>
-      <h2>Welcome to ocelot.social!</h2>
+      <h2>Hello Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>Thank you for joining our cause – it's awesome to have you on board. There's just one tiny step missing before we can start shaping the world together … Please confirm your e-mail address by clicking the button below:</p><a class="button" href="http://webapp:3000/registration?email=user%40example.org&amp;nonce=123456&amp;method=invite-mail">Confirm your e-mail address</a>
-        <p>If the above button doesn't work, you can also copy the following code into your browser window: <span>123456</span></p>
-        <p>However, this only works if you have registered through our website.</p>
-        <p>If you didn't sign up for <a>ocelot.social</a> we recommend you to check it out! It's a social network from people for people who want to connect and change the world together.
-        </p>
-        <p>PS: If you ignore this e-mail we will not create an account for you. ;)</p>
+        <p>So, you forgot your password? No problem! Just click the button below to reset it within the next 24 hours:</p><a class="button" href="http://webapp:3000/password-reset/change-password?email=user%40example.org&amp;nonce=123456">Confirm your e-mail address</a>
+        <p>If you didn't request a new password feel free to ignore this e-mail.</p>
+        <p>If the above button doesn't work you can also copy the following code into your browser window: <span>123456</span></p>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– The ocelot.social Team</p>
         </div>
-      </div>
-      <div class="support">
-        <p>If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -402,33 +376,23 @@ footer {
     </div>
   </body>
 </html>",
-  "subject": "Welcome to ocelot.social",
-  "text": "WELCOME TO OCELOT.SOCIAL!
+  "subject": "Reset Password ocelot.social",
+  "text": "HELLO JENNY ROSTOCK,
 
-Thank you for joining our cause – it's awesome to have you on board. There's
-just one tiny step missing before we can start shaping the world together …
-Please confirm your e-mail address by clicking the button below:
+So, you forgot your password? No problem! Just click the button below to reset
+it within the next 24 hours:
 
 Confirm your e-mail address
-[http://webapp:3000/registration?email=user%40example.org&nonce=123456&method=invite-mail]
+[http://webapp:3000/password-reset/change-password?email=user%40example.org&nonce=123456]
 
-If the above button doesn't work, you can also copy the following code into your
+If you didn't request a new password feel free to ignore this e-mail.
+
+If the above button doesn't work you can also copy the following code into your
 browser window: 123456
-
-However, this only works if you have registered through our website.
-
-If you didn't sign up for ocelot.social we recommend you to check it out! It's a
-social network from people for people who want to connect and change the world
-together.
-
-PS: If you ignore this e-mail we will not create an account for you. ;)
 
 See you soon on ocelot.social [https://ocelot.social]!
 
 – The ocelot.social Team
-
-If you have questions or problems, feel free to contact our support:
-devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -436,7 +400,7 @@ ocelot.social Community [https://ocelot.social]",
 }
 `;
 
-exports[`sendRegistrationMail without invite code German renders correctly 1`] = `
+exports[`sendResetPasswordMail without support German renders correctly 1`] = `
 {
   "attachments": [],
   "from": "ocelot.social",
@@ -524,22 +488,16 @@ footer {
         <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
         </div>
       </header>
-      <h2>Willkommen bei ocelot.social!</h2>
+      <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können … Bitte bestätige Deine E-Mail Adresse:</p><a class="button" href="http://webapp:3000/registration?email=user%40example.org&amp;nonce=123456&amp;method=invite-mail">Bestätige Deine E-Mail Adresse</a>
-        <p>Sollte der Button für Dich nicht funktionieren, kannst Du auch folgenden Code in Dein Browserfenster kopieren: <span>123456</span></p>
-        <p>Das funktioniert allerdings nur, wenn du Dich über unsere Website registriert hast.</p>
-        <p>Falls Du Dich nicht selbst bei <a>ocelot.social</a> angemeldet hast, schau doch mal vorbei! Wir sind ein gemeinnütziges Aktionsnetzwerk – von Menschen für Menschen.
-        </p>
-        <p>PS: Wenn Du keinen Account bei uns möchtest, kannst Du diese E-Mail einfach ignorieren. ;)</p>
+        <p>Du hast also dein Passwort vergessen? Kein Problem! Mit Klick auf diesen Button kannst du innerhalb der nächsten 24 Stunden dein Passwort zurücksetzen:</p><a class="button" href="http://webapp:3000/password-reset/change-password?email=user%40example.org&amp;nonce=123456">Bestätige Deine E-Mail Adresse</a>
+        <p>Falls du kein neues Passwort angefordert hast, kannst du diese E-Mail einfach ignorieren.</p>
+        <p>Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in Dein Browserfenster kopieren: <span>123456</span></p>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p>
         </div>
-      </div>
-      <div class="support">
-        <p>Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -547,34 +505,24 @@ footer {
     </div>
   </body>
 </html>",
-  "subject": "Willkommen bei ocelot.social",
-  "text": "WILLKOMMEN BEI OCELOT.SOCIAL!
+  "subject": "Neues Passwort ocelot.social",
+  "text": "HALLO JENNY ROSTOCK,
 
-Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt
-fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können
-… Bitte bestätige Deine E-Mail Adresse:
+Du hast also dein Passwort vergessen? Kein Problem! Mit Klick auf diesen Button
+kannst du innerhalb der nächsten 24 Stunden dein Passwort zurücksetzen:
 
 Bestätige Deine E-Mail Adresse
-[http://webapp:3000/registration?email=user%40example.org&nonce=123456&method=invite-mail]
+[http://webapp:3000/password-reset/change-password?email=user%40example.org&nonce=123456]
 
-Sollte der Button für Dich nicht funktionieren, kannst Du auch folgenden Code in
+Falls du kein neues Passwort angefordert hast, kannst du diese E-Mail einfach
+ignorieren.
+
+Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in
 Dein Browserfenster kopieren: 123456
-
-Das funktioniert allerdings nur, wenn du Dich über unsere Website registriert
-hast.
-
-Falls Du Dich nicht selbst bei ocelot.social angemeldet hast, schau doch mal
-vorbei! Wir sind ein gemeinnütziges Aktionsnetzwerk – von Menschen für Menschen.
-
-PS: Wenn Du keinen Account bei uns möchtest, kannst Du diese E-Mail einfach
-ignorieren. ;)
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 
 – Dein ocelot.social Team
-
-Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden:
-devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",

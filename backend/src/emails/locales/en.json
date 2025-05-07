@@ -28,6 +28,7 @@
     "introduction": "So, you want to change your e-mail? No problem! Just click the button below to verify your new address:",
     "doNotChange": "If you don't want to change your e-mail address feel free to ignore this message. "
   },
+  "support": "If you have questions or problems, feel free to contact our support: ",
   "buttons": {
     "confirmEmail": "Confirm your e-mail address",
     "resetPassword": "Reset password",
