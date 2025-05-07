@@ -7,6 +7,7 @@ import {
   postFragment,
   commentFragment,
   groupFragment,
+  userTeaserFragment,
 } from './Fragments'
 
 export const profileUserQuery = (i18n) => {
@@ -125,7 +126,7 @@ export const mapUserQuery = (i18n) => {
   `
 }
 
-export const notificationQuery = (_i18n) => {
+export const notificationQuery = () => {
   return gql`
     ${userFragment}
     ${commentFragment}
@@ -478,6 +479,18 @@ export const userDataQuery = (i18n) => {
             ...comment
           }
         }
+      }
+    }
+  `
+}
+
+export const userTeaserQuery = (i18n) => {
+  const lang = i18n.locale().toUpperCase()
+  return gql`
+    ${userTeaserFragment(lang)}
+    query ($id: ID!) {
+      User(id: $id) {
+        ...userTeaser
       }
     }
   `

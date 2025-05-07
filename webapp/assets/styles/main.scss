@@ -52,11 +52,6 @@ $easeOut: cubic-bezier(0.19, 1, 0.22, 1);
   background: #fff;
 }
 
-body.dropdown-open {
-  height: 100vh;
-  overflow: hidden;
-}
-
 blockquote {
   display: block;
   padding: 15px 20px 15px 45px;
@@ -140,6 +135,10 @@ hr {
     opacity: 1;
     transition-delay: 0;
     transition: opacity 80ms ease-out;
+
+    @media(hover: none) {
+      pointer-events: all;
+    }
   }
 }
 
@@ -155,7 +154,6 @@ hr {
 [class$='menu-popover'] {
   min-width: 130px;
 
-  a,
   button {
     display: flex;
     align-content: center;
