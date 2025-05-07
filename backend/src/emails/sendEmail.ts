@@ -28,11 +28,13 @@ const defaultParams = {
   renderSettingsUrl: true,
 }
 
+const from = `${CONFIG.APPLICATION_NAME} <${CONFIG.EMAIL_DEFAULT_SENDER}>`
+
 const transport = createTransport(nodemailerTransportOptions)
 
 const email = new Email({
   message: {
-    from: `${CONFIG.APPLICATION_NAME}`,
+    from,
   },
   transport,
   i18n: {

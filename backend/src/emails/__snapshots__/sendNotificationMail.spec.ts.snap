@@ -3,7 +3,7 @@
 exports[`sendNotificationMail English changed_group_member_role template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -129,7 +129,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail English commented_on_post template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -257,7 +257,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail English followed_user_posted template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -385,7 +385,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail English mentioned_in_comment template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -513,7 +513,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail English mentioned_in_post template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -640,7 +640,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail English post_in_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -766,7 +766,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail English removed_user_from_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -889,7 +889,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail English user_joined_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -1016,7 +1016,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail English user_left_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -1143,7 +1143,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German changed_group_member_role template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1269,7 +1269,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German commented_on_post template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1397,7 +1397,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German followed_user_posted template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1525,7 +1525,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German mentioned_in_comment template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1653,7 +1653,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German mentioned_in_post template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1780,7 +1780,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German post_in_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1906,7 +1906,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German removed_user_from_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -2029,7 +2029,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German user_joined_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -2156,7 +2156,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German user_left_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
