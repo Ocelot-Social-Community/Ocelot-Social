@@ -62,10 +62,14 @@ export const redeemInviteCode = async (context: Context, code) => {
       RETURN inviteCode {.*}, group {.*}`,
       variables: { code },
     })
-  ).records[0]
+  ).records
 
-  const inviteCode = result.get('inviteCode')
-  const group = result.get('group')
+  if (result.length !== 1) {
+    return false
+  }
+
+  const inviteCode = result[0].get('inviteCode')
+  const group = result[0].get('group')
 
   if (!inviteCode) {
     return false

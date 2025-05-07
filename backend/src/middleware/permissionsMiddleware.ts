@@ -521,7 +521,7 @@ export default shield(
       inviteCodes: isMyOwn,
     },
     Group: {
-      '*': isAuthenticated, // TODO - is allowed to see group
+      '*': isAuthenticated, // TODO - only who is allowed to see group
       inviteCodes: isMyOwnInviteCode,
       avatar: allow,
       name: allow,

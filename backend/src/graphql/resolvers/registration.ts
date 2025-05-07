@@ -88,8 +88,11 @@ export default {
         const [user] = createUserTransactionResponse.records.map((record) => record.get('user'))
         if (!user) throw new UserInputError('Invalid email or nonce')
 
+        // To allow redeeming and return an User object we require a User in the context
+        context.user = user
         // join Group via invite Code
-        await redeemInviteCode({ ...context, user }, inviteCode)
+        await redeemInviteCode(context, inviteCode)
+
         return user
       })
       try {
