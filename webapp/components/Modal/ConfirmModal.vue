@@ -15,7 +15,6 @@
         :danger="!modalData.buttons.confirm.danger"
         :icon="modalData.buttons.cancel.icon"
         @click="cancel"
-        data-test="cancel-button"
       >
         {{ $t(modalData.buttons.cancel.textIdent) }}
       </base-button>
@@ -26,7 +25,6 @@
         :icon="modalData.buttons.confirm.icon"
         :loading="loading"
         @click="confirm"
-        data-test="confirm-button"
       >
         {{ $t(modalData.buttons.confirm.textIdent) }}
       </base-button>
