@@ -355,6 +355,8 @@ describe.only('validateInviteCode', () => {
         errors: [{ message: 'Not Authorized!' }],
       })
     })
+
+    it.skip('throws no authorization error when querying extended hidden group fields as member', async () => {})
   })
 })
 
