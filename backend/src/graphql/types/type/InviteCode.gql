@@ -4,6 +4,7 @@ type InviteCode {
   generatedBy: User @relation(name: "GENERATED", direction: "IN")
   redeemedBy: [User] @relation(name: "REDEEMED", direction: "IN")
   expiresAt: String
+  comment: String
 
   invitedTo: Group @neo4j_ignore
   invitedFrom: User! @neo4j_ignore
@@ -11,10 +12,13 @@ type InviteCode {
   isValid: Boolean! @neo4j_ignore
 }
 
+type Query {
+  validateInviteCode(code: String!): InviteCode
+}
+
 type Mutation {
   generatePersonalInviteCode(expiresAt: String = null): InviteCode!
-  generateGroupInviteCode(expiresAt: String = null): InviteCode!
+  generateGroupInviteCode(groupId: ID!, expiresAt: String = null): InviteCode!
   invalidateInviteCode(code: String!): InviteCode
-  validateInviteCode(code: String!): InviteCode
   redeemInviteCode(code: String!): Boolean!
 }

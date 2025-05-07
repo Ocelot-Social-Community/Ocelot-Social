@@ -81,6 +81,8 @@ export const redeemInviteCode = async (context: Context, code) => {
     })
     // Group Invite Link
   } else {
+    const role = ['closed', 'hidden'].includes(group.type as string) ? 'pending' : 'usual'
+
     await context.database.write({
       query: `
       MATCH (user:User {id: $user.id}), (group:Group)<-[:INVITES_TO]-(inviteCode:InviteCode {code: toUpper($code)})<-[:GENERATED]-(host:User)
@@ -90,9 +92,9 @@ export const redeemInviteCode = async (context: Context, code) => {
         ON CREATE SET
           membership.createdAt = toString(datetime()),
           membership.updatedAt = null,
-          membership.role = 'usual'
+          membership.role = $role
       `,
-      variables: { user: context.user, code },
+      variables: { user: context.user, code, role },
     })
   }
   return true
@@ -101,16 +103,22 @@ export const redeemInviteCode = async (context: Context, code) => {
 export default {
   Query: {
     validateInviteCode: async (_parent, args, context: Context, _resolveInfo) => {
-      return (
+      const result = (
         await context.database.query({
           query: `
-        MATCH (inviteCode:InviteCode { code: toUpper($args.inviteCode) })
+        MATCH (inviteCode:InviteCode { code: toUpper($args.code) })
         WHERE inviteCode.expiresAt IS NULL
           OR datetime(inviteCode.expiresAt) >=  datetime() 
-        RETURN inviteCode`,
+        RETURN inviteCode {.*}`,
           variables: { args },
         })
-      ).records[0].get('inviteCode')
+      ).records
+
+      if (result.length !== 1) {
+        return null
+      }
+
+      return result[0].get('inviteCode')
     },
   },
   Mutation: {
@@ -156,15 +164,17 @@ export default {
         await context.database.query({
           query: `
       MATCH (inviteCode:InviteCode)<-[:GENERATED]-(user:user {id: $user.id})
-      WHERE (inviteCode)-[:INVITES_TO]-(:Group)
+      WHERE (inviteCode)-[:INVITES_TO]-(group:Group {id: $args.groupId})
       RETURN COUNT(inviteCode) as count
       `,
-          variables: { user: context.user },
+          variables: { user: context.user, args },
         })
       ).records[0].get('count')
 
       if (CONFIG.INVITE_CODES_GROUP_PER_USER >= userInviteCodeAmount) {
-        throw new Error('You have reached the maximum of Group Invite Codes you can generate')
+        throw new Error(
+          'You have reached the maximum of Invite Codes you can generate for this group.',
+        )
       }
 
       let code = generateInviteCode()
@@ -172,17 +182,15 @@ export default {
         code = generateInviteCode()
       }
 
-      const { groupId } = args
-
       return (
         await context.database.write({
           query: `MATCH (user:User {id: $user.id})
-         MERGE (user)-[:GENERATED]->(inviteCode:InviteCode { code: toUpper($code) })-[:INVITES_TO]->(group:Group {id: $groupId})
+         MERGE (user)-[:GENERATED]->(inviteCode:InviteCode { code: toUpper($code) })-[:INVITES_TO]->(group:Group {id: $args.groupId})
          ON CREATE SET
          inviteCode.createdAt = toString(datetime()),
-         inviteCode.expiresAt = $expiresAt
+         inviteCode.expiresAt = $args.expiresAt
          RETURN inviteCode {.*}`,
-          variables: { user: context.user, code, expiresAt: args.expiresAt, groupId },
+          variables: { user: context.user, code, args },
         })
       ).records[0].get('inviteCode')
     },
@@ -207,7 +215,7 @@ export default {
         return null
       }
 
-      return (
+      const result = (
         await context.database.query({
           query: `
         MATCH (inviteCode:InviteCode {code: $parent.code})-[:INVITES_TO]->(group:Group)
@@ -215,7 +223,12 @@ export default {
         `,
           variables: { parent },
         })
-      ).records[0].get('group')
+      ).records
+
+      if (result.length !== 1) {
+        return null
+      }
+      return result[0].get('group')
     },
     invitedFrom: async (parent, _args, context: Context, _resolveInfo) => {
       if (!parent.code) {

@@ -386,6 +386,24 @@ const inviteRegistration = rule()(async (_parent, args, context: Context) => {
   return validateInviteCode(context, inviteCode)
 })
 
+const isAllowedToGenerateGroupInviteCode = rule({
+  cache: 'no_cache',
+})(async (_parent, args, context: Context) => {
+  if (!context.user) return false
+
+  return !!(
+    await context.database.query({
+      query: `
+    MATCH (user:User{id: user.id})-[membership:MEMBER_OF]->(group:Group {id: $args.groupId})
+    WHERE (group.type IN ['closed','hidden'] AND membership.role IN ['admin', 'owner'])
+      OR (NOT group.type IN ['closed','hidden'] AND NOT membership.role = 'pending')
+    RETURN count(group) as count
+    `,
+      variables: { user: context.user, args },
+    })
+  ).records[0].get('count')
+})
+
 // Permissions
 export default shield(
   {
@@ -408,7 +426,7 @@ export default shield(
       Post: allow,
       profilePagePosts: allow,
       Comment: allow,
-      User: or(noEmailFilter, isAdmin),
+      User: and(isAuthenticated, or(noEmailFilter, isAdmin)),
       Badge: allow,
       PostsEmotionsCountByEmotion: allow,
       PostsEmotionsByCurrentUser: isAuthenticated,
@@ -477,7 +495,7 @@ export default shield(
 
       // InviteCode
       generatePersonalInviteCode: isAuthenticated,
-      generateGroupInviteCode: and(isAuthenticated, isAllowedToChangeGroupMemberRole),
+      generateGroupInviteCode: isAllowedToGenerateGroupInviteCode,
       invalidateInviteCode: isAuthenticated,
       redeemInviteCode: isAuthenticated,
 
@@ -495,12 +513,19 @@ export default shield(
       resetTrophyBadgesSelected: isAuthenticated,
     },
     User: {
+      '*': isAuthenticated,
+      name: allow,
+      avatar: allow,
       email: or(isMyOwn, isAdmin),
       emailNotificationSettings: isMyOwn,
       inviteCodes: isMyOwn,
     },
     Group: {
+      '*': isAuthenticated,
       inviteCodes: isMyOwnInviteCode,
+      avatar: allow,
+      name: allow,
+      groupType: allow,
     },
     Location: {
       distanceToMe: isAuthenticated,
