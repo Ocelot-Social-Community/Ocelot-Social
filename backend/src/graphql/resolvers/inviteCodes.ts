@@ -24,7 +24,7 @@ const uniqueInviteCode = async (context: Context, code) => {
   return (
     (
       await context.database.query({
-        query: `MATCH (inviteCode:InviteCode { code: $code })
+        query: `MATCH (inviteCode:InviteCode { code: toUpper($code) })
         WHERE inviteCode.expiresAt >= datetime()
         RETURN count(inviteCode) AS count`,
         variables: { code },
@@ -36,11 +36,11 @@ const uniqueInviteCode = async (context: Context, code) => {
 export const validateInviteCode = async (context: Context, inviteCode) => {
   return !!(
     await context.database.query({
-      query: `MATCH (ic:InviteCode { code: toUpper($inviteCode) })
+      query: `MATCH (inviteCode:InviteCode { code: toUpper($inviteCode) })
        RETURN
        CASE
-       WHEN ic.expiresAt IS NULL THEN true
-       WHEN datetime(ic.expiresAt) >=  datetime() THEN true
+       WHEN inviteCode.expiresAt IS NULL THEN true
+       WHEN datetime(inviteCode.expiresAt) >=  datetime() THEN true
        ELSE false END AS result`,
       variables: { inviteCode },
     })
@@ -51,9 +51,10 @@ export const redeemInviteCode = async (context: Context, code) => {
   const result = (
     await context.database.query({
       query: `
-      MATCH (inviteCode:InviteCode {code: $code})<-[:GENERATED]-(host:User)
+      MATCH (inviteCode:InviteCode {code: toUpper($code)})<-[:GENERATED]-(host:User)
       OPTIONAL MATCH (inviteCode)-[:INVITES_TO]->(group:Group)
-      WHERE datetime(inviteCode.expiresAt) >= datetime()
+      WHERE inviteCode.expiresAt IS NULL
+        OR datetime(inviteCode.expiresAt) >= datetime()
       RETURN inviteCode {.*}, group {.*}`,
       variables: { code },
     })
@@ -70,7 +71,7 @@ export const redeemInviteCode = async (context: Context, code) => {
   if (!group) {
     await context.database.write({
       query: `
-      MATCH (user:User {id: $user.id}), (inviteCode:InviteCode {code: $code})<-[:GENERATED]-(host:User)
+      MATCH (user:User {id: $user.id}), (inviteCode:InviteCode {code: toUpper($code)})<-[:GENERATED]-(host:User)
       MERGE (user)-[:REDEEMED { createdAt: toString(datetime()) }]->(inviteCode)
       MERGE (host)-[:INVITED { createdAt: toString(datetime()) }]->(user)
       MERGE (user)-[:FOLLOWS { createdAt: toString(datetime()) }]->(host)
@@ -82,7 +83,7 @@ export const redeemInviteCode = async (context: Context, code) => {
   } else {
     await context.database.write({
       query: `
-      MATCH (user:User {id: $user.id}), (group:Group)<-[:INVITES_TO]-(inviteCode:InviteCode {code: $code})<-[:GENERATED]-(host:User)
+      MATCH (user:User {id: $user.id}), (group:Group)<-[:INVITES_TO]-(inviteCode:InviteCode {code: toUpper($code)})<-[:GENERATED]-(host:User)
       MERGE (user)-[:REDEEMED { createdAt: toString(datetime()) }]->(inviteCode)
       MERGE (host)-[:INVITED { createdAt: toString(datetime()) }]->(user)
       MERGE (user)-[membership:MEMBER_OF]->(group)
@@ -98,6 +99,20 @@ export const redeemInviteCode = async (context: Context, code) => {
 }
 
 export default {
+  Query: {
+    validateInviteCode: async (_parent, args, context: Context, _resolveInfo) => {
+      return (
+        await context.database.query({
+          query: `
+        MATCH (inviteCode:InviteCode { code: toUpper($args.inviteCode) })
+        WHERE inviteCode.expiresAt IS NULL
+          OR datetime(inviteCode.expiresAt) >=  datetime() 
+        RETURN inviteCode`,
+          variables: { args },
+        })
+      ).records[0].get('inviteCode')
+    },
+  },
   Mutation: {
     generatePersonalInviteCode: async (_parent, args, context: Context, _resolveInfo) => {
       const userInviteCodeAmount = (
@@ -124,7 +139,7 @@ export default {
         await context.database.write({
           // We delete a potential old invite code if there is a collision on an expired code
           query: `
-          MATCH (inviteCode:InviteCode { code: $code })
+          MATCH (inviteCode:InviteCode { code: toUpper($code) })
           DETACH DELETE inviteCode
           MATCH (user:User {id: $user.id})
            MERGE (user)-[:GENERATED]->(inviteCode)
@@ -162,7 +177,7 @@ export default {
       return (
         await context.database.write({
           query: `MATCH (user:User {id: $user.id})
-         MERGE (user)-[:GENERATED]->(inviteCode:InviteCode { code: $code })-[:INVITES_TO]->(group:Group {id: $groupId})
+         MERGE (user)-[:GENERATED]->(inviteCode:InviteCode { code: toUpper($code) })-[:INVITES_TO]->(group:Group {id: $groupId})
          ON CREATE SET
          inviteCode.createdAt = toString(datetime()),
          inviteCode.expiresAt = $expiresAt
@@ -175,7 +190,7 @@ export default {
       return (
         await context.database.write({
           query: `
-        MATCH (user:User {id: $user.id})-[rel:GENERATED]-(inviteCode:InviteCode {code: $args.code})
+        MATCH (user:User {id: $user.id})-[rel:GENERATED]-(inviteCode:InviteCode {code: toUpper($args.code)})
         SET inviteCode.expiresAt = toString(datetime())
         RETURN inviteCode {.*}`,
           variables: { args, user: context.user },
@@ -210,7 +225,7 @@ export default {
       return (
         await context.database.query({
           query: `
-        MATCH (inviteCode:InviteCode {code: $parent.code})<-[:GENERATED]->(user:User)
+        MATCH (inviteCode:InviteCode {code: toUpper($parent.code)})<-[:GENERATED]->(user:User)
         RETURN user {.*}
         `,
           variables: { parent },

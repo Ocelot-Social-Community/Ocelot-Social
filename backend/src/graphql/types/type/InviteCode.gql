@@ -15,5 +15,6 @@ type Mutation {
   generatePersonalInviteCode(expiresAt: String = null): InviteCode!
   generateGroupInviteCode(expiresAt: String = null): InviteCode!
   invalidateInviteCode(code: String!): InviteCode
+  validateInviteCode(code: String!): InviteCode
   redeemInviteCode(code: String!): Boolean!
 }

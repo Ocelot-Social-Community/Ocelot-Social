@@ -423,7 +423,9 @@ export default shield(
       Room: isAuthenticated,
       Message: isAuthenticated,
       UnreadRooms: isAuthenticated,
-      InviteCode: allow, // TODO
+
+      // Invite Code
+      validateInviteCode: allow,
     },
     Mutation: {
       '*': deny,
@@ -472,10 +474,13 @@ export default shield(
       pinPost: isAdmin,
       unpinPost: isAdmin,
       UpdateDonations: isAdmin,
+
+      // InviteCode
       generatePersonalInviteCode: isAuthenticated,
       generateGroupInviteCode: and(isAuthenticated, isAllowedToChangeGroupMemberRole),
       invalidateInviteCode: isAuthenticated,
       redeemInviteCode: isAuthenticated,
+
       switchUserRole: isAdmin,
       markTeaserAsViewed: allow,
       saveCategorySettings: isAuthenticated,
