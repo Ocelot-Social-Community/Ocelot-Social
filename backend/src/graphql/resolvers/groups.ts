@@ -473,8 +473,11 @@ export default {
           'MATCH (this) RETURN EXISTS( (this)<-[:MUTED]-(:User {id: $cypherParams.currentUserId}) )',
       },
     }),
-    name: async (parent, _args, _context: Context, _resolveInfo) => {
-      return parent.groupType === 'hidden' ? '<hidden>' : parent.name
+    name: async (parent, _args, context: Context, _resolveInfo) => {
+      if (!context.user) {
+        return parent.groupType === 'hidden' ? '<hidden>' : parent.name
+      }
+      return parent.name
     },
   },
 }

@@ -7,7 +7,7 @@ type InviteCode {
   comment: String
 
   invitedTo: Group @neo4j_ignore
-  invitedFrom: User! @neo4j_ignore
+  # invitedFrom: User! @neo4j_ignore # -> see generatedBy
 
   isValid: Boolean! @neo4j_ignore
 }

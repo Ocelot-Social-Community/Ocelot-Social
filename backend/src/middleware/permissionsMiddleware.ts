@@ -525,7 +525,11 @@ export default shield(
       inviteCodes: isMyOwnInviteCode,
       avatar: allow,
       name: allow,
-      groupType: allow,
+    },
+    InviteCode: {
+      redeemedBy: isMyOwnInviteCode,
+      createdAt: isMyOwnInviteCode,
+      expiresAt: isMyOwnInviteCode,
     },
     Location: {
       distanceToMe: isAuthenticated,

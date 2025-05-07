@@ -230,7 +230,7 @@ export default {
       }
       return result[0].get('group')
     },
-    invitedFrom: async (parent, _args, context: Context, _resolveInfo) => {
+    /* invitedFrom: async (parent, _args, context: Context, _resolveInfo) => {
       if (!parent.code) {
         return null
       }
@@ -244,7 +244,7 @@ export default {
           variables: { parent },
         })
       ).records[0].get('user')
-    },
+    }, */
     isValid: async (parent, _args, context: Context, _resolveInfo) => {
       if (!parent.code) {
         return false

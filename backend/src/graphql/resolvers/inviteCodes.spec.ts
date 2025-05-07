@@ -1,20 +1,20 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable security/detect-non-literal-regexp */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import registrationConstants from '@constants/registrationBranded'
+import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getDriver } from '@db/neo4j'
-import createServer from '@src/server'
-
-let user
-let query
-let mutate
-
-const driver = getDriver()
+import {
+  authenticatedValidateInviteCode,
+  unauthenticatedValidateInviteCode,
+} from '@graphql/queries/validateInviteCode'
+import createServer, { getContext } from '@src/server'
 
 const generateInviteCodeMutation = gql`
   mutation ($expiresAt: String = null) {
@@ -40,24 +40,136 @@ const isValidInviteCodeQuery = gql`
   }
 `
 
+const database = databaseContext()
+
+let server: ApolloServer
+let authenticatedUser
+let query
+let mutate
+
 beforeAll(async () => {
   await cleanDatabase()
 
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        user,
-      }
-    },
-  })
-  query = createTestClient(server).query
-  mutate = createTestClient(server).mutate
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database })
+
+  server = createServer({ context }).server
+
+  const createTestClientResult = createTestClient(server)
+  query = createTestClientResult.query
+  mutate = createTestClientResult.mutate
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
+})
+
+describe.only('validateInviteCode', () => {
+  let invitingUser
+  let personalInviteCode, expiredInviteCode
+
+  beforeEach(async () => {
+    await cleanDatabase()
+    invitingUser = await Factory.build('user', {
+      id: 'inviting-user',
+      role: 'user',
+      name: 'Inviting User',
+    })
+    expiredInviteCode = await Factory.build(
+      'inviteCode',
+      {
+        code: 'EXPIRD',
+        expiresAt: new Date(1970, 1).toISOString(),
+      },
+      {
+        generatedBy: invitingUser,
+      },
+    )
+    personalInviteCode = await Factory.build(
+      'inviteCode',
+      {
+        code: 'PERSNL',
+      },
+      {
+        generatedBy: invitingUser,
+      },
+    )
+  })
+
+  describe('as unauthenticated user', () => {
+    beforeAll(() => {
+      authenticatedUser = null
+    })
+
+    it('returns null when the code does not exist', async () => {
+      await expect(
+        query({ query: unauthenticatedValidateInviteCode, variables: { code: 'INVALD' } }),
+      ).resolves.toEqual(
+        expect.objectContaining({
+          data: {
+            validateInviteCode: null,
+          },
+          errors: undefined,
+        }),
+      )
+    })
+
+    it('returns null when the code is expired', async () => {
+      await expect(
+        query({ query: unauthenticatedValidateInviteCode, variables: { code: 'EXPIRD' } }),
+      ).resolves.toEqual(
+        expect.objectContaining({
+          data: {
+            validateInviteCode: null,
+          },
+          errors: undefined,
+        }),
+      )
+    })
+
+    it('returns the inviteCode when the code exists', async () => {
+      await expect(
+        query({ query: unauthenticatedValidateInviteCode, variables: { code: 'PERSNL' } }),
+      ).resolves.toEqual(
+        expect.objectContaining({
+          data: {
+            validateInviteCode: {
+              code: 'PERSNL',
+              generatedBy: {
+                avatar: {
+                  url: expect.any(String),
+                },
+                name: 'Inviting User',
+              },
+              invitedTo: null,
+              isValid: true,
+            },
+          },
+          errors: undefined,
+        }),
+      )
+    })
+
+    it('throws authorization error when querying extended fields', async () => {
+      await expect(
+        query({ query: authenticatedValidateInviteCode, variables: { code: 'PERSNL' } }),
+      ).resolves.toMatchObject({
+        data: {
+          validateInviteCode: {
+            code: 'PERSNL',
+            generatedBy: null,
+            invitedTo: null,
+            isValid: true,
+          },
+        },
+        errors: [{ message: 'Not Authorized!' }],
+      })
+    })
+  })
 })
 
 describe('inviteCodes', () => {
@@ -95,7 +207,7 @@ describe('inviteCodes', () => {
 
   describe('as authenticated user', () => {
     beforeAll(async () => {
-      const authenticatedUser = await Factory.build(
+      const user = await Factory.build(
         'user',
         {
           role: 'user',
@@ -105,7 +217,7 @@ describe('inviteCodes', () => {
           password: '1234',
         },
       )
-      user = await authenticatedUser.toJson()
+      authenticatedUser = await user.toJson()
     })
 
     it('generates an invite code without expiresAt', async () => {
