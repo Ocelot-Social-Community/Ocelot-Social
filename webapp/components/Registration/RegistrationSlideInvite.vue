@@ -16,18 +16,26 @@
     <ds-text v-if="!validInput">
       {{ $t('components.registration.invite-code.form.description') }}
     </ds-text>
-    <div class="invitation-info" v-if="invitedBy && invitedTo">
+    <div class="invitation-info" v-if="invitedBy">
       <profile-avatar :profile="invitedBy" size="small" />
-      {{
-        $t('components.registration.invite-code.invited-by-and-to', {
-          invitedBy: invitedBy.name,
-          invitedTo: invitedTo.name,
-        })
-      }}
-    </div>
-    <div class="invitation-info" v-else-if="invitedBy">
-      <profile-avatar :profile="invitedBy" size="small" />
-      {{ $t('components.registration.invite-code.invited-by', { invitedBy: invitedBy.name }) }}
+      <span v-if="invitedTo && invitedTo.groupType === 'hidden'">
+        {{
+          $t('components.registration.invite-code.invited-to-hidden-group', {
+            invitedBy: invitedBy.name,
+          })
+        }}
+      </span>
+      <span v-else-if="invitedTo">
+        {{
+          $t('components.registration.invite-code.invited-by-and-to', {
+            invitedBy: invitedBy.name,
+            invitedTo: invitedTo.name,
+          })
+        }}
+      </span>
+      <span v-else>
+        {{ $t('components.registration.invite-code.invited-by', { invitedBy: invitedBy.name }) }}
+      </span>
     </div>
     <slot></slot>
     <ds-space margin="xxx-small" />
