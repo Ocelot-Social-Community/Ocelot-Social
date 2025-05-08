@@ -89,6 +89,11 @@ export default {
           path: `/groups/edit/${this.group.id}`,
           icon: 'edit',
         })
+        routes.push({
+          label: this.$t('group.contentMenu.inviteLinks'),
+          path: `/groups/edit/${this.group.id}/invites`,
+          icon: 'link',
+        })
       }
 
       return routes
