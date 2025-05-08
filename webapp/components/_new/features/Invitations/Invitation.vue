@@ -115,12 +115,12 @@ export default {
   --invitation-opacity: 0.5;
 }
 
-.inviation:nth-child(even) {
-  --invitation-opacity: 0.2;
+.invitation:nth-child(even) {
+  --invitation-opacity: 0.3;
 }
 
 .invitation:nth-child(odd) {
-  --invitation-opacity: 0.3;
+  --invitation-opacity: 0.1;
 }
 
 .row1 {
