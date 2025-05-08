@@ -1,41 +1,43 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
+import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
-import createServer from '@src/server'
+import createServer, { getContext } from '@src/server'
 
-const driver = getDriver()
-const instance = getNeode()
+let regularUser, administrator, moderator, badge, verification
 
-let authenticatedUser, regularUser, administrator, moderator, badge, verification, query, mutate
+const database = databaseContext()
+
+let server: ApolloServer
+let authenticatedUser
+let query, mutate
+
+beforeAll(async () => {
+  await cleanDatabase()
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database })
+
+  server = createServer({ context }).server
+
+  const createTestClientResult = createTestClient(server)
+  query = createTestClientResult.query
+  mutate = createTestClientResult.mutate
+})
+
+afterAll(() => {
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
+})
 
 describe('Badges', () => {
-  beforeAll(async () => {
-    await cleanDatabase()
-
-    const { server } = createServer({
-      context: () => {
-        return {
-          driver,
-          neode: instance,
-          user: authenticatedUser,
-        }
-      },
-    })
-    query = createTestClient(server).query
-    mutate = createTestClient(server).mutate
-  })
-
-  afterAll(async () => {
-    await cleanDatabase()
-    await driver.close()
-  })
-
   beforeEach(async () => {
     regularUser = await Factory.build(
       'user',
@@ -83,7 +85,6 @@ describe('Badges', () => {
     })
   })
 
-  // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
   afterEach(async () => {
     await cleanDatabase()
   })
@@ -122,7 +123,7 @@ describe('Badges', () => {
     })
 
     describe('authenticated as moderator', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         authenticatedUser = moderator.toJson()
       })
 
@@ -322,7 +323,7 @@ describe('Badges', () => {
     })
 
     describe('authenticated as moderator', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         authenticatedUser = moderator.toJson()
       })
 
