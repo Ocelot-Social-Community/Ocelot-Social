@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <ul v-if="validInviteCodes.length" class="invitation-list">
+  <div class="invitation-list">
+    <ul v-if="validInviteCodes.length">
       <invitation
         v-for="inviteCode in inviteCodes"
         :key="inviteCode.code"
@@ -46,3 +46,11 @@ export default {
   },
 }
 </script>
+
+<style scoped lang="scss">
+.invitation-list {
+  ul {
+    list-style: none;
+  }
+}
+</style>

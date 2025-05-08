@@ -13,13 +13,15 @@
       />
     </template>
     <template #popover>
-      <h2>My invitation links</h2>
-      <div>Create links to invite people to this network.</div>
-      <invitation-list
-        @generate-invite-code="generatePersonalInviteCode"
-        @invalidate-invite-code="invalidateInviteCode"
-        :inviteCodes="user.inviteCodes"
-      />
+      <div class="invite-list">
+        <h2>My invitation links</h2>
+        <div>Create links to invite people to this network.</div>
+        <invitation-list
+          @generate-invite-code="generatePersonalInviteCode"
+          @invalidate-invite-code="invalidateInviteCode"
+          :inviteCodes="user.inviteCodes"
+        />
+      </div>
     </template>
   </dropdown>
 </template>
@@ -72,26 +74,13 @@ export default {
 }
 </script>
 
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .invite-button {
   color: $color-secondary;
 }
 
-.invite-button-menu-popover {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  .description {
-    margin-top: $space-x-small;
-    margin-bottom: $space-x-small;
-  }
-  .code-card {
-    margin-bottom: $space-x-small;
-  }
-}
-
-.invite-code {
-  margin-left: 25%;
+.invite-list {
+  max-width: min(400px, 90vw);
+  padding: $space-small;
 }
 </style>
