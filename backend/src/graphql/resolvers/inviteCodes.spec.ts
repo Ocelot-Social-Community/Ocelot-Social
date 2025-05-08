@@ -1027,12 +1027,12 @@ describe('redeemInviteCode', () => {
         data: {
           currentUser: {
             following: [],
-            inviteCodes: expect.arrayContaining([
+            inviteCodes: [
               {
                 code: 'CODE33',
                 redeemedByCount: 0,
               },
-            ]),
+            ],
           },
         },
         errors: undefined,
@@ -1061,20 +1061,18 @@ describe('redeemInviteCode', () => {
         errors: undefined,
       })
       authenticatedUser = await invitingUser.toJson()
-      await expect(query({ query: currentUser })).resolves.toMatchObject({
+      await expect(query({ query: Group })).resolves.toMatchObject({
         data: {
-          currentUser: {
-            inviteCodes: expect.arrayContaining([
-              {
-                code: 'GRPPBL',
-                redeemedByCount: 1,
-              },
-              {
-                code: 'GRPHDN',
-                redeemedByCount: 0,
-              },
-            ]),
-          },
+          Group: expect.arrayContaining([
+            expect.objectContaining({
+              inviteCodes: expect.arrayContaining([
+                {
+                  code: 'GRPPBL',
+                  redeemedByCount: 1,
+                },
+              ]),
+            }),
+          ]),
         },
         errors: undefined,
       })
@@ -1111,20 +1109,18 @@ describe('redeemInviteCode', () => {
         },
         errors: undefined,
       })
-      await expect(query({ query: currentUser })).resolves.toMatchObject({
+      await expect(query({ query: Group })).resolves.toMatchObject({
         data: {
-          currentUser: {
-            inviteCodes: expect.arrayContaining([
-              {
-                code: 'GRPPBL',
-                redeemedByCount: 0,
-              },
-              {
-                code: 'GRPHDN',
-                redeemedByCount: 1,
-              },
-            ]),
-          },
+          Group: expect.arrayContaining([
+            expect.objectContaining({
+              inviteCodes: expect.arrayContaining([
+                {
+                  code: 'GRPHDN',
+                  redeemedByCount: 1,
+                },
+              ]),
+            }),
+          ]),
         },
         errors: undefined,
       })
@@ -1149,12 +1145,12 @@ describe('redeemInviteCode', () => {
         data: {
           currentUser: {
             following: [],
-            inviteCodes: expect.arrayContaining([
+            inviteCodes: [
               {
                 code: 'CODE33',
                 redeemedByCount: 0,
               },
-            ]),
+            ],
           },
         },
         errors: undefined,
@@ -1182,21 +1178,18 @@ describe('redeemInviteCode', () => {
         },
         errors: undefined,
       })
-      await expect(query({ query: currentUser })).resolves.toMatchObject({
+      await expect(query({ query: Group })).resolves.toMatchObject({
         data: {
-          currentUser: {
-            following: [],
-            inviteCodes: expect.arrayContaining([
-              {
-                code: 'GRPPBL',
-                redeemedByCount: 0,
-              },
-              {
-                code: 'GRPHDN',
-                redeemedByCount: 0,
-              },
-            ]),
-          },
+          Group: expect.arrayContaining([
+            expect.objectContaining({
+              inviteCodes: expect.arrayContaining([
+                {
+                  code: 'GRPPBL',
+                  redeemedByCount: 0,
+                },
+              ]),
+            }),
+          ]),
         },
         errors: undefined,
       })

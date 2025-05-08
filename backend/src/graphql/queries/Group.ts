@@ -31,6 +31,10 @@ export const Group = gql`
         nameEN
       }
       myRole
+      inviteCodes {
+        code
+        redeemedByCount
+      }
     }
   }
 `
