@@ -3,7 +3,7 @@
 exports[`sendWrongEmail English renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <undefined>",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -85,13 +85,13 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Welcome to ocelot.social!</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>You requested a password reset but unfortunately we couldn't find an account associated with your e-mail address. Did you maybe use another one when you signed up?</p><a class="button" href="http://localhost:3000/password-reset/request">Try a different e-mail</a>
+        <p>You requested a password reset but unfortunately we couldn't find an account associated with your e-mail address. Did you maybe use another one when you signed up?</p><a class="button" href="http://webapp:3000/password-reset/request">Try a different e-mail</a>
         <p>If you don't have an account at <a>ocelot.social</a> yet or if you didn't want to reset your password, please ignore this e-mail.
         </p>
         <div class="text-block">
@@ -112,7 +112,7 @@ You requested a password reset but unfortunately we couldn't find an account
 associated with your e-mail address. Did you maybe use another one when you
 signed up?
 
-Try a different e-mail [http://localhost:3000/password-reset/request]
+Try a different e-mail [http://webapp:3000/password-reset/request]
 
 If you don't have an account at ocelot.social yet or if you didn't want to reset
 your password, please ignore this e-mail.
@@ -130,7 +130,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendWrongEmail German renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <undefined>",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -212,13 +212,13 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Willkommen bei ocelot.social!</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>Du hast bei uns ein neues Passwort angefordert – leider haben wir aber keinen Account mit deiner E-Mailadresse gefunden. Kann es sein, dass du mit einer anderen Adresse bei uns angemeldet bist?</p><a class="button" href="http://localhost:3000/password-reset/request">Versuch' es mit einer anderen E-Mail</a>
+        <p>Du hast bei uns ein neues Passwort angefordert – leider haben wir aber keinen Account mit deiner E-Mailadresse gefunden. Kann es sein, dass du mit einer anderen Adresse bei uns angemeldet bist?</p><a class="button" href="http://webapp:3000/password-reset/request">Versuch' es mit einer anderen E-Mail</a>
         <p>Wenn du noch keinen Account bei <a>ocelot.social</a> hast oder dein Password gar nicht ändern willst, kannst du diese E-Mail einfach ignorieren!
         </p>
         <div class="text-block">
@@ -239,8 +239,7 @@ Du hast bei uns ein neues Passwort angefordert – leider haben wir aber keinen
 Account mit deiner E-Mailadresse gefunden. Kann es sein, dass du mit einer
 anderen Adresse bei uns angemeldet bist?
 
-Versuch' es mit einer anderen E-Mail
-[http://localhost:3000/password-reset/request]
+Versuch' es mit einer anderen E-Mail [http://webapp:3000/password-reset/request]
 
 Wenn du noch keinen Account bei ocelot.social hast oder dein Password gar nicht
 ändern willst, kannst du diese E-Mail einfach ignorieren!

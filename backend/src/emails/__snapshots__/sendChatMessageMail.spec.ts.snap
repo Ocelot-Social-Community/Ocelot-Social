@@ -3,7 +3,7 @@
 exports[`sendChatMessageMail English chat_message template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <undefined>",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -85,18 +85,18 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hello chatReceiver,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>you have received a new chat message from <a class="user" href="http://localhost:3000/user/chatSender/chatsender">chatSender</a>.
-        </p><a class="button" href="http://localhost:3000/chat">Show Chat</a>
+        <p>you have received a new chat message from <a class="user" href="http://webapp:3000/user/chatSender/chatsender">chatSender</a>.
+        </p><a class="button" href="http://webapp:3000/chat">Show Chat</a>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://localhost:3000/settings/notifications">notification settings</a>!</p>
+          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <footer>
@@ -109,9 +109,9 @@ footer {
   "text": "HELLO CHATRECEIVER,
 
 you have received a new chat message from chatSender
-[http://localhost:3000/user/chatSender/chatsender].
+[http://webapp:3000/user/chatSender/chatsender].
 
-Show Chat [http://localhost:3000/chat]
+Show Chat [http://webapp:3000/chat]
 
 See you soon on ocelot.social [https://ocelot.social]!
 
@@ -119,7 +119,7 @@ See you soon on ocelot.social [https://ocelot.social]!
 
 
 PS: If you don't want to receive e-mails anymore, change your notification
-settings [http://localhost:3000/settings/notifications]!
+settings [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -130,7 +130,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendChatMessageMail German chat_message template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <undefined>",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -212,18 +212,18 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hallo chatReceiver,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>du hast eine neue Chat-Nachricht von <a class="user" href="http://localhost:3000/user/chatSender/chatsender">chatSender</a> erhalten.
-        </p><a class="button" href="http://localhost:3000/chat">Chat anzeigen</a>
+        <p>du hast eine neue Chat-Nachricht von <a class="user" href="http://webapp:3000/user/chatSender/chatsender">chatSender</a> erhalten.
+        </p><a class="button" href="http://webapp:3000/chat">Chat anzeigen</a>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://localhost:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <footer>
@@ -236,9 +236,9 @@ footer {
   "text": "HALLO CHATRECEIVER,
 
 du hast eine neue Chat-Nachricht von chatSender
-[http://localhost:3000/user/chatSender/chatsender] erhalten.
+[http://webapp:3000/user/chatSender/chatsender] erhalten.
 
-Chat anzeigen [http://localhost:3000/chat]
+Chat anzeigen [http://webapp:3000/chat]
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 
@@ -246,7 +246,7 @@ Bis bald bei ocelot.social [https://ocelot.social]!
 
 
 PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine
-Benachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!
+Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
