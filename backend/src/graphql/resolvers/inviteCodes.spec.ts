@@ -493,9 +493,6 @@ describe('generatePersonalInviteCode', () => {
     // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
     it.skip('returns a new invite code when colliding with an existing one', () => {})
   })
-
-  // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
-  it.skip('code collision', () => {})
 })
 
 describe('generateGroupInviteCode', () => {
