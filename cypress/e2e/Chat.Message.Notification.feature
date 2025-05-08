@@ -28,8 +28,8 @@ Feature: Notifications for Chat Messages via E-Mail
     When I am logged in as "billy-block"
     And I send a chat message to "Anna Absent"
     And I log out
-    # Then "Anna Absent" should receive "1" chat notification email referencing "Chilly Chatter"
-    # When I am logged in as "anna-absent"
+    Then "Anna Absent" should receive "1" chat notification email referencing "Chilly Chatter"
+    When I am logged in as "anna-absent"
     # And "Chilly Chatter" sends a chat message to "Anna Absent"
     # And "Michi Mute" sends a chat message to "Anna Absent"
     # And "Billy Block" sends a chat message to "Anna Absent"

@@ -9,6 +9,24 @@ defineStep('the mailserver inbox is empty', () => {
     .should('equal', 200)
 })
 
+defineStep('{string} should receive {string} chat notification email referencing {string}', (recipientName, emailCount, senderName) => {
+  cy.request('GET', 'http://localhost:1080/email').then(
+    (response) => {
+      expect(response.status).to.eq(200)
+      cy.log(response.body)
+      console.log
+      expect(response.body).to.have.length(emailCount)
+      const email = response.body[0]
+      expect(email.read).to.be.false
+      expect(email.subject).to.eq('ocelot.social  – Notification: New chat message')
+      const assertedString = `Hello ${recipientName}`
+      expect(email.text.toLowerCase()).to.include(assertedString.toLowerCase())
+      expect(email.text).to.include(`from ${senderName}`)
+      expect(email.html).to.include('/chat')
+    }
+  )
+})
+
 defineStep('{string} should receive no chat notification email', (recipientEmailAddress) => {
   const emailTitle = 'Neue Chat-Nachricht | New chat message'
   
