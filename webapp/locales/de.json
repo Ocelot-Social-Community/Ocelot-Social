@@ -65,7 +65,7 @@
       "tagCountUnique": "Nutzer"
     },
     "invites": {
-      "description": "Einladungen sind eine wunderbare Möglichkeit, Deine Freunde in Deinem Netzwerk zu haben …",
+      "description": "Einladungen sind eine wunderbare Möglichkeit, deine Freunde in deinem Netzwerk zu haben …",
       "name": "Nutzer einladen",
       "title": "Leute einladen"
     },
@@ -222,7 +222,7 @@
         "buttonTitle": "Weiter",
         "form": {
           "click-next": "Click auf Weiter.",
-          "description": "Öffne Dein E-Mail Postfach und gib den Code ein, den wir geschickt haben.",
+          "description": "Öffne dein E-Mail Postfach und gib den Code ein, den wir geschickt haben.",
           "next": "Weiter",
           "nonce": "E-Mail-Code: 32143",
           "validations": {
@@ -257,7 +257,7 @@
             "email-exists": "Es gibt schon ein Nutzerkonto mit dieser E-Mail-Adresse!"
           },
           "submit": "Konto erstellen",
-          "success": "Eine E-Mail mit einem Link zum Abschließen Deiner Registrierung wurde an <b>{email}</b> geschickt",
+          "success": "Eine E-Mail mit einem Link zum Abschließen deiner Registrierung wurde an <b>{email}</b> geschickt",
           "terms-and-condition": "Ich stimme den <a href=\"/terms-and-conditions\" target=\"_blank\"><ds-text bold color=\"primary\">Nutzungsbedingungen</ds-text></a> zu."
         },
         "title": "Mach mit bei {APPLICATION_NAME}!",
@@ -335,7 +335,7 @@
     },
     "filterMyGroups": "Meine Gruppen",
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
-    "languageSelectLabel": "Sprache Deines Beitrags",
+    "languageSelectLabel": "Sprache deines Beitrags",
     "languageSelectText": "Sprache wählen",
     "newEvent": "Erstelle einen neue Veranstaltung",
     "newPost": "Erstelle einen neuen Beitrag",
@@ -395,8 +395,8 @@
   "editor": {
     "embed": {
       "always_allow": "Einzubettende Inhalte von Drittanbietern immer erlauben (diese Einstellung ist jederzeit änderbar)",
-      "data_privacy_info": "Deine Daten wurden noch nicht an Drittanbieter weitergegeben. Wenn du diesen Inhalt jetzt abspielst, registriert der folgende Anbieter wahrscheinlich Deine Nutzerdaten:",
-      "data_privacy_warning": "Achte auf Deine Daten!",
+      "data_privacy_info": "Deine Daten wurden noch nicht an Drittanbieter weitergegeben. Wenn du diesen Inhalt jetzt abspielst, registriert der folgende Anbieter wahrscheinlich deine Nutzerdaten:",
+      "data_privacy_warning": "Achte auf deine Daten!",
       "play_now": "Jetzt ansehen"
     },
     "hashtag": {
@@ -768,14 +768,14 @@
     "pageLink": "Alle Benachrichtigungen",
     "post": "Beitrag oder Gruppe",
     "reason": {
-      "changed_group_member_role": "Hat Deine Rolle in der Gruppe geändert …",
+      "changed_group_member_role": "Hat deine Rolle in der Gruppe geändert …",
       "commented_on_post": "Hat einen Beitrag den du beobachtest kommentiert …",
       "followed_user_posted": "Hat einen neuen Betrag geschrieben …",
       "mentioned_in_comment": "Hat dich in einem Kommentar erwähnt …",
       "mentioned_in_post": "Hat dich in einem Beitrag erwähnt …",
       "post_in_group": "Hat einen Beitrag in der Gruppe geschrieben …",
       "removed_user_from_group": "Hat dich aus der Gruppe entfernt …",
-      "user_joined_group": "Ist Deiner Gruppe beigetreten …",
+      "user_joined_group": "Ist deiner Gruppe beigetreten …",
       "user_left_group": "Hat deine Gruppe verlassen …"
     },
     "title": "Benachrichtigungen",
@@ -983,9 +983,9 @@
         "commenting-disabled": "Du kannst den Beitrag derzeit nicht kommentieren.",
         "commenting-explanation": "Dafür kann es mehrere Gründe geben, bitte schau in unsere ",
         "intro": "Wenn ein anderer Nutzer durch dich blockiert wurde, dann passiert Folgendes:",
-        "notifications": "Von Dir blockierte Nutzer werden keine Benachrichtigungen mehr erhalten, falls sie in Deinen Beiträgen erwähnt werden.",
-        "their-perspective": "Umgekehrt das gleiche: Die blockierte Person bekommt auch in ihren Benachrichtigungen Deine Beiträge nicht mehr zu sehen.",
-        "your-perspective": "In Deinen Benachrichtigungen tauchen keine Beiträge der blockierten Person mehr auf."
+        "notifications": "Von Dir blockierte Nutzer werden keine Benachrichtigungen mehr erhalten, falls sie in deinen Beiträgen erwähnt werden.",
+        "their-perspective": "Umgekehrt das gleiche: Die blockierte Person bekommt auch in ihren Benachrichtigungen deine Beiträge nicht mehr zu sehen.",
+        "your-perspective": "In deinen Benachrichtigungen tauchen keine Beiträge der blockierten Person mehr auf."
       },
       "how-to": "Du kannst andere Nutzer auf deren Profilseite über das Inhaltsmenü blockieren.",
       "name": "Blockierte Nutzer",
@@ -1026,17 +1026,17 @@
       "labelNewEmail": "Neue E-Mail-Adresse",
       "labelNonce": "Bestätigungscode eingeben",
       "name": "Deine E-Mail",
-      "submitted": "Eine E-Mail zur Bestätigung Deiner Adresse wurde an <b>{email}</b> gesendet.",
+      "submitted": "Eine E-Mail zur Bestätigung deiner Adresse wurde an <b>{email}</b> gesendet.",
       "success": "Eine neue E-Mail-Adresse wurde registriert.",
       "validation": {
-        "same-email": "Das ist Deine aktuelle E-Mail-Adresse"
+        "same-email": "Das ist deine aktuelle E-Mail-Adresse"
       },
       "verification-error": {
         "explanation": "Das kann verschiedene Ursachen haben:",
         "message": "Deine E-Mail-Adresse konnte nicht verifiziert werden.",
         "reason": {
           "invalid-nonce": "Ist der Bestätigungscode falsch?",
-          "no-email-request": "Bist du Dir sicher, dass du eine Änderung Deiner E-Mail-Adresse angefragt hattest?"
+          "no-email-request": "Bist du Dir sicher, dass du eine Änderung deiner E-Mail-Adresse angefragt hattest?"
         },
         "support": "Wenn das Problem weiterhin besteht, kontaktiere uns gerne per E-Mail an"
       }
@@ -1114,12 +1114,12 @@
       "change-password": {
         "button": "Passwort ändern",
         "label-new-password": "Dein neues Passwort",
-        "label-new-password-confirm": "Bestätige Dein neues Passwort",
+        "label-new-password-confirm": "Bestätige dein neues Passwort",
         "label-old-password": "Dein altes Passwort",
-        "message-new-password-confirm-required": "Bestätige Dein neues Passwort",
+        "message-new-password-confirm-required": "Bestätige dein neues Passwort",
         "message-new-password-missmatch": "Gib dasselbe Passwort nochmals ein",
         "message-new-password-required": "Gib ein neues Passwort ein",
-        "message-old-password-required": "Gib Dein altes Passwort ein",
+        "message-old-password-required": "Gib dein altes Passwort ein",
         "passwordSecurity": "Passwortsicherheit",
         "passwordStrength0": "Sehr unsicheres Passwort",
         "passwordStrength1": "Unsicheres Passwort",
