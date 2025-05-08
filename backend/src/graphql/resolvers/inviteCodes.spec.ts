@@ -1055,19 +1055,7 @@ describe('redeemInviteCode', () => {
         },
         errors: undefined,
       })
-      // It is not possible to see if I am in a hidden group when pending
-      /* await expect(query({ query: Group, variables: { id: hiddenGroup } })).resolves.toMatchObject({
-        data: {
-          Group: [
-            {
-              myRole: 'pending',
-            },
-          ],
-        },
-        errors: undefined,
-      }) */
       authenticatedUser = await invitingUser.toJson()
-      // with this query we cannot determine the users group role?
       await expect(
         query({ query: GroupMembers, variables: { id: 'hidden-group' } }),
       ).resolves.toMatchObject({
@@ -1075,9 +1063,15 @@ describe('redeemInviteCode', () => {
           GroupMembers: expect.arrayContaining([
             {
               id: 'inviting-user',
+              myRoleInGroup: 'owner',
+              name: 'Inviting User',
+              slug: 'inviting-user',
             },
             {
               id: 'other-user',
+              myRoleInGroup: 'pending',
+              name: 'Other User',
+              slug: 'other-user',
             },
           ]),
         },

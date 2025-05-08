@@ -11,7 +11,7 @@ import Factory, { cleanDatabase } from '@db/factories'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { Group as groupQuery } from '@graphql/queries/Group'
-import { groupMembersQuery } from '@graphql/queries/groupMembersQuery'
+import { GroupMembers as groupMembersQuery } from '@graphql/queries/GroupMembers'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
@@ -1037,7 +1037,7 @@ describe('in mode', () => {
           variables = {
             id: 'not-existing-group',
           }
-          const { errors } = await query({ query: groupMembersQuery(), variables })
+          const { errors } = await query({ query: groupMembersQuery, variables })
           expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
@@ -1210,7 +1210,7 @@ describe('in mode', () => {
 
               it('finds all members', async () => {
                 const result = await query({
-                  query: groupMembersQuery(),
+                  query: groupMembersQuery,
                   variables,
                 })
                 expect(result).toMatchObject({
@@ -1243,7 +1243,7 @@ describe('in mode', () => {
 
               it('finds all members', async () => {
                 const result = await query({
-                  query: groupMembersQuery(),
+                  query: groupMembersQuery,
                   variables,
                 })
                 expect(result).toMatchObject({
@@ -1276,7 +1276,7 @@ describe('in mode', () => {
 
               it('finds all members', async () => {
                 const result = await query({
-                  query: groupMembersQuery(),
+                  query: groupMembersQuery,
                   variables,
                 })
                 expect(result).toMatchObject({
@@ -1319,7 +1319,7 @@ describe('in mode', () => {
 
               it('finds all members', async () => {
                 const result = await query({
-                  query: groupMembersQuery(),
+                  query: groupMembersQuery,
                   variables,
                 })
                 expect(result).toMatchObject({
@@ -1352,7 +1352,7 @@ describe('in mode', () => {
 
               it('finds all members', async () => {
                 const result = await query({
-                  query: groupMembersQuery(),
+                  query: groupMembersQuery,
                   variables,
                 })
                 expect(result).toMatchObject({
@@ -1384,7 +1384,7 @@ describe('in mode', () => {
               })
 
               it('throws authorization error', async () => {
-                const { errors } = await query({ query: groupMembersQuery(), variables })
+                const { errors } = await query({ query: groupMembersQuery, variables })
                 expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
@@ -1395,7 +1395,7 @@ describe('in mode', () => {
               })
 
               it('throws authorization error', async () => {
-                const { errors } = await query({ query: groupMembersQuery(), variables })
+                const { errors } = await query({ query: groupMembersQuery, variables })
                 expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
@@ -1417,7 +1417,7 @@ describe('in mode', () => {
 
               it('finds all members', async () => {
                 const result = await query({
-                  query: groupMembersQuery(),
+                  query: groupMembersQuery,
                   variables,
                 })
                 expect(result).toMatchObject({
@@ -1454,7 +1454,7 @@ describe('in mode', () => {
 
               it('finds all members', async () => {
                 const result = await query({
-                  query: groupMembersQuery(),
+                  query: groupMembersQuery,
                   variables,
                 })
                 expect(result).toMatchObject({
@@ -1491,7 +1491,7 @@ describe('in mode', () => {
 
               it('finds all members', async () => {
                 const result = await query({
-                  query: groupMembersQuery(),
+                  query: groupMembersQuery,
                   variables,
                 })
                 expect(result).toMatchObject({
@@ -1527,7 +1527,7 @@ describe('in mode', () => {
               })
 
               it('throws authorization error', async () => {
-                const { errors } = await query({ query: groupMembersQuery(), variables })
+                const { errors } = await query({ query: groupMembersQuery, variables })
                 expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
@@ -1538,7 +1538,7 @@ describe('in mode', () => {
               })
 
               it('throws authorization error', async () => {
-                const { errors } = await query({ query: groupMembersQuery(), variables })
+                const { errors } = await query({ query: groupMembersQuery, variables })
                 expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
@@ -2416,7 +2416,7 @@ describe('in mode', () => {
           describe('here "closed-group" for example', () => {
             const memberInGroup = async (userId, groupId) => {
               const result = await query({
-                query: groupMembersQuery(),
+                query: groupMembersQuery,
                 variables: {
                   id: groupId,
                 },
