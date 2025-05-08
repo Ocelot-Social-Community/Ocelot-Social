@@ -20,11 +20,11 @@
       </div>
     </div>
     <div class="row2">
-      <span v-if="inviteCode.redeemedCount === 0">
-        {{ $t('invite-codes.invite-code.redeemed-count-0') }}
+      <span v-if="inviteCode.redeemedByCount === 0">
+        {{ $t('invite-codes.redeemed-count-0') }}
       </span>
       <span v-else>
-        {{ $t('invite-codes.invite-code.redeemed-count', { count: inviteCode.redeemedCount }) }}
+        {{ $t('invite-codes.redeemed-count', { count: inviteCode.redeemedByCount }) }}
       </span>
     </div>
   </li>

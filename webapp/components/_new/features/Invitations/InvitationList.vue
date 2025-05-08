@@ -2,7 +2,7 @@
   <div class="invitation-list">
     <ul v-if="validInviteCodes.length">
       <invitation
-        v-for="inviteCode in inviteCodes"
+        v-for="inviteCode in validInviteCodes"
         :key="inviteCode.code"
         :invite-code="inviteCode"
         @invalidate-invite-code="invalidateInviteCode"
