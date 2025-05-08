@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
+
 import { categories } from '@constants/categories'
 import databaseContext from '@context/database'
 
-const { query, mutate, driver } = databaseContext()
+const { query, write, driver } = databaseContext()
 
 const createCategories = async () => {
   const result = await query({
@@ -17,7 +17,7 @@ const createCategories = async () => {
 
   const newCategories = categories.filter((c) => !existingCategoryIds.includes(c.id))
 
-  await mutate({
+  await write({
     query: `UNWIND $newCategories AS map
             CREATE (category:Category)
             SET category = map
@@ -28,7 +28,7 @@ const createCategories = async () => {
   })
 
   const categoryIds = categories.map((c) => c.id)
-  await mutate({
+  await write({
     query: `MATCH (category:Category)
             WHERE NOT category.id IN $categoryIds
             DETACH DELETE category`,
