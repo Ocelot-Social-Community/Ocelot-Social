@@ -7,18 +7,18 @@ import { createTestClient } from 'apollo-server-testing'
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { currentUser } from '@graphql/queries/currentUser'
 import { generateGroupInviteCode } from '@graphql/queries/generateGroupInviteCode'
 import { generatePersonalInviteCode } from '@graphql/queries/generatePersonalInviteCode'
+import { Group } from '@graphql/queries/Group'
+import { GroupMembers } from '@graphql/queries/GroupMembers'
+import { invalidateInviteCode } from '@graphql/queries/invalidateInviteCode'
+import { redeemInviteCode } from '@graphql/queries/redeemInviteCode'
 import {
   authenticatedValidateInviteCode,
   unauthenticatedValidateInviteCode,
 } from '@graphql/queries/validateInviteCode'
 import createServer, { getContext } from '@src/server'
-import { invalidateInviteCode } from '@graphql/queries/invalidateInviteCode'
-import { redeemInviteCode } from '@graphql/queries/redeemInviteCode'
-import { currentUser } from '@graphql/queries/currentUser'
-import { Group } from '@graphql/queries/Group'
-import { GroupMembers } from '@graphql/queries/GroupMembers'
 
 const database = databaseContext()
 

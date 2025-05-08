@@ -25,7 +25,7 @@ export default {
     }),
     distanceToMe: async (parent, _params, context, _resolveInfo) => {
       if (!parent.id) {
-        throw new Error('Can not identify selected Group!')
+        throw new Error('Can not identify selected Location!')
       }
       const session = context.driver.session()
 

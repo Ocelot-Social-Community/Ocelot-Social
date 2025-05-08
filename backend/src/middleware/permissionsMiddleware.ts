@@ -44,14 +44,6 @@ const isMyOwn = rule({
   return user && user.id === parent.id
 })
 
-const isMyOwnInviteCode = rule({
-  cache: 'no_cache',
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-})(async (parent, _args, { user }, _info) => {
-  // TODO
-  return true
-})
-
 const isMySocialMedia = rule({
   cache: 'no_cache',
 })(async (_, args, { user }) => {
@@ -521,17 +513,19 @@ export default shield(
       inviteCodes: isMyOwn,
     },
     Group: {
-      '*': isAuthenticated, // TODO - only who is allowed to see group
-      inviteCodes: isMyOwnInviteCode,
+      '*': isAuthenticated, // TODO - only those who are allowed to see the group
       avatar: allow,
       name: allow,
       about: allow,
       groupType: allow,
     },
     InviteCode: {
-      redeemedBy: isMyOwnInviteCode,
-      createdAt: isMyOwnInviteCode,
-      expiresAt: isMyOwnInviteCode,
+      '*': allow,
+      redeemedBy: isAuthenticated, // TODO only for self generated, must be done in resolver
+      redeemedByCount: isAuthenticated, // TODO only for self generated, must be done in resolver
+      createdAt: isAuthenticated, // TODO only for self generated, must be done in resolver
+      expiresAt: isAuthenticated, // TODO only for self generated, must be done in resolver
+      comment: isAuthenticated, // TODO only for self generated, must be done in resolver
     },
     Location: {
       distanceToMe: isAuthenticated,
