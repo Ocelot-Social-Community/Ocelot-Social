@@ -9,9 +9,9 @@
       />
     </ul>
     <div v-else class="no-invitation">
-      {{ $t('components.invitations.no-invitation') }}
+      {{ $t('invite-codes.no-links', { max: maxLinks }) }}
     </div>
-    <create-invitation @generate-invite-code="generateInviteCode" />
+    <create-invitation @generate-invite-code="generateInviteCode" :disabled="isLimitReached" />
   </div>
 </template>
 
@@ -35,6 +35,12 @@ export default {
     validInviteCodes() {
       return this.inviteCodes.filter((inviteCode) => inviteCode.isValid)
     },
+    maxLinks() {
+      return Number(this.$env.INVITE_LINK_LIMIT)
+    },
+    isLimitReached() {
+      return this.validInviteCodes.length >= this.maxLinks
+    },
   },
   methods: {
     generateInviteCode(comment) {
@@ -52,5 +58,9 @@ export default {
   ul {
     list-style: none;
   }
+}
+
+.no-invitation {
+  margin-block: $space-base;
 }
 </style>

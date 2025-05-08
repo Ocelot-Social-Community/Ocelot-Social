@@ -42,6 +42,7 @@ export const generatePersonalInviteCode = () => gql`
           url
         }
       }
+      redeemedByCount
       expiresAt
       comment
       invitedTo {
@@ -76,6 +77,7 @@ export const generateGroupInviteCode = () => gql`
           url
         }
       }
+      redeemedByCount
       expiresAt
       comment
       invitedTo {
@@ -111,6 +113,7 @@ export const invalidateInviteCode = () => gql`
           url
         }
       }
+      redeemedByCount
       expiresAt
       comment
       invitedTo {

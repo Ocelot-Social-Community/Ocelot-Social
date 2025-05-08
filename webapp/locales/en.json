@@ -632,8 +632,15 @@
     },
     "copy-code": "Copy Invite Link",
     "copy-success": "Invite code copied to clipboard",
-    "not-available": "You have no valid invite code available!",
-    "your-code": "Send this link per e-mail or in social media to invite your friends:"
+    "redeemed-count-0": "No one has used this code yet.",
+    "redeemed-count": "This code has been used {count} times.",
+    "generate-code": "Create link",
+    "comment-placeholder": "Comment (optional)",
+    "no-links": "Create up to {max} links to invite more people. You can add a comment to each link, only visible to you.",
+    "delete-modal": {
+      "title": "Link ungültig machen?",
+      "message": "Do you really want to invalidate this invite link?"
+    }
   },
   "localeSwitch": {
     "tooltip": "Choose language"

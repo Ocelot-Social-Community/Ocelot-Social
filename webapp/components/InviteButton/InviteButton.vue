@@ -15,7 +15,6 @@
     <template #popover>
       <div class="invite-list">
         <h2>My invitation links</h2>
-        <div>Create links to invite people to this network.</div>
         <invitation-list
           @generate-invite-code="generatePersonalInviteCode"
           @invalidate-invite-code="invalidateInviteCode"

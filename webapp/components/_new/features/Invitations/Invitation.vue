@@ -12,11 +12,7 @@
           @click="copyInviteCode(inviteCode.code)"
           :disabled="!canCopy"
         />
-        <base-button
-          class="invalidate-button"
-          icon="trash"
-          @click="$emit('invalidate-invite-code', inviteCode.code)"
-        />
+        <base-button class="invalidate-button" icon="trash" @click="openDeleteModal" />
       </div>
     </div>
     <div class="row2">
@@ -31,6 +27,7 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
 import BaseButton from '~/components/_new/generic/BaseButton/BaseButton.vue'
 
 export default {
@@ -58,9 +55,43 @@ export default {
     this.canCopy = !!navigator.clipboard
   },
   methods: {
+    ...mapMutations({
+      commitModalData: 'modal/SET_OPEN',
+    }),
     async copyInviteCode(code) {
       await navigator.clipboard.writeText(this.inviteLink)
       this.$toast.success(this.$t('invite-codes.copy-success'))
+    },
+    openDeleteModal() {
+      this.commitModalData({
+        name: 'confirm',
+        data: {
+          type: '',
+          resource: { id: '' },
+          modalData: {
+            titleIdent: this.$t('invite-codes.delete-modal.title'),
+            messageIdent: this.$t('invite-codes.delete-modal.message'),
+            messageParams: {
+              name: this.inviteCode.code,
+            },
+            buttons: {
+              confirm: {
+                danger: true,
+                icon: 'trash',
+                textIdent: 'actions.delete',
+                callback: () => {
+                  this.$emit('invalidate-invite-code', this.inviteCode.code)
+                },
+              },
+              cancel: {
+                icon: 'close',
+                textIdent: 'actions.cancel',
+                callback: () => {},
+              },
+            },
+          },
+        },
+      })
     },
   },
 }
