@@ -252,7 +252,7 @@
       "signup": {
         "form": {
           "data-privacy": "Ich habe die Datenschutzerklärung gelesen und verstanden.",
-          "description": "Um loszulegen, kannst du Dich hier kostenfrei registrieren:",
+          "description": "Um loszulegen, kannst du dich hier kostenfrei registrieren:",
           "errors": {
             "email-exists": "Es gibt schon ein Nutzerkonto mit dieser E-Mail-Adresse!"
           },
@@ -771,10 +771,10 @@
       "changed_group_member_role": "Hat Deine Rolle in der Gruppe geändert …",
       "commented_on_post": "Hat einen Beitrag den du beobachtest kommentiert …",
       "followed_user_posted": "Hat einen neuen Betrag geschrieben …",
-      "mentioned_in_comment": "Hat Dich in einem Kommentar erwähnt …",
-      "mentioned_in_post": "Hat Dich in einem Beitrag erwähnt …",
+      "mentioned_in_comment": "Hat dich in einem Kommentar erwähnt …",
+      "mentioned_in_post": "Hat dich in einem Beitrag erwähnt …",
       "post_in_group": "Hat einen Beitrag in der Gruppe geschrieben …",
-      "removed_user_from_group": "Hat Dich aus der Gruppe entfernt …",
+      "removed_user_from_group": "Hat dich aus der Gruppe entfernt …",
       "user_joined_group": "Ist Deiner Gruppe beigetreten …",
       "user_left_group": "Hat deine Gruppe verlassen …"
     },
@@ -979,10 +979,10 @@
       },
       "empty": "Bislang hast du niemanden blockiert.",
       "explanation": {
-        "closing": "Das sollte fürs Erste genügen, damit blockierte Nutzer Dich nicht mehr länger belästigen können.",
+        "closing": "Das sollte fürs Erste genügen, damit blockierte Nutzer dich nicht mehr länger belästigen können.",
         "commenting-disabled": "Du kannst den Beitrag derzeit nicht kommentieren.",
         "commenting-explanation": "Dafür kann es mehrere Gründe geben, bitte schau in unsere ",
-        "intro": "Wenn ein anderer Nutzer durch Dich blockiert wurde, dann passiert Folgendes:",
+        "intro": "Wenn ein anderer Nutzer durch dich blockiert wurde, dann passiert Folgendes:",
         "notifications": "Von Dir blockierte Nutzer werden keine Benachrichtigungen mehr erhalten, falls sie in Deinen Beiträgen erwähnt werden.",
         "their-perspective": "Umgekehrt das gleiche: Die blockierte Person bekommt auch in ihren Benachrichtigungen Deine Beiträge nicht mehr zu sehen.",
         "your-perspective": "In Deinen Benachrichtigungen tauchen keine Beiträge der blockierten Person mehr auf."
@@ -993,7 +993,7 @@
       "unblocked": "{name} ist wieder entsperrt"
     },
     "data": {
-      "labelBio": "Über Dich",
+      "labelBio": "Über dich",
       "labelCity": "Deine Stadt oder Region",
       "labelCityHint": "(zeigt ungefähre Position auf der Landkarte)",
       "labelName": "Dein Name",
