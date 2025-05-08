@@ -4,7 +4,12 @@
       {{ inviteCode.comment }}
     </span>
     {{ inviteCode.code }}
-    <base-button class="copy-button" icon="copy" @click="copyInviteCode(inviteCode.code)" />
+    <base-button
+      class="copy-button"
+      icon="copy"
+      @click="copyInviteCode(inviteCode.code)"
+      :disabled="!canCopy"
+    />
     <base-button
       class="invalidate-button"
       icon="trash"
@@ -31,6 +36,14 @@ export default {
     inviteLink() {
       return `${window.location.origin}/registration?method=invite-code&inviteCode=${this.inviteCode.code}`
     },
+  },
+  data() {
+    return {
+      canCopy: false,
+    }
+  },
+  created() {
+    this.canCopy = !!navigator.clipboard
   },
   methods: {
     async copyInviteCode(code) {

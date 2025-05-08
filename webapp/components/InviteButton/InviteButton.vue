@@ -15,28 +15,11 @@
     <template #popover>
       <h2>My invitation links</h2>
       <div>Create links to invite people to this network.</div>
-      <invitation-list @create-invite-code="createInviteCode" :inviteCodes="user.inviteCodes" />
-      <!--
-      <div class="invite-button-menu-popover">
-        <div v-if="inviteCode && inviteCode.code">
-          <p class="description">{{ $t('invite-codes.your-code') }}</p>
-          <base-card class="code-card" wideContent>
-            <base-button
-              v-if="canCopy"
-              class="invite-code"
-              icon="copy"
-              ghost
-              @click="copyInviteLink"
-            >
-              <ds-text bold>{{ $t('invite-codes.copy-code') }}</ds-text>
-            </base-button>
-          </base-card>
-        </div>
-        <div v-else>
-          <ds-text>{{ $t('invite-codes.not-available') }}</ds-text>
-        </div>
-      </div>
-      -->
+      <invitation-list
+        @generate-invite-code="generatePersonalInviteCode"
+        @invalidate-invite-code="invalidateInviteCode"
+        :inviteCodes="user.inviteCodes"
+      />
     </template>
   </dropdown>
 </template>
@@ -45,8 +28,7 @@
 import Dropdown from '~/components/Dropdown'
 import { mapGetters } from 'vuex'
 import InvitationList from '~/components/_new/features/Invitations/InvitationList.vue'
-import { create } from 'core-js/core/object'
-import { generatePersonalInviteCode } from '~/graphql/InviteCode'
+import { generatePersonalInviteCode, invalidateInviteCode } from '~/graphql/InviteCode'
 
 export default {
   components: {
@@ -56,14 +38,7 @@ export default {
   props: {
     placement: { type: String, default: 'top-end' },
   },
-  data() {
-    return {
-      canCopy: false,
-    }
-  },
-  created() {
-    this.canCopy = !!navigator.clipboard
-  },
+
   computed: {
     ...mapGetters({
       user: 'auth/user',
@@ -71,23 +46,26 @@ export default {
     inviteCode() {
       return this.user.inviteCodes[0] || null
     },
-    inviteLink() {
-      return (
-        window.location.origin +
-        '/registration?method=invite-code&inviteCode=' +
-        this.inviteCode.code
-      )
-    },
   },
   methods: {
-    async createInviteCode(comment) {
+    async generatePersonalInviteCode(comment) {
       await this.$apollo.mutate({
-        mutation: generatePersonalInviteCode,
+        mutation: generatePersonalInviteCode(),
         variables: {
           comment,
         },
       })
       this.$toast.success(this.$t('invite-codes.create-success'))
+      // TODO update the invite code list?
+    },
+    async invalidateInviteCode(code) {
+      await this.$apollo.mutate({
+        mutation: invalidateInviteCode(),
+        variables: {
+          code,
+        },
+      })
+      this.$toast.success(this.$t('invite-codes.invalidate-success'))
       // TODO update the invite code list?
     },
   },
