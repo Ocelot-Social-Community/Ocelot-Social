@@ -72,9 +72,6 @@ type User {
   followedBy: [User]! @relation(name: "FOLLOWS", direction: "IN")
   followedByCount: Int! @cypher(statement: "MATCH (this)<-[:FOLLOWS]-(r:User) RETURN COUNT(DISTINCT r)")
 
-  inviteCodes: [InviteCode] @relation(name: "GENERATED", direction: "OUT")
-  redeemedInviteCode: InviteCode @relation(name: "REDEEMED", direction: "OUT")
-
   # Is the currently logged in user following that user?
   followedByCurrentUser: Boolean! @cypher(
   statement: """
@@ -125,12 +122,18 @@ type User {
 
   categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
 
+  # Badges
   badgeVerification: Badge! @neo4j_ignore
   badgeTrophies: [Badge]! @relation(name: "REWARDED", direction: "IN")
   badgeTrophiesCount: Int! @cypher(statement: "MATCH (this)<-[:REWARDED]-(r:Badge) RETURN COUNT(r)")
   badgeTrophiesSelected: [Badge!]! @neo4j_ignore
   badgeTrophiesUnused: [Badge]! @neo4j_ignore
   badgeTrophiesUnusedCount: Int! @neo4j_ignore
+
+  "personal inviteCodes the user has generated"
+  inviteCodes: [InviteCode]! @neo4j_ignore
+  # inviteCodes: [InviteCode]! @relation(name: "GENERATED", direction: "OUT")
+  redeemedInviteCode: InviteCode @relation(name: "REDEEMED", direction: "OUT")
 
   emotions: [EMOTED]
 

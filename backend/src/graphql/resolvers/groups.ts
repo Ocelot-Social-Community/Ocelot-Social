@@ -436,6 +436,24 @@ export default {
     },
   },
   Group: {
+    inviteCodes: async (parent, _args, context: Context, _resolveInfo) => {
+      if (!parent.id) {
+        throw new Error('Can not identify selected Group!')
+      }
+      return (
+        await context.database.query({
+          query: `
+          MATCH (user:User {id: $user.id})-[:GENERATED]->(inviteCodes:InviteCode)-[:INVITES_TO]->(g:Group {id: $parent.id})
+          RETURN inviteCodes {.*}
+          ORDER BY inviteCodes.createdAt ASC
+          `,
+          variables: {
+            user: context.user,
+            parent,
+          },
+        })
+      ).records.map((r) => r.get('inviteCodes'))
+    },
     ...Resolver('Group', {
       undefinedToNull: ['deleted', 'disabled', 'locationName', 'about'],
       hasMany: {
@@ -451,6 +469,18 @@ export default {
           'MATCH (this) RETURN EXISTS( (this)<-[:MUTED]-(:User {id: $cypherParams.currentUserId}) )',
       },
     }),
+    name: async (parent, _args, context: Context, _resolveInfo) => {
+      if (!context.user) {
+        return parent.groupType === 'hidden' ? '' : parent.name
+      }
+      return parent.name
+    },
+    about: async (parent, _args, context: Context, _resolveInfo) => {
+      if (!context.user) {
+        return parent.groupType === 'hidden' ? '' : parent.about
+      }
+      return parent.about
+    },
   },
 }
 

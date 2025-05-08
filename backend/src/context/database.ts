@@ -19,7 +19,7 @@ export const query =
     }
   }
 
-export const mutate =
+export const write =
   (driver: Driver) =>
   async ({ query, variables = {} }: { query: string; variables?: object }) => {
     const session = driver.session()
@@ -44,6 +44,6 @@ export default () => {
     driver,
     neode,
     query: query(driver),
-    mutate: mutate(driver),
+    write: write(driver),
   }
 }
