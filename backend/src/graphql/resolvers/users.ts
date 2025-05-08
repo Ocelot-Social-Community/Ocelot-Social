@@ -478,6 +478,7 @@ export default {
           query: `
           MATCH (user:User {id: $userId})-[:GENERATED]->(inviteCodes:InviteCode)
           WHERE NOT (inviteCodes)-[:INVITES_TO]->(:Group)
+          ORDER BY inviteCodes.createdAt ASC
           RETURN inviteCodes {.*}
           `,
           variables: { userId },
