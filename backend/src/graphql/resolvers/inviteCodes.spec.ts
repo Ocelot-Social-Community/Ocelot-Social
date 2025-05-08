@@ -20,7 +20,6 @@ import {
   unauthenticatedValidateInviteCode,
 } from '@graphql/queries/validateInviteCode'
 import createServer, { getContext } from '@src/server'
-import inviteCodes from './inviteCodes'
 
 const database = databaseContext()
 
@@ -64,11 +63,10 @@ describe('validateInviteCode', () => {
     })
 
     authenticatedUser = await invitingUser.toJson()
-    const hiddenGroup = 'g0'
     await mutate({
       mutation: createGroupMutation(),
       variables: {
-        id: hiddenGroup,
+        id: 'hidden-group',
         name: 'Hidden Group',
         about: 'We are hidden',
         description: 'anything',
@@ -79,11 +77,10 @@ describe('validateInviteCode', () => {
       },
     })
 
-    const publicGroup = 'g2'
     await mutate({
       mutation: createGroupMutation(),
       variables: {
-        id: publicGroup,
+        id: 'public-group',
         name: 'Public Group',
         about: 'We are public',
         description: 'anything',
@@ -119,7 +116,7 @@ describe('validateInviteCode', () => {
       },
       {
         generatedBy: invitingUser,
-        groupId: publicGroup,
+        groupId: 'public-group',
       },
     )
     await Factory.build(
@@ -129,7 +126,7 @@ describe('validateInviteCode', () => {
       },
       {
         generatedBy: invitingUser,
-        groupId: hiddenGroup,
+        groupId: 'hidden-group',
       },
     )
   })
@@ -151,7 +148,7 @@ describe('validateInviteCode', () => {
       )
     })
 
-    it('returns null when the code is expired', async () => {
+    it('returns null when the code has expired', async () => {
       await expect(
         query({ query: unauthenticatedValidateInviteCode, variables: { code: 'EXPIRD' } }),
       ).resolves.toEqual(
@@ -164,7 +161,7 @@ describe('validateInviteCode', () => {
       )
     })
 
-    it('returns the inviteCode when the code exists and is not expired', async () => {
+    it('returns the inviteCode when the code exists and hs not expired', async () => {
       await expect(
         query({ query: unauthenticatedValidateInviteCode, variables: { code: 'PERSNL' } }),
       ).resolves.toEqual(
@@ -302,7 +299,7 @@ describe('validateInviteCode', () => {
               },
             },
             invitedTo: {
-              id: 'g2',
+              id: 'public-group',
               groupType: 'public',
               name: 'Public Group',
               about: 'We are public',
@@ -503,7 +500,6 @@ describe('generatePersonalInviteCode', () => {
 
 describe('generateGroupInviteCode', () => {
   let invitingUser, notMemberUser, pendingMemberUser
-  let publicGroup, hiddenGroup
   beforeEach(async () => {
     await cleanDatabase()
     invitingUser = await Factory.build('user', {
@@ -525,11 +521,10 @@ describe('generateGroupInviteCode', () => {
     })
 
     authenticatedUser = await invitingUser.toJson()
-    hiddenGroup = 'g0'
     await mutate({
       mutation: createGroupMutation(),
       variables: {
-        id: hiddenGroup,
+        id: 'hidden-group',
         name: 'Hidden Group',
         about: 'We are hidden',
         description: 'anything',
@@ -540,11 +535,10 @@ describe('generateGroupInviteCode', () => {
       },
     })
 
-    publicGroup = 'g2'
     await mutate({
       mutation: createGroupMutation(),
       variables: {
-        id: publicGroup,
+        id: 'public-group',
         name: 'Public Group',
         about: 'We are public',
         description: 'anything',
@@ -565,7 +559,7 @@ describe('generateGroupInviteCode', () => {
 
     it('throws authorization error', async () => {
       await expect(
-        mutate({ mutation: generateGroupInviteCode, variables: { groupId: publicGroup } }),
+        mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'public-group' } }),
       ).resolves.toMatchObject({
         data: null,
         errors: [{ message: 'Not Authorized!' }],
@@ -579,7 +573,7 @@ describe('generateGroupInviteCode', () => {
 
     it('returns a new group invite code', async () => {
       await expect(
-        mutate({ mutation: generateGroupInviteCode, variables: { groupId: publicGroup } }),
+        mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'public-group' } }),
       ).resolves.toMatchObject({
         data: {
           generateGroupInviteCode: {
@@ -595,7 +589,7 @@ describe('generateGroupInviteCode', () => {
               name: 'Inviting User',
             },
             invitedTo: {
-              id: publicGroup,
+              id: 'public-group',
               groupType: 'public',
               name: 'Public Group',
               about: 'We are public',
@@ -613,7 +607,7 @@ describe('generateGroupInviteCode', () => {
       await expect(
         mutate({
           mutation: generateGroupInviteCode,
-          variables: { groupId: publicGroup, comment: 'some text' },
+          variables: { groupId: 'public-group', comment: 'some text' },
         }),
       ).resolves.toMatchObject({
         data: {
@@ -630,7 +624,7 @@ describe('generateGroupInviteCode', () => {
               name: 'Inviting User',
             },
             invitedTo: {
-              id: publicGroup,
+              id: 'public-group',
               groupType: 'public',
               name: 'Public Group',
               about: 'We are public',
@@ -650,7 +644,7 @@ describe('generateGroupInviteCode', () => {
       await expect(
         mutate({
           mutation: generateGroupInviteCode,
-          variables: { groupId: publicGroup, expiresAt: date.toISOString() },
+          variables: { groupId: 'public-group', expiresAt: date.toISOString() },
         }),
       ).resolves.toMatchObject({
         data: {
@@ -667,7 +661,7 @@ describe('generateGroupInviteCode', () => {
               name: 'Inviting User',
             },
             invitedTo: {
-              id: publicGroup,
+              id: 'public-group',
               groupType: 'public',
               name: 'Public Group',
               about: 'We are public',
@@ -687,7 +681,7 @@ describe('generateGroupInviteCode', () => {
       await expect(
         mutate({
           mutation: generateGroupInviteCode,
-          variables: { groupId: publicGroup, expiresAt: date.toISOString() },
+          variables: { groupId: 'public-group', expiresAt: date.toISOString() },
         }),
       ).resolves.toMatchObject({
         data: {
@@ -704,7 +698,7 @@ describe('generateGroupInviteCode', () => {
               name: 'Inviting User',
             },
             invitedTo: {
-              id: publicGroup,
+              id: 'public-group',
               groupType: 'public',
               name: 'Public Group',
               about: 'We are public',
@@ -721,13 +715,13 @@ describe('generateGroupInviteCode', () => {
     it('throws an error when the max amount of invite links was reached', async () => {
       for (let i = 0; i < CONFIG.INVITE_CODES_GROUP_PER_USER; i++) {
         await expect(
-          mutate({ mutation: generateGroupInviteCode, variables: { groupId: publicGroup } }),
+          mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'public-group' } }),
         ).resolves.toMatchObject({
           errors: undefined,
         })
       }
       await expect(
-        mutate({ mutation: generateGroupInviteCode, variables: { groupId: publicGroup } }),
+        mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'public-group' } }),
       ).resolves.toMatchObject({
         errors: [
           {
@@ -752,7 +746,7 @@ describe('generateGroupInviteCode', () => {
       await expect(
         mutate({
           mutation: generateGroupInviteCode,
-          variables: { groupId: publicGroup },
+          variables: { groupId: 'public-group' },
         }),
       ).resolves.toMatchObject({
         data: null,
@@ -773,7 +767,7 @@ describe('generateGroupInviteCode', () => {
       await expect(
         mutate({
           mutation: generateGroupInviteCode,
-          variables: { groupId: hiddenGroup },
+          variables: { groupId: 'hidden-group' },
         }),
       ).resolves.toMatchObject({
         data: null,
@@ -881,7 +875,6 @@ describe('invalidateInviteCode', () => {
 
 describe('redeemInviteCode', () => {
   let invitingUser, otherUser
-  let hiddenGroup, publicGroup
   beforeEach(async () => {
     await cleanDatabase()
     invitingUser = await Factory.build('user', {
@@ -897,11 +890,10 @@ describe('redeemInviteCode', () => {
     })
 
     authenticatedUser = await invitingUser.toJson()
-    hiddenGroup = 'g0'
     await mutate({
       mutation: createGroupMutation(),
       variables: {
-        id: hiddenGroup,
+        id: 'hidden-group',
         name: 'Hidden Group',
         about: 'We are hidden',
         description: 'anything',
@@ -912,11 +904,10 @@ describe('redeemInviteCode', () => {
       },
     })
 
-    publicGroup = 'g2'
     await mutate({
       mutation: createGroupMutation(),
       variables: {
-        id: publicGroup,
+        id: 'public-group',
         name: 'Public Group',
         about: 'We are public',
         description: 'anything',
@@ -942,7 +933,7 @@ describe('redeemInviteCode', () => {
       },
       {
         generatedBy: invitingUser,
-        groupId: publicGroup,
+        groupId: 'public-group',
       },
     )
     await Factory.build(
@@ -952,7 +943,7 @@ describe('redeemInviteCode', () => {
       },
       {
         generatedBy: invitingUser,
-        groupId: hiddenGroup,
+        groupId: 'hidden-group',
       },
     )
   })
@@ -1023,7 +1014,9 @@ describe('redeemInviteCode', () => {
         },
         errors: undefined,
       })
-      await expect(query({ query: Group, variables: { id: publicGroup } })).resolves.toMatchObject({
+      await expect(
+        query({ query: Group, variables: { id: 'public-group' } }),
+      ).resolves.toMatchObject({
         data: {
           Group: [
             {
@@ -1076,7 +1069,7 @@ describe('redeemInviteCode', () => {
       authenticatedUser = await invitingUser.toJson()
       // with this query we cannot determine the users group role?
       await expect(
-        query({ query: GroupMembers, variables: { id: hiddenGroup } }),
+        query({ query: GroupMembers, variables: { id: 'hidden-group' } }),
       ).resolves.toMatchObject({
         data: {
           GroupMembers: expect.arrayContaining([
@@ -1149,7 +1142,9 @@ describe('redeemInviteCode', () => {
         },
         errors: undefined,
       })
-      await expect(query({ query: Group, variables: { id: publicGroup } })).resolves.toMatchObject({
+      await expect(
+        query({ query: Group, variables: { id: 'public-group' } }),
+      ).resolves.toMatchObject({
         data: {
           Group: [
             {
