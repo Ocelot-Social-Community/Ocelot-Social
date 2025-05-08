@@ -50,7 +50,6 @@ export default {
         })
         this.$toast.success(this.$t('invite-codes.create-success'))
       } catch (error) {
-        console.log(error)
         this.$toast.error(this.$t('invite-codes.create-error', { error: error.message }))
       }
     },

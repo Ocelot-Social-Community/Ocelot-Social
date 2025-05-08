@@ -18,6 +18,9 @@ export const mutations = {
   SET_USER(state, user) {
     state.user = user || null
   },
+  SET_USER_PARTIAL(state, user) {
+    state.user = { ...state.user, ...user }
+  },
   SET_TOKEN(state, token) {
     state.token = token || null
   },

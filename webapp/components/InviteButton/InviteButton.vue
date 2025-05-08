@@ -55,7 +55,7 @@ export default {
   },
   methods: {
     ...mapMutations({
-      setCurrentUser: 'auth/SET_USER',
+      setCurrentUser: 'auth/SET_USER_PARTIAL',
     }),
     async generatePersonalInviteCode(comment) {
       try {
