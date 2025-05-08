@@ -4,6 +4,7 @@
 import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 
+import CONFIG from '@config/index'
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
@@ -475,12 +476,25 @@ describe('generatePersonalInviteCode', () => {
         errors: undefined,
       })
     })
+
+    it('throws an error when the max amount of invite links was reached', async () => {
+      for (let i = 0; i < CONFIG.INVITE_CODES_PERSONAL_PER_USER; i++) {
+        await expect(mutate({ mutation: generatePersonalInviteCode })).resolves.toMatchObject({
+          errors: undefined,
+        })
+      }
+      await expect(mutate({ mutation: generatePersonalInviteCode })).resolves.toMatchObject({
+        errors: [
+          {
+            message: 'You have reached the maximum of Invite Codes you can generate',
+          },
+        ],
+      })
+    })
   })
 
   // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
   it.skip('code collision', () => {})
-  // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
-  it.skip('max amount used', () => {})
 })
 
 describe('generateGroupInviteCode', () => {
@@ -699,6 +713,25 @@ describe('generateGroupInviteCode', () => {
         errors: undefined,
       })
     })
+
+    it('throws an error when the max amount of invite links was reached', async () => {
+      for (let i = 0; i < CONFIG.INVITE_CODES_GROUP_PER_USER; i++) {
+        await expect(
+          mutate({ mutation: generateGroupInviteCode, variables: { groupId: publicGroup } }),
+        ).resolves.toMatchObject({
+          errors: undefined,
+        })
+      }
+      await expect(
+        mutate({ mutation: generateGroupInviteCode, variables: { groupId: publicGroup } }),
+      ).resolves.toMatchObject({
+        errors: [
+          {
+            message: 'You have reached the maximum of Invite Codes you can generate for this group',
+          },
+        ],
+      })
+    })
   })
 
   describe('as authenticated not-member', () => {
@@ -744,8 +777,6 @@ describe('generateGroupInviteCode', () => {
 
   // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
   it.skip('code collision', () => {})
-  // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
-  it.skip('max amount used', () => {})
 })
 
 describe('invalidateInviteCode', () => {

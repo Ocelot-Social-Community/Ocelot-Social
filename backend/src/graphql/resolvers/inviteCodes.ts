@@ -149,7 +149,7 @@ export default {
       const userInviteCodeAmount = (
         await context.database.query({
           query: `
-        MATCH (inviteCode:InviteCode)<-[:GENERATED]-(user:user {id: $user.id})
+        MATCH (inviteCode:InviteCode)<-[:GENERATED]-(user:User {id: $user.id})
         WHERE NOT (inviteCode)-[:INVITES_TO]-(:Group)
         RETURN toString(count(inviteCode)) as count
         `,
@@ -187,8 +187,7 @@ export default {
       const userInviteCodeAmount = (
         await context.database.query({
           query: `
-          MATCH (inviteCode:InviteCode)<-[:GENERATED]-(user:user {id: $user.id})
-          WHERE (inviteCode)-[:INVITES_TO]->(:Group {id: $args.groupId})
+          MATCH (:Group {id: $args.groupId})<-[:INVITES_TO]-(inviteCode:InviteCode)<-[:GENERATED]-(user:User {id: $user.id})
           RETURN toString(count(inviteCode)) as count
           `,
           variables: { user: context.user, args },
@@ -197,7 +196,7 @@ export default {
 
       if (parseInt(userInviteCodeAmount as string) >= CONFIG.INVITE_CODES_GROUP_PER_USER) {
         throw new Error(
-          'You have reached the maximum of Invite Codes you can generate for this group.',
+          'You have reached the maximum of Invite Codes you can generate for this group',
         )
       }
 
