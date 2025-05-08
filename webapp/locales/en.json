@@ -641,9 +641,15 @@
     "comment-placeholder": "Comment (optional)",
     "no-links": "No invite links created yet.",
     "delete-modal": {
-      "title": "Link ungültig machen?",
+      "title": "Invalidate link?",
       "message": "Do you really want to invalidate this invite link?"
-    }
+    },
+    "create-error": "Creating a new invite link failed! Error: {error}",
+    "invalidate-error": "Invalidating the invite link failed! Error: {error}",
+    "create-success": "Invite link created successfully!",
+    "invalidate-success": "Invite link invalidated successfully!",
+    "invite-link-message-group": "You have been invited to join the group “{groupName}” on {network}.",
+    "invite-link-message-personal": "You have been invited to join {network}."
   },
   "localeSwitch": {
     "tooltip": "Choose language"

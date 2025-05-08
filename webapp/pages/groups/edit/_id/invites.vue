@@ -2,9 +2,15 @@
   <div>
     <base-card>
       <invitation-list
-        :inviteCodes="group.inviteCodes"
         @generate-invite-code="generateGroupInviteCode"
         @invalidate-invite-code="invalidateInviteCode"
+        :inviteCodes="group.inviteCodes"
+        :copy-message="
+          $t('invite-codes.invite-link-message-group', {
+            groupName: group.name,
+            network: $env.NETWORK_NAME,
+          })
+        "
       />
     </base-card>
   </div>
@@ -31,6 +37,7 @@ export default {
           mutation: generateGroupInviteCode(),
           variables: {
             comment,
+            groupId: this.group.id,
           },
           update: (_, { data: { generateGroupInviteCode } }) => {
             /*
@@ -43,7 +50,8 @@ export default {
         })
         this.$toast.success(this.$t('invite-codes.create-success'))
       } catch (error) {
-        this.$toast.error(this.$t('invite-codes.create-error'))
+        console.log(error)
+        this.$toast.error(this.$t('invite-codes.create-error', { error: error.message }))
       }
     },
     async invalidateInviteCode(code) {
@@ -67,7 +75,7 @@ export default {
         })
         this.$toast.success(this.$t('invite-codes.invalidate-success'))
       } catch (error) {
-        this.$toast.error(this.$t('invite-codes.invalidate-error'))
+        this.$toast.error(this.$t('invite-codes.invalidate-error', { error: error.message }))
       }
     },
   },

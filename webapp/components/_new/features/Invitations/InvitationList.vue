@@ -1,13 +1,15 @@
 <template>
   <div class="invitation-list">
     <ul v-if="validInviteCodes.length">
-      <invitation
-        v-for="inviteCode in validInviteCodes"
-        :key="inviteCode.code"
-        :invite-code="inviteCode"
-        :copy-message="copyMessage"
-        @invalidate-invite-code="invalidateInviteCode"
-      />
+      <client-only>
+        <invitation
+          v-for="inviteCode in validInviteCodes"
+          :key="inviteCode.code"
+          :invite-code="inviteCode"
+          :copy-message="copyMessage"
+          @invalidate-invite-code="invalidateInviteCode"
+        />
+      </client-only>
     </ul>
     <div v-else class="no-invitation">
       {{ $t('invite-codes.no-links', { max: maxLinks }) }}

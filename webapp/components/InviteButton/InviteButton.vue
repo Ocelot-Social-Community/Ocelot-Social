@@ -19,6 +19,11 @@
           @generate-invite-code="generatePersonalInviteCode"
           @invalidate-invite-code="invalidateInviteCode"
           :inviteCodes="user.inviteCodes"
+          :copy-message="
+            $t('invite-codes.invite-link-message-personal', {
+              network: $env.NETWORK_NAME,
+            })
+          "
         />
       </div>
     </template>
@@ -68,7 +73,7 @@ export default {
         })
         this.$toast.success(this.$t('invite-codes.create-success'))
       } catch (error) {
-        this.$toast.error(this.$t('invite-codes.create-error'))
+        this.$toast.error(this.$t('invite-codes.create-error', { error: error.message }))
       }
     },
     async invalidateInviteCode(code) {
@@ -90,7 +95,7 @@ export default {
         })
         this.$toast.success(this.$t('invite-codes.invalidate-success'))
       } catch (error) {
-        this.$toast.error(this.$t('invite-codes.invalidate-error'))
+        this.$toast.error(this.$t('invite-codes.invalidate-error', { error: error.message }))
       }
     },
   },
