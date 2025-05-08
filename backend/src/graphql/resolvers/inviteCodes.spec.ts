@@ -20,6 +20,7 @@ import {
   unauthenticatedValidateInviteCode,
 } from '@graphql/queries/validateInviteCode'
 import createServer, { getContext } from '@src/server'
+import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 
 const database = databaseContext()
 
@@ -545,8 +546,26 @@ describe('generateGroupInviteCode', () => {
       },
     })
 
-    // TODO
-    // pendingMemberUser.relateTo(hiddenGroup, 'memberOf', { role: 'pending' })
+    await mutate({
+      mutation: createGroupMutation(),
+      variables: {
+        id: 'closed-group',
+        name: 'Closed Group',
+        about: 'We are closed',
+        description: 'anything',
+        groupType: 'closed',
+        actionRadius: 'interplanetary',
+        categoryIds: ['cat4', 'cat5', 'cat17'],
+      },
+    })
+
+    await mutate({
+      mutation: joinGroupMutation(),
+      variables: {
+        groupId: 'closed-group',
+        userId: 'pending-member-user',
+      },
+    })
   })
 
   describe('as unauthenticated user', () => {
@@ -752,15 +771,12 @@ describe('generateGroupInviteCode', () => {
     })
   })
 
-  // eslint-disable-next-line jest/no-disabled-tests
-  describe.skip('as pending-member user', () => {
+  describe('as pending-member user', () => {
     beforeEach(async () => {
       authenticatedUser = await pendingMemberUser.toJson()
     })
 
     it('throws authorization error', async () => {
-      const date = new Date()
-      date.setFullYear(date.getFullYear() - 1)
       await expect(
         mutate({
           mutation: generateGroupInviteCode,
