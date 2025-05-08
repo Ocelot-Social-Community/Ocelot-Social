@@ -23,7 +23,7 @@ COPY . .
 ONBUILD COPY ./branding/constants/ src/config/tmp
 ONBUILD RUN tools/replace-constants.sh
 # copy categories to brand them (use yarn prod:db:data:categories)
-ONBUILD COPY branding/constants/categories.ts src/constants/
+ONBUILD COPY branding/constants/ src/constants/
 ONBUILD COPY ./branding/email/ src/middleware/helpers/email/
 ONBUILD COPY ./branding/middlewares/ src/middleware/branding/
 ONBUILD COPY ./branding/data/ src/db/data
