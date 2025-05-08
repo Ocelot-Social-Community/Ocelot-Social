@@ -14,13 +14,13 @@ import { generatePersonalInviteCode } from '@graphql/queries/generatePersonalInv
 import { Group } from '@graphql/queries/Group'
 import { GroupMembers } from '@graphql/queries/GroupMembers'
 import { invalidateInviteCode } from '@graphql/queries/invalidateInviteCode'
+import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { redeemInviteCode } from '@graphql/queries/redeemInviteCode'
 import {
   authenticatedValidateInviteCode,
   unauthenticatedValidateInviteCode,
 } from '@graphql/queries/validateInviteCode'
 import createServer, { getContext } from '@src/server'
-import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 
 const database = databaseContext()
 
