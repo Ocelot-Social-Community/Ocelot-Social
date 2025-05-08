@@ -493,39 +493,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        PL
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          PL
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -538,17 +551,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                           >
                             Peter Lustig
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -558,39 +573,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        JR
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          JR
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -603,17 +631,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                           >
                             Jenny Rostock
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -623,39 +653,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        BDB
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          BDB
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -668,17 +711,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                           >
                             Bob der Baumeister
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -688,39 +733,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        H
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          H
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -733,17 +791,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                           >
                             Huey
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
           </ul>
@@ -2304,39 +2364,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        PL
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          PL
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -2349,17 +2422,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                           >
                             Peter Lustig
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -2369,39 +2444,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        JR
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          JR
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -2414,17 +2502,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                           >
                             Jenny Rostock
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -2434,39 +2524,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        BDB
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          BDB
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -2479,17 +2582,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                           >
                             Bob der Baumeister
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -2499,39 +2604,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        H
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          H
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -2544,17 +2662,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                           >
                             Huey
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
           </ul>
@@ -3197,39 +3317,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        PL
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          PL
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -3242,17 +3375,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                           >
                             Peter Lustig
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -3262,39 +3397,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        JR
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          JR
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -3307,17 +3455,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                           >
                             Jenny Rostock
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -3327,39 +3477,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        BDB
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          BDB
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -3372,17 +3535,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                           >
                             Bob der Baumeister
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -3392,39 +3557,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        H
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          H
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -3437,17 +3615,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                           >
                             Huey
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
           </ul>
@@ -3956,39 +4136,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        PL
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          PL
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -4001,17 +4194,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                           >
                             Peter Lustig
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -4021,39 +4216,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        JR
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          JR
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -4066,17 +4274,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                           >
                             Jenny Rostock
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -4086,39 +4296,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        BDB
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          BDB
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -4131,17 +4354,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                           >
                             Bob der Baumeister
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -4151,39 +4376,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        H
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          H
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -4196,17 +4434,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                           >
                             Huey
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
           </ul>
@@ -4713,39 +4953,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        PL
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          PL
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -4758,17 +5011,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                           >
                             Peter Lustig
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -4778,39 +5033,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        JR
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          JR
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -4823,17 +5091,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                           >
                             Jenny Rostock
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -4843,39 +5113,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        BDB
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          BDB
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -4888,17 +5171,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                           >
                             Bob der Baumeister
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -4908,39 +5193,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        H
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          H
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -4953,17 +5251,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                           >
                             Huey
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
           </ul>
@@ -5539,39 +5839,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        PL
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          PL
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -5584,17 +5897,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                           >
                             Peter Lustig
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -5604,39 +5919,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        JR
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          JR
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -5649,17 +5977,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                           >
                             Jenny Rostock
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -5669,39 +5999,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        BDB
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          BDB
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -5714,17 +6057,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                           >
                             Bob der Baumeister
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -5734,39 +6079,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        H
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          H
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -5779,17 +6137,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                           >
                             Huey
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
           </ul>
@@ -6479,39 +6839,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        PL
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          PL
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -6524,17 +6897,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                           >
                             Peter Lustig
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -6544,39 +6919,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        JR
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          JR
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -6589,17 +6977,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                           >
                             Jenny Rostock
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -6609,39 +6999,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        BDB
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          BDB
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -6654,17 +7057,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                           >
                             Bob der Baumeister
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -6674,39 +7079,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        H
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          H
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -6719,17 +7137,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                           >
                             Huey
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
           </ul>
@@ -7393,39 +7813,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        PL
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          PL
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -7438,17 +7871,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                           >
                             Peter Lustig
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -7458,39 +7893,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        JR
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          JR
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -7503,17 +7951,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                           >
                             Jenny Rostock
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -7523,39 +7973,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        BDB
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          BDB
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -7568,17 +8031,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                           >
                             Bob der Baumeister
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
             <li
@@ -7588,39 +8053,52 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class=""
                 placement="top-start"
               >
-                <div
-                  class="user-teaser"
-                >
-                  <nuxt-link-stub
-                    data-test="avatarUserLink"
-                    to="[object Object]"
+                <client-only-stub>
+                  <v-popover-stub
+                    autohide="true"
+                    class="user-teaser"
+                    container="body"
+                    delay="0"
+                    handleresize="true"
+                    offset="16"
+                    openclass="open"
+                    opengroup="0"
+                    placement="bottom-end"
+                    popoverarrowclass="tooltip-arrow popover-arrow"
+                    popoverbaseclass="tooltip popover"
+                    popoverclass="vue-popover-theme"
+                    popoverinnerclass="tooltip-inner popover-inner"
+                    popoverwrapperclass="wrapper"
+                    popperoptions="[object Object]"
+                    trigger="manual"
                   >
-                    <div
-                      class="profile-avatar --small --no-image"
+                    <nuxt-link-stub
+                      data-test="avatarUserLink"
+                      to="[object Object]"
                     >
-                      <span
-                        class="initials"
-                      >
-                        H
-                      </span>
-                       
-                      <!---->
-                       
-                      <!---->
-                    </div>
-                  </nuxt-link-stub>
-                   
-                  <div
-                    class="info flex-direction-column"
-                  >
-                    <div
-                      class="flex-direction-column"
-                    >
-                      <nuxt-link-stub
-                        to="[object Object]"
+                      <div
+                        class="profile-avatar --small --no-image"
                       >
                         <span
-                          class="text"
+                          class="initials"
+                        >
+                          H
+                        </span>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
+                    </nuxt-link-stub>
+                     
+                    <div
+                      class="info flex-direction-column"
+                    >
+                      <div
+                        class="flex-direction-column"
+                      >
+                        <nuxt-link-stub
+                          to="[object Object]"
                         >
                           <span
                             class="slug"
@@ -7633,17 +8111,19 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                           >
                             Huey
                           </span>
-                        </span>
-                      </nuxt-link-stub>
-                       
-                      <!---->
+                        </nuxt-link-stub>
+                         
+                        <!---->
+                         
+                        <!---->
+                      </div>
                        
                       <!---->
                     </div>
                      
-                    <!---->
-                  </div>
-                </div>
+                    <div />
+                  </v-popover-stub>
+                </client-only-stub>
               </div>
             </li>
           </ul>

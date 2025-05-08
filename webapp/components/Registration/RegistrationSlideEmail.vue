@@ -36,8 +36,8 @@ import normalizeEmail from '~/components/utils/NormalizeEmail'
 import translateErrorMessage from '~/components/utils/TranslateErrorMessage'
 
 export const SignupMutation = gql`
-  mutation ($email: String!, $inviteCode: String) {
-    Signup(email: $email, inviteCode: $inviteCode) {
+  mutation ($email: String!, $locale: String!, $inviteCode: String) {
+    Signup(email: $email, locale: $locale, inviteCode: $inviteCode) {
       email
     }
   }
@@ -140,7 +140,7 @@ export default {
     async onNextClick() {
       const { email } = this.formData
       const { inviteCode = null } = this.sliderData.collectedInputData
-      const variables = { email, inviteCode }
+      const variables = { email, inviteCode, locale: this.$i18n.locale() }
 
       if (this.sliderData.collectedInputData.emailSend && !this.sendEmailAgain) {
         return true

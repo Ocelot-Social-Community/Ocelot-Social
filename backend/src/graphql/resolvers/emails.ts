@@ -69,6 +69,7 @@ export default {
         )
         return result.records.map((record) => ({
           name: record.get('user').properties.name,
+          locale: record.get('user').properties.locale,
           ...record.get('email').properties,
         }))
       })

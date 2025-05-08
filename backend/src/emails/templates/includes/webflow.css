@@ -50,6 +50,10 @@ a.button {
   border-radius: 4px;
 }
 
+span {
+  color: #17b53e;
+}
+
 .text-block {
   margin-top: 20px;
   color: #000000;

@@ -7,16 +7,13 @@ import path from 'node:path'
 
 import Email from 'email-templates'
 import { createTransport } from 'nodemailer'
+
 // import type Email as EmailType from '@types/email-templates'
 
-import CONFIG from '@config/index'
+import CONFIG, { nodemailerTransportOptions } from '@config/index'
 import logosWebapp from '@config/logos'
 import metadata from '@config/metadata'
 import { UserDbProperties } from '@db/types/User'
-
-const hasAuthData = CONFIG.SMTP_USERNAME && CONFIG.SMTP_PASSWORD
-const hasDKIMData =
-  CONFIG.SMTP_DKIM_DOMAINNAME && CONFIG.SMTP_DKIM_KEYSELECTOR && CONFIG.SMTP_DKIM_PRIVATKEY
 
 const welcomeImageUrl = new URL(logosWebapp.LOGO_WELCOME_PATH, CONFIG.CLIENT_URI)
 const settingsUrl = new URL('/settings/notifications', CONFIG.CLIENT_URI)
@@ -28,30 +25,16 @@ const defaultParams = {
   ORGANIZATION_URL: CONFIG.ORGANIZATION_URL,
   supportUrl: CONFIG.SUPPORT_URL,
   settingsUrl,
+  renderSettingsUrl: true,
 }
 
-export const transport = createTransport({
-  host: CONFIG.SMTP_HOST,
-  port: CONFIG.SMTP_PORT,
-  ignoreTLS: CONFIG.SMTP_IGNORE_TLS,
-  secure: CONFIG.SMTP_SECURE, // true for 465, false for other ports
-  pool: true,
-  maxConnections: CONFIG.SMTP_MAX_CONNECTIONS,
-  maxMessages: CONFIG.SMTP_MAX_MESSAGES,
-  auth: hasAuthData && {
-    user: CONFIG.SMTP_USERNAME,
-    pass: CONFIG.SMTP_PASSWORD,
-  },
-  dkim: hasDKIMData && {
-    domainName: CONFIG.SMTP_DKIM_DOMAINNAME,
-    keySelector: CONFIG.SMTP_DKIM_KEYSELECTOR,
-    privateKey: CONFIG.SMTP_DKIM_PRIVATKEY,
-  },
-})
+const from = `${CONFIG.APPLICATION_NAME} <${CONFIG.EMAIL_DEFAULT_SENDER}>`
+
+const transport = createTransport(nodemailerTransportOptions)
 
 const email = new Email({
   message: {
-    from: `${CONFIG.APPLICATION_NAME}`,
+    from,
   },
   transport,
   i18n: {
@@ -195,6 +178,140 @@ export const sendChatMessageMail = async (
         chattingUser: senderUser.name,
         chattingUserUrl: new URL(`/user/${senderUser.id}/${senderUser.slug}`, CONFIG.CLIENT_URI),
         chatUrl: new URL('/chat', CONFIG.CLIENT_URI),
+      },
+    })
+    return originalMessage as OriginalMessage
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+interface VerifyMailInput {
+  email: string
+  nonce: string
+  locale: string
+}
+
+interface RegistrationMailInput extends VerifyMailInput {
+  inviteCode?: string
+}
+
+export const sendRegistrationMail = async (
+  data: RegistrationMailInput,
+): Promise<OriginalMessage> => {
+  const { nonce, locale, inviteCode } = data
+  const to = data.email
+  const actionUrl = new URL('/registration', CONFIG.CLIENT_URI)
+  actionUrl.searchParams.set('email', to)
+  actionUrl.searchParams.set('nonce', nonce)
+  if (inviteCode) {
+    actionUrl.searchParams.set('inviteCode', inviteCode)
+    actionUrl.searchParams.set('method', 'invite-code')
+  } else {
+    actionUrl.searchParams.set('method', 'invite-mail')
+  }
+
+  try {
+    const { originalMessage } = await email.send({
+      template: path.join(__dirname, 'templates', 'registration'),
+      message: {
+        to,
+      },
+      locals: {
+        ...defaultParams,
+        locale,
+        actionUrl,
+        nonce,
+        renderSettingsUrl: false,
+      },
+    })
+    return originalMessage as OriginalMessage
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+interface EmailVerificationInput extends VerifyMailInput {
+  name: string
+}
+
+export const sendEmailVerification = async (
+  data: EmailVerificationInput,
+): Promise<OriginalMessage> => {
+  const { nonce, locale, name } = data
+  const to = data.email
+  const actionUrl = new URL('/settings/my-email-address/verify', CONFIG.CLIENT_URI)
+  actionUrl.searchParams.set('email', to)
+  actionUrl.searchParams.set('nonce', nonce)
+
+  try {
+    const { originalMessage } = await email.send({
+      template: path.join(__dirname, 'templates', 'emailVerification'),
+      message: {
+        to,
+      },
+      locals: {
+        ...defaultParams,
+        locale,
+        actionUrl,
+        nonce,
+        name,
+        renderSettingsUrl: false,
+      },
+    })
+    return originalMessage as OriginalMessage
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+export const sendResetPasswordMail = async (
+  data: EmailVerificationInput,
+): Promise<OriginalMessage> => {
+  const { nonce, locale, name } = data
+  const to = data.email
+  const actionUrl = new URL('/password-reset/change-password', CONFIG.CLIENT_URI)
+  actionUrl.searchParams.set('email', to)
+  actionUrl.searchParams.set('nonce', nonce)
+  try {
+    const { originalMessage } = await email.send({
+      template: path.join(__dirname, 'templates', 'resetPassword'),
+      message: {
+        to,
+      },
+      locals: {
+        ...defaultParams,
+        locale,
+        actionUrl,
+        nonce,
+        name,
+        renderSettingsUrl: false,
+      },
+    })
+    return originalMessage as OriginalMessage
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+export const sendWrongEmail = async (data: {
+  locale: string
+  email: string
+}): Promise<OriginalMessage> => {
+  const { locale } = data
+  const to = data.email
+  const actionUrl = new URL('/password-reset/request', CONFIG.CLIENT_URI)
+  try {
+    const { originalMessage } = await email.send({
+      template: path.join(__dirname, 'templates', 'wrongEmail'),
+      message: {
+        to,
+      },
+      locals: {
+        ...defaultParams,
+        locale,
+        actionUrl,
+        renderSettingsUrl: false,
       },
     })
     return originalMessage as OriginalMessage
