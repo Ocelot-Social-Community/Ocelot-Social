@@ -5,6 +5,7 @@
         v-for="inviteCode in validInviteCodes"
         :key="inviteCode.code"
         :invite-code="inviteCode"
+        :copy-message="copyMessage"
         @invalidate-invite-code="invalidateInviteCode"
       />
     </ul>
@@ -25,6 +26,10 @@ export default {
     inviteCodes: {
       type: Array,
       required: true,
+    },
+    copyMessage: {
+      type: String,
+      default: '',
     },
   },
   components: {

@@ -40,10 +40,17 @@ export default {
       type: Object,
       required: true,
     },
+    copyMessage: {
+      type: String,
+      default: '',
+    },
   },
   computed: {
     inviteLink() {
       return `${window.location.origin}/registration?method=invite-code&inviteCode=${this.inviteCode.code}`
+    },
+    inviteMessageAndLink() {
+      return this.copyMessage ? `${this.copyMessage} ${this.inviteLink}` : this.inviteLink
     },
   },
   data() {
@@ -58,8 +65,8 @@ export default {
     ...mapMutations({
       commitModalData: 'modal/SET_OPEN',
     }),
-    async copyInviteCode(code) {
-      await navigator.clipboard.writeText(this.inviteLink)
+    async copyInviteCode() {
+      await navigator.clipboard.writeText(this.inviteMessageAndLink)
       this.$toast.success(this.$t('invite-codes.copy-success'))
     },
     openDeleteModal() {
@@ -71,9 +78,6 @@ export default {
           modalData: {
             titleIdent: this.$t('invite-codes.delete-modal.title'),
             messageIdent: this.$t('invite-codes.delete-modal.message'),
-            messageParams: {
-              name: this.inviteCode.code,
-            },
             buttons: {
               confirm: {
                 danger: true,
