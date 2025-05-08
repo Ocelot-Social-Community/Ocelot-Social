@@ -91,14 +91,14 @@ a:hover > .base-button.--circle.post-add-button-top {
 
 /* ds-menu-item link colors */
 a.ds-menu-item-link {
-  color: $color-primary;
+  color: $color-secondary;
 }
 a:hover.ds-menu-item-link {
-  color: $color-primary-light;
+  color: black;
 }
 .ds-menu-item-link.router-link-exact-active {
-  color: $color-primary;
-  border-left-color: $color-primary;
+  color: $color-secondary;
+  border-left-color: $color-secondary;
 }
 
 .v-popover.open .trigger a {
@@ -147,10 +147,11 @@ a:hover.ds-menu-item-link {
   background-color: $color-secondary-active;
 }
 #footer a {
-  color: $color-secondary-inverse;
+  color: white;
+  font-weight: 500;
 }
 #footer a:hover {
-  color: color.adjust($color-primary-light, $lightness: -10%);
+  color: color.adjust(white, $lightness: -10%);
 }
 
 .avatar-menu .profile-avatar {
@@ -159,10 +160,6 @@ a:hover.ds-menu-item-link {
 
 .profile-avatar .initials {
   color: $color-primary;
-}
-
-.ds-footer {
-  font-weight: 600;
 }
 
 /* chips with primary color */
