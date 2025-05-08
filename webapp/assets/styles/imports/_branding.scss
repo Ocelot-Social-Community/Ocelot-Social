@@ -127,8 +127,13 @@ a:hover.ds-menu-item-link {
   color: $color-primary-light;
 }
 
-.user-teaser:hover .slug {
-  color: $color-primary-light;
+.user-teaser .info {
+  a .slug {
+    color: $color-secondary;
+  }
+  a:hover .slug {
+    color: black;
+  }
 }
 .profile-avatar.--no-image {
   background-color: $color-secondary;
@@ -180,6 +185,10 @@ div.tab-navigation li.Tabs__tab {
 /* ds-button with primary color */
 .ds-button-primary {
   background-color: $color-primary;
+
+  &:hover {
+    background-color: $color-tertiary;
+  }
 }
 
 /* color of active filter tags in post teaser */
