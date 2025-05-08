@@ -3,7 +3,7 @@
 exports[`sendEmailVerification English renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -85,13 +85,13 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hello User,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>So, you want to change your e-mail? No problem! Just click the button below to verify your new address:</p><a class="button" href="http://webapp:3000/settings/my-email-address/verify?email=user%40example.org&amp;nonce=123456">Verify e-mail address</a>
+        <p>So, you want to change your e-mail? No problem! Just click the button below to verify your new address:</p><a class="button" href="http://localhost:3000/settings/my-email-address/verify?email=user%40example.org&amp;nonce=123456">Verify e-mail address</a>
         <p>If you don't want to change your e-mail address feel free to ignore this message. </p>
         <p>If the above button doesn't work, you can also copy the following code into your browser window: <span>123456</span></p>
         <div class="text-block">
@@ -112,7 +112,7 @@ So, you want to change your e-mail? No problem! Just click the button below to
 verify your new address:
 
 Verify e-mail address
-[http://webapp:3000/settings/my-email-address/verify?email=user%40example.org&nonce=123456]
+[http://localhost:3000/settings/my-email-address/verify?email=user%40example.org&nonce=123456]
 
 If you don't want to change your e-mail address feel free to ignore this
 message.
@@ -133,7 +133,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendEmailVerification German renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -215,15 +215,15 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hallo User,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>Du möchtest also deine E-Mail ändern? Kein Problem! Mit Klick auf diesen Button kannst Du Deine neue E-Mail Adresse bestätigen:</p><a class="button" href="http://webapp:3000/settings/my-email-address/verify?email=user%40example.org&amp;nonce=123456">E-Mail Adresse bestätigen</a>
-        <p>Falls Du deine E-Mail Adresse doch nicht ändern möchtest, kannst du diese Nachricht einfach ignorieren. </p>
-        <p>Sollte der Button für Dich nicht funktionieren, kannst Du auch folgenden Code in Dein Browserfenster kopieren: <span>123456</span></p>
+        <p>Du möchtest also deine E-Mail ändern? Kein Problem! Mit Klick auf diesen Button kannst du Deine neue E-Mail Adresse bestätigen:</p><a class="button" href="http://localhost:3000/settings/my-email-address/verify?email=user%40example.org&amp;nonce=123456">E-Mail Adresse bestätigen</a>
+        <p>Falls du deine E-Mail Adresse doch nicht ändern möchtest, kannst du diese Nachricht einfach ignorieren. </p>
+        <p>Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in Dein Browserfenster kopieren: <span>123456</span></p>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p>
@@ -239,15 +239,15 @@ footer {
   "text": "HALLO USER,
 
 Du möchtest also deine E-Mail ändern? Kein Problem! Mit Klick auf diesen Button
-kannst Du Deine neue E-Mail Adresse bestätigen:
+kannst du Deine neue E-Mail Adresse bestätigen:
 
 E-Mail Adresse bestätigen
-[http://webapp:3000/settings/my-email-address/verify?email=user%40example.org&nonce=123456]
+[http://localhost:3000/settings/my-email-address/verify?email=user%40example.org&nonce=123456]
 
-Falls Du deine E-Mail Adresse doch nicht ändern möchtest, kannst du diese
+Falls du deine E-Mail Adresse doch nicht ändern möchtest, kannst du diese
 Nachricht einfach ignorieren.
 
-Sollte der Button für Dich nicht funktionieren, kannst Du auch folgenden Code in
+Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in
 Dein Browserfenster kopieren: 123456
 
 Bis bald bei ocelot.social [https://ocelot.social]!

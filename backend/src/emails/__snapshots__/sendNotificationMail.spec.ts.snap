@@ -3,7 +3,7 @@
 exports[`sendNotificationMail English changed_group_member_role template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -85,17 +85,17 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hello Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>your role in the group “The Group” has been changed. Click on the button to view this group:</p><a class="button" href="http://webapp:3000/group/g1/the-group">View group</a>
+        <p>your role in the group “The Group” has been changed. Click on the button to view this group:</p><a class="button" href="http://localhost:3000/group/g1/the-group">View group</a>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://localhost:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <footer>
@@ -110,7 +110,7 @@ footer {
 your role in the group “The Group” has been changed. Click on the button to view
 this group:
 
-View group [http://webapp:3000/group/g1/the-group]
+View group [http://localhost:3000/group/g1/the-group]
 
 See you soon on ocelot.social [https://ocelot.social]!
 
@@ -118,7 +118,7 @@ See you soon on ocelot.social [https://ocelot.social]!
 
 
 PS: If you don't want to receive e-mails anymore, change your notification
-settings [http://webapp:3000/settings/notifications]!
+settings [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -129,7 +129,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail English commented_on_post template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -211,18 +211,18 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hello Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> commented on a post that you are observing with the title “New Post”. Click on the button to view this comment:
-        </p><a class="button" href="http://webapp:3000/post/p1/new-post#commentId-c1">View comment</a>
+        <p><a class="user" href="http://localhost:3000/user/u2/peter-lustig">Peter Lustig</a> commented on a post that you are observing with the title “New Post”. Click on the button to view this comment:
+        </p><a class="button" href="http://localhost:3000/post/p1/new-post#commentId-c1">View comment</a>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://localhost:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <footer>
@@ -234,11 +234,11 @@ footer {
   "subject": "ocelot.social  – Notification: New comment on post",
   "text": "HELLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] commented on a post that
-you are observing with the title “New Post”. Click on the button to view this
-comment:
+Peter Lustig [http://localhost:3000/user/u2/peter-lustig] commented on a post
+that you are observing with the title “New Post”. Click on the button to view
+this comment:
 
-View comment [http://webapp:3000/post/p1/new-post#commentId-c1]
+View comment [http://localhost:3000/post/p1/new-post#commentId-c1]
 
 See you soon on ocelot.social [https://ocelot.social]!
 
@@ -246,7 +246,7 @@ See you soon on ocelot.social [https://ocelot.social]!
 
 
 PS: If you don't want to receive e-mails anymore, change your notification
-settings [http://webapp:3000/settings/notifications]!
+settings [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -257,7 +257,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail English followed_user_posted template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -339,18 +339,18 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hello Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a>, a user you are following, wrote a new post with the title “New Post”. Click on the button to view this post:
-        </p><a class="button" href="http://webapp:3000/post/p1/new-post">View post</a>
+        <p><a class="user" href="http://localhost:3000/user/u2/peter-lustig">Peter Lustig</a>, a user you are following, wrote a new post with the title “New Post”. Click on the button to view this post:
+        </p><a class="button" href="http://localhost:3000/post/p1/new-post">View post</a>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://localhost:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <footer>
@@ -362,11 +362,11 @@ footer {
   "subject": "ocelot.social  – Notification: New post by followd user",
   "text": "HELLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig], a user you are
+Peter Lustig [http://localhost:3000/user/u2/peter-lustig], a user you are
 following, wrote a new post with the title “New Post”. Click on the button to
 view this post:
 
-View post [http://webapp:3000/post/p1/new-post]
+View post [http://localhost:3000/post/p1/new-post]
 
 See you soon on ocelot.social [https://ocelot.social]!
 
@@ -374,7 +374,7 @@ See you soon on ocelot.social [https://ocelot.social]!
 
 
 PS: If you don't want to receive e-mails anymore, change your notification
-settings [http://webapp:3000/settings/notifications]!
+settings [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -385,7 +385,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail English mentioned_in_comment template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -467,18 +467,18 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hello Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> mentioned you in a comment to the post with the title “New Post”. Click on the button to view this comment:
-        </p><a class="button" href="http://webapp:3000/post/p1/new-post#commentId-c1">View comment</a>
+        <p><a class="user" href="http://localhost:3000/user/u2/peter-lustig">Peter Lustig</a> mentioned you in a comment to the post with the title “New Post”. Click on the button to view this comment:
+        </p><a class="button" href="http://localhost:3000/post/p1/new-post#commentId-c1">View comment</a>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://localhost:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <footer>
@@ -490,11 +490,11 @@ footer {
   "subject": "ocelot.social  – Notification: Mentioned in comment",
   "text": "HELLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] mentioned you in a
+Peter Lustig [http://localhost:3000/user/u2/peter-lustig] mentioned you in a
 comment to the post with the title “New Post”. Click on the button to view this
 comment:
 
-View comment [http://webapp:3000/post/p1/new-post#commentId-c1]
+View comment [http://localhost:3000/post/p1/new-post#commentId-c1]
 
 See you soon on ocelot.social [https://ocelot.social]!
 
@@ -502,7 +502,7 @@ See you soon on ocelot.social [https://ocelot.social]!
 
 
 PS: If you don't want to receive e-mails anymore, change your notification
-settings [http://webapp:3000/settings/notifications]!
+settings [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -513,7 +513,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail English mentioned_in_post template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -595,18 +595,18 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hello Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> mentioned you in a post with the title “New Post”. Click on the button to view this post:
-        </p><a class="button" href="http://webapp:3000/post/p1/new-post">View post</a>
+        <p><a class="user" href="http://localhost:3000/user/u2/peter-lustig">Peter Lustig</a> mentioned you in a post with the title “New Post”. Click on the button to view this post:
+        </p><a class="button" href="http://localhost:3000/post/p1/new-post">View post</a>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://localhost:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <footer>
@@ -618,10 +618,10 @@ footer {
   "subject": "ocelot.social  – Notification: Mentioned in post",
   "text": "HELLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] mentioned you in a post
-with the title “New Post”. Click on the button to view this post:
+Peter Lustig [http://localhost:3000/user/u2/peter-lustig] mentioned you in a
+post with the title “New Post”. Click on the button to view this post:
 
-View post [http://webapp:3000/post/p1/new-post]
+View post [http://localhost:3000/post/p1/new-post]
 
 See you soon on ocelot.social [https://ocelot.social]!
 
@@ -629,7 +629,7 @@ See you soon on ocelot.social [https://ocelot.social]!
 
 
 PS: If you don't want to receive e-mails anymore, change your notification
-settings [http://webapp:3000/settings/notifications]!
+settings [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -640,7 +640,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail English post_in_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -722,17 +722,17 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hello Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>someone wrote a new post with the title “New Post” in one of your groups. Click on the button to view this post:</p><a class="button" href="http://webapp:3000/post/p1/new-post">View post</a>
+        <p>someone wrote a new post with the title “New Post” in one of your groups. Click on the button to view this post:</p><a class="button" href="http://localhost:3000/post/p1/new-post">View post</a>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://localhost:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <footer>
@@ -747,7 +747,7 @@ footer {
 someone wrote a new post with the title “New Post” in one of your groups. Click
 on the button to view this post:
 
-View post [http://webapp:3000/post/p1/new-post]
+View post [http://localhost:3000/post/p1/new-post]
 
 See you soon on ocelot.social [https://ocelot.social]!
 
@@ -755,7 +755,7 @@ See you soon on ocelot.social [https://ocelot.social]!
 
 
 PS: If you don't want to receive e-mails anymore, change your notification
-settings [http://webapp:3000/settings/notifications]!
+settings [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -766,7 +766,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail English removed_user_from_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -848,7 +848,7 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hello Jenny Rostock,</h2>
@@ -858,7 +858,7 @@ footer {
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://localhost:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <footer>
@@ -878,7 +878,7 @@ See you soon on ocelot.social [https://ocelot.social]!
 
 
 PS: If you don't want to receive e-mails anymore, change your notification
-settings [http://webapp:3000/settings/notifications]!
+settings [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -889,7 +889,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail English user_joined_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -971,18 +971,18 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hello Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> joined the group “The Group”. Click on the button to view this group:
-        </p><a class="button" href="http://webapp:3000/group/g1/the-group">View group</a>
+        <p><a class="user" href="http://localhost:3000/user/u2/peter-lustig">Peter Lustig</a> joined the group “The Group”. Click on the button to view this group:
+        </p><a class="button" href="http://localhost:3000/group/g1/the-group">View group</a>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://localhost:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <footer>
@@ -994,10 +994,10 @@ footer {
   "subject": "ocelot.social  – Notification: User joined group",
   "text": "HELLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] joined the group “The
+Peter Lustig [http://localhost:3000/user/u2/peter-lustig] joined the group “The
 Group”. Click on the button to view this group:
 
-View group [http://webapp:3000/group/g1/the-group]
+View group [http://localhost:3000/group/g1/the-group]
 
 See you soon on ocelot.social [https://ocelot.social]!
 
@@ -1005,7 +1005,7 @@ See you soon on ocelot.social [https://ocelot.social]!
 
 
 PS: If you don't want to receive e-mails anymore, change your notification
-settings [http://webapp:3000/settings/notifications]!
+settings [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -1016,7 +1016,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail English user_left_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -1098,18 +1098,18 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hello Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> left the group “The Group”. Click on the button to view this group:
-        </p><a class="button" href="http://webapp:3000/group/g1/the-group">View group</a>
+        <p><a class="user" href="http://localhost:3000/user/u2/peter-lustig">Peter Lustig</a> left the group “The Group”. Click on the button to view this group:
+        </p><a class="button" href="http://localhost:3000/group/g1/the-group">View group</a>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://localhost:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <footer>
@@ -1121,10 +1121,10 @@ footer {
   "subject": "ocelot.social  – Notification: User left group",
   "text": "HELLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] left the group “The
+Peter Lustig [http://localhost:3000/user/u2/peter-lustig] left the group “The
 Group”. Click on the button to view this group:
 
-View group [http://webapp:3000/group/g1/the-group]
+View group [http://localhost:3000/group/g1/the-group]
 
 See you soon on ocelot.social [https://ocelot.social]!
 
@@ -1132,7 +1132,7 @@ See you soon on ocelot.social [https://ocelot.social]!
 
 
 PS: If you don't want to receive e-mails anymore, change your notification
-settings [http://webapp:3000/settings/notifications]!
+settings [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -1143,7 +1143,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German changed_group_member_role template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1225,17 +1225,17 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>deine Rolle in der Gruppe „The Group“ wurde geändert. Klicke auf den Knopf, um diese Gruppe zu sehen:</p><a class="button" href="http://webapp:3000/group/g1/the-group">Gruppe ansehen</a>
+        <p>deine Rolle in der Gruppe „The Group“ wurde geändert. Klicke auf den Knopf, um diese Gruppe zu sehen:</p><a class="button" href="http://localhost:3000/group/g1/the-group">Gruppe ansehen</a>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://localhost:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <footer>
@@ -1250,7 +1250,7 @@ footer {
 deine Rolle in der Gruppe „The Group“ wurde geändert. Klicke auf den Knopf, um
 diese Gruppe zu sehen:
 
-Gruppe ansehen [http://webapp:3000/group/g1/the-group]
+Gruppe ansehen [http://localhost:3000/group/g1/the-group]
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 
@@ -1258,7 +1258,7 @@ Bis bald bei ocelot.social [https://ocelot.social]!
 
 
 PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine
-Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
+Benachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -1269,7 +1269,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German commented_on_post template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1351,18 +1351,18 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> hat einen Beitrag den du beobachtest mit dem Titel „New Post“ kommentiert. Klicke auf den Knopf, um diesen Kommentar zu sehen:
-        </p><a class="button" href="http://webapp:3000/post/p1/new-post#commentId-c1">Kommentar ansehen</a>
+        <p><a class="user" href="http://localhost:3000/user/u2/peter-lustig">Peter Lustig</a> hat einen Beitrag den du beobachtest mit dem Titel „New Post“ kommentiert. Klicke auf den Knopf, um diesen Kommentar zu sehen:
+        </p><a class="button" href="http://localhost:3000/post/p1/new-post#commentId-c1">Kommentar ansehen</a>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://localhost:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <footer>
@@ -1374,11 +1374,11 @@ footer {
   "subject": "ocelot.social  – Benachrichtigung: Neuer Kommentar zu Beitrag",
   "text": "HALLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] hat einen Beitrag den du
-beobachtest mit dem Titel „New Post“ kommentiert. Klicke auf den Knopf, um
+Peter Lustig [http://localhost:3000/user/u2/peter-lustig] hat einen Beitrag den
+du beobachtest mit dem Titel „New Post“ kommentiert. Klicke auf den Knopf, um
 diesen Kommentar zu sehen:
 
-Kommentar ansehen [http://webapp:3000/post/p1/new-post#commentId-c1]
+Kommentar ansehen [http://localhost:3000/post/p1/new-post#commentId-c1]
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 
@@ -1386,7 +1386,7 @@ Bis bald bei ocelot.social [https://ocelot.social]!
 
 
 PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine
-Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
+Benachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -1397,7 +1397,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German followed_user_posted template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1479,18 +1479,18 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a>, ein Nutzer dem du folgst, hat einen neuen Beitrag mit dem Titel „New Post“ geschrieben. Klicke auf den Knopf, um diesen Beitrag zu sehen:
-        </p><a class="button" href="http://webapp:3000/post/p1/new-post">Beitrag ansehen</a>
+        <p><a class="user" href="http://localhost:3000/user/u2/peter-lustig">Peter Lustig</a>, ein Nutzer dem du folgst, hat einen neuen Beitrag mit dem Titel „New Post“ geschrieben. Klicke auf den Knopf, um diesen Beitrag zu sehen:
+        </p><a class="button" href="http://localhost:3000/post/p1/new-post">Beitrag ansehen</a>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://localhost:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <footer>
@@ -1502,11 +1502,11 @@ footer {
   "subject": "ocelot.social  – Benachrichtigung: Neuer Beitrag von gefolgtem Nutzer",
   "text": "HALLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig], ein Nutzer dem du
+Peter Lustig [http://localhost:3000/user/u2/peter-lustig], ein Nutzer dem du
 folgst, hat einen neuen Beitrag mit dem Titel „New Post“ geschrieben. Klicke auf
 den Knopf, um diesen Beitrag zu sehen:
 
-Beitrag ansehen [http://webapp:3000/post/p1/new-post]
+Beitrag ansehen [http://localhost:3000/post/p1/new-post]
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 
@@ -1514,7 +1514,7 @@ Bis bald bei ocelot.social [https://ocelot.social]!
 
 
 PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine
-Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
+Benachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -1525,7 +1525,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German mentioned_in_comment template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1607,18 +1607,18 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> hat dich in einem Kommentar zu dem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Kommentar zu sehen:
-        </p><a class="button" href="http://webapp:3000/post/p1/new-post#commentId-c1">Kommentar ansehen</a>
+        <p><a class="user" href="http://localhost:3000/user/u2/peter-lustig">Peter Lustig</a> hat dich in einem Kommentar zu dem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Kommentar zu sehen:
+        </p><a class="button" href="http://localhost:3000/post/p1/new-post#commentId-c1">Kommentar ansehen</a>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://localhost:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <footer>
@@ -1630,11 +1630,11 @@ footer {
   "subject": "ocelot.social  – Benachrichtigung: Erwähnung in Kommentar",
   "text": "HALLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] hat dich in einem
+Peter Lustig [http://localhost:3000/user/u2/peter-lustig] hat dich in einem
 Kommentar zu dem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf,
 um den Kommentar zu sehen:
 
-Kommentar ansehen [http://webapp:3000/post/p1/new-post#commentId-c1]
+Kommentar ansehen [http://localhost:3000/post/p1/new-post#commentId-c1]
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 
@@ -1642,7 +1642,7 @@ Bis bald bei ocelot.social [https://ocelot.social]!
 
 
 PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine
-Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
+Benachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -1653,7 +1653,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German mentioned_in_post template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1735,18 +1735,18 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> hat Dich in einem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Beitrag zu sehen:
-        </p><a class="button" href="http://webapp:3000/post/p1/new-post">Beitrag ansehen</a>
+        <p><a class="user" href="http://localhost:3000/user/u2/peter-lustig">Peter Lustig</a> hat dich in einem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Beitrag zu sehen:
+        </p><a class="button" href="http://localhost:3000/post/p1/new-post">Beitrag ansehen</a>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://localhost:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <footer>
@@ -1758,10 +1758,11 @@ footer {
   "subject": "ocelot.social  – Benachrichtigung: Erwähnung in Beitrag",
   "text": "HALLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] hat Dich in einem Beitrag
-mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Beitrag zu sehen:
+Peter Lustig [http://localhost:3000/user/u2/peter-lustig] hat dich in einem
+Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Beitrag
+zu sehen:
 
-Beitrag ansehen [http://webapp:3000/post/p1/new-post]
+Beitrag ansehen [http://localhost:3000/post/p1/new-post]
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 
@@ -1769,7 +1770,7 @@ Bis bald bei ocelot.social [https://ocelot.social]!
 
 
 PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine
-Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
+Benachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -1780,7 +1781,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German post_in_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1862,17 +1863,17 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>jemand hat einen neuen Beitrag mit dem Titel „New Post“ in einer deiner Gruppen geschrieben. Klicke auf den Knopf, um diesen Beitrag zu sehen:</p><a class="button" href="http://webapp:3000/post/p1/new-post">Beitrag ansehen</a>
+        <p>jemand hat einen neuen Beitrag mit dem Titel „New Post“ in einer deiner Gruppen geschrieben. Klicke auf den Knopf, um diesen Beitrag zu sehen:</p><a class="button" href="http://localhost:3000/post/p1/new-post">Beitrag ansehen</a>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://localhost:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <footer>
@@ -1887,7 +1888,7 @@ footer {
 jemand hat einen neuen Beitrag mit dem Titel „New Post“ in einer deiner Gruppen
 geschrieben. Klicke auf den Knopf, um diesen Beitrag zu sehen:
 
-Beitrag ansehen [http://webapp:3000/post/p1/new-post]
+Beitrag ansehen [http://localhost:3000/post/p1/new-post]
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 
@@ -1895,7 +1896,7 @@ Bis bald bei ocelot.social [https://ocelot.social]!
 
 
 PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine
-Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
+Benachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -1906,7 +1907,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German removed_user_from_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1988,7 +1989,7 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hallo Jenny Rostock,</h2>
@@ -1998,7 +1999,7 @@ footer {
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://localhost:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <footer>
@@ -2018,7 +2019,7 @@ Bis bald bei ocelot.social [https://ocelot.social]!
 
 
 PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine
-Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
+Benachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -2029,7 +2030,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German user_joined_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -2111,18 +2112,18 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> ist der Gruppe „The Group“ beigetreten. Klicke auf den Knopf, um diese Gruppe zu sehen:
-        </p><a class="button" href="http://webapp:3000/group/g1/the-group">Gruppe ansehen</a>
+        <p><a class="user" href="http://localhost:3000/user/u2/peter-lustig">Peter Lustig</a> ist der Gruppe „The Group“ beigetreten. Klicke auf den Knopf, um diese Gruppe zu sehen:
+        </p><a class="button" href="http://localhost:3000/group/g1/the-group">Gruppe ansehen</a>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://localhost:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <footer>
@@ -2134,10 +2135,10 @@ footer {
   "subject": "ocelot.social  – Benachrichtigung: Nutzer tritt Gruppe bei",
   "text": "HALLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] ist der Gruppe „The
+Peter Lustig [http://localhost:3000/user/u2/peter-lustig] ist der Gruppe „The
 Group“ beigetreten. Klicke auf den Knopf, um diese Gruppe zu sehen:
 
-Gruppe ansehen [http://webapp:3000/group/g1/the-group]
+Gruppe ansehen [http://localhost:3000/group/g1/the-group]
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 
@@ -2145,7 +2146,7 @@ Bis bald bei ocelot.social [https://ocelot.social]!
 
 
 PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine
-Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
+Benachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -2156,7 +2157,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendNotificationMail German user_left_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": "ocelot.social <undefined>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -2238,18 +2239,18 @@ footer {
   <body>
     <div class="container">
       <header>
-        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://webapp:3000/img/custom/logo-squared.svg">
+        <div class="head"><img class="head-logo" alt="Welcome Image" loading="lazy" src="http://localhost:3000/img/custom/logo-squared.svg">
         </div>
       </header>
       <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> hat die Gruppe „The Group“ verlassen. Klicke auf den Knopf, um diese Gruppe zu sehen:
-        </p><a class="button" href="http://webapp:3000/group/g1/the-group">Gruppe ansehen</a>
+        <p><a class="user" href="http://localhost:3000/user/u2/peter-lustig">Peter Lustig</a> hat die Gruppe „The Group“ verlassen. Klicke auf den Knopf, um diese Gruppe zu sehen:
+        </p><a class="button" href="http://localhost:3000/group/g1/the-group">Gruppe ansehen</a>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://localhost:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <footer>
@@ -2261,10 +2262,10 @@ footer {
   "subject": "ocelot.social  – Benachrichtigung: Nutzer verlässt Gruppe",
   "text": "HALLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] hat die Gruppe „The
+Peter Lustig [http://localhost:3000/user/u2/peter-lustig] hat die Gruppe „The
 Group“ verlassen. Klicke auf den Knopf, um diese Gruppe zu sehen:
 
-Gruppe ansehen [http://webapp:3000/group/g1/the-group]
+Gruppe ansehen [http://localhost:3000/group/g1/the-group]
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 
@@ -2272,7 +2273,7 @@ Bis bald bei ocelot.social [https://ocelot.social]!
 
 
 PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine
-Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
+Benachrichtigungseinstellungen [http://localhost:3000/settings/notifications]!
 
 
 ocelot.social Community [https://ocelot.social]",
