@@ -191,6 +191,17 @@ span.category-tag.filterActive {
 div.ds-input-wrap > input:focus-within.ds-input {
   border-color: $color-primary;
 }
+.ds-input:focus {
+  border-color: $color-primary;
+}
+.ds-form-item.ds-input-has-focus {
+  .ds-select,
+  .ds-select-dropdown {
+    border-color: $color-primary;
+  }
+}
+
+
 // div .ds-form-item .ds-input-has-focus {
 //   border-color: $color-primary;
 // }
