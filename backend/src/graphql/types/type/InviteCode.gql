@@ -3,6 +3,7 @@ type InviteCode {
   createdAt: String!
   generatedBy: User @relation(name: "GENERATED", direction: "IN")
   redeemedBy: [User] @relation(name: "REDEEMED", direction: "IN")
+  redeemedByCount: Int! @cypher(statement: "MATCH (this)<-[:REDEEMED]-(related:User)")
   expiresAt: String
   comment: String
 

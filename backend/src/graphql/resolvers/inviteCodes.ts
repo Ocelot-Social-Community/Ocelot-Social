@@ -51,7 +51,7 @@ export const validateInviteCode = async (context: Context, inviteCode) => {
   return result[0].get('result') === true
 }
 
-export const redeemInviteCode = async (context: Context, code) => {
+export const redeemInviteCode = async (context: Context, code, newUser = false) => {
   const result = (
     await context.database.query({
       query: `
@@ -59,7 +59,7 @@ export const redeemInviteCode = async (context: Context, code) => {
       OPTIONAL MATCH (inviteCode)-[:INVITES_TO]->(group:Group)
       WHERE inviteCode.expiresAt IS NULL
         OR datetime(inviteCode.expiresAt) >= datetime()
-      RETURN inviteCode {.*}, group {.*}`,
+      RETURN inviteCode {.*}, group {.*}, host {.*}`,
       variables: { code },
     })
   ).records
@@ -70,13 +70,23 @@ export const redeemInviteCode = async (context: Context, code) => {
 
   const inviteCode = result[0].get('inviteCode')
   const group = result[0].get('group')
+  const host = result[0].get('host')
 
-  if (!inviteCode) {
+  if (!inviteCode || !host) {
     return false
+  }
+
+  if (host.id === context.user.id) {
+    return true
   }
 
   // Personal Invite Link
   if (!group) {
+    // We redeemed this link while having an account, hence we do nothing, but return true
+    if (!newUser) {
+      return true
+    }
+
     await context.database.write({
       query: `
       MATCH (user:User {id: $user.id}), (inviteCode:InviteCode {code: toUpper($code)})<-[:GENERATED]-(host:User)
@@ -89,14 +99,18 @@ export const redeemInviteCode = async (context: Context, code) => {
     })
     // Group Invite Link
   } else {
-    const role = ['closed', 'hidden'].includes(group.type as string) ? 'pending' : 'usual'
+    const role = ['closed', 'hidden'].includes(group.groupType as string) ? 'pending' : 'usual'
+
+    const optionalInvited = newUser
+      ? 'MERGE (host)-[:INVITED { createdAt: toString(datetime()) }]->(user)'
+      : ''
 
     await context.database.write({
       query: `
       MATCH (user:User {id: $user.id}), (group:Group)<-[:INVITES_TO]-(inviteCode:InviteCode {code: toUpper($code)})<-[:GENERATED]-(host:User)
       MERGE (user)-[:REDEEMED { createdAt: toString(datetime()) }]->(inviteCode)
-      MERGE (host)-[:INVITED { createdAt: toString(datetime()) }]->(user)
-      MERGE (user)-[membership:MEMBER_OF]->(group)
+      ${optionalInvited}
+      MERGE (user)-[membership:MEMBER_OF]->(group) 
         ON CREATE SET
           membership.createdAt = toString(datetime()),
           membership.updatedAt = null,
@@ -237,7 +251,7 @@ export default {
       return result[0].get('inviteCode')
     },
     redeemInviteCode: async (_parent, args, context: Context, _resolveInfo) => {
-      return redeemInviteCode(context, args.inviteCode)
+      return redeemInviteCode(context, args.code)
     },
   },
   InviteCode: {
@@ -270,6 +284,9 @@ export default {
     ...Resolver('InviteCode', {
       idAttribute: 'code',
       undefinedToNull: ['expiresAt', 'comment'],
+      count: {
+        redeemedByCount: '<-[:REDEEMED]-(related:User)',
+      },
       hasOne: {
         generatedBy: '<-[:GENERATED]-(related:User)',
       },

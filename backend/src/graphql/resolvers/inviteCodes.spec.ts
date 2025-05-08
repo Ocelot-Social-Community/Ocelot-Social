@@ -15,6 +15,10 @@ import {
 } from '@graphql/queries/validateInviteCode'
 import createServer, { getContext } from '@src/server'
 import { invalidateInviteCode } from '@graphql/queries/invalidateInviteCode'
+import { redeemInviteCode } from '@graphql/queries/redeemInviteCode'
+import { currentUser } from '@graphql/queries/currentUser'
+import { Group } from '@graphql/queries/Group'
+import { GroupMembers } from '@graphql/queries/GroupMembers'
 
 const database = databaseContext()
 
@@ -787,6 +791,7 @@ describe('invalidateInviteCode', () => {
       })
     })
   })
+
   describe('as authenticated user', () => {
     describe('as link owner', () => {
       beforeEach(async () => {
@@ -834,6 +839,295 @@ describe('invalidateInviteCode', () => {
           },
           errors: [{ message: 'Not Authorized!' }],
         })
+      })
+    })
+  })
+})
+
+describe('redeemInviteCode', () => {
+  let invitingUser, otherUser
+  let hiddenGroup, publicGroup
+  beforeEach(async () => {
+    await cleanDatabase()
+    invitingUser = await Factory.build('user', {
+      id: 'inviting-user',
+      role: 'user',
+      name: 'Inviting User',
+    })
+
+    otherUser = await Factory.build('user', {
+      id: 'other-user',
+      role: 'user',
+      name: 'Other User',
+    })
+
+    authenticatedUser = await invitingUser.toJson()
+    hiddenGroup = 'g0'
+    await mutate({
+      mutation: createGroupMutation(),
+      variables: {
+        id: hiddenGroup,
+        name: 'Hidden Group',
+        about: 'We are hidden',
+        description: 'anything',
+        groupType: 'hidden',
+        actionRadius: 'global',
+        categoryIds: ['cat6', 'cat12', 'cat16'],
+        locationName: 'Hamburg, Germany',
+      },
+    })
+
+    publicGroup = 'g2'
+    await mutate({
+      mutation: createGroupMutation(),
+      variables: {
+        id: publicGroup,
+        name: 'Public Group',
+        about: 'We are public',
+        description: 'anything',
+        groupType: 'public',
+        actionRadius: 'interplanetary',
+        categoryIds: ['cat4', 'cat5', 'cat17'],
+      },
+    })
+
+    await Factory.build(
+      'inviteCode',
+      {
+        code: 'CODE33',
+      },
+      {
+        generatedBy: invitingUser,
+      },
+    )
+    await Factory.build(
+      'inviteCode',
+      {
+        code: 'GRPPBL',
+      },
+      {
+        generatedBy: invitingUser,
+        groupId: publicGroup,
+      },
+    )
+    await Factory.build(
+      'inviteCode',
+      {
+        code: 'GRPHDN',
+      },
+      {
+        generatedBy: invitingUser,
+        groupId: hiddenGroup,
+      },
+    )
+  })
+
+  describe('as unauthenticated user', () => {
+    beforeEach(() => {
+      authenticatedUser = null
+    })
+
+    it('throws authorization error', async () => {
+      await expect(
+        mutate({ mutation: redeemInviteCode, variables: { code: 'CODE33' } }),
+      ).resolves.toMatchObject({
+        data: null,
+        errors: [{ message: 'Not Authorized!' }],
+      })
+    })
+  })
+
+  describe('as authenticated user', () => {
+    beforeEach(async () => {
+      authenticatedUser = await otherUser.toJson()
+    })
+
+    it('returns false for an invalid inviteCode', async () => {
+      await expect(
+        mutate({ mutation: redeemInviteCode, variables: { code: 'INVALD' } }),
+      ).resolves.toMatchObject({
+        data: {
+          redeemInviteCode: false,
+        },
+        errors: undefined,
+      })
+    })
+
+    it('returns true for a personal inviteCode, but does nothing', async () => {
+      await expect(
+        mutate({ mutation: redeemInviteCode, variables: { code: 'CODE33' } }),
+      ).resolves.toMatchObject({
+        data: {
+          redeemInviteCode: true,
+        },
+        errors: undefined,
+      })
+      await expect(query({ query: currentUser })).resolves.toMatchObject({
+        data: {
+          currentUser: {
+            following: [],
+          },
+        },
+        errors: undefined,
+      })
+    })
+
+    it('returns true for a public group inviteCode and makes the user a group member', async () => {
+      await expect(
+        mutate({ mutation: redeemInviteCode, variables: { code: 'GRPPBL' } }),
+      ).resolves.toMatchObject({
+        data: {
+          redeemInviteCode: true,
+        },
+        errors: undefined,
+      })
+      await expect(query({ query: Group, variables: { id: publicGroup } })).resolves.toMatchObject({
+        data: {
+          Group: [
+            {
+              myRole: 'usual',
+            },
+          ],
+        },
+        errors: undefined,
+      })
+      authenticatedUser = await invitingUser.toJson()
+      await expect(query({ query: currentUser })).resolves.toMatchObject({
+        data: {
+          currentUser: {
+            inviteCodes: expect.arrayContaining([
+              {
+                code: 'GRPPBL',
+                redeemedByCount: 1,
+              },
+              {
+                code: 'GRPHDN',
+                redeemedByCount: 0,
+              },
+            ]),
+          },
+        },
+        errors: undefined,
+      })
+    })
+
+    it('returns true for a hidden group inviteCode and makes the user a pending member', async () => {
+      await expect(
+        mutate({ mutation: redeemInviteCode, variables: { code: 'GRPHDN' } }),
+      ).resolves.toMatchObject({
+        data: {
+          redeemInviteCode: true,
+        },
+        errors: undefined,
+      })
+      // It is not possible to see if I am in a hidden group when pending
+      /* await expect(query({ query: Group, variables: { id: hiddenGroup } })).resolves.toMatchObject({
+        data: {
+          Group: [
+            {
+              myRole: 'pending',
+            },
+          ],
+        },
+        errors: undefined,
+      }) */
+      authenticatedUser = await invitingUser.toJson()
+      // with this query we cannot determine the users group role?
+      await expect(
+        query({ query: GroupMembers, variables: { id: hiddenGroup } }),
+      ).resolves.toMatchObject({
+        data: {
+          GroupMembers: expect.arrayContaining([
+            {
+              id: 'inviting-user',
+            },
+            {
+              id: 'other-user',
+            },
+          ]),
+        },
+        errors: undefined,
+      })
+      await expect(query({ query: currentUser })).resolves.toMatchObject({
+        data: {
+          currentUser: {
+            inviteCodes: expect.arrayContaining([
+              {
+                code: 'GRPPBL',
+                redeemedByCount: 0,
+              },
+              {
+                code: 'GRPHDN',
+                redeemedByCount: 1,
+              },
+            ]),
+          },
+        },
+        errors: undefined,
+      })
+    })
+  })
+
+  describe('as authenticated self', () => {
+    beforeEach(async () => {
+      authenticatedUser = await invitingUser.toJson()
+    })
+
+    it('returns true for a personal inviteCode, but does nothing', async () => {
+      await expect(
+        mutate({ mutation: redeemInviteCode, variables: { code: 'CODE33' } }),
+      ).resolves.toMatchObject({
+        data: {
+          redeemInviteCode: true,
+        },
+        errors: undefined,
+      })
+      await expect(query({ query: currentUser })).resolves.toMatchObject({
+        data: {
+          currentUser: {
+            following: [],
+          },
+        },
+        errors: undefined,
+      })
+    })
+
+    it('returns true for a public group inviteCode, but does nothing', async () => {
+      await expect(
+        mutate({ mutation: redeemInviteCode, variables: { code: 'GRPPBL' } }),
+      ).resolves.toMatchObject({
+        data: {
+          redeemInviteCode: true,
+        },
+        errors: undefined,
+      })
+      await expect(query({ query: Group, variables: { id: publicGroup } })).resolves.toMatchObject({
+        data: {
+          Group: [
+            {
+              myRole: 'owner',
+            },
+          ],
+        },
+        errors: undefined,
+      })
+      authenticatedUser = await invitingUser.toJson()
+      await expect(query({ query: currentUser })).resolves.toMatchObject({
+        data: {
+          currentUser: {
+            inviteCodes: expect.arrayContaining([
+              {
+                code: 'GRPPBL',
+                redeemedByCount: 0,
+              },
+              {
+                code: 'GRPHDN',
+                redeemedByCount: 0,
+              },
+            ]),
+          },
+        },
+        errors: undefined,
       })
     })
   })
