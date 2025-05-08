@@ -246,7 +246,8 @@
           }
         },
         "invited-by-and-to": "Invited by {invitedBy} to group {invitedTo}.",
-        "invited-by": "Invited by {invitedBy}."
+        "invited-by": "Invited by {invitedBy}.",
+        "invited-to-hidden-group": "Invited by {invitedBy} to a hidden group."
       },
       "no-public-registrstion": {
         "title": "No Public Registration"
