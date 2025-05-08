@@ -4,7 +4,7 @@
     <form @submit.prevent="generateInviteCode" class="generate-invite-code-form">
       <ds-input
         name="comment"
-        placeholder="Comment"
+        :placeholder="$t('invite-codes.comment-placeholder')"
         v-model="comment"
         :schema="{ type: 'string', max: 30 }"
       />
