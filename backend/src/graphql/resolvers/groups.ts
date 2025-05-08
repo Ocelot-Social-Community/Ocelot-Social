@@ -440,19 +440,15 @@ export default {
       if (!parent.id) {
         throw new Error('Can not identify selected Group!')
       }
-      const {
-        user: { id: userId },
-      } = context
-
       return (
         await context.database.query({
           query: `
-          MATCH (user:User {id: $userId})-[:GENERATED]->(inviteCodes:InviteCode)-[:INVITES_TO]->(g:Group {id: $parent.id})
+          MATCH (user:User {id: $user.id})-[:GENERATED]->(inviteCodes:InviteCode)-[:INVITES_TO]->(g:Group {id: $parent.id})
           WHERE (inviteCodes)
           RETURN inviteCodes {.*}
           `,
           variables: {
-            userId,
+            user: context.user,
             parent,
           },
         })
