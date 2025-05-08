@@ -55,6 +55,11 @@ export default {
 
 <style scoped lang="scss">
 .invitation-list {
+  display: flex;
+  flex-flow: column;
+  gap: $space-base;
+  padding-bottom: $space-base;
+
   ul {
     list-style: none;
   }
