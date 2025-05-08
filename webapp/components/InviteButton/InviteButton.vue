@@ -28,7 +28,7 @@
 
 <script>
 import Dropdown from '~/components/Dropdown'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import InvitationList from '~/components/_new/features/Invitations/InvitationList.vue'
 import { generatePersonalInviteCode, invalidateInviteCode } from '~/graphql/InviteCode'
 
@@ -50,25 +50,49 @@ export default {
     },
   },
   methods: {
+    ...mapMutations({
+      setCurrentUser: 'auth/SET_USER',
+    }),
     async generatePersonalInviteCode(comment) {
-      await this.$apollo.mutate({
-        mutation: generatePersonalInviteCode(),
-        variables: {
-          comment,
-        },
-      })
-      this.$toast.success(this.$t('invite-codes.create-success'))
-      // TODO update the invite code list?
+      try {
+        await this.$apollo.mutate({
+          mutation: generatePersonalInviteCode(),
+          variables: {
+            comment,
+          },
+          update: (_, { data: { generatePersonalInviteCode } }) => {
+            this.setCurrentUser({
+              ...this.currentUser,
+              inviteCodes: [...this.user.inviteCodes, generatePersonalInviteCode],
+            })
+          },
+        })
+        this.$toast.success(this.$t('invite-codes.create-success'))
+      } catch (error) {
+        this.$toast.error(this.$t('invite-codes.create-error'))
+      }
     },
     async invalidateInviteCode(code) {
-      await this.$apollo.mutate({
-        mutation: invalidateInviteCode(),
-        variables: {
-          code,
-        },
-      })
-      this.$toast.success(this.$t('invite-codes.invalidate-success'))
-      // TODO update the invite code list?
+      try {
+        await this.$apollo.mutate({
+          mutation: invalidateInviteCode(),
+          variables: {
+            code,
+          },
+          update: (_, { data: { generatePersonalInviteCode } }) => {
+            this.setCurrentUser({
+              ...this.currentUser,
+              inviteCodes: this.user.inviteCodes.map((inviteCode) => ({
+                ...inviteCode,
+                isValid: inviteCode.code === code ? false : inviteCode.isValid,
+              })),
+            })
+          },
+        })
+        this.$toast.success(this.$t('invite-codes.invalidate-success'))
+      } catch (error) {
+        this.$toast.error(this.$t('invite-codes.invalidate-error'))
+      }
     },
   },
 }
