@@ -25,7 +25,8 @@ const uniqueInviteCode = async (context: Context, code: string) => {
     (
       await context.database.query({
         query: `MATCH (inviteCode:InviteCode { code: toUpper($code) })
-        WHERE inviteCode.expiresAt >= datetime()
+        WHERE inviteCode.expiresAt IS NULL
+          OR inviteCode.expiresAt >= datetime()
         RETURN toString(count(inviteCode)) AS count`,
         variables: { code },
       })
