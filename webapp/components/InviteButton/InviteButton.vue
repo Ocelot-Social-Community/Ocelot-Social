@@ -78,7 +78,7 @@ export default {
           variables: {
             code,
           },
-          update: (_, { data: { generatePersonalInviteCode } }) => {
+          update: (_, { data: { _invalidateInviteCode } }) => {
             this.setCurrentUser({
               ...this.currentUser,
               inviteCodes: this.user.inviteCodes.map((inviteCode) => ({
