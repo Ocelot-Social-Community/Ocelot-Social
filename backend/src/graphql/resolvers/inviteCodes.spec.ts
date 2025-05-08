@@ -477,8 +477,10 @@ describe('generatePersonalInviteCode', () => {
     })
 
     it('throws an error when the max amount of invite links was reached', async () => {
+      let lastCode
       for (let i = 0; i < CONFIG.INVITE_CODES_PERSONAL_PER_USER; i++) {
-        await expect(mutate({ mutation: generatePersonalInviteCode })).resolves.toMatchObject({
+        lastCode = await mutate({ mutation: generatePersonalInviteCode })
+        expect(lastCode).toMatchObject({
           errors: undefined,
         })
       }
@@ -488,6 +490,13 @@ describe('generatePersonalInviteCode', () => {
             message: 'You have reached the maximum of Invite Codes you can generate',
           },
         ],
+      })
+      await mutate({
+        mutation: invalidateInviteCode,
+        variables: { code: lastCode.data.generatePersonalInviteCode.code },
+      })
+      await expect(mutate({ mutation: generatePersonalInviteCode })).resolves.toMatchObject({
+        errors: undefined,
       })
     })
 
@@ -729,10 +738,13 @@ describe('generateGroupInviteCode', () => {
     })
 
     it('throws an error when the max amount of invite links was reached', async () => {
+      let lastCode
       for (let i = 0; i < CONFIG.INVITE_CODES_GROUP_PER_USER; i++) {
-        await expect(
-          mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'public-group' } }),
-        ).resolves.toMatchObject({
+        lastCode = await mutate({
+          mutation: generateGroupInviteCode,
+          variables: { groupId: 'public-group' },
+        })
+        expect(lastCode).toMatchObject({
           errors: undefined,
         })
       }
@@ -744,6 +756,15 @@ describe('generateGroupInviteCode', () => {
             message: 'You have reached the maximum of Invite Codes you can generate for this group',
           },
         ],
+      })
+      await mutate({
+        mutation: invalidateInviteCode,
+        variables: { code: lastCode.data.generateGroupInviteCode.code },
+      })
+      await expect(
+        mutate({ mutation: generateGroupInviteCode, variables: { groupId: 'public-group' } }),
+      ).resolves.toMatchObject({
+        errors: undefined,
       })
     })
 
