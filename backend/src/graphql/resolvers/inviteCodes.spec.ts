@@ -20,6 +20,7 @@ import {
   unauthenticatedValidateInviteCode,
 } from '@graphql/queries/validateInviteCode'
 import createServer, { getContext } from '@src/server'
+import inviteCodes from './inviteCodes'
 
 const database = databaseContext()
 
@@ -491,6 +492,9 @@ describe('generatePersonalInviteCode', () => {
         ],
       })
     })
+
+    // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
+    it.skip('returns a new invite code when colliding with an existing one', () => {})
   })
 
   // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
@@ -732,6 +736,9 @@ describe('generateGroupInviteCode', () => {
         ],
       })
     })
+
+    // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
+    it.skip('returns a new group invite code when colliding with an existing one', () => {})
   })
 
   describe('as authenticated not-member', () => {
@@ -774,9 +781,6 @@ describe('generateGroupInviteCode', () => {
       })
     })
   })
-
-  // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
-  it.skip('code collision', () => {})
 })
 
 describe('invalidateInviteCode', () => {
