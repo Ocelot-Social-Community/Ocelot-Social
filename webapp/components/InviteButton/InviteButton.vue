@@ -13,6 +13,10 @@
       />
     </template>
     <template #popover>
+      <h2>My invitation links</h2>
+      <div>Create links to invite people to this network.</div>
+      <invitation-list @create-invite-code="createInviteCode" :inviteCodes="user.inviteCodes" />
+      <!--
       <div class="invite-button-menu-popover">
         <div v-if="inviteCode && inviteCode.code">
           <p class="description">{{ $t('invite-codes.your-code') }}</p>
@@ -32,6 +36,7 @@
           <ds-text>{{ $t('invite-codes.not-available') }}</ds-text>
         </div>
       </div>
+      -->
     </template>
   </dropdown>
 </template>
@@ -39,12 +44,14 @@
 <script>
 import Dropdown from '~/components/Dropdown'
 import { mapGetters } from 'vuex'
-import BaseCard from '../_new/generic/BaseCard/BaseCard.vue'
+import InvitationList from '~/components/_new/features/Invitations/InvitationList.vue'
+import { create } from 'core-js/core/object'
+import { generatePersonalInviteCode } from '~/graphql/InviteCode'
 
 export default {
   components: {
     Dropdown,
-    BaseCard,
+    InvitationList,
   },
   props: {
     placement: { type: String, default: 'top-end' },
@@ -66,17 +73,22 @@ export default {
     },
     inviteLink() {
       return (
-        'https://' +
-        window.location.hostname +
+        window.location.origin +
         '/registration?method=invite-code&inviteCode=' +
         this.inviteCode.code
       )
     },
   },
   methods: {
-    async copyInviteLink() {
-      await navigator.clipboard.writeText(this.inviteLink)
-      this.$toast.success(this.$t('invite-codes.copy-success'))
+    async createInviteCode(comment) {
+      await this.$apollo.mutate({
+        mutation: generatePersonalInviteCode,
+        variables: {
+          comment,
+        },
+      })
+      this.$toast.success(this.$t('invite-codes.create-success'))
+      // TODO update the invite code list?
     },
   },
 }

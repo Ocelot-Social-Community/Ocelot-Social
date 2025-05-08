@@ -412,6 +412,7 @@ export const currentUserQuery = gql`
         redeemedBy {
           id
         }
+        redeemedByCount
       }
       badgeTrophiesSelected {
         id
