@@ -744,9 +744,7 @@ describe('generateGroupInviteCode', () => {
   it.skip('max amount used', () => {})
 })
 
-// ---
-
-describe.only('invalidateInviteCode', () => {
+describe('invalidateInviteCode', () => {
   let invitingUser, otherUser
   beforeEach(async () => {
     await cleanDatabase()
