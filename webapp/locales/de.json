@@ -252,7 +252,7 @@
       "signup": {
         "form": {
           "data-privacy": "Ich habe die Datenschutzerklärung gelesen und verstanden.",
-          "description": "Um loszulegen, kannst Du Dich hier kostenfrei registrieren:",
+          "description": "Um loszulegen, kannst du Dich hier kostenfrei registrieren:",
           "errors": {
             "email-exists": "Es gibt schon ein Nutzerkonto mit dieser E-Mail-Adresse!"
           },
@@ -355,13 +355,13 @@
   "delete": {
     "cancel": "Abbrechen",
     "comment": {
-      "message": "Bist Du sicher, dass Du den Kommentar „<b>{name}</b>“ löschen möchtest?",
+      "message": "Bist du sicher, dass du den Kommentar „<b>{name}</b>“ löschen möchtest?",
       "success": "Kommentar erfolgreich gelöscht!",
       "title": "Lösche Kommentar",
       "type": "Kommentar"
     },
     "contribution": {
-      "message": "Bist Du sicher, dass Du den Beitrag „<b>{name}</b>“ löschen möchtest?",
+      "message": "Bist du sicher, dass du den Beitrag „<b>{name}</b>“ löschen möchtest?",
       "success": "Beitrag erfolgreich gelöscht!",
       "title": "Lösche Beitrag",
       "type": "Beitrag"
@@ -371,19 +371,19 @@
   "disable": {
     "cancel": "Abbrechen",
     "comment": {
-      "message": "Bist Du sicher, dass Du den Kommentar „<b>{name}</b>“ deaktivieren möchtest?",
+      "message": "Bist du sicher, dass du den Kommentar „<b>{name}</b>“ deaktivieren möchtest?",
       "title": "Kommentar sperren",
       "type": "Kommentar"
     },
     "contribution": {
-      "message": "Bist Du sicher, dass Du den Beitrag von „<b>{name}</b>“ deaktivieren möchtest?",
+      "message": "Bist du sicher, dass du den Beitrag von „<b>{name}</b>“ deaktivieren möchtest?",
       "title": "Beitrag sperren",
       "type": "Beitrag"
     },
     "submit": "Deaktivieren",
     "success": "Erfolgreich deaktiviert",
     "user": {
-      "message": "Bist Du sicher, dass Du den Nutzer „<b>{name}</b>“ sperren möchtest?",
+      "message": "Bist du sicher, dass du den Nutzer „<b>{name}</b>“ sperren möchtest?",
       "title": "Nutzer sperren",
       "type": "Nutzer"
     }
@@ -395,7 +395,7 @@
   "editor": {
     "embed": {
       "always_allow": "Einzubettende Inhalte von Drittanbietern immer erlauben (diese Einstellung ist jederzeit änderbar)",
-      "data_privacy_info": "Deine Daten wurden noch nicht an Drittanbieter weitergegeben. Wenn Du diesen Inhalt jetzt abspielst, registriert der folgende Anbieter wahrscheinlich Deine Nutzerdaten:",
+      "data_privacy_info": "Deine Daten wurden noch nicht an Drittanbieter weitergegeben. Wenn du diesen Inhalt jetzt abspielst, registriert der folgende Anbieter wahrscheinlich Deine Nutzerdaten:",
       "data_privacy_warning": "Achte auf Deine Daten!",
       "play_now": "Jetzt ansehen"
     },
@@ -656,7 +656,7 @@
   },
   "maintenance": {
     "explanation": "Derzeit führen wir einige geplante Wartungsarbeiten durch, bitte versuche es später erneut.",
-    "questions": "Bei Fragen oder Problemen erreichst Du uns per E-Mail an",
+    "questions": "Bei Fragen oder Problemen erreichst du uns per E-Mail an",
     "title": "{APPLICATION_NAME} befindet sich in der Wartung"
   },
   "map": {
@@ -697,32 +697,32 @@
         "cancel": "Abbruch",
         "Comment": {
           "disable": {
-            "message": "Möchtest Du den Kommentar „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
+            "message": "Möchtest du den Kommentar „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
             "title": "Sperre den Kommentar abschließend"
           },
           "enable": {
-            "message": "Möchtest Du den Kommentar „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
+            "message": "Möchtest du den Kommentar „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
             "title": "Entsperre den Kommentar abschließend"
           }
         },
         "Post": {
           "disable": {
-            "message": "Möchtest Du den Beitrag „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
+            "message": "Möchtest du den Beitrag „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
             "title": "Sperre den Beitrag abschließend"
           },
           "enable": {
-            "message": "Möchtest Du den Beitrag „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
+            "message": "Möchtest du den Beitrag „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
             "title": "Entsperre den Beitrag abschließend"
           }
         },
         "submit": "Bestätige Entscheidung",
         "User": {
           "disable": {
-            "message": "Möchtest Du den Nutzer „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
+            "message": "Möchtest du den Nutzer „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
             "title": "Sperre den Nutzer abschließend"
           },
           "enable": {
-            "message": "Möchtest Du den Nutzer „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
+            "message": "Möchtest du den Nutzer „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
             "title": "Entsperre den Nutzer abschließend"
           }
         }
@@ -757,7 +757,7 @@
   "notifications": {
     "comment": "Kommentar",
     "content": "Inhalt oder Beschreibung",
-    "empty": "Bedaure, Du hast momentan keinerlei Benachrichtigungen.",
+    "empty": "Bedaure, du hast momentan keinerlei Benachrichtigungen.",
     "filterLabel": {
       "all": "Alle",
       "read": "Gelesen",
@@ -879,22 +879,22 @@
   "release": {
     "cancel": "Abbrechen",
     "comment": {
-      "error": "Den Kommentar hast Du schon gemeldet!",
-      "message": "Bist Du sicher, dass Du den Kommentar „<b>{name}</b>“ freigeben möchtest?",
+      "error": "Den Kommentar hast du schon gemeldet!",
+      "message": "Bist du sicher, dass du den Kommentar „<b>{name}</b>“ freigeben möchtest?",
       "title": "Kommentar freigeben",
       "type": "Kommentar"
     },
     "contribution": {
-      "error": "Den Beitrag hast Du schon gemeldet!",
-      "message": "Bist Du sicher, dass Du den Beitrag „<b>{name}</b>“ freigeben möchtest?",
+      "error": "Den Beitrag hast du schon gemeldet!",
+      "message": "Bist du sicher, dass du den Beitrag „<b>{name}</b>“ freigeben möchtest?",
       "title": "Beitrag freigeben",
       "type": "Beitrag"
     },
     "submit": "freigeben",
     "success": "Erfolgreich freigegeben!",
     "user": {
-      "error": "Den Nutzer hast Du schon gemeldet!",
-      "message": "Bist Du sicher, dass Du den Nutzer „<b>{name}</b>“ freigeben möchtest?",
+      "error": "Den Nutzer hast du schon gemeldet!",
+      "message": "Bist du sicher, dass du den Nutzer „<b>{name}</b>“ freigeben möchtest?",
       "title": "Nutzer freigeben",
       "type": "Nutzer"
     }
@@ -903,13 +903,13 @@
     "cancel": "Abbrechen",
     "comment": {
       "error": "Du hast den Kommentar bereits gemeldet!",
-      "message": "Bist Du sicher, dass Du den Kommentar von „<b>{name}</b>“ melden möchtest?",
+      "message": "Bist du sicher, dass du den Kommentar von „<b>{name}</b>“ melden möchtest?",
       "title": "Kommentar melden",
       "type": "Kommentar"
     },
     "contribution": {
       "error": "Du hast den Beitrag bereits gemeldet!",
-      "message": "Bist Du sicher, dass Du den Beitrag „<b>{name}</b>“ melden möchtest?",
+      "message": "Bist du sicher, dass du den Beitrag „<b>{name}</b>“ melden möchtest?",
       "title": "Beitrag melden",
       "type": "Beitrag"
     },
@@ -930,7 +930,7 @@
         "placeholder": "Thema …"
       },
       "description": {
-        "label": "Bitte erkläre: Warum möchtest Du dies melden?",
+        "label": "Bitte erkläre: Warum möchtest du dies melden?",
         "placeholder": "Zusätzliche Information …"
       }
     },
@@ -938,7 +938,7 @@
     "success": "Vielen Dank für diese Meldung!",
     "user": {
       "error": "Du hast den Nutzer bereits gemeldet!",
-      "message": "Bist Du sicher, dass Du den Nutzer „<b>{name}</b>“ melden möchtest?",
+      "message": "Bist du sicher, dass du den Nutzer „<b>{name}</b>“ melden möchtest?",
       "title": "Nutzer melden",
       "type": "Nutzer"
     }
@@ -977,7 +977,7 @@
         "slug": "Alias",
         "unblock": "Entsperren"
       },
-      "empty": "Bislang hast Du niemanden blockiert.",
+      "empty": "Bislang hast du niemanden blockiert.",
       "explanation": {
         "closing": "Das sollte fürs Erste genügen, damit blockierte Nutzer Dich nicht mehr länger belästigen können.",
         "commenting-disabled": "Du kannst den Beitrag derzeit nicht kommentieren.",
@@ -1036,7 +1036,7 @@
         "message": "Deine E-Mail-Adresse konnte nicht verifiziert werden.",
         "reason": {
           "invalid-nonce": "Ist der Bestätigungscode falsch?",
-          "no-email-request": "Bist Du Dir sicher, dass Du eine Änderung Deiner E-Mail-Adresse angefragt hattest?"
+          "no-email-request": "Bist du Dir sicher, dass du eine Änderung Deiner E-Mail-Adresse angefragt hattest?"
         },
         "support": "Wenn das Problem weiterhin besteht, kontaktiere uns gerne per E-Mail an"
       }
