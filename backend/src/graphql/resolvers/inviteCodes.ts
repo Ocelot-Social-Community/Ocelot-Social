@@ -172,9 +172,8 @@ export default {
           MATCH (user:User {id: $user.id})
           OPTIONAL MATCH (oldInviteCode:InviteCode { code: toUpper($code) })
           DETACH DELETE oldInviteCode
-          MERGE (user)-[:GENERATED]->(inviteCode:InviteCode)
+          MERGE (user)-[:GENERATED]->(inviteCode:InviteCode { code: toUpper($code)})
           ON CREATE SET
-            inviteCode.code = toUpper($code),
             inviteCode.createdAt = toString(datetime()),
             inviteCode.expiresAt = $args.expiresAt,
             inviteCode.comment = $args.comment
@@ -216,7 +215,6 @@ export default {
           DETACH DELETE oldInviteCode
           MERGE (user)-[:GENERATED]->(inviteCode:InviteCode { code: toUpper($code) })-[:INVITES_TO]->(group)
           ON CREATE SET
-            inviteCode.code = toUpper($code),
             inviteCode.createdAt = toString(datetime()),
             inviteCode.expiresAt = $args.expiresAt,
             inviteCode.comment = $args.comment
