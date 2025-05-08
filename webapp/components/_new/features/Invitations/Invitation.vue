@@ -106,6 +106,21 @@ export default {
   display: flex;
   flex-flow: column;
   margin-block: $space-small;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: rgb(from $color-primary r g b / var(--invitation-opacity));
+}
+
+.invitation:hover {
+  --invitation-opacity: 0.5;
+}
+
+.inviation:nth-child(even) {
+  --invitation-opacity: 0.2;
+}
+
+.invitation:nth-child(odd) {
+  --invitation-opacity: 0.3;
 }
 
 .row1 {
