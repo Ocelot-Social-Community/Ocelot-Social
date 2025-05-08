@@ -2,7 +2,9 @@
 // this are the paths in the webapp
 export default {
   LOGO_HEADER_PATH: '/img/custom/logo-horizontal.svg',
+  LOGO_HEADER_MOBILE_PATH: '/img/custom/logo-horizontal.svg',
   LOGO_HEADER_WIDTH: '130px',
+  LOGO_HEADER_MOBILE_WIDTH: '100px',
   LOGO_HEADER_CLICK: {
     // externalLink: {
     //   url: 'https://ocelot.social',

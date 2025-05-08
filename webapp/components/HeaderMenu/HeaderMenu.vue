@@ -136,11 +136,11 @@
           <ds-flex-item class="mobile-hamburger-menu">
             <client-only>
               <!-- chat menu -->
-              <div style="display: inline-flex">
+              <div>
                 <chat-notification-menu />
               </div>
               <!-- notification menu -->
-              <div style="display: inline-flex; padding-right: clamp(10px, 2.5vw, 20px)">
+              <div>
                 <notification-menu />
               </div>
             </client-only>
@@ -409,6 +409,25 @@ export default {
   flex-flow: row nowrap;
   align-items: center;
   justify-content: flex-end;
+
+  & > div {
+    display: inline-flex;
+
+    padding-right: 15px;
+    &:first-child {
+      padding-right: 10px;
+    }
+
+    button {
+      overflow: visible;
+      .svg {
+        height: 1.8em;
+      }
+    }
+  }
+  .hamburger-button .svg {
+    height: 1.5em;
+  }
 }
 .mobile-menu {
   margin: 0 20px;
