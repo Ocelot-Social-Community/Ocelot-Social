@@ -514,7 +514,8 @@
     "contentMenu": {
       "muteGroup": "Mute group",
       "unmuteGroup": "Unmute group",
-      "visitGroupPage": "Show group"
+      "visitGroupPage": "Show group",
+      "inviteLinks": "Invite links"
     },
     "createNewGroup": {
       "title": "Create A New Group",
