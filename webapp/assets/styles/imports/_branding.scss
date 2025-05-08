@@ -55,6 +55,7 @@ $color-ribbon-event-shadow: color.adjust($color-ribbon-event, $lightness: -20%);
 
 $chat-sidemenu-background-over: color.adjust($color-tertiary-light, $lightness: -10%);
 $chat-sidemenu-background-active: $color-tertiary-light;
+$chat-message-color: $color-secondary-dark;
 $chat-message-bg-me: $color-tertiary-light;
 $chat-message-bg-others: $color-secondary-light;
 $chat-message-checkmark-seen: $color-primary;
@@ -64,6 +65,10 @@ $chat-room-background-counter-badge: $color-primary;
 $chat-icon-add: $color-primary-light;
 $chat-icon-send: $color-primary-light;
 $chat-icon-emoji: $color-primary-light;
+
+.vac-avatar {
+  background-color: $color-secondary !important;
+}
 
 body, .ds-button, .ds-chip, .ds-copy-field, .ds-list, .ds-select-search, .ds-tag, .ds-text {
   font-family: $font-family-text !important;
