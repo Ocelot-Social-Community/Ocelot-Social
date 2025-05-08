@@ -5,7 +5,7 @@
 import { categories } from '@constants/categories'
 import databaseContext from '@context/database'
 
-const { query, mutate } = databaseContext()
+const { query, mutate, driver } = databaseContext()
 
 const createCategories = async () => {
   const result = await query({
@@ -38,6 +38,7 @@ const createCategories = async () => {
   })
   // eslint-disable-next-line no-console
   console.log('Successfully created categories!')
+  await driver.close()
 }
 
 ;(async function () {
