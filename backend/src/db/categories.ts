@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { categories } from '@constants/categories'
 import databaseContext from '@context/database'
 
