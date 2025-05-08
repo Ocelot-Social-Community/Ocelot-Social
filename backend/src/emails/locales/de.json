@@ -17,16 +17,16 @@
   },
   "registration": {
     "introduction": "Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können … Bitte bestätige Deine E-Mail Adresse:",
-    "codeHint": "Sollte der Button für dich nicht funktionieren, kannst Du auch folgenden Code in Dein Browserfenster kopieren: ",
+    "codeHint": "Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in Dein Browserfenster kopieren: ",
     "codeHintException": "Das funktioniert allerdings nur, wenn du dich über unsere Website registriert hast.",
-    "notYouStart": "Falls Du dich nicht selbst bei ",
+    "notYouStart": "Falls du dich nicht selbst bei ",
     "notYouEnd": " angemeldet hast, schau doch mal vorbei! Wir sind ein gemeinnütziges Aktionsnetzwerk – von Menschen für Menschen.",
-    "ps": "PS: Wenn Du keinen Account bei uns möchtest, kannst Du diese E-Mail einfach ignorieren. ;)"
+    "ps": "PS: Wenn du keinen Account bei uns möchtest, kannst du diese E-Mail einfach ignorieren. ;)"
   },
   "emailVerification": {
-    "codeHint": "Sollte der Button für dich nicht funktionieren, kannst Du auch folgenden Code in Dein Browserfenster kopieren: ",
-    "introduction": "Du möchtest also deine E-Mail ändern? Kein Problem! Mit Klick auf diesen Button kannst Du Deine neue E-Mail Adresse bestätigen:",
-    "doNotChange": "Falls Du deine E-Mail Adresse doch nicht ändern möchtest, kannst du diese Nachricht einfach ignorieren. "
+    "codeHint": "Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in Dein Browserfenster kopieren: ",
+    "introduction": "Du möchtest also deine E-Mail ändern? Kein Problem! Mit Klick auf diesen Button kannst du Deine neue E-Mail Adresse bestätigen:",
+    "doNotChange": "Falls du deine E-Mail Adresse doch nicht ändern möchtest, kannst du diese Nachricht einfach ignorieren. "
   },
   "buttons": {
     "confirmEmail": "Bestätige Deine E-Mail Adresse",
@@ -52,7 +52,7 @@
     "introduction": "Du hast also dein Passwort vergessen? Kein Problem! Mit Klick auf diesen Button kannst du innerhalb der nächsten 24 Stunden dein Passwort zurücksetzen:"
   },
   "wrongEmail": {
-    "codeHint": "Sollte der Button für dich nicht funktionieren, kannst Du auch folgenden Code in Dein Browserfenster kopieren: ",
+    "codeHint": "Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in Dein Browserfenster kopieren: ",
     "ignoreEnd": " hast oder dein Password gar nicht ändern willst, kannst du diese E-Mail einfach ignorieren!",
     "ignoreStart": "Wenn du noch keinen Account bei ",
     "introduction": "Du hast bei uns ein neues Passwort angefordert – leider haben wir aber keinen Account mit deiner E-Mailadresse gefunden. Kann es sein, dass du mit einer anderen Adresse bei uns angemeldet bist?"
