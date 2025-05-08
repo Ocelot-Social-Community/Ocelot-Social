@@ -3,7 +3,7 @@
 exports[`sendWrongEmail English renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -130,7 +130,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendWrongEmail German renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>

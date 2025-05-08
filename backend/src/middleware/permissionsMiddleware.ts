@@ -9,7 +9,9 @@ import { rule, shield, deny, allow, or, and } from 'graphql-shield'
 import CONFIG from '@config/index'
 import SocialMedia from '@db/models/SocialMedia'
 import { getNeode } from '@db/neo4j'
-import { validateInviteCode } from '@graphql/resolvers/transactions/inviteCodes'
+// eslint-disable-next-line import/no-cycle
+import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
+import { Context } from '@src/server'
 
 const debug = !!CONFIG.DEBUG
 const allowExternalErrors = true
@@ -370,11 +372,28 @@ const noEmailFilter = rule({
 
 const publicRegistration = rule()(() => CONFIG.PUBLIC_REGISTRATION)
 
-const inviteRegistration = rule()(async (_parent, args, { _user, driver }) => {
+const inviteRegistration = rule()(async (_parent, args, context: Context) => {
   if (!CONFIG.INVITE_REGISTRATION) return false
   const { inviteCode } = args
-  const session = driver.session()
-  return validateInviteCode(session, inviteCode)
+  return validateInviteCode(context, inviteCode)
+})
+
+const isAllowedToGenerateGroupInviteCode = rule({
+  cache: 'no_cache',
+})(async (_parent, args, context: Context) => {
+  if (!context.user) return false
+
+  return !!(
+    await context.database.query({
+      query: `
+    MATCH (user:User{id: user.id})-[membership:MEMBER_OF]->(group:Group {id: $args.groupId})
+    WHERE (group.type IN ['closed','hidden'] AND membership.role IN ['admin', 'owner'])
+      OR (NOT group.type IN ['closed','hidden'] AND NOT membership.role = 'pending')
+    RETURN count(group) as count
+    `,
+      variables: { user: context.user, args },
+    })
+  ).records[0].get('count')
 })
 
 // Permissions
@@ -399,7 +418,7 @@ export default shield(
       Post: allow,
       profilePagePosts: allow,
       Comment: allow,
-      User: or(noEmailFilter, isAdmin),
+      User: and(isAuthenticated, or(noEmailFilter, isAdmin)),
       Badge: allow,
       PostsEmotionsCountByEmotion: allow,
       PostsEmotionsByCurrentUser: isAuthenticated,
@@ -408,15 +427,15 @@ export default shield(
       notifications: isAuthenticated,
       Donations: isAuthenticated,
       userData: isAuthenticated,
-      MyInviteCodes: isAuthenticated,
-      isValidInviteCode: allow,
       VerifyNonce: allow,
       queryLocations: isAuthenticated,
       availableRoles: isAdmin,
-      getInviteCode: isAuthenticated, // and inviteRegistration
       Room: isAuthenticated,
       Message: isAuthenticated,
       UnreadRooms: isAuthenticated,
+
+      // Invite Code
+      validateInviteCode: allow,
     },
     Mutation: {
       '*': deny,
@@ -465,7 +484,13 @@ export default shield(
       pinPost: isAdmin,
       unpinPost: isAdmin,
       UpdateDonations: isAdmin,
-      GenerateInviteCode: isAuthenticated,
+
+      // InviteCode
+      generatePersonalInviteCode: isAuthenticated,
+      generateGroupInviteCode: isAllowedToGenerateGroupInviteCode,
+      invalidateInviteCode: isAuthenticated,
+      redeemInviteCode: isAuthenticated,
+
       switchUserRole: isAdmin,
       markTeaserAsViewed: allow,
       saveCategorySettings: isAuthenticated,
@@ -480,8 +505,27 @@ export default shield(
       resetTrophyBadgesSelected: isAuthenticated,
     },
     User: {
+      '*': isAuthenticated,
+      name: allow,
+      avatar: allow,
       email: or(isMyOwn, isAdmin),
       emailNotificationSettings: isMyOwn,
+      inviteCodes: isMyOwn,
+    },
+    Group: {
+      '*': isAuthenticated, // TODO - only those who are allowed to see the group
+      avatar: allow,
+      name: allow,
+      about: allow,
+      groupType: allow,
+    },
+    InviteCode: {
+      '*': allow,
+      redeemedBy: isAuthenticated, // TODO only for self generated, must be done in resolver
+      redeemedByCount: isAuthenticated, // TODO only for self generated, must be done in resolver
+      createdAt: isAuthenticated, // TODO only for self generated, must be done in resolver
+      expiresAt: isAuthenticated, // TODO only for self generated, must be done in resolver
+      comment: isAuthenticated, // TODO only for self generated, must be done in resolver
     },
     Location: {
       distanceToMe: isAuthenticated,

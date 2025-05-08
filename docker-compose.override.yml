@@ -30,6 +30,8 @@ services:
     environment:
       - NODE_ENV="development"
       - DEBUG=true
+      - SMTP_PORT=1025
+      - SMTP_HOST=mailserver
     volumes:
       - ./backend:/app
 

@@ -14,4 +14,10 @@ export default {
     target: 'User',
     direction: 'in',
   },
+  invitesTo: {
+    type: 'relationship',
+    relationship: 'INVITES_TO',
+    target: 'Group',
+    direction: 'out',
+  },
 }
