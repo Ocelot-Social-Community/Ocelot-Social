@@ -1741,7 +1741,7 @@ footer {
       <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> hat Dich in einem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Beitrag zu sehen:
+        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> hat dich in einem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Beitrag zu sehen:
         </p><a class="button" href="http://webapp:3000/post/p1/new-post">Beitrag ansehen</a>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
@@ -1758,7 +1758,7 @@ footer {
   "subject": "ocelot.social  – Benachrichtigung: Erwähnung in Beitrag",
   "text": "HALLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] hat Dich in einem Beitrag
+Peter Lustig [http://webapp:3000/user/u2/peter-lustig] hat dich in einem Beitrag
 mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Beitrag zu sehen:
 
 Beitrag ansehen [http://webapp:3000/post/p1/new-post]
