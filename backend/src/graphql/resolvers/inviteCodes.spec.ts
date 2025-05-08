@@ -162,7 +162,7 @@ describe('validateInviteCode', () => {
       )
     })
 
-    it('returns the inviteCode when the code exists', async () => {
+    it('returns the inviteCode when the code exists and is not expired', async () => {
       await expect(
         query({ query: unauthenticatedValidateInviteCode, variables: { code: 'PERSNL' } }),
       ).resolves.toEqual(
@@ -554,7 +554,7 @@ describe('generateGroupInviteCode', () => {
       })
     })
   })
-  describe('as authenticated user', () => {
+  describe('as authenticated member', () => {
     beforeEach(async () => {
       authenticatedUser = await invitingUser.toJson()
     })
@@ -701,7 +701,7 @@ describe('generateGroupInviteCode', () => {
     })
   })
 
-  describe('as not-member user', () => {
+  describe('as authenticated not-member', () => {
     beforeEach(async () => {
       authenticatedUser = await notMemberUser.toJson()
     })
@@ -962,10 +962,17 @@ describe('redeemInviteCode', () => {
         },
         errors: undefined,
       })
+      authenticatedUser = await invitingUser.toJson()
       await expect(query({ query: currentUser })).resolves.toMatchObject({
         data: {
           currentUser: {
             following: [],
+            inviteCodes: expect.arrayContaining([
+              {
+                code: 'CODE33',
+                redeemedByCount: 0,
+              },
+            ]),
           },
         },
         errors: undefined,
@@ -1086,6 +1093,12 @@ describe('redeemInviteCode', () => {
         data: {
           currentUser: {
             following: [],
+            inviteCodes: expect.arrayContaining([
+              {
+                code: 'CODE33',
+                redeemedByCount: 0,
+              },
+            ]),
           },
         },
         errors: undefined,
@@ -1111,10 +1124,10 @@ describe('redeemInviteCode', () => {
         },
         errors: undefined,
       })
-      authenticatedUser = await invitingUser.toJson()
       await expect(query({ query: currentUser })).resolves.toMatchObject({
         data: {
           currentUser: {
+            following: [],
             inviteCodes: expect.arrayContaining([
               {
                 code: 'GRPPBL',
