@@ -436,7 +436,7 @@ export default {
     },
   },
   Group: {
-    inviteCodes: async (parent, args, context: Context, _resolveInfo) => {
+    inviteCodes: async (parent, _args, context: Context, _resolveInfo) => {
       if (!parent.id) {
         throw new Error('Can not identify selected Group!')
       }
