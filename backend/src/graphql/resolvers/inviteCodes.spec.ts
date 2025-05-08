@@ -14,6 +14,7 @@ import {
   unauthenticatedValidateInviteCode,
 } from '@graphql/queries/validateInviteCode'
 import createServer, { getContext } from '@src/server'
+import { invalidateInviteCode } from '@graphql/queries/invalidateInviteCode'
 
 const database = databaseContext()
 
@@ -741,4 +742,101 @@ describe('generateGroupInviteCode', () => {
   it.skip('code collision', () => {})
   // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
   it.skip('max amount used', () => {})
+})
+
+// ---
+
+describe.only('invalidateInviteCode', () => {
+  let invitingUser, otherUser
+  beforeEach(async () => {
+    await cleanDatabase()
+    invitingUser = await Factory.build('user', {
+      id: 'inviting-user',
+      role: 'user',
+      name: 'Inviting User',
+    })
+
+    otherUser = await Factory.build('user', {
+      id: 'other-user',
+      role: 'user',
+      name: 'Other User',
+    })
+
+    await Factory.build(
+      'inviteCode',
+      {
+        code: 'CODE33',
+      },
+      {
+        generatedBy: invitingUser,
+      },
+    )
+  })
+
+  describe('as unauthenticated user', () => {
+    beforeEach(() => {
+      authenticatedUser = null
+    })
+
+    it('throws authorization error', async () => {
+      await expect(
+        mutate({ mutation: invalidateInviteCode, variables: { code: 'CODE33' } }),
+      ).resolves.toMatchObject({
+        data: {
+          invalidateInviteCode: null,
+        },
+        errors: [{ message: 'Not Authorized!' }],
+      })
+    })
+  })
+  describe('as authenticated user', () => {
+    describe('as link owner', () => {
+      beforeEach(async () => {
+        authenticatedUser = await invitingUser.toJson()
+      })
+
+      it('returns the invalidated InviteCode', async () => {
+        await expect(
+          mutate({ mutation: invalidateInviteCode, variables: { code: 'CODE33' } }),
+        ).resolves.toMatchObject({
+          data: {
+            invalidateInviteCode: {
+              code: expect.any(String),
+              comment: null,
+              createdAt: expect.any(String),
+              expiresAt: expect.any(String),
+              generatedBy: {
+                avatar: {
+                  url: expect.any(String),
+                },
+                id: 'inviting-user',
+                name: 'Inviting User',
+              },
+              invitedTo: null,
+              isValid: false,
+              redeemedBy: [],
+            },
+          },
+          errors: undefined,
+        })
+      })
+    })
+
+    describe('as not link owner', () => {
+      beforeEach(async () => {
+        authenticatedUser = await otherUser.toJson()
+      })
+
+      it('throws authorization error', async () => {
+        await expect(
+          mutate({ mutation: invalidateInviteCode, variables: { code: 'CODE33' } }),
+        ).resolves.toMatchObject({
+          data: {
+            invalidateInviteCode: null,
+          },
+          errors: [{ message: 'Not Authorized!' }],
+        })
+      })
+    })
+  })
 })
