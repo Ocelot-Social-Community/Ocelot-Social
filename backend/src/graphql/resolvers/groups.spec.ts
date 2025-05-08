@@ -10,8 +10,8 @@ import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { Group as groupQuery } from '@graphql/queries/Group'
 import { groupMembersQuery } from '@graphql/queries/groupMembersQuery'
-import { groupQuery } from '@graphql/queries/groupQuery'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
@@ -423,7 +423,7 @@ describe('in mode', () => {
 
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
-          const { errors } = await query({ query: groupQuery(), variables: {} })
+          const { errors } = await query({ query: groupQuery, variables: {} })
           expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
@@ -541,7 +541,7 @@ describe('in mode', () => {
           describe('in general finds only listed groups – no hidden groups where user is none or pending member', () => {
             describe('without any filters', () => {
               it('finds all listed groups – including the set descriptionExcerpts and locations', async () => {
-                const result = await query({ query: groupQuery(), variables: {} })
+                const result = await query({ query: groupQuery, variables: {} })
                 expect(result).toMatchObject({
                   data: {
                     Group: expect.arrayContaining([
@@ -586,9 +586,7 @@ describe('in mode', () => {
                 })
 
                 it('has set categories', async () => {
-                  await expect(
-                    query({ query: groupQuery(), variables: {} }),
-                  ).resolves.toMatchObject({
+                  await expect(query({ query: groupQuery, variables: {} })).resolves.toMatchObject({
                     data: {
                       Group: expect.arrayContaining([
                         expect.objectContaining({
@@ -622,7 +620,7 @@ describe('in mode', () => {
             describe('with given id', () => {
               describe("id = 'my-group'", () => {
                 it('finds only the listed group with this id', async () => {
-                  const result = await query({ query: groupQuery(), variables: { id: 'my-group' } })
+                  const result = await query({ query: groupQuery, variables: { id: 'my-group' } })
                   expect(result).toMatchObject({
                     data: {
                       Group: [
@@ -642,7 +640,7 @@ describe('in mode', () => {
               describe("id = 'third-hidden-group'", () => {
                 it("finds only the hidden group where I'm 'usual' member", async () => {
                   const result = await query({
-                    query: groupQuery(),
+                    query: groupQuery,
                     variables: { id: 'third-hidden-group' },
                   })
                   expect(result).toMatchObject({
@@ -664,7 +662,7 @@ describe('in mode', () => {
               describe("id = 'second-hidden-group'", () => {
                 it("finds no hidden group where I'm 'pending' member", async () => {
                   const result = await query({
-                    query: groupQuery(),
+                    query: groupQuery,
                     variables: { id: 'second-hidden-group' },
                   })
                   expect(result.data?.Group.length).toBe(0)
@@ -674,7 +672,7 @@ describe('in mode', () => {
               describe("id = 'hidden-group'", () => {
                 it("finds no hidden group where I'm not(!) a member at all", async () => {
                   const result = await query({
-                    query: groupQuery(),
+                    query: groupQuery,
                     variables: { id: 'hidden-group' },
                   })
                   expect(result.data?.Group.length).toBe(0)
@@ -686,7 +684,7 @@ describe('in mode', () => {
               describe("slug = 'the-best-group'", () => {
                 it('finds only the listed group with this slug', async () => {
                   const result = await query({
-                    query: groupQuery(),
+                    query: groupQuery,
                     variables: { slug: 'the-best-group' },
                   })
                   expect(result).toMatchObject({
@@ -708,7 +706,7 @@ describe('in mode', () => {
               describe("slug = 'third-investigative-journalism-group'", () => {
                 it("finds only the hidden group where I'm 'usual' member", async () => {
                   const result = await query({
-                    query: groupQuery(),
+                    query: groupQuery,
                     variables: { slug: 'third-investigative-journalism-group' },
                   })
                   expect(result).toMatchObject({
@@ -730,7 +728,7 @@ describe('in mode', () => {
               describe("slug = 'second-investigative-journalism-group'", () => {
                 it("finds no hidden group where I'm 'pending' member", async () => {
                   const result = await query({
-                    query: groupQuery(),
+                    query: groupQuery,
                     variables: { slug: 'second-investigative-journalism-group' },
                   })
                   expect(result.data?.Group.length).toBe(0)
@@ -740,7 +738,7 @@ describe('in mode', () => {
               describe("slug = 'investigative-journalism-group'", () => {
                 it("finds no hidden group where I'm not(!) a member at all", async () => {
                   const result = await query({
-                    query: groupQuery(),
+                    query: groupQuery,
                     variables: { slug: 'investigative-journalism-group' },
                   })
                   expect(result.data?.Group.length).toBe(0)
@@ -750,7 +748,7 @@ describe('in mode', () => {
 
             describe('isMember = true', () => {
               it('finds only listed groups where user is member', async () => {
-                const result = await query({ query: groupQuery(), variables: { isMember: true } })
+                const result = await query({ query: groupQuery, variables: { isMember: true } })
                 expect(result).toMatchObject({
                   data: {
                     Group: expect.arrayContaining([
@@ -774,7 +772,7 @@ describe('in mode', () => {
 
             describe('isMember = false', () => {
               it('finds only listed groups where user is not(!) member', async () => {
-                const result = await query({ query: groupQuery(), variables: { isMember: false } })
+                const result = await query({ query: groupQuery, variables: { isMember: false } })
                 expect(result).toMatchObject({
                   data: {
                     Group: expect.arrayContaining([
