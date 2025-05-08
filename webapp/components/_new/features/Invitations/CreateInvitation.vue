@@ -1,15 +1,16 @@
 <template>
-  <form @submit.prevent="generateInviteCode" class="generate-invite-code-form">
-    <ds-input
-      name="comment"
-      placeholder="Comment"
-      v-model="comment"
-      :schema="{ type: 'string', max: 30 }"
-    />
-    <base-button class="generate-invite-code" icon="plus" type="submit">
-      {{ $t('invite-codes.generate-code') }}
-    </base-button>
-  </form>
+  <div class="create-invitation">
+    <div>{{ $t('invite-codes.generate-code-explanation') }}</div>
+    <form @submit.prevent="generateInviteCode" class="generate-invite-code-form">
+      <ds-input
+        name="comment"
+        placeholder="Comment"
+        v-model="comment"
+        :schema="{ type: 'string', max: 30 }"
+      />
+      <base-button class="generate-invite-code" icon="plus" type="submit" />
+    </form>
+  </div>
 </template>
 
 <script>
@@ -30,6 +31,12 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.create-invitation {
+  display: flex;
+  flex-direction: column;
+  gap: $space-small;
+}
+
 .generate-invite-code-form {
   display: flex;
   align-items: center;
@@ -38,6 +45,7 @@ export default {
 
 ::v-deep .ds-form-item {
   margin-bottom: 0;
+  flex: auto;
 }
 
 ::v-deep .ds-input-error {

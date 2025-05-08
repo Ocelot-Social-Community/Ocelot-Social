@@ -634,9 +634,10 @@
     "copy-success": "Invite code copied to clipboard",
     "redeemed-count-0": "No one has used this code yet.",
     "redeemed-count": "This code has been used {count} times.",
-    "generate-code": "Create link",
+    "generate-code-explanation": "Create a new link. You can add a comment if you like (only visible to you).",
+    "limit-reached": "You have reached the maximum number of invite links.",
     "comment-placeholder": "Comment (optional)",
-    "no-links": "Create up to {max} links to invite more people. You can add a comment to each link, only visible to you.",
+    "no-links": "No invite links created yet.",
     "delete-modal": {
       "title": "Link ungültig machen?",
       "message": "Do you really want to invalidate this invite link?"

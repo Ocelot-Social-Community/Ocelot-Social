@@ -105,5 +105,9 @@ export default {
 .invite-list {
   max-width: min(400px, 90vw);
   padding: $space-small;
+  margin-top: $space-base;
+  display: flex;
+  flex-flow: column;
+  gap: $space-small;
 }
 </style>

@@ -64,8 +64,4 @@ export default {
     list-style: none;
   }
 }
-
-.no-invitation {
-  margin-block: $space-base;
-}
 </style>
