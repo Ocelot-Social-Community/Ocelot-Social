@@ -59,7 +59,12 @@ describe('Request', () => {
       })
 
       it('delivers email to backend', () => {
-        const expected = expect.objectContaining({ variables: { email: 'mail@example.org' } })
+        const expected = expect.objectContaining({
+          variables: {
+            email: 'mail@example.org',
+            locale: 'en',
+          },
+        })
         expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
       })
 
@@ -92,7 +97,12 @@ describe('Request', () => {
       })
 
       it('normalizes email to lower case letters', () => {
-        const expected = expect.objectContaining({ variables: { email: 'mail@gmail.com' } })
+        const expected = expect.objectContaining({
+          variables: {
+            email: 'mail@gmail.com',
+            locale: 'en',
+          },
+        })
         expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
       })
     })

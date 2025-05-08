@@ -1,0 +1,547 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UserTeaserPopover does not show badges when disabled 1`] = `
+<div>
+  <div
+    class="user-teaser-popover"
+  >
+    <!---->
+     
+    <!---->
+     
+    <ul
+      class="statistics"
+    >
+      <li>
+        <div
+          class="ds-number ds-number-size-x-large"
+        >
+          <p
+            class="ds-text ds-number-count ds-text-size-x-large"
+            style="margin-bottom: 0px;"
+          >
+            0
+          </p>
+          <p
+            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          >
+            
+    profile.followers
+  
+          </p>
+        </div>
+      </li>
+       
+      <li>
+        <div
+          class="ds-number ds-number-size-x-large"
+        >
+          <p
+            class="ds-text ds-number-count ds-text-size-x-large"
+            style="margin-bottom: 0px;"
+          >
+            0
+          </p>
+          <p
+            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          >
+            
+    common.post
+  
+          </p>
+        </div>
+      </li>
+       
+      <li>
+        <div
+          class="ds-number ds-number-size-x-large"
+        >
+          <p
+            class="ds-text ds-number-count ds-text-size-x-large"
+            style="margin-bottom: 0px;"
+          >
+            0
+          </p>
+          <p
+            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          >
+            
+    common.comment
+  
+          </p>
+        </div>
+      </li>
+    </ul>
+     
+    <!---->
+  </div>
+</div>
+`;
+
+exports[`UserTeaserPopover given a non-touch device does not show button when userLink is provided 1`] = `
+<div>
+  <div
+    class="user-teaser-popover"
+  >
+    <div
+      class="hc-badges"
+    >
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/verified"
+          title="Verified"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/trophy1"
+          title="Trophy 1"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/trophy2"
+          title="Trophy 2"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/empty"
+          title="Empty"
+        />
+      </div>
+    </div>
+     
+    <!---->
+     
+    <ul
+      class="statistics"
+    >
+      <li>
+        <div
+          class="ds-number ds-number-size-x-large"
+        >
+          <p
+            class="ds-text ds-number-count ds-text-size-x-large"
+            style="margin-bottom: 0px;"
+          >
+            0
+          </p>
+          <p
+            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          >
+            
+    profile.followers
+  
+          </p>
+        </div>
+      </li>
+       
+      <li>
+        <div
+          class="ds-number ds-number-size-x-large"
+        >
+          <p
+            class="ds-text ds-number-count ds-text-size-x-large"
+            style="margin-bottom: 0px;"
+          >
+            0
+          </p>
+          <p
+            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          >
+            
+    common.post
+  
+          </p>
+        </div>
+      </li>
+       
+      <li>
+        <div
+          class="ds-number ds-number-size-x-large"
+        >
+          <p
+            class="ds-text ds-number-count ds-text-size-x-large"
+            style="margin-bottom: 0px;"
+          >
+            0
+          </p>
+          <p
+            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          >
+            
+    common.comment
+  
+          </p>
+        </div>
+      </li>
+    </ul>
+     
+    <!---->
+  </div>
+</div>
+`;
+
+exports[`UserTeaserPopover given a touch device does not show button when userLink is not provided 1`] = `
+<div>
+  <div
+    class="user-teaser-popover"
+  >
+    <div
+      class="hc-badges"
+    >
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/verified"
+          title="Verified"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/trophy1"
+          title="Trophy 1"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/trophy2"
+          title="Trophy 2"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/empty"
+          title="Empty"
+        />
+      </div>
+    </div>
+     
+    <!---->
+     
+    <ul
+      class="statistics"
+    >
+      <li>
+        <div
+          class="ds-number ds-number-size-x-large"
+        >
+          <p
+            class="ds-text ds-number-count ds-text-size-x-large"
+            style="margin-bottom: 0px;"
+          >
+            0
+          </p>
+          <p
+            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          >
+            
+    profile.followers
+  
+          </p>
+        </div>
+      </li>
+       
+      <li>
+        <div
+          class="ds-number ds-number-size-x-large"
+        >
+          <p
+            class="ds-text ds-number-count ds-text-size-x-large"
+            style="margin-bottom: 0px;"
+          >
+            0
+          </p>
+          <p
+            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          >
+            
+    common.post
+  
+          </p>
+        </div>
+      </li>
+       
+      <li>
+        <div
+          class="ds-number ds-number-size-x-large"
+        >
+          <p
+            class="ds-text ds-number-count ds-text-size-x-large"
+            style="margin-bottom: 0px;"
+          >
+            0
+          </p>
+          <p
+            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          >
+            
+    common.comment
+  
+          </p>
+        </div>
+      </li>
+    </ul>
+     
+    <!---->
+  </div>
+</div>
+`;
+
+exports[`UserTeaserPopover given a touch device shows button when userLink is provided 1`] = `
+<div>
+  <div
+    class="user-teaser-popover"
+  >
+    <div
+      class="hc-badges"
+    >
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/verified"
+          title="Verified"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/trophy1"
+          title="Trophy 1"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/trophy2"
+          title="Trophy 2"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/empty"
+          title="Empty"
+        />
+      </div>
+    </div>
+     
+    <!---->
+     
+    <ul
+      class="statistics"
+    >
+      <li>
+        <div
+          class="ds-number ds-number-size-x-large"
+        >
+          <p
+            class="ds-text ds-number-count ds-text-size-x-large"
+            style="margin-bottom: 0px;"
+          >
+            0
+          </p>
+          <p
+            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          >
+            
+    profile.followers
+  
+          </p>
+        </div>
+      </li>
+       
+      <li>
+        <div
+          class="ds-number ds-number-size-x-large"
+        >
+          <p
+            class="ds-text ds-number-count ds-text-size-x-large"
+            style="margin-bottom: 0px;"
+          >
+            0
+          </p>
+          <p
+            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          >
+            
+    common.post
+  
+          </p>
+        </div>
+      </li>
+       
+      <li>
+        <div
+          class="ds-number ds-number-size-x-large"
+        >
+          <p
+            class="ds-text ds-number-count ds-text-size-x-large"
+            style="margin-bottom: 0px;"
+          >
+            0
+          </p>
+          <p
+            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          >
+            
+    common.comment
+  
+          </p>
+        </div>
+      </li>
+    </ul>
+     
+    <!---->
+  </div>
+</div>
+`;
+
+exports[`UserTeaserPopover shows badges when enabled 1`] = `
+<div>
+  <div
+    class="user-teaser-popover"
+  >
+    <div
+      class="hc-badges"
+    >
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/verified"
+          title="Verified"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/trophy1"
+          title="Trophy 1"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/trophy2"
+          title="Trophy 2"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/empty"
+          title="Empty"
+        />
+      </div>
+    </div>
+     
+    <!---->
+     
+    <ul
+      class="statistics"
+    >
+      <li>
+        <div
+          class="ds-number ds-number-size-x-large"
+        >
+          <p
+            class="ds-text ds-number-count ds-text-size-x-large"
+            style="margin-bottom: 0px;"
+          >
+            0
+          </p>
+          <p
+            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          >
+            
+    profile.followers
+  
+          </p>
+        </div>
+      </li>
+       
+      <li>
+        <div
+          class="ds-number ds-number-size-x-large"
+        >
+          <p
+            class="ds-text ds-number-count ds-text-size-x-large"
+            style="margin-bottom: 0px;"
+          >
+            0
+          </p>
+          <p
+            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          >
+            
+    common.post
+  
+          </p>
+        </div>
+      </li>
+       
+      <li>
+        <div
+          class="ds-number ds-number-size-x-large"
+        >
+          <p
+            class="ds-text ds-number-count ds-text-size-x-large"
+            style="margin-bottom: 0px;"
+          >
+            0
+          </p>
+          <p
+            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          >
+            
+    common.comment
+  
+          </p>
+        </div>
+      </li>
+    </ul>
+     
+    <!---->
+  </div>
+</div>
+`;

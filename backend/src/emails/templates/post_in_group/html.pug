@@ -1,0 +1,7 @@
+extend ../layout.pug
+
+block content
+  .content
+  - var postUrl = postUrl
+  p= t('postInGroup', { postTitle})
+  a.button(href=postUrl)= t('buttons.viewPost')

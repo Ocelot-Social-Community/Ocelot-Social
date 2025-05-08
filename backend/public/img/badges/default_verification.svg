@@ -15,7 +15,8 @@
     <path
        fill="#333"
        d="M384.5.297L512.325 221.9l-128 221.702-255.825.102L.675 222.1 128.675.4z"
-       id="path1" />
+       id="path1"
+       style="fill:#868383;fill-opacity:1" />
     <g
        fill="#ffffff"
        id="g2"

@@ -1,8 +1,8 @@
-import { Then } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-Then("I add all required fields", () => {
+defineStep('I add all required fields', () => {
   cy.get('input[name="title"]')
     .type('new post')
-    .get(".editor .ProseMirror")
+    .get('.editor .ProseMirror')
     .type('new post content')
-  })
+})

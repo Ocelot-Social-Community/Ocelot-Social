@@ -1,18 +1,15 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import slugify from 'slug'
 
-export default async function uniqueSlug(string, isUnique) {
-  const slug = slugify(string || 'anonymous', {
+type IsUnique = (slug: string) => Promise<boolean>
+export default async function uniqueSlug(str: string, isUnique: IsUnique) {
+  const slug = slugify(str || 'anonymous', {
     lower: true,
     multicharmap: { Ä: 'AE', ä: 'ae', Ö: 'OE', ö: 'oe', Ü: 'UE', ü: 'ue', ß: 'ss' },
   })
   if (await isUnique(slug)) return slug
 
   let count = 0
-  let uniqueSlug
+  let uniqueSlug: string
   do {
     count += 1
     uniqueSlug = `${slug}-${count}`

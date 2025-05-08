@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { applyMiddleware, IMiddleware } from 'graphql-middleware'
 
@@ -15,7 +13,6 @@ import hashtags from './hashtags/hashtagsMiddleware'
 import includedFields from './includedFieldsMiddleware'
 import languages from './languages/languages'
 import login from './login/loginMiddleware'
-// eslint-disable-next-line import/no-cycle
 import notifications from './notifications/notificationsMiddleware'
 import orderBy from './orderByMiddleware'
 import permissions from './permissionsMiddleware'

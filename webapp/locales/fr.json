@@ -636,6 +636,9 @@
   "localeSwitch": {
     "tooltip": null
   },
+  "location": {
+    "distance": null
+  },
   "login": {
     "email": "Votre mail",
     "failure": "Adresse mail ou mot de passe incorrect.",
@@ -1173,5 +1176,10 @@
     "newTermsAndConditions": "Nouvelles conditions générales",
     "termsAndConditionsNewConfirm": "J'ai lu et accepté les nouvelles conditions générales.",
     "termsAndConditionsNewConfirmText": "Veuillez lire les nouvelles conditions d'utilisation dès maintenant !"
+  },
+  "user-teaser": {
+    "popover": {
+      "open-profile": null
+    }
   }
 }
