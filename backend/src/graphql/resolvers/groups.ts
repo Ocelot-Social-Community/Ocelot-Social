@@ -444,8 +444,8 @@ export default {
         await context.database.query({
           query: `
           MATCH (user:User {id: $user.id})-[:GENERATED]->(inviteCodes:InviteCode)-[:INVITES_TO]->(g:Group {id: $parent.id})
-          ORDER BY inviteCodes.createdAt ASC
           RETURN inviteCodes {.*}
+          ORDER BY inviteCodes.createdAt ASC
           `,
           variables: {
             user: context.user,
