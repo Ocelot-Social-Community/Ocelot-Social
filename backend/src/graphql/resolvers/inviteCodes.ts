@@ -76,6 +76,7 @@ export const redeemInviteCode = async (context: Context, code, newUser = false) 
     return false
   }
 
+  // self
   if (host.id === context.user.id) {
     return true
   }
@@ -234,7 +235,7 @@ export default {
       const result = (
         await context.database.write({
           query: `
-        MATCH (user:User {id: $user.id})-[rel:GENERATED]-(inviteCode:InviteCode {code: toUpper($args.code)})
+        MATCH (user:User {id: $user.id})-[:GENERATED]-(inviteCode:InviteCode {code: toUpper($args.code)})
         SET inviteCode.expiresAt = toString(datetime())
         RETURN inviteCode {.*}`,
           variables: { args, user: context.user },
