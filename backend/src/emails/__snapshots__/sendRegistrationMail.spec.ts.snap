@@ -230,8 +230,8 @@ footer {
       <h2>Willkommen bei ocelot.social!</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können … Bitte bestätige Deine E-Mail Adresse:</p><a class="button" href="http://webapp:3000/registration?email=user%40example.org&amp;nonce=123456&amp;inviteCode=welcome&amp;method=invite-code">Bestätige Deine E-Mail Adresse</a>
-        <p>Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in Dein Browserfenster kopieren: <span>123456</span></p>
+        <p>Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können … Bitte bestätige deine E-Mail Adresse:</p><a class="button" href="http://webapp:3000/registration?email=user%40example.org&amp;nonce=123456&amp;inviteCode=welcome&amp;method=invite-code">Bestätige deine E-Mail Adresse</a>
+        <p>Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in dein Browserfenster kopieren: <span>123456</span></p>
         <p>Das funktioniert allerdings nur, wenn du dich über unsere Website registriert hast.</p>
         <p>Falls du dich nicht selbst bei <a>ocelot.social</a> angemeldet hast, schau doch mal vorbei! Wir sind ein gemeinnütziges Aktionsnetzwerk – von Menschen für Menschen.
         </p>
@@ -252,13 +252,13 @@ footer {
 
 Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt
 fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können
-… Bitte bestätige Deine E-Mail Adresse:
+… Bitte bestätige deine E-Mail Adresse:
 
-Bestätige Deine E-Mail Adresse
+Bestätige deine E-Mail Adresse
 [http://webapp:3000/registration?email=user%40example.org&nonce=123456&inviteCode=welcome&method=invite-code]
 
 Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in
-Dein Browserfenster kopieren: 123456
+dein Browserfenster kopieren: 123456
 
 Das funktioniert allerdings nur, wenn du dich über unsere Website registriert
 hast.
@@ -509,8 +509,8 @@ footer {
       <h2>Willkommen bei ocelot.social!</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können … Bitte bestätige Deine E-Mail Adresse:</p><a class="button" href="http://webapp:3000/registration?email=user%40example.org&amp;nonce=123456&amp;method=invite-mail">Bestätige Deine E-Mail Adresse</a>
-        <p>Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in Dein Browserfenster kopieren: <span>123456</span></p>
+        <p>Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können … Bitte bestätige deine E-Mail Adresse:</p><a class="button" href="http://webapp:3000/registration?email=user%40example.org&amp;nonce=123456&amp;method=invite-mail">Bestätige deine E-Mail Adresse</a>
+        <p>Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in dein Browserfenster kopieren: <span>123456</span></p>
         <p>Das funktioniert allerdings nur, wenn du dich über unsere Website registriert hast.</p>
         <p>Falls du dich nicht selbst bei <a>ocelot.social</a> angemeldet hast, schau doch mal vorbei! Wir sind ein gemeinnütziges Aktionsnetzwerk – von Menschen für Menschen.
         </p>
@@ -531,13 +531,13 @@ footer {
 
 Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt
 fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können
-… Bitte bestätige Deine E-Mail Adresse:
+… Bitte bestätige deine E-Mail Adresse:
 
-Bestätige Deine E-Mail Adresse
+Bestätige deine E-Mail Adresse
 [http://webapp:3000/registration?email=user%40example.org&nonce=123456&method=invite-mail]
 
 Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in
-Dein Browserfenster kopieren: 123456
+dein Browserfenster kopieren: 123456
 
 Das funktioniert allerdings nur, wenn du dich über unsere Website registriert
 hast.
