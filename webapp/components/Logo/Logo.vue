@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import logos from '~/constants/logos.js'
+import logos from '~/constants/logosBranded.js'
 import metadata from '~/constants/metadata.js'
 
 /**
