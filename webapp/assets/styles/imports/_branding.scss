@@ -55,6 +55,7 @@ $color-ribbon-event-shadow: color.adjust($color-ribbon-event, $lightness: -20%);
 
 $chat-sidemenu-background-over: color.adjust($color-tertiary-light, $lightness: -10%);
 $chat-sidemenu-background-active: $color-tertiary-light;
+$chat-message-color: $color-secondary-dark;
 $chat-message-bg-me: $color-tertiary-light;
 $chat-message-bg-others: $color-secondary-light;
 $chat-message-checkmark-seen: $color-primary;
@@ -64,6 +65,10 @@ $chat-room-background-counter-badge: $color-primary;
 $chat-icon-add: $color-primary-light;
 $chat-icon-send: $color-primary-light;
 $chat-icon-emoji: $color-primary-light;
+
+.vac-avatar {
+  background-color: $color-secondary !important;
+}
 
 body, .ds-button, .ds-chip, .ds-copy-field, .ds-list, .ds-select-search, .ds-tag, .ds-text {
   font-family: $font-family-text !important;
@@ -91,14 +96,14 @@ a:hover > .base-button.--circle.post-add-button-top {
 
 /* ds-menu-item link colors */
 a.ds-menu-item-link {
-  color: $color-primary;
+  color: $color-secondary;
 }
 a:hover.ds-menu-item-link {
-  color: $color-primary-light;
+  color: black;
 }
 .ds-menu-item-link.router-link-exact-active {
-  color: $color-primary;
-  border-left-color: $color-primary;
+  color: $color-secondary;
+  border-left-color: $color-secondary;
 }
 
 .v-popover.open .trigger a {
@@ -127,8 +132,13 @@ a:hover.ds-menu-item-link {
   color: $color-primary-light;
 }
 
-.user-teaser:hover .slug {
-  color: $color-primary-light;
+.user-teaser .info {
+  a .slug {
+    color: $color-secondary;
+  }
+  a:hover .slug {
+    color: black;
+  }
 }
 .profile-avatar.--no-image {
   background-color: $color-secondary;
@@ -147,10 +157,11 @@ a:hover.ds-menu-item-link {
   background-color: $color-secondary-active;
 }
 #footer a {
-  color: $color-secondary-inverse;
+  color: white;
+  font-weight: 500;
 }
 #footer a:hover {
-  color: color.adjust($color-primary-light, $lightness: -10%);
+  color: color.adjust(white, $lightness: -10%);
 }
 
 .avatar-menu .profile-avatar {
@@ -159,10 +170,6 @@ a:hover.ds-menu-item-link {
 
 .profile-avatar .initials {
   color: $color-primary;
-}
-
-.ds-footer {
-  font-weight: 600;
 }
 
 /* chips with primary color */
@@ -183,6 +190,10 @@ div.tab-navigation li.Tabs__tab {
 /* ds-button with primary color */
 .ds-button-primary {
   background-color: $color-primary;
+
+  &:hover {
+    background-color: $color-tertiary;
+  }
 }
 
 /* color of active filter tags in post teaser */
@@ -194,6 +205,17 @@ span.category-tag.filterActive {
 div.ds-input-wrap > input:focus-within.ds-input {
   border-color: $color-primary;
 }
+.ds-input:focus {
+  border-color: $color-primary;
+}
+.ds-form-item.ds-input-has-focus {
+  .ds-select,
+  .ds-select-dropdown {
+    border-color: $color-primary;
+  }
+}
+
+
 // div .ds-form-item .ds-input-has-focus {
 //   border-color: $color-primary;
 // }
@@ -207,6 +229,17 @@ div.ds-input-wrap > input:focus-within.ds-input {
 /* checkbox */
 [type="checkbox"] {
   accent-color: $color-primary-light;
+}
+
+.editor .base-button {
+  color: $color-secondary;
+  border-color: $color-secondary;
+
+  &:hover {
+    color: white;
+    background-color: black;
+    border-color: black;
+  }
 }
 
 body.page-name-login,
