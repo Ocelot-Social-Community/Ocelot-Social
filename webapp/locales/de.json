@@ -109,7 +109,7 @@
     "isOnline": "online",
     "isTyping": "tippt...",
     "lastSeen": "zuletzt gesehen ",
-    "messageDeleted": "Diese Nachricht wuerde gelöscht",
+    "messageDeleted": "Diese Nachricht wurde gelöscht",
     "messagesEmpty": "Keine Nachrichten",
     "newMessages": "Neue Nachrichten",
     "page": {
@@ -269,7 +269,7 @@
     "amount-clicks": "{amount} Klicks",
     "amount-comments": "{amount} Kommentare",
     "amount-shouts": "{amount} Empfehlungen",
-    "amount-views": "{amount} Aurufe",
+    "amount-views": "{amount} Aufrufe",
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} von {max} Themen ausgewählt"
     },
@@ -337,7 +337,7 @@
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
     "languageSelectLabel": "Sprache deines Beitrags",
     "languageSelectText": "Sprache wählen",
-    "newEvent": "Erstelle einen neue Veranstaltung",
+    "newEvent": "Erstelle eine neue Veranstaltung",
     "newPost": "Erstelle einen neuen Beitrag",
     "success": "Gespeichert!",
     "teaserImage": {
