@@ -1,7 +1,8 @@
 // this file is duplicated in `backend/src/config/logos.ts` and `webapp/constants/logos.js` and replaced on rebranding
 // this are the paths in the webapp
-import logos from '@config/logos'
 import { merge } from 'lodash'
+
+import logos from '@config/logos'
 
 const defaultLogos = {
   LOGO_HEADER_PATH: '/img/custom/logo-horizontal.svg',
