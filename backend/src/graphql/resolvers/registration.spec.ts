@@ -1,49 +1,48 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import CONFIG from '@config/index'
+import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import EmailAddress from '@db/models/EmailAddress'
 import User from '@db/models/User'
-import { getDriver, getNeode } from '@db/neo4j'
-import createServer from '@src/server'
+import createServer, { getContext } from '@src/server'
 
-const neode = getNeode()
-
-let mutate
-let authenticatedUser
 let variables
-const driver = getDriver()
+
+const database = databaseContext()
+
+let server: ApolloServer
+let authenticatedUser
+let mutate
 
 beforeAll(async () => {
   await cleanDatabase()
 
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode,
-        user: authenticatedUser,
-      }
-    },
-  })
-  mutate = createTestClient(server).mutate
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database })
+
+  server = createServer({ context }).server
+
+  const createTestClientResult = createTestClient(server)
+  mutate = createTestClientResult.mutate
 })
 
-afterAll(async () => {
-  await cleanDatabase()
-  await driver.close()
+afterAll(() => {
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
-beforeEach(async () => {
+beforeEach(() => {
   variables = {}
 })
 
-// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
@@ -98,7 +97,7 @@ describe('Signup', () => {
       describe('creates a EmailAddress node', () => {
         it('with `createdAt` attribute', async () => {
           await mutate({ mutation, variables })
-          const emailAddress = await neode.first<typeof EmailAddress>(
+          const emailAddress = await database.neode.first<typeof EmailAddress>(
             'EmailAddress',
             { email: 'someuser@example.org' },
             undefined,
@@ -112,7 +111,7 @@ describe('Signup', () => {
 
         it('with a cryptographic `nonce`', async () => {
           await mutate({ mutation, variables })
-          const emailAddress = await neode.first<typeof EmailAddress>(
+          const emailAddress = await database.neode.first<typeof EmailAddress>(
             'EmailAddress',
             { email: 'someuser@example.org' },
             undefined,
@@ -153,12 +152,12 @@ describe('Signup', () => {
 
             it('creates no additional `EmailAddress` node', async () => {
               // admin account and the already existing user
-              await expect(neode.all('EmailAddress')).resolves.toHaveLength(2)
+              await expect(database.neode.all('EmailAddress')).resolves.toHaveLength(2)
               await expect(mutate({ mutation, variables })).resolves.toMatchObject({
                 data: { Signup: { email: 'someuser@example.org' } },
                 errors: undefined,
               })
-              await expect(neode.all('EmailAddress')).resolves.toHaveLength(2)
+              await expect(database.neode.all('EmailAddress')).resolves.toHaveLength(2)
             })
           })
         })
@@ -194,7 +193,7 @@ describe('SignupVerification', () => {
     }
   `
   describe('given valid password and email', () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       variables = {
         ...variables,
         nonce: '12345',
@@ -207,7 +206,7 @@ describe('SignupVerification', () => {
     })
 
     describe('unauthenticated', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         authenticatedUser = null
       })
 
@@ -215,8 +214,8 @@ describe('SignupVerification', () => {
         beforeEach(async () => {
           const { email, nonce } = variables
           const [emailAddress, user] = await Promise.all([
-            neode.model('EmailAddress').create({ email, nonce }),
-            neode
+            database.neode.model('EmailAddress').create({ email, nonce }),
+            database.neode
               .model('User')
               .create({ name: 'Somebody', password: '1234', email: 'john@example.org' }),
           ])
@@ -242,7 +241,7 @@ describe('SignupVerification', () => {
             email: 'john@example.org',
             nonce: '12345',
           }
-          await neode.model('EmailAddress').create(args)
+          await database.neode.model('EmailAddress').create(args)
         })
 
         describe('sending a valid nonce', () => {
@@ -258,7 +257,7 @@ describe('SignupVerification', () => {
 
           it('sets `verifiedAt` attribute of EmailAddress', async () => {
             await mutate({ mutation, variables })
-            const email = await neode.first(
+            const email = await database.neode.first(
               'EmailAddress',
               { email: 'john@example.org' },
               undefined,
@@ -276,14 +275,18 @@ describe('SignupVerification', () => {
                 RETURN email
               `
             await mutate({ mutation, variables })
-            const { records: emails } = await neode.cypher(cypher, { name: 'John Doe' })
+            const { records: emails } = await database.neode.cypher(cypher, { name: 'John Doe' })
             expect(emails).toHaveLength(1)
           })
 
           it('sets `about` attribute of User', async () => {
             variables = { ...variables, about: 'Find this description in the user profile' }
             await mutate({ mutation, variables })
-            const user = await neode.first<typeof User>('User', { name: 'John Doe' }, undefined)
+            const user = await database.neode.first<typeof User>(
+              'User',
+              { name: 'John Doe' },
+              undefined,
+            )
             await expect(user.toJson()).resolves.toMatchObject({
               about: 'Find this description in the user profile',
             })
@@ -306,7 +309,7 @@ describe('SignupVerification', () => {
                 RETURN email
               `
             await mutate({ mutation, variables })
-            const { records: emails } = await neode.cypher(cypher, { name: 'John Doe' })
+            const { records: emails } = await database.neode.cypher(cypher, { name: 'John Doe' })
             expect(emails).toHaveLength(1)
           })
 

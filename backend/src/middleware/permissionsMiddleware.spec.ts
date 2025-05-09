@@ -1,42 +1,45 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import CONFIG from '@config/index'
+import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getDriver, getNeode } from '@db/neo4j'
-import createServer from '@src/server'
+import createServer, { getContext } from '@src/server'
 
-const instance = getNeode()
-const driver = getDriver()
+let variables
+let owner, anotherRegularUser, administrator, moderator
 
-let query, mutate, variables
-let authenticatedUser, owner, anotherRegularUser, administrator, moderator
+const database = databaseContext()
+
+let server: ApolloServer
+let authenticatedUser
+let query, mutate
+
+beforeAll(async () => {
+  await cleanDatabase()
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database })
+
+  server = createServer({ context }).server
+
+  const createTestClientResult = createTestClient(server)
+  query = createTestClientResult.query
+  mutate = createTestClientResult.mutate
+})
+
+afterAll(() => {
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
+})
 
 describe('authorization', () => {
-  beforeAll(async () => {
-    await cleanDatabase()
-
-    const { server } = createServer({
-      context: () => ({
-        driver,
-        instance,
-        user: authenticatedUser,
-      }),
-    })
-    query = createTestClient(server).query
-    mutate = createTestClient(server).mutate
-  })
-
-  afterAll(async () => {
-    await cleanDatabase()
-    await driver.close()
-  })
-
-  // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
   afterEach(async () => {
     await cleanDatabase()
   })
@@ -109,7 +112,7 @@ describe('authorization', () => {
             query({ query: userQuery, variables: { name: 'Owner' } }),
           ).resolves.toMatchObject({
             errors: [{ message: 'Not Authorized!' }],
-            data: { User: [null] },
+            data: { User: null },
           })
         })
       })
@@ -242,7 +245,7 @@ describe('authorization', () => {
         })
 
         describe('as anyone', () => {
-          beforeEach(async () => {
+          beforeEach(() => {
             authenticatedUser = null
           })
 
@@ -267,7 +270,7 @@ describe('authorization', () => {
         })
 
         describe('as anyone with valid invite code', () => {
-          beforeEach(async () => {
+          beforeEach(() => {
             variables = {
               email: 'some@email.org',
               inviteCode: 'ABCDEF',
@@ -287,7 +290,7 @@ describe('authorization', () => {
         })
 
         describe('as anyone without valid invite', () => {
-          beforeEach(async () => {
+          beforeEach(() => {
             variables = {
               email: 'some@email.org',
               inviteCode: 'no valid invite code',
