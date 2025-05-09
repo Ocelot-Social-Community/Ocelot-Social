@@ -115,7 +115,7 @@ export const sendNotificationMail = async (notification: any): Promise<OriginalM
         commenterUrl:
           notification?.from?.__typename === 'Comment'
             ? new URL(
-                `/user/${notification?.from?.author?.id}/${notification?.from?.author?.slug}`,
+                `/profile/${notification?.from?.author?.id}/${notification?.from?.author?.slug}`,
                 CONFIG.CLIENT_URI,
               )
             : undefined,
@@ -131,7 +131,7 @@ export const sendNotificationMail = async (notification: any): Promise<OriginalM
         groupUrl:
           notification?.from?.__typename === 'Group'
             ? new URL(
-                `/group/${notification?.from?.id}/${notification?.from?.slug}`,
+                `/groups/${notification?.from?.id}/${notification?.from?.slug}`,
                 CONFIG.CLIENT_URI,
               )
             : undefined,
@@ -142,7 +142,7 @@ export const sendNotificationMail = async (notification: any): Promise<OriginalM
         groupRelatedUserUrl:
           notification?.from?.__typename === 'Group'
             ? new URL(
-                `/user/${notification?.relatedUser?.id}/${notification?.relatedUser?.slug}`,
+                `/profile/${notification?.relatedUser?.id}/${notification?.relatedUser?.slug}`,
                 CONFIG.CLIENT_URI,
               )
             : undefined,
@@ -176,7 +176,7 @@ export const sendChatMessageMail = async (
         locale: recipientUser.locale,
         name: recipientUser.name,
         chattingUser: senderUser.name,
-        chattingUserUrl: new URL(`/user/${senderUser.id}/${senderUser.slug}`, CONFIG.CLIENT_URI),
+        chattingUserUrl: new URL(`/profile/${senderUser.id}/${senderUser.slug}`, CONFIG.CLIENT_URI),
         chatUrl: new URL('/chat', CONFIG.CLIENT_URI),
       },
     })
