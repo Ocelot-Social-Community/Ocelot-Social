@@ -136,12 +136,12 @@
           <ds-flex-item class="mobile-hamburger-menu">
             <client-only>
               <!-- chat menu -->
-              <div style="display: inline-flex">
+              <div>
                 <chat-notification-menu />
               </div>
               <!-- notification menu -->
-              <div style="display: inline-flex; padding-right: clamp(10px, 2.5vw, 20px)">
-                <notification-menu />
+              <div>
+                <notification-menu no-menu />
               </div>
             </client-only>
             <!-- hamburger menu -->
@@ -284,7 +284,7 @@ import { mapGetters } from 'vuex'
 import isEmpty from 'lodash/isEmpty'
 import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
 import { SHOW_CONTENT_FILTER_HEADER_MENU } from '~/constants/filter.js'
-import LOGOS from '~/constants/logos.js'
+import LOGOS from '~/constants/logosBranded.js'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
 import ChatNotificationMenu from '~/components/ChatNotificationMenu/ChatNotificationMenu'
 import CustomButton from '~/components/CustomButton/CustomButton'
@@ -409,6 +409,25 @@ export default {
   flex-flow: row nowrap;
   align-items: center;
   justify-content: flex-end;
+
+  & > div {
+    display: inline-flex;
+
+    padding-right: 15px;
+    &:first-child {
+      padding-right: 10px;
+    }
+
+    button {
+      overflow: visible;
+      .svg {
+        height: 1.8em;
+      }
+    }
+  }
+  .hamburger-button .svg {
+    height: 1.5em;
+  }
 }
 .mobile-menu {
   margin: 0 20px;

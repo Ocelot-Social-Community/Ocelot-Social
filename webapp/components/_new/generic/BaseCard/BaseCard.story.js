@@ -1,6 +1,6 @@
 import { storiesOf } from '@storybook/vue'
 import helpers from '~/storybook/helpers'
-import logos from '~/constants/logos.js'
+import logos from '~/constants/logosBranded.js'
 import BaseCard from './BaseCard.vue'
 
 storiesOf('Generic/BaseCard', module)
