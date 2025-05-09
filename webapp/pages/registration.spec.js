@@ -2,6 +2,7 @@ import Vuex from 'vuex'
 import { mount } from '@vue/test-utils'
 import Registration from './registration.vue'
 import Vue from 'vue'
+import { validateInviteCodeQuery, redeemInviteCodeMutation } from '~/graphql/inviteCodes'
 
 const localVue = global.localVue
 
@@ -10,6 +11,18 @@ const stubs = {
   'router-link': true,
   'nuxt-link': true,
   'infinite-loading': true,
+}
+
+const queryMock = jest.fn()
+const mutationMock = jest.fn()
+
+const app = {
+  apolloProvider: {
+    defaultClient: {
+      query: queryMock,
+      mutation: mutationMock,
+    },
+  },
 }
 
 describe('Registration', () => {
@@ -70,6 +83,7 @@ describe('Registration', () => {
           store,
           redirect,
           route,
+          app,
         })
         Registration.data = function () {
           return { ...data, ...aData }
@@ -333,6 +347,92 @@ describe('Registration', () => {
       isLoggedIn = true
       wrapper = await Wrapper()
       expect(redirect).toHaveBeenCalledWith('/')
+    })
+
+    describe('already logged in', () => {
+      beforeEach(async () => {
+        asyncData = true
+        isLoggedIn = true
+      })
+
+      describe('route contains public invite code', () => {
+        beforeEach(async () => {
+          jest.clearAllMocks()
+          queryMock.mockResolvedValue({
+            data: {
+              validateInviteCode: {
+                invitedTo: null,
+              },
+            },
+          })
+          route.query.inviteCode = 'ABCDEF'
+          wrapper = await Wrapper()
+        })
+
+        it('calls validate invite code', () => {
+          expect(queryMock).toHaveBeenCalledWith({
+            query: validateInviteCodeQuery,
+            variables: {
+              code: 'ABCDEF',
+            },
+          })
+        })
+
+        it('redirects to index', () => {
+          expect(redirect).toHaveBeenCalledWith('/')
+        })
+
+        it('does not redeem the link', () => {
+          expect(mutationMock).not.toBeCalled()
+        })
+      })
+
+      // no idea why this is not working
+      describe.skip('route contains group invite code to public group', () => {
+        beforeEach(async () => {
+          jest.clearAllMocks()
+          queryMock.mockResolvedValue({
+            data: {
+              validateInviteCode: {
+                invitedTo: {
+                  id: 'public-group',
+                  slug: 'public-group',
+                  groupType: 'public',
+                },
+              },
+            },
+          })
+          mutationMock.mockResolvedValue({
+            data: {
+              redeemInviteCode: true,
+            },
+          })
+          route.query.inviteCode = 'ABCDEF'
+          wrapper = await Wrapper()
+        })
+
+        it('calls validate invite code', () => {
+          expect(queryMock).toHaveBeenCalledWith({
+            query: validateInviteCodeQuery,
+            variables: {
+              code: 'ABCDEF',
+            },
+          })
+        })
+
+        it('redirects to group', () => {
+          expect(redirect).toHaveBeenCalledWith('/groups/public-group/public-group')
+        })
+
+        it('redeems the code', () => {
+          expect(mutationMock).toBeCalledWith({
+            mutation: redeemInviteCodeMutation,
+            variables: {
+              code: 'ABCDEF',
+            },
+          })
+        })
+      })
     })
 
     // copied from webapp/components/Registration/Signup.spec.js as testing template

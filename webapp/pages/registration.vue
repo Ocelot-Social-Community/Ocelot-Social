@@ -9,9 +9,9 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
 import registrationConstants from '~/constants/registrationBranded.js'
 import RegistrationSlider from '~/components/Registration/RegistrationSlider'
+import { validateInviteCodeQuery, redeemInviteCodeMutation } from '~/graphql/inviteCodes'
 
 export default {
   layout: registrationConstants.LAYOUT,
@@ -45,20 +45,9 @@ export default {
         const {
           apolloProvider: { defaultClient: client },
         } = app
-        const query = gql`
-          query ($code: String!) {
-            validateInviteCode(code: $code) {
-              invitedTo {
-                id
-                slug
-                groupType
-              }
-            }
-          }
-        `
         try {
           const result = await client.query({
-            query,
+            query: validateInviteCodeQuery,
             variables: { code },
           })
           const {
@@ -67,13 +56,8 @@ export default {
             },
           } = result
           if (group) {
-            const mutation = gql`
-              mutation ($code: String!) {
-                redeemInviteCode(code: $code)
-              }
-            `
             const mutationResult = await client.mutate({
-              mutation,
+              mutation: redeemInviteCodeMutation,
               variables: { code },
             })
             if (mutationResult.data.redeemInviteCode && group.groupType === 'public') {
