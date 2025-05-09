@@ -87,9 +87,9 @@ A fresh database needs to be initialized and migrated.
 # in folder backend while database is running
 yarn db:migrate init
 # for docker environments:
-docker exec backend yarn db:migrate init
+docker exec ocelot-social-backend-1 yarn db:migrate init
 # for docker production:
-docker exec backend yarn prod:migrate init
+docker exec ocelot-social-backend-1 yarn prod:migrate init
 ```
 
 ```sh
@@ -97,9 +97,9 @@ docker exec backend yarn prod:migrate init
 yarn db:migrate up
 
 # for docker development:
-docker exec backend yarn db:migrate up
+docker exec ocelot-social-backend-1 yarn db:migrate up
 # for docker production
-docker exec backend yarn prod:migrate up
+docker exec ocelot-social-backend-1 yarn prod:migrate up
 ```
 
 ### Optional Data
@@ -131,7 +131,7 @@ To do so, run:
 yarn db:data:branding
 
 # for docker
-docker exec backend yarn db:data:branding
+docker exec ocelot-social-backend-1 yarn db:data:branding
 ```
 
 ### Seed Data
@@ -143,7 +143,7 @@ For a predefined set of test data you can seed the database with:
 yarn db:seed
 
 # for docker
-docker exec backend yarn db:seed
+docker exec ocelot-social-backend-1 yarn db:seed
 ```
 
 ### Reset Data
@@ -157,9 +157,9 @@ yarn db:reset
 yarn db:reset:withmigrations
 
 # for docker
-docker exec backend yarn db:reset
+docker exec ocelot-social-backend-1 yarn db:reset
 # or deleting the migrations as well
-docker exec backend yarn db:reset:withmigrations
+docker exec ocelot-social-backend-1 yarn db:reset:withmigrations
 # you could also wipe out your neo4j database and delete all volumes with:
 docker compose down -v
 ```
@@ -180,7 +180,7 @@ $ yarn run db:migrate:create your_data_migration
 
 # for docker
 # in main folder while docker compose is running
-$ docker compose exec backend yarn run db:migrate:create your_data_migration
+$ docker compose exec ocelot-social-backend-1 yarn run db:migrate:create your_data_migration
 # Edit the file in ./src/db/migrations/
 ```
 
@@ -208,5 +208,12 @@ $ yarn run test
 
 # for docker
 # in main folder while docker compose is running
-$ docker exec backend yarn run test
+$ docker exec ocelot-social-backend-1 yarn run test
+```
+
+If the snapshots of the emails must be updated, you have to run the tests in docker! Otherwise the CI will fail.
+
+```sh
+# in main folder while docker compose is running
+$ docker exec ocelot-social-backend-1 yarn run test -u src/emails/
 ```

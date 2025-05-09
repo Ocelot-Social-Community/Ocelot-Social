@@ -7,10 +7,12 @@ import { UserInputError } from 'apollo-server'
 import { hash } from 'bcryptjs'
 
 import { getNeode } from '@db/neo4j'
+import { Context } from '@src/server'
 
 import existingEmailAddress from './helpers/existingEmailAddress'
 import generateNonce from './helpers/generateNonce'
 import normalizeEmail from './helpers/normalizeEmail'
+import { redeemInviteCode } from './inviteCodes'
 
 const neode = getNeode()
 
@@ -33,7 +35,7 @@ export default {
         throw new UserInputError(e.message)
       }
     },
-    SignupVerification: async (_parent, args, context) => {
+    SignupVerification: async (_parent, args, context: Context) => {
       const { termsAndConditionsAgreedVersion } = args
       const regEx = /^[0-9]+\.[0-9]+\.[0-9]+$/g
       if (!regEx.test(termsAndConditionsAgreedVersion)) {
@@ -52,69 +54,60 @@ export default {
       const { driver } = context
       const session = driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const createUserTransactionResponse = await transaction.run(signupCypher(inviteCode), {
-          args,
-          nonce,
-          email,
-          inviteCode,
-        })
+        const createUserTransactionResponse = await transaction.run(
+          `
+            MATCH (email:EmailAddress {nonce: $nonce, email: $email})
+            WHERE NOT (email)-[:BELONGS_TO]->()
+            CREATE (user:User)
+            MERGE (user)-[:PRIMARY_EMAIL]->(email)
+            MERGE (user)<-[:BELONGS_TO]-(email)
+            SET user += $args
+            SET user.id = randomUUID()
+            SET user.role = 'user'
+            SET user.createdAt = toString(datetime())
+            SET user.updatedAt = toString(datetime())
+            SET user.allowEmbedIframes = false
+            SET user.showShoutsPublicly = false
+            SET email.verifiedAt = toString(datetime())
+            WITH user
+            OPTIONAL MATCH (post:Post)-[:IN]->(group:Group)
+              WHERE NOT group.groupType = 'public'
+            WITH user, collect(post) AS invisiblePosts
+            FOREACH (invisiblePost IN invisiblePosts |
+              MERGE (user)-[:CANNOT_SEE]->(invisiblePost)
+            )
+            RETURN user {.*}
+          `,
+          {
+            args,
+            nonce,
+            email,
+            inviteCode,
+          },
+        )
         const [user] = createUserTransactionResponse.records.map((record) => record.get('user'))
         if (!user) throw new UserInputError('Invalid email or nonce')
+
         return user
       })
       try {
         const user = await writeTxResultPromise
+
+        // To allow redeeming and return an User object we require a User in the context
+        context.user = user
+
+        if (inviteCode) {
+          await redeemInviteCode(context, inviteCode, true)
+        }
+
         return user
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
           throw new UserInputError('User with this slug already exists!')
         throw new UserInputError(e.message)
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
-}
-
-const signupCypher = (inviteCode) => {
-  let optionalMatch = ''
-  let optionalMerge = ''
-  if (inviteCode) {
-    optionalMatch = `
-      OPTIONAL MATCH
-      (inviteCode:InviteCode {code: $inviteCode})<-[:GENERATED]-(host:User)
-      `
-    optionalMerge = `
-      MERGE (user)-[:REDEEMED { createdAt: toString(datetime()) }]->(inviteCode)
-      MERGE (host)-[:INVITED { createdAt: toString(datetime()) }]->(user)
-      MERGE (user)-[:FOLLOWS { createdAt: toString(datetime()) }]->(host)
-      MERGE (host)-[:FOLLOWS { createdAt: toString(datetime()) }]->(user)
-      `
-  }
-  const cypher = `
-      MATCH (email:EmailAddress {nonce: $nonce, email: $email})
-      WHERE NOT (email)-[:BELONGS_TO]->()
-      ${optionalMatch}
-      CREATE (user:User)
-      MERGE (user)-[:PRIMARY_EMAIL]->(email)
-      MERGE (user)<-[:BELONGS_TO]-(email)
-      ${optionalMerge}
-      SET user += $args
-      SET user.id = randomUUID()
-      SET user.role = 'user'
-      SET user.createdAt = toString(datetime())
-      SET user.updatedAt = toString(datetime())
-      SET user.allowEmbedIframes = false
-      SET user.showShoutsPublicly = false
-      SET email.verifiedAt = toString(datetime())
-      WITH user
-      OPTIONAL MATCH (post:Post)-[:IN]->(group:Group)
-        WHERE NOT group.groupType = 'public'
-      WITH user, collect(post) AS invisiblePosts
-      FOREACH (invisiblePost IN invisiblePosts |
-        MERGE (user)-[:CANNOT_SEE]->(invisiblePost)
-      )
-      RETURN user {.*}
-    `
-  return cypher
 }

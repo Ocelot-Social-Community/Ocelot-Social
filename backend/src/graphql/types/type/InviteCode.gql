@@ -3,16 +3,23 @@ type InviteCode {
   createdAt: String!
   generatedBy: User @relation(name: "GENERATED", direction: "IN")
   redeemedBy: [User] @relation(name: "REDEEMED", direction: "IN")
+  redeemedByCount: Int! @cypher(statement: "MATCH (this)<-[:REDEEMED]-(related:User)")
   expiresAt: String
-}
+  comment: String
 
+  invitedTo: Group @neo4j_ignore
+  # invitedFrom: User! @neo4j_ignore # -> see generatedBy
 
-type Mutation {
-  GenerateInviteCode(expiresAt: String = null): InviteCode
+  isValid: Boolean! @neo4j_ignore
 }
 
 type Query {
-  MyInviteCodes: [InviteCode]
-  isValidInviteCode(code: ID!): Boolean
-  getInviteCode: InviteCode
+  validateInviteCode(code: String!): InviteCode
+}
+
+type Mutation {
+  generatePersonalInviteCode(expiresAt: String = null, comment: String = null): InviteCode!
+  generateGroupInviteCode(groupId: ID!, expiresAt: String = null, comment: String = null): InviteCode!
+  invalidateInviteCode(code: String!): InviteCode
+  redeemInviteCode(code: String!): Boolean!
 }
