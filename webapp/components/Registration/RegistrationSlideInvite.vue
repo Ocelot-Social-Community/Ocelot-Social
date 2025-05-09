@@ -200,5 +200,9 @@ export default {
   > * {
     flex-shrink: 0;
   }
+
+  > span {
+    flex: auto;
+  }
 }
 </style>
