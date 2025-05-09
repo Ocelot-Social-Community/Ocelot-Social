@@ -45,9 +45,6 @@
       </base-button>
     </template>
     <template #popover="{ closeMenu }">
-      <div class="notifications-menu-popover">
-        <notification-list :notifications="notifications" @markAsRead="markAsRead" />
-      </div>
       <ds-flex class="notifications-link-container">
         <ds-flex-item class="notifications-link-container-item" :width="{ base: '100%' }" centered>
           <nuxt-link :to="{ name: 'notifications' }">
@@ -67,6 +64,9 @@
           </base-button>
         </ds-flex-item>
       </ds-flex>
+      <div class="notifications-menu-popover">
+        <notification-list :notifications="notifications" @markAsRead="markAsRead" />
+      </div>
     </template>
   </dropdown>
 </template>
