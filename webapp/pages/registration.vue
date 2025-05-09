@@ -35,8 +35,8 @@ export default {
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling
     }
   },
-  async asyncData({ store, route, app, redirect, router }) {
-    // http://localhost:3000/registration?method=invite-code&inviteCode=GBQ9ZR
+  async asyncData({ store, route, app, redirect }) {
+    // http://localhost:3000/registration?method=invite-code&inviteCode=T9TWMJ
     if (store.getters['auth/isLoggedIn']) {
       const {
         query: { inviteCode: code },
