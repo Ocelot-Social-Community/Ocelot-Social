@@ -7,7 +7,8 @@ LABEL org.label-schema.vcs-url="https://github.com/Ocelot-Social-Community/Ocelo
 LABEL org.label-schema.vendor="ocelot.social Community"
 LABEL org.label-schema.schema-version="1.0"
 LABEL maintainer="devops@ocelot.social"
-ENV NODE_ENV="production"
+ARG NODE_ENV="production"
+ENV NODE_ENV=${NODE_ENV}
 ENV PORT="3000"
 EXPOSE ${PORT}
 RUN apk --no-cache add git python3 make g++ bash jq
@@ -28,8 +29,7 @@ ONBUILD RUN mkdir /build
 ONBUILD RUN cp -r ./.nuxt /build
 ONBUILD RUN cp -r ./nuxt.config.js /build
 # Copy static files
-# TODO - this seems not be needed anymore for the new rebranding
-# TODO - this should be one Folder containign all stuff needed to be copied
+# TODO - this should be one Folder containing all stuff needed to be copied
 ONBUILD RUN cp -r ./config/ /build
 ONBUILD RUN cp -r ./constants /build
 ONBUILD RUN cp -r ./static /build
