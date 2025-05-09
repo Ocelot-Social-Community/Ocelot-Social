@@ -11,7 +11,6 @@ import LoginForm from '~/components/LoginForm/LoginForm.vue'
 import loginConstants from '~/constants/loginBranded.js'
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import { mapGetters } from 'vuex'
-import { validateInviteCodeQuery, redeemInviteCodeMutation } from '~/graphql/inviteCodes'
 
 export default {
   layout: loginConstants.LAYOUT,
@@ -34,29 +33,10 @@ export default {
 
       try {
         if (this.$route.query.inviteCode) {
-          const code = this.$route.query.inviteCode
-          const result = await this.$apollo.query({
-            query: validateInviteCodeQuery,
-            variables: { code },
+          this.$router.push({
+            name: 'registration',
+            query: this.$route.query,
           })
-          const {
-            data: {
-              validateInviteCode: { invitedTo: group },
-            },
-          } = result
-          if (group) {
-            const mutationResult = await this.$apollo.mutate({
-              mutation: redeemInviteCodeMutation,
-              variables: { code },
-            })
-            if (mutationResult.data.redeemInviteCode && group.groupType === 'public') {
-              this.$router.push(`/groups/${group.id}/${group.slug}`)
-            } else {
-              await this.$router.replace(this.$route.query.path || '/')
-            }
-          } else {
-            await this.$router.replace(this.$route.query.path || '/')
-          }
         } else {
           await this.$router.replace(this.$route.query.path || '/')
         }
