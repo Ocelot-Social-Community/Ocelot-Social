@@ -8,7 +8,7 @@
         v-model="comment"
         :schema="{ type: 'string', max: 30 }"
       />
-      <base-button circle class="generate-invite-code" icon="plus" type="submit" />
+      <base-button circle class="generate-invite-code" :aria-label="$t('invite-codes.generate-code')" icon="plus" type="submit" :disabled="disabled" />
     </form>
   </div>
 </template>
@@ -16,6 +16,12 @@
 <script>
 export default {
   name: 'CreateInvitation',
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       comment: '',

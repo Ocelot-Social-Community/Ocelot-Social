@@ -106,8 +106,8 @@ describe('InvitationList.vue', () => {
   })
 
   it('cannot generate more than the limit of invite codes', () => {
-    wrapper = Wrapper({ withInviteCodes: true, limit: 3 })
-    const generateButton = screen.getByText('invite-codes.generate-invite-code')
+    wrapper = Wrapper({ withInviteCodes: true, limit: 2 })
+    const generateButton = screen.getByLabelText('invite-codes.generate-code')
     expect(generateButton).toBeDisabled()
   })
 })

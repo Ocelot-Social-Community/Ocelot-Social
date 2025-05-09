@@ -7,9 +7,12 @@ const localVue = global.localVue
 describe('CreateInvitation.vue', () => {
   let wrapper
 
-  const Wrapper = () => {
+  const Wrapper = ({isDisabled = false }) => {
     return render(CreateInvitation, {
       localVue,
+      propsData: {
+        isDisabled,
+      },
       mocks: {
         $t: jest.fn((v) => v),
       },
@@ -17,13 +20,18 @@ describe('CreateInvitation.vue', () => {
   }
 
   it('renders', () => {
-    wrapper = Wrapper()
+    wrapper = Wrapper({})
+    expect(wrapper.container).toMatchSnapshot()
+  })
+
+  it('renders with disabled button', () => {
+    wrapper = Wrapper({ isDisabled: true })
     expect(wrapper.container).toMatchSnapshot()
   })
 
   describe('when the form is submitted', () => {
     beforeEach(() => {
-      wrapper = Wrapper()
+      wrapper = Wrapper({})
     })
 
     it('emits generate-invite-code with empty comment', async () => {

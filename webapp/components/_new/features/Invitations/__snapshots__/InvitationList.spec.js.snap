@@ -195,7 +195,8 @@ exports[`InvitationList.vue renders 1`] = `
         </div>
          
         <button
-          class="generate-invite-code base-button --icon-only"
+          aria-label="invite-codes.generate-code"
+          class="generate-invite-code base-button --icon-only --circle"
           type="submit"
         >
           <span
@@ -275,7 +276,8 @@ exports[`InvitationList.vue renders empty state 1`] = `
         </div>
          
         <button
-          class="generate-invite-code base-button --icon-only"
+          aria-label="invite-codes.generate-code"
+          class="generate-invite-code base-button --icon-only --circle"
           type="submit"
         >
           <span

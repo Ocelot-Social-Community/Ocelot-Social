@@ -51,6 +51,77 @@ exports[`CreateInvitation.vue renders 1`] = `
       </div>
        
       <button
+        aria-label="invite-codes.generate-code"
+        class="generate-invite-code base-button --icon-only --circle"
+        type="submit"
+      >
+        <span
+          class="base-icon"
+        >
+          <!---->
+        </span>
+         
+        <!---->
+         
+      </button>
+    </form>
+  </div>
+</div>
+`;
+
+exports[`CreateInvitation.vue renders with disabled button 1`] = `
+<div>
+  <div
+    class="create-invitation"
+    isdisabled="true"
+  >
+    <div>
+      invite-codes.generate-code-explanation
+    </div>
+     
+    <form
+      class="generate-invite-code-form"
+    >
+      <div
+        class="ds-form-item ds-input-size-base"
+      >
+        <label
+          class="ds-input-label"
+          style="display: none;"
+        >
+          
+  
+
+        </label>
+        <div
+          class="ds-input-wrap"
+        >
+          <!---->
+          <input
+            class="ds-input"
+            name="comment"
+            placeholder="invite-codes.comment-placeholder"
+            tabindex="0"
+            type="text"
+          />
+          <!---->
+        </div>
+        <transition-stub
+          name="ds-input-error"
+        >
+          <div
+            class="ds-input-error"
+            style="display: none;"
+          >
+            
+    
+  
+          </div>
+        </transition-stub>
+      </div>
+       
+      <button
+        aria-label="invite-codes.generate-code"
         class="generate-invite-code base-button --icon-only --circle"
         type="submit"
       >
