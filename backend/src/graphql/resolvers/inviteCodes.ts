@@ -151,7 +151,7 @@ export default {
         await context.database.query({
           query: `
         MATCH (inviteCode:InviteCode)<-[:GENERATED]-(user:User {id: $user.id})
-        WHERE NOT (inviteCode)-[:INVITES_TO]-(:Group)
+        WHERE NOT (inviteCode)-[:INVITES_TO]->(:Group)
           AND (inviteCode.expiresAt IS NULL OR inviteCode.expiresAt >= datetime())
         RETURN toString(count(inviteCode)) as count
         `,
