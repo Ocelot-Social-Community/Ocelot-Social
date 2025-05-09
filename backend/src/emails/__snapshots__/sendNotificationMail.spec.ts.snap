@@ -91,7 +91,7 @@ footer {
       <h2>Hello Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>your role in the group “The Group” has been changed. Click on the button to view this group:</p><a class="button" href="http://webapp:3000/group/g1/the-group">View group</a>
+        <p>your role in the group “The Group” has been changed. Click on the button to view this group:</p><a class="button" href="http://webapp:3000/groups/g1/the-group">View group</a>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– The ocelot.social Team</p><br>
@@ -110,7 +110,7 @@ footer {
 your role in the group “The Group” has been changed. Click on the button to view
 this group:
 
-View group [http://webapp:3000/group/g1/the-group]
+View group [http://webapp:3000/groups/g1/the-group]
 
 See you soon on ocelot.social [https://ocelot.social]!
 
@@ -217,7 +217,7 @@ footer {
       <h2>Hello Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> commented on a post that you are observing with the title “New Post”. Click on the button to view this comment:
+        <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> commented on a post that you are observing with the title “New Post”. Click on the button to view this comment:
         </p><a class="button" href="http://webapp:3000/post/p1/new-post#commentId-c1">View comment</a>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
@@ -234,9 +234,9 @@ footer {
   "subject": "ocelot.social  – Notification: New comment on post",
   "text": "HELLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] commented on a post that
-you are observing with the title “New Post”. Click on the button to view this
-comment:
+Peter Lustig [http://webapp:3000/profile/u2/peter-lustig] commented on a post
+that you are observing with the title “New Post”. Click on the button to view
+this comment:
 
 View comment [http://webapp:3000/post/p1/new-post#commentId-c1]
 
@@ -473,7 +473,7 @@ footer {
       <h2>Hello Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> mentioned you in a comment to the post with the title “New Post”. Click on the button to view this comment:
+        <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> mentioned you in a comment to the post with the title “New Post”. Click on the button to view this comment:
         </p><a class="button" href="http://webapp:3000/post/p1/new-post#commentId-c1">View comment</a>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
@@ -490,7 +490,7 @@ footer {
   "subject": "ocelot.social  – Notification: Mentioned in comment",
   "text": "HELLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] mentioned you in a
+Peter Lustig [http://webapp:3000/profile/u2/peter-lustig] mentioned you in a
 comment to the post with the title “New Post”. Click on the button to view this
 comment:
 
@@ -977,8 +977,8 @@ footer {
       <h2>Hello Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> joined the group “The Group”. Click on the button to view this group:
-        </p><a class="button" href="http://webapp:3000/group/g1/the-group">View group</a>
+        <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> joined the group “The Group”. Click on the button to view this group:
+        </p><a class="button" href="http://webapp:3000/groups/g1/the-group">View group</a>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– The ocelot.social Team</p><br>
@@ -994,10 +994,10 @@ footer {
   "subject": "ocelot.social  – Notification: User joined group",
   "text": "HELLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] joined the group “The
+Peter Lustig [http://webapp:3000/profile/u2/peter-lustig] joined the group “The
 Group”. Click on the button to view this group:
 
-View group [http://webapp:3000/group/g1/the-group]
+View group [http://webapp:3000/groups/g1/the-group]
 
 See you soon on ocelot.social [https://ocelot.social]!
 
@@ -1104,8 +1104,8 @@ footer {
       <h2>Hello Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> left the group “The Group”. Click on the button to view this group:
-        </p><a class="button" href="http://webapp:3000/group/g1/the-group">View group</a>
+        <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> left the group “The Group”. Click on the button to view this group:
+        </p><a class="button" href="http://webapp:3000/groups/g1/the-group">View group</a>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– The ocelot.social Team</p><br>
@@ -1121,10 +1121,10 @@ footer {
   "subject": "ocelot.social  – Notification: User left group",
   "text": "HELLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] left the group “The
+Peter Lustig [http://webapp:3000/profile/u2/peter-lustig] left the group “The
 Group”. Click on the button to view this group:
 
-View group [http://webapp:3000/group/g1/the-group]
+View group [http://webapp:3000/groups/g1/the-group]
 
 See you soon on ocelot.social [https://ocelot.social]!
 
@@ -1231,7 +1231,7 @@ footer {
       <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>deine Rolle in der Gruppe „The Group“ wurde geändert. Klicke auf den Knopf, um diese Gruppe zu sehen:</p><a class="button" href="http://webapp:3000/group/g1/the-group">Gruppe ansehen</a>
+        <p>deine Rolle in der Gruppe „The Group“ wurde geändert. Klicke auf den Knopf, um diese Gruppe zu sehen:</p><a class="button" href="http://webapp:3000/groups/g1/the-group">Gruppe ansehen</a>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p><br>
@@ -1250,7 +1250,7 @@ footer {
 deine Rolle in der Gruppe „The Group“ wurde geändert. Klicke auf den Knopf, um
 diese Gruppe zu sehen:
 
-Gruppe ansehen [http://webapp:3000/group/g1/the-group]
+Gruppe ansehen [http://webapp:3000/groups/g1/the-group]
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 
@@ -1357,7 +1357,7 @@ footer {
       <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> hat einen Beitrag den du beobachtest mit dem Titel „New Post“ kommentiert. Klicke auf den Knopf, um diesen Kommentar zu sehen:
+        <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> hat einen Beitrag den du beobachtest mit dem Titel „New Post“ kommentiert. Klicke auf den Knopf, um diesen Kommentar zu sehen:
         </p><a class="button" href="http://webapp:3000/post/p1/new-post#commentId-c1">Kommentar ansehen</a>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
@@ -1374,8 +1374,8 @@ footer {
   "subject": "ocelot.social  – Benachrichtigung: Neuer Kommentar zu Beitrag",
   "text": "HALLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] hat einen Beitrag den du
-beobachtest mit dem Titel „New Post“ kommentiert. Klicke auf den Knopf, um
+Peter Lustig [http://webapp:3000/profile/u2/peter-lustig] hat einen Beitrag den
+du beobachtest mit dem Titel „New Post“ kommentiert. Klicke auf den Knopf, um
 diesen Kommentar zu sehen:
 
 Kommentar ansehen [http://webapp:3000/post/p1/new-post#commentId-c1]
@@ -1613,7 +1613,7 @@ footer {
       <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> hat dich in einem Kommentar zu dem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Kommentar zu sehen:
+        <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> hat dich in einem Kommentar zu dem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Kommentar zu sehen:
         </p><a class="button" href="http://webapp:3000/post/p1/new-post#commentId-c1">Kommentar ansehen</a>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
@@ -1630,7 +1630,7 @@ footer {
   "subject": "ocelot.social  – Benachrichtigung: Erwähnung in Kommentar",
   "text": "HALLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] hat dich in einem
+Peter Lustig [http://webapp:3000/profile/u2/peter-lustig] hat dich in einem
 Kommentar zu dem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf,
 um den Kommentar zu sehen:
 
@@ -1741,7 +1741,7 @@ footer {
       <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> hat Dich in einem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Beitrag zu sehen:
+        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> hat dich in einem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Beitrag zu sehen:
         </p><a class="button" href="http://webapp:3000/post/p1/new-post">Beitrag ansehen</a>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
@@ -1758,7 +1758,7 @@ footer {
   "subject": "ocelot.social  – Benachrichtigung: Erwähnung in Beitrag",
   "text": "HALLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] hat Dich in einem Beitrag
+Peter Lustig [http://webapp:3000/user/u2/peter-lustig] hat dich in einem Beitrag
 mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Beitrag zu sehen:
 
 Beitrag ansehen [http://webapp:3000/post/p1/new-post]
@@ -2117,8 +2117,8 @@ footer {
       <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> ist der Gruppe „The Group“ beigetreten. Klicke auf den Knopf, um diese Gruppe zu sehen:
-        </p><a class="button" href="http://webapp:3000/group/g1/the-group">Gruppe ansehen</a>
+        <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> ist der Gruppe „The Group“ beigetreten. Klicke auf den Knopf, um diese Gruppe zu sehen:
+        </p><a class="button" href="http://webapp:3000/groups/g1/the-group">Gruppe ansehen</a>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p><br>
@@ -2134,10 +2134,10 @@ footer {
   "subject": "ocelot.social  – Benachrichtigung: Nutzer tritt Gruppe bei",
   "text": "HALLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] ist der Gruppe „The
+Peter Lustig [http://webapp:3000/profile/u2/peter-lustig] ist der Gruppe „The
 Group“ beigetreten. Klicke auf den Knopf, um diese Gruppe zu sehen:
 
-Gruppe ansehen [http://webapp:3000/group/g1/the-group]
+Gruppe ansehen [http://webapp:3000/groups/g1/the-group]
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 
@@ -2244,8 +2244,8 @@ footer {
       <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p><a class="user" href="http://webapp:3000/user/u2/peter-lustig">Peter Lustig</a> hat die Gruppe „The Group“ verlassen. Klicke auf den Knopf, um diese Gruppe zu sehen:
-        </p><a class="button" href="http://webapp:3000/group/g1/the-group">Gruppe ansehen</a>
+        <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> hat die Gruppe „The Group“ verlassen. Klicke auf den Knopf, um diese Gruppe zu sehen:
+        </p><a class="button" href="http://webapp:3000/groups/g1/the-group">Gruppe ansehen</a>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p><br>
@@ -2261,10 +2261,10 @@ footer {
   "subject": "ocelot.social  – Benachrichtigung: Nutzer verlässt Gruppe",
   "text": "HALLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/user/u2/peter-lustig] hat die Gruppe „The
+Peter Lustig [http://webapp:3000/profile/u2/peter-lustig] hat die Gruppe „The
 Group“ verlassen. Klicke auf den Knopf, um diese Gruppe zu sehen:
 
-Gruppe ansehen [http://webapp:3000/group/g1/the-group]
+Gruppe ansehen [http://webapp:3000/groups/g1/the-group]
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 

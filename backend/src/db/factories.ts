@@ -10,7 +10,7 @@ import { Factory } from 'rosie'
 import slugify from 'slug'
 import { v4 as uuid } from 'uuid'
 
-import generateInviteCode from '@graphql/resolvers/helpers/generateInviteCode'
+import { generateInviteCode } from '@graphql/resolvers/inviteCodes'
 
 import { getDriver, getNeode } from './neo4j'
 
@@ -268,17 +268,27 @@ const inviteCodeDefaults = {
 
 Factory.define('inviteCode')
   .attrs(inviteCodeDefaults)
+  .option('groupId', null)
+  .option('group', ['groupId'], (groupId) => {
+    if (groupId) {
+      return neode.find('Group', groupId)
+    }
+  })
   .option('generatedById', null)
   .option('generatedBy', ['generatedById'], (generatedById) => {
     if (generatedById) return neode.find('User', generatedById)
     return Factory.build('user')
   })
   .after(async (buildObject, options) => {
-    const [inviteCode, generatedBy] = await Promise.all([
+    const [inviteCode, generatedBy, group] = await Promise.all([
       neode.create('InviteCode', buildObject),
       options.generatedBy,
+      options.group,
     ])
-    await Promise.all([inviteCode.relateTo(generatedBy, 'generated')])
+    await inviteCode.relateTo(generatedBy, 'generated')
+    if (group) {
+      await inviteCode.relateTo(group, 'invitesTo')
+    }
     return inviteCode
   })
 
