@@ -49,7 +49,6 @@ export default {
             this.$emit('update-invite-codes', [...this.group.inviteCodes, generateGroupInviteCode])
           },
         })
-        // this.$nuxt.refresh()
         this.$toast.success(this.$t('invite-codes.create-success'))
       } catch (error) {
         this.$toast.error(this.$t('invite-codes.create-error', { error: error.message }))
@@ -72,7 +71,6 @@ export default {
             )
           },
         })
-        this.$nuxt.refresh()
         this.$toast.success(this.$t('invite-codes.invalidate-success'))
       } catch (error) {
         this.$toast.error(this.$t('invite-codes.invalidate-error', { error: error.message }))
