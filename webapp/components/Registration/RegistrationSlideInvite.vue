@@ -25,9 +25,11 @@
 import gql from 'graphql-tag'
 import registrationConstants from '~/constants/registration'
 
-export const isValidInviteCodeQuery = gql`
-  query ($code: ID!) {
-    isValidInviteCode(code: $code)
+export const validateInviteCodeQuery = gql`
+  query ($code: String!) {
+    validateInviteCode(code: $code){
+      isValid
+    }
   }
 `
 export default {
@@ -85,7 +87,7 @@ export default {
       let dbValidated = false
       if (this.validInput) {
         await this.handleSubmitVerify()
-        dbValidated = this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode
+        dbValidated = this.sliderData.sliders[this.sliderIndex].data.response.validateInviteCode
       }
       this.sliderData.setSliderValuesCallback(dbValidated)
     },
@@ -110,7 +112,7 @@ export default {
         try {
           this.dbRequestInProgress = true
 
-          const response = await this.$apollo.query({ query: isValidInviteCodeQuery, variables })
+          const response = await this.$apollo.query({ query: validateInviteCodeQuery, variables })
           this.sliderData.setSliderValuesCallback(null, {
             sliderData: {
               request: { variables },
@@ -119,7 +121,7 @@ export default {
           })
 
           if (this.sliderData.sliders[this.sliderIndex].data.response) {
-            if (this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode) {
+            if (this.sliderData.sliders[this.sliderIndex].data.response.validateInviteCode) {
               this.$toast.success(
                 this.$t('components.registration.invite-code.form.validations.success', {
                   inviteCode,
@@ -135,7 +137,7 @@ export default {
           }
         } catch (err) {
           this.sliderData.setSliderValuesCallback(false, {
-            sliderData: { response: { isValidInviteCode: false } },
+            sliderData: { response: { validateInviteCode: false } },
           })
 
           const { message } = err

@@ -91,7 +91,7 @@ export default {
         name: 'enter-invite',
         titleIdent: { id: 'components.registration.signup.title', data: metadata },
         validated: false,
-        data: { request: null, response: { isValidInviteCode: false } },
+        data: { request: null, response: { validateInviteCode: false } },
         button: {
           titleIdent: 'components.registration.invite-code.buttonTitle',
           icon: 'arrow-right',

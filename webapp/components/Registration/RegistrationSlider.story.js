@@ -22,8 +22,8 @@ const plugins = [
         throw new Error(`Mutation name not found!`)
       },
       query: (data) => {
-        if (JSON.stringify(data).includes('isValidInviteCode')) {
-          return { data: { isValidInviteCode: true } }
+        if (JSON.stringify(data).includes('validateInviteCode')) {
+          return { data: { validateInviteCode: true } }
         }
         if (JSON.stringify(data).includes('VerifyNonce')) {
           return { data: { VerifyNonce: true } }
