@@ -11,6 +11,7 @@ import LoginForm from '~/components/LoginForm/LoginForm.vue'
 import loginConstants from '~/constants/loginBranded.js'
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import { mapGetters } from 'vuex'
+import { validateInviteCodeQuery, redeemInviteCodeMutation } from '~/graphql/inviteCodes'
 
 export default {
   layout: loginConstants.LAYOUT,
@@ -22,17 +23,38 @@ export default {
       user: 'auth/user',
     }),
   },
-  asyncData({ store, redirect }) {
-    if (store.getters['auth/user'].termsAndConditionsAgreedVersion === VERSION) {
-      redirect('/')
-    }
-  },
   methods: {
     async handleSuccess() {
       this.$i18n.set(this.user.locale || 'en')
 
       try {
-        await this.$router.replace(this.$route.query.path || '/')
+        if (this.$route.query.inviteCode) {
+          const code = this.$route.query.inviteCode
+          const result = await this.$apollo.query({
+            query: validateInviteCodeQuery,
+            variables: { code },
+          })
+          const {
+            data: {
+              validateInviteCode: { invitedTo: group },
+            },
+          } = result
+          if (group) {
+            const mutationResult = await this.$apollo.mutate({
+              mutation: redeemInviteCodeMutation,
+              variables: { code },
+            })
+            if (mutationResult.data.redeemInviteCode && group.groupType === 'public') {
+              this.$router.push(`/groups/${group.id}/${group.slug}`)
+            } else {
+              await this.$router.replace(this.$route.query.path || '/')
+            }
+          } else {
+            await this.$router.replace(this.$route.query.path || '/')
+          }
+        } else {
+          await this.$router.replace(this.$route.query.path || '/')
+        }
       } catch (err) {
         // throw new Error(`Problem handling something: ${err}.`);
         // TODO this is causing trouble - most likely due to double redirect on terms&conditions
