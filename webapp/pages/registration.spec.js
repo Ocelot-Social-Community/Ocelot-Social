@@ -355,7 +355,7 @@ describe('Registration', () => {
         isLoggedIn = true
       })
 
-      describe('route contains public invite code', () => {
+      describe('route contains personal invite code', () => {
         beforeEach(async () => {
           jest.clearAllMocks()
           queryMock.mockResolvedValue({
