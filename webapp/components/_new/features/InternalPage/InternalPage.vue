@@ -32,3 +32,18 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+@media only screen and (max-width: 500px) {
+  .ds-container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+
+    .base-card {
+      padding: 16px !important;
+    }
+  }
+}
+</style>
+
+
