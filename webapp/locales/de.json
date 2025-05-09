@@ -644,6 +644,7 @@
     },
     "generate-code-explanation": "Erstelle einen neuen Link. Wenn du möchtest, füge einen Kommentar hinzu (nur für dich sichtbar). ",
     "group-invite-links": "Gruppen-Einladungslinks",
+    "invalidate": "Widerrufen",
     "invalidate-error": "Einladungslink konnte nicht ungültig gemacht werden: {error}",
     "invalidate-success": "Einladungslink erfolgreich widerrufen",
     "invite-link-message-group": "Du wurdest eingeladen, der Gruppe {groupName} auf {network} beizutreten.",

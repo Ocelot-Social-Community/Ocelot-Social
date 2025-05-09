@@ -644,6 +644,7 @@
     },
     "generate-code-explanation": null,
     "group-invite-links": null,
+    "invalidate": null,
     "invalidate-error": null,
     "invalidate-success": null,
     "invite-link-message-group": null,
