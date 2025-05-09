@@ -51,7 +51,7 @@ exports[`CreateInvitation.vue renders 1`] = `
       </div>
        
       <button
-        class="generate-invite-code base-button --icon-only"
+        class="generate-invite-code base-button --icon-only --circle"
         type="submit"
       >
         <span

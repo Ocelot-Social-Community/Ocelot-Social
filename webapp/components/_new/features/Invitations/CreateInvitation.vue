@@ -8,7 +8,7 @@
         v-model="comment"
         :schema="{ type: 'string', max: 30 }"
       />
-      <base-button class="generate-invite-code" icon="plus" type="submit" />
+      <base-button circle class="generate-invite-code" icon="plus" type="submit" />
     </form>
   </div>
 </template>
