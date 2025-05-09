@@ -37,13 +37,11 @@ ONBUILD RUN cp -r ./locales /build
 ONBUILD RUN cp -r ./package.json ./yarn.lock /build
 ONBUILD RUN cd /build && yarn install --production=true --frozen-lockfile --non-interactive
 
+FROM build AS test_build
+
 FROM base AS test
 ENV NODE_ENV="test"
-COPY . .
-RUN tools/merge-locales.sh
-RUN yarn install --production=true --frozen-lockfile --non-interactive
-RUN yarn run build
-CMD ["/bin/bash", "-c", "yarn run start"]
+COPY --from=test_build /build .
 
 FROM build AS production_build
 
