@@ -14,7 +14,7 @@
     </template>
     <template #popover>
       <div class="invite-list">
-        <h2>My invitation links</h2>
+        <h2>{{ $t('invite-codes.my-invite-links') }}</h2>
         <invitation-list
           @generate-invite-code="generatePersonalInviteCode"
           @invalidate-invite-code="invalidateInviteCode"

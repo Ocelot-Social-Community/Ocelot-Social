@@ -1,27 +1,29 @@
 <template>
   <li class="invitation">
-    <div class="row1">
+    <div class="column1">
       <div class="code">
         {{ inviteCode.code }}
-        <span v-if="inviteCode.comment" class="comment">&nbsp;({{ inviteCode.comment }})</span>
+        <span v-if="inviteCode.comment" class="mdash">—</span>
+        <span v-if="inviteCode.comment" class="comment">{{ inviteCode.comment }}</span>
       </div>
-      <div class="actions">
-        <base-button
-          class="copy-button"
-          icon="copy"
-          @click="copyInviteCode(inviteCode.code)"
-          :disabled="!canCopy"
-        />
-        <base-button class="invalidate-button" icon="trash" @click="openDeleteModal" />
+      <div>
+        <span v-if="inviteCode.redeemedByCount === 0">
+          {{ $t('invite-codes.redeemed-count-0') }}
+        </span>
+        <span v-else>
+          {{ $t('invite-codes.redeemed-count', { count: inviteCode.redeemedByCount }) }}
+        </span>
       </div>
     </div>
-    <div class="row2">
-      <span v-if="inviteCode.redeemedByCount === 0">
-        {{ $t('invite-codes.redeemed-count-0') }}
-      </span>
-      <span v-else>
-        {{ $t('invite-codes.redeemed-count', { count: inviteCode.redeemedByCount }) }}
-      </span>
+    <div class="actions">
+      <base-button
+        circle
+        class="copy-button"
+        icon="copy"
+        @click="copyInviteCode(inviteCode.code)"
+        :disabled="!canCopy"
+      />
+      <base-button circle class="invalidate-button" icon="trash" @click="openDeleteModal" />
     </div>
   </li>
 </template>
@@ -104,30 +106,24 @@ export default {
 <style scoped lang="scss">
 .invitation {
   display: flex;
-  flex-flow: column;
-  margin-block: $space-small;
-  border-radius: 8px;
-  padding: 16px;
-  background-color: rgb(from $color-primary r g b / var(--invitation-opacity));
-}
-
-.invitation:hover {
-  --invitation-opacity: 0.5;
-}
-
-.invitation:nth-child(even) {
-  --invitation-opacity: 0.3;
+  padding: calc($space-base / 2);
+  border-bottom: 1px dotted #e5e3e8;
+  align-items: center;
 }
 
 .invitation:nth-child(odd) {
-  --invitation-opacity: 0.1;
+  background-color: $color-neutral-90;
 }
 
-.row1 {
+.invitation:nth-child(even) {
+  background-color: white;
+}
+
+.column1 {
+  flex: auto;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: $space-small;
+  flex-flow: column;
+  gap: $space-xx-small;
 }
 
 .code {
@@ -142,8 +138,11 @@ export default {
 }
 
 .actions {
-  justify-self: right;
   display: inline-flex;
   gap: $space-x-small;
+}
+
+.mdash {
+  margin-inline: $space-x-small;
 }
 </style>

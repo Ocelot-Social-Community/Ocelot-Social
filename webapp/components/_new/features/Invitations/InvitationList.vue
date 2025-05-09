@@ -14,7 +14,11 @@
     <div v-else class="no-invitation">
       {{ $t('invite-codes.no-links', { max: maxLinks }) }}
     </div>
-    <create-invitation @generate-invite-code="generateInviteCode" :disabled="isLimitReached" />
+    <create-invitation
+      @generate-invite-code="generateInviteCode"
+      :disabled="isLimitReached"
+      class="create-invitation"
+    />
   </div>
 </template>
 
@@ -70,5 +74,9 @@ export default {
   ul {
     list-style: none;
   }
+}
+
+.create-invitation {
+  margin-top: $space-base;
 }
 </style>

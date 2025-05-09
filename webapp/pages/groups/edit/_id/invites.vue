@@ -1,6 +1,8 @@
 <template>
   <div>
     <base-card>
+      <ds-heading tag="h3">{{ $t('invite-codes.group-invite-links') }}</ds-heading>
+      <ds-space margin="large" />
       <invitation-list
         @generate-invite-code="generateGroupInviteCode"
         @invalidate-invite-code="invalidateInviteCode"
