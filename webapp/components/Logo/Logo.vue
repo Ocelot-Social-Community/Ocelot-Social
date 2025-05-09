@@ -63,7 +63,7 @@ export default {
     tag: {
       type: String,
       default: 'div',
-    }
+    },
   },
   data() {
     const logosObject = {
@@ -72,7 +72,7 @@ export default {
         mobilePath: logos.LOGO_HEADER_MOBILE_PATH || null,
         alt: 'Header',
         widthDefault: logos.LOGO_HEADER_WIDTH,
-        mobileWidthDefault: logos.LOGO_HEADER_MOBILE_WIDTH || logos.LOGO_HEADER_WIDTH
+        mobileWidthDefault: logos.LOGO_HEADER_MOBILE_WIDTH || logos.LOGO_HEADER_WIDTH,
       },
       welcome: { path: logos.LOGO_WELCOME_PATH, alt: 'Welcome', widthDefault: '200px' },
       signup: { path: logos.LOGO_SIGNUP_PATH, alt: 'Sign Up', widthDefault: '200px' },
@@ -95,14 +95,15 @@ export default {
   },
   computed: {
     logoWidthStyle() {
-      let width = this.logoWidth === null ? this.logo.widthDefault : this.logoWidth;
-      return `width: ${width};`;
+      const width = this.logoWidth === null ? this.logo.widthDefault : this.logoWidth
+      return `width: ${width};`
     },
     mobileLogoWidthStyle() {
-      let width = this.mobileLogoWidth === null ? this.logo.mobileWidthDefault : this.mobileLogoWidth;
-      return `width: ${width};`;
-    }
-  }
+      const width =
+        this.mobileLogoWidth === null ? this.logo.mobileWidthDefault : this.mobileLogoWidth
+      return `width: ${width};`
+    },
+  },
 }
 </script>
 
