@@ -11,6 +11,7 @@
 <script>
 import registrationConstants from '~/constants/registrationBranded.js'
 import RegistrationSlider from '~/components/Registration/RegistrationSlider'
+import { validateInviteCodeQuery, redeemInviteCodeMutation } from '~/graphql/inviteCodes'
 
 export default {
   layout: registrationConstants.LAYOUT,
@@ -34,9 +35,45 @@ export default {
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling
     }
   },
-  asyncData({ store, redirect }) {
+  async asyncData({ store, route, app, redirect }) {
+    // http://localhost:3000/registration?method=invite-code&inviteCode=T9TWMJ
     if (store.getters['auth/isLoggedIn']) {
-      redirect('/')
+      const {
+        query: { inviteCode: code },
+      } = route
+      if (code) {
+        const {
+          apolloProvider: { defaultClient: client },
+        } = app
+        try {
+          const result = await client.query({
+            query: validateInviteCodeQuery,
+            variables: { code },
+          })
+          const {
+            data: {
+              validateInviteCode: { invitedTo: group },
+            },
+          } = result
+          if (group) {
+            const mutationResult = await client.mutate({
+              mutation: redeemInviteCodeMutation,
+              variables: { code },
+            })
+            if (mutationResult.data.redeemInviteCode && group.groupType === 'public') {
+              redirect(`/groups/${group.id}/${group.slug}`)
+            } else {
+              redirect('/')
+            }
+          } else {
+            redirect('/')
+          }
+        } catch (_err) {
+          redirect('/')
+        }
+      } else {
+        redirect('/')
+      }
     }
   },
   computed: {
