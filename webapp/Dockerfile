@@ -21,6 +21,7 @@ CMD ["/bin/bash", "-c", "yarn install && yarn run dev"]
 
 FROM base AS build
 COPY . .
+COPY ./.env.template /.env
 ONBUILD COPY ./branding .
 ONBUILD RUN tools/merge-locales.sh
 ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
@@ -38,7 +39,6 @@ ONBUILD RUN cp -r ./package.json ./yarn.lock /build
 ONBUILD RUN cd /build && yarn install --production=true --frozen-lockfile --non-interactive
 
 FROM build AS test
-COPY ./.env.template /.env
 CMD ["/bin/bash", "-c", "yarn run dev"]
 
 FROM build AS production_build
