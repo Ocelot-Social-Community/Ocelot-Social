@@ -20,7 +20,7 @@ const app = {
   apolloProvider: {
     defaultClient: {
       query: queryMock,
-      mutation: mutationMock,
+      mutate: mutationMock,
     },
   },
 }
@@ -387,8 +387,7 @@ describe('Registration', () => {
         })
       })
 
-      // no idea why this is not working
-      describe.skip('route contains group invite code to public group', () => {
+      describe('route contains group invite code to public group', () => {
         beforeEach(async () => {
           jest.clearAllMocks()
           queryMock.mockResolvedValue({
@@ -422,6 +421,96 @@ describe('Registration', () => {
 
         it('redirects to group', () => {
           expect(redirect).toHaveBeenCalledWith('/groups/public-group/public-group')
+        })
+
+        it('redeems the code', () => {
+          expect(mutationMock).toBeCalledWith({
+            mutation: redeemInviteCodeMutation,
+            variables: {
+              code: 'ABCDEF',
+            },
+          })
+        })
+      })
+
+      describe('route contains group invite code to closed group', () => {
+        beforeEach(async () => {
+          jest.clearAllMocks()
+          queryMock.mockResolvedValue({
+            data: {
+              validateInviteCode: {
+                invitedTo: {
+                  id: 'closed-group',
+                  slug: 'closed-group',
+                  groupType: 'closed',
+                },
+              },
+            },
+          })
+          mutationMock.mockResolvedValue({
+            data: {
+              redeemInviteCode: true,
+            },
+          })
+          route.query.inviteCode = 'ABCDEF'
+          wrapper = await Wrapper()
+        })
+
+        it('calls validate invite code', () => {
+          expect(queryMock).toHaveBeenCalledWith({
+            query: validateInviteCodeQuery,
+            variables: {
+              code: 'ABCDEF',
+            },
+          })
+        })
+
+        it('redirects to index', () => {
+          expect(redirect).toHaveBeenCalledWith('/')
+        })
+
+        it('redeems the code', () => {
+          expect(mutationMock).toBeCalledWith({
+            mutation: redeemInviteCodeMutation,
+            variables: {
+              code: 'ABCDEF',
+            },
+          })
+        })
+      })
+
+      describe('route contains group invite code to public group, but redeem throws', () => {
+        beforeEach(async () => {
+          jest.clearAllMocks()
+          queryMock.mockResolvedValue({
+            data: {
+              validateInviteCode: {
+                invitedTo: {
+                  id: 'public-group',
+                  slug: 'public-group',
+                  groupType: 'public',
+                },
+              },
+            },
+          })
+          mutationMock.mockRejectedValue({
+            error: 'Aua!',
+          })
+          route.query.inviteCode = 'ABCDEF'
+          wrapper = await Wrapper()
+        })
+
+        it('calls validate invite code', () => {
+          expect(queryMock).toHaveBeenCalledWith({
+            query: validateInviteCodeQuery,
+            variables: {
+              code: 'ABCDEF',
+            },
+          })
+        })
+
+        it('redirects to index', () => {
+          expect(redirect).toHaveBeenCalledWith('/')
         })
 
         it('redeems the code', () => {

@@ -36,7 +36,7 @@ export default {
     }
   },
   async asyncData({ store, route, app, redirect }) {
-    // http://localhost:3000/registration?method=invite-code&inviteCode=T9TWMJ
+    // http://localhost:3000/registration?method=invite-code&inviteCode=PEY8FN
     if (store.getters['auth/isLoggedIn']) {
       const {
         query: { inviteCode: code },
@@ -62,18 +62,15 @@ export default {
             })
             if (mutationResult.data.redeemInviteCode && group.groupType === 'public') {
               redirect(`/groups/${group.id}/${group.slug}`)
-            } else {
-              redirect('/')
+              return
             }
-          } else {
-            redirect('/')
           }
         } catch (_err) {
           redirect('/')
+          return
         }
-      } else {
-        redirect('/')
       }
+      redirect('/')
     }
   },
   computed: {
