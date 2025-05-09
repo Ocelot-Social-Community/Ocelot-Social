@@ -642,8 +642,8 @@
       "message": "Möchtest du diesen Einladungslink wirklich ungültig machen?",
       "title": "Einladungslink widerrufen"
     },
-    "generate-code-explanation": "Erstelle einen neuen Link. Wenn du möchtest, füge einen Kommentar hinzu (nur für dich sichtbar). ",
     "generate-code": "Neuen Einladungslink erstellen",
+    "generate-code-explanation": "Erstelle einen neuen Link. Wenn du möchtest, füge einen Kommentar hinzu (nur für dich sichtbar). ",
     "group-invite-links": "Gruppen-Einladungslinks",
     "invalidate": "Widerrufen",
     "invalidate-error": "Einladungslink konnte nicht ungültig gemacht werden: {error}",
