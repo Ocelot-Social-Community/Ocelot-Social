@@ -141,7 +141,7 @@
               </div>
               <!-- notification menu -->
               <div>
-                <notification-menu />
+                <notification-menu no-menu />
               </div>
             </client-only>
             <!-- hamburger menu -->

@@ -14,6 +14,22 @@
       }"
     />
   </nuxt-link>
+  <nuxt-link
+    v-else-if="noMenu"
+    class="notifications-menu"
+    :to="{ name: 'notifications' }"
+  >
+    <base-button
+      ghost
+      circle
+      v-tooltip="{
+          content: $t('header.notifications.tooltip'),
+          placement: 'bottom-start',
+        }"
+    >
+      <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
+    </base-button>
+  </nuxt-link>
   <dropdown v-else class="notifications-menu" offset="8" :placement="placement">
     <template #default="{ toggleMenu }">
       <base-button
@@ -82,6 +98,7 @@ export default {
   },
   props: {
     placement: { type: String },
+    noMenu: { type: Boolean, default: false },
   },
   methods: {
     async markAsRead(notificationSourceId) {
