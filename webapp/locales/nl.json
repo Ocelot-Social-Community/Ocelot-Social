@@ -649,6 +649,7 @@
     "invalidate-error": null,
     "invalidate-success": null,
     "invite-link-message-group": null,
+    "invite-link-message-hidden-group": null,
     "invite-link-message-personal": null,
     "limit-reached": null,
     "my-invite-links": null,

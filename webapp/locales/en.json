@@ -649,6 +649,7 @@
     "invalidate-error": "Invalidating the invite link failed! Error: {error}",
     "invalidate-success": "Invite link invalidated successfully!",
     "invite-link-message-group": "You have been invited to join the group “{groupName}” on {network}.",
+    "invite-link-message-hidden-group": "You have been invited to join a hidden group on {network}.",
     "invite-link-message-personal": "You have been invited to join {network}.",
     "limit-reached": "You have reached the maximum number of invite links.",
     "my-invite-links": "My invite links",

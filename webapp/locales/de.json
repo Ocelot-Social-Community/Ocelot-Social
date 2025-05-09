@@ -649,6 +649,7 @@
     "invalidate-error": "Einladungslink konnte nicht ungültig gemacht werden: {error}",
     "invalidate-success": "Einladungslink erfolgreich widerrufen",
     "invite-link-message-group": "Du wurdest eingeladen, der Gruppe {groupName} auf {network} beizutreten.",
+    "invite-link-message-hidden-group": "Du wurdest eingeladen, einer versteckten Gruppe auf {network} beizutreten.",
     "invite-link-message-personal": "Du wurdest eingeladen, dem Netzwerk {network} beizutreten",
     "limit-reached": "Du hast die maximale Anzahl an Einladungslinks erreicht.",
     "my-invite-links": "Meine Einladungslinks",
