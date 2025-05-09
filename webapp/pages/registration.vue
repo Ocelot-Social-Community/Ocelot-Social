@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import gql from 'graphql-tag'
 import registrationConstants from '~/constants/registrationBranded.js'
 import RegistrationSlider from '~/components/Registration/RegistrationSlider'
 
@@ -34,9 +35,61 @@ export default {
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling
     }
   },
-  asyncData({ store, redirect }) {
+  async asyncData({ store, route, app, redirect, router }) {
+    // http://localhost:3000/registration?method=invite-code&inviteCode=GBQ9ZR
     if (store.getters['auth/isLoggedIn']) {
-      redirect('/')
+      const {
+        query: { inviteCode: code },
+      } = route
+      if (code) {
+        const {
+          apolloProvider: { defaultClient: client },
+        } = app
+        const query = gql`
+          query ($code: String!) {
+            validateInviteCode(code: $code) {
+              invitedTo {
+                id
+                slug
+                groupType
+              }
+            }
+          }
+        `
+        try {
+          const result = await client.query({
+            query,
+            variables: { code },
+          })
+          const {
+            data: {
+              validateInviteCode: { invitedTo: group },
+            },
+          } = result
+          if (group) {
+            const mutation = gql`
+              mutation ($code: String!) {
+                redeemInviteCode(code: $code)
+              }
+            `
+            const mutationResult = await client.mutate({
+              mutation,
+              variables: { code },
+            })
+            if (mutationResult.data.redeemInviteCode && group.groupType === 'public') {
+              redirect(`/groups/${group.id}/${group.slug}`)
+            } else {
+              redirect('/')
+            }
+          } else {
+            redirect('/')
+          }
+        } catch (_err) {
+          redirect('/')
+        }
+      } else {
+        redirect('/')
+      }
     }
   },
   computed: {

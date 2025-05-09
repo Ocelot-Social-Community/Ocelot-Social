@@ -20,6 +20,7 @@ describe('Registration', () => {
   let store
   let redirect
   let isLoggedIn
+  let route
 
   beforeEach(() => {
     mocks = {
@@ -39,6 +40,9 @@ describe('Registration', () => {
     asyncData = false
     isLoggedIn = false
     redirect = jest.fn()
+    route = {
+      query: {},
+    }
   })
 
   describe('mount', () => {
@@ -65,6 +69,7 @@ describe('Registration', () => {
         const aData = await Registration.asyncData({
           store,
           redirect,
+          route,
         })
         Registration.data = function () {
           return { ...data, ...aData }
