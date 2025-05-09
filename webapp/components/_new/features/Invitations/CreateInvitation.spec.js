@@ -7,7 +7,7 @@ const localVue = global.localVue
 describe('CreateInvitation.vue', () => {
   let wrapper
 
-  const Wrapper = ({isDisabled = false }) => {
+  const Wrapper = ({ isDisabled = false }) => {
     return render(CreateInvitation, {
       localVue,
       propsData: {

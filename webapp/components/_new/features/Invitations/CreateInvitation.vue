@@ -8,7 +8,14 @@
         v-model="comment"
         :schema="{ type: 'string', max: 30 }"
       />
-      <base-button circle class="generate-invite-code" :aria-label="$t('invite-codes.generate-code')" icon="plus" type="submit" :disabled="disabled" />
+      <base-button
+        circle
+        class="generate-invite-code"
+        :aria-label="$t('invite-codes.generate-code')"
+        icon="plus"
+        type="submit"
+        :disabled="disabled"
+      />
     </form>
   </div>
 </template>
