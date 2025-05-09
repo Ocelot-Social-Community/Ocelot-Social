@@ -93,9 +93,11 @@ export default {
       try {
         const user = await writeTxResultPromise
 
-        // To allow redeeming and return an User object we require a User in the context
-        context.user = user
-        await redeemInviteCode(context, inviteCode, true)
+        if (inviteCode) {
+          // To allow redeeming and return an User object we require a User in the context
+          context.user = user
+          await redeemInviteCode(context, inviteCode, true)
+        }
 
         return user
       } catch (e) {
