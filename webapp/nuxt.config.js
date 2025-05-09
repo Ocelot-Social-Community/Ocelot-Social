@@ -302,7 +302,7 @@ export default {
         exclude: /(node_modules)/,
       })
 
-      const tagAttributesForTesting = ['data-test', ':data-test', 'v-bind:data-test']
+      /* const tagAttributesForTesting = ['data-test', ':data-test', 'v-bind:data-test']
       ctx.loaders.vue.compilerOptions = {
         modules: [
           {
@@ -321,7 +321,7 @@ export default {
             },
           },
         ],
-      }
+      }*/
     },
   },
 }
