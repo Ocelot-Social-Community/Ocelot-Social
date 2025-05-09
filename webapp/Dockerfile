@@ -39,10 +39,10 @@ ONBUILD RUN cd /build && yarn install --production=true --frozen-lockfile --non-
 
 FROM base AS test
 ENV NODE_ENV="test"
-ONBUILD COPY ./branding .
-ONBUILD RUN tools/merge-locales.sh
-ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
-ONBUILD RUN yarn run build
+COPY . .
+RUN tools/merge-locales.sh
+RUN yarn install --frozen-lockfile --non-interactive
+RUN yarn run build
 CMD ["/bin/bash", "-c", "yarn run dev"]
 
 FROM build AS production_build
