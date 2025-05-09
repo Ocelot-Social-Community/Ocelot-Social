@@ -11,7 +11,7 @@ import { createTransport } from 'nodemailer'
 // import type Email as EmailType from '@types/email-templates'
 
 import CONFIG, { nodemailerTransportOptions } from '@config/index'
-import logosWebapp from '@config/logos'
+import logosWebapp from '@config/logosBranded'
 import metadata from '@config/metadata'
 import { UserDbProperties } from '@db/types/User'
 

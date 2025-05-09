@@ -1,12 +1,10 @@
 <template>
   <div>
-    <ds-heading tag="h1">{{ $t('chat.page.headline') }}</ds-heading>
     <add-chat-room-by-user-search
       v-if="showUserSearch"
       @add-chat-room="addChatRoom"
       @close-user-search="showUserSearch = false"
     />
-    <ds-space margin-bottom="small" />
     <chat
       :roomId="getShowChat.showChat ? getShowChat.roomID : null"
       ref="chat"
