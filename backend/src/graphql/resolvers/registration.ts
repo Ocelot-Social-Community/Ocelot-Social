@@ -88,15 +88,15 @@ export default {
         const [user] = createUserTransactionResponse.records.map((record) => record.get('user'))
         if (!user) throw new UserInputError('Invalid email or nonce')
 
-        // To allow redeeming and return an User object we require a User in the context
-        context.user = user
-        // join Group via invite Code
-        await redeemInviteCode(context, inviteCode, true)
-
         return user
       })
       try {
         const user = await writeTxResultPromise
+
+        // To allow redeeming and return an User object we require a User in the context
+        context.user = user
+        await redeemInviteCode(context, inviteCode, true)
+
         return user
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
