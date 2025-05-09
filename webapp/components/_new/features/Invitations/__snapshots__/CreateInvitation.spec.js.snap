@@ -1,0 +1,69 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CreateInvitation.vue renders 1`] = `
+<div>
+  <div
+    class="create-invitation"
+  >
+    <div>
+      invite-codes.generate-code-explanation
+    </div>
+     
+    <form
+      class="generate-invite-code-form"
+    >
+      <div
+        class="ds-form-item ds-input-size-base"
+      >
+        <label
+          class="ds-input-label"
+          style="display: none;"
+        >
+          
+  
+
+        </label>
+        <div
+          class="ds-input-wrap"
+        >
+          <!---->
+          <input
+            class="ds-input"
+            name="comment"
+            placeholder="invite-codes.comment-placeholder"
+            tabindex="0"
+            type="text"
+          />
+          <!---->
+        </div>
+        <transition-stub
+          name="ds-input-error"
+        >
+          <div
+            class="ds-input-error"
+            style="display: none;"
+          >
+            
+    
+  
+          </div>
+        </transition-stub>
+      </div>
+       
+      <button
+        class="generate-invite-code base-button --icon-only"
+        type="submit"
+      >
+        <span
+          class="base-icon"
+        >
+          <!---->
+        </span>
+         
+        <!---->
+         
+      </button>
+    </form>
+  </div>
+</div>
+`;
