@@ -17,6 +17,7 @@
         :loading-rooms="loadingRooms"
         show-files="false"
         show-audio="false"
+        :height="'calc(100dvh - 110px)'"
         :styles="JSON.stringify(computedChatStyle)"
         :show-footer="true"
         :responsive-breakpoint="responsiveBreakpoint"
