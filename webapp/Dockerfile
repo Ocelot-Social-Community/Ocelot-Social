@@ -37,11 +37,8 @@ ONBUILD RUN cp -r ./locales /build
 ONBUILD RUN cp -r ./package.json ./yarn.lock /build
 ONBUILD RUN cd /build && yarn install --production=true --frozen-lockfile --non-interactive
 
-FROM build AS test_build
-
-FROM base AS test
-ENV NODE_ENV="test"
-COPY --from=test_build /build .
+FROM build AS test
+CMD ["/bin/bash", "-c", "yarn run dev"]
 
 FROM build AS production_build
 
