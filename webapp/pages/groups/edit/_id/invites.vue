@@ -39,8 +39,11 @@ export default {
             comment,
             groupId: this.group.id,
           },
+          update: (_, { data: { generateGroupInviteCode } }) => {
+            this.$emit('update-invite-codes', [...this.group.inviteCodes, generateGroupInviteCode])
+          },
         })
-        this.$nuxt.refresh()
+        // this.$nuxt.refresh()
         this.$toast.success(this.$t('invite-codes.create-success'))
       } catch (error) {
         this.$toast.error(this.$t('invite-codes.create-error', { error: error.message }))
@@ -52,6 +55,15 @@ export default {
           mutation: invalidateInviteCode(),
           variables: {
             code,
+          },
+          update: (_, { data: { _invalidateInviteCode } }) => {
+            this.$emit(
+              'update-invite-codes',
+              this.group.inviteCodes.map((inviteCode) => ({
+                ...inviteCode,
+                isValid: inviteCode.code === code ? false : inviteCode.isValid,
+              })),
+            )
           },
         })
         this.$nuxt.refresh()
