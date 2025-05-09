@@ -47,7 +47,8 @@ module.exports = defineConfig({
     supportFile: false,
     includeShadowDom: true,
     retries:  0,
-    video: false,
+    video: true,
+    videosFolder: 'cypress/reports/failure/'
     viewportHeight: 720,
     viewportWidth: 1290,
     setupNodeEvents,
