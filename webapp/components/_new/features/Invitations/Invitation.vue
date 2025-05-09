@@ -20,10 +20,17 @@
         circle
         class="copy-button"
         icon="copy"
-        @click="copyInviteCode(inviteCode.code)"
+        @click="copyInviteCode(inviteCode.copy)"
         :disabled="!canCopy"
+        :aria-label="$t('invite-codes.copy-code')"
       />
-      <base-button circle class="invalidate-button" icon="trash" @click="openDeleteModal" />
+      <base-button
+        circle
+        class="invalidate-button"
+        icon="trash"
+        @click="openDeleteModal"
+        :aria-label="$t('invite-codes.invalidate')"
+      />
     </div>
   </li>
 </template>

@@ -644,6 +644,7 @@
     },
     "generate-code-explanation": "Create a new link. You can add a comment if you like (only visible to you).",
     "group-invite-links": "Group invite links",
+    "invalidate": "Invalidate link",
     "invalidate-error": "Invalidating the invite link failed! Error: {error}",
     "invalidate-success": "Invite link invalidated successfully!",
     "invite-link-message-group": "You have been invited to join the group “{groupName}” on {network}.",
