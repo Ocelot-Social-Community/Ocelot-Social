@@ -41,9 +41,9 @@ FROM base AS test
 ENV NODE_ENV="test"
 COPY . .
 RUN tools/merge-locales.sh
-RUN yarn install --frozen-lockfile --non-interactive
+RUN yarn install --production=true --frozen-lockfile --non-interactive
 RUN yarn run build
-CMD ["/bin/bash", "-c", "yarn run dev"]
+CMD ["/bin/bash", "-c", "yarn run start"]
 
 FROM build AS production_build
 
