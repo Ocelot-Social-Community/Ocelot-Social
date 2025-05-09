@@ -23,6 +23,11 @@ export default {
       user: 'auth/user',
     }),
   },
+  asyncData({ store, redirect }) {
+    if (store.getters['auth/user'].termsAndConditionsAgreedVersion === VERSION) {
+      redirect('/')
+    }
+  },
   methods: {
     async handleSuccess() {
       this.$i18n.set(this.user.locale || 'en')
