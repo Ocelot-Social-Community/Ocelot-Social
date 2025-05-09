@@ -231,6 +231,17 @@ div.ds-input-wrap > input:focus-within.ds-input {
   accent-color: $color-primary-light;
 }
 
+.editor .base-button {
+  color: $color-secondary;
+  border-color: $color-secondary;
+
+  &:hover {
+    color: white;
+    background-color: black;
+    border-color: black;
+  }
+}
+
 body.page-name-login,
 body.page-name-registration,
 body.page-name-password-reset-request {
