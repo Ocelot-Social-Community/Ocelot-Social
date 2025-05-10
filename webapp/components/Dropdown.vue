@@ -94,8 +94,7 @@ export default {
       }
     },
     popoverMouseLeave() {
-      if (this.noMouseLeaveClosing) return
-      if (this.disabled) {
+      if (this.noMouseLeaveClosing || this.disabled) {
         return
       }
       this.clearTimeouts()
