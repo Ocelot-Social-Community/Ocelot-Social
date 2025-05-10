@@ -514,6 +514,7 @@ export default shield(
     },
     Group: {
       '*': isAuthenticated, // TODO - only those who are allowed to see the group
+      slug: allow,
       avatar: allow,
       name: allow,
       about: allow,
