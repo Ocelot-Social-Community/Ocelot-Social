@@ -17,7 +17,6 @@ const createCategories = async () => {
   await write({
     query: `MATCH (category:Category)
             WHERE NOT category.id IN $categoryIds
-              OR NOT category.slug IN $categorySlugs
             DETACH DELETE category`,
     variables: {
       categoryIds,
