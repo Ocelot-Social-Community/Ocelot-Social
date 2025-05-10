@@ -131,6 +131,7 @@ export default {
   display: flex;
   flex-flow: column;
   gap: $space-xx-small;
+  max-width: var(--invitation-column-max-width, 100%);
 }
 
 .code {

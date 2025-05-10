@@ -114,5 +114,6 @@ export default {
   display: flex;
   flex-flow: column;
   gap: $space-small;
+  --invitation-column-max-width: 75%;
 }
 </style>
