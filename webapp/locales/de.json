@@ -247,7 +247,7 @@
         },
         "invited-by": "Eingeladung von {invitedBy}",
         "invited-by-and-to": "Einladung von {invitedBy} zur Grupppe {invitedTo}",
-        "invited-to-hidden-group": "Eingeladung von {invitedBy} zu einer versteckten Gruppe"
+        "invited-to-hidden-group": "Eingeladen von {invitedBy} zu einer versteckten Gruppe"
       },
       "no-public-registrstion": {
         "title": "Keine öffentliche Registrierung möglich"
