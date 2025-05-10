@@ -8,8 +8,8 @@
         @invalidate-invite-code="invalidateInviteCode"
         :inviteCodes="group.inviteCodes"
         :copy-message="
-          group.type === 'hidden'
-            ? $T('invite-codes.invite-link-message-hidden-group', {
+          group.groupType === 'hidden'
+            ? $t('invite-codes.invite-link-message-hidden-group', {
                 network: $env.NETWORK_NAME,
               })
             : $t('invite-codes.invite-link-message-group', {
