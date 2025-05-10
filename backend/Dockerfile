@@ -1,4 +1,4 @@
-FROM node:23.11.0-alpine AS base
+FROM node:24.0.1-alpine AS base
 LABEL org.label-schema.name="ocelot.social:backend"
 LABEL org.label-schema.description="Backend of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
