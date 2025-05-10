@@ -245,7 +245,7 @@
             "success": "Gültiger Einladungs-Code <b>{inviteCode}</b>!"
           }
         },
-        "invited-by": "Eingeladung von {invitedBy}",
+        "invited-by": "Eingeladen von {invitedBy}",
         "invited-by-and-to": "Einladung von {invitedBy} zur Grupppe {invitedTo}",
         "invited-to-hidden-group": "Eingeladen von {invitedBy} zu einer versteckten Gruppe"
       },
