@@ -94,7 +94,7 @@ describe('LoginForm', () => {
           it('sets the categories', async () => {
             authUserMock.mockReturnValue({ activeCategories: ['cat0', 'cat2', 'cat4'] })
             const wrapper = Wrapper()
-            await fillIn(Wrapper())
+            await fillIn(wrapper)
             await wrapper.vm.$nextTick()
             expect(storeMocks.mutations['posts/RESET_CATEGORIES']).toHaveBeenCalled()
             expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledTimes(3)
