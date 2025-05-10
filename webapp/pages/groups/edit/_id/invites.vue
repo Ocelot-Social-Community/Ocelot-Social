@@ -9,7 +9,7 @@
         :inviteCodes="group.inviteCodes"
         :copy-message="
           group.groupType === 'hidden'
-            ? $T('invite-codes.invite-link-message-hidden-group', {
+            ? $t('invite-codes.invite-link-message-hidden-group', {
                 network: $env.NETWORK_NAME,
               })
             : $t('invite-codes.invite-link-message-group', {
