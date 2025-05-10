@@ -28,6 +28,7 @@
     "introduction": "Du möchtest also deine E-Mail ändern? Kein Problem! Mit Klick auf diesen Button kannst du deine neue E-Mail Adresse bestätigen:",
     "doNotChange": "Falls du deine E-Mail Adresse doch nicht ändern möchtest, kannst du diese Nachricht einfach ignorieren. "
   },
+  "support": "Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: ",
   "buttons": {
     "confirmEmail": "Bestätige deine E-Mail Adresse",
     "resetPassword": "Passwort zurücksetzen",
