@@ -308,12 +308,11 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await dagobert.relateTo(louie, 'blocked')
 
     // categories
-    let i = 0
     for (const category of categories) {
       await Factory.build('category', {
-        id: `cat${i++}`,
-        slug: category.name,
-        naem: category.name,
+        id: category.id,
+        slug: category.slug,
+        name: category.name,
         icon: category.icon,
       })
     }
