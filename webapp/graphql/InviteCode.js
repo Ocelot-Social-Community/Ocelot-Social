@@ -5,6 +5,7 @@ export const validateInviteCode = () => gql`
     validateInviteCode(code: $code) {
       code
       invitedTo {
+        slug
         groupType
         name
         about
