@@ -1,5 +1,5 @@
 <template>
-  <dropdown class="invite-button" offset="8" :placement="placement">
+  <dropdown class="invite-button" offset="8" :placement="placement" noMouseLeaveClosing>
     <template #default="{ toggleMenu }">
       <base-button
         icon="user-plus"

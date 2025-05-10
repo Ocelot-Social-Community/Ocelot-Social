@@ -29,11 +29,11 @@ export default {
     placement: { type: String, default: 'bottom-end' },
     disabled: { type: Boolean, default: false },
     offset: { type: [String, Number], default: '16' },
+    noMouseLeaveClosing: { type: Boolean, default: false },
   },
   data() {
     return {
       isPopoverOpen: false,
-      developerNoAutoClosing: false, // stops automatic closing of menu for developer purposes: default is 'false'
     }
   },
   computed: {
@@ -94,7 +94,7 @@ export default {
       }
     },
     popoverMouseLeave() {
-      if (this.developerNoAutoClosing) return
+      if (this.noMouseLeaveClosing) return
       if (this.disabled) {
         return
       }
