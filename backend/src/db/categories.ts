@@ -12,10 +12,22 @@ const createCategories = async () => {
     query: 'MATCH (category:Category) RETURN category { .* }',
   })
 
-  const existingCategories = result.records.map((r) => r.get('category'))
-  const existingCategoryIds = existingCategories.map((c) => c.id)
+  const categoryIds = categories.map((c) => c.id)
+  const categorySlugs = categories.map((c) => c.slug)
+  await write({
+    query: `MATCH (category:Category)
+            WHERE NOT category.id IN $categoryIds
+              OR NOT category.slug IN $categorySlugs
+            DETACH DELETE category`,
+    variables: {
+      categoryIds,
+      categorySlugs,
+    },
+  })
 
-  const newCategories = categories.filter((c) => !existingCategoryIds.includes(c.id))
+  const existingCategories = result.records.map((r) => r.get('category'))
+
+  const newCategories = categories.filter((c) => !existingCategories.some((cat) => c.id === cat.id))
 
   await write({
     query: `UNWIND $newCategories AS map
@@ -27,15 +39,6 @@ const createCategories = async () => {
     },
   })
 
-  const categoryIds = categories.map((c) => c.id)
-  await write({
-    query: `MATCH (category:Category)
-            WHERE NOT category.id IN $categoryIds
-            DETACH DELETE category`,
-    variables: {
-      categoryIds,
-    },
-  })
   // eslint-disable-next-line no-console
   console.log('Successfully created categories!')
   await driver.close()
