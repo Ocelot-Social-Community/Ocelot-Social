@@ -142,6 +142,12 @@ hr {
   }
 }
 
+body.dropdown-open {
+  max-height: 100vh;
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
 .base-card > .ds-section {
   padding: 0;
   margin: -$space-base;

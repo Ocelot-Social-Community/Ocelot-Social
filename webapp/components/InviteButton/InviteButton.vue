@@ -13,24 +13,18 @@
       />
     </template>
     <template #popover>
-      <div class="invite-button-menu-popover">
-        <div v-if="inviteCode && inviteCode.code">
-          <p class="description">{{ $t('invite-codes.your-code') }}</p>
-          <base-card class="code-card" wideContent>
-            <base-button
-              v-if="canCopy"
-              class="invite-code"
-              icon="copy"
-              ghost
-              @click="copyInviteLink"
-            >
-              <ds-text bold>{{ $t('invite-codes.copy-code') }}</ds-text>
-            </base-button>
-          </base-card>
-        </div>
-        <div v-else>
-          <ds-text>{{ $t('invite-codes.not-available') }}</ds-text>
-        </div>
+      <div class="invite-list">
+        <h2>{{ $t('invite-codes.my-invite-links') }}</h2>
+        <invitation-list
+          @generate-invite-code="generatePersonalInviteCode"
+          @invalidate-invite-code="invalidateInviteCode"
+          :inviteCodes="user.inviteCodes"
+          :copy-message="
+            $t('invite-codes.invite-link-message-personal', {
+              network: $env.NETWORK_NAME,
+            })
+          "
+        />
       </div>
     </template>
   </dropdown>
@@ -38,82 +32,87 @@
 
 <script>
 import Dropdown from '~/components/Dropdown'
-import gql from 'graphql-tag'
-import BaseCard from '../_new/generic/BaseCard/BaseCard.vue'
+import { mapGetters, mapMutations } from 'vuex'
+import InvitationList from '~/components/_new/features/Invitations/InvitationList.vue'
+import { generatePersonalInviteCode, invalidateInviteCode } from '~/graphql/InviteCode'
 
 export default {
   components: {
     Dropdown,
-    BaseCard,
+    InvitationList,
   },
   props: {
     placement: { type: String, default: 'top-end' },
   },
-  data() {
-    return {
-      inviteCode: null,
-      canCopy: false,
-    }
-  },
-  created() {
-    this.canCopy = !!navigator.clipboard
-  },
+
   computed: {
-    inviteLink() {
-      return (
-        'https://' +
-        window.location.hostname +
-        '/registration?method=invite-code&inviteCode=' +
-        this.inviteCode.code
-      )
+    ...mapGetters({
+      user: 'auth/user',
+    }),
+    inviteCode() {
+      return this.user.inviteCodes[0] || null
     },
   },
   methods: {
-    async copyInviteLink() {
-      await navigator.clipboard.writeText(this.inviteLink)
-      this.$toast.success(this.$t('invite-codes.copy-success'))
+    ...mapMutations({
+      setCurrentUser: 'auth/SET_USER_PARTIAL',
+    }),
+    async generatePersonalInviteCode(comment) {
+      try {
+        await this.$apollo.mutate({
+          mutation: generatePersonalInviteCode(),
+          variables: {
+            comment,
+          },
+          update: (_, { data: { generatePersonalInviteCode } }) => {
+            this.setCurrentUser({
+              ...this.currentUser,
+              inviteCodes: [...this.user.inviteCodes, generatePersonalInviteCode],
+            })
+          },
+        })
+        this.$toast.success(this.$t('invite-codes.create-success'))
+      } catch (error) {
+        this.$toast.error(this.$t('invite-codes.create-error', { error: error.message }))
+      }
     },
-  },
-  apollo: {
-    inviteCode: {
-      query() {
-        return gql`
-          query {
-            getInviteCode {
-              code
-            }
-          }
-        `
-      },
-      variables() {},
-      update({ getInviteCode }) {
-        return getInviteCode
-      },
+    async invalidateInviteCode(code) {
+      try {
+        await this.$apollo.mutate({
+          mutation: invalidateInviteCode(),
+          variables: {
+            code,
+          },
+          update: (_, { data: { _invalidateInviteCode } }) => {
+            this.setCurrentUser({
+              ...this.currentUser,
+              inviteCodes: this.user.inviteCodes.map((inviteCode) => ({
+                ...inviteCode,
+                isValid: inviteCode.code === code ? false : inviteCode.isValid,
+              })),
+            })
+          },
+        })
+        this.$toast.success(this.$t('invite-codes.invalidate-success'))
+      } catch (error) {
+        this.$toast.error(this.$t('invite-codes.invalidate-error', { error: error.message }))
+      }
     },
   },
 }
 </script>
 
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .invite-button {
   color: $color-secondary;
 }
 
-.invite-button-menu-popover {
+.invite-list {
+  max-width: min(400px, 90vw);
+  padding: $space-small;
+  margin-top: $space-base;
   display: flex;
-  justify-content: center;
-  align-items: center;
-
-  .description {
-    margin-top: $space-x-small;
-    margin-bottom: $space-x-small;
-  }
-  .code-card {
-    margin-bottom: $space-x-small;
-  }
-}
-
-.invite-code {
-  margin-left: 25%;
+  flex-flow: column;
+  gap: $space-small;
 }
 </style>
