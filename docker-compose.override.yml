@@ -32,6 +32,7 @@ services:
       - DEBUG=true
       - SMTP_PORT=1025
       - SMTP_HOST=mailserver
+      - AWS_ENDPOINT=http://minio:9000
     volumes:
       - ./backend:/app
 
@@ -46,3 +47,18 @@ services:
     ports:
       - 1080:1080
       - 1025:1025
+
+  minio:
+    image: quay.io/minio/minio
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - minio_data:/data
+    environment:
+      - MINIO_ROOT_USER=AKIAIOSFODNN7EXAMPLE
+      - MINIO_ROOT_PASSWORD=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    command: server /data --console-address ":9001"
+
+volumes:
+  minio_data:
