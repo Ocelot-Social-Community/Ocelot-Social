@@ -102,12 +102,14 @@ const s3 = {
   AWS_ENDPOINT: env.AWS_ENDPOINT,
   AWS_REGION: env.AWS_REGION,
   AWS_BUCKET: env.AWS_BUCKET,
+  S3_PUBLIC_GATEWAY: env.S3_PUBLIC_GATEWAY,
   S3_CONFIGURED:
     env.AWS_ACCESS_KEY_ID &&
     env.AWS_SECRET_ACCESS_KEY &&
     env.AWS_ENDPOINT &&
     env.AWS_REGION &&
-    env.AWS_BUCKET,
+    env.AWS_BUCKET &&
+    env.S3_PUBLIC_GATEWAY,
 }
 
 const options = {
