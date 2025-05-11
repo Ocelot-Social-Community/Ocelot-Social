@@ -30,14 +30,21 @@ import type { FileUpload } from 'graphql-upload'
 export const images = (
   config: Pick<
     typeof CONFIG,
-    'AWS_ACCESS_KEY_ID' | 'AWS_SECRET_ACCESS_KEY' | 'AWS_ENDPOINT' | 'AWS_REGION' | 'AWS_BUCKET'
+    | 'AWS_ACCESS_KEY_ID'
+    | 'AWS_SECRET_ACCESS_KEY'
+    | 'AWS_ENDPOINT'
+    | 'AWS_REGION'
+    | 'AWS_BUCKET'
+    | 'S3_PUBLIC_GATEWAY'
   >,
 ) => {
   // const widths = [34, 160, 320, 640, 1024]
-  const { AWS_BUCKET: Bucket } = config
+  const { AWS_BUCKET: Bucket, S3_PUBLIC_GATEWAY } = config
 
   const { AWS_ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = config
-  if (!(AWS_ENDPOINT && AWS_ACCESS_KEY_ID && AWS_SECRET_ACCESS_KEY)) {
+  if (
+    !(AWS_ENDPOINT && AWS_ACCESS_KEY_ID && AWS_SECRET_ACCESS_KEY && Bucket && S3_PUBLIC_GATEWAY)
+  ) {
     throw new Error('Missing AWS credentials.')
   }
   const s3 = new S3Client({
@@ -174,7 +181,9 @@ export const images = (
     if (!Location) {
       throw new Error('File upload did not return `Location`')
     }
-    return Location
+    const publicLocation = new URL(S3_PUBLIC_GATEWAY)
+    publicLocation.pathname = new URL(Location).pathname
+    return publicLocation.href
   }
 
   const s3Delete: FileDeleteCallback = async (url) => {
