@@ -33,6 +33,7 @@ services:
       - SMTP_PORT=1025
       - SMTP_HOST=mailserver
       - AWS_ENDPOINT=http://minio:9000
+      - S3_PUBLIC_GATEWAY=http://localhost:9000
     volumes:
       - ./backend:/app
 
