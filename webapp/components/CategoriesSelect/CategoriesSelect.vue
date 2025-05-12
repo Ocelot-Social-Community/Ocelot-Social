@@ -1,7 +1,7 @@
 <template>
   <section class="categories-select">
     <base-button
-      v-for="category in categories"
+      v-for="category in sortCategories(categories)"
       :key="category.id"
       :data-test="categoryButtonsId(category.id)"
       @click="toggleCategory(category.id)"
@@ -20,10 +20,10 @@
 </template>
 
 <script>
-import CategoryQuery from '~/graphql/CategoryQuery'
 import { CATEGORIES_MAX } from '~/constants/categories.js'
 import xor from 'lodash/xor'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
+import { mapGetters } from 'vuex'
 
 export default {
   inject: {
@@ -38,7 +38,6 @@ export default {
   },
   data() {
     return {
-      categories: null,
       selectedMax: CATEGORIES_MAX,
       selectedCategoryIds: this.existingCategoryIds,
     }
@@ -58,6 +57,9 @@ export default {
     reachedMaximum() {
       return this.selectedCount >= this.selectedMax
     },
+    ...mapGetters({
+      categories: 'categories/categories',
+    }),
   },
   methods: {
     toggleCategory(id) {
@@ -74,16 +76,6 @@ export default {
     },
     categoryButtonsId(categoryId) {
       return `category-buttons-${categoryId}`
-    },
-  },
-  apollo: {
-    Category: {
-      query() {
-        return CategoryQuery()
-      },
-      result({ data: { Category } }) {
-        this.categories = this.sortCategories(Category)
-      },
     },
   },
 }

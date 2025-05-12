@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import CategoriesSelect from './CategoriesSelect'
-import Vue from 'vue'
+import Vuex from 'vuex'
 
 const localVue = global.localVue
 
@@ -12,7 +12,6 @@ describe('CategoriesSelect.vue', () => {
   let environmentAndNature
   let consumptionAndSustainablity
 
-  const propsData = { model: 'categoryIds' }
   const categories = [
     {
       id: 'cat9',
@@ -35,6 +34,16 @@ describe('CategoriesSelect.vue', () => {
       id: 'cat8',
     },
   ]
+
+  const propsData = { model: 'categoryIds' }
+  const categoriesMock = jest.fn().mockReturnValue(categories)
+
+  const storeMocks = {
+    getters: {
+      'categories/categories': categoriesMock,
+    },
+  }
+
   beforeEach(() => {
     provide = {
       $parentForm: {
@@ -48,7 +57,8 @@ describe('CategoriesSelect.vue', () => {
 
   describe('shallowMount', () => {
     const Wrapper = () => {
-      return mount(CategoriesSelect, { propsData, mocks, localVue, provide })
+      const store = new Vuex.Store(storeMocks)
+      return mount(CategoriesSelect, { propsData, mocks, localVue, provide, store })
     }
 
     beforeEach(() => {
@@ -56,9 +66,7 @@ describe('CategoriesSelect.vue', () => {
     })
 
     describe('toggleCategory', () => {
-      beforeEach(async () => {
-        wrapper.vm.categories = categories
-        await Vue.nextTick()
+      beforeEach(() => {
         democracyAndPolitics = wrapper.findAll('button').at(0)
         democracyAndPolitics.trigger('click')
       })
