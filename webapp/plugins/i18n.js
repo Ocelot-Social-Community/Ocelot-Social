@@ -48,6 +48,7 @@ export default ({ app, req, cookie, store }) => {
       })
     }
 
+    /*
     const user = store.getters['auth/user']
     const token = store.getters['auth/token']
     // persist language if it differs from last value
@@ -57,54 +58,47 @@ export default ({ app, req, cookie, store }) => {
       //   uiLanguage: localeInStore
       // }, { root: true })
     }
+    */
   }
 
-  // const i18nStore = new Vuex.Store({
-  //   strict: debug
-  // })
-
   Vue.use(vuexI18n.plugin, store, {
-    onTranslationNotFound: function (locale, key) {
-      if (debug) {
+    onTranslationNotFound:
+      debug &&
+      function (locale, key) {
         /* eslint-disable-next-line no-console */
         console.warn(`vuex-i18n :: Key '${key}' not found for locale '${locale}'`)
-      }
-    },
+      },
   })
 
-  let userLocale = 'en'
+  let userLocale = app.$env.LANGUAGE_DEFAULT
   const localeCookie = app.$cookies.get(key)
-  /* const userSettings = store.getters['auth/userSettings']
-  if (userSettings && userSettings.uiLanguage) {
-    // try to get saved user preference
-    userLocale = userSettings.uiLanguage
-  } else */
+
   if (!isEmpty(localeCookie)) {
     userLocale = localeCookie
   } else {
     try {
-      userLocale = process.browser
-        ? navigator.language || navigator.userLanguage
-        : req.headers['accept-language'].split(',')[0]
+      userLocale = (
+        process.browser
+          ? navigator.language || navigator.userLanguage
+          : req.headers['accept-language'].split(',')[0]
+      ).substr(0, 2)
     } catch (err) {}
-
-    if (userLocale && !isEmpty(userLocale.language)) {
-      userLocale = userLocale.language.substr(0, 2)
-    }
   }
 
   const availableLocales = locales.filter((lang) => !!lang.enabled)
-  const locale = find(availableLocales, ['code', userLocale]) ? userLocale : 'en'
+  const locale = find(availableLocales, ['code', userLocale])
+    ? userLocale
+    : app.$env.LANGUAGE_DEFAULT
 
-  // register the fallback locales
-  registerTranslation({ Vue, locale: 'en' })
-  if (locale !== 'en') {
+  // register locales
+  registerTranslation({ Vue, locale: app.$env.LANGUAGE_FALLBACK })
+  if (locale !== app.$env.LANGUAGE_FALLBACK) {
     registerTranslation({ Vue, locale })
   }
 
   // Set the start locale to use
   Vue.i18n.set(locale)
-  Vue.i18n.fallback('en')
+  Vue.i18n.fallback(app.$env.LANGUAGE_FALLBACK)
 
   if (process.browser) {
     store.subscribe((mutation) => {

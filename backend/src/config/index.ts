@@ -124,6 +124,10 @@ const options = {
   CATEGORIES_ACTIVE: process.env.CATEGORIES_ACTIVE === 'true' || false,
 }
 
+const language = {
+  LANGUAGE_DEFAULT: process.env.LANGUAGE_DEFAULT ?? 'en',
+}
+
 // Check if all required configs are present
 Object.entries(required).map((entry) => {
   if (!entry[1]) {
@@ -141,6 +145,7 @@ export default {
   ...redis,
   ...s3,
   ...options,
+  ...language,
 }
 
 export { nodemailerTransportOptions }
