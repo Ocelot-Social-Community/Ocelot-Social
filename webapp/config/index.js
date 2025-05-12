@@ -42,6 +42,7 @@ const options = {
 
 const language = {
   LANGUAGE_DEFAULT: process.env.LANGUAGE_DEFAULT || 'en',
+  LANGUAGE_FALLBACK: process.env.LANGUAGE_FALLBACK || 'en',
 }
 
 const CONFIG = {
