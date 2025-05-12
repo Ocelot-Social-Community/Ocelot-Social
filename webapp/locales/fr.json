@@ -39,16 +39,28 @@
       "postCount": "Postes"
     },
     "dashboard": {
+      "badgesDisplayed": null,
+      "badgesRewarded": null,
+      "chatMessages": null,
+      "chatRooms": null,
       "comments": "Commentaires",
+      "emails": null,
       "follows": "Suit",
+      "groups": null,
+      "inviteCodes": null,
+      "inviteCodesExpired": null,
+      "inviteCodesRedeemed": null,
       "invites": "Invitations",
+      "locations": null,
       "name": "Tableau de bord",
       "notifications": "Notifications",
-      "organizations": "Organisations",
       "posts": "Postes",
-      "projects": "Projets",
+      "reports": null,
       "shouts": "Cris",
-      "users": "Utilisateurs"
+      "tags": null,
+      "users": "Utilisateurs",
+      "usersDeleted": null,
+      "usersVerified": null
     },
     "donations": {
       "goal": "Dons mensuels requis",

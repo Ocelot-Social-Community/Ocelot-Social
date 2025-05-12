@@ -39,16 +39,28 @@
       "postCount": "Beiträge"
     },
     "dashboard": {
+      "badgesDisplayed": "Badges ausgestellt",
+      "badgesRewarded": "Badges verteilt",
+      "chatMessages": "Chat-Nachrichten",
+      "chatRooms": "Chat-Räume",
       "comments": "Kommentare",
-      "follows": "Folgen",
+      "emails": "E-Mails",
+      "follows": "Follows",
+      "groups": "Gruppen",
+      "inviteCodes": "Einladungslinks",
+      "inviteCodesExpired": "Abgelaufene Einladungslinks",
+      "inviteCodesRedeemed": "Eingelöste Einladungslinks",
       "invites": "Einladungen",
+      "locations": "Orte",
       "name": "Startzentrale",
       "notifications": "Benachrichtigungen",
-      "organizations": "Organisationen",
       "posts": "Beiträge",
-      "projects": "Projekte",
+      "reports": "Gemeldet",
       "shouts": "Empfehlungen",
-      "users": "Nutzer"
+      "tags": "Tags",
+      "users": "Nutzer",
+      "usersDeleted": "Gelöschte Nutzer",
+      "usersVerified": "Verifizierte Nutzer"
     },
     "donations": {
       "goal": "Monatlich benötigte Spenden",
@@ -246,7 +258,7 @@
           }
         },
         "invited-by": "Eingeladen von {invitedBy}",
-        "invited-by-and-to": "Einladung von {invitedBy} zur Grupppe {invitedTo}",
+        "invited-by-and-to": "Einladung von {invitedBy} zur Gruppe {invitedTo}",
         "invited-to-hidden-group": "Eingeladen von {invitedBy} zu einer versteckten Gruppe"
       },
       "no-public-registrstion": {
