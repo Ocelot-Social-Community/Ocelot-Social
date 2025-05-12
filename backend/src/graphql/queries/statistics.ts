@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 
-export const Statistics = gql`
-  query {
+export const statistics = gql`
+  query statistics {
     statistics {
       users
       usersDeleted

@@ -39,16 +39,28 @@
       "postCount": "Berichten"
     },
     "dashboard": {
+      "badgesDisplayed": null,
+      "badgesRewarded": null,
+      "chatMessages": null,
+      "chatRooms": null,
       "comments": "Opmerkingen",
+      "emails": null,
       "follows": "Volgt",
+      "groups": null,
+      "inviteCodes": null,
+      "inviteCodesExpired": null,
+      "inviteCodesRedeemed": null,
       "invites": "Uitnodigingen",
+      "locations": null,
       "name": "Dashboard",
       "notifications": "Meldingen",
-      "organizations": "Organisaties",
       "posts": "Berichten",
-      "projects": "Projecten",
+      "reports": null,
       "shouts": "Shouts",
-      "users": "Gebruikers"
+      "tags": null,
+      "users": "Gebruikers",
+      "usersDeleted": null,
+      "usersVerified": null
     },
     "donations": {
       "goal": null,

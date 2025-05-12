@@ -39,16 +39,28 @@
       "postCount": "Stanowiska"
     },
     "dashboard": {
+      "badgesDisplayed": null,
+      "badgesRewarded": null,
+      "chatMessages": null,
+      "chatRooms": null,
       "comments": "Komentarze",
+      "emails": null,
       "follows": "Podąża za",
+      "groups": null,
+      "inviteCodes": null,
+      "inviteCodesExpired": null,
+      "inviteCodesRedeemed": null,
       "invites": "Zaprasza",
+      "locations": null,
       "name": "Tablica rozdzielcza",
       "notifications": "Powiadomienia",
-      "organizations": "Organizacje",
       "posts": "Stanowiska",
-      "projects": "Projekty",
+      "reports": null,
       "shouts": "Zalecane",
-      "users": "Użytkownicy"
+      "tags": null,
+      "users": "Użytkownicy",
+      "usersDeleted": null,
+      "usersVerified": null
     },
     "donations": {
       "goal": null,
