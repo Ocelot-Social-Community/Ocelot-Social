@@ -175,8 +175,11 @@ describe('actions', () => {
         expect(commit.mock.calls).toEqual(expect.arrayContaining([['SET_TOKEN', token]]))
       })
 
-      it('fetches the user', () => {
-        expect(dispatch.mock.calls).toEqual([['fetchCurrentUser']])
+      it('fetches the user and initializes categories', () => {
+        expect(dispatch.mock.calls).toEqual([
+          ['fetchCurrentUser'],
+          ['categories/init', null, { root: true }],
+        ])
       })
 
       it('saves pending flags in order', () => {

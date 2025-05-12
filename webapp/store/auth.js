@@ -106,6 +106,7 @@ export const actions = {
       await this.app.$apolloHelpers.onLogin(login)
       commit('SET_TOKEN', login)
       await dispatch('fetchCurrentUser')
+      await dispatch('categories/init', null, { root: true })
       if (cookies.get(metadata.COOKIE_NAME) === undefined) {
         throw new Error('no-cookie')
       }
