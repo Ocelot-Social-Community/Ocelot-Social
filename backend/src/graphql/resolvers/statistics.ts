@@ -56,27 +56,27 @@ export default {
         ).records[0].get('count') as string,
       )
 
-      statistics.users = metaStats['User'].toNumber() - deletedUsers
+      statistics.users = (metaStats['User']?.toNumber() ?? 0) - deletedUsers
       statistics.usersDeleted = deletedUsers
-      statistics.posts = metaStats['Post'].toNumber()
-      statistics.comments = metaStats['Comment'].toNumber()
-      statistics.notifications = metaStats['NOTIFIED'].toNumber()
-      statistics.emails = metaStats['EmailAddress'].toNumber()
-      statistics.follows = metaStats['FOLLOWS'].toNumber()
-      statistics.shouts = metaStats['SHOUTED'].toNumber()
+      statistics.posts = metaStats['Post']?.toNumber() ?? 0
+      statistics.comments = metaStats['Comment']?.toNumber() ?? 0
+      statistics.notifications = metaStats['NOTIFIED']?.toNumber() ?? 0
+      statistics.emails = metaStats['EmailAddress']?.toNumber() ?? 0
+      statistics.follows = metaStats['FOLLOWS']?.toNumber() ?? 0
+      statistics.shouts = metaStats['SHOUTED']?.toNumber() ?? 0
       statistics.invites = statistics.emails - statistics.users
-      statistics.chatMessages = metaStats['Message'].toNumber()
-      statistics.chatRooms = metaStats['Room'].toNumber()
-      statistics.tags = metaStats['Tag'].toNumber()
-      statistics.locations = metaStats['Location'].toNumber()
-      statistics.groups = metaStats['Group'].toNumber()
-      statistics.inviteCodes = metaStats['InviteCode'].toNumber() - invalidInviteCodes
+      statistics.chatMessages = metaStats['Message']?.toNumber() ?? 0
+      statistics.chatRooms = metaStats['Room']?.toNumber() ?? 0
+      statistics.tags = metaStats['Tag']?.toNumber() ?? 0
+      statistics.locations = metaStats['Location']?.toNumber() ?? 0
+      statistics.groups = metaStats['Group']?.toNumber() ?? 0
+      statistics.inviteCodes = (metaStats['InviteCode']?.toNumber() ?? 0) - invalidInviteCodes
       statistics.inviteCodesExpired = invalidInviteCodes
-      statistics.inviteCodesRedeemed = metaStats['REDEEMED'].toNumber()
-      statistics.badgesRewarded = metaStats['REWARDED'].toNumber()
-      statistics.badgesDisplayed = metaStats['SELECTED'].toNumber()
-      statistics.usersVerified = metaStats['VERIFIES'].toNumber()
-      statistics.reports = metaStats['InviteCode'].toNumber()
+      statistics.inviteCodesRedeemed = metaStats['REDEEMED']?.toNumber() ?? 0
+      statistics.badgesRewarded = metaStats['REWARDED']?.toNumber() ?? 0
+      statistics.badgesDisplayed = metaStats['SELECTED']?.toNumber() ?? 0
+      statistics.usersVerified = metaStats['VERIFIES']?.toNumber() ?? 0
+      statistics.reports = metaStats['InviteCode']?.toNumber() ?? 0
       return statistics
     },
   },
