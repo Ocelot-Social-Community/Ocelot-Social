@@ -1,5 +1,4 @@
 import CategoryQuery from '~/graphql/CategoryQuery'
-import CONFIG from '~/config/index'
 
 export const state = () => {
   return {
@@ -21,7 +20,7 @@ export const getters = {
 
 export const actions = {
   async init({ commit }) {
-    if (CONFIG.CATEGORIES_ACTIVE) {
+    if (process.env.CATEGORIES_ACTIVE === 'true') {
       try {
         const client = this.app.apolloProvider.defaultClient
         const {

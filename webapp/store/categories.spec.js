@@ -1,6 +1,5 @@
 import { state, mutations, getters, actions } from './categories'
 import CategoryQuery from '~/graphql/CategoryQuery'
-import CONFIG from '~/config/index'
 
 describe('categories store', () => {
   describe('initial state', () => {
@@ -59,7 +58,7 @@ describe('categories store', () => {
       describe('categories NOT active', () => {
         beforeEach(async () => {
           jest.clearAllMocks()
-          CONFIG.CATEGORIES_ACTIVE = false
+          process.env.CATEGORIES_ACTIVE = false
           await action({ commit })
         })
 
@@ -70,7 +69,7 @@ describe('categories store', () => {
 
       describe('categories active', () => {
         beforeEach(async () => {
-          CONFIG.CATEGORIES_ACTIVE = true
+          process.env.CATEGORIES_ACTIVE = true
           await action({ commit })
         })
 
