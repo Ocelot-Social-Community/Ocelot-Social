@@ -258,7 +258,7 @@
           }
         },
         "invited-by": "Eingeladen von {invitedBy}",
-        "invited-by-and-to": "Einladung von {invitedBy} zur Grupppe {invitedTo}",
+        "invited-by-and-to": "Einladung von {invitedBy} zur Gruppe {invitedTo}",
         "invited-to-hidden-group": "Eingeladen von {invitedBy} zu einer versteckten Gruppe"
       },
       "no-public-registrstion": {
