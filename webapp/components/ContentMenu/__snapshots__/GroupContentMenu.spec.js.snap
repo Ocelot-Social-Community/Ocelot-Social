@@ -88,6 +88,27 @@ exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
               </a>
               <!---->
             </li>
+            
+          
+          
+            <li
+              class="ds-menu-item ds-menu-item-level-0"
+            >
+              <a
+                class="ds-menu-item-link"
+                href="/groups/edit/groupid/invites"
+              >
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+            group.contentMenu.inviteLinks
+          
+              </a>
+              <!---->
+            </li>
           </ul>
         </nav>
       </div>

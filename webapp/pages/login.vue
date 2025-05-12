@@ -32,7 +32,14 @@ export default {
       this.$i18n.set(this.user.locale || 'en')
 
       try {
-        await this.$router.replace(this.$route.query.path || '/')
+        if (this.$route.query.inviteCode) {
+          this.$router.push({
+            name: 'registration',
+            query: this.$route.query,
+          })
+        } else {
+          await this.$router.replace(this.$route.query.path || '/')
+        }
       } catch (err) {
         // throw new Error(`Problem handling something: ${err}.`);
         // TODO this is causing trouble - most likely due to double redirect on terms&conditions

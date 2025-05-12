@@ -1,0 +1,147 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Invitation.vue when the invite code was not redeemed renders 1`] = `
+<div>
+  <li
+    class="invitation"
+  >
+    <div
+      class="column1"
+    >
+      <div
+        class="code"
+      >
+        
+      test-invite-code
+      
+        <span
+          class="mdash"
+        >
+          —
+        </span>
+         
+        <span
+          class="comment"
+        >
+          test-comment
+        </span>
+      </div>
+       
+      <div>
+        <span>
+          
+        invite-codes.redeemed-count-0
+      
+        </span>
+      </div>
+    </div>
+     
+    <div
+      class="actions"
+    >
+      <button
+        aria-label="invite-codes.copy-code"
+        class="copy-button base-button --icon-only --circle"
+        type="button"
+      >
+        <span
+          class="base-icon"
+        >
+          <!---->
+        </span>
+         
+        <!---->
+         
+      </button>
+       
+      <button
+        aria-label="invite-codes.invalidate"
+        class="invalidate-button base-button --icon-only --circle"
+        type="button"
+      >
+        <span
+          class="base-icon"
+        >
+          <!---->
+        </span>
+         
+        <!---->
+         
+      </button>
+    </div>
+  </li>
+</div>
+`;
+
+exports[`Invitation.vue when the invite code was redeemed renders 1`] = `
+<div>
+  <li
+    class="invitation"
+  >
+    <div
+      class="column1"
+    >
+      <div
+        class="code"
+      >
+        
+      test-invite-code
+      
+        <span
+          class="mdash"
+        >
+          —
+        </span>
+         
+        <span
+          class="comment"
+        >
+          test-comment
+        </span>
+      </div>
+       
+      <div>
+        <span>
+          
+        invite-codes.redeemed-count
+      
+        </span>
+      </div>
+    </div>
+     
+    <div
+      class="actions"
+    >
+      <button
+        aria-label="invite-codes.copy-code"
+        class="copy-button base-button --icon-only --circle"
+        type="button"
+      >
+        <span
+          class="base-icon"
+        >
+          <!---->
+        </span>
+         
+        <!---->
+         
+      </button>
+       
+      <button
+        aria-label="invite-codes.invalidate"
+        class="invalidate-button base-button --icon-only --circle"
+        type="button"
+      >
+        <span
+          class="base-icon"
+        >
+          <!---->
+        </span>
+         
+        <!---->
+         
+      </button>
+    </div>
+  </li>
+</div>
+`;
