@@ -72,7 +72,7 @@ export default ({ app, req, cookie, store }) => {
     },
   })
 
-  let userLocale = 'en'
+  let userLocale = app.$env.LANGUAGE_DEFAULT
   const localeCookie = app.$cookies.get(key)
   /* const userSettings = store.getters['auth/userSettings']
   if (userSettings && userSettings.uiLanguage) {
@@ -94,17 +94,19 @@ export default ({ app, req, cookie, store }) => {
   }
 
   const availableLocales = locales.filter((lang) => !!lang.enabled)
-  const locale = find(availableLocales, ['code', userLocale]) ? userLocale : 'en'
+  const locale = find(availableLocales, ['code', userLocale])
+    ? userLocale
+    : app.$env.LANGUAGE_FALLBACK
 
   // register the fallback locales
-  registerTranslation({ Vue, locale: 'en' })
-  if (locale !== 'en') {
+  registerTranslation({ Vue, locale: app.$env.LANGUAGE_FALLBACK })
+  if (locale !== app.$env.LANGUAGE_FALLBACK) {
     registerTranslation({ Vue, locale })
   }
 
   // Set the start locale to use
   Vue.i18n.set(locale)
-  Vue.i18n.fallback('en')
+  Vue.i18n.fallback(app.$env.LANGUAGE_FALLBACK)
 
   if (process.browser) {
     store.subscribe((mutation) => {

@@ -40,11 +40,16 @@ const options = {
   NETWORK_NAME: process.env.NETWORK_NAME || 'Ocelot.social',
 }
 
+const language = {
+  LANGUAGE_DEFAULT: process.env.LANGUAGE_DEFAULT || 'en',
+}
+
 const CONFIG = {
   ...environment,
   ...server,
   ...sentry,
   ...options,
+  ...language,
 }
 
 // override process.env with the values here since they contain default values
