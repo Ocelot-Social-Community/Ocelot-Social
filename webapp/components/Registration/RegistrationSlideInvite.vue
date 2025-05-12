@@ -13,27 +13,47 @@
       id="inviteCode"
       icon="question-circle"
     />
-    <ds-text>
+    <ds-text v-if="!validInput">
       {{ $t('components.registration.invite-code.form.description') }}
     </ds-text>
+    <div class="invitation-info" v-if="invitedBy">
+      <profile-avatar :profile="invitedBy" size="small" />
+      <span v-if="invitedTo && invitedTo.groupType === 'hidden'">
+        {{
+          $t('components.registration.invite-code.invited-to-hidden-group', {
+            invitedBy: invitedBy.name,
+          })
+        }}
+      </span>
+      <span v-else-if="invitedTo">
+        {{
+          $t('components.registration.invite-code.invited-by-and-to', {
+            invitedBy: invitedBy.name,
+            invitedTo: invitedTo.name,
+          })
+        }}
+      </span>
+      <span v-else>
+        {{ $t('components.registration.invite-code.invited-by', { invitedBy: invitedBy.name }) }}
+      </span>
+    </div>
     <slot></slot>
     <ds-space margin="xxx-small" />
   </ds-form>
 </template>
 
 <script>
-import gql from 'graphql-tag'
 import registrationConstants from '~/constants/registration'
+import { validateInviteCode } from '~/graphql/InviteCode'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 
-export const isValidInviteCodeQuery = gql`
-  query ($code: ID!) {
-    isValidInviteCode(code: $code)
-  }
-`
 export default {
   name: 'RegistrationSlideInvite',
   props: {
     sliderData: { type: Object, required: true },
+  },
+  components: {
+    ProfileAvatar,
   },
   data() {
     return {
@@ -75,6 +95,16 @@ export default {
     validInput() {
       return this.formData.inviteCode.length === 6
     },
+    invitedBy() {
+      return this.sliderData.sliders[this.sliderIndex].data.response.validateInviteCode
+        ? this.sliderData.sliders[this.sliderIndex].data.response.validateInviteCode.generatedBy
+        : null
+    },
+    invitedTo() {
+      return this.sliderData.sliders[this.sliderIndex].data.response.validateInviteCode
+        ? this.sliderData.sliders[this.sliderIndex].data.response.validateInviteCode.invitedTo
+        : null
+    },
   },
   methods: {
     async sendValidation() {
@@ -84,8 +114,7 @@ export default {
 
       let dbValidated = false
       if (this.validInput) {
-        await this.handleSubmitVerify()
-        dbValidated = this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode
+        dbValidated = await this.handleSubmitVerify()
       }
       this.sliderData.setSliderValuesCallback(dbValidated)
     },
@@ -110,7 +139,7 @@ export default {
         try {
           this.dbRequestInProgress = true
 
-          const response = await this.$apollo.query({ query: isValidInviteCodeQuery, variables })
+          const response = await this.$apollo.query({ query: validateInviteCode(), variables })
           this.sliderData.setSliderValuesCallback(null, {
             sliderData: {
               request: { variables },
@@ -118,20 +147,22 @@ export default {
             },
           })
 
-          if (this.sliderData.sliders[this.sliderIndex].data.response) {
-            if (this.sliderData.sliders[this.sliderIndex].data.response.isValidInviteCode) {
-              this.$toast.success(
-                this.$t('components.registration.invite-code.form.validations.success', {
-                  inviteCode,
-                }),
-              )
-            } else {
-              this.$toast.error(
-                this.$t('components.registration.invite-code.form.validations.error', {
-                  inviteCode,
-                }),
-              )
-            }
+          const validationResult = response.data.validateInviteCode
+
+          if (validationResult && validationResult.isValid) {
+            this.$toast.success(
+              this.$t('components.registration.invite-code.form.validations.success', {
+                inviteCode,
+              }),
+            )
+            return true
+          } else {
+            this.$toast.error(
+              this.$t('components.registration.invite-code.form.validations.error', {
+                inviteCode,
+              }),
+            )
+            return false
           }
         } catch (err) {
           this.sliderData.setSliderValuesCallback(false, {
@@ -140,6 +171,7 @@ export default {
 
           const { message } = err
           this.$toast.error(message)
+          return false
         } finally {
           this.dbRequestInProgress = false
         }
@@ -152,10 +184,25 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .enter-invite {
   display: flex;
   flex-direction: column;
   margin: $space-large 0 $space-xxx-small 0;
+}
+
+.invitation-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: $space-x-small;
+  gap: $space-small;
+
+  > * {
+    flex-shrink: 0;
+  }
+
+  > span {
+    flex: auto;
+  }
 }
 </style>

@@ -244,7 +244,10 @@
             "length": "muss genau {inviteCodeLength} Buchstaben lang sein",
             "success": "Gültiger Einladungs-Code <b>{inviteCode}</b>!"
           }
-        }
+        },
+        "invited-by": "Eingeladen von {invitedBy}",
+        "invited-by-and-to": "Einladung von {invitedBy} zur Grupppe {invitedTo}",
+        "invited-to-hidden-group": "Eingeladen von {invitedBy} zu einer versteckten Gruppe"
       },
       "no-public-registrstion": {
         "title": "Keine öffentliche Registrierung möglich"
@@ -509,6 +512,7 @@
     "categoriesTitle": "Themen der Gruppe",
     "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
     "contentMenu": {
+      "inviteLinks": "Einladungslinks",
       "muteGroup": "Stummschalten",
       "unmuteGroup": "Nicht stummschalten",
       "visitGroupPage": "Gruppe anzeigen"
@@ -531,6 +535,7 @@
     "goal": "Ziel der Gruppe",
     "groupCreated": "Die Gruppe wurde angelegt!",
     "in": "in",
+    "invite-links": "Einladungslinks",
     "joinLeaveButton": {
       "iAmMember": "Bin Mitglied",
       "join": "Beitreten",
@@ -628,10 +633,29 @@
     "button": {
       "tooltip": "Freunde einladen"
     },
+    "comment-placeholder": "Kommentar (optional)",
     "copy-code": "Einladungslink kopieren",
     "copy-success": "Einladungscode erfolgreich in die Zwischenablage kopiert",
-    "not-available": "Du hast keinen Einladungscode zur Verfügung!",
-    "your-code": "Sende diesen Link per E-Mail oder in sozialen Medien, um deine Freunde einzuladen:"
+    "create-error": "Einladungslink konnte nicht erstellt werden: {error}",
+    "create-success": "Einladungslink erfolgreich erstellt!",
+    "delete-modal": {
+      "message": "Möchtest du diesen Einladungslink wirklich ungültig machen?",
+      "title": "Einladungslink widerrufen"
+    },
+    "generate-code": "Neuen Einladungslink erstellen",
+    "generate-code-explanation": "Erstelle einen neuen Link. Wenn du möchtest, füge einen Kommentar hinzu (nur für dich sichtbar). ",
+    "group-invite-links": "Gruppen-Einladungslinks",
+    "invalidate": "Widerrufen",
+    "invalidate-error": "Einladungslink konnte nicht ungültig gemacht werden: {error}",
+    "invalidate-success": "Einladungslink erfolgreich widerrufen",
+    "invite-link-message-group": "Du wurdest eingeladen, der Gruppe {groupName} auf {network} beizutreten.",
+    "invite-link-message-hidden-group": "Du wurdest eingeladen, einer versteckten Gruppe auf {network} beizutreten.",
+    "invite-link-message-personal": "Du wurdest eingeladen, dem Netzwerk {network} beizutreten",
+    "limit-reached": "Du hast die maximale Anzahl an Einladungslinks erreicht.",
+    "my-invite-links": "Meine Einladungslinks",
+    "no-links": "Keine Links vorhanden",
+    "redeemed-count": "{count} mal eingelöst",
+    "redeemed-count-0": "Noch von niemandem eingelöst"
   },
   "localeSwitch": {
     "tooltip": "Sprache wählen"

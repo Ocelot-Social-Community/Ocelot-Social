@@ -269,7 +269,17 @@ export default {
         setTimeout(async () => {
           await this.$store.dispatch('auth/login', { email, password })
           this.$toast.success(this.$t('login.success'))
-          this.$router.push('/')
+          const { validateInviteCode } = this.sliderData.sliders[0].data.response
+          if (
+            validateInviteCode &&
+            validateInviteCode.invitedTo &&
+            validateInviteCode.invitedTo.groupType === 'public'
+          ) {
+            const { invitedTo } = validateInviteCode
+            this.$router.push(`/groups/${invitedTo.slug}`)
+          } else {
+            this.$router.push('/')
+          }
           this.sliderData.setSliderValuesCallback(null, {
             sliderSettings: { buttonLoading: false },
           })

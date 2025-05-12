@@ -151,6 +151,27 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                         </router-link-stub>
                         <!---->
                       </li>
+                      
+          
+          
+                      <li
+                        class="ds-menu-item ds-menu-item-level-0"
+                      >
+                        <router-link-stub
+                          class="ds-menu-item-link"
+                          to="/groups/edit/g1/invites"
+                        >
+                          <span
+                            class="base-icon"
+                          >
+                            <!---->
+                          </span>
+                          
+            group.contentMenu.inviteLinks
+          
+                        </router-link-stub>
+                        <!---->
+                      </li>
                     </ul>
                   </nav>
                 </div>
@@ -3005,6 +3026,27 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                           </span>
                           
             admin.settings.name
+          
+                        </router-link-stub>
+                        <!---->
+                      </li>
+                      
+          
+          
+                      <li
+                        class="ds-menu-item ds-menu-item-level-0"
+                      >
+                        <router-link-stub
+                          class="ds-menu-item-link"
+                          to="/groups/edit/g2/invites"
+                        >
+                          <span
+                            class="base-icon"
+                          >
+                            <!---->
+                          </span>
+                          
+            group.contentMenu.inviteLinks
           
                         </router-link-stub>
                         <!---->
@@ -6485,6 +6527,27 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                           </span>
                           
             admin.settings.name
+          
+                        </router-link-stub>
+                        <!---->
+                      </li>
+                      
+          
+          
+                      <li
+                        class="ds-menu-item ds-menu-item-level-0"
+                      >
+                        <router-link-stub
+                          class="ds-menu-item-link"
+                          to="/groups/edit/g0/invites"
+                        >
+                          <span
+                            class="base-icon"
+                          >
+                            <!---->
+                          </span>
+                          
+            group.contentMenu.inviteLinks
           
                         </router-link-stub>
                         <!---->
