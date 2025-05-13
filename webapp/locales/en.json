@@ -39,16 +39,28 @@
       "postCount": "Posts"
     },
     "dashboard": {
+      "badgesDisplayed": "Badges Displayed",
+      "badgesRewarded": "Badges Rewarded",
+      "chatMessages": "Chat Messages",
+      "chatRooms": "Chat Rooms",
       "comments": "Comments",
+      "emails": "E-Mails",
       "follows": "Follows",
+      "groups": "Groups",
+      "inviteCodes": "Invite Codes",
+      "inviteCodesExpired": "Expired Invite Codes",
+      "inviteCodesRedeemed": "Redeemed Invite Codes",
       "invites": "Invites",
+      "locations": "Locations",
       "name": "Dashboard",
       "notifications": "Notifications",
-      "organizations": "Organizations",
       "posts": "Posts",
-      "projects": "Projects",
+      "reports": "Reports",
       "shouts": "Shouts",
-      "users": "Users"
+      "tags": "Tags",
+      "users": "Users",
+      "usersDeleted": "Users deleted",
+      "usersVerified": "Users verified"
     },
     "donations": {
       "goal": "Monthly donations needed",
@@ -244,7 +256,10 @@
             "length": "must be {inviteCodeLength} characters long",
             "success": "Valid invite code <b>{inviteCode}</b>!"
           }
-        }
+        },
+        "invited-by": "Invited by {invitedBy}.",
+        "invited-by-and-to": "Invited by {invitedBy} to group {invitedTo}.",
+        "invited-to-hidden-group": "Invited by {invitedBy} to a hidden group."
       },
       "no-public-registrstion": {
         "title": "No Public Registration"
@@ -509,6 +524,7 @@
     "categoriesTitle": "Topics of the group",
     "changeMemberRole": "The role has been changed to “{role}”!",
     "contentMenu": {
+      "inviteLinks": "Invite links",
       "muteGroup": "Mute group",
       "unmuteGroup": "Unmute group",
       "visitGroupPage": "Show group"
@@ -531,6 +547,7 @@
     "goal": "Goal of group",
     "groupCreated": "The group was created!",
     "in": "in",
+    "invite-links": "Invite Links",
     "joinLeaveButton": {
       "iAmMember": "I'm a member",
       "join": "Join",
@@ -628,10 +645,29 @@
     "button": {
       "tooltip": "Invite friends"
     },
+    "comment-placeholder": "Comment (optional)",
     "copy-code": "Copy Invite Link",
     "copy-success": "Invite code copied to clipboard",
-    "not-available": "You have no valid invite code available!",
-    "your-code": "Send this link per e-mail or in social media to invite your friends:"
+    "create-error": "Creating a new invite link failed! Error: {error}",
+    "create-success": "Invite link created successfully!",
+    "delete-modal": {
+      "message": "Do you really want to invalidate this invite link?",
+      "title": "Invalidate link?"
+    },
+    "generate-code": "Create new link",
+    "generate-code-explanation": "Create a new link. You can add a comment if you like (only visible to you).",
+    "group-invite-links": "Group invite links",
+    "invalidate": "Invalidate link",
+    "invalidate-error": "Invalidating the invite link failed! Error: {error}",
+    "invalidate-success": "Invite link invalidated successfully!",
+    "invite-link-message-group": "You have been invited to join the group “{groupName}” on {network}.",
+    "invite-link-message-hidden-group": "You have been invited to join a hidden group on {network}.",
+    "invite-link-message-personal": "You have been invited to join {network}.",
+    "limit-reached": "You have reached the maximum number of invite links.",
+    "my-invite-links": "My invite links",
+    "no-links": "No invite links created yet.",
+    "redeemed-count": "This code has been used {count} times.",
+    "redeemed-count-0": "No one has used this code yet."
   },
   "localeSwitch": {
     "tooltip": "Choose language"

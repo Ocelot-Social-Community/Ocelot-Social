@@ -1,6 +1,10 @@
 @import './imports/_tooltip.scss';
 @import './imports/_toast.scss';
 
+html {
+  scrollbar-gutter: stable;
+}
+
 // Transition Easing
 $easeOut: cubic-bezier(0.19, 1, 0.22, 1);
 
@@ -140,6 +144,11 @@ hr {
       pointer-events: all;
     }
   }
+}
+
+body.dropdown-open {
+  max-height: 100vh;
+  overflow: hidden;
 }
 
 .base-card > .ds-section {

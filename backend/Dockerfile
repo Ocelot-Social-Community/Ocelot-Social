@@ -21,6 +21,8 @@ CMD ["/bin/sh", "-c", "yarn install && yarn run dev"]
 FROM base AS build
 COPY . .
 ONBUILD COPY ./branding/constants/ src/config/tmp
+# copy categories to brand them (use yarn prod:db:data:categories)
+ONBUILD COPY ./branding/constants/ src/constants/
 ONBUILD RUN tools/replace-constants.sh
 ONBUILD COPY ./branding/email/ src/middleware/helpers/email/
 ONBUILD COPY ./branding/middlewares/ src/middleware/branding/

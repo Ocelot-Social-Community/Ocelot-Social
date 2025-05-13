@@ -118,7 +118,15 @@ const options = {
   ORGANIZATION_URL: emails.ORGANIZATION_LINK,
   PUBLIC_REGISTRATION: env.PUBLIC_REGISTRATION === 'true' || false,
   INVITE_REGISTRATION: env.INVITE_REGISTRATION !== 'false', // default = true
+  INVITE_CODES_PERSONAL_PER_USER:
+    (env.INVITE_CODES_PERSONAL_PER_USER && parseInt(env.INVITE_CODES_PERSONAL_PER_USER)) || 7,
+  INVITE_CODES_GROUP_PER_USER:
+    (env.INVITE_CODES_GROUP_PER_USER && parseInt(env.INVITE_CODES_GROUP_PER_USER)) || 7,
   CATEGORIES_ACTIVE: process.env.CATEGORIES_ACTIVE === 'true' || false,
+}
+
+const language = {
+  LANGUAGE_DEFAULT: process.env.LANGUAGE_DEFAULT ?? 'en',
 }
 
 // Check if all required configs are present
@@ -138,6 +146,7 @@ export default {
   ...redis,
   ...s3,
   ...options,
+  ...language,
 }
 
 export { nodemailerTransportOptions }

@@ -19,6 +19,7 @@ import pubsubContext from '@context/pubsub'
 import CONFIG from './config'
 import schema from './graphql/schema'
 import decode from './jwt/decode'
+// eslint-disable-next-line import/no-cycle
 import middleware from './middleware'
 
 const serverDatabase = databaseContext()

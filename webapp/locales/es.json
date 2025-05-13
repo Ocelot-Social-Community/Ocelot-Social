@@ -39,16 +39,28 @@
       "postCount": "Contribuciones"
     },
     "dashboard": {
+      "badgesDisplayed": null,
+      "badgesRewarded": null,
+      "chatMessages": null,
+      "chatRooms": null,
       "comments": "Comentarios",
+      "emails": null,
       "follows": "Sigue",
+      "groups": null,
+      "inviteCodes": null,
+      "inviteCodesExpired": null,
+      "inviteCodesRedeemed": null,
       "invites": "Invita",
+      "locations": null,
       "name": "Tablero",
       "notifications": "Notificaciones",
-      "organizations": "Organizaciones",
       "posts": "Contribuciones",
-      "projects": "Proyectos",
+      "reports": null,
       "shouts": "Recomendaciones",
-      "users": "Usuarios"
+      "tags": null,
+      "users": "Usuarios",
+      "usersDeleted": null,
+      "usersVerified": null
     },
     "donations": {
       "goal": "Donaciones mensuales necesarias",
@@ -244,7 +256,10 @@
             "length": null,
             "success": null
           }
-        }
+        },
+        "invited-by": null,
+        "invited-by-and-to": null,
+        "invited-to-hidden-group": null
       },
       "no-public-registrstion": {
         "title": null
@@ -509,6 +524,7 @@
     "categoriesTitle": null,
     "changeMemberRole": null,
     "contentMenu": {
+      "inviteLinks": null,
       "muteGroup": "Silenciar grupo",
       "unmuteGroup": "Desactivar silencio del grupo",
       "visitGroupPage": null
@@ -531,6 +547,7 @@
     "goal": null,
     "groupCreated": null,
     "in": null,
+    "invite-links": null,
     "joinLeaveButton": {
       "iAmMember": null,
       "join": null,
@@ -628,10 +645,29 @@
     "button": {
       "tooltip": null
     },
+    "comment-placeholder": null,
     "copy-code": null,
     "copy-success": null,
-    "not-available": null,
-    "your-code": null
+    "create-error": null,
+    "create-success": null,
+    "delete-modal": {
+      "message": null,
+      "title": null
+    },
+    "generate-code": null,
+    "generate-code-explanation": null,
+    "group-invite-links": null,
+    "invalidate": null,
+    "invalidate-error": null,
+    "invalidate-success": null,
+    "invite-link-message-group": null,
+    "invite-link-message-hidden-group": null,
+    "invite-link-message-personal": null,
+    "limit-reached": null,
+    "my-invite-links": null,
+    "no-links": null,
+    "redeemed-count": null,
+    "redeemed-count-0": null
   },
   "localeSwitch": {
     "tooltip": null

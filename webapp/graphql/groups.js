@@ -195,6 +195,16 @@ export const groupQuery = (i18n) => {
           lat
         }
         myRole
+        inviteCodes {
+          createdAt
+          code
+          isValid
+          redeemedBy {
+            id
+          }
+          comment
+          redeemedByCount
+        }
       }
     }
   `
