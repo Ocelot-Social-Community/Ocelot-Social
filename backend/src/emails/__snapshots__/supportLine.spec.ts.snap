@@ -3,7 +3,7 @@
 exports[`sendResetPasswordMail with support English renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -138,7 +138,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendResetPasswordMail with support German renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -226,9 +226,9 @@ footer {
       <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>Du hast also dein Passwort vergessen? Kein Problem! Mit Klick auf diesen Button kannst du innerhalb der nächsten 24 Stunden dein Passwort zurücksetzen:</p><a class="button" href="http://webapp:3000/password-reset/change-password?email=user%40example.org&amp;nonce=123456">Bestätige Deine E-Mail Adresse</a>
+        <p>Du hast also dein Passwort vergessen? Kein Problem! Mit Klick auf diesen Button kannst du innerhalb der nächsten 24 Stunden dein Passwort zurücksetzen:</p><a class="button" href="http://webapp:3000/password-reset/change-password?email=user%40example.org&amp;nonce=123456">Bestätige deine E-Mail Adresse</a>
         <p>Falls du kein neues Passwort angefordert hast, kannst du diese E-Mail einfach ignorieren.</p>
-        <p>Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in Dein Browserfenster kopieren: <span>123456</span></p>
+        <p>Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in dein Browserfenster kopieren: <span>123456</span></p>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p>
@@ -249,14 +249,14 @@ footer {
 Du hast also dein Passwort vergessen? Kein Problem! Mit Klick auf diesen Button
 kannst du innerhalb der nächsten 24 Stunden dein Passwort zurücksetzen:
 
-Bestätige Deine E-Mail Adresse
+Bestätige deine E-Mail Adresse
 [http://webapp:3000/password-reset/change-password?email=user%40example.org&nonce=123456]
 
 Falls du kein neues Passwort angefordert hast, kannst du diese E-Mail einfach
 ignorieren.
 
 Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in
-Dein Browserfenster kopieren: 123456
+dein Browserfenster kopieren: 123456
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 
@@ -274,7 +274,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendResetPasswordMail without support English renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -403,7 +403,7 @@ ocelot.social Community [https://ocelot.social]",
 exports[`sendResetPasswordMail without support German renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social",
+  "from": "ocelot.social <devops@ocelot.social>",
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -491,9 +491,9 @@ footer {
       <h2>Hallo Jenny Rostock,</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>Du hast also dein Passwort vergessen? Kein Problem! Mit Klick auf diesen Button kannst du innerhalb der nächsten 24 Stunden dein Passwort zurücksetzen:</p><a class="button" href="http://webapp:3000/password-reset/change-password?email=user%40example.org&amp;nonce=123456">Bestätige Deine E-Mail Adresse</a>
+        <p>Du hast also dein Passwort vergessen? Kein Problem! Mit Klick auf diesen Button kannst du innerhalb der nächsten 24 Stunden dein Passwort zurücksetzen:</p><a class="button" href="http://webapp:3000/password-reset/change-password?email=user%40example.org&amp;nonce=123456">Bestätige deine E-Mail Adresse</a>
         <p>Falls du kein neues Passwort angefordert hast, kannst du diese E-Mail einfach ignorieren.</p>
-        <p>Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in Dein Browserfenster kopieren: <span>123456</span></p>
+        <p>Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in dein Browserfenster kopieren: <span>123456</span></p>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p>
@@ -511,14 +511,14 @@ footer {
 Du hast also dein Passwort vergessen? Kein Problem! Mit Klick auf diesen Button
 kannst du innerhalb der nächsten 24 Stunden dein Passwort zurücksetzen:
 
-Bestätige Deine E-Mail Adresse
+Bestätige deine E-Mail Adresse
 [http://webapp:3000/password-reset/change-password?email=user%40example.org&nonce=123456]
 
 Falls du kein neues Passwort angefordert hast, kannst du diese E-Mail einfach
 ignorieren.
 
 Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in
-Dein Browserfenster kopieren: 123456
+dein Browserfenster kopieren: 123456
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 
