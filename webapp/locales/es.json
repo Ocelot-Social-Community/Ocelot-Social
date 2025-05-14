@@ -39,16 +39,28 @@
       "postCount": "Contribuciones"
     },
     "dashboard": {
+      "badgesDisplayed": null,
+      "badgesRewarded": null,
+      "chatMessages": null,
+      "chatRooms": null,
       "comments": "Comentarios",
+      "emails": null,
       "follows": "Sigue",
+      "groups": null,
+      "inviteCodes": null,
+      "inviteCodesExpired": null,
+      "inviteCodesRedeemed": null,
       "invites": "Invita",
+      "locations": null,
       "name": "Tablero",
       "notifications": "Notificaciones",
-      "organizations": "Organizaciones",
       "posts": "Contribuciones",
-      "projects": "Proyectos",
+      "reports": null,
       "shouts": "Recomendaciones",
-      "users": "Usuarios"
+      "tags": null,
+      "users": "Usuarios",
+      "usersDeleted": null,
+      "usersVerified": null
     },
     "donations": {
       "goal": "Donaciones mensuales necesarias",

@@ -39,16 +39,28 @@
       "postCount": "Postagens"
     },
     "dashboard": {
+      "badgesDisplayed": null,
+      "badgesRewarded": null,
+      "chatMessages": null,
+      "chatRooms": null,
       "comments": "Comentários",
+      "emails": null,
       "follows": "Segue",
+      "groups": null,
+      "inviteCodes": null,
+      "inviteCodesExpired": null,
+      "inviteCodesRedeemed": null,
       "invites": "Convites",
+      "locations": null,
       "name": "Painel de controle",
       "notifications": "Notificações",
-      "organizations": "Organizações",
       "posts": "Postagens",
-      "projects": "Projetos",
+      "reports": null,
       "shouts": "Aclamações",
-      "users": "Usuários"
+      "tags": null,
+      "users": "Usuários",
+      "usersDeleted": null,
+      "usersVerified": null
     },
     "donations": {
       "goal": "Doações mensais necessárias",

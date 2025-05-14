@@ -39,16 +39,28 @@
       "postCount": "Messaggi"
     },
     "dashboard": {
+      "badgesDisplayed": null,
+      "badgesRewarded": null,
+      "chatMessages": null,
+      "chatRooms": null,
       "comments": "Commenti",
+      "emails": null,
       "follows": "Segue",
+      "groups": null,
+      "inviteCodes": null,
+      "inviteCodesExpired": null,
+      "inviteCodesRedeemed": null,
       "invites": "Inviti",
+      "locations": null,
       "name": "Cruscotto",
-      "notifications": "Notifiche",
       "organizations": "Organizzazioni",
       "posts": "Messaggi",
-      "projects": "Progetti",
+      "reports": null,
       "shouts": "Gridi",
-      "users": "Utenti"
+      "tags": null,
+      "users": "Utenti",
+      "usersDeleted": null,
+      "usersVerified": null
     },
     "donations": {
       "goal": "Donazioni mensili necessarie",

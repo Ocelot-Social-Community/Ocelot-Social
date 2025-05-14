@@ -20,100 +20,20 @@
         <template v-else-if="data">
           <ds-space margin="large">
             <ds-flex>
-              <ds-flex-item :width="{ base: '100%', sm: '50%', md: '33%' }">
+              <ds-flex-item
+                v-for="(value, name, index) in filterStatistics(data.statistics)"
+                :key="index"
+                :width="{ base: '100%', sm: '50%', md: '33%' }"
+              >
                 <ds-space margin="small">
                   <ds-number
                     :count="0"
-                    :label="$t('admin.dashboard.users')"
+                    :label="$t('admin.dashboard.' + name)"
                     size="x-large"
                     uppercase
                   >
                     <client-only slot="count">
-                      <hc-count-to :end-val="data.statistics.countUsers" />
-                    </client-only>
-                  </ds-number>
-                </ds-space>
-              </ds-flex-item>
-              <ds-flex-item :width="{ base: '100%', sm: '50%', md: '33%' }">
-                <ds-space margin="small">
-                  <ds-number
-                    :count="0"
-                    :label="$t('admin.dashboard.posts')"
-                    size="x-large"
-                    uppercase
-                  >
-                    <client-only slot="count">
-                      <hc-count-to :end-val="data.statistics.countPosts" />
-                    </client-only>
-                  </ds-number>
-                </ds-space>
-              </ds-flex-item>
-              <ds-flex-item :width="{ base: '100%', sm: '50%', md: '33%' }">
-                <ds-space margin="small">
-                  <ds-number
-                    :count="0"
-                    :label="$t('admin.dashboard.comments')"
-                    size="x-large"
-                    uppercase
-                  >
-                    <client-only slot="count">
-                      <hc-count-to :end-val="data.statistics.countComments" />
-                    </client-only>
-                  </ds-number>
-                </ds-space>
-              </ds-flex-item>
-              <ds-flex-item :width="{ base: '100%', sm: '50%', md: '33%' }">
-                <ds-space margin="small">
-                  <ds-number
-                    :count="0"
-                    :label="$t('admin.dashboard.notifications')"
-                    size="x-large"
-                    uppercase
-                  >
-                    <client-only slot="count">
-                      <hc-count-to :end-val="data.statistics.countNotifications" />
-                    </client-only>
-                  </ds-number>
-                </ds-space>
-              </ds-flex-item>
-              <ds-flex-item :width="{ base: '100%', sm: '50%', md: '33%' }">
-                <ds-space margin="small">
-                  <ds-number
-                    :count="0"
-                    :label="$t('admin.dashboard.invites')"
-                    size="x-large"
-                    uppercase
-                  >
-                    <client-only slot="count">
-                      <hc-count-to :end-val="data.statistics.countInvites" />
-                    </client-only>
-                  </ds-number>
-                </ds-space>
-              </ds-flex-item>
-              <ds-flex-item :width="{ base: '100%', sm: '50%', md: '33%' }">
-                <ds-space margin="small">
-                  <ds-number
-                    :count="0"
-                    :label="$t('admin.dashboard.follows')"
-                    size="x-large"
-                    uppercase
-                  >
-                    <client-only slot="count">
-                      <hc-count-to :end-val="data.statistics.countFollows" />
-                    </client-only>
-                  </ds-number>
-                </ds-space>
-              </ds-flex-item>
-              <ds-flex-item :width="{ base: '100%', sm: '50%', md: '33%' }">
-                <ds-space margin="small">
-                  <ds-number
-                    :count="0"
-                    :label="$t('admin.dashboard.shouts')"
-                    size="x-large"
-                    uppercase
-                  >
-                    <client-only slot="count">
-                      <hc-count-to :end-val="data.statistics.countShouts" />
+                      <hc-count-to :end-val="value" />
                     </client-only>
                   </ds-number>
                 </ds-space>
@@ -139,6 +59,12 @@ export default {
       errorIconPath: '/img/svg/emoji/cry.svg',
       Statistics,
     }
+  },
+  methods: {
+    filterStatistics(data) {
+      delete data.__typename
+      return data
+    },
   },
 }
 </script>
