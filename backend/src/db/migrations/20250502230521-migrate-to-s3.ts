@@ -13,15 +13,20 @@ import { getDriver } from '@db/neo4j'
 export const description =
   'Upload all image files to a S3 compatible object storage in order to reduce load on our backend.'
 
-export async function up(_next) {
+export async function up() {
+  if (CONFIG.NODE_ENV === 'test') {
+    // Let's skip this migration for simplicity.
+    // There is nothing to migrate in test environment and setting up the S3 services seems overkill.
+  }
+  const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_ENDPOINT, AWS_BUCKET } = CONFIG
+  if (!(AWS_ACCESS_KEY_ID && AWS_SECRET_ACCESS_KEY && AWS_ENDPOINT && AWS_BUCKET)) {
+    throw new Error('No S3 configuration given, cannot upload image files')
+  }
+
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
 
-  const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_ENDPOINT, AWS_BUCKET } = CONFIG
-  if (!(AWS_ACCESS_KEY_ID && AWS_SECRET_ACCESS_KEY && AWS_ENDPOINT && AWS_BUCKET)) {
-    throw new Error('No S3 given, cannot upload image files')
-  }
   const s3 = new S3Client({
     credentials: {
       accessKeyId: AWS_ACCESS_KEY_ID,
@@ -85,7 +90,7 @@ export async function up(_next) {
   }
 }
 
-export async function down(_next) {
+export async function down() {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
