@@ -6,6 +6,7 @@ const localVue = global.localVue
 const stubs = {
   'sweetalert-icon': true,
   'nuxt-link': true,
+  'client-only': true,
 }
 
 localVue.use(DeleteUserModal)
