@@ -31,11 +31,8 @@ export default {
     ...mapGetters({
       // TODO: implement visibility of active filter later on
       filterActive: 'posts/isActive',
-      categories: 'categories/categories',
+      categoriesActive: 'categories/categoriesActive',
     }),
-    categoriesActive() {
-      return !!this.categories.length
-    },
   },
 }
 </script>

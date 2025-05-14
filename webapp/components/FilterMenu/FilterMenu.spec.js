@@ -14,7 +14,7 @@ describe('FilterMenu.vue', () => {
     'posts/isActive': () => false,
     'posts/filteredPostTypes': () => [],
     'posts/orderBy': () => 'createdAt_desc',
-    'categories/categories': jest.fn(() => []),
+    'categories/categoriesActive': () => false,
   }
 
   const stubs = {

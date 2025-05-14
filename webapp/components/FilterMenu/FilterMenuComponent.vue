@@ -50,11 +50,8 @@ export default {
     ...mapGetters({
       filteredPostTypes: 'posts/filteredPostTypes',
       filteredCategoryIds: 'posts/filteredCategoryIds',
-      categories: 'categories/categories',
+      categoriesActive: 'categories/categoriesActive',
     }),
-    categoriesActive() {
-      return !!this.categories.length
-    },
     eventSetInPostTypeFilter() {
       return this.filteredPostTypes ? this.filteredPostTypes.includes('Event') : null
     },
