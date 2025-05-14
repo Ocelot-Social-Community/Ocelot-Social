@@ -42,9 +42,7 @@ export const images = (
   const { AWS_BUCKET: Bucket, S3_PUBLIC_GATEWAY } = config
 
   const { AWS_ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = config
-  if (
-    !(AWS_ENDPOINT && AWS_ACCESS_KEY_ID && AWS_SECRET_ACCESS_KEY && Bucket && S3_PUBLIC_GATEWAY)
-  ) {
+  if (!(AWS_ENDPOINT && AWS_ACCESS_KEY_ID && AWS_SECRET_ACCESS_KEY && Bucket)) {
     throw new Error('Missing AWS credentials.')
   }
   const s3 = new S3Client({
@@ -180,6 +178,9 @@ export const images = (
     const { Location } = data
     if (!Location) {
       throw new Error('File upload did not return `Location`')
+    }
+    if (!S3_PUBLIC_GATEWAY) {
+      return Location
     }
     const publicLocation = new URL(S3_PUBLIC_GATEWAY)
     publicLocation.pathname = new URL(Location).pathname
