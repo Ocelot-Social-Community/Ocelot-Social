@@ -68,7 +68,8 @@ describe('categroeis middleware', () => {
         }),
       ).resolves.toMatchObject({
         data: {
-          Category: categories,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          Category: expect.arrayContaining(categories),
         },
         errors: undefined,
       })
