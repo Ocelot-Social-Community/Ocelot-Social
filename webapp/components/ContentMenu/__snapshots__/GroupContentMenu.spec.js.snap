@@ -4,6 +4,7 @@ exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
 <div>
   <v-popover-stub
     autohide="true"
+    boundarieselement="body"
     class="group-content-menu"
     container="body"
     delay="0"
@@ -121,6 +122,7 @@ exports[`GroupContentMenu renders as groupProfile, muted 1`] = `
 <div>
   <v-popover-stub
     autohide="true"
+    boundarieselement="body"
     class="group-content-menu"
     container="body"
     delay="0"
@@ -196,6 +198,7 @@ exports[`GroupContentMenu renders as groupProfile, not muted 1`] = `
 <div>
   <v-popover-stub
     autohide="true"
+    boundarieselement="body"
     class="group-content-menu"
     container="body"
     delay="0"
@@ -271,6 +274,7 @@ exports[`GroupContentMenu renders as groupTeaser 1`] = `
 <div>
   <v-popover-stub
     autohide="true"
+    boundarieselement="body"
     class="group-content-menu"
     container="body"
     delay="0"

@@ -6,7 +6,7 @@
         :link-to-profile="linkToProfile"
         :show-popover="showPopover"
         :user-link="userLink"
-        @open-menu="openMenu(false)"
+        @open-menu="loadPopover(openMenu)"
         @close-menu="closeMenu(false)"
         data-test="avatarUserLink"
       >
@@ -18,7 +18,7 @@
             :link-to-profile="linkToProfile"
             :show-popover="showPopover"
             :user-link="userLink"
-            @open-menu="openMenu(false)"
+            @open-menu="loadPopover(openMenu)"
             @close-menu="closeMenu(false)"
           >
             <span class="slug">{{ userSlug }}</span>
@@ -57,6 +57,7 @@
 <script>
 import { mapGetters } from 'vuex'
 
+import { userTeaserQuery } from '~/graphql/User.js'
 import DateTime from '~/components/DateTime'
 import Dropdown from '~/components/Dropdown'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
@@ -117,6 +118,16 @@ export default {
     groupName() {
       const { name } = this.group || {}
       return name || this.$t('profile.userAnonym')
+    },
+  },
+  methods: {
+    async loadPopover(openMenu) {
+      // Load user data if not already loaded, to avoid flickering
+      await this.$apollo.query({
+        query: userTeaserQuery(this.$i18n),
+        variables: { id: this.user.id },
+      })
+      openMenu(false)
     },
   },
 }
