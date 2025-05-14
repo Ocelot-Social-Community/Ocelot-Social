@@ -10,6 +10,20 @@ describe('categories store', () => {
     })
   })
 
+  describe('getters', () => {
+    describe('categoriesActive', () => {
+      it('returns true if there are categories', () => {
+        const state = { categories: ['cat1', 'cat2'] }
+        expect(getters.categoriesActive(state)).toBe(true)
+      })
+
+      it('returns false if there are no categories', () => {
+        const state = { categories: [] }
+        expect(getters.categoriesActive(state)).toBe(false)
+      })
+    })
+  })
+
   describe('mutations', () => {
     let testMutation
 
@@ -55,33 +69,18 @@ describe('categories store', () => {
     })
 
     describe('init', () => {
-      describe('categories NOT active', () => {
-        beforeEach(async () => {
-          jest.clearAllMocks()
-          process.env.CATEGORIES_ACTIVE = false
-          await action({ commit })
-        })
+      beforeEach(async () => {
+        await action({ commit })
+      })
 
-        it('does not call apollo', () => {
-          expect(queryMock).not.toBeCalled()
+      it('calls apollo', () => {
+        expect(queryMock).toBeCalledWith({
+          query: CategoryQuery(),
         })
       })
 
-      describe('categories active', () => {
-        beforeEach(async () => {
-          process.env.CATEGORIES_ACTIVE = true
-          await action({ commit })
-        })
-
-        it('calls apollo', () => {
-          expect(queryMock).toBeCalledWith({
-            query: CategoryQuery(),
-          })
-        })
-
-        it('commits SET_CATEGORIES', () => {
-          expect(commit).toBeCalledWith('SET_CATEGORIES', ['cat1', 'cat2', 'cat3'])
-        })
+      it('commits SET_CATEGORIES', () => {
+        expect(commit).toBeCalledWith('SET_CATEGORIES', ['cat1', 'cat2', 'cat3'])
       })
     })
   })

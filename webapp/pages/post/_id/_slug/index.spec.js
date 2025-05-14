@@ -42,6 +42,7 @@ describe('PostSlug', () => {
             return { id: '1stUser' }
           },
           'auth/isModerator': () => false,
+          'categories/categoriesActive': () => false,
         },
       })
       const propsData = {}
@@ -73,9 +74,6 @@ describe('PostSlug', () => {
           query: jest.fn().mockResolvedValue({ data: { PostEmotionsCountByEmotion: {} } }),
         },
         $scrollTo: jest.fn(),
-        $env: {
-          CATEGORIES_ACTIVE: false,
-        },
       }
       stubs = {
         'client-only': true,

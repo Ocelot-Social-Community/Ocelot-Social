@@ -46,16 +46,15 @@ export default {
     PostTypeFilter,
     LabeledButton,
   },
-  data() {
-    return {
-      categoriesActive: this.$env ? this.$env.CATEGORIES_ACTIVE : false,
-    }
-  },
   computed: {
     ...mapGetters({
       filteredPostTypes: 'posts/filteredPostTypes',
       filteredCategoryIds: 'posts/filteredCategoryIds',
+      categories: 'categories/categories',
     }),
+    categoriesActive() {
+      return !!this.categories.length
+    },
     eventSetInPostTypeFilter() {
       return this.filteredPostTypes ? this.filteredPostTypes.includes('Event') : null
     },

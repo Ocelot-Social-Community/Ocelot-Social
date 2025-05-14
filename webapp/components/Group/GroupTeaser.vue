@@ -79,6 +79,7 @@
 <script>
 import Category from '~/components/Category'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'GroupTeaser',
@@ -96,12 +97,10 @@ export default {
       default: () => {},
     },
   },
-  data() {
-    return {
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
-    }
-  },
   computed: {
+    ...mapGetters({
+      categoriesActive: 'categories/categoriesActive',
+    }),
     descriptionExcerpt() {
       return this.$filters.removeLinks(this.group.descriptionExcerpt)
     },

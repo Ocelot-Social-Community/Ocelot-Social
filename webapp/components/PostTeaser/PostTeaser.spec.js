@@ -47,15 +47,13 @@ describe('PostTeaser', () => {
           data: { DeletePost: { id: 'deleted-post-id' } },
         }),
       },
-      $env: {
-        CATEGORIES_ACTIVE: false,
-      },
     }
     getters = {
       'auth/isModerator': () => false,
       'auth/user': () => {
         return {}
       },
+      'categories/categoriesActive': () => false,
     }
   })
 

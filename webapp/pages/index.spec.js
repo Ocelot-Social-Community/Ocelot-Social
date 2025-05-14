@@ -36,6 +36,8 @@ describe('PostIndex', () => {
         'auth/user': () => {
           return { id: 'u23' }
         },
+        'categories/categoriesActive': () => true,
+        'categories/categories': () => ['cat1', 'cat2', 'cat3'],
       },
       mutations,
     })
@@ -78,9 +80,6 @@ describe('PostIndex', () => {
       },
       $route: {
         query: {},
-      },
-      $env: {
-        CATEGORIES_ACTIVE: true,
       },
     }
   })

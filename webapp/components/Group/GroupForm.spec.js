@@ -13,10 +13,6 @@ const propsData = {
   group: {},
 }
 
-const categoriesMock = jest
-  .fn()
-  .mockReturnValue([{ id: 'cat0' }, { id: 'cat1' }, { id: 'cat2' }, { id: 'cat3' }, { id: 'cat4' }])
-
 describe('GroupForm', () => {
   let wrapper
   let mocks
@@ -26,13 +22,10 @@ describe('GroupForm', () => {
   beforeEach(() => {
     mocks = {
       $t: jest.fn(),
-      $env: {
-        CATEGORIES_ACTIVE: true,
-      },
     }
     storeMocks = {
       getters: {
-        'categories/categories': categoriesMock,
+        'categories/categoriesActive': () => false,
       },
     }
     store = new Vuex.Store(storeMocks)

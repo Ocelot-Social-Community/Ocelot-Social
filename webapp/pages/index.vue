@@ -184,7 +184,6 @@ export default {
       offset: 0,
       pageSize: 12,
       hashtag,
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
       SHOW_CONTENT_FILTER_MASONRY_GRID,
       POST_ADD_BUTTON_POSITION_TOP,
     }
@@ -194,6 +193,7 @@ export default {
       filteredPostTypes: 'posts/filteredPostTypes',
       postsFilter: 'posts/filter',
       orderBy: 'posts/orderBy',
+      categoriesActive: 'categories/categoriesActive',
     }),
     filterButtonIcon() {
       return this.showFilter ? 'angle-up' : 'angle-down'

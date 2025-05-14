@@ -182,6 +182,7 @@ import { groupQuery } from '~/graphql/groups'
 import PostMutations from '~/graphql/PostMutations'
 import links from '~/constants/links.js'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'PostSlug',
@@ -219,7 +220,6 @@ export default {
       blurred: false,
       blocked: null,
       postAuthor: null,
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
       group: null,
     }
   },
@@ -231,6 +231,9 @@ export default {
     }, 50)
   },
   computed: {
+    ...mapGetters({
+      categoriesActive: 'categories/categoriesActive',
+    }),
     routes() {
       const { slug, id } = this.$route.params
       return [

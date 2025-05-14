@@ -333,12 +333,12 @@ export default {
       mobileSearchVisible: false,
       toggleMobileMenu: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
     }
   },
   computed: {
     ...mapGetters({
       isLoggedIn: 'auth/isLoggedIn',
+      categoriesActive: 'categories/categoriesActive',
     }),
     showFilterMenuDropdown() {
       const [firstRoute] = this.$route.matched

@@ -268,11 +268,8 @@ export default {
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
-      categories: 'categories/categories',
+      categoriesActive: 'categories/categoriesActive',
     }),
-    categoriesActive() {
-      return !!this.categories.length
-    },
     formSchema() {
       return {
         title: { required: true, min: 3, max: 100 },

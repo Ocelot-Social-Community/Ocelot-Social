@@ -27,16 +27,15 @@ export default {
     placement: { type: String },
     offset: { type: [String, Number] },
   },
-  data() {
-    return {
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
-    }
-  },
   computed: {
     ...mapGetters({
       // TODO: implement visibility of active filter later on
       filterActive: 'posts/isActive',
+      categories: 'categories/categories',
     }),
+    categoriesActive() {
+      return !!this.categories.length
+    },
   },
 }
 </script>

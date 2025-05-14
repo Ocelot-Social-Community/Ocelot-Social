@@ -316,6 +316,7 @@ import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import ProfileList from '~/components/features/ProfileList/ProfileList'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
+import { mapGetters } from 'vuex'
 // import SocialMedia from '~/components/SocialMedia/SocialMedia'
 // import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 
@@ -360,7 +361,6 @@ export default {
     // const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
     const filter = { group: { id: this.$route.params.id } }
     return {
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
       loadGroupMembers: false,
       posts: [],
       hasMore: true,
@@ -378,9 +378,10 @@ export default {
     }
   },
   computed: {
-    currentUser() {
-      return this.$store.getters['auth/user']
-    },
+    ...mapGetters({
+      currentUser: 'auth/user',
+      categoriesActive: 'categories/categoriesActive',
+    }),
     group() {
       return this.Group && this.Group[0] ? this.Group[0] : {}
     },

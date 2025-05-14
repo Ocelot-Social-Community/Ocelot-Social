@@ -168,6 +168,7 @@
 
 <script>
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
+import { mapGetters } from 'vuex'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
 import {
   NAME_LENGTH_MIN,
@@ -203,7 +204,6 @@ export default {
     const { name, slug, groupType, about, description, actionRadius, locationName, categories } =
       this.group
     return {
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
       disabled: false,
       groupTypeOptions: ['public', 'closed', 'hidden'],
       loadingGeo: false,
@@ -264,6 +264,9 @@ export default {
       (await this.requestGeoData(this.formLocationName)) || this.formLocationName
   },
   computed: {
+    ...mapGetters({
+      categoriesActive: 'categories/categoriesActive',
+    }),
     formLocationName() {
       const isNestedValue =
         typeof this.formData.locationName === 'object' &&

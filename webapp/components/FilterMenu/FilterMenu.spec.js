@@ -8,15 +8,13 @@ let wrapper
 describe('FilterMenu.vue', () => {
   const mocks = {
     $t: jest.fn((string) => string),
-    $env: {
-      CATEGORIES_ACTIVE: true,
-    },
   }
 
   const getters = {
     'posts/isActive': () => false,
     'posts/filteredPostTypes': () => [],
     'posts/orderBy': () => 'createdAt_desc',
+    'categories/categories': jest.fn(() => []),
   }
 
   const stubs = {
