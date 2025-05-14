@@ -86,6 +86,12 @@ describe('UserTeaser', () => {
       },
       mocks: {
         $t: jest.fn((t) => t),
+        $i18n: {
+          locale: jest.fn(() => 'en'),
+        },
+        $apollo: {
+          query: jest.fn(() => Promise.resolve({ data: { user } })),
+        },
       },
     })
   }
