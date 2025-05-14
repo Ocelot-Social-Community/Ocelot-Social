@@ -108,8 +108,7 @@ const s3 = {
     env.AWS_SECRET_ACCESS_KEY &&
     env.AWS_ENDPOINT &&
     env.AWS_REGION &&
-    env.AWS_BUCKET &&
-    env.S3_PUBLIC_GATEWAY,
+    env.AWS_BUCKET,
 }
 
 const options = {
