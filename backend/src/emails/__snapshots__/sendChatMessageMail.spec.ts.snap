@@ -99,6 +99,9 @@ footer {
           <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
+      <div class="support">
+        <p>If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+      </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
       </footer>
@@ -120,6 +123,9 @@ See you soon on ocelot.social [https://ocelot.social]!
 
 PS: If you don't want to receive e-mails anymore, change your notification
 settings [http://webapp:3000/settings/notifications]!
+
+If you have questions or problems, feel free to contact our support:
+devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
@@ -226,6 +232,9 @@ footer {
           <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
+      <div class="support">
+        <p>Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+      </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
       </footer>
@@ -247,6 +256,9 @@ Bis bald bei ocelot.social [https://ocelot.social]!
 
 PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine
 Benachrichtigungseinstellungen [http://webapp:3000/settings/notifications]!
+
+Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden:
+devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
