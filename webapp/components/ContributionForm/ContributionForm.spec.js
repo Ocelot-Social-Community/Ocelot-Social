@@ -37,7 +37,7 @@ describe('ContributionForm.vue', () => {
   const image = { sensitive: false, url: '/uploads/1562010976466-avataaars', aspectRatio: 1 }
   beforeEach(() => {
     mocks = {
-      $t: jest.fn(),
+      $t: jest.fn((t) => t),
       $apollo: {
         mutate: jest.fn().mockResolvedValueOnce({
           data: {
