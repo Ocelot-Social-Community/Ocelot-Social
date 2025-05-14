@@ -27,15 +27,11 @@ export default {
     placement: { type: String },
     offset: { type: [String, Number] },
   },
-  data() {
-    return {
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
-    }
-  },
   computed: {
     ...mapGetters({
       // TODO: implement visibility of active filter later on
       filterActive: 'posts/isActive',
+      categoriesActive: 'categories/categoriesActive',
     }),
   },
 }

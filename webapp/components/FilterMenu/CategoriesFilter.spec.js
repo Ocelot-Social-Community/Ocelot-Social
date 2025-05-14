@@ -13,6 +13,21 @@ describe('CategoriesFilter.vue', () => {
   }
   const getters = {
     'posts/filteredCategoryIds': jest.fn(() => []),
+    'categories/categories': jest.fn().mockReturnValue([
+      { id: 'cat4', name: 'Environment & Nature', icon: 'tree', slug: 'environment-nature' },
+      {
+        id: 'cat15',
+        name: 'Consumption & Sustainability',
+        icon: 'shopping-cart',
+        slug: 'consumption-sustainability',
+      },
+      {
+        id: 'cat9',
+        name: 'Democracy & Politics',
+        icon: 'university',
+        slug: 'democracy-politics',
+      },
+    ]),
   }
 
   const apolloMutationMock = jest.fn().mockResolvedValue({
@@ -33,23 +48,6 @@ describe('CategoriesFilter.vue', () => {
   const Wrapper = () => {
     const store = new Vuex.Store({ mutations, getters })
     const wrapper = mount(CategoriesFilter, { mocks, localVue, store })
-    wrapper.setData({
-      categories: [
-        { id: 'cat4', name: 'Environment & Nature', icon: 'tree', slug: 'environment-nature' },
-        {
-          id: 'cat15',
-          name: 'Consumption & Sustainability',
-          icon: 'shopping-cart',
-          slug: 'consumption-sustainability',
-        },
-        {
-          id: 'cat9',
-          name: 'Democracy & Politics',
-          icon: 'university',
-          slug: 'democracy-politics',
-        },
-      ],
-    })
     return wrapper
   }
 
@@ -75,7 +73,7 @@ describe('CategoriesFilter.vue', () => {
       it('calls TOGGLE_CATEGORY when clicked', () => {
         environmentAndNatureButton = wrapper.findAll('.category-filter-list .base-button').at(0)
         environmentAndNatureButton.trigger('click')
-        expect(mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledWith({}, 'cat4')
+        expect(mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledWith({}, 'cat15')
       })
     })
 

@@ -164,11 +164,6 @@ export default {
       default: () => {},
     },
   },
-  data() {
-    return {
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
-    }
-  },
   mounted() {
     const { image } = this.post
     if (!image) return
@@ -182,6 +177,7 @@ export default {
   computed: {
     ...mapGetters({
       user: 'auth/user',
+      categoriesActive: 'categories/categoriesActive',
     }),
     excerpt() {
       return this.$filters.removeLinks(this.post.contentExcerpt)

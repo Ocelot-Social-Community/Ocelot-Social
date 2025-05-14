@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import create from './create.vue'
+import Vuex from 'vuex'
 
 const localVue = global.localVue
 
@@ -8,9 +9,6 @@ describe('create.vue', () => {
 
   const mocks = {
     $t: jest.fn(),
-    $env: {
-      CATEGORIES_ACTIVE: false,
-    },
     $route: {
       query: {
         groupId: null,
@@ -23,8 +21,14 @@ describe('create.vue', () => {
   }
 
   describe('mount', () => {
+    const store = new Vuex.Store({
+      getters: {
+        'categories/categoriesActive': () => false,
+      },
+    })
+
     const Wrapper = () => {
-      return mount(create, { mocks, localVue, stubs })
+      return mount(create, { mocks, localVue, stubs, store })
     }
 
     beforeEach(() => {

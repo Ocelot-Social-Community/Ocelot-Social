@@ -240,7 +240,6 @@ export default {
       type: imageType = null,
     } = image || {}
     return {
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
       links,
       formData: {
         title: title || '',
@@ -269,6 +268,7 @@ export default {
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
+      categoriesActive: 'categories/categoriesActive',
     }),
     formSchema() {
       return {

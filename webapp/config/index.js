@@ -34,7 +34,6 @@ const options = {
   // Cookies
   COOKIE_EXPIRE_TIME: process.env.COOKIE_EXPIRE_TIME || 730, // Two years by default
   COOKIE_HTTPS_ONLY: process.env.COOKIE_HTTPS_ONLY || process.env.NODE_ENV === 'production', // ensure true in production if not set explicitly
-  CATEGORIES_ACTIVE: process.env.CATEGORIES_ACTIVE === 'true' || false,
   BADGES_ENABLED: process.env.BADGES_ENABLED === 'true' || false,
   INVITE_LINK_LIMIT: process.env.INVITE_LINK_LIMIT || 7,
   NETWORK_NAME: process.env.NETWORK_NAME || 'Ocelot.social',

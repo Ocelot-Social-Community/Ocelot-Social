@@ -39,15 +39,14 @@ describe('post/_id.vue', () => {
             }),
           },
         },
-        $env: {
-          CATEGORIES_ACTIVE: false,
-        },
       }
       store = new Vuex.Store({
         getters: {
           'auth/user': () => {
             return { id: userId }
           },
+          'categories/categories': jest.fn(() => []),
+          'categories/categoriesActive': () => false,
         },
       })
       if (asyncData) {

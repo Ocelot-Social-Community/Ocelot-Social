@@ -15,11 +15,9 @@ const stubs = {
 }
 
 const authUserMock = jest.fn().mockReturnValue({ activeCategories: [] })
-const apolloQueryMock = jest.fn().mockResolvedValue({
-  data: {
-    Category: [{ id: 'cat0' }, { id: 'cat1' }, { id: 'cat2' }, { id: 'cat3' }, { id: 'cat4' }],
-  },
-})
+const categoriesMock = jest
+  .fn()
+  .mockReturnValue([{ id: 'cat0' }, { id: 'cat1' }, { id: 'cat2' }, { id: 'cat3' }, { id: 'cat4' }])
 
 describe('LoginForm', () => {
   let mocks
@@ -36,6 +34,7 @@ describe('LoginForm', () => {
         getters: {
           'auth/pending': () => false,
           'auth/user': authUserMock,
+          'categories/categories': categoriesMock,
         },
         actions: {
           'auth/login': jest.fn(),
@@ -51,9 +50,6 @@ describe('LoginForm', () => {
         $toast: {
           success: jest.fn(),
           error: jest.fn(),
-        },
-        $apollo: {
-          query: apolloQueryMock,
         },
       }
       return mount(LoginForm, { mocks, localVue, propsData, store, stubs })
