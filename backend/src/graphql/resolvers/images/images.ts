@@ -43,6 +43,4 @@ export interface Images {
   ) => Promise<any>
 }
 
-const images = isS3configured(CONFIG) ? imagesS3(CONFIG) : imagesLocal
-const { mergeImage, deleteImage } = images
-export { mergeImage, deleteImage }
+export const images = isS3configured(CONFIG) ? imagesS3(CONFIG) : imagesLocal
