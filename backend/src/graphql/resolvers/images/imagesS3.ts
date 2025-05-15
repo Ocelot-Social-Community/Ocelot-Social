@@ -14,7 +14,7 @@ import { UserInputError } from 'apollo-server'
 import slug from 'slug'
 import { v4 as uuid } from 'uuid'
 
-import type CONFIG from '@config/index'
+import { S3Configured } from '@config/index'
 import { getDriver } from '@db/neo4j'
 
 import type {
@@ -27,24 +27,11 @@ import type {
 } from './images'
 import type { FileUpload } from 'graphql-upload'
 
-export const images = (
-  config: Pick<
-    typeof CONFIG,
-    | 'AWS_ACCESS_KEY_ID'
-    | 'AWS_SECRET_ACCESS_KEY'
-    | 'AWS_ENDPOINT'
-    | 'AWS_REGION'
-    | 'AWS_BUCKET'
-    | 'S3_PUBLIC_GATEWAY'
-  >,
-) => {
+export const images = (config: S3Configured) => {
   // const widths = [34, 160, 320, 640, 1024]
   const { AWS_BUCKET: Bucket, S3_PUBLIC_GATEWAY } = config
 
   const { AWS_ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = config
-  if (!(AWS_ENDPOINT && AWS_ACCESS_KEY_ID && AWS_SECRET_ACCESS_KEY && Bucket)) {
-    throw new Error('Missing AWS credentials.')
-  }
   const s3 = new S3Client({
     credentials: {
       accessKeyId: AWS_ACCESS_KEY_ID,
