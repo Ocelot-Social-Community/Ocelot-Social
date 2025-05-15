@@ -45,9 +45,9 @@ describe('deleteImage', () => {
   const { deleteImage } = images
 
   describe('given a resource with an image', () => {
-    let user
+    let user: { id: string }
     beforeEach(async () => {
-      user = await Factory.build(
+      const u = await Factory.build(
         'user',
         {},
         {
@@ -57,7 +57,7 @@ describe('deleteImage', () => {
           }),
         },
       )
-      user = await user.toJson()
+      user = await u.toJson()
     })
 
     it('deletes `Image` node', async () => {
@@ -67,8 +67,8 @@ describe('deleteImage', () => {
     })
 
     it('calls deleteCallback', async () => {
-      user = await Factory.build('user')
-      user = await user.toJson()
+      const u = await Factory.build('user')
+      user = await u.toJson()
       await deleteImage(user, 'AVATAR_IMAGE', { deleteCallback })
       expect(deleteCallback).toHaveBeenCalled()
     })
@@ -121,7 +121,7 @@ describe('deleteImage', () => {
 describe('mergeImage', () => {
   const { mergeImage } = images
   let imageInput: ImageInput
-  let post
+  let post: { id: string }
   beforeEach(() => {
     imageInput = {
       alt: 'A description of the new image',
@@ -148,7 +148,7 @@ describe('mergeImage', () => {
 
     describe('on existing resource', () => {
       beforeEach(async () => {
-        post = await Factory.build(
+        const p = await Factory.build(
           'post',
           { id: 'p99' },
           {
@@ -156,7 +156,7 @@ describe('mergeImage', () => {
             image: null,
           },
         )
-        post = await post.toJson()
+        post = await p.toJson()
       })
 
       it('returns new image', async () => {
@@ -199,7 +199,7 @@ describe('mergeImage', () => {
           `MATCH(p:Post {id: "p99"})-[:HERO_IMAGE]->(i:Image) RETURN i,p`,
           {},
         )
-        post = neode.hydrateFirst(result, 'p', neode.model('Post'))
+        post = neode.hydrateFirst<{ id: string }>(result, 'p', neode.model('Post')).properties()
         const image = neode.hydrateFirst(result, 'i', neode.model('Image'))
         expect(post).toBeTruthy()
         expect(image).toBeTruthy()
@@ -314,8 +314,8 @@ describe('mergeImage', () => {
 
   describe('without image.upload', () => {
     it('throws UserInputError', async () => {
-      post = await Factory.build('post', { id: 'p99' }, { image: null })
-      post = await post.toJson()
+      const p = await Factory.build('post', { id: 'p99' }, { image: null })
+      post = await p.toJson()
       await expect(mergeImage(post, 'HERO_IMAGE', imageInput)).rejects.toEqual(
         new UserInputError('Cannot find image for given resource'),
       )
@@ -323,7 +323,7 @@ describe('mergeImage', () => {
 
     describe('if resource has an image already', () => {
       beforeEach(async () => {
-        post = await Factory.build(
+        const p = await Factory.build(
           'post',
           {
             id: 'p99',
@@ -342,7 +342,7 @@ describe('mergeImage', () => {
             }),
           },
         )
-        post = await post.toJson()
+        post = await p.toJson()
       })
 
       it('does not call deleteCallback', async () => {

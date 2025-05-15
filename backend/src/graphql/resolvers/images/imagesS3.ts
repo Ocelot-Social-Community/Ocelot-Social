@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
+
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
@@ -17,14 +17,7 @@ import { v4 as uuid } from 'uuid'
 import { S3Configured } from '@config/index'
 import { getDriver } from '@db/neo4j'
 
-import type {
-  DeleteImageOpts,
-  Images,
-  MergeImageOpts,
-  FileDeleteCallback,
-  FileUploadCallback,
-  ImageInput,
-} from './images'
+import type { Images, FileDeleteCallback, FileUploadCallback } from './images'
 import type { FileUpload } from 'graphql-upload'
 
 export const images = (config: S3Configured) => {
@@ -41,7 +34,7 @@ export const images = (config: S3Configured) => {
     forcePathStyle: true,
   })
 
-  const deleteImage = async (resource, relationshipType, opts: DeleteImageOpts = {}) => {
+  const deleteImage: Images['deleteImage'] = async (resource, relationshipType, opts = {}) => {
     sanitizeRelationshipType(relationshipType)
     const { transaction, deleteCallback } = opts
     if (!transaction) return wrapTransaction(deleteImage, [resource, relationshipType], opts)
@@ -63,11 +56,11 @@ export const images = (config: S3Configured) => {
     return image
   }
 
-  const mergeImage = async (
+  const mergeImage: Images['mergeImage'] = async (
     resource,
     relationshipType,
-    imageInput: ImageInput | null | undefined,
-    opts: MergeImageOpts = {},
+    imageInput,
+    opts = {},
   ) => {
     if (typeof imageInput === 'undefined') return
     if (imageInput === null) return deleteImage(resource, relationshipType, opts)
@@ -143,7 +136,7 @@ export const images = (config: S3Configured) => {
     return uploadCallback({ createReadStream, uniqueFilename, mimetype })
   }
 
-  const sanitizeRelationshipType = (relationshipType) => {
+  const sanitizeRelationshipType = (relationshipType: string) => {
     // Cypher query language does not allow to parameterize relationship types
     // See: https://github.com/neo4j/neo4j/issues/340
     if (!['HERO_IMAGE', 'AVATAR_IMAGE'].includes(relationshipType)) {
@@ -188,9 +181,9 @@ export const images = (config: S3Configured) => {
     await s3.send(new DeleteObjectCommand(params))
   }
 
-  const images = {
+  const images: Images = {
     deleteImage,
     mergeImage,
-  } satisfies Images
+  }
   return images
 }
