@@ -124,7 +124,13 @@ export const images = (config: S3Configured) => {
     const { createReadStream, filename, mimetype } = await upload
     const { name, ext } = path.parse(filename)
     const uniqueFilename = `${uuid()}-${slug(name)}${ext}`
-    return uploadCallback({ createReadStream, uniqueFilename, mimetype })
+    const Location = await uploadCallback({ createReadStream, uniqueFilename, mimetype })
+    if (!S3_PUBLIC_GATEWAY) {
+      return Location
+    }
+    const publicLocation = new URL(S3_PUBLIC_GATEWAY)
+    publicLocation.pathname = new URL(Location).pathname
+    return publicLocation.href
   }
 
   const sanitizeRelationshipType = (relationshipType: string) => {
@@ -150,12 +156,7 @@ export const images = (config: S3Configured) => {
     if (!Location) {
       throw new Error('File upload did not return `Location`')
     }
-    if (!S3_PUBLIC_GATEWAY) {
-      return Location
-    }
-    const publicLocation = new URL(S3_PUBLIC_GATEWAY)
-    publicLocation.pathname = new URL(Location).pathname
-    return publicLocation.href
+    return Location
   }
 
   const s3Delete: FileDeleteCallback = async (url) => {
