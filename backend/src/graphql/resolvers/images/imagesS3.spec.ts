@@ -42,7 +42,9 @@ afterAll(async () => {
 })
 
 beforeEach(async () => {
-  uploadCallback = jest.fn(({ uniqueFilename }) => `/uploads/${uniqueFilename}`)
+  uploadCallback = jest.fn(
+    ({ uniqueFilename }) => `http://your-objectstorage.com/bucket/${uniqueFilename}`,
+  )
   deleteCallback = jest.fn()
 })
 
@@ -198,7 +200,32 @@ describe('mergeImage', () => {
         await expect(
           mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback }),
         ).resolves.toMatchObject({
-          url: expect.stringMatching(new RegExp(`^/uploads/${uuid}-foo-bar-avatar.jpg`)),
+          url: expect.stringMatching(
+            new RegExp(`^http://your-objectstorage.com/bucket/${uuid}-foo-bar-avatar.jpg`),
+          ),
+        })
+      })
+
+      describe('but given a `S3_PUBLIC_GATEWAY` configuration', () => {
+        const { mergeImage } = images({
+          ...config,
+          S3_PUBLIC_GATEWAY: 'http://s3-public-gateway.com',
+        })
+
+        it('changes the domain of the URL to a server that could e.g. apply image transformations', async () => {
+          if (!imageInput.upload) {
+            throw new Error('Test imageInput was not setup correctly.')
+          }
+          const upload = await imageInput.upload
+          upload.filename = '/path/to/file-location/foo-bar-avatar.jpg'
+          imageInput.upload = Promise.resolve(upload)
+          await expect(
+            mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback }),
+          ).resolves.toMatchObject({
+            url: expect.stringMatching(
+              new RegExp(`^http://s3-public-gateway.com/bucket/${uuid}-foo-bar-avatar.jpg`),
+            ),
+          })
         })
       })
 
