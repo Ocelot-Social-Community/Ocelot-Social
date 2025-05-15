@@ -8,6 +8,7 @@ import { v4 as uuid } from 'uuid'
 
 import { S3Configured } from '@config/index'
 
+import { sanitizeRelationshipType } from './sanitizeRelationshipTypes'
 import { wrapTransaction } from './wrapTransaction'
 
 import type { Image, Images, FileDeleteCallback, FileUploadCallback } from './images'
@@ -110,14 +111,6 @@ export const images = (config: S3Configured) => {
     const publicLocation = new URL(S3_PUBLIC_GATEWAY)
     publicLocation.pathname = new URL(Location).pathname
     return publicLocation.href
-  }
-
-  const sanitizeRelationshipType = (relationshipType: string) => {
-    // Cypher query language does not allow to parameterize relationship types
-    // See: https://github.com/neo4j/neo4j/issues/340
-    if (!['HERO_IMAGE', 'AVATAR_IMAGE'].includes(relationshipType)) {
-      throw new Error(`Unknown relationship type ${relationshipType}`)
-    }
   }
 
   const s3Upload: FileUploadCallback = async ({ createReadStream, uniqueFilename, mimetype }) => {
