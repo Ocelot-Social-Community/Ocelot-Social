@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
+
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
@@ -15,6 +15,7 @@ import { UserInputError } from 'apollo-server'
 import slug from 'slug'
 import { v4 as uuid } from 'uuid'
 
+import { sanitizeRelationshipType } from './sanitizeRelationshipTypes'
 import { wrapTransaction } from './wrapTransaction'
 
 import type { Images, FileDeleteCallback, FileUploadCallback } from './images'
@@ -114,14 +115,6 @@ const uploadImageFile = async (
   const { name, ext } = path.parse(filename)
   const uniqueFilename = `${uuid()}-${slug(name)}${ext}`
   return uploadCallback({ createReadStream, uniqueFilename, mimetype })
-}
-
-const sanitizeRelationshipType = (relationshipType) => {
-  // Cypher query language does not allow to parameterize relationship types
-  // See: https://github.com/neo4j/neo4j/issues/340
-  if (!['HERO_IMAGE', 'AVATAR_IMAGE'].includes(relationshipType)) {
-    throw new Error(`Unknown relationship type ${relationshipType}`)
-  }
 }
 
 const localFileUpload: FileUploadCallback = ({ createReadStream, uniqueFilename }) => {
