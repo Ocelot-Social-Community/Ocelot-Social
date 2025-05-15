@@ -36,7 +36,7 @@ export const images = (config: S3Configured) => {
 
   const deleteImage: Images['deleteImage'] = async (resource, relationshipType, opts = {}) => {
     sanitizeRelationshipType(relationshipType)
-    const { transaction, deleteCallback } = opts
+    const { transaction, deleteCallback = s3Delete } = opts
     if (!transaction) return wrapTransaction(deleteImage, [resource, relationshipType], opts)
     const txResult = await transaction.run(
       `
@@ -52,7 +52,9 @@ export const images = (config: S3Configured) => {
     // with metadata for an image that does not exist, it's an indicator
     // of an error (so throw an error). If we bulk delete an image, it
     // could very well be that there is no image for the resource.
-    if (image) deleteImageFile(image, deleteCallback)
+    if (image) {
+      await deleteCallback(image.url)
+    }
     return image
   }
 
@@ -65,7 +67,7 @@ export const images = (config: S3Configured) => {
     if (typeof imageInput === 'undefined') return
     if (imageInput === null) return deleteImage(resource, relationshipType, opts)
     sanitizeRelationshipType(relationshipType)
-    const { transaction, uploadCallback, deleteCallback } = opts
+    const { transaction, uploadCallback, deleteCallback = s3Delete } = opts
     if (!transaction)
       return wrapTransaction(mergeImage, [resource, relationshipType, imageInput], opts)
 
@@ -80,7 +82,9 @@ export const images = (config: S3Configured) => {
     const [existingImage] = txResult.records.map((record) => record.get('image'))
     const { upload } = imageInput
     if (!(existingImage || upload)) throw new UserInputError('Cannot find image for given resource')
-    if (existingImage && upload) deleteImageFile(existingImage, deleteCallback)
+    if (existingImage && upload) {
+      await deleteCallback(existingImage.url)
+    }
     const url = await uploadImageFile(upload, uploadCallback)
     const { alt, sensitive, aspectRatio, type } = imageInput
     const image = { alt, sensitive, aspectRatio, url, type }
@@ -111,24 +115,11 @@ export const images = (config: S3Configured) => {
     }
   }
 
-  const deleteImageFile = (image, deleteCallback: FileDeleteCallback | undefined) => {
-    if (!deleteCallback) {
-      deleteCallback = s3Delete
-    }
-    const { url } = image
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    deleteCallback(url)
-    return url
-  }
-
   const uploadImageFile = async (
     upload: Promise<FileUpload> | undefined,
-    uploadCallback: FileUploadCallback | undefined,
+    uploadCallback: FileUploadCallback | undefined = s3Upload,
   ) => {
     if (!upload) return undefined
-    if (!uploadCallback) {
-      uploadCallback = s3Upload
-    }
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const { createReadStream, filename, mimetype } = await upload
     const { name, ext } = path.parse(filename)
