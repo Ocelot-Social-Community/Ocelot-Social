@@ -30,6 +30,14 @@ export interface ImageInput {
   type?: string
 }
 
+export interface Image {
+  url: string
+  alt?: string
+  sensitive?: boolean
+  aspectRatio?: number
+  type?: string
+}
+
 export interface Images {
   deleteImage: (
     resource: { id: string },

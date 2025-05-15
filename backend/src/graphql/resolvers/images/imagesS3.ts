@@ -1,11 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
-
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-
 import path from 'node:path'
 
 import { S3Client, DeleteObjectCommand, ObjectCannedACL } from '@aws-sdk/client-s3'
@@ -15,9 +7,10 @@ import slug from 'slug'
 import { v4 as uuid } from 'uuid'
 
 import { S3Configured } from '@config/index'
-import { getDriver } from '@db/neo4j'
 
-import type { Images, FileDeleteCallback, FileUploadCallback } from './images'
+import { wrapTransaction } from './wrapTransaction'
+
+import type { Image, Images, FileDeleteCallback, FileUploadCallback } from './images'
 import type { FileUpload } from 'graphql-upload'
 
 export const images = (config: S3Configured) => {
@@ -47,7 +40,7 @@ export const images = (config: S3Configured) => {
     `,
       { resource },
     )
-    const [image] = txResult.records.map((record) => record.get('imageProps'))
+    const [image] = txResult.records.map((record) => record.get('imageProps') as Image)
     // This behaviour differs from `mergeImage`. If you call `mergeImage`
     // with metadata for an image that does not exist, it's an indicator
     // of an error (so throw an error). If we bulk delete an image, it
@@ -71,15 +64,14 @@ export const images = (config: S3Configured) => {
     if (!transaction)
       return wrapTransaction(mergeImage, [resource, relationshipType, imageInput], opts)
 
-    let txResult
-    txResult = await transaction.run(
+    let txResult = await transaction.run(
       `
       MATCH (resource {id: $resource.id})-[:${relationshipType}]->(image:Image)
       RETURN image {.*}
       `,
       { resource },
     )
-    const [existingImage] = txResult.records.map((record) => record.get('image'))
+    const [existingImage] = txResult.records.map((record) => record.get('image') as Image)
     const { upload } = imageInput
     if (!(existingImage || upload)) throw new UserInputError('Cannot find image for given resource')
     if (existingImage && upload) {
@@ -99,20 +91,8 @@ export const images = (config: S3Configured) => {
       `,
       { resource, image },
     )
-    const [mergedImage] = txResult.records.map((record) => record.get('image'))
+    const [mergedImage] = txResult.records.map((record) => record.get('image') as Image)
     return mergedImage
-  }
-
-  const wrapTransaction = async (wrappedCallback, args, opts) => {
-    const session = getDriver().session()
-    try {
-      const result = await session.writeTransaction(async (transaction) => {
-        return wrappedCallback(...args, { ...opts, transaction })
-      })
-      return result
-    } finally {
-      await session.close()
-    }
   }
 
   const uploadImageFile = async (

@@ -15,7 +15,7 @@ import { UserInputError } from 'apollo-server'
 import slug from 'slug'
 import { v4 as uuid } from 'uuid'
 
-import { getDriver } from '@db/neo4j'
+import { wrapTransaction } from './wrapTransaction'
 
 import type { Images, FileDeleteCallback, FileUploadCallback } from './images'
 import type { FileUpload } from 'graphql-upload'
@@ -83,18 +83,6 @@ const mergeImage: Images['mergeImage'] = async (
   )
   const [mergedImage] = txResult.records.map((record) => record.get('image'))
   return mergedImage
-}
-
-const wrapTransaction = async (wrappedCallback, args, opts) => {
-  const session = getDriver().session()
-  try {
-    const result = await session.writeTransaction(async (transaction) => {
-      return wrappedCallback(...args, { ...opts, transaction })
-    })
-    return result
-  } finally {
-    await session.close()
-  }
 }
 
 const localFileDelete: FileDeleteCallback = async (url) => {
