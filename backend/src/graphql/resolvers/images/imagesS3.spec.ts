@@ -10,8 +10,9 @@ import { UserInputError } from 'apollo-server'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
+import type { S3Configured } from '@src/config'
 
-import { deleteImage, mergeImage } from './images'
+import { images } from './imagesS3'
 
 import type { ImageInput } from './images'
 import type { FileUpload } from 'graphql-upload'
@@ -21,6 +22,15 @@ const neode = getNeode()
 const uuid = '[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}'
 let uploadCallback
 let deleteCallback
+
+const config: S3Configured = {
+  AWS_ACCESS_KEY_ID: 'AWS_ACCESS_KEY_ID',
+  AWS_SECRET_ACCESS_KEY: 'AWS_SECRET_ACCESS_KEY',
+  AWS_BUCKET: 'AWS_BUCKET',
+  AWS_ENDPOINT: 'AWS_ENDPOINT',
+  AWS_REGION: 'AWS_REGION',
+  S3_PUBLIC_GATEWAY: undefined,
+}
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -42,6 +52,7 @@ afterEach(async () => {
 })
 
 describe('deleteImage', () => {
+  const { deleteImage } = images(config)
   describe('given a resource with an image', () => {
     let user
     beforeEach(async () => {
@@ -117,6 +128,7 @@ describe('deleteImage', () => {
 })
 
 describe('mergeImage', () => {
+  const { mergeImage } = images(config)
   let imageInput: ImageInput
   let post
   beforeEach(() => {
