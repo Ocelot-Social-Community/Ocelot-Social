@@ -17,17 +17,10 @@ import { v4 as uuid } from 'uuid'
 
 import { getDriver } from '@db/neo4j'
 
-import type {
-  DeleteImageOpts,
-  Images,
-  MergeImageOpts,
-  FileDeleteCallback,
-  FileUploadCallback,
-  ImageInput,
-} from './images'
+import type { Images, FileDeleteCallback, FileUploadCallback } from './images'
 import type { FileUpload } from 'graphql-upload'
 
-async function deleteImage(resource, relationshipType, opts: DeleteImageOpts = {}) {
+const deleteImage: Images['deleteImage'] = async (resource, relationshipType, opts = {}) => {
   sanitizeRelationshipType(relationshipType)
   const { transaction, deleteCallback } = opts
   if (!transaction) return wrapTransaction(deleteImage, [resource, relationshipType], opts)
@@ -49,12 +42,12 @@ async function deleteImage(resource, relationshipType, opts: DeleteImageOpts = {
   return image
 }
 
-export async function mergeImage(
+const mergeImage: Images['mergeImage'] = async (
   resource,
   relationshipType,
-  imageInput: ImageInput | null | undefined,
-  opts: MergeImageOpts = {},
-) {
+  imageInput,
+  opts = {},
+) => {
   if (typeof imageInput === 'undefined') return
   if (imageInput === null) return deleteImage(resource, relationshipType, opts)
   sanitizeRelationshipType(relationshipType)
@@ -154,7 +147,7 @@ const localFileUpload: FileUploadCallback = ({ createReadStream, uniqueFilename 
   )
 }
 
-export const images = {
+export const images: Images = {
   deleteImage,
   mergeImage,
-} satisfies Images
+}
