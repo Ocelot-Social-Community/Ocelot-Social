@@ -96,15 +96,14 @@ export const images = (config: S3Configured) => {
   }
 
   const uploadImageFile = async (
-    upload: Promise<FileUpload> | undefined,
+    uploadPromise: Promise<FileUpload> | undefined,
     uploadCallback: FileUploadCallback | undefined = s3Upload,
   ) => {
-    if (!upload) return undefined
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const { createReadStream, filename, mimetype } = await upload
-    const { name, ext } = path.parse(filename)
+    if (!uploadPromise) return undefined
+    const upload = await uploadPromise
+    const { name, ext } = path.parse(upload.filename)
     const uniqueFilename = `${uuid()}-${slug(name)}${ext}`
-    const Location = await uploadCallback({ createReadStream, uniqueFilename, mimetype })
+    const Location = await uploadCallback({ ...upload, uniqueFilename })
     if (!S3_PUBLIC_GATEWAY) {
       return Location
     }
