@@ -103,12 +103,25 @@ const s3 = {
   AWS_REGION: env.AWS_REGION,
   AWS_BUCKET: env.AWS_BUCKET,
   S3_PUBLIC_GATEWAY: env.S3_PUBLIC_GATEWAY,
-  S3_CONFIGURED:
-    env.AWS_ACCESS_KEY_ID &&
-    env.AWS_SECRET_ACCESS_KEY &&
-    env.AWS_ENDPOINT &&
-    env.AWS_REGION &&
-    env.AWS_BUCKET,
+}
+
+export interface S3Configured {
+  AWS_ACCESS_KEY_ID: string
+  AWS_SECRET_ACCESS_KEY: string
+  AWS_ENDPOINT: string
+  AWS_REGION: string
+  AWS_BUCKET: string
+  S3_PUBLIC_GATEWAY: string | undefined
+}
+
+export const isS3configured = (config: typeof s3): config is S3Configured => {
+  return !!(
+    config.AWS_ACCESS_KEY_ID &&
+    config.AWS_SECRET_ACCESS_KEY &&
+    config.AWS_ENDPOINT &&
+    config.AWS_REGION &&
+    config.AWS_BUCKET
+  )
 }
 
 const options = {

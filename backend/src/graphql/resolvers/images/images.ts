@@ -1,4 +1,4 @@
-import CONFIG from '@config/index'
+import CONFIG, { isS3configured } from '@config/index'
 
 import { images as imagesLocal } from './imagesLocal'
 import { images as imagesS3 } from './imagesS3'
@@ -43,6 +43,6 @@ export interface Images {
   ) => Promise<any>
 }
 
-const images = CONFIG.S3_CONFIGURED ? imagesS3(CONFIG) : imagesLocal
+const images = isS3configured(CONFIG) ? imagesS3(CONFIG) : imagesLocal
 const { mergeImage, deleteImage } = images
 export { mergeImage, deleteImage }
