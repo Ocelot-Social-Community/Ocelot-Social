@@ -31,14 +31,18 @@ export interface ImageInput {
 }
 
 export interface Images {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  deleteImage: (resource, relationshipType, opts: DeleteImageOpts) => Promise<any>
+  deleteImage: (
+    resource: { id: string },
+    relationshipType: string,
+    opts?: DeleteImageOpts,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ) => Promise<any>
 
   mergeImage: (
-    resource,
-    relationshipType,
+    resource: { id: string },
+    relationshipType: string,
     imageInput: ImageInput | null | undefined,
-    opts: MergeImageOpts,
+    opts?: MergeImageOpts,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) => Promise<any>
 }
