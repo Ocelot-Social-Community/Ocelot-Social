@@ -15,6 +15,8 @@
         :show-avatar="showAvatar"
         :date-time="dateTime"
         :show-popover="showPopover"
+        :injectedText="injectedText"
+        :injectedDate="injectedDate"
         @close="closeMenu"
       />
     </client-only>
@@ -41,6 +43,8 @@ export default {
     showAvatar: { type: Boolean, default: true },
     dateTime: { type: [Date, String], default: null },
     showPopover: { type: Boolean, default: true },
+    injectedText: { type: String, default: null },
+    injectedDate: { type: Boolean, default: false },
   },
   computed: {
     ...mapGetters({
@@ -76,10 +80,10 @@ export default {
   }
 
   .info {
-    padding-left: $space-xx-small;
+    padding-left: 10px;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: break-spaces;
 
     &.anonymous {
       font-size: $font-size-base;
