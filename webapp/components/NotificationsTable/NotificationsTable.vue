@@ -17,81 +17,71 @@
         <ds-grid>
           <ds-grid-item>
             <ds-flex class="user-section">
-              <ds-flex-item :width="{ base: '20%' }">
-                <div>
-                  <base-card :wide-content="true">
-                    <base-icon
-                      v-if="notification.from.post"
-                      name="comment"
-                      v-tooltip="{ content: $t('notifications.comment'), placement: 'right' }"
-                    />
-                    <base-icon
-                      v-else
-                      name="bookmark"
-                      v-tooltip="{ content: $t('notifications.post'), placement: 'right' }"
-                    />
-                  </base-card>
-                </div>
-              </ds-flex-item>
               <ds-flex-item>
-                <div>
-                  <base-card :wide-content="true">
-                    <ds-space margin-bottom="base">
-                      <client-only>
-                        <user-teaser
-                          :user="
-                            isGroup(notification.from)
-                              ? notification.relatedUser
-                              : notification.from.author
-                          "
-                          :date-time="notification.from.createdAt"
-                          :class="{ 'notification-status': notification.read }"
-                        />
-                      </client-only>
-                    </ds-space>
-                    <ds-text :class="{ 'notification-status': notification.read, reason: true }">
-                      {{ $t(`notifications.reason.${notification.reason}`) }}
-                    </ds-text>
-                  </base-card>
-                </div>
+                <base-card :wide-content="true">
+                  <client-only>
+                    <user-teaser
+                      :user="
+                        isGroup(notification.from)
+                          ? notification.relatedUser
+                          : notification.from.author
+                      "
+                      :class="{ 'notification-status': notification.read }"
+                      :date-time="notification.from.createdAt"
+                      :injected-text="$t(`notifications.reason.${notification.reason}`)"
+                      :injected-date="true"
+                    />
+                  </client-only>
+                </base-card>
               </ds-flex-item>
             </ds-flex>
           </ds-grid-item>
           <ds-grid-item>
-            <ds-flex class="content-section" :direction="{ base: 'column', xs: 'row' }">
-              <ds-flex-item>
-                <base-card :wide-content="true">
-                  <nuxt-link
-                    class="notification-mention-post"
-                    :class="{ 'notification-status': notification.read }"
-                    :to="{
-                      name: isGroup(notification.from) ? 'groups-id-slug' : 'post-id-slug',
-                      params: params(notification.from),
-                      hash: hashParam(notification.from),
-                    }"
-                    @click.native="markNotificationAsRead(notification.from.id)"
-                  >
-                    <b>
-                      {{
-                        notification.from.title ||
-                        notification.from.groupName ||
-                        notification.from.post.title | truncate(50)
-                      }}
-                    </b>
-                  </nuxt-link>
-                </base-card>
-              </ds-flex-item>
-              <ds-flex-item>
-                <base-card :wide-content="true">
-                  <b :class="{ 'notification-status': notification.read }">
+            <base-card :wide-content="true">
+            <div class="notification-container">
+              <!-- Icon with responsive sizing -->
+              <div class="notification-icon">
+                <base-icon
+                  v-if="notification.from.post"
+                  name="comment"
+                  v-tooltip="{ content: $t('notifications.comment'), placement: 'right' }"
+                />
+                <base-icon
+                  v-else
+                  name="bookmark"
+                  v-tooltip="{ content: $t('notifications.post'), placement: 'right' }"
+                />
+              </div>
+
+              <!-- Content section with title and description -->
+              <div class="notification-content">
+                <nuxt-link
+                  class="notification-mention-post"
+                  :class="{ 'notification-status': notification.read }"
+                  :to="{
+                    name: isGroup(notification.from) ? 'groups-id-slug' : 'post-id-slug',
+                    params: params(notification.from),
+                    hash: hashParam(notification.from),
+                  }"
+                  @click.native="markNotificationAsRead(notification.from.id)"
+                >
+                  <b>
                     {{
-                      notification.from.contentExcerpt ||
-                      notification.from.descriptionExcerpt | removeHtml
+                      notification.from.title ||
+                      notification.from.groupName ||
+                      notification.from.post.title | truncate(50)
                     }}
                   </b>
-                </base-card>
-              </ds-flex-item>
-            </ds-flex>
+                </nuxt-link>
+                <p class="notification-description" :class="{ 'notification-status': notification.read }">
+                  {{
+                    notification.from.contentExcerpt ||
+                    notification.from.descriptionExcerpt | removeHtml
+                  }}
+                </p>
+              </div>
+            </div>
+            </base-card>
           </ds-grid-item>
         </ds-grid>
       </ds-grid-item>
@@ -120,21 +110,13 @@ export default {
   computed: {
     fields() {
       return {
-        icon: {
-          label: ' ',
-          width: '5',
-        },
         user: {
           label: this.$t('notifications.user'),
-          width: '45%',
+          width: '50%',
         },
         post: {
           label: this.$t('notifications.post'),
-          width: '25%',
-        },
-        content: {
-          label: this.$t('notifications.content'),
-          width: '25%',
+          width: '50%',
         },
       }
     },
@@ -172,12 +154,6 @@ export default {
 .notification-grid .content-section {
   flex-wrap: nowrap;
 }
-.notification-grid .ds-grid.header-grid {
-  grid-template-columns: 1fr 4fr 3fr 3fr !important;
-}
-.notification-grid-row {
-  border-top: 1px dotted #e5e3e8;
-}
 .notification-grid .base-card {
   border-radius: 0;
   box-shadow: none;
@@ -190,6 +166,19 @@ export default {
   grid-template-rows: 1fr;
   gap: 0px !important;
 }
+.notification-grid-row {
+  padding: 10px;
+  border-bottom: 1px dotted #e5e3e8;
+  background-color: white;
+
+  &:nth-child(odd) {
+    background-color: $color-neutral-90;
+  }
+  .base-card {
+    padding: 8px 0;
+    background-color: unset !important;
+  }
+}
 @media screen and (max-width: 768px) {
   .notification-grid .ds-grid {
     grid-template-columns: 1fr !important;
@@ -197,10 +186,47 @@ export default {
   .notification-grid .content-section {
     border-top: 1px dotted #e5e3e8;
   }
-  .notification-grid-row {
-    box-shadow: 0px 12px 26px -4px rgb(0 0 0 / 10%);
-    margin-top: 5px;
-    border-top: none;
+}
+
+.notification-description {
+  margin-top: 4px;
+}
+.notification-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  .notification-icon {
+    flex-shrink: 0;
   }
+}
+
+/* Desktop icon size */
+@media (min-width: 768px) {
+  .notification-icon {
+    width: 18px;
+  }
+
+  .notification-icon :deep(svg) {
+    width: 25px;
+    height: 25px;
+  }
+}
+
+/* Mobile icon size */
+@media (max-width: 767px) {
+  .notification-icon {
+    width: 34px;
+    text-align: center;
+  }
+
+  .notification-icon :deep(svg) {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+.notification-content {
+  flex: 1;
 }
 </style>

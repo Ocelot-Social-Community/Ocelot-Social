@@ -36,8 +36,10 @@
               </span>
             </nuxt-link>
           </span>
+          <span>{{ injectedText }}<span v-if="injectedText && injectedDate && !userOnly && dateTime"> {{$t(`notifications.reason.on_date`)}} <date-time :date-time="dateTime" /></span>
+          </span>
         </div>
-        <span v-if="!userOnly && dateTime" class="text">
+        <span v-if="!userOnly && !injectedDate && dateTime" class="text">
           <base-icon name="clock" />
           <date-time :date-time="dateTime" />
           <slot name="dateTime"></slot>
@@ -81,6 +83,8 @@ export default {
     showAvatar: { type: Boolean, default: true },
     dateTime: { type: [Date, String], default: null },
     showPopover: { type: Boolean, default: true },
+    injectedText: { type: String, default: null },
+    injectedDate: { type: Boolean, default: false },
   },
   computed: {
     ...mapGetters({
