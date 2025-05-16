@@ -804,15 +804,16 @@
     "pageLink": "Alle Benachrichtigungen",
     "post": "Beitrag oder Gruppe",
     "reason": {
-      "changed_group_member_role": "Hat deine Rolle in der Gruppe geändert …",
-      "commented_on_post": "Hat einen Beitrag den du beobachtest kommentiert …",
-      "followed_user_posted": "Hat einen neuen Betrag geschrieben …",
-      "mentioned_in_comment": "Hat dich in einem Kommentar erwähnt …",
-      "mentioned_in_post": "Hat dich in einem Beitrag erwähnt …",
-      "post_in_group": "Hat einen Beitrag in der Gruppe geschrieben …",
-      "removed_user_from_group": "Hat dich aus der Gruppe entfernt …",
-      "user_joined_group": "Ist deiner Gruppe beigetreten …",
-      "user_left_group": "Hat deine Gruppe verlassen …"
+      "changed_group_member_role": "Hat deine Rolle in der Gruppe geändert",
+      "commented_on_post": "Hat einen Beitrag den du beobachtest kommentiert",
+      "followed_user_posted": "Hat einen neuen Betrag geschrieben",
+      "mentioned_in_comment": "Hat dich in einem Kommentar erwähnt",
+      "mentioned_in_post": "Hat dich in einem Beitrag erwähnt",
+      "on_date": "am",
+      "post_in_group": "Hat einen Beitrag in der Gruppe geschrieben",
+      "removed_user_from_group": "Hat dich aus der Gruppe entfernt",
+      "user_joined_group": "Ist deiner Gruppe beigetreten",
+      "user_left_group": "Hat deine Gruppe verlassen"
     },
     "title": "Benachrichtigungen",
     "user": "Nutzer"
