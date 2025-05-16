@@ -34,8 +34,8 @@ class Store {
       // we need to have all constraints and indexes defined here. They can not be properly migrated
       await txFreshIndicesConstrains
 
-      // You have to wait for the schema to install, else the constraints will not be present.
-      // This is a type error of the library
+      // You have to await schema.install(), else the constraints will not be present.
+      // This is a type error of the library, the method is indeed returning a promise.
       // eslint-disable-next-line @typescript-eslint/await-thenable
       await getNeode().schema.install()
       // eslint-disable-next-line no-console
