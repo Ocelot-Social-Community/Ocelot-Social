@@ -14,11 +14,6 @@ export const description =
   'Upload all image files to a S3 compatible object storage in order to reduce load on our backend.'
 
 export async function up(_next) {
-  if (CONFIG.NODE_ENV === 'test') {
-    // Let's skip this migration for simplicity.
-    // There is nothing to migrate in test environment and setting up the S3 services seems overkill.
-    return
-  }
   const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_ENDPOINT, AWS_BUCKET } = CONFIG
   if (!(AWS_ACCESS_KEY_ID && AWS_SECRET_ACCESS_KEY && AWS_ENDPOINT && AWS_BUCKET)) {
     throw new Error('No S3 configuration given, cannot upload image files')
