@@ -20,11 +20,15 @@ jobs:
       - name: Count feature files and create matrix
         id: set
         run: |
-          count=$(find cypress/integration -name "*.feature" | wc -l)
+          count=$(find cypress -name "*.feature" | wc -l)
           max=8
           actual=$(( count < max ? count : max ))
-          json=$(seq 1 $actual | jq -R . | jq -s .)
-          echo "matrix=$json" >> $GITHUB_OUTPUT
+          if [ "$actual" -eq 0 ]; then
+            echo "matrix=[1]" >> $GITHUB_OUTPUT
+          else
+            json=$(seq 1 $actual | jq -R . | jq -s .)
+            echo "matrix=$json" >> $GITHUB_OUTPUT
+          fi
 
   test:
     name: e2e test fullstack
