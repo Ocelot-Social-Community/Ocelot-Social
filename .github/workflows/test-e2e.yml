@@ -11,10 +11,6 @@ on:
       - 'docker-compose*.yml'
   workflow_dispatch:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   test:
     name: e2e test fullstack
@@ -22,6 +18,8 @@ jobs:
     strategy:
       matrix:
         job: [1, 2, 3, 4, 5, 6, 7, 8]
+    env:
+      MATRIX_SIZE: 8
     steps:
       - uses: actions/checkout@v4
 
@@ -53,7 +51,14 @@ jobs:
           timeout 120s bash -c 'until curl -s http://localhost:3000/ > /dev/null; do sleep 2; done' || exit 1
 
       - name: Run Cypress e2e
-        run: yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} 8)
+        id: e2e-tests
+        run: |
+          SPEC=$(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.MATRIX_SIZE }})
+          if [ -z "$SPEC" ]; then
+            echo "⚠️ No spec assigned to job ${{ matrix.job }} – skipping."
+            exit 0
+          fi
+          yarn run cypress:run --spec "$SPEC"
 
       - name: Report (on fail)
         if: failure()
