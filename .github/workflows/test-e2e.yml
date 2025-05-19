@@ -77,6 +77,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Restore docker cache
         uses: actions/cache@v4
         with:
@@ -85,6 +87,7 @@ jobs:
       - name: Build and save docker image
         run: |
           docker buildx build \
+            --builder default \
             --cache-from=type=local,src=/tmp/.buildx-cache-webapp \
             --cache-to=type=local,dest=/tmp/.buildx-cache-webapp \
             -t ocelot/webapp:test \
@@ -95,6 +98,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Restore docker cache
         uses: actions/cache@v4
         with:
@@ -103,6 +108,7 @@ jobs:
       - name: Build and save docker image
         run: |
           docker buildx build \
+            --builder default \
             --cache-from=type=local,src=/tmp/.buildx-cache-backend \
             --cache-to=type=local,dest=/tmp/.buildx-cache-backend \
             -t ocelot/backend:test \
@@ -113,6 +119,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Restore docker cache
         uses: actions/cache@v4
         with:
@@ -121,6 +129,7 @@ jobs:
       - name: Build and save docker image
         run: |
           docker buildx build \
+            --builder default \
             --cache-from=type=local,src=/tmp/.buildx-cache-neo4j \
             --cache-to=type=local,dest=/tmp/.buildx-cache-neo4j \
             -t ocelot/neo4j:test \
