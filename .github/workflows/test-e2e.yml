@@ -22,7 +22,7 @@ jobs:
         shell: bash
         run: |
           generate_matrix() {
-            local count=$(find cypress/integration -name "*.feature" | wc -l)
+            local count=$(find cypress/e2e -name "*.feature" | wc -l)
             local max=8
             local actual=$(( count < max ? count : max ))
             seq 1 "$actual" | jq -R . | jq -s '.'
@@ -31,43 +31,82 @@ jobs:
           echo "Generated Matrix: $matrix"
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
 
-  build-images:
+  build-webapp:
     runs-on: ubuntu-latest
-    outputs:
-      cache-hit: ${{ steps.cache.outputs.cache-hit }}
     steps:
       - uses: actions/checkout@v4
-      - name: Docker cache
-        id: cache
-        uses: actions/cache@v4
+      - run: docker build -t ocelot/webapp:test -f webapp/Dockerfile webapp
+      - run: docker save ocelot/webapp:test -o webapp.tar
+      - uses: actions/upload-artifact@v4
         with:
-          path: ocelot_images.tar
-          key: docker-${{ hashFiles('**/Dockerfile') }}
+          name: webapp-image
+          path: webapp.tar
 
-      - name: Build docker images (if needed)
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          docker build -t ocelot/core ./backend
-          docker build -t ocelot/api ./webapp
-          docker build -t ocelot/db ./neo4j
-          docker save -o ocelot_images.tar ocelot/core ocelot/api ocelot/db
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t ocelot/backend:test -f backend/Dockerfile backend
+      - run: docker save ocelot/backend:test -o backend.tar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend-image
+          path: backend.tar
+
+  build-neo4j:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t ocelot/neo4j:test -f neo4j/Dockerfile neo4j
+      - run: docker save ocelot/neo4j:test -o neo4j.tar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neo4j-image
+          path: neo4j.tar
+
+  combine-images:
+    runs-on: ubuntu-latest
+    needs: [build-webapp, build-backend, build-neo4j]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: webapp-image
+          path: .
+      - uses: actions/download-artifact@v4
+        with:
+          name: backend-image
+          path: .
+      - uses: actions/download-artifact@v4
+        with:
+          name: neo4j-image
+          path: .
+      - run: |
+          docker load -i webapp.tar
+          docker load -i backend.tar
+          docker load -i neo4j.tar
+          docker save -o ocelot_images.tar ocelot/webapp:test ocelot/backend:test ocelot/neo4j:test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: combined-images
+          path: ocelot_images.tar
 
   test:
     name: e2e-${{ matrix.job }}
     runs-on: ubuntu-latest
-    needs: [determine-matrix, build-images]
+    needs: [determine-matrix, combine-images]
     strategy:
       fail-fast: false
       matrix:
         job: ${{ fromJson(needs.determine-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Load prebuilt docker images
-        run: docker load -i ocelot_images.tar
-
+      - uses: actions/download-artifact@v4
+        with:
+          name: combined-images
+          path: .
+      - run: docker load -i ocelot_images.tar
       - name: Run Cypress tests
         run: |
-          echo "Running tests for job ${{ matrix.job }}..."
-          npm ci
-          npm run test:e2e -- --env group=${{ matrix.job }}
+          echo "Running tests for group ${{ matrix.job }}..."
+          yarn install
+          yarn run cypress:run --env group=${{ matrix.job }}
