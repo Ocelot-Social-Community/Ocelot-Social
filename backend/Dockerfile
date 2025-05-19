@@ -1,4 +1,4 @@
-# ✅ Refactored Dockerfile: backend (ocelot.social) with ensured build output
+# ✅ Refactored Dockerfile: backend (ocelot.social) with ensured build output and caching
 
 # 🧱 Base image with shared environment
 FROM node:24.0.2-alpine AS base
@@ -16,7 +16,7 @@ EXPOSE ${PORT}
 RUN apk --no-cache add git python3 make g++ bash linux-headers
 WORKDIR /app
 
-# 🔧 Dependencies stage
+# 🔧 Dependencies stage (cached by GitHub Actions)
 FROM base AS deps
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile --non-interactive
@@ -36,3 +36,11 @@ CMD ["yarn", "start"]
 FROM deps AS development
 COPY . .
 CMD ["yarn", "dev"]
+
+# 🗃️ Buildx cache hint
+# Use this in your GitHub Actions build step:
+# docker buildx build \
+#   --cache-from=type=local,src=/tmp/.buildx-cache-backend \
+#   --cache-to=type=local,dest=/tmp/.buildx-cache-backend \
+#   -t ocelot/backend:test \
+#   -f backend/Dockerfile backend
