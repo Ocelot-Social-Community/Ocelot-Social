@@ -44,3 +44,5 @@ CMD ["yarn", "dev"]
 #   --cache-to=type=local,dest=/tmp/.buildx-cache-backend \
 #   -t ocelot/backend:test \
 #   -f backend/Dockerfile backend
+# Also ensure `/tmp/backend.tar` is always written for downstream jobs:
+# docker save ocelot/backend:test -o /tmp/backend.tar
