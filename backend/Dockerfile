@@ -1,4 +1,4 @@
-# ✅ Refactored Dockerfile: backend (ocelot.social)
+# ✅ Refactored Dockerfile: backend (ocelot.social) with ensured build output
 
 # 🧱 Base image with shared environment
 FROM node:24.0.2-alpine AS base
@@ -26,9 +26,10 @@ FROM deps AS build
 COPY . .
 RUN yarn build
 
-# 🚀 Production image
+# 🚀 Production image (with build output included!)
 FROM base AS production
 COPY --from=build /app /app
+COPY --from=build /app/build /app/build
 CMD ["yarn", "start"]
 
 # 🧪 Development image
