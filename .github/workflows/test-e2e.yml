@@ -106,6 +106,14 @@ jobs:
           name: combined-images
           path: .
       - run: docker load -i ocelot_images.tar
+
+      - name: Start services
+        run: |
+          docker network create ocelot || true
+          docker run -d --rm --net ocelot --name webapp -p 3000:3000 ocelot/webapp:test
+          docker run -d --rm --net ocelot --name backend ocelot/backend:test
+          docker run -d --rm --net ocelot --name neo4j ocelot/neo4j:test
+
       - name: Run Cypress tests
         run: |
           echo "Running tests for group ${{ matrix.job }}..."
