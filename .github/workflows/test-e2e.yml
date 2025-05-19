@@ -20,7 +20,7 @@ jobs:
         shell: bash
         run: |
           modules=$(find . -name package.json | grep -v node_modules | sed 's|/package.json||' | sed 's|^./||')
-          limited=$(echo "$modules" | head -n 8 | jq -R . | jq -s '.')
+          limited=$(echo "$modules" | head -n 8 | jq -R . | jq -s -c '.')
           echo "Install matrix: $limited"
           echo "matrix=$limited" >> "$GITHUB_OUTPUT"
 
