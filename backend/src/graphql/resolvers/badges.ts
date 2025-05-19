@@ -112,7 +112,7 @@ export default {
       }
 
       // reward badge and assign slot
-      const writeBadge = (
+      const users = (
         await context.database.write({
           query: `
         MATCH (badge:Badge {id: $badgeId, type: 'trophy'}), (user:User {id: $userId})
@@ -124,13 +124,13 @@ export default {
         })
       ).records.map((record) => record.get('user'))
 
-      if (writeBadge.length !== 1) {
+      if (users.length !== 1) {
         throw new Error(
           'Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
         )
       }
 
-      return writeBadge[0] // user
+      return users[0]
     },
 
     revokeBadge: async (_object, args, context, _resolveInfo) => {
