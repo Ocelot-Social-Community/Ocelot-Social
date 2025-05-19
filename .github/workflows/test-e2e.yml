@@ -28,7 +28,7 @@ jobs:
             local actual=$(( count < max ? count : max ))
             seq 1 "$actual" | jq -R . | jq -s '.'
           }
-          matrix=$(generate_matrix)
+          matrix=$(generate_matrix | jq -c '.')
           echo "Generated Matrix: $matrix"
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
 
