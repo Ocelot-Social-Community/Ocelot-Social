@@ -1,41 +1,38 @@
 name: ocelot.social test-e2e optimized
-'on':
+on:
   push:
     paths:
-    - backend/**
-    - webapp/**
-    - neo4j/**
-    - cypress/**
-    - .github/workflows/test-e2e.yml
-    - docker-compose*.yml
+      - backend/**
+      - webapp/**
+      - neo4j/**
+      - cypress/**
+      - .github/workflows/test-e2e.yml
+      - docker-compose*.yml
   workflow_dispatch: null
 jobs:
   test:
     name: e2e test optimized
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Prepare environment
-      run: 'cp webapp/.env.template webapp/.env
-
-        cp backend/.env.test_e2e backend/.env
-
-        yarn install --frozen-lockfile --non-interactive
-
-        cd backend && yarn install --frozen-lockfile && yarn build
-
-        '
-    - name: Start services via Docker Compose
-      run: docker compose -f docker-compose.yml -f docker-compose.test.yml up -d --wait
-        --no-build
-    - name: Run Cypress Tests (batched)
-      run: yarn run cypress:run --browser chrome
-    - name: Generate Report on Fail
-      if: failure()
-      run: node cypress/create-cucumber-html-report.js || echo 'No report generated.'
-    - name: Upload Report Artifact
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: e2e-report
-        path: cypress/reports/cucumber_html_report
+      - uses: actions/checkout@v4
+      - name: Build maintenance image
+        run: docker build -t ocelotsocialnetwork/maintenance:test maintenance/
+      - name: Prepare environment
+        run: |
+          cp webapp/.env.template webapp/.env
+          cp backend/.env.test_e2e backend/.env
+          yarn install --frozen-lockfile --non-interactive
+          cd backend && yarn install --frozen-lockfile && yarn build
+      - name: Start services via Docker Compose
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml up -d --wait --no-build
+      - name: Run Cypress Tests (batched)
+        run: yarn run cypress:run --browser chrome
+      - name: Generate Report on Fail
+        if: failure()
+        run: node cypress/create-cucumber-html-report.js || echo 'No report generated.'
+      - name: Upload Report Artifact
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report
+          path: cypress/reports/cucumber_html_report
