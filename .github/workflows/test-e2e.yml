@@ -18,4 +18,4 @@ jobs:
       - name: Build maintenance image
         run: docker build -f webapp/Dockerfile.maintenance -t ocelotsocialnetwork/maintenance:test webapp/
       - name: Build neo4j image
-        run: docker build -f neo4j/Dockerfile.community -t ocelotsocialnetwork/neo4j-community:test neo4j/
+        run: docker build --target community -t ocelotsocialnetwork/neo4j-community:test neo4j/
