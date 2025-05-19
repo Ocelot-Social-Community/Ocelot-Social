@@ -42,14 +42,12 @@
     </template>
     <template #popover="{ closeMenu }">
       <ds-flex class="notifications-link-container">
-        <ds-flex-item class="notifications-link-container-item" :width="{ base: '100%' }" centered>
+        <ds-flex-item>
           <nuxt-link :to="{ name: 'notifications' }">
             <base-button ghost primary>
               {{ $t('notifications.pageLink') }}
             </base-button>
           </nuxt-link>
-        </ds-flex-item>
-        <ds-flex-item class="notifications-link-container-item" :width="{ base: '100%' }" centered>
           <base-button
             ghost
             primary
@@ -183,12 +181,9 @@ export default {
 }
 .notifications-link-container {
   background-color: $background-color-softer-active;
-  justify-content: center;
-  padding: $space-x-small;
+  text-align: right;
+  padding: $space-x-small 0;
   flex-direction: row;
 }
-.notifications-link-container-item {
-  justify-content: center;
-  display: flex;
-}
+
 </style>
