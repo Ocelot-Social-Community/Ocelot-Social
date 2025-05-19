@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build maintenance image
-        run: docker build -t ocelotsocialnetwork/maintenance:test maintenance/
+        run: docker build -f webapp/Dockerfile.maintenance -t ocelotsocialnetwork/maintenance:test webapp/
       - name: Prepare environment
         run: |
           cp webapp/.env.template webapp/.env
