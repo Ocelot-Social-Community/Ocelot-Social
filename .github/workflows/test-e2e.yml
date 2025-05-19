@@ -77,84 +77,45 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Restore docker cache
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache-webapp
-          key: docker-webapp-${{ hashFiles('webapp/Dockerfile', 'webapp/yarn.lock') }}
-      - name: Build and save docker image
+      - name: Build webapp image
         run: |
-          docker buildx build \
-            --cache-from=type=local,src=/tmp/.buildx-cache-webapp \
-            --cache-to=type=local,dest=/tmp/.buildx-cache-webapp \
-            --load \
-            -t ocelot/webapp:test \
-            -f webapp/Dockerfile webapp
+          docker build -t ocelot/webapp:test -f webapp/Dockerfile webapp
           docker save ocelot/webapp:test -o /tmp/webapp.tar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: webapp-image
+          path: /tmp/webapp.tar
 
   build-backend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Restore docker cache
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache-backend
-          key: docker-backend-${{ hashFiles('backend/Dockerfile', 'backend/yarn.lock') }}
-      - name: Build and save docker image
+      - name: Build backend image
         run: |
-          docker buildx build \
-            --cache-from=type=local,src=/tmp/.buildx-cache-backend \
-            --cache-to=type=local,dest=/tmp/.buildx-cache-backend \
-            --load \
-            -t ocelot/backend:test \
-            -f backend/Dockerfile backend
+          docker build -t ocelot/backend:test -f backend/Dockerfile backend
           docker save ocelot/backend:test -o /tmp/backend.tar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend-image
+          path: /tmp/backend.tar
 
   build-neo4j:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Restore docker cache
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache-neo4j
-          key: docker-neo4j-${{ hashFiles('neo4j/Dockerfile') }}
-      - name: Build and save docker image
+      - name: Build neo4j image
         run: |
-          docker buildx build \
-            --cache-from=type=local,src=/tmp/.buildx-cache-neo4j \
-            --cache-to=type=local,dest=/tmp/.buildx-cache-neo4j \
-            --load \
-            -t ocelot/neo4j:test \
-            -f neo4j/Dockerfile neo4j
+          docker build -t ocelot/neo4j:test -f neo4j/Dockerfile neo4j
           docker save ocelot/neo4j:test -o /tmp/neo4j.tar
-
-  combine-images:
-    runs-on: ubuntu-latest
-    needs: [build-webapp, build-backend, build-neo4j]
-    steps:
-      - name: Load docker images from cache
-        run: |
-          docker load -i /tmp/webapp.tar
-          docker load -i /tmp/backend.tar
-          docker load -i /tmp/neo4j.tar
-      - run: docker save -o ocelot_images.tar ocelot/webapp:test ocelot/backend:test ocelot/neo4j:test
       - uses: actions/upload-artifact@v4
         with:
-          name: combined-images
-          path: ocelot_images.tar
+          name: neo4j-image
+          path: /tmp/neo4j.tar
 
   test:
     name: e2e-${{ matrix.job }}
     runs-on: ubuntu-latest
-    needs: [prepare-install, determine-matrix, combine-images]
+    needs: [prepare-install, determine-matrix, build-webapp, build-backend, build-neo4j]
     strategy:
       fail-fast: false
       matrix:
@@ -163,9 +124,20 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: combined-images
-          path: .
-      - run: docker load -i ocelot_images.tar
+          name: webapp-image
+          path: /tmp
+      - uses: actions/download-artifact@v4
+        with:
+          name: backend-image
+          path: /tmp
+      - uses: actions/download-artifact@v4
+        with:
+          name: neo4j-image
+          path: /tmp
+      - run: |
+          docker load -i /tmp/webapp.tar
+          docker load -i /tmp/backend.tar
+          docker load -i /tmp/neo4j.tar
       - name: Start services
         run: |
           docker network create ocelot || true
