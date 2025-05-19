@@ -1,4 +1,4 @@
-name: ocelot.social test-e2e ⇌⋇⟴
+name: ocelot.social test-e2e ⇌⋇➴
 
 on:
   push:
@@ -73,14 +73,7 @@ jobs:
           echo "Generated Matrix: $matrix"
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
 
-build-webapp:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build and save docker image
-        run: |
-          docker build -t ocelot/webapp:test -f webapp/Dockerfile webapp
-          docker save ocelot/webapp:test -o /tmp/webapp.tar
+  build-webapp:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -91,17 +84,14 @@ build-webapp:
           key: docker-webapp-${{ hashFiles('webapp/Dockerfile', 'webapp/yarn.lock') }}
       - name: Build and save docker image
         run: |
-          docker buildx build             --cache-from=type=local,src=/tmp/.buildx-cache-webapp             --cache-to=type=local,dest=/tmp/.buildx-cache-webapp             -t ocelot/webapp:test             -f webapp/Dockerfile webapp
+          docker buildx build \
+            --cache-from=type=local,src=/tmp/.buildx-cache-webapp \
+            --cache-to=type=local,dest=/tmp/.buildx-cache-webapp \
+            -t ocelot/webapp:test \
+            -f webapp/Dockerfile webapp
           docker save ocelot/webapp:test -o /tmp/webapp.tar
 
-build-backend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build and save docker image
-        run: |
-          docker build -t ocelot/backend:test -f backend/Dockerfile backend
-          docker save ocelot/backend:test -o /tmp/backend.tar
+  build-backend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -112,17 +102,14 @@ build-backend:
           key: docker-backend-${{ hashFiles('backend/Dockerfile', 'backend/yarn.lock') }}
       - name: Build and save docker image
         run: |
-          docker buildx build             --cache-from=type=local,src=/tmp/.buildx-cache-backend             --cache-to=type=local,dest=/tmp/.buildx-cache-backend             -t ocelot/backend:test             -f backend/Dockerfile backend
+          docker buildx build \
+            --cache-from=type=local,src=/tmp/.buildx-cache-backend \
+            --cache-to=type=local,dest=/tmp/.buildx-cache-backend \
+            -t ocelot/backend:test \
+            -f backend/Dockerfile backend
           docker save ocelot/backend:test -o /tmp/backend.tar
 
-build-neo4j:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build and save docker image
-        run: |
-          docker build -t ocelot/neo4j:test -f neo4j/Dockerfile neo4j
-          docker save ocelot/neo4j:test -o /tmp/neo4j.tar
+  build-neo4j:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -133,7 +120,11 @@ build-neo4j:
           key: docker-neo4j-${{ hashFiles('neo4j/Dockerfile') }}
       - name: Build and save docker image
         run: |
-          docker buildx build             --cache-from=type=local,src=/tmp/.buildx-cache-neo4j             --cache-to=type=local,dest=/tmp/.buildx-cache-neo4j             -t ocelot/neo4j:test             -f neo4j/Dockerfile neo4j
+          docker buildx build \
+            --cache-from=type=local,src=/tmp/.buildx-cache-neo4j \
+            --cache-to=type=local,dest=/tmp/.buildx-cache-neo4j \
+            -t ocelot/neo4j:test \
+            -f neo4j/Dockerfile neo4j
           docker save ocelot/neo4j:test -o /tmp/neo4j.tar
 
   combine-images:
