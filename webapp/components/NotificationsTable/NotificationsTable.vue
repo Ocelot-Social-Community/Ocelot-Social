@@ -63,7 +63,7 @@
                     params: params(notification.from),
                     hash: hashParam(notification.from),
                   }"
-                  @click.native="markNotificationAsRead(notification.from.id)"
+                  @click.native.prevent="handleNotificationClick(notification)"
                 >
                   <b>
                     {{
@@ -141,8 +141,24 @@ export default {
       return this.isComment(notificationSource) ? `#commentId-${notificationSource.id}` : ''
     },
     markNotificationAsRead(notificationSourceId) {
-      this.$emit('markNotificationAsRead', notificationSourceId)
+      return new Promise((resolve) => {
+        this.$emit('markNotificationAsRead', notificationSourceId);
+        resolve();
+      });
     },
+    async handleNotificationClick(notification) {
+      const route = {
+        name: this.isGroup(notification.from) ? 'groups-id-slug' : 'post-id-slug',
+        params: this.params(notification.from),
+        hash: this.hashParam(notification.from),
+      };
+
+      await this.markNotificationAsRead(notification.from.id);
+
+      setTimeout(() => {
+        this.$router.push(route);
+      }, 10);
+    }
   },
 }
 </script>
