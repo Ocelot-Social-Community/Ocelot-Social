@@ -1,4 +1,4 @@
-name: ocelot.social test-e2e ⇌⋇➴
+name: ocelot.social test-e2e ⇌⋇⟴
 
 on:
   push:
@@ -87,7 +87,6 @@ jobs:
       - name: Build and save docker image
         run: |
           docker buildx build \
-            --builder default \
             --cache-from=type=local,src=/tmp/.buildx-cache-webapp \
             --cache-to=type=local,dest=/tmp/.buildx-cache-webapp \
             -t ocelot/webapp:test \
@@ -108,7 +107,6 @@ jobs:
       - name: Build and save docker image
         run: |
           docker buildx build \
-            --builder default \
             --cache-from=type=local,src=/tmp/.buildx-cache-backend \
             --cache-to=type=local,dest=/tmp/.buildx-cache-backend \
             -t ocelot/backend:test \
@@ -129,7 +127,6 @@ jobs:
       - name: Build and save docker image
         run: |
           docker buildx build \
-            --builder default \
             --cache-from=type=local,src=/tmp/.buildx-cache-neo4j \
             --cache-to=type=local,dest=/tmp/.buildx-cache-neo4j \
             -t ocelot/neo4j:test \
