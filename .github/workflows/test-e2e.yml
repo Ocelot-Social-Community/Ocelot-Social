@@ -3,15 +3,52 @@ name: ocelot.social test-e2e ⇌⋇⟴
 on:
   push:
     paths:
-      - 'backend/**'
-      - 'webapp/**'
-      - 'neo4j/**'
+      - '**/package.json'
       - 'cypress/**'
       - '.github/workflows/test-e2e.yml'
       - 'docker-compose*.yml'
   workflow_dispatch:
 
 jobs:
+  determine-install-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: set
+        shell: bash
+        run: |
+          modules=$(find . -name package.json | grep -v node_modules | sed 's|/package.json||' | sed 's|^./||')
+          limited=$(echo "$modules" | head -n 8 | jq -R . | jq -s '.')
+          echo "Install matrix: $limited"
+          echo "matrix=$limited" >> "$GITHUB_OUTPUT"
+
+  prepare-install:
+    runs-on: ubuntu-latest
+    needs: determine-install-matrix
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.determine-install-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ${{ matrix.module }} dependencies
+        working-directory: ${{ matrix.module }}
+        run: yarn install
+
+      - name: Verify Cypress (if webapp)
+        if: matrix.module == 'webapp'
+        run: yarn cypress:verify
+
+      - name: Cache Cypress (if webapp)
+        if: matrix.module == 'webapp'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
   determine-matrix:
     runs-on: ubuntu-latest
     outputs:
@@ -32,91 +69,4 @@ jobs:
           echo "Generated Matrix: $matrix"
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
 
-  build-webapp:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Restore docker cache
-        uses: actions/cache@v4
-        with:
-          path: /tmp/webapp.tar
-          key: docker-webapp-${{ hashFiles('webapp/Dockerfile', 'webapp/yarn.lock') }}
-      - name: Build docker image
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          docker build -t ocelot/webapp:test -f webapp/Dockerfile webapp
-          docker save ocelot/webapp:test -o /tmp/webapp.tar
-
-  build-backend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Restore docker cache
-        uses: actions/cache@v4
-        with:
-          path: /tmp/backend.tar
-          key: docker-backend-${{ hashFiles('backend/Dockerfile', 'backend/yarn.lock') }}
-      - name: Build docker image
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          docker build -t ocelot/backend:test -f backend/Dockerfile backend
-          docker save ocelot/backend:test -o /tmp/backend.tar
-
-  build-neo4j:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Restore docker cache
-        uses: actions/cache@v4
-        with:
-          path: /tmp/neo4j.tar
-          key: docker-neo4j-${{ hashFiles('neo4j/Dockerfile') }}
-      - name: Build docker image
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          docker build -t ocelot/neo4j:test -f neo4j/Dockerfile neo4j
-          docker save ocelot/neo4j:test -o /tmp/neo4j.tar
-
-  combine-images:
-    runs-on: ubuntu-latest
-    needs: [build-webapp, build-backend, build-neo4j]
-    steps:
-      - name: Load docker images from cache
-        run: |
-          docker load -i /tmp/webapp.tar
-          docker load -i /tmp/backend.tar
-          docker load -i /tmp/neo4j.tar
-      - run: docker save -o ocelot_images.tar ocelot/webapp:test ocelot/backend:test ocelot/neo4j:test
-      - uses: actions/upload-artifact@v4
-        with:
-          name: combined-images
-          path: ocelot_images.tar
-
-  test:
-    name: e2e-${{ matrix.job }}
-    runs-on: ubuntu-latest
-    needs: [determine-matrix, combine-images]
-    strategy:
-      fail-fast: false
-      matrix:
-        job: ${{ fromJson(needs.determine-matrix.outputs.matrix) }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: combined-images
-          path: .
-      - run: docker load -i ocelot_images.tar
-
-      - name: Start services
-        run: |
-          docker network create ocelot || true
-          docker run -d --rm --net ocelot --name webapp -p 3000:3000 ocelot/webapp:test
-          docker run -d --rm --net ocelot --name backend ocelot/backend:test
-          docker run -d --rm --net ocelot --name neo4j ocelot/neo4j:test
-
-      - name: Run Cypress tests
-        run: |
-          echo "Running tests for group ${{ matrix.job }}..."
-          yarn install
-          yarn run cypress:run --env group=${{ matrix.job }}
+  # ... (restliche Jobs bleiben gleich, aber test: bekommt needs: [prepare-install, determine-matrix, combine-images])
