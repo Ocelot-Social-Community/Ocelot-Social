@@ -26,7 +26,7 @@
       <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
     </base-button>
   </nuxt-link>
-  <dropdown v-else class="notifications-menu" offset="8" :placement="placement">
+  <dropdown v-else class="notifications-menu" offset="8" :placement="placement" noMouseLeaveClosing>
     <template #default="{ toggleMenu }">
       <base-button
         ghost
