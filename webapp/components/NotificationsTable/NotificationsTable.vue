@@ -30,6 +30,7 @@
                       :date-time="notification.from.createdAt"
                       :injected-text="$t(`notifications.reason.${notification.reason}`)"
                       :injected-date="true"
+                      :show-popover="showPopover"
                     />
                   </client-only>
                 </base-card>
@@ -106,6 +107,7 @@ export default {
   mixins: [mobile(maxMobileWidth)],
   props: {
     notifications: { type: Array, default: () => [] },
+    showPopover: { type: Boolean, default: true },
   },
   computed: {
     fields() {

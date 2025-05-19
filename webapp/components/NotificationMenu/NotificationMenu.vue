@@ -61,7 +61,10 @@
         </ds-flex-item>
       </ds-flex>
       <div class="notifications-menu-popover">
-        <notification-list :notifications="notifications" @markAsRead="markAsRead" />
+        <notifications-table
+          @markNotificationAsRead="markAsReadAndCloseMenu($event, closeMenu)"
+          :notifications="notifications"
+          :show-popover="false" />
       </div>
     </template>
   </dropdown>
@@ -78,14 +81,14 @@ import {
 } from '~/graphql/User'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import Dropdown from '~/components/Dropdown'
-import NotificationList from '../NotificationList/NotificationList'
+import NotificationsTable from '../NotificationsTable/NotificationsTable.vue'
 
 export default {
   name: 'NotificationMenu',
   components: {
+    NotificationsTable,
     CounterIcon,
-    Dropdown,
-    NotificationList,
+    Dropdown
   },
   data() {
     return {
@@ -97,13 +100,15 @@ export default {
     noMenu: { type: Boolean, default: false },
   },
   methods: {
-    async markAsRead(notificationSourceId) {
+    async markAsReadAndCloseMenu(notificationSourceId, closeMenu) {
       const variables = { id: notificationSourceId }
       try {
         await this.$apollo.mutate({
           mutation: markAsReadMutation(this.$i18n),
           variables,
         })
+
+        closeMenu?.()
       } catch (error) {
         this.$toast.error(error.message)
       }
@@ -113,7 +118,7 @@ export default {
         return
       }
 
-      closeMenu()
+      closeMenu?.()
       try {
         await this.$apollo.mutate({
           mutation: markAllAsReadMutation(this.$i18n),
