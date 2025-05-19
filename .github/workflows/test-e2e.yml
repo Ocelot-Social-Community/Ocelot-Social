@@ -17,6 +17,7 @@ jobs:
     outputs:
       matrix: ${{ steps.set.outputs.matrix }}
     steps:
+      - uses: actions/checkout@v4
       - name: Create dynamic test matrix
         id: set
         shell: bash
