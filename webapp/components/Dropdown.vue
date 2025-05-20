@@ -6,6 +6,7 @@
     :disabled="disabled"
     trigger="manual"
     :offset="offset"
+    boundaries-element="body"
   >
     <slot :toggleMenu="toggleMenu" :openMenu="openMenu" :closeMenu="closeMenu" :isOpen="isOpen" />
     <div slot="popover" @mouseover="popoverMouseEnter" @mouseleave="popoverMouseLeave">
@@ -72,7 +73,7 @@ export default {
       }
     },
     closeMenu(useTimeout) {
-      if (this.disabled) {
+      if (this.noMouseLeaveClosing || this.disabled) {
         return
       }
       this.clearTimeouts()
