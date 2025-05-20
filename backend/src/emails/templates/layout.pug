@@ -27,4 +27,9 @@ html(lang=locale)
         block content
         include includes/greeting.pug
 
+      - var supportEmail = SUPPORT_EMAIL
+      if supportEmail
+        .support
+          include includes/support.pug
+
       include includes/footer.pug
