@@ -37,7 +37,8 @@ services:
       - AWS_ENDPOINT=http:/minio:9000
       - AWS_REGION=local
       - AWS_BUCKET=ocelot
-      - S3_PUBLIC_GATEWAY=http:/localhost:9000
+      - S3_PUBLIC_GATEWAY=http:/localhost:8000
+      - IMAGOR_SECRET=mysecret
     volumes:
       - ./backend:/app
 
@@ -86,8 +87,8 @@ services:
       - 8000:8000
     environment:
       PORT: 8000
-      # IMAGOR_SECRET: mysecret # secret key for URL signature
-      IMAGOR_UNSAFE: 1 # unsafe URL for testing
+      IMAGOR_SECRET: mysecret # secret key for URL signature
+      # IMAGOR_UNSAFE: 1 # unsafe URL for testing
       AWS_ACCESS_KEY_ID: h6uWJf7Earij3143YBV7
       AWS_SECRET_ACCESS_KEY: or9ZWh34BmAIqzIbJL5QpeTrey5ChGirH0mmyMdn
       AWS_ENDPOINT: http:/minio:9000
@@ -95,6 +96,7 @@ services:
       S3_LOADER_BUCKET: ocelot # enable S3 loader by specifying bucket
       S3_STORAGE_BUCKET: ocelot # enable S3 storage by specifying bucket
       S3_RESULT_STORAGE_BUCKET: ocelot # enable S3 result storage by specifying bucket
+      HTTP_LOADER_BASE_URL: http://minio:9000
 
 volumes:
   minio_data:

@@ -114,6 +114,8 @@ export interface S3Configured {
   S3_PUBLIC_GATEWAY: string | undefined
 }
 
+export const IMAGOR_SECRET: string | undefined = env.IMAGOR_SECRET
+
 export const isS3configured = (config: typeof s3): config is S3Configured => {
   return !!(
     config.AWS_ACCESS_KEY_ID &&
@@ -161,6 +163,7 @@ export default {
   ...s3,
   ...options,
   ...language,
+  IMAGOR_SECRET,
 }
 
 export { nodemailerTransportOptions }
