@@ -97,39 +97,19 @@
       </div>
     </div>
     <!-- content grid -->
-    <masonry-grid
-      :class="[
-        !hashtag && !showDonations ? 'grid-margin-top' : '',
-        !isMobile && posts.length <= 2 ? 'grid-column-helper' : '',
-      ]"
-    >
-      <!-- news feed -->
-      <template v-if="hasResults">
-        <masonry-grid-item
-          v-for="post in posts"
-          :key="post.id"
-          :imageAspectRatio="post.image && post.image.aspectRatio"
-        >
-          <post-teaser
-            :post="post"
-            :postsFilter="postsFilter['categories_some']"
-            @removePostFromList="posts = removePostFromList(post, posts)"
-            @pinPost="pinPost(post, refetchPostList)"
-            @unpinPost="unpinPost(post, refetchPostList)"
-            @toggleObservePost="
-              (postId, value) => toggleObservePost(postId, value, refetchPostList)
-            "
-          />
-        </masonry-grid-item>
-      </template>
-      <template v-else>
-        <ds-grid-item :row-span="2" column-span="fullWidth">
-          <hc-empty icon="docs" />
-          <ds-text align="center">{{ $t('index.no-results') }}</ds-text>
-          <ds-text align="center">{{ $t('index.change-filter-settings') }}</ds-text>
-        </ds-grid-item>
-      </template>
-    </masonry-grid>
+    <div class="supergrid">
+      <post-teaser
+        v-for="post in posts"
+        :key="post.id"
+        :post="post"
+        :postsFilter="postsFilter['categories_some']"
+        @removePostFromList="posts = removePostFromList(post, posts)"
+        @pinPost="pinPost(post, refetchPostList)"
+        @unpinPost="unpinPost(post, refetchPostList)"
+        @toggleObservePost="(postId, value) => toggleObservePost(postId, value, refetchPostList)"
+        class="super-post-teaser"
+      />
+    </div>
 
     <!-- infinite loading -->
     <client-only>
@@ -466,5 +446,13 @@ export default {
   .newsfeed-controls {
     margin-top: 32px;
   }
+}
+
+.supergrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+  container: supergrid;
 }
 </style>

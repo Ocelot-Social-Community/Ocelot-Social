@@ -176,7 +176,7 @@ export default {
     const height = Math.min(width / image.aspectRatio, 2000)
     const imageElement = this.$el.querySelector('.hero-image')
     if (imageElement) {
-      imageElement.style.height = `${height}px`
+      // imageElement.style.height = `${height}px`
     }
   },
   computed: {
