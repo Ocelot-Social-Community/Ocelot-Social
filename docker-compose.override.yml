@@ -32,6 +32,13 @@ services:
       - DEBUG=true
       - SMTP_PORT=1025
       - SMTP_HOST=mailserver
+      - AWS_ACCESS_KEY_ID=h6uWJf7Earij3143YBV7
+      - AWS_SECRET_ACCESS_KEY=or9ZWh34BmAIqzIbJL5QpeTrey5ChGirH0mmyMdn
+      - AWS_ENDPOINT=http:/minio:9000
+      - AWS_REGION=local
+      - AWS_BUCKET=ocelot
+      - S3_PUBLIC_GATEWAY=http:/localhost:8000
+      - IMAGOR_SECRET=mysecret
     volumes:
       - ./backend:/app
 
@@ -46,3 +53,50 @@ services:
     ports:
       - 1080:1080
       - 1025:1025
+
+  minio:
+    image: quay.io/minio/minio
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - minio_data:/data
+    environment:
+      - MINIO_ROOT_USER=h6uWJf7Earij3143YBV7
+      - MINIO_ROOT_PASSWORD=or9ZWh34BmAIqzIbJL5QpeTrey5ChGirH0mmyMdn
+    command: server /data --console-address ":9001"
+
+  minio-mc:
+    image: quay.io/minio/mc
+    depends_on:
+      - minio
+    restart: on-failure
+    volumes:
+      - ./minio/readonly-policy.json:/tmp/readonly-policy.json
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      /usr/bin/mc alias set dockerminio http://minio:9000 h6uWJf7Earij3143YBV7 or9ZWh34BmAIqzIbJL5QpeTrey5ChGirH0mmyMdn;
+      /usr/bin/mc mb --ignore-existing dockerminio/ocelot;
+      /usr/bin/mc anonymous set-json /tmp/readonly-policy.json dockerminio/ocelot;
+      "
+
+  imagor:
+    image: shumc/imagor:latest
+    ports:
+      - 8000:8000
+    environment:
+      PORT: 8000
+      IMAGOR_SECRET: mysecret # secret key for URL signature
+      # IMAGOR_UNSAFE: 1 # unsafe URL for testing
+      AWS_ACCESS_KEY_ID: h6uWJf7Earij3143YBV7
+      AWS_SECRET_ACCESS_KEY: or9ZWh34BmAIqzIbJL5QpeTrey5ChGirH0mmyMdn
+      AWS_ENDPOINT: http:/minio:9000
+      S3_FORCE_PATH_STYLE: 1
+      S3_LOADER_BUCKET: ocelot # enable S3 loader by specifying bucket
+      S3_STORAGE_BUCKET: ocelot # enable S3 storage by specifying bucket
+      S3_RESULT_STORAGE_BUCKET: ocelot # enable S3 result storage by specifying bucket
+      HTTP_LOADER_BASE_URL: http://minio:9000
+
+volumes:
+  minio_data:

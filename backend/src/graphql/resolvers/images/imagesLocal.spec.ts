@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/await-thenable */
+
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -11,7 +11,10 @@ import { UserInputError } from 'apollo-server'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 
-import { deleteImage, mergeImage } from './images'
+import { images } from './imagesLocal'
+
+import type { ImageInput } from './images'
+import type { FileUpload } from 'graphql-upload'
 
 const driver = getDriver()
 const neode = getNeode()
@@ -39,10 +42,12 @@ afterEach(async () => {
 })
 
 describe('deleteImage', () => {
+  const { deleteImage } = images
+
   describe('given a resource with an image', () => {
-    let user
+    let user: { id: string }
     beforeEach(async () => {
-      user = await Factory.build(
+      const u = await Factory.build(
         'user',
         {},
         {
@@ -52,18 +57,18 @@ describe('deleteImage', () => {
           }),
         },
       )
-      user = await user.toJson()
+      user = await u.toJson()
     })
 
-    it('soft deletes `Image` node', async () => {
+    it('deletes `Image` node', async () => {
       await expect(neode.all('Image')).resolves.toHaveLength(1)
       await deleteImage(user, 'AVATAR_IMAGE', { deleteCallback })
       await expect(neode.all('Image')).resolves.toHaveLength(0)
     })
 
     it('calls deleteCallback', async () => {
-      user = await Factory.build('user')
-      user = await user.toJson()
+      const u = await Factory.build('user')
+      user = await u.toJson()
       await deleteImage(user, 'AVATAR_IMAGE', { deleteCallback })
       expect(deleteCallback).toHaveBeenCalled()
     })
@@ -71,7 +76,7 @@ describe('deleteImage', () => {
     describe('given a transaction parameter', () => {
       it('executes cypher statements within the transaction', async () => {
         const session = driver.session()
-        let someString
+        let someString: string
         try {
           someString = await session.writeTransaction(async (transaction) => {
             await deleteImage(user, 'AVATAR_IMAGE', {
@@ -86,7 +91,7 @@ describe('deleteImage', () => {
           await session.close()
         }
         await expect(neode.all('Image')).resolves.toHaveLength(0)
-        await expect(someString).toEqual('Hello')
+        expect(someString).toEqual('Hello')
       })
 
       it('rolls back the transaction in case of errors', async () => {
@@ -114,8 +119,9 @@ describe('deleteImage', () => {
 })
 
 describe('mergeImage', () => {
-  let imageInput
-  let post
+  const { mergeImage } = images
+  let imageInput: ImageInput
+  let post: { id: string }
   beforeEach(() => {
     imageInput = {
       alt: 'A description of the new image',
@@ -124,24 +130,25 @@ describe('mergeImage', () => {
 
   describe('given image.upload', () => {
     beforeEach(() => {
+      const createReadStream: FileUpload['createReadStream'] = (() => ({
+        pipe: () => ({
+          on: (_, callback) => callback(),
+        }),
+      })) as unknown as FileUpload['createReadStream']
       imageInput = {
         ...imageInput,
-        upload: {
+        upload: Promise.resolve({
           filename: 'image.jpg',
           mimetype: 'image/jpeg',
           encoding: '7bit',
-          createReadStream: () => ({
-            pipe: () => ({
-              on: (_, callback) => callback(),
-            }),
-          }),
-        },
+          createReadStream,
+        }),
       }
     })
 
     describe('on existing resource', () => {
       beforeEach(async () => {
-        post = await Factory.build(
+        const p = await Factory.build(
           'post',
           { id: 'p99' },
           {
@@ -149,7 +156,7 @@ describe('mergeImage', () => {
             image: null,
           },
         )
-        post = await post.toJson()
+        post = await p.toJson()
       })
 
       it('returns new image', async () => {
@@ -173,26 +180,16 @@ describe('mergeImage', () => {
       })
 
       it('creates a url safe name', async () => {
-        imageInput.upload.filename = '/path/to/awkward?/ file-location/?foo- bar-avatar.jpg'
+        if (!imageInput.upload) {
+          throw new Error('Test imageInput was not setup correctly.')
+        }
+        const upload = await imageInput.upload
+        upload.filename = '/path/to/awkward?/ file-location/?foo- bar-avatar.jpg'
+        imageInput.upload = Promise.resolve(upload)
         await expect(
           mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback }),
         ).resolves.toMatchObject({
           url: expect.stringMatching(new RegExp(`^/uploads/${uuid}-foo-bar-avatar.jpg`)),
-        })
-      })
-
-      // eslint-disable-next-line jest/no-disabled-tests
-      it.skip('automatically creates different image sizes', async () => {
-        await expect(
-          mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback }),
-        ).resolves.toEqual({
-          url: expect.any(String),
-          alt: expect.any(String),
-          urlW34: expect.stringMatching(new RegExp(`^/uploads/W34/${uuid}-image.jpg`)),
-          urlW160: expect.stringMatching(new RegExp(`^/uploads/W160/${uuid}-image.jpg`)),
-          urlW320: expect.stringMatching(new RegExp(`^/uploads/W320/${uuid}-image.jpg`)),
-          urlW640: expect.stringMatching(new RegExp(`^/uploads/W640/${uuid}-image.jpg`)),
-          urlW1024: expect.stringMatching(new RegExp(`^/uploads/W1024/${uuid}-image.jpg`)),
         })
       })
 
@@ -202,7 +199,7 @@ describe('mergeImage', () => {
           `MATCH(p:Post {id: "p99"})-[:HERO_IMAGE]->(i:Image) RETURN i,p`,
           {},
         )
-        post = neode.hydrateFirst(result, 'p', neode.model('Post'))
+        post = neode.hydrateFirst<{ id: string }>(result, 'p', neode.model('Post')).properties()
         const image = neode.hydrateFirst(result, 'i', neode.model('Image'))
         expect(post).toBeTruthy()
         expect(image).toBeTruthy()
@@ -317,8 +314,8 @@ describe('mergeImage', () => {
 
   describe('without image.upload', () => {
     it('throws UserInputError', async () => {
-      post = await Factory.build('post', { id: 'p99' }, { image: null })
-      post = await post.toJson()
+      const p = await Factory.build('post', { id: 'p99' }, { image: null })
+      post = await p.toJson()
       await expect(mergeImage(post, 'HERO_IMAGE', imageInput)).rejects.toEqual(
         new UserInputError('Cannot find image for given resource'),
       )
@@ -326,7 +323,7 @@ describe('mergeImage', () => {
 
     describe('if resource has an image already', () => {
       beforeEach(async () => {
-        post = await Factory.build(
+        const p = await Factory.build(
           'post',
           {
             id: 'p99',
@@ -345,7 +342,7 @@ describe('mergeImage', () => {
             }),
           },
         )
-        post = await post.toJson()
+        post = await p.toJson()
       })
 
       it('does not call deleteCallback', async () => {
