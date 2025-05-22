@@ -41,6 +41,10 @@ describe('CategoriesSelect.vue', () => {
   const storeMocks = {
     getters: {
       'categories/categories': categoriesMock,
+      'categories/isInizialized': jest.fn(() => true),
+    },
+    actions: {
+      'categories/init': jest.fn(),
     },
   }
 

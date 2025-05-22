@@ -29,6 +29,9 @@ describe('CategoriesFilter.vue', () => {
       },
     ]),
   }
+  const actions = {
+    'categories/init': jest.fn(),
+  }
 
   const apolloMutationMock = jest.fn().mockResolvedValue({
     data: { saveCategorySettings: true },
@@ -46,7 +49,7 @@ describe('CategoriesFilter.vue', () => {
   }
 
   const Wrapper = () => {
-    const store = new Vuex.Store({ mutations, getters })
+    const store = new Vuex.Store({ mutations, getters, actions })
     const wrapper = mount(CategoriesFilter, { mocks, localVue, store })
     return wrapper
   }

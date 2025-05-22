@@ -3,9 +3,10 @@ import CategoryQuery from '~/graphql/CategoryQuery'
 
 describe('categories store', () => {
   describe('initial state', () => {
-    it('sets no categories', () => {
+    it('sets no categories and is not inizialized', () => {
       expect(state()).toEqual({
         categories: [],
+        isInizialized: false,
       })
     })
   })
@@ -41,6 +42,19 @@ describe('categories store', () => {
 
       it('sets categories correctly', () => {
         expect(testMutation(['cat1', 'cat2', 'cat3'])).toEqual(['cat1', 'cat2', 'cat3'])
+      })
+    })
+
+    describe('SET_INIZIALIZED', () => {
+      beforeEach(() => {
+        testMutation = () => {
+          mutations.SET_INIZIALIZED(state)
+          return getters.isInizialized(state)
+        }
+      })
+
+      it('sets isInizialized to true', () => {
+        expect(testMutation()).toBe(true)
       })
     })
   })
@@ -81,6 +95,10 @@ describe('categories store', () => {
 
       it('commits SET_CATEGORIES', () => {
         expect(commit).toBeCalledWith('SET_CATEGORIES', ['cat1', 'cat2', 'cat3'])
+      })
+
+      it('commits SET_INIZIALIZED', () => {
+        expect(commit).toBeCalledWith('SET_INIZIALIZED')
       })
     })
   })

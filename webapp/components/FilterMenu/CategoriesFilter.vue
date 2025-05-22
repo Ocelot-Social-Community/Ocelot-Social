@@ -37,16 +37,16 @@
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   components: {
     FilterMenuSection,
   },
-  mixins: [SortCategories],
+  mixins: [SortCategories, GetCategories],
   computed: {
     ...mapGetters({
       filteredCategoryIds: 'posts/filteredCategoryIds',
-      categories: 'categories/categories',
     }),
   },
   methods: {

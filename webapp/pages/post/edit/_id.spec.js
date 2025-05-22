@@ -48,6 +48,9 @@ describe('post/_id.vue', () => {
           'categories/categories': jest.fn(() => []),
           'categories/categoriesActive': () => false,
         },
+        actions: {
+          'categories/init': jest.fn(),
+        },
       })
       if (asyncData) {
         const data = _id.data ? _id.data() : {}

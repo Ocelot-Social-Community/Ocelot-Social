@@ -299,8 +299,10 @@ import SearchField from '~/components/features/SearchField/SearchField.vue'
 import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
 import links from '~/constants/links.js'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
+  mixins: [GetCategories],
   components: {
     AvatarMenu,
     ChatNotificationMenu,
@@ -338,7 +340,6 @@ export default {
   computed: {
     ...mapGetters({
       isLoggedIn: 'auth/isLoggedIn',
-      categoriesActive: 'categories/categoriesActive',
     }),
     showFilterMenuDropdown() {
       const [firstRoute] = this.$route.matched

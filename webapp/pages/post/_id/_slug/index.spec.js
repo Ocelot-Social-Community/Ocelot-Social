@@ -44,6 +44,9 @@ describe('PostSlug', () => {
           'auth/isModerator': () => false,
           'categories/categoriesActive': () => false,
         },
+        actions: {
+          'categories/init': jest.fn(),
+        },
       })
       const propsData = {}
       mocks = {

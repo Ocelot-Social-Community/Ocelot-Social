@@ -197,8 +197,10 @@ import links from '~/constants/links.js'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 import DatePicker from 'vue2-datepicker'
 import 'vue2-datepicker/scss/index.scss'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
+  mixins: [GetCategories],
   components: {
     Editor,
     ImageUploader,
@@ -268,7 +270,6 @@ export default {
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
-      categoriesActive: 'categories/categoriesActive',
     }),
     formSchema() {
       return {

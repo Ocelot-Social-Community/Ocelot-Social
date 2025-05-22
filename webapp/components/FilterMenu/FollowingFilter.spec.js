@@ -19,13 +19,16 @@ describe('FollowingFilter', () => {
     'posts/filteredByUsersFollowed': jest.fn(),
     'posts/filteredByPostsInMyGroups': jest.fn(),
   }
+  const actions = {
+    'categories/init': jest.fn(),
+  }
 
   const mocks = {
     $t: jest.fn((string) => string),
   }
 
   const Wrapper = () => {
-    const store = new Vuex.Store({ mutations, getters })
+    const store = new Vuex.Store({ mutations, getters, actions })
     const wrapper = mount(FollowingFilter, { mocks, localVue, store })
     return wrapper
   }

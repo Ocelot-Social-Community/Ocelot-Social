@@ -317,6 +317,7 @@ import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar
 import ProfileList from '~/components/features/ProfileList/ProfileList'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
 import { mapGetters } from 'vuex'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 // import SocialMedia from '~/components/SocialMedia/SocialMedia'
 // import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 
@@ -347,7 +348,7 @@ export default {
     // SocialMedia,
     // TabNavigation,
   },
-  mixins: [postListActions, SortCategories],
+  mixins: [postListActions, SortCategories, GetCategories],
   transition: {
     name: 'slide-up',
     mode: 'out-in',
@@ -380,7 +381,6 @@ export default {
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
-      categoriesActive: 'categories/categoriesActive',
     }),
     group() {
       return this.Group && this.Group[0] ? this.Group[0] : {}

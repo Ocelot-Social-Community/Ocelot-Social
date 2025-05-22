@@ -83,6 +83,9 @@ describe('ContributionForm.vue', () => {
     }
     const store = new Vuex.Store({
       getters,
+      actions: {
+        'categories/init': jest.fn(),
+      },
     })
     const Wrapper = () => {
       return mount(ContributionForm, {

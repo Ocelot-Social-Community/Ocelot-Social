@@ -16,6 +16,9 @@ describe('FilterMenu.vue', () => {
     'posts/orderBy': () => 'createdAt_desc',
     'categories/categoriesActive': () => false,
   }
+  const actions = {
+    'categories/init': jest.fn(),
+  }
 
   const stubs = {
     FollowingFilter: true,
@@ -26,7 +29,7 @@ describe('FilterMenu.vue', () => {
   }
 
   const Wrapper = () => {
-    const store = new Vuex.Store({ getters })
+    const store = new Vuex.Store({ getters, actions })
     return mount(FilterMenu, { mocks, localVue, store, stubs })
   }
 

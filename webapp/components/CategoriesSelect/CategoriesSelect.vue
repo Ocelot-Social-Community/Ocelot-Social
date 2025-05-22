@@ -23,7 +23,7 @@
 import { CATEGORIES_MAX } from '~/constants/categories.js'
 import xor from 'lodash/xor'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
-import { mapGetters } from 'vuex'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   inject: {
@@ -31,7 +31,7 @@ export default {
       default: null,
     },
   },
-  mixins: [SortCategories],
+  mixins: [SortCategories, GetCategories],
   props: {
     existingCategoryIds: { type: Array, default: () => [] },
     model: { type: String, required: true },
@@ -57,9 +57,6 @@ export default {
     reachedMaximum() {
       return this.selectedCount >= this.selectedMax
     },
-    ...mapGetters({
-      categories: 'categories/categories',
-    }),
   },
   methods: {
     toggleCategory(id) {

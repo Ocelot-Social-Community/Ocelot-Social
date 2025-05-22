@@ -79,10 +79,11 @@
 <script>
 import Category from '~/components/Category'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
-import { mapGetters } from 'vuex'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   name: 'GroupTeaser',
+  mixins: [GetCategories],
   components: {
     Category,
     GroupContentMenu,
@@ -98,9 +99,6 @@ export default {
     },
   },
   computed: {
-    ...mapGetters({
-      categoriesActive: 'categories/categoriesActive',
-    }),
     descriptionExcerpt() {
       return this.$filters.removeLinks(this.group.descriptionExcerpt)
     },

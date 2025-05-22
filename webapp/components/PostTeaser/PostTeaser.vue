@@ -137,9 +137,11 @@ import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import { mapGetters } from 'vuex'
 import PostMutations from '~/graphql/PostMutations'
 import { postMenuModalsData, deletePostMutation } from '~/components/utils/PostHelpers'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   name: 'PostTeaser',
+  mixins: [GetCategories],
   components: {
     Category,
     ContentMenu,
@@ -177,7 +179,6 @@ export default {
   computed: {
     ...mapGetters({
       user: 'auth/user',
-      categoriesActive: 'categories/categoriesActive',
     }),
     excerpt() {
       return this.$filters.removeLinks(this.post.contentExcerpt)

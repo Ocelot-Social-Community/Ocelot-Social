@@ -168,7 +168,6 @@
 
 <script>
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
-import { mapGetters } from 'vuex'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
 import {
   NAME_LENGTH_MIN,
@@ -178,11 +177,13 @@ import {
 import Editor from '~/components/Editor/Editor'
 import ActionRadiusSelect from '~/components/Select/ActionRadiusSelect'
 import { queryLocations } from '~/graphql/location'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 let timeout
 
 export default {
   name: 'GroupForm',
+  mixins: [GetCategories],
   components: {
     CategoriesSelect,
     Editor,
@@ -264,9 +265,6 @@ export default {
       (await this.requestGeoData(this.formLocationName)) || this.formLocationName
   },
   computed: {
-    ...mapGetters({
-      categoriesActive: 'categories/categoriesActive',
-    }),
     formLocationName() {
       const isNestedValue =
         typeof this.formData.locationName === 'object' &&

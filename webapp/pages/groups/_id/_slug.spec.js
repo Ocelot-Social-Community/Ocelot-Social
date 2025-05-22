@@ -42,8 +42,13 @@ describe('GroupProfileSlug', () => {
     'categories/categories': () => [{ id: 'cat1' }],
   }
 
+  const actions = {
+    'categories/init': jest.fn(),
+  }
+
   const store = new Vuex.Store({
     getters,
+    actions,
   })
 
   beforeEach(() => {

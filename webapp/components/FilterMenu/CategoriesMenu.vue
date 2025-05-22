@@ -16,9 +16,11 @@
 import Dropdown from '~/components/Dropdown'
 import { mapGetters } from 'vuex'
 import CategoriesFilter from './CategoriesFilter'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   name: 'CategoriesMenu',
+  mixins: [GetCategories],
   components: {
     Dropdown,
     CategoriesFilter,
@@ -31,7 +33,6 @@ export default {
     ...mapGetters({
       // TODO: implement visibility of active filter later on
       filterActive: 'posts/isActive',
-      categoriesActive: 'categories/categoriesActive',
     }),
   },
 }

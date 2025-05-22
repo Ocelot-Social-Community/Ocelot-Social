@@ -27,6 +27,9 @@ describe('GroupForm', () => {
       getters: {
         'categories/categoriesActive': () => false,
       },
+      actions: {
+        'categories/init': jest.fn(),
+      },
     }
     store = new Vuex.Store(storeMocks)
   })
