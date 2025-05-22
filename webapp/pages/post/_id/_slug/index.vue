@@ -21,9 +21,14 @@
             :style="heroImageStyle"
           >
             <template #heroImage v-if="post.image">
-              <img :src="post.image | proxyApiUrl" class="image" />
+              <img
+                :src="post.image.url"
+                :srcset="resolutions.srcset"
+                :sizes="resolutions.sizes"
+                class="image"
+              />
               <aside v-show="post.image && post.image.sensitive" class="blur-toggle">
-                <img v-show="blurred" :src="post.image | proxyApiUrl" class="preview" />
+                <img v-show="blurred" :src="post.image.url.w320" class="preview" />
                 <base-button
                   :icon="blurred ? 'eye' : 'eye-slash'"
                   filled
@@ -231,6 +236,13 @@ export default {
     }, 50)
   },
   computed: {
+    resolutions() {
+      const { w320, w640, w1024 } = this.post.image
+      return {
+        sizes: '(max-width: 1024px) 640px, 1024px',
+        srcset: `${w320} 320w, ${w640} 640w, ${w1024} 1024w`,
+      }
+    },
     routes() {
       const { slug, id } = this.$route.params
       return [

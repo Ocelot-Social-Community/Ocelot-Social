@@ -42,7 +42,7 @@ const resize: UrlResolver = ({ url }, { height, width }) => {
   if (!(height || width)) {
     return url
   }
-  const window = `/fit-in/${height ?? FALLBACK_MAXIMUM_LENGTH}x${width ?? FALLBACK_MAXIMUM_LENGTH}`
+  const window = `/fit-in/${width ?? FALLBACK_MAXIMUM_LENGTH}x${height ?? FALLBACK_MAXIMUM_LENGTH}`
   const newUrl = new URL(url)
   newUrl.pathname = window + newUrl.pathname
   return newUrl.href

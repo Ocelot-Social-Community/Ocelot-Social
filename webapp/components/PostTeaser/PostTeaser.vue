@@ -12,7 +12,12 @@
       :highlight="isPinned"
     >
       <template v-if="post.image" #heroImage>
-        <img :src="post.image | proxyApiUrl" class="image" />
+        <img
+          :src="post.image.url"
+          :srcset="resolutions.srcset"
+          :sizes="resolutions.sizes"
+          class="image"
+        />
       </template>
       <client-only>
         <div class="post-user-row">
@@ -183,6 +188,13 @@ export default {
     ...mapGetters({
       user: 'auth/user',
     }),
+    resolutions() {
+      const { w640 } = this.post.image
+      return {
+        sizes: `640px`,
+        srcset: `${w640} 640w`,
+      }
+    },
     excerpt() {
       return this.$filters.removeLinks(this.post.contentExcerpt)
     },
