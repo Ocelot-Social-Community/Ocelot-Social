@@ -76,7 +76,7 @@ export default {
       statistics.badgesRewarded = metaStats['REWARDED']?.toNumber() ?? 0
       statistics.badgesDisplayed = metaStats['SELECTED']?.toNumber() ?? 0
       statistics.usersVerified = metaStats['VERIFIES']?.toNumber() ?? 0
-      statistics.reports = metaStats['InviteCode']?.toNumber() ?? 0
+      statistics.reports = metaStats['Report']?.toNumber() ?? 0
       return statistics
     },
   },
