@@ -1,0 +1,14 @@
+union File = Image | Document # | Video
+
+type Document {
+  url: ID!,
+  name: String,
+}
+
+input FileInput {
+  name: String,
+  upload: Upload,
+  sensitive: Boolean,
+  aspectRatio: Float,
+  type: String,
+}

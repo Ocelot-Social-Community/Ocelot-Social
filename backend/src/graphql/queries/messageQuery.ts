@@ -18,6 +18,7 @@ export const messageQuery = () => {
         saved
         distributed
         seen
+        images
       }
     }
   `

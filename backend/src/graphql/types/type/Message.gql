@@ -13,7 +13,7 @@ type Message {
   updatedAt: String
 
   content: String!
-  
+
   author: User! @relation(name: "CREATED", direction: "IN")
   room: Room! @relation(name: "INSIDE", direction: "OUT")
 
@@ -25,12 +25,14 @@ type Message {
   saved: Boolean
   distributed: Boolean
   seen: Boolean
+  files: [File] @relation(name: "MESSAGE_FILE", direction: "OUT")
 }
 
 type Mutation {
   CreateMessage(
     roomId: ID!
     content: String!
+    files: [FileInput]
   ): Message
 
   MarkMessagesAsSeen(messageIds: [String!]): Boolean
