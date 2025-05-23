@@ -85,7 +85,6 @@
 <script>
 import { mapGetters } from 'vuex'
 import { isEmail } from 'validator'
-import normalizeEmail from '~/components/utils/NormalizeEmail'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 import { adminUserQuery } from '~/graphql/User'
 import { FetchAllRoles, updateUserRole } from '~/graphql/admin/Roles'
@@ -193,7 +192,7 @@ export default {
       this.offset = 0
       const { query } = formData
       if (isEmail(query)) {
-        this.email = normalizeEmail(query)
+        this.email = query
         this.filter = null
       } else {
         this.email = null

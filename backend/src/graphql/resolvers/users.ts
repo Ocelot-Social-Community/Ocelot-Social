@@ -66,6 +66,7 @@ export default {
       }
     },
     User: async (object, args, context, resolveInfo) => {
+      args.email = normalizeEmail(args.email)
       const { email } = args
       if (email) {
         let session
