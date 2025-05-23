@@ -10,15 +10,18 @@ import { v4 as uuid } from 'uuid'
 import registrationConstants from '@constants/registrationBranded'
 
 import createPasswordReset from './helpers/createPasswordReset'
+import normalizeEmail from './helpers/normalizeEmail'
 
 export default {
   Mutation: {
     requestPasswordReset: async (_parent, { email }, { driver }) => {
+      email = normalizeEmail(email)
       // TODO: why this is generated differntly from 'backend/src/schema/resolvers/helpers/generateNonce.js'?
       const nonce = uuid().substring(0, registrationConstants.NONCE_LENGTH)
       return createPasswordReset({ driver, nonce, email })
     },
     resetPassword: async (_parent, { email, nonce, newPassword }, { driver }) => {
+      email = normalizeEmail(email)
       const stillValid = new Date()
       stillValid.setDate(stillValid.getDate() - 1)
       const encryptedNewPassword = await bcrypt.hash(newPassword, 10)

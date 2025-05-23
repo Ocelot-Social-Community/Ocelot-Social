@@ -15,6 +15,7 @@ import Resolver from './helpers/Resolver'
 export default {
   Query: {
     VerifyNonce: async (_parent, args, context, _resolveInfo) => {
+      args.email = normalizeEmail(args.email)
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (txc) => {
         const result = await txc.run(
@@ -38,7 +39,6 @@ export default {
     AddEmailAddress: async (_parent, args, context, _resolveInfo) => {
       let response
       args.email = normalizeEmail(args.email)
-
       try {
         const { neode } = context
         await new Validator(neode, neode.model('UnverifiedEmailAddress'), args)
@@ -86,6 +86,7 @@ export default {
       const {
         user: { id: userId },
       } = context
+      args.email = normalizeEmail(args.email)
       const { nonce, email } = args
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (txc) => {

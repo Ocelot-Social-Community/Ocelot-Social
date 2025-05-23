@@ -32,7 +32,6 @@
 import gql from 'graphql-tag'
 import metadata from '~/constants/metadata'
 import { isEmail } from 'validator'
-import normalizeEmail from '~/components/utils/NormalizeEmail'
 import translateErrorMessage from '~/components/utils/TranslateErrorMessage'
 
 export const SignupMutation = gql`
@@ -94,9 +93,6 @@ export default {
   },
   methods: {
     async sendValidation() {
-      if (this.formData.email && isEmail(this.formData.email)) {
-        this.formData.email = normalizeEmail(this.formData.email)
-      }
       const { email } = this.formData
 
       this.sliderData.setSliderValuesCallback(this.validInput, { collectedInputData: { email } })
