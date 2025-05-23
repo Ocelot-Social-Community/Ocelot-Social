@@ -48,3 +48,10 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.login-page {
+  width: auto;
+  height: auto;
+}
+</style>
