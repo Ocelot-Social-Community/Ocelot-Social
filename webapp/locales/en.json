@@ -39,16 +39,28 @@
       "postCount": "Posts"
     },
     "dashboard": {
+      "badgesDisplayed": "Badges Displayed",
+      "badgesRewarded": "Badges Rewarded",
+      "chatMessages": "Chat Messages",
+      "chatRooms": "Chat Rooms",
       "comments": "Comments",
+      "emails": "E-Mails",
       "follows": "Follows",
+      "groups": "Groups",
+      "inviteCodes": "Invite Codes",
+      "inviteCodesExpired": "Expired Invite Codes",
+      "inviteCodesRedeemed": "Redeemed Invite Codes",
       "invites": "Invites",
+      "locations": "Locations",
       "name": "Dashboard",
       "notifications": "Notifications",
-      "organizations": "Organizations",
       "posts": "Posts",
-      "projects": "Projects",
+      "reports": "Reports",
       "shouts": "Shouts",
-      "users": "Users"
+      "tags": "Tags",
+      "users": "Users",
+      "usersDeleted": "Users deleted",
+      "usersVerified": "Users verified"
     },
     "donations": {
       "goal": "Monthly donations needed",

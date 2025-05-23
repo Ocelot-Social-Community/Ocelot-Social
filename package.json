@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social",
-  "version": "3.6.0",
+  "version": "3.6.1",
   "description": "Free and open source software program code available to run social networks.",
   "author": "ocelot.social Community",
   "license": "MIT",
@@ -39,7 +39,7 @@
     "@badeball/cypress-cucumber-preprocessor": "^22.0.1",
     "@cucumber/cucumber": "11.2.0",
     "@cypress/browserify-preprocessor": "^3.0.2",
-    "@faker-js/faker": "9.7.0",
+    "@faker-js/faker": "9.8.0",
     "auto-changelog": "^2.5.0",
     "bcryptjs": "^3.0.2",
     "cross-env": "^7.0.3",

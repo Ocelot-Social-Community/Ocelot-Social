@@ -39,16 +39,28 @@
       "postCount": "Посты"
     },
     "dashboard": {
+      "badgesDisplayed": null,
+      "badgesRewarded": null,
+      "chatMessages": null,
+      "chatRooms": null,
       "comments": "Комментарии",
+      "emails": null,
       "follows": "Подписки",
+      "groups": null,
+      "inviteCodes": null,
+      "inviteCodesExpired": null,
+      "inviteCodesRedeemed": null,
       "invites": "Приглашения",
+      "locations": null,
       "name": "Панель управления",
       "notifications": "Уведомления",
-      "organizations": "Организации",
       "posts": "Посты",
-      "projects": "Проекты",
+      "reports": null,
       "shouts": "Выкрики",
-      "users": "Пользователи"
+      "tags": null,
+      "users": "Пользователи",
+      "usersDeleted": null,
+      "usersVerified": null
     },
     "donations": {
       "goal": "Необходимы ежемесячные пожертвования",

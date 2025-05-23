@@ -2,52 +2,39 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
+import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
-import createServer from '@src/server'
+import { statistics } from '@graphql/queries/statistics'
+import createServer, { getContext } from '@src/server'
 
+const database = databaseContext()
+
+let server: ApolloServer
 let query, authenticatedUser
-const instance = getNeode()
-const driver = getDriver()
 
-const statisticsQuery = gql`
-  query {
-    statistics {
-      countUsers
-      countPosts
-      countComments
-      countNotifications
-      countInvites
-      countFollows
-      countShouts
-    }
-  }
-`
 beforeAll(async () => {
   await cleanDatabase()
 
-  authenticatedUser = undefined
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode: instance,
-        user: authenticatedUser,
-      }
-    },
-  })
-  query = createTestClient(server).query
+  // eslint-disable-next-line @typescript-eslint/require-await
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database })
+
+  server = createServer({ context }).server
+
+  const createTestClientResult = createTestClient(server)
+  query = createTestClientResult.query
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
-// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
@@ -63,8 +50,8 @@ describe('statistics', () => {
     })
 
     it('returns the count of all users', async () => {
-      await expect(query({ query: statisticsQuery })).resolves.toMatchObject({
-        data: { statistics: { countUsers: 6 } },
+      await expect(query({ query: statistics })).resolves.toMatchObject({
+        data: { statistics: { users: 6 } },
         errors: undefined,
       })
     })
@@ -80,8 +67,8 @@ describe('statistics', () => {
     })
 
     it('returns the count of all posts', async () => {
-      await expect(query({ query: statisticsQuery })).resolves.toMatchObject({
-        data: { statistics: { countPosts: 3 } },
+      await expect(query({ query: statistics })).resolves.toMatchObject({
+        data: { statistics: { posts: 3 } },
         errors: undefined,
       })
     })
@@ -97,8 +84,8 @@ describe('statistics', () => {
     })
 
     it('returns the count of all comments', async () => {
-      await expect(query({ query: statisticsQuery })).resolves.toMatchObject({
-        data: { statistics: { countComments: 2 } },
+      await expect(query({ query: statistics })).resolves.toMatchObject({
+        data: { statistics: { comments: 2 } },
         errors: undefined,
       })
     })
@@ -116,8 +103,8 @@ describe('statistics', () => {
     })
 
     it('returns the count of all follows', async () => {
-      await expect(query({ query: statisticsQuery })).resolves.toMatchObject({
-        data: { statistics: { countFollows: 1 } },
+      await expect(query({ query: statistics })).resolves.toMatchObject({
+        data: { statistics: { follows: 1 } },
         errors: undefined,
       })
     })
@@ -143,8 +130,8 @@ describe('statistics', () => {
     })
 
     it('returns the count of all shouts', async () => {
-      await expect(query({ query: statisticsQuery })).resolves.toMatchObject({
-        data: { statistics: { countShouts: 2 } },
+      await expect(query({ query: statistics })).resolves.toMatchObject({
+        data: { statistics: { shouts: 2 } },
         errors: undefined,
       })
     })

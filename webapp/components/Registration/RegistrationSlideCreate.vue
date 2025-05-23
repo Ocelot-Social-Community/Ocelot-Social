@@ -171,31 +171,27 @@ export default {
     }
   },
   mounted: function () {
-    this.$nextTick(function () {
-      // Code that will run only after the entire view has been rendered
+    this.formData.name = this.sliderData.collectedInputData.name
+      ? this.sliderData.collectedInputData.name
+      : ''
+    this.formData.password = this.sliderData.collectedInputData.password
+      ? this.sliderData.collectedInputData.password
+      : ''
+    this.formData.passwordConfirmation = this.sliderData.collectedInputData.passwordConfirmation
+      ? this.sliderData.collectedInputData.passwordConfirmation
+      : ''
+    this.termsAndConditionsConfirmed = this.sliderData.collectedInputData
+      .termsAndConditionsConfirmed
+      ? this.sliderData.collectedInputData.termsAndConditionsConfirmed
+      : false
+    this.recieveCommunicationAsEmailsEtcConfirmed = this.sliderData.collectedInputData
+      .recieveCommunicationAsEmailsEtcConfirmed
+      ? this.sliderData.collectedInputData.recieveCommunicationAsEmailsEtcConfirmed
+      : false
+    this.sendValidation()
 
-      this.formData.name = this.sliderData.collectedInputData.name
-        ? this.sliderData.collectedInputData.name
-        : ''
-      this.formData.password = this.sliderData.collectedInputData.password
-        ? this.sliderData.collectedInputData.password
-        : ''
-      this.formData.passwordConfirmation = this.sliderData.collectedInputData.passwordConfirmation
-        ? this.sliderData.collectedInputData.passwordConfirmation
-        : ''
-      this.termsAndConditionsConfirmed = this.sliderData.collectedInputData
-        .termsAndConditionsConfirmed
-        ? this.sliderData.collectedInputData.termsAndConditionsConfirmed
-        : false
-      this.recieveCommunicationAsEmailsEtcConfirmed = this.sliderData.collectedInputData
-        .recieveCommunicationAsEmailsEtcConfirmed
-        ? this.sliderData.collectedInputData.recieveCommunicationAsEmailsEtcConfirmed
-        : false
-      this.sendValidation()
-
-      this.sliderData.setSliderValuesCallback(this.validInput, {
-        sliderSettings: { buttonSliderCallback: this.onNextClick },
-      })
+    this.sliderData.setSliderValuesCallback(this.validInput, {
+      sliderSettings: { buttonSliderCallback: this.onNextClick },
     })
   },
   computed: {
