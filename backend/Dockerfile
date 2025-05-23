@@ -1,3 +1,6 @@
+# ✅ Refactored Dockerfile: backend (ocelot.social) with ensured build output and caching
+
+# 🧱 Base image with shared environment
 FROM node:24.0.2-alpine AS base
 LABEL org.label-schema.name="ocelot.social:backend"
 LABEL org.label-schema.description="Backend of the Social Network Software ocelot.social"
@@ -11,37 +14,35 @@ ENV NODE_ENV="production"
 ENV PORT="4000"
 EXPOSE ${PORT}
 RUN apk --no-cache add git python3 make g++ bash linux-headers
-RUN mkdir -p /app
 WORKDIR /app
-CMD ["/bin/bash", "-c", "yarn run start"]
 
-FROM base AS development
-CMD ["/bin/sh", "-c", "yarn install && yarn run dev"]
+# 🔧 Dependencies stage (cached by GitHub Actions)
+FROM base AS deps
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile --non-interactive
 
-FROM base AS build
+# 🔨 Build stage
+FROM deps AS build
 COPY . .
-ONBUILD COPY ./branding/constants/ src/config/tmp
-# copy categories to brand them (use yarn prod:db:data:categories)
-ONBUILD COPY ./branding/constants/ src/constants/
-ONBUILD RUN tools/replace-constants.sh
-ONBUILD COPY ./branding/email/ src/middleware/helpers/email/
-ONBUILD COPY ./branding/middlewares/ src/middleware/branding/
-ONBUILD COPY ./branding/data/ src/db/data
-ONBUILD COPY ./branding/public/ public/
-ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
-ONBUILD RUN yarn run build
-ONBUILD RUN mkdir /build
-ONBUILD RUN cp -r ./build /build
-ONBUILD RUN cp -r ./public /build
-ONBUILD RUN cp -r ./package.json yarn.lock /build
-ONBUILD RUN cd /build && yarn install --production=true --frozen-lockfile --non-interactive
+RUN yarn build
 
-FROM build AS test
-# required for the migrations
-# ONBUILD RUN cp -r ./src /src
-CMD ["/bin/bash", "-c", "yarn run dev"]
-
-FROM build AS production_build
-
+# 🚀 Production image (with build output included!)
 FROM base AS production
-COPY --from=production_build /build .
+COPY --from=build /app /app
+COPY --from=build /app/build /app/build
+CMD ["yarn", "start"]
+
+# 🧪 Development image
+FROM deps AS development
+COPY . .
+CMD ["yarn", "dev"]
+
+# 🗃️ Buildx cache hint
+# Use this in your GitHub Actions build step:
+# docker buildx build \
+#   --cache-from=type=local,src=/tmp/.buildx-cache-backend \
+#   --cache-to=type=local,dest=/tmp/.buildx-cache-backend \
+#   -t ocelot/backend:test \
+#   -f backend/Dockerfile backend
+# Also ensure `/tmp/backend.tar` is always written for downstream jobs:
+# docker save ocelot/backend:test -o /tmp/backend.tar
