@@ -1,202 +1,53 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`notifications.vue mount renders 1`] = `
-<article
-  class="base-card"
->
-  <h2
-    class="title"
-  >
-    settings.notifications.name
-  </h2>
-   
-  <div
-    class="ds-space"
-    style="margin-top: 16px; margin-bottom: 16px;"
-  >
-    <div
-      class="ds-space"
-      style="margin-bottom: 8px;"
-    >
-      <h4>
-        settings.notifications.post
-      </h4>
+<article class="base-card">
+  <h2 class="title">settings.notifications.name</h2>
+  <div class="ds-space" style="margin-top: 16px; margin-bottom: 16px;">
+    <div class="ds-space" style="margin-bottom: 8px;">
+      <h4>settings.notifications.post</h4>
     </div>
-     
-    <div
-      class="notifcation-settings-section"
-    >
-      <div
-        class="ds-space"
-        style="margin-bottom: 8px;"
-      >
-        <input
-          id="commentOnObservedPost"
-          type="checkbox"
-        />
-         
-        <label
-          class="label"
-          for="commentOnObservedPost"
-        >
-          
+    <div class="notifcation-settings-section">
+      <div class="ds-space" style="margin-bottom: 8px;"><input id="commentOnObservedPost" type="checkbox"> <label for="commentOnObservedPost" class="label">
           settings.notifications.commentOnObservedPost
-        
-        </label>
-      </div>
-      <div
-        class="ds-space"
-        style="margin-bottom: 8px;"
-      >
-        <input
-          id="mention"
-          type="checkbox"
-        />
-         
-        <label
-          class="label"
-          for="mention"
-        >
-          
+        </label></div>
+      <div class="ds-space" style="margin-bottom: 8px;"><input id="mention" type="checkbox"> <label for="mention" class="label">
           settings.notifications.mention
-        
-        </label>
-      </div>
+        </label></div>
     </div>
   </div>
-  <div
-    class="ds-space"
-    style="margin-top: 16px; margin-bottom: 16px;"
-  >
-    <div
-      class="ds-space"
-      style="margin-bottom: 8px;"
-    >
-      <h4>
-        settings.notifications.group
-      </h4>
+  <div class="ds-space" style="margin-top: 16px; margin-bottom: 16px;">
+    <div class="ds-space" style="margin-bottom: 8px;">
+      <h4>settings.notifications.group</h4>
     </div>
-     
-    <div
-      class="notifcation-settings-section"
-    >
-      <div
-        class="ds-space"
-        style="margin-bottom: 8px;"
-      >
-        <input
-          id="groupMemberJoined"
-          type="checkbox"
-        />
-         
-        <label
-          class="label"
-          for="groupMemberJoined"
-        >
-          
+    <div class="notifcation-settings-section">
+      <div class="ds-space" style="margin-bottom: 8px;"><input id="groupMemberJoined" type="checkbox"> <label for="groupMemberJoined" class="label">
           settings.notifications.groupMemberJoined
-        
-        </label>
-      </div>
-      <div
-        class="ds-space"
-        style="margin-bottom: 8px;"
-      >
-        <input
-          id="groupMemberLeft"
-          type="checkbox"
-        />
-         
-        <label
-          class="label"
-          for="groupMemberLeft"
-        >
-          
+        </label></div>
+      <div class="ds-space" style="margin-bottom: 8px;"><input id="groupMemberLeft" type="checkbox"> <label for="groupMemberLeft" class="label">
           settings.notifications.groupMemberLeft
-        
-        </label>
-      </div>
-      <div
-        class="ds-space"
-        style="margin-bottom: 8px;"
-      >
-        <input
-          id="groupMemberRemoved"
-          type="checkbox"
-        />
-         
-        <label
-          class="label"
-          for="groupMemberRemoved"
-        >
-          
+        </label></div>
+      <div class="ds-space" style="margin-bottom: 8px;"><input id="groupMemberRemoved" type="checkbox"> <label for="groupMemberRemoved" class="label">
           settings.notifications.groupMemberRemoved
-        
-        </label>
-      </div>
-      <div
-        class="ds-space"
-        style="margin-bottom: 8px;"
-      >
-        <input
-          id="groupMemberRoleChanged"
-          type="checkbox"
-        />
-         
-        <label
-          class="label"
-          for="groupMemberRoleChanged"
-        >
-          
+        </label></div>
+      <div class="ds-space" style="margin-bottom: 8px;"><input id="groupMemberRoleChanged" type="checkbox"> <label for="groupMemberRoleChanged" class="label">
           settings.notifications.groupMemberRoleChanged
-        
-        </label>
-      </div>
+        </label></div>
     </div>
   </div>
-   
-  <div
-    class="ds-space"
-    style="margin-top: 24px; margin-bottom: 8px;"
-  >
-    <button
-      class="base-button"
-      type="button"
-    >
+  <div class="ds-space" style="margin-top: 24px; margin-bottom: 8px;"><button type="button" class="base-button">
       <!---->
-       
       <!---->
-       
       settings.notifications.checkAll
-    
-    </button>
-     
-    <button
-      class="base-button"
-      type="button"
-    >
+    </button> <button type="button" class="base-button">
       <!---->
-       
       <!---->
-       
       settings.notifications.uncheckAll
-    
-    </button>
-     
-    <button
-      class="save-button base-button --filled"
-      disabled="disabled"
-      type="button"
-    >
+    </button> <button disabled="disabled" type="button" class="save-button base-button --filled">
       <!---->
-       
       <!---->
-       
       actions.save
-    
-    </button>
-  </div>
-   
+    </button></div>
   <!---->
 </article>
 `;
