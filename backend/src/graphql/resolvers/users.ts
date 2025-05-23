@@ -16,6 +16,7 @@ import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import Resolver from './helpers/Resolver'
 import { mergeImage, deleteImage } from './images/images'
 import { createOrUpdateLocations } from './users/location'
+import normalizeEmail from './helpers/normalizeEmail'
 
 const neode = getNeode()
 
