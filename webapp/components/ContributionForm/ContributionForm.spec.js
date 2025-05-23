@@ -37,7 +37,7 @@ describe('ContributionForm.vue', () => {
   const image = { sensitive: false, url: '/uploads/1562010976466-avataaars', aspectRatio: 1 }
   beforeEach(() => {
     mocks = {
-      $t: jest.fn(),
+      $t: jest.fn((t) => t),
       $apollo: {
         mutate: jest.fn().mockResolvedValueOnce({
           data: {
@@ -62,9 +62,6 @@ describe('ContributionForm.vue', () => {
         back: jest.fn(),
         push: jest.fn(),
       },
-      $env: {
-        CATEGORIES_ACTIVE: false,
-      },
     }
     propsData = {}
   })
@@ -82,9 +79,13 @@ describe('ContributionForm.vue', () => {
           slug: 'you-yourself',
         }
       },
+      'categories/categoriesActive': jest.fn(() => false),
     }
     const store = new Vuex.Store({
       getters,
+      actions: {
+        'categories/init': jest.fn(),
+      },
     })
     const Wrapper = () => {
       return mount(ContributionForm, {

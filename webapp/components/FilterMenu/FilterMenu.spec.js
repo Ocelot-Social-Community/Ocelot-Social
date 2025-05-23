@@ -8,15 +8,16 @@ let wrapper
 describe('FilterMenu.vue', () => {
   const mocks = {
     $t: jest.fn((string) => string),
-    $env: {
-      CATEGORIES_ACTIVE: true,
-    },
   }
 
   const getters = {
     'posts/isActive': () => false,
     'posts/filteredPostTypes': () => [],
     'posts/orderBy': () => 'createdAt_desc',
+    'categories/categoriesActive': () => false,
+  }
+  const actions = {
+    'categories/init': jest.fn(),
   }
 
   const stubs = {
@@ -28,7 +29,7 @@ describe('FilterMenu.vue', () => {
   }
 
   const Wrapper = () => {
-    const store = new Vuex.Store({ getters })
+    const store = new Vuex.Store({ getters, actions })
     return mount(FilterMenu, { mocks, localVue, store, stubs })
   }
 

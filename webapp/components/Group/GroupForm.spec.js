@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import GroupForm from './GroupForm.vue'
+import Vuex from 'vuex'
 
 const localVue = global.localVue
 
@@ -15,19 +16,27 @@ const propsData = {
 describe('GroupForm', () => {
   let wrapper
   let mocks
+  let storeMocks
+  let store
 
   beforeEach(() => {
     mocks = {
       $t: jest.fn(),
-      $env: {
-        CATEGORIES_ACTIVE: true,
+    }
+    storeMocks = {
+      getters: {
+        'categories/categoriesActive': () => false,
+      },
+      actions: {
+        'categories/init': jest.fn(),
       },
     }
+    store = new Vuex.Store(storeMocks)
   })
 
   describe('mount', () => {
     const Wrapper = () => {
-      return mount(GroupForm, { propsData, mocks, localVue, stubs })
+      return mount(GroupForm, { propsData, mocks, localVue, stubs, store })
     }
 
     beforeEach(() => {

@@ -1,7 +1,7 @@
 <template>
   <section class="categories-select">
     <base-button
-      v-for="category in categories"
+      v-for="category in sortCategories(categories)"
       :key="category.id"
       :data-test="categoryButtonsId(category.id)"
       @click="toggleCategory(category.id)"
@@ -20,10 +20,10 @@
 </template>
 
 <script>
-import CategoryQuery from '~/graphql/CategoryQuery'
 import { CATEGORIES_MAX } from '~/constants/categories.js'
 import xor from 'lodash/xor'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   inject: {
@@ -31,14 +31,13 @@ export default {
       default: null,
     },
   },
-  mixins: [SortCategories],
+  mixins: [SortCategories, GetCategories],
   props: {
     existingCategoryIds: { type: Array, default: () => [] },
     model: { type: String, required: true },
   },
   data() {
     return {
-      categories: null,
       selectedMax: CATEGORIES_MAX,
       selectedCategoryIds: this.existingCategoryIds,
     }
@@ -74,16 +73,6 @@ export default {
     },
     categoryButtonsId(categoryId) {
       return `category-buttons-${categoryId}`
-    },
-  },
-  apollo: {
-    Category: {
-      query() {
-        return CategoryQuery()
-      },
-      result({ data: { Category } }) {
-        this.categories = this.sortCategories(Category)
-      },
     },
   },
 }

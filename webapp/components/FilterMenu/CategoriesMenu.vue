@@ -16,9 +16,11 @@
 import Dropdown from '~/components/Dropdown'
 import { mapGetters } from 'vuex'
 import CategoriesFilter from './CategoriesFilter'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   name: 'CategoriesMenu',
+  mixins: [GetCategories],
   components: {
     Dropdown,
     CategoriesFilter,
@@ -26,11 +28,6 @@ export default {
   props: {
     placement: { type: String },
     offset: { type: [String, Number] },
-  },
-  data() {
-    return {
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
-    }
   },
   computed: {
     ...mapGetters({

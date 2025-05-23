@@ -36,8 +36,10 @@ import OrderByFilter from './OrderByFilter'
 import CategoriesFilter from './CategoriesFilter'
 import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
 import SaveCategories from '~/graphql/SaveCategories.js'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
+  mixins: [GetCategories],
   components: {
     EventsByFilter,
     FollowingFilter,
@@ -45,11 +47,6 @@ export default {
     CategoriesFilter,
     PostTypeFilter,
     LabeledButton,
-  },
-  data() {
-    return {
-      categoriesActive: this.$env ? this.$env.CATEGORIES_ACTIVE : false,
-    }
   },
   computed: {
     ...mapGetters({

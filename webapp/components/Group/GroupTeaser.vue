@@ -79,9 +79,11 @@
 <script>
 import Category from '~/components/Category'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   name: 'GroupTeaser',
+  mixins: [GetCategories],
   components: {
     Category,
     GroupContentMenu,
@@ -95,11 +97,6 @@ export default {
       type: Object,
       default: () => {},
     },
-  },
-  data() {
-    return {
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
-    }
   },
   computed: {
     descriptionExcerpt() {

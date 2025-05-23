@@ -15,13 +15,16 @@ describe('OrderByFilter', () => {
     'posts/orderedByCreationDate': () => true,
     'posts/orderBy': () => 'createdAt_desc',
   }
+  const actions = {
+    'categories/init': jest.fn(),
+  }
 
   const mocks = {
     $t: jest.fn((string) => string),
   }
 
   const Wrapper = () => {
-    const store = new Vuex.Store({ mutations, getters })
+    const store = new Vuex.Store({ mutations, getters, actions })
     const wrapper = mount(OrderByFilter, { mocks, localVue, store })
     return wrapper
   }
