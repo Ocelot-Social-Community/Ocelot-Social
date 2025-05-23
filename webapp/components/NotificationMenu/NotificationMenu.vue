@@ -26,7 +26,7 @@
       <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
     </base-button>
   </nuxt-link>
-  <dropdown v-else class="notifications-menu" offset="8" :placement="placement" noMouseLeaveClosing>
+  <dropdown v-else class="notifications-menu" offset="8" :placement="placement" noMouseLeaveClosing ref="dropdown">
     <template #default="{ toggleMenu }">
       <base-button
         ghost
@@ -97,13 +97,22 @@ export default {
     placement: { type: String },
     noMenu: { type: Boolean, default: false },
   },
+  mounted() {
+    window.addEventListener('resize', this.handleResize)
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize)
+  },
   methods: {
+    handleResize() {
+      // When the viewport get resized close menu
+      this.$refs?.dropdown?.closeMenu?.()
+    },
     async markAsReadAndCloseMenu(notificationSourceId, closeMenu) {
-      const variables = { id: notificationSourceId }
       try {
         await this.$apollo.mutate({
           mutation: markAsReadMutation(this.$i18n),
-          variables,
+          variables: { id: notificationSourceId },
         })
 
         closeMenu?.()
