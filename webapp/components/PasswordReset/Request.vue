@@ -86,7 +86,7 @@ export default {
         }
       `
       try {
-        const { email } = this
+        const email = this.formData.email
         await this.$apollo.mutate({ mutation, variables: { email, locale: this.$i18n.locale() } })
         this.submitted = true
 
