@@ -55,7 +55,7 @@ $color-ribbon-event-shadow: color.adjust($color-ribbon-event, $lightness: -20%);
 
 $chat-sidemenu-background-over: color.adjust($color-tertiary-light, $lightness: -10%);
 $chat-sidemenu-background-active: $color-tertiary-light;
-$chat-message-color: $color-secondary-dark;
+$chat-message-color: black;
 $chat-message-bg-me: $color-tertiary-light;
 $chat-message-bg-others: $color-secondary-light;
 $chat-message-checkmark-seen: $color-primary;
