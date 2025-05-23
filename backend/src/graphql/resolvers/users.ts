@@ -13,10 +13,10 @@ import { getNeode } from '@db/neo4j'
 import { Context } from '@src/server'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
+import normalizeEmail from './helpers/normalizeEmail'
 import Resolver from './helpers/Resolver'
 import { mergeImage, deleteImage } from './images/images'
 import { createOrUpdateLocations } from './users/location'
-import normalizeEmail from './helpers/normalizeEmail'
 
 const neode = getNeode()
 
