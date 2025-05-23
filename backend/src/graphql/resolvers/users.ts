@@ -67,9 +67,8 @@ export default {
       }
     },
     User: async (object, args, context, resolveInfo) => {
-      args.email = normalizeEmail(args.email)
-      const { email } = args
-      if (email) {
+      if (args.email) {
+        args.email = normalizeEmail(args.email)
         let session
         try {
           session = context.driver.session()
