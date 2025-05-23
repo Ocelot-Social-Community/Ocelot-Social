@@ -15,7 +15,8 @@
         :room-actions="JSON.stringify(roomActions)"
         :rooms-loaded="roomsLoaded"
         :loading-rooms="loadingRooms"
-        show-files="false"
+        show-files="true"
+        accepted-files="image/png, image/jpeg, image/gif"
         show-audio="false"
         :height="'calc(100dvh - 190px)'"
         :styles="JSON.stringify(computedChatStyle)"
@@ -365,31 +366,78 @@ export default {
       }
     },
 
-    async sendMessage(message) {
+    async sendMessage(messageDetails) {
+      const { roomId, content, files } = messageDetails
+
+      const hasFiles = files && files.length > 0
+
+      const imagesToUpload = hasFiles
+        ? files.map((file) => ({
+            upload: file,
+            name: file.name,
+            type: file.type,
+          }))
+        : null
+
+      // Check if the message is effectively empty (no text and no files)
+      const isTextEmpty = !content || content.trim() === ''
+      const noFiles = !imagesToUpload || imagesToUpload.length === 0
+
+      if (isTextEmpty && noFiles) {
+        // TODO disable submit in this case if not already happening
+        this.$toast.info(this.$t('chat.emptyMessageError'))
+        return
+      }
+
+      const mutationVariables = {
+        roomId,
+        content,
+      }
+
+      if (imagesToUpload && imagesToUpload.length > 0) {
+        mutationVariables.images = imagesToUpload
+      }
+
       try {
-        const {
-          data: { CreateMessage: createdMessage },
-        } = await this.$apollo.mutate({
+        const { data } = await this.$apollo.mutate({
           mutation: createMessageMutation(),
-          variables: {
-            roomId: message.roomId,
-            content: message.content,
-          },
+          variables: mutationVariables,
         })
-        const roomIndex = this.rooms.findIndex((r) => r.id === message.roomId)
-        const changedRoom = { ...this.rooms[roomIndex] }
-        changedRoom.lastMessage = createdMessage
-        changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
-        // move current room to top (not 100% working)
-        // const rooms = [...this.rooms]
-        // rooms.splice(roomIndex,1)
-        // this.rooms = [changedRoom, ...rooms]
-        this.rooms[roomIndex] = changedRoom
+        const createdMessagePayload = data.CreateMessage
+
+        if (createdMessagePayload) {
+          const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
+          if (roomIndex !== -1) {
+            const changedRoom = { ...this.rooms[roomIndex] }
+            // Use content from the backend response first for the last message preview
+            let displayContent = createdMessagePayload.content
+            // Fallback if backend content is empty but files were sent (should ideally not happen if backend sets content)
+            if (!displayContent && imagesToUpload && imagesToUpload.length > 0) {
+              const fileCount = imagesToUpload.length
+              displayContent = `${fileCount} ${
+                fileCount > 1
+                  ? this.$t('chat.filesLabel', 'files')
+                  : this.$t('chat.fileLabel', 'file')
+              } ${this.$t('chat.attachedLabel', 'attached')}`
+            } else if (!displayContent) {
+              // General fallback if content is still undefined/empty
+              displayContent = this.$t('chat.fileMessageDefault', 'Message sent')
+            }
+
+            changedRoom.lastMessage.content = changedRoom.lastMessage.content
+              .trim()
+              .substring(0, 30)
+
+            // Move changed room to the top of the list
+            this.rooms.splice(roomIndex, 1, changedRoom)
+          }
+        }
       } catch (error) {
         this.$toast.error(error.message)
       }
+
       this.fetchMessages({
-        room: this.rooms.find((r) => r.roomId === message.roomId),
+        room: this.rooms.find((r) => r.roomId === messageDetails.roomId),
         options: { refetch: true },
       })
     },
