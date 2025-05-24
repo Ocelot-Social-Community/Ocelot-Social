@@ -152,16 +152,32 @@ export default {
 .ds-logo-desktop {
   display: block;
 }
-
+.ds-logo-tablet {
+  display: none;
+}
 .ds-logo-mobile {
   display: none;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 810px) {
   .ds-logo-desktop {
     display: none;
   }
+  .ds-logo-tablet {
+    display: block;
+  }
+  .ds-logo-mobile {
+    display: none;
+  }
+}
 
+@media (max-width: 450px) {
+  .ds-logo-desktop {
+    display: none;
+  }
+  .ds-logo-tablet {
+    display: none;
+  }
   .ds-logo-mobile {
     display: block;
   }
