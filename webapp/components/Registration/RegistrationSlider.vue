@@ -12,9 +12,9 @@
           <registration-slide-no-public :sliderData="sliderData" />
         </template>
 
-<!--        <template #enter-invite>-->
-<!--          <registration-slide-invite :sliderData="sliderData" />-->
-<!--        </template>-->
+        <template #enter-invite>
+          <registration-slide-invite :sliderData="sliderData" />
+        </template>
 
         <template #enter-email>
           <registration-slide-email :sliderData="sliderData" :invitation="false" />
@@ -24,7 +24,7 @@
           <registration-slide-nonce :sliderData="sliderData" />
         </template>
 
-        <template #enter-invite>
+        <template #create-user-account>
           <registration-slide-create :sliderData="sliderData" />
         </template>
 

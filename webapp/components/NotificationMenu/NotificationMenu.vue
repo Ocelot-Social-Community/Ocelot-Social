@@ -26,7 +26,14 @@
       <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
     </base-button>
   </nuxt-link>
-  <dropdown v-else class="notifications-menu" offset="8" :placement="placement" noMouseLeaveClosing ref="dropdown">
+  <dropdown
+    v-else
+    class="notifications-menu"
+    offset="8"
+    :placement="placement"
+    noMouseLeaveClosing
+    ref="dropdown"
+  >
     <template #default="{ toggleMenu }">
       <base-button
         ghost
@@ -62,7 +69,8 @@
         <notifications-table
           @markNotificationAsRead="markAsReadAndCloseMenu($event, closeMenu)"
           :notifications="notifications"
-          :show-popover="false" />
+          :show-popover="false"
+        />
       </div>
     </template>
   </dropdown>
@@ -86,7 +94,7 @@ export default {
   components: {
     NotificationsTable,
     CounterIcon,
-    Dropdown
+    Dropdown,
   },
   data() {
     return {
@@ -194,5 +202,4 @@ export default {
   padding: $space-x-small 0;
   flex-direction: row;
 }
-
 </style>

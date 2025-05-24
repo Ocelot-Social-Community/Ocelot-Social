@@ -39,49 +39,52 @@
           </ds-grid-item>
           <ds-grid-item>
             <base-card :wide-content="true">
-            <div class="notification-container">
-              <!-- Icon with responsive sizing -->
-              <div class="notification-icon">
-                <base-icon
-                  v-if="notification.from.post"
-                  name="comment"
-                  v-tooltip="{ content: $t('notifications.comment'), placement: 'right' }"
-                />
-                <base-icon
-                  v-else
-                  name="bookmark"
-                  v-tooltip="{ content: $t('notifications.post'), placement: 'right' }"
-                />
-              </div>
+              <div class="notification-container">
+                <!-- Icon with responsive sizing -->
+                <div class="notification-icon">
+                  <base-icon
+                    v-if="notification.from.post"
+                    name="comment"
+                    v-tooltip="{ content: $t('notifications.comment'), placement: 'right' }"
+                  />
+                  <base-icon
+                    v-else
+                    name="bookmark"
+                    v-tooltip="{ content: $t('notifications.post'), placement: 'right' }"
+                  />
+                </div>
 
-              <!-- Content section with title and description -->
-              <div class="notification-content">
-                <nuxt-link
-                  class="notification-mention-post"
-                  :class="{ 'notification-status': notification.read }"
-                  :to="{
-                    name: isGroup(notification.from) ? 'groups-id-slug' : 'post-id-slug',
-                    params: params(notification.from),
-                    hash: hashParam(notification.from),
-                  }"
-                  @click.native.prevent="handleNotificationClick(notification)"
-                >
-                  <b>
+                <!-- Content section with title and description -->
+                <div class="notification-content">
+                  <nuxt-link
+                    class="notification-mention-post"
+                    :class="{ 'notification-status': notification.read }"
+                    :to="{
+                      name: isGroup(notification.from) ? 'groups-id-slug' : 'post-id-slug',
+                      params: params(notification.from),
+                      hash: hashParam(notification.from),
+                    }"
+                    @click.native.prevent="handleNotificationClick(notification)"
+                  >
+                    <b>
+                      {{
+                        notification.from.title ||
+                        notification.from.groupName ||
+                        notification.from.post.title | truncate(50)
+                      }}
+                    </b>
+                  </nuxt-link>
+                  <p
+                    class="notification-description"
+                    :class="{ 'notification-status': notification.read }"
+                  >
                     {{
-                      notification.from.title ||
-                      notification.from.groupName ||
-                      notification.from.post.title | truncate(50)
+                      notification.from.contentExcerpt ||
+                      notification.from.descriptionExcerpt | removeHtml
                     }}
-                  </b>
-                </nuxt-link>
-                <p class="notification-description" :class="{ 'notification-status': notification.read }">
-                  {{
-                    notification.from.contentExcerpt ||
-                    notification.from.descriptionExcerpt | removeHtml
-                  }}
-                </p>
+                  </p>
+                </div>
               </div>
-            </div>
             </base-card>
           </ds-grid-item>
         </ds-grid>
@@ -144,23 +147,23 @@ export default {
     },
     markNotificationAsRead(notificationSourceId) {
       return new Promise((resolve) => {
-        this.$emit('markNotificationAsRead', notificationSourceId);
-        resolve();
-      });
+        this.$emit('markNotificationAsRead', notificationSourceId)
+        resolve()
+      })
     },
     async handleNotificationClick(notification) {
       const route = {
         name: this.isGroup(notification.from) ? 'groups-id-slug' : 'post-id-slug',
         params: this.params(notification.from),
         hash: this.hashParam(notification.from),
-      };
+      }
 
-      await this.markNotificationAsRead(notification.from.id);
+      await this.markNotificationAsRead(notification.from.id)
 
       setTimeout(() => {
-        this.$router.push(route);
-      }, 10);
-    }
+        this.$router.push(route)
+      }, 10)
+    },
   },
 }
 </script>

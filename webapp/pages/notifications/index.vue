@@ -36,7 +36,6 @@
           @next="next"
         />
       </ds-flex-item>
-
     </ds-flex>
   </base-card>
 </template>

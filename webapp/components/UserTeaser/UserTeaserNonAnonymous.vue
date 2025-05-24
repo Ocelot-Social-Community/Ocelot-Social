@@ -36,7 +36,12 @@
               </span>
             </nuxt-link>
           </span>
-          <span>{{ injectedText }}<span v-if="injectedText && injectedDate && !userOnly && dateTime"> {{$t(`notifications.reason.on_date`)}} <date-time :date-time="dateTime" /></span>
+          <span>
+            {{ injectedText }}
+            <span v-if="injectedText && injectedDate && !userOnly && dateTime">
+              {{ $t(`notifications.reason.on_date`) }}
+              <date-time :date-time="dateTime" />
+            </span>
           </span>
         </div>
         <span v-if="!userOnly && !injectedDate && dateTime" class="text">
