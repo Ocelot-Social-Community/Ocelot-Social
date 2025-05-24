@@ -10,7 +10,7 @@
 
     <!-- Tablet logo (falls back to desktop if not provided) -->
     <img
-      class="ds-logo-svg ds-logo-mobile"
+      class="ds-logo-svg ds-logo-tablet"
       :alt="metadata.APPLICATION_NAME + ' ' + logo.alt"
       :src="logo.tabletPath || logo.path"
       :style="tabletLogoWidthStyle"
@@ -115,7 +115,7 @@ export default {
       const width = this.logoWidth === null ? this.logo.widthDefault : this.logoWidth
       return `width: ${width};`
     },
-    tabeletLogoWidthStyle() {
+    tabletLogoWidthStyle() {
       const width =
         this.tabletLogoWidth === null ? this.logo.tabletWidthDefault : this.tabletLogoWidth
       return `width: ${width};`
