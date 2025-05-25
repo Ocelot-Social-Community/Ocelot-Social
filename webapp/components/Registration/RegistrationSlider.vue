@@ -44,7 +44,6 @@
 
 <script>
 import links from '~/constants/links.js'
-import metadata from '~/constants/metadata.js'
 import ComponentSlider from '~/components/ComponentSlider/ComponentSlider'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
@@ -54,6 +53,7 @@ import RegistrationSlideEmail from './RegistrationSlideEmail'
 import RegistrationSlideInvite from './RegistrationSlideInvite'
 import RegistrationSlideNonce from './RegistrationSlideNonce'
 import RegistrationSlideNoPublic from './RegistrationSlideNoPublic'
+import CONFIG from '~/config'
 
 export default {
   name: 'RegistrationSlider',
@@ -89,7 +89,10 @@ export default {
       },
       enterInvite: {
         name: 'enter-invite',
-        titleIdent: { id: 'components.registration.signup.title', data: metadata },
+        titleIdent: {
+          id: 'components.registration.signup.title',
+          data: { APPLICATION_NAME: CONFIG.APPLICATION_NAME },
+        },
         validated: false,
         data: { request: null, response: { isValidInviteCode: false } },
         button: {
@@ -168,7 +171,9 @@ export default {
         query: this.$route.query,
       },
       links,
-      metadata,
+      metadata: {
+        APPLICATION_NAME: CONFIG.APPLICATION_NAME,
+      },
       sliderData: {
         collectedInputData: {
           inviteCode: null,

@@ -7,7 +7,6 @@ import { config } from 'dotenv'
 import * as SMTPTransport from 'nodemailer/lib/smtp-pool'
 
 import emails from './emails'
-import metadata from './metadata'
 
 // Load env file
 config()
@@ -110,11 +109,15 @@ const s3 = {
     env.AWS_BUCKET,
 }
 
+const meta = {
+  APPLICATION_NAME: process.env.APPLICATION_NAME ?? 'ocelot.social',
+  ORGANIZATION_NAME: process.env.ORGANIZATION_NAME ?? 'ocelot.social Community',
+}
+
 const options = {
   EMAIL_DEFAULT_SENDER: env.EMAIL_DEFAULT_SENDER,
   SUPPORT_EMAIL: env.SUPPORT_EMAIL,
   SUPPORT_URL: emails.SUPPORT_LINK,
-  APPLICATION_NAME: metadata.APPLICATION_NAME,
   ORGANIZATION_URL: emails.ORGANIZATION_LINK,
   PUBLIC_REGISTRATION: env.PUBLIC_REGISTRATION === 'true' || false,
   INVITE_REGISTRATION: env.INVITE_REGISTRATION !== 'false', // default = true
@@ -147,6 +150,7 @@ export default {
   ...s3,
   ...options,
   ...language,
+  ...meta,
 }
 
 export { nodemailerTransportOptions }

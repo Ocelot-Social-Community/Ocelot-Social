@@ -53,7 +53,7 @@
 
 <script>
 import links from '~/constants/links.js'
-import metadata from '~/constants/metadata.js'
+import CONFIG from '~/config'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
@@ -70,7 +70,9 @@ export default {
   },
   data() {
     return {
-      metadata,
+      metadata: {
+        APPLICATION_NAME: CONFIG.APPLICATION_NAME,
+      },
       links,
       form: {
         email: '',

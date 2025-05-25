@@ -2,7 +2,7 @@ import gql from 'graphql-tag'
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import { currentUserQuery } from '~/graphql/User'
 import Cookie from 'universal-cookie'
-import metadata from '~/constants/metadata'
+import CONFIG from '~/config'
 
 const cookies = new Cookie()
 
@@ -106,7 +106,7 @@ export const actions = {
       await this.app.$apolloHelpers.onLogin(login)
       commit('SET_TOKEN', login)
       await dispatch('fetchCurrentUser')
-      if (cookies.get(metadata.COOKIE_NAME) === undefined) {
+      if (cookies.get(CONFIG.COOKIE_NAME) === undefined) {
         throw new Error('no-cookie')
       }
     } catch (err) {
