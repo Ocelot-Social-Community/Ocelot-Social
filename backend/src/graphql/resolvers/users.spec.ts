@@ -12,6 +12,7 @@ import databaseContext from '@context/database'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import User from '@db/models/User'
+import { setTrophyBadgeSelected } from '@graphql/queries/setTrophyBadgeSelected'
 import createServer, { getContext } from '@src/server'
 
 const categoryIds = ['cat9']
@@ -74,22 +75,6 @@ const saveCategorySettings = gql`
 const updateOnlineStatus = gql`
   mutation ($status: OnlineStatus!) {
     updateOnlineStatus(status: $status)
-  }
-`
-
-const setTrophyBadgeSelected = gql`
-  mutation ($slot: Int!, $badgeId: ID) {
-    setTrophyBadgeSelected(slot: $slot, badgeId: $badgeId) {
-      badgeTrophiesCount
-      badgeTrophiesSelected {
-        id
-        isDefault
-      }
-      badgeTrophiesUnused {
-        id
-      }
-      badgeTrophiesUnusedCount
-    }
   }
 `
 
