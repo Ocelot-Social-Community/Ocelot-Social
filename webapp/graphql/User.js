@@ -388,6 +388,11 @@ export const updateUserMutation = () => {
         avatar {
           url
         }
+        badgeVerification {
+          id
+          description
+          icon
+        }
       }
     }
   `
