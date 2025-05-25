@@ -37,7 +37,16 @@ const options = {
   CATEGORIES_ACTIVE: process.env.CATEGORIES_ACTIVE === 'true' || false,
   BADGES_ENABLED: process.env.BADGES_ENABLED === 'true' || false,
   INVITE_LINK_LIMIT: process.env.INVITE_LINK_LIMIT || 7,
-  NETWORK_NAME: process.env.NETWORK_NAME || 'Ocelot.social',
+}
+
+const meta = {
+  APPLICATION_NAME: process.env.APPLICATION_NAME ?? 'ocelot.social',
+  APPLICATION_SHORT_NAME: process.env.APPLICATION_SHORT_NAME ?? 'ocelot.social',
+  APPLICATION_DESCRIPTION: process.env.APPLICATION_DESCRIPTION ?? 'ocelot.social Community Network',
+  COOKIE_NAME: process.env.COOKIE_NAME ?? 'ocelot-social-token',
+  ORGANIZATION_NAME: process.env.ORGANIZATION_NAME ?? 'ocelot.social Community',
+  ORGANIZATION_JURISDICTION: process.env.ORGANIZATION_JURISDICTION ?? 'City of Angels',
+  THEME_COLOR: process.env.THEME_COLOR ?? 'rgb(23, 181, 63)', // $color-primary – as the main color in general. e.g. the color in the background of the app that is visible behind the transparent iPhone status bar to name one use case, or the current color of SVGs to name another use case
 }
 
 const language = {
@@ -51,6 +60,7 @@ const CONFIG = {
   ...sentry,
   ...options,
   ...language,
+  ...meta,
 }
 
 // override process.env with the values here since they contain default values

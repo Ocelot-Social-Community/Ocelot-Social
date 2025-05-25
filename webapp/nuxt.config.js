@@ -1,6 +1,5 @@
 import path from 'path'
 import manifest from './constants/manifest.js'
-import metadata from './constants/metadata.js'
 
 const CONFIG = require('./config').default // we need to use require since this is only evaluated at compile time.
 
@@ -211,7 +210,7 @@ export default {
 
   // Give apollo module options
   apollo: {
-    tokenName: metadata.COOKIE_NAME, // optional, default: apollo-token
+    tokenName: CONFIG.COOKIE_NAME, // optional, default: apollo-token
     cookieAttributes: {
       expires: CONFIG.COOKIE_EXPIRE_TIME, // optional, default: 7 (days)
       /** * Define the path where the cookie is available. Defaults to '/' */

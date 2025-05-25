@@ -45,10 +45,8 @@
 
 <script>
 import emails from '~/constants/emails.js'
-// import links from '~/constants/links.js'
-import metadata from '~/constants/metadata.js'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
-// import Logo from '~/components/Logo/Logo'
+import CONFIG from '~/config'
 
 export default {
   layout: 'blank',
@@ -58,7 +56,9 @@ export default {
   },
   data() {
     // return { links, metadata, supportEmail: emails.SUPPORT_EMAIL }
-    return { metadata, supportEmail: emails.SUPPORT_EMAIL }
+    return { metadata: {
+      APPLICATION_NAME: CONFIG.APPLICATION_NAME,
+    }, supportEmail: emails.SUPPORT_EMAIL }
   },
 }
 </script>

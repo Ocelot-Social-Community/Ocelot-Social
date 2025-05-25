@@ -20,7 +20,7 @@
 
 <script>
 import logos from '~/constants/logosBranded.js'
-import metadata from '~/constants/metadata.js'
+import CONFIG from '~/config'
 
 /**
  * This component displays the brand's logo.
@@ -90,7 +90,9 @@ export default {
     }
     return {
       logo: logosObject[this.logoType],
-      metadata,
+      metadata: {
+        APPLICATION_NAME: CONFIG.APPLICATION_NAME,
+      },
     }
   },
   computed: {

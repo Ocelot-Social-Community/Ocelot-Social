@@ -1,4 +1,4 @@
-// this file is duplicated in `backend/src/constants/metadata` and `webapp/constants/metadata.js`
+// this file is duplicated in `backend/src/constants/categories` and `webapp/constants/categories.js`
 export const CATEGORIES_MIN = 1
 export const CATEGORIES_MAX = 3
 

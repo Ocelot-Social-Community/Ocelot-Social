@@ -1,10 +1,9 @@
-import metadata from './metadata.js'
-const { APPLICATION_NAME, APPLICATION_SHORT_NAME, APPLICATION_DESCRIPTION, THEME_COLOR } = metadata
+import CONFIG from '~/config'
 
 export default {
-  name: APPLICATION_NAME,
-  short_name: APPLICATION_SHORT_NAME,
-  description: APPLICATION_DESCRIPTION,
-  theme_color: THEME_COLOR,
+  name: CONFIG.APPLICATION_NAME,
+  short_name: CONFIG.APPLICATION_SHORT_NAME,
+  description: CONFIG.APPLICATION_DESCRIPTION,
+  theme_color: CONFIG.THEME_COLOR,
   lang: 'en',
 }
