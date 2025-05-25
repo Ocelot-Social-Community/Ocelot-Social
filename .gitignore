@@ -10,11 +10,13 @@ yarn-error.log*
 kubeconfig.yaml
 backup-cron-job.log
 .vscode
+.nuxt
 
 node_modules/
 cypress/videos
 cypress/screenshots/
 cypress.env.json
+deployment/configurations/
 
 .vuepress/.cache/
 .vuepress/.temp/

@@ -30,11 +30,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
       
-      - name: Remove old documentation files
-        run: rm -rf ./deployment/src/old/ ./CHANGELOG.md # workaround until https://github.com/gaurav-nelson/github-action-markdown-link-check/pull/183 has been done
+      - name: Remove uncheckable documentation files
+        run: rm -rf ./CHANGELOG.md # workaround until https://github.com/gaurav-nelson/github-action-markdown-link-check/pull/183 has been done
 
       - name: Check Markdown Links
-        uses: gaurav-nelson/github-action-markdown-link-check@7d83e59a57f3c201c76eed3d33dff64ec4452d27 # 1.0.15
+        uses: gaurav-nelson/github-action-markdown-link-check@1b916f2cf6c36510a6059943104e3c42ce6c16bc # 1.0.15
         with:
           use-quiet-mode: 'yes'
           use-verbose-mode: 'no'
@@ -54,7 +54,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
 
       - name: Setup Node 20
-        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.0.3
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.0.3
         with:
           node-version: '20'
 

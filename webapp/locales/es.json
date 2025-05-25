@@ -10,22 +10,57 @@
     "saveCategories": null
   },
   "admin": {
+    "badges": {
+      "description": null,
+      "noBadges": null,
+      "revokeTrophy": {
+        "error": null,
+        "success": null
+      },
+      "revokeVerification": {
+        "error": null,
+        "success": null
+      },
+      "rewardTrophy": {
+        "error": null,
+        "success": null
+      },
+      "setVerification": {
+        "error": null,
+        "success": null
+      },
+      "title": null,
+      "trophyBadges": null,
+      "verificationBadges": null
+    },
     "categories": {
       "categoryName": "Nombre",
       "name": "Categorías",
       "postCount": "Contribuciones"
     },
     "dashboard": {
+      "badgesDisplayed": null,
+      "badgesRewarded": null,
+      "chatMessages": null,
+      "chatRooms": null,
       "comments": "Comentarios",
+      "emails": null,
       "follows": "Sigue",
+      "groups": null,
+      "inviteCodes": null,
+      "inviteCodesExpired": null,
+      "inviteCodesRedeemed": null,
       "invites": "Invita",
+      "locations": null,
       "name": "Tablero",
       "notifications": "Notificaciones",
-      "organizations": "Organizaciones",
       "posts": "Contribuciones",
-      "projects": "Proyectos",
+      "reports": null,
       "shouts": "Recomendaciones",
-      "users": "Usuarios"
+      "tags": null,
+      "users": "Usuarios",
+      "usersDeleted": null,
+      "usersVerified": null
     },
     "donations": {
       "goal": "Donaciones mensuales necesarias",
@@ -68,6 +103,7 @@
       "roleChanged": null,
       "table": {
         "columns": {
+          "badges": null,
           "createdAt": "Creado el",
           "email": "Correo electrónico",
           "name": "Nombre",
@@ -220,7 +256,10 @@
             "length": null,
             "success": null
           }
-        }
+        },
+        "invited-by": null,
+        "invited-by-and-to": null,
+        "invited-to-hidden-group": null
       },
       "no-public-registrstion": {
         "title": null
@@ -485,6 +524,9 @@
     "categoriesTitle": null,
     "changeMemberRole": null,
     "contentMenu": {
+      "inviteLinks": null,
+      "muteGroup": "Silenciar grupo",
+      "unmuteGroup": "Desactivar silencio del grupo",
       "visitGroupPage": null
     },
     "createNewGroup": {
@@ -505,6 +547,7 @@
     "goal": null,
     "groupCreated": null,
     "in": null,
+    "invite-links": null,
     "joinLeaveButton": {
       "iAmMember": null,
       "join": null,
@@ -535,6 +578,7 @@
       "confirmAddGroupMemberText": null,
       "confirmAddGroupMemberTitle": null
     },
+    "muted": "Grupo silenciado",
     "myGroups": null,
     "name": null,
     "radius": null,
@@ -559,6 +603,8 @@
       "hidden": null,
       "public": null
     },
+    "unmute": "Desactivar silencio",
+    "unmuted": "Silencio del grupo desactivado",
     "update": null,
     "updatedGroup": null
   },
@@ -599,13 +645,35 @@
     "button": {
       "tooltip": null
     },
+    "comment-placeholder": null,
     "copy-code": null,
     "copy-success": null,
-    "not-available": null,
-    "your-code": null
+    "create-error": null,
+    "create-success": null,
+    "delete-modal": {
+      "message": null,
+      "title": null
+    },
+    "generate-code": null,
+    "generate-code-explanation": null,
+    "group-invite-links": null,
+    "invalidate": null,
+    "invalidate-error": null,
+    "invalidate-success": null,
+    "invite-link-message-group": null,
+    "invite-link-message-hidden-group": null,
+    "invite-link-message-personal": null,
+    "limit-reached": null,
+    "my-invite-links": null,
+    "no-links": null,
+    "redeemed-count": null,
+    "redeemed-count-0": null
   },
   "localeSwitch": {
     "tooltip": null
+  },
+  "location": {
+    "distance": null
   },
   "login": {
     "email": "Su correo electrónico",
@@ -737,15 +805,21 @@
     "post": "Contribución",
     "reason": {
       "changed_group_member_role": null,
-      "commented_on_post": "Comentó su contribución ...",
-      "mentioned_in_comment": "Le mencionó en un comentario …",
-      "mentioned_in_post": "Le mencionó en una contribución …",
+      "commented_on_post": "Comentó su contribución",
+      "followed_user_posted": null,
+      "mentioned_in_comment": "Le mencionó en un comentario",
+      "mentioned_in_post": "Le mencionó en una contribución",
+      "on_date": "de",
+      "post_in_group": null,
       "removed_user_from_group": null,
       "user_joined_group": null,
       "user_left_group": null
     },
     "title": "Notificaciones",
     "user": "Usuario"
+  },
+  "observeButton": {
+    "observed": null
   },
   "post": {
     "comment": {
@@ -778,8 +852,12 @@
     "menu": {
       "delete": "Borrar contribución",
       "edit": "Editar contribución",
+      "observe": "Observar contribución",
+      "observedSuccessfully": null,
       "pin": "Anclar contribución",
       "pinnedSuccessfully": "¡Contribución anclado con éxito!",
+      "unobserve": "Dejar de observar contribución",
+      "unobservedSuccessfully": null,
       "unpin": "Desanclar contribución",
       "unpinnedSuccessfully": "¡Contribución desanclado con éxito!"
     },
@@ -919,6 +997,16 @@
     "title": null
   },
   "settings": {
+    "badges": {
+      "click-to-select": null,
+      "click-to-use": null,
+      "description": null,
+      "name": null,
+      "no-badges-available": null,
+      "remove": null,
+      "success-update": null,
+      "verification": null
+    },
     "blocked-users": {
       "block": "Bloquear usuario",
       "columns": {
@@ -1032,9 +1120,24 @@
     },
     "name": "Configuración",
     "notifications": {
-      "name": null,
-      "send-email-notifications": null,
-      "success-update": null
+      "chat": "Chat",
+      "chatMessage": "Mensaje recibido mientras estaba ausente",
+      "checkAll": "Seleccionar todo",
+      "commentOnObservedPost": "Comentario en una contribución que estoy observando",
+      "followingUsers": null,
+      "group": "Grupos",
+      "groupMemberJoined": "Un nuevo miembro se unió a un grupo mio",
+      "groupMemberLeft": "Un miembro dejó un grupo mio",
+      "groupMemberRemoved": "Fui eliminado de un grupo",
+      "groupMemberRoleChanged": "Mi rol en un grupo ha cambiado",
+      "mention": "Mencionado en una contribución",
+      "name": "Notificaciones por correo electrónico",
+      "post": "Entradas y comentarios",
+      "postByFollowedUser": "Posts by users I follow",
+      "postInGroup": "Post en un grupo del que soy miembro",
+      "send-email-notifications": "Enviar notificaciones por correo electrónico",
+      "success-update": "¡Configuración de notificaciones guardada!",
+      "uncheckAll": "Deseleccionar todo"
     },
     "organizations": {
       "name": "Mis organizaciones"
@@ -1110,5 +1213,10 @@
     "newTermsAndConditions": "Nuevos términos de uso",
     "termsAndConditionsNewConfirm": "He leído y acepto los nuevos términos de uso.",
     "termsAndConditionsNewConfirmText": "¡Por favor, lea los nuevos términos de uso ahora!"
+  },
+  "user-teaser": {
+    "popover": {
+      "open-profile": null
+    }
   }
 }

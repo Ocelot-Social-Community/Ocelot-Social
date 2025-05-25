@@ -1,4 +1,9 @@
-import { getDriver } from '../../db/neo4j'
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+
+import { getDriver } from '@db/neo4j'
 
 export const description =
   'We should not maintain obsolete attributes for posts which have been deleted.'
@@ -22,7 +27,7 @@ export async function up(next) {
   `)
   try {
     // Implement your migration here.
-    const posts = await updateDeletedPostsAttributes.records.map((record) => record.get('post'))
+    const posts = updateDeletedPostsAttributes.records.map((record) => record.get('post'))
     // eslint-disable-next-line no-console
     console.log(posts)
     await transaction.commit()
@@ -35,7 +40,7 @@ export async function up(next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 

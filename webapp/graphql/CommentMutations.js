@@ -13,6 +13,8 @@ export default (i18n) => {
           updatedAt
           disabled
           deleted
+          isPostObservedByMe
+          postObservingUsersCount
           author {
             id
             slug
@@ -27,7 +29,7 @@ export default (i18n) => {
             commentedCount
             followedByCount
             followedByCurrentUser
-            badges {
+            badgeTrophies {
               id
               icon
             }

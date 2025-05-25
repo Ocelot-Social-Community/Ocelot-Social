@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-maintenance
+spec:
+  ports:
+    - name: {{ .Release.Name }}-http
+      port: 80
+      targetPort: 80
+  selector:
+    app: {{ .Release.Name }}-maintenance

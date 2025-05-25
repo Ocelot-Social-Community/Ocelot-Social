@@ -1,5 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import jwt from 'jsonwebtoken'
-import CONFIG from './../config'
+
+import CONFIG from '@config/index'
 
 // Generate an Access Token for the given User ID
 export default function encode(user) {

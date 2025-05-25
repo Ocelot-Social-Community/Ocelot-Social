@@ -1,8 +1,9 @@
-import * as cheerio from 'cheerio'
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+import { load } from 'cheerio'
 
 export default (content?) => {
   if (!content) return []
-  const $ = cheerio.load(content)
+  const $ = load(content)
   const userIds = $('a.mention[data-mention-id]')
     .map((_, el) => {
       return $(el).attr('data-mention-id')

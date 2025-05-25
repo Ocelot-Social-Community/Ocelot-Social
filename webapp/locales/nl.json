@@ -10,22 +10,57 @@
     "saveCategories": null
   },
   "admin": {
+    "badges": {
+      "description": null,
+      "noBadges": null,
+      "revokeTrophy": {
+        "error": null,
+        "success": null
+      },
+      "revokeVerification": {
+        "error": null,
+        "success": null
+      },
+      "rewardTrophy": {
+        "error": null,
+        "success": null
+      },
+      "setVerification": {
+        "error": null,
+        "success": null
+      },
+      "title": null,
+      "trophyBadges": null,
+      "verificationBadges": null
+    },
     "categories": {
       "categoryName": "Naam",
       "name": "Categorieën",
       "postCount": "Berichten"
     },
     "dashboard": {
+      "badgesDisplayed": null,
+      "badgesRewarded": null,
+      "chatMessages": null,
+      "chatRooms": null,
       "comments": "Opmerkingen",
+      "emails": null,
       "follows": "Volgt",
+      "groups": null,
+      "inviteCodes": null,
+      "inviteCodesExpired": null,
+      "inviteCodesRedeemed": null,
       "invites": "Uitnodigingen",
+      "locations": null,
       "name": "Dashboard",
       "notifications": "Meldingen",
-      "organizations": "Organisaties",
       "posts": "Berichten",
-      "projects": "Projecten",
+      "reports": null,
       "shouts": "Shouts",
-      "users": "Gebruikers"
+      "tags": null,
+      "users": "Gebruikers",
+      "usersDeleted": null,
+      "usersVerified": null
     },
     "donations": {
       "goal": null,
@@ -68,6 +103,7 @@
       "roleChanged": null,
       "table": {
         "columns": {
+          "badges": null,
           "createdAt": null,
           "email": null,
           "name": null,
@@ -220,7 +256,10 @@
             "length": null,
             "success": null
           }
-        }
+        },
+        "invited-by": null,
+        "invited-by-and-to": null,
+        "invited-to-hidden-group": null
       },
       "no-public-registrstion": {
         "title": null
@@ -485,6 +524,9 @@
     "categoriesTitle": null,
     "changeMemberRole": null,
     "contentMenu": {
+      "inviteLinks": null,
+      "muteGroup": null,
+      "unmuteGroup": null,
       "visitGroupPage": null
     },
     "createNewGroup": {
@@ -505,6 +547,7 @@
     "goal": null,
     "groupCreated": null,
     "in": null,
+    "invite-links": null,
     "joinLeaveButton": {
       "iAmMember": null,
       "join": null,
@@ -535,6 +578,7 @@
       "confirmAddGroupMemberText": null,
       "confirmAddGroupMemberTitle": null
     },
+    "muted": null,
     "myGroups": null,
     "name": null,
     "radius": null,
@@ -559,6 +603,8 @@
       "hidden": null,
       "public": null
     },
+    "unmute": null,
+    "unmuted": null,
     "update": null,
     "updatedGroup": null
   },
@@ -599,13 +645,35 @@
     "button": {
       "tooltip": null
     },
+    "comment-placeholder": null,
     "copy-code": null,
     "copy-success": null,
-    "not-available": null,
-    "your-code": null
+    "create-error": null,
+    "create-success": null,
+    "delete-modal": {
+      "message": null,
+      "title": null
+    },
+    "generate-code": null,
+    "generate-code-explanation": null,
+    "group-invite-links": null,
+    "invalidate": null,
+    "invalidate-error": null,
+    "invalidate-success": null,
+    "invite-link-message-group": null,
+    "invite-link-message-hidden-group": null,
+    "invite-link-message-personal": null,
+    "limit-reached": null,
+    "my-invite-links": null,
+    "no-links": null,
+    "redeemed-count": null,
+    "redeemed-count-0": null
   },
   "localeSwitch": {
     "tooltip": null
+  },
+  "location": {
+    "distance": null
   },
   "login": {
     "email": "Uw E-mail",
@@ -738,14 +806,20 @@
     "reason": {
       "changed_group_member_role": null,
       "commented_on_post": null,
+      "followed_user_posted": null,
       "mentioned_in_comment": null,
       "mentioned_in_post": null,
+      "on_date": null,
+      "post_in_group": null,
       "removed_user_from_group": null,
       "user_joined_group": null,
       "user_left_group": null
     },
     "title": null,
     "user": null
+  },
+  "observeButton": {
+    "observed": null
   },
   "post": {
     "comment": {
@@ -778,8 +852,12 @@
     "menu": {
       "delete": null,
       "edit": null,
+      "observe": null,
+      "observedSuccessfully": null,
       "pin": null,
       "pinnedSuccessfully": null,
+      "unobserve": null,
+      "unobservedSuccessfully": null,
       "unpin": null,
       "unpinnedSuccessfully": null
     },
@@ -919,6 +997,16 @@
     "title": null
   },
   "settings": {
+    "badges": {
+      "click-to-select": null,
+      "click-to-use": null,
+      "description": null,
+      "name": null,
+      "no-badges-available": null,
+      "remove": null,
+      "success-update": null,
+      "verification": null
+    },
     "blocked-users": {
       "block": null,
       "columns": {
@@ -1032,9 +1120,24 @@
     },
     "name": "Instellingen",
     "notifications": {
-      "name": null,
-      "send-email-notifications": null,
-      "success-update": null
+      "chat": "Chat",
+      "chatMessage": "Bericht ontvangen tijdens afwezigheid",
+      "checkAll": "Vink alles aan",
+      "commentOnObservedPost": "Geef commentaar op een bijdrage die ik volg",
+      "followingUsers": null,
+      "group": "Groepen",
+      "groupMemberJoined": "Een nieuw lid is lid geworden van een groep van mij",
+      "groupMemberLeft": "Een lid heeft een groep van mij verlaten",
+      "groupMemberRemoved": "Ik ben verwijderd uit een groep",
+      "groupMemberRoleChanged": "Mijn rol in een groep is veranderd",
+      "mention": "Genoemd in een bijdrage",
+      "name": "Email Meldingen",
+      "post": "Berichten en reacties",
+      "postByFollowedUser": "Berichten van gebruikers die ik volg",
+      "postInGroup": "Bericht in een groep waar ik lid van ben",
+      "send-email-notifications": "E-mailmeldingen verzenden",
+      "success-update": "Meldingsinstellingen opgeslagen! ",
+      "uncheckAll": "Vink alles uit"
     },
     "organizations": {
       "name": "Mijn Organisaties"
@@ -1110,5 +1213,10 @@
     "newTermsAndConditions": null,
     "termsAndConditionsNewConfirm": null,
     "termsAndConditionsNewConfirmText": null
+  },
+  "user-teaser": {
+    "popover": {
+      "open-profile": null
+    }
   }
 }

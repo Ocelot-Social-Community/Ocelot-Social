@@ -1,3 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { UserInputError } from 'apollo-server'
 
 const COMMENT_MIN_LENGTH = 1
@@ -80,7 +87,7 @@ const validateReview = async (resolve, root, args, context, info) => {
   try {
     const txResult = await reportReadTxPromise
     existingReportedResource = txResult
-    if (!existingReportedResource || !existingReportedResource.length)
+    if (!existingReportedResource?.length)
       throw new Error(`Resource not found or is not a Post|Comment|User!`)
     existingReportedResource = existingReportedResource[0]
     if (!existingReportedResource.filed)
@@ -101,7 +108,13 @@ const validateReview = async (resolve, root, args, context, info) => {
 }
 
 export const validateNotifyUsers = async (label, reason) => {
-  const reasonsAllowed = ['mentioned_in_post', 'mentioned_in_comment', 'commented_on_post']
+  const reasonsAllowed = [
+    'mentioned_in_post',
+    'mentioned_in_comment',
+    'commented_on_post',
+    'followed_user_posted',
+    'post_in_group',
+  ]
   if (!reasonsAllowed.includes(reason)) throw new Error('Notification reason is not allowed!')
   if (
     (label === 'Post' && reason !== 'mentioned_in_post') ||

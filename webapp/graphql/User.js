@@ -7,6 +7,7 @@ import {
   postFragment,
   commentFragment,
   groupFragment,
+  userTeaserFragment,
 } from './Fragments'
 
 export const profileUserQuery = (i18n) => {
@@ -46,7 +47,6 @@ export const profileUserQuery = (i18n) => {
           url
         }
         showShoutsPublicly
-        sendNotificationEmails
       }
     }
   `
@@ -91,6 +91,23 @@ export const adminUserQuery = () => {
   `
 }
 
+export const adminUserBadgesQuery = () => {
+  return gql`
+    query User($id: ID!) {
+      User(id: $id) {
+        id
+        name
+        badgeTrophies {
+          id
+        }
+        badgeVerification {
+          id
+        }
+      }
+    }
+  `
+}
+
 export const mapUserQuery = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
@@ -109,7 +126,7 @@ export const mapUserQuery = (i18n) => {
   `
 }
 
-export const notificationQuery = (_i18n) => {
+export const notificationQuery = () => {
   return gql`
     ${userFragment}
     ${commentFragment}
@@ -335,7 +352,7 @@ export const updateUserMutation = () => {
       $about: String
       $allowEmbedIframes: Boolean
       $showShoutsPublicly: Boolean
-      $sendNotificationEmails: Boolean
+      $emailNotificationSettings: [EmailNotificationSettingsInput]
       $termsAndConditionsAgreedVersion: String
       $avatar: ImageInput
       $locationName: String # empty string '' sets it to null
@@ -347,7 +364,7 @@ export const updateUserMutation = () => {
         about: $about
         allowEmbedIframes: $allowEmbedIframes
         showShoutsPublicly: $showShoutsPublicly
-        sendNotificationEmails: $sendNotificationEmails
+        emailNotificationSettings: $emailNotificationSettings
         termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
         avatar: $avatar
         locationName: $locationName
@@ -359,11 +376,22 @@ export const updateUserMutation = () => {
         about
         allowEmbedIframes
         showShoutsPublicly
-        sendNotificationEmails
+        emailNotificationSettings {
+          type
+          settings {
+            name
+            value
+          }
+        }
         locale
         termsAndConditionsAgreedVersion
         avatar {
           url
+        }
+        badgeVerification {
+          id
+          description
+          icon
         }
       }
     }
@@ -383,6 +411,31 @@ export const currentUserQuery = gql`
   query {
     currentUser {
       ...user
+      inviteCodes {
+        code
+        isValid
+        redeemedBy {
+          id
+        }
+        comment
+        redeemedByCount
+      }
+      badgeTrophiesSelected {
+        id
+        icon
+        description
+        isDefault
+      }
+      badgeTrophiesUnused {
+        id
+        icon
+        description
+      }
+      badgeVerification {
+        id
+        icon
+        description
+      }
       email
       role
       about
@@ -390,7 +443,13 @@ export const currentUserQuery = gql`
       locale
       allowEmbedIframes
       showShoutsPublicly
-      sendNotificationEmails
+      emailNotificationSettings {
+        type
+        settings {
+          name
+          value
+        }
+      }
       termsAndConditionsAgreedVersion
       socialMedia {
         id
@@ -438,3 +497,55 @@ export const userDataQuery = (i18n) => {
     }
   `
 }
+
+export const userTeaserQuery = (i18n) => {
+  const lang = i18n.locale().toUpperCase()
+  return gql`
+    ${userTeaserFragment(lang)}
+    query ($id: ID!) {
+      User(id: $id) {
+        ...userTeaser
+      }
+    }
+  `
+}
+
+export const setTrophyBadgeSelected = gql`
+  mutation ($slot: Int!, $badgeId: ID) {
+    setTrophyBadgeSelected(slot: $slot, badgeId: $badgeId) {
+      badgeTrophiesCount
+      badgeTrophiesSelected {
+        id
+        icon
+        description
+        isDefault
+      }
+      badgeTrophiesUnused {
+        id
+        icon
+        description
+      }
+      badgeTrophiesUnusedCount
+    }
+  }
+`
+
+export const resetTrophyBadgesSelected = gql`
+  mutation {
+    resetTrophyBadgesSelected {
+      badgeTrophiesCount
+      badgeTrophiesSelected {
+        id
+        icon
+        description
+        isDefault
+      }
+      badgeTrophiesUnused {
+        id
+        icon
+        description
+      }
+      badgeTrophiesUnusedCount
+    }
+  }
+`

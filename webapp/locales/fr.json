@@ -10,22 +10,57 @@
     "saveCategories": null
   },
   "admin": {
+    "badges": {
+      "description": null,
+      "noBadges": null,
+      "revokeTrophy": {
+        "error": null,
+        "success": null
+      },
+      "revokeVerification": {
+        "error": null,
+        "success": null
+      },
+      "rewardTrophy": {
+        "error": null,
+        "success": null
+      },
+      "setVerification": {
+        "error": null,
+        "success": null
+      },
+      "title": null,
+      "trophyBadges": null,
+      "verificationBadges": null
+    },
     "categories": {
       "categoryName": "Nom",
       "name": "Catégories",
       "postCount": "Postes"
     },
     "dashboard": {
+      "badgesDisplayed": null,
+      "badgesRewarded": null,
+      "chatMessages": null,
+      "chatRooms": null,
       "comments": "Commentaires",
+      "emails": null,
       "follows": "Suit",
+      "groups": null,
+      "inviteCodes": null,
+      "inviteCodesExpired": null,
+      "inviteCodesRedeemed": null,
       "invites": "Invitations",
+      "locations": null,
       "name": "Tableau de bord",
       "notifications": "Notifications",
-      "organizations": "Organisations",
       "posts": "Postes",
-      "projects": "Projets",
+      "reports": null,
       "shouts": "Cris",
-      "users": "Utilisateurs"
+      "tags": null,
+      "users": "Utilisateurs",
+      "usersDeleted": null,
+      "usersVerified": null
     },
     "donations": {
       "goal": "Dons mensuels requis",
@@ -68,6 +103,7 @@
       "roleChanged": null,
       "table": {
         "columns": {
+          "badges": null,
           "createdAt": "Créé à",
           "email": "Mail",
           "name": "Nom",
@@ -220,7 +256,10 @@
             "length": null,
             "success": null
           }
-        }
+        },
+        "invited-by": null,
+        "invited-by-and-to": null,
+        "invited-to-hidden-group": null
       },
       "no-public-registrstion": {
         "title": null
@@ -485,6 +524,9 @@
     "categoriesTitle": null,
     "changeMemberRole": null,
     "contentMenu": {
+      "inviteLinks": null,
+      "muteGroup": null,
+      "unmuteGroup": null,
       "visitGroupPage": null
     },
     "createNewGroup": {
@@ -505,6 +547,7 @@
     "goal": null,
     "groupCreated": null,
     "in": null,
+    "invite-links": null,
     "joinLeaveButton": {
       "iAmMember": null,
       "join": null,
@@ -535,6 +578,7 @@
       "confirmAddGroupMemberText": null,
       "confirmAddGroupMemberTitle": null
     },
+    "muted": null,
     "myGroups": null,
     "name": null,
     "radius": null,
@@ -559,6 +603,8 @@
       "hidden": null,
       "public": null
     },
+    "unmute": null,
+    "unmuted": null,
     "update": null,
     "updatedGroup": null
   },
@@ -599,13 +645,35 @@
     "button": {
       "tooltip": null
     },
+    "comment-placeholder": null,
     "copy-code": null,
     "copy-success": null,
-    "not-available": null,
-    "your-code": null
+    "create-error": null,
+    "create-success": null,
+    "delete-modal": {
+      "message": null,
+      "title": null
+    },
+    "generate-code": null,
+    "generate-code-explanation": null,
+    "group-invite-links": null,
+    "invalidate": null,
+    "invalidate-error": null,
+    "invalidate-success": null,
+    "invite-link-message-group": null,
+    "invite-link-message-hidden-group": null,
+    "invite-link-message-personal": null,
+    "limit-reached": null,
+    "my-invite-links": null,
+    "no-links": null,
+    "redeemed-count": null,
+    "redeemed-count-0": null
   },
   "localeSwitch": {
     "tooltip": null
+  },
+  "location": {
+    "distance": null
   },
   "login": {
     "email": "Votre mail",
@@ -738,14 +806,20 @@
     "reason": {
       "changed_group_member_role": null,
       "commented_on_post": "Commenté sur votre post…",
+      "followed_user_posted": null,
       "mentioned_in_comment": "Vous a mentionné dans un commentaire…",
       "mentioned_in_post": "Vous a mentionné dans un post…",
+      "on_date": null,
+      "post_in_group": null,
       "removed_user_from_group": null,
       "user_joined_group": null,
       "user_left_group": null
     },
     "title": "Notifications",
     "user": "Utilisateur"
+  },
+  "observeButton": {
+    "observed": null
   },
   "post": {
     "comment": {
@@ -778,8 +852,12 @@
     "menu": {
       "delete": "Supprimer le Post",
       "edit": "Modifier le Post",
+      "observe": "Observer le Post",
+      "observedSuccessfully": null,
       "pin": "Épingler le Post",
       "pinnedSuccessfully": "Poste épinglé avec succès!",
+      "unobserve": "Ne plus observer le Post",
+      "unobservedSuccessfully": null,
       "unpin": "Retirer l'épingle du poste",
       "unpinnedSuccessfully": "Épingle retirer du Post avec succès!"
     },
@@ -919,6 +997,16 @@
     "title": null
   },
   "settings": {
+    "badges": {
+      "click-to-select": null,
+      "click-to-use": null,
+      "description": null,
+      "name": null,
+      "no-badges-available": null,
+      "remove": null,
+      "success-update": null,
+      "verification": null
+    },
     "blocked-users": {
       "block": "Bloquer l'utilisateur",
       "columns": {
@@ -1032,9 +1120,24 @@
     },
     "name": "Paramètres",
     "notifications": {
-      "name": null,
-      "send-email-notifications": null,
-      "success-update": null
+      "chat": "Chat",
+      "chatMessage": "Message reçu pendant l'absence",
+      "checkAll": "Tout cocher",
+      "commentOnObservedPost": "Commentez une contribution que je suis",
+      "followingUsers": null,
+      "group": "Groups",
+      "groupMemberJoined": "Un nouveau membre a rejoint un de mes groupes",
+      "groupMemberLeft": "Un membre a quitté un de mes groupes",
+      "groupMemberRemoved": "J'ai été retiré d'un groupe",
+      "groupMemberRoleChanged": "Mon rôle au sein d'un groupe a changé",
+      "mention": "Mentionné dans une contribution",
+      "name": "Notifications par mail",
+      "post": "Messages et commentaires",
+      "postByFollowedUser": "Messages des utilisateurs que je suis",
+      "postInGroup": "Message dans un groupe dont je suis membre",
+      "send-email-notifications": "Envoyer des notifications par courrier électronique",
+      "success-update": "Paramètres de notification sauvegardés ! ",
+      "uncheckAll": "Tout décocher"
     },
     "organizations": {
       "name": "Mes organisations"
@@ -1110,5 +1213,10 @@
     "newTermsAndConditions": "Nouvelles conditions générales",
     "termsAndConditionsNewConfirm": "J'ai lu et accepté les nouvelles conditions générales.",
     "termsAndConditionsNewConfirmText": "Veuillez lire les nouvelles conditions d'utilisation dès maintenant !"
+  },
+  "user-teaser": {
+    "popover": {
+      "open-profile": null
+    }
   }
 }

@@ -17,18 +17,26 @@ export const locationFragment = (lang) => gql`
   fragment location on User {
     locationName
     location {
+      id
       name: name${lang}
       lng
       lat
+      distanceToMe
     }
   }
 `
 
 export const badgesFragment = gql`
   fragment badges on User {
-    badges {
+    badgeTrophiesSelected {
       id
       icon
+      description
+    }
+    badgeVerification {
+      id
+      icon
+      description
     }
   }
 `
@@ -41,6 +49,19 @@ export const userCountsFragment = gql`
     followedByCount
     followingCount
     followedByCurrentUser
+  }
+`
+
+export const userTeaserFragment = (lang) => gql`
+  ${badgesFragment}
+  ${locationFragment(lang)}
+
+  fragment userTeaser on User {
+    followedByCount
+    contributionsCount
+    commentedCount
+    ...badges
+    ...location
   }
 `
 
@@ -67,6 +88,8 @@ export const postFragment = gql`
     }
     pinnedAt
     pinned
+    isObservedByMe
+    observingUsersCount
   }
 `
 
@@ -133,5 +156,7 @@ export const commentFragment = gql`
     deleted
     content
     contentExcerpt
+    isPostObservedByMe
+    postObservingUsersCount
   }
 `

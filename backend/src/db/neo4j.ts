@@ -1,9 +1,11 @@
-import neo4j from 'neo4j-driver'
-import CONFIG from './../config'
+/* eslint-disable import/no-named-as-default-member */
+import neo4j, { Driver } from 'neo4j-driver'
 import Neode from 'neode'
-import models from '../models'
 
-let driver
+import CONFIG from '@config/index'
+import models from '@db/models/index'
+
+let driver: Driver
 const defaultOptions = {
   uri: CONFIG.NEO4J_URI,
   username: CONFIG.NEO4J_USERNAME,
@@ -18,7 +20,7 @@ export function getDriver(options = {}) {
   return driver
 }
 
-let neodeInstance
+let neodeInstance: Neode
 export function getNeode(options = {}) {
   if (!neodeInstance) {
     const { uri, username, password } = { ...defaultOptions, ...options }

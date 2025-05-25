@@ -2,6 +2,7 @@ import Vuex from 'vuex'
 import { mount } from '@vue/test-utils'
 import Registration from './registration.vue'
 import Vue from 'vue'
+import { validateInviteCodeQuery, redeemInviteCodeMutation } from '~/graphql/inviteCodes'
 
 const localVue = global.localVue
 
@@ -12,6 +13,18 @@ const stubs = {
   'infinite-loading': true,
 }
 
+const queryMock = jest.fn()
+const mutationMock = jest.fn()
+
+const app = {
+  apolloProvider: {
+    defaultClient: {
+      query: queryMock,
+      mutate: mutationMock,
+    },
+  },
+}
+
 describe('Registration', () => {
   let wrapper
   let Wrapper
@@ -20,6 +33,7 @@ describe('Registration', () => {
   let store
   let redirect
   let isLoggedIn
+  let route
 
   beforeEach(() => {
     mocks = {
@@ -39,6 +53,9 @@ describe('Registration', () => {
     asyncData = false
     isLoggedIn = false
     redirect = jest.fn()
+    route = {
+      query: {},
+    }
   })
 
   describe('mount', () => {
@@ -65,6 +82,8 @@ describe('Registration', () => {
         const aData = await Registration.asyncData({
           store,
           redirect,
+          route,
+          app,
         })
         Registration.data = function () {
           return { ...data, ...aData }
@@ -313,7 +332,7 @@ describe('Registration', () => {
 
     it('renders', async () => {
       wrapper = await Wrapper()
-      expect(wrapper.classes('registration-slider')).toBe(true)
+      expect(wrapper.find('.registration-slider')).toBeTruthy()
     })
 
     // The asyncTests must go last
@@ -328,6 +347,181 @@ describe('Registration', () => {
       isLoggedIn = true
       wrapper = await Wrapper()
       expect(redirect).toHaveBeenCalledWith('/')
+    })
+
+    describe('already logged in', () => {
+      beforeEach(async () => {
+        asyncData = true
+        isLoggedIn = true
+      })
+
+      describe('route contains personal invite code', () => {
+        beforeEach(async () => {
+          jest.clearAllMocks()
+          queryMock.mockResolvedValue({
+            data: {
+              validateInviteCode: {
+                invitedTo: null,
+              },
+            },
+          })
+          route.query.inviteCode = 'ABCDEF'
+          wrapper = await Wrapper()
+        })
+
+        it('calls validate invite code', () => {
+          expect(queryMock).toHaveBeenCalledWith({
+            query: validateInviteCodeQuery,
+            variables: {
+              code: 'ABCDEF',
+            },
+          })
+        })
+
+        it('redirects to index', () => {
+          expect(redirect).toHaveBeenCalledWith('/')
+        })
+
+        it('does not redeem the link', () => {
+          expect(mutationMock).not.toBeCalled()
+        })
+      })
+
+      describe('route contains group invite code to public group', () => {
+        beforeEach(async () => {
+          jest.clearAllMocks()
+          queryMock.mockResolvedValue({
+            data: {
+              validateInviteCode: {
+                invitedTo: {
+                  id: 'public-group',
+                  slug: 'public-group',
+                  groupType: 'public',
+                },
+              },
+            },
+          })
+          mutationMock.mockResolvedValue({
+            data: {
+              redeemInviteCode: true,
+            },
+          })
+          route.query.inviteCode = 'ABCDEF'
+          wrapper = await Wrapper()
+        })
+
+        it('calls validate invite code', () => {
+          expect(queryMock).toHaveBeenCalledWith({
+            query: validateInviteCodeQuery,
+            variables: {
+              code: 'ABCDEF',
+            },
+          })
+        })
+
+        it('redirects to group', () => {
+          expect(redirect).toHaveBeenCalledWith('/groups/public-group/public-group')
+        })
+
+        it('redeems the code', () => {
+          expect(mutationMock).toBeCalledWith({
+            mutation: redeemInviteCodeMutation,
+            variables: {
+              code: 'ABCDEF',
+            },
+          })
+        })
+      })
+
+      describe('route contains group invite code to closed group', () => {
+        beforeEach(async () => {
+          jest.clearAllMocks()
+          queryMock.mockResolvedValue({
+            data: {
+              validateInviteCode: {
+                invitedTo: {
+                  id: 'closed-group',
+                  slug: 'closed-group',
+                  groupType: 'closed',
+                },
+              },
+            },
+          })
+          mutationMock.mockResolvedValue({
+            data: {
+              redeemInviteCode: true,
+            },
+          })
+          route.query.inviteCode = 'ABCDEF'
+          wrapper = await Wrapper()
+        })
+
+        it('calls validate invite code', () => {
+          expect(queryMock).toHaveBeenCalledWith({
+            query: validateInviteCodeQuery,
+            variables: {
+              code: 'ABCDEF',
+            },
+          })
+        })
+
+        it('redirects to index', () => {
+          expect(redirect).toHaveBeenCalledWith('/')
+        })
+
+        it('redeems the code', () => {
+          expect(mutationMock).toBeCalledWith({
+            mutation: redeemInviteCodeMutation,
+            variables: {
+              code: 'ABCDEF',
+            },
+          })
+        })
+      })
+
+      describe('route contains group invite code to public group, but redeem throws', () => {
+        beforeEach(async () => {
+          jest.clearAllMocks()
+          queryMock.mockResolvedValue({
+            data: {
+              validateInviteCode: {
+                invitedTo: {
+                  id: 'public-group',
+                  slug: 'public-group',
+                  groupType: 'public',
+                },
+              },
+            },
+          })
+          mutationMock.mockRejectedValue({
+            error: 'Aua!',
+          })
+          route.query.inviteCode = 'ABCDEF'
+          wrapper = await Wrapper()
+        })
+
+        it('calls validate invite code', () => {
+          expect(queryMock).toHaveBeenCalledWith({
+            query: validateInviteCodeQuery,
+            variables: {
+              code: 'ABCDEF',
+            },
+          })
+        })
+
+        it('redirects to index', () => {
+          expect(redirect).toHaveBeenCalledWith('/')
+        })
+
+        it('redeems the code', () => {
+          expect(mutationMock).toBeCalledWith({
+            mutation: redeemInviteCodeMutation,
+            variables: {
+              code: 'ABCDEF',
+            },
+          })
+        })
+      })
     })
 
     // copied from webapp/components/Registration/Signup.spec.js as testing template

@@ -1,5 +1,5 @@
-import { When } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-When("I wait for {int} milliseconds", time => {
+defineStep('I wait for {int} milliseconds', time => {
   cy.wait(time)
-});
+})

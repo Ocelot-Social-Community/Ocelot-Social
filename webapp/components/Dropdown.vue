@@ -29,11 +29,11 @@ export default {
     placement: { type: String, default: 'bottom-end' },
     disabled: { type: Boolean, default: false },
     offset: { type: [String, Number], default: '16' },
+    noMouseLeaveClosing: { type: Boolean, default: false },
   },
   data() {
     return {
       isPopoverOpen: false,
-      developerNoAutoClosing: false, // stops automatic closing of menu for developer purposes: default is 'false'
     }
   },
   computed: {
@@ -43,32 +43,12 @@ export default {
   },
   watch: {
     isPopoverOpen: {
-      immediate: true,
       handler(isOpen) {
-        try {
-          if (isOpen) {
-            this.$nextTick(() => {
-              setTimeout(() => {
-                const paddingRightStyle = `${
-                  window.innerWidth - document.documentElement.clientWidth
-                }px`
-                const navigationElement = document.querySelector('.main-navigation')
-                document.body.style.paddingRight = paddingRightStyle
-                document.body.classList.add('dropdown-open')
-                if (navigationElement) {
-                  navigationElement.style.paddingRight = paddingRightStyle
-                }
-              }, 20)
-            })
-          } else {
-            const navigationElement = document.querySelector('.main-navigation')
-            document.body.style.paddingRight = null
-            document.body.classList.remove('dropdown-open')
-            if (navigationElement) {
-              navigationElement.style.paddingRight = null
-            }
-          }
-        } catch (err) {}
+        if (isOpen) {
+          document.body.classList.add('dropdown-open')
+        } else {
+          document.body.classList.remove('dropdown-open')
+        }
       },
     },
   },
@@ -92,7 +72,7 @@ export default {
       }
     },
     closeMenu(useTimeout) {
-      if (this.disabled) {
+      if (this.noMouseLeaveClosing || this.disabled) {
         return
       }
       this.clearTimeouts()
@@ -114,8 +94,7 @@ export default {
       }
     },
     popoverMouseLeave() {
-      if (this.developerNoAutoClosing) return
-      if (this.disabled) {
+      if (this.noMouseLeaveClosing || this.disabled) {
         return
       }
       this.clearTimeouts()

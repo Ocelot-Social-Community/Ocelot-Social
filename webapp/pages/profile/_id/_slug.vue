@@ -42,8 +42,11 @@
               {{ $t('profile.memberSince') }} {{ user.createdAt | date('MMMM yyyy') }}
             </ds-text>
           </ds-space>
-          <ds-space v-if="user.badges && user.badges.length" margin="x-small">
-            <hc-badges :badges="user.badges" />
+          <ds-space v-if="userBadges && userBadges.length" margin="x-small">
+            <a v-if="myProfile" href="/settings/badges" class="badge-edit-link">
+              <hc-badges :badges="userBadges" />
+            </a>
+            <hc-badges v-if="!myProfile" :badges="userBadges" />
           </ds-space>
           <ds-flex>
             <ds-flex-item>
@@ -156,6 +159,9 @@
                 @removePostFromList="posts = removePostFromList(post, posts)"
                 @pinPost="pinPost(post, refetchPostList)"
                 @unpinPost="unpinPost(post, refetchPostList)"
+                @toggleObservePost="
+                  (postId, value) => toggleObservePost(postId, value, refetchPostList)
+                "
               />
             </masonry-grid-item>
           </template>
@@ -262,6 +268,10 @@ export default {
     },
     user() {
       return this.User ? this.User[0] : {}
+    },
+    userBadges() {
+      if (!this.$env.BADGES_ENABLED) return null
+      return [this.user.badgeVerification, ...(this.user.badgeTrophiesSelected || [])]
     },
     userName() {
       const { name } = this.user || {}
@@ -452,6 +462,12 @@ export default {
 .profile-page-avatar.profile-avatar {
   margin: auto;
   margin-top: -60px;
+}
+.badge-edit-link {
+  transition: all 0.2s ease-out;
+  &:hover {
+    opacity: 0.7;
+  }
 }
 .page-name-profile-id-slug {
   .ds-flex-item:first-child .content-menu {

@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
-      - uses: amannn/action-semantic-pull-request@40166f00814508ec3201fc8595b393d451c8cd80 # v5.5.3
+      - uses: amannn/action-semantic-pull-request@335288255954904a41ddda8947c8f2c844b8bfeb # v5.5.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

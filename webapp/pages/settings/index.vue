@@ -47,10 +47,12 @@ import { mapGetters, mapMutations } from 'vuex'
 import UniqueSlugForm from '~/components/utils/UniqueSlugForm'
 import { updateUserMutation } from '~/graphql/User'
 import { queryLocations } from '~/graphql/location'
+import scrollToContent from './scroll-to-content.js'
 
 let timeout
 
 export default {
+  mixins: [scrollToContent],
   name: 'NewsFeed',
   data() {
     return {
@@ -104,13 +106,9 @@ export default {
             about,
           },
           update: (store, { data: { UpdateUser } }) => {
-            const { name, slug, locationName, about } = UpdateUser
             this.setCurrentUser({
               ...this.currentUser,
-              name,
-              slug,
-              locationName,
-              about,
+              ...UpdateUser,
             })
           },
         })

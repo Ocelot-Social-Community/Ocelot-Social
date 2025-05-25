@@ -1,24 +1,24 @@
 #!/bin/sh
 
-# html files
-mkdir -p build/src/middleware/helpers/email/templates/
-cp -r src/middleware/helpers/email/templates/*.html build/src/middleware/helpers/email/templates/
+# public
+cp -r public/ build/public/
 
-mkdir -p build/src/middleware/helpers/email/templates/en/
-cp -r src/middleware/helpers/email/templates/en/*.html build/src/middleware/helpers/email/templates/en/
+# email files
+mkdir -p build/src/emails/templates/
+cp -r src/emails/templates/ build/src/emails/
 
-mkdir -p build/src/middleware/helpers/email/templates/de/
-cp -r src/middleware/helpers/email/templates/de/*.html build/src/middleware/helpers/email/templates/de/
+mkdir -p build/src/emails/locales/
+cp -r src/emails/locales/ build/src/emails/
 
 # gql files
-mkdir -p build/src/schema/types/
-cp -r src/schema/types/*.gql build/src/schema/types/
+mkdir -p build/src/graphql/types/
+cp -r src/graphql/types/*.gql build/src/graphql/types/
 
-mkdir -p build/src/schema/types/enum/
-cp -r src/schema/types/enum/*.gql build/src/schema/types/enum/
+mkdir -p build/src/graphql/types/enum/
+cp -r src/graphql/types/enum/*.gql build/src/graphql/types/enum/
 
-mkdir -p build/src/schema/types/scalar/
-cp -r src/schema/types/scalar/*.gql build/src/schema/types/scalar/
+mkdir -p build/src/graphql/types/scalar/
+cp -r src/graphql/types/scalar/*.gql build/src/graphql/types/scalar/
 
-mkdir -p build/src/schema/types/type/
-cp -r src/schema/types/type/*.gql build/src/schema/types/type/
+mkdir -p build/src/graphql/types/type/
+cp -r src/graphql/types/type/*.gql build/src/graphql/types/type/

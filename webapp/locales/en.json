@@ -10,22 +10,57 @@
     "saveCategories": "Save topics"
   },
   "admin": {
+    "badges": {
+      "description": "Configure the available badges for this user",
+      "noBadges": "There are no badges available",
+      "revokeTrophy": {
+        "error": "Trophy could not be revoked!",
+        "success": "Trophy successfully revoked!"
+      },
+      "revokeVerification": {
+        "error": "Verification could not be revoked!",
+        "success": "Verification succesfully revoked"
+      },
+      "rewardTrophy": {
+        "error": "Trophy could not be rewarded!",
+        "success": "Trophy successfully rewarded!"
+      },
+      "setVerification": {
+        "error": "Verification could not be set!",
+        "success": "Verification successfully set!"
+      },
+      "title": "Badges",
+      "trophyBadges": "Trophies",
+      "verificationBadges": "Verifications"
+    },
     "categories": {
       "categoryName": "Name",
       "name": "Topics",
       "postCount": "Posts"
     },
     "dashboard": {
+      "badgesDisplayed": "Badges Displayed",
+      "badgesRewarded": "Badges Rewarded",
+      "chatMessages": "Chat Messages",
+      "chatRooms": "Chat Rooms",
       "comments": "Comments",
+      "emails": "E-Mails",
       "follows": "Follows",
+      "groups": "Groups",
+      "inviteCodes": "Invite Codes",
+      "inviteCodesExpired": "Expired Invite Codes",
+      "inviteCodesRedeemed": "Redeemed Invite Codes",
       "invites": "Invites",
+      "locations": "Locations",
       "name": "Dashboard",
       "notifications": "Notifications",
-      "organizations": "Organizations",
       "posts": "Posts",
-      "projects": "Projects",
+      "reports": "Reports",
       "shouts": "Shouts",
-      "users": "Users"
+      "tags": "Tags",
+      "users": "Users",
+      "usersDeleted": "Users deleted",
+      "usersVerified": "Users verified"
     },
     "donations": {
       "goal": "Monthly donations needed",
@@ -68,6 +103,7 @@
       "roleChanged": "Role changed successfully!",
       "table": {
         "columns": {
+          "badges": "Badges",
           "createdAt": "Created at",
           "email": "E-mail",
           "name": "Name",
@@ -226,7 +262,10 @@
             "length": "must be {inviteCodeLength} characters long",
             "success": "Valid invite code <b>{inviteCode}</b>!"
           }
-        }
+        },
+        "invited-by": "Invited by {invitedBy}.",
+        "invited-by-and-to": "Invited by {invitedBy} to group {invitedTo}.",
+        "invited-to-hidden-group": "Invited by {invitedBy} to a hidden group."
       },
       "no-public-registrstion": {
         "title": "No Public Registration"
@@ -248,10 +287,10 @@
     }
   },
   "contribution": {
-    "amount-clicks": "{amount} clicks",
-    "amount-comments": "{amount} comments",
-    "amount-shouts": "{amount} recommendations",
-    "amount-views": "{amount} views",
+    "amount-clicks": "{amount} Clicks",
+    "amount-comments": "{amount} Comments",
+    "amount-shouts": "{amount} Recommendations",
+    "amount-views": "{amount} Views",
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} of {max} topics selected"
     },
@@ -491,6 +530,9 @@
     "categoriesTitle": "Topics of the group",
     "changeMemberRole": "The role has been changed to “{role}”!",
     "contentMenu": {
+      "inviteLinks": "Invite links",
+      "muteGroup": "Mute group",
+      "unmuteGroup": "Unmute group",
       "visitGroupPage": "Show group"
     },
     "createNewGroup": {
@@ -511,6 +553,7 @@
     "goal": "Goal of group",
     "groupCreated": "The group was created!",
     "in": "in",
+    "invite-links": "Invite Links",
     "joinLeaveButton": {
       "iAmMember": "I'm a member",
       "join": "Join",
@@ -541,6 +584,7 @@
       "confirmAddGroupMemberText": "Add user “{name}” to group?",
       "confirmAddGroupMemberTitle": "Confirm"
     },
+    "muted": "Group muted",
     "myGroups": "My Groups",
     "name": "Group name",
     "radius": "Radius",
@@ -565,6 +609,8 @@
       "hidden": "Secret — Group (including the name) is completely invisible",
       "public": "Public — Group and all posts are visible for all registered users"
     },
+    "unmute": "Unmute group",
+    "unmuted": "Group unmuted",
     "update": "Save change",
     "updatedGroup": "The group data has been changed."
   },
@@ -605,13 +651,35 @@
     "button": {
       "tooltip": "Invite friends"
     },
+    "comment-placeholder": "Comment (optional)",
     "copy-code": "Copy Invite Link",
     "copy-success": "Invite code copied to clipboard",
-    "not-available": "You have no valid invite code available!",
-    "your-code": "Send this link per e-mail or in social media to invite your friends:"
+    "create-error": "Creating a new invite link failed! Error: {error}",
+    "create-success": "Invite link created successfully!",
+    "delete-modal": {
+      "message": "Do you really want to invalidate this invite link?",
+      "title": "Invalidate link?"
+    },
+    "generate-code": "Create new link",
+    "generate-code-explanation": "Create a new link. You can add a comment if you like (only visible to you).",
+    "group-invite-links": "Group invite links",
+    "invalidate": "Invalidate link",
+    "invalidate-error": "Invalidating the invite link failed! Error: {error}",
+    "invalidate-success": "Invite link invalidated successfully!",
+    "invite-link-message-group": "You have been invited to join the group “{groupName}” on {network}.",
+    "invite-link-message-hidden-group": "You have been invited to join a hidden group on {network}.",
+    "invite-link-message-personal": "You have been invited to join {network}.",
+    "limit-reached": "You have reached the maximum number of invite links.",
+    "my-invite-links": "My invite links",
+    "no-links": "No invite links created yet.",
+    "redeemed-count": "This code has been used {count} times.",
+    "redeemed-count-0": "No one has used this code yet."
   },
   "localeSwitch": {
     "tooltip": "Choose language"
+  },
+  "location": {
+    "distance": "{distance} km away from me"
   },
   "login": {
     "email": "Your E-mail",
@@ -742,16 +810,22 @@
     "pageLink": "All notifications",
     "post": "Post or Group",
     "reason": {
-      "changed_group_member_role": "Changed your role in group …",
-      "commented_on_post": "Commented on your post …",
-      "mentioned_in_comment": "Mentioned you in a comment …",
-      "mentioned_in_post": "Mentioned you in a post …",
-      "removed_user_from_group": "Removed you from group …",
-      "user_joined_group": "Joined your group …",
-      "user_left_group": "Left your group …"
+      "changed_group_member_role": "Changed your role in group",
+      "commented_on_post": "Commented on a post you observe",
+      "followed_user_posted": "Wrote a new post",
+      "mentioned_in_comment": "Mentioned you in a comment",
+      "mentioned_in_post": "Mentioned you in a post",
+      "on_date": "on",
+      "post_in_group": "Posted in a group",
+      "removed_user_from_group": "Removed you from group",
+      "user_joined_group": "Joined your group",
+      "user_left_group": "Left your group"
     },
     "title": "Notifications",
     "user": "User"
+  },
+  "observeButton": {
+    "observed": "observed"
   },
   "post": {
     "comment": {
@@ -784,8 +858,12 @@
     "menu": {
       "delete": "Delete post",
       "edit": "Edit post",
+      "observe": "Observe post",
+      "observedSuccessfully": "You are now observing this post!",
       "pin": "Pin post",
       "pinnedSuccessfully": "Post pinned successfully!",
+      "unobserve": "Stop to observe post",
+      "unobservedSuccessfully": "You are no longer observing this post!",
       "unpin": "Unpin post",
       "unpinnedSuccessfully": "Post unpinned successfully!"
     },
@@ -925,6 +1003,16 @@
     "title": "Search Results"
   },
   "settings": {
+    "badges": {
+      "click-to-select": "Click on an empty space to add a badge.",
+      "click-to-use": "Click on a badge to use it in the selected slot.",
+      "description": "Here you can choose how to display your earned badges on your profile.",
+      "name": "Badges",
+      "no-badges-available": "You currently don't have any badges available to add.",
+      "remove": "Remove Badge",
+      "success-update": "Your badges have been updated successfully.",
+      "verification": "This is your verification badge and cannot be changed."
+    },
     "blocked-users": {
       "block": "Block user",
       "columns": {
@@ -1038,9 +1126,24 @@
     },
     "name": "Settings",
     "notifications": {
-      "name": "Notifications",
+      "chat": "Chat",
+      "chatMessage": "Message received while absent.",
+      "checkAll": "Check all",
+      "commentOnObservedPost": "Comments on observed posts.",
+      "followingUsers": "User I follow published a new post.",
+      "group": "Groups",
+      "groupMemberJoined": "Member joined a group I own.",
+      "groupMemberLeft": "Member left a group I own.",
+      "groupMemberRemoved": "I was removed from a group.",
+      "groupMemberRoleChanged": "Your role in a group changed or you were invited.",
+      "mention": "I was mentioned.",
+      "name": "E-Mail Notifications",
+      "post": "Posts and comments",
+      "postByFollowedUser": "Posts by users I follow.",
+      "postInGroup": "Post in a group I am a member of.",
       "send-email-notifications": "Send e-mail notifications",
-      "success-update": "Notifications settings saved!"
+      "success-update": "Notifications settings saved!",
+      "uncheckAll": "Uncheck all"
     },
     "organizations": {
       "name": "My Organizations"
@@ -1100,7 +1203,7 @@
     "bank": "bank account",
     "code-of-conduct": "Code of Conduct",
     "contact": "Contact",
-    "data-privacy": "Data privacy",
+    "data-privacy": "Data Privacy",
     "donate": "Donate",
     "error-occurred": "An error occurred.",
     "faq": "FAQ",
@@ -1109,12 +1212,17 @@
     "made": "Made with ❤️",
     "register": "Registry number",
     "support": "Support",
-    "termsAndConditions": "Terms and conditions",
+    "termsAndConditions": "Terms and Conditions",
     "thanks": "Thanks!"
   },
   "termsAndConditions": {
     "newTermsAndConditions": "New Terms and Conditions",
     "termsAndConditionsNewConfirm": "I have read and agree to the new terms of conditions.",
     "termsAndConditionsNewConfirmText": "Please read the new terms of use now!"
+  },
+  "user-teaser": {
+    "popover": {
+      "open-profile": "Open profile"
+    }
   }
 }

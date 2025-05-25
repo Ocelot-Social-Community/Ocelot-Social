@@ -96,6 +96,10 @@
               <client-only v-if="!isEmpty(this.$env.MAPBOX_TOKEN)">
                 <map-button />
               </client-only>
+              <!-- custom button -->
+              <client-only v-if="!isEmpty(customButton)">
+                <custom-button :settings="customButton" />
+              </client-only>
               <!-- avatar menu -->
               <client-only>
                 <avatar-menu placement="top" />
@@ -132,12 +136,12 @@
           <ds-flex-item class="mobile-hamburger-menu">
             <client-only>
               <!-- chat menu -->
-              <div style="display: inline-flex">
+              <div>
                 <chat-notification-menu />
               </div>
               <!-- notification menu -->
-              <div style="display: inline-flex; padding-right: clamp(10px, 2.5vw, 20px)">
-                <notification-menu />
+              <div>
+                <notification-menu no-menu />
               </div>
             </client-only>
             <!-- hamburger menu -->
@@ -214,6 +218,18 @@
               </div>
             </client-only>
           </ds-flex-item>
+          <!-- custom button -->
+          <ds-flex-item
+            v-if="!isEmpty(customButton)"
+            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+            style="text-align: center"
+          >
+            <client-only>
+              <div @click="toggleMobileMenuView">
+                <custom-button :settings="customButton" />
+              </div>
+            </client-only>
+          </ds-flex-item>
           <!-- avatar menu mobile -->
           <ds-flex-item :class="{ 'hide-mobile-menu': !toggleMobileMenu }" style="text-align: end">
             <client-only>
@@ -268,12 +284,13 @@ import { mapGetters } from 'vuex'
 import isEmpty from 'lodash/isEmpty'
 import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
 import { SHOW_CONTENT_FILTER_HEADER_MENU } from '~/constants/filter.js'
-import LOGOS from '~/constants/logos.js'
+import LOGOS from '~/constants/logosBranded.js'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
 import ChatNotificationMenu from '~/components/ChatNotificationMenu/ChatNotificationMenu'
+import CustomButton from '~/components/CustomButton/CustomButton'
 import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
 import GroupButton from '~/components/Group/GroupButton'
-import headerMenu from '~/constants/headerMenu.js'
+import headerMenuBranded from '~/constants/headerMenuBranded.js'
 import InviteButton from '~/components/InviteButton/InviteButton'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
@@ -286,6 +303,8 @@ import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParams
 export default {
   components: {
     AvatarMenu,
+    ChatNotificationMenu,
+    CustomButton,
     FilterMenu,
     GroupButton,
     InviteButton,
@@ -295,7 +314,6 @@ export default {
     NotificationMenu,
     PageParamsLink,
     SearchField,
-    ChatNotificationMenu,
   },
   props: {
     showMobileMenu: { type: Boolean, default: false },
@@ -309,8 +327,9 @@ export default {
       LOGOS,
       SHOW_GROUP_BUTTON_IN_HEADER,
       SHOW_CONTENT_FILTER_HEADER_MENU,
-      isHeaderMenu: headerMenu.MENU.length > 0,
-      menu: headerMenu.MENU,
+      isHeaderMenu: headerMenuBranded.MENU.length > 0,
+      customButton: headerMenuBranded.CUSTOM_BUTTON,
+      menu: headerMenuBranded.MENU,
       mobileSearchVisible: false,
       toggleMobileMenu: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
@@ -390,6 +409,25 @@ export default {
   flex-flow: row nowrap;
   align-items: center;
   justify-content: flex-end;
+
+  & > div {
+    display: inline-flex;
+
+    padding-right: 15px;
+    &:first-child {
+      padding-right: 10px;
+    }
+
+    button {
+      overflow: visible;
+      .svg {
+        height: 1.8em;
+      }
+    }
+  }
+  .hamburger-button .svg {
+    height: 1.5em;
+  }
 }
 .mobile-menu {
   margin: 0 20px;

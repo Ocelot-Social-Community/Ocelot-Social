@@ -1,10 +1,12 @@
-import { getDriver } from '../../db/neo4j'
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
+import { getDriver } from '@db/neo4j'
 
 export const description = `
 This migration adds the clickedCount property to all posts, setting it to 0.
 `
 
-module.exports.up = async function (next) {
+export async function up(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
@@ -15,7 +17,6 @@ module.exports.up = async function (next) {
         SET p.clickedCount = 0
     `)
     await transaction.commit()
-    next()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
@@ -24,11 +25,11 @@ module.exports.up = async function (next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
-module.exports.down = async function (next) {
+export async function down(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
@@ -39,7 +40,6 @@ module.exports.down = async function (next) {
         REMOVE p.clickedCount
     `)
     await transaction.commit()
-    next()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
@@ -48,6 +48,6 @@ module.exports.down = async function (next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }

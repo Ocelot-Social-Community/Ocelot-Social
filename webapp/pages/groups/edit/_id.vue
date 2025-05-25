@@ -13,7 +13,7 @@
       </ds-flex-item>
       <ds-flex-item :width="{ base: '100%', md: 1 }">
         <transition name="slide-up" appear>
-          <nuxt-child :group="group" />
+          <nuxt-child :group="group" @update-invite-codes="updateInviteCodes" />
         </transition>
       </ds-flex-item>
     </ds-flex>
@@ -39,8 +39,17 @@ export default {
           name: this.$t('group.members'),
           path: `/groups/edit/${this.group.id}/members`,
         },
+        {
+          name: this.$t('group.invite-links'),
+          path: `/groups/edit/${this.group.id}/invites`,
+        },
       ]
     },
+  },
+  data() {
+    return {
+      group: {},
+    }
   },
   async asyncData(context) {
     const {
@@ -61,6 +70,11 @@ export default {
       error({ statusCode: 403, message: 'NONONNNO' })
     }
     return { group }
+  },
+  methods: {
+    updateInviteCodes(inviteCodes) {
+      this.group.inviteCodes = inviteCodes
+    },
   },
 }
 </script>

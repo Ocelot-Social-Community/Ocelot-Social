@@ -30,7 +30,7 @@
 
         <template v-if="registrationType !== 'no-public-registration'" #footer>
           <ds-space margin-bottom="xxx-small" margin-top="small" centered>
-            <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
+            <nuxt-link :to="loginLink">{{ $t('site.back-to-login') }}</nuxt-link>
           </ds-space>
         </template>
       </component-slider>
@@ -163,6 +163,10 @@ export default {
     }
 
     return {
+      loginLink: {
+        name: 'login',
+        query: this.$route.query,
+      },
       links,
       metadata,
       sliderData: {
