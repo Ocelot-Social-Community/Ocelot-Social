@@ -67,20 +67,16 @@ export default {
     }
   },
   mounted: function () {
-    this.$nextTick(function () {
-      // Code that will run only after the entire view has been rendered
+    this.formData.email = this.sliderData.collectedInputData.email
+      ? this.sliderData.collectedInputData.email
+      : ''
+    this.sendValidation()
 
-      this.formData.email = this.sliderData.collectedInputData.email
-        ? this.sliderData.collectedInputData.email
-        : ''
-      this.sendValidation()
-
-      this.sliderData.setSliderValuesCallback(this.validInput, {
-        sliderSettings: {
-          ...this.buttonValues().sliderSettings,
-          buttonSliderCallback: this.onNextClick,
-        },
-      })
+    this.sliderData.setSliderValuesCallback(this.validInput, {
+      sliderSettings: {
+        ...this.buttonValues().sliderSettings,
+        buttonSliderCallback: this.onNextClick,
+      },
     })
   },
   watch: {
