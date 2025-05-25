@@ -106,13 +106,9 @@ export default {
             about,
           },
           update: (store, { data: { UpdateUser } }) => {
-            const { name, slug, locationName, about } = UpdateUser
             this.setCurrentUser({
               ...this.currentUser,
-              name,
-              slug,
-              locationName,
-              about,
+              ...UpdateUser,
             })
           },
         })
