@@ -2,7 +2,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
+import normalizeEmail from './normalizeEmail'
+
 export default async function alreadyExistingMail({ args, context }) {
+  args.email = normalizeEmail(args.email)
   const session = context.driver.session()
   try {
     const existingEmailAddressTxPromise = session.writeTransaction(async (transaction) => {
