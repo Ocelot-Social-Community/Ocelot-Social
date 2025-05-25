@@ -63,21 +63,13 @@ describe('NotificationsTable.vue', () => {
         expect(wrapper.find('.notification-grid').exists()).toBe(true)
       })
 
-      describe('renders 4 columns', () => {
-        it('for icon', () => {
-          expect(wrapper.vm.fields.icon).toBeTruthy()
-        })
-
+      describe('renders 2 columns', () => {
         it('for user', () => {
           expect(wrapper.vm.fields.user).toBeTruthy()
         })
 
         it('for post', () => {
           expect(wrapper.vm.fields.post).toBeTruthy()
-        })
-
-        it('for content', () => {
-          expect(wrapper.vm.fields.content).toBeTruthy()
         })
       })
 
@@ -93,9 +85,9 @@ describe('NotificationsTable.vue', () => {
         })
 
         it('renders the reason for the notification', () => {
-          const dsTexts = firstRowNotification.findAll('.ds-text')
-          const reason = dsTexts.filter(
-            (element) => element.text() === 'notifications.reason.mentioned_in_post',
+          const dsTexts = firstRowNotification.findAll('.info span')
+          const reason = dsTexts.filter((element) =>
+            element.text().startsWith('notifications.reason.mentioned_in_post'),
           )
           expect(reason.exists()).toBe(true)
         })
@@ -106,7 +98,7 @@ describe('NotificationsTable.vue', () => {
         })
 
         it("renders the Post's content", () => {
-          const boldTags = firstRowNotification.findAll('b')
+          const boldTags = firstRowNotification.findAll('p')
           const content = boldTags.filter(
             (element) => element.text() === postNotification.from.contentExcerpt,
           )
@@ -126,9 +118,9 @@ describe('NotificationsTable.vue', () => {
         })
 
         it('renders the reason for the notification', () => {
-          const dsTexts = secondRowNotification.findAll('.ds-text')
-          const reason = dsTexts.filter(
-            (element) => element.text() === 'notifications.reason.mentioned_in_comment',
+          const dsTexts = secondRowNotification.findAll('.info span')
+          const reason = dsTexts.filter((element) =>
+            element.text().startsWith('notifications.reason.mentioned_in_comment'),
           )
           expect(reason.exists()).toBe(true)
         })
@@ -139,7 +131,7 @@ describe('NotificationsTable.vue', () => {
         })
 
         it("renders the Post's content", () => {
-          const boldTags = secondRowNotification.findAll('b')
+          const boldTags = secondRowNotification.findAll('p')
           const content = boldTags.filter(
             (element) => element.text() === commentNotification.from.contentExcerpt,
           )
