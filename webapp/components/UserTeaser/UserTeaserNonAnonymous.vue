@@ -37,7 +37,7 @@
             </nuxt-link>
           </span>
           <!-- eslint-disable-next-line prettier/prettier -->
-          <span>{{ injectedText }}<span v-if="injectedText && injectedDate && !userOnly && dateTime"> {{$t(notifications.reason.on_date)}} <date-time :date-time="dateTime" /></span></span>
+          <span>{{ injectedText }}<span v-if="injectedText && injectedDate && !userOnly && dateTime"> {{$t('notifications.reason.on_date')}} <date-time :date-time="dateTime" /></span></span>
         </div>
         <span v-if="!userOnly && !injectedDate && dateTime" class="text">
           <base-icon name="clock" />
