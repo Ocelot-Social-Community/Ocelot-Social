@@ -28,7 +28,7 @@
     "prod:db:data:categories": "node build/src/db/categories.js"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.796.0",
+    "@aws-sdk/client-s3": "^3.817.0",
     "@aws-sdk/lib-storage": "^3.797.0",
     "@sentry/node": "^5.15.4",
     "@types/mime-types": "^2.1.4",
@@ -96,8 +96,8 @@
     "@faker-js/faker": "9.8.0",
     "@types/email-templates": "^10.0.4",
     "@types/jest": "^29.5.14",
-    "@types/lodash": "^4.17.16",
-    "@types/node": "^22.15.18",
+    "@types/lodash": "^4.17.17",
+    "@types/node": "^22.15.21",
     "@types/slug": "^5.0.9",
     "@types/uuid": "~9.0.1",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
@@ -109,7 +109,7 @@
     "eslint-import-resolver-typescript": "^4.3.4",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jest": "^28.11.0",
-    "eslint-plugin-jsonc": "^2.20.0",
+    "eslint-plugin-jsonc": "^2.20.1",
     "eslint-plugin-n": "^17.17.0",
     "eslint-plugin-no-catch-all": "^1.1.0",
     "eslint-plugin-prettier": "^5.4.0",
