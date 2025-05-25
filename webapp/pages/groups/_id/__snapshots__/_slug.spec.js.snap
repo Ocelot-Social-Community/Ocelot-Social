@@ -67,7 +67,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           <client-only-stub>
             <v-popover-stub
               autohide="true"
-              boundarieselement="body"
               class="group-content-menu group-profile-content-menu"
               container="body"
               delay="0"
@@ -518,7 +517,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -604,7 +602,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -690,7 +687,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -776,7 +772,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -2006,7 +2001,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           <client-only-stub>
             <v-popover-stub
               autohide="true"
-              boundarieselement="body"
               class="group-content-menu group-profile-content-menu"
               container="body"
               delay="0"
@@ -2414,7 +2408,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -2500,7 +2493,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -2586,7 +2578,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -2672,7 +2663,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -2996,7 +2986,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           <client-only-stub>
             <v-popover-stub
               autohide="true"
-              boundarieselement="body"
               class="group-content-menu group-profile-content-menu"
               container="body"
               delay="0"
@@ -3413,7 +3402,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -3499,7 +3487,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -3585,7 +3572,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -3671,7 +3657,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -4256,7 +4241,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -4342,7 +4326,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -4428,7 +4411,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -4514,7 +4496,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -5097,7 +5078,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -5183,7 +5163,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -5269,7 +5248,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -5355,7 +5333,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -5634,7 +5611,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           <client-only-stub>
             <v-popover-stub
               autohide="true"
-              boundarieselement="body"
               class="group-content-menu group-profile-content-menu"
               container="body"
               delay="0"
@@ -6008,7 +5984,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -6094,7 +6069,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -6180,7 +6154,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -6266,7 +6239,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -6595,7 +6567,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           <client-only-stub>
             <v-popover-stub
               autohide="true"
-              boundarieselement="body"
               class="group-content-menu group-profile-content-menu"
               container="body"
               delay="0"
@@ -7054,7 +7025,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -7140,7 +7110,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -7226,7 +7195,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -7312,7 +7280,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -7637,7 +7604,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           <client-only-stub>
             <v-popover-stub
               autohide="true"
-              boundarieselement="body"
               class="group-content-menu group-profile-content-menu"
               container="body"
               delay="0"
@@ -8053,7 +8019,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -8139,7 +8104,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -8225,7 +8189,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
@@ -8311,7 +8274,6 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 <client-only-stub>
                   <v-popover-stub
                     autohide="true"
-                    boundarieselement="body"
                     class="user-teaser"
                     container="body"
                     delay="0"
