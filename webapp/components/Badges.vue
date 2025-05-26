@@ -8,7 +8,7 @@
       :class="{ selectable: selectionMode && index > 0, selected: selectedIndex === index }"
       @click="handleBadgeClick(index)"
     >
-      <img :title="badge.description" :src="badge.icon | proxyApiUrl" class="hc-badge" />
+      <img :title="badge.description" :src="'/api' + badge.icon" class="hc-badge" />
     </component>
   </div>
 </template>

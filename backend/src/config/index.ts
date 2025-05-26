@@ -132,7 +132,10 @@ export interface S3Configured {
   AWS_REGION: string
   AWS_BUCKET: string
   S3_PUBLIC_GATEWAY: string | undefined
+  IMAGOR_SECRET: string | undefined
 }
+
+export const IMAGOR_SECRET: string | undefined = env.IMAGOR_SECRET
 
 export const isS3configured = (config: typeof s3): config is S3Configured => {
   return !!(
@@ -176,6 +179,7 @@ const CONFIG = {
   ...s3,
   ...options,
   ...language,
+  IMAGOR_SECRET,
 }
 
 export type Config = typeof CONFIG

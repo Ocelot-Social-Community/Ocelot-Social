@@ -38,6 +38,8 @@ spec:
             value: "http://{{ .Release.Name }}-backend:4000"
           - name: CLIENT_URI
             value: "https://{{ .Values.domain }}"
+          - name: S3_PUBLIC_GATEWAY
+            value: "https://{{ .Values.domain }}/imagor"
           envFrom:
           - configMapRef:
               name: {{ .Release.Name }}-backend-env

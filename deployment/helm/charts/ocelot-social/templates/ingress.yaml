@@ -63,3 +63,33 @@ spec:
     replacement: https://{{ $.Values.domain }}${1}
     permanent: true
 {{- end }}
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ .Release.Name }}-stripprefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /imagor
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-path-prefixes
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: "{{ .Release.Namespace }}-{{ .Release.Name }}-stripprefix@kubernetescrd"
+spec:
+  rules:
+  - host: {{ quote .Values.domain }}
+    http:
+      paths:
+      - path: /imagor
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Release.Name }}-imagor
+            port:
+              number: 8000
