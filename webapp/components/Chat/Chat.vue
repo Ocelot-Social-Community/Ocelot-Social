@@ -371,7 +371,7 @@ export default {
 
       const hasFiles = files && files.length > 0
 
-      const imagesToUpload = hasFiles
+      const filesToUpload = hasFiles
         ? files.map((file) => ({
             upload: file,
             name: file.name,
@@ -379,23 +379,13 @@ export default {
           }))
         : null
 
-      // Check if the message is effectively empty (no text and no files)
-      const isTextEmpty = !content || content.trim() === ''
-      const noFiles = !imagesToUpload || imagesToUpload.length === 0
-
-      if (isTextEmpty && noFiles) {
-        // TODO disable submit in this case if not already happening
-        this.$toast.info(this.$t('chat.emptyMessageError'))
-        return
-      }
-
       const mutationVariables = {
         roomId,
         content,
       }
 
-      if (imagesToUpload && imagesToUpload.length > 0) {
-        mutationVariables.images = imagesToUpload
+      if (filesToUpload && filesToUpload.length > 0) {
+        mutationVariables.files = filesToUpload
       }
 
       try {
@@ -412,8 +402,8 @@ export default {
             // Use content from the backend response first for the last message preview
             let displayContent = createdMessagePayload.content
             // Fallback if backend content is empty but files were sent (should ideally not happen if backend sets content)
-            if (!displayContent && imagesToUpload && imagesToUpload.length > 0) {
-              const fileCount = imagesToUpload.length
+            if (!displayContent && filesToUpload && filesToUpload.length > 0) {
+              const fileCount = filesToUpload.length
               displayContent = `${fileCount} ${
                 fileCount > 1
                   ? this.$t('chat.filesLabel', 'files')

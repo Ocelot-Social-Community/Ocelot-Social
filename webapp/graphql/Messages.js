@@ -21,7 +21,14 @@ export const createMessageMutation = () => {
         saved
         distributed
         seen
-        files
+        files {
+          url
+          name
+          size
+          type
+          url
+          preview
+        }
       }
     }
   `
@@ -48,7 +55,15 @@ export const messageQuery = () => {
         saved
         distributed
         seen
-        images
+        files {
+          name
+          size
+          type
+          audio
+          duration
+          url
+          preview
+        }
       }
     }
   `
@@ -75,7 +90,15 @@ export const chatMessageAdded = () => {
         saved
         distributed
         seen
-        images
+        files {
+          name
+          size
+          type
+          audio
+          duration
+          url
+          preview
+        }
       }
     }
   `
