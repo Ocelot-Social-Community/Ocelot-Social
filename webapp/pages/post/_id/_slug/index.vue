@@ -179,9 +179,9 @@ import {
 } from '~/components/utils/PostHelpers'
 import PostQuery from '~/graphql/PostQuery'
 import { groupQuery } from '~/graphql/groups'
-import PostMutations from '~/graphql/PostMutations'
 import links from '~/constants/links.js'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
+import postListActions from '~/mixins/postListActions'
 
 export default {
   name: 'PostSlug',
@@ -203,7 +203,7 @@ export default {
     PageParamsLink,
     UserTeaser,
   },
-  mixins: [SortCategories],
+  mixins: [SortCategories, postListActions],
   head() {
     return {
       title: this.title,
@@ -319,46 +319,6 @@ export default {
       this.post.comments.push(comment)
       this.post.isObservedByMe = comment.isPostObservedByMe
       this.post.observingUsersCount = comment.postObservingUsersCount
-    },
-    pinPost(post) {
-      this.$apollo
-        .mutate({
-          mutation: PostMutations().pinPost,
-          variables: { id: post.id },
-        })
-        .then(() => {
-          this.$toast.success(this.$t('post.menu.pinnedSuccessfully'))
-        })
-        .catch((error) => this.$toast.error(error.message))
-    },
-    unpinPost(post) {
-      this.$apollo
-        .mutate({
-          mutation: PostMutations().unpinPost,
-          variables: { id: post.id },
-        })
-        .then(() => {
-          this.$toast.success(this.$t('post.menu.unpinnedSuccessfully'))
-        })
-        .catch((error) => this.$toast.error(error.message))
-    },
-    toggleObservePost(postId, value) {
-      this.$apollo
-        .mutate({
-          mutation: PostMutations().toggleObservePost,
-          variables: {
-            value,
-            id: postId,
-          },
-        })
-        .then(() => {
-          const message = this.$t(
-            `post.menu.${value ? 'observedSuccessfully' : 'unobservedSuccessfully'}`,
-          )
-          this.$toast.success(message)
-          this.$apollo.queries.Post.refetch()
-        })
-        .catch((error) => this.$toast.error(error.message))
     },
     toggleNewCommentForm(showNewCommentForm) {
       this.showNewCommentForm = showNewCommentForm

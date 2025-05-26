@@ -32,12 +32,14 @@
 
 <script>
 import Dropdown from '~/components/Dropdown'
+import PinnedPostsMixin from '~/mixins/pinnedPosts'
 
 export default {
   name: 'ContentMenu',
   components: {
     Dropdown,
   },
+  mixins: [PinnedPostsMixin],
   props: {
     placement: { type: String, default: 'top-end' },
     resource: { type: Object, required: true },
@@ -81,7 +83,7 @@ export default {
         }
 
         if (this.isAdmin && !this.resource.group) {
-          if (!this.resource.pinnedBy) {
+          if (!this.resource.pinnedBy && this.canBePinned) {
             routes.push({
               label: this.$t(`post.menu.pin`),
               callback: () => {
@@ -90,13 +92,15 @@ export default {
               icon: 'link',
             })
           } else {
-            routes.push({
-              label: this.$t(`post.menu.unpin`),
-              callback: () => {
-                this.$emit('unpinPost', this.resource)
-              },
-              icon: 'unlink',
-            })
+            if (this.maxPinnedPosts) {
+              routes.push({
+                label: this.$t(`post.menu.unpin`),
+                callback: () => {
+                  this.$emit('unpinPost', this.resource)
+                },
+                icon: 'unlink',
+              })
+            }
           }
         }
 
@@ -227,6 +231,12 @@ export default {
     },
     isAdmin() {
       return this.$store.getters['auth/isAdmin']
+    },
+    canBePinned() {
+      return (
+        this.maxPinnedPosts === 1 ||
+        (this.maxPinnedPosts > 1 && this.currentlyPinnedPosts < this.maxPinnedPosts)
+      )
     },
   },
   methods: {
