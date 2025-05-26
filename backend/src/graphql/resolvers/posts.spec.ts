@@ -15,6 +15,7 @@ import { createPostMutation } from '@graphql/queries/createPostMutation'
 import { Post } from '@graphql/queries/Post'
 import { pushPost } from '@graphql/queries/pushPost'
 import { unpushPost } from '@graphql/queries/unpushPost'
+import { TEST_CONFIG } from '@src/config/test-mock'
 import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = true
@@ -32,7 +33,7 @@ beforeAll(async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
   const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database })
+  const context = getContext({ user: contextUser, database, config: TEST_CONFIG })
 
   server = createServer({ context }).server
 

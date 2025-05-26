@@ -18,6 +18,7 @@ import { postQuery } from '@graphql/queries/postQuery'
 import { profilePagePosts } from '@graphql/queries/profilePagePosts'
 import { searchPosts } from '@graphql/queries/searchPosts'
 import { signupVerificationMutation } from '@graphql/queries/signupVerificationMutation'
+import { TEST_CONFIG } from '@src/config/test-mock'
 import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
@@ -48,7 +49,7 @@ beforeAll(async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database })
+  const context = getContext({ user: contextUser, database, config: TEST_CONFIG })
 
   server = createServer({ context }).server
   query = createTestClient(server).query

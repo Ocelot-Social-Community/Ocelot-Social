@@ -34,7 +34,7 @@ jobs:
         run: |
           docker build --target community -t "ocelotsocialnetwork/neo4j-community:test" neo4j/
           docker save "ocelotsocialnetwork/neo4j-community:test" > /tmp/neo4j.tar
-      
+
       - name: Cache docker images
         id: cache-neo4j
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
@@ -55,7 +55,7 @@ jobs:
         run: |
           docker build --target test -t "ocelotsocialnetwork/backend:test" backend/
           docker save "ocelotsocialnetwork/backend:test" > /tmp/backend.tar
-      
+
       - name: Cache docker images
         id: cache-backend
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
@@ -80,7 +80,7 @@ jobs:
     if: needs.files-changed.outputs.backend == 'true' || needs.files-changed.outputs.docker == 'true'
     needs: [files-changed, build_test_neo4j, build_test_backend]
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
       checks: write
     steps:
       - name: Checkout code

@@ -30,6 +30,7 @@ const config: S3Configured = {
   AWS_ENDPOINT: 'AWS_ENDPOINT',
   AWS_REGION: 'AWS_REGION',
   S3_PUBLIC_GATEWAY: undefined,
+  IMAGOR_SECRET: undefined,
 }
 
 beforeAll(async () => {
