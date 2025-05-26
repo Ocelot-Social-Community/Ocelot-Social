@@ -4,7 +4,7 @@ export default {
   computed: {
     ...mapGetters({
       categories: 'categories/categories',
-      isInizialized: 'categories/isInizialized',
+      isInitialized: 'categories/isInitialized',
       categoriesActive: 'categories/categoriesActive',
     }),
   },

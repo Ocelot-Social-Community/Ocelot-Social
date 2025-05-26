@@ -6,7 +6,7 @@ describe('categories store', () => {
     it('sets no categories and is not inizialized', () => {
       expect(state()).toEqual({
         categories: [],
-        isInizialized: false,
+        isInitialized: false,
       })
     })
   })
@@ -49,11 +49,11 @@ describe('categories store', () => {
       beforeEach(() => {
         testMutation = () => {
           mutations.SET_INIZIALIZED(state)
-          return getters.isInizialized(state)
+          return getters.isInitialized(state)
         }
       })
 
-      it('sets isInizialized to true', () => {
+      it('sets isInitialized to true', () => {
         expect(testMutation()).toBe(true)
       })
     })

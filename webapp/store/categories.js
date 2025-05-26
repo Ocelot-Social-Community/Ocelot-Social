@@ -3,7 +3,7 @@ import CategoryQuery from '~/graphql/CategoryQuery'
 export const state = () => {
   return {
     categories: [],
-    isInizialized: false,
+    isInitialized: false,
   }
 }
 
@@ -12,7 +12,7 @@ export const mutations = {
     state.categories = categories || []
   },
   SET_INIZIALIZED(state) {
-    state.isInizialized = true
+    state.isInitialized = true
   },
 }
 
@@ -23,8 +23,8 @@ export const getters = {
   categoriesActive(state) {
     return !!state.categories.length
   },
-  isInizialized(state) {
-    return state.isInizialized
+  isInitialized(state) {
+    return state.isInitialized
   },
 }
 
