@@ -43,6 +43,7 @@ export const TEST_CONFIG = {
   AWS_REGION: 'local',
   AWS_BUCKET: 'ocelot',
 
+  IMAGOR_SECRET: 'IMAGOR_SECRET',
   S3_PUBLIC_GATEWAY: undefined,
 
   EMAIL_DEFAULT_SENDER: '',

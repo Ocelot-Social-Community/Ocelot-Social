@@ -7,7 +7,7 @@
       @click="handleBadgeClick(badge, index)"
     >
       <div class="badge-icon">
-        <img :src="badge.icon | proxyApiUrl" :alt="badge.id" />
+        <img :src="'/api' + badge.icon" :alt="badge.id" />
       </div>
       <div class="badge-info">
         <div class="badge-description">{{ badge.description }}</div>

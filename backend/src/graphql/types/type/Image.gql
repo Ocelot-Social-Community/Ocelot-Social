@@ -1,5 +1,6 @@
 type Image {
   url: ID!,
+  transform(width: Int, height: Int): String
   # urlW34: String,
   # urlW160: String,
   # urlW320: String,
