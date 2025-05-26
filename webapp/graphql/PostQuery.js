@@ -187,3 +187,13 @@ export const relatedContributions = (i18n) => {
     }
   `
 }
+
+export const postsPinnedCountsQuery = () => {
+  return gql`
+    query {
+      PostsPinnedCounts {
+        maxPinnedPosts
+        currentlyPinnedPosts
+      }
+    }`
+}
