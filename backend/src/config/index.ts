@@ -103,6 +103,7 @@ const required = {
   PRIVATE_KEY_PASSPHRASE: env.PRIVATE_KEY_PASSPHRASE,
 }
 
+const IMAGOR_SECRET = env.IMAGOR_SECRET
 const S3_PUBLIC_GATEWAY = env.S3_PUBLIC_GATEWAY
 
 // https://stackoverflow.com/a/53050575
@@ -151,6 +152,7 @@ const CONFIG = {
   ...redis,
   ...options,
   ...language,
+  IMAGOR_SECRET,
   S3_PUBLIC_GATEWAY,
 }
 
@@ -162,6 +164,7 @@ export type S3Config = Pick<
   | 'AWS_ENDPOINT'
   | 'AWS_REGION'
   | 'AWS_BUCKET'
+  | 'IMAGOR_SECRET'
   | 'S3_PUBLIC_GATEWAY'
 >
 export default CONFIG
