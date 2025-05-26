@@ -75,17 +75,13 @@ export default {
     }
   },
   mounted: function () {
-    this.$nextTick(function () {
-      // Code that will run only after the entire view has been rendered
+    this.formData.inviteCode = this.sliderData.collectedInputData.inviteCode
+      ? this.sliderData.collectedInputData.inviteCode
+      : ''
+    this.sendValidation()
 
-      this.formData.inviteCode = this.sliderData.collectedInputData.inviteCode
-        ? this.sliderData.collectedInputData.inviteCode
-        : ''
-      this.sendValidation()
-
-      this.sliderData.setSliderValuesCallback(this.validInput, {
-        sliderSettings: { buttonSliderCallback: this.onNextClick },
-      })
+    this.sliderData.setSliderValuesCallback(this.validInput, {
+      sliderSettings: { buttonSliderCallback: this.onNextClick },
     })
   },
   computed: {
@@ -96,12 +92,14 @@ export default {
       return this.formData.inviteCode.length === 6
     },
     invitedBy() {
-      return this.sliderData.sliders[this.sliderIndex].data.response.validateInviteCode
+      return this.validInput &&
+        this.sliderData.sliders[this.sliderIndex].data.response.validateInviteCode
         ? this.sliderData.sliders[this.sliderIndex].data.response.validateInviteCode.generatedBy
         : null
     },
     invitedTo() {
-      return this.sliderData.sliders[this.sliderIndex].data.response.validateInviteCode
+      return this.validInput &&
+        this.sliderData.sliders[this.sliderIndex].data.response.validateInviteCode
         ? this.sliderData.sliders[this.sliderIndex].data.response.validateInviteCode.invitedTo
         : null
     },
@@ -124,18 +122,11 @@ export default {
     async handleInputValid() {
       this.sendValidation()
     },
-    isVariablesRequested(variables) {
-      return (
-        this.sliderData.sliders[this.sliderIndex].data.request &&
-        this.sliderData.sliders[this.sliderIndex].data.request.variables &&
-        this.sliderData.sliders[this.sliderIndex].data.request.variables.code === variables.code
-      )
-    },
     async handleSubmitVerify() {
       const { inviteCode } = this.sliderData.collectedInputData
       const variables = { code: inviteCode }
 
-      if (!this.isVariablesRequested(variables) && !this.dbRequestInProgress) {
+      if (!this.dbRequestInProgress) {
         try {
           this.dbRequestInProgress = true
 

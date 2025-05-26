@@ -9,7 +9,6 @@ exports[`UserTeaser given an user avatar is disabled does not render the avatar 
     <client-only-stub>
       <v-popover-stub
         autohide="true"
-        boundarieselement="body"
         class="user-teaser"
         container="body"
         delay="0"
@@ -51,6 +50,11 @@ exports[`UserTeaser given an user avatar is disabled does not render the avatar 
             <!---->
              
             <!---->
+             
+            <span>
+              
+              <!---->
+            </span>
           </div>
            
           <!---->
@@ -136,7 +140,6 @@ exports[`UserTeaser given an user user is disabled current user is a moderator r
     <client-only-stub>
       <v-popover-stub
         autohide="true"
-        boundarieselement="body"
         class="user-teaser"
         container="body"
         delay="0"
@@ -199,6 +202,11 @@ exports[`UserTeaser given an user user is disabled current user is a moderator r
             <!---->
              
             <!---->
+             
+            <span>
+              
+              <!---->
+            </span>
           </div>
            
           <!---->
@@ -252,7 +260,6 @@ exports[`UserTeaser given an user with linkToProfile, on desktop renders 1`] = `
     <client-only-stub>
       <v-popover-stub
         autohide="true"
-        boundarieselement="body"
         class="user-teaser"
         container="body"
         delay="0"
@@ -315,6 +322,11 @@ exports[`UserTeaser given an user with linkToProfile, on desktop renders 1`] = `
             <!---->
              
             <!---->
+             
+            <span>
+              
+              <!---->
+            </span>
           </div>
            
           <!---->
@@ -336,7 +348,6 @@ exports[`UserTeaser given an user with linkToProfile, on desktop when hovering t
     <client-only-stub>
       <v-popover-stub
         autohide="true"
-        boundarieselement="body"
         class="user-teaser"
         container="body"
         delay="0"
@@ -400,6 +411,11 @@ exports[`UserTeaser given an user with linkToProfile, on desktop when hovering t
             <!---->
              
             <!---->
+             
+            <span>
+              
+              <!---->
+            </span>
           </div>
            
           <!---->
@@ -426,7 +442,6 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen renders 1`
     <client-only-stub>
       <v-popover-stub
         autohide="true"
-        boundarieselement="body"
         class="user-teaser"
         container="body"
         delay="0"
@@ -489,6 +504,11 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen renders 1`
             <!---->
              
             <!---->
+             
+            <span>
+              
+              <!---->
+            </span>
           </div>
            
           <!---->
@@ -510,7 +530,6 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen when click
     <client-only-stub>
       <v-popover-stub
         autohide="true"
-        boundarieselement="body"
         class="user-teaser"
         container="body"
         delay="0"
@@ -574,6 +593,11 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen when click
             <!---->
              
             <!---->
+             
+            <span>
+              
+              <!---->
+            </span>
           </div>
            
           <!---->
@@ -600,7 +624,6 @@ exports[`UserTeaser given an user without linkToProfile, on desktop renders 1`] 
     <client-only-stub>
       <v-popover-stub
         autohide="true"
-        boundarieselement="body"
         class="user-teaser"
         container="body"
         delay="0"
@@ -663,6 +686,11 @@ exports[`UserTeaser given an user without linkToProfile, on desktop renders 1`] 
             <!---->
              
             <!---->
+             
+            <span>
+              
+              <!---->
+            </span>
           </div>
            
           <!---->
@@ -684,7 +712,6 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
     <client-only-stub>
       <v-popover-stub
         autohide="true"
-        boundarieselement="body"
         class="user-teaser"
         container="body"
         delay="0"
@@ -748,6 +775,11 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
             <!---->
              
             <!---->
+             
+            <span>
+              
+              <!---->
+            </span>
           </div>
            
           <!---->
@@ -773,7 +805,6 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
     <client-only-stub>
       <v-popover-stub
         autohide="true"
-        boundarieselement="body"
         class="user-teaser"
         container="body"
         delay="0"
@@ -837,6 +868,11 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
             <!---->
              
             <!---->
+             
+            <span>
+              
+              <!---->
+            </span>
           </div>
            
           <!---->
@@ -862,7 +898,6 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen renders
     <client-only-stub>
       <v-popover-stub
         autohide="true"
-        boundarieselement="body"
         class="user-teaser"
         container="body"
         delay="0"
@@ -925,6 +960,11 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen renders
             <!---->
              
             <!---->
+             
+            <span>
+              
+              <!---->
+            </span>
           </div>
            
           <!---->
@@ -946,7 +986,6 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
     <client-only-stub>
       <v-popover-stub
         autohide="true"
-        boundarieselement="body"
         class="user-teaser"
         container="body"
         delay="0"
@@ -1010,6 +1049,11 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
             <!---->
              
             <!---->
+             
+            <span>
+              
+              <!---->
+            </span>
           </div>
            
           <!---->
@@ -1035,7 +1079,6 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
     <client-only-stub>
       <v-popover-stub
         autohide="true"
-        boundarieselement="body"
         class="user-teaser"
         container="body"
         delay="0"
@@ -1099,6 +1142,11 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
             <!---->
              
             <!---->
+             
+            <span>
+              
+              <!---->
+            </span>
           </div>
            
           <!---->

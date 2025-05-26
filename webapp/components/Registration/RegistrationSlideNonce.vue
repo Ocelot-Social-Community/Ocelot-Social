@@ -66,17 +66,13 @@ export default {
     }
   },
   mounted: function () {
-    this.$nextTick(function () {
-      // Code that will run only after the entire view has been rendered
+    this.formData.nonce = this.sliderData.collectedInputData.nonce
+      ? this.sliderData.collectedInputData.nonce
+      : ''
+    this.sendValidation()
 
-      this.formData.nonce = this.sliderData.collectedInputData.nonce
-        ? this.sliderData.collectedInputData.nonce
-        : ''
-      this.sendValidation()
-
-      this.sliderData.setSliderValuesCallback(this.validInput, {
-        sliderSettings: { buttonSliderCallback: this.onNextClick },
-      })
+    this.sliderData.setSliderValuesCallback(this.validInput, {
+      sliderSettings: { buttonSliderCallback: this.onNextClick },
     })
   },
   computed: {
@@ -109,20 +105,11 @@ export default {
     async handleInputValid() {
       this.sendValidation()
     },
-    isVariablesRequested(variables) {
-      return (
-        this.sliderData.sliders[this.sliderIndex].data.request &&
-        this.sliderData.sliders[this.sliderIndex].data.request.variables &&
-        this.sliderData.sliders[this.sliderIndex].data.request.variables.email ===
-          variables.email &&
-        this.sliderData.sliders[this.sliderIndex].data.request.variables.nonce === variables.nonce
-      )
-    },
     async handleSubmitVerify() {
       const { email, nonce } = this.sliderData.collectedInputData
       const variables = { email, nonce }
 
-      if (!this.isVariablesRequested(variables) && !this.dbRequestInProgress) {
+      if (!this.dbRequestInProgress) {
         try {
           this.dbRequestInProgress = true
 
