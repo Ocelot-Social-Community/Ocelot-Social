@@ -8,7 +8,7 @@
       <!-- header menu -->
       <ds-flex v-if="!showMobileMenu" class="main-navigation-flex">
         <!-- logo -->
-        <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
+        <ds-flex-item class="logo-wrapper" :width="{ base: 'auto' }">
           <a
             v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
             :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
@@ -48,13 +48,7 @@
           v-if="isLoggedIn"
           id="nav-search-box"
           class="header-search"
-          :width="{
-            base: '45%',
-            sm: '40%',
-            md: isHeaderMenu ? 'auto' : '40%',
-            lg: isHeaderMenu ? 'auto' : '50%',
-          }"
-          style="flex-shrink: 0; flex-grow: 1"
+          :width="{ base: 'auto' }"
         >
           <search-field />
         </ds-flex-item>
@@ -69,7 +63,7 @@
           </client-only>
         </ds-flex-item>
         <!-- right symbols -->
-        <ds-flex-item style="flex-basis: auto">
+        <ds-flex-item style="flex: none">
           <div class="main-navigation-right" style="flex-basis: auto">
             <!-- locale switch -->
             <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
@@ -384,7 +378,6 @@ export default {
   white-space: nowrap;
 }
 .topbar-locale-switch {
-  display: flex;
   margin-right: $space-xx-small;
   align-self: center;
   display: inline-flex;
@@ -393,45 +386,67 @@ export default {
   margin-top: $space-xx-small;
 }
 .main-navigation-flex {
+  display: flex;
   align-items: center;
   flex-wrap: nowrap !important;
+  gap: 20px;
+  min-width: 0;
 }
+@media (max-width: 800px) {
+  .main-navigation-flex {
+    gap: 10px;
+  }
+}
+
+.logo-wrapper {
+  flex: 0 0 auto;
+}
+.branding-menu {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.header-search {
+  flex: 1 1 auto !important;
+}
+.navigation-actions {
+  flex: 0 0 auto;
+}
+
 .main-navigation-right {
   display: flex;
   justify-content: flex-end;
 }
-.main-navigation-right .desktop-view {
-  float: right;
-}
-.ds-flex-item.mobile-hamburger-menu {
-  margin-left: auto;
-  text-align: right;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  justify-content: flex-end;
 
-  & > div {
-    display: inline-flex;
+// Mobile Header mit verbessertem Layout
+.mobil-header-box {
+  .logo-container {
+    flex: 1 1 auto;
+    min-width: 60px;
+    max-width: calc(100vw - 200px);
+  }
 
-    padding-right: 15px;
-    &:first-child {
-      padding-right: 10px;
-    }
+  .mobile-hamburger-menu {
+    flex: 0 0 auto; // no shrinking
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
 
-    button {
-      overflow: visible;
-      .svg {
-        height: 1.8em;
+    > div {
+      flex-shrink: 0; // Buttons remain their size
+
+      button {
+        overflow: visible;
+        .svg {
+          height: 1.8em;
+        }
       }
     }
   }
   .hamburger-button .svg {
     height: 1.5em;
   }
-}
-.mobile-menu {
-  margin: 0 20px;
 }
 .mobile-search {
   margin-top: 20px;
@@ -446,11 +461,5 @@ export default {
 }
 .hide-mobile-menu {
   display: none;
-}
-.logo-container {
-  max-width: calc(100vw - 140px) !important;
-}
-.hamburger-button {
-  flex-shrink: 0;
 }
 </style>

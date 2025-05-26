@@ -26,7 +26,14 @@
       <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
     </base-button>
   </nuxt-link>
-  <dropdown v-else class="notifications-menu" offset="8" :placement="placement">
+  <dropdown
+    v-else
+    class="notifications-menu"
+    offset="8"
+    :placement="placement"
+    noMouseLeaveClosing
+    ref="dropdown"
+  >
     <template #default="{ toggleMenu }">
       <base-button
         ghost
@@ -42,14 +49,12 @@
     </template>
     <template #popover="{ closeMenu }">
       <ds-flex class="notifications-link-container">
-        <ds-flex-item class="notifications-link-container-item" :width="{ base: '100%' }" centered>
+        <ds-flex-item>
           <nuxt-link :to="{ name: 'notifications' }">
             <base-button ghost primary>
               {{ $t('notifications.pageLink') }}
             </base-button>
           </nuxt-link>
-        </ds-flex-item>
-        <ds-flex-item class="notifications-link-container-item" :width="{ base: '100%' }" centered>
           <base-button
             ghost
             primary
@@ -61,7 +66,11 @@
         </ds-flex-item>
       </ds-flex>
       <div class="notifications-menu-popover">
-        <notification-list :notifications="notifications" @markAsRead="markAsRead" />
+        <notifications-table
+          @markNotificationAsRead="markAsReadAndCloseMenu($event, closeMenu)"
+          :notifications="notifications"
+          :show-popover="false"
+        />
       </div>
     </template>
   </dropdown>
@@ -78,14 +87,14 @@ import {
 } from '~/graphql/User'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import Dropdown from '~/components/Dropdown'
-import NotificationList from '../NotificationList/NotificationList'
+import NotificationsTable from '../NotificationsTable/NotificationsTable.vue'
 
 export default {
   name: 'NotificationMenu',
   components: {
+    NotificationsTable,
     CounterIcon,
     Dropdown,
-    NotificationList,
   },
   data() {
     return {
@@ -96,14 +105,25 @@ export default {
     placement: { type: String },
     noMenu: { type: Boolean, default: false },
   },
+  mounted() {
+    window.addEventListener('resize', this.handleResize)
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize)
+  },
   methods: {
-    async markAsRead(notificationSourceId) {
-      const variables = { id: notificationSourceId }
+    handleResize() {
+      // When the viewport get resized close menu
+      this.$refs?.dropdown?.closeMenu?.()
+    },
+    async markAsReadAndCloseMenu(notificationSourceId, closeMenu) {
       try {
         await this.$apollo.mutate({
           mutation: markAsReadMutation(this.$i18n),
-          variables,
+          variables: { id: notificationSourceId },
         })
+
+        closeMenu?.()
       } catch (error) {
         this.$toast.error(error.message)
       }
@@ -113,7 +133,7 @@ export default {
         return
       }
 
-      closeMenu()
+      closeMenu?.()
       try {
         await this.$apollo.mutate({
           mutation: markAllAsReadMutation(this.$i18n),
@@ -178,12 +198,8 @@ export default {
 }
 .notifications-link-container {
   background-color: $background-color-softer-active;
-  justify-content: center;
-  padding: $space-x-small;
+  text-align: right;
+  padding: $space-x-small 0;
   flex-direction: row;
-}
-.notifications-link-container-item {
-  justify-content: center;
-  display: flex;
 }
 </style>
