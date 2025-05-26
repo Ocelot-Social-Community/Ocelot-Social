@@ -65,7 +65,20 @@ export default {
         }
         // send subscription to author to updated the messages
       }
-      return resolved.reverse()
+      return resolved.reverse().map((m) => ({
+        ...m,
+        files: [
+          {
+            name: 'My File',
+            size: 67351,
+            type: 'png',
+            audio: true,
+            duration: 14.4,
+            url: '/icon.png',
+            preview: 'data:image/png;base64,iVBORw0KGgoAA...',
+          },
+        ],
+      }))
     },
   },
   Mutation: {
@@ -82,7 +95,7 @@ export default {
           OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
           OPTIONAL MATCH (room)<-[:CHATS_IN]-(recipientUser:User)
             WHERE NOT recipientUser.id = $currentUserId
-          WITH MAX(m.indexId) as maxIndex, room, currentUser, image, recipientUser 
+          WITH MAX(m.indexId) as maxIndex, room, currentUser, image, recipientUser
           CREATE (currentUser)-[:CREATED]->(message:Message {
             createdAt: toString(datetime()),
             id: apoc.create.uuid(),
@@ -113,7 +126,29 @@ export default {
           record.get('message'),
         )
 
-        return message
+        return {
+          ...message,
+          files: [
+            {
+              name: 'My File',
+              size: 67351,
+              type: 'png',
+              audio: true,
+              duration: 14.4,
+              url: '/icon.png',
+              preview: 'data:image/png;base64,iVBORw0KGgoAA...',
+            },
+            {
+              name: 'My File',
+              size: 67351,
+              type: 'png',
+              audio: true,
+              duration: 14.4,
+              url: '/icon.png',
+              preview: 'data:image/png;base64,iVBORw0KGgoAA...',
+            },
+          ],
+        }
       })
       try {
         return await writeTxResultPromise
