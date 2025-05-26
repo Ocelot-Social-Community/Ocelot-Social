@@ -433,6 +433,7 @@ export default shield(
       Room: isAuthenticated,
       Message: isAuthenticated,
       UnreadRooms: isAuthenticated,
+      PostsPinnedCounts: isAdmin,
 
       // Invite Code
       validateInviteCode: allow,

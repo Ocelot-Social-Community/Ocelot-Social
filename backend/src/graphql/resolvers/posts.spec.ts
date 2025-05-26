@@ -1107,9 +1107,9 @@ describe('pin posts', () => {
       }
     `
 
-    describe('PINNED_POSTS_COUNT is 0', () => {
+    describe('MAX_PINNED_POSTS is 0', () => {
       beforeEach(async () => {
-        CONFIG.PINNED_POSTS_COUNT = 0
+        CONFIG.MAX_PINNED_POSTS = 0
         await Factory.build(
           'post',
           {
@@ -1130,9 +1130,9 @@ describe('pin posts', () => {
       })
     })
 
-    describe('PINNED_POSTS_COUNT is 1', () => {
+    describe('MAX_PINNED_POSTS is 1', () => {
       beforeEach(() => {
-        CONFIG.PINNED_POSTS_COUNT = 1
+        CONFIG.MAX_PINNED_POSTS = 1
       })
 
       describe('are allowed to pin posts', () => {
@@ -1356,9 +1356,11 @@ describe('pin posts', () => {
       })
     })
 
-    describe('PINNED_POST_COUNT = 3', () => {
+    describe('MAX_PINNED_POSTS = 3', () => {
+      const postsPinnedCountsQuery = `query { PostsPinnedCounts { maxPinnedPosts, currentlyPinnedPosts } }`
+
       beforeEach(async () => {
-        CONFIG.PINNED_POSTS_COUNT = 3
+        CONFIG.MAX_PINNED_POSTS = 3
         await Factory.build(
           'post',
           {
@@ -1423,6 +1425,21 @@ describe('pin posts', () => {
           })
         })
 
+        it('returns the correct counts', async () => {
+          await expect(
+            query({
+              query: postsPinnedCountsQuery,
+            }),
+          ).resolves.toMatchObject({
+            data: {
+              PostsPinnedCounts: {
+                maxPinnedPosts: 3,
+                currentlyPinnedPosts: 1,
+              },
+            },
+          })
+        })
+
         describe('second post', () => {
           beforeEach(async () => {
             variables = { ...variables, id: 'second-post' }
@@ -1444,6 +1461,21 @@ describe('pin posts', () => {
             })
           })
 
+          it('returns the correct counts', async () => {
+            await expect(
+              query({
+                query: postsPinnedCountsQuery,
+              }),
+            ).resolves.toMatchObject({
+              data: {
+                PostsPinnedCounts: {
+                  maxPinnedPosts: 3,
+                  currentlyPinnedPosts: 2,
+                },
+              },
+            })
+          })
+
           describe('third post', () => {
             beforeEach(async () => {
               variables = { ...variables, id: 'third-post' }
@@ -1460,6 +1492,21 @@ describe('pin posts', () => {
                     pinnedBy: {
                       id: 'current-user',
                     },
+                  },
+                },
+              })
+            })
+
+            it('returns the correct counts', async () => {
+              await expect(
+                query({
+                  query: postsPinnedCountsQuery,
+                }),
+              ).resolves.toMatchObject({
+                data: {
+                  PostsPinnedCounts: {
+                    maxPinnedPosts: 3,
+                    currentlyPinnedPosts: 3,
                   },
                 },
               })

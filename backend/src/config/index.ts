@@ -123,9 +123,9 @@ const options = {
   INVITE_CODES_GROUP_PER_USER:
     (env.INVITE_CODES_GROUP_PER_USER && parseInt(env.INVITE_CODES_GROUP_PER_USER)) || 7,
   CATEGORIES_ACTIVE: process.env.CATEGORIES_ACTIVE === 'true' || false,
-  PINNED_POSTS_COUNT: Number.isNaN(Number(process.env.PINNED_POSTS_COUNT))
+  MAX_PINNED_POSTS: Number.isNaN(Number(process.env.MAX_PINNED_POSTS))
     ? 1
-    : Number(process.env.PINNED_POSTS_COUNT),
+    : Number(process.env.MAX_PINNED_POSTS),
 }
 
 const language = {
