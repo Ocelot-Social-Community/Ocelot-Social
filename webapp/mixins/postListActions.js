@@ -57,8 +57,8 @@ export default {
         .catch((error) => this.$toast.error(error.message))
     },
     ...mapMutations({
-      storePinPost: 'pinnedPost/pinPost',
-      storeUnpinPost: 'pinnedPost/unpinPost',
+      storePinPost: 'pinnedPosts/pinPost',
+      storeUnpinPost: 'pinnedPosts/unpinPost',
     }),
   },
 }
