@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid'
 import type { S3Config } from '@config/index'
 import { s3Service } from '@src/uploads/s3Service'
 
-import { wrapTransaction } from './wrapTransaction'
+import { wrapTransactionDeleteImage, wrapTransactionMergeImage } from './wrapTransaction'
 
 import type { Image, Images } from './images'
 
@@ -17,7 +17,8 @@ export const images = (config: S3Config) => {
 
   const deleteImage: Images['deleteImage'] = async (resource, relationshipType, opts = {}) => {
     const { transaction } = opts
-    if (!transaction) return wrapTransaction(deleteImage, [resource, relationshipType], opts)
+    if (!transaction)
+      return wrapTransactionDeleteImage(deleteImage, [resource, relationshipType], opts)
     const txResult = await transaction.run(
       `
       MATCH (resource {id: $resource.id})-[rel:${relationshipType}]->(image:Image)
@@ -48,7 +49,7 @@ export const images = (config: S3Config) => {
     if (imageInput === null) return deleteImage(resource, relationshipType, opts)
     const { transaction } = opts
     if (!transaction)
-      return wrapTransaction(mergeImage, [resource, relationshipType, imageInput], opts)
+      return wrapTransactionMergeImage(mergeImage, [resource, relationshipType, imageInput], opts)
 
     let txResult = await transaction.run(
       `

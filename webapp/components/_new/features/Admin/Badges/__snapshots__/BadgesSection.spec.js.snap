@@ -18,7 +18,7 @@ exports[`Admin/BadgesSection with badges renders 1`] = `
         >
           <img
             alt="description1"
-            src="icon1"
+            src="/api/icon1"
           />
         </button>
         <button
@@ -26,7 +26,7 @@ exports[`Admin/BadgesSection with badges renders 1`] = `
         >
           <img
             alt="description2"
-            src="icon2"
+            src="/api/icon2"
           />
         </button>
       </div>

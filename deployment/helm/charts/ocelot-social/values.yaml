@@ -25,3 +25,9 @@ webapp:
 maintenance:
   image:
     repository: ghcr.io/ocelot-social-community/ocelot-social/maintenance
+
+imagor:
+  image:
+    repository: shumc/imagor
+    tag: 1.5.4
+

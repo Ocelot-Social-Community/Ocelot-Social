@@ -344,7 +344,7 @@ export default {
         ;[...this.messages, ...Message].forEach((m) => {
           if (m.senderId !== this.currentUser.id) m.seen = true
           m.date = new Date(m.date).toDateString()
-          m.avatar = this.$filters.proxyApiUrl(m.avatar)
+          m.avatar = m.avatar?.w320
           msgs[m.indexId] = m
         })
         this.messages = msgs.filter(Boolean)
@@ -466,7 +466,7 @@ export default {
       const fixedRoom = {
         ...room,
         index: room.lastMessage ? room.lastMessage.date : room.createdAt,
-        avatar: this.$filters.proxyApiUrl(room.avatar),
+        avatar: room.avatar?.w320,
         lastMessage: room.lastMessage
           ? {
               ...room.lastMessage,
@@ -474,7 +474,7 @@ export default {
             }
           : {},
         users: room.users.map((u) => {
-          return { ...u, username: u.name, avatar: this.$filters.proxyApiUrl(u.avatar?.url) }
+          return { ...u, username: u.name, avatar: u.avatar?.w320 }
         }),
       }
       if (!fixedRoom.avatar) {
