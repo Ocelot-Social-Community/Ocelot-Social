@@ -16,7 +16,7 @@ import type { FileUpload } from 'graphql-upload'
 
 export const images = (config: S3Configured) => {
   // const widths = [34, 160, 320, 640, 1024]
-  const { AWS_BUCKET: Bucket, S3_PUBLIC_GATEWAY } = config
+  const { AWS_BUCKET: Bucket } = config
 
   const { AWS_ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = config
   const s3 = new S3Client({
@@ -105,12 +105,7 @@ export const images = (config: S3Configured) => {
     const { name, ext } = path.parse(upload.filename)
     const uniqueFilename = `${uuid()}-${slug(name)}${ext}`
     const Location = await uploadCallback({ ...upload, uniqueFilename })
-    if (!S3_PUBLIC_GATEWAY) {
-      return Location
-    }
-    const publicLocation = new URL(S3_PUBLIC_GATEWAY)
-    publicLocation.pathname = new URL(Location).pathname
-    return publicLocation.href
+    return Location
   }
 
   const s3Upload: FileUploadCallback = async ({ createReadStream, uniqueFilename, mimetype }) => {

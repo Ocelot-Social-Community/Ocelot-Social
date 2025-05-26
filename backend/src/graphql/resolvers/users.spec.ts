@@ -13,6 +13,7 @@ import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import User from '@db/models/User'
 import { setTrophyBadgeSelected } from '@graphql/queries/setTrophyBadgeSelected'
+import { TEST_CONFIG } from '@src/config/test-mock'
 import createServer, { getContext } from '@src/server'
 
 const categoryIds = ['cat9']
@@ -102,7 +103,7 @@ beforeAll(async () => {
   await cleanDatabase()
 
   const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database, pubsub })
+  const context = getContext({ user: contextUser, database, pubsub, config: TEST_CONFIG })
 
   server = createServer({ context }).server
 
