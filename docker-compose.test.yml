@@ -2,7 +2,7 @@ services:
 
   webapp:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ghcr.io/ocelot-social-community/ocelot-social/webapp:test
+    image: ocelotsocialnetwork/webapp:test
     build:
       target: test
     environment:
@@ -12,7 +12,7 @@ services:
 
   backend:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ghcr.io/ocelot-social-community/ocelot-social/backend:test
+    image: ocelotsocialnetwork/backend:test
     build:
       target: test
     environment:
@@ -22,11 +22,11 @@ services:
 
   maintenance:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ghcr.io/ocelot-social-community/ocelot-social/maintenance:test
+    image: ocelotsocialnetwork/maintenance:test
 
   neo4j:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ghcr.io/ocelot-social-community/ocelot-social/neo4j-community:test
+    image: ocelotsocialnetwork/neo4j-community:test
     #environment:
     #  - NEO4J_dbms_connector_bolt_enabled=true
     #  - NEO4J_dbms_connector_bolt_tls__level=OPTIONAL
