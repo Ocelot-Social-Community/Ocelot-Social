@@ -25,6 +25,9 @@ services:
 
   backend:
     image: ghcr.io/ocelot-social-community/ocelot-social/backend:local-development
+    depends_on:
+      - minio
+      - minio-mc
     build:
       target: development
     environment:
