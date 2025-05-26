@@ -195,5 +195,6 @@ export const postsPinnedCountsQuery = () => {
         maxPinnedPosts
         currentlyPinnedPosts
       }
-    }`
+    }
+  `
 }

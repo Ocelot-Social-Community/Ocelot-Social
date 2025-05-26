@@ -35,9 +35,9 @@ export const actions = {
   async fetch({ commit }) {
     const client = this.app.apolloProvider.defaultClient
     const {
-      data: { PostsPinnedCounts }
-    } = await client.query({ query: postsPinnedCountsQuery })
+      data: { PostsPinnedCounts },
+    } = await client.query({ query: postsPinnedCountsQuery() })
     commit('setMaxPinnedPosts', PostsPinnedCounts.maxPinnedPosts)
     commit('setCurrentlyPinnedPosts', PostsPinnedCounts.currentlyPinnedPosts)
-  }
+  },
 }
