@@ -7,6 +7,7 @@ import CONFIG from '@config/index'
 
 // eslint-disable-next-line import/no-cycle
 import brandingMiddlewares from './branding/brandingMiddlewares'
+import categories from './categories'
 import chatMiddleware from './chatMiddleware'
 import excerpt from './excerptMiddleware'
 import hashtags from './hashtags/hashtagsMiddleware'
@@ -46,6 +47,7 @@ const ocelotMiddlewares: MiddlewareOrder[] = [
   { order: -80, name: 'includedFields', middleware: includedFields },
   { order: -70, name: 'orderBy', middleware: orderBy },
   { order: -60, name: 'chatMiddleware', middleware: chatMiddleware },
+  { order: -50, name: 'categories', middleware: categories },
 ]
 
 export default (schema) => {

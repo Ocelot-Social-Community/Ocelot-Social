@@ -59,7 +59,6 @@ import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
 import ShowPassword from '../ShowPassword/ShowPassword.vue'
 import { mapGetters, mapMutations } from 'vuex'
-import CategoryQuery from '~/graphql/CategoryQuery'
 
 export default {
   components: {
@@ -88,6 +87,7 @@ export default {
     },
     ...mapGetters({
       currentUser: 'auth/user',
+      categories: 'categories/categories',
     }),
   },
   methods: {
@@ -99,13 +99,9 @@ export default {
       const { email, password } = this.form
       try {
         await this.$store.dispatch('auth/login', { email, password })
-        const result = await this.$apollo.query({
-          query: CategoryQuery(),
-        })
-        const categories = result.data.Category
         if (this.currentUser && this.currentUser.activeCategories) {
           this.resetCategories()
-          if (this.currentUser.activeCategories.length < categories.length) {
+          if (this.currentUser.activeCategories.length < this.categories.length) {
             this.currentUser.activeCategories.forEach((categoryId) => {
               this.toggleCategory(categoryId)
             })
