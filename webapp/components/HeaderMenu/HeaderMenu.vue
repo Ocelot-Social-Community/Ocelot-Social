@@ -293,8 +293,10 @@ import SearchField from '~/components/features/SearchField/SearchField.vue'
 import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
 import links from '~/constants/links.js'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
+  mixins: [GetCategories],
   components: {
     AvatarMenu,
     ChatNotificationMenu,
@@ -327,7 +329,6 @@ export default {
       mobileSearchVisible: false,
       toggleMobileMenu: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
     }
   },
   computed: {

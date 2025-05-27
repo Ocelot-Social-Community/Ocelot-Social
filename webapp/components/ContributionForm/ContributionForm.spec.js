@@ -62,9 +62,6 @@ describe('ContributionForm.vue', () => {
         back: jest.fn(),
         push: jest.fn(),
       },
-      $env: {
-        CATEGORIES_ACTIVE: false,
-      },
     }
     propsData = {}
   })
@@ -82,9 +79,13 @@ describe('ContributionForm.vue', () => {
           slug: 'you-yourself',
         }
       },
+      'categories/categoriesActive': jest.fn(() => false),
     }
     const store = new Vuex.Store({
       getters,
+      actions: {
+        'categories/init': jest.fn(),
+      },
     })
     const Wrapper = () => {
       return mount(ContributionForm, {
