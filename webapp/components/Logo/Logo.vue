@@ -8,10 +8,18 @@
       :style="logoWidthStyle"
     />
 
+    <!-- Tablet logo (falls back to desktop if not provided) -->
+    <img
+      class="ds-logo-svg ds-logo-tablet"
+      :alt="metadata.APPLICATION_NAME + ' ' + logo.alt"
+      :src="logo.tabletPath || logo.path"
+      :style="tabletLogoWidthStyle"
+    />
+
     <!-- Mobile logo (falls back to desktop if not provided) -->
     <img
       class="ds-logo-svg ds-logo-mobile"
-      :alt="metadata.APPLICATION_NAME + ' ' + logo.alt + ' Mobile'"
+      :alt="metadata.APPLICATION_NAME + ' ' + logo.alt"
       :src="logo.mobilePath || logo.path"
       :style="mobileLogoWidthStyle"
     />
@@ -44,6 +52,13 @@ export default {
       default: null,
     },
     /**
+     * Tablet logo width
+     */
+    tabletLogoWidth: {
+      type: String,
+      default: null,
+    },
+    /**
      * Mobile logo width
      */
     mobileLogoWidth: {
@@ -69,9 +84,11 @@ export default {
     const logosObject = {
       header: {
         path: logos.LOGO_HEADER_PATH,
+        tabletPath: logos.LOGO_HEADER_TABLET_PATH || null,
         mobilePath: logos.LOGO_HEADER_MOBILE_PATH || null,
         alt: 'Header',
         widthDefault: logos.LOGO_HEADER_WIDTH,
+        tabletWidthDefault: logos.LOGO_HEADER_TABLET_WIDTH || logos.LOGO_HEADER_WIDTH,
         mobileWidthDefault: logos.LOGO_HEADER_MOBILE_WIDTH || logos.LOGO_HEADER_WIDTH,
       },
       welcome: { path: logos.LOGO_WELCOME_PATH, alt: 'Welcome', widthDefault: '200px' },
@@ -96,6 +113,11 @@ export default {
   computed: {
     logoWidthStyle() {
       const width = this.logoWidth === null ? this.logo.widthDefault : this.logoWidth
+      return `width: ${width};`
+    },
+    tabletLogoWidthStyle() {
+      const width =
+        this.tabletLogoWidth === null ? this.logo.tabletWidthDefault : this.tabletLogoWidth
       return `width: ${width};`
     },
     mobileLogoWidthStyle() {
@@ -130,16 +152,32 @@ export default {
 .ds-logo-desktop {
   display: block;
 }
-
+.ds-logo-tablet {
+  display: none;
+}
 .ds-logo-mobile {
   display: none;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 810px) {
   .ds-logo-desktop {
     display: none;
   }
+  .ds-logo-tablet {
+    display: block;
+  }
+  .ds-logo-mobile {
+    display: none;
+  }
+}
 
+@media (max-width: 450px) {
+  .ds-logo-desktop {
+    display: none;
+  }
+  .ds-logo-tablet {
+    display: none;
+  }
   .ds-logo-mobile {
     display: block;
   }

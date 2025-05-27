@@ -6,8 +6,10 @@ import logos from '@config/logos'
 
 const defaultLogos = {
   LOGO_HEADER_PATH: '/img/custom/logo-horizontal.svg',
+  LOGO_HEADER_TABLET_PATH: '/img/custom/logo-horizontal.svg',
   LOGO_HEADER_MOBILE_PATH: '/img/custom/logo-horizontal.svg',
   LOGO_HEADER_WIDTH: '130px',
+  LOGO_HEADER_TABLET_WIDTH: '115px',
   LOGO_HEADER_MOBILE_WIDTH: '100px',
   LOGO_HEADER_CLICK: {
     // externalLink: {
