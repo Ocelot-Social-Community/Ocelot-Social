@@ -11,6 +11,7 @@ localVue.filter('dateTime', () => Date.now)
 
 const stubs = {
   'nuxt-link': true,
+  'client-only': true,
 }
 
 describe('SearchableInput.vue', () => {

@@ -40,6 +40,9 @@ describe('default.vue', () => {
           return { showChat: false, roomID: null }
         },
       },
+      mutations: {
+        'chat/SET_OPEN_CHAT': jest.fn(),
+      },
     })
   })
 
