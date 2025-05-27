@@ -59,7 +59,7 @@ type Comment {
 
   shoutedCount: Int!
     @cypher(
-      statement: "MATCH (this)<-[:SHOUTED]-(r:User) WHERE NOT r.deleted = true AND NOT r.disabled = true RETURN COUNT(DISTINCT r)"
+      statement: "MATCH (this)<-[:SHOUTED]-(related:User) WHERE NOT related.deleted = true AND NOT related.disabled = true RETURN COUNT(DISTINCT related)"
     )
 }
 

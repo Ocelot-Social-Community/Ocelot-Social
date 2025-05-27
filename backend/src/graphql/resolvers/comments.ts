@@ -108,7 +108,8 @@ export default {
       count: {
         postObservingUsersCount:
           '-[:COMMENTS]->(:Post)<-[obs:OBSERVES]-(related:User) WHERE obs.active = true AND NOT related.deleted AND NOT related.disabled',
-        shoutedCount: '<-[:SHOUTED]-(r:User) WHERE NOT r.deleted = true AND NOT r.disabled = true',
+        shoutedCount:
+          '<-[:SHOUTED]-(related:User) WHERE NOT related.deleted = true AND NOT related.disabled = true',
       },
       boolean: {
         isPostObservedByMe:
