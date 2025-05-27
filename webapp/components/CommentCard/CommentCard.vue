@@ -39,6 +39,13 @@
         {{ isCollapsed ? $t('comment.show.more') : $t('comment.show.less') }}
       </base-button>
     </template>
+    <hc-shout-button
+      :disabled="isAuthor"
+      :count="comment.shoutedCount"
+      :is-shouted="comment.shoutedByCurrentUser"
+      :node-id="comment.id"
+      node-type="Comment"
+    />
     <base-button
       :title="this.$t('post.comment.reply')"
       icon="level-down"
@@ -59,6 +66,7 @@ import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
 import CommentMutations from '~/graphql/CommentMutations'
+import HcShoutButton from '~/components/ShoutButton.vue'
 import scrollToAnchor from '~/mixins/scrollToAnchor.js'
 
 export default {
@@ -67,6 +75,7 @@ export default {
     ContentMenu,
     ContentViewer,
     CommentForm,
+    HcShoutButton,
   },
   mixins: [scrollToAnchor],
   data() {
@@ -97,6 +106,11 @@ export default {
     }),
     hasLongContent() {
       return this.$filters.removeHtml(this.comment.content).length > COMMENT_MAX_UNTRUNCATED_LENGTH
+    },
+    isAuthor() {
+      const { author } = this.comment
+      if (!author) return false
+      return this.$store.getters['auth/user'].id === author.id
     },
     isUnavailable() {
       return (this.comment.deleted || this.comment.disabled) && !this.isModerator

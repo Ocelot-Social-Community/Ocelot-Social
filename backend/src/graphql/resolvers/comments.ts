@@ -108,10 +108,13 @@ export default {
       count: {
         postObservingUsersCount:
           '-[:COMMENTS]->(:Post)<-[obs:OBSERVES]-(related:User) WHERE obs.active = true AND NOT related.deleted AND NOT related.disabled',
+        shoutedCount: '<-[:SHOUTED]-(r:User) WHERE NOT r.deleted = true AND NOT r.disabled = true',
       },
       boolean: {
         isPostObservedByMe:
           'MATCH (this)-[:COMMENTS]->(:Post)<-[obs:OBSERVES]-(related:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(related) >= 1',
+        shoutedByCurrentUser:
+          'MATCH (this) RETURN EXISTS((this)<-[:SHOUTED]-(:User {id: $cypherParams.currentUserId}))',
       },
     }),
   },

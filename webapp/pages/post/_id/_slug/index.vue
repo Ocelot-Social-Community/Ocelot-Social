@@ -105,11 +105,11 @@
                   class="shout-button"
                 >
                   <hc-shout-button
-                    v-if="post.author"
                     :disabled="isAuthor"
                     :count="post.shoutedCount"
                     :is-shouted="post.shoutedByCurrentUser"
-                    :post-id="post.id"
+                    :node-id="post.id"
+                    node-type="Post"
                   />
                 </ds-flex-item>
                 <!-- Follow Button -->

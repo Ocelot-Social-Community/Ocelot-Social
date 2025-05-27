@@ -53,6 +53,14 @@ type Comment {
   )
   postObservingUsersCount: Int! 
     @cypher(statement: "MATCH (this)-[:COMMENTS]->(:Post)<-[obs:OBSERVES]-(u:User) WHERE obs.active = true AND NOT u.disabled = true AND NOT u.deleted = true RETURN COUNT(DISTINCT u)")
+
+  shoutedByCurrentUser: Boolean!
+    @cypher(statement: "MATCH (this) RETURN EXISTS((this)<-[:SHOUTED]-(:User {id: $cypherParams.currentUserId}))")
+
+  shoutedCount: Int!
+    @cypher(
+      statement: "MATCH (this)<-[:SHOUTED]-(r:User) WHERE NOT r.deleted = true AND NOT r.disabled = true RETURN COUNT(DISTINCT r)"
+    )
 }
 
 type Query {

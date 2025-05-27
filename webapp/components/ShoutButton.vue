@@ -21,8 +21,9 @@ import gql from 'graphql-tag'
 
 export default {
   props: {
+    nodeType: { type: String },
     count: { type: Number, default: 0 },
-    postId: { type: String, default: null },
+    nodeId: { type: String, default: null },
     isShouted: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
   },
@@ -58,12 +59,13 @@ export default {
       this.$apollo
         .mutate({
           mutation: gql`
-            mutation($id: ID!) {
-              ${mutation}(id: $id, type: Post)
+            mutation($id: ID!, $type: ShoutTypeEnum!) {
+              ${mutation}(id: $id, type: $type)
             }
           `,
           variables: {
-            id: this.postId,
+            id: this.nodeId,
+            type: this.nodeType,
           },
         })
         .then((res) => {

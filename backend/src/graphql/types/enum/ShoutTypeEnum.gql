@@ -1,3 +1,4 @@
 enum ShoutTypeEnum {
   Post
+  Comment
 }
