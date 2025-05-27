@@ -1,5 +1,6 @@
 import GroupProfileSlug from './_slug.vue'
 import { render, screen, fireEvent } from '@testing-library/vue'
+import Vuex from 'vuex'
 
 const localVue = global.localVue
 
@@ -32,11 +33,26 @@ describe('GroupProfileSlug', () => {
   let bobDerBaumeister
   let huey
 
+  const currentUserMock = jest.fn()
+
+  const getters = {
+    'auth/user': currentUserMock,
+    'auth/isModerator': () => false,
+    'categories/categoriesActive': () => true,
+    'categories/categories': () => [{ id: 'cat1' }],
+  }
+
+  const actions = {
+    'categories/init': jest.fn(),
+  }
+
+  const store = new Vuex.Store({
+    getters,
+    actions,
+  })
+
   beforeEach(() => {
     mocks = {
-      $env: {
-        CATEGORIES_ACTIVE: true,
-      },
       // post: {
       //   id: 'p23',
       //   name: 'It is a post',
@@ -213,6 +229,7 @@ describe('GroupProfileSlug', () => {
       localVue,
       data,
       stubs,
+      store,
     })
   }
 
@@ -220,12 +237,7 @@ describe('GroupProfileSlug', () => {
     describe('given a current user', () => {
       describe('as group owner – "peter-lustig"', () => {
         beforeEach(() => {
-          mocks.$store = {
-            getters: {
-              'auth/user': peterLustig,
-              'auth/isModerator': () => false,
-            },
-          }
+          currentUserMock.mockReturnValue(peterLustig)
           wrapper = Wrapper(() => {
             return {
               Group: [
@@ -265,12 +277,7 @@ describe('GroupProfileSlug', () => {
 
       describe('as usual member – "jenny-rostock"', () => {
         beforeEach(() => {
-          mocks.$store = {
-            getters: {
-              'auth/user': jennyRostock,
-              'auth/isModerator': () => false,
-            },
-          }
+          currentUserMock.mockReturnValue(jennyRostock)
           wrapper = Wrapper(() => {
             return {
               Group: [
@@ -291,12 +298,7 @@ describe('GroupProfileSlug', () => {
 
       describe('as pending member – "bob-der-baumeister"', () => {
         beforeEach(() => {
-          mocks.$store = {
-            getters: {
-              'auth/user': bobDerBaumeister,
-              'auth/isModerator': () => false,
-            },
-          }
+          currentUserMock.mockReturnValue(bobDerBaumeister)
           wrapper = Wrapper(() => {
             return {
               Group: [
@@ -317,12 +319,7 @@ describe('GroupProfileSlug', () => {
 
       describe('as none(!) member – "huey"', () => {
         beforeEach(() => {
-          mocks.$store = {
-            getters: {
-              'auth/user': huey,
-              'auth/isModerator': () => false,
-            },
-          }
+          currentUserMock.mockReturnValue(huey)
           wrapper = Wrapper(() => {
             return {
               Group: [
@@ -346,12 +343,7 @@ describe('GroupProfileSlug', () => {
       describe('given a current user', () => {
         describe('as group owner – "peter-lustig"', () => {
           beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': peterLustig,
-                'auth/isModerator': () => false,
-              },
-            }
+            currentUserMock.mockReturnValue(peterLustig)
             wrapper = Wrapper(() => {
               return {
                 Group: [
@@ -372,12 +364,7 @@ describe('GroupProfileSlug', () => {
 
         describe('as usual member – "jenny-rostock"', () => {
           beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': jennyRostock,
-                'auth/isModerator': () => false,
-              },
-            }
+            currentUserMock.mockReturnValue(jennyRostock)
             wrapper = Wrapper(() => {
               return {
                 Group: [
@@ -421,12 +408,7 @@ describe('GroupProfileSlug', () => {
 
         describe('as pending member – "bob-der-baumeister"', () => {
           beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': bobDerBaumeister,
-                'auth/isModerator': () => false,
-              },
-            }
+            currentUserMock.mockReturnValue(bobDerBaumeister)
             wrapper = Wrapper(() => {
               return {
                 Group: [
@@ -447,12 +429,7 @@ describe('GroupProfileSlug', () => {
 
         describe('as none(!) member – "huey"', () => {
           beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': huey,
-                'auth/isModerator': () => false,
-              },
-            }
+            currentUserMock.mockReturnValue(huey)
             wrapper = Wrapper(() => {
               return {
                 Group: [
@@ -477,12 +454,7 @@ describe('GroupProfileSlug', () => {
       describe('given a current user', () => {
         describe('as group owner – "peter-lustig"', () => {
           beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': peterLustig,
-                'auth/isModerator': () => false,
-              },
-            }
+            currentUserMock.mockReturnValue(peterLustig)
             wrapper = Wrapper(() => {
               return {
                 Group: [
@@ -503,12 +475,7 @@ describe('GroupProfileSlug', () => {
 
         describe('as usual member – "jenny-rostock"', () => {
           beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': jennyRostock,
-                'auth/isModerator': () => false,
-              },
-            }
+            currentUserMock.mockReturnValue(jennyRostock)
             wrapper = Wrapper(() => {
               return {
                 Group: [
@@ -529,12 +496,7 @@ describe('GroupProfileSlug', () => {
 
         describe('as pending member – "bob-der-baumeister"', () => {
           beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': bobDerBaumeister,
-                'auth/isModerator': () => false,
-              },
-            }
+            currentUserMock.mockReturnValue(bobDerBaumeister)
             wrapper = Wrapper(() => {
               return {
                 Group: [
@@ -555,12 +517,7 @@ describe('GroupProfileSlug', () => {
 
         describe('as none(!) member – "huey"', () => {
           beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': huey,
-                'auth/isModerator': () => false,
-              },
-            }
+            currentUserMock.mockReturnValue(huey)
             wrapper = Wrapper(() => {
               return {
                 Group: [
