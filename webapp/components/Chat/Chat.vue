@@ -399,14 +399,20 @@ export default {
           if (roomIndex !== -1) {
             const changedRoom = { ...this.rooms[roomIndex] }
             changedRoom.lastMessage.content = createdMessagePayload.content.trim().substring(0, 30)
+            changedRoom.lastMessage.date = createdMessagePayload.date
 
             // Move changed room to the top of the list - does not work with Vue Advanced Chat
-            // const rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== roomId)]
+            this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== roomId)]
           }
         }
       } catch (error) {
         this.$toast.error(error.message)
       }
+
+      this.fetchMessages({
+        room: this.rooms.find((r) => r.roomId === messageDetails.roomId),
+        options: { refetch: true },
+      })
     },
 
     getInitialsName(fullname) {
