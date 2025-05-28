@@ -373,7 +373,7 @@ export default {
 
       const filesToUpload = hasFiles
         ? files.map((file) => ({
-            upload: file,
+            upload: file.upload,
             name: file.name,
             type: file.type,
           }))
@@ -387,7 +387,6 @@ export default {
       if (filesToUpload && filesToUpload.length > 0) {
         mutationVariables.files = filesToUpload
       }
-
       try {
         const { data } = await this.$apollo.mutate({
           mutation: createMessageMutation(),
@@ -399,37 +398,15 @@ export default {
           const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
           if (roomIndex !== -1) {
             const changedRoom = { ...this.rooms[roomIndex] }
-            // Use content from the backend response first for the last message preview
-            let displayContent = createdMessagePayload.content
-            // Fallback if backend content is empty but files were sent (should ideally not happen if backend sets content)
-            if (!displayContent && filesToUpload && filesToUpload.length > 0) {
-              const fileCount = filesToUpload.length
-              displayContent = `${fileCount} ${
-                fileCount > 1
-                  ? this.$t('chat.filesLabel', 'files')
-                  : this.$t('chat.fileLabel', 'file')
-              } ${this.$t('chat.attachedLabel', 'attached')}`
-            } else if (!displayContent) {
-              // General fallback if content is still undefined/empty
-              displayContent = this.$t('chat.fileMessageDefault', 'Message sent')
-            }
+            changedRoom.lastMessage.content = createdMessagePayload.content.trim().substring(0, 30)
 
-            changedRoom.lastMessage.content = changedRoom.lastMessage.content
-              .trim()
-              .substring(0, 30)
-
-            // Move changed room to the top of the list
-            this.rooms.splice(roomIndex, 1, changedRoom)
+            // Move changed room to the top of the list - does not work with Vue Advanced Chat
+            // const rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== roomId)]
           }
         }
       } catch (error) {
         this.$toast.error(error.message)
       }
-
-      this.fetchMessages({
-        room: this.rooms.find((r) => r.roomId === messageDetails.roomId),
-        options: { refetch: true },
-      })
     },
 
     getInitialsName(fullname) {
