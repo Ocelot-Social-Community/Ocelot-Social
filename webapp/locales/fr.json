@@ -1030,6 +1030,8 @@
       "unblocked": "{name} est à nouveau débloqué"
     },
     "data": {
+      "givenName": null,
+      "givenNamePlaceholder": null,
       "labelBio": "À propos de vous",
       "labelCity": "Votre ville ou région",
       "labelCityHint": null,
@@ -1037,7 +1039,10 @@
       "labelSlug": "Votre nom d'utilisateur unique",
       "name": "Vos données",
       "namePlaceholder": "Fémanon Funny",
-      "success": "Vos données ont été mises à jour avec succès !"
+      "realNamePlease": null,
+      "success": "Vos données ont été mises à jour avec succès !",
+      "surName": null,
+      "surNamePlaceholder": null
     },
     "deleteUserAccount": {
       "accountDescription": "Sachez que vos postes et commentaires sont importants pour notre communauté. Si vous voulez quand même les supprimer, vous devez les marquer ci-dessous.",

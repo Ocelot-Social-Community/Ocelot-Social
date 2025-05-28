@@ -1030,19 +1030,19 @@
       "unblocked": "{name} ist wieder entsperrt"
     },
     "data": {
+      "givenName": "Dein Vorname",
+      "givenNamePlaceholder": "Petra",
       "labelBio": "Über dich",
       "labelCity": "Deine Stadt oder Region",
       "labelCityHint": "(zeigt ungefähre Position auf der Landkarte)",
-      "givenName": "Dein Vorname",
       "labelName": "Dein Name",
-      "surName": "Dein Nachname",
       "labelSlug": "Dein eindeutiger Nutzername",
       "name": "Deine Daten",
-      "givenNamePlaceholder": "Petra",
       "namePlaceholder": "Petra Lustig",
-      "surNamePlaceholder": "Lustig",
       "realNamePlease": "Bitte gib deinen Klarnamen an",
-      "success": "Deine Daten wurden erfolgreich aktualisiert!"
+      "success": "Deine Daten wurden erfolgreich aktualisiert!",
+      "surName": "Dein Nachname",
+      "surNamePlaceholder": "Lustig"
     },
     "deleteUserAccount": {
       "accountDescription": "Sei dir bewusst, dass deine Beiträge und Kommentare für unsere Community wichtig sind. Wenn du sie trotzdem löschen möchtest, musst du sie unten markieren.",

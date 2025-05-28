@@ -1030,6 +1030,8 @@
       "unblocked": "{name} - снова разблокирован"
     },
     "data": {
+      "givenName": null,
+      "givenNamePlaceholder": null,
       "labelBio": "О себе",
       "labelCity": "Город или регион",
       "labelCityHint": null,
@@ -1037,7 +1039,10 @@
       "labelSlug": "Уникальное имя пользователя",
       "name": "Персональные данные",
       "namePlaceholder": "Маша Медведева",
-      "success": "Персональные данные были успешно обновлены!"
+      "realNamePlease": null,
+      "success": "Персональные данные были успешно обновлены!",
+      "surName": null,
+      "surNamePlaceholder": null
     },
     "deleteUserAccount": {
       "accountDescription": "Обратите внимание, что ваши посты и комментарии важны для сообщества. Если вы все равно хотите их удалить, то вы должны отметить соответствующие опции ниже.",

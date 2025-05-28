@@ -1030,19 +1030,19 @@
       "unblocked": "{name} is unblocked again"
     },
     "data": {
+      "givenName": "Your Given Name",
+      "givenNamePlaceholder": "Femanon",
       "labelBio": "About You",
       "labelCity": "Your City or Region",
       "labelCityHint": "(shows approximate position on map)",
-      "givenName": "Your Given Name",
       "labelName": "Your Name",
-      "surName": "Your Surname",
       "labelSlug": "Your unique user name",
       "name": "Your data",
-      "realNamePlease": "Please enter your real name",
-      "givenNamePlaceholder": "Femanon",
       "namePlaceholder": "Femanon Funny",
-      "surNamePlaceholder": "Funny",
-      "success": "Your data was successfully updated!"
+      "realNamePlease": "Please enter your real name",
+      "success": "Your data was successfully updated!",
+      "surName": "Your Surname",
+      "surNamePlaceholder": "Funny"
     },
     "deleteUserAccount": {
       "accountDescription": "Be aware that your Posts and Comments are important to our community. If you still choose to delete them, you have to mark them below.",

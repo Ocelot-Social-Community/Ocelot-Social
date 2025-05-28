@@ -1030,6 +1030,8 @@
       "unblocked": "{name} está desbloqueado novamente"
     },
     "data": {
+      "givenName": null,
+      "givenNamePlaceholder": null,
       "labelBio": "Sobre você",
       "labelCity": "Sua cidade ou estado",
       "labelCityHint": null,
@@ -1037,7 +1039,10 @@
       "labelSlug": "Seu nome de usuário exclusivo",
       "name": "Seus dados",
       "namePlaceholder": "Anonymous",
-      "success": "Seus dados foram atualizados com sucesso!"
+      "realNamePlease": null,
+      "success": "Seus dados foram atualizados com sucesso!",
+      "surName": null,
+      "surNamePlaceholder": null
     },
     "deleteUserAccount": {
       "accountDescription": "Esteja ciente de que o suas Publicações e Comentários são importantes para a nossa comunidade. Se você ainda optar por excluí-los, você tem que marcá-los abaixo.",
