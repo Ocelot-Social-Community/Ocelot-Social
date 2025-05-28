@@ -14,6 +14,7 @@ import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { markMessagesAsSeen } from '@graphql/queries/markMessagesAsSeen'
 import { messageQuery } from '@graphql/queries/messageQuery'
 import { roomQuery } from '@graphql/queries/roomQuery'
+import { TEST_CONFIG } from '@src/config/test-mock'
 import createServer, { getContext } from '@src/server'
 
 let query
@@ -31,7 +32,7 @@ beforeAll(async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
   const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database, pubsub })
+  const context = getContext({ user: contextUser, database, pubsub, config: TEST_CONFIG })
 
   server = createServer({ context }).server
 

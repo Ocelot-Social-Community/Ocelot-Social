@@ -33,11 +33,13 @@ export const getContext =
       database = serverDatabase,
       pubsub = serverPubsub,
       user = databaseUser,
+      config = CONFIG,
     }: {
       database?: ReturnType<typeof databaseContext>
       pubsub?: ReturnType<typeof pubsubContext>
       user?: (any) => Promise<any>
-    } = { database: serverDatabase, pubsub: serverPubsub, user: databaseUser },
+      config: typeof CONFIG
+    } = { database: serverDatabase, pubsub: serverPubsub, user: databaseUser, config: CONFIG },
   ) =>
   async (req) => {
     const u = await user(req)
@@ -51,6 +53,7 @@ export const getContext =
       cypherParams: {
         currentUserId: u ? u.id : null,
       },
+      config,
     }
   }
 

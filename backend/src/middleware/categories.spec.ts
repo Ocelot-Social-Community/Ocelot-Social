@@ -6,7 +6,7 @@ import gql from 'graphql-tag'
 
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import CONFIG from '@src/config'
+import { TEST_CONFIG } from '@src/config/test-mock'
 import { categories } from '@src/constants/categories'
 import createServer, { getContext } from '@src/server'
 
@@ -17,17 +17,6 @@ let query
 
 beforeAll(async () => {
   await cleanDatabase()
-  const authenticatedUser = null
-
-  // eslint-disable-next-line @typescript-eslint/require-await
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database })
-
-  server = createServer({ context }).server
-
-  const createTestClientResult = createTestClient(server)
-  query = createTestClientResult.query
-
   for (const category of categories) {
     await Factory.build('category', {
       id: category.id,
@@ -57,8 +46,20 @@ const categoriesQuery = gql`
 
 describe('categroeis middleware', () => {
   describe('categories are active', () => {
-    beforeEach(() => {
-      CONFIG.CATEGORIES_ACTIVE = true
+    beforeAll(() => {
+      const authenticatedUser = null
+      // eslint-disable-next-line @typescript-eslint/require-await
+      const contextUser = async (_req) => authenticatedUser
+      const context = getContext({
+        user: contextUser,
+        database,
+        config: { ...TEST_CONFIG, CATEGORIES_ACTIVE: true },
+      })
+
+      server = createServer({ context }).server
+
+      const createTestClientResult = createTestClient(server)
+      query = createTestClientResult.query
     })
 
     it('returns the categories', async () => {
@@ -77,8 +78,20 @@ describe('categroeis middleware', () => {
   })
 
   describe('categories are not active', () => {
-    beforeEach(() => {
-      CONFIG.CATEGORIES_ACTIVE = false
+    beforeAll(() => {
+      const authenticatedUser = null
+      // eslint-disable-next-line @typescript-eslint/require-await
+      const contextUser = async (_req) => authenticatedUser
+      const context = getContext({
+        user: contextUser,
+        database,
+        config: { ...TEST_CONFIG, CATEGORIES_ACTIVE: false },
+      })
+
+      server = createServer({ context }).server
+
+      const createTestClientResult = createTestClient(server)
+      query = createTestClientResult.query
     })
 
     it('returns an empty array though there are categories in the db', async () => {
