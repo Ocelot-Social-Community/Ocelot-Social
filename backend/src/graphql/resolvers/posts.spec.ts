@@ -2,12 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import CONFIG from '@config/index'
-import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import Image from '@db/models/Image'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
@@ -15,30 +11,32 @@ import { createPostMutation } from '@graphql/queries/createPostMutation'
 import { Post } from '@graphql/queries/Post'
 import { pushPost } from '@graphql/queries/pushPost'
 import { unpushPost } from '@graphql/queries/unpushPost'
-import createServer, { getContext } from '@src/server'
-
-CONFIG.CATEGORIES_ACTIVE = true
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
 let user
 
-const database = databaseContext()
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser, config })
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
-let server: ApolloServer
-let authenticatedUser
-let query, mutate
+const defaultConfig = {
+  CATEGORIES_ACTIVE: true,
+  // MAPBOX_TOKEN: CONFIG.MAPBOX_TOKEN,
+}
+let config: Partial<Context['config']>
 
 beforeAll(async () => {
   await cleanDatabase()
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database })
-
-  server = createServer({ context }).server
-
-  const createTestClientResult = createTestClient(server)
-  mutate = createTestClientResult.mutate
-  query = createTestClientResult.query
+  const apolloSetup = createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(() => {
@@ -51,6 +49,7 @@ const categoryIds = ['cat9', 'cat4', 'cat15']
 let variables
 
 beforeEach(async () => {
+  config = { ...defaultConfig }
   variables = {}
   user = await Factory.build(
     'user',
@@ -271,7 +270,7 @@ describe('CreatePost', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       const { errors } = await mutate({ mutation: createPostMutation(), variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+      expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
@@ -708,7 +707,7 @@ describe('UpdatePost', () => {
         categoryIds,
       },
     })
-    newlyCreatedPost = data.CreatePost
+    newlyCreatedPost = (data as any).CreatePost // eslint-disable-line @typescript-eslint/no-explicit-any
     variables = {
       id: newlyCreatedPost.id,
       title: 'New title',
@@ -733,7 +732,7 @@ describe('UpdatePost', () => {
 
     it('throws authorization error', async () => {
       const { errors } = await mutate({ mutation: updatePostMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+      expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
@@ -771,7 +770,7 @@ describe('UpdatePost', () => {
     it('updates the updatedAt attribute', async () => {
       const {
         data: { UpdatePost },
-      } = await mutate({ mutation: updatePostMutation, variables })
+      } = (await mutate({ mutation: updatePostMutation, variables })) as any // eslint-disable-line @typescript-eslint/no-explicit-any
       expect(UpdatePost.updatedAt).toBeTruthy()
       expect(Date.parse(UpdatePost.updatedAt)).toEqual(expect.any(Number))
       expect(newlyCreatedPost.updatedAt).not.toEqual(UpdatePost.updatedAt)
@@ -1377,7 +1376,8 @@ describe('pin posts', () => {
 
     describe('MAX_PINNED_POSTS is 0', () => {
       beforeEach(async () => {
-        CONFIG.MAX_PINNED_POSTS = 0
+        config = { ...defaultConfig, MAX_PINNED_POSTS: 0 }
+
         await Factory.build(
           'post',
           {
@@ -1400,7 +1400,7 @@ describe('pin posts', () => {
 
     describe('MAX_PINNED_POSTS is 1', () => {
       beforeEach(() => {
-        CONFIG.MAX_PINNED_POSTS = 1
+        config = { ...defaultConfig, MAX_PINNED_POSTS: 1 }
       })
 
       describe('are allowed to pin posts', () => {
@@ -1752,7 +1752,8 @@ describe('pin posts', () => {
       const postsPinnedCountsQuery = `query { PostsPinnedCounts { maxPinnedPosts, currentlyPinnedPosts } }`
 
       beforeEach(async () => {
-        CONFIG.MAX_PINNED_POSTS = 3
+        config = { ...defaultConfig, MAX_PINNED_POSTS: 3 }
+
         await Factory.build(
           'post',
           {
@@ -2127,7 +2128,7 @@ describe('DeletePost', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       const { errors } = await mutate({ mutation: deletePostMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+      expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
@@ -2138,7 +2139,7 @@ describe('DeletePost', () => {
 
     it('throws authorization error', async () => {
       const { errors } = await mutate({ mutation: deletePostMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+      expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
@@ -2280,7 +2281,7 @@ describe('emotions', () => {
           variables,
         })
 
-        expect(addPostEmotions.errors[0]).toHaveProperty('message', 'Not Authorized!')
+        expect(addPostEmotions.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -2401,7 +2402,7 @@ describe('emotions', () => {
           mutation: removePostEmotionsMutation,
           variables: removePostEmotionsVariables,
         })
-        expect(removePostEmotions.errors[0]).toHaveProperty('message', 'Not Authorized!')
+        expect(removePostEmotions.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 

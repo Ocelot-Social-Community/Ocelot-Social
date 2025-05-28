@@ -1,10 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import type { Context } from '@src/context'
+
 import normalizeEmail from './normalizeEmail'
 
-export default async function createPasswordReset(options) {
+export default async function createPasswordReset(options: {
+  driver: Context['driver']
+  nonce: string
+  email: string
+  issuedAt?: Date
+}) {
   const { driver, nonce, email, issuedAt = new Date() } = options
   const normalizedEmail = normalizeEmail(email)
   const session = driver.session()
@@ -33,6 +38,6 @@ export default async function createPasswordReset(options) {
     const [records] = await createPasswordResetTxPromise
     return records || {}
   } finally {
-    session.close()
+    await session.close()
   }
 }

@@ -1,31 +1,32 @@
 /* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
+
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable jest/unbound-method */
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
-import jwt from 'jsonwebtoken'
+import { verify } from 'jsonwebtoken'
 
-import CONFIG from '@config/index'
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { loginMutation } from '@graphql/queries/loginMutation'
-import encode from '@jwt/encode'
-import createServer, { context } from '@src/server'
+import { decode } from '@jwt/decode'
+import { encode } from '@jwt/encode'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup, TEST_CONFIG } from '@root/test/helpers'
 
-const neode = getNeode()
-const driver = getDriver()
-
-let query, mutate, variables, req, user
+const jwt = { verify }
+let variables, req, user
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 const disable = async (id) => {
   const moderator = await Factory.build('user', { id: 'u2', role: 'moderator' })
-  const user = await neode.find('User', id)
+  const user = await database.neode.find('User', id)
   const reportAgainstUser = await Factory.build('report')
   await Promise.all([
     reportAgainstUser.relateTo(moderator, 'filed', {
@@ -42,23 +43,34 @@ const disable = async (id) => {
   ])
 }
 
+const config = {
+  JWT_SECRET: 'I am the JWT secret',
+  JWT_EXPIRES: TEST_CONFIG.JWT_EXPIRES,
+  CLIENT_URI: TEST_CONFIG.CLIENT_URI,
+  GRAPHQL_URI: TEST_CONFIG.GRAPHQL_URI,
+}
+const context = { config }
+
 beforeAll(async () => {
   await cleanDatabase()
-
-  const { server } = createServer({
-    context: () => {
-      // One of the rare occasions where we test
-      // the actual `context` implementation here
-      return context({ req })
-    },
-  })
-  query = createTestClient(server).query
-  mutate = createTestClient(server).mutate
+  const context = async () => {
+    const authenticatedUser = await decode({ driver: database.driver, config })(
+      req.headers.authorization,
+    )
+    return { authenticatedUser, config }
+  }
+  const apolloSetup = createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 beforeEach(() => {
@@ -120,7 +132,7 @@ describe('currentUser', () => {
             avatar,
           },
         )
-        const userBearerToken = encode({ id: 'u3' })
+        const userBearerToken = encode(context)({ id: 'u3' })
         req = { headers: { authorization: `Bearer ${userBearerToken}` } }
       })
 
@@ -203,11 +215,11 @@ describe('currentUser', () => {
 
           it('returns only the saved active categories', async () => {
             const result = await query({ query: currentUserQuery, variables })
-            expect(result.data.currentUser.activeCategories).toHaveLength(4)
-            expect(result.data.currentUser.activeCategories).toContain('cat1')
-            expect(result.data.currentUser.activeCategories).toContain('cat3')
-            expect(result.data.currentUser.activeCategories).toContain('cat5')
-            expect(result.data.currentUser.activeCategories).toContain('cat7')
+            expect(result.data?.currentUser.activeCategories).toHaveLength(4)
+            expect(result.data?.currentUser.activeCategories).toContain('cat1')
+            expect(result.data?.currentUser.activeCategories).toContain('cat3')
+            expect(result.data?.currentUser.activeCategories).toContain('cat5')
+            expect(result.data?.currentUser.activeCategories).toContain('cat7')
           })
         })
       })
@@ -236,8 +248,8 @@ describe('login', () => {
       it('responds with a JWT bearer token', async () => {
         const {
           data: { login: token },
-        } = await mutate({ mutation: loginMutation, variables })
-        jwt.verify(token, CONFIG.JWT_SECRET, (err, data) => {
+        } = (await mutate({ mutation: loginMutation, variables })) as any // eslint-disable-line @typescript-eslint/no-explicit-any
+        jwt.verify(token, config.JWT_SECRET, (err, data) => {
           expect(data).toMatchObject({
             id: 'acb2d923-f3af-479e-9f00-61b12e864666',
           })
@@ -274,7 +286,7 @@ describe('login', () => {
       describe('normalization', () => {
         describe('email address is a gmail address ', () => {
           beforeEach(async () => {
-            const email = await neode.first(
+            const email = await database.neode.first(
               'EmailAddress',
               { email: 'test@example.org' },
               undefined,
@@ -354,7 +366,7 @@ describe('change password', () => {
   describe('authenticated', () => {
     beforeEach(async () => {
       await Factory.build('user', { id: 'u3' })
-      const userBearerToken = encode({ id: 'u3' })
+      const userBearerToken = encode(context)({ id: 'u3' })
       req = { headers: { authorization: `Bearer ${userBearerToken}` } }
     })
     describe('old password === new password', () => {
