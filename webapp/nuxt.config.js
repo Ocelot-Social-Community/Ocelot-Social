@@ -124,7 +124,7 @@ export default {
     { src: '~/plugins/axios.js', ssr: false },
     { src: '~/plugins/keep-alive.js', ssr: false },
     { src: '~/plugins/vue-directives.js', ssr: false },
-    { src: '~/plugins/v-tooltip.js', ssr: false },
+    { src: '~/plugins/floating-vue.js', ssr: false },
     { src: '~/plugins/izi-toast.js', ssr: false },
     { src: '~/plugins/vue-filters.js' },
     { src: '~/plugins/vue-infinite-loading.js', ssr: false },
