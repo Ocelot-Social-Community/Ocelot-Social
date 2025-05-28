@@ -197,6 +197,79 @@ describe('ContentMenu.vue', () => {
             ],
           ])
         })
+
+        describe('post in public group', () => {
+          it('can pin unpinned post', async () => {
+            getters['auth/isAdmin'] = () => true
+            const wrapper = await openContentMenu({
+              isOwner: false,
+              resourceType: 'contribution',
+              resource: {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                pinnedBy: null,
+                group: {
+                  groupType: 'public',
+                },
+              },
+            })
+            wrapper
+              .findAll('.ds-menu-item')
+              .filter((item) => item.text() === 'post.menu.pin')
+              .at(0)
+              .trigger('click')
+            expect(wrapper.emitted('pinPost')).toEqual([
+              [
+                {
+                  id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                  pinnedBy: null,
+                  group: {
+                    groupType: 'public',
+                  },
+                },
+              ],
+            ])
+          })
+        })
+
+        describe('post in closed group', () => {
+          it('can not be pinned', async () => {
+            getters['auth/isAdmin'] = () => true
+            const wrapper = await openContentMenu({
+              isOwner: false,
+              resourceType: 'contribution',
+              resource: {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                pinnedBy: null,
+                group: {
+                  groupType: 'closed',
+                },
+              },
+            })
+            expect(
+              wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.pin'),
+            ).toHaveLength(0)
+          })
+        })
+
+        describe('post in hidden group', () => {
+          it('can not be pinned', async () => {
+            getters['auth/isAdmin'] = () => true
+            const wrapper = await openContentMenu({
+              isOwner: false,
+              resourceType: 'contribution',
+              resource: {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                pinnedBy: null,
+                group: {
+                  groupType: 'hidden',
+                },
+              },
+            })
+            expect(
+              wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.pin'),
+            ).toHaveLength(0)
+          })
+        })
       })
 
       describe('when maxPinnedPosts = 3', () => {

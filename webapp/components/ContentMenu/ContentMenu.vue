@@ -82,7 +82,7 @@ export default {
           })
         }
 
-        if (this.isAdmin && !this.resource.group) {
+        if (this.isAdmin && (!this.resource.group || this.resource.group.groupType === 'public')) {
           if (!this.resource.pinnedBy && this.canBePinned) {
             routes.push({
               label: this.$t(`post.menu.pin`),
