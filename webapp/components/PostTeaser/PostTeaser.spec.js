@@ -12,6 +12,7 @@ describe('PostTeaser', () => {
   let mocks
   let propsData
   let getters
+  let actions
   let Wrapper
   let wrapper
 
@@ -47,21 +48,22 @@ describe('PostTeaser', () => {
           data: { DeletePost: { id: 'deleted-post-id' } },
         }),
       },
-      $env: {
-        CATEGORIES_ACTIVE: false,
-      },
     }
     getters = {
       'auth/isModerator': () => false,
       'auth/user': () => {
         return {}
       },
+      'categories/categoriesActive': () => false,
+    }
+    actions = {
+      'categories/init': jest.fn(),
     }
   })
 
   describe('shallowMount', () => {
     Wrapper = () => {
-      store = new Vuex.Store({ getters })
+      store = new Vuex.Store({ getters, actions })
       return shallowMount(PostTeaser, {
         store,
         propsData,
@@ -114,6 +116,7 @@ describe('PostTeaser', () => {
     Wrapper = () => {
       const store = new Vuex.Store({
         getters,
+        actions,
       })
       return mount(PostTeaser, {
         stubs,
