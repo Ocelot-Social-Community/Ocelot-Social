@@ -10,7 +10,7 @@ import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
 import { getNeode } from '@db/neo4j'
-import { Context } from '@src/server'
+import { Context } from '@src/context'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import normalizeEmail from './helpers/normalizeEmail'
@@ -168,10 +168,10 @@ export default {
       } catch (error) {
         throw new UserInputError(error.message)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    UpdateUser: async (_parent, params, context, _resolveInfo) => {
+    UpdateUser: async (_parent, params, context: Context, _resolveInfo) => {
       const { avatar: avatarInput } = params
       delete params.avatar
       params.locationName = params.locationName === '' ? null : params.locationName
@@ -210,22 +210,24 @@ export default {
         )
         const [user] = updateUserTransactionResponse.records.map((record) => record.get('user'))
         if (avatarInput) {
-          await images.mergeImage(user, 'AVATAR_IMAGE', avatarInput, { transaction })
+          await images(context.config).mergeImage(user, 'AVATAR_IMAGE', avatarInput, {
+            transaction,
+          })
         }
         return user
       })
       try {
         const user = await writeTxResultPromise
         // TODO: put in a middleware, see "CreateGroup", "UpdateGroup"
-        await createOrUpdateLocations('User', params.id, params.locationName, session)
+        await createOrUpdateLocations('User', params.id, params.locationName, session, context)
         return user
       } catch (error) {
         throw new UserInputError(error.message)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    DeleteUser: async (_object, params, context, _resolveInfo) => {
+    DeleteUser: async (_object, params, context: Context, _resolveInfo) => {
       const { resource, id: userId } = params
       const session = context.driver.session()
 
@@ -253,7 +255,9 @@ export default {
               return Promise.all(
                 txResult.records
                   .map((record) => record.get('resource'))
-                  .map((resource) => images.deleteImage(resource, 'HERO_IMAGE', { transaction })),
+                  .map((resource) =>
+                    images(context.config).deleteImage(resource, 'HERO_IMAGE', { transaction }),
+                  ),
               )
             }),
           )
@@ -281,14 +285,14 @@ export default {
           { userId },
         )
         const [user] = deleteUserTransactionResponse.records.map((record) => record.get('user'))
-        await images.deleteImage(user, 'AVATAR_IMAGE', { transaction })
+        await images(context.config).deleteImage(user, 'AVATAR_IMAGE', { transaction })
         return user
       })
       try {
         const user = await deleteUserTxResultPromise
         return user
       } finally {
-        session.close()
+        await session.close()
       }
     },
     switchUserRole: async (_object, args, context, _resolveInfo) => {

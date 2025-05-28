@@ -1,16 +1,26 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
-import createServer from '@src/server'
+import { fetchMock } from '@root/test/fetchMock'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-const neode = getNeode()
-const driver = getDriver()
-let authenticatedUser, mutate, query, variables
+let variables
+let authenticatedUser: Context['user']
+const context = () => ({
+  authenticatedUser,
+  // config: { MAPBOX_TOKEN: CONFIG.MAPBOX_TOKEN },
+  // fetch: defaultFetch,
+  fetch: fetchMock,
+})
+let mutate: ApolloTestSetup['mutate']
+let query: any // eslint-disable-line @typescript-eslint/no-explicit-any
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 const updateUserMutation = gql`
   mutation ($id: ID!, $name: String!, $locationName: String) {
@@ -78,23 +88,19 @@ const newlyCreatedNodesWithLocales = [
 
 beforeAll(async () => {
   await cleanDatabase()
-
-  const { server } = createServer({
-    context: () => {
-      return {
-        user: authenticatedUser,
-        neode,
-        driver,
-      }
-    },
+  const apolloSetup = createApolloTestSetup({
+    context,
   })
-  mutate = createTestClient(server).mutate
-  query = createTestClient(server).query
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
-afterAll(async () => {
-  await cleanDatabase()
-  await driver.close()
+afterAll(() => {
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 beforeEach(() => {
@@ -110,9 +116,8 @@ afterEach(async () => {
 describe('Location Service', () => {
   // Authentication
   // TODO: unify, externalize, simplify, wtf?
-  let user
   beforeEach(async () => {
-    user = await Factory.build('user', {
+    const user = await Factory.build('user', {
       id: 'location-user',
     })
     authenticatedUser = await user.toJson()
@@ -195,9 +200,8 @@ describe('Location Service', () => {
 
 describe('userMiddleware', () => {
   describe('UpdateUser', () => {
-    let user
     beforeEach(async () => {
-      user = await Factory.build('user', {
+      const user = await Factory.build('user', {
         id: 'updating-user',
       })
       authenticatedUser = await user.toJson()
@@ -211,7 +215,7 @@ describe('userMiddleware', () => {
         locationName: 'Welzheim, Baden-Württemberg, Germany',
       }
       await mutate({ mutation: updateUserMutation, variables })
-      const locations = await neode.cypher(
+      const locations = await database.neode.cypher(
         `MATCH (city:Location)-[:IS_IN]->(district:Location)-[:IS_IN]->(state:Location)-[:IS_IN]->(country:Location) return city {.*}, state {.*}, country {.*}`,
         {},
       )

@@ -3,10 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
 
-import databaseContext from '@context/database'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import { createMessageMutation } from '@graphql/queries/createMessageMutation'
@@ -14,29 +11,28 @@ import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { markMessagesAsSeen } from '@graphql/queries/markMessagesAsSeen'
 import { messageQuery } from '@graphql/queries/messageQuery'
 import { roomQuery } from '@graphql/queries/roomQuery'
-import createServer, { getContext } from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-let query
-let mutate
-let authenticatedUser
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser, pubsub })
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 let chattingUser, otherChattingUser, notChattingUser
 
-const database = databaseContext()
 const pubsub = pubsubContext()
 const pubsubSpy = jest.spyOn(pubsub, 'publish')
 
-let server: ApolloServer
 beforeAll(async () => {
   await cleanDatabase()
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database, pubsub })
-
-  server = createServer({ context }).server
-
-  query = createTestClient(server).query
-  mutate = createTestClient(server).mutate
+  const apolloSetup = createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
@@ -120,7 +116,7 @@ describe('Message', () => {
               userId: 'other-chatting-user',
             },
           })
-          roomId = room.data.CreateRoom.id
+          roomId = (room.data as any).CreateRoom.id // eslint-disable-line @typescript-eslint/no-explicit-any
         })
 
         describe('user chats in room', () => {
@@ -162,7 +158,7 @@ describe('Message', () => {
                       lastMessageAt: expect.any(String),
                       unreadCount: 0,
                       lastMessage: expect.objectContaining({
-                        _id: result.data.Room[0].lastMessage.id,
+                        _id: result.data?.Room[0].lastMessage.id,
                         id: expect.any(String),
                         content: 'Some nice message to other chatting user',
                         senderId: 'chatting-user',
@@ -293,7 +289,7 @@ describe('Message', () => {
               Message: [
                 {
                   id: expect.any(String),
-                  _id: result.data.Message[0].id,
+                  _id: result.data?.Message[0].id,
                   indexId: 0,
                   content: 'Some nice message to other chatting user',
                   senderId: 'chatting-user',
@@ -500,7 +496,7 @@ describe('Message', () => {
             roomId,
           },
         })
-        msgs.data.Message.forEach((m) => messageIds.push(m.id))
+        msgs.data?.Message.forEach((m) => messageIds.push(m.id))
       })
 
       it('returns true', async () => {
