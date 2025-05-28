@@ -12,9 +12,14 @@ import Factory, { cleanDatabase } from '@db/factories'
 import Image from '@db/models/Image'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
+<<<<<<< HEAD
 import { Post } from '@graphql/queries/Post'
 import { pushPost } from '@graphql/queries/pushPost'
 import { unpushPost } from '@graphql/queries/unpushPost'
+||||||| parent of d9c6819f1 (refactor(backend): put config into context)
+=======
+import { TEST_CONFIG } from '@src/config/test-mock'
+>>>>>>> d9c6819f1 (refactor(backend): put config into context)
 import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = true
@@ -32,7 +37,7 @@ beforeAll(async () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
   const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database })
+  const context = getContext({ user: contextUser, database, config: TEST_CONFIG })
 
   server = createServer({ context }).server
 

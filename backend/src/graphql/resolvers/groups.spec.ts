@@ -16,6 +16,7 @@ import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
 import { updateGroupMutation } from '@graphql/queries/updateGroupMutation'
+import { TEST_CONFIG } from '@src/config/test-mock'
 import createServer, { getContext } from '@src/server'
 
 let authenticatedUser
@@ -35,7 +36,7 @@ let variables = {}
 const database = databaseContext()
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 const contextUser = async (_req) => authenticatedUser
-const context = getContext({ user: contextUser, database })
+const context = getContext({ user: contextUser, database, config: TEST_CONFIG })
 
 const { server } = createServer({ context })
 const { mutate, query } = createTestClient(server)
