@@ -120,13 +120,13 @@
           <input
             id="checkbox1"
             type="checkbox"
-            v-model="recieveCommunicationAsEmailsEtcConfirmed"
-            :checked="recieveCommunicationAsEmailsEtcConfirmed"
+            v-model="receiveCommunicationAsEmailsEtcConfirmed"
+            :checked="receiveCommunicationAsEmailsEtcConfirmed"
           />
           <label for="checkbox1">
             {{
               $t(
-                'components.registration.create-user-account.recieveCommunicationAsEmailsEtcConfirmed',
+                'components.registration.create-user-account.receiveCommunicationAsEmailsEtcConfirmed',
               )
             }}
           </label>
@@ -148,6 +148,8 @@ import EmailDisplayAndVerify from './EmailDisplayAndVerify'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
 import ShowPassword from '../ShowPassword/ShowPassword.vue'
+
+const threePerEmSpace = ' ' // unicode u+2004;
 
 export default {
   name: 'RegistrationSlideCreate',
@@ -195,7 +197,7 @@ export default {
       // Integrate termsAndConditionsConfirmed into `this.formData` once we
       // have checkmarks available.
       termsAndConditionsConfirmed: false,
-      recieveCommunicationAsEmailsEtcConfirmed: false,
+      receiveCommunicationAsEmailsEtcConfirmed: false,
       showPassword: false,
       showPasswordConfirm: false,
     }
@@ -203,9 +205,9 @@ export default {
   mounted: function () {
     if (this.askForRealName) {
       if (this.sliderData.collectedInputData.name) {
-        const split = this.sliderData.collectedInputData.name.split(' ')
+        const split = this.sliderData.collectedInputData.name.split(threePerEmSpace)
         this.formData.givenName = split[0]
-        this.formData.surName = split[1]
+        this.formData.surName = split[1] || ''
       } else {
         this.formData.surName = ''
         this.formData.givenName = ''
@@ -225,9 +227,9 @@ export default {
       .termsAndConditionsConfirmed
       ? this.sliderData.collectedInputData.termsAndConditionsConfirmed
       : false
-    this.recieveCommunicationAsEmailsEtcConfirmed = this.sliderData.collectedInputData
-      .recieveCommunicationAsEmailsEtcConfirmed
-      ? this.sliderData.collectedInputData.recieveCommunicationAsEmailsEtcConfirmed
+    this.receiveCommunicationAsEmailsEtcConfirmed = this.sliderData.collectedInputData
+      .receiveCommunicationAsEmailsEtcConfirmed
+      ? this.sliderData.collectedInputData.receiveCommunicationAsEmailsEtcConfirmed
       : false
     this.sendValidation()
 
@@ -247,7 +249,7 @@ export default {
         this.formData.password.length >= 1 &&
         this.formData.password === this.formData.passwordConfirmation &&
         this.termsAndConditionsConfirmed &&
-        this.recieveCommunicationAsEmailsEtcConfirmed
+        this.receiveCommunicationAsEmailsEtcConfirmed
       )
     },
     iconNamePassword() {
@@ -261,19 +263,19 @@ export default {
     termsAndConditionsConfirmed() {
       this.sendValidation()
     },
-    recieveCommunicationAsEmailsEtcConfirmed() {
+    receiveCommunicationAsEmailsEtcConfirmed() {
       this.sendValidation()
     },
   },
   methods: {
     buildName(data) {
-      if (this.askForRealName) return `${data.givenName} ${data.surName}`
+      if (this.askForRealName) return `${data.givenName}${threePerEmSpace}${data.surName}`
       return data.name
     },
     sendValidation() {
       const { password, passwordConfirmation } = this.formData
       const name = this.buildName(this.formData)
-      const { termsAndConditionsConfirmed, recieveCommunicationAsEmailsEtcConfirmed } = this
+      const { termsAndConditionsConfirmed, receiveCommunicationAsEmailsEtcConfirmed } = this
 
       this.sliderData.setSliderValuesCallback(this.validInput, {
         collectedInputData: {
@@ -281,7 +283,7 @@ export default {
           password,
           passwordConfirmation,
           termsAndConditionsConfirmed,
-          recieveCommunicationAsEmailsEtcConfirmed,
+          receiveCommunicationAsEmailsEtcConfirmed,
         },
       })
     },
@@ -293,7 +295,7 @@ export default {
     },
     async submit() {
       const { password } = this.formData
-      const name = this.buildName(this.formData)
+      const name = this.buildName(this.formData).replace(threePerEmSpace, ' ')
       const { email, inviteCode = null, nonce } = this.sliderData.collectedInputData
       const termsAndConditionsAgreedVersion = VERSION
       const locale = this.$i18n.locale()

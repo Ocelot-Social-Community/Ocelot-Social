@@ -208,7 +208,7 @@
         "buttonTitle": null,
         "error": "Не удалось создать учетную запись!",
         "help": "Может быть, подтверждение было недействительным? В случае возникновения проблем, не стесняйтесь обращаться за помощью, отправив нам письмо по электронной почте:",
-        "recieveCommunicationAsEmailsEtcConfirmed": null,
+        "receiveCommunicationAsEmailsEtcConfirmed": null,
         "success": "Учетная запись успешно создана!",
         "termsAndCondsEtcConfirmed": null,
         "title": "Создать учетную запись"

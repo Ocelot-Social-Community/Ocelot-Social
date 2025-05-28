@@ -208,7 +208,7 @@
         "buttonTitle": "Create",
         "error": "No user account could be created!",
         "help": " Maybe the confirmation was invalid? In case of problems, feel free to ask for help by sending us a mail to:",
-        "recieveCommunicationAsEmailsEtcConfirmed": "I also agree to receive e-mails and other forms of communication (e.g. push notifications).",
+        "receiveCommunicationAsEmailsEtcConfirmed": "I also agree to receive e-mails and other forms of communication (e.g. push notifications).",
         "success": "Your account has been created!",
         "termsAndCondsEtcConfirmed": "I have read, understand and agree to the following:",
         "title": "Create user account"
@@ -1030,18 +1030,18 @@
       "unblocked": "{name} is unblocked again"
     },
     "data": {
-      "givenName": "Your Given Name",
+      "givenName": "Your given name",
       "givenNamePlaceholder": "Femanon",
       "labelBio": "About You",
       "labelCity": "Your City or Region",
       "labelCityHint": "(shows approximate position on map)",
-      "labelName": "Your Name",
+      "labelName": "Your name",
       "labelSlug": "Your unique user name",
       "name": "Your data",
       "namePlaceholder": "Femanon Funny",
       "realNamePlease": "Please enter your real name",
       "success": "Your data was successfully updated!",
-      "surName": "Your Surname",
+      "surName": "Your surname",
       "surNamePlaceholder": "Funny"
     },
     "deleteUserAccount": {

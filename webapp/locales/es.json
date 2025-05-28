@@ -208,7 +208,7 @@
         "buttonTitle": null,
         "error": "¡No se ha podido crear una cuenta de usuario!",
         "help": "¿Tal vez el código de verificación era incorrecto o expiró? Si el problema persiste, por favor envíenos un correo electrónico a:",
-        "recieveCommunicationAsEmailsEtcConfirmed": null,
+        "receiveCommunicationAsEmailsEtcConfirmed": null,
         "success": "¡Su cuenta de usuario ha sido creada!",
         "termsAndCondsEtcConfirmed": null,
         "title": "Crear una cuenta de usuario"

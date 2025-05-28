@@ -208,7 +208,7 @@
         "buttonTitle": null,
         "error": "Compte d'utilisateur n'a pas pu être créé!",
         "help": " Peut-être que la confirmation n'était pas valide? En cas de problème, n'hésitez pas à nous demander de l'aide en nous envoyant un mail à:",
-        "recieveCommunicationAsEmailsEtcConfirmed": null,
+        "receiveCommunicationAsEmailsEtcConfirmed": null,
         "success": "Votre compte a été créé!",
         "termsAndCondsEtcConfirmed": null,
         "title": "Créer un compte utilisateur"
