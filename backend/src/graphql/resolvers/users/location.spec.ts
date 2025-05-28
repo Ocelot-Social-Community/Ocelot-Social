@@ -8,15 +8,15 @@ import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
+let mutate: ApolloTestSetup['mutate']
+let query: any // eslint-disable-line @typescript-eslint/no-explicit-any
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 let variables
 let authenticatedUser: Context['user']
 const context = () => ({
   authenticatedUser,
 })
-let mutate: ApolloTestSetup['mutate']
-let query: any // eslint-disable-line @typescript-eslint/no-explicit-any
-let database: ApolloTestSetup['database']
-let server: ApolloTestSetup['server']
 
 const updateUserMutation = gql`
   mutation ($id: ID!, $name: String!, $locationName: String) {

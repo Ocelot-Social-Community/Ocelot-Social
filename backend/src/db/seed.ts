@@ -16,6 +16,7 @@ import { createPostMutation } from '@graphql/queries/createPostMutation'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { fetch as actualFetch } from '@src/context/fetch'
 
 import Factory from './factories'
 import { trophies, verification } from './seed/badges'
@@ -38,6 +39,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
   const context = () => ({
     authenticatedUser,
     config: CONFIG,
+    fetch: actualFetch,
   })
   const apolloSetup = createApolloTestSetup({ context })
   const { mutate, server, database } = apolloSetup

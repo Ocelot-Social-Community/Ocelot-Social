@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
 import databaseContext from '@context/database'
+import type { Fetch } from '@context/fetch'
+import { fetch as defaultFetch } from '@context/fetch'
 import pubsubContext from '@context/pubsub'
 import CONFIG from '@src/config'
 import type { DecodedUser } from '@src/jwt/decode'
@@ -17,6 +19,7 @@ export const getContext =
     pubsub?: ReturnType<typeof pubsubContext>
     authenticatedUser: DecodedUser | null | undefined
     config: typeof CONFIG
+    fetch: Fetch
   }) =>
   async (req: { headers: { authorization?: string } }) => {
     const {
@@ -24,6 +27,7 @@ export const getContext =
       database = serverDatabase,
       pubsub = serverPubsub,
       config = CONFIG,
+      fetch = defaultFetch,
     } = opts ?? {}
     const { driver } = database
     const user =
@@ -41,6 +45,7 @@ export const getContext =
         currentUserId: user ? user.id : null,
       },
       config,
+      fetch,
     }
     return result
   }

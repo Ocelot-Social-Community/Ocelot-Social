@@ -19,8 +19,7 @@ export const TEST_CONFIG = {
   GRAPHQL_URI: 'http://localhost:4000',
   JWT_EXPIRES: '2y',
 
-  MAPBOX_TOKEN:
-    'pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g',
+  MAPBOX_TOKEN: 'MAPBOX_TOKEN',
   JWT_SECRET: 'JWT_SECRET',
   PRIVATE_KEY_PASSPHRASE: 'PRIVATE_KEY_PASSPHRASE',
 
@@ -61,9 +60,14 @@ interface OverwritableContextParams {
   authenticatedUser?: Context['user']
   config?: Partial<typeof CONFIG>
   pubsub?: Context['pubsub']
+  fetch?: Context['fetch']
 }
 interface CreateTestServerOptions {
   context: () => OverwritableContextParams | Promise<OverwritableContextParams>
+}
+
+const crash = () => {
+  throw new Error('Mock me in your test!')
 }
 
 export const createApolloTestSetup = (opts?: CreateTestServerOptions) => {
@@ -71,12 +75,13 @@ export const createApolloTestSetup = (opts?: CreateTestServerOptions) => {
   const { context: testContext } = opts ?? defaultOpts
   const database = databaseContext()
   const context = async (req: { headers: { authorization?: string } }) => {
-    const { authenticatedUser, config = {}, pubsub } = await testContext()
+    const { authenticatedUser, config = {}, pubsub, fetch = crash } = await testContext()
     return getContext({
       authenticatedUser,
       database,
       pubsub,
       config: { ...TEST_CONFIG, ...config },
+      fetch,
     })(req)
   }
 
