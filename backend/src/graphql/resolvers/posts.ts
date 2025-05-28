@@ -351,7 +351,8 @@ export default {
       const pinPostCypher = `
         MATCH (user:User {id: $userId}) WHERE user.role = 'admin'
         MATCH (post:Post {id: $params.id})
-        WHERE NOT((post)-[:IN]->(:Group))
+        WHERE NOT EXISTS((post)-[:IN]->(:Group)) OR 
+          (post)-[:IN]->(:Group { groupType: 'public'})
         MERGE (user)-[pinned:PINNED {createdAt: toString(datetime())}]->(post)
         SET post.pinned = true
         RETURN post, pinned.createdAt as pinnedAt`
