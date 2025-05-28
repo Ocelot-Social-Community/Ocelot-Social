@@ -119,7 +119,7 @@ describe('ContentMenu.vue', () => {
           ).toHaveLength(0)
         })
 
-        it('not unpin pinned post', async () => {
+        it('unpin pinned post', async () => {
           const wrapper = await openContentMenu({
             isOwner: false,
             resourceType: 'contribution',
@@ -128,9 +128,19 @@ describe('ContentMenu.vue', () => {
               pinnedBy: 'someone',
             },
           })
-          expect(
-            wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.unpin'),
-          ).toHaveLength(0)
+          wrapper
+            .findAll('.ds-menu-item')
+            .filter((item) => item.text() === 'post.menu.unpin')
+            .at(0)
+            .trigger('click')
+          expect(wrapper.emitted('unpinPost')).toEqual([
+            [
+              {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                pinnedBy: 'someone',
+              },
+            ],
+          ])
         })
       })
 

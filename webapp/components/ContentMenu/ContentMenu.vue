@@ -92,7 +92,7 @@ export default {
               icon: 'link',
             })
           } else {
-            if (this.maxPinnedPosts && this.resource.pinnedBy) {
+            if (this.resource.pinnedBy) {
               routes.push({
                 label: this.$t(`post.menu.unpin`),
                 callback: () => {
