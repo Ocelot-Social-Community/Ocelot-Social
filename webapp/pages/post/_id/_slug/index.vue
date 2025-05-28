@@ -97,35 +97,25 @@
               <ds-space margin="xx-small" />
               <hc-hashtag v-for="tag in sortedTags" :key="tag.id" :id="tag.id" />
             </div>
-            <ds-space margin-top="small">
-              <ds-flex :gutter="{ lg: 'small' }">
-                <!-- Shout Button -->
-                <ds-flex-item
-                  :width="{ lg: '15%', md: '22%', sm: '22%', base: '100%' }"
-                  class="shout-button"
-                >
-                  <hc-shout-button
-                    :disabled="isAuthor"
-                    :count="post.shoutedCount"
-                    :is-shouted="post.shoutedByCurrentUser"
-                    :node-id="post.id"
-                    node-type="Post"
-                  />
-                </ds-flex-item>
-                <!-- Follow Button -->
-                <ds-flex-item
-                  :width="{ lg: '15%', md: '22%', sm: '22%', base: '100%' }"
-                  class="shout-button"
-                >
-                  <observe-button
-                    :is-observed="post.isObservedByMe"
-                    :count="post.observingUsersCount"
-                    :post-id="post.id"
-                    @toggleObservePost="toggleObservePost"
-                  />
-                </ds-flex-item>
-              </ds-flex>
-            </ds-space>
+            <div class="actions">
+              <!-- Shout Button -->
+              <hc-shout-button
+                :disabled="isAuthor"
+                :count="post.shoutedCount"
+                :is-shouted="post.shoutedByCurrentUser"
+                :node-id="post.id"
+                node-type="Post"
+                class="action-item"
+              />
+              <!-- Follow Button -->
+              <observe-button
+                :is-observed="post.isObservedByMe"
+                :count="post.observingUsersCount"
+                :post-id="post.id"
+                @toggleObservePost="toggleObservePost"
+                class="action-item"
+              />
+            </div>
             <!-- Comments -->
             <ds-section>
               <comment-list
@@ -424,11 +414,13 @@ export default {
       min-height: 0px;
     }
   }
-}
 
-@media only screen and (max-width: 960px) {
-  .shout-button {
-    float: left;
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: $space-x-small;
+    margin-top: $space-small;
+    margin-bottom: calc($space-xx-small * 10);
   }
 }
 </style>
