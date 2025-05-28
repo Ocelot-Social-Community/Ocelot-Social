@@ -77,7 +77,7 @@
             <!-- content -->
             <content-viewer class="content hyphenate-text" :content="post.content" />
             <!-- categories -->
-            <div v-if="categoriesActive" class="categories">
+            <div v-if="categoriesActive && post.categories.length > 0" class="categories">
               <ds-space margin="xx-large" />
               <ds-space margin="xx-small" />
               <hc-category
