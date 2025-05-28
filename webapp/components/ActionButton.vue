@@ -31,7 +31,6 @@ export default {
 
 <style lang="scss" scoped>
 .action-button {
-  margin: $space-xx-small;
   display: flex;
   justify-content: center;
   align-items: center;

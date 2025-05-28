@@ -418,9 +418,9 @@ export default {
   .actions {
     display: flex;
     align-items: center;
-    gap: $space-x-small;
+    gap: $space-small;
     margin-top: $space-small;
-    margin-bottom: calc($space-xx-small * 10);
+    margin-bottom: calc($space-base * 2);
   }
 }
 </style>
