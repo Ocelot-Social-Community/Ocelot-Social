@@ -10,6 +10,7 @@ import CONFIG from '@config/index'
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import Image from '@db/models/Image'
+import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
 import createServer, { getContext } from '@src/server'
 
@@ -1302,6 +1303,130 @@ describe('pin posts', () => {
             {},
           )
           expect(pinnedPost.records).toHaveLength(1)
+        })
+      })
+
+      describe('post in public group', () => {
+        beforeEach(async () => {
+          await mutate({
+            mutation: createGroupMutation(),
+            variables: {
+              name: 'Public Group',
+              id: 'public-group',
+              about: 'This is a public group',
+              groupType: 'public',
+              actionRadius: 'regional',
+              description:
+                'This is a public group to test if the posts of this group can be pinned.',
+              categoryIds,
+            },
+          })
+          await mutate({
+            mutation: createPostMutation(),
+            variables: {
+              id: 'public-group-post',
+              title: 'Public group post',
+              content: 'This is a post in a public group',
+              groupId: 'public-group',
+              categoryIds,
+            },
+          })
+          variables = { ...variables, id: 'public-group-post' }
+        })
+
+        it('can be pinned', async () => {
+          await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject({
+            data: {
+              pinPost: {
+                id: 'public-group-post',
+                author: {
+                  slug: 'testuser',
+                },
+                pinnedBy: {
+                  id: 'current-user',
+                  name: 'Admin',
+                  role: 'admin',
+                },
+              },
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('post in closed group', () => {
+        beforeEach(async () => {
+          await mutate({
+            mutation: createGroupMutation(),
+            variables: {
+              name: 'Closed Group',
+              id: 'closed-group',
+              about: 'This is a closed group',
+              groupType: 'closed',
+              actionRadius: 'regional',
+              description:
+                'This is a closed group to test if the posts of this group can be pinned.',
+              categoryIds,
+            },
+          })
+          await mutate({
+            mutation: createPostMutation(),
+            variables: {
+              id: 'closed-group-post',
+              title: 'Closed group post',
+              content: 'This is a post in a closed group',
+              groupId: 'closed-group',
+              categoryIds,
+            },
+          })
+          variables = { ...variables, id: 'closed-group-post' }
+        })
+
+        it('can not be pinned', async () => {
+          await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject({
+            data: {
+              pinPost: null,
+            },
+            errors: undefined,
+          })
+        })
+      })
+
+      describe('post in hidden group', () => {
+        beforeEach(async () => {
+          await mutate({
+            mutation: createGroupMutation(),
+            variables: {
+              name: 'Hidden Group',
+              id: 'hidden-group',
+              about: 'This is a hidden group',
+              groupType: 'hidden',
+              actionRadius: 'regional',
+              description:
+                'This is a hidden group to test if the posts of this group can be pinned.',
+              categoryIds,
+            },
+          })
+          await mutate({
+            mutation: createPostMutation(),
+            variables: {
+              id: 'hidden-group-post',
+              title: 'Hidden group post',
+              content: 'This is a post in a hidden group',
+              groupId: 'hidden-group',
+              categoryIds,
+            },
+          })
+          variables = { ...variables, id: 'hidden-group-post' }
+        })
+
+        it('can not be pinned', async () => {
+          await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject({
+            data: {
+              pinPost: null,
+            },
+            errors: undefined,
+          })
         })
       })
 
