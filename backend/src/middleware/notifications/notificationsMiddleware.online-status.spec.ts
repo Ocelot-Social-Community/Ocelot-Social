@@ -8,6 +8,7 @@ import gql from 'graphql-tag'
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import CONFIG from '@src/config'
+import { TEST_CONFIG } from '@src/config/test-mock'
 import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
@@ -43,7 +44,7 @@ beforeAll(async () => {
 
   // eslint-disable-next-line @typescript-eslint/require-await
   const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database })
+  const context = getContext({ user: contextUser, database, config: TEST_CONFIG })
 
   const { server } = createServer({ context })
 
