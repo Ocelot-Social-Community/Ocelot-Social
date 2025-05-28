@@ -26,15 +26,13 @@ describe('SearchResults', () => {
   beforeEach(() => {
     mocks = {
       $t: jest.fn(),
-      $env: {
-        CATEGORIES_ACTIVE: false,
-      },
     }
     getters = {
       'auth/user': () => {
         return { id: 'u343', name: 'Matt' }
       },
       'auth/isModerator': () => false,
+      'categories/categoriesActive': () => false,
     }
     propsData = {
       pageSize: 12,

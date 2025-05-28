@@ -250,6 +250,11 @@ type Mutation {
   toggleObservePost(id: ID!, value: Boolean!): Post!
 }
 
+type PinnedPostCounts {
+  maxPinnedPosts: Int!
+  currentlyPinnedPosts: Int!
+}
+
 type Query {
   Post(
     id: ID
@@ -271,4 +276,5 @@ type Query {
   PostsEmotionsCountByEmotion(postId: ID!, data: _EMOTEDInput!): Int!
   PostsEmotionsByCurrentUser(postId: ID!): [String]
   profilePagePosts(filter: _PostFilter, first: Int, offset: Int, orderBy: [_PostOrdering]): [Post]
+  PostsPinnedCounts: PinnedPostCounts!
 }

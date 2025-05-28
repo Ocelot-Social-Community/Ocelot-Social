@@ -15,7 +15,7 @@
       <div class="category-filter-list">
         <!-- <ds-space margin="small" /> -->
         <base-button
-          v-for="category in categories"
+          v-for="category in sortCategories(categories)"
           :key="category.id"
           @click="saveCategories(category.id)"
           :filled="filteredCategoryIds.includes(category.id)"
@@ -35,20 +35,15 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
-import CategoryQuery from '~/graphql/CategoryQuery.js'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   components: {
     FilterMenuSection,
   },
-  mixins: [SortCategories],
-  data() {
-    return {
-      categories: [],
-    }
-  },
+  mixins: [SortCategories, GetCategories],
   computed: {
     ...mapGetters({
       filteredCategoryIds: 'posts/filteredCategoryIds',
@@ -66,18 +61,6 @@ export default {
     saveCategories(categoryId) {
       this.toggleCategory(categoryId)
       this.$emit('updateCategories', categoryId)
-    },
-  },
-  apollo: {
-    Category: {
-      query() {
-        return CategoryQuery()
-      },
-      update({ Category }) {
-        if (!Category) return []
-        this.categories = this.sortCategories(Category)
-      },
-      fetchPolicy: 'cache-and-network',
     },
   },
 }
