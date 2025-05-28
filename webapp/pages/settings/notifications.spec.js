@@ -1,12 +1,10 @@
 import Vuex from 'vuex'
-import { mount } from '@vue/test-utils'
 import { render, fireEvent, screen } from '@testing-library/vue'
 import Notifications from './notifications.vue'
 
 const localVue = global.localVue
 
 describe('notifications.vue', () => {
-  let wrapper
   let mocks
   let store
 
@@ -70,20 +68,14 @@ describe('notifications.vue', () => {
   })
 
   describe('mount', () => {
-    const Wrapper = () => {
-      return mount(Notifications, {
-        store,
-        mocks,
-        localVue,
-      })
-    }
-
-    beforeEach(() => {
-      wrapper = Wrapper()
-    })
-
     it('renders', () => {
-      expect(wrapper.element).toMatchSnapshot()
+      expect(
+        render(Notifications, {
+          store,
+          mocks,
+          localVue,
+        }),
+      ).toMatchSnapshot()
     })
   })
 
