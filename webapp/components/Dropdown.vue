@@ -6,6 +6,7 @@
     :disabled="disabled"
     trigger="manual"
     :offset="offset"
+    :boundaries-element="bodyAsBoundary ? 'body' : undefined"
   >
     <slot :toggleMenu="toggleMenu" :openMenu="openMenu" :closeMenu="closeMenu" :isOpen="isOpen" />
     <div slot="popover" @mouseover="popoverMouseEnter" @mouseleave="popoverMouseLeave">
@@ -30,6 +31,7 @@ export default {
     disabled: { type: Boolean, default: false },
     offset: { type: [String, Number], default: '16' },
     noMouseLeaveClosing: { type: Boolean, default: false },
+    bodyAsBoundary: { type: Boolean, default: false },
   },
   data() {
     return {
