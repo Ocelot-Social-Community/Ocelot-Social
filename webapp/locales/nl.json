@@ -208,7 +208,7 @@
         "buttonTitle": null,
         "error": null,
         "help": null,
-        "recieveCommunicationAsEmailsEtcConfirmed": null,
+        "receiveCommunicationAsEmailsEtcConfirmed": null,
         "success": null,
         "termsAndCondsEtcConfirmed": null,
         "title": null
@@ -1030,6 +1030,8 @@
       "unblocked": null
     },
     "data": {
+      "givenName": null,
+      "givenNamePlaceholder": null,
       "labelBio": null,
       "labelCity": null,
       "labelCityHint": null,
@@ -1037,7 +1039,10 @@
       "labelSlug": null,
       "name": "Uw gegevens",
       "namePlaceholder": null,
-      "success": null
+      "realNamePlease": null,
+      "success": null,
+      "surName": null,
+      "surNamePlaceholder": null
     },
     "deleteUserAccount": {
       "accountDescription": null,

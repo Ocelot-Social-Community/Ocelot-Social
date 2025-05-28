@@ -208,7 +208,7 @@
         "buttonTitle": null,
         "error": "Nenhuma conta de usuário pode ser criada!",
         "help": " Talvez a confirmação tenha sido inválida? Em caso de problemas, sinta-se à vontade para pedir ajuda, enviando um e-mail para:",
-        "recieveCommunicationAsEmailsEtcConfirmed": null,
+        "receiveCommunicationAsEmailsEtcConfirmed": null,
         "success": "A sua conta foi criada!",
         "termsAndCondsEtcConfirmed": null,
         "title": "Criar uma conta de usuário"
@@ -1030,6 +1030,8 @@
       "unblocked": "{name} está desbloqueado novamente"
     },
     "data": {
+      "givenName": null,
+      "givenNamePlaceholder": null,
       "labelBio": "Sobre você",
       "labelCity": "Sua cidade ou estado",
       "labelCityHint": null,
@@ -1037,7 +1039,10 @@
       "labelSlug": "Seu nome de usuário exclusivo",
       "name": "Seus dados",
       "namePlaceholder": "Anonymous",
-      "success": "Seus dados foram atualizados com sucesso!"
+      "realNamePlease": null,
+      "success": "Seus dados foram atualizados com sucesso!",
+      "surName": null,
+      "surNamePlaceholder": null
     },
     "deleteUserAccount": {
       "accountDescription": "Esteja ciente de que o suas Publicações e Comentários são importantes para a nossa comunidade. Se você ainda optar por excluí-los, você tem que marcá-los abaixo.",

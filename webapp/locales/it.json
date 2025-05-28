@@ -53,7 +53,7 @@
       "invites": "Inviti",
       "locations": null,
       "name": "Cruscotto",
-      "organizations": "Organizzazioni",
+      "notifications": null,
       "posts": "Messaggi",
       "reports": null,
       "shouts": "Gridi",
@@ -208,7 +208,7 @@
         "buttonTitle": null,
         "error": null,
         "help": null,
-        "recieveCommunicationAsEmailsEtcConfirmed": null,
+        "receiveCommunicationAsEmailsEtcConfirmed": null,
         "success": null,
         "termsAndCondsEtcConfirmed": null,
         "title": null
@@ -809,6 +809,7 @@
       "followed_user_posted": null,
       "mentioned_in_comment": null,
       "mentioned_in_post": null,
+      "on_date": null,
       "post_in_group": null,
       "removed_user_from_group": null,
       "user_joined_group": null,
@@ -1029,6 +1030,8 @@
       "unblocked": null
     },
     "data": {
+      "givenName": null,
+      "givenNamePlaceholder": null,
       "labelBio": "Su di te",
       "labelCity": "La tua città o regione",
       "labelCityHint": null,
@@ -1036,7 +1039,10 @@
       "labelSlug": null,
       "name": "I tuoi dati",
       "namePlaceholder": "Anonymous",
-      "success": null
+      "realNamePlease": null,
+      "success": null,
+      "surName": null,
+      "surNamePlaceholder": null
     },
     "deleteUserAccount": {
       "accountDescription": "Essere consapevoli che i tuoi post e commenti sono importanti per la nostra comunità. Se cancelli il tuo account utente, tutto scomparirà per sempre - e sarebbe un vero peccato!",

@@ -208,7 +208,7 @@
         "buttonTitle": null,
         "error": "Compte d'utilisateur n'a pas pu être créé!",
         "help": " Peut-être que la confirmation n'était pas valide? En cas de problème, n'hésitez pas à nous demander de l'aide en nous envoyant un mail à:",
-        "recieveCommunicationAsEmailsEtcConfirmed": null,
+        "receiveCommunicationAsEmailsEtcConfirmed": null,
         "success": "Votre compte a été créé!",
         "termsAndCondsEtcConfirmed": null,
         "title": "Créer un compte utilisateur"
@@ -1030,6 +1030,8 @@
       "unblocked": "{name} est à nouveau débloqué"
     },
     "data": {
+      "givenName": null,
+      "givenNamePlaceholder": null,
       "labelBio": "À propos de vous",
       "labelCity": "Votre ville ou région",
       "labelCityHint": null,
@@ -1037,7 +1039,10 @@
       "labelSlug": "Votre nom d'utilisateur unique",
       "name": "Vos données",
       "namePlaceholder": "Fémanon Funny",
-      "success": "Vos données ont été mises à jour avec succès !"
+      "realNamePlease": null,
+      "success": "Vos données ont été mises à jour avec succès !",
+      "surName": null,
+      "surNamePlaceholder": null
     },
     "deleteUserAccount": {
       "accountDescription": "Sachez que vos postes et commentaires sont importants pour notre communauté. Si vous voulez quand même les supprimer, vous devez les marquer ci-dessous.",

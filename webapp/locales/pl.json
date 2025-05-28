@@ -208,7 +208,7 @@
         "buttonTitle": null,
         "error": null,
         "help": null,
-        "recieveCommunicationAsEmailsEtcConfirmed": null,
+        "receiveCommunicationAsEmailsEtcConfirmed": null,
         "success": null,
         "termsAndCondsEtcConfirmed": null,
         "title": null
@@ -1030,6 +1030,8 @@
       "unblocked": null
     },
     "data": {
+      "givenName": null,
+      "givenNamePlaceholder": null,
       "labelBio": "O Tobie",
       "labelCity": "Twoje miasto lub region",
       "labelCityHint": null,
@@ -1037,7 +1039,10 @@
       "labelSlug": null,
       "name": "Twoje dane",
       "namePlaceholder": "Anonymous",
-      "success": "Twoje dane zostały pomyślnie zaktualizowane!"
+      "realNamePlease": null,
+      "success": "Twoje dane zostały pomyślnie zaktualizowane!",
+      "surName": null,
+      "surNamePlaceholder": null
     },
     "deleteUserAccount": {
       "accountDescription": "Be aware that your Post and Comments are important to our community. If you still choose to delete them, you have to mark them below.",
