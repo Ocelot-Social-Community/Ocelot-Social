@@ -35,7 +35,25 @@
       <!-- leave this here in case the scoped variable is needed in the future nobody would remember this -->
       <!-- <template v-slot="{ errors }"> -->
       <template>
+        <div v-if="askForRealName" class="full-name">
+          <!-- <p>{{ $t('settings.data.realNamePlease') }}</p>-->
+          <ds-input
+            id="givenName"
+            model="givenName"
+            icon="user"
+            :label="$t('settings.data.givenName')"
+            :placeholder="$t('settings.data.givenNamePlaceholder')"
+          />
+          <ds-input
+            id="surName"
+            model="surName"
+            icon="user"
+            :label="$t('settings.data.surName')"
+            :placeholder="$t('settings.data.surNamePlaceholder')"
+          />
+        </div>
         <ds-input
+          v-else
           id="name"
           model="name"
           icon="user"
@@ -149,13 +167,25 @@ export default {
       links,
       supportEmail: emails.SUPPORT_EMAIL,
       formData: {
+        givenName: '',
+        surName: '',
         name: '',
         ...passwordForm.formData,
       },
       formSchema: {
+        givenName: {
+          type: 'string',
+          required: this.$env.ASK_FOR_REAL_NAME,
+          min: 2,
+        },
+        surName: {
+          type: 'string',
+          required: this.$env.ASK_FOR_REAL_NAME,
+          min: 2,
+        },
         name: {
           type: 'string',
-          required: true,
+          required: !this.$env.ASK_FOR_REAL_NAME,
           min: 3,
         },
         ...passwordForm.formSchema,
@@ -171,9 +201,20 @@ export default {
     }
   },
   mounted: function () {
-    this.formData.name = this.sliderData.collectedInputData.name
-      ? this.sliderData.collectedInputData.name
-      : ''
+    if (this.askForRealName) {
+      if (this.sliderData.collectedInputData.name) {
+        const split = this.sliderData.collectedInputData.name.split(' ')
+        this.formData.givenName = split[0]
+        this.formData.surName = split[1]
+      } else {
+        this.formData.surName = ''
+        this.formData.givenName = ''
+      }
+    } else {
+      this.formData.name = this.sliderData.collectedInputData.name
+        ? this.sliderData.collectedInputData.name
+        : ''
+    }
     this.formData.password = this.sliderData.collectedInputData.password
       ? this.sliderData.collectedInputData.password
       : ''
@@ -195,9 +236,14 @@ export default {
     })
   },
   computed: {
+    askForRealName() {
+      return this.$env.ASK_FOR_REAL_NAME
+    },
     validInput() {
       return (
-        this.formData.name.length >= 3 &&
+        (this.askForRealName
+          ? this.formData.givenName.length >= 2 && this.formData.surName.length >= 2
+          : this.formData.name.length >= 3) &&
         this.formData.password.length >= 1 &&
         this.formData.password === this.formData.passwordConfirmation &&
         this.termsAndConditionsConfirmed &&
@@ -221,7 +267,10 @@ export default {
   },
   methods: {
     sendValidation() {
-      const { name, password, passwordConfirmation } = this.formData
+      const { password, passwordConfirmation } = this.formData
+      const name = this.askForRealName
+        ? `${this.formData.givenName} ${this.formData.surName}`
+        : this.formData.name
       const { termsAndConditionsConfirmed, recieveCommunicationAsEmailsEtcConfirmed } = this
 
       this.sliderData.setSliderValuesCallback(this.validInput, {
@@ -241,7 +290,10 @@ export default {
       this.sendValidation()
     },
     async submit() {
-      const { name, password } = this.formData
+      const { password } = this.formData
+      const name = this.askForRealName
+        ? `${this.formData.givenName} ${this.formData.surName}`
+        : this.formData.name
       const { email, inviteCode = null, nonce } = this.sliderData.collectedInputData
       const termsAndConditionsAgreedVersion = VERSION
       const locale = this.$i18n.locale()
@@ -353,5 +405,9 @@ export default {
     margin-left: 0;
     width: 100%;
   }
+}
+
+.full-name {
+  padding-bottom: 16px;
 }
 </style>

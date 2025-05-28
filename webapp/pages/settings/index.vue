@@ -7,7 +7,11 @@
           id="name"
           model="name"
           icon="user"
-          :label="$t('settings.data.labelName')"
+          :label="
+            $env.ASK_FOR_REAL_NAME
+              ? $t('settings.data.realNamePlease')
+              : $t('settings.data.labelName')
+          "
           :placeholder="$t('settings.data.namePlaceholder')"
         />
         <ds-input id="slug" model="slug" icon="at" :label="$t('settings.data.labelSlug')" />

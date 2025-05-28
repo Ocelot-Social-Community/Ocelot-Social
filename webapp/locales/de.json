@@ -1033,10 +1033,15 @@
       "labelBio": "Über dich",
       "labelCity": "Deine Stadt oder Region",
       "labelCityHint": "(zeigt ungefähre Position auf der Landkarte)",
+      "givenName": "Dein Vorname",
       "labelName": "Dein Name",
+      "surName": "Dein Nachname",
       "labelSlug": "Dein eindeutiger Nutzername",
       "name": "Deine Daten",
+      "givenNamePlaceholder": "Petra",
       "namePlaceholder": "Petra Lustig",
+      "surNamePlaceholder": "Lustig",
+      "realNamePlease": "Bitte gib deinen Klarnamen an",
       "success": "Deine Daten wurden erfolgreich aktualisiert!"
     },
     "deleteUserAccount": {

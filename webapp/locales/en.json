@@ -1033,10 +1033,15 @@
       "labelBio": "About You",
       "labelCity": "Your City or Region",
       "labelCityHint": "(shows approximate position on map)",
+      "givenName": "Your Given Name",
       "labelName": "Your Name",
+      "surName": "Your Surname",
       "labelSlug": "Your unique user name",
       "name": "Your data",
+      "realNamePlease": "Please enter your real name",
+      "givenNamePlaceholder": "Femanon",
       "namePlaceholder": "Femanon Funny",
+      "surNamePlaceholder": "Funny",
       "success": "Your data was successfully updated!"
     },
     "deleteUserAccount": {
