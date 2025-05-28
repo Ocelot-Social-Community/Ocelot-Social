@@ -266,11 +266,13 @@ export default {
     },
   },
   methods: {
+    buildName(data) {
+      if (this.askForRealName) return `${data.givenName} ${data.surName}`
+      return data.name
+    },
     sendValidation() {
       const { password, passwordConfirmation } = this.formData
-      const name = this.askForRealName
-        ? `${this.formData.givenName} ${this.formData.surName}`
-        : this.formData.name
+      const name = this.buildName(this.formData)
       const { termsAndConditionsConfirmed, recieveCommunicationAsEmailsEtcConfirmed } = this
 
       this.sliderData.setSliderValuesCallback(this.validInput, {
@@ -291,9 +293,7 @@ export default {
     },
     async submit() {
       const { password } = this.formData
-      const name = this.askForRealName
-        ? `${this.formData.givenName} ${this.formData.surName}`
-        : this.formData.name
+      const name = this.buildName(this.formData)
       const { email, inviteCode = null, nonce } = this.sliderData.collectedInputData
       const termsAndConditionsAgreedVersion = VERSION
       const locale = this.$i18n.locale()
