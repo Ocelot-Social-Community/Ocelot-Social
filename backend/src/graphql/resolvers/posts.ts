@@ -10,6 +10,7 @@ import { neo4jgraphql } from 'neo4j-graphql-js'
 import { v4 as uuid } from 'uuid'
 
 import CONFIG from '@config/index'
+import { Context } from '@src/server'
 
 import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
@@ -94,6 +95,17 @@ export default {
         return emotions
       } finally {
         session.close()
+      }
+    },
+    PostsPinnedCounts: async (_object, params, context: Context, _resolveInfo) => {
+      const [postsPinnedCount] = (
+        await context.database.query({
+          query: 'MATCH (p:Post { pinned: true }) RETURN COUNT (p) AS count',
+        })
+      ).records.map((r) => Number(r.get('count').toString()))
+      return {
+        maxPinnedPosts: CONFIG.MAX_PINNED_POSTS,
+        currentlyPinnedPosts: postsPinnedCount,
       }
     },
   },
@@ -330,56 +342,79 @@ export default {
         session.close()
       }
     },
-    pinPost: async (_parent, params, context, _resolveInfo) => {
+    pinPost: async (_parent, params, context: Context, _resolveInfo) => {
+      if (CONFIG.MAX_PINNED_POSTS === 0) throw new Error('Pinned posts are not allowed!')
       let pinnedPostWithNestedAttributes
       const { driver, user } = context
       const session = driver.session()
       const { id: userId } = user
-      let writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const deletePreviousRelationsResponse = await transaction.run(
-          `
+      const pinPostCypher = `
+        MATCH (user:User {id: $userId}) WHERE user.role = 'admin'
+        MATCH (post:Post {id: $params.id})
+        WHERE NOT((post)-[:IN]->(:Group))
+        MERGE (user)-[pinned:PINNED {createdAt: toString(datetime())}]->(post)
+        SET post.pinned = true
+        RETURN post, pinned.createdAt as pinnedAt`
+
+      if (CONFIG.MAX_PINNED_POSTS === 1) {
+        let writeTxResultPromise = session.writeTransaction(async (transaction) => {
+          const deletePreviousRelationsResponse = await transaction.run(
+            `
           MATCH (:User)-[previousRelations:PINNED]->(post:Post)
           REMOVE post.pinned
           DELETE previousRelations
           RETURN post
         `,
-        )
-        return deletePreviousRelationsResponse.records.map(
-          (record) => record.get('post').properties,
-        )
-      })
-      try {
-        await writeTxResultPromise
-
-        writeTxResultPromise = session.writeTransaction(async (transaction) => {
-          const pinPostTransactionResponse = await transaction.run(
-            `
-            MATCH (user:User {id: $userId}) WHERE user.role = 'admin'
-            MATCH (post:Post {id: $params.id})
-            WHERE NOT((post)-[:IN]->(:Group))
-            MERGE (user)-[pinned:PINNED {createdAt: toString(datetime())}]->(post)
-            SET post.pinned = true
-            RETURN post, pinned.createdAt as pinnedAt
-         `,
-            { userId, params },
           )
-          return pinPostTransactionResponse.records.map((record) => ({
-            pinnedPost: record.get('post').properties,
-            pinnedAt: record.get('pinnedAt'),
-          }))
+          return deletePreviousRelationsResponse.records.map(
+            (record) => record.get('post').properties,
+          )
         })
-        const [transactionResult] = await writeTxResultPromise
-        if (transactionResult) {
-          const { pinnedPost, pinnedAt } = transactionResult
-          pinnedPostWithNestedAttributes = {
-            ...pinnedPost,
-            pinnedAt,
+        try {
+          await writeTxResultPromise
+
+          writeTxResultPromise = session.writeTransaction(async (transaction) => {
+            const pinPostTransactionResponse = await transaction.run(pinPostCypher, {
+              userId,
+              params,
+            })
+            return pinPostTransactionResponse.records.map((record) => ({
+              pinnedPost: record.get('post').properties,
+              pinnedAt: record.get('pinnedAt'),
+            }))
+          })
+          const [transactionResult] = await writeTxResultPromise
+          if (transactionResult) {
+            const { pinnedPost, pinnedAt } = transactionResult
+            pinnedPostWithNestedAttributes = {
+              ...pinnedPost,
+              pinnedAt,
+            }
           }
+        } finally {
+          await session.close()
         }
-      } finally {
-        session.close()
+        return pinnedPostWithNestedAttributes
+      } else {
+        const [currentPinnedPostCount] = (
+          await context.database.query({
+            query: `MATCH (:User)-[:PINNED]->(post:Post { pinned: true }) RETURN COUNT(post) AS count`,
+          })
+        ).records.map((r) => Number(r.get('count').toString()))
+        if (currentPinnedPostCount >= CONFIG.MAX_PINNED_POSTS) {
+          throw new Error('Max number of pinned posts is reached!')
+        }
+        const [pinPostResult] = (
+          await context.database.write({
+            query: pinPostCypher,
+            variables: { userId, params },
+          })
+        ).records.map((r) => ({
+          ...r.get('post').properties,
+          pinnedAt: r.get('pinnedAt'),
+        }))
+        return pinPostResult
       }
-      return pinnedPostWithNestedAttributes
     },
     unpinPost: async (_parent, params, context, _resolveInfo) => {
       let unpinnedPost
