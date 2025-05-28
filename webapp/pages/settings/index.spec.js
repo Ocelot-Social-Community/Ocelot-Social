@@ -67,6 +67,9 @@ describe('index.vue', () => {
         error: jest.fn(),
         success: jest.fn(),
       },
+      $env: {
+        ASK_FOR_REAL_NAME: false,
+      },
     }
     getters = {
       'auth/user': () => ({}),
