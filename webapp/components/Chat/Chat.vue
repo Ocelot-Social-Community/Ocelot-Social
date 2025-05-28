@@ -401,7 +401,8 @@ export default {
             changedRoom.lastMessage.content = createdMessagePayload.content.trim().substring(0, 30)
             changedRoom.lastMessage.date = createdMessagePayload.date
 
-            // Move changed room to the top of the list - does not work with Vue Advanced Chat
+            // Move changed room to the top of the list
+            changedRoom.index = createdMessagePayload.date
             this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== roomId)]
           }
         }
