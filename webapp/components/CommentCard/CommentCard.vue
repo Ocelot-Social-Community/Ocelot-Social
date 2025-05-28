@@ -228,6 +228,10 @@ export default {
 </style>
 
 <style lang="scss" scoped>
+.actions {
+  margin-top: $space-x-small;
+}
+
 .shout-button {
   --icon-size: 1em;
   --circle-button-width: 28px;
