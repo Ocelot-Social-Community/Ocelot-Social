@@ -3,42 +3,40 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getDriver } from '@db/neo4j'
 import { markAllAsReadMutation } from '@graphql/queries/markAllAsReadMutation'
 import { markAsReadMutation } from '@graphql/queries/markAsReadMutation'
 import { notificationQuery } from '@graphql/queries/notificationQuery'
-import createServer from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-const driver = getDriver()
-let authenticatedUser
 let user
 let author
 let variables
-let query
-let mutate
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser })
+let query: ApolloTestSetup['query']
+let mutate: ApolloTestSetup['mutate']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 beforeAll(async () => {
   await cleanDatabase()
-
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        user: authenticatedUser,
-      }
-    },
-  })
-  query = createTestClient(server).query
-  mutate = createTestClient(server).mutate
+  const apolloSetup = createApolloTestSetup({ context })
+  query = apolloSetup.query
+  mutate = apolloSetup.mutate
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 beforeEach(async () => {
@@ -157,7 +155,7 @@ describe('given some notifications', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const { errors } = await query({ query: notificationQuery() })
-        expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+        expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -241,7 +239,7 @@ describe('given some notifications', () => {
             variables: { ...variables, read: false },
           })
           await expect(response).toMatchObject(expected)
-          await expect(response.data.notifications).toHaveLength(2) // double-check
+          await expect(response.data?.notifications).toHaveLength(2) // double-check
         })
 
         describe('if a resource gets deleted', () => {
@@ -288,7 +286,7 @@ describe('given some notifications', () => {
           mutation: markAsReadMutation(),
           variables: { ...variables, id: 'p1' },
         })
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
+        expect(result.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -307,7 +305,7 @@ describe('given some notifications', () => {
 
         it('returns null', async () => {
           const response = await mutate({ mutation: markAsReadMutation(), variables })
-          expect(response.data.markAsRead).toEqual(null)
+          expect(response.data?.markAsRead).toEqual(null)
           expect(response.errors).toBeUndefined()
         })
       })
@@ -344,7 +342,7 @@ describe('given some notifications', () => {
             })
             it('returns null', async () => {
               const response = await mutate({ mutation: markAsReadMutation(), variables })
-              expect(response.data.markAsRead).toEqual(null)
+              expect(response.data?.markAsRead).toEqual(null)
               expect(response.errors).toBeUndefined()
             })
           })
@@ -382,7 +380,7 @@ describe('given some notifications', () => {
         const result = await mutate({
           mutation: markAllAsReadMutation(),
         })
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
+        expect(result.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -400,7 +398,7 @@ describe('given some notifications', () => {
 
         it('returns all as read', async () => {
           const response = await mutate({ mutation: markAllAsReadMutation(), variables })
-          expect(response.data.markAllAsRead).toEqual(
+          expect(response.data?.markAllAsRead).toEqual(
             expect.arrayContaining([
               {
                 createdAt: '2019-08-30T19:33:48.651Z',

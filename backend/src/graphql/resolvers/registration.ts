@@ -7,7 +7,7 @@ import { UserInputError } from 'apollo-server'
 import { hash } from 'bcryptjs'
 
 import { getNeode } from '@db/neo4j'
-import { Context } from '@src/server'
+import { Context } from '@src/context'
 
 import existingEmailAddress from './helpers/existingEmailAddress'
 import generateNonce from './helpers/generateNonce'
@@ -106,7 +106,7 @@ export default {
           await redeemInviteCode(context, inviteCode, true)
         }
 
-        await createOrUpdateLocations('User', user.id, locationName, session)
+        await createOrUpdateLocations('User', user.id, locationName, session, context)
         return user
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')

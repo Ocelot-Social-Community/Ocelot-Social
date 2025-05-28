@@ -16,7 +16,6 @@ import languages from './languages/languages'
 import login from './login/loginMiddleware'
 import notifications from './notifications/notificationsMiddleware'
 import orderBy from './orderByMiddleware'
-// eslint-disable-next-line import/no-cycle
 import permissions from './permissionsMiddleware'
 import sentry from './sentryMiddleware'
 import sluggify from './sluggifyMiddleware'

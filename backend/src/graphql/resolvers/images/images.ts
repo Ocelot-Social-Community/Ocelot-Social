@@ -1,4 +1,5 @@
-import CONFIG, { isS3configured } from '@config/index'
+import { isS3configured } from '@config/index'
+import type { Context } from '@src/context'
 
 import { images as imagesLocal } from './imagesLocal'
 import { images as imagesS3 } from './imagesS3'
@@ -55,4 +56,5 @@ export interface Images {
   ) => Promise<any>
 }
 
-export const images = isS3configured(CONFIG) ? imagesS3(CONFIG) : imagesLocal
+export const images = (config: Context['config']) =>
+  isS3configured(config) ? imagesS3(config) : imagesLocal
