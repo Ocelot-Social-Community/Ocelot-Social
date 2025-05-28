@@ -39,22 +39,25 @@
         {{ isCollapsed ? $t('comment.show.more') : $t('comment.show.less') }}
       </base-button>
     </template>
-    <hc-shout-button
-      :disabled="isAuthor"
-      :count="comment.shoutedCount"
-      :is-shouted="comment.shoutedByCurrentUser"
-      :node-id="comment.id"
-      node-type="Comment"
-    />
-    <base-button
-      :title="this.$t('post.comment.reply')"
-      icon="level-down"
-      class="reply-button"
-      circle
-      size="small"
-      v-scroll-to="'.editor'"
-      @click="reply"
-    />
+    <div class="actions">
+      <hc-shout-button
+        :disabled="isAuthor"
+        :count="comment.shoutedCount"
+        :is-shouted="comment.shoutedByCurrentUser"
+        :node-id="comment.id"
+        class="shout-button"
+        node-type="Comment"
+      />
+      <base-button
+        :title="this.$t('post.comment.reply')"
+        icon="level-down"
+        class="reply-button"
+        circle
+        size="small"
+        v-scroll-to="'.editor'"
+        @click="reply"
+      />
+    </div>
   </base-card>
 </template>
 
@@ -206,17 +209,12 @@ export default {
     margin-bottom: $space-small;
   }
 
-  > .base-button {
-    align-self: flex-end;
+  .actions {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
   }
-}
-
-.reply-button {
-  float: right;
-  top: 0px;
-}
-.reply-button:after {
-  clear: both;
 }
 
 @keyframes highlight {
@@ -226,5 +224,12 @@ export default {
   100% {
     border: $border-size-base solid transparent;
   }
+}
+</style>
+
+<style lang="scss" scoped>
+.shout-button {
+  --icon-size: 1em;
+  --circle-button-width: 28px;
 }
 </style>

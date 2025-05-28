@@ -414,13 +414,15 @@ export default {
       min-height: 0px;
     }
   }
+}
+</style>
 
-  .actions {
-    display: flex;
-    align-items: center;
-    gap: $space-small;
-    margin-top: $space-small;
-    margin-bottom: calc($space-base * 2);
-  }
+<style lang="scss" scoped>
+.actions {
+  display: flex;
+  align-items: center;
+  gap: $space-small;
+  margin-top: $space-small;
+  margin-bottom: calc($space-base * 2);
 }
 </style>
