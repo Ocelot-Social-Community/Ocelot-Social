@@ -182,6 +182,7 @@ import { groupQuery } from '~/graphql/groups'
 import PostMutations from '~/graphql/PostMutations'
 import links from '~/constants/links.js'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   name: 'PostSlug',
@@ -203,7 +204,7 @@ export default {
     PageParamsLink,
     UserTeaser,
   },
-  mixins: [SortCategories],
+  mixins: [SortCategories, GetCategories],
   head() {
     return {
       title: this.title,
@@ -219,7 +220,6 @@ export default {
       blurred: false,
       blocked: null,
       postAuthor: null,
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
       group: null,
     }
   },
