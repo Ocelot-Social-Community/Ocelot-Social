@@ -41,14 +41,14 @@ export interface Image {
 export interface Images {
   deleteImage: (
     resource: { id: string },
-    relationshipType: string,
+    relationshipType: 'HERO_IMAGE' | 'AVATAR_IMAGE',
     opts?: DeleteImageOpts,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) => Promise<any>
 
   mergeImage: (
     resource: { id: string },
-    relationshipType: string,
+    relationshipType: 'HERO_IMAGE' | 'AVATAR_IMAGE',
     imageInput: ImageInput | null | undefined,
     opts?: MergeImageOpts,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

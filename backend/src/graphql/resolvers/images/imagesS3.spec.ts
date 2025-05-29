@@ -243,7 +243,10 @@ describe('mergeImage', () => {
 
       it('whitelists relationship types', async () => {
         await expect(
-          mergeImage(post, 'WHATEVER', imageInput, { uploadCallback, deleteCallback }),
+          mergeImage(post, 'WHATEVER' as 'HERO_IMAGE', imageInput, {
+            uploadCallback,
+            deleteCallback,
+          }),
         ).rejects.toEqual(new Error('Unknown relationship type WHATEVER'))
       })
 
