@@ -2,7 +2,7 @@
   <div>
     <label class="ds-input-label">
       {{ `${$t('settings.data.labelCity')}` }}
-      <span v-if="locationName">{{ `- ${locationName}` }}</span>
+      <span v-if="locationName">{{ `— ${locationName}` }}</span>
     </label>
     <ds-select
       id="city"
