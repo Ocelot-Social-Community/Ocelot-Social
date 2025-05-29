@@ -7,6 +7,7 @@ export const createPostMutation = () => {
       $title: String!
       $slug: String
       $content: String!
+      $filesToUpload: [FileInput]
       $categoryIds: [ID]
       $groupId: ID
       $postType: PostType
@@ -17,6 +18,7 @@ export const createPostMutation = () => {
         title: $title
         slug: $slug
         content: $content
+        $filesToUpload: $filesToUpload
         categoryIds: $categoryIds
         groupId: $groupId
         postType: $postType
