@@ -37,7 +37,7 @@ describe('LocationSelect', () => {
       expect(wrapper.find('.base-button').exists()).toBe(true)
     })
 
-    describe('button click', () => {
+    describe('clearLocationName button click', () => {
       beforeEach(() => {
         wrapper.find('.base-button').trigger('click')
       })
