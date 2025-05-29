@@ -36,8 +36,8 @@ class Store {
 
       // You have to wait for the schema to install, else the constraints will not be present.
       // This is a type error of the library
-
-      getNeode().schema.install()
+      // eslint-disable-next-line @typescript-eslint/await-thenable
+      await getNeode().schema.install()
       // eslint-disable-next-line no-console
       console.log('Successfully created database indices and constraints!')
       // eslint-disable-next-line no-catch-all/no-catch-all

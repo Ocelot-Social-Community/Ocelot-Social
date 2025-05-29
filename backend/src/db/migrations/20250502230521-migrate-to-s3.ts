@@ -14,11 +14,6 @@ export const description =
   'Upload all image files to a S3 compatible object storage in order to reduce load on our backend.'
 
 export async function up(_next) {
-  if (CONFIG.NODE_ENV === 'test') {
-    // Let's skip this migration for simplicity.
-    // There is nothing to migrate in test environment and setting up the S3 services seems overkill.
-    return
-  }
   const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_ENDPOINT, AWS_BUCKET } = CONFIG
   if (!(AWS_ACCESS_KEY_ID && AWS_SECRET_ACCESS_KEY && AWS_ENDPOINT && AWS_BUCKET)) {
     throw new Error('No S3 configuration given, cannot upload image files')
@@ -87,23 +82,6 @@ export async function up(_next) {
   }
 }
 
-export async function down(_next) {
-  const driver = getDriver()
-  const session = driver.session()
-  const transaction = session.beginTransaction()
-
-  try {
-    // Implement your migration here.
-    await transaction.run(``)
-    await transaction.commit()
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.log(error)
-    await transaction.rollback()
-    // eslint-disable-next-line no-console
-    console.log('rolled back')
-    throw new Error(error)
-  } finally {
-    await session.close()
-  }
+export function down(_next) {
+  throw new Error('This migration is irreversible: The backend does not have disk access anymore.')
 }
