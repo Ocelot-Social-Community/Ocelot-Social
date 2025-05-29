@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
 import index from './index.vue'
 import Vuex from 'vuex'
+import LocationSelect from '~/components/Select/LocationSelect'
 
 const localVue = global.localVue
 
@@ -161,17 +162,7 @@ describe('index.vue', () => {
       describe('given a new location and hitting submit', () => {
         it('calls updateUser mutation', async () => {
           const wrapper = Wrapper()
-          wrapper.setData({
-            cities: [
-              {
-                label: 'Berlin, Germany',
-                value: 'Berlin, Germany',
-                id: '1',
-              },
-            ],
-          })
-          await wrapper.vm.$nextTick()
-          wrapper.find('.ds-select-option').trigger('click')
+          wrapper.findComponent(LocationSelect).vm.$emit('input', 'Berlin, Germany')
           wrapper.find('.ds-form').trigger('submit')
 
           await expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
@@ -204,25 +195,9 @@ describe('index.vue', () => {
       describe('given new username, slug, location and about then hitting submit', () => {
         it('calls updateUser mutation', async () => {
           const wrapper = Wrapper()
-
-          wrapper.setData({
-            cities: [
-              {
-                label: 'Berlin, Germany',
-                value: 'Berlin, Germany',
-                id: '1',
-              },
-              {
-                label: 'Hamburg, Germany',
-                value: 'Hamburg, Germany',
-                id: '2',
-              },
-            ],
-          })
-          await wrapper.vm.$nextTick()
           wrapper.find('#name').setValue('Peter')
           wrapper.find('#slug').setValue('peter-der-lustige')
-          wrapper.findAll('.ds-select-option').at(1).trigger('click')
+          await wrapper.findComponent(LocationSelect).vm.$emit('input', 'Hamburg, Germany')
           wrapper.find('#about').setValue('I am Peter!111elf')
           wrapper.find('.ds-form').trigger('submit')
 
