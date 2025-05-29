@@ -438,25 +438,10 @@ export default {
             const fileName = src.split('/').pop()
             const blob = await urlToBlob(src)
             return {
-              name: fileName,
-              type: 'image/jpeg',
-              upload: {
-                uuid: 'c0a81271-3901-456d-b642-1fbebdf29097',
-                progress: 0,
-                total: 779384,
-                bytesSent: 0,
-                filename: '299551939_5382369645175932_651167422159851441_n.jpeg',
-                chunked: false,
-                totalChunkCount: 1,
-              },
-            }
-            /*
-            return {
-              upload: new File([blob], fileName, { type: 'image/jpeg' }),
+              upload: blob,
               name: fileName,
               type: 'image/jpeg',
             }
-            */
           }),
       )
 
