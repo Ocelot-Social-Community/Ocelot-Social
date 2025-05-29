@@ -1,7 +1,7 @@
 name: ocelot.social webapp test CI
 
 
-on: [push]
+on: push
 
 jobs:
   files-changed:
@@ -11,10 +11,10 @@ jobs:
       docker: ${{ steps.changes.outputs.docker }}
       webapp: ${{ steps.changes.outputs.webapp }}
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
 
       - name: Check for frontend file changes
-        uses: dorny/paths-filter@v2.11.1
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
         id: changes
         with:
           token: ${{ github.token }}
@@ -23,79 +23,96 @@ jobs:
 
   prepare:
     name: Prepare
-    if: needs.files-changed.outputs.webapp
+    if: needs.files-changed.outputs.webapp == 'true'
     needs: files-changed
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
 
       - name: Check translation files
         run: |
           scripts/translations/sort.sh
           scripts/translations/missing-keys.sh
-          
+
   build_test_webapp:
     name: Docker Build Test - Webapp
-    if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp
+    if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true'
     needs: [files-changed, prepare]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
 
-      - name: webapp | Build 'test' image
+      - name: Webapp | Build 'test' image
         run: |
           docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
           docker save "ocelotsocialnetwork/webapp:test" > /tmp/webapp.tar
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+      - name: Cache docker image
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
-          name: docker-webapp-test
           path: /tmp/webapp.tar
+          key: ${{ github.run_id }}-webapp-cache
 
   lint_webapp:
     name: Lint Webapp
-    if: needs.files-changed.outputs.webapp
+    if: needs.files-changed.outputs.webapp == 'true'
     needs: files-changed
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
 
       - name: webapp | Lint
         run: cd webapp && yarn && yarn run lint
 
   unit_test_webapp:
     name: Unit Tests - Webapp
-    if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp
+    if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true'
     needs: [files-changed, build_test_webapp]
     runs-on: ubuntu-latest
     permissions: 
       checks: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
 
-      - name: Download Docker Image (Webapp)
-        uses: actions/download-artifact@v3
+      - name: Restore webapp cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
-          name: docker-webapp-test
-          path: /tmp
+          path: /tmp/webapp.tar
+          key: ${{ github.run_id }}-webapp-cache
 
       - name: Load Docker Image
         run: docker load < /tmp/webapp.tar
 
-      - name: backend | copy env files webapp
-        run: cp webapp/.env.template webapp/.env
+      - name: Copy env files
+        run: |
+          cp webapp/.env.template webapp/.env
+          cp frontend/.env.dist frontend/.env
+          cp backend/.env.template backend/.env
 
-      - name: backend | copy env files backend
-        run: cp backend/.env.template backend/.env
-
-      - name: backend | docker-compose
-        run: docker-compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp
+      - name: backend | docker compose
+        # doesn't work without the --build flag - this either means we should not load the cached images or cache the correct image
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach --no-deps webapp --build
 
       - name: webapp | Unit tests incl. coverage check
-        run: docker-compose exec -T webapp yarn test
+        run: docker compose exec -T webapp yarn test
+
+  cleanup:
+    name: Cleanup
+    if: ${{ needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true' }}
+    needs: [files-changed, unit_test_webapp]
+    runs-on: ubuntu-latest
+    permissions: write-all
+    continue-on-error: true
+    steps:
+      - name: Delete cache
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh extension install actions/gh-actions-cache
+          KEY="${{ github.run_id }}-webapp-cache"
+          gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
 

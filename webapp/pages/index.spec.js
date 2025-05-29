@@ -36,8 +36,13 @@ describe('PostIndex', () => {
         'auth/user': () => {
           return { id: 'u23' }
         },
+        'categories/categoriesActive': () => true,
+        'categories/categories': () => ['cat1', 'cat2', 'cat3'],
       },
       mutations,
+      actions: {
+        'categories/init': jest.fn(),
+      },
     })
     mocks = {
       $t: (key) => key,
@@ -79,9 +84,6 @@ describe('PostIndex', () => {
       $route: {
         query: {},
       },
-      $env: {
-        CATEGORIES_ACTIVE: true,
-      },
     }
   })
 
@@ -114,11 +116,11 @@ describe('PostIndex', () => {
       })
 
       it('resets the category filter', () => {
-        expect(mutations['posts/RESET_CATEGORIES']).toBeCalled()
+        expect(mutations['posts/RESET_CATEGORIES']).toHaveBeenCalled()
       })
 
       it('sets the category', () => {
-        expect(mutations['posts/TOGGLE_CATEGORY']).toBeCalledWith({}, 'cat3')
+        expect(mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledWith({}, 'cat3')
       })
     })
   })

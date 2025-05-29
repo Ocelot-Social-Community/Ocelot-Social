@@ -39,15 +39,17 @@ describe('post/_id.vue', () => {
             }),
           },
         },
-        $env: {
-          CATEGORIES_ACTIVE: false,
-        },
       }
       store = new Vuex.Store({
         getters: {
           'auth/user': () => {
             return { id: userId }
           },
+          'categories/categories': jest.fn(() => []),
+          'categories/categoriesActive': () => false,
+        },
+        actions: {
+          'categories/init': jest.fn(),
         },
       })
       if (asyncData) {
@@ -76,7 +78,10 @@ describe('post/_id.vue', () => {
       authorId = 'some-author'
       userId = 'some-user'
       wrapper = await Wrapper()
-      expect(error).toBeCalledWith({ message: 'error-pages.cannot-edit-post', statusCode: 403 })
+      expect(error).toHaveBeenCalledWith({
+        message: 'error-pages.cannot-edit-post',
+        statusCode: 403,
+      })
     })
 
     it('renders with asyncData of same user', async () => {

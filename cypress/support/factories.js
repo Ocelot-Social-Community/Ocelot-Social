@@ -1,5 +1,5 @@
-import Factory from '../../backend/build/db/factories'
-import { getNeode } from '../../backend/build/db/neo4j'
+import Factory from '../../backend/build/src/db/factories'
+import { getNeode } from '../../backend/build/src/db/neo4j'
 
 const neodeInstance = getNeode()
 

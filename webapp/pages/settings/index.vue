@@ -7,7 +7,11 @@
           id="name"
           model="name"
           icon="user"
-          :label="$t('settings.data.labelName')"
+          :label="
+            $env.ASK_FOR_REAL_NAME
+              ? $t('settings.data.realNamePlease')
+              : $t('settings.data.labelName')
+          "
           :placeholder="$t('settings.data.namePlaceholder')"
         />
         <ds-input id="slug" model="slug" icon="at" :label="$t('settings.data.labelSlug')" />
@@ -34,10 +38,12 @@ import { mapGetters, mapMutations } from 'vuex'
 import UniqueSlugForm from '~/components/utils/UniqueSlugForm'
 import LocationSelect from '~/components/Select/LocationSelect'
 import { updateUserMutation } from '~/graphql/User'
+import scrollToContent from './scroll-to-content.js'
 
 let timeout
 
 export default {
+  mixins: [scrollToContent],
   name: 'NewsFeed',
   components: {
     LocationSelect
@@ -94,13 +100,9 @@ export default {
             about,
           },
           update: (store, { data: { UpdateUser } }) => {
-            const { name, slug, locationName, about } = UpdateUser
             this.setCurrentUser({
               ...this.currentUser,
-              name,
-              slug,
-              locationName,
-              about,
+              ...UpdateUser,
             })
           },
         })

@@ -1,0 +1,40 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`LogoAvatar > renders 1`] = `
+<div
+  class="v-application v-theme--light v-layout v-layout--full-height v-locale--is-ltr"
+>
+  <div
+    class="v-application__wrap"
+  >
+    
+    <main
+      class="v-main bg-grey-lighten-3"
+      style="--v-layout-left: 0px; --v-layout-right: 0px; --v-layout-top: 0px; --v-layout-bottom: 0px; transition: none !important;"
+    >
+      
+      <div
+        class="v-container v-locale--is-ltr"
+      >
+        <div
+          class="v-row"
+        >
+          <!--v-if-->
+          <div
+            class="v-col"
+          >
+            <div
+              class="v-sheet v-theme--light v-sheet--rounded pa-3"
+            >
+              
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </main>
+    
+  </div>
+</div>
+`;

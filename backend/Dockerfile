@@ -1,103 +1,47 @@
-##################################################################################
-# BASE (Is pushed to DockerHub for rebranding) ###################################
-##################################################################################
-FROM node:20.2.0-alpine3.17 as base
-
-# ENVs
-## DOCKER_WORKDIR would be a classical ARG, but that is not multi layer persistent - shame
-ENV DOCKER_WORKDIR="/app"
-## We Cannot do `$(date -u +'%Y-%m-%dT%H:%M:%SZ')` here so we use unix timestamp=0
-ARG BBUILD_DATE="1970-01-01T00:00:00.00Z"
-ENV BUILD_DATE=$BBUILD_DATE
-## We cannot do $(yarn run version)-${BUILD_NUMBER} here so we default to 0.0.0-0
-ARG BBUILD_VERSION="0.0.0-0"
-ENV BUILD_VERSION=$BBUILD_VERSION
-## We cannot do `$(git rev-parse --short HEAD)` here so we default to 0000000
-ARG BBUILD_COMMIT="0000000"
-ENV BUILD_COMMIT=$BBUILD_COMMIT
-## SET NODE_ENV
-ENV NODE_ENV="production"
-## App relevant Envs
-ENV PORT="4000"
-
-# Labels
-LABEL org.label-schema.build-date="${BUILD_DATE}"
+FROM node:24.0.2-alpine AS base
 LABEL org.label-schema.name="ocelot.social:backend"
 LABEL org.label-schema.description="Backend of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
 LABEL org.label-schema.url="https://ocelot.social"
 LABEL org.label-schema.vcs-url="https://github.com/Ocelot-Social-Community/Ocelot-Social/tree/master/backend"
-LABEL org.label-schema.vcs-ref="${BUILD_COMMIT}"
 LABEL org.label-schema.vendor="ocelot.social Community"
-LABEL org.label-schema.version="${BUILD_VERSION}"
 LABEL org.label-schema.schema-version="1.0"
 LABEL maintainer="devops@ocelot.social"
-
-# Install Additional Software
-## install: git
-RUN apk --no-cache add git python3 make g++
-
-# Settings
-## Expose Container Port
+ENV NODE_ENV="production"
+ENV PORT="4000"
 EXPOSE ${PORT}
+RUN apk --no-cache add git python3 make g++ bash linux-headers
+RUN mkdir -p /app
+WORKDIR /app
+CMD ["/bin/bash", "-c", "yarn run start"]
 
-## Workdir
-RUN mkdir -p ${DOCKER_WORKDIR}
-WORKDIR ${DOCKER_WORKDIR}
+FROM base AS development
+CMD ["/bin/sh", "-c", "yarn install && yarn run dev"]
 
-##################################################################################
-# DEVELOPMENT (Connected to the local environment, to reload on demand) ##########
-##################################################################################
-FROM base as development
-
-# We don't need to copy or build anything since we gonna bind to the
-# local filesystem which will need a rebuild anyway
-
-# Run command
-# (for development we need to execute yarn install since the
-#  node_modules are on another volume and need updating)
-CMD /bin/sh -c "yarn install && yarn run dev"
-
-##################################################################################
-# CODE (Does contain all code files and is pushed to DockerHub for rebranding) ###
-##################################################################################
-FROM base as code
-
-# copy everything, but do not build.
+FROM base AS build
 COPY . .
+ONBUILD COPY ./branding/constants/ src/config/tmp
+# copy categories to brand them (use yarn prod:db:data:categories)
+ONBUILD COPY ./branding/constants/ src/constants/
+ONBUILD RUN tools/replace-constants.sh
+ONBUILD COPY ./branding/email/ src/middleware/helpers/email/
+ONBUILD COPY ./branding/middlewares/ src/middleware/branding/
+ONBUILD COPY ./branding/data/ src/db/data
+ONBUILD COPY ./branding/public/ public/
+ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
+ONBUILD RUN yarn run build
+ONBUILD RUN mkdir /build
+ONBUILD RUN cp -r ./build /build
+ONBUILD RUN cp -r ./public /build
+ONBUILD RUN cp -r ./package.json yarn.lock /build
+ONBUILD RUN cd /build && yarn install --production=true --frozen-lockfile --non-interactive
 
-##################################################################################
-# BUILD (Does contain all files and the compilate and is therefore bloated) ######
-##################################################################################
-FROM code as build
+FROM build AS test
+# required for the migrations
+# ONBUILD RUN cp -r ./src /src
+CMD ["/bin/bash", "-c", "yarn run dev"]
 
-# yarn install
-RUN yarn install --production=false --frozen-lockfile --non-interactive
-# yarn build
-RUN /bin/sh -c "yarn run build"
+FROM build AS production_build
 
-##################################################################################
-# TEST ###########################################################################
-##################################################################################
-FROM build as test
-
-# Run command
-CMD /bin/sh -c "yarn run dev"
-
-##################################################################################
-# PRODUCTION (Does contain only "binary"- and static-files to reduce image size) #
-##################################################################################
-FROM base as production
-
-# Copy "binary"-files from build image
-COPY --from=build ${DOCKER_WORKDIR}/build ./build
-COPY --from=build ${DOCKER_WORKDIR}/node_modules ./node_modules
-# Copy static files
-# TODO - externalize the uploads so we can copy the whole folder
-COPY --from=build ${DOCKER_WORKDIR}/public/img/ ./public/img/
-COPY --from=build ${DOCKER_WORKDIR}/public/providers.json ./public/providers.json
-# Copy package.json for script definitions (lock file should not be needed)
-COPY --from=build ${DOCKER_WORKDIR}/package.json ./package.json
-
-# Run command
-CMD /bin/sh -c "yarn run start"
+FROM base AS production
+COPY --from=production_build /build .

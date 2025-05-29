@@ -1,4 +1,6 @@
-import { getDriver } from '../../db/neo4j'
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+
+import { getDriver } from '@db/neo4j'
 
 export const description = `
   This migration creates a MUTED relationship between two edges(:User) that have a pre-existing BLOCKED relationship.
@@ -8,7 +10,7 @@ export const description = `
   A blocked user will still be able to see your contributions, but will not be able to interact with them and vice versa.
 `
 
-export async function up(next) {
+export async function up(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
@@ -21,6 +23,7 @@ export async function up(next) {
       `,
     )
     await transaction.commit()
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
@@ -28,19 +31,20 @@ export async function up(next) {
     // eslint-disable-next-line no-console
     console.log('rolled back')
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
-export function down(next) {
+export async function down(next) {
   const driver = getDriver()
   const session = driver.session()
   try {
     // Rollback your migration here.
-    next()
+    // next()
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
     next(err)
   } finally {
-    session.close()
+    await session.close()
   }
 }

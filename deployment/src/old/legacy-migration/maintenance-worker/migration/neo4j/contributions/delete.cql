@@ -1,2 +1,0 @@
-MATCH (n:Post) DETACH DELETE n;
-MATCH (n:Tag) DETACH DELETE n;

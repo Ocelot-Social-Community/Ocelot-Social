@@ -156,9 +156,11 @@ import Editor from '~/components/Editor/Editor'
 import ActionRadiusSelect from '~/components/Select/ActionRadiusSelect'
 import LocationSelect from '~/components/Select/LocationSelect'
 import { queryLocations } from '~/graphql/location'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   name: 'GroupForm',
+  mixins: [GetCategories],
   components: {
     CategoriesSelect,
     Editor,
@@ -181,7 +183,6 @@ export default {
     const { name, slug, groupType, about, description, actionRadius, locationName, categories } =
       this.group
     return {
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
       disabled: false,
       groupTypeOptions: ['public', 'closed', 'hidden'],
       loadingGeo: false,
@@ -239,8 +240,8 @@ export default {
       return isNestedValue
         ? this.formData.locationName.value
         : isDirectString
-        ? this.formData.locationName
-        : ''
+          ? this.formData.locationName
+          : ''
     },
     descriptionLength() {
       return this.$filters.removeHtml(this.formData.description).length

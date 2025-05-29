@@ -1,6 +1,6 @@
 <template>
   <ds-text class="date-time-range" align="left" color="soft" :size="size">
-    <div>
+    <div class="date-time-row">
       <div>
         <base-icon name="calendar" data-test="calendar" />
         {{ getStartDateString }}
@@ -14,8 +14,8 @@
       </div>
     </div>
     <template v-if="!isSameDayLocal">
-      &nbsp;&mdash;&nbsp;
-      <div>
+      <base-icon name="arrow-down" />
+      <div class="ds-flex date-time-row">
         <div>
           <base-icon name="calendar" data-test="calendar" />
           {{ getEndDateString }}
@@ -69,11 +69,7 @@ export default {
       return !this.endDateAsDate || isSameYear(this.endDateAsDate, this.startDateAsDate)
     },
     getStartDateString() {
-      let startDateFormat = this.$t('components.dateTimeRange.yearMonthDay')
-      if (!this.isSameDayLocal && this.isSameYearLocal) {
-        startDateFormat = this.$t('components.dateTimeRange.monthDay')
-      }
-      return format(this.startDateAsDate, startDateFormat)
+      return format(this.startDateAsDate, this.$t('components.dateTimeRange.yearMonthDay'))
     },
     getStartTimeString() {
       return format(new Date(this.startDate), this.$t('components.dateTimeRange.hourMinute'))
@@ -95,7 +91,12 @@ export default {
 <style lang="scss">
 .date-time-range {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 2px;
+
+  .date-time-row {
+    display: flex;
+    gap: 10px;
+  }
 }
 </style>

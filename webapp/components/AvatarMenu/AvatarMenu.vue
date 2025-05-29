@@ -93,7 +93,17 @@ export default {
           icon: 'users',
         },
         {
-          name: this.$t('notifications.pageLink'),
+          name: this.$t('header.avatarMenu.map'),
+          path: `/map`,
+          icon: 'globe',
+        },
+        {
+          name: this.$t('header.avatarMenu.chats'),
+          path: `/chat`,
+          icon: 'chat-bubble',
+        },
+        {
+          name: this.$t('header.avatarMenu.notifications'),
           path: '/notifications',
           icon: 'bell',
         },
@@ -158,10 +168,10 @@ export default {
     background-color: $color-neutral-90;
   }
   .logout-link {
-    color: $text-color-base;
+    color: $text-color-danger;
     padding-top: $space-xx-small;
     &:hover {
-      color: $text-color-link-active;
+      color: color.adjust($text-color-danger, $lightness: -10%);
     }
   }
 }

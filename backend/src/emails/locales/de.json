@@ -1,0 +1,72 @@
+{
+  "notification": "Benachrichtigung",
+  "subjects": {
+    "changedGroupMemberRole": "Rolle in Gruppe geändert",
+    "chatMessage": "Neue Chat Nachricht",
+    "commentedOnPost": "Neuer Kommentar zu Beitrag",
+    "followedUserPosted": "Neuer Beitrag von gefolgtem Nutzer",
+    "mentionedInComment": "Erwähnung in Kommentar",
+    "mentionedInPost": "Erwähnung in Beitrag",
+    "newEmail": "Neue E-Mail Addresse",
+    "removedUserFromGroup": "Aus Gruppe entfernt",
+    "postInGroup": "Neuer Beitrag in Gruppe",
+    "resetPassword": "Neues Passwort",
+    "userJoinedGroup": "Nutzer tritt Gruppe bei",
+    "userLeftGroup": "Nutzer verlässt Gruppe",
+    "wrongEmail": "Falsche Mailaddresse?"
+  },
+  "registration": {
+    "introduction": "Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können … Bitte bestätige deine E-Mail Adresse:",
+    "codeHint": "Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in dein Browserfenster kopieren: ",
+    "codeHintException": "Das funktioniert allerdings nur, wenn du dich über unsere Website registriert hast.",
+    "notYouStart": "Falls du dich nicht selbst bei ",
+    "notYouEnd": " angemeldet hast, schau doch mal vorbei! Wir sind ein gemeinnütziges Aktionsnetzwerk – von Menschen für Menschen.",
+    "ps": "PS: Wenn du keinen Account bei uns möchtest, kannst du diese E-Mail einfach ignorieren. ;)"
+  },
+  "emailVerification": {
+    "codeHint": "Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in dein Browserfenster kopieren: ",
+    "introduction": "Du möchtest also deine E-Mail ändern? Kein Problem! Mit Klick auf diesen Button kannst du deine neue E-Mail Adresse bestätigen:",
+    "doNotChange": "Falls du deine E-Mail Adresse doch nicht ändern möchtest, kannst du diese Nachricht einfach ignorieren. "
+  },
+  "support": "Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: ",
+  "buttons": {
+    "confirmEmail": "Bestätige deine E-Mail Adresse",
+    "resetPassword": "Passwort zurücksetzen",
+    "tryAgain": "Versuch' es mit einer anderen E-Mail",
+    "verifyEmail": "E-Mail Adresse bestätigen",
+    "viewChat": "Chat anzeigen",
+    "viewComment": "Kommentar ansehen",
+    "viewGroup": "Gruppe ansehen",
+    "viewPost": "Beitrag ansehen"
+  },
+  "general": {
+    "greeting": "Hallo",
+    "seeYou": "Bis bald bei ",
+    "yourTeam": "– Dein {team} Team",
+    "settingsHint": "PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine ",
+    "settingsName": "Benachrichtigungseinstellungen",
+    "welcome": "Willkommen bei"
+  },
+  "resetPassword": {
+    "codeHint": "Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in dein Browserfenster kopieren: ",
+    "ignore": "Falls du kein neues Passwort angefordert hast, kannst du diese E-Mail einfach ignorieren.",
+    "introduction": "Du hast also dein Passwort vergessen? Kein Problem! Mit Klick auf diesen Button kannst du innerhalb der nächsten 24 Stunden dein Passwort zurücksetzen:"
+  },
+  "wrongEmail": {
+    "codeHint": "Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in dein Browserfenster kopieren: ",
+    "ignoreEnd": " hast oder dein Password gar nicht ändern willst, kannst du diese E-Mail einfach ignorieren!",
+    "ignoreStart": "Wenn du noch keinen Account bei ",
+    "introduction": "Du hast bei uns ein neues Passwort angefordert – leider haben wir aber keinen Account mit deiner E-Mailadresse gefunden. Kann es sein, dass du mit einer anderen Adresse bei uns angemeldet bist?"
+  },
+  "changedGroupMemberRole": "deine Rolle in der Gruppe „{groupName}“ wurde geändert. Klicke auf den Knopf, um diese Gruppe zu sehen:",
+  "chatMessageStart": "du hast eine neue Chat-Nachricht von ",
+  "chatMessageEnd": " erhalten.",
+  "commentedOnPost": " hat einen Beitrag den du beobachtest mit dem Titel „{postTitle}“ kommentiert. Klicke auf den Knopf, um diesen Kommentar zu sehen:",
+  "followedUserPosted": ", ein Nutzer dem du folgst, hat einen neuen Beitrag mit dem Titel „{postTitle}“ geschrieben. Klicke auf den Knopf, um diesen Beitrag zu sehen:",
+  "mentionedInComment": " hat dich in einem Kommentar zu dem Beitrag mit dem Titel „{postTitle}“ erwähnt. Klicke auf den Knopf, um den Kommentar zu sehen:",
+  "mentionedInPost": " hat dich in einem Beitrag mit dem Titel „{postTitle}“ erwähnt. Klicke auf den Knopf, um den Beitrag zu sehen:",
+  "postInGroup": "jemand hat einen neuen Beitrag mit dem Titel „{postTitle}“ in einer deiner Gruppen geschrieben. Klicke auf den Knopf, um diesen Beitrag zu sehen:",
+  "removedUserFromGroup": "du wurdest aus der Gruppe „{groupName}“ entfernt.",
+  "userJoinedGroup": " ist der Gruppe „{groupName}“ beigetreten. Klicke auf den Knopf, um diese Gruppe zu sehen:",
+  "userLeftGroup": " hat die Gruppe „{groupName}“ verlassen. Klicke auf den Knopf, um diese Gruppe zu sehen:"
+}

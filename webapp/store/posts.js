@@ -47,6 +47,16 @@ export const mutations = {
     delete filter.categories_some
     state.filter = filter
   },
+  RESET_FOLLOWERS_FILTER(state) {
+    const filter = clone(state.filter)
+    if (get(filter, 'postsInMyGroups')) {
+      delete filter.postsInMyGroups
+    }
+    if (get(filter, 'author.followedBy_some.id')) {
+      delete filter.author
+    }
+    state.filter = filter
+  },
   RESET_EMOTIONS(state) {
     const filter = clone(state.filter)
     delete filter.emotions_some

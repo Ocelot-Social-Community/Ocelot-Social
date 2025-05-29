@@ -1,4 +1,9 @@
-import { getDriver } from '../../db/neo4j'
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+
+import { getDriver } from '@db/neo4j'
 
 export const description = `
 This migration swaps the value stored in Location.lat with the value

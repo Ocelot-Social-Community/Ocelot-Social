@@ -8,7 +8,6 @@
             :disabled="disabled && !update"
             @click="handleCancel"
             data-test="cancel-button"
-            danger
           >
             {{ $t('actions.cancel') }}
           </base-button>

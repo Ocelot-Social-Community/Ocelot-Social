@@ -28,8 +28,8 @@ export default {
       return this.forceTargetBlank
         ? '_blank'
         : !this.pageParams.isInternalPage
-        ? this.pageParams.externalLink.target
-        : ''
+          ? this.pageParams.externalLink.target
+          : ''
     },
     isInternalLink() {
       return !this.forceTargetBlank && this.pageParams.isInternalPage

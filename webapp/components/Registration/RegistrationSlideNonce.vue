@@ -18,6 +18,9 @@
     <ds-text>
       {{ $t('components.registration.email-nonce.form.description') }}
     </ds-text>
+    <ds-text>
+      {{ $t('components.registration.email-nonce.form.click-next') }}
+    </ds-text>
     <slot></slot>
     <ds-space margin="xxx-small" />
   </ds-form>
@@ -26,7 +29,7 @@
 <script>
 import gql from 'graphql-tag'
 import { isEmail } from 'validator'
-import CONSTANTS_REGISTRATION from './../../constants/registration'
+import registrationConstants from '~/constants/registration'
 
 import EmailDisplayAndVerify from './EmailDisplayAndVerify'
 
@@ -51,11 +54,11 @@ export default {
       formSchema: {
         nonce: {
           type: 'string',
-          min: CONSTANTS_REGISTRATION.NONCE_LENGTH,
-          max: CONSTANTS_REGISTRATION.NONCE_LENGTH,
+          min: registrationConstants.NONCE_LENGTH,
+          max: registrationConstants.NONCE_LENGTH,
           required: true,
           message: this.$t('components.registration.email-nonce.form.validations.length', {
-            nonceLength: CONSTANTS_REGISTRATION.NONCE_LENGTH,
+            nonceLength: registrationConstants.NONCE_LENGTH,
           }),
         },
       },
@@ -63,17 +66,13 @@ export default {
     }
   },
   mounted: function () {
-    this.$nextTick(function () {
-      // Code that will run only after the entire view has been rendered
+    this.formData.nonce = this.sliderData.collectedInputData.nonce
+      ? this.sliderData.collectedInputData.nonce
+      : ''
+    this.sendValidation()
 
-      this.formData.nonce = this.sliderData.collectedInputData.nonce
-        ? this.sliderData.collectedInputData.nonce
-        : ''
-      this.sendValidation()
-
-      this.sliderData.setSliderValuesCallback(this.validInput, {
-        sliderSettings: { buttonSliderCallback: this.onNextClick },
-      })
+    this.sliderData.setSliderValuesCallback(this.validInput, {
+      sliderSettings: { buttonSliderCallback: this.onNextClick },
     })
   },
   computed: {
@@ -106,20 +105,11 @@ export default {
     async handleInputValid() {
       this.sendValidation()
     },
-    isVariablesRequested(variables) {
-      return (
-        this.sliderData.sliders[this.sliderIndex].data.request &&
-        this.sliderData.sliders[this.sliderIndex].data.request.variables &&
-        this.sliderData.sliders[this.sliderIndex].data.request.variables.email ===
-          variables.email &&
-        this.sliderData.sliders[this.sliderIndex].data.request.variables.nonce === variables.nonce
-      )
-    },
     async handleSubmitVerify() {
       const { email, nonce } = this.sliderData.collectedInputData
       const variables = { email, nonce }
 
-      if (!this.isVariablesRequested(variables) && !this.dbRequestInProgress) {
+      if (!this.dbRequestInProgress) {
         try {
           this.dbRequestInProgress = true
 

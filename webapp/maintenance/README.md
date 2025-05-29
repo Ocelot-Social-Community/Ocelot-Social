@@ -8,8 +8,8 @@ The maintenance mode shows a translatable page that tells the user that we are r
 
 At the moment the maintenance mode can only be locally tested with Docker-Compose.
 
-{% tabs %}
-{% tab title="Locally Without Docker" %}
+::: tabs
+@tab:active Locally Without Docker
 
 {% hint style="info" %}
 TODO: Implement a locally running maintenance mode! Without Docker …
@@ -25,8 +25,7 @@ $ yarn generate:maintenance
 … is unfortunatelly **not(!)** working at the moment.
 This is because the code is rewritten to be easy usable for Docker-Compose. Therefore we lost this possibility.
 
-{% endtab %}
-{% tab title="Locally With Docker" %}
+@tab Locally With Docker
 
 To get the maintenance mode running use the command:
 
@@ -37,3 +36,5 @@ $ docker-compose up
 
 And the maintenance mode page or service will be started as well in an own container.
 In the browser you can reach it under `http://localhost:3001/`.
+
+:::

@@ -8,7 +8,7 @@
       <!-- header menu -->
       <ds-flex v-if="!showMobileMenu" class="main-navigation-flex">
         <!-- logo -->
-        <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
+        <ds-flex-item class="logo-wrapper" :width="{ base: 'auto' }">
           <a
             v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
             :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
@@ -48,13 +48,7 @@
           v-if="isLoggedIn"
           id="nav-search-box"
           class="header-search"
-          :width="{
-            base: '45%',
-            sm: '40%',
-            md: isHeaderMenu ? 'auto' : '40%',
-            lg: isHeaderMenu ? 'auto' : '50%',
-          }"
-          style="flex-shrink: 0; flex-grow: 1"
+          :width="{ base: 'auto' }"
         >
           <search-field />
         </ds-flex-item>
@@ -69,11 +63,15 @@
           </client-only>
         </ds-flex-item>
         <!-- right symbols -->
-        <ds-flex-item style="flex-basis: auto">
+        <ds-flex-item style="flex: none">
           <div class="main-navigation-right" style="flex-basis: auto">
             <!-- locale switch -->
             <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
             <template v-if="isLoggedIn">
+              <!-- chat menu -->
+              <client-only>
+                <chat-notification-menu placement="top" />
+              </client-only>
               <!-- notification menu -->
               <client-only>
                 <notification-menu placement="top" />
@@ -92,6 +90,10 @@
               <client-only v-if="!isEmpty(this.$env.MAPBOX_TOKEN)">
                 <map-button />
               </client-only>
+              <!-- custom button -->
+              <client-only v-if="!isEmpty(customButton)">
+                <custom-button :settings="customButton" />
+              </client-only>
               <!-- avatar menu -->
               <client-only>
                 <avatar-menu placement="top" />
@@ -105,7 +107,7 @@
       <div v-else class="mobil-header-box">
         <!-- logo, hamburger-->
         <ds-flex style="align-items: center">
-          <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" style="margin-right: 20px">
+          <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" class="logo-container">
             <div @click="toggleMobileMenu ? toggleMobileMenuView() : ''">
               <a
                 v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
@@ -127,11 +129,22 @@
           <!-- mobile hamburger menu -->
           <ds-flex-item class="mobile-hamburger-menu">
             <client-only>
-              <div style="display: inline-flex; padding-right: 20px">
-                <notification-menu />
+              <!-- chat menu -->
+              <div>
+                <chat-notification-menu />
+              </div>
+              <!-- notification menu -->
+              <div>
+                <notification-menu no-menu />
               </div>
             </client-only>
-            <base-button icon="bars" @click="toggleMobileMenuView" circle />
+            <!-- hamburger menu -->
+            <base-button
+              icon="bars"
+              @click="toggleMobileMenuView"
+              circle
+              class="hamburger-button"
+            />
           </ds-flex-item>
         </ds-flex>
         <!-- search, filter -->
@@ -167,6 +180,7 @@
           </ds-flex-item>
           <!-- invite button mobile -->
           <ds-flex-item
+            v-if="inviteRegistration"
             :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
             style="text-align: center"
           >
@@ -195,6 +209,18 @@
             <client-only>
               <div @click="toggleMobileMenuView">
                 <map-button />
+              </div>
+            </client-only>
+          </ds-flex-item>
+          <!-- custom button -->
+          <ds-flex-item
+            v-if="!isEmpty(customButton)"
+            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+            style="text-align: center"
+          >
+            <client-only>
+              <div @click="toggleMobileMenuView">
+                <custom-button :settings="customButton" />
               </div>
             </client-only>
           </ds-flex-item>
@@ -252,11 +278,13 @@ import { mapGetters } from 'vuex'
 import isEmpty from 'lodash/isEmpty'
 import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
 import { SHOW_CONTENT_FILTER_HEADER_MENU } from '~/constants/filter.js'
-import LOGOS from '~/constants/logos.js'
-import headerMenu from '~/constants/headerMenu.js'
+import LOGOS from '~/constants/logosBranded.js'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
+import ChatNotificationMenu from '~/components/ChatNotificationMenu/ChatNotificationMenu'
+import CustomButton from '~/components/CustomButton/CustomButton'
 import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
 import GroupButton from '~/components/Group/GroupButton'
+import headerMenuBranded from '~/constants/headerMenuBranded.js'
 import InviteButton from '~/components/InviteButton/InviteButton'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
@@ -265,10 +293,14 @@ import SearchField from '~/components/features/SearchField/SearchField.vue'
 import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
 import links from '~/constants/links.js'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
+  mixins: [GetCategories],
   components: {
     AvatarMenu,
+    ChatNotificationMenu,
+    CustomButton,
     FilterMenu,
     GroupButton,
     InviteButton,
@@ -291,12 +323,12 @@ export default {
       LOGOS,
       SHOW_GROUP_BUTTON_IN_HEADER,
       SHOW_CONTENT_FILTER_HEADER_MENU,
-      isHeaderMenu: headerMenu.MENU.length > 0,
-      menu: headerMenu.MENU,
+      isHeaderMenu: headerMenuBranded.MENU.length > 0,
+      customButton: headerMenuBranded.CUSTOM_BUTTON,
+      menu: headerMenuBranded.MENU,
       mobileSearchVisible: false,
       toggleMobileMenu: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
     }
   },
   computed: {
@@ -346,7 +378,6 @@ export default {
   white-space: nowrap;
 }
 .topbar-locale-switch {
-  display: flex;
   margin-right: $space-xx-small;
   align-self: center;
   display: inline-flex;
@@ -355,21 +386,67 @@ export default {
   margin-top: $space-xx-small;
 }
 .main-navigation-flex {
+  display: flex;
   align-items: center;
+  flex-wrap: nowrap !important;
+  gap: 20px;
+  min-width: 0;
 }
+@media (max-width: 800px) {
+  .main-navigation-flex {
+    gap: 10px;
+  }
+}
+
+.logo-wrapper {
+  flex: 0 0 auto;
+}
+.branding-menu {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.header-search {
+  flex: 1 1 auto !important;
+}
+.navigation-actions {
+  flex: 0 0 auto;
+}
+
 .main-navigation-right {
   display: flex;
   justify-content: flex-end;
 }
-.main-navigation-right .desktop-view {
-  float: right;
-}
-.ds-flex-item.mobile-hamburger-menu {
-  margin-left: auto;
-  text-align: right;
-}
-.mobile-menu {
-  margin: 0 20px;
+
+// Mobile Header mit verbessertem Layout
+.mobil-header-box {
+  .logo-container {
+    flex: 1 1 auto;
+    min-width: 60px;
+    max-width: calc(100vw - 200px);
+  }
+
+  .mobile-hamburger-menu {
+    flex: 0 0 auto; // no shrinking
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+
+    > div {
+      flex-shrink: 0; // Buttons remain their size
+
+      button {
+        overflow: visible;
+        .svg {
+          height: 1.8em;
+        }
+      }
+    }
+  }
+  .hamburger-button .svg {
+    height: 1.5em;
+  }
 }
 .mobile-search {
   margin-top: 20px;

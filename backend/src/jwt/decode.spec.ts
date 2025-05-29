@@ -1,34 +1,15 @@
-import Factory, { cleanDatabase } from '../db/factories'
-import { getDriver, getNeode } from '../db/neo4j'
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import Factory, { cleanDatabase } from '@db/factories'
+import User from '@db/models/User'
+import { getDriver, getNeode } from '@db/neo4j'
+
 import decode from './decode'
+import encode from './encode'
 
 const driver = getDriver()
 const neode = getNeode()
-
-// here is the decoded JWT token:
-// {
-//   role: 'user',
-//   locationName: null,
-//   name: 'Jenny Rostock',
-//   about: null,
-//   avatar: 'https://s3.amazonaws.com/uifaces/faces/twitter/sasha_shestakov/128.jpg',
-//   id: 'u3',
-//   email: 'user@example.org',
-//   slug: 'jenny-rostock',
-//   iat: 1550846680,
-//   exp: 1637246680,
-//   aud: 'http://localhost:3000',
-//   iss: 'http://localhost:4000',
-//   sub: 'u3'
-// }
-// !!! if the token expires go into the GraphQL Playground in the browser at 'http://localhost:4000' with a running backend and a seeded Neo4j database
-//     now do the login mutation:
-//       mutation {
-//         login(email:"user@example.org", password:"1234")
-//       }
-//     replace this token here with the one you received as the result
-export const validAuthorizationHeader =
-  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InUzIiwibmFtZSI6Ikplbm55IFJvc3RvY2siLCJzbHVnIjoiamVubnktcm9zdG9jayIsImlhdCI6MTYzNzY0NDMwMCwiZXhwIjoxNzAwNzU5NTAwLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjQwMDAiLCJzdWIiOiJ1MyJ9.ispIfRfgkXuYoIhKx7x2jPxgvHDJVv1ogMycLmfUnsk'
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -36,7 +17,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
@@ -75,14 +56,8 @@ describe('decode', () => {
   })
 
   describe('given valid JWT Bearer token', () => {
-    beforeEach(() => {
-      authorizationHeader = validAuthorizationHeader
-    })
-
-    it('returns null', returnsNull)
-
     describe('and corresponding user in the database', () => {
-      let user
+      let user, validAuthorizationHeader
       beforeEach(async () => {
         user = await Factory.build(
           'user',
@@ -99,10 +74,11 @@ describe('decode', () => {
             email: 'user@example.org',
           },
         )
+        validAuthorizationHeader = encode(await user.toJson())
       })
 
       it('returns user object without email', async () => {
-        await expect(decode(driver, authorizationHeader)).resolves.toMatchObject({
+        await expect(decode(driver, validAuthorizationHeader)).resolves.toMatchObject({
           role: 'user',
           name: 'Jenny Rostock',
           id: 'u3',
@@ -111,26 +87,28 @@ describe('decode', () => {
       })
 
       it('sets `lastActiveAt`', async () => {
-        let user = await neode.first('User', { id: 'u3' })
+        let user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
         await expect(user.toJson()).resolves.not.toHaveProperty('lastActiveAt')
-        await decode(driver, authorizationHeader)
-        user = await neode.first('User', { id: 'u3' })
+        await decode(driver, validAuthorizationHeader)
+        user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
         await expect(user.toJson()).resolves.toMatchObject({
           lastActiveAt: expect.any(String),
         })
       })
 
       it('updates `lastActiveAt` for every authenticated request', async () => {
-        let user = await neode.first('User', { id: 'u3' })
+        let user = await neode.first('User', { id: 'u3' }, undefined)
         await user.update({
-          updatedAt: new Date().toISOString(),
-          lastActiveAt: '2019-10-03T23:33:08.598Z',
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          updatedAt: new Date().toISOString() as any,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          lastActiveAt: '2019-10-03T23:33:08.598Z' as any,
         })
         await expect(user.toJson()).resolves.toMatchObject({
           lastActiveAt: '2019-10-03T23:33:08.598Z',
         })
-        await decode(driver, authorizationHeader)
-        user = await neode.first('User', { id: 'u3' })
+        await decode(driver, validAuthorizationHeader)
+        user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
         await expect(user.toJson()).resolves.toMatchObject({
           // should be a different time by now ;)
           lastActiveAt: expect.not.stringContaining('2019-10-03T23:33'),
@@ -148,6 +126,15 @@ describe('decode', () => {
       describe('but user is disabled', () => {
         beforeEach(async () => {
           await user.update({ updatedAt: new Date().toISOString(), disabled: true })
+        })
+
+        it('returns null', returnsNull)
+      })
+
+      describe('and NO corresponding user in the database', () => {
+        beforeEach(async () => {
+          await cleanDatabase()
+          authorizationHeader = validAuthorizationHeader
         })
 
         it('returns null', returnsNull)

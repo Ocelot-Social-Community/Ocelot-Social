@@ -36,8 +36,8 @@ describe('logout.vue', () => {
     })
 
     it('logs out and redirects to login', () => {
-      expect(mocks.$store.dispatch).toBeCalledWith('auth/logout')
-      expect(mocks.$router.replace).toBeCalledWith('/login')
+      expect(mocks.$store.dispatch).toHaveBeenCalledWith('auth/logout')
+      expect(mocks.$router.replace).toHaveBeenCalledWith('/login')
     })
   })
 })

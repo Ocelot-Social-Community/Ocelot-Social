@@ -150,7 +150,7 @@ $font-size-xx-large: 2rem;
 $font-size-x-large: 1.5rem;
 $font-size-large: 1.25rem;
 $font-size-base: 1rem;
-$font-size-body: 15px;
+$font-size-body: 0.938rem;
 $font-size-small: 0.8rem;
 $font-size-x-small: 0.7rem;
 $font-size-xx-small: 0.6rem;
@@ -359,37 +359,37 @@ $media-query-medium: (min-width: 768px);
 $media-query-large: (min-width: 1024px);
 $media-query-x-large: (min-width: 1200px);
 
-/** 
+/**
  * @tokens Background Images
  */
 
-/** 
+/**
  * @tokens Header Color
  */
 
 $color-header-background: $color-neutral-100;
 
-/** 
+/**
  * @tokens Footer Color
  */
 
 $color-footer-background: $color-neutral-100;
 $color-footer-link: $color-primary;
 
-/** 
+/**
  * @tokens Locale Menu Color
  */
 
 $color-locale-menu: $text-color-soft;
 
-/** 
+/**
  * @tokens Donation Bar Color
  */
 
 $color-donation-bar: $color-primary;
 $color-donation-bar-light: $color-primary-light;
 
-/** 
+/**
  * @tokens Toast Color
  */
 
@@ -403,7 +403,29 @@ $color-toast-green: $color-success;
  * @tokens Ribbon Color
  */
 
-$color-ribbon-event: $background-color-third;
-$color-ribbon-event-active: $background-color-third-active;
-$color-ribbon-article: $background-color-secondary;
-$color-ribbon-article-active: $background-color-secondary-active;
+$color-ribbon-announcement: $background-color-warning;
+$color-ribbon-announcement-shadow: color.adjust($color-ribbon-announcement, $lightness: -20%,);
+$color-ribbon-article: $background-color-secondary-active;
+$color-ribbon-article-shadow: color.adjust($color-ribbon-article, $lightness: -20%);
+$color-ribbon-event: $background-color-third-active;
+$color-ribbon-event-shadow: color.adjust($color-ribbon-event, $lightness: -20%);
+
+/**
+ * @tokens Chat Color
+ */
+
+$chat-message-bg-me: $color-primary-light;
+$chat-message-color: $text-color-base;
+$chat-message-bg-others: $color-neutral-80;
+$chat-sidemenu-bg: white;
+$chat-sidemenu-background-over: '#f6f6f6';
+$chat-sidemenu-background-active: $color-primary-light;
+$chat-new-message-color: $color-secondary-active;
+$chat-message-timestamp: $text-color-soft;
+$chat-message-checkmark-seen: $text-color-secondary;
+$chat-message-checkmark: $text-color-soft;
+$chat-room-color-counter-badge: $text-color-inverse;
+$chat-room-background-counter-badge: $color-secondary;
+$chat-icon-add: $color-primary;
+$chat-icon-send: $color-primary;
+$chat-icon-emoji: $color-primary;

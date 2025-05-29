@@ -2,24 +2,30 @@
   <filter-menu-section class="order-by-filter" :title="sectionTitle" :divider="false">
     <template #filter-list>
       <li class="item">
-        <labeled-button
+        <base-button
           icon="check"
           :label="$t('filter-menu.ended.all.label')"
           :filled="!eventsEnded"
           :title="$t('filter-menu.ended.all.hint')"
           @click="toggleEventsEnded"
           data-test="all-button"
-        />
+          size="small"
+        >
+          {{ $t('filter-menu.ended.all.label') }}
+        </base-button>
       </li>
       <li class="item">
-        <labeled-button
+        <base-button
           icon="calendar"
           :label="$t('filter-menu.ended.onlyEnded.label')"
           :filled="eventsEnded"
           :title="$t('filter-menu.ended.onlyEnded.hint')"
           @click="toggleEventsEnded"
           data-test="not-ended-button"
-        />
+          size="small"
+        >
+          {{ $t('filter-menu.ended.onlyEnded.label') }}
+        </base-button>
       </li>
     </template>
   </filter-menu-section>
@@ -28,13 +34,11 @@
 <script>
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
-import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
 
 export default {
   name: 'EventsByFilter',
   components: {
     FilterMenuSection,
-    LabeledButton,
   },
   computed: {
     ...mapGetters({

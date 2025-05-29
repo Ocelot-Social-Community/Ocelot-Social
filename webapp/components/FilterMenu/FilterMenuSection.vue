@@ -61,28 +61,24 @@ export default {
 
   > .filter-list {
     display: flex;
-    flex-wrap: wrap;
     flex-basis: 100%;
     flex-grow: 1;
+    padding-left: $space-base;
 
     > .item {
-      width: 30%;
-      padding: 0 $space-x-small;
+      // width: 30%;
+      padding: 0 $space-xx-small;
       margin-bottom: $space-small;
       text-align: center;
 
       @media only screen and (min-width: 800px) {
-        width: 20%;
+        // width: 15%;
       }
     }
   }
 
   @media only screen and (max-width: 630px) {
     flex-direction: column;
-
-    > .title {
-      text-align: center;
-    }
 
     // > .sidebar {
     //   max-width: none;

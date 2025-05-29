@@ -1,8 +1,8 @@
-import { When } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-When("I choose {string} as the title", async title => {
+defineStep('I choose {string} as the title', title => {
   const lastPost = {}
-  lastPost.title = title.replace("\n", " ");
+  lastPost.title = title.replace('\n', ' ')
   cy.task('pushValue', { name: 'lastPost', value: lastPost })
-  cy.get('input[name="title"]').type(lastPost.title);
-});
+  cy.get('input[name="title"]').type(lastPost.title)
+})

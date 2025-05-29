@@ -16,6 +16,7 @@
         />
       </slot>
     </template>
+    <!-- eslint-disable-next-line vue/no-useless-template-attributes -->
     <template #popover="" class="legend">
       <div class="legend-container">
         <div class="legend-header">{{ $t(`editor.legend.legendTitle`) }}</div>

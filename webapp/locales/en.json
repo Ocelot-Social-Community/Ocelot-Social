@@ -6,25 +6,61 @@
     "edit": "Edit",
     "loading": "loading",
     "loadMore": "load more",
-    "save": "Save"
+    "save": "Save",
+    "saveCategories": "Save topics"
   },
   "admin": {
+    "badges": {
+      "description": "Configure the available badges for this user",
+      "noBadges": "There are no badges available",
+      "revokeTrophy": {
+        "error": "Trophy could not be revoked!",
+        "success": "Trophy successfully revoked!"
+      },
+      "revokeVerification": {
+        "error": "Verification could not be revoked!",
+        "success": "Verification succesfully revoked"
+      },
+      "rewardTrophy": {
+        "error": "Trophy could not be rewarded!",
+        "success": "Trophy successfully rewarded!"
+      },
+      "setVerification": {
+        "error": "Verification could not be set!",
+        "success": "Verification successfully set!"
+      },
+      "title": "Badges",
+      "trophyBadges": "Trophies",
+      "verificationBadges": "Verifications"
+    },
     "categories": {
       "categoryName": "Name",
       "name": "Topics",
       "postCount": "Posts"
     },
     "dashboard": {
+      "badgesDisplayed": "Badges Displayed",
+      "badgesRewarded": "Badges Rewarded",
+      "chatMessages": "Chat Messages",
+      "chatRooms": "Chat Rooms",
       "comments": "Comments",
+      "emails": "E-Mails",
       "follows": "Follows",
+      "groups": "Groups",
+      "inviteCodes": "Invite Codes",
+      "inviteCodesExpired": "Expired Invite Codes",
+      "inviteCodesRedeemed": "Redeemed Invite Codes",
       "invites": "Invites",
+      "locations": "Locations",
       "name": "Dashboard",
       "notifications": "Notifications",
-      "organizations": "Organizations",
       "posts": "Posts",
-      "projects": "Projects",
+      "reports": "Reports",
       "shouts": "Shouts",
-      "users": "Users"
+      "tags": "Tags",
+      "users": "Users",
+      "usersDeleted": "Users deleted",
+      "usersVerified": "Users verified"
     },
     "donations": {
       "goal": "Monthly donations needed",
@@ -67,6 +103,7 @@
       "roleChanged": "Role changed successfully!",
       "table": {
         "columns": {
+          "badges": "Badges",
           "createdAt": "Created at",
           "email": "E-mail",
           "name": "Name",
@@ -75,6 +112,28 @@
           "slug": "Slug"
         }
       }
+    }
+  },
+  "chat": {
+    "addRoomHeadline": "Search User for new Chat",
+    "cancelSelectMessage": "Cancel",
+    "conversationStarted": "Conversation started on:",
+    "isOnline": "is online",
+    "isTyping": "is writing...",
+    "lastSeen": "last seen ",
+    "messageDeleted": "This message was deleted",
+    "messagesEmpty": "No messages",
+    "newMessages": "New Messages",
+    "page": {
+      "headline": "Chat"
+    },
+    "roomEmpty": "No room selected",
+    "roomsEmpty": "No rooms",
+    "search": "Filter chat rooms",
+    "typeMessage": "Type message",
+    "userProfileButton": {
+      "label": "Chat",
+      "tooltip": "Chat with “{name}”"
     }
   },
   "client-only": {
@@ -149,7 +208,7 @@
         "buttonTitle": "Create",
         "error": "No user account could be created!",
         "help": " Maybe the confirmation was invalid? In case of problems, feel free to ask for help by sending us a mail to:",
-        "recieveCommunicationAsEmailsEtcConfirmed": "I also agree to receive e-mails and other forms of communication (e.g. push notifications).",
+        "receiveCommunicationAsEmailsEtcConfirmed": "I also agree to receive e-mails and other forms of communication (e.g. push notifications).",
         "success": "Your account has been created!",
         "termsAndCondsEtcConfirmed": "I have read, understand and agree to the following:",
         "title": "Create user account"
@@ -172,9 +231,10 @@
         "yourEmail": "Your e-mail address:"
       },
       "email-nonce": {
-        "buttonTitle": "Confirm",
+        "buttonTitle": "Continue",
         "form": {
-          "description": "Open your inbox and enter the code that we've sent to you.",
+          "click-next": "Click on Continue.",
+          "description": "Open your e-mail inbox and enter the code that we've sent to you.",
           "next": "Continue",
           "nonce": "E-mail code: 32143",
           "validations": {
@@ -196,7 +256,10 @@
             "length": "must be {inviteCodeLength} characters long",
             "success": "Valid invite code <b>{inviteCode}</b>!"
           }
-        }
+        },
+        "invited-by": "Invited by {invitedBy}.",
+        "invited-by-and-to": "Invited by {invitedBy} to group {invitedTo}.",
+        "invited-to-hidden-group": "Invited by {invitedBy} to a hidden group."
       },
       "no-public-registrstion": {
         "title": "No Public Registration"
@@ -218,10 +281,10 @@
     }
   },
   "contribution": {
-    "amount-clicks": "{amount} clicks",
-    "amount-comments": "{amount} comments",
-    "amount-shouts": "{amount} recommendations",
-    "amount-views": "{amount} views",
+    "amount-clicks": "{amount} Clicks",
+    "amount-comments": "{amount} Comments",
+    "amount-shouts": "{amount} Recommendations",
+    "amount-views": "{amount} Views",
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} of {max} topics selected"
     },
@@ -276,16 +339,16 @@
       "happy": "Happy",
       "surprised": "Surprised"
     },
-    "filterFollow": "Filter contributions from users I follow",
+    "filterFollow": "Users I follow",
     "filterMasonryGrid": {
       "myFriends": "Users I follow",
       "myGroups": "By my groups",
       "myTopics": "My topics",
       "noFilter": "Filter content",
-      "onlyArticles": "Only articles",
-      "onlyEvents": "Only events"
+      "onlyArticles": "Articles",
+      "onlyEvents": "Events"
     },
-    "filterMyGroups": "Contributions in my groups",
+    "filterMyGroups": "My groups",
     "inappropriatePicture": "This image may be inappropriate for some people.",
     "languageSelectLabel": "Language of your contribution",
     "languageSelectText": "Select Language",
@@ -409,6 +472,7 @@
     "eventsEnded": "Ended",
     "filter-by": "Filter by ...",
     "following": "Users I follow",
+    "following-title": "Sources",
     "languages": "Languages",
     "my-groups": "My groups",
     "order": {
@@ -454,15 +518,15 @@
     "addMemberToGroupSuccess": "“{name}” was added to the group with the role “{role}”!",
     "addUser": "Add User",
     "addUserNoOptions": "No users found!",
-    "addUserPlaceholder": " Username",
+    "addUserPlaceholder": "User name",
     "allGroups": "All Groups",
-    "button": {
-      "tooltip": "Show groups"
-    },
     "categories": "Topic ::: Topics",
     "categoriesTitle": "Topics of the group",
     "changeMemberRole": "The role has been changed to “{role}”!",
     "contentMenu": {
+      "inviteLinks": "Invite links",
+      "muteGroup": "Mute group",
+      "unmuteGroup": "Unmute group",
       "visitGroupPage": "Show group"
     },
     "createNewGroup": {
@@ -483,6 +547,7 @@
     "goal": "Goal of group",
     "groupCreated": "The group was created!",
     "in": "in",
+    "invite-links": "Invite Links",
     "joinLeaveButton": {
       "iAmMember": "I'm a member",
       "join": "Join",
@@ -513,6 +578,7 @@
       "confirmAddGroupMemberText": "Add user “{name}” to group?",
       "confirmAddGroupMemberTitle": "Confirm"
     },
+    "muted": "Group muted",
     "myGroups": "My Groups",
     "name": "Group name",
     "radius": "Radius",
@@ -537,6 +603,8 @@
       "hidden": "Secret — Group (including the name) is completely invisible",
       "public": "Public — Group and all posts are visible for all registered users"
     },
+    "unmute": "Unmute group",
+    "unmuted": "Group unmuted",
     "update": "Save change",
     "updatedGroup": "The group data has been changed."
   },
@@ -550,8 +618,23 @@
       "button": {
         "tooltip": "My profile"
       },
+      "chats": "Chats",
       "groups": "Groups",
-      "myProfile": "My profile"
+      "map": "Map",
+      "myProfile": "My profile",
+      "notifications": "Notifications"
+    },
+    "chats": {
+      "tooltip": "Chats"
+    },
+    "groups": {
+      "tooltip": "Groups"
+    },
+    "map": {
+      "tooltip": "Map"
+    },
+    "notifications": {
+      "tooltip": "Notifications"
     }
   },
   "index": {
@@ -562,13 +645,35 @@
     "button": {
       "tooltip": "Invite friends"
     },
+    "comment-placeholder": "Comment (optional)",
     "copy-code": "Copy Invite Link",
     "copy-success": "Invite code copied to clipboard",
-    "not-available": "You have no valid invite code available!",
-    "your-code": "Send this link per e-mail or in social media to invite your friends:"
+    "create-error": "Creating a new invite link failed! Error: {error}",
+    "create-success": "Invite link created successfully!",
+    "delete-modal": {
+      "message": "Do you really want to invalidate this invite link?",
+      "title": "Invalidate link?"
+    },
+    "generate-code": "Create new link",
+    "generate-code-explanation": "Create a new link. You can add a comment if you like (only visible to you).",
+    "group-invite-links": "Group invite links",
+    "invalidate": "Invalidate link",
+    "invalidate-error": "Invalidating the invite link failed! Error: {error}",
+    "invalidate-success": "Invite link invalidated successfully!",
+    "invite-link-message-group": "You have been invited to join the group “{groupName}” on {network}.",
+    "invite-link-message-hidden-group": "You have been invited to join a hidden group on {network}.",
+    "invite-link-message-personal": "You have been invited to join {network}.",
+    "limit-reached": "You have reached the maximum number of invite links.",
+    "my-invite-links": "My invite links",
+    "no-links": "No invite links created yet.",
+    "redeemed-count": "This code has been used {count} times.",
+    "redeemed-count-0": "No one has used this code yet."
   },
   "localeSwitch": {
     "tooltip": "Choose language"
+  },
+  "location": {
+    "distance": "{distance} km away from me"
   },
   "login": {
     "email": "Your E-mail",
@@ -592,12 +697,16 @@
   },
   "map": {
     "alertMessage": "The map cannot be accessed: The Mapbox token is not set on the server!",
-    "button": {
-      "tooltip": "Show map"
+    "legend": {
+      "event": "Event",
+      "group": "Group",
+      "theUser": "My position",
+      "user": "User"
     },
     "markerTypes": {
+      "event": "event",
       "group": "group",
-      "theUser": "your position",
+      "theUser": "my position",
       "user": "user"
     },
     "pageTitle": "Map",
@@ -691,28 +800,26 @@
       "unread": "Unread"
     },
     "group": "Description",
-    "headerMenuButton": {
-      "tooltip": "My notifications"
-    },
     "markAllAsRead": "Mark all as read",
     "pageLink": "All notifications",
     "post": "Post or Group",
     "reason": {
-      "changed_group_member_role": "Changed your role in group …",
-      "commented_on_post": "Commented on your post …",
-      "mentioned_in_comment": "Mentioned you in a comment …",
-      "mentioned_in_post": "Mentioned you in a post …",
-      "removed_user_from_group": "Removed you from group …",
-      "user_joined_group": "Joined your group …",
-      "user_left_group": "Left your group …"
+      "changed_group_member_role": "Changed your role in group",
+      "commented_on_post": "Commented on a post you observe",
+      "followed_user_posted": "Wrote a new post",
+      "mentioned_in_comment": "Mentioned you in a comment",
+      "mentioned_in_post": "Mentioned you in a post",
+      "on_date": "on",
+      "post_in_group": "Posted in a group",
+      "removed_user_from_group": "Removed you from group",
+      "user_joined_group": "Joined your group",
+      "user_left_group": "Left your group"
     },
     "title": "Notifications",
     "user": "User"
   },
-  "position": {
-    "group": "Group",
-    "my": "My position",
-    "user": "User"
+  "observeButton": {
+    "observed": "observed"
   },
   "post": {
     "comment": {
@@ -725,13 +832,13 @@
       "forGroup": {
         "title": "For The Group “{name}”"
       },
-      "title": "Create A New Event"
+      "title": "Create an Event"
     },
     "createNewPost": {
       "forGroup": {
         "title": "For The Group “{name}”"
       },
-      "title": "Create A New Article"
+      "title": "Create an Article"
     },
     "edited": "edited",
     "editPost": {
@@ -745,8 +852,12 @@
     "menu": {
       "delete": "Delete post",
       "edit": "Edit post",
+      "observe": "Observe post",
+      "observedSuccessfully": "You are now observing this post!",
       "pin": "Pin post",
       "pinnedSuccessfully": "Post pinned successfully!",
+      "unobserve": "Stop to observe post",
+      "unobservedSuccessfully": "You are no longer observing this post!",
       "unpin": "Unpin post",
       "unpinnedSuccessfully": "Post unpinned successfully!"
     },
@@ -758,9 +869,9 @@
     "viewEvent": {
       "eventEnd": "End",
       "eventIsOnline": "Online",
-      "eventLocationName": "City",
+      "eventLocationName": "Adress for navi — e.g. Example Street 1, 12345 City",
       "eventStart": "Start",
-      "eventVenue": "Venue",
+      "eventVenue": "Location description — e.g. backyard, 1st floor, …",
       "title": "Event"
     },
     "viewPost": {
@@ -878,7 +989,7 @@
       "Tag": "Hashtag ::: Hashtags",
       "User": "User ::: Users"
     },
-    "hint": "What are you searching for? Use !… for posts, @… for users, &… for groups, #… for hashtags.",
+    "hint": "!... searches posts, @... searches users, &... searches groups, #… searches hashtags",
     "no-results": "No results found for \"{search}\". Try a different search term!",
     "page": "Page",
     "placeholder": "Search",
@@ -886,6 +997,16 @@
     "title": "Search Results"
   },
   "settings": {
+    "badges": {
+      "click-to-select": "Click on an empty space to add a badge.",
+      "click-to-use": "Click on a badge to use it in the selected slot.",
+      "description": "Here you can choose how to display your earned badges on your profile.",
+      "name": "Badges",
+      "no-badges-available": "You currently don't have any badges available to add.",
+      "remove": "Remove Badge",
+      "success-update": "Your badges have been updated successfully.",
+      "verification": "This is your verification badge and cannot be changed."
+    },
     "blocked-users": {
       "block": "Block user",
       "columns": {
@@ -909,14 +1030,19 @@
       "unblocked": "{name} is unblocked again"
     },
     "data": {
+      "givenName": "Your given name",
+      "givenNamePlaceholder": "Femanon",
       "labelBio": "About You",
       "labelCity": "Your City or Region",
       "labelCityHint": "(shows approximate position on map)",
-      "labelName": "Your Name",
+      "labelName": "Your name",
       "labelSlug": "Your unique user name",
       "name": "Your data",
       "namePlaceholder": "Femanon Funny",
-      "success": "Your data was successfully updated!"
+      "realNamePlease": "Please enter your real name",
+      "success": "Your data was successfully updated!",
+      "surName": "Your surname",
+      "surNamePlaceholder": "Funny"
     },
     "deleteUserAccount": {
       "accountDescription": "Be aware that your Posts and Comments are important to our community. If you still choose to delete them, you have to mark them below.",
@@ -999,9 +1125,24 @@
     },
     "name": "Settings",
     "notifications": {
-      "name": "Notifications",
+      "chat": "Chat",
+      "chatMessage": "Message received while absent.",
+      "checkAll": "Check all",
+      "commentOnObservedPost": "Comments on observed posts.",
+      "followingUsers": "User I follow published a new post.",
+      "group": "Groups",
+      "groupMemberJoined": "Member joined a group I own.",
+      "groupMemberLeft": "Member left a group I own.",
+      "groupMemberRemoved": "I was removed from a group.",
+      "groupMemberRoleChanged": "Your role in a group changed or you were invited.",
+      "mention": "I was mentioned.",
+      "name": "E-Mail Notifications",
+      "post": "Posts and comments",
+      "postByFollowedUser": "Posts by users I follow.",
+      "postInGroup": "Post in a group I am a member of.",
       "send-email-notifications": "Send e-mail notifications",
-      "success-update": "Notifications settings saved!"
+      "success-update": "Notifications settings saved!",
+      "uncheckAll": "Uncheck all"
     },
     "organizations": {
       "name": "My Organizations"
@@ -1061,8 +1202,7 @@
     "bank": "bank account",
     "code-of-conduct": "Code of Conduct",
     "contact": "Contact",
-    "data-privacy": "Data privacy",
-    "director": "Managing Director",
+    "data-privacy": "Data Privacy",
     "donate": "Donate",
     "error-occurred": "An error occurred.",
     "faq": "FAQ",
@@ -1070,16 +1210,18 @@
     "imprint": "Imprint",
     "made": "Made with ❤️",
     "register": "Registry number",
-    "responsible": "responsible for contents of this page (§ 55 Abs. 2 RStV)",
     "support": "Support",
-    "taxident": "USt-ID. according to §27a of the German Sales Tax Law:",
-    "termsAndConditions": "Terms and conditions",
-    "thanks": "Thanks!",
-    "tribunal": "Registry court"
+    "termsAndConditions": "Terms and Conditions",
+    "thanks": "Thanks!"
   },
   "termsAndConditions": {
     "newTermsAndConditions": "New Terms and Conditions",
     "termsAndConditionsNewConfirm": "I have read and agree to the new terms of conditions.",
     "termsAndConditionsNewConfirmText": "Please read the new terms of use now!"
+  },
+  "user-teaser": {
+    "popover": {
+      "open-profile": "Open profile"
+    }
   }
 }

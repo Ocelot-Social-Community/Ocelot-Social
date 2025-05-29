@@ -1,13 +1,19 @@
 import Vuex from 'vuex'
 import { mount } from '@vue/test-utils'
 import login from './login.vue'
+import LoginForm from '~/components/LoginForm/LoginForm.vue'
 
 const localVue = global.localVue
 
 const stubs = {
   'client-only': true,
   'nuxt-link': true,
+  'router-link': true,
 }
+
+const routerPushMock = jest.fn()
+const routerReplaceMock = jest.fn()
+const i18nSetMock = jest.fn()
 
 describe('Login.vue', () => {
   let store
@@ -22,6 +28,14 @@ describe('Login.vue', () => {
       $t: jest.fn(),
       $i18n: {
         locale: () => 'en',
+        set: i18nSetMock,
+      },
+      $route: {
+        query: {},
+      },
+      $router: {
+        replace: routerReplaceMock,
+        push: routerPushMock,
       },
     }
     asyncData = false
@@ -71,7 +85,53 @@ describe('Login.vue', () => {
       asyncData = true
       tosVersion = '0.0.4'
       wrapper = await Wrapper()
-      expect(redirect).toBeCalledWith('/')
+      expect(redirect).toHaveBeenCalledWith('/')
+    })
+
+    describe('handle succcess', () => {
+      beforeEach(async () => {
+        asyncData = true
+        tosVersion = '0.0.4'
+      })
+
+      describe('with route query to invite code', () => {
+        beforeEach(async () => {
+          mocks.$route.query = {
+            inviteCode: 'ABCDEF',
+          }
+          wrapper = await Wrapper()
+          wrapper.findComponent(LoginForm).vm.$emit('success')
+        })
+
+        it('calls i18n.set', () => {
+          expect(i18nSetMock).toBeCalledWith('en')
+        })
+
+        it('call router push to registration page', () => {
+          expect(routerPushMock).toBeCalledWith({
+            name: 'registration',
+            query: {
+              inviteCode: 'ABCDEF',
+            },
+          })
+        })
+      })
+
+      describe('without route query to invite code', () => {
+        beforeEach(async () => {
+          mocks.$route.query = {}
+          wrapper = await Wrapper()
+          wrapper.findComponent(LoginForm).vm.$emit('success')
+        })
+
+        it('calls i18n.set', () => {
+          expect(i18nSetMock).toBeCalledWith('en')
+        })
+
+        it('call router push to registration page', () => {
+          expect(routerReplaceMock).toBeCalledWith('/')
+        })
+      })
     })
   })
 })

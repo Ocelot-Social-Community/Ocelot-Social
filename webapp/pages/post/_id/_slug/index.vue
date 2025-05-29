@@ -49,6 +49,7 @@
                   :is-owner="isAuthor"
                   @pinPost="pinPost"
                   @unpinPost="unpinPost"
+                  @toggleObservePost="toggleObservePost"
                 />
               </client-only>
             </section>
@@ -111,6 +112,18 @@
                     :post-id="post.id"
                   />
                 </ds-flex-item>
+                <!-- Follow Button -->
+                <ds-flex-item
+                  :width="{ lg: '15%', md: '22%', sm: '22%', base: '100%' }"
+                  class="shout-button"
+                >
+                  <observe-button
+                    :is-observed="post.isObservedByMe"
+                    :count="post.observingUsersCount"
+                    :post-id="post.id"
+                    @toggleObservePost="toggleObservePost"
+                  />
+                </ds-flex-item>
               </ds-flex>
             </ds-space>
             <!-- Comments -->
@@ -156,6 +169,7 @@ import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import HcShoutButton from '~/components/ShoutButton.vue'
+import ObserveButton from '~/components/ObserveButton.vue'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 import {
@@ -165,8 +179,9 @@ import {
 } from '~/components/utils/PostHelpers'
 import PostQuery from '~/graphql/PostQuery'
 import { groupQuery } from '~/graphql/groups'
-import PostMutations from '~/graphql/PostMutations'
 import links from '~/constants/links.js'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
+import postListActions from '~/mixins/postListActions'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
 
 export default {
@@ -184,11 +199,12 @@ export default {
     HcCategory,
     HcHashtag,
     HcShoutButton,
+    ObserveButton,
     LocationTeaser,
     PageParamsLink,
     UserTeaser,
   },
-  mixins: [SortCategories],
+  mixins: [GetCategories, postListActions, SortCategories],
   head() {
     return {
       title: this.title,
@@ -204,7 +220,6 @@ export default {
       blurred: false,
       blocked: null,
       postAuthor: null,
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
       group: null,
     }
   },
@@ -302,28 +317,8 @@ export default {
     },
     async createComment(comment) {
       this.post.comments.push(comment)
-    },
-    pinPost(post) {
-      this.$apollo
-        .mutate({
-          mutation: PostMutations().pinPost,
-          variables: { id: post.id },
-        })
-        .then(() => {
-          this.$toast.success(this.$t('post.menu.pinnedSuccessfully'))
-        })
-        .catch((error) => this.$toast.error(error.message))
-    },
-    unpinPost(post) {
-      this.$apollo
-        .mutate({
-          mutation: PostMutations().unpinPost,
-          variables: { id: post.id },
-        })
-        .then(() => {
-          this.$toast.success(this.$t('post.menu.unpinnedSuccessfully'))
-        })
-        .catch((error) => this.$toast.error(error.message))
+      this.post.isObservedByMe = comment.isPostObservedByMe
+      this.post.observingUsersCount = comment.postObservingUsersCount
     },
     toggleNewCommentForm(showNewCommentForm) {
       this.showNewCommentForm = showNewCommentForm
@@ -379,7 +374,7 @@ export default {
     position: relative;
     /*  The padding top makes sure the correct height is set (according to the
         hero image aspect ratio) before the hero image loads so
-        the autoscroll works correctly when following a comment link. 
+        the autoscroll works correctly when following a comment link.
       */
 
     padding-top: calc(var(--hero-image-aspect-ratio) * (100% + 48px));
@@ -403,12 +398,6 @@ export default {
 
   &.--blur-image > .hero-image > .image {
     filter: blur($blur-radius);
-  }
-
-  & .event-info {
-    display: flex;
-    align-items: center;
-    gap: 2px;
   }
 
   .blur-toggle {

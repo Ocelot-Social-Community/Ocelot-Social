@@ -71,7 +71,7 @@ describe('terms-and-conditions-confirm.vue', () => {
       asyncData = true
       tosAgree = true
       wrapper = await Wrapper()
-      expect(redirect).toBeCalledWith('/')
+      expect(redirect).toHaveBeenCalledWith('/')
     })
   })
 })

@@ -1,5 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable security/detect-unsafe-regex */
+import linkifyHtml from 'linkify-html'
 import sanitizeHtml from 'sanitize-html'
-import linkifyHtml from 'linkifyjs/html'
 
 export const removeHtmlTags = (input) => {
   return sanitizeHtml(input, {
@@ -30,6 +36,7 @@ const standardSanitizeHtmlOptions = {
     'strike',
     'span',
     'blockquote',
+    'usertag',
   ],
   allowedAttributes: {
     a: ['href', 'class', 'target', 'data-*', 'contenteditable'],

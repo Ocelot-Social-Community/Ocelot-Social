@@ -36,6 +36,12 @@ describe('default.vue', () => {
     store = new Vuex.Store({
       getters: {
         'auth/isLoggedIn': () => true,
+        'chat/showChat': () => {
+          return { showChat: false, roomID: null }
+        },
+      },
+      mutations: {
+        'chat/SET_OPEN_CHAT': jest.fn(),
       },
     })
   })

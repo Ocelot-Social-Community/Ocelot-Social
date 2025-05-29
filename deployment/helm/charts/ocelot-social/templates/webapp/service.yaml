@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-webapp
+spec:
+  ports:
+    - name: {{ .Release.Name }}-http
+      port: 3000
+      targetPort: 3000
+  selector:
+    app: {{ .Release.Name }}-webapp

@@ -87,6 +87,7 @@ export default {
     },
     ...mapGetters({
       currentUser: 'auth/user',
+      categories: 'categories/categories',
     }),
   },
   methods: {
@@ -100,7 +101,7 @@ export default {
         await this.$store.dispatch('auth/login', { email, password })
         if (this.currentUser && this.currentUser.activeCategories) {
           this.resetCategories()
-          if (this.currentUser.activeCategories.length > 0) {
+          if (this.currentUser.activeCategories.length < this.categories.length) {
             this.currentUser.activeCategories.forEach((categoryId) => {
               this.toggleCategory(categoryId)
             })

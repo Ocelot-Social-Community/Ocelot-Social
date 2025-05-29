@@ -1,8 +1,13 @@
-import gql from 'graphql-tag'
-import { cleanDatabase } from '../../db/factories'
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
-import { getNeode, getDriver } from '../../db/neo4j'
-import createServer from '../../server'
+import gql from 'graphql-tag'
+
+import { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
+import createServer from '@src/server'
 
 let server
 let query
@@ -50,22 +55,15 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 beforeEach(async () => {
-  hashtagingUser = await neode.create(
-    'User',
-    {
-      id: 'you',
-      name: 'Al Capone',
-      slug: 'al-capone',
-    },
-    {
-      password: '1234',
-      email: 'test@example.org',
-    },
-  )
+  hashtagingUser = await neode.create('User', {
+    id: 'you',
+    name: 'Al Capone',
+    slug: 'al-capone',
+  })
   await neode.create('Category', {
     id: 'cat9',
     name: 'Democracy & Politics',

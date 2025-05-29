@@ -42,8 +42,11 @@
               {{ $t('profile.memberSince') }} {{ user.createdAt | date('MMMM yyyy') }}
             </ds-text>
           </ds-space>
-          <ds-space v-if="user.badges && user.badges.length" margin="x-small">
-            <hc-badges :badges="user.badges" />
+          <ds-space v-if="userBadges && userBadges.length" margin="x-small">
+            <a v-if="myProfile" href="/settings/badges" class="badge-edit-link">
+              <hc-badges :badges="userBadges" />
+            </a>
+            <hc-badges v-if="!myProfile" :badges="userBadges" />
           </ds-space>
           <ds-flex>
             <ds-flex-item>
@@ -79,6 +82,16 @@
               @optimistic="optimisticFollow"
               @update="updateFollow"
             />
+            <base-button
+              icon="chat-bubble"
+              v-tooltip="{
+                content: $t('chat.userProfileButton.tooltip', { name: userName }),
+                placement: 'bottom-start',
+              }"
+              @click="showOrChangeChat(user.id)"
+            >
+              {{ $t('chat.userProfileButton.label') }}
+            </base-button>
           </div>
           <template v-if="user.about">
             <hr />
@@ -146,6 +159,9 @@
                 @removePostFromList="posts = removePostFromList(post, posts)"
                 @pinPost="pinPost(post, refetchPostList)"
                 @unpinPost="unpinPost(post, refetchPostList)"
+                @toggleObservePost="
+                  (postId, value) => toggleObservePost(postId, value, refetchPostList)
+                "
               />
             </masonry-grid-item>
           </template>
@@ -172,6 +188,7 @@
 
 <script>
 import uniqBy from 'lodash/uniqBy'
+import { mapGetters, mapMutations } from 'vuex'
 import postListActions from '~/mixins/postListActions'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import HcFollowButton from '~/components/Button/FollowButton'
@@ -243,11 +260,18 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      getShowChat: 'chat/showChat',
+    }),
     myProfile() {
       return this.$route.params.id === this.$store.getters['auth/user'].id
     },
     user() {
       return this.User ? this.User[0] : {}
+    },
+    userBadges() {
+      if (!this.$env.BADGES_ENABLED) return null
+      return [this.user.badgeVerification, ...(this.user.badgeTrophiesSelected || [])]
     },
     userName() {
       const { name } = this.user || {}
@@ -281,6 +305,10 @@ export default {
     },
   },
   methods: {
+    ...mapMutations({
+      commitModalData: 'modal/SET_OPEN',
+      showChat: 'chat/SET_OPEN_CHAT',
+    }),
     handleTab(tab) {
       if (this.tabActive !== tab) {
         this.tabActive = tab
@@ -356,7 +384,7 @@ export default {
       }
     },
     async deleteUser(userdata) {
-      this.$store.commit('modal/SET_OPEN', {
+      this.commitModalData({
         name: 'delete',
         data: {
           userdata: userdata,
@@ -387,6 +415,12 @@ export default {
     fetchAllConnections(type, count) {
       if (type === 'following') this.followingCount = count
       if (type === 'followedBy') this.followedByCount = count
+    },
+    async showOrChangeChat(roomID) {
+      if (this.getShowChat.showChat) {
+        await this.showChat({ showChat: false, roomID: null })
+      }
+      await this.showChat({ showChat: true, roomID })
     },
   },
   apollo: {
@@ -428,6 +462,12 @@ export default {
 .profile-page-avatar.profile-avatar {
   margin: auto;
   margin-top: -60px;
+}
+.badge-edit-link {
+  transition: all 0.2s ease-out;
+  &:hover {
+    opacity: 0.7;
+  }
 }
 .page-name-profile-id-slug {
   .ds-flex-item:first-child .content-menu {

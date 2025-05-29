@@ -15,13 +15,16 @@ describe('OrderByFilter', () => {
     'posts/orderedByCreationDate': () => true,
     'posts/orderBy': () => 'createdAt_desc',
   }
+  const actions = {
+    'categories/init': jest.fn(),
+  }
 
   const mocks = {
     $t: jest.fn((string) => string),
   }
 
   const Wrapper = () => {
-    const store = new Vuex.Store({ mutations, getters })
+    const store = new Vuex.Store({ mutations, getters, actions })
     const wrapper = mount(OrderByFilter, { mocks, localVue, store })
     return wrapper
   }
@@ -35,7 +38,7 @@ describe('OrderByFilter', () => {
       it('sets "newest-button" attribute `filled`', () => {
         expect(
           wrapper
-            .find('.order-by-filter .filter-list [data-test="newest-button"] .base-button')
+            .find('.order-by-filter .filter-list .base-button[data-test="newest-button"]')
             .classes('--filled'),
         ).toBe(true)
       })
@@ -43,7 +46,7 @@ describe('OrderByFilter', () => {
       it('don\'t sets "oldest-button" attribute `filled`', () => {
         expect(
           wrapper
-            .find('.order-by-filter .filter-list [data-test="oldest-button"] .base-button')
+            .find('.order-by-filter .filter-list .base-button[data-test="oldest-button"]')
             .classes('--filled'),
         ).toBe(false)
       })
@@ -58,7 +61,7 @@ describe('OrderByFilter', () => {
       it('don\'t sets "newest-button" attribute `filled`', () => {
         expect(
           wrapper
-            .find('.order-by-filter .filter-list [data-test="newest-button"] .base-button')
+            .find('.order-by-filter .filter-list .base-button[data-test="newest-button"]')
             .classes('--filled'),
         ).toBe(false)
       })
@@ -66,7 +69,7 @@ describe('OrderByFilter', () => {
       it('sets "oldest-button" attribute `filled`', () => {
         expect(
           wrapper
-            .find('.order-by-filter .filter-list [data-test="oldest-button"] .base-button')
+            .find('.order-by-filter .filter-list .base-button[data-test="oldest-button"]')
             .classes('--filled'),
         ).toBe(true)
       })
@@ -75,7 +78,7 @@ describe('OrderByFilter', () => {
     describe('click "newest-button"', () => {
       it('calls TOGGLE_ORDER with "createdAt_desc"', () => {
         wrapper
-          .find('.order-by-filter .filter-list [data-test="newest-button"] .base-button')
+          .find('.order-by-filter .filter-list .base-button[data-test="newest-button"]')
           .trigger('click')
         expect(mutations['posts/TOGGLE_ORDER']).toHaveBeenCalledWith({}, 'createdAt_desc')
       })
@@ -84,7 +87,7 @@ describe('OrderByFilter', () => {
     describe('click "oldest-button"', () => {
       it('calls TOGGLE_ORDER with "createdAt_asc"', () => {
         wrapper
-          .find('.order-by-filter .filter-list [data-test="oldest-button"] .base-button')
+          .find('.order-by-filter .filter-list .base-button[data-test="oldest-button"]')
           .trigger('click')
         expect(mutations['posts/TOGGLE_ORDER']).toHaveBeenCalledWith({}, 'createdAt_asc')
       })

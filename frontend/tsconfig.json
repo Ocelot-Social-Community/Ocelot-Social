@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "module": "ES2020",
+    "target": "ES2020",
+    // Doesn't apply to server/, see ts-node config down below and server/tsconfig.json
+    "moduleResolution": "Bundler",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "types": ["vite/client"],
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "#components/*": ["./src/components/*"],
+      "#pages/*": ["./src/pages/*"],
+      "#assets/*": ["./src/assets/*"],
+      "#layouts/*": ["./src/layouts/*"],
+      "#stores/*": ["./src/stores/*"],
+      "#src/*": ["./src/*"],
+      "#plugins/*": ["./renderer/plugins/*"],
+      "#context/*": ["./renderer/context/*"],
+      "#types/*": ["./types/*"],
+      "#root/*": ["./*"]
+    }
+  },
+  "ts-node": {
+    "transpileOnly": true,
+    "esm": true,
+    "compilerOptions": {
+      "module": "Node16",
+      "moduleResolution": "Node16"
+    }
+  }
+}

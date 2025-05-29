@@ -17,6 +17,9 @@
     <ds-text>
       {{ $t('components.registration.email-nonce.form.description') }}
     </ds-text>
+    <ds-text>
+      {{ $t('components.registration.email-nonce.form.click-next') }}
+    </ds-text>
     <base-button :disabled="disabled" filled name="submit" type="submit">
       {{ $t('components.registration.email-nonce.form.next') }}
     </base-button>

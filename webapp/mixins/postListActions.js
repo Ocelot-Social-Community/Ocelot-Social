@@ -1,4 +1,5 @@
 import PostMutations from '~/graphql/PostMutations'
+import { mapMutations } from 'vuex'
 
 export default {
   methods: {
@@ -17,6 +18,7 @@ export default {
         })
         .then(() => {
           this.$toast.success(this.$t('post.menu.pinnedSuccessfully'))
+          this.storePinPost()
           refetchPostList()
         })
         .catch((error) => this.$toast.error(error.message))
@@ -31,9 +33,32 @@ export default {
         })
         .then(() => {
           this.$toast.success(this.$t('post.menu.unpinnedSuccessfully'))
+          this.storeUnpinPost()
           refetchPostList()
         })
         .catch((error) => this.$toast.error(error.message))
     },
+    toggleObservePost(postId, value, refetchPostList = () => {}) {
+      this.$apollo
+        .mutate({
+          mutation: PostMutations().toggleObservePost,
+          variables: {
+            value,
+            id: postId,
+          },
+        })
+        .then(() => {
+          const message = this.$t(
+            `post.menu.${value ? 'observedSuccessfully' : 'unobservedSuccessfully'}`,
+          )
+          this.$toast.success(message)
+          refetchPostList()
+        })
+        .catch((error) => this.$toast.error(error.message))
+    },
+    ...mapMutations({
+      storePinPost: 'pinnedPosts/pinPost',
+      storeUnpinPost: 'pinnedPosts/unpinPost',
+    }),
   },
 }

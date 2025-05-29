@@ -39,6 +39,7 @@ export default () => {
           deleted
           postType
           author {
+            id
             name
           }
           categories {
@@ -171,6 +172,14 @@ export default () => {
       mutation ($id: ID!) {
         markTeaserAsViewed(id: $id) {
           id
+        }
+      }
+    `,
+    toggleObservePost: gql`
+      mutation ($id: ID!, $value: Boolean!) {
+        toggleObservePost(id: $id, value: $value) {
+          isObservedByMe
+          observingUsersCount
         }
       }
     `,

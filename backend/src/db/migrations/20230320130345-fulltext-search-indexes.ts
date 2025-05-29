@@ -1,13 +1,17 @@
-import { getDriver } from '../../db/neo4j'
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
+import { getDriver } from '@db/neo4j'
 
 export const description = ''
 
-export async function up(next) {
+export async function up(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
 
   try {
+    // We do do this in /src/db/migrate/store.ts
+    /*
     // Drop indexes if they exist because due to legacy code they might be set already
     const indexesResponse = await transaction.run(`CALL db.indexes()`)
     const indexes = indexesResponse.records.map((record) => record.get('name'))
@@ -31,7 +35,7 @@ export async function up(next) {
       `CALL db.index.fulltext.createNodeIndex("tag_fulltext_search",["Tag"],["id"])`,
     )
     await transaction.commit()
-    next()
+    */
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
@@ -40,21 +44,23 @@ export async function up(next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
-export async function down(next) {
+export async function down(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
 
   try {
+    // We do do this in /src/db/migrate/store.ts
+    /*
     await transaction.run(`CALL db.index.fulltext.drop("user_fulltext_search")`)
     await transaction.run(`CALL db.index.fulltext.drop("post_fulltext_search")`)
     await transaction.run(`CALL db.index.fulltext.drop("tag_fulltext_search")`)
     await transaction.commit()
-    next()
+    */
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
@@ -63,6 +69,6 @@ export async function down(next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }

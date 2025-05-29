@@ -11,6 +11,17 @@
       </ds-flex-item>
     </ds-flex>
     <ds-space />
+    <ds-flex-item class="notifications-header-button" :width="{ base: 'auto' }" centered>
+      <base-button
+        primary
+        :disabled="unreadNotificationsCount === 0"
+        @click="markAllAsRead"
+        data-test="markAllAsRead-button"
+      >
+        {{ $t('notifications.markAllAsRead') }}
+      </base-button>
+    </ds-flex-item>
+    <ds-space />
     <notifications-table
       @markNotificationAsRead="markNotificationAsRead"
       :notifications="notifications"
@@ -24,16 +35,6 @@
           @back="back"
           @next="next"
         />
-      </ds-flex-item>
-      <ds-flex-item class="notifications-footer-button" :width="{ base: 'auto' }" centered>
-        <ds-button
-          primary
-          :disabled="unreadNotificationsCount === 0"
-          @click="markAllAsRead"
-          data-test="markAllAsRead-button"
-        >
-          {{ $t('notifications.markAllAsRead') }}
-        </ds-button>
       </ds-flex-item>
     </ds-flex>
   </base-card>
@@ -153,10 +154,15 @@ export default {
 </script>
 <style lang="scss">
 .notifications-page-flex {
+  padding: 8px;
   justify-content: space-between;
 }
 
+.notifications-header-button {
+  text-align: right;
+}
 .notifications-footer {
+  margin-top: 1.5rem;
   justify-content: space-evenly;
 }
 </style>

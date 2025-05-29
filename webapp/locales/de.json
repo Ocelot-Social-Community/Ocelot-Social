@@ -6,25 +6,61 @@
     "edit": "Bearbeiten",
     "loading": "wird geladen",
     "loadMore": "mehr laden",
-    "save": "Speichern"
+    "save": "Speichern",
+    "saveCategories": "Themen speichern"
   },
   "admin": {
+    "badges": {
+      "description": "Stelle die verfügbaren Auszeichnungen für diesen Nutzer ein.",
+      "noBadges": "Keine Auszeichnungen vorhanden.",
+      "revokeTrophy": {
+        "error": "Trophäe konnte nicht widerrufen werden!",
+        "success": "Trophäe erfolgreich widerrufen"
+      },
+      "revokeVerification": {
+        "error": "Verifizierung konnte nicht gesetzt werden!",
+        "success": "Verifizierung erfolgreich widerrufen"
+      },
+      "rewardTrophy": {
+        "error": "Trophäe konnte nicht vergeben werden!",
+        "success": "Trophäe erfolgreich vergeben!"
+      },
+      "setVerification": {
+        "error": "Verifizierung konnte nicht gesetzt werden!",
+        "success": "Verifizierung erfolgreich gesetzt"
+      },
+      "title": "Auszeichnungen",
+      "trophyBadges": "Trophäen",
+      "verificationBadges": "Verifizierungen"
+    },
     "categories": {
       "categoryName": "Name",
       "name": "Themen",
       "postCount": "Beiträge"
     },
     "dashboard": {
+      "badgesDisplayed": "Badges ausgestellt",
+      "badgesRewarded": "Badges verteilt",
+      "chatMessages": "Chat-Nachrichten",
+      "chatRooms": "Chat-Räume",
       "comments": "Kommentare",
-      "follows": "Folgen",
+      "emails": "E-Mails",
+      "follows": "Follows",
+      "groups": "Gruppen",
+      "inviteCodes": "Einladungslinks",
+      "inviteCodesExpired": "Abgelaufene Einladungslinks",
+      "inviteCodesRedeemed": "Eingelöste Einladungslinks",
       "invites": "Einladungen",
+      "locations": "Orte",
       "name": "Startzentrale",
       "notifications": "Benachrichtigungen",
-      "organizations": "Organisationen",
       "posts": "Beiträge",
-      "projects": "Projekte",
+      "reports": "Gemeldet",
       "shouts": "Empfehlungen",
-      "users": "Nutzer"
+      "tags": "Tags",
+      "users": "Nutzer",
+      "usersDeleted": "Gelöschte Nutzer",
+      "usersVerified": "Verifizierte Nutzer"
     },
     "donations": {
       "goal": "Monatlich benötigte Spenden",
@@ -41,7 +77,7 @@
       "tagCountUnique": "Nutzer"
     },
     "invites": {
-      "description": "Einladungen sind eine wunderbare Möglichkeit, Deine Freunde in Deinem Netzwerk zu haben …",
+      "description": "Einladungen sind eine wunderbare Möglichkeit, deine Freunde in deinem Netzwerk zu haben …",
       "name": "Nutzer einladen",
       "title": "Leute einladen"
     },
@@ -67,6 +103,7 @@
       "roleChanged": "Rolle erfolgreich geändert!",
       "table": {
         "columns": {
+          "badges": "Auszeichnungen",
           "createdAt": "Erstellt am",
           "email": "E-Mail",
           "name": "Name",
@@ -75,6 +112,28 @@
           "slug": "Alias"
         }
       }
+    }
+  },
+  "chat": {
+    "addRoomHeadline": "Suche Nutzer für neuen Chat",
+    "cancelSelectMessage": "Abbrechen",
+    "conversationStarted": "Unterhaltung startete am:",
+    "isOnline": "online",
+    "isTyping": "tippt...",
+    "lastSeen": "zuletzt gesehen ",
+    "messageDeleted": "Diese Nachricht wurde gelöscht",
+    "messagesEmpty": "Keine Nachrichten",
+    "newMessages": "Neue Nachrichten",
+    "page": {
+      "headline": "Chat"
+    },
+    "roomEmpty": "Keinen Raum selektiert",
+    "roomsEmpty": "Keine Räume",
+    "search": "Chat-Räume filtern",
+    "typeMessage": "Nachricht schreiben",
+    "userProfileButton": {
+      "label": "Chat",
+      "tooltip": "Chatte mit „{name}“"
     }
   },
   "client-only": {
@@ -149,7 +208,7 @@
         "buttonTitle": "Erstellen",
         "error": "Es konnte kein Nutzerkonto erstellt werden!",
         "help": "Vielleicht war der Bestätigungscode falsch oder abgelaufen? Wenn das Problem weiterhin besteht, schicke uns gerne eine E-Mail an:",
-        "recieveCommunicationAsEmailsEtcConfirmed": "Ich stimme auch dem Erhalt von E-Mails und anderen Formen der Kommunikation (z.B. Push-Benachrichtigungen) zu.",
+        "receiveCommunicationAsEmailsEtcConfirmed": "Ich stimme auch dem Erhalt von E-Mails und anderen Formen der Kommunikation (z.B. Push-Benachrichtigungen) zu.",
         "success": "Dein Nutzerkonto wurde erstellt!",
         "termsAndCondsEtcConfirmed": "Ich habe folgendes gelesen, verstanden und stimme zu:",
         "title": "Nutzerkonto anlegen"
@@ -172,9 +231,10 @@
         "yourEmail": "Deine E-Mail-Adresse:"
       },
       "email-nonce": {
-        "buttonTitle": "Bestätigen",
+        "buttonTitle": "Weiter",
         "form": {
-          "description": "Öffne Dein E-Mail Postfach und gib den Code ein, den wir geschickt haben.",
+          "click-next": "Click auf Weiter.",
+          "description": "Öffne dein E-Mail Postfach und gib den Code ein, den wir geschickt haben.",
           "next": "Weiter",
           "nonce": "E-Mail-Code: 32143",
           "validations": {
@@ -196,7 +256,10 @@
             "length": "muss genau {inviteCodeLength} Buchstaben lang sein",
             "success": "Gültiger Einladungs-Code <b>{inviteCode}</b>!"
           }
-        }
+        },
+        "invited-by": "Eingeladen von {invitedBy}",
+        "invited-by-and-to": "Einladung von {invitedBy} zur Gruppe {invitedTo}",
+        "invited-to-hidden-group": "Eingeladen von {invitedBy} zu einer versteckten Gruppe"
       },
       "no-public-registrstion": {
         "title": "Keine öffentliche Registrierung möglich"
@@ -204,12 +267,12 @@
       "signup": {
         "form": {
           "data-privacy": "Ich habe die Datenschutzerklärung gelesen und verstanden.",
-          "description": "Um loszulegen, kannst Du Dich hier kostenfrei registrieren:",
+          "description": "Um loszulegen, kannst du dich hier kostenfrei registrieren:",
           "errors": {
             "email-exists": "Es gibt schon ein Nutzerkonto mit dieser E-Mail-Adresse!"
           },
           "submit": "Konto erstellen",
-          "success": "Eine E-Mail mit einem Link zum Abschließen Deiner Registrierung wurde an <b>{email}</b> geschickt",
+          "success": "Eine E-Mail mit einem Link zum Abschließen deiner Registrierung wurde an <b>{email}</b> geschickt",
           "terms-and-condition": "Ich stimme den <a href=\"/terms-and-conditions\" target=\"_blank\"><ds-text bold color=\"primary\">Nutzungsbedingungen</ds-text></a> zu."
         },
         "title": "Mach mit bei {APPLICATION_NAME}!",
@@ -218,10 +281,10 @@
     }
   },
   "contribution": {
-    "amount-clicks": "{amount} clicks",
-    "amount-comments": "{amount} comments",
-    "amount-shouts": "{amount} recommendations",
-    "amount-views": "{amount} views",
+    "amount-clicks": "{amount} Klicks",
+    "amount-comments": "{amount} Kommentare",
+    "amount-shouts": "{amount} Empfehlungen",
+    "amount-views": "{amount} Aufrufe",
     "categories": {
       "infoSelectedNoOfMaxCategories": "{chosen} von {max} Themen ausgewählt"
     },
@@ -276,20 +339,20 @@
       "happy": "Glücklich",
       "surprised": "Erstaunt"
     },
-    "filterFollow": "Beiträge von Nutzern filtern, denen ich folge",
+    "filterFollow": "Nutzern, denen ich folge",
     "filterMasonryGrid": {
-      "myFriends": "Nutzer denen ich folge",
+      "myFriends": "Nutzer, denen ich folge",
       "myGroups": "Aus meinen Gruppen",
       "myTopics": "Meine Themen",
-      "noFilter": "Inhalt filtern",
-      "onlyArticles": "Nur Beiträge",
-      "onlyEvents": "Nur Veranstaltungen"
+      "noFilter": "Inhalte filtern",
+      "onlyArticles": "Beiträge",
+      "onlyEvents": "Veranstaltungen"
     },
-    "filterMyGroups": "Beiträge in meinen Gruppen",
+    "filterMyGroups": "Meine Gruppen",
     "inappropriatePicture": "Dieses Bild kann für einige Menschen unangemessen sein.",
-    "languageSelectLabel": "Sprache Deines Beitrags",
+    "languageSelectLabel": "Sprache deines Beitrags",
     "languageSelectText": "Sprache wählen",
-    "newEvent": "Erstelle einen neue Veranstaltung",
+    "newEvent": "Erstelle eine neue Veranstaltung",
     "newPost": "Erstelle einen neuen Beitrag",
     "success": "Gespeichert!",
     "teaserImage": {
@@ -307,13 +370,13 @@
   "delete": {
     "cancel": "Abbrechen",
     "comment": {
-      "message": "Bist Du sicher, dass Du den Kommentar „<b>{name}</b>“ löschen möchtest?",
+      "message": "Bist du sicher, dass du den Kommentar „<b>{name}</b>“ löschen möchtest?",
       "success": "Kommentar erfolgreich gelöscht!",
       "title": "Lösche Kommentar",
       "type": "Kommentar"
     },
     "contribution": {
-      "message": "Bist Du sicher, dass Du den Beitrag „<b>{name}</b>“ löschen möchtest?",
+      "message": "Bist du sicher, dass du den Beitrag „<b>{name}</b>“ löschen möchtest?",
       "success": "Beitrag erfolgreich gelöscht!",
       "title": "Lösche Beitrag",
       "type": "Beitrag"
@@ -323,19 +386,19 @@
   "disable": {
     "cancel": "Abbrechen",
     "comment": {
-      "message": "Bist Du sicher, dass Du den Kommentar „<b>{name}</b>“ deaktivieren möchtest?",
+      "message": "Bist du sicher, dass du den Kommentar „<b>{name}</b>“ deaktivieren möchtest?",
       "title": "Kommentar sperren",
       "type": "Kommentar"
     },
     "contribution": {
-      "message": "Bist Du sicher, dass Du den Beitrag von „<b>{name}</b>“ deaktivieren möchtest?",
+      "message": "Bist du sicher, dass du den Beitrag von „<b>{name}</b>“ deaktivieren möchtest?",
       "title": "Beitrag sperren",
       "type": "Beitrag"
     },
     "submit": "Deaktivieren",
     "success": "Erfolgreich deaktiviert",
     "user": {
-      "message": "Bist Du sicher, dass Du den Nutzer „<b>{name}</b>“ sperren möchtest?",
+      "message": "Bist du sicher, dass du den Nutzer „<b>{name}</b>“ sperren möchtest?",
       "title": "Nutzer sperren",
       "type": "Nutzer"
     }
@@ -347,8 +410,8 @@
   "editor": {
     "embed": {
       "always_allow": "Einzubettende Inhalte von Drittanbietern immer erlauben (diese Einstellung ist jederzeit änderbar)",
-      "data_privacy_info": "Deine Daten wurden noch nicht an Drittanbieter weitergegeben. Wenn Du diesen Inhalt jetzt abspielst, registriert der folgende Anbieter wahrscheinlich Deine Nutzerdaten:",
-      "data_privacy_warning": "Achte auf Deine Daten!",
+      "data_privacy_info": "Deine Daten wurden noch nicht an Drittanbieter weitergegeben. Wenn du diesen Inhalt jetzt abspielst, registriert der folgende Anbieter wahrscheinlich deine Nutzerdaten:",
+      "data_privacy_warning": "Achte auf deine Daten!",
       "play_now": "Jetzt ansehen"
     },
     "hashtag": {
@@ -396,21 +459,22 @@
     "emotions": "Emotionen",
     "ended": {
       "all": {
-        "hint": "Zeige alle, auch beendete",
+        "hint": "Zeige alle, auch zukünftige",
         "label": "Alle"
       },
       "onlyEnded": {
-        "hint": "Zeige nur noch nicht beendete",
-        "label": "Nicht beendete"
+        "hint": "Zeige nur noch zukünftige",
+        "label": "Zukünftige"
       }
     },
     "event": "Veranstaltung",
     "eventsBy": "Veranstaltungen – zeige ...",
     "eventsEnded": "Beendet",
     "filter-by": "Filtern nach ...",
-    "following": "Nutzer denen ich folge",
+    "following": "Nutzer, denen ich folge",
+    "following-title": "Quellen",
     "languages": "Sprachen",
-    "my-groups": "Meinen Gruppen",
+    "my-groups": "Meine Gruppen",
     "order": {
       "last": {
         "hint": "Sortiere die Letzten nach vorn",
@@ -456,13 +520,13 @@
     "addUserNoOptions": "Keine Nutzer gefunden!",
     "addUserPlaceholder": "Nutzername",
     "allGroups": "Alle Gruppen",
-    "button": {
-      "tooltip": "Gruppen anzeigen"
-    },
     "categories": "Thema ::: Themen",
     "categoriesTitle": "Themen der Gruppe",
     "changeMemberRole": "Die Rolle wurde auf „{role}“ geändert!",
     "contentMenu": {
+      "inviteLinks": "Einladungslinks",
+      "muteGroup": "Stummschalten",
+      "unmuteGroup": "Nicht stummschalten",
       "visitGroupPage": "Gruppe anzeigen"
     },
     "createNewGroup": {
@@ -483,6 +547,7 @@
     "goal": "Ziel der Gruppe",
     "groupCreated": "Die Gruppe wurde angelegt!",
     "in": "in",
+    "invite-links": "Einladungslinks",
     "joinLeaveButton": {
       "iAmMember": "Bin Mitglied",
       "join": "Beitreten",
@@ -513,6 +578,7 @@
       "confirmAddGroupMemberText": "Nutzer „{name}“ zur Gruppe hinzufügen?",
       "confirmAddGroupMemberTitle": "Bestätigen"
     },
+    "muted": "Gruppe stummgeschaltet",
     "myGroups": "Meine Gruppen",
     "name": "Gruppenname",
     "radius": "Radius",
@@ -537,6 +603,8 @@
       "hidden": "Geheim — Gruppe (auch der Name) komplett unsichtbar",
       "public": "Öffentlich — Gruppe und alle Beiträge für registrierte Nutzer sichtbar"
     },
+    "unmute": "Nicht stummschalten",
+    "unmuted": "Gruppe nicht mehr stummgeschaltet",
     "update": "Änderung speichern",
     "updatedGroup": "Die Gruppendaten wurden geändert!"
   },
@@ -550,8 +618,23 @@
       "button": {
         "tooltip": "Mein Profil"
       },
+      "chats": "Chats",
       "groups": "Gruppen",
-      "myProfile": "Mein Profil"
+      "map": "Landkarte",
+      "myProfile": "Mein Profil",
+      "notifications": "Benachrichtigungen"
+    },
+    "chats": {
+      "tooltip": "Chats"
+    },
+    "groups": {
+      "tooltip": "Gruppen"
+    },
+    "map": {
+      "tooltip": "Landkarte"
+    },
+    "notifications": {
+      "tooltip": "Benachrichtigungen"
     }
   },
   "index": {
@@ -562,13 +645,35 @@
     "button": {
       "tooltip": "Freunde einladen"
     },
+    "comment-placeholder": "Kommentar (optional)",
     "copy-code": "Einladungslink kopieren",
     "copy-success": "Einladungscode erfolgreich in die Zwischenablage kopiert",
-    "not-available": "Du hast keinen Einladungscode zur Verfügung!",
-    "your-code": "Sende diesen Link per E-Mail oder in sozialen Medien, um deine Freunde einzuladen:"
+    "create-error": "Einladungslink konnte nicht erstellt werden: {error}",
+    "create-success": "Einladungslink erfolgreich erstellt!",
+    "delete-modal": {
+      "message": "Möchtest du diesen Einladungslink wirklich ungültig machen?",
+      "title": "Einladungslink widerrufen"
+    },
+    "generate-code": "Neuen Einladungslink erstellen",
+    "generate-code-explanation": "Erstelle einen neuen Link. Wenn du möchtest, füge einen Kommentar hinzu (nur für dich sichtbar). ",
+    "group-invite-links": "Gruppen-Einladungslinks",
+    "invalidate": "Widerrufen",
+    "invalidate-error": "Einladungslink konnte nicht ungültig gemacht werden: {error}",
+    "invalidate-success": "Einladungslink erfolgreich widerrufen",
+    "invite-link-message-group": "Du wurdest eingeladen, der Gruppe {groupName} auf {network} beizutreten.",
+    "invite-link-message-hidden-group": "Du wurdest eingeladen, einer versteckten Gruppe auf {network} beizutreten.",
+    "invite-link-message-personal": "Du wurdest eingeladen, dem Netzwerk {network} beizutreten",
+    "limit-reached": "Du hast die maximale Anzahl an Einladungslinks erreicht.",
+    "my-invite-links": "Meine Einladungslinks",
+    "no-links": "Keine Links vorhanden",
+    "redeemed-count": "{count} mal eingelöst",
+    "redeemed-count-0": "Noch von niemandem eingelöst"
   },
   "localeSwitch": {
     "tooltip": "Sprache wählen"
+  },
+  "location": {
+    "distance": "{distance} km von mir entfernt"
   },
   "login": {
     "email": "Deine E-Mail",
@@ -580,24 +685,28 @@
     "moreInfo": "Was ist {APPLICATION_NAME}?",
     "moreInfoHint": "zur Präsentationsseite",
     "no-account": "Du hast noch kein Nutzerkonto?",
-    "no-cookie": "Es kann kein Cookie angelegt werden. Du must Cookies akzeptieren.",
+    "no-cookie": "Es kann kein Cookie angelegt werden. Du musst Cookies akzeptieren.",
     "password": "Dein Passwort",
     "register": "Nutzerkonto erstellen",
     "success": "Du bist eingeloggt!"
   },
   "maintenance": {
     "explanation": "Derzeit führen wir einige geplante Wartungsarbeiten durch, bitte versuche es später erneut.",
-    "questions": "Bei Fragen oder Problemen erreichst Du uns per E-Mail an",
+    "questions": "Bei Fragen oder Problemen erreichst du uns per E-Mail an",
     "title": "{APPLICATION_NAME} befindet sich in der Wartung"
   },
   "map": {
     "alertMessage": "Es kann nicht auf die Karte zugegriffen werden: Der Mapbox-Token ist auf dem Server nicht gesetzt!",
-    "button": {
-      "tooltip": "Landkarte anzeigen"
+    "legend": {
+      "event": "Veranstaltung",
+      "group": "Gruppe",
+      "theUser": "Meine Position",
+      "user": "Nutzer"
     },
     "markerTypes": {
+      "event": "Veranstaltung",
       "group": "Gruppe",
-      "theUser": "deine Position",
+      "theUser": "meine Position",
       "user": "Nutzer"
     },
     "pageTitle": "Landkarte",
@@ -624,32 +733,32 @@
         "cancel": "Abbruch",
         "Comment": {
           "disable": {
-            "message": "Möchtest Du den Kommentar „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
+            "message": "Möchtest du den Kommentar „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
             "title": "Sperre den Kommentar abschließend"
           },
           "enable": {
-            "message": "Möchtest Du den Kommentar „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
+            "message": "Möchtest du den Kommentar „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
             "title": "Entsperre den Kommentar abschließend"
           }
         },
         "Post": {
           "disable": {
-            "message": "Möchtest Du den Beitrag „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
+            "message": "Möchtest du den Beitrag „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
             "title": "Sperre den Beitrag abschließend"
           },
           "enable": {
-            "message": "Möchtest Du den Beitrag „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
+            "message": "Möchtest du den Beitrag „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
             "title": "Entsperre den Beitrag abschließend"
           }
         },
         "submit": "Bestätige Entscheidung",
         "User": {
           "disable": {
-            "message": "Möchtest Du den Nutzer „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
+            "message": "Möchtest du den Nutzer „<b>{name}</b>“ wirklich <b>gesperrt</b> lassen?",
             "title": "Sperre den Nutzer abschließend"
           },
           "enable": {
-            "message": "Möchtest Du den Nutzer „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
+            "message": "Möchtest du den Nutzer „<b>{name}</b>“ wirklich <b>entsperrt</b> lassen?",
             "title": "Entsperre den Nutzer abschließend"
           }
         }
@@ -684,35 +793,33 @@
   "notifications": {
     "comment": "Kommentar",
     "content": "Inhalt oder Beschreibung",
-    "empty": "Bedaure, Du hast momentan keinerlei Benachrichtigungen.",
+    "empty": "Bedaure, du hast momentan keinerlei Benachrichtigungen.",
     "filterLabel": {
       "all": "Alle",
       "read": "Gelesen",
       "unread": "Ungelesen"
     },
     "group": "Beschreibung",
-    "headerMenuButton": {
-      "tooltip": "Meine Benachrichtigungen"
-    },
     "markAllAsRead": "Markiere alle als gelesen",
     "pageLink": "Alle Benachrichtigungen",
     "post": "Beitrag oder Gruppe",
     "reason": {
-      "changed_group_member_role": "Hat Deine Rolle in der Gruppe geändert …",
-      "commented_on_post": "Hat Deinen Beitrag kommentiert …",
-      "mentioned_in_comment": "Hat Dich in einem Kommentar erwähnt …",
-      "mentioned_in_post": "Hat Dich in einem Beitrag erwähnt …",
-      "removed_user_from_group": "Hat Dich aus der Gruppe entfernt …",
-      "user_joined_group": "Ist Deiner Gruppe beigetreten …",
-      "user_left_group": "Hat deine Gruppe verlassen …"
+      "changed_group_member_role": "Hat deine Rolle in der Gruppe geändert",
+      "commented_on_post": "Hat einen Beitrag den du beobachtest kommentiert",
+      "followed_user_posted": "Hat einen neuen Betrag geschrieben",
+      "mentioned_in_comment": "Hat dich in einem Kommentar erwähnt",
+      "mentioned_in_post": "Hat dich in einem Beitrag erwähnt",
+      "on_date": "am",
+      "post_in_group": "Hat einen Beitrag in der Gruppe geschrieben",
+      "removed_user_from_group": "Hat dich aus der Gruppe entfernt",
+      "user_joined_group": "Ist deiner Gruppe beigetreten",
+      "user_left_group": "Hat deine Gruppe verlassen"
     },
     "title": "Benachrichtigungen",
     "user": "Nutzer"
   },
-  "position": {
-    "group": "Gruppe",
-    "my": "Meine Position",
-    "user": "Nutzer"
+  "observeButton": {
+    "observed": "beobachtet"
   },
   "post": {
     "comment": {
@@ -725,13 +832,13 @@
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
       },
-      "title": "Erstelle ein neues Event"
+      "title": "Erstelle eine Veranstaltung"
     },
     "createNewPost": {
       "forGroup": {
         "title": "Für die Gruppe „{name}“"
       },
-      "title": "Erstelle einen neuen Beitrag"
+      "title": "Erstelle einen Beitrag"
     },
     "edited": "bearbeitet",
     "editPost": {
@@ -745,8 +852,12 @@
     "menu": {
       "delete": "Beitrag löschen",
       "edit": "Beitrag bearbeiten",
+      "observe": "Beitrag beobachten",
+      "observedSuccessfully": "Du beobachtest diesen Beitrag!",
       "pin": "Beitrag anheften",
       "pinnedSuccessfully": "Beitrag erfolgreich angeheftet!",
+      "unobserve": "Beitrag nicht mehr beobachten",
+      "unobservedSuccessfully": "Du beobachtest diesen Beitrag nicht mehr!",
       "unpin": "Beitrag loslösen",
       "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!"
     },
@@ -758,9 +869,9 @@
     "viewEvent": {
       "eventEnd": "Ende",
       "eventIsOnline": "Online",
-      "eventLocationName": "Stadt",
+      "eventLocationName": "Adresse für Navi — z.B. Musterstraße 1, 12345 Musterstadt",
       "eventStart": "Beginn",
-      "eventVenue": "Veranstaltungsort",
+      "eventVenue": "Ortsbeschreibung — z.B. Hinterhof, 1. OG, …",
       "title": "Veranstaltung"
     },
     "viewPost": {
@@ -805,22 +916,22 @@
   "release": {
     "cancel": "Abbrechen",
     "comment": {
-      "error": "Den Kommentar hast Du schon gemeldet!",
-      "message": "Bist Du sicher, dass Du den Kommentar „<b>{name}</b>“ freigeben möchtest?",
+      "error": "Den Kommentar hast du schon gemeldet!",
+      "message": "Bist du sicher, dass du den Kommentar „<b>{name}</b>“ freigeben möchtest?",
       "title": "Kommentar freigeben",
       "type": "Kommentar"
     },
     "contribution": {
-      "error": "Den Beitrag hast Du schon gemeldet!",
-      "message": "Bist Du sicher, dass Du den Beitrag „<b>{name}</b>“ freigeben möchtest?",
+      "error": "Den Beitrag hast du schon gemeldet!",
+      "message": "Bist du sicher, dass du den Beitrag „<b>{name}</b>“ freigeben möchtest?",
       "title": "Beitrag freigeben",
       "type": "Beitrag"
     },
     "submit": "freigeben",
     "success": "Erfolgreich freigegeben!",
     "user": {
-      "error": "Den Nutzer hast Du schon gemeldet!",
-      "message": "Bist Du sicher, dass Du den Nutzer „<b>{name}</b>“ freigeben möchtest?",
+      "error": "Den Nutzer hast du schon gemeldet!",
+      "message": "Bist du sicher, dass du den Nutzer „<b>{name}</b>“ freigeben möchtest?",
       "title": "Nutzer freigeben",
       "type": "Nutzer"
     }
@@ -829,13 +940,13 @@
     "cancel": "Abbrechen",
     "comment": {
       "error": "Du hast den Kommentar bereits gemeldet!",
-      "message": "Bist Du sicher, dass Du den Kommentar von „<b>{name}</b>“ melden möchtest?",
+      "message": "Bist du sicher, dass du den Kommentar von „<b>{name}</b>“ melden möchtest?",
       "title": "Kommentar melden",
       "type": "Kommentar"
     },
     "contribution": {
       "error": "Du hast den Beitrag bereits gemeldet!",
-      "message": "Bist Du sicher, dass Du den Beitrag „<b>{name}</b>“ melden möchtest?",
+      "message": "Bist du sicher, dass du den Beitrag „<b>{name}</b>“ melden möchtest?",
       "title": "Beitrag melden",
       "type": "Beitrag"
     },
@@ -856,7 +967,7 @@
         "placeholder": "Thema …"
       },
       "description": {
-        "label": "Bitte erkläre: Warum möchtest Du dies melden?",
+        "label": "Bitte erkläre: Warum möchtest du dies melden?",
         "placeholder": "Zusätzliche Information …"
       }
     },
@@ -864,7 +975,7 @@
     "success": "Vielen Dank für diese Meldung!",
     "user": {
       "error": "Du hast den Nutzer bereits gemeldet!",
-      "message": "Bist Du sicher, dass Du den Nutzer „<b>{name}</b>“ melden möchtest?",
+      "message": "Bist du sicher, dass du den Nutzer „<b>{name}</b>“ melden möchtest?",
       "title": "Nutzer melden",
       "type": "Nutzer"
     }
@@ -878,7 +989,7 @@
       "Tag": "Hashtag ::: Hashtags",
       "User": "Nutzer ::: Nutzer"
     },
-    "hint": "Wonach suchst Du? Nutze !… für Beiträge, @… für Mitglieder, &… für Gruppen, #… für Hashtags",
+    "hint": "!... sucht Beiträge, @... sucht Nutzer, &... sucht Gruppen, #… sucht Hashtags",
     "no-results": "Keine Ergebnisse für \"{search}\" gefunden. Versuch' es mit einem anderen Begriff!",
     "page": "Seite",
     "placeholder": "Suchen",
@@ -886,6 +997,16 @@
     "title": "Suchergebnisse"
   },
   "settings": {
+    "badges": {
+      "click-to-select": "Klicke auf einen freien Platz, um eine Badge hinzufügen.",
+      "click-to-use": "Klicke auf eine Badge, um sie zu platzieren.",
+      "description": "Hier hast du die Möglichkeit zu entscheiden, wie deine bereits erworbenen Badges in deinem Profil gezeigt werden sollen.",
+      "name": "Badges",
+      "no-badges-available": "Im Moment stehen dir keine Badges zur Verfügung, die du hinzufügen könntest.",
+      "remove": "Badge entfernen",
+      "success-update": "Deine Badges wurden erfolgreich gespeichert.",
+      "verification": "Dies ist deine Verifikations-Badge und kann nicht geändert werden."
+    },
     "blocked-users": {
       "block": "Nutzer blockieren",
       "columns": {
@@ -893,15 +1014,15 @@
         "slug": "Alias",
         "unblock": "Entsperren"
       },
-      "empty": "Bislang hast Du niemanden blockiert.",
+      "empty": "Bislang hast du niemanden blockiert.",
       "explanation": {
-        "closing": "Das sollte fürs Erste genügen, damit blockierte Nutzer Dich nicht mehr länger belästigen können.",
+        "closing": "Das sollte fürs Erste genügen, damit blockierte Nutzer dich nicht mehr länger belästigen können.",
         "commenting-disabled": "Du kannst den Beitrag derzeit nicht kommentieren.",
         "commenting-explanation": "Dafür kann es mehrere Gründe geben, bitte schau in unsere ",
-        "intro": "Wenn ein anderer Nutzer durch Dich blockiert wurde, dann passiert Folgendes:",
-        "notifications": "Von Dir blockierte Nutzer werden keine Benachrichtigungen mehr erhalten, falls sie in Deinen Beiträgen erwähnt werden.",
-        "their-perspective": "Umgekehrt das gleiche: Die blockierte Person bekommt auch in ihren Benachrichtigungen Deine Beiträge nicht mehr zu sehen.",
-        "your-perspective": "In Deinen Benachrichtigungen tauchen keine Beiträge der blockierten Person mehr auf."
+        "intro": "Wenn ein anderer Nutzer durch dich blockiert wurde, dann passiert Folgendes:",
+        "notifications": "Von Dir blockierte Nutzer werden keine Benachrichtigungen mehr erhalten, falls sie in deinen Beiträgen erwähnt werden.",
+        "their-perspective": "Umgekehrt das gleiche: Die blockierte Person bekommt auch in ihren Benachrichtigungen deine Beiträge nicht mehr zu sehen.",
+        "your-perspective": "In deinen Benachrichtigungen tauchen keine Beiträge der blockierten Person mehr auf."
       },
       "how-to": "Du kannst andere Nutzer auf deren Profilseite über das Inhaltsmenü blockieren.",
       "name": "Blockierte Nutzer",
@@ -909,14 +1030,19 @@
       "unblocked": "{name} ist wieder entsperrt"
     },
     "data": {
-      "labelBio": "Über Dich",
+      "givenName": "Dein Vorname",
+      "givenNamePlaceholder": "Petra",
+      "labelBio": "Über dich",
       "labelCity": "Deine Stadt oder Region",
       "labelCityHint": "(zeigt ungefähre Position auf der Landkarte)",
       "labelName": "Dein Name",
       "labelSlug": "Dein eindeutiger Nutzername",
       "name": "Deine Daten",
       "namePlaceholder": "Petra Lustig",
-      "success": "Deine Daten wurden erfolgreich aktualisiert!"
+      "realNamePlease": "Bitte gib deinen Klarnamen an",
+      "success": "Deine Daten wurden erfolgreich aktualisiert!",
+      "surName": "Dein Nachname",
+      "surNamePlaceholder": "Lustig"
     },
     "deleteUserAccount": {
       "accountDescription": "Sei dir bewusst, dass deine Beiträge und Kommentare für unsere Community wichtig sind. Wenn du sie trotzdem löschen möchtest, musst du sie unten markieren.",
@@ -942,17 +1068,17 @@
       "labelNewEmail": "Neue E-Mail-Adresse",
       "labelNonce": "Bestätigungscode eingeben",
       "name": "Deine E-Mail",
-      "submitted": "Eine E-Mail zur Bestätigung Deiner Adresse wurde an <b>{email}</b> gesendet.",
+      "submitted": "Eine E-Mail zur Bestätigung deiner Adresse wurde an <b>{email}</b> gesendet.",
       "success": "Eine neue E-Mail-Adresse wurde registriert.",
       "validation": {
-        "same-email": "Das ist Deine aktuelle E-Mail-Adresse"
+        "same-email": "Das ist deine aktuelle E-Mail-Adresse"
       },
       "verification-error": {
         "explanation": "Das kann verschiedene Ursachen haben:",
         "message": "Deine E-Mail-Adresse konnte nicht verifiziert werden.",
         "reason": {
           "invalid-nonce": "Ist der Bestätigungscode falsch?",
-          "no-email-request": "Bist Du Dir sicher, dass Du eine Änderung Deiner E-Mail-Adresse angefragt hattest?"
+          "no-email-request": "Bist du Dir sicher, dass du eine Änderung deiner E-Mail-Adresse angefragt hattest?"
         },
         "support": "Wenn das Problem weiterhin besteht, kontaktiere uns gerne per E-Mail an"
       }
@@ -999,9 +1125,24 @@
     },
     "name": "Einstellungen",
     "notifications": {
-      "name": "Benachrichtigungen",
+      "chat": "Chat",
+      "chatMessage": "Nachricht erhalten während Abwesenheit.",
+      "checkAll": "Alle auswählen",
+      "commentOnObservedPost": "Kommentare zu beobachteten Beiträgen.",
+      "followingUsers": "Ein Nutzer dem ich folge veröffentlichte einen neuen Beitrag.",
+      "group": "Gruppen",
+      "groupMemberJoined": "Ein Mitglied ist deiner Gruppe beigetreten.",
+      "groupMemberLeft": "Ein Mitglied hat deine Gruppe verlassen.",
+      "groupMemberRemoved": "Du wurdest aus einer Gruppe entfernt.",
+      "groupMemberRoleChanged": "Deine Rolle in einer Gruppe wurde geändert oder du wurdest eingeladen.",
+      "mention": "Ich wurde erwähnt.",
+      "name": "Benachrichtigungen per E-Mail",
+      "post": "Beiträge und Kommentare",
+      "postByFollowedUser": "Beitrag von einem Nutzer, dem ich folge.",
+      "postInGroup": "Beitrag in einer Gruppe, die ich beobachte.",
       "send-email-notifications": "Sende E-Mail-Benachrichtigungen",
-      "success-update": "Benachrichtigungs-Einstellungen gespeichert!"
+      "success-update": "Benachrichtigungs-Einstellungen gespeichert!",
+      "uncheckAll": "Alle abwählen"
     },
     "organizations": {
       "name": "Meine Organisationen"
@@ -1015,12 +1156,12 @@
       "change-password": {
         "button": "Passwort ändern",
         "label-new-password": "Dein neues Passwort",
-        "label-new-password-confirm": "Bestätige Dein neues Passwort",
+        "label-new-password-confirm": "Bestätige dein neues Passwort",
         "label-old-password": "Dein altes Passwort",
-        "message-new-password-confirm-required": "Bestätige Dein neues Passwort",
+        "message-new-password-confirm-required": "Bestätige dein neues Passwort",
         "message-new-password-missmatch": "Gib dasselbe Passwort nochmals ein",
         "message-new-password-required": "Gib ein neues Passwort ein",
-        "message-old-password-required": "Gib Dein altes Passwort ein",
+        "message-old-password-required": "Gib dein altes Passwort ein",
         "passwordSecurity": "Passwortsicherheit",
         "passwordStrength0": "Sehr unsicheres Passwort",
         "passwordStrength1": "Unsicheres Passwort",
@@ -1062,7 +1203,6 @@
     "code-of-conduct": "Verhaltenscodex",
     "contact": "Kontakt",
     "data-privacy": "Datenschutzerklärung",
-    "director": "Geschäftsführer",
     "donate": "Spenden",
     "error-occurred": "Ein Fehler ist aufgetreten.",
     "faq": "FAQ",
@@ -1070,16 +1210,18 @@
     "imprint": "Impressum",
     "made": "Mit ❤️ gemacht",
     "register": "Registernummer",
-    "responsible": "Verantwortlich für Inhalte dieser Seite (§ 55 Abs. 2 RStV)",
     "support": "Support",
-    "taxident": "Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz (Deutschland)",
     "termsAndConditions": "Nutzungsbedingungen",
-    "thanks": "Danke!",
-    "tribunal": "Registergericht"
+    "thanks": "Danke!"
   },
   "termsAndConditions": {
     "newTermsAndConditions": "Neue Nutzungsbedingungen",
     "termsAndConditionsNewConfirm": "Ich habe die neuen Nutzungsbedingungen durchgelesen und stimme zu.",
     "termsAndConditionsNewConfirmText": "Bitte lies Dir die neuen Nutzungsbedingungen jetzt durch!"
+  },
+  "user-teaser": {
+    "popover": {
+      "open-profile": "Profil öffnen"
+    }
   }
 }

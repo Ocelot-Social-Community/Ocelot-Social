@@ -16,7 +16,7 @@
       </template>
       <client-only>
         <div class="post-user-row">
-          <user-teaser :user="post.author" :group="post.group" :date-time="post.createdAt" />
+          <user-teaser :user="post.author" :group="post.group" />
           <hc-ribbon
             :class="[isPinned ? '--pinned' : '', post.image ? 'post-ribbon-w-img' : 'post-ribbon']"
             :text="ribbonText"
@@ -25,25 +25,27 @@
         </div>
       </client-only>
       <h2 class="title hyphenate-text">{{ post.title }}</h2>
-      <ds-space
-        v-if="post && post.postType[0] === 'Event'"
-        margin-bottom="small"
-        style="padding: 5px"
-      >
-        <location-teaser
-          class="event-info"
-          size="small"
-          :venue="post.eventVenue"
-          :locationName="post.eventLocationName"
-          :isOnline="post.eventIsOnline"
-        />
-        <date-time-range
-          class="event-info"
-          size="small"
-          :startDate="post.eventStart"
-          :endDate="post.eventEnd"
-        />
-      </ds-space>
+      <client-only>
+        <ds-space
+          v-if="post && post.postType[0] === 'Event'"
+          margin-bottom="small"
+          style="padding: 5px"
+        >
+          <location-teaser
+            class="event-info"
+            size="base"
+            :venue="post.eventVenue"
+            :locationName="post.eventLocationName"
+            :isOnline="post.eventIsOnline"
+          />
+          <date-time-range
+            class="event-info"
+            size="base"
+            :startDate="post.eventStart"
+            :endDate="post.eventEnd"
+          />
+        </ds-space>
+      </client-only>
       <!-- TODO: replace editor content with tiptap render view -->
       <!-- eslint-disable-next-line vue/no-v-html -->
       <div class="content hyphenate-text" v-html="excerpt" />
@@ -57,7 +59,7 @@
             :key="category.id"
             v-tooltip="{
               content: `
-                ${$t(`contribution.category.name.${category.slug}`)}: 
+                ${$t(`contribution.category.name.${category.slug}`)}:
                 ${$t(`contribution.category.description.${category.slug}`)}
               `,
               placement: 'bottom-start',
@@ -70,22 +72,34 @@
         <counter-icon
           icon="heart-o"
           :count="post.shoutedCount"
-          :title="$t('contribution.amount-shouts', { amount: post.shoutedCount })"
+          v-tooltip="{
+            content: $t('contribution.amount-shouts', { amount: post.shoutedCount }),
+            placement: 'bottom-start',
+          }"
         />
         <counter-icon
           icon="comments"
           :count="post.commentsCount"
-          :title="$t('contribution.amount-comments', { amount: post.commentsCount })"
+          v-tooltip="{
+            content: $t('contribution.amount-comments', { amount: post.commentsCount }),
+            placement: 'bottom-start',
+          }"
         />
         <counter-icon
           icon="hand-pointer"
           :count="post.clickedCount"
-          :title="$t('contribution.amount-clicks', { amount: post.clickedCount })"
+          v-tooltip="{
+            content: $t('contribution.amount-clicks', { amount: post.clickedCount }),
+            placement: 'bottom-start',
+          }"
         />
         <counter-icon
           icon="eye"
           :count="post.viewedTeaserCount"
-          :title="$t('contribution.amount-views', { amount: post.viewedTeaserCount })"
+          v-tooltip="{
+            content: $t('contribution.amount-views', { amount: post.viewedTeaserCount }),
+            placement: 'bottom-start',
+          }"
         />
         <client-only>
           <content-menu
@@ -95,9 +109,18 @@
             :is-owner="isAuthor"
             @pinPost="pinPost"
             @unpinPost="unpinPost"
+            @toggleObservePost="toggleObservePost"
           />
         </client-only>
       </footer>
+      <client-only>
+        <div class="date-row" v-if="post.createdAt">
+          <span class="text">
+            <date-time :date-time="post.createdAt" />
+            <slot name="dateTime"></slot>
+          </span>
+        </div>
+      </client-only>
     </base-card>
   </nuxt-link>
 </template>
@@ -109,13 +132,16 @@ import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import HcRibbon from '~/components/Ribbon'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
+import DateTime from '~/components/DateTime'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import { mapGetters } from 'vuex'
 import PostMutations from '~/graphql/PostMutations'
 import { postMenuModalsData, deletePostMutation } from '~/components/utils/PostHelpers'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   name: 'PostTeaser',
+  mixins: [GetCategories],
   components: {
     Category,
     ContentMenu,
@@ -123,6 +149,7 @@ export default {
     DateTimeRange,
     HcRibbon,
     LocationTeaser,
+    DateTime,
     UserTeaser,
   },
   props: {
@@ -138,11 +165,6 @@ export default {
       type: Object,
       default: () => {},
     },
-  },
-  data() {
-    return {
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
-    }
   },
   mounted() {
     const { image } = this.post
@@ -200,6 +222,9 @@ export default {
     unpinPost(post) {
       this.$emit('unpinPost', post)
     },
+    toggleObservePost(postId, value) {
+      this.$emit('toggleObservePost', postId, value)
+    },
     visibilityChanged(isVisible, entry, id) {
       if (!this.post.viewedTeaserByCurrentUser && isVisible) {
         this.$apollo
@@ -251,6 +276,7 @@ export default {
   flex-direction: column;
   overflow: visible;
   height: 100%;
+  padding-bottom: $space-x-small;
 
   > .hero-image {
     border-top-left-radius: 5px;
@@ -264,12 +290,6 @@ export default {
   > .content {
     flex-grow: 1;
     margin-bottom: $space-small;
-  }
-
-  & .event-info {
-    display: flex;
-    align-items: center;
-    gap: 2px;
   }
 
   > .footer {
@@ -300,6 +320,22 @@ export default {
 
   .user-teaser {
     margin-bottom: $space-small;
+  }
+  > .date-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: $space-small;
+    > .text {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      color: $text-color-soft;
+      font-size: $font-size-small;
+
+      > .ds-text {
+        display: inline;
+      }
+    }
   }
 }
 </style>

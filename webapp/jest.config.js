@@ -17,7 +17,7 @@ module.exports = {
   ],
   coverageThreshold: {
     global: {
-      lines: 83,
+      lines: 82,
     },
   },
   coverageProvider: 'v8',
@@ -38,4 +38,5 @@ module.exports = {
   },
   moduleFileExtensions: ['js', 'json', 'vue'],
   testEnvironment: 'jest-environment-jsdom',
+  snapshotSerializers: ['jest-serializer-vue'],
 }

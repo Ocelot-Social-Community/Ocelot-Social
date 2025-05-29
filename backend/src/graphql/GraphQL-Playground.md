@@ -1,5 +1,7 @@
 # GraphQL Playground
 
+![GraphQL Playground](../../../.gitbook/assets/graphql-playground%20%281%29.png)
+
 ***Attention:** For using the GraphQL Playground set `DEBUG=true` in your backend `.env`, see `.env.template`!*
 
 To use GraphQL Playground, we need to know some basics:

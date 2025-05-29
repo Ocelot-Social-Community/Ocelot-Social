@@ -8,11 +8,20 @@ yarn-error.log*
 .yarn-integrity
 .eslintcache
 kubeconfig.yaml
+backup-cron-job.log
+.vscode
+.nuxt
 
 node_modules/
 cypress/videos
 cypress/screenshots/
 cypress.env.json
+deployment/configurations/
+
+.vuepress/.cache/
+.vuepress/.temp/
+.vuepress/dist/
+
 
 !.gitkeep
 **/coverage

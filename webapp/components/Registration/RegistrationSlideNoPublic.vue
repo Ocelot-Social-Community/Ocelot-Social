@@ -18,12 +18,8 @@ export default {
     sliderData: { type: Object, required: true },
   },
   mounted: function () {
-    this.$nextTick(function () {
-      // Code that will run only after the entire view has been rendered
-
-      this.sliderData.setSliderValuesCallback(true, {
-        sliderSettings: { buttonSliderCallback: this.onNextClick },
-      })
+    this.sliderData.setSliderValuesCallback(true, {
+      sliderSettings: { buttonSliderCallback: this.onNextClick },
     })
   },
   methods: {

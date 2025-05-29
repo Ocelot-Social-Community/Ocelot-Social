@@ -1,4 +1,8 @@
-import extractHashtags from '../hashtags/extractHashtags'
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+import extractHashtags from './extractHashtags'
 
 const updateHashtagsOfPost = async (postId, hashtags, context) => {
   if (!hashtags.length) return

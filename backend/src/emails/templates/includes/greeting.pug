@@ -1,0 +1,17 @@
+//- This sets the greeting at the end of every e-mail
+.text-block
+  - var organizationUrl = ORGANIZATION_URL
+  - var team = APPLICATION_NAME
+  - var settingsUrl = settingsUrl
+  - var renderSettingsUrl = renderSettingsUrl
+  p= t('general.seeYou')
+    a.organization(href=organizationUrl)= team
+    | !
+  p= t('general.yourTeam', { team })
+
+  if renderSettingsUrl
+    br
+    p= t('general.settingsHint')
+      a.settings(href=settingsUrl)= t('general.settingsName')
+      | !
+  

@@ -16,7 +16,10 @@ const stubs = {
   },
 }
 
-let getters, mutations, mocks, menuToggle, openModalSpy
+let getters, mutations, actions, mocks, menuToggle, openModalSpy
+
+const maxPinnedPostsMock = jest.fn()
+const currentlyPinnedPostsMock = jest.fn()
 
 describe('ContentMenu.vue', () => {
   beforeEach(() => {
@@ -38,10 +41,15 @@ describe('ContentMenu.vue', () => {
     getters = {
       'auth/isModerator': () => false,
       'auth/isAdmin': () => false,
+      'pinnedPosts/maxPinnedPosts': maxPinnedPostsMock,
+      'pinnedPosts/currentlyPinnedPosts': currentlyPinnedPostsMock,
+    }
+    actions = {
+      'pinnedPosts/fetch': jest.fn(),
     }
 
     const openContentMenu = async (values = {}) => {
-      const store = new Vuex.Store({ mutations, getters })
+      const store = new Vuex.Store({ mutations, getters, actions })
       const wrapper = mount(ContentMenu, {
         propsData: {
           ...values,
@@ -91,53 +99,281 @@ describe('ContentMenu.vue', () => {
     })
 
     describe('admin can', () => {
-      it('pin unpinned post', async () => {
-        getters['auth/isAdmin'] = () => true
-        const wrapper = await openContentMenu({
-          isOwner: false,
-          resourceType: 'contribution',
-          resource: {
-            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
-            pinnedBy: null,
-          },
+      describe('when maxPinnedPosts = 0', () => {
+        beforeEach(() => {
+          maxPinnedPostsMock.mockReturnValue(0)
         })
-        wrapper
-          .findAll('.ds-menu-item')
-          .filter((item) => item.text() === 'post.menu.pin')
-          .at(0)
-          .trigger('click')
-        expect(wrapper.emitted('pinPost')).toEqual([
-          [
-            {
+
+        it('not pin unpinned post', async () => {
+          getters['auth/isAdmin'] = () => true
+          const wrapper = await openContentMenu({
+            isOwner: false,
+            resourceType: 'contribution',
+            resource: {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               pinnedBy: null,
             },
-          ],
-        ])
-      })
-
-      it('unpin pinned post', async () => {
-        const wrapper = await openContentMenu({
-          isOwner: false,
-          resourceType: 'contribution',
-          resource: {
-            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
-            pinnedBy: 'someone',
-          },
+          })
+          expect(
+            wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.pin'),
+          ).toHaveLength(0)
         })
-        wrapper
-          .findAll('.ds-menu-item')
-          .filter((item) => item.text() === 'post.menu.unpin')
-          .at(0)
-          .trigger('click')
-        expect(wrapper.emitted('unpinPost')).toEqual([
-          [
-            {
+
+        it('unpin pinned post', async () => {
+          const wrapper = await openContentMenu({
+            isOwner: false,
+            resourceType: 'contribution',
+            resource: {
               id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
               pinnedBy: 'someone',
             },
-          ],
-        ])
+          })
+          wrapper
+            .findAll('.ds-menu-item')
+            .filter((item) => item.text() === 'post.menu.unpin')
+            .at(0)
+            .trigger('click')
+          expect(wrapper.emitted('unpinPost')).toEqual([
+            [
+              {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                pinnedBy: 'someone',
+              },
+            ],
+          ])
+        })
+      })
+
+      describe('when maxPinnedPosts = 1', () => {
+        beforeEach(() => {
+          maxPinnedPostsMock.mockReturnValue(1)
+        })
+
+        it('pin unpinned post', async () => {
+          getters['auth/isAdmin'] = () => true
+          const wrapper = await openContentMenu({
+            isOwner: false,
+            resourceType: 'contribution',
+            resource: {
+              id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+              pinnedBy: null,
+            },
+          })
+          wrapper
+            .findAll('.ds-menu-item')
+            .filter((item) => item.text() === 'post.menu.pin')
+            .at(0)
+            .trigger('click')
+          expect(wrapper.emitted('pinPost')).toEqual([
+            [
+              {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                pinnedBy: null,
+              },
+            ],
+          ])
+        })
+
+        it('unpin pinned post', async () => {
+          const wrapper = await openContentMenu({
+            isOwner: false,
+            resourceType: 'contribution',
+            resource: {
+              id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+              pinnedBy: 'someone',
+            },
+          })
+          wrapper
+            .findAll('.ds-menu-item')
+            .filter((item) => item.text() === 'post.menu.unpin')
+            .at(0)
+            .trigger('click')
+          expect(wrapper.emitted('unpinPost')).toEqual([
+            [
+              {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                pinnedBy: 'someone',
+              },
+            ],
+          ])
+        })
+
+        describe('post in public group', () => {
+          it('can pin unpinned post', async () => {
+            getters['auth/isAdmin'] = () => true
+            const wrapper = await openContentMenu({
+              isOwner: false,
+              resourceType: 'contribution',
+              resource: {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                pinnedBy: null,
+                group: {
+                  groupType: 'public',
+                },
+              },
+            })
+            wrapper
+              .findAll('.ds-menu-item')
+              .filter((item) => item.text() === 'post.menu.pin')
+              .at(0)
+              .trigger('click')
+            expect(wrapper.emitted('pinPost')).toEqual([
+              [
+                {
+                  id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                  pinnedBy: null,
+                  group: {
+                    groupType: 'public',
+                  },
+                },
+              ],
+            ])
+          })
+        })
+
+        describe('post in closed group', () => {
+          it('can not be pinned', async () => {
+            getters['auth/isAdmin'] = () => true
+            const wrapper = await openContentMenu({
+              isOwner: false,
+              resourceType: 'contribution',
+              resource: {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                pinnedBy: null,
+                group: {
+                  groupType: 'closed',
+                },
+              },
+            })
+            expect(
+              wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.pin'),
+            ).toHaveLength(0)
+          })
+        })
+
+        describe('post in hidden group', () => {
+          it('can not be pinned', async () => {
+            getters['auth/isAdmin'] = () => true
+            const wrapper = await openContentMenu({
+              isOwner: false,
+              resourceType: 'contribution',
+              resource: {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                pinnedBy: null,
+                group: {
+                  groupType: 'hidden',
+                },
+              },
+            })
+            expect(
+              wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.pin'),
+            ).toHaveLength(0)
+          })
+        })
+      })
+
+      describe('when maxPinnedPosts = 3', () => {
+        describe('and max is not reached', () => {
+          beforeEach(() => {
+            maxPinnedPostsMock.mockReturnValue(3)
+            currentlyPinnedPostsMock.mockReturnValue(2)
+          })
+
+          it('pin unpinned post', async () => {
+            getters['auth/isAdmin'] = () => true
+            const wrapper = await openContentMenu({
+              isOwner: false,
+              resourceType: 'contribution',
+              resource: {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                pinnedBy: null,
+              },
+            })
+            wrapper
+              .findAll('.ds-menu-item')
+              .filter((item) => item.text() === 'post.menu.pin')
+              .at(0)
+              .trigger('click')
+            expect(wrapper.emitted('pinPost')).toEqual([
+              [
+                {
+                  id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                  pinnedBy: null,
+                },
+              ],
+            ])
+          })
+
+          it('unpin pinned post', async () => {
+            const wrapper = await openContentMenu({
+              isOwner: false,
+              resourceType: 'contribution',
+              resource: {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                pinnedBy: 'someone',
+              },
+            })
+            wrapper
+              .findAll('.ds-menu-item')
+              .filter((item) => item.text() === 'post.menu.unpin')
+              .at(0)
+              .trigger('click')
+            expect(wrapper.emitted('unpinPost')).toEqual([
+              [
+                {
+                  id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                  pinnedBy: 'someone',
+                },
+              ],
+            ])
+          })
+        })
+
+        describe('and max is reached', () => {
+          beforeEach(() => {
+            maxPinnedPostsMock.mockReturnValue(3)
+            currentlyPinnedPostsMock.mockReturnValue(3)
+          })
+
+          it('not pin unpinned post', async () => {
+            getters['auth/isAdmin'] = () => true
+            const wrapper = await openContentMenu({
+              isOwner: false,
+              resourceType: 'contribution',
+              resource: {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                pinnedBy: null,
+              },
+            })
+            expect(
+              wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.pin'),
+            ).toHaveLength(0)
+          })
+
+          it('unpin pinned post', async () => {
+            const wrapper = await openContentMenu({
+              isOwner: false,
+              resourceType: 'contribution',
+              resource: {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                pinnedBy: 'someone',
+              },
+            })
+            wrapper
+              .findAll('.ds-menu-item')
+              .filter((item) => item.text() === 'post.menu.unpin')
+              .at(0)
+              .trigger('click')
+            expect(wrapper.emitted('unpinPost')).toEqual([
+              [
+                {
+                  id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                  pinnedBy: 'someone',
+                },
+              ],
+            ])
+          })
+        })
       })
 
       it('can delete another user', async () => {
@@ -498,6 +734,44 @@ describe('ContentMenu.vue', () => {
               isMuted: true,
             },
           ],
+        ])
+      })
+
+      it('can observe posts', async () => {
+        const wrapper = await openContentMenu({
+          isOwner: false,
+          resourceType: 'contribution',
+          resource: {
+            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+            isObservedByMe: false,
+          },
+        })
+        wrapper
+          .findAll('.ds-menu-item')
+          .filter((item) => item.text() === 'post.menu.observe')
+          .at(0)
+          .trigger('click')
+        expect(wrapper.emitted('toggleObservePost')).toEqual([
+          ['d23a4265-f5f7-4e17-9f86-85f714b4b9f8', true],
+        ])
+      })
+
+      it('can unobserve posts', async () => {
+        const wrapper = await openContentMenu({
+          isOwner: false,
+          resourceType: 'contribution',
+          resource: {
+            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+            isObservedByMe: true,
+          },
+        })
+        wrapper
+          .findAll('.ds-menu-item')
+          .filter((item) => item.text() === 'post.menu.unobserve')
+          .at(0)
+          .trigger('click')
+        expect(wrapper.emitted('toggleObservePost')).toEqual([
+          ['d23a4265-f5f7-4e17-9f86-85f714b4b9f8', false],
         ])
       })
     })

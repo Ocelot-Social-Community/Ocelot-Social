@@ -58,15 +58,41 @@ export default {
         routes.push({
           label: this.$t('group.contentMenu.visitGroupPage'),
           icon: 'home',
-          name: 'group-id-slug',
+          path: `/groups/${this.group.id}`,
           params: { id: this.group.id, slug: this.group.slug },
         })
       }
+
+      if (this.usage === 'groupProfile') {
+        if (this.group.isMutedByMe) {
+          routes.push({
+            label: this.$t('group.contentMenu.unmuteGroup'),
+            icon: 'volume-up',
+            callback: () => {
+              this.$emit('unmute', this.group.id)
+            },
+          })
+        } else {
+          routes.push({
+            label: this.$t('group.contentMenu.muteGroup'),
+            icon: 'volume-off',
+            callback: () => {
+              this.$emit('mute', this.group.id)
+            },
+          })
+        }
+      }
+
       if (this.group.myRole === 'owner') {
         routes.push({
           label: this.$t('admin.settings.name'),
-          path: `/group/edit/${this.group.id}`,
+          path: `/groups/edit/${this.group.id}`,
           icon: 'edit',
+        })
+        routes.push({
+          label: this.$t('group.contentMenu.inviteLinks'),
+          path: `/groups/edit/${this.group.id}/invites`,
+          icon: 'link',
         })
       }
 
