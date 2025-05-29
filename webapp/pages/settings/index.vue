@@ -1,5 +1,5 @@
 <template>
-  <ds-form class="settings-form" v-model="form" :schema="formSchema" @submit="submit">
+  <ds-form class="settings-form" v-model="formData" :schema="formSchema" @submit="submit">
     <template #default="{ errors }">
       <base-card>
         <h2 class="title">{{ $t('settings.data.name') }}</h2>
@@ -15,7 +15,7 @@
           :placeholder="$t('settings.data.namePlaceholder')"
         />
         <ds-input id="slug" model="slug" icon="at" :label="$t('settings.data.labelSlug')" />
-        <location-select v-model="locationName"/>
+        <location-select v-model="formData.locationName" />
         <!-- eslint-enable vue/use-v-on-exact -->
         <ds-input
           id="about"
@@ -40,21 +40,30 @@ import LocationSelect from '~/components/Select/LocationSelect'
 import { updateUserMutation } from '~/graphql/User'
 import scrollToContent from './scroll-to-content.js'
 
-let timeout
-
 export default {
   mixins: [scrollToContent],
   name: 'NewsFeed',
   components: {
-    LocationSelect
+    LocationSelect,
   },
   data() {
     return {
       cities: [],
       loadingData: false,
       loadingGeo: false,
-      formData: {},
+      formData: {
+        name: '',
+        slug: '',
+        about: '',
+        locationName: '',
+      },
     }
+  },
+  mounted() {
+    this.formData.name = this.currentUser.name
+    this.formData.slug = this.currentUser.slug
+    this.formData.about = this.currentUser.about
+    this.formData.locationName = this.currentUser.locationName || ''
   },
   computed: {
     ...mapGetters({
@@ -67,17 +76,9 @@ export default {
         translate: this.$t,
       })
       return {
+        name: { required: true, min: 3 },
         ...uniqueSlugForm.formSchema,
       }
-    },
-    form: {
-      get: function () {
-        const { name, slug, locationName = '', about } = this.currentUser
-        return { name, slug, locationName, about }
-      },
-      set: function (formData) {
-        this.formData = formData
-      },
     },
   },
   methods: {

@@ -14,9 +14,7 @@ const mocks = {
 }
 
 describe('LocationSelect', () => {
-  beforeEach(() => {
-    
-  })
+  beforeEach(() => {})
 
   describe('mount', () => {
     const Wrapper = () => {

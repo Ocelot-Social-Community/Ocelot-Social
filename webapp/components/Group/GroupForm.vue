@@ -155,7 +155,6 @@ import {
 import Editor from '~/components/Editor/Editor'
 import ActionRadiusSelect from '~/components/Select/ActionRadiusSelect'
 import LocationSelect from '~/components/Select/LocationSelect'
-import { queryLocations } from '~/graphql/location'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {

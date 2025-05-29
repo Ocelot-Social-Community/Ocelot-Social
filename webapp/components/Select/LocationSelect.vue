@@ -39,7 +39,7 @@ export default {
   },
   async created() {
     const result = await this.requestGeoData(this.locationName)
-    await this.$nextTick(() => {
+    this.$nextTick(() => {
       this.currentValue = result || this.locationName
     })
   },
