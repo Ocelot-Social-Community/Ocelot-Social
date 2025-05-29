@@ -189,6 +189,7 @@
 <script>
 import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
+import { urlToBlob } from 'image-resize-compress'
 import Editor from '~/components/Editor/Editor'
 import PostMutations from '~/graphql/PostMutations.js'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
@@ -243,6 +244,7 @@ export default {
     } = image || {}
     return {
       links,
+      filesToUpload: [],
       formData: {
         title: title || '',
         content: content || '',
@@ -398,6 +400,7 @@ export default {
           variables: {
             title,
             content,
+            filesToUpload: this.filesToUpload,
             categoryIds,
             id: this.contribution.id || null,
             image,
@@ -421,7 +424,42 @@ export default {
           this.loading = false
         })
     },
-    updateEditorContent(value) {
+    async updateEditorContent(value) {
+      // If value contains img tags with src in blob storage, add them to files to upload
+      const blobImages = value.match(/<img[^>]+src="blob:[^"]+"[^>]*>/g) || []
+      this.filesToUpload = await Promise.all(
+        blobImages
+          .map((img) => {
+            const srcMatch = img.match(/src="([^"]+)"/)
+            return srcMatch ? srcMatch[1] : null
+          })
+          .filter(Boolean)
+          .map(async (src) => {
+            const fileName = src.split('/').pop()
+            const blob = await urlToBlob(src)
+            return {
+              name: fileName,
+              type: 'image/jpeg',
+              upload: {
+                uuid: 'c0a81271-3901-456d-b642-1fbebdf29097',
+                progress: 0,
+                total: 779384,
+                bytesSent: 0,
+                filename: '299551939_5382369645175932_651167422159851441_n.jpeg',
+                chunked: false,
+                totalChunkCount: 1,
+              },
+            }
+            /*
+            return {
+              upload: new File([blob], fileName, { type: 'image/jpeg' }),
+              name: fileName,
+              type: 'image/jpeg',
+            }
+            */
+          }),
+      )
+
       this.$refs.contributionForm.update('content', value)
     },
     changeEventIsOnline(event) {
