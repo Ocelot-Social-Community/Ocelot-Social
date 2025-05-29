@@ -33,7 +33,7 @@ describe('LocationSelect', () => {
       expect(wrapper.find('.ds-select').exists()).toBe(true)
     })
 
-    it('renders the button', () => {
+    it('renders the clearLocationName button', () => {
       expect(wrapper.find('.base-button').exists()).toBe(true)
     })
 
