@@ -1,5 +1,5 @@
 <template>
-  <dropdown class="user-teaser">
+  <dropdown class="user-teaser" body-as-boundary>
     <template #default="{ openMenu, closeMenu }">
       <user-teaser-helper
         v-if="showAvatar"

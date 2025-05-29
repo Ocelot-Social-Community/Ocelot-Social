@@ -2531,6 +2531,18 @@
   resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-9.8.0.tgz#3344284028d1c9dc98dee2479f82939310370d88"
   integrity sha512-U9wpuSrJC93jZBxx/Qq2wPjCuYISBueyVUGK7qqdmj7r/nxaxwW8AQDCLeRO7wZnjj94sh3p246cAYjUKuqgfg==
 
+"@floating-ui/core@^0.3.0":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@floating-ui/core/-/core-0.3.1.tgz#3dde0ad0724d4b730567c92f49f0950910e18871"
+  integrity sha512-ensKY7Ub59u16qsVIFEo2hwTCqZ/r9oZZFh51ivcLGHfUwTn8l1Xzng8RJUe91H/UP8PeqeBronAGx0qmzwk2g==
+
+"@floating-ui/dom@^0.1.10":
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/@floating-ui/dom/-/dom-0.1.10.tgz#ce304136a52c71ef157826d2ebf52d68fa2deed5"
+  integrity sha512-4kAVoogvQm2N0XE0G6APQJuCNuErjOfPW8Ux7DFxh8+AfugWflwVJ5LDlHOwrwut7z/30NUvdtHzQ3zSip4EzQ==
+  dependencies:
+    "@floating-ui/core" "^0.3.0"
+
 "@human-connection/styleguide@0.5.22":
   version "0.5.22"
   resolved "https://registry.yarnpkg.com/@human-connection/styleguide/-/styleguide-0.5.22.tgz#444ec98b8f8d1c438e2e99736dcffe432b302755"
@@ -10203,6 +10215,14 @@ flatten@^1.0.2:
   resolved "https://registry.yarnpkg.com/flatten/-/flatten-1.0.2.tgz#dae46a9d78fbe25292258cc1e780a41d95c03782"
   integrity sha1-2uRqnXj74lKSJYzB54CkHZXAN4I=
 
+floating-vue@1.0.0-beta.19:
+  version "1.0.0-beta.19"
+  resolved "https://registry.yarnpkg.com/floating-vue/-/floating-vue-1.0.0-beta.19.tgz#9ba42675bada14fc3523e0972731d4bbc67fb534"
+  integrity sha512-OcM7z5Ua4XAykqolmvPj3l1s+KqUKj6Xz2t66eqjgaWfNBjtuifmxO5+4rRXakIch/Crt8IH+vKdKcR3jOUaoQ==
+  dependencies:
+    "@floating-ui/dom" "^0.1.10"
+    vue-resize "^1.0.0"
+
 flush-promises@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/flush-promises/-/flush-promises-1.0.2.tgz#4948fd58f15281fed79cbafc86293d5bb09b2ced"
@@ -15329,7 +15349,7 @@ polished@^3.3.1:
   dependencies:
     "@babel/runtime" "^7.4.5"
 
-popper.js@^1.14.4, popper.js@^1.14.7, popper.js@^1.16.1:
+popper.js@^1.14.4, popper.js@^1.14.7:
   version "1.16.1"
   resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.16.1.tgz#2a223cb3dc7b6213d740e40372be40de43e65b1b"
   integrity sha512-Wb4p1J4zyFTbM+u6WuO4XstYx4Ky9Cewe4DWrel7B0w6VVICvPwdOpotjzcf6eD8TsckVnIMNONQyPIUFOUbCQ==
@@ -19601,16 +19621,6 @@ v-mapbox@^1.11.2:
   dependencies:
     map-promisified "^0.4.0"
 
-v-tooltip@~2.1.3:
-  version "2.1.3"
-  resolved "https://registry.yarnpkg.com/v-tooltip/-/v-tooltip-2.1.3.tgz#281c2015d1e73787f13c8956aa295b8c3a73f261"
-  integrity sha512-xXngyxLQTOx/yUEy50thb8te7Qo4XU6h4LZB6cvEfVd9mnysUxLEoYwGWDdqR+l69liKsy3IPkdYff3J1gAJ5w==
-  dependencies:
-    "@babel/runtime" "^7.13.10"
-    lodash "^4.17.21"
-    popper.js "^1.16.1"
-    vue-resize "^1.0.1"
-
 v8-compile-cache@^2.0.3:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/v8-compile-cache/-/v8-compile-cache-2.1.0.tgz#e14de37b31a6d194f5690d67efc4e7f6fc6ab30e"
@@ -19831,7 +19841,7 @@ vue-observe-visibility@^1.0.0:
   resolved "https://registry.yarnpkg.com/vue-observe-visibility/-/vue-observe-visibility-1.0.0.tgz#17cf1b2caf74022f0f3c95371468ddf2b9573152"
   integrity sha512-s5TFh3s3h3Mhd3jaz3zGzkVHKHnc/0C/gNr30olO99+yw2hl3WBhK3ng3/f9OF+qkW4+l7GkmwfAzDAcY3lCFg==
 
-vue-resize@^1.0.1:
+vue-resize@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/vue-resize/-/vue-resize-1.0.1.tgz#c120bed4e09938771d622614f57dbcf58a5147ee"
   integrity sha512-z5M7lJs0QluJnaoMFTIeGx6dIkYxOwHThlZDeQnWZBizKblb99GSejPnK37ZbNE/rVwDcYcHY+Io+AxdpY952w==

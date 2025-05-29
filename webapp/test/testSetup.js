@@ -1,6 +1,6 @@
 import { createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
-import VTooltip from 'v-tooltip'
+import VTooltip from 'floating-vue'
 import Styleguide from '@human-connection/styleguide'
 import BaseComponents from '~/plugins/base-components'
 import Filters from '~/plugins/vue-filters'

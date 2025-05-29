@@ -8,7 +8,7 @@ import Directives from '~/plugins/vue-directives'
 import IziToast from '~/plugins/izi-toast'
 import layout from './layout.vue'
 import locales from '~/locales/index.js'
-import '~/plugins/v-tooltip'
+import '~/plugins/floating-vue.js'
 
 const helpers = {
   init(options = {}) {

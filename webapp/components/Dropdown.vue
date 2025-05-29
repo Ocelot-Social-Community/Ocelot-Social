@@ -1,11 +1,13 @@
 <template>
-  <v-popover
+  <VPopover
     :open.sync="isPopoverOpen"
     :open-group="Math.random().toString()"
     :placement="placement"
     :disabled="disabled"
-    trigger="manual"
-    :offset="offset"
+    :triggers="[]"
+    :skidding="offset"
+    :distance="offset"
+    :container="body"
   >
     <slot :toggleMenu="toggleMenu" :openMenu="openMenu" :closeMenu="closeMenu" :isOpen="isOpen" />
     <div slot="popover" @mouseover="popoverMouseEnter" @mouseleave="popoverMouseLeave">
@@ -17,7 +19,7 @@
         :isOpen="isOpen"
       />
     </div>
-  </v-popover>
+  </VPopover>
 </template>
 
 <script>
@@ -28,8 +30,9 @@ export default {
   props: {
     placement: { type: String, default: 'bottom-end' },
     disabled: { type: Boolean, default: false },
-    offset: { type: [String, Number], default: '16' },
+    offset: { type: [String, Number], default: '0' },
     noMouseLeaveClosing: { type: Boolean, default: false },
+    bodyAsBoundary: { type: Boolean, default: false },
   },
   data() {
     return {
