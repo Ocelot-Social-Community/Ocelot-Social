@@ -1,0 +1,5 @@
+input FileInput {
+  upload: Upload,
+  name: String,
+  type: String,
+}
