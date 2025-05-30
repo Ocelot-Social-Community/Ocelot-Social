@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ActionButton.vue mount when not disabled renders 1`] = `
+exports[`ActionButton.vue when disabled renders 1`] = `
 <div>
   <div
     class="action-button"
@@ -8,6 +8,7 @@ exports[`ActionButton.vue mount when not disabled renders 1`] = `
     <button
       aria-label="Click me"
       class="base-button --icon-only --circle"
+      disabled="disabled"
       type="button"
     >
       <span
@@ -29,7 +30,7 @@ exports[`ActionButton.vue mount when not disabled renders 1`] = `
 </div>
 `;
 
-exports[`ActionButton.vue mount when not disabled when disabled renders 1`] = `
+exports[`ActionButton.vue when not disabled renders 1`] = `
 <div>
   <div
     class="action-button"
@@ -37,7 +38,6 @@ exports[`ActionButton.vue mount when not disabled when disabled renders 1`] = `
     <button
       aria-label="Click me"
       class="base-button --icon-only --circle"
-      disabled="disabled"
       type="button"
     >
       <span
