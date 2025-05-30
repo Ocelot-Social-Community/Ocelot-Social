@@ -3,44 +3,36 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
 
+import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { createMessageMutation } from '@graphql/queries/createMessageMutation'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { roomQuery } from '@graphql/queries/roomQuery'
 import { unreadRoomsQuery } from '@graphql/queries/unreadRoomsQuery'
-import createServer from '@src/server'
-
-const driver = getDriver()
-const neode = getNeode()
+import { TEST_CONFIG } from '@src/config/test-mock'
+import createServer, { getContext } from '@src/server'
 
 let query
 let mutate
 let authenticatedUser
 let chattingUser, otherChattingUser, notChattingUser
 
+const database = databaseContext()
+
 beforeAll(async () => {
   await cleanDatabase()
 
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode,
-        user: authenticatedUser,
-        cypherParams: {
-          currentUserId: authenticatedUser ? authenticatedUser.id : null,
-        },
-      }
-    },
-  })
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database, config: TEST_CONFIG })
+  const { server } = createServer({ context })
   query = createTestClient(server).query
   mutate = createTestClient(server).mutate
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  await database.driver.close()
 })
 
 describe('Room', () => {
