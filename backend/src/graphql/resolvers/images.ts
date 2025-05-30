@@ -29,8 +29,14 @@ const changeDomain: (opts: { transformations: UrlResolver[] }) => UrlResolver =
 
     const publicUrl = new URL(S3_PUBLIC_GATEWAY)
     publicUrl.pathname = originalUrl.pathname
-    const newUrl = publicUrl.href
-    return chain(...transformations)({ url: newUrl }, _args, context)
+    let newUrl = publicUrl.href
+    newUrl = chain(...transformations)({ url: newUrl }, _args, context)
+    const result = new URL(newUrl)
+    if (new URL(S3_PUBLIC_GATEWAY).pathname === '/') {
+      return result.href
+    }
+    result.pathname = new URL(S3_PUBLIC_GATEWAY).pathname + result.pathname
+    return result.href
   }
 
 const sign: UrlResolver = ({ url }, _args, { config: { IMAGOR_SECRET } }) => {
