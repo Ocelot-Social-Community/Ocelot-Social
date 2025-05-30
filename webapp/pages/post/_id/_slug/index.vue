@@ -105,7 +105,6 @@
                 :is-shouted="post.shoutedByCurrentUser"
                 :node-id="post.id"
                 node-type="Post"
-                class="action-item"
               />
               <!-- Follow Button -->
               <observe-button
@@ -113,7 +112,6 @@
                 :count="post.observingUsersCount"
                 :post-id="post.id"
                 @toggleObservePost="toggleObservePost"
-                class="action-item"
               />
             </div>
             <!-- Comments -->
