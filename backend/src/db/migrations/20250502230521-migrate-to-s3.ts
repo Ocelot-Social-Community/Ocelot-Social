@@ -41,7 +41,11 @@ export async function up(_next) {
       urls
         .map((url) => async () => {
           const { pathname } = new URL(url, 'http://example.org')
-          const fileLocation = path.join(__dirname, `../../../public/${pathname}`)
+          // TODO: find a better way to do this - this is quite a hack
+          const fileLocation =
+            CONFIG.NODE_ENV === 'production'
+              ? path.join(__dirname, `../../../../public/${pathname}`) // we're in the /build folder
+              : path.join(__dirname, `../../../public/${pathname}`)
           const s3Location = `original${pathname}`
           const mimeType = lookup(fileLocation)
           // eslint-disable-next-line security/detect-non-literal-fs-filename
