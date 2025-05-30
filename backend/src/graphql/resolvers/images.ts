@@ -1,4 +1,5 @@
 import crypto from 'node:crypto'
+import { join as joinPath } from 'node:path/posix'
 
 import type { Context } from '@src/server'
 
@@ -27,16 +28,12 @@ const changeDomain: (opts: { transformations: UrlResolver[] }) => UrlResolver =
       return url
     }
 
+    const transformedUrl = new URL(
+      chain(...transformations)({ url: originalUrl.href }, _args, context),
+    )
     const publicUrl = new URL(S3_PUBLIC_GATEWAY)
-    publicUrl.pathname = originalUrl.pathname
-    let newUrl = publicUrl.href
-    newUrl = chain(...transformations)({ url: newUrl }, _args, context)
-    const result = new URL(newUrl)
-    if (new URL(S3_PUBLIC_GATEWAY).pathname === '/') {
-      return result.href
-    }
-    result.pathname = new URL(S3_PUBLIC_GATEWAY).pathname + result.pathname
-    return result.href
+    publicUrl.pathname = joinPath(publicUrl.pathname, transformedUrl.pathname)
+    return publicUrl.href
   }
 
 const sign: UrlResolver = ({ url }, _args, { config: { IMAGOR_SECRET } }) => {
