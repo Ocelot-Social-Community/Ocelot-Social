@@ -45,6 +45,7 @@ export default {
     required: true,
     default: () => new Date().toISOString(),
   },
+  sortDate: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
   language: { type: 'string', allow: [null] },
   comments: {
     type: 'relationship',

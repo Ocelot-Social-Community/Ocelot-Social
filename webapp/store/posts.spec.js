@@ -107,9 +107,9 @@ describe('getters', () => {
   describe('orderBy', () => {
     it('returns value for graphql query', () => {
       state = {
-        order: 'createdAt_desc',
+        order: 'sortDate_desc',
       }
-      expect(getters.orderBy(state)).toEqual('createdAt_desc')
+      expect(getters.orderBy(state)).toEqual('sortDate_desc')
     })
   })
 })

@@ -168,6 +168,23 @@ export default () => {
         }
       }
     `,
+    pushPostToTop: gql`
+      mutation ($id: ID!) {
+        pushPostToTop(id: $id) {
+          id
+          title
+          slug
+          content
+          contentExcerpt
+          language
+          pinnedBy {
+            id
+            name
+            role
+          }
+        }
+      }
+    `,
     markTeaserAsViewed: gql`
       mutation ($id: ID!) {
         markTeaserAsViewed(id: $id) {

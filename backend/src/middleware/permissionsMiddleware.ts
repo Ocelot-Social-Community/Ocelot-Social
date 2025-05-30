@@ -484,6 +484,7 @@ export default shield(
       VerifyEmailAddress: isAuthenticated,
       pinPost: isAdmin,
       unpinPost: isAdmin,
+      pushPostToTop: isAdmin,
       UpdateDonations: isAdmin,
 
       // InviteCode

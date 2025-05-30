@@ -104,6 +104,16 @@ export default {
           }
         }
 
+        if (this.isAdmin) {
+          routes.push({
+            label: this.$t(`post.menu.pushToTop`),
+            callback: () => {
+              this.$emit('pushPostToTop', this.resource)
+            },
+            icon: 'link',
+          })
+        }
+
         if (this.resource.isObservedByMe) {
           routes.push({
             label: this.$t(`post.menu.unobserve`),

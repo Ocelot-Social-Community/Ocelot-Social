@@ -48,6 +48,7 @@
                 @removePostFromList="posts = removePostFromList(post, posts)"
                 @pinPost="pinPost(post, refetchPostList)"
                 @unpinPost="unpinPost(post, refetchPostList)"
+                @pushPostToTop="pushPostToTop(post, refetchPostList)"
                 @toggleObservePost="
                   (postId, value) => toggleObservePost(postId, value, refetchPostList)
                 "
