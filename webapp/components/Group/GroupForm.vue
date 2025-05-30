@@ -213,7 +213,7 @@ export default {
           },
         },
         actionRadius: { required: true, min: 1 },
-        locationName: { required: false },
+        locationName: { required: this.$env.REQUIRE_LOCATION },
         categoryIds: {
           type: 'array',
           required: this.categoriesActive,

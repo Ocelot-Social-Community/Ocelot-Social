@@ -15,7 +15,7 @@
       @input.native="handleCityInput"
     />
     <base-button
-      v-if="locationName !== ''"
+      v-if="locationName !== '' && !locationRequired"
       icon="close"
       ghost
       size="small"
@@ -51,6 +51,9 @@ export default {
     }
   },
   computed: {
+    locationRequired() {
+      return this.$env.REQUIRE_LOCATION
+    },
     locationName() {
       return typeof this.value === 'object' ? this.value.value : this.value
     },

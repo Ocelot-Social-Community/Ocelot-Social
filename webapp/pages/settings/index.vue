@@ -76,6 +76,7 @@ export default {
         translate: this.$t,
       })
       return {
+        locationName: { required: this.$env.REQUIRE_LOCATION },
         name: { required: true, min: 3 },
         ...uniqueSlugForm.formSchema,
       }
