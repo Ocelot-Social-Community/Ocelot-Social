@@ -23,7 +23,7 @@ beforeAll(async () => {
   await cleanDatabase()
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  const contextUser = async (_req) => authenticatedUser
+  const contextUser = (_req) => authenticatedUser
   const context = getContext({ user: contextUser, database, config: TEST_CONFIG })
   const { server } = createServer({ context })
   query = createTestClient(server).query
