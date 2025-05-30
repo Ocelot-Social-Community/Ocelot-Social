@@ -50,6 +50,7 @@
                   @pinPost="pinPost"
                   @unpinPost="unpinPost"
                   @pushPostToTop="pushPostToTop"
+                  @unpushPost="unpushPost(post, refetchPostList)"
                   @toggleObservePost="toggleObservePost"
                 />
               </client-only>

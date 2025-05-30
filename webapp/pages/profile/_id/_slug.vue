@@ -160,6 +160,7 @@
                 @pinPost="pinPost(post, refetchPostList)"
                 @unpinPost="unpinPost(post, refetchPostList)"
                 @pushPostToTop="pushPostToTop(post, refetchPostList)"
+                @unpushPost="unpushPost(post, refetchPostList)"
                 @toggleObservePost="
                   (postId, value) => toggleObservePost(postId, value, refetchPostList)
                 "

@@ -485,6 +485,7 @@ export default shield(
       pinPost: isAdmin,
       unpinPost: isAdmin,
       pushPostToTop: isAdmin,
+      unpushPost: isAdmin,
       UpdateDonations: isAdmin,
 
       // InviteCode

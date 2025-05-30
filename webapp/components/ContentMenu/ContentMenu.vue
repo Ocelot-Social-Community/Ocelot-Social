@@ -114,6 +114,16 @@ export default {
           })
         }
 
+        if (this.isAdmin && this.resource.sortDate !== this.resource.createdAt) {
+          routes.push({
+            label: this.$t(`post.menu.unpush`),
+            callback: () => {
+              this.$emit('unpushPost', this.resource)
+            },
+            icon: 'link',
+          })
+        }
+
         if (this.resource.isObservedByMe) {
           routes.push({
             label: this.$t(`post.menu.unobserve`),

@@ -110,6 +110,7 @@
             @pinPost="pinPost"
             @unpinPost="unpinPost"
             @pushPostToTop="pushPostToTop"
+            @unpushPost="unpushPost"
             @toggleObservePost="toggleObservePost"
           />
         </client-only>
@@ -225,6 +226,9 @@ export default {
     },
     pushPostToTop(post) {
       this.$emit('pushPostToTop', post)
+    },
+    unpushPost(post) {
+      this.$emit('unpushPost', post)
     },
     toggleObservePost(postId, value) {
       this.$emit('toggleObservePost', postId, value)

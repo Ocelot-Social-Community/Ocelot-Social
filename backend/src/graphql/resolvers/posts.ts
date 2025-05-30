@@ -509,7 +509,23 @@ export default {
         throw new Error('Could not find Post')
       }
 
-      console.log(posts)
+      return posts[0]
+    },
+    unpushPost: async (_parent, params, context: Context, _resolveInfo) => {
+      const posts = (
+        await context.database.write({
+          query: `
+        MATCH (post:Post {id: $id})
+        SET post.sortDate = post.createdAt
+        RETURN post {.*}`,
+          variables: params,
+        })
+      ).records.map((record) => record.get('post'))
+
+      if (posts.length !== 1) {
+        throw new Error('Could not find Post')
+      }
+
       return posts[0]
     },
   },
