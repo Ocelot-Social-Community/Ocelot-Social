@@ -16,7 +16,7 @@ import slug from 'slug'
 import { v4 as uuid } from 'uuid'
 
 import { sanitizeRelationshipType } from './sanitizeRelationshipTypes'
-import { wrapTransaction } from './wrapTransaction'
+import { wrapTransactionDeleteImage, wrapTransactionMergeImage } from './wrapTransaction'
 
 import type { Images, FileDeleteCallback, FileUploadCallback } from './images'
 import type { FileUpload } from 'graphql-upload'
@@ -24,7 +24,8 @@ import type { FileUpload } from 'graphql-upload'
 const deleteImage: Images['deleteImage'] = async (resource, relationshipType, opts = {}) => {
   sanitizeRelationshipType(relationshipType)
   const { transaction, deleteCallback } = opts
-  if (!transaction) return wrapTransaction(deleteImage, [resource, relationshipType], opts)
+  if (!transaction)
+    return wrapTransactionDeleteImage(deleteImage, [resource, relationshipType], opts)
   const txResult = await transaction.run(
     `
     MATCH (resource {id: $resource.id})-[rel:${relationshipType}]->(image:Image)
@@ -54,7 +55,7 @@ const mergeImage: Images['mergeImage'] = async (
   sanitizeRelationshipType(relationshipType)
   const { transaction, uploadCallback, deleteCallback } = opts
   if (!transaction)
-    return wrapTransaction(mergeImage, [resource, relationshipType, imageInput], opts)
+    return wrapTransactionMergeImage(mergeImage, [resource, relationshipType, imageInput], opts)
 
   let txResult
   txResult = await transaction.run(

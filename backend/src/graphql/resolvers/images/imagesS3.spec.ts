@@ -341,6 +341,9 @@ describe('mergeImage', () => {
           expect(result).toMatchObject({
             url: 'https://fsn1.your-objectstorage.com/ocelot-social-staging/original/f965ea15-1f6b-43aa-a535-927410e2585e-dsc02586.jpg',
           })
+          if (!result?.url) {
+            throw new Error()
+          }
           expect(new URL(result.url)).toBeDefined()
         })
       })

@@ -1,21 +1,37 @@
 import { getDriver } from '@db/neo4j'
 
-import type { DeleteImageOpts, MergeImageOpts } from './images'
+import type { DeleteImageOpts, MergeImageOpts, Images, ImageInput } from './images'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AsyncFunc = (...args: any[]) => Promise<any>
-export const wrapTransaction = async <F extends AsyncFunc>(
-  wrappedCallback: F,
-  args: unknown[],
-  opts: DeleteImageOpts | MergeImageOpts,
-) => {
+export const wrapTransactionDeleteImage = async (
+  wrappedCallback: Images['deleteImage'],
+  args: [resource: { id: string }, relationshipType: 'HERO_IMAGE' | 'AVATAR_IMAGE'],
+  opts: DeleteImageOpts,
+): ReturnType<Images['deleteImage']> => {
   const session = getDriver().session()
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const result = await session.writeTransaction((transaction) => {
       return wrappedCallback(...args, { ...opts, transaction })
     })
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return result
+  } finally {
+    await session.close()
+  }
+}
+
+export const wrapTransactionMergeImage = async (
+  wrappedCallback: Images['mergeImage'],
+  args: [
+    resource: { id: string },
+    relationshipType: 'HERO_IMAGE' | 'AVATAR_IMAGE',
+    imageInput: ImageInput | null | undefined,
+  ],
+  opts: MergeImageOpts,
+): ReturnType<Images['mergeImage']> => {
+  const session = getDriver().session()
+  try {
+    const result = await session.writeTransaction((transaction) => {
+      return wrappedCallback(...args, { ...opts, transaction })
+    })
     return result
   } finally {
     await session.close()

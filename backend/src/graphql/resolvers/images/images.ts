@@ -51,7 +51,7 @@ export interface Images {
     relationshipType: 'HERO_IMAGE' | 'AVATAR_IMAGE',
     imageInput: ImageInput | null | undefined,
     opts?: MergeImageOpts,
-  ) => Promise<Image>
+  ) => Promise<Image | undefined>
 }
 
 export const images = (config: Context['config']) =>
