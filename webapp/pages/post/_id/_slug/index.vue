@@ -77,7 +77,7 @@
             <!-- content -->
             <content-viewer class="content hyphenate-text" :content="post.content" />
             <!-- categories -->
-            <div v-if="categoriesActive" class="categories">
+            <div v-if="categoriesActive && post.categories.length > 0" class="categories">
               <ds-space margin="xx-large" />
               <ds-space margin="xx-small" />
               <hc-category
@@ -97,35 +97,23 @@
               <ds-space margin="xx-small" />
               <hc-hashtag v-for="tag in sortedTags" :key="tag.id" :id="tag.id" />
             </div>
-            <ds-space margin-top="small">
-              <ds-flex :gutter="{ lg: 'small' }">
-                <!-- Shout Button -->
-                <ds-flex-item
-                  :width="{ lg: '15%', md: '22%', sm: '22%', base: '100%' }"
-                  class="shout-button"
-                >
-                  <hc-shout-button
-                    v-if="post.author"
-                    :disabled="isAuthor"
-                    :count="post.shoutedCount"
-                    :is-shouted="post.shoutedByCurrentUser"
-                    :post-id="post.id"
-                  />
-                </ds-flex-item>
-                <!-- Follow Button -->
-                <ds-flex-item
-                  :width="{ lg: '15%', md: '22%', sm: '22%', base: '100%' }"
-                  class="shout-button"
-                >
-                  <observe-button
-                    :is-observed="post.isObservedByMe"
-                    :count="post.observingUsersCount"
-                    :post-id="post.id"
-                    @toggleObservePost="toggleObservePost"
-                  />
-                </ds-flex-item>
-              </ds-flex>
-            </ds-space>
+            <div class="actions">
+              <!-- Shout Button -->
+              <shout-button
+                :disabled="isAuthor"
+                :count="post.shoutedCount"
+                :is-shouted="post.shoutedByCurrentUser"
+                :node-id="post.id"
+                node-type="Post"
+              />
+              <!-- Follow Button -->
+              <observe-button
+                :is-observed="post.isObservedByMe"
+                :count="post.observingUsersCount"
+                :post-id="post.id"
+                @toggleObservePost="toggleObservePost"
+              />
+            </div>
             <!-- Comments -->
             <ds-section>
               <comment-list
@@ -168,7 +156,7 @@ import CommentList from '~/components/CommentList/CommentList'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
-import HcShoutButton from '~/components/ShoutButton.vue'
+import ShoutButton from '~/components/ShoutButton.vue'
 import ObserveButton from '~/components/ObserveButton.vue'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
@@ -198,7 +186,7 @@ export default {
     DateTimeRange,
     HcCategory,
     HcHashtag,
-    HcShoutButton,
+    ShoutButton,
     ObserveButton,
     LocationTeaser,
     PageParamsLink,
@@ -425,10 +413,15 @@ export default {
     }
   }
 }
+</style>
 
-@media only screen and (max-width: 960px) {
-  .shout-button {
-    float: left;
-  }
+<style lang="scss" scoped>
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  gap: $space-small;
+  margin-top: $space-small;
+  margin-bottom: calc($space-base * 2);
 }
 </style>
