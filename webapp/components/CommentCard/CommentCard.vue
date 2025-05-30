@@ -40,7 +40,7 @@
       </base-button>
     </template>
     <div class="actions">
-      <hc-shout-button
+      <shout-button
         :disabled="isAuthor"
         :count="comment.shoutedCount"
         :is-shouted="comment.shoutedByCurrentUser"
@@ -69,7 +69,7 @@ import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
 import CommentMutations from '~/graphql/CommentMutations'
-import HcShoutButton from '~/components/ShoutButton.vue'
+import ShoutButton from '~/components/ShoutButton.vue'
 import scrollToAnchor from '~/mixins/scrollToAnchor.js'
 
 export default {
@@ -78,7 +78,7 @@ export default {
     ContentMenu,
     ContentViewer,
     CommentForm,
-    HcShoutButton,
+    ShoutButton,
   },
   mixins: [scrollToAnchor],
   data() {

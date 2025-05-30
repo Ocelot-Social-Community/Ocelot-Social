@@ -99,7 +99,7 @@
             </div>
             <div class="actions">
               <!-- Shout Button -->
-              <hc-shout-button
+              <shout-button
                 :disabled="isAuthor"
                 :count="post.shoutedCount"
                 :is-shouted="post.shoutedByCurrentUser"
@@ -158,7 +158,7 @@ import CommentList from '~/components/CommentList/CommentList'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
-import HcShoutButton from '~/components/ShoutButton.vue'
+import ShoutButton from '~/components/ShoutButton.vue'
 import ObserveButton from '~/components/ObserveButton.vue'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
@@ -188,7 +188,7 @@ export default {
     DateTimeRange,
     HcCategory,
     HcHashtag,
-    HcShoutButton,
+    ShoutButton,
     ObserveButton,
     LocationTeaser,
     PageParamsLink,
