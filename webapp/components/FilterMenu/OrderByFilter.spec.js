@@ -54,7 +54,7 @@ describe('OrderByFilter', () => {
 
     describe('if ordered by oldest', () => {
       beforeEach(() => {
-        getters['posts/orderBy'] = jest.fn(() => 'createdAt_asc')
+        getters['posts/orderBy'] = jest.fn(() => 'sortDate_asc')
         wrapper = Wrapper()
       })
 
@@ -85,11 +85,11 @@ describe('OrderByFilter', () => {
     })
 
     describe('click "oldest-button"', () => {
-      it('calls TOGGLE_ORDER with "createdAt_asc"', () => {
+      it('calls TOGGLE_ORDER with "sortDate_asc"', () => {
         wrapper
           .find('.order-by-filter .filter-list .base-button[data-test="oldest-button"]')
           .trigger('click')
-        expect(mutations['posts/TOGGLE_ORDER']).toHaveBeenCalledWith({}, 'createdAt_asc')
+        expect(mutations['posts/TOGGLE_ORDER']).toHaveBeenCalledWith({}, 'sortDate_asc')
       })
     })
   })

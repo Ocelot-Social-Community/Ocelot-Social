@@ -270,7 +270,7 @@ describe('mutations', () => {
         order: 'eventStart_asc',
       }
       expect(testMutation('Article')).toEqual({ postType_in: ['Article'] })
-      expect(getters.orderBy(state)).toEqual('createdAt_desc')
+      expect(getters.orderBy(state)).toEqual('sortDate_desc')
     })
 
     it('removes post type filter if same post type is present and sets order', () => {
@@ -282,7 +282,7 @@ describe('mutations', () => {
         order: 'eventStart_asc',
       }
       expect(testMutation('Event')).toEqual({})
-      expect(getters.orderBy(state)).toEqual('createdAt_desc')
+      expect(getters.orderBy(state)).toEqual('sortDate_desc')
     })
 
     it('removes post type filter if called with null', () => {
@@ -294,7 +294,7 @@ describe('mutations', () => {
         order: 'eventStart_asc',
       }
       expect(testMutation(null)).toEqual({})
-      expect(getters.orderBy(state)).toEqual('createdAt_desc')
+      expect(getters.orderBy(state)).toEqual('sortDate_desc')
     })
 
     it('does not get in the way of other filters', () => {
@@ -325,7 +325,7 @@ describe('mutations', () => {
         order: 'eventStart_asc',
       }
       expect(testMutation()).toEqual({})
-      expect(getters.orderBy(state)).toEqual('createdAt_desc')
+      expect(getters.orderBy(state)).toEqual('sortDate_desc')
     })
   })
 
