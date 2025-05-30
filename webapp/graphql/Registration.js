@@ -9,6 +9,7 @@ export const SignupVerificationMutation = gql`
     $about: String
     $termsAndConditionsAgreedVersion: String!
     $locale: String
+    $locationName: String
   ) {
     SignupVerification(
       nonce: $nonce
@@ -19,6 +20,7 @@ export const SignupVerificationMutation = gql`
       about: $about
       termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
       locale: $locale
+      locationName: $locationName
     ) {
       id
       name

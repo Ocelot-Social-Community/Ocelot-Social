@@ -96,6 +96,9 @@
         </div>
         <password-strength class="password-strength" :password="formData.password" />
 
+        <!-- location -->
+        <location-select v-if="locationRequired" v-model="locationName" />
+
         <email-display-and-verify :email="sliderData.collectedInputData.email" />
         <ds-text>
           <input
@@ -148,6 +151,7 @@ import EmailDisplayAndVerify from './EmailDisplayAndVerify'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
 import ShowPassword from '../ShowPassword/ShowPassword.vue'
+import LocationSelect from '~/components/Select/LocationSelect'
 
 const threePerEmSpace = ' ' // unicode u+2004;
 
@@ -159,6 +163,7 @@ export default {
     PasswordStrength,
     ShowPassword,
     SweetalertIcon,
+    LocationSelect,
   },
   props: {
     sliderData: { type: Object, required: true },
@@ -196,6 +201,7 @@ export default {
       // TODO: Our styleguide does not support checkmarks.
       // Integrate termsAndConditionsConfirmed into `this.formData` once we
       // have checkmarks available.
+      locationName: '',
       termsAndConditionsConfirmed: false,
       receiveCommunicationAsEmailsEtcConfirmed: false,
       showPassword: false,
@@ -213,24 +219,16 @@ export default {
         this.formData.givenName = ''
       }
     } else {
-      this.formData.name = this.sliderData.collectedInputData.name
-        ? this.sliderData.collectedInputData.name
-        : ''
+      this.formData.name = this.sliderData.collectedInputData.name || ''
     }
-    this.formData.password = this.sliderData.collectedInputData.password
-      ? this.sliderData.collectedInputData.password
-      : ''
-    this.formData.passwordConfirmation = this.sliderData.collectedInputData.passwordConfirmation
-      ? this.sliderData.collectedInputData.passwordConfirmation
-      : ''
-    this.termsAndConditionsConfirmed = this.sliderData.collectedInputData
-      .termsAndConditionsConfirmed
-      ? this.sliderData.collectedInputData.termsAndConditionsConfirmed
-      : false
-    this.receiveCommunicationAsEmailsEtcConfirmed = this.sliderData.collectedInputData
-      .receiveCommunicationAsEmailsEtcConfirmed
-      ? this.sliderData.collectedInputData.receiveCommunicationAsEmailsEtcConfirmed
-      : false
+    this.formData.password = this.sliderData.collectedInputData.password || ''
+    this.formData.passwordConfirmation =
+      this.sliderData.collectedInputData.passwordConfirmation || ''
+    this.termsAndConditionsConfirmed =
+      this.sliderData.collectedInputData.termsAndConditionsConfirmed || false
+    this.receiveCommunicationAsEmailsEtcConfirmed =
+      this.sliderData.collectedInputData.receiveCommunicationAsEmailsEtcConfirmed || false
+    this.locationName = this.sliderData.collectedInputData.locationName || ''
     this.sendValidation()
 
     this.sliderData.setSliderValuesCallback(this.validInput, {
@@ -238,6 +236,16 @@ export default {
     })
   },
   computed: {
+    formLocationName() {
+      // toDo: Mixin or move it to location select component
+      const isNestedValue =
+        typeof this.locationName === 'object' && typeof this.locationName.value === 'string'
+      const isDirectString = typeof this.locationName === 'string'
+      return isNestedValue ? this.locationName.value : isDirectString ? this.locationName : ''
+    },
+    locationRequired() {
+      return this.$env.REQUIRE_LOCATION
+    },
     askForRealName() {
       return this.$env.ASK_FOR_REAL_NAME
     },
@@ -249,7 +257,8 @@ export default {
         this.formData.password.length >= 1 &&
         this.formData.password === this.formData.passwordConfirmation &&
         this.termsAndConditionsConfirmed &&
-        this.receiveCommunicationAsEmailsEtcConfirmed
+        this.receiveCommunicationAsEmailsEtcConfirmed &&
+        (this.locationRequired ? this.formLocationName : true)
       )
     },
     iconNamePassword() {
@@ -266,6 +275,9 @@ export default {
     receiveCommunicationAsEmailsEtcConfirmed() {
       this.sendValidation()
     },
+    locationName() {
+      this.sendValidation()
+    },
   },
   methods: {
     buildName(data) {
@@ -276,6 +288,7 @@ export default {
       const { password, passwordConfirmation } = this.formData
       const name = this.buildName(this.formData)
       const { termsAndConditionsConfirmed, receiveCommunicationAsEmailsEtcConfirmed } = this
+      const locationName = this.formLocationName
 
       this.sliderData.setSliderValuesCallback(this.validInput, {
         collectedInputData: {
@@ -284,6 +297,7 @@ export default {
           passwordConfirmation,
           termsAndConditionsConfirmed,
           receiveCommunicationAsEmailsEtcConfirmed,
+          locationName,
         },
       })
     },
@@ -299,6 +313,7 @@ export default {
       const { email, inviteCode = null, nonce } = this.sliderData.collectedInputData
       const termsAndConditionsAgreedVersion = VERSION
       const locale = this.$i18n.locale()
+
       try {
         this.sliderData.setSliderValuesCallback(null, {
           sliderSettings: { buttonLoading: true },
@@ -313,6 +328,7 @@ export default {
             nonce,
             termsAndConditionsAgreedVersion,
             locale,
+            locationName: this.formLocationName,
           },
         })
         this.response = 'success'
