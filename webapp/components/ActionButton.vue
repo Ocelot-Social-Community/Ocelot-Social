@@ -17,9 +17,9 @@ export default {
   props: {
     count: { type: Number, required: true },
     text: { type: String, required: true },
-    disabled: { type: Boolean, default: false },
     icon: { type: String, required: true },
-    loading: { type: Boolean, default: false },
+    disabled: { type: Boolean },
+    loading: { type: Boolean },
   },
   methods: {
     click() {

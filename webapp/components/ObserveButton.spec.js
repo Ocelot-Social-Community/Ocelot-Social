@@ -1,14 +1,14 @@
-import { mount } from '@vue/test-utils'
+import { render, screen, fireEvent } from '@testing-library/vue'
 import ObserveButton from './ObserveButton.vue'
 
 const localVue = global.localVue
 
 describe('ObserveButton', () => {
-  let mocks
-
   const Wrapper = (count = 1, postId = '123', isObserved = true) => {
-    return mount(ObserveButton, {
-      mocks,
+    return render(ObserveButton, {
+      mocks: {
+        $t: jest.fn((t) => t),
+      },
       localVue,
       propsData: {
         count,
@@ -18,31 +18,27 @@ describe('ObserveButton', () => {
     })
   }
 
-  let wrapper
-
-  beforeEach(() => {
-    mocks = {
-      $t: jest.fn(),
-    }
-  })
-
   describe('observed', () => {
+    let wrapper
+
     beforeEach(() => {
       wrapper = Wrapper(1, '123', true)
     })
 
     it('renders', () => {
-      expect(wrapper.element).toMatchSnapshot()
+      expect(wrapper.container).toMatchSnapshot()
     })
 
-    it('emits toggleObservePost with false when clicked', () => {
-      const button = wrapper.find('.base-button')
-      button.trigger('click')
-      expect(wrapper.emitted('toggleObservePost')).toEqual([['123', false]])
+    it('emits toggleObservePost with false when clicked', async () => {
+      const button = screen.getByRole('button')
+      await fireEvent.click(button)
+      expect(wrapper.emitted().toggleObservePost).toEqual([['123', false]])
     })
   })
 
   describe('unobserved', () => {
+    let wrapper
+
     beforeEach(() => {
       wrapper = Wrapper(1, '123', false)
     })
@@ -51,10 +47,10 @@ describe('ObserveButton', () => {
       expect(wrapper.element).toMatchSnapshot()
     })
 
-    it('emits toggleObservePost with true when clicked', () => {
-      const button = wrapper.find('.base-button')
-      button.trigger('click')
-      expect(wrapper.emitted('toggleObservePost')).toEqual([['123', true]])
+    it('emits toggleObservePost with true when clicked', async () => {
+      const button = screen.getByRole('button')
+      await fireEvent.click(button)
+      expect(wrapper.emitted().toggleObservePost).toEqual([['123', true]])
     })
   })
 })
