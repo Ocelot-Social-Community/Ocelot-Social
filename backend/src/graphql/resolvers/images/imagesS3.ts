@@ -9,7 +9,7 @@ import { v4 as uuid } from 'uuid'
 import { S3Configured } from '@config/index'
 
 import { sanitizeRelationshipType } from './sanitizeRelationshipTypes'
-import { wrapTransaction } from './wrapTransaction'
+import { wrapTransactionDeleteImage, wrapTransactionMergeImage } from './wrapTransaction'
 
 import type { Image, Images, FileDeleteCallback, FileUploadCallback } from './images'
 import type { FileUpload } from 'graphql-upload'
@@ -31,7 +31,8 @@ export const images = (config: S3Configured) => {
   const deleteImage: Images['deleteImage'] = async (resource, relationshipType, opts = {}) => {
     sanitizeRelationshipType(relationshipType)
     const { transaction, deleteCallback = s3Delete } = opts
-    if (!transaction) return wrapTransaction(deleteImage, [resource, relationshipType], opts)
+    if (!transaction)
+      return wrapTransactionDeleteImage(deleteImage, [resource, relationshipType], opts)
     const txResult = await transaction.run(
       `
       MATCH (resource {id: $resource.id})-[rel:${relationshipType}]->(image:Image)
@@ -63,7 +64,7 @@ export const images = (config: S3Configured) => {
     sanitizeRelationshipType(relationshipType)
     const { transaction, uploadCallback, deleteCallback = s3Delete } = opts
     if (!transaction)
-      return wrapTransaction(mergeImage, [resource, relationshipType, imageInput], opts)
+      return wrapTransactionMergeImage(mergeImage, [resource, relationshipType, imageInput], opts)
 
     let txResult = await transaction.run(
       `
