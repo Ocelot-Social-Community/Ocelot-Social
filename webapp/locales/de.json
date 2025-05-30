@@ -859,7 +859,11 @@
       "unobserve": "Beitrag nicht mehr beobachten",
       "unobservedSuccessfully": "Du beobachtest diesen Beitrag nicht mehr!",
       "unpin": "Beitrag loslösen",
-      "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!"
+      "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!",
+      "pushToTop": "Vorschieben",
+      "unpush": "Vorschieben aufheben",
+      "pushedSuccessfully": "Beitrag erfolgreich nach vorne geschoben!",
+      "unpushedSuccessfully": "Beitrag erfolgreich zuück gestellt!"
     },
     "name": "Beitrag",
     "pinned": "Meldung",

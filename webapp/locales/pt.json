@@ -859,7 +859,11 @@
       "unobserve": "Deixar de observar publicação",
       "unobservedSuccessfully": null,
       "unpin": "Desafixar publicação",
-      "unpinnedSuccessfully": "Publicação desafixada com sucesso!"
+      "unpinnedSuccessfully": "Publicação desafixada com sucesso!",
+      "pushToTop": null,
+      "unpush": null,
+      "pushedSuccessfully": null,
+      "unpushedSuccessfully": null
     },
     "name": "Postar",
     "pinned": "Anúncio",

@@ -859,7 +859,11 @@
       "unobserve": "Dejar de observar contribución",
       "unobservedSuccessfully": null,
       "unpin": "Desanclar contribución",
-      "unpinnedSuccessfully": "¡Contribución desanclado con éxito!"
+      "unpinnedSuccessfully": "¡Contribución desanclado con éxito!",
+      "pushToTop": null,
+      "unpush": null,
+      "pushedSuccessfully": null,
+      "unpushedSuccessfully": null
     },
     "name": "Contribución",
     "pinned": "Anuncio",

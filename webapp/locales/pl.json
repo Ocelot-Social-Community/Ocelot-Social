@@ -859,7 +859,11 @@
       "unobserve": null,
       "unobservedSuccessfully": null,
       "unpin": null,
-      "unpinnedSuccessfully": null
+      "unpinnedSuccessfully": null,
+      "pushToTop": null,
+      "unpush": null,
+      "pushedSuccessfully": null,
+      "unpushedSuccessfully": null
     },
     "name": "Poczta",
     "pinned": null,

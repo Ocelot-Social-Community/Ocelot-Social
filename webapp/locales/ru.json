@@ -859,7 +859,11 @@
       "unobserve": null,
       "unobservedSuccessfully": null,
       "unpin": "Открепить пост",
-      "unpinnedSuccessfully": "Пост успешно не закреплено!"
+      "unpinnedSuccessfully": "Пост успешно не закреплено!",
+      "pushToTop": null,
+      "unpush": null,
+      "pushedSuccessfully": null,
+      "unpushedSuccessfully": null
     },
     "name": "Пост",
     "pinned": "Объявление",

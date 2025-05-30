@@ -859,7 +859,11 @@
       "unobserve": "Ne plus observer le Post",
       "unobservedSuccessfully": null,
       "unpin": "Retirer l'épingle du poste",
-      "unpinnedSuccessfully": "Épingle retirer du Post avec succès!"
+      "unpinnedSuccessfully": "Épingle retirer du Post avec succès!",
+      "pushToTop": null,
+      "unpush": null,
+      "pushedSuccessfully": null,
+      "unpushedSuccessfully": null
     },
     "name": "Post",
     "pinned": "Annonce",
