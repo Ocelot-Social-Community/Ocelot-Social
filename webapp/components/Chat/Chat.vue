@@ -357,6 +357,8 @@ export default {
       changedRoom.lastMessage = data.chatMessageAdded
       changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
       changedRoom.lastMessageAt = data.chatMessageAdded.date
+      // Move changed room to the top of the list
+      changedRoom.index = data.chatMessageAdded.date
       changedRoom.unreadCount++
       this.rooms[roomIndex] = changedRoom
       if (data.chatMessageAdded.room.id === this.selectedRoom?.id) {
