@@ -2,10 +2,9 @@
   <action-button
     :loading="loading"
     :disabled="disabled"
-    :filled="shouted"
     :count="shoutedCount"
     :text="$t('shoutButton.shouted')"
-    icon="heart-o"
+    :icon="shouted ? 'heart' : 'heart-o'"
     @click="toggle"
   />
 </template>

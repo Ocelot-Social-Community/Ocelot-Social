@@ -2,10 +2,9 @@
   <action-button
     :loading="false"
     :disabled="disabled"
-    :filled="isObserved"
     :count="count"
     :text="$t('observeButton.observed')"
-    icon="bell"
+    :icon="isObserved ? 'bell-filled' : 'bell'"
     circle
     @click="toggle"
   />
