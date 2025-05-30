@@ -421,6 +421,7 @@ export default {
 .actions {
   display: flex;
   align-items: center;
+  justify-content: right;
   gap: $space-small;
   margin-top: $space-small;
   margin-bottom: calc($space-base * 2);

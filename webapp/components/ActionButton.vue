@@ -37,6 +37,7 @@ export default {
   align-items: center;
   gap: $space-xx-small;
   position: relative;
+  --icon-size: calc(var(--circle-button-width, #{$size-button-base}) / 2);
 }
 .count {
   user-select: none;
@@ -48,10 +49,10 @@ export default {
   position: absolute;
   top: -8px;
   right: -8px;
-  width: 22px;
-  height: 22px;
-  font-size: 14px;
-  letter-spacing: 0.1px;
+  --diameter: calc(var(--circle-button-width, #{$size-button-base}) * 0.7);
+  width: var(--diameter);
+  height: var(--diameter);
   border-radius: 12px;
+  font-size: 12px;
 }
 </style>

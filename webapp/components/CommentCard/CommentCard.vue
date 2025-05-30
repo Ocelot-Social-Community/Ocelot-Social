@@ -230,10 +230,13 @@ export default {
 <style lang="scss" scoped>
 .actions {
   margin-top: $space-x-small;
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  gap: $space-x-small;
 }
 
 .shout-button {
-  --icon-size: 1em;
   --circle-button-width: 28px;
 }
 </style>
