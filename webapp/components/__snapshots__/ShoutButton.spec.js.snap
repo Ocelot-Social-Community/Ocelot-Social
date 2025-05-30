@@ -1,0 +1,88 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ShoutButton.vue mount renders button and text 1`] = `
+<div>
+  <div
+    class="action-button"
+  >
+    <button
+      aria-label="shoutButton.shouted"
+      class="base-button --icon-only --circle"
+      type="button"
+    >
+      <span
+        class="base-icon"
+      >
+        <!---->
+      </span>
+       
+      <!---->
+       
+    </button>
+     
+    <div
+      class="count"
+    >
+      0
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ShoutButton.vue mount toggle the button 1`] = `
+<div>
+  <div
+    class="action-button"
+  >
+    <button
+      aria-label="shoutButton.shouted"
+      class="base-button --icon-only --circle"
+      type="button"
+    >
+      <span
+        class="base-icon"
+      >
+        <!---->
+      </span>
+       
+      <!---->
+       
+    </button>
+     
+    <div
+      class="count"
+    >
+      1
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ShoutButton.vue mount toggle the button, but backend fails 1`] = `
+<div>
+  <div
+    class="action-button"
+  >
+    <button
+      aria-label="shoutButton.shouted"
+      class="base-button --icon-only --circle"
+      type="button"
+    >
+      <span
+        class="base-icon"
+      >
+        <!---->
+      </span>
+       
+      <!---->
+       
+    </button>
+     
+    <div
+      class="count"
+    >
+      1
+    </div>
+  </div>
+</div>
+`;
