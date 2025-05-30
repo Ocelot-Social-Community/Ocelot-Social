@@ -40,7 +40,7 @@ export default (i18n) => {
           ...badges
           blocked
         }
-        comments(orderBy: sortDate_asc) {
+        comments(orderBy: createdAt_asc) {
           ...comment
           author {
             ...user
