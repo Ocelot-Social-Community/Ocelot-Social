@@ -97,7 +97,7 @@
         <password-strength class="password-strength" :password="formData.password" />
 
         <!-- location -->
-        <location-select v-if="locationRequired" v-model="locationName" />
+        <location-select v-if="locationRequired" class="location-select" v-model="locationName" />
 
         <email-display-and-verify :email="sliderData.collectedInputData.email" />
         <ds-text>
@@ -426,6 +426,10 @@ export default {
 }
 
 .full-name {
+  padding-bottom: 16px;
+}
+
+.location-select {
   padding-bottom: 16px;
 }
 </style>
