@@ -6,7 +6,7 @@ describe('Image', () => {
   const { Image } = ImageResolver
   const args = {}
   const Location =
-    'fsn1.your-objectstorage.com/ocelot-social-staging/original/f965ea15-1f6b-43aa-a535-927410e2585e-dsc02586.jpg'
+    'https://fsn1.your-objectstorage.com/ocelot-social-staging/original/f965ea15-1f6b-43aa-a535-927410e2585e-dsc02586.jpg'
   const config = {
     ...TEST_CONFIG,
     AWS_ENDPOINT: 'https://fsn1.your-objectstorage.com',
@@ -17,7 +17,7 @@ describe('Image', () => {
   describe('.url', () => {
     it('replaces the internal domain of the S3 `Location` with a public domain', () => {
       const expectedUrl =
-        'https://your-public-gateway.com/iJ5iCYb-c6DnvQHTLrKcIlioWVk=/fsn1.your-objectstorage.com/ocelot-social-staging/original/f965ea15-1f6b-43aa-a535-927410e2585e-dsc02586.jpg'
+        'https://your-public-gateway.com/f_qz7PlAWIQx-IrMOZfikzDFM6I=/ocelot-social-staging/original/f965ea15-1f6b-43aa-a535-927410e2585e-dsc02586.jpg'
       expect(Image.url({ url: Location }, args, { config })).toEqual(expectedUrl)
     })
   })
@@ -28,7 +28,7 @@ describe('Image', () => {
 
       it('encodes `fit-in` imagor transformations in the URL', () => {
         const expectedUrl =
-          'https://your-public-gateway.com/gg1VO_owYoOkltsIPNNFV7JcuUE=/fit-in/320x5000/fsn1.your-objectstorage.com/ocelot-social-staging/original/f965ea15-1f6b-43aa-a535-927410e2585e-dsc02586.jpg'
+          'https://your-public-gateway.com/1OEqC7g0YFxuvnRCX2hOukYMJEY=/fit-in/320x5000/ocelot-social-staging/original/f965ea15-1f6b-43aa-a535-927410e2585e-dsc02586.jpg'
         expect(Image.transform({ url: Location }, args, { config })).toEqual(expectedUrl)
       })
     })
