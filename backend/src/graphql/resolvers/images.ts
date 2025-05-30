@@ -9,27 +9,28 @@ type UrlResolver = (
   args: { width?: number; height?: number },
   {
     config: { S3_PUBLIC_GATEWAY },
-  }: Context,
+  }: Pick<Context, 'config'>,
 ) => string
 
 const changeDomain: (opts: { transformations: UrlResolver[] }) => UrlResolver =
   ({ transformations }) =>
-  (parent, _args, context) => {
+  ({ url }, _args, context) => {
     const { config } = context
     const { S3_PUBLIC_GATEWAY, AWS_ENDPOINT } = config
     if (!(S3_PUBLIC_GATEWAY && AWS_ENDPOINT)) {
-      return parent.url
+      return url
     }
-    if (new URL(parent.url).host !== new URL(AWS_ENDPOINT).host) {
+    const originalUrl = new URL(url, AWS_ENDPOINT) // some S3 object storages return invalid URLs as location, so put the AWS_ENDPOINT as `base`
+    if (originalUrl.host !== new URL(AWS_ENDPOINT).host) {
       // In this case it's an external upload - maybe seeded?
       // Let's not change the URL in this case
-      return parent.url
+      return url
     }
 
     const publicUrl = new URL(S3_PUBLIC_GATEWAY)
-    publicUrl.pathname = new URL(parent.url).pathname
-    const url = publicUrl.href
-    return chain(...transformations)({ url }, _args, context)
+    publicUrl.pathname = originalUrl.pathname
+    const newUrl = publicUrl.href
+    return chain(...transformations)({ url: newUrl }, _args, context)
   }
 
 const sign: UrlResolver = ({ url }, _args, { config: { IMAGOR_SECRET } }) => {
