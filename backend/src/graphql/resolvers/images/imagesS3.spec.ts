@@ -324,6 +324,26 @@ describe('mergeImage', () => {
           })
         })
       })
+
+      describe('edge cases: `Location` is not a valid URL (e.g. hetzner object storage)', () => {
+        beforeEach(async () => {
+          uploadCallback = jest.fn(
+            () =>
+              'fsn1.your-objectstorage.com/ocelot-social-staging/original/f965ea15-1f6b-43aa-a535-927410e2585e-dsc02586.jpg',
+          )
+        })
+
+        it('adds missing https:// protocol', async () => {
+          const result = await mergeImage(post, 'HERO_IMAGE', imageInput, {
+            uploadCallback,
+            deleteCallback,
+          })
+          expect(result).toMatchObject({
+            url: 'https://fsn1.your-objectstorage.com/ocelot-social-staging/original/f965ea15-1f6b-43aa-a535-927410e2585e-dsc02586.jpg',
+          })
+          expect(new URL(result.url)).toBeDefined()
+        })
+      })
     })
   })
 

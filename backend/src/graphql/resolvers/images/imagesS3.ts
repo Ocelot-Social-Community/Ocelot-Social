@@ -104,7 +104,10 @@ export const images = (config: S3Configured) => {
     const upload = await uploadPromise
     const { name, ext } = path.parse(upload.filename)
     const uniqueFilename = `${uuid()}-${slug(name)}${ext}`
-    const Location = await uploadCallback({ ...upload, uniqueFilename })
+    let Location = await uploadCallback({ ...upload, uniqueFilename })
+    if (!Location.startsWith('https://') && !Location.startsWith('http://')) {
+      Location = `https://${Location}` // assume https
+    }
     return Location
   }
 
