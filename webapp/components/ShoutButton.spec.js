@@ -1,6 +1,7 @@
-import { mount } from '@vue/test-utils'
-import ShoutButton from './ShoutButton.vue'
+import { render, screen, fireEvent } from '@testing-library/vue'
+import '@testing-library/jest-dom'
 import Vue from 'vue'
+import ShoutButton from './ShoutButton.vue'
 
 const localVue = global.localVue
 
@@ -9,49 +10,54 @@ describe('ShoutButton.vue', () => {
 
   beforeEach(() => {
     mocks = {
-      $t: jest.fn(),
+      $t: jest.fn((t) => t),
       $apollo: {
         mutate: jest.fn(),
       },
     }
   })
 
-  describe('mount', () => {
-    let wrapper
-    const Wrapper = () => {
-      return mount(ShoutButton, { mocks, localVue })
-    }
+  let wrapper
 
-    beforeEach(() => {
-      wrapper = Wrapper()
-    })
+  const Wrapper = ({ isShouted = false } = {}) => {
+    return render(ShoutButton, { mocks, localVue, propsData: { isShouted } })
+  }
 
-    it('renders button and text', () => {
-      expect(mocks.$t).toHaveBeenCalledWith('shoutButton.shouted')
-      expect(wrapper.findAll('.base-button')).toHaveLength(1)
-      expect(wrapper.findAll('.shout-button-text')).toHaveLength(1)
-      expect(wrapper.vm.shouted).toBe(false)
-      expect(wrapper.vm.shoutedCount).toBe(0)
-    })
+  beforeEach(() => {
+    wrapper = Wrapper()
+  })
 
-    it('toggle the button', async () => {
-      mocks.$apollo.mutate = jest.fn().mockResolvedValue({ data: { shout: 'WeDoShout' } })
-      wrapper.find('.base-button').trigger('click')
-      expect(wrapper.vm.shouted).toBe(true)
-      expect(wrapper.vm.shoutedCount).toBe(1)
-      await Vue.nextTick()
-      expect(wrapper.vm.shouted).toBe(true)
-      expect(wrapper.vm.shoutedCount).toBe(1)
-    })
+  it('renders button and text', () => {
+    expect(wrapper.container).toMatchSnapshot()
+    const button = screen.getByRole('button')
+    expect(button).toBeInTheDocument()
+  })
 
-    it('toggle the button, but backend fails', async () => {
-      mocks.$apollo.mutate = jest.fn().mockRejectedValue({ message: 'Ouch!' })
-      await wrapper.find('.base-button').trigger('click')
-      expect(wrapper.vm.shouted).toBe(true)
-      expect(wrapper.vm.shoutedCount).toBe(1)
-      await Vue.nextTick()
-      expect(wrapper.vm.shouted).toBe(false)
-      expect(wrapper.vm.shoutedCount).toBe(0)
+  it('toggle the button', async () => {
+    mocks.$apollo.mutate = jest.fn().mockResolvedValue({ data: { shout: 'WeDoShout' } })
+    const button = screen.getByRole('button')
+    await fireEvent.click(button)
+    expect(wrapper.container).toMatchSnapshot()
+    const shoutedCount = screen.getByText('1')
+    expect(shoutedCount).toBeInTheDocument()
+  })
+
+  it('toggle the button, but backend fails', async () => {
+    mocks.$apollo.mutate = jest.fn().mockRejectedValue({ message: 'Ouch!' })
+    const button = screen.getByRole('button')
+    await fireEvent.click(button)
+    expect(wrapper.container).toMatchSnapshot()
+    let shoutedCount = screen.getByText('1')
+    expect(shoutedCount).toBeInTheDocument()
+    await Vue.nextTick()
+    shoutedCount = screen.getByText('0')
+    expect(shoutedCount).toBeInTheDocument()
+  })
+
+  describe('when shouted', () => {
+    it('renders', () => {
+      wrapper = Wrapper({ isShouted: true })
+      expect(wrapper.container).toMatchSnapshot()
     })
   })
 })
