@@ -44,7 +44,7 @@ describe('ObserveButton', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.element).toMatchSnapshot()
+      expect(wrapper.container).toMatchSnapshot()
     })
 
     it('emits toggleObservePost with true when clicked', async () => {

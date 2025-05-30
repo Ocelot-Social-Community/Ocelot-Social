@@ -5,6 +5,7 @@
       :disabled="disabled"
       :icon="icon"
       :aria-label="text"
+      :filled="filled"
       circle
       @click="click"
     />
@@ -18,6 +19,7 @@ export default {
     count: { type: Number, required: true },
     text: { type: String, required: true },
     icon: { type: String, required: true },
+    filled: { type: Boolean, default: false },
     disabled: { type: Boolean },
     loading: { type: Boolean },
   },
@@ -40,8 +42,9 @@ export default {
 }
 .count {
   user-select: none;
-  color: $color-secondary-inverse;
-  background-color: $color-primary-dark;
+  color: $color-primary-dark;
+  background-color: $color-secondary-inverse;
+  border: 1px solid $color-primary-dark;
   display: flex;
   align-items: center;
   justify-content: center;

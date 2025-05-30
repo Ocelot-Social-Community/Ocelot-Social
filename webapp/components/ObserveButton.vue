@@ -3,7 +3,8 @@
     :loading="false"
     :count="count"
     :text="$t('observeButton.observed')"
-    :icon="isObserved ? 'bell-filled' : 'bell'"
+    :filled="isObserved"
+    icon="bell"
     circle
     @click="toggle"
   />

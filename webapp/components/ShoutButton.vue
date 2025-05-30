@@ -4,7 +4,8 @@
     :disabled="disabled"
     :count="shoutedCount"
     :text="$t('shoutButton.shouted')"
-    :icon="shouted ? 'heart' : 'heart-o'"
+    :filled="shouted"
+    icon="heart-o"
     @click="toggle"
   />
 </template>

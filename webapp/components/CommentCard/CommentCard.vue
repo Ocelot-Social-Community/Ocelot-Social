@@ -233,7 +233,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: right;
-  gap: $space-x-small;
+  gap: calc($space-base * 0.5);
 }
 
 .shout-button {

@@ -8,7 +8,7 @@ exports[`ObserveButton observed renders 1`] = `
   >
     <button
       aria-label="observeButton.observed"
-      class="base-button --icon-only --circle"
+      class="base-button --icon-only --circle --filled"
       type="button"
     >
       <span
@@ -30,4 +30,32 @@ exports[`ObserveButton observed renders 1`] = `
 </div>
 `;
 
-exports[`ObserveButton unobserved renders 1`] = `undefined`;
+exports[`ObserveButton unobserved renders 1`] = `
+<div>
+  <div
+    circle=""
+    class="action-button"
+  >
+    <button
+      aria-label="observeButton.observed"
+      class="base-button --icon-only --circle"
+      type="button"
+    >
+      <span
+        class="base-icon"
+      >
+        <!---->
+      </span>
+       
+      <!---->
+       
+    </button>
+     
+    <div
+      class="count"
+    >
+      1
+    </div>
+  </div>
+</div>
+`;
