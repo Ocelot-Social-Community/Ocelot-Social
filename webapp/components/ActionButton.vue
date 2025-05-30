@@ -49,12 +49,13 @@ export default {
   align-items: center;
   justify-content: center;
   position: absolute;
-  top: -8px;
-  right: -8px;
+  top: -12px;
+  left: calc(100% - 16px);
   --diameter: calc(var(--circle-button-width, #{$size-button-base}) * 0.7);
-  width: var(--diameter);
+  min-width: var(--diameter);
   height: var(--diameter);
   border-radius: 12px;
   font-size: 12px;
+  padding-inline: 2px;
 }
 </style>
