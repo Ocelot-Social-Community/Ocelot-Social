@@ -5,10 +5,11 @@
       :disabled="disabled"
       :filled="filled"
       :icon="icon"
+      :aria-label="text"
       circle
       @click="click"
     />
-    <span color="soft" class="text">{{ count }}x {{ text }}</span>
+    <div class="count">{{ count }}</div>
   </div>
 </template>
 
@@ -35,9 +36,22 @@ export default {
   justify-content: center;
   align-items: center;
   gap: $space-xx-small;
+  position: relative;
 }
-.text {
+.count {
   user-select: none;
-  color: $text-color-soft;
+  color: $color-secondary-inverse;
+  background-color: $color-primary-dark;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  font-size: 14px;
+  letter-spacing: 0.1px;
+  border-radius: 12px;
 }
 </style>
