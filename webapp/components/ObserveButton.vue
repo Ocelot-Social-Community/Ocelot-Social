@@ -1,7 +1,6 @@
 <template>
   <action-button
     :loading="false"
-    :disabled="disabled"
     :count="count"
     :text="$t('observeButton.observed')"
     :icon="isObserved ? 'bell-filled' : 'bell'"

@@ -3,7 +3,6 @@
     <base-button
       :loading="loading"
       :disabled="disabled"
-      :filled="filled"
       :icon="icon"
       :aria-label="text"
       circle
@@ -19,8 +18,8 @@ export default {
     count: { type: Number, required: true },
     text: { type: String, required: true },
     disabled: { type: Boolean, default: false },
-    filled: { type: Boolean, required: true },
     icon: { type: String, required: true },
+    loading: { type: Boolean, default: false },
   },
   methods: {
     click() {

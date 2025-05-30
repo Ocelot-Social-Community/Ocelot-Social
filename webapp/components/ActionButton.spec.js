@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/vue'
+import '@testing-library/jest-dom'
 import ActionButton from './ActionButton.vue'
 
 const localVue = global.localVue
@@ -14,16 +15,15 @@ describe('ActionButton.vue', () => {
 
   describe('mount', () => {
     let wrapper
-    const Wrapper = () => {
+    const Wrapper = ({ isDisabled = false } = {}) => {
       return render(ActionButton, {
         mocks,
         localVue,
         propsData: {
-          icon: 'my-icon',
+          icon: 'heart',
           text: 'Click me',
-          count: 0,
-          disabled: false,
-          filled: false,
+          count: 7,
+          disabled: isDisabled,
         },
       })
     }
@@ -32,15 +32,35 @@ describe('ActionButton.vue', () => {
       wrapper = Wrapper()
     })
 
-    it('renders', () => {
-      const wrapper = Wrapper()
-      expect(wrapper.containr).toMatchSnapshot()
-    })
+    describe('when not disabled', () => {
+      it('renders', () => {
+        const wrapper = Wrapper()
+        expect(wrapper.container).toMatchSnapshot()
+      })
 
-    it('button emits click event', async () => {
-      const button = screen.getByRole('button')
-      await fireEvent.click(button)
-      expect(wrapper.emitted().click).toBeTruthy()
+      it('shows count', () => {
+        const count = screen.getByText('7')
+        expect(count).toBeInTheDocument()
+      })
+
+      it('button emits click event', async () => {
+        const button = screen.getByRole('button')
+        await fireEvent.click(button)
+        expect(wrapper.emitted().click).toEqual([[]])
+      })
+
+      describe('when disabled', () => {
+        it('renders', () => {
+          const wrapper = Wrapper({ isDisabled: true })
+          expect(wrapper.container).toMatchSnapshot()
+        })
+
+        it('button does not emit click event', async () => {
+          const button = screen.getByRole('button')
+          await fireEvent.click(button)
+          expect(wrapper.emitted().click).toEqual([[]])
+        })
+      })
     })
   })
 })
