@@ -97,7 +97,12 @@
         <password-strength class="password-strength" :password="formData.password" />
 
         <!-- location -->
-        <location-select v-if="locationRequired" class="location-select" v-model="locationName" />
+        <location-select
+          v-if="locationRequired"
+          class="location-select"
+          v-model="locationName"
+          :canBeCleared="false"
+        />
 
         <email-display-and-verify :email="sliderData.collectedInputData.email" />
         <ds-text>

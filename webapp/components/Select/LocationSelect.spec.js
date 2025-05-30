@@ -77,9 +77,9 @@ describe('LocationSelect', () => {
       })
     })
 
-    describe('require location  is true', () => {
+    describe('canBeCleared is false', () => {
       beforeEach(() => {
-        mocks.$env.REQUIRE_LOCATION = true
+        propsData.canBeCleared = false
         wrapper = Wrapper()
       })
 

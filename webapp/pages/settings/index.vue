@@ -15,7 +15,7 @@
           :placeholder="$t('settings.data.namePlaceholder')"
         />
         <ds-input id="slug" model="slug" icon="at" :label="$t('settings.data.labelSlug')" />
-        <location-select v-model="formData.locationName" />
+        <location-select v-model="formData.locationName" :canBeCleared="!$env.REQUIRE_LOCATION" />
         <!-- eslint-enable vue/use-v-on-exact -->
         <ds-input
           id="about"
