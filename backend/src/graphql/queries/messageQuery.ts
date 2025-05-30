@@ -18,7 +18,14 @@ export const messageQuery = () => {
         saved
         distributed
         seen
-        images
+        files {
+          url
+          name
+          size
+          type
+          url
+          preview
+        }
       }
     }
   `
