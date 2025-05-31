@@ -159,5 +159,7 @@ export const commentFragment = gql`
     contentExcerpt
     isPostObservedByMe
     postObservingUsersCount
+    shoutedByCurrentUser
+    shoutedCount
   }
 `

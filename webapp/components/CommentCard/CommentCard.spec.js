@@ -17,7 +17,7 @@ describe('CommentCard.vue', () => {
       postId: 'post42',
     }
     mocks = {
-      $t: jest.fn(),
+      $t: jest.fn((t) => t),
       $toast: {
         success: jest.fn(),
         error: jest.fn(),

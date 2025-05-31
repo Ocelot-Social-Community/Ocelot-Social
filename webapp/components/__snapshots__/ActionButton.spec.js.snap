@@ -1,14 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ObserveButton observed renders 1`] = `
+exports[`ActionButton.vue when disabled renders 1`] = `
 <div>
   <div
-    circle=""
     class="action-button"
   >
     <button
-      aria-label="observeButton.observed"
-      class="base-button --icon-only --circle --filled"
+      aria-label="Click me"
+      class="base-button --icon-only --circle"
+      disabled="disabled"
       type="button"
     >
       <span
@@ -24,20 +24,19 @@ exports[`ObserveButton observed renders 1`] = `
     <div
       class="count"
     >
-      1
+      7
     </div>
   </div>
 </div>
 `;
 
-exports[`ObserveButton unobserved renders 1`] = `
+exports[`ActionButton.vue when not disabled renders 1`] = `
 <div>
   <div
-    circle=""
     class="action-button"
   >
     <button
-      aria-label="observeButton.observed"
+      aria-label="Click me"
       class="base-button --icon-only --circle"
       type="button"
     >
@@ -54,7 +53,7 @@ exports[`ObserveButton unobserved renders 1`] = `
     <div
       class="count"
     >
-      1
+      7
     </div>
   </div>
 </div>

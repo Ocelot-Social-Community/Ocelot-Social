@@ -112,7 +112,8 @@ export default {
   }
 
   &.--circle {
-    width: $size-button-base;
+    width: var(--circle-button-width, $size-button-base);
+    height: var(--circle-button-width, $size-button-base);
     border-radius: 50%;
   }
 
