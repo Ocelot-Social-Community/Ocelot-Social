@@ -435,6 +435,6 @@ export default {
 }
 
 .location-select {
-  padding-bottom: 16px;
+  padding-bottom: $space-small;
 }
 </style>
