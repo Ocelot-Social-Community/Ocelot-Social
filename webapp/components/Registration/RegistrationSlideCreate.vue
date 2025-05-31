@@ -386,10 +386,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.password-strength {
-  margin-bottom: 14px;
-}
-
 .password-wrapper {
   display: flex;
   width: 100%;
@@ -399,7 +395,7 @@ export default {
   padding-right: 0;
   height: $input-height;
   margin-bottom: 10px;
-  margin-bottom: 16px;
+  margin-bottom: $space-small;
 
   color: $text-color-base;
   background: $background-color-disabled;
@@ -421,7 +417,7 @@ export default {
 
   .password-field {
     position: relative;
-    padding-top: 16px;
+    padding-top: $space-small;
     border: none;
     border-style: none;
     appearance: none;
@@ -431,10 +427,10 @@ export default {
 }
 
 .full-name {
-  padding-bottom: 16px;
+  padding-bottom: $space-small;
 }
 
 .location-select {
-  padding-bottom: $space-small;
+  padding-bottom: $space-base;
 }
 </style>
