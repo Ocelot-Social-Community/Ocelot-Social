@@ -49,10 +49,10 @@ export default {
       return !this.filteredPostTypes.includes('Event')
     },
     orderedAsc() {
-      return this.orderedByCreationDate ? 'createdAt_asc' : 'eventStart_desc'
+      return this.orderedByCreationDate ? 'sortDate_asc' : 'eventStart_desc'
     },
     orderedDesc() {
-      return this.orderedByCreationDate ? 'createdAt_desc' : 'eventStart_asc'
+      return this.orderedByCreationDate ? 'sortDate_desc' : 'eventStart_asc'
     },
     sectionTitle() {
       return this.orderedByCreationDate

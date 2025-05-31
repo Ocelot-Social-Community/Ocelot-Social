@@ -856,10 +856,14 @@
       "observedSuccessfully": null,
       "pin": null,
       "pinnedSuccessfully": null,
+      "pushedSuccessfully": null,
+      "pushToTop": null,
       "unobserve": null,
       "unobservedSuccessfully": null,
       "unpin": null,
-      "unpinnedSuccessfully": null
+      "unpinnedSuccessfully": null,
+      "unpush": null,
+      "unpushedSuccessfully": null
     },
     "name": "Messaggio",
     "pinned": null,

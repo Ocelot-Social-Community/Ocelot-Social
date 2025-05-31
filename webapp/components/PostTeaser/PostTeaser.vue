@@ -109,6 +109,8 @@
             :is-owner="isAuthor"
             @pinPost="pinPost"
             @unpinPost="unpinPost"
+            @pushPostToTop="pushPostToTop"
+            @unpushPost="unpushPost"
             @toggleObservePost="toggleObservePost"
           />
         </client-only>
@@ -221,6 +223,12 @@ export default {
     },
     unpinPost(post) {
       this.$emit('unpinPost', post)
+    },
+    pushPostToTop(post) {
+      this.$emit('pushPostToTop', post)
+    },
+    unpushPost(post) {
+      this.$emit('unpushPost', post)
     },
     toggleObservePost(postId, value) {
       this.$emit('toggleObservePost', postId, value)
