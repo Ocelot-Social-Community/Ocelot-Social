@@ -213,7 +213,6 @@ export default {
           },
         },
         actionRadius: { required: true, min: 1 },
-        locationName: { required: false },
         categoryIds: {
           type: 'array',
           required: this.categoriesActive,

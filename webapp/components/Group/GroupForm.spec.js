@@ -22,6 +22,9 @@ describe('GroupForm', () => {
   beforeEach(() => {
     mocks = {
       $t: jest.fn(),
+      $env: {
+        REQUIRE_LOCATION: false,
+      },
     }
     storeMocks = {
       getters: {

@@ -428,7 +428,7 @@ export default shield(
       Donations: isAuthenticated,
       userData: isAuthenticated,
       VerifyNonce: allow,
-      queryLocations: isAuthenticated,
+      queryLocations: allow,
       availableRoles: isAdmin,
       Room: isAuthenticated,
       Message: isAuthenticated,

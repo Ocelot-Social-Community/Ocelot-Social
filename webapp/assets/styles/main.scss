@@ -187,3 +187,11 @@ body.dropdown-open {
 .dropdown-arrow {
   font-size: $font-size-xx-small;
 }
+
+/* Prevent ds-select overflow */
+.ds-select-value {
+  max-height: 38px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

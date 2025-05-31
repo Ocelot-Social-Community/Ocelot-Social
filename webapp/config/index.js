@@ -38,6 +38,7 @@ const options = {
   INVITE_LINK_LIMIT: process.env.INVITE_LINK_LIMIT || 7,
   NETWORK_NAME: process.env.NETWORK_NAME || 'Ocelot.social',
   ASK_FOR_REAL_NAME: process.env.ASK_FOR_REAL_NAME === 'true' || false,
+  REQUIRE_LOCATION: process.env.REQUIRE_LOCATION === 'true' || false,
 }
 
 const language = {
