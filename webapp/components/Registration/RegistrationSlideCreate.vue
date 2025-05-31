@@ -386,6 +386,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.password-strength {
+  margin-bottom: 14px;
+}
+
 .password-wrapper {
   display: flex;
   width: 100%;
