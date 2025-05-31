@@ -17,7 +17,7 @@ import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
 import Resolver from './helpers/Resolver'
-import { mergeImage, deleteImage } from './images/images'
+import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
 
 const maintainPinnedPosts = (params) => {
@@ -176,7 +176,7 @@ export default {
         )
         const [post] = createPostTransactionResponse.records.map((record) => record.get('post'))
         if (imageInput) {
-          await mergeImage(post, 'HERO_IMAGE', imageInput, { transaction })
+          await images.mergeImage(post, 'HERO_IMAGE', imageInput, { transaction })
         }
         return post
       })
@@ -247,7 +247,7 @@ export default {
             updatePostVariables,
           )
           const [post] = updatePostTransactionResponse.records.map((record) => record.get('post'))
-          await mergeImage(post, 'HERO_IMAGE', imageInput, { transaction })
+          await images.mergeImage(post, 'HERO_IMAGE', imageInput, { transaction })
           return post
         })
         const post = await writeTxResultPromise
@@ -277,7 +277,7 @@ export default {
           { postId: args.id },
         )
         const [post] = deletePostTransactionResponse.records.map((record) => record.get('post'))
-        await deleteImage(post, 'HERO_IMAGE', { transaction })
+        await images.deleteImage(post, 'HERO_IMAGE', { transaction })
         return post
       })
       try {
