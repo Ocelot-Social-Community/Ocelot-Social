@@ -862,8 +862,8 @@
       "unobservedSuccessfully": "Du beobachtest diesen Beitrag nicht mehr!",
       "unpin": "Beitrag loslösen",
       "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!",
-      "unpush": "Vorschieben aufheben",
-      "unpushedSuccessfully": "Beitrag erfolgreich zuück gestellt!"
+      "unpush": "Beitrag hochschieben aufheben",
+      "unpushedSuccessfully": "Hochschieben des Beitrags erfolgreich rückgängig gemacht!"
     },
     "name": "Beitrag",
     "pinned": "Meldung",
