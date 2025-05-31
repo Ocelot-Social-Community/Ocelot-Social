@@ -53,8 +53,6 @@ services:
       - neo4j
     ports:
       - 4000:4000
-    volumes:
-      - backend_uploads:/app/public/uploads
     environment:
       # Envs used in Dockerfile
       # - DOCKER_WORKDIR="/app"
@@ -104,5 +102,4 @@ services:
     # command: ["tail", "-f", "/dev/null"]
 
 volumes:
-  backend_uploads:
   neo4j_data:

@@ -509,7 +509,9 @@ export default shield(
     },
     User: {
       '*': isAuthenticated,
+      id: allow,
       name: allow,
+      slug: allow,
       avatar: allow,
       email: or(isMyOwn, isAdmin),
       emailNotificationSettings: isMyOwn,
