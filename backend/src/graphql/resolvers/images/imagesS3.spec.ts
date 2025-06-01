@@ -78,8 +78,6 @@ describe('deleteImage', () => {
     })
 
     it('calls deleteCallback', async () => {
-      const u = await Factory.build('user')
-      user = await u.toJson()
       await deleteImage(user, 'AVATAR_IMAGE', { deleteCallback })
       expect(deleteCallback).toHaveBeenCalled()
     })
@@ -206,7 +204,7 @@ describe('mergeImage', () => {
         })
       })
 
-      describe('but given a `S3_PUBLIC_GATEWAY` configuration', () => {
+      describe('given a `S3_PUBLIC_GATEWAY` configuration', () => {
         const { mergeImage } = images({
           ...config,
           S3_PUBLIC_GATEWAY: 'http://s3-public-gateway.com',
