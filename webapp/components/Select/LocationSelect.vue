@@ -40,6 +40,11 @@ export default {
       required: false,
       default: true,
     },
+    showPreviousLocation: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   async created() {
     const result = await this.requestGeoData(this.locationName)
@@ -59,7 +64,7 @@ export default {
       return typeof this.value === 'object' ? this.value.value : this.value
     },
     locationNameLabelAddOnOldName() {
-      return this.locationName !== '' ? ' — ' + this.locationName : ''
+      return this.locationName !== '' && this.showPreviousLocation ? ' — ' + this.locationName : ''
     },
   },
   watch: {

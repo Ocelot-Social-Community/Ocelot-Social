@@ -102,6 +102,7 @@
           class="location-select"
           v-model="locationName"
           :canBeCleared="false"
+          :showPreviousLocation="false"
         />
 
         <email-display-and-verify :email="sliderData.collectedInputData.email" />

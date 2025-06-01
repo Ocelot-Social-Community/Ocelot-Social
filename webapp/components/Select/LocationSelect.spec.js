@@ -23,9 +23,6 @@ const mocks = {
   $i18n: {
     locale: () => 'en',
   },
-  $env: {
-    REQUIRE_LOCATION: false,
-  },
   $apollo: {
     query: queryMock,
   },
@@ -44,7 +41,7 @@ describe('LocationSelect', () => {
     })
 
     it('renders the label', () => {
-      expect(wrapper.find('label.ds-input-label').exists()).toBe(true)
+      expect(wrapper.find('label.ds-input-label').text()).toBe('settings.data.labelCity — nowhere')
     })
 
     it('renders the select', () => {
@@ -85,6 +82,17 @@ describe('LocationSelect', () => {
 
       it('does not show clear location name button', () => {
         expect(wrapper.find('.base-button').exists()).toBe(false)
+      })
+    })
+
+    describe('showPreviousLocation is false', () => {
+      beforeEach(() => {
+        propsData.showPreviousLocation = false
+        wrapper = Wrapper()
+      })
+
+      it('does not show clear location name button', () => {
+        expect(wrapper.find('.ds-input-label').text()).toBe('settings.data.labelCity')
       })
     })
   })
