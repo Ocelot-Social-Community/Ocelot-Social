@@ -111,11 +111,7 @@ export default {
               ? 'components.registration.email.buttonTitle.resend'
               : 'components.registration.email.buttonTitle.skipResend'
             : 'components.registration.email.buttonTitle.send',
-          buttonIcon: this.sliderData.collectedInputData.emailSend
-            ? this.sendEmailAgain
-              ? 'envelope'
-              : 'arrow-right'
-            : 'envelope',
+          buttonIcon: null,
         },
       }
     },
