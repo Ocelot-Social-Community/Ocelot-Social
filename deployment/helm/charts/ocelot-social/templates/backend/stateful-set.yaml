@@ -25,6 +25,9 @@ spec:
               name: {{ .Release.Name }}-backend-env
           - secretRef:
               name: {{ .Release.Name }}-backend-secret-env
+          volumeMounts:
+            - mountPath: /app/public/uploads
+              name: uploads
       containers:
         - name: {{ .Release.Name }}-backend
           image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default (include "defaultTag" .) }}"

@@ -1,25 +1,26 @@
 <template>
-  <ds-space margin="xx-small" class="text-align-center">
-    <base-button :loading="loading" :filled="isObserved" icon="bell" circle @click="toggle" />
-    <ds-space margin-bottom="xx-small" />
-    <ds-text color="soft" class="observe-button-text">
-      <ds-heading style="display: inline" tag="h3">{{ count }}x</ds-heading>
-      {{ $t('observeButton.observed') }}
-    </ds-text>
-  </ds-space>
+  <action-button
+    :loading="false"
+    :count="count"
+    :text="$t('observeButton.observed')"
+    :filled="isObserved"
+    icon="bell"
+    circle
+    @click="toggle"
+  />
 </template>
 
 <script>
+import ActionButton from '~/components/ActionButton.vue'
+
 export default {
+  components: {
+    ActionButton,
+  },
   props: {
     count: { type: Number, default: 0 },
     postId: { type: String, default: null },
     isObserved: { type: Boolean, default: false },
-  },
-  data() {
-    return {
-      loading: false,
-    }
   },
   methods: {
     toggle() {
@@ -28,12 +29,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss">
-.observe-button-text {
-  user-select: none;
-}
-.text-align-center {
-  text-align: center;
-}
-</style>
