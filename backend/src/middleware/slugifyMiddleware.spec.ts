@@ -2,17 +2,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
-
-import { TEST_CONFIG } from '@config/test-config'
-import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
 import { signupVerificationMutation } from '@graphql/queries/signupVerificationMutation'
 import { updateGroupMutation } from '@graphql/queries/updateGroupMutation'
-import createServer, { getContext } from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
 
 let variables
 const categoryIds = ['cat9']
@@ -20,23 +16,19 @@ const categoryIds = ['cat9']
 const descriptionAdditional100 =
   ' 123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789'
 
-const database = databaseContext()
-
-let server: ApolloServer
 let authenticatedUser
-let mutate
+// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+const contextUser = () => authenticatedUser
+let mutate: ApolloTestSetup['mutate']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 beforeAll(async () => {
   await cleanDatabase()
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database, config: TEST_CONFIG })
-
-  server = createServer({ context }).server
-
-  const createTestClientResult = createTestClient(server)
-  mutate = createTestClientResult.mutate
+  const testServer = createApolloTestSetup({ contextUser })
+  mutate = testServer.mutate
+  database = testServer.database
+  server = testServer.server
 })
 
 afterAll(() => {
