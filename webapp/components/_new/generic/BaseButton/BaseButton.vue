@@ -174,6 +174,11 @@ export default {
   &.--padding {
     padding: 0 20px;
   }
+  @media screen and (max-width: 400px) {
+    &.--padding {
+      padding: 0 15px;
+    }
+  }
 
   &:not(.--icon-only) > .base-icon {
     margin-right: $space-xx-small;
