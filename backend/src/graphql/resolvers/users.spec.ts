@@ -3,29 +3,31 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import { TEST_CONFIG } from '@config/test-config'
 import { categories } from '@constants/categories'
-import databaseContext from '@context/database'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import User from '@db/models/User'
 import { setTrophyBadgeSelected } from '@graphql/queries/setTrophyBadgeSelected'
-import createServer, { getContext } from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
 
 const categoryIds = ['cat9']
 let user
 let admin
-let authenticatedUser
 
-let query
-let mutate
 let variables
 
 const pubsub = pubsubContext()
+
+let authenticatedUser
+
+const contextUser = () => authenticatedUser
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 const deleteUserMutation = gql`
   mutation ($id: ID!, $resource: [Deletable]) {
@@ -95,21 +97,13 @@ const resetTrophyBadgesSelected = gql`
   }
 `
 
-const database = databaseContext()
-
-let server: ApolloServer
-
 beforeAll(async () => {
   await cleanDatabase()
-
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database, pubsub, config: TEST_CONFIG })
-
-  server = createServer({ context }).server
-
-  const createTestClientResult = createTestClient(server)
-  query = createTestClientResult.query
-  mutate = createTestClientResult.mutate
+  const apolloSetup = createApolloTestSetup({ contextUser, pubsub })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {

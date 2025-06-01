@@ -2,26 +2,25 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { ApolloServer } from 'apollo-server-express'
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import type { ApolloTestSetup } from '@root/test/helpers'
-import { apolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
 
 let variables, authenticatedUser, commentAuthor, newlyCreatedComment
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 const contextUser = () => authenticatedUser
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
-let server: ApolloServer
 beforeAll(async () => {
   await cleanDatabase()
-  const testServer = apolloTestSetup({ contextUser })
-  mutate = testServer.mutate
-  database = testServer.database
-  server = testServer.server
+  const apolloSetup = createApolloTestSetup({ contextUser })
+  mutate = apolloSetup.mutate
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
