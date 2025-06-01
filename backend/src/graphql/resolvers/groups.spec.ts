@@ -6,6 +6,7 @@
 import { createTestClient } from 'apollo-server-testing'
 
 import CONFIG from '@config/index'
+import { TEST_CONFIG } from '@config/test-config'
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
@@ -16,7 +17,6 @@ import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
 import { updateGroupMutation } from '@graphql/queries/updateGroupMutation'
-import { TEST_CONFIG } from '@config/test-config'
 import createServer, { getContext } from '@src/server'
 
 let authenticatedUser

@@ -5,12 +5,12 @@ import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
+import { TEST_CONFIG } from '@config/test-config'
 import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { rewardTrophyBadge } from '@graphql/queries/rewardTrophyBadge'
 import { setTrophyBadgeSelected } from '@graphql/queries/setTrophyBadgeSelected'
-import { TEST_CONFIG } from '@config/test-config'
 import createServer, { getContext } from '@src/server'
 
 let regularUser, administrator, moderator, badge, verification

@@ -8,6 +8,7 @@ import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
+import { TEST_CONFIG } from '@config/test-config'
 import databaseContext from '@context/database'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
@@ -18,7 +19,6 @@ import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
-import { TEST_CONFIG } from '@config/test-config'
 import createServer, { getContext } from '@src/server'
 
 const sendChatMessageMailMock: (notification) => void = jest.fn()

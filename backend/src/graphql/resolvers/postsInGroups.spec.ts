@@ -6,6 +6,7 @@ import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 
 import CONFIG from '@config/index'
+import { TEST_CONFIG } from '@config/test-config'
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
@@ -18,7 +19,6 @@ import { postQuery } from '@graphql/queries/postQuery'
 import { profilePagePosts } from '@graphql/queries/profilePagePosts'
 import { searchPosts } from '@graphql/queries/searchPosts'
 import { signupVerificationMutation } from '@graphql/queries/signupVerificationMutation'
-import { TEST_CONFIG } from '@config/test-config'
 import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false

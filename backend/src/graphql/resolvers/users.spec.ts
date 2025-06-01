@@ -7,13 +7,13 @@ import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
+import { TEST_CONFIG } from '@config/test-config'
 import { categories } from '@constants/categories'
 import databaseContext from '@context/database'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import User from '@db/models/User'
 import { setTrophyBadgeSelected } from '@graphql/queries/setTrophyBadgeSelected'
-import { TEST_CONFIG } from '@config/test-config'
 import createServer, { getContext } from '@src/server'
 
 const categoryIds = ['cat9']
