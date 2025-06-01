@@ -15,7 +15,7 @@ import { Context } from '@src/server'
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import normalizeEmail from './helpers/normalizeEmail'
 import Resolver from './helpers/Resolver'
-import { mergeImage, deleteImage } from './images/images'
+import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
 
 const neode = getNeode()
@@ -210,7 +210,7 @@ export default {
         )
         const [user] = updateUserTransactionResponse.records.map((record) => record.get('user'))
         if (avatarInput) {
-          await mergeImage(user, 'AVATAR_IMAGE', avatarInput, { transaction })
+          await images.mergeImage(user, 'AVATAR_IMAGE', avatarInput, { transaction })
         }
         return user
       })
@@ -253,7 +253,7 @@ export default {
               return Promise.all(
                 txResult.records
                   .map((record) => record.get('resource'))
-                  .map((resource) => deleteImage(resource, 'HERO_IMAGE', { transaction })),
+                  .map((resource) => images.deleteImage(resource, 'HERO_IMAGE', { transaction })),
               )
             }),
           )
@@ -281,7 +281,7 @@ export default {
           { userId },
         )
         const [user] = deleteUserTransactionResponse.records.map((record) => record.get('user'))
-        await deleteImage(user, 'AVATAR_IMAGE', { transaction })
+        await images.deleteImage(user, 'AVATAR_IMAGE', { transaction })
         return user
       })
       try {

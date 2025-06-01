@@ -18,7 +18,7 @@ import Resolver, {
   removeUndefinedNullValuesFromObject,
   convertObjectToCypherMapLiteral,
 } from './helpers/Resolver'
-import { mergeImage } from './images/images'
+import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
 
 export default {
@@ -260,7 +260,7 @@ export default {
         })
         const [group] = transactionResponse.records.map((record) => record.get('group'))
         if (avatarInput) {
-          await mergeImage(group, 'AVATAR_IMAGE', avatarInput, { transaction })
+          await images.mergeImage(group, 'AVATAR_IMAGE', avatarInput, { transaction })
         }
         return group
       })
