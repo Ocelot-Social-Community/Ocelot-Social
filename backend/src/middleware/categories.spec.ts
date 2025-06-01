@@ -6,7 +6,7 @@ import gql from 'graphql-tag'
 
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { TEST_CONFIG } from '@src/config/test-mock'
+import { TEST_CONFIG } from '@config/test-config'
 import { categories } from '@src/constants/categories'
 import createServer, { getContext } from '@src/server'
 

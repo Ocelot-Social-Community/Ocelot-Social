@@ -18,7 +18,7 @@ import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
-import { TEST_CONFIG } from '@src/config/test-mock'
+import { TEST_CONFIG } from '@config/test-config'
 import createServer, { getContext } from '@src/server'
 
 const sendChatMessageMailMock: (notification) => void = jest.fn()

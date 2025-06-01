@@ -7,19 +7,15 @@ import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import CONFIG from '@config/index'
+import { TEST_CONFIG } from '@config/test-config'
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import Image from '@db/models/Image'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
-<<<<<<< HEAD
 import { Post } from '@graphql/queries/Post'
 import { pushPost } from '@graphql/queries/pushPost'
 import { unpushPost } from '@graphql/queries/unpushPost'
-||||||| parent of d9c6819f1 (refactor(backend): put config into context)
-=======
-import { TEST_CONFIG } from '@src/config/test-mock'
->>>>>>> d9c6819f1 (refactor(backend): put config into context)
 import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = true

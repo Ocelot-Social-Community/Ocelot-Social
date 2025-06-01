@@ -13,7 +13,7 @@ import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import User from '@db/models/User'
 import { setTrophyBadgeSelected } from '@graphql/queries/setTrophyBadgeSelected'
-import { TEST_CONFIG } from '@src/config/test-mock'
+import { TEST_CONFIG } from '@config/test-config'
 import createServer, { getContext } from '@src/server'
 
 const categoryIds = ['cat9']

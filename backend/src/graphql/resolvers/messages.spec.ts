@@ -14,7 +14,7 @@ import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { markMessagesAsSeen } from '@graphql/queries/markMessagesAsSeen'
 import { messageQuery } from '@graphql/queries/messageQuery'
 import { roomQuery } from '@graphql/queries/roomQuery'
-import { TEST_CONFIG } from '@src/config/test-mock'
+import { TEST_CONFIG } from '@config/test-config'
 import createServer, { getContext } from '@src/server'
 
 let query
