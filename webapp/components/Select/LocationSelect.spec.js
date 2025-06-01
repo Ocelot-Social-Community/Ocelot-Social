@@ -40,7 +40,7 @@ describe('LocationSelect', () => {
       wrapper = Wrapper()
     })
 
-    it('renders the label', () => {
+    it('renders the label with previous location by default', () => {
       expect(wrapper.find('label.ds-input-label').text()).toBe('settings.data.labelCity — nowhere')
     })
 
@@ -48,7 +48,7 @@ describe('LocationSelect', () => {
       expect(wrapper.find('.ds-select').exists()).toBe(true)
     })
 
-    it('renders the clearLocationName button', () => {
+    it('renders the clearLocationName button by default', () => {
       expect(wrapper.find('.base-button').exists()).toBe(true)
     })
 
@@ -91,7 +91,7 @@ describe('LocationSelect', () => {
         wrapper = Wrapper()
       })
 
-      it('does not show clear location name button', () => {
+      it('does not show the previous location', () => {
         expect(wrapper.find('.ds-input-label').text()).toBe('settings.data.labelCity')
       })
     })
