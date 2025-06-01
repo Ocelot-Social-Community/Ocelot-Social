@@ -2,44 +2,40 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import CONFIG from '@config/index'
-import { TEST_CONFIG } from '@config/test-config'
-import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import Image from '@db/models/Image'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
+<<<<<<< HEAD
 import { Post } from '@graphql/queries/Post'
 import { pushPost } from '@graphql/queries/pushPost'
 import { unpushPost } from '@graphql/queries/unpushPost'
 import createServer, { getContext } from '@src/server'
+||||||| parent of b1b3f236c (wip: continue posts)
+import createServer, { getContext } from '@src/server'
+=======
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
+>>>>>>> b1b3f236c (wip: continue posts)
 
-CONFIG.CATEGORIES_ACTIVE = true
+let user, authenticatedUser
 
-let user
-
-const database = databaseContext()
-
-let server: ApolloServer
-let authenticatedUser
-let query, mutate
+// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+const contextUser = () => authenticatedUser
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 beforeAll(async () => {
   await cleanDatabase()
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database, config: TEST_CONFIG })
-
-  server = createServer({ context }).server
-
-  const createTestClientResult = createTestClient(server)
-  mutate = createTestClientResult.mutate
-  query = createTestClientResult.query
+  const apolloSetup = createApolloTestSetup({ contextUser, config: { CATEGORIES_ACTIVE: true } })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(() => {
@@ -1377,8 +1373,18 @@ describe('pin posts', () => {
     })
 
     describe('MAX_PINNED_POSTS is 0', () => {
+      beforeAll(() => {
+        const apolloSetup = createApolloTestSetup({
+          contextUser,
+          config: { CATEGORIES_ACTIVE: true, MAX_PINNED_POSTS: 0 },
+        })
+        mutate = apolloSetup.mutate
+        query = apolloSetup.query
+        database = apolloSetup.database
+        server = apolloSetup.server
+      })
+
       beforeEach(async () => {
-        CONFIG.MAX_PINNED_POSTS = 0
         await Factory.build(
           'post',
           {
@@ -1400,8 +1406,15 @@ describe('pin posts', () => {
     })
 
     describe('MAX_PINNED_POSTS is 1', () => {
-      beforeEach(() => {
-        CONFIG.MAX_PINNED_POSTS = 1
+      beforeAll(() => {
+        const apolloSetup = createApolloTestSetup({
+          contextUser,
+          config: { CATEGORIES_ACTIVE: true, MAX_PINNED_POSTS: 1 },
+        })
+        mutate = apolloSetup.mutate
+        query = apolloSetup.query
+        database = apolloSetup.database
+        server = apolloSetup.server
       })
 
       describe('are allowed to pin posts', () => {
@@ -1751,9 +1764,18 @@ describe('pin posts', () => {
 
     describe('MAX_PINNED_POSTS = 3', () => {
       const postsPinnedCountsQuery = `query { PostsPinnedCounts { maxPinnedPosts, currentlyPinnedPosts } }`
+      beforeAll(() => {
+        const apolloSetup = createApolloTestSetup({
+          contextUser,
+          config: { CATEGORIES_ACTIVE: true, MAX_PINNED_POSTS: 3 },
+        })
+        mutate = apolloSetup.mutate
+        query = apolloSetup.query
+        database = apolloSetup.database
+        server = apolloSetup.server
+      })
 
       beforeEach(async () => {
-        CONFIG.MAX_PINNED_POSTS = 3
         await Factory.build(
           'post',
           {

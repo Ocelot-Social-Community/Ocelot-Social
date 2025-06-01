@@ -9,7 +9,6 @@ import { isEmpty } from 'lodash'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 import { v4 as uuid } from 'uuid'
 
-import CONFIG from '@config/index'
 import { Context } from '@src/server'
 
 import { validateEventParams } from './helpers/events'
@@ -98,19 +97,21 @@ export default {
       }
     },
     PostsPinnedCounts: async (_object, params, context: Context, _resolveInfo) => {
+      const { config } = context
       const [postsPinnedCount] = (
         await context.database.query({
           query: 'MATCH (p:Post { pinned: true }) RETURN COUNT (p) AS count',
         })
       ).records.map((r) => Number(r.get('count').toString()))
       return {
-        maxPinnedPosts: CONFIG.MAX_PINNED_POSTS,
+        maxPinnedPosts: config.MAX_PINNED_POSTS,
         currentlyPinnedPosts: postsPinnedCount,
       }
     },
   },
   Mutation: {
     CreatePost: async (_parent, params, context, _resolveInfo) => {
+      const { config } = context
       const { categoryIds, groupId } = params
       const { image: imageInput } = params
 
@@ -146,7 +147,7 @@ export default {
              )`
         }
         const categoriesCypher =
-          CONFIG.CATEGORIES_ACTIVE && categoryIds
+          config.CATEGORIES_ACTIVE && categoryIds
             ? `WITH post
               UNWIND $categoryIds AS categoryId
               MATCH (category:Category {id: categoryId})
@@ -196,6 +197,7 @@ export default {
       }
     },
     UpdatePost: async (_parent, params, context, _resolveInfo) => {
+      const { config } = context
       const { categoryIds } = params
       const { image: imageInput } = params
 
@@ -211,7 +213,7 @@ export default {
         WITH post
       `
 
-      if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
+      if (config.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
         const cypherDeletePreviousRelations = `
           MATCH (post:Post { id: $params.id })-[previousRelations:CATEGORIZED]->(category:Category)
           DELETE previousRelations
@@ -344,7 +346,8 @@ export default {
       }
     },
     pinPost: async (_parent, params, context: Context, _resolveInfo) => {
-      if (CONFIG.MAX_PINNED_POSTS === 0) throw new Error('Pinned posts are not allowed!')
+      const { config } = context
+      if (config.MAX_PINNED_POSTS === 0) throw new Error('Pinned posts are not allowed!')
       let pinnedPostWithNestedAttributes
       const { driver, user } = context
       const session = driver.session()
@@ -358,7 +361,7 @@ export default {
         SET post.pinned = true
         RETURN post, pinned.createdAt as pinnedAt`
 
-      if (CONFIG.MAX_PINNED_POSTS === 1) {
+      if (config.MAX_PINNED_POSTS === 1) {
         let writeTxResultPromise = session.writeTransaction(async (transaction) => {
           const deletePreviousRelationsResponse = await transaction.run(
             `
@@ -403,7 +406,7 @@ export default {
             query: `MATCH (:User)-[:PINNED]->(post:Post { pinned: true }) RETURN COUNT(post) AS count`,
           })
         ).records.map((r) => Number(r.get('count').toString()))
-        if (currentPinnedPostCount >= CONFIG.MAX_PINNED_POSTS) {
+        if (currentPinnedPostCount >= config.MAX_PINNED_POSTS) {
           throw new Error('Max number of pinned posts is reached!')
         }
         const [pinPostResult] = (
