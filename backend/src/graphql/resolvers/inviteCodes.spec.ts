@@ -5,6 +5,7 @@ import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 
 import CONFIG from '@config/index'
+import { TEST_CONFIG } from '@config/test-config'
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
@@ -20,7 +21,6 @@ import {
   authenticatedValidateInviteCode,
   unauthenticatedValidateInviteCode,
 } from '@graphql/queries/validateInviteCode'
-import { TEST_CONFIG } from '@config/test-config'
 import createServer, { getContext } from '@src/server'
 
 const database = databaseContext()

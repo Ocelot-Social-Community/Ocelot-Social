@@ -3,29 +3,25 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { TEST_CONFIG } from '@config/test-config'
-import createServer, { getContext } from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { apolloTestSetup } from '@root/test/helpers'
 
-const database = databaseContext()
-
-let variables, mutate, authenticatedUser, commentAuthor, newlyCreatedComment
+let variables, authenticatedUser, commentAuthor, newlyCreatedComment
+// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+const contextUser = () => authenticatedUser
+let mutate: ApolloTestSetup['mutate']
+let database: ApolloTestSetup['database']
 
 let server: ApolloServer
 beforeAll(async () => {
   await cleanDatabase()
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database, config: TEST_CONFIG })
-
-  server = createServer({ context }).server
-
-  mutate = createTestClient(server).mutate
+  const testServer = apolloTestSetup({ contextUser })
+  mutate = testServer.mutate
+  database = testServer.database
+  server = testServer.server
 })
 
 afterAll(async () => {

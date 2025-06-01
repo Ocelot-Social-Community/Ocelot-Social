@@ -6,6 +6,7 @@
 import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 
+import { TEST_CONFIG } from '@config/test-config'
 import databaseContext from '@context/database'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
@@ -14,7 +15,6 @@ import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { markMessagesAsSeen } from '@graphql/queries/markMessagesAsSeen'
 import { messageQuery } from '@graphql/queries/messageQuery'
 import { roomQuery } from '@graphql/queries/roomQuery'
-import { TEST_CONFIG } from '@config/test-config'
 import createServer, { getContext } from '@src/server'
 
 let query

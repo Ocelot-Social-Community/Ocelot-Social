@@ -8,9 +8,9 @@ import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import CONFIG from '@config/index'
+import { TEST_CONFIG } from '@config/test-config'
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { TEST_CONFIG } from '@config/test-config'
 import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false

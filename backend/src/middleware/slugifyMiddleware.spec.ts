@@ -5,13 +5,13 @@
 import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
 
+import { TEST_CONFIG } from '@config/test-config'
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
 import { signupVerificationMutation } from '@graphql/queries/signupVerificationMutation'
 import { updateGroupMutation } from '@graphql/queries/updateGroupMutation'
-import { TEST_CONFIG } from '@config/test-config'
 import createServer, { getContext } from '@src/server'
 
 let variables
