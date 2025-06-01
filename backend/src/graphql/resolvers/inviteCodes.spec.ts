@@ -20,7 +20,7 @@ import {
   authenticatedValidateInviteCode,
   unauthenticatedValidateInviteCode,
 } from '@graphql/queries/validateInviteCode'
-import { TEST_CONFIG } from '@src/config/test-mock'
+import { TEST_CONFIG } from '@config/test-config'
 import createServer, { getContext } from '@src/server'
 
 const database = databaseContext()

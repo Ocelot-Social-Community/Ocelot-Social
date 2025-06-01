@@ -8,7 +8,7 @@ import { createTestClient } from 'apollo-server-testing'
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { statistics } from '@graphql/queries/statistics'
-import { TEST_CONFIG } from '@src/config/test-mock'
+import { TEST_CONFIG } from '@config/test-config'
 import createServer, { getContext } from '@src/server'
 
 const database = databaseContext()

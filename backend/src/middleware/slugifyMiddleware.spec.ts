@@ -11,7 +11,7 @@ import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
 import { signupVerificationMutation } from '@graphql/queries/signupVerificationMutation'
 import { updateGroupMutation } from '@graphql/queries/updateGroupMutation'
-import { TEST_CONFIG } from '@src/config/test-mock'
+import { TEST_CONFIG } from '@config/test-config'
 import createServer, { getContext } from '@src/server'
 
 let variables

@@ -18,7 +18,7 @@ import { postQuery } from '@graphql/queries/postQuery'
 import { profilePagePosts } from '@graphql/queries/profilePagePosts'
 import { searchPosts } from '@graphql/queries/searchPosts'
 import { signupVerificationMutation } from '@graphql/queries/signupVerificationMutation'
-import { TEST_CONFIG } from '@src/config/test-mock'
+import { TEST_CONFIG } from '@config/test-config'
 import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false

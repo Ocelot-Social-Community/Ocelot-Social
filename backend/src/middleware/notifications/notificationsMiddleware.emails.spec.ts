@@ -12,7 +12,7 @@ import Factory, { cleanDatabase } from '@db/factories'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import CONFIG from '@src/config'
-import { TEST_CONFIG } from '@src/config/test-mock'
+import { TEST_CONFIG } from '@config/test-config'
 import createServer, { getContext } from '@src/server'
 
 CONFIG.CATEGORIES_ACTIVE = false
