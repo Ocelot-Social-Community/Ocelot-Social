@@ -1,22 +1,25 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import { TEST_CONFIG } from '@config/test-config'
-import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
 import { categories } from '@src/constants/categories'
-import createServer, { getContext } from '@src/server'
 
-const database = databaseContext()
-
-let server: ApolloServer
-let query
+let authenticatedUser
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+const contextUser = () => authenticatedUser
 
 beforeAll(async () => {
   await cleanDatabase()
+  const apolloSetup = createApolloTestSetup({ contextUser })
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
   for (const category of categories) {
     await Factory.build('category', {
       id: category.id,
@@ -44,22 +47,15 @@ const categoriesQuery = gql`
   }
 `
 
-describe('categroeis middleware', () => {
+describe('categories middleware', () => {
   describe('categories are active', () => {
     beforeAll(() => {
-      const authenticatedUser = null
-      // eslint-disable-next-line @typescript-eslint/require-await
-      const contextUser = async (_req) => authenticatedUser
-      const context = getContext({
-        user: contextUser,
-        database,
-        config: { ...TEST_CONFIG, CATEGORIES_ACTIVE: true },
+      const apolloSetup = createApolloTestSetup({
+        contextUser,
+        config: { CATEGORIES_ACTIVE: true },
       })
-
-      server = createServer({ context }).server
-
-      const createTestClientResult = createTestClient(server)
-      query = createTestClientResult.query
+      query = apolloSetup.query
+      database = apolloSetup.database
     })
 
     it('returns the categories', async () => {
@@ -79,19 +75,12 @@ describe('categroeis middleware', () => {
 
   describe('categories are not active', () => {
     beforeAll(() => {
-      const authenticatedUser = null
-      // eslint-disable-next-line @typescript-eslint/require-await
-      const contextUser = async (_req) => authenticatedUser
-      const context = getContext({
-        user: contextUser,
-        database,
-        config: { ...TEST_CONFIG, CATEGORIES_ACTIVE: false },
+      const apolloSetup = createApolloTestSetup({
+        contextUser,
+        config: { CATEGORIES_ACTIVE: false },
       })
-
-      server = createServer({ context }).server
-
-      const createTestClientResult = createTestClient(server)
-      query = createTestClientResult.query
+      query = apolloSetup.query
+      database = apolloSetup.database
     })
 
     it('returns an empty array though there are categories in the db', async () => {
