@@ -8,7 +8,6 @@
 import { UserInputError } from 'apollo-server'
 import { v4 as uuid } from 'uuid'
 
-import CONFIG from '@config/index'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '@constants/groups'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
@@ -136,13 +135,14 @@ export default {
   },
   Mutation: {
     CreateGroup: async (_parent, params, context: Context, _resolveInfo) => {
+      const { config } = context
       const { categoryIds } = params
       delete params.categoryIds
       params.locationName = params.locationName === '' ? null : params.locationName
-      if (CONFIG.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
+      if (config.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
         throw new UserInputError('Too few categories!')
       }
-      if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > CATEGORIES_MAX) {
+      if (config.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > CATEGORIES_MAX) {
         throw new UserInputError('Too many categories!')
       }
       if (
@@ -156,7 +156,7 @@ export default {
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const categoriesCypher =
-          CONFIG.CATEGORIES_ACTIVE && categoryIds
+          config.CATEGORIES_ACTIVE && categoryIds
             ? `
                 WITH group, membership
                 UNWIND $categoryIds AS categoryId
@@ -202,13 +202,14 @@ export default {
       }
     },
     UpdateGroup: async (_parent, params, context: Context, _resolveInfo) => {
+      const { config } = context
       const { categoryIds } = params
       delete params.categoryIds
       const { id: groupId, avatar: avatarInput } = params
       delete params.avatar
       params.locationName = params.locationName === '' ? null : params.locationName
 
-      if (CONFIG.CATEGORIES_ACTIVE && categoryIds) {
+      if (config.CATEGORIES_ACTIVE && categoryIds) {
         if (categoryIds.length < CATEGORIES_MIN) {
           throw new UserInputError('Too few categories!')
         }
@@ -223,7 +224,7 @@ export default {
         throw new UserInputError('Description too short!')
       }
       const session = context.driver.session()
-      if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
+      if (config.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
         const cypherDeletePreviousRelations = `
           MATCH (group:Group {id: $groupId})-[previousRelations:CATEGORIZED]->(category:Category)
           DELETE previousRelations
@@ -240,7 +241,7 @@ export default {
           SET group.updatedAt = toString(datetime())
           WITH group
         `
-        if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
+        if (config.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
           updateGroupCypher += `
             UNWIND $categoryIds AS categoryId
             MATCH (category:Category {id: categoryId})
