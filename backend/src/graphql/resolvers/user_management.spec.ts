@@ -10,12 +10,12 @@ import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 import jwt from 'jsonwebtoken'
 
-import CONFIG from '@config/index'
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import { loginMutation } from '@graphql/queries/loginMutation'
 import encode from '@jwt/encode'
+import { TEST_CONFIG } from '@root/test/helpers'
 import createServer, { context } from '@src/server'
 
 const neode = getNeode()
@@ -237,7 +237,7 @@ describe('login', () => {
         const {
           data: { login: token },
         } = await mutate({ mutation: loginMutation, variables })
-        jwt.verify(token, CONFIG.JWT_SECRET, (err, data) => {
+        jwt.verify(token, TEST_CONFIG.JWT_SECRET, (err, data) => {
           expect(data).toMatchObject({
             id: 'acb2d923-f3af-479e-9f00-61b12e864666',
           })

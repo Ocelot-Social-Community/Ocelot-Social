@@ -11,7 +11,7 @@
 import { UserInputError } from 'apollo-server'
 import request from 'request'
 
-import CONFIG from '@config/index'
+import type { Context } from '@src/server'
 
 const fetch = (url) => {
   return new Promise((resolve, reject) => {
@@ -73,7 +73,13 @@ const createLocation = async (session, mapboxData) => {
   })
 }
 
-export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, session) => {
+export const createOrUpdateLocations = async (
+  nodeLabel,
+  nodeId,
+  locationName,
+  session,
+  config: Context['config'],
+) => {
   if (locationName === undefined) return
 
   let locationId
@@ -83,7 +89,7 @@ export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, s
       `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
         locationName,
       )}.json?access_token=${
-        CONFIG.MAPBOX_TOKEN
+        config.MAPBOX_TOKEN
       }&types=region,place,country,address&language=${locales.join(',')}`,
     )
 
@@ -159,9 +165,9 @@ export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, s
   })
 }
 
-export const queryLocations = async ({ place, lang }) => {
+export const queryLocations = async ({ place, lang }, config: Context['config']) => {
   const res: any = await fetch(
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${CONFIG.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`,
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${config.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`,
   )
   // Return empty array if no location found or error occurred
   if (!res?.features) {

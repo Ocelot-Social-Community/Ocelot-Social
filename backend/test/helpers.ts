@@ -19,7 +19,7 @@ export const TEST_CONFIG: typeof CONFIG = {
   JWT_EXPIRES: '2y',
 
   MAPBOX_TOKEN: undefined,
-  JWT_SECRET: undefined,
+  JWT_SECRET: 'JWT_SECRET',
   PRIVATE_KEY_PASSPHRASE: undefined,
 
   NEO4J_URI: 'bolt://localhost:7687',

@@ -168,10 +168,10 @@ export default {
       } catch (error) {
         throw new UserInputError(error.message)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    UpdateUser: async (_parent, params, context, _resolveInfo) => {
+    UpdateUser: async (_parent, params, context: Context, _resolveInfo) => {
       const { avatar: avatarInput } = params
       delete params.avatar
       params.locationName = params.locationName === '' ? null : params.locationName
@@ -219,12 +219,18 @@ export default {
       try {
         const user = await writeTxResultPromise
         // TODO: put in a middleware, see "CreateGroup", "UpdateGroup"
-        await createOrUpdateLocations('User', params.id, params.locationName, session)
+        await createOrUpdateLocations(
+          'User',
+          params.id,
+          params.locationName,
+          session,
+          context.config,
+        )
         return user
       } catch (error) {
         throw new UserInputError(error.message)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     DeleteUser: async (_object, params, context: Context, _resolveInfo) => {
