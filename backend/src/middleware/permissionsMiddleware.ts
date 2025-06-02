@@ -11,7 +11,7 @@ import SocialMedia from '@db/models/SocialMedia'
 import { getNeode } from '@db/neo4j'
 // eslint-disable-next-line import/no-cycle
 import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
-import { Context } from '@src/server'
+import type { Context } from '@src/server'
 
 const debug = !!CONFIG.DEBUG
 const allowExternalErrors = true
@@ -370,10 +370,12 @@ const noEmailFilter = rule({
   return !('email' in args)
 })
 
-const publicRegistration = rule()(() => CONFIG.PUBLIC_REGISTRATION)
+const publicRegistration = rule()(
+  async (_parent, _args, context: Context) => context.config.PUBLIC_REGISTRATION,
+)
 
 const inviteRegistration = rule()(async (_parent, args, context: Context) => {
-  if (!CONFIG.INVITE_REGISTRATION) return false
+  if (!context.config.INVITE_REGISTRATION) return false
   const { inviteCode } = args
   return validateInviteCode(context, inviteCode)
 })
