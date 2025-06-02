@@ -15,7 +15,6 @@ let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
-
 beforeAll(async () => {
   await cleanDatabase()
   const apolloSetup = createApolloTestSetup({ contextUser })
