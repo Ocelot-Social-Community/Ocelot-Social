@@ -6,26 +6,29 @@
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable jest/unbound-method */
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 import jwt from 'jsonwebtoken'
 
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { loginMutation } from '@graphql/queries/loginMutation'
+import decode from '@jwt/decode'
 import encode from '@jwt/encode'
-import { TEST_CONFIG } from '@root/test/helpers'
-import createServer, { context } from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
 
-const neode = getNeode()
-const driver = getDriver()
+const JWT_SECRET = 'I am the JWT secret'
 
-let query, mutate, variables, req, user
+let variables, req, user
+const databaseUser = async () => decode(database.driver, req.headers.authorization)
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 const disable = async (id) => {
   const moderator = await Factory.build('user', { id: 'u2', role: 'moderator' })
-  const user = await neode.find('User', id)
+  const user = await database.neode.find('User', id)
   const reportAgainstUser = await Factory.build('report')
   await Promise.all([
     reportAgainstUser.relateTo(moderator, 'filed', {
@@ -44,21 +47,18 @@ const disable = async (id) => {
 
 beforeAll(async () => {
   await cleanDatabase()
-
-  const { server } = createServer({
-    context: () => {
-      // One of the rare occasions where we test
-      // the actual `context` implementation here
-      return context({ req })
-    },
-  })
-  query = createTestClient(server).query
-  mutate = createTestClient(server).mutate
+  const apolloSetup = createApolloTestSetup({ config: { JWT_SECRET }, contextUser: databaseUser })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 beforeEach(() => {
@@ -203,11 +203,11 @@ describe('currentUser', () => {
 
           it('returns only the saved active categories', async () => {
             const result = await query({ query: currentUserQuery, variables })
-            expect(result.data.currentUser.activeCategories).toHaveLength(4)
-            expect(result.data.currentUser.activeCategories).toContain('cat1')
-            expect(result.data.currentUser.activeCategories).toContain('cat3')
-            expect(result.data.currentUser.activeCategories).toContain('cat5')
-            expect(result.data.currentUser.activeCategories).toContain('cat7')
+            expect(result.data?.currentUser.activeCategories).toHaveLength(4)
+            expect(result.data?.currentUser.activeCategories).toContain('cat1')
+            expect(result.data?.currentUser.activeCategories).toContain('cat3')
+            expect(result.data?.currentUser.activeCategories).toContain('cat5')
+            expect(result.data?.currentUser.activeCategories).toContain('cat7')
           })
         })
       })
@@ -236,8 +236,8 @@ describe('login', () => {
       it('responds with a JWT bearer token', async () => {
         const {
           data: { login: token },
-        } = await mutate({ mutation: loginMutation, variables })
-        jwt.verify(token, TEST_CONFIG.JWT_SECRET, (err, data) => {
+        } = (await mutate({ mutation: loginMutation, variables })) as any // eslint-disable-line @typescript-eslint/no-explicit-any
+        jwt.verify(token, JWT_SECRET, (err, data) => {
           expect(data).toMatchObject({
             id: 'acb2d923-f3af-479e-9f00-61b12e864666',
           })
@@ -274,7 +274,7 @@ describe('login', () => {
       describe('normalization', () => {
         describe('email address is a gmail address ', () => {
           beforeEach(async () => {
-            const email = await neode.first(
+            const email = await database.neode.first(
               'EmailAddress',
               { email: 'test@example.org' },
               undefined,
