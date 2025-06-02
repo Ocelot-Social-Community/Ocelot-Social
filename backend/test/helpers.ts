@@ -18,7 +18,7 @@ export const TEST_CONFIG: typeof CONFIG = {
   GRAPHQL_URI: 'http://localhost:4000',
   JWT_EXPIRES: '2y',
 
-  MAPBOX_TOKEN: undefined,
+  MAPBOX_TOKEN: 'MAPBOX_TOKEN',
   JWT_SECRET: 'JWT_SECRET',
   PRIVATE_KEY_PASSPHRASE: undefined,
 
@@ -58,12 +58,18 @@ interface CreateTestServerOptions {
   contextUser: Context['user']
   config?: Partial<typeof CONFIG>
   pubsub?: Context['pubsub']
+  fetch?: Context['fetch']
+}
+
+const crash = () => {
+  throw new Error('Mock me in your test!')
 }
 
 export const createApolloTestSetup = ({
   contextUser,
   config = {},
   pubsub,
+  fetch = crash,
 }: CreateTestServerOptions) => {
   const database = databaseContext()
 
@@ -72,6 +78,7 @@ export const createApolloTestSetup = ({
     database,
     pubsub,
     config: { ...TEST_CONFIG, ...config },
+    fetch,
   })
 
   const server = createServer({ context }).server

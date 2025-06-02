@@ -14,6 +14,8 @@ import { graphqlUploadExpress } from 'graphql-upload'
 import helmet from 'helmet'
 
 import databaseContext from '@context/database'
+import type { Fetch } from '@context/fetch'
+import { fetch as defaultFetch } from '@context/fetch'
 import pubsubContext from '@context/pubsub'
 
 import CONFIG from './config'
@@ -34,12 +36,20 @@ export const getContext =
       pubsub = serverPubsub,
       user = databaseUser,
       config = CONFIG,
+      fetch = defaultFetch,
     }: {
       database?: ReturnType<typeof databaseContext>
       pubsub?: ReturnType<typeof pubsubContext>
       user?: (any) => Promise<any>
       config: typeof CONFIG
-    } = { database: serverDatabase, pubsub: serverPubsub, user: databaseUser, config: CONFIG },
+      fetch: Fetch
+    } = {
+      database: serverDatabase,
+      pubsub: serverPubsub,
+      user: databaseUser,
+      config: CONFIG,
+      fetch: defaultFetch,
+    },
   ) =>
   async (req) => {
     const u = await user(req)
@@ -54,6 +64,7 @@ export const getContext =
         currentUserId: u ? u.id : null,
       },
       config,
+      fetch,
     }
   }
 

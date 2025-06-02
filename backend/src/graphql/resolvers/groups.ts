@@ -191,13 +191,7 @@ export default {
       try {
         const group = await writeTxResultPromise
         // TODO: put in a middleware, see "UpdateGroup", "UpdateUser"
-        await createOrUpdateLocations(
-          'Group',
-          params.id,
-          params.locationName,
-          session,
-          context.config,
-        )
+        await createOrUpdateLocations('Group', params.id, params.locationName, session, context)
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
@@ -276,13 +270,7 @@ export default {
       try {
         const group = await writeTxResultPromise
         // TODO: put in a middleware, see "CreateGroup", "UpdateUser"
-        await createOrUpdateLocations(
-          'Group',
-          params.id,
-          params.locationName,
-          session,
-          context.config,
-        )
+        await createOrUpdateLocations('Group', params.id, params.locationName, session, context)
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
