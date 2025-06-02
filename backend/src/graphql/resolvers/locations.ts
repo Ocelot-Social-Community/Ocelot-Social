@@ -5,6 +5,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { UserInputError } from 'apollo-server'
 
+import type { Context } from '@src/server'
+
 import Resolver from './helpers/Resolver'
 import { queryLocations } from './users/location'
 
@@ -53,9 +55,9 @@ export default {
     },
   },
   Query: {
-    queryLocations: async (_object, args, _context, _resolveInfo) => {
+    queryLocations: async (_object, args, context: Context, _resolveInfo) => {
       try {
-        return queryLocations(args)
+        return queryLocations(args, context.config)
       } catch (e) {
         throw new UserInputError(e.message)
       }

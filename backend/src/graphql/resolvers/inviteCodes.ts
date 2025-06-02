@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import CONFIG from '@config/index'
 import registrationConstants from '@constants/registrationBranded'
 // eslint-disable-next-line import/no-cycle
 import { Context } from '@src/server'
@@ -159,7 +158,9 @@ export default {
         })
       ).records[0].get('count')
 
-      if (parseInt(userInviteCodeAmount as string) >= CONFIG.INVITE_CODES_PERSONAL_PER_USER) {
+      if (
+        parseInt(userInviteCodeAmount as string) >= context.config.INVITE_CODES_PERSONAL_PER_USER
+      ) {
         throw new Error('You have reached the maximum of Invite Codes you can generate')
       }
 
@@ -198,7 +199,7 @@ export default {
         })
       ).records[0].get('count')
 
-      if (parseInt(userInviteCodeAmount as string) >= CONFIG.INVITE_CODES_GROUP_PER_USER) {
+      if (parseInt(userInviteCodeAmount as string) >= context.config.INVITE_CODES_GROUP_PER_USER) {
         throw new Error(
           'You have reached the maximum of Invite Codes you can generate for this group',
         )

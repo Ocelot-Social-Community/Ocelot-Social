@@ -40,7 +40,7 @@ const filterEventDates = (params) => {
 
 export default {
   Query: {
-    Post: async (object, params, context, resolveInfo) => {
+    Post: async (object, params, context: Context, resolveInfo) => {
       params = await filterPostsOfMyGroups(params, context)
       params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
@@ -76,7 +76,7 @@ export default {
         session.close()
       }
     },
-    PostsEmotionsByCurrentUser: async (_object, params, context, _resolveInfo) => {
+    PostsEmotionsByCurrentUser: async (_object, params, context: Context, _resolveInfo) => {
       const { postId } = params
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (transaction) => {
@@ -93,7 +93,7 @@ export default {
         const [emotions] = await readTxResultPromise
         return emotions
       } finally {
-        session.close()
+        await session.close()
       }
     },
     PostsPinnedCounts: async (_object, params, context: Context, _resolveInfo) => {
@@ -110,7 +110,7 @@ export default {
     },
   },
   Mutation: {
-    CreatePost: async (_parent, params, context, _resolveInfo) => {
+    CreatePost: async (_parent, params, context: Context, _resolveInfo) => {
       const { config } = context
       const { categoryIds, groupId } = params
       const { image: imageInput } = params
@@ -185,7 +185,7 @@ export default {
       try {
         const post = await writeTxResultPromise
         if (locationName) {
-          await createOrUpdateLocations('Post', post.id, locationName, session)
+          await createOrUpdateLocations('Post', post.id, locationName, session, context.config)
         }
         return post
       } catch (e) {
@@ -193,7 +193,7 @@ export default {
           throw new UserInputError('Post with this slug already exists!')
         throw new Error(e)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     UpdatePost: async (_parent, params, context, _resolveInfo) => {
@@ -255,7 +255,7 @@ export default {
         })
         const post = await writeTxResultPromise
         if (locationName) {
-          await createOrUpdateLocations('Post', post.id, locationName, session)
+          await createOrUpdateLocations('Post', post.id, locationName, session, context.config)
         }
         return post
       } finally {

@@ -3,7 +3,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import gql from 'graphql-tag'
 
-import CONFIG from '@config/index'
 import Factory, { cleanDatabase } from '@db/factories'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -188,11 +187,24 @@ describe('authorization', () => {
             inviteCode: 'ABCDEF',
             locale: 'de',
           }
-          CONFIG.INVITE_REGISTRATION = false
-          CONFIG.PUBLIC_REGISTRATION = false
           await Factory.build('inviteCode', {
             code: 'ABCDEF',
           })
+        })
+
+        beforeAll(() => {
+          const apolloSetup = createApolloTestSetup({
+            contextUser,
+            config: {
+              CATEGORIES_ACTIVE: true,
+              INVITE_REGISTRATION: false,
+              PUBLIC_REGISTRATION: false,
+            },
+          })
+          mutate = apolloSetup.mutate
+          query = apolloSetup.query
+          database = apolloSetup.database
+          server = apolloSetup.server
         })
 
         describe('as user', () => {
@@ -231,11 +243,24 @@ describe('authorization', () => {
             inviteCode: 'ABCDEF',
             locale: 'de',
           }
-          CONFIG.INVITE_REGISTRATION = false
-          CONFIG.PUBLIC_REGISTRATION = true
           await Factory.build('inviteCode', {
             code: 'ABCDEF',
           })
+        })
+
+        beforeAll(() => {
+          const apolloSetup = createApolloTestSetup({
+            contextUser,
+            config: {
+              CATEGORIES_ACTIVE: true,
+              INVITE_REGISTRATION: false,
+              PUBLIC_REGISTRATION: true,
+            },
+          })
+          mutate = apolloSetup.mutate
+          query = apolloSetup.query
+          database = apolloSetup.database
+          server = apolloSetup.server
         })
 
         describe('as anyone', () => {
@@ -256,11 +281,24 @@ describe('authorization', () => {
 
       describe('invite registration', () => {
         beforeEach(async () => {
-          CONFIG.INVITE_REGISTRATION = true
-          CONFIG.PUBLIC_REGISTRATION = false
           await Factory.build('inviteCode', {
             code: 'ABCDEF',
           })
+        })
+
+        beforeAll(() => {
+          const apolloSetup = createApolloTestSetup({
+            contextUser,
+            config: {
+              CATEGORIES_ACTIVE: true,
+              INVITE_REGISTRATION: true,
+              PUBLIC_REGISTRATION: false,
+            },
+          })
+          mutate = apolloSetup.mutate
+          query = apolloSetup.query
+          database = apolloSetup.database
+          server = apolloSetup.server
         })
 
         describe('as anyone with valid invite code', () => {
