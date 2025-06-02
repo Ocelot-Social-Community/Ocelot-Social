@@ -6,24 +6,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable promise/avoid-new */
-/* eslint-disable promise/prefer-await-to-callbacks */
+
 import { UserInputError } from 'apollo-server'
-import request from 'request'
 
 import type { Context } from '@src/server'
-
-const fetch = (url) => {
-  return new Promise((resolve, reject) => {
-    request(url, function (error, response, body) {
-      if (error) {
-        reject(error)
-      } else {
-        resolve(JSON.parse(body))
-      }
-    })
-  })
-}
 
 const locales = ['en', 'de', 'fr', 'nl', 'it', 'es', 'pt', 'pl', 'ru']
 
@@ -78,18 +64,18 @@ export const createOrUpdateLocations = async (
   nodeId,
   locationName,
   session,
-  config: Context['config'],
+  context: Context,
 ) => {
   if (locationName === undefined) return
 
   let locationId
 
   if (locationName !== null) {
-    const res: any = await fetch(
+    const res: any = await context.fetch(
       `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
         locationName,
       )}.json?access_token=${
-        config.MAPBOX_TOKEN
+        context.config.MAPBOX_TOKEN
       }&types=region,place,country,address&language=${locales.join(',')}`,
     )
 
@@ -165,9 +151,9 @@ export const createOrUpdateLocations = async (
   })
 }
 
-export const queryLocations = async ({ place, lang }, config: Context['config']) => {
-  const res: any = await fetch(
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${config.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`,
+export const queryLocations = async ({ place, lang }, context: Context) => {
+  const res: any = await context.fetch(
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${context.config.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`,
   )
   // Return empty array if no location found or error occurred
   if (!res?.features) {

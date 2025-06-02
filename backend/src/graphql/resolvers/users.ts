@@ -219,13 +219,7 @@ export default {
       try {
         const user = await writeTxResultPromise
         // TODO: put in a middleware, see "CreateGroup", "UpdateGroup"
-        await createOrUpdateLocations(
-          'User',
-          params.id,
-          params.locationName,
-          session,
-          context.config,
-        )
+        await createOrUpdateLocations('User', params.id, params.locationName, session, context)
         return user
       } catch (error) {
         throw new UserInputError(error.message)

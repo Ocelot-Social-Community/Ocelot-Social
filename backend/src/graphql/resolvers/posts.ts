@@ -185,7 +185,7 @@ export default {
       try {
         const post = await writeTxResultPromise
         if (locationName) {
-          await createOrUpdateLocations('Post', post.id, locationName, session, context.config)
+          await createOrUpdateLocations('Post', post.id, locationName, session, context)
         }
         return post
       } catch (e) {
