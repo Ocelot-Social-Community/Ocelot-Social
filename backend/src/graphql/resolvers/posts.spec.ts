@@ -268,7 +268,7 @@ describe('CreatePost', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       const { errors } = await mutate({ mutation: createPostMutation(), variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+      expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
@@ -705,7 +705,7 @@ describe('UpdatePost', () => {
         categoryIds,
       },
     })
-    newlyCreatedPost = data.CreatePost
+    newlyCreatedPost = (data as any).CreatePost // eslint-disable-line @typescript-eslint/no-explicit-any
     variables = {
       id: newlyCreatedPost.id,
       title: 'New title',
@@ -730,7 +730,7 @@ describe('UpdatePost', () => {
 
     it('throws authorization error', async () => {
       const { errors } = await mutate({ mutation: updatePostMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+      expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
@@ -768,7 +768,7 @@ describe('UpdatePost', () => {
     it('updates the updatedAt attribute', async () => {
       const {
         data: { UpdatePost },
-      } = await mutate({ mutation: updatePostMutation, variables })
+      } = (await mutate({ mutation: updatePostMutation, variables })) as any // eslint-disable-line @typescript-eslint/no-explicit-any
       expect(UpdatePost.updatedAt).toBeTruthy()
       expect(Date.parse(UpdatePost.updatedAt)).toEqual(expect.any(Number))
       expect(newlyCreatedPost.updatedAt).not.toEqual(UpdatePost.updatedAt)
@@ -2150,7 +2150,7 @@ describe('DeletePost', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       const { errors } = await mutate({ mutation: deletePostMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+      expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
@@ -2161,7 +2161,7 @@ describe('DeletePost', () => {
 
     it('throws authorization error', async () => {
       const { errors } = await mutate({ mutation: deletePostMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+      expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
@@ -2303,7 +2303,7 @@ describe('emotions', () => {
           variables,
         })
 
-        expect(addPostEmotions.errors[0]).toHaveProperty('message', 'Not Authorized!')
+        expect(addPostEmotions.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -2424,7 +2424,7 @@ describe('emotions', () => {
           mutation: removePostEmotionsMutation,
           variables: removePostEmotionsVariables,
         })
-        expect(removePostEmotions.errors[0]).toHaveProperty('message', 'Not Authorized!')
+        expect(removePostEmotions.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 

@@ -116,7 +116,7 @@ describe('Message', () => {
               userId: 'other-chatting-user',
             },
           })
-          roomId = room.data.CreateRoom.id
+          roomId = (room.data as any).CreateRoom.id // eslint-disable-line @typescript-eslint/no-explicit-any
         })
 
         describe('user chats in room', () => {

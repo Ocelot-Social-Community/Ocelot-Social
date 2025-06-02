@@ -249,7 +249,7 @@ describe('UpdateUser', () => {
 
     it('is not allowed to change other user accounts', async () => {
       const { errors } = await mutate({ mutation: updateUserMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+      expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
@@ -321,7 +321,7 @@ describe('UpdateUser', () => {
         termsAndConditionsAgreedVersion: 'invalid version format',
       }
       const { errors } = await mutate({ mutation: updateUserMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Invalid version format!')
+      expect(errors?.[0]).toHaveProperty('message', 'Invalid version format!')
     })
 
     describe('supports updating location', () => {
