@@ -178,7 +178,7 @@ export default {
         )
         const [post] = createPostTransactionResponse.records.map((record) => record.get('post'))
         if (imageInput) {
-          await images.mergeImage(post, 'HERO_IMAGE', imageInput, { transaction })
+          await images(context.config).mergeImage(post, 'HERO_IMAGE', imageInput, { transaction })
         }
         return post
       })
@@ -250,7 +250,7 @@ export default {
             updatePostVariables,
           )
           const [post] = updatePostTransactionResponse.records.map((record) => record.get('post'))
-          await images.mergeImage(post, 'HERO_IMAGE', imageInput, { transaction })
+          await images(context.config).mergeImage(post, 'HERO_IMAGE', imageInput, { transaction })
           return post
         })
         const post = await writeTxResultPromise
@@ -280,7 +280,7 @@ export default {
           { postId: args.id },
         )
         const [post] = deletePostTransactionResponse.records.map((record) => record.get('post'))
-        await images.deleteImage(post, 'HERO_IMAGE', { transaction })
+        await images(context.config).deleteImage(post, 'HERO_IMAGE', { transaction })
         return post
       })
       try {
