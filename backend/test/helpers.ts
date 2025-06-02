@@ -79,8 +79,7 @@ export const createApolloTestSetup = ({
   return {
     server,
     query,
-    // TODO: fix this (easy, just some effort)
-    mutate: mutate as any, // eslint-disable-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-explicit-any
+    mutate,
     database,
   }
 }
