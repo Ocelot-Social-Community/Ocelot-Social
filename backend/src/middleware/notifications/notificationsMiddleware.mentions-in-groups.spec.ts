@@ -3,27 +3,26 @@
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import { TEST_CONFIG } from '@config/test-config'
-import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
-import CONFIG from '@src/config'
-import createServer, { getContext } from '@src/server'
-
-CONFIG.CATEGORIES_ACTIVE = false
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
 
 const sendNotificationMailMock: (notification) => void = jest.fn()
 jest.mock('@src/emails/sendEmail', () => ({
   sendNotificationMail: (notification) => sendNotificationMailMock(notification),
 }))
 
-let query, mutate, authenticatedUser
+let authenticatedUser
+const contextUser = () => authenticatedUser
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 let postAuthor, groupMember, pendingMember, noMember, emaillessMember
 
@@ -91,21 +90,13 @@ const markAllAsRead = async () =>
     `,
   })
 
-const database = databaseContext()
-
-let server: ApolloServer
-
 beforeAll(async () => {
   await cleanDatabase()
-
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database, config: TEST_CONFIG })
-
-  server = createServer({ context }).server
-
-  const createTestClientResult = createTestClient(server)
-  query = createTestClientResult.query
-  mutate = createTestClientResult.mutate
+  const apolloSetup = createApolloTestSetup({ contextUser, config: { CATEGORIES_ACTIVE: false } })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
