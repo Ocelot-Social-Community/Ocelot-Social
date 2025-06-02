@@ -4,12 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import { TEST_CONFIG } from '@config/test-config'
-import databaseContext from '@context/database'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
@@ -19,7 +15,8 @@ import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
-import createServer, { getContext } from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
 
 const sendChatMessageMailMock: (notification) => void = jest.fn()
 const sendNotificationMailMock: (notification) => void = jest.fn()
@@ -33,11 +30,16 @@ jest.mock('../helpers/isUserOnline', () => ({
   isUserOnline: () => isUserOnlineMock(),
 }))
 
-const database = databaseContext()
 const pubsub = pubsubContext()
 const pubsubSpy = jest.spyOn(pubsub, 'publish')
 
-let query, mutate, notifiedUser, authenticatedUser
+let notifiedUser, authenticatedUser
+const contextUser = () => authenticatedUser
+let mutate: ApolloTestSetup['mutate']
+
+let query: any // eslint-disable-line @typescript-eslint/no-explicit-any
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 const categoryIds = ['cat9']
 const createPostMutation = gql`
@@ -66,19 +68,13 @@ const createCommentMutation = gql`
   }
 `
 
-let server: ApolloServer
-
 beforeAll(async () => {
   await cleanDatabase()
-
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database, pubsub, config: TEST_CONFIG })
-
-  server = createServer({ context }).server
-
-  const createTestClientResult = createTestClient(server)
-  query = createTestClientResult.query
-  mutate = createTestClientResult.mutate
+  const apolloSetup = createApolloTestSetup({ contextUser, pubsub })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
