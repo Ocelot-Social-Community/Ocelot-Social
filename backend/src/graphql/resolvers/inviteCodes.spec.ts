@@ -1,12 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
 
-import CONFIG from '@config/index'
-import { TEST_CONFIG } from '@config/test-config'
-import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { currentUser } from '@graphql/queries/currentUser'
@@ -21,26 +16,24 @@ import {
   authenticatedValidateInviteCode,
   unauthenticatedValidateInviteCode,
 } from '@graphql/queries/validateInviteCode'
-import createServer, { getContext } from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup, TEST_CONFIG } from '@root/test/helpers'
 
-const database = databaseContext()
-
-let server: ApolloServer
 let authenticatedUser
-let query, mutate
+// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+const contextUser = () => authenticatedUser
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 beforeAll(async () => {
   await cleanDatabase()
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database, config: TEST_CONFIG })
-
-  server = createServer({ context }).server
-
-  const createTestClientResult = createTestClient(server)
-  query = createTestClientResult.query
-  mutate = createTestClientResult.mutate
+  const apolloSetup = createApolloTestSetup({ contextUser })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(() => {
@@ -480,7 +473,7 @@ describe('generatePersonalInviteCode', () => {
 
     it('throws an error when the max amount of invite links was reached', async () => {
       let lastCode
-      for (let i = 0; i < CONFIG.INVITE_CODES_PERSONAL_PER_USER; i++) {
+      for (let i = 0; i < TEST_CONFIG.INVITE_CODES_PERSONAL_PER_USER; i++) {
         lastCode = await mutate({ mutation: generatePersonalInviteCode })
         expect(lastCode).toMatchObject({
           errors: undefined,
@@ -741,7 +734,7 @@ describe('generateGroupInviteCode', () => {
 
     it('throws an error when the max amount of invite links was reached', async () => {
       let lastCode
-      for (let i = 0; i < CONFIG.INVITE_CODES_GROUP_PER_USER; i++) {
+      for (let i = 0; i < TEST_CONFIG.INVITE_CODES_GROUP_PER_USER; i++) {
         lastCode = await mutate({
           mutation: generateGroupInviteCode,
           variables: { groupId: 'public-group' },
