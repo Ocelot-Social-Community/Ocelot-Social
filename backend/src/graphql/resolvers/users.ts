@@ -210,7 +210,9 @@ export default {
         )
         const [user] = updateUserTransactionResponse.records.map((record) => record.get('user'))
         if (avatarInput) {
-          await images.mergeImage(user, 'AVATAR_IMAGE', avatarInput, { transaction })
+          await images(context.config).mergeImage(user, 'AVATAR_IMAGE', avatarInput, {
+            transaction,
+          })
         }
         return user
       })
@@ -225,7 +227,7 @@ export default {
         session.close()
       }
     },
-    DeleteUser: async (_object, params, context, _resolveInfo) => {
+    DeleteUser: async (_object, params, context: Context, _resolveInfo) => {
       const { resource, id: userId } = params
       const session = context.driver.session()
 
@@ -253,7 +255,9 @@ export default {
               return Promise.all(
                 txResult.records
                   .map((record) => record.get('resource'))
-                  .map((resource) => images.deleteImage(resource, 'HERO_IMAGE', { transaction })),
+                  .map((resource) =>
+                    images(context.config).deleteImage(resource, 'HERO_IMAGE', { transaction }),
+                  ),
               )
             }),
           )
@@ -281,14 +285,14 @@ export default {
           { userId },
         )
         const [user] = deleteUserTransactionResponse.records.map((record) => record.get('user'))
-        await images.deleteImage(user, 'AVATAR_IMAGE', { transaction })
+        await images(context.config).deleteImage(user, 'AVATAR_IMAGE', { transaction })
         return user
       })
       try {
         const user = await deleteUserTxResultPromise
         return user
       } finally {
-        session.close()
+        await session.close()
       }
     },
     switchUserRole: async (_object, args, context, _resolveInfo) => {

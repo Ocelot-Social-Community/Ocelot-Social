@@ -261,7 +261,9 @@ export default {
         })
         const [group] = transactionResponse.records.map((record) => record.get('group'))
         if (avatarInput) {
-          await images.mergeImage(group, 'AVATAR_IMAGE', avatarInput, { transaction })
+          await images(context.config).mergeImage(group, 'AVATAR_IMAGE', avatarInput, {
+            transaction,
+          })
         }
         return group
       })
