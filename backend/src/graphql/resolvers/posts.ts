@@ -158,6 +158,7 @@ export default {
             SET post += $params
             SET post.createdAt = toString(datetime())
             SET post.updatedAt = toString(datetime())
+            SET post.sortDate = toString(datetime())
             SET post.clickedCount = 0
             SET post.viewedTeaserCount = 0
             SET post:${params.postType}
@@ -492,6 +493,40 @@ export default {
       } finally {
         session.close()
       }
+    },
+    pushPost: async (_parent, params, context: Context, _resolveInfo) => {
+      const posts = (
+        await context.database.write({
+          query: `
+        MATCH (post:Post {id: $id})
+        SET post.sortDate = toString(datetime())
+        RETURN post {.*}`,
+          variables: params,
+        })
+      ).records.map((record) => record.get('post'))
+
+      if (posts.length !== 1) {
+        throw new Error('Could not find Post')
+      }
+
+      return posts[0]
+    },
+    unpushPost: async (_parent, params, context: Context, _resolveInfo) => {
+      const posts = (
+        await context.database.write({
+          query: `
+        MATCH (post:Post {id: $id})
+        SET post.sortDate = post.createdAt
+        RETURN post {.*}`,
+          variables: params,
+        })
+      ).records.map((record) => record.get('post'))
+
+      if (posts.length !== 1) {
+        throw new Error('Could not find Post')
+      }
+
+      return posts[0]
     },
   },
   Post: {

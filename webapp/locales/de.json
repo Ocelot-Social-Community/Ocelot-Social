@@ -856,10 +856,14 @@
       "observedSuccessfully": "Du beobachtest diesen Beitrag!",
       "pin": "Beitrag anheften",
       "pinnedSuccessfully": "Beitrag erfolgreich angeheftet!",
+      "push": "Beitrag hochschieben",
+      "pushedSuccessfully": "Beitrag erfolgreich nach oben geschoben!",
       "unobserve": "Beitrag nicht mehr beobachten",
       "unobservedSuccessfully": "Du beobachtest diesen Beitrag nicht mehr!",
       "unpin": "Beitrag loslösen",
-      "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!"
+      "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!",
+      "unpush": "Beitrag hochschieben aufheben",
+      "unpushedSuccessfully": "Hochschieben des Beitrags erfolgreich rückgängig gemacht!"
     },
     "name": "Beitrag",
     "pinned": "Meldung",

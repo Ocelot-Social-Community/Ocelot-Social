@@ -856,10 +856,14 @@
       "observedSuccessfully": null,
       "pin": "Anclar contribución",
       "pinnedSuccessfully": "¡Contribución anclado con éxito!",
+      "push": null,
+      "pushedSuccessfully": null,
       "unobserve": "Dejar de observar contribución",
       "unobservedSuccessfully": null,
       "unpin": "Desanclar contribución",
-      "unpinnedSuccessfully": "¡Contribución desanclado con éxito!"
+      "unpinnedSuccessfully": "¡Contribución desanclado con éxito!",
+      "unpush": null,
+      "unpushedSuccessfully": null
     },
     "name": "Contribución",
     "pinned": "Anuncio",

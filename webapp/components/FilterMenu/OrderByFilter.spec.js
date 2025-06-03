@@ -13,7 +13,7 @@ describe('OrderByFilter', () => {
   const getters = {
     'posts/filteredPostTypes': () => [],
     'posts/orderedByCreationDate': () => true,
-    'posts/orderBy': () => 'createdAt_desc',
+    'posts/orderBy': () => 'sortDate_desc',
   }
   const actions = {
     'categories/init': jest.fn(),
@@ -54,7 +54,7 @@ describe('OrderByFilter', () => {
 
     describe('if ordered by oldest', () => {
       beforeEach(() => {
-        getters['posts/orderBy'] = jest.fn(() => 'createdAt_asc')
+        getters['posts/orderBy'] = jest.fn(() => 'sortDate_asc')
         wrapper = Wrapper()
       })
 
@@ -76,20 +76,20 @@ describe('OrderByFilter', () => {
     })
 
     describe('click "newest-button"', () => {
-      it('calls TOGGLE_ORDER with "createdAt_desc"', () => {
+      it('calls TOGGLE_ORDER with "sortDate_desc"', () => {
         wrapper
           .find('.order-by-filter .filter-list .base-button[data-test="newest-button"]')
           .trigger('click')
-        expect(mutations['posts/TOGGLE_ORDER']).toHaveBeenCalledWith({}, 'createdAt_desc')
+        expect(mutations['posts/TOGGLE_ORDER']).toHaveBeenCalledWith({}, 'sortDate_desc')
       })
     })
 
     describe('click "oldest-button"', () => {
-      it('calls TOGGLE_ORDER with "createdAt_asc"', () => {
+      it('calls TOGGLE_ORDER with "sortDate_asc"', () => {
         wrapper
           .find('.order-by-filter .filter-list .base-button[data-test="oldest-button"]')
           .trigger('click')
-        expect(mutations['posts/TOGGLE_ORDER']).toHaveBeenCalledWith({}, 'createdAt_asc')
+        expect(mutations['posts/TOGGLE_ORDER']).toHaveBeenCalledWith({}, 'sortDate_asc')
       })
     })
   })

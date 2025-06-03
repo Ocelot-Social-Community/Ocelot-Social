@@ -49,6 +49,8 @@
                   :is-owner="isAuthor"
                   @pinPost="pinPost"
                   @unpinPost="unpinPost"
+                  @pushPost="pushPost"
+                  @unpushPost="unpushPost"
                   @toggleObservePost="toggleObservePost"
                 />
               </client-only>

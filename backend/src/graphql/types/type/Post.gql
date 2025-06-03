@@ -103,6 +103,8 @@ enum _PostOrdering {
   createdAt_desc
   updatedAt_asc
   updatedAt_desc
+  sortDate_asc
+  sortDate_desc
   language_asc
   language_desc
   pinned_asc
@@ -128,6 +130,7 @@ type Post {
   pinned: Boolean
   createdAt: String
   updatedAt: String
+  sortDate: String
   language: String
   pinnedAt: String @cypher(
       statement: "MATCH (this)<-[pinned:PINNED]-(:User) WHERE NOT this.deleted = true AND NOT this.disabled = true RETURN pinned.createdAt"
@@ -241,6 +244,8 @@ type Mutation {
   pinPost(id: ID!): Post
   unpinPost(id: ID!): Post
   markTeaserAsViewed(id: ID!): Post
+  pushPost(id: ID!): Post!
+  unpushPost(id: ID!): Post!
 
   # Shout the given Type and ID
   shout(id: ID!, type: ShoutTypeEnum!): Boolean!

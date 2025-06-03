@@ -856,10 +856,14 @@
       "observedSuccessfully": null,
       "pin": "Закрепить пост",
       "pinnedSuccessfully": "Пост больше не закреплен!",
+      "push": null,
+      "pushedSuccessfully": null,
       "unobserve": null,
       "unobservedSuccessfully": null,
       "unpin": "Открепить пост",
-      "unpinnedSuccessfully": "Пост успешно не закреплено!"
+      "unpinnedSuccessfully": "Пост успешно не закреплено!",
+      "unpush": null,
+      "unpushedSuccessfully": null
     },
     "name": "Пост",
     "pinned": "Объявление",
