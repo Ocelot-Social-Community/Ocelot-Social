@@ -20,48 +20,47 @@ import pubsubContext from '@context/pubsub'
 
 import CONFIG from './config'
 import schema from './graphql/schema'
-import decode from './jwt/decode'
+import { decode } from './jwt/decode'
 // eslint-disable-next-line import/no-cycle
 import middleware from './middleware'
 
 const serverDatabase = databaseContext()
 const serverPubsub = pubsubContext()
 
-const databaseUser = async (req) => decode(serverDatabase.driver, req.headers.authorization)
-
 export const getContext =
   (
     {
       database = serverDatabase,
       pubsub = serverPubsub,
-      user = databaseUser,
+      contextUser,
       config = CONFIG,
       fetch = defaultFetch,
     }: {
       database?: ReturnType<typeof databaseContext>
       pubsub?: ReturnType<typeof pubsubContext>
-      user?: (any) => Promise<any>
+      contextUser?: (any) => Promise<any>
       config: typeof CONFIG
       fetch: Fetch
     } = {
       database: serverDatabase,
       pubsub: serverPubsub,
-      user: databaseUser,
       config: CONFIG,
       fetch: defaultFetch,
     },
   ) =>
   async (req) => {
-    const u = await user(req)
+    const { driver } = database
+    const getUser = contextUser ?? decode({ driver, config })
+    const user = await getUser(req)
     return {
       database,
-      driver: database.driver,
+      driver,
       neode: database.neode,
       pubsub,
-      user: u,
+      user,
       req,
       cypherParams: {
-        currentUserId: u ? u.id : null,
+        currentUserId: user ? user.id : null,
       },
       config,
       fetch,
