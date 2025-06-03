@@ -4,11 +4,9 @@
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
+import { fetchMock } from '@root/test/fetchMock'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/server'
-
-import { mapboxResponses } from './location.spec/mapboxResponses'
 
 let authenticatedUser, variables
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -17,14 +15,6 @@ let mutate: ApolloTestSetup['mutate']
 let query: any // eslint-disable-line @typescript-eslint/no-explicit-any
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
-
-const fetchMock: Context['fetch'] = (url) => {
-  const response = mapboxResponses[url] // eslint-disable-line security/detect-object-injection
-  if (!response) {
-    throw new Error(`Missing response for url: ${url}`)
-  }
-  return response // eslint-disable-line @typescript-eslint/no-unsafe-return
-}
 
 const updateUserMutation = gql`
   mutation ($id: ID!, $name: String!, $locationName: String) {

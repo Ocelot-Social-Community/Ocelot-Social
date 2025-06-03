@@ -71,13 +71,12 @@ export const createOrUpdateLocations = async (
   let locationId
 
   if (locationName !== null) {
-    const res: any = await context.fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-        locationName,
-      )}.json?access_token=${
-        context.config.MAPBOX_TOKEN
-      }&types=region,place,country,address&language=${locales.join(',')}`,
-    )
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+      locationName,
+    )}.json?access_token=${
+      context.config.MAPBOX_TOKEN
+    }&types=region,place,country,address&language=${locales.join(',')}`
+    const res: any = await context.fetch(url)
 
     if (!res?.features?.[0]) {
       throw new UserInputError('locationName is invalid')
@@ -152,9 +151,8 @@ export const createOrUpdateLocations = async (
 }
 
 export const queryLocations = async ({ place, lang }, context: Context) => {
-  const res: any = await context.fetch(
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${context.config.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`,
-  )
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${context.config.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`
+  const res: any = await context.fetch(url)
   // Return empty array if no location found or error occurred
   if (!res?.features) {
     return []

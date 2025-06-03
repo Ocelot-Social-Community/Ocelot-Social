@@ -12,8 +12,11 @@ import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
 import { updateGroupMutation } from '@graphql/queries/updateGroupMutation'
+import { fetchMock } from '@root/test/fetchMock'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+// import CONFIG from '@src/config'
+// import { fetch as fetchMock } from '@src/context/fetch'
 
 let authenticatedUser
 let user
@@ -35,6 +38,10 @@ const categoryIds = ['cat9', 'cat4', 'cat15']
 const descriptionAdditional100 =
   ' 123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789'
 let variables = {}
+const config = {
+  CATEGORIES_ACTIVE: true,
+  // MAPBOX_TOKEN: CONFIG.MAPBOX_TOKEN,
+}
 
 const seedBasicsAndClearAuthentication = async () => {
   variables = {}
@@ -226,7 +233,11 @@ const seedComplexScenarioAndClearAuthentication = async () => {
 }
 
 beforeAll(async () => {
-  const apolloSetup = createApolloTestSetup({ contextUser, config: { CATEGORIES_ACTIVE: true } })
+  const apolloSetup = createApolloTestSetup({
+    contextUser,
+    config,
+    fetch: fetchMock,
+  })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database
@@ -349,7 +360,8 @@ describe('in mode', () => {
           beforeAll(() => {
             const apolloSetup = createApolloTestSetup({
               contextUser,
-              config: { CATEGORIES_ACTIVE: true },
+              config,
+              fetch: fetchMock,
             })
             mutate = apolloSetup.mutate
             query = apolloSetup.query
@@ -591,7 +603,8 @@ describe('in mode', () => {
                 beforeAll(() => {
                   const apolloSetup = createApolloTestSetup({
                     contextUser,
-                    config: { CATEGORIES_ACTIVE: true },
+                    config,
+                    fetch: fetchMock,
                   })
                   mutate = apolloSetup.mutate
                   query = apolloSetup.query
@@ -2883,7 +2896,8 @@ describe('in mode', () => {
               beforeAll(async () => {
                 const apolloSetup = createApolloTestSetup({
                   contextUser,
-                  config: { CATEGORIES_ACTIVE: true },
+                  config,
+                  fetch: fetchMock,
                 })
                 mutate = apolloSetup.mutate
                 query = apolloSetup.query
