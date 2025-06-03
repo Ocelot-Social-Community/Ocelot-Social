@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable jest/unbound-method */
 import gql from 'graphql-tag'
-import jwt from 'jsonwebtoken'
+import { verify } from 'jsonwebtoken'
 
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
@@ -17,6 +17,7 @@ import { encode } from '@jwt/encode'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup, TEST_CONFIG } from '@root/test/helpers'
 
+const jwt = { verify }
 let variables, req, user
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']

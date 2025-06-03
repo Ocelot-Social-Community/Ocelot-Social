@@ -1,22 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import jwt from 'jsonwebtoken'
+import { verify } from 'jsonwebtoken'
 
 import type CONFIG from '@src/config'
 
+import type { JwtPayload } from 'jsonwebtoken'
 import type { Driver } from 'neo4j-driver'
 
+const jwt = { verify }
 export const decode =
   (context: { config: Pick<typeof CONFIG, 'JWT_SECRET'>; driver: Driver }) =>
-  async (authorizationHeader) => {
+  async (authorizationHeader: string | undefined | null) => {
     if (!authorizationHeader) return null
     const token = authorizationHeader.replace('Bearer ', '')
     let id: null | string = null
     try {
-      const decoded = jwt.verify(token, context.config.JWT_SECRET)
-      id = decoded.sub
+      const decoded = jwt.verify(token, context.config.JWT_SECRET) as JwtPayload
+      id = decoded.sub ?? null
       // eslint-disable-next-line no-catch-all/no-catch-all
     } catch (err) {
       return null
