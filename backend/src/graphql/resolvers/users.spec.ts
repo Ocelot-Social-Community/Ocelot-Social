@@ -10,8 +10,11 @@ import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import User from '@db/models/User'
 import { setTrophyBadgeSelected } from '@graphql/queries/setTrophyBadgeSelected'
+import { fetchMock } from '@root/test/fetchMock'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+// import CONFIG from '@src/config'
+// import { fetch as fetchMock } from '@src/context/fetch'
 
 const categoryIds = ['cat9']
 let user
@@ -99,7 +102,7 @@ const resetTrophyBadgesSelected = gql`
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ contextUser, pubsub })
+  const apolloSetup = createApolloTestSetup({ contextUser, pubsub, fetch: fetchMock })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database

@@ -8,7 +8,10 @@ export const fetch = (url: string) => {
       if (error) {
         reject(error)
       } else {
-        resolve(JSON.parse(body)) // eslint-disable-line @typescript-eslint/no-unsafe-argument
+        const response = JSON.parse(body) // eslint-disable-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-argument
+        // console.log(url)
+        // console.log(JSON.stringify(response, null, 2))
+        resolve(response)
       }
     })
   })
