@@ -196,7 +196,7 @@ export default {
         await session.close()
       }
     },
-    UpdatePost: async (_parent, params, context, _resolveInfo) => {
+    UpdatePost: async (_parent, params, context: Context, _resolveInfo) => {
       const { config } = context
       const { categoryIds } = params
       const { image: imageInput } = params
@@ -255,11 +255,11 @@ export default {
         })
         const post = await writeTxResultPromise
         if (locationName) {
-          await createOrUpdateLocations('Post', post.id, locationName, session, context.config)
+          await createOrUpdateLocations('Post', post.id, locationName, session, context)
         }
         return post
       } finally {
-        session.close()
+        await session.close()
       }
     },
 

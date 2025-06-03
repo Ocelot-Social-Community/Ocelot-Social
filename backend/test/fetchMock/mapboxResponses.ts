@@ -3,6 +3,7 @@ import { berlinEn } from './berlinEn'
 import { empty } from './empty'
 import { hamburg } from './hamburg'
 import { hamburgNY } from './hamburgNY'
+import { leipzig } from './leipzig'
 import { welzheim } from './welzheim'
 
 export const mapboxResponses = {
@@ -20,4 +21,6 @@ export const mapboxResponses = {
     hamburg,
   'https://api.mapbox.com/geocoding/v5/mapbox.places/Hamburg%2C%20New%20Jersey%2C%20United%20States.json?access_token=MAPBOX_TOKEN&types=region,place,country,address&language=en,de,fr,nl,it,es,pt,pl,ru':
     hamburgNY,
+  'https://api.mapbox.com/geocoding/v5/mapbox.places/Leipzig.json?access_token=MAPBOX_TOKEN&types=region,place,country,address&language=en,de,fr,nl,it,es,pt,pl,ru':
+    leipzig,
 } as const
