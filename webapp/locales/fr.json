@@ -857,7 +857,7 @@
       "pin": "Épingler le Post",
       "pinnedSuccessfully": "Poste épinglé avec succès!",
       "pushedSuccessfully": null,
-      "pushToTop": null,
+      "push": null,
       "unobserve": "Ne plus observer le Post",
       "unobservedSuccessfully": null,
       "unpin": "Retirer l'épingle du poste",

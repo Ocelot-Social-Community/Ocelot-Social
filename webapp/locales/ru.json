@@ -857,7 +857,7 @@
       "pin": "Закрепить пост",
       "pinnedSuccessfully": "Пост больше не закреплен!",
       "pushedSuccessfully": null,
-      "pushToTop": null,
+      "push": null,
       "unobserve": null,
       "unobservedSuccessfully": null,
       "unpin": "Открепить пост",

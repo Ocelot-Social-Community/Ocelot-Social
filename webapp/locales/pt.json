@@ -857,7 +857,7 @@
       "pin": "Fixar publicação",
       "pinnedSuccessfully": "Publicação fixada com sucesso!",
       "pushedSuccessfully": null,
-      "pushToTop": null,
+      "push": null,
       "unobserve": "Deixar de observar publicação",
       "unobservedSuccessfully": null,
       "unpin": "Desafixar publicação",

@@ -106,7 +106,7 @@ export default {
 
         if (this.isAdmin) {
           routes.push({
-            label: this.$t(`post.menu.pushToTop`),
+            label: this.$t(`post.menu.push`),
             callback: () => {
               this.$emit('pushPost', this.resource)
             },
