@@ -49,7 +49,7 @@
                   :is-owner="isAuthor"
                   @pinPost="pinPost"
                   @unpinPost="unpinPost"
-                  @pushPostToTop="pushPostToTop"
+                  @pushPost="pushPost"
                   @unpushPost="unpushPost"
                   @toggleObservePost="toggleObservePost"
                 />

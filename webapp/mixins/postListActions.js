@@ -38,10 +38,10 @@ export default {
         })
         .catch((error) => this.$toast.error(error.message))
     },
-    pushPostToTop(post, refetchPostList = () => {}) {
+    pushPost(post, refetchPostList = () => {}) {
       this.$apollo
         .mutate({
-          mutation: PostMutations().pushPostToTop,
+          mutation: PostMutations().pushPost,
           variables: {
             id: post.id,
           },

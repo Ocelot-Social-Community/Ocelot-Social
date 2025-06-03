@@ -168,9 +168,9 @@ export default () => {
         }
       }
     `,
-    pushPostToTop: gql`
+    pushPost: gql`
       mutation ($id: ID!) {
-        pushPostToTop(id: $id) {
+        pushPost(id: $id) {
           id
           title
           slug

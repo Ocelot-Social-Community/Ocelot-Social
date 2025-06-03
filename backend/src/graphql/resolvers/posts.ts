@@ -494,7 +494,7 @@ export default {
         session.close()
       }
     },
-    pushPostToTop: async (_parent, params, context: Context, _resolveInfo) => {
+    pushPost: async (_parent, params, context: Context, _resolveInfo) => {
       const posts = (
         await context.database.write({
           query: `

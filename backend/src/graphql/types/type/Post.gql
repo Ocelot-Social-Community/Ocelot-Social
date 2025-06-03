@@ -244,7 +244,7 @@ type Mutation {
   pinPost(id: ID!): Post
   unpinPost(id: ID!): Post
   markTeaserAsViewed(id: ID!): Post
-  pushPostToTop(id: ID!): Post!
+  pushPost(id: ID!): Post!
   unpushPost(id: ID!): Post!
 
   # Shout the given Type and ID

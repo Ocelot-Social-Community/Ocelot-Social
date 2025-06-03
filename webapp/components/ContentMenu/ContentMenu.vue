@@ -108,7 +108,7 @@ export default {
           routes.push({
             label: this.$t(`post.menu.pushToTop`),
             callback: () => {
-              this.$emit('pushPostToTop', this.resource)
+              this.$emit('pushPost', this.resource)
             },
             icon: 'link',
           })
