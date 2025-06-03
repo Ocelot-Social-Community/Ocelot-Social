@@ -263,7 +263,7 @@ export default {
       }
     },
 
-    DeletePost: async (_object, args, context, _resolveInfo) => {
+    DeletePost: async (_object, args, context: Context, _resolveInfo) => {
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const deletePostTransactionResponse = await transaction.run(
@@ -287,10 +287,10 @@ export default {
         const post = await writeTxResultPromise
         return post
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    AddPostEmotions: async (_object, params, context, _resolveInfo) => {
+    AddPostEmotions: async (_object, params, context: Context, _resolveInfo) => {
       const { to, data } = params
       const { user } = context
       const session = context.driver.session()
@@ -314,7 +314,7 @@ export default {
         const [emoted] = await writeTxResultPromise
         return emoted
       } finally {
-        session.close()
+        await session.close()
       }
     },
     RemovePostEmotions: async (_object, params, context, _resolveInfo) => {
