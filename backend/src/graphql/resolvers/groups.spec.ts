@@ -357,18 +357,6 @@ describe('in mode', () => {
         })
 
         describe('categories', () => {
-          beforeAll(() => {
-            const apolloSetup = createApolloTestSetup({
-              contextUser,
-              config,
-              fetch: fetchMock,
-            })
-            mutate = apolloSetup.mutate
-            query = apolloSetup.query
-            database = apolloSetup.database
-            server = apolloSetup.server
-          })
-
           describe('with matching amount of categories', () => {
             it('has new categories', async () => {
               await expect(
@@ -600,18 +588,6 @@ describe('in mode', () => {
               })
 
               describe('categories', () => {
-                beforeAll(() => {
-                  const apolloSetup = createApolloTestSetup({
-                    contextUser,
-                    config,
-                    fetch: fetchMock,
-                  })
-                  mutate = apolloSetup.mutate
-                  query = apolloSetup.query
-                  database = apolloSetup.database
-                  server = apolloSetup.server
-                })
-
                 it('has set categories', async () => {
                   await expect(query({ query: groupQuery, variables: {} })).resolves.toMatchObject({
                     data: {
@@ -2893,18 +2869,6 @@ describe('in mode', () => {
             })
 
             describe('categories', () => {
-              beforeAll(async () => {
-                const apolloSetup = createApolloTestSetup({
-                  contextUser,
-                  config,
-                  fetch: fetchMock,
-                })
-                mutate = apolloSetup.mutate
-                query = apolloSetup.query
-                database = apolloSetup.database
-                server = apolloSetup.server
-              })
-
               describe('with matching amount of categories', () => {
                 it('has new categories', async () => {
                   await expect(
