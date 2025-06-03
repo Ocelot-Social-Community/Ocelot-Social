@@ -8,17 +8,12 @@ import Factory, { cleanDatabase } from '@db/factories'
 import Image from '@db/models/Image'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
-<<<<<<< HEAD
 import { Post } from '@graphql/queries/Post'
 import { pushPost } from '@graphql/queries/pushPost'
 import { unpushPost } from '@graphql/queries/unpushPost'
-import createServer, { getContext } from '@src/server'
-||||||| parent of b1b3f236c (wip: continue posts)
-import createServer, { getContext } from '@src/server'
-=======
+import { fetchMock } from '@root/test/fetchMock'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
->>>>>>> b1b3f236c (wip: continue posts)
 
 let user, authenticatedUser
 
@@ -29,9 +24,14 @@ let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
+const config = {
+  CATEGORIES_ACTIVE: true,
+  // MAPBOX_TOKEN: CONFIG.MAPBOX_TOKEN,
+}
+
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ contextUser, config: { CATEGORIES_ACTIVE: true } })
+  const apolloSetup = createApolloTestSetup({ contextUser, config, fetch: fetchMock })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database
@@ -1376,7 +1376,8 @@ describe('pin posts', () => {
       beforeAll(() => {
         const apolloSetup = createApolloTestSetup({
           contextUser,
-          config: { CATEGORIES_ACTIVE: true, MAX_PINNED_POSTS: 0 },
+          config: { ...config, MAX_PINNED_POSTS: 0 },
+          fetch: fetchMock,
         })
         mutate = apolloSetup.mutate
         query = apolloSetup.query
@@ -1409,7 +1410,8 @@ describe('pin posts', () => {
       beforeAll(() => {
         const apolloSetup = createApolloTestSetup({
           contextUser,
-          config: { CATEGORIES_ACTIVE: true, MAX_PINNED_POSTS: 1 },
+          config: { ...config, MAX_PINNED_POSTS: 1 },
+          fetch: fetchMock,
         })
         mutate = apolloSetup.mutate
         query = apolloSetup.query
@@ -1767,7 +1769,8 @@ describe('pin posts', () => {
       beforeAll(() => {
         const apolloSetup = createApolloTestSetup({
           contextUser,
-          config: { CATEGORIES_ACTIVE: true, MAX_PINNED_POSTS: 3 },
+          config: { ...config, MAX_PINNED_POSTS: 3 },
+          fetch: fetchMock,
         })
         mutate = apolloSetup.mutate
         query = apolloSetup.query
