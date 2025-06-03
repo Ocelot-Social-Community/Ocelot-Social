@@ -1,11 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import jwt from 'jsonwebtoken'
 
-import CONFIG from '@config/index'
+import { TEST_CONFIG } from '@root/test/helpers'
 
-import encode from './encode'
+import { encode } from './encode'
+
+const config = {
+  JWT_SECRET: 'supersecret',
+  JWT_EXPIRES: TEST_CONFIG.JWT_EXPIRES,
+  CLIENT_URI: TEST_CONFIG.CLIENT_URI,
+  GRAPHQL_URI: TEST_CONFIG.GRAPHQL_URI,
+}
+const context = { config }
 
 describe('encode', () => {
   let payload
@@ -18,9 +26,9 @@ describe('encode', () => {
   })
 
   it('encodes a valided JWT bearer token', () => {
-    const token = encode(payload)
+    const token = encode(context)(payload)
     expect(token.split('.')).toHaveLength(3)
-    const decoded = jwt.verify(token, CONFIG.JWT_SECRET)
+    const decoded = jwt.verify(token, context.config.JWT_SECRET)
     expect(decoded).toEqual({
       name: 'Some body',
       slug: 'some-body',
@@ -51,7 +59,7 @@ describe('encode', () => {
         slug: 'some-body',
         id: 'some-id',
       })
-      const decoded = jwt.verify(token, CONFIG.JWT_SECRET)
+      const decoded = jwt.verify(token, context.config.JWT_SECRET)
       expect(decoded).toEqual({
         name: 'Some body',
         slug: 'some-body',

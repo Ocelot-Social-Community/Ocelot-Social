@@ -20,7 +20,7 @@ export const TEST_CONFIG: typeof CONFIG = {
 
   MAPBOX_TOKEN: 'MAPBOX_TOKEN',
   JWT_SECRET: 'JWT_SECRET',
-  PRIVATE_KEY_PASSPHRASE: undefined,
+  PRIVATE_KEY_PASSPHRASE: 'PRIVATE_KEY_PASSPHRASE',
 
   NEO4J_URI: 'bolt://localhost:7687',
   NEO4J_USERNAME: 'neo4j',
@@ -74,7 +74,7 @@ export const createApolloTestSetup = ({
   const database = databaseContext()
 
   const context = getContext({
-    user: contextUser, // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+    contextUser, // eslint-disable-line @typescript-eslint/no-unsafe-assignment
     database,
     pubsub,
     config: { ...TEST_CONFIG, ...config },

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
+
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -12,15 +12,12 @@ import jwt from 'jsonwebtoken'
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
 import { loginMutation } from '@graphql/queries/loginMutation'
-import decode from '@jwt/decode'
-import encode from '@jwt/encode'
+import { decode } from '@jwt/decode'
+import { encode } from '@jwt/encode'
 import type { ApolloTestSetup } from '@root/test/helpers'
-import { createApolloTestSetup } from '@root/test/helpers'
-
-const JWT_SECRET = 'I am the JWT secret'
+import { createApolloTestSetup, TEST_CONFIG } from '@root/test/helpers'
 
 let variables, req, user
-const databaseUser = async () => decode(database.driver, req.headers.authorization)
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
@@ -45,9 +42,19 @@ const disable = async (id) => {
   ])
 }
 
+const config = {
+  JWT_SECRET: 'I am the JWT secret',
+  JWT_EXPIRES: TEST_CONFIG.JWT_EXPIRES,
+  CLIENT_URI: TEST_CONFIG.CLIENT_URI,
+  GRAPHQL_URI: TEST_CONFIG.GRAPHQL_URI,
+}
+const context = { config }
+
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ config: { JWT_SECRET }, contextUser: databaseUser })
+  const contextUser = async () =>
+    decode({ driver: database.driver, config })(req.headers.authorization)
+  const apolloSetup = createApolloTestSetup({ config, contextUser })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database
@@ -120,7 +127,7 @@ describe('currentUser', () => {
             avatar,
           },
         )
-        const userBearerToken = encode({ id: 'u3' })
+        const userBearerToken = encode(context)({ id: 'u3' })
         req = { headers: { authorization: `Bearer ${userBearerToken}` } }
       })
 
@@ -237,7 +244,7 @@ describe('login', () => {
         const {
           data: { login: token },
         } = (await mutate({ mutation: loginMutation, variables })) as any // eslint-disable-line @typescript-eslint/no-explicit-any
-        jwt.verify(token, JWT_SECRET, (err, data) => {
+        jwt.verify(token, config.JWT_SECRET, (err, data) => {
           expect(data).toMatchObject({
             id: 'acb2d923-f3af-479e-9f00-61b12e864666',
           })
@@ -354,7 +361,7 @@ describe('change password', () => {
   describe('authenticated', () => {
     beforeEach(async () => {
       await Factory.build('user', { id: 'u3' })
-      const userBearerToken = encode({ id: 'u3' })
+      const userBearerToken = encode(context)({ id: 'u3' })
       req = { headers: { authorization: `Bearer ${userBearerToken}` } }
     })
     describe('old password === new password', () => {
