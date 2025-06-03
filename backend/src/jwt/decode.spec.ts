@@ -34,7 +34,7 @@ afterEach(async () => {
 })
 
 describe('decode', () => {
-  let authorizationHeader
+  let authorizationHeader: string | undefined | null
   const returnsNull = async () => {
     await expect(decode(context)(authorizationHeader)).resolves.toBeNull()
   }
@@ -65,7 +65,8 @@ describe('decode', () => {
 
   describe('given valid JWT Bearer token', () => {
     describe('and corresponding user in the database', () => {
-      let user, validAuthorizationHeader
+      let user
+      let validAuthorizationHeader: string
       beforeEach(async () => {
         user = await Factory.build(
           'user',

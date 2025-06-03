@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import jwt from 'jsonwebtoken'
+import { verify } from 'jsonwebtoken'
 
 import { TEST_CONFIG } from '@root/test/helpers'
 
 import { encode } from './encode'
 
+const jwt = { verify }
 const config = {
   JWT_SECRET: 'supersecret',
   JWT_EXPIRES: TEST_CONFIG.JWT_EXPIRES,
@@ -51,7 +50,7 @@ describe('encode', () => {
     })
 
     it('does not encode sensitive data', () => {
-      const token = encode(payload)
+      const token = encode(context)(payload)
       expect(payload).toEqual({
         email: 'none-of-your-business@example.org',
         password: 'topsecret',
