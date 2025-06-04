@@ -1,8 +1,7 @@
 <template>
   <div>
     <label class="ds-input-label">
-      {{ `${$t('settings.data.labelCity')}` }}
-      <span v-if="locationName">{{ `— ${locationName}` }}</span>
+      {{ `${$t('settings.data.labelCity')}` + locationNameLabelAddOnOldName }}
     </label>
     <ds-select
       id="city"
@@ -15,7 +14,7 @@
       @input.native="handleCityInput"
     />
     <base-button
-      v-if="locationName !== ''"
+      v-if="locationName !== '' && canBeCleared"
       icon="close"
       ghost
       size="small"
@@ -36,6 +35,16 @@ export default {
     value: {
       required: true,
     },
+    canBeCleared: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    showPreviousLocation: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   async created() {
     const result = await this.requestGeoData(this.locationName)
@@ -53,6 +62,9 @@ export default {
   computed: {
     locationName() {
       return typeof this.value === 'object' ? this.value.value : this.value
+    },
+    locationNameLabelAddOnOldName() {
+      return this.locationName !== '' && this.showPreviousLocation ? ' — ' + this.locationName : ''
     },
   },
   watch: {

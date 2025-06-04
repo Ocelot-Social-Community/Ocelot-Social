@@ -180,6 +180,7 @@ export default {
           passwordConfirmation: null,
           termsAndConditionsConfirmed: null,
           receiveCommunicationAsEmailsEtcConfirmed: null,
+          locationName: null,
         },
         sliderIndex:
           this.activePage === null ? 0 : sliders.findIndex((el) => el.name === this.activePage),
