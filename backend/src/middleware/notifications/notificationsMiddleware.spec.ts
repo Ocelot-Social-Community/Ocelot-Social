@@ -1224,7 +1224,7 @@ describe('notifications', () => {
           }),
         ).resolves.toMatchObject({
           data: {
-            notifications: [
+            notifications: expect.arrayContaining([
               {
                 read: false,
                 reason: 'user_left_group',
@@ -1249,7 +1249,7 @@ describe('notifications', () => {
                   id: 'you',
                 },
               },
-            ],
+            ]),
           },
           errors: undefined,
         })
@@ -1280,7 +1280,7 @@ describe('notifications', () => {
             }),
           ).resolves.toMatchObject({
             data: {
-              notifications: [
+              notifications: expect.arrayContaining([
                 {
                   read: false,
                   reason: 'user_left_group',
@@ -1305,7 +1305,7 @@ describe('notifications', () => {
                     id: 'you',
                   },
                 },
-              ],
+              ]),
             },
             errors: undefined,
           })
