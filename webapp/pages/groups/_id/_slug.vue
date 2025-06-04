@@ -131,7 +131,9 @@
             <ds-space margin="x-small" />
           </ds-space>
           <!-- group categories -->
-          <template v-if="categoriesActive && group && group.categories.length > 0">
+          <template
+            v-if="categoriesActive && group && group.categories && group.categories.length > 0"
+          >
             <hr />
             <ds-space margin-top="small" margin-bottom="small">
               <ds-text class="centered-text hyphenate-text" color="soft" size="small">
