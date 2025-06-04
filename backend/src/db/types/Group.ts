@@ -10,7 +10,7 @@ export interface GroupDbProperties {
   disabled: boolean
   groupType: string
   id: string
-  locationName: string
+  locationName?: string
   name: string
   slug: string
   updatedAt: string
