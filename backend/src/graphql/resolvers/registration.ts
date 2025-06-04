@@ -106,7 +106,7 @@ export default {
           await redeemInviteCode(context, inviteCode, true)
         }
 
-        await createOrUpdateLocations('User', user.id, locationName, session)
+        await createOrUpdateLocations('User', user.id, locationName, session, context)
         return user
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
