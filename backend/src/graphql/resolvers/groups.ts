@@ -11,7 +11,7 @@ import { v4 as uuid } from 'uuid'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '@constants/groups'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
-import type { Context } from '@src/server'
+import type { Context } from '@src/context'
 
 import Resolver, {
   removeUndefinedNullValuesFromObject,
@@ -31,6 +31,9 @@ export default {
       removeUndefinedNullValuesFromObject(matchParams)
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (txc) => {
+        if (!context.user) {
+          throw new Error('Missing authenticated user.')
+        }
         const groupMatchParamsCypher = convertObjectToCypherMapLiteral(matchParams, true)
         let groupCypher
         if (isMember === true) {
@@ -155,6 +158,9 @@ export default {
       params.id = params.id || uuid()
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        if (!context.user) {
+          throw new Error('Missing authenticated user.')
+        }
         const categoriesCypher =
           config.CATEGORIES_ACTIVE && categoryIds
             ? `
@@ -235,6 +241,9 @@ export default {
         })
       }
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        if (!context.user) {
+          throw new Error('Missing authenticated user.')
+        }
         let updateGroupCypher = `
           MATCH (group:Group {id: $groupId})
           SET group += $params
@@ -380,10 +389,16 @@ export default {
       }
     },
     muteGroup: async (_parent, params, context: Context, _resolveInfo) => {
+      if (!context.user) {
+        throw new Error('Missing authenticated user.')
+      }
       const { groupId } = params
       const userId = context.user.id
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        if (!context.user) {
+          throw new Error('Missing authenticated user.')
+        }
         const transactionResponse = await transaction.run(
           `
           MATCH (group:Group { id: $groupId })
@@ -409,6 +424,9 @@ export default {
       }
     },
     unmuteGroup: async (_parent, params, context: Context, _resolveInfo) => {
+      if (!context.user) {
+        throw new Error('Missing authenticated user.')
+      }
       const { groupId } = params
       const userId = context.user.id
       const session = context.driver.session()

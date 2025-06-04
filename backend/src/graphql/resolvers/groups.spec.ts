@@ -15,10 +15,10 @@ import { updateGroupMutation } from '@graphql/queries/updateGroupMutation'
 import { fetchMock } from '@root/test/fetchMock'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 // import CONFIG from '@src/config'
 // import { fetch as fetchMock } from '@src/context/fetch'
 
-let authenticatedUser
 let user
 let noMemberUser
 let pendingMemberUser
@@ -27,8 +27,8 @@ let adminMemberUser
 let ownerMemberUser
 let secondOwnerMemberUser
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-const contextUser = () => authenticatedUser
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser, config, fetch: fetchMock })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
@@ -233,11 +233,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
 }
 
 beforeAll(async () => {
-  const apolloSetup = createApolloTestSetup({
-    contextUser,
-    config,
-    fetch: fetchMock,
-  })
+  const apolloSetup = createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database

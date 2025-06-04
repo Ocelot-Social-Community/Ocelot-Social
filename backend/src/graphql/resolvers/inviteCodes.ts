@@ -2,8 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import registrationConstants from '@constants/registrationBranded'
-// eslint-disable-next-line import/no-cycle
-import { Context } from '@src/server'
+import { Context } from '@src/context'
 
 import Resolver from './helpers/Resolver'
 
@@ -52,6 +51,9 @@ export const validateInviteCode = async (context: Context, inviteCode) => {
 }
 
 export const redeemInviteCode = async (context: Context, code, newUser = false) => {
+  if (!context.user) {
+    throw new Error('Missing authenticated user.')
+  }
   const result = (
     await context.database.query({
       query: `

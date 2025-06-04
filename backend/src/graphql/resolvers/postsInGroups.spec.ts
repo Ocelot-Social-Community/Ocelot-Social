@@ -15,6 +15,7 @@ import { searchPosts } from '@graphql/queries/searchPosts'
 import { signupVerificationMutation } from '@graphql/queries/signupVerificationMutation'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
 jest.mock('@constants/groups', () => {
   return {
@@ -29,10 +30,10 @@ let pendingUser
 let publicUser
 let closedUser
 let hiddenUser
-let authenticatedUser
 let newUser
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-const contextUser = () => authenticatedUser
+let authenticatedUser: Context['user']
+const config = { CATEGORIES_ACTIVE: false }
+const context = () => ({ authenticatedUser, config })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
@@ -40,7 +41,7 @@ let server: ApolloTestSetup['server']
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ contextUser, config: { CATEGORIES_ACTIVE: false } })
+  const apolloSetup = createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database
@@ -537,7 +538,7 @@ describe('Posts in Groups', () => {
   describe('visibility of posts', () => {
     describe('query post by ID', () => {
       describe('without authentication', () => {
-        beforeAll(async () => {
+        beforeEach(() => {
           authenticatedUser = null
         })
 
@@ -794,7 +795,7 @@ describe('Posts in Groups', () => {
 
     describe('filter posts', () => {
       describe('without authentication', () => {
-        beforeAll(async () => {
+        beforeEach(() => {
           authenticatedUser = null
         })
 
@@ -958,7 +959,7 @@ describe('Posts in Groups', () => {
 
     describe('profile page posts', () => {
       describe('without authentication', () => {
-        beforeAll(async () => {
+        beforeEach(() => {
           authenticatedUser = null
         })
 
@@ -1110,7 +1111,7 @@ describe('Posts in Groups', () => {
 
     describe('searchPosts', () => {
       describe('without authentication', () => {
-        beforeAll(async () => {
+        beforeEach(() => {
           authenticatedUser = null
         })
 

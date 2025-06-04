@@ -1,12 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { verify } from 'jsonwebtoken'
 
 import type CONFIG from '@src/config'
 
 import type { JwtPayload } from 'jsonwebtoken'
 import type { Driver } from 'neo4j-driver'
+
+export interface DecodedUser {
+  id: string
+  slug: string
+  name: string
+  role: string
+  disabled: boolean
+}
 
 const jwt = { verify }
 export const decode =
@@ -24,7 +31,7 @@ export const decode =
     }
     const session = context.driver.session()
 
-    const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+    const writeTxResultPromise = session.writeTransaction<DecodedUser[]>(async (transaction) => {
       const updateUserLastActiveTransactionResponse = await transaction.run(
         `
         MATCH (user:User {id: $id, deleted: false, disabled: false })

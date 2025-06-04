@@ -10,7 +10,7 @@ import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
 import { getNeode } from '@db/neo4j'
-import { Context } from '@src/server'
+import { Context } from '@src/context'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import normalizeEmail from './helpers/normalizeEmail'

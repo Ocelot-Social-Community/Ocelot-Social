@@ -7,10 +7,16 @@ import Factory, { cleanDatabase } from '@db/factories'
 import { fetchMock } from '@root/test/fetchMock'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-let authenticatedUser, variables
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-const contextUser = () => authenticatedUser
+let variables
+let authenticatedUser: Context['user']
+const context = () => ({
+  authenticatedUser,
+  // config: { MAPBOX_TOKEN: CONFIG.MAPBOX_TOKEN },
+  // fetch: defaultFetch,
+  fetch: fetchMock,
+})
 let mutate: ApolloTestSetup['mutate']
 let query: any // eslint-disable-line @typescript-eslint/no-explicit-any
 let database: ApolloTestSetup['database']
@@ -83,10 +89,7 @@ const newlyCreatedNodesWithLocales = [
 beforeAll(async () => {
   await cleanDatabase()
   const apolloSetup = createApolloTestSetup({
-    contextUser,
-    // config: { MAPBOX_TOKEN: CONFIG.MAPBOX_TOKEN },
-    // fetch: defaultFetch,
-    fetch: fetchMock,
+    context,
   })
   mutate = apolloSetup.mutate
   query = apolloSetup.query

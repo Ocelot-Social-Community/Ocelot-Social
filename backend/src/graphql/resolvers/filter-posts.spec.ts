@@ -1,24 +1,26 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Factory, { cleanDatabase } from '@db/factories'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
 import { filterPosts } from '@graphql/queries/filterPosts'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-let authenticatedUser
 let user
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-const contextUser = () => authenticatedUser
+let authenticatedUser: Context['user']
+const config = { CATEGORIES_ACTIVE: false }
+const context = () => ({ authenticatedUser, config })
 let mutate: ApolloTestSetup['mutate']
-let query: any // eslint-disable-line @typescript-eslint/no-explicit-any
+let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ contextUser, config: { CATEGORIES_ACTIVE: false } })
+  const apolloSetup = createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database
@@ -90,7 +92,7 @@ describe('Filter Posts', () => {
     it('finds all posts', async () => {
       const {
         data: { Post: result },
-      } = await query({ query: filterPosts() })
+      } = (await query({ query: filterPosts() })) as any
       expect(result).toHaveLength(4)
       expect(result).toEqual(
         expect.arrayContaining([
@@ -107,7 +109,10 @@ describe('Filter Posts', () => {
     it('finds the articles', async () => {
       const {
         data: { Post: result },
-      } = await query({ query: filterPosts(), variables: { filter: { postType_in: ['Article'] } } })
+      } = (await query({
+        query: filterPosts(),
+        variables: { filter: { postType_in: ['Article'] } },
+      })) as any
       expect(result).toHaveLength(2)
       expect(result).toEqual(
         expect.arrayContaining([
@@ -122,7 +127,10 @@ describe('Filter Posts', () => {
     it('finds the articles', async () => {
       const {
         data: { Post: result },
-      } = await query({ query: filterPosts(), variables: { filter: { postType_in: ['Event'] } } })
+      } = (await query({
+        query: filterPosts(),
+        variables: { filter: { postType_in: ['Event'] } },
+      })) as any
       expect(result).toHaveLength(2)
       expect(result).toEqual(
         expect.arrayContaining([
@@ -137,10 +145,10 @@ describe('Filter Posts', () => {
     it('finds all posts', async () => {
       const {
         data: { Post: result },
-      } = await query({
+      } = (await query({
         query: filterPosts(),
         variables: { filter: { postType_in: ['Article', 'Event'] } },
-      })
+      })) as any
       expect(result).toHaveLength(4)
       expect(result).toEqual(
         expect.arrayContaining([
@@ -157,10 +165,10 @@ describe('Filter Posts', () => {
     it('finds the events ordered accordingly', async () => {
       const {
         data: { Post: result },
-      } = await query({
+      } = (await query({
         query: filterPosts(),
         variables: { filter: { postType_in: ['Event'] }, orderBy: ['eventStart_desc'] },
-      })
+      })) as any
       expect(result).toHaveLength(2)
       expect(result).toEqual([
         expect.objectContaining({
@@ -181,10 +189,10 @@ describe('Filter Posts', () => {
     it('finds the events ordered accordingly', async () => {
       const {
         data: { Post: result },
-      } = await query({
+      } = (await query({
         query: filterPosts(),
         variables: { filter: { postType_in: ['Event'] }, orderBy: ['eventStart_asc'] },
-      })
+      })) as any
       expect(result).toHaveLength(2)
       expect(result).toEqual([
         expect.objectContaining({
@@ -205,7 +213,7 @@ describe('Filter Posts', () => {
     it('finds only events after given date', async () => {
       const {
         data: { Post: result },
-      } = await query({
+      } = (await query({
         query: filterPosts(),
         variables: {
           filter: {
@@ -217,7 +225,7 @@ describe('Filter Posts', () => {
             ).toISOString(),
           },
         },
-      })
+      })) as any
       expect(result).toHaveLength(1)
       expect(result).toEqual([
         expect.objectContaining({

@@ -7,7 +7,7 @@ import { UserInputError } from 'apollo-server'
 import { hash } from 'bcryptjs'
 
 import { getNeode } from '@db/neo4j'
-import { Context } from '@src/server'
+import { Context } from '@src/context'
 
 import existingEmailAddress from './helpers/existingEmailAddress'
 import generateNonce from './helpers/generateNonce'

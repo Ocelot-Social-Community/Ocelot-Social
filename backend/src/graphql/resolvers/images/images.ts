@@ -1,5 +1,5 @@
 import { isS3configured } from '@config/index'
-import type { Context } from '@src/server'
+import type { Context } from '@src/context'
 
 import { images as imagesLocal } from './imagesLocal'
 import { images as imagesS3 } from './imagesS3'

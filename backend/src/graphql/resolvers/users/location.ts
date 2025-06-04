@@ -9,7 +9,7 @@
 
 import { UserInputError } from 'apollo-server'
 
-import type { Context } from '@src/server'
+import type { Context } from '@src/context'
 
 const locales = ['en', 'de', 'fr', 'nl', 'it', 'es', 'pt', 'pl', 'ru']
 

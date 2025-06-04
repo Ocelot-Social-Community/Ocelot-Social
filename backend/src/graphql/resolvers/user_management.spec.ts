@@ -53,9 +53,13 @@ const context = { config }
 
 beforeAll(async () => {
   await cleanDatabase()
-  const contextUser = async () =>
-    decode({ driver: database.driver, config })(req.headers.authorization)
-  const apolloSetup = createApolloTestSetup({ config, contextUser })
+  const context = async () => {
+    const authenticatedUser = await decode({ driver: database.driver, config })(
+      req.headers.authorization,
+    )
+    return { authenticatedUser, config }
+  }
+  const apolloSetup = createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database
