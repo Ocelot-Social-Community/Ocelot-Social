@@ -30,6 +30,7 @@ const config: S3Configured = {
   AWS_ENDPOINT: 'AWS_ENDPOINT',
   AWS_REGION: 'AWS_REGION',
   S3_PUBLIC_GATEWAY: undefined,
+  IMAGOR_SECRET: undefined,
 }
 
 beforeAll(async () => {
@@ -204,29 +205,6 @@ describe('mergeImage', () => {
         })
       })
 
-      describe('given a `S3_PUBLIC_GATEWAY` configuration', () => {
-        const { mergeImage } = images({
-          ...config,
-          S3_PUBLIC_GATEWAY: 'http://s3-public-gateway.com',
-        })
-
-        it('changes the domain of the URL to a server that could e.g. apply image transformations', async () => {
-          if (!imageInput.upload) {
-            throw new Error('Test imageInput was not setup correctly.')
-          }
-          const upload = await imageInput.upload
-          upload.filename = '/path/to/file-location/foo-bar-avatar.jpg'
-          imageInput.upload = Promise.resolve(upload)
-          await expect(
-            mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback }),
-          ).resolves.toMatchObject({
-            url: expect.stringMatching(
-              new RegExp(`^http://s3-public-gateway.com/bucket/${uuid}-foo-bar-avatar.jpg`),
-            ),
-          })
-        })
-      })
-
       it('connects resource with image via given image type', async () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback })
         const result = await neode.cypher(
@@ -344,6 +322,29 @@ describe('mergeImage', () => {
             // width:
             // height:
           })
+        })
+      })
+
+      describe('edge cases: `Location` is not a valid URL (e.g. hetzner object storage)', () => {
+        beforeEach(async () => {
+          uploadCallback = jest.fn(
+            () =>
+              'fsn1.your-objectstorage.com/ocelot-social-staging/original/f965ea15-1f6b-43aa-a535-927410e2585e-dsc02586.jpg',
+          )
+        })
+
+        it('adds missing https:// protocol', async () => {
+          const result = await mergeImage(post, 'HERO_IMAGE', imageInput, {
+            uploadCallback,
+            deleteCallback,
+          })
+          expect(result).toMatchObject({
+            url: 'https://fsn1.your-objectstorage.com/ocelot-social-staging/original/f965ea15-1f6b-43aa-a535-927410e2585e-dsc02586.jpg',
+          })
+          if (!result?.url) {
+            throw new Error()
+          }
+          expect(new URL(result.url)).toBeDefined()
         })
       })
     })

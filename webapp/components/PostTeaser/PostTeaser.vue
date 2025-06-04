@@ -12,7 +12,7 @@
       :highlight="isPinned"
     >
       <template v-if="post.image" #heroImage>
-        <img :src="post.image | proxyApiUrl" class="image" />
+        <responsive-image :image="post.image" sizes="640px" class="image" />
       </template>
       <client-only>
         <div class="post-user-row">
@@ -136,6 +136,7 @@ import HcRibbon from '~/components/Ribbon'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
 import DateTime from '~/components/DateTime'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 import { mapGetters } from 'vuex'
 import PostMutations from '~/graphql/PostMutations'
 import { postMenuModalsData, deletePostMutation } from '~/components/utils/PostHelpers'
@@ -153,6 +154,7 @@ export default {
     LocationTeaser,
     DateTime,
     UserTeaser,
+    ResponsiveImage,
   },
   props: {
     post: {

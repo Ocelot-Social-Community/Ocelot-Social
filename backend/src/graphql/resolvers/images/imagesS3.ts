@@ -9,14 +9,14 @@ import { v4 as uuid } from 'uuid'
 import { S3Configured } from '@config/index'
 
 import { sanitizeRelationshipType } from './sanitizeRelationshipTypes'
-import { wrapTransaction } from './wrapTransaction'
+import { wrapTransactionDeleteImage, wrapTransactionMergeImage } from './wrapTransaction'
 
 import type { Image, Images, FileDeleteCallback, FileUploadCallback } from './images'
 import type { FileUpload } from 'graphql-upload'
 
 export const images = (config: S3Configured) => {
   // const widths = [34, 160, 320, 640, 1024]
-  const { AWS_BUCKET: Bucket, S3_PUBLIC_GATEWAY } = config
+  const { AWS_BUCKET: Bucket } = config
 
   const { AWS_ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = config
   const s3 = new S3Client({
@@ -31,7 +31,8 @@ export const images = (config: S3Configured) => {
   const deleteImage: Images['deleteImage'] = async (resource, relationshipType, opts = {}) => {
     sanitizeRelationshipType(relationshipType)
     const { transaction, deleteCallback = s3Delete } = opts
-    if (!transaction) return wrapTransaction(deleteImage, [resource, relationshipType], opts)
+    if (!transaction)
+      return wrapTransactionDeleteImage(deleteImage, [resource, relationshipType], opts)
     const txResult = await transaction.run(
       `
       MATCH (resource {id: $resource.id})-[rel:${relationshipType}]->(image:Image)
@@ -63,7 +64,7 @@ export const images = (config: S3Configured) => {
     sanitizeRelationshipType(relationshipType)
     const { transaction, uploadCallback, deleteCallback = s3Delete } = opts
     if (!transaction)
-      return wrapTransaction(mergeImage, [resource, relationshipType, imageInput], opts)
+      return wrapTransactionMergeImage(mergeImage, [resource, relationshipType, imageInput], opts)
 
     let txResult = await transaction.run(
       `
@@ -104,13 +105,11 @@ export const images = (config: S3Configured) => {
     const upload = await uploadPromise
     const { name, ext } = path.parse(upload.filename)
     const uniqueFilename = `${uuid()}-${slug(name)}${ext}`
-    const Location = await uploadCallback({ ...upload, uniqueFilename })
-    if (!S3_PUBLIC_GATEWAY) {
-      return Location
+    let Location = await uploadCallback({ ...upload, uniqueFilename })
+    if (!Location.startsWith('https://') && !Location.startsWith('http://')) {
+      Location = `https://${Location}` // assume https
     }
-    const publicLocation = new URL(S3_PUBLIC_GATEWAY)
-    publicLocation.pathname = new URL(Location).pathname
-    return publicLocation.href
+    return Location
   }
 
   const s3Upload: FileUploadCallback = async ({ createReadStream, uniqueFilename, mimetype }) => {

@@ -18,6 +18,7 @@ import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
+import { TEST_CONFIG } from '@src/config/test-mock'
 import createServer, { getContext } from '@src/server'
 
 const sendChatMessageMailMock: (notification) => void = jest.fn()
@@ -71,7 +72,7 @@ beforeAll(async () => {
   await cleanDatabase()
 
   const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database, pubsub })
+  const context = getContext({ user: contextUser, database, pubsub, config: TEST_CONFIG })
 
   server = createServer({ context }).server
 
