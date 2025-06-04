@@ -11,13 +11,13 @@ import { markAsReadMutation } from '@graphql/queries/markAsReadMutation'
 import { notificationQuery } from '@graphql/queries/notificationQuery'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-let authenticatedUser
 let user
 let author
 let variables
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-const contextUser = () => authenticatedUser
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser })
 let query: ApolloTestSetup['query']
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
@@ -25,7 +25,7 @@ let server: ApolloTestSetup['server']
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ contextUser })
+  const apolloSetup = createApolloTestSetup({ context })
   query = apolloSetup.query
   mutate = apolloSetup.mutate
   database = apolloSetup.database

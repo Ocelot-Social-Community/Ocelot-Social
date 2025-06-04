@@ -8,19 +8,20 @@ import EmailAddress from '@db/models/EmailAddress'
 import User from '@db/models/User'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
 let variables
 
-let authenticatedUser
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-const contextUser = () => authenticatedUser
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser, config })
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
+let config: Partial<Context['config']> = {}
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ contextUser })
+  const apolloSetup = createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   database = apolloSetup.database
   server = apolloSetup.server
@@ -33,6 +34,7 @@ afterAll(() => {
 })
 
 beforeEach(() => {
+  config = {}
   variables = {}
 })
 
@@ -55,18 +57,10 @@ describe('Signup', () => {
   describe('unauthenticated', () => {
     beforeEach(() => {
       authenticatedUser = null
-    })
-    beforeAll(() => {
-      const apolloSetup = createApolloTestSetup({
-        contextUser,
-        config: {
-          INVITE_REGISTRATION: false,
-          PUBLIC_REGISTRATION: false,
-        },
-      })
-      mutate = apolloSetup.mutate
-      database = apolloSetup.database
-      server = apolloSetup.server
+      config = {
+        INVITE_REGISTRATION: false,
+        PUBLIC_REGISTRATION: false,
+      }
     })
 
     it('throws AuthorizationError', async () => {

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
@@ -10,14 +10,16 @@ import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
 const sendNotificationMailMock: (notification) => void = jest.fn()
 jest.mock('@src/emails/sendEmail', () => ({
   sendNotificationMail: (notification) => sendNotificationMailMock(notification),
 }))
 
-let authenticatedUser
-const contextUser = () => authenticatedUser
+let authenticatedUser: Context['user']
+const config = { CATEGORIES_ACTIVE: false }
+const context = () => ({ authenticatedUser, config })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
@@ -91,7 +93,7 @@ const markAllAsRead = async () =>
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ contextUser, config: { CATEGORIES_ACTIVE: false } })
+  const apolloSetup = createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database

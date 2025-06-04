@@ -1,4 +1,4 @@
-import type { Context } from '@src/server'
+import type { Context } from '@src/context'
 
 type Resolver = (
   root: unknown,

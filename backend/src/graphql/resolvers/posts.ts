@@ -9,7 +9,7 @@ import { isEmpty } from 'lodash'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 import { v4 as uuid } from 'uuid'
 
-import { Context } from '@src/server'
+import { Context } from '@src/context'
 
 import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
@@ -80,6 +80,9 @@ export default {
       const { postId } = params
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (transaction) => {
+        if (!context.user) {
+          throw new Error('Missing authenticated user.')
+        }
         const emotionsTransactionResponse = await transaction.run(
           `
             MATCH (user:User {id: $userId})-[emoted:EMOTED]->(post:Post {id: $postId})
@@ -123,6 +126,9 @@ export default {
       params.id = params.id || uuid()
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        if (!context.user) {
+          throw new Error('Missing authenticated user.')
+        }
         let groupCypher = ''
         if (groupId) {
           groupCypher = `
@@ -346,6 +352,9 @@ export default {
       }
     },
     pinPost: async (_parent, params, context: Context, _resolveInfo) => {
+      if (!context.user) {
+        throw new Error('Missing authenticated user.')
+      }
       const { config } = context
       if (config.MAX_PINNED_POSTS === 0) throw new Error('Pinned posts are not allowed!')
       let pinnedPostWithNestedAttributes

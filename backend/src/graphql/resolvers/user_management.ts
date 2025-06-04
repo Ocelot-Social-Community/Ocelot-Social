@@ -10,7 +10,7 @@ import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import { getNeode } from '@db/neo4j'
 import { encode } from '@jwt/encode'
-import type { Context } from '@src/server'
+import type { Context } from '@src/context'
 
 import normalizeEmail from './helpers/normalizeEmail'
 
@@ -58,6 +58,9 @@ export default {
       }
     },
     changePassword: async (_, { oldPassword, newPassword }, context: Context) => {
+      if (!context.user) {
+        throw new Error('Missing authenticated user.')
+      }
       const { user } = context
       const currentUser = await neode.find('User', user.id)
 

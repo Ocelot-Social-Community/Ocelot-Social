@@ -6,11 +6,11 @@ import gql from 'graphql-tag'
 import { cleanDatabase } from '@db/factories'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
 let hashtagingUser
-let authenticatedUser
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-const contextUser = () => authenticatedUser
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser })
 let mutate: ApolloTestSetup['mutate']
 let query: any // eslint-disable-line @typescript-eslint/no-explicit-any
 let database: ApolloTestSetup['database']
@@ -36,7 +36,7 @@ const updatePostMutation = gql`
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ contextUser, config: { CATEGORIES_ACTIVE: false } })
+  const apolloSetup = createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database

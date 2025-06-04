@@ -6,17 +6,21 @@ import Factory, { cleanDatabase } from '@db/factories'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import { categories } from '@src/constants/categories'
+import type { Context } from '@src/context'
 
-let authenticatedUser
+let config: Partial<Context['config']>
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-const contextUser = () => authenticatedUser
+
+beforeEach(() => {
+  config = {}
+})
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ contextUser })
+  const context = () => ({ config })
+  const apolloSetup = createApolloTestSetup({ context })
   query = apolloSetup.query
   database = apolloSetup.database
   server = apolloSetup.server
@@ -49,13 +53,8 @@ const categoriesQuery = gql`
 
 describe('categories middleware', () => {
   describe('categories are active', () => {
-    beforeAll(() => {
-      const apolloSetup = createApolloTestSetup({
-        contextUser,
-        config: { CATEGORIES_ACTIVE: true },
-      })
-      query = apolloSetup.query
-      database = apolloSetup.database
+    beforeEach(() => {
+      config = { ...config, CATEGORIES_ACTIVE: true }
     })
 
     it('returns the categories', async () => {
@@ -74,13 +73,8 @@ describe('categories middleware', () => {
   })
 
   describe('categories are not active', () => {
-    beforeAll(() => {
-      const apolloSetup = createApolloTestSetup({
-        contextUser,
-        config: { CATEGORIES_ACTIVE: false },
-      })
-      query = apolloSetup.query
-      database = apolloSetup.database
+    beforeEach(() => {
+      config = { ...config, CATEGORIES_ACTIVE: false }
     })
 
     it('returns an empty array though there are categories in the db', async () => {

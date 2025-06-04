@@ -14,24 +14,26 @@ import { unpushPost } from '@graphql/queries/unpushPost'
 import { fetchMock } from '@root/test/fetchMock'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-let user, authenticatedUser
+let user
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-const contextUser = () => authenticatedUser
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser, config, fetch: fetchMock })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
-const config = {
+const defaultConfig = {
   CATEGORIES_ACTIVE: true,
   // MAPBOX_TOKEN: CONFIG.MAPBOX_TOKEN,
 }
+let config: Partial<Context['config']>
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ contextUser, config, fetch: fetchMock })
+  const apolloSetup = createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database
@@ -48,6 +50,7 @@ const categoryIds = ['cat9', 'cat4', 'cat15']
 let variables
 
 beforeEach(async () => {
+  config = { ...defaultConfig }
   variables = {}
   user = await Factory.build(
     'user',
@@ -1373,19 +1376,9 @@ describe('pin posts', () => {
     })
 
     describe('MAX_PINNED_POSTS is 0', () => {
-      beforeAll(() => {
-        const apolloSetup = createApolloTestSetup({
-          contextUser,
-          config: { ...config, MAX_PINNED_POSTS: 0 },
-          fetch: fetchMock,
-        })
-        mutate = apolloSetup.mutate
-        query = apolloSetup.query
-        database = apolloSetup.database
-        server = apolloSetup.server
-      })
-
       beforeEach(async () => {
+        config = { ...defaultConfig, MAX_PINNED_POSTS: 0 }
+
         await Factory.build(
           'post',
           {
@@ -1407,16 +1400,8 @@ describe('pin posts', () => {
     })
 
     describe('MAX_PINNED_POSTS is 1', () => {
-      beforeAll(() => {
-        const apolloSetup = createApolloTestSetup({
-          contextUser,
-          config: { ...config, MAX_PINNED_POSTS: 1 },
-          fetch: fetchMock,
-        })
-        mutate = apolloSetup.mutate
-        query = apolloSetup.query
-        database = apolloSetup.database
-        server = apolloSetup.server
+      beforeEach(() => {
+        config = { ...defaultConfig, MAX_PINNED_POSTS: 1 }
       })
 
       describe('are allowed to pin posts', () => {
@@ -1766,19 +1751,10 @@ describe('pin posts', () => {
 
     describe('MAX_PINNED_POSTS = 3', () => {
       const postsPinnedCountsQuery = `query { PostsPinnedCounts { maxPinnedPosts, currentlyPinnedPosts } }`
-      beforeAll(() => {
-        const apolloSetup = createApolloTestSetup({
-          contextUser,
-          config: { ...config, MAX_PINNED_POSTS: 3 },
-          fetch: fetchMock,
-        })
-        mutate = apolloSetup.mutate
-        query = apolloSetup.query
-        database = apolloSetup.database
-        server = apolloSetup.server
-      })
 
       beforeEach(async () => {
+        config = { ...defaultConfig, MAX_PINNED_POSTS: 3 }
+
         await Factory.build(
           'post',
           {

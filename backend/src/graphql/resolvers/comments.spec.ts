@@ -7,17 +7,18 @@ import gql from 'graphql-tag'
 import Factory, { cleanDatabase } from '@db/factories'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-let variables, authenticatedUser, commentAuthor, newlyCreatedComment
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-const contextUser = () => authenticatedUser
+let variables, commentAuthor, newlyCreatedComment
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser })
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ contextUser })
+  const apolloSetup = createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   database = apolloSetup.database
   server = apolloSetup.server
@@ -101,7 +102,7 @@ describe('CreateComment', () => {
   describe('authenticated', () => {
     beforeEach(async () => {
       const user = await database.neode.create('User', { name: 'Author' })
-      authenticatedUser = await user.toJson()
+      authenticatedUser = (await user.toJson()) as Context['user']
     })
 
     describe('given a post', () => {

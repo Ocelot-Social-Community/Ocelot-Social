@@ -9,6 +9,7 @@ import { signupVerificationMutation } from '@graphql/queries/signupVerificationM
 import { updateGroupMutation } from '@graphql/queries/updateGroupMutation'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
 let variables
 const categoryIds = ['cat9']
@@ -16,16 +17,15 @@ const categoryIds = ['cat9']
 const descriptionAdditional100 =
   ' 123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789'
 
-let authenticatedUser
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-const contextUser = () => authenticatedUser
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser })
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
 beforeAll(async () => {
   await cleanDatabase()
-  const testServer = createApolloTestSetup({ contextUser })
+  const testServer = createApolloTestSetup({ context })
   mutate = testServer.mutate
   database = testServer.database
   server = testServer.server

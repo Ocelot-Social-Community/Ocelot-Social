@@ -7,15 +7,13 @@ import { statistics } from '@graphql/queries/statistics'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-let authenticatedUser
-const contextUser = () => authenticatedUser
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 let query: ApolloTestSetup['query']
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ contextUser })
+  const apolloSetup = createApolloTestSetup()
   query = apolloSetup.query
   database = apolloSetup.database
   server = apolloSetup.server

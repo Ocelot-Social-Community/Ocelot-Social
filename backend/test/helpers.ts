@@ -2,8 +2,9 @@ import { createTestClient } from 'apollo-server-testing'
 
 import databaseContext from '@context/database'
 import type CONFIG from '@src/config'
-import type { Context } from '@src/server'
-import createServer, { getContext } from '@src/server'
+import type { Context } from '@src/context'
+import { getContext } from '@src/context'
+import createServer from '@src/server'
 
 export const TEST_CONFIG: typeof CONFIG = {
   NODE_ENV: 'test',
@@ -54,34 +55,39 @@ export const TEST_CONFIG: typeof CONFIG = {
 
   LANGUAGE_DEFAULT: 'en',
 }
-interface CreateTestServerOptions {
-  contextUser: Context['user']
+
+interface OverwritableContextParams {
+  authenticatedUser?: Context['user']
   config?: Partial<typeof CONFIG>
   pubsub?: Context['pubsub']
   fetch?: Context['fetch']
+}
+interface CreateTestServerOptions {
+  context: () => OverwritableContextParams | Promise<OverwritableContextParams>
 }
 
 const crash = () => {
   throw new Error('Mock me in your test!')
 }
 
-export const createApolloTestSetup = ({
-  contextUser,
-  config = {},
-  pubsub,
-  fetch = crash,
-}: CreateTestServerOptions) => {
+export const createApolloTestSetup = (opts?: CreateTestServerOptions) => {
+  const defaultOpts: CreateTestServerOptions = { context: () => ({ authenticatedUser: null }) }
+  const { context: testContext } = opts ?? defaultOpts
   const database = databaseContext()
+  const context = async (req) => {
+    const { authenticatedUser, config = {}, pubsub, fetch = crash } = await testContext()
+    return getContext({
+      givenUser: authenticatedUser ?? null,
+      database,
+      pubsub,
+      config: { ...TEST_CONFIG, ...config },
+      fetch,
+    })(req)
+  }
 
-  const context = getContext({
-    contextUser, // eslint-disable-line @typescript-eslint/no-unsafe-assignment
-    database,
-    pubsub,
-    config: { ...TEST_CONFIG, ...config },
-    fetch,
-  })
-
-  const server = createServer({ context }).server
+  const server = createServer({
+    context,
+  }).server
   const { mutate, query } = createTestClient(server)
   return {
     server,

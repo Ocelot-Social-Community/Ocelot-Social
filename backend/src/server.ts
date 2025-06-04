@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable import/no-named-as-default-member */
 import http from 'node:http'
@@ -13,71 +12,15 @@ import express from 'express'
 import { graphqlUploadExpress } from 'graphql-upload'
 import helmet from 'helmet'
 
-import databaseContext from '@context/database'
-import type { Fetch } from '@context/fetch'
-import { fetch as defaultFetch } from '@context/fetch'
-import pubsubContext from '@context/pubsub'
-
 import CONFIG from './config'
+import { context, getContext } from './context'
 import schema from './graphql/schema'
-import { decode } from './jwt/decode'
-// eslint-disable-next-line import/no-cycle
 import middleware from './middleware'
 
-const serverDatabase = databaseContext()
-const serverPubsub = pubsubContext()
+import type { ApolloServerExpressConfig } from 'apollo-server-express'
 
-export const getContext =
-  (
-    {
-      database = serverDatabase,
-      pubsub = serverPubsub,
-      contextUser,
-      config = CONFIG,
-      fetch = defaultFetch,
-    }: {
-      database?: ReturnType<typeof databaseContext>
-      pubsub?: ReturnType<typeof pubsubContext>
-      contextUser?: (any) => Promise<any>
-      config: typeof CONFIG
-      fetch: Fetch
-    } = {
-      database: serverDatabase,
-      pubsub: serverPubsub,
-      config: CONFIG,
-      fetch: defaultFetch,
-    },
-  ) =>
-  async (req) => {
-    const { driver } = database
-    const getUser = contextUser ?? decode({ driver, config })
-    const user = await getUser(req)
-    return {
-      database,
-      driver,
-      neode: database.neode,
-      pubsub,
-      user,
-      req,
-      cypherParams: {
-        currentUserId: user ? user.id : null,
-      },
-      config,
-      fetch,
-    }
-  }
-
-export const context = async (options) => {
-  const { connection, req } = options
-  if (connection) {
-    return connection.context
-  } else {
-    return getContext()(req)
-  }
-}
-
-const createServer = (options?) => {
-  const defaults = {
+const createServer = (options?: ApolloServerExpressConfig) => {
+  const defaults: ApolloServerExpressConfig = {
     context,
     schema: middleware(schema),
     subscriptions: {
@@ -87,8 +30,9 @@ const createServer = (options?) => {
     uploads: false,
     tracing: !!CONFIG.DEBUG,
     formatError: (error) => {
+      // console.log(error.originalError)
       if (error.message === 'ERROR_VALIDATION') {
-        return new Error(error.originalError.details.map((d) => d.message))
+        return new Error((error.originalError as any).details.map((d) => d.message))
       }
       return error
     },
@@ -116,4 +60,3 @@ const createServer = (options?) => {
 }
 
 export default createServer
-export type Context = Awaited<ReturnType<ReturnType<typeof getContext>>>

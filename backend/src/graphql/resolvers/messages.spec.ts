@@ -13,10 +13,10 @@ import { messageQuery } from '@graphql/queries/messageQuery'
 import { roomQuery } from '@graphql/queries/roomQuery'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-let authenticatedUser
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-const contextUser = () => authenticatedUser
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser, pubsub })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
@@ -28,7 +28,7 @@ const pubsubSpy = jest.spyOn(pubsub, 'publish')
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ contextUser, pubsub })
+  const apolloSetup = createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database

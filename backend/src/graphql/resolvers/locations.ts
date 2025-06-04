@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { UserInputError } from 'apollo-server'
 
-import type { Context } from '@src/server'
+import type { Context } from '@src/context'
 
 import Resolver from './helpers/Resolver'
 import { queryLocations } from './users/location'

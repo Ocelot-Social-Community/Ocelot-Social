@@ -13,6 +13,8 @@ import { setTrophyBadgeSelected } from '@graphql/queries/setTrophyBadgeSelected'
 import { fetchMock } from '@root/test/fetchMock'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
+import type { DecodedUser } from '@src/jwt/decode'
 // import CONFIG from '@src/config'
 // import { fetch as fetchMock } from '@src/context/fetch'
 
@@ -24,9 +26,8 @@ let variables
 
 const pubsub = pubsubContext()
 
-let authenticatedUser
-
-const contextUser = () => authenticatedUser
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser, pubsub, fetch: fetchMock })
 let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
@@ -102,7 +103,7 @@ const resetTrophyBadgesSelected = gql`
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ contextUser, pubsub, fetch: fetchMock })
+  const apolloSetup = createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database
@@ -682,7 +683,10 @@ describe('emailNotificationSettings', () => {
       it('returns the emailNotificationSettings', async () => {
         authenticatedUser = await user.toJson()
         await expect(
-          query({ query: emailNotificationSettingsQuery, variables: { id: authenticatedUser.id } }),
+          query({
+            query: emailNotificationSettingsQuery,
+            variables: { id: authenticatedUser?.id },
+          }),
         ).resolves.toEqual(
           expect.objectContaining({
             data: {
@@ -776,7 +780,7 @@ describe('emailNotificationSettings', () => {
 
     describe('as self', () => {
       it('updates the emailNotificationSettings', async () => {
-        authenticatedUser = await user.toJson()
+        authenticatedUser = (await user.toJson()) as DecodedUser
         await expect(
           mutate({
             mutation: emailNotificationSettingsMutation,
@@ -874,7 +878,7 @@ describe('save category settings', () => {
 
   describe('not authenticated', () => {
     beforeEach(async () => {
-      authenticatedUser = undefined
+      authenticatedUser = null
     })
 
     it('throws an error', async () => {
@@ -919,7 +923,7 @@ describe('save category settings', () => {
 
         it('returns the active categories when user is queried', async () => {
           await expect(
-            query({ query: userQuery, variables: { id: authenticatedUser.id } }),
+            query({ query: userQuery, variables: { id: authenticatedUser?.id } }),
           ).resolves.toEqual(
             expect.objectContaining({
               data: {
@@ -961,7 +965,7 @@ describe('save category settings', () => {
 
         it('returns the new active categories when user is queried', async () => {
           await expect(
-            query({ query: userQuery, variables: { id: authenticatedUser.id } }),
+            query({ query: userQuery, variables: { id: authenticatedUser?.id } }),
           ).resolves.toEqual(
             expect.objectContaining({
               data: {
@@ -998,7 +1002,7 @@ describe('updateOnlineStatus', () => {
 
   describe('not authenticated', () => {
     beforeEach(async () => {
-      authenticatedUser = undefined
+      authenticatedUser = null
     })
 
     it('throws an error', async () => {
@@ -1028,7 +1032,7 @@ describe('updateOnlineStatus', () => {
         )
 
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
-        const result = await database.neode.cypher(cypher, { id: authenticatedUser.id })
+        const result = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
         await expect(dbUser.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'online',
@@ -1054,7 +1058,7 @@ describe('updateOnlineStatus', () => {
         )
 
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
-        const result = await database.neode.cypher(cypher, { id: authenticatedUser.id })
+        const result = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
         await expect(dbUser.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
@@ -1070,7 +1074,7 @@ describe('updateOnlineStatus', () => {
         )
 
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
-        const result = await database.neode.cypher(cypher, { id: authenticatedUser.id })
+        const result = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser = database.neode.hydrateFirst<typeof User>(
           result,
           'u',
@@ -1089,7 +1093,7 @@ describe('updateOnlineStatus', () => {
           }),
         )
 
-        const result2 = await database.neode.cypher(cypher, { id: authenticatedUser.id })
+        const result2 = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser2 = database.neode.hydrateFirst(result2, 'u', database.neode.model('User'))
         await expect(dbUser2.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
@@ -1131,7 +1135,7 @@ describe('setTrophyBadgeSelected', () => {
 
   describe('not authenticated', () => {
     beforeEach(async () => {
-      authenticatedUser = undefined
+      authenticatedUser = null
     })
 
     it('throws an error', async () => {
@@ -1513,8 +1517,8 @@ describe('resetTrophyBadgesSelected', () => {
   })
 
   describe('not authenticated', () => {
-    beforeEach(async () => {
-      authenticatedUser = undefined
+    beforeEach(() => {
+      authenticatedUser = null
     })
 
     it('throws an error', async () => {

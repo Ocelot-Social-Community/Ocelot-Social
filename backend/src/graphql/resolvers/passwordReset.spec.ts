@@ -10,9 +10,6 @@ import { createApolloTestSetup } from '@root/test/helpers'
 
 import createPasswordReset from './helpers/createPasswordReset'
 
-let authenticatedUser
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-const contextUser = () => authenticatedUser
 let variables
 
 let mutate: ApolloTestSetup['mutate']
@@ -32,9 +29,7 @@ const getAllPasswordResets = async () => {
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({
-    contextUser,
-  })
+  const apolloSetup = createApolloTestSetup()
   mutate = apolloSetup.mutate
   database = apolloSetup.database
   server = apolloSetup.server
