@@ -4,6 +4,7 @@ defineStep('I click on {string}', element => {
   const elementSelectors = {
     'submit button': 'button[name=submit]',
     'create post button': '.post-add-button',
+    'create group button': '.group-add-button',
     'save button': 'button[type=submit]',
     'the first post': '.post-teaser:first-child',
     'comment button': 'button[type=submit]',
