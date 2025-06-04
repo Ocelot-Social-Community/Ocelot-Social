@@ -18,3 +18,4 @@ export interface PostDbProperties {
 }
 
 export type Post = Node<Integer, PostDbProperties>
+export type Article = Node<Integer, PostDbProperties>
