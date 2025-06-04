@@ -15,7 +15,11 @@
           :placeholder="$t('settings.data.namePlaceholder')"
         />
         <ds-input id="slug" model="slug" icon="at" :label="$t('settings.data.labelSlug')" />
-        <location-select v-model="formData.locationName" />
+        <location-select
+          class="location-selet"
+          v-model="formData.locationName"
+          :canBeCleared="!$env.REQUIRE_LOCATION"
+        />
         <!-- eslint-enable vue/use-v-on-exact -->
         <ds-input
           id="about"
@@ -76,6 +80,7 @@ export default {
         translate: this.$t,
       })
       return {
+        locationName: { required: this.$env.REQUIRE_LOCATION },
         name: { required: true, min: 3 },
         ...uniqueSlugForm.formSchema,
       }
@@ -121,5 +126,9 @@ export default {
 <style lang="scss">
 .location-hint {
   margin-top: -$space-x-small - $space-xxx-small - $space-xxx-small;
+}
+
+.location-selet {
+  margin-bottom: $space-small;
 }
 </style>
