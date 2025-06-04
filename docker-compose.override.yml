@@ -28,6 +28,7 @@ services:
     depends_on:
       - minio
       - minio-mc
+      - imagor
     build:
       target: development
     environment:
