@@ -131,7 +131,9 @@
             <ds-space margin="x-small" />
           </ds-space>
           <!-- group categories -->
-          <template v-if="categoriesActive && group && group.categories.length > 0">
+          <template
+            v-if="categoriesActive && group && group.categories && group.categories.length > 0"
+          >
             <hr />
             <ds-space margin-top="small" margin-bottom="small">
               <ds-text class="centered-text hyphenate-text" color="soft" size="small">
@@ -267,6 +269,8 @@
                 @removePostFromList="posts = removePostFromList(post, posts)"
                 @pinPost="pinPost(post, refetchPostList)"
                 @unpinPost="unpinPost(post, refetchPostList)"
+                @pushPost="pushPost(post, refetchPostList)"
+                @unpushPost="unpushPost(post, refetchPostList)"
                 @toggleObservePost="
                   (postId, value) => toggleObservePost(postId, value, refetchPostList)
                 "
@@ -493,7 +497,7 @@ export default {
           offset: this.offset,
           filter: this.filter,
           first: this.pageSize,
-          orderBy: 'createdAt_desc',
+          orderBy: 'sortDate_desc',
         },
         updateQuery: UpdateQuery(this, { $state, pageKey: 'profilePagePosts' }),
       })
@@ -602,7 +606,7 @@ export default {
           filter: this.filter,
           first: this.pageSize,
           offset: 0,
-          orderBy: 'createdAt_desc',
+          orderBy: 'sortDate_desc',
         }
       },
       update({ profilePagePosts }) {

@@ -13,7 +13,7 @@ describe('FilterMenu.vue', () => {
   const getters = {
     'posts/isActive': () => false,
     'posts/filteredPostTypes': () => [],
-    'posts/orderBy': () => 'createdAt_desc',
+    'posts/orderBy': () => 'sortDate_desc',
     'categories/categoriesActive': () => false,
   }
   const actions = {

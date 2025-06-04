@@ -73,6 +73,7 @@ export const postFragment = gql`
     contentExcerpt
     createdAt
     updatedAt
+    sortDate
     disabled
     deleted
     slug

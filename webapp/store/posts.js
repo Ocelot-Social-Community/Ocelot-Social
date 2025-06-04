@@ -12,7 +12,7 @@ export const state = () => {
     filter: {
       ...defaultFilter,
     },
-    order: 'createdAt_desc',
+    order: 'sortDate_desc',
   }
 }
 
@@ -89,7 +89,7 @@ export const mutations = {
     const filter = clone(state.filter)
     delete filter.eventStart_gte
     delete filter.postType_in
-    state.order = 'createdAt_desc'
+    state.order = 'sortDate_desc'
     state.filter = filter
   },
   TOGGLE_POST_TYPE(state, postType) {
@@ -101,12 +101,12 @@ export const mutations = {
         state.order = 'eventStart_asc'
       } else {
         delete filter.eventStart_gte
-        state.order = 'createdAt_desc'
+        state.order = 'sortDate_desc'
       }
     } else {
       delete filter.eventStart_gte
       delete filter.postType_in
-      state.order = 'createdAt_desc'
+      state.order = 'sortDate_desc'
     }
     state.filter = filter
   },

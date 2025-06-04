@@ -856,10 +856,14 @@
       "observedSuccessfully": "You are now observing this post!",
       "pin": "Pin post",
       "pinnedSuccessfully": "Post pinned successfully!",
+      "push": "Push to top",
+      "pushedSuccessfully": "Post pushed to top successfully!",
       "unobserve": "Stop to observe post",
       "unobservedSuccessfully": "You are no longer observing this post!",
       "unpin": "Unpin post",
-      "unpinnedSuccessfully": "Post unpinned successfully!"
+      "unpinnedSuccessfully": "Post unpinned successfully!",
+      "unpush": "Cancel push",
+      "unpushedSuccessfully": "Post push has been canceled!"
     },
     "name": "Article",
     "pinned": "Announcement",

@@ -856,10 +856,14 @@
       "observedSuccessfully": null,
       "pin": "Fixar publicação",
       "pinnedSuccessfully": "Publicação fixada com sucesso!",
+      "push": null,
+      "pushedSuccessfully": null,
       "unobserve": "Deixar de observar publicação",
       "unobservedSuccessfully": null,
       "unpin": "Desafixar publicação",
-      "unpinnedSuccessfully": "Publicação desafixada com sucesso!"
+      "unpinnedSuccessfully": "Publicação desafixada com sucesso!",
+      "unpush": null,
+      "unpushedSuccessfully": null
     },
     "name": "Postar",
     "pinned": "Anúncio",

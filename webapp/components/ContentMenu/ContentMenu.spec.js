@@ -99,6 +99,82 @@ describe('ContentMenu.vue', () => {
     })
 
     describe('admin can', () => {
+      it('push post', async () => {
+        getters['auth/isAdmin'] = () => true
+        const wrapper = await openContentMenu({
+          isOwner: false,
+          resourceType: 'contribution',
+          resource: {
+            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+            sortDate: 'some-date',
+            createdAt: 'some-date',
+          },
+        })
+        expect(
+          wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.push'),
+        ).toHaveLength(1)
+        wrapper
+          .findAll('.ds-menu-item')
+          .filter((item) => item.text() === 'post.menu.push')
+          .at(0)
+          .trigger('click')
+        expect(wrapper.emitted('pushPost')).toEqual([
+          [
+            {
+              id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+              sortDate: 'some-date',
+              createdAt: 'some-date',
+            },
+          ],
+        ])
+      })
+
+      it('not unpush post which was not pushed', async () => {
+        getters['auth/isAdmin'] = () => true
+        const wrapper = await openContentMenu({
+          isOwner: false,
+          resourceType: 'contribution',
+          resource: {
+            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+            sortDate: 'some-date',
+            createdAt: 'some-date',
+          },
+        })
+        expect(
+          wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.unpush'),
+        ).toHaveLength(0)
+      })
+
+      it('unpush post which was pushed', async () => {
+        getters['auth/isAdmin'] = () => true
+        const wrapper = await openContentMenu({
+          isOwner: false,
+          resourceType: 'contribution',
+          resource: {
+            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+            sortDate: 'some-date',
+            createdAt: 'some-other-date',
+          },
+        })
+        expect(
+          wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.unpush'),
+        ).toHaveLength(1)
+        wrapper
+          .findAll('.ds-menu-item')
+          .filter((item) => item.text() === 'post.menu.unpush')
+          .at(0)
+          .trigger('click')
+        expect(wrapper.emitted('unpushPost')).toEqual([
+          [
+            {
+              id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+              sortDate: 'some-date',
+              createdAt: 'some-other-date',
+            },
+          ],
+        ])
+      })
+
       describe('when maxPinnedPosts = 0', () => {
         beforeEach(() => {
           maxPinnedPostsMock.mockReturnValue(0)
