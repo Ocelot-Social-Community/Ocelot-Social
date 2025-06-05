@@ -13,7 +13,6 @@
       model="inviteCode"
       name="inviteCode"
       id="inviteCode"
-      icon="question-circle"
     />
     <ds-text v-if="!validInput">
       {{ $t('components.registration.invite-code.form.description') }}

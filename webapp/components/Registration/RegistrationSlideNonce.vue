@@ -13,7 +13,6 @@
       model="nonce"
       name="nonce"
       id="nonce"
-      icon="question-circle"
     />
     <ds-text>
       {{ $t('components.registration.email-nonce.form.description') }}
