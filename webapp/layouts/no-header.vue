@@ -1,11 +1,13 @@
 <template>
   <div class="layout-blank">
-    <ds-container>
-      <div>
-        <nuxt />
-      </div>
-    </ds-container>
-    <page-footer />
+    <div class="layout-content">
+      <ds-container>
+        <div>
+          <nuxt />
+        </div>
+      </ds-container>
+    </div>
+    <page-footer :is-sticky="false" />
     <div id="overlay" />
   </div>
 </template>
@@ -28,11 +30,22 @@ export default {
 </script>
 
 <style lang="scss">
-.layout-blank > .ds-container > div {
+.layout-blank {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.layout-content {
+  flex: 1;
+}
+
+.layout-blank > .layout-content > .ds-container > div {
   padding: 5rem 2rem;
 }
+
 @media only screen and (max-width: 500px) {
-  .layout-blank > .ds-container > div {
+  .layout-blank > .layout-content > .ds-container > div {
     padding: 3rem 0;
   }
 }
