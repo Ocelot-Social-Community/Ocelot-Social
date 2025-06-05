@@ -1,7 +1,7 @@
 <template>
   <div class="layout-blank">
     <ds-container>
-      <div style="padding: 5rem 2rem">
+      <div>
         <nuxt />
       </div>
     </ds-container>
@@ -26,3 +26,14 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.layout-blank > .ds-container > div {
+  padding: 5rem 2rem;
+}
+@media only screen and (max-width: 500px) {
+  .layout-blank > .ds-container > div {
+    padding: 3rem 0;
+  }
+}
+</style>
