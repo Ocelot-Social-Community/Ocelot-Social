@@ -46,7 +46,7 @@
         <!-- group categories -->
         <div
           class="categories"
-          v-if="categoriesActive && group && group.categories && group.categories.length > 0"
+          v-if="categoriesActive && group.categories && group.categories.length > 0"
         >
           <category
             v-for="category in group.categories"
