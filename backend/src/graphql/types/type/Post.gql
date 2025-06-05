@@ -173,7 +173,7 @@ type Post {
     @cypher(
       statement: "MATCH (this)<-[:VIEWED_TEASER]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1"
     )
-  
+
   emotions: [EMOTED]
   emotionsCount: Int!
     @cypher(statement: "MATCH (this)<-[emoted:EMOTED]-(:User) RETURN COUNT(DISTINCT emoted)")
@@ -195,7 +195,7 @@ type Post {
       statement: "MATCH (this)<-[obs:OBSERVES]-(u:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(u) >= 1"
   )
   observingUsersCount: Int!
-    @cypher(statement: "MATCH (this)<-[obs:OBSERVES]-(u:User) WHERE obs.active = true AND NOT u.deleted = true AND NOT u.disabled = true RETURN COUNT(DISTINCT u)")  
+    @cypher(statement: "MATCH (this)<-[obs:OBSERVES]-(u:User) WHERE obs.active = true AND NOT u.deleted = true AND NOT u.disabled = true RETURN COUNT(DISTINCT u)")
 }
 
 input _PostInput {
@@ -216,6 +216,7 @@ type Mutation {
     title: String!
     slug: String
     content: String!
+    filesToUpload: [FileInput]
     image: ImageInput,
     visibility: Visibility
     language: String
