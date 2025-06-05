@@ -44,7 +44,10 @@
           </ds-chip>
         </div>
         <!-- group categories -->
-        <div class="categories" v-if="categoriesActive && group.categories.length > 0">
+        <div
+          class="categories"
+          v-if="categoriesActive && group && group.categories && group.categories.length > 0"
+        >
           <category
             v-for="category in group.categories"
             :key="category.id"
