@@ -2,8 +2,8 @@ import gql from 'graphql-tag'
 
 export const createMessageMutation = () => {
   return gql`
-    mutation ($roomId: ID!, $content: String!) {
-      CreateMessage(roomId: $roomId, content: $content) {
+    mutation ($roomId: ID!, $content: String, $files: [FileInput]) {
+      CreateMessage(roomId: $roomId, content: $content, files: $files) {
         #_id
         id
         indexId
@@ -21,6 +21,14 @@ export const createMessageMutation = () => {
         saved
         distributed
         seen
+        files {
+          url
+          name
+          size
+          type
+          url
+          preview
+        }
       }
     }
   `
@@ -47,6 +55,15 @@ export const messageQuery = () => {
         saved
         distributed
         seen
+        files {
+          name
+          size
+          type
+          audio
+          duration
+          url
+          preview
+        }
       }
     }
   `
@@ -73,6 +90,15 @@ export const chatMessageAdded = () => {
         saved
         distributed
         seen
+        files {
+          name
+          size
+          type
+          audio
+          duration
+          url
+          preview
+        }
       }
     }
   `
