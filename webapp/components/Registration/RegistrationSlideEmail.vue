@@ -15,7 +15,6 @@
       id="email"
       model="email"
       name="email"
-      icon="envelope"
     />
     <slot></slot>
     <ds-text v-if="sliderData.collectedInputData.emailSend">

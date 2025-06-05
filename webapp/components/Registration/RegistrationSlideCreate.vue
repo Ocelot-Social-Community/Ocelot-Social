@@ -40,14 +40,12 @@
           <ds-input
             id="givenName"
             model="givenName"
-            icon="user"
             :label="$t('settings.data.givenName')"
             :placeholder="$t('settings.data.givenNamePlaceholder')"
           />
           <ds-input
             id="surName"
             model="surName"
-            icon="user"
             :label="$t('settings.data.surName')"
             :placeholder="$t('settings.data.surNamePlaceholder')"
           />
@@ -56,7 +54,6 @@
           v-else
           id="name"
           model="name"
-          icon="user"
           :label="$t('settings.data.labelName')"
           :placeholder="$t('settings.data.namePlaceholder')"
         />
