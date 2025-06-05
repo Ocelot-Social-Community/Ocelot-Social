@@ -7,7 +7,9 @@
     @input-valid="handleInputValid"
   >
     <ds-input
-      :placeholder="$t('components.registration.invite-code.form.invite-code')"
+      :placeholder="formSchema.inviteCode.placeholder"
+      :minlength="formSchema.inviteCode.minLength"
+      :maxlength="formSchema.inviteCode.maxLength"
       model="inviteCode"
       name="inviteCode"
       id="inviteCode"
@@ -43,7 +45,7 @@
 </template>
 
 <script>
-import registrationConstants from '~/constants/registration'
+import registrationConstants from '~/constants/registrationBranded.js'
 import { validateInviteCode } from '~/graphql/InviteCode'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 
