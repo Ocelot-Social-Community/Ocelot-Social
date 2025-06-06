@@ -9,13 +9,7 @@
     <ds-text>
       {{ $t('components.registration.signup.form.description') }}
     </ds-text>
-    <ds-input
-      :placeholder="$t('login.email')"
-      type="email"
-      id="email"
-      model="email"
-      name="email"
-    />
+    <ds-input :placeholder="$t('login.email')" type="email" id="email" model="email" name="email" />
     <slot></slot>
     <ds-text v-if="sliderData.collectedInputData.emailSend">
       <input id="checkbox" type="checkbox" v-model="sendEmailAgain" :checked="sendEmailAgain" />

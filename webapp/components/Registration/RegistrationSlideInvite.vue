@@ -143,11 +143,16 @@ export default {
           const validationResult = response.data.validateInviteCode
 
           if (validationResult && validationResult.isValid) {
-            this.$toast.success(
-              this.$t('components.registration.invite-code.form.validations.success', {
-                inviteCode,
-              }),
-            )
+            // Auto-advance to next slide
+            const currentIndex = this.sliderData.sliderIndex
+            const nextIndex = currentIndex + 1
+
+            if (
+              this.sliderData.sliderSelectorCallback &&
+              nextIndex < this.sliderData.sliders.length
+            ) {
+              this.sliderData.sliderSelectorCallback(nextIndex)
+            }
             return true
           } else {
             this.$toast.error(
