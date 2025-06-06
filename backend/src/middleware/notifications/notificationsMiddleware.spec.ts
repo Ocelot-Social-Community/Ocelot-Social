@@ -4,11 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import databaseContext from '@context/database'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
@@ -18,7 +15,10 @@ import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
-import createServer, { getContext } from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
+import type { DecodedUser } from '@src/jwt/decode'
 
 const sendChatMessageMailMock: (notification) => void = jest.fn()
 const sendNotificationMailMock: (notification) => void = jest.fn()
@@ -32,11 +32,17 @@ jest.mock('../helpers/isUserOnline', () => ({
   isUserOnline: () => isUserOnlineMock(),
 }))
 
-const database = databaseContext()
 const pubsub = pubsubContext()
 const pubsubSpy = jest.spyOn(pubsub, 'publish')
 
-let query, mutate, notifiedUser, authenticatedUser
+let notifiedUser
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser, pubsub })
+let mutate: ApolloTestSetup['mutate']
+
+let query: any // eslint-disable-line @typescript-eslint/no-explicit-any
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 const categoryIds = ['cat9']
 const createPostMutation = gql`
@@ -65,19 +71,13 @@ const createCommentMutation = gql`
   }
 `
 
-let server: ApolloServer
-
 beforeAll(async () => {
   await cleanDatabase()
-
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database, pubsub })
-
-  server = createServer({ context }).server
-
-  const createTestClientResult = createTestClient(server)
-  query = createTestClientResult.query
-  mutate = createTestClientResult.mutate
+  const apolloSetup = createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
@@ -910,7 +910,7 @@ describe('notifications', () => {
           userId: 'chatReceiver',
         },
       })
-      roomId = room.data.CreateRoom.id
+      roomId = (room.data as any).CreateRoom.id // eslint-disable-line @typescript-eslint/no-explicit-any
     })
 
     describe('if the chatReceiver is online', () => {
@@ -1106,7 +1106,7 @@ describe('notifications', () => {
 
     describe('user joins group', () => {
       const joinGroupAction = async () => {
-        authenticatedUser = await notifiedUser.toJson()
+        authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
         await mutate({
           mutation: joinGroupMutation(),
           variables: {
@@ -1193,7 +1193,7 @@ describe('notifications', () => {
 
     describe('user joins and leaves group', () => {
       const leaveGroupAction = async () => {
-        authenticatedUser = await notifiedUser.toJson()
+        authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
         await mutate({
           mutation: leaveGroupMutation(),
           variables: {
@@ -1206,7 +1206,7 @@ describe('notifications', () => {
 
       beforeEach(async () => {
         jest.clearAllMocks()
-        authenticatedUser = await notifiedUser.toJson()
+        authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
         await mutate({
           mutation: joinGroupMutation(),
           variables: {
@@ -1318,7 +1318,7 @@ describe('notifications', () => {
 
     describe('user role in group changes', () => {
       const changeGroupMemberRoleAction = async () => {
-        authenticatedUser = await groupOwner.toJson()
+        authenticatedUser = (await groupOwner.toJson()) as DecodedUser
         await mutate({
           mutation: changeGroupMemberRoleMutation(),
           variables: {
@@ -1331,7 +1331,7 @@ describe('notifications', () => {
       }
 
       beforeEach(async () => {
-        authenticatedUser = await notifiedUser.toJson()
+        authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
         await mutate({
           mutation: joinGroupMutation(),
           variables: {
@@ -1427,7 +1427,7 @@ describe('notifications', () => {
       }
 
       beforeEach(async () => {
-        authenticatedUser = await notifiedUser.toJson()
+        authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
         await mutate({
           mutation: joinGroupMutation(),
           variables: {

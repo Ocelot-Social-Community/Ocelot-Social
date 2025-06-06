@@ -2,29 +2,26 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import createServer, { getContext } from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-const database = databaseContext()
+let variables, commentAuthor, newlyCreatedComment
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser })
+let mutate: ApolloTestSetup['mutate']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
-let variables, mutate, authenticatedUser, commentAuthor, newlyCreatedComment
-
-let server: ApolloServer
 beforeAll(async () => {
   await cleanDatabase()
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database })
-
-  server = createServer({ context }).server
-
-  mutate = createTestClient(server).mutate
+  const apolloSetup = createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
@@ -98,14 +95,14 @@ describe('CreateComment', () => {
         content: "I'm not authorized to comment",
       }
       const { errors } = await mutate({ mutation: createCommentMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+      expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
   describe('authenticated', () => {
     beforeEach(async () => {
       const user = await database.neode.create('User', { name: 'Author' })
-      authenticatedUser = await user.toJson()
+      authenticatedUser = (await user.toJson()) as Context['user']
     })
 
     describe('given a post', () => {
@@ -157,7 +154,7 @@ describe('UpdateComment', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const { errors } = await mutate({ mutation: updateCommentMutation, variables })
-        expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+        expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -169,7 +166,7 @@ describe('UpdateComment', () => {
 
       it('throws authorization error', async () => {
         const { errors } = await mutate({ mutation: updateCommentMutation, variables })
-        expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+        expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -208,7 +205,7 @@ describe('UpdateComment', () => {
         newlyCreatedComment = await newlyCreatedComment.toJson()
         const {
           data: { UpdateComment },
-        } = await mutate({ mutation: updateCommentMutation, variables })
+        } = (await mutate({ mutation: updateCommentMutation, variables })) as any // eslint-disable-line @typescript-eslint/no-explicit-any
         expect(newlyCreatedComment.updatedAt).toBeTruthy()
         expect(Date.parse(newlyCreatedComment.updatedAt)).toEqual(expect.any(Number))
         expect(UpdateComment.updatedAt).toBeTruthy()
@@ -224,7 +221,7 @@ describe('UpdateComment', () => {
         it('returns null', async () => {
           const { data, errors } = await mutate({ mutation: updateCommentMutation, variables })
           expect(data).toMatchObject({ UpdateComment: null })
-          expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+          expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
     })
@@ -249,7 +246,7 @@ describe('DeleteComment', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const result = await mutate({ mutation: deleteCommentMutation, variables })
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
+        expect(result.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -261,7 +258,7 @@ describe('DeleteComment', () => {
 
       it('throws authorization error', async () => {
         const { errors } = await mutate({ mutation: deleteCommentMutation, variables })
-        expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+        expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 

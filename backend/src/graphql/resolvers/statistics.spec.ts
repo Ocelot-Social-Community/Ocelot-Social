@@ -2,30 +2,21 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
-
-import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { statistics } from '@graphql/queries/statistics'
-import createServer, { getContext } from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
 
-const database = databaseContext()
-
-let server: ApolloServer
-let query, authenticatedUser
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+let query: ApolloTestSetup['query']
 
 beforeAll(async () => {
   await cleanDatabase()
-
-  // eslint-disable-next-line @typescript-eslint/require-await
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database })
-
-  server = createServer({ context }).server
-
-  const createTestClientResult = createTestClient(server)
-  query = createTestClientResult.query
+  const apolloSetup = createApolloTestSetup()
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
