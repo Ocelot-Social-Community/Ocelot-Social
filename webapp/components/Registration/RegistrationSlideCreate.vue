@@ -100,7 +100,6 @@
         <!-- location -->
         <location-select
           v-if="locationRequired"
-          class="location-select"
           v-model="locationName"
           :canBeCleared="false"
           :showPreviousLocation="false"
@@ -423,10 +422,6 @@ export default {
 
 .full-name {
   padding-bottom: $space-small;
-}
-
-.location-select {
-  padding-bottom: $space-base;
 }
 
 .checkbox-group {
