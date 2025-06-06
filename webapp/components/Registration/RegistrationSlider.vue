@@ -1,8 +1,8 @@
 <template>
   <section class="registration-slider">
-    <ds-space v-if="registrationType !== 'no-public-registration'" margin-bottom="x-small" left>
+    <div v-if="registrationType !== 'no-public-registration'" class="back-link" left>
       <nuxt-link :to="loginLink">{{ $t('site.back-to-login') }}</nuxt-link>
-    </ds-space>
+    </div>
     <base-card>
       <template #imageColumn>
         <page-params-link :pageParams="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)">
@@ -262,5 +262,8 @@ export default {
   width: 80vw;
   max-width: 620px;
   margin: auto;
+}
+.back-link {
+  height: 35px;
 }
 </style>
