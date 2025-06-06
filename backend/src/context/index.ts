@@ -1,7 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 
 import databaseContext from '@context/database'
 import type { Fetch } from '@context/fetch'
@@ -24,7 +21,7 @@ export const getContext =
     config: typeof CONFIG
     fetch: Fetch
   }) =>
-  async (req) => {
+  async (req: { headers: { authorization?: string } }) => {
     const {
       givenUser = undefined,
       database = serverDatabase,
@@ -33,7 +30,10 @@ export const getContext =
       fetch = defaultFetch,
     } = opts ?? {}
     const { driver } = database
-    const user = givenUser === null ? null : (givenUser ?? (await decode({ driver, config })(req)))
+    const user =
+      givenUser === null
+        ? null
+        : (givenUser ?? (await decode({ driver, config })(req.headers.authorization)))
     const result = {
       database,
       driver,

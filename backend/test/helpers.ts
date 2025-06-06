@@ -74,7 +74,7 @@ export const createApolloTestSetup = (opts?: CreateTestServerOptions) => {
   const defaultOpts: CreateTestServerOptions = { context: () => ({ authenticatedUser: null }) }
   const { context: testContext } = opts ?? defaultOpts
   const database = databaseContext()
-  const context = async (req) => {
+  const context = async (req: { headers: { authorization?: string } }) => {
     const { authenticatedUser, config = {}, pubsub, fetch = crash } = await testContext()
     return getContext({
       givenUser: authenticatedUser ?? null,

@@ -24,7 +24,8 @@ const createServer = (options?: ApolloServerExpressConfig) => {
     context,
     schema: middleware(schema),
     subscriptions: {
-      onConnect: (connectionParams) => getContext()(connectionParams),
+      onConnect: (connectionParams) =>
+        getContext()(connectionParams as { headers: { authorization?: string } }),
     },
     debug: !!CONFIG.DEBUG,
     uploads: false,
