@@ -1,5 +1,5 @@
 <template>
-  <div id="footer" class="ds-footer">
+  <div id="footer" class="ds-footer" :class="{ 'is-sticky': isSticky }">
     <!-- links to internal or external pages -->
     <span v-for="pageParams in links.FOOTER_LINK_LIST" :key="pageParams.name">
       <page-params-link :pageParams="pageParams">
@@ -26,6 +26,12 @@ export default {
   components: {
     PageParamsLink,
   },
+  props: {
+    isSticky: {
+      type: Boolean,
+      default: true,
+    },
+  },
   data() {
     return { links, version: `v${this.$env.VERSION}` }
   },
@@ -35,13 +41,16 @@ export default {
 <style lang="scss" scoped>
 .ds-footer {
   text-align: center;
-  position: fixed;
-  bottom: 0px;
   z-index: 10;
   background-color: $color-footer-background;
   width: 100%;
   padding: 10px 10px;
   box-shadow: 0px -6px 12px -4px rgba(0, 0, 0, 0.1);
+
+  &.is-sticky {
+    position: fixed;
+    bottom: 0px;
+  }
 }
 .ds-footer a {
   color: $color-footer-link;

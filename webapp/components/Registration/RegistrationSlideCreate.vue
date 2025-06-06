@@ -35,19 +35,19 @@
       <!-- leave this here in case the scoped variable is needed in the future nobody would remember this -->
       <!-- <template v-slot="{ errors }"> -->
       <template>
+        <email-display-and-verify :email="sliderData.collectedInputData.email" />
+
         <div v-if="askForRealName" class="full-name">
           <!-- <p>{{ $t('settings.data.realNamePlease') }}</p>-->
           <ds-input
             id="givenName"
             model="givenName"
-            icon="user"
             :label="$t('settings.data.givenName')"
             :placeholder="$t('settings.data.givenNamePlaceholder')"
           />
           <ds-input
             id="surName"
             model="surName"
-            icon="user"
             :label="$t('settings.data.surName')"
             :placeholder="$t('settings.data.surNamePlaceholder')"
           />
@@ -56,90 +56,99 @@
           v-else
           id="name"
           model="name"
-          icon="user"
           :label="$t('settings.data.labelName')"
           :placeholder="$t('settings.data.namePlaceholder')"
         />
-        <label for="password">
-          {{ $t('settings.security.change-password.label-new-password') }}
-        </label>
         <div class="password-wrapper">
           <ds-input
             id="password"
             model="password"
             :type="showPassword ? 'text' : 'password'"
+            :label="$t('settings.security.change-password.label-new-password')"
             autocomplete="off"
             class="password-field"
             ref="password"
           />
           <show-password
+            class="show-password-toggle with-label"
             @show-password="toggleShowPassword('password')"
             :iconName="iconNamePassword"
           />
         </div>
-        <label for="passwordConfirmation">
-          {{ $t('settings.security.change-password.label-new-password-confirm') }}
-        </label>
         <div class="password-wrapper">
           <ds-input
             id="passwordConfirmation"
             model="passwordConfirmation"
             :type="showPasswordConfirm ? 'text' : 'password'"
+            :label="$t('settings.security.change-password.label-new-password-confirm')"
             autocomplete="off"
             class="password-field"
             ref="confirmPassword"
           />
           <show-password
+            class="show-password-toggle with-label"
             @show-password="toggleShowPassword('confirmPassword')"
             :iconName="iconNamePasswordConfirm"
           />
         </div>
-        <password-strength class="password-strength" :password="formData.password" />
+        <password-strength
+          class="password-strength"
+          :password="formData.password"
+          style="margin: 30px 0 20px 0"
+        />
 
         <!-- location -->
         <location-select
           v-if="locationRequired"
-          class="location-select"
           v-model="locationName"
           :canBeCleared="false"
           :showPreviousLocation="false"
         />
 
-        <email-display-and-verify :email="sliderData.collectedInputData.email" />
-        <ds-text>
-          <input
-            id="checkbox0"
-            type="checkbox"
-            v-model="termsAndConditionsConfirmed"
-            :checked="termsAndConditionsConfirmed"
-          />
-          <label for="checkbox0">
-            {{ $t('components.registration.create-user-account.termsAndCondsEtcConfirmed') }}
-            <br />
-            <page-params-link :pageParams="links.TERMS_AND_CONDITIONS" forceTargetBlank>
-              {{ $t('site.termsAndConditions') }}
-            </page-params-link>
-            <br />
-            <page-params-link :pageParams="links.DATA_PRIVACY" forceTargetBlank>
-              {{ $t('site.data-privacy') }}
-            </page-params-link>
-          </label>
-        </ds-text>
-        <ds-text>
-          <input
-            id="checkbox1"
-            type="checkbox"
-            v-model="receiveCommunicationAsEmailsEtcConfirmed"
-            :checked="receiveCommunicationAsEmailsEtcConfirmed"
-          />
-          <label for="checkbox1">
-            {{
-              $t(
-                'components.registration.create-user-account.receiveCommunicationAsEmailsEtcConfirmed',
-              )
-            }}
-          </label>
-        </ds-text>
+        <div class="checkbox-group">
+          <div class="checkbox-item">
+            <input
+              id="checkbox0"
+              type="checkbox"
+              v-model="termsAndConditionsConfirmed"
+              :checked="termsAndConditionsConfirmed"
+              class="checkbox-input"
+            />
+            <label for="checkbox0" class="checkbox-label">
+              <span class="checkbox-text">
+                {{ $t('components.registration.create-user-account.termsAndCondsEtcConfirmed') }}
+              </span>
+              <div class="checkbox-links">
+                <page-params-link :pageParams="links.TERMS_AND_CONDITIONS" forceTargetBlank>
+                  {{ $t('site.termsAndConditions') }}
+                </page-params-link>
+                <span class="separator">•</span>
+                <page-params-link :pageParams="links.DATA_PRIVACY" forceTargetBlank>
+                  {{ $t('site.data-privacy') }}
+                </page-params-link>
+              </div>
+            </label>
+          </div>
+
+          <div class="checkbox-item">
+            <input
+              id="checkbox1"
+              type="checkbox"
+              v-model="receiveCommunicationAsEmailsEtcConfirmed"
+              :checked="receiveCommunicationAsEmailsEtcConfirmed"
+              class="checkbox-input"
+            />
+            <label for="checkbox1" class="checkbox-label">
+              <span class="checkbox-text">
+                {{
+                  $t(
+                    'components.registration.create-user-account.receiveCommunicationAsEmailsEtcConfirmed',
+                  )
+                }}
+              </span>
+            </label>
+          </div>
+        </div>
       </template>
       <ds-space margin="xxx-small" />
     </ds-form>
@@ -395,39 +404,19 @@ export default {
   display: flex;
   width: 100%;
   align-items: center;
-  padding: $input-padding-vertical $space-x-small;
-  padding-left: 0;
-  padding-right: 0;
+  padding: 0;
   height: $input-height;
-  margin-bottom: 10px;
-  margin-bottom: $space-small;
-
-  color: $text-color-base;
-  background: $background-color-disabled;
-
-  border: $input-border-size solid $border-color-softer;
-  border-left: none;
-  border-radius: $border-radius-base;
-  outline: none;
-  transition: all $duration-short $ease-out;
-
-  &:focus-within {
-    background-color: $background-color-base;
-    border: $input-border-size solid $border-color-active;
-
-    .toggle-icon {
-      color: $text-color-base;
-    }
-  }
+  margin-top: 40px;
+  margin-bottom: 16px;
 
   .password-field {
-    position: relative;
-    padding-top: $space-small;
-    border: none;
-    border-style: none;
-    appearance: none;
-    margin-left: 0;
     width: 100%;
+    padding: 0;
+  }
+
+  ::v-deep .ds-input-wrap {
+    bottom: 4px;
+    left: -1px;
   }
 }
 
@@ -435,7 +424,60 @@ export default {
   padding-bottom: $space-small;
 }
 
-.location-select {
-  padding-bottom: $space-base;
+.checkbox-group {
+  margin: 20px 0;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  padding: 16px;
+  background-color: #f8f9fa; // Light gray background
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #f0f2f5; // Slightly darker on hover
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.checkbox-input {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-right: 12px;
+  margin-top: 2px; // Align with first line of text
+  cursor: pointer;
+}
+
+.checkbox-label {
+  flex: 1;
+  cursor: pointer;
+  line-height: 1.5;
+  color: #374151; // Dark gray text
+}
+
+.checkbox-text {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.checkbox-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.875rem; // Slightly smaller text for links
+
+  .separator {
+    color: #9ca3af; // Light gray separator
+    font-size: 0.75rem;
+  }
 }
 </style>

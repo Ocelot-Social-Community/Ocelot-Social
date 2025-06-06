@@ -13,13 +13,9 @@
       model="nonce"
       name="nonce"
       id="nonce"
-      icon="question-circle"
     />
     <ds-text>
       {{ $t('components.registration.email-nonce.form.description') }}
-    </ds-text>
-    <ds-text>
-      {{ $t('components.registration.email-nonce.form.click-next') }}
     </ds-text>
     <slot></slot>
     <ds-space margin="xxx-small" />
@@ -120,12 +116,16 @@ export default {
 
           if (this.sliderData.sliders[this.sliderIndex].data.response) {
             if (this.sliderData.sliders[this.sliderIndex].data.response.VerifyNonce) {
-              this.$toast.success(
-                this.$t('components.registration.email-nonce.form.validations.success', {
-                  email,
-                  nonce,
-                }),
-              )
+              // Auto-advance to next slide
+              const currentIndex = this.sliderData.sliderIndex
+              const nextIndex = currentIndex + 1
+
+              if (
+                this.sliderData.sliderSelectorCallback &&
+                nextIndex < this.sliderData.sliders.length
+              ) {
+                this.sliderData.sliderSelectorCallback(nextIndex)
+              }
             } else {
               this.$toast.error(
                 this.$t('components.registration.email-nonce.form.validations.error', {
