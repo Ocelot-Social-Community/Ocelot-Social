@@ -123,7 +123,7 @@ export default {
 
         return this.cities.find((city) => city.value === value)
       } catch (error) {
-        this.$toast(error)
+        this.$toast.error(error.message)
       } finally {
         this.loadingGeo = false
       }
