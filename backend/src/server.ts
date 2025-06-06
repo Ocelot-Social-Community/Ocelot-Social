@@ -87,6 +87,8 @@ const createServer = (options?) => {
     uploads: false,
     tracing: !!CONFIG.DEBUG,
     formatError: (error) => {
+      // eslint-disable-next-line no-console
+      console.error(error.originalError)
       if (error.message === 'ERROR_VALIDATION') {
         return new Error(error.originalError.details.map((d) => d.message))
       }
