@@ -70,6 +70,7 @@ export default {
           message: this.$t('components.registration.invite-code.form.validations.length', {
             inviteCodeLength: registrationConstants.INVITE_CODE_LENGTH,
           }),
+          placeholder: this.$t('components.registration.invite-code.form.invite-code'),
         },
       },
       dbRequestInProgress: false,
