@@ -47,6 +47,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
 
+      - name: Copy backend env file
+        run: |
+          cp backend/.env.test_e2e backend/.env
+      
       - name: Build docker image
         run: |
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach webapp --build --no-deps
