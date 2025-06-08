@@ -50,6 +50,7 @@ jobs:
       - name: Copy backend env file
         run: |
           cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
       
       - name: Build docker image
         run: |
