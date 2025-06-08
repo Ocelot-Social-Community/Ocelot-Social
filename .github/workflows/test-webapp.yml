@@ -44,6 +44,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
 
+      - uses: 8BitJonny/gh-get-current-pr@bccb4d0785d00a707b5c31c2c03410b01bb4658c # v3.0.0
+        id: PR
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Webapp | Build 'test' image
         run: |
           docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
@@ -53,7 +58,7 @@ jobs:
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
           path: /tmp/webapp.tar
-          key: ${{ github.run_id }}-webapp-cache
+          key: ${{ steps.PR.outputs.number }}-${{ github.run_id }}-webapp-cache
 
   lint_webapp:
     name: Lint Webapp
@@ -78,11 +83,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
 
+      - uses: 8BitJonny/gh-get-current-pr@bccb4d0785d00a707b5c31c2c03410b01bb4658c # v3.0.0
+        id: PR
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Restore webapp cache
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
           path: /tmp/webapp.tar
-          key: ${{ github.run_id }}-webapp-cache
+          key: ${{ steps.PR.outputs.number }}-${{ github.run_id }}-webapp-cache
 
       - name: Load Docker Image
         run: docker load < /tmp/webapp.tar
@@ -113,6 +123,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh extension install actions/gh-actions-cache
-          KEY="${{ github.run_id }}-webapp-cache"
+          KEY="${{ steps.PR.outputs.number }}-${{ github.run_id }}-webapp-cache"
           gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
 
