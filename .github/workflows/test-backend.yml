@@ -44,29 +44,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
 
-      - name: Restore Neo4J cache
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
-        with:
-          path: /tmp/neo4j.tar
-          key: ${{ github.run_id }}-backend-neo4j-cache
-          fail-on-cache-miss: true
-
-      - name: Restore Backend cache
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
-        with:
-          path: /tmp/backend.tar
-          key: ${{ github.run_id }}-backend-cache
-          fail-on-cache-miss: true
-
-      - name: Load Docker Images
-        run: |
-          docker load < /tmp/neo4j.tar
-          docker load < /tmp/backend.tar
-
       - name: backend | copy env files
         run: |
           cp webapp/.env.template webapp/.env
-          cp frontend/.env.dist frontend/.env
           cp backend/.env.template backend/.env
 
       - name: backend | docker compose
