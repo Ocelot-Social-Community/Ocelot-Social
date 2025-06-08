@@ -135,8 +135,7 @@ jobs:
           docker load < /tmp/neo4j.tar
           docker load < /tmp/backend.tar
           docker load < /tmp/webapp.tar
-          docker compose -f docker-compose.yml -f docker-compose.test.yml up --build --detach webapp mailserver
-          sleep 90s
+          docker compose -f docker-compose.yml -f docker-compose.test.yml up -d neo4j backend webapp mailserver
 
       - name: Full stack tests | run tests
         id: e2e-tests
