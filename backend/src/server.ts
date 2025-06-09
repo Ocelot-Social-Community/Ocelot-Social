@@ -19,8 +19,11 @@ import pubsubContext from '@context/pubsub'
 import CONFIG from './config'
 import schema from './graphql/schema'
 import decode from './jwt/decode'
+import ocelotLogger from './logger'
 // eslint-disable-next-line import/no-cycle
 import middleware from './middleware'
+
+import type OcelotLogger from './logger'
 
 const serverDatabase = databaseContext()
 const serverPubsub = pubsubContext()
@@ -33,11 +36,18 @@ export const getContext =
       database = serverDatabase,
       pubsub = serverPubsub,
       user = databaseUser,
+      logger = ocelotLogger,
     }: {
       database?: ReturnType<typeof databaseContext>
       pubsub?: ReturnType<typeof pubsubContext>
       user?: (any) => Promise<any>
-    } = { database: serverDatabase, pubsub: serverPubsub, user: databaseUser },
+      logger?: typeof OcelotLogger
+    } = {
+      database: serverDatabase,
+      pubsub: serverPubsub,
+      user: databaseUser,
+      logger: ocelotLogger,
+    },
   ) =>
   async (req) => {
     const u = await user(req)
@@ -46,6 +56,7 @@ export const getContext =
       driver: database.driver,
       neode: database.neode,
       pubsub,
+      logger,
       user: u,
       req,
       cypherParams: {
@@ -53,6 +64,8 @@ export const getContext =
       },
     }
   }
+
+export type Context = Awaited<ReturnType<ReturnType<typeof getContext>>>
 
 export const context = async (options) => {
   const { connection, req } = options
@@ -103,4 +116,3 @@ const createServer = (options?) => {
 }
 
 export default createServer
-export type Context = Awaited<ReturnType<ReturnType<typeof getContext>>>
