@@ -15,17 +15,29 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [neo4j, backend, webapp]
+        include:
+          - service: backend
+            dockerfile: backend/Dockerfile
+            context: backend
+            target: build
+          - service: webapp
+            dockerfile: webapp/Dockerfile
+            context: webapp
+            target: build
+          - service: neo4j
+            dockerfile: neo4j/Dockerfile
+            context: neo4j
+            target: community
     steps:
       - uses: actions/checkout@v4
-
       - uses: docker/setup-buildx-action@v3
 
-      - name: Build ${{ matrix.service }} with cache
+      - name: Build ${{ matrix.service }} image
         uses: docker/build-push-action@v5
         with:
-          context: ./${{ matrix.service }}
-          target: test
+          context: ./${{ matrix.context }}
+          file: ./${{ matrix.dockerfile }}
+          target: ${{ matrix.target }}
           tags: ocelotsocialnetwork/${{ matrix.service }}:test
           outputs: type=docker,dest=/tmp/${{ matrix.service }}.tar
           cache-from: type=gha
@@ -42,7 +54,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -79,6 +90,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: ⏱️ Mark Start Time
+        id: timer_start
+        run: echo "start_time=$(date +%s)" >> $GITHUB_OUTPUT
+
       - name: Restore caches
         uses: actions/cache@v4
         with:
@@ -88,12 +103,13 @@ jobs:
             /tmp/backend.tar
             /tmp/webapp.tar
           key: all-${{ github.sha }}
+        continue-on-error: true
 
       - name: Load Docker images
         run: |
-          docker load < /tmp/neo4j.tar
-          docker load < /tmp/backend.tar
-          docker load < /tmp/webapp.tar
+          docker load < /tmp/neo4j.tar || true
+          docker load < /tmp/backend.tar || true
+          docker load < /tmp/webapp.tar || true
 
       - name: Start system
         run: |
@@ -118,3 +134,19 @@ jobs:
         with:
           name: e2e-report
           path: cypress/reports/cucumber_html_report
+
+      - name: ⏱️ Measure Duration
+        if: always()
+        run: |
+          end_time=$(date +%s)
+          start=${{ steps.timer_start.outputs.start_time }}
+          duration=$((end_time - start))
+          echo "⏱️ Dauer für Job ${{ matrix.job }}: ${duration}s" | tee duration.log
+          echo "Testdauer: **${duration}s** für Job `${{ matrix.job }}`" >> $GITHUB_STEP_SUMMARY
+
+      - name: ⬆️ Upload Duration Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: duration-job-${{ matrix.job }}
+          path: duration.log
