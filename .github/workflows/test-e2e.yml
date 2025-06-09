@@ -1,150 +1,120 @@
-name: ocelot.social test-e2e ⇌⋇⟴
+name: ocelot.social end-to-end test CI
 
 on:
   push:
     paths:
-      - 'backend/**'
       - 'webapp/**'
+      - 'backend/**'
       - 'neo4j/**'
-      - '**/package.json'
       - 'cypress/**'
       - '.github/workflows/test-e2e.yml'
-      - 'docker-compose*.yml'
-  workflow_dispatch:
 
 jobs:
-  determine-install-matrix:
+  build_images:
+    name: Build Docker Images
     runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set.outputs.matrix }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: set
-        shell: bash
-        run: |
-          modules=$(find . -name package.json | grep -v node_modules | sed 's|/package.json||' | sed 's|^./||')
-          limited=$(echo "$modules" | head -n 8 | jq -R . | jq -s -c '.')
-          echo "Install matrix: $limited"
-          echo "matrix=$limited" >> "$GITHUB_OUTPUT"
-
-  prepare-install:
-    runs-on: ubuntu-latest
-    needs: determine-install-matrix
     strategy:
-      fail-fast: false
       matrix:
-        module: ${{ fromJson(needs.determine-install-matrix.outputs.matrix) }}
+        service: [neo4j, backend, webapp]
     steps:
       - uses: actions/checkout@v4
-      - name: Install ${{ matrix.module }} dependencies
-        working-directory: ${{ matrix.module }}
-        run: yarn install
-      - name: Fix vite (if frontend)
-        if: matrix.module == 'frontend'
-        working-directory: frontend
-        run: yarn add vite
-      - name: Verify Cypress (if webapp)
-        if: matrix.module == 'webapp'
-        run: npx cypress verify
-      - name: Cache Cypress (if webapp)
-        if: matrix.module == 'webapp'
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build ${{ matrix.service }} with cache
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ matrix.service }}
+          target: test
+          tags: ocelotsocialnetwork/${{ matrix.service }}:test
+          outputs: type=docker,dest=/tmp/${{ matrix.service }}.tar
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Cache docker image
         uses: actions/cache@v4
         with:
-          path: ~/.cache/Cypress
-          key: cypress-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          path: /tmp/${{ matrix.service }}.tar
+          key: docker-${{ matrix.service }}-${{ github.sha }}
 
-  determine-matrix:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set.outputs.matrix }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Create dynamic test matrix
-        id: set
-        shell: bash
-        run: |
-          generate_matrix() {
-            local count=$(find cypress/e2e -name "*.feature" | wc -l)
-            local max=8
-            local actual=$(( count < max ? count : max ))
-            seq 1 "$actual" | jq -R . | jq -s -c '.'
-          }
-          matrix=$(generate_matrix)
-          echo "Generated Matrix: $matrix"
-          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
-
-  build-webapp:
+  prepare_env:
+    name: Prepare Environment
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build webapp image
-        run: |
-          docker build -t ocelot/webapp:test -f webapp/Dockerfile webapp
-          docker save ocelot/webapp:test -o /tmp/webapp.tar
-      - uses: actions/upload-artifact@v4
+
+      - uses: actions/setup-node@v4
         with:
-          name: webapp-image
-          path: /tmp/webapp.tar
+          node-version: '20'
 
-  build-backend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build backend image
+      - name: Setup .env and deps
         run: |
-          docker build -t ocelot/backend:test -f backend/Dockerfile backend
-          docker save ocelot/backend:test -o /tmp/backend.tar
-      - uses: actions/upload-artifact@v4
-        with:
-          name: backend-image
-          path: /tmp/backend.tar
+          cp webapp/.env.template webapp/.env || true
+          cp backend/.env.test_e2e backend/.env || true
+          npm install -g yarn
+          wget -q -O /opt/cucumber-json-formatter https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386
+          chmod +x /opt/cucumber-json-formatter
+          yarn install || true
+          (cd backend && yarn install && yarn build || true)
+          (cd webapp && yarn install || true)
 
-  build-neo4j:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build neo4j image
-        run: |
-          docker build -t ocelot/neo4j:test -f neo4j/Dockerfile neo4j
-          docker save ocelot/neo4j:test -o /tmp/neo4j.tar
-      - uses: actions/upload-artifact@v4
+      - name: Cache node & Cypress deps
+        uses: actions/cache@v4
         with:
-          name: neo4j-image
-          path: /tmp/neo4j.tar
+          path: |
+            ~/.cache/Cypress
+            ./backend/node_modules
+            ./webapp/node_modules
+          key: deps-${{ github.sha }}
 
-  test:
-    name: e2e-${{ matrix.job }}
+  fullstack_tests:
+    name: Run Fullstack E2E Tests
+    needs: [build_images, prepare_env]
     runs-on: ubuntu-latest
-    needs: [prepare-install, determine-matrix, build-webapp, build-backend, build-neo4j]
     strategy:
-      fail-fast: false
       matrix:
-        job: ${{ fromJson(needs.determine-matrix.outputs.matrix) }}
+        job: [1, 2, 3, 4, 5, 6, 7, 8]
+    env:
+      jobs: 8
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+
+      - name: Restore caches
+        uses: actions/cache@v4
         with:
-          name: webapp-image
-          path: /tmp
-      - uses: actions/download-artifact@v4
-        with:
-          name: backend-image
-          path: /tmp
-      - uses: actions/download-artifact@v4
-        with:
-          name: neo4j-image
-          path: /tmp
-      - run: |
-          docker load -i /tmp/webapp.tar
-          docker load -i /tmp/backend.tar
-          docker load -i /tmp/neo4j.tar
-      - name: Start services
+          path: |
+            ~/.cache/Cypress
+            /tmp/neo4j.tar
+            /tmp/backend.tar
+            /tmp/webapp.tar
+          key: all-${{ github.sha }}
+
+      - name: Load Docker images
         run: |
-          docker network create ocelot || true
-          docker run -d --rm --net ocelot --name webapp -p 3000:3000 ocelot/webapp:test
-          docker run -d --rm --net ocelot --name backend ocelot/backend:test
-          docker run -d --rm --net ocelot --name neo4j ocelot/neo4j:test
+          docker load < /tmp/neo4j.tar
+          docker load < /tmp/backend.tar
+          docker load < /tmp/webapp.tar
+
+      - name: Start system
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.test.yml up --build --detach webapp mailserver
+
+      - name: Wait for webapp
+        run: timeout 60 bash -c 'until curl -s http://localhost:3000 > /dev/null; do sleep 2; done'
+
       - name: Run Cypress tests
+        id: tests
+        run: yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }})
+
+      - name: Generate HTML report
+        if: failure() && steps.tests.conclusion == 'failure'
         run: |
-          echo "Running tests for group ${{ matrix.job }}..."
-          yarn run cypress:run --env group=${{ matrix.job }}
+          cd cypress
+          node create-cucumber-html-report.js
+
+      - name: Upload HTML report
+        if: failure() && steps.tests.conclusion == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report
+          path: cypress/reports/cucumber_html_report
