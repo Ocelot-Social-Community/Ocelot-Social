@@ -78,7 +78,7 @@ export const context = async (options) => {
   }
 }
 
-const loggerPlugin = {
+export const loggerPlugin = {
   requestDidStart(requestContext) {
     const isIntrospectionQuery = requestContext.request.operationName === 'IntrospectionQuery'
     const qID = randomBytes(4).toString('hex')
@@ -125,7 +125,7 @@ const createServer = (options?) => {
       }
       return error
     },
-    plugins: [loggerPlugin],
+    plugins: [],
   }
   const server = new ApolloServer(Object.assign(defaults, options))
 
