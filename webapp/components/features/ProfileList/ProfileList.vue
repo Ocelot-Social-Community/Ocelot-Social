@@ -117,7 +117,7 @@ export default {
 
       const filterLower = this.filter.toLowerCase()
 
-      const simpleMatches = this.profiles.filter(user => {
+      const simpleMatches = this.profiles.filter((user) => {
         const name = (user.name || '').toLowerCase()
         const slug = (user.slug || '').toLowerCase()
         return name.includes(filterLower) || slug.includes(filterLower)
