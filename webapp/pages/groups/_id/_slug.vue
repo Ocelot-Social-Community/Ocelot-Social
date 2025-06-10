@@ -55,7 +55,7 @@
                   <count-to
                     slot="count"
                     :start-val="membersCountStartValue"
-                    :end-val="groupMembers.length"
+                    :end-val="group.membersCount"
                   />
                 </ds-number>
               </client-only>
@@ -194,25 +194,11 @@
               ? $t('group.membersListTitleNotAllowedSeeingGroupMembers')
               : null
           "
-          :allProfilesCount="isAllowedSeeingGroupMembers ? groupMembers.length : 0"
+          :allProfilesCount="isAllowedSeeingGroupMembers ? group.membersCount : 0"
           :profiles="isAllowedSeeingGroupMembers ? groupMembers : []"
           :loading="$apollo.loading"
           @fetchAllProfiles="fetchAllMembers"
         />
-        <!-- <ds-space />
-             <follow-list
-             :loading="$apollo.loading"
-             :user="user"
-             type="followedBy"
-             @fetchAllConnections="fetchAllConnections"
-             />
-             <ds-space />
-             <follow-list
-             :loading="$apollo.loading"
-             :user="user"
-             type="following"
-             @fetchAllConnections="fetchAllConnections"
-             /> -->
         <!-- <social-media :user-name="groupName" :user="user" /> -->
       </ds-flex-item>
 
@@ -333,6 +319,8 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 //   }[tab]
 // }
 
+const PAGE_SIZE = 25
+
 export default {
   components: {
     AvatarUploader,
@@ -377,7 +365,7 @@ export default {
       // followedByCount: 7,
       // followingCount: 7,
       membersCountStartValue: 0,
-      membersCountToLoad: Infinity,
+      membersCountToLoad: PAGE_SIZE,
       updateGroupMutation,
       isDescriptionCollapsed: true,
     }
@@ -593,7 +581,10 @@ export default {
       }
     },
     fetchAllMembers() {
-      this.membersCountToLoad = Infinity
+      this.membersCountToLoad = Math.min(
+        this.membersCountToLoad + PAGE_SIZE,
+        this.group.membersCount,
+      )
     },
   },
   apollo: {
@@ -621,8 +612,6 @@ export default {
       variables() {
         return {
           id: this.$route.params.id,
-          // followedByCount: this.followedByCount,
-          // followingCount: this.followingCount,
         }
       },
       error(error) {
@@ -637,6 +626,7 @@ export default {
       variables() {
         return {
           id: this.$route.params.id,
+          first: this.membersCountToLoad,
         }
       },
       skip() {
