@@ -131,7 +131,6 @@ export default {
         })
 
         const attachments = await writeFilesPromise
-        console.log(attachments)
         return { ...message, files: attachments }
       } catch (error) {
         throw new Error(error)
