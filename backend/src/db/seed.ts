@@ -1202,6 +1202,17 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       await jennyRostock.relateTo(user, 'following')
       await user.relateTo(jennyRostock, 'following')
       additionalUsers.push(user)
+
+      const userObj = await user.toJson()
+      authenticatedUser = userObj
+
+      await mutate({
+        mutation: joinGroupMutation(),
+        variables: {
+          groupId: 'g2',
+          userId: userObj.id,
+        },
+      })
     }
 
     // Jenny users
