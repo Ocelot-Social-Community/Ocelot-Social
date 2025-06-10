@@ -353,7 +353,6 @@ exports[`UserTeaser given an user with linkToProfile, on desktop when hovering t
         delay="0"
         handleresize="true"
         offset="16"
-        open="true"
         openclass="open"
         opengroup="0"
         placement="bottom-end"
@@ -421,12 +420,7 @@ exports[`UserTeaser given an user with linkToProfile, on desktop when hovering t
           <!---->
         </div>
          
-        <div>
-          <user-teaser-popover-stub
-            user-id="user1"
-            user-link="[object Object]"
-          />
-        </div>
+        <div />
       </v-popover-stub>
     </client-only-stub>
   </div>
@@ -717,7 +711,6 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
         delay="0"
         handleresize="true"
         offset="16"
-        open="true"
         openclass="open"
         opengroup="0"
         placement="bottom-end"
@@ -785,11 +778,7 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
           <!---->
         </div>
          
-        <div>
-          <user-teaser-popover-stub
-            user-id="user1"
-          />
-        </div>
+        <div />
       </v-popover-stub>
     </client-only-stub>
   </div>
@@ -810,7 +799,6 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
         delay="0"
         handleresize="true"
         offset="16"
-        open="true"
         openclass="open"
         opengroup="0"
         placement="bottom-end"
@@ -878,11 +866,7 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
           <!---->
         </div>
          
-        <div>
-          <user-teaser-popover-stub
-            user-id="user1"
-          />
-        </div>
+        <div />
       </v-popover-stub>
     </client-only-stub>
   </div>
