@@ -4,24 +4,44 @@
       <h5 class="title spacer-x-small">
         {{ title }}
       </h5>
-      <ul :class="profilesClass">
+
+      <!-- Virtual Scroller for better performance -->
+      <recycle-scroller
+        v-if="isMoreAsVisible && showVirtualScroll"
+        :items="filteredConnections"
+        :item-size="itemHeight"
+        key-field="id"
+        :class="profilesClass"
+        class="profiles-virtual"
+        v-slot="{ item }"
+      >
+        <div class="connections__item">
+          <user-teaser :user="item" />
+        </div>
+      </recycle-scroller>
+
+      <!-- Normal list for only a few items -->
+      <ul v-else :class="profilesClass">
         <li
-          v-for="connection in filteredConnections"
+          v-for="connection in displayedConnections"
           :key="connection.id"
           class="connections__item"
         >
           <user-teaser :user="connection" />
         </li>
       </ul>
+
       <ds-input
         v-if="isMoreAsVisible"
         :name="uniqueName"
-        :placeholder="filter"
+        :placeholder="filterPlaceholder"
+        :value="filter"
         class="spacer-x-small"
         icon="filter"
         size="small"
         @input.native="setFilter"
       />
+
       <base-button
         v-if="hasMore"
         :loading="loading"
@@ -42,14 +62,19 @@
 
 <script>
 import { escape } from 'xregexp/xregexp-all.js'
+// @ts-ignore
+import { RecycleScroller } from 'vue-virtual-scroller'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 
-export const profileListVisibleCount = 7
+export const profileListVisibleCount = 5
+const VIRTUAL_SCROLL_THRESHOLD = 50
 
 export default {
   name: 'ProfileList',
   components: {
     UserTeaser,
+    RecycleScroller,
   },
   props: {
     uniqueName: { type: String, required: true },
@@ -63,6 +88,8 @@ export default {
     return {
       profileListVisibleCount,
       filter: null,
+      itemHeight: 56,
+      filterPlaceholder: this.$t('common.filter', 'Filter...'),
     }
   },
   computed: {
@@ -72,17 +99,34 @@ export default {
     isMoreAsVisible() {
       return this.profiles.length > this.profileListVisibleCount
     },
+    showVirtualScroll() {
+      return process.client && this.filteredConnections.length > VIRTUAL_SCROLL_THRESHOLD
+    },
     profilesClass() {
       return `profiles${this.isMoreAsVisible ? ' --overflow' : ''}`
+    },
+    displayedConnections() {
+      return this.isMoreAsVisible
+        ? this.filteredConnections
+        : this.filteredConnections.slice(0, this.profileListVisibleCount)
     },
     filteredConnections() {
       if (!this.filter) {
         return this.profiles
       }
 
-      // @example
-      //  this.filter = 'foo';
-      //  fuzzyExpression = /([^f]*f)([^o]*o)([^o]*o)/i
+      const filterLower = this.filter.toLowerCase()
+
+      const simpleMatches = this.profiles.filter(user => {
+        const name = (user.name || '').toLowerCase()
+        const slug = (user.slug || '').toLowerCase()
+        return name.includes(filterLower) || slug.includes(filterLower)
+      })
+
+      if (simpleMatches.length > 0) {
+        return simpleMatches
+      }
+
       const fuzzyExpression = new RegExp(
         `${this.filter.split('').reduce((expr, c) => `${expr}([^${escape(c)}]*${escape(c)})`, '')}`,
         'i',
@@ -151,6 +195,26 @@ export default {
     }
   }
 
+  .profiles-virtual {
+    height: $size-height-connections;
+    padding: $space-none;
+
+    &.--overflow {
+      overflow-y: auto;
+    }
+
+    .connections__item {
+      padding: $space-xx-small;
+      height: 56px;
+      display: flex;
+      align-items: center;
+
+      &:hover {
+        background-color: $background-color-primary-inverse;
+      }
+    }
+  }
+
   .nobody-message {
     text-align: center;
     color: $text-color-soft;
@@ -159,5 +223,9 @@ export default {
   > :nth-child(n):not(:last-child) {
     margin-bottom: $space-small;
   }
+}
+
+.vue-recycle-scroller__item-wrapper {
+  overflow: visible;
 }
 </style>
