@@ -23,7 +23,7 @@
             @open-menu="loadPopover(openMenu)"
             @close-menu="closeMenu(false)"
           >
-            <span class="slug">{{ userSlug }}</span>
+            <span v-if="showSlug" class="slug">{{ userSlug }}</span>
             <span class="name">{{ userName }}</span>
           </user-teaser-helper>
           <span v-if="wide">&nbsp;</span>
@@ -83,6 +83,7 @@ export default {
     group: { type: Object, default: null },
     wide: { type: Boolean, default: false },
     showAvatar: { type: Boolean, default: true },
+    showSlug: { type: Boolean, default: true },
     dateTime: { type: [Date, String], default: null },
     showPopover: { type: Boolean, default: true },
     injectedText: { type: String, default: null },
