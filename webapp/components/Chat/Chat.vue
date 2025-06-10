@@ -373,9 +373,10 @@ export default {
 
       const hasFiles = files && files.length > 0
 
+      console.log(files)
       const filesToUpload = hasFiles
         ? files.map((file) => ({
-            upload: file.upload,
+            upload: file.blob,
             name: file.name,
             type: file.type,
           }))

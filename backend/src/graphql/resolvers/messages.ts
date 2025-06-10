@@ -10,6 +10,7 @@ import { neo4jgraphql } from 'neo4j-graphql-js'
 import { CHAT_MESSAGE_ADDED } from '@constants/subscriptions'
 
 import Resolver from './helpers/Resolver'
+import { images } from './images/images'
 
 const setMessagesAsDistributed = async (undistributedMessagesIds, session) => {
   return session.writeTransaction(async (transaction) => {
@@ -65,25 +66,12 @@ export default {
         }
         // send subscription to author to updated the messages
       }
-      return resolved.reverse().map((m) => ({
-        ...m,
-        files: [
-          {
-            name: 'My File',
-            size: 67351,
-            type: 'png',
-            audio: true,
-            duration: 14.4,
-            url: '/icon.png',
-            preview: 'data:image/png;base64,iVBORw0KGgoAA...',
-          },
-        ],
-      }))
+      return resolved.reverse().map((m) => m)
     },
   },
   Mutation: {
     CreateMessage: async (_parent, params, context, _resolveInfo) => {
-      const { roomId, content } = params
+      const { roomId, content, files } = params
       const {
         user: { id: currentUserId },
       } = context
@@ -126,32 +114,25 @@ export default {
           record.get('message'),
         )
 
-        return {
-          ...message,
-          files: [
-            {
-              name: 'My File',
-              size: 67351,
-              type: 'png',
-              audio: true,
-              duration: 14.4,
-              url: '/icon.png',
-              preview: 'data:image/png;base64,iVBORw0KGgoAA...',
-            },
-            {
-              name: 'My File',
-              size: 67351,
-              type: 'png',
-              audio: true,
-              duration: 14.4,
-              url: '/icon.png',
-              preview: 'data:image/png;base64,iVBORw0KGgoAA...',
-            },
-          ],
-        }
+        return message
       })
       try {
-        return await writeTxResultPromise
+        const message = await writeTxResultPromise
+
+        const session = context.driver.session()
+        const writeFilesPromise = session.writeTransaction(async (transaction) => {
+          const attachments: any[] = []
+          for await (const file of files) {
+            file.alt = file.name
+            const attachemnt = await images.mergeImage(message, 'ATTACHMENT', file, { transaction })
+            attachments.push({ ...attachemnt, name: attachemnt.alt })
+          }
+          return attachments
+        })
+
+        const attachments = await writeFilesPromise
+        console.log(attachments)
+        return { ...message, files: attachments }
       } catch (error) {
         throw new Error(error)
       } finally {
@@ -190,6 +171,9 @@ export default {
       hasOne: {
         author: '<-[:CREATED]-(related:User)',
         room: '-[:INSIDE]->(related:Room)',
+      },
+      hasMany: {
+        files: '-[:ATTACHMENT]-(related:Image)',
       },
     }),
   },

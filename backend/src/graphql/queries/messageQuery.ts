@@ -20,11 +20,10 @@ export const messageQuery = () => {
         seen
         files {
           url
-          name
-          size
+          #name
+          #size
           type
-          url
-          preview
+          #preview
         }
       }
     }

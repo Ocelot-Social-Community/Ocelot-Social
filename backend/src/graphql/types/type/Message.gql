@@ -25,14 +25,14 @@ type Message {
   saved: Boolean
   distributed: Boolean
   seen: Boolean
-  files: [File] @relation(name: "MESSAGE_FILE", direction: "OUT")
+  files: [Image]! @relation(name: "ATTACHMENT", direction: "OUT")
 }
 
 type Mutation {
   CreateMessage(
     roomId: ID!
     content: String
-    files: [FileInput]
+    files: [FileInput]!
   ): Message
 
   MarkMessagesAsSeen(messageIds: [String!]): Boolean
