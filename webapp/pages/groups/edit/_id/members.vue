@@ -20,6 +20,7 @@
 import GroupMember from '~/components/Group/GroupMember'
 import AddGroupMember from '~/components/Group/AddGroupMember'
 import { groupMembersQuery } from '~/graphql/groups.js'
+import { inlineFragmentOnNonCompositeErrorMessage } from 'graphql/validation/rules/FragmentsOnCompositeTypes'
 
 export default {
   components: {
@@ -45,6 +46,7 @@ export default {
       variables() {
         return {
           id: this.group.id,
+          first: 999999,
         }
       },
       error(error) {
