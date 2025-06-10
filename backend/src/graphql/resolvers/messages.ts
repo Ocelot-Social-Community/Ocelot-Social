@@ -125,7 +125,6 @@ export default {
         const writeFilesPromise = session.writeTransaction(async (transaction) => {
           const atns: any[] = []
           for await (const file of files) {
-            file.alt = file.name
             const atn = await attachments(CONFIG).add(
               message,
               'ATTACHMENT',

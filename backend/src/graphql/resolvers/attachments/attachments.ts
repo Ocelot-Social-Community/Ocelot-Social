@@ -107,36 +107,26 @@ export const attachments = (config: typeof CONFIG) => {
     if (!transaction)
       return wrapTransaction(add, [resource, relationshipType, fileInput, fileAttributes], opts)
 
-    let txResult = await transaction.run(
-      `
-      MATCH (resource {id: $resource.id})-[:${relationshipType}]->(file:File)
-      RETURN file {.*}
-      `,
-      { resource },
-    )
-    const [existingFile] = txResult.records.map((record) => record.get('file') as File)
     const { upload } = fileInput
-    if (!(existingFile || upload))
-      throw new UserInputError('Cannot find attachment for given resource')
-    if (existingFile && upload) {
-      await s3Delete(existingFile.url)
-    }
+    if (!upload) throw new UserInputError('Cannot find attachment for given resource')
     const url = await uploadFile(upload)
     const { name, type } = fileInput
     const file = { url, name, type, ...fileAttributes }
-    txResult = await transaction.run(
+    const txResult = await transaction.run(
       `
       MATCH (resource {id: $resource.id})
-      MERGE (resource)-[:${relationshipType}]->(file:File)
-      ON CREATE SET file.createdAt = toString(datetime())
-      ON MATCH SET file.updatedAt = toString(datetime())
+      CREATE (file:File)
+      SET file.createdAt = toString(datetime())
       SET file += $file
+      SET file.updatedAt = toString(datetime())
+      WITH resource, file
+      MERGE (resource)-[:${relationshipType}]->(file)
       RETURN file {.*}
       `,
       { resource, file },
     )
-    const [mergedFile] = txResult.records.map((record) => record.get('file') as File)
-    return mergedFile
+    const [uploadedFile] = txResult.records.map((record) => record.get('file') as File)
+    return uploadedFile
   }
 
   const uploadFile = async (uploadPromise: Promise<FileUpload> | undefined) => {
