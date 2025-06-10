@@ -1,29 +1,38 @@
 <template>
   <component :is="tag" class="ds-logo" :class="[inverse && 'ds-logo-inverse']">
+    <!-- Desktop logo -->
     <img
-      v-if="!inverse"
-      class="ds-logo-svg"
+      class="ds-logo-svg ds-logo-desktop"
       :alt="metadata.APPLICATION_NAME + ' ' + logo.alt"
       :src="logo.path"
       :style="logoWidthStyle"
     />
+
+    <!-- Tablet logo (falls back to desktop if not provided) -->
     <img
-      v-else
-      class="ds-logo-svg"
+      class="ds-logo-svg ds-logo-tablet"
       :alt="metadata.APPLICATION_NAME + ' ' + logo.alt"
-      :src="logo.path"
-      :style="logoWidthStyle"
+      :src="logo.tabletPath || logo.path"
+      :style="tabletLogoWidthStyle"
+    />
+
+    <!-- Mobile logo (falls back to desktop if not provided) -->
+    <img
+      class="ds-logo-svg ds-logo-mobile"
+      :alt="metadata.APPLICATION_NAME + ' ' + logo.alt"
+      :src="logo.mobilePath || logo.path"
+      :style="mobileLogoWidthStyle"
     />
   </component>
 </template>
 
 <script>
-import logos from '~/constants/logos.js'
+import logos from '~/constants/logosBranded.js'
 import metadata from '~/constants/metadata.js'
 
 /**
  * This component displays the brand's logo.
- * @version 1.0.0
+ * @version 1.1.0
  */
 export default {
   name: 'Logo',
@@ -39,6 +48,20 @@ export default {
      * Logo width
      */
     logoWidth: {
+      type: String,
+      default: null,
+    },
+    /**
+     * Tablet logo width
+     */
+    tabletLogoWidth: {
+      type: String,
+      default: null,
+    },
+    /**
+     * Mobile logo width
+     */
+    mobileLogoWidth: {
       type: String,
       default: null,
     },
@@ -61,8 +84,12 @@ export default {
     const logosObject = {
       header: {
         path: logos.LOGO_HEADER_PATH,
+        tabletPath: logos.LOGO_HEADER_TABLET_PATH || null,
+        mobilePath: logos.LOGO_HEADER_MOBILE_PATH || null,
         alt: 'Header',
         widthDefault: logos.LOGO_HEADER_WIDTH,
+        tabletWidthDefault: logos.LOGO_HEADER_TABLET_WIDTH || logos.LOGO_HEADER_WIDTH,
+        mobileWidthDefault: logos.LOGO_HEADER_MOBILE_WIDTH || logos.LOGO_HEADER_WIDTH,
       },
       welcome: { path: logos.LOGO_WELCOME_PATH, alt: 'Welcome', widthDefault: '200px' },
       signup: { path: logos.LOGO_SIGNUP_PATH, alt: 'Sign Up', widthDefault: '200px' },
@@ -85,12 +112,17 @@ export default {
   },
   computed: {
     logoWidthStyle() {
-      let width = ''
-      if (this.logoWidth === null) {
-        width = this.logo.widthDefault
-      } else {
-        width = this.logoWidth
-      }
+      const width = this.logoWidth === null ? this.logo.widthDefault : this.logoWidth
+      return `width: ${width};`
+    },
+    tabletLogoWidthStyle() {
+      const width =
+        this.tabletLogoWidth === null ? this.logo.tabletWidthDefault : this.tabletLogoWidth
+      return `width: ${width};`
+    },
+    mobileLogoWidthStyle() {
+      const width =
+        this.mobileLogoWidth === null ? this.logo.mobileWidthDefault : this.mobileLogoWidth
       return `width: ${width};`
     },
   },
@@ -114,6 +146,41 @@ export default {
   height: auto;
   fill: #000000;
   max-width: 100%;
+}
+
+/* Show desktop logo by default and hide mobile logo */
+.ds-logo-desktop {
+  display: block;
+}
+.ds-logo-tablet {
+  display: none;
+}
+.ds-logo-mobile {
+  display: none;
+}
+
+@media (max-width: 810px) {
+  .ds-logo-desktop {
+    display: none;
+  }
+  .ds-logo-tablet {
+    display: block;
+  }
+  .ds-logo-mobile {
+    display: none;
+  }
+}
+
+@media (max-width: 450px) {
+  .ds-logo-desktop {
+    display: none;
+  }
+  .ds-logo-tablet {
+    display: none;
+  }
+  .ds-logo-mobile {
+    display: block;
+  }
 }
 </style>
 

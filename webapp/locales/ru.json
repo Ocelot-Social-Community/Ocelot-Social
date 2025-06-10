@@ -10,22 +10,57 @@
     "saveCategories": null
   },
   "admin": {
+    "badges": {
+      "description": null,
+      "noBadges": null,
+      "revokeTrophy": {
+        "error": null,
+        "success": null
+      },
+      "revokeVerification": {
+        "error": null,
+        "success": null
+      },
+      "rewardTrophy": {
+        "error": null,
+        "success": null
+      },
+      "setVerification": {
+        "error": null,
+        "success": null
+      },
+      "title": null,
+      "trophyBadges": null,
+      "verificationBadges": null
+    },
     "categories": {
       "categoryName": "Имя",
       "name": "Категории",
       "postCount": "Посты"
     },
     "dashboard": {
+      "badgesDisplayed": null,
+      "badgesRewarded": null,
+      "chatMessages": null,
+      "chatRooms": null,
       "comments": "Комментарии",
+      "emails": null,
       "follows": "Подписки",
+      "groups": null,
+      "inviteCodes": null,
+      "inviteCodesExpired": null,
+      "inviteCodesRedeemed": null,
       "invites": "Приглашения",
+      "locations": null,
       "name": "Панель управления",
       "notifications": "Уведомления",
-      "organizations": "Организации",
       "posts": "Посты",
-      "projects": "Проекты",
+      "reports": null,
       "shouts": "Выкрики",
-      "users": "Пользователи"
+      "tags": null,
+      "users": "Пользователи",
+      "usersDeleted": null,
+      "usersVerified": null
     },
     "donations": {
       "goal": "Необходимы ежемесячные пожертвования",
@@ -68,6 +103,7 @@
       "roleChanged": null,
       "table": {
         "columns": {
+          "badges": null,
           "createdAt": "Дата создания",
           "email": "Эл. почта",
           "name": "Имя",
@@ -172,7 +208,7 @@
         "buttonTitle": null,
         "error": "Не удалось создать учетную запись!",
         "help": "Может быть, подтверждение было недействительным? В случае возникновения проблем, не стесняйтесь обращаться за помощью, отправив нам письмо по электронной почте:",
-        "recieveCommunicationAsEmailsEtcConfirmed": null,
+        "receiveCommunicationAsEmailsEtcConfirmed": null,
         "success": "Учетная запись успешно создана!",
         "termsAndCondsEtcConfirmed": null,
         "title": "Создать учетную запись"
@@ -220,7 +256,10 @@
             "length": null,
             "success": null
           }
-        }
+        },
+        "invited-by": null,
+        "invited-by-and-to": null,
+        "invited-to-hidden-group": null
       },
       "no-public-registrstion": {
         "title": null
@@ -485,6 +524,9 @@
     "categoriesTitle": null,
     "changeMemberRole": null,
     "contentMenu": {
+      "inviteLinks": null,
+      "muteGroup": null,
+      "unmuteGroup": null,
       "visitGroupPage": null
     },
     "createNewGroup": {
@@ -505,6 +547,7 @@
     "goal": null,
     "groupCreated": null,
     "in": null,
+    "invite-links": null,
     "joinLeaveButton": {
       "iAmMember": null,
       "join": null,
@@ -535,6 +578,7 @@
       "confirmAddGroupMemberText": null,
       "confirmAddGroupMemberTitle": null
     },
+    "muted": null,
     "myGroups": null,
     "name": null,
     "radius": null,
@@ -559,6 +603,8 @@
       "hidden": null,
       "public": null
     },
+    "unmute": null,
+    "unmuted": null,
     "update": null,
     "updatedGroup": null
   },
@@ -599,13 +645,35 @@
     "button": {
       "tooltip": null
     },
+    "comment-placeholder": null,
     "copy-code": null,
     "copy-success": null,
-    "not-available": null,
-    "your-code": null
+    "create-error": null,
+    "create-success": null,
+    "delete-modal": {
+      "message": null,
+      "title": null
+    },
+    "generate-code": null,
+    "generate-code-explanation": null,
+    "group-invite-links": null,
+    "invalidate": null,
+    "invalidate-error": null,
+    "invalidate-success": null,
+    "invite-link-message-group": null,
+    "invite-link-message-hidden-group": null,
+    "invite-link-message-personal": null,
+    "limit-reached": null,
+    "my-invite-links": null,
+    "no-links": null,
+    "redeemed-count": null,
+    "redeemed-count-0": null
   },
   "localeSwitch": {
     "tooltip": null
+  },
+  "location": {
+    "distance": null
   },
   "login": {
     "email": "Электронная почта",
@@ -738,8 +806,11 @@
     "reason": {
       "changed_group_member_role": null,
       "commented_on_post": "Комментарий к посту...",
+      "followed_user_posted": null,
       "mentioned_in_comment": "Упоминание в комментарии....",
       "mentioned_in_post": "Упоминание в посте....",
+      "on_date": null,
+      "post_in_group": null,
       "removed_user_from_group": null,
       "user_joined_group": null,
       "user_left_group": null
@@ -785,10 +856,14 @@
       "observedSuccessfully": null,
       "pin": "Закрепить пост",
       "pinnedSuccessfully": "Пост больше не закреплен!",
+      "push": null,
+      "pushedSuccessfully": null,
       "unobserve": null,
       "unobservedSuccessfully": null,
       "unpin": "Открепить пост",
-      "unpinnedSuccessfully": "Пост успешно не закреплено!"
+      "unpinnedSuccessfully": "Пост успешно не закреплено!",
+      "unpush": null,
+      "unpushedSuccessfully": null
     },
     "name": "Пост",
     "pinned": "Объявление",
@@ -926,6 +1001,16 @@
     "title": null
   },
   "settings": {
+    "badges": {
+      "click-to-select": null,
+      "click-to-use": null,
+      "description": null,
+      "name": null,
+      "no-badges-available": null,
+      "remove": null,
+      "success-update": null,
+      "verification": null
+    },
     "blocked-users": {
       "block": "Блокировать",
       "columns": {
@@ -949,6 +1034,8 @@
       "unblocked": "{name} - снова разблокирован"
     },
     "data": {
+      "givenName": null,
+      "givenNamePlaceholder": null,
       "labelBio": "О себе",
       "labelCity": "Город или регион",
       "labelCityHint": null,
@@ -956,7 +1043,10 @@
       "labelSlug": "Уникальное имя пользователя",
       "name": "Персональные данные",
       "namePlaceholder": "Маша Медведева",
-      "success": "Персональные данные были успешно обновлены!"
+      "realNamePlease": null,
+      "success": "Персональные данные были успешно обновлены!",
+      "surName": null,
+      "surNamePlaceholder": null
     },
     "deleteUserAccount": {
       "accountDescription": "Обратите внимание, что ваши посты и комментарии важны для сообщества. Если вы все равно хотите их удалить, то вы должны отметить соответствующие опции ниже.",
@@ -1039,9 +1129,24 @@
     },
     "name": "Настройки",
     "notifications": {
-      "name": null,
-      "send-email-notifications": null,
-      "success-update": null
+      "chat": "Чат",
+      "chatMessage": "Сообщение, полученное во время отсутствия",
+      "checkAll": "Отметить все",
+      "commentOnObservedPost": "Комментарии по поводу замеченных сообщений",
+      "followingUsers": null,
+      "group": "Группы",
+      "groupMemberJoined": "Участник присоединился к группе, которой я владею",
+      "groupMemberLeft": "Участник вышел из группы, которой владею",
+      "groupMemberRemoved": "Был удален из группы",
+      "groupMemberRoleChanged": "Моя роль в группе была изменена",
+      "mention": "Упоминание в вкладе",
+      "name": "Уведомления",
+      "post": "Сообщения и комментарии",
+      "postByFollowedUser": "Сообщения пользователей, за которыми я слежу",
+      "postInGroup": "Сообщение в группе, членом которой я являюсь",
+      "send-email-notifications": "Отправлять уведомления по электронной почте",
+      "success-update": "Настройки уведомлений сохранены! ",
+      "uncheckAll": "Снимите все флажки"
     },
     "organizations": {
       "name": "Мои организации"
@@ -1117,5 +1222,10 @@
     "newTermsAndConditions": "Новые условия и положения",
     "termsAndConditionsNewConfirm": "Я прочитал(а) и согласен(на) с новыми условиями.",
     "termsAndConditionsNewConfirmText": "Пожалуйста, ознакомьтесь с новыми условиями использования!"
+  },
+  "user-teaser": {
+    "popover": {
+      "open-profile": null
+    }
   }
 }

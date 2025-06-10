@@ -43,8 +43,6 @@ services:
       # Application only envs
       #- HOST=0.0.0.0 # This is nuxt specific, alternative value is HOST=webapp
       #- GRAPHQL_URI=http://backend:4000
-    env_file:
-      - ./frontend/.env
 
   backend:
     image: ghcr.io/ocelot-social-community/ocelot-social/backend:${OCELOT_VERSION:-latest}
@@ -55,8 +53,6 @@ services:
       - neo4j
     ports:
       - 4000:4000
-    volumes:
-      - backend_uploads:/app/public/uploads
     environment:
       # Envs used in Dockerfile
       # - DOCKER_WORKDIR="/app"
@@ -106,5 +102,4 @@ services:
     # command: ["tail", "-f", "/dev/null"]
 
 volumes:
-  backend_uploads:
   neo4j_data:

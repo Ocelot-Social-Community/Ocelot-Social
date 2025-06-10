@@ -1,8 +1,12 @@
-import Factory, { cleanDatabase } from '../../db/factories'
-import gql from 'graphql-tag'
-import { getNeode, getDriver } from '../../db/neo4j'
-import createServer from '../../server'
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
+import gql from 'graphql-tag'
+
+import Factory, { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
+import createServer from '@src/server'
 
 let mutate
 let authenticatedUser
@@ -28,7 +32,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 const createPostMutation = gql`

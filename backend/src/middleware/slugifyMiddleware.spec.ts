@@ -1,42 +1,47 @@
-import { getNeode, getDriver } from '../db/neo4j'
-import createServer from '../server'
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
-import Factory, { cleanDatabase } from '../db/factories'
-import { createGroupMutation, updateGroupMutation } from '../graphql/groups'
-import { createPostMutation } from '../graphql/posts'
-import { signupVerificationMutation } from '../graphql/authentications'
 
-let authenticatedUser
+import databaseContext from '@context/database'
+import Factory, { cleanDatabase } from '@db/factories'
+import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { createPostMutation } from '@graphql/queries/createPostMutation'
+import { signupVerificationMutation } from '@graphql/queries/signupVerificationMutation'
+import { updateGroupMutation } from '@graphql/queries/updateGroupMutation'
+import createServer, { getContext } from '@src/server'
+
 let variables
 const categoryIds = ['cat9']
 
-const driver = getDriver()
-const neode = getNeode()
 const descriptionAdditional100 =
   ' 123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789'
 
-const { server } = createServer({
-  context: () => {
-    return {
-      driver,
-      neode,
-      user: authenticatedUser,
-      cypherParams: {
-        currentUserId: authenticatedUser ? authenticatedUser.id : null,
-      },
-    }
-  },
-})
+const database = databaseContext()
 
-const { mutate } = createTestClient(server)
+let server: ApolloServer
+let authenticatedUser
+let mutate
 
 beforeAll(async () => {
   await cleanDatabase()
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database })
+
+  server = createServer({ context }).server
+
+  const createTestClientResult = createTestClient(server)
+  mutate = createTestClientResult.mutate
 })
 
-afterAll(async () => {
-  await cleanDatabase()
-  driver.close()
+afterAll(() => {
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 beforeEach(async () => {

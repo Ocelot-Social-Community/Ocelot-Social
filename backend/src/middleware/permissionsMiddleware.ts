@@ -1,7 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { rule, shield, deny, allow, or, and } from 'graphql-shield'
-import { getNeode } from '../db/neo4j'
-import CONFIG from '../config'
-import { validateInviteCode } from '../schema/resolvers/transactions/inviteCodes'
+
+import CONFIG from '@config/index'
+import SocialMedia from '@db/models/SocialMedia'
+import { getNeode } from '@db/neo4j'
+// eslint-disable-next-line import/no-cycle
+import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
+import { Context } from '@src/server'
 
 const debug = !!CONFIG.DEBUG
 const allowExternalErrors = true
@@ -11,26 +21,26 @@ const neode = getNeode()
 const isAuthenticated = rule({
   cache: 'contextual',
 })(async (_parent, _args, ctx, _info) => {
-  return !!(ctx && ctx.user && ctx.user.id)
+  return !!ctx?.user?.id
 })
 
-const isModerator = rule()(async (parent, args, { user }, info) => {
+const isModerator = rule()(async (_parent, _args, { user }, _info) => {
   return user && (user.role === 'moderator' || user.role === 'admin')
 })
 
-const isAdmin = rule()(async (parent, args, { user }, info) => {
+const isAdmin = rule()(async (_parent, _args, { user }, _info) => {
   return user && user.role === 'admin'
 })
 
 const onlyYourself = rule({
   cache: 'no_cache',
-})(async (parent, args, context, info) => {
+})(async (_parent, args, context, _info) => {
   return context.user.id === args.id
 })
 
 const isMyOwn = rule({
   cache: 'no_cache',
-})(async (parent, args, { user }, info) => {
+})(async (parent, _args, { user }, _info) => {
   return user && user.id === parent.id
 })
 
@@ -41,21 +51,22 @@ const isMySocialMedia = rule({
   if (!user) {
     return false
   }
-  let socialMedia = await neode.find('SocialMedia', args.id)
+  const socialMedia = await neode.find<typeof SocialMedia>('SocialMedia', args.id)
   // Did we find a social media node?
   if (!socialMedia) {
     return false
   }
-  socialMedia = await socialMedia.toJson() // whats this for?
+  const socialMediaJson = await socialMedia.toJson() // whats this for?
 
   // Is it my social media entry?
-  return socialMedia.ownedBy.node.id === user.id
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (socialMediaJson.ownedBy as any).node.id === user.id
 })
 
 const isAllowedToChangeGroupSettings = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const ownerId = user.id
   const { id: groupId } = args
   const session = driver.session()
@@ -85,7 +96,7 @@ const isAllowedToChangeGroupSettings = rule({
 const isAllowedSeeingGroupMembers = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { id: groupId } = args
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
@@ -121,7 +132,7 @@ const isAllowedSeeingGroupMembers = rule({
 const isAllowedToChangeGroupMemberRole = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const currentUserId = user.id
   const { groupId, userId, roleInGroup } = args
   if (currentUserId === userId) return false
@@ -168,7 +179,7 @@ const isAllowedToChangeGroupMemberRole = rule({
 const isAllowedToJoinGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { groupId, userId } = args
   const session = driver.session()
   const readTxPromise = session.readTransaction(async (transaction) => {
@@ -198,7 +209,7 @@ const isAllowedToJoinGroup = rule({
 const isAllowedToLeaveGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { groupId, userId } = args
   if (user.id !== userId) return false
   const session = driver.session()
@@ -228,7 +239,7 @@ const isAllowedToLeaveGroup = rule({
 const isMemberOfGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { groupId } = args
   if (!groupId) return true
   const userId = user.id
@@ -256,7 +267,7 @@ const isMemberOfGroup = rule({
 const canRemoveUserFromGroup = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { groupId, userId } = args
   const currentUserId = user.id
   if (currentUserId === userId) return false
@@ -292,7 +303,7 @@ const canRemoveUserFromGroup = rule({
 const canCommentPost = rule({
   cache: 'no_cache',
 })(async (_parent, args, { user, driver }) => {
-  if (!(user && user.id)) return false
+  if (!user?.id) return false
   const { postId } = args
   const userId = user.id
   const session = driver.session()
@@ -349,7 +360,7 @@ const isAuthor = rule({
 
 const isDeletingOwnAccount = rule({
   cache: 'no_cache',
-})(async (parent, args, context, _info) => {
+})(async (_parent, args, context, _info) => {
   return context.user.id === args.id
 })
 
@@ -361,11 +372,28 @@ const noEmailFilter = rule({
 
 const publicRegistration = rule()(() => CONFIG.PUBLIC_REGISTRATION)
 
-const inviteRegistration = rule()(async (_parent, args, { user, driver }) => {
+const inviteRegistration = rule()(async (_parent, args, context: Context) => {
   if (!CONFIG.INVITE_REGISTRATION) return false
   const { inviteCode } = args
-  const session = driver.session()
-  return validateInviteCode(session, inviteCode)
+  return validateInviteCode(context, inviteCode)
+})
+
+const isAllowedToGenerateGroupInviteCode = rule({
+  cache: 'no_cache',
+})(async (_parent, args, context: Context) => {
+  if (!context.user) return false
+
+  return !!(
+    await context.database.query({
+      query: `
+    MATCH (user:User{id: user.id})-[membership:MEMBER_OF]->(group:Group {id: $args.groupId})
+    WHERE (group.type IN ['closed','hidden'] AND membership.role IN ['admin', 'owner'])
+      OR (NOT group.type IN ['closed','hidden'] AND NOT membership.role = 'pending')
+    RETURN count(group) as count
+    `,
+      variables: { user: context.user, args },
+    })
+  ).records[0].get('count')
 })
 
 // Permissions
@@ -383,15 +411,14 @@ export default shield(
       Tag: allow,
       reports: isModerator,
       statistics: allow,
-      currentUser: allow,
+      currentUser: isAuthenticated,
       Group: isAuthenticated,
       GroupMembers: isAllowedSeeingGroupMembers,
       GroupCount: isAuthenticated,
       Post: allow,
       profilePagePosts: allow,
       Comment: allow,
-      User: or(noEmailFilter, isAdmin),
-      isLoggedIn: allow,
+      User: and(isAuthenticated, or(noEmailFilter, isAdmin)),
       Badge: allow,
       PostsEmotionsCountByEmotion: allow,
       PostsEmotionsByCurrentUser: isAuthenticated,
@@ -400,15 +427,16 @@ export default shield(
       notifications: isAuthenticated,
       Donations: isAuthenticated,
       userData: isAuthenticated,
-      MyInviteCodes: isAuthenticated,
-      isValidInviteCode: allow,
       VerifyNonce: allow,
-      queryLocations: isAuthenticated,
+      queryLocations: allow,
       availableRoles: isAdmin,
-      getInviteCode: isAuthenticated, // and inviteRegistration
       Room: isAuthenticated,
       Message: isAuthenticated,
       UnreadRooms: isAuthenticated,
+      PostsPinnedCounts: isAdmin,
+
+      // Invite Code
+      validateInviteCode: allow,
     },
     Mutation: {
       '*': deny,
@@ -429,10 +457,9 @@ export default shield(
       CreateSocialMedia: isAuthenticated,
       UpdateSocialMedia: isMySocialMedia,
       DeleteSocialMedia: isMySocialMedia,
-      // AddBadgeRewarded: isAdmin,
-      // RemoveBadgeRewarded: isAdmin,
-      reward: isAdmin,
-      unreward: isAdmin,
+      setVerificationBadge: isAdmin,
+      rewardTrophyBadge: isAdmin,
+      revokeBadge: isAdmin,
       followUser: isAuthenticated,
       unfollowUser: isAuthenticated,
       shout: isAuthenticated,
@@ -457,8 +484,16 @@ export default shield(
       VerifyEmailAddress: isAuthenticated,
       pinPost: isAdmin,
       unpinPost: isAdmin,
+      pushPost: isAdmin,
+      unpushPost: isAdmin,
       UpdateDonations: isAdmin,
-      GenerateInviteCode: isAuthenticated,
+
+      // InviteCode
+      generatePersonalInviteCode: isAuthenticated,
+      generateGroupInviteCode: isAllowedToGenerateGroupInviteCode,
+      invalidateInviteCode: isAuthenticated,
+      redeemInviteCode: isAuthenticated,
+
       switchUserRole: isAdmin,
       markTeaserAsViewed: allow,
       saveCategorySettings: isAuthenticated,
@@ -467,9 +502,39 @@ export default shield(
       CreateMessage: isAuthenticated,
       MarkMessagesAsSeen: isAuthenticated,
       toggleObservePost: isAuthenticated,
+      muteGroup: and(isAuthenticated, isMemberOfGroup),
+      unmuteGroup: and(isAuthenticated, isMemberOfGroup),
+      setTrophyBadgeSelected: isAuthenticated,
+      resetTrophyBadgesSelected: isAuthenticated,
     },
     User: {
+      '*': isAuthenticated,
+      id: allow,
+      name: allow,
+      slug: allow,
+      avatar: allow,
       email: or(isMyOwn, isAdmin),
+      emailNotificationSettings: isMyOwn,
+      inviteCodes: isMyOwn,
+    },
+    Group: {
+      '*': isAuthenticated, // TODO - only those who are allowed to see the group
+      slug: allow,
+      avatar: allow,
+      name: allow,
+      about: allow,
+      groupType: allow,
+    },
+    InviteCode: {
+      '*': allow,
+      redeemedBy: isAuthenticated, // TODO only for self generated, must be done in resolver
+      redeemedByCount: isAuthenticated, // TODO only for self generated, must be done in resolver
+      createdAt: isAuthenticated, // TODO only for self generated, must be done in resolver
+      expiresAt: isAuthenticated, // TODO only for self generated, must be done in resolver
+      comment: isAuthenticated, // TODO only for self generated, must be done in resolver
+    },
+    Location: {
+      distanceToMe: isAuthenticated,
     },
     Report: isModerator,
   },

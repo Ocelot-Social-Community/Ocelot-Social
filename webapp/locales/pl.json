@@ -10,22 +10,57 @@
     "saveCategories": null
   },
   "admin": {
+    "badges": {
+      "description": null,
+      "noBadges": null,
+      "revokeTrophy": {
+        "error": null,
+        "success": null
+      },
+      "revokeVerification": {
+        "error": null,
+        "success": null
+      },
+      "rewardTrophy": {
+        "error": null,
+        "success": null
+      },
+      "setVerification": {
+        "error": null,
+        "success": null
+      },
+      "title": null,
+      "trophyBadges": null,
+      "verificationBadges": null
+    },
     "categories": {
       "categoryName": "Nazwa",
       "name": "Kategorie",
       "postCount": "Stanowiska"
     },
     "dashboard": {
+      "badgesDisplayed": null,
+      "badgesRewarded": null,
+      "chatMessages": null,
+      "chatRooms": null,
       "comments": "Komentarze",
+      "emails": null,
       "follows": "Podąża za",
+      "groups": null,
+      "inviteCodes": null,
+      "inviteCodesExpired": null,
+      "inviteCodesRedeemed": null,
       "invites": "Zaprasza",
+      "locations": null,
       "name": "Tablica rozdzielcza",
       "notifications": "Powiadomienia",
-      "organizations": "Organizacje",
       "posts": "Stanowiska",
-      "projects": "Projekty",
+      "reports": null,
       "shouts": "Zalecane",
-      "users": "Użytkownicy"
+      "tags": null,
+      "users": "Użytkownicy",
+      "usersDeleted": null,
+      "usersVerified": null
     },
     "donations": {
       "goal": null,
@@ -68,6 +103,7 @@
       "roleChanged": null,
       "table": {
         "columns": {
+          "badges": null,
           "createdAt": null,
           "email": null,
           "name": null,
@@ -172,7 +208,7 @@
         "buttonTitle": null,
         "error": null,
         "help": null,
-        "recieveCommunicationAsEmailsEtcConfirmed": null,
+        "receiveCommunicationAsEmailsEtcConfirmed": null,
         "success": null,
         "termsAndCondsEtcConfirmed": null,
         "title": null
@@ -220,7 +256,10 @@
             "length": null,
             "success": null
           }
-        }
+        },
+        "invited-by": null,
+        "invited-by-and-to": null,
+        "invited-to-hidden-group": null
       },
       "no-public-registrstion": {
         "title": null
@@ -485,6 +524,9 @@
     "categoriesTitle": null,
     "changeMemberRole": null,
     "contentMenu": {
+      "inviteLinks": null,
+      "muteGroup": null,
+      "unmuteGroup": null,
       "visitGroupPage": null
     },
     "createNewGroup": {
@@ -505,6 +547,7 @@
     "goal": null,
     "groupCreated": null,
     "in": null,
+    "invite-links": null,
     "joinLeaveButton": {
       "iAmMember": null,
       "join": null,
@@ -535,6 +578,7 @@
       "confirmAddGroupMemberText": null,
       "confirmAddGroupMemberTitle": null
     },
+    "muted": null,
     "myGroups": null,
     "name": null,
     "radius": null,
@@ -559,6 +603,8 @@
       "hidden": null,
       "public": null
     },
+    "unmute": null,
+    "unmuted": null,
     "update": null,
     "updatedGroup": null
   },
@@ -599,13 +645,35 @@
     "button": {
       "tooltip": null
     },
+    "comment-placeholder": null,
     "copy-code": null,
     "copy-success": null,
-    "not-available": null,
-    "your-code": null
+    "create-error": null,
+    "create-success": null,
+    "delete-modal": {
+      "message": null,
+      "title": null
+    },
+    "generate-code": null,
+    "generate-code-explanation": null,
+    "group-invite-links": null,
+    "invalidate": null,
+    "invalidate-error": null,
+    "invalidate-success": null,
+    "invite-link-message-group": null,
+    "invite-link-message-hidden-group": null,
+    "invite-link-message-personal": null,
+    "limit-reached": null,
+    "my-invite-links": null,
+    "no-links": null,
+    "redeemed-count": null,
+    "redeemed-count-0": null
   },
   "localeSwitch": {
     "tooltip": null
+  },
+  "location": {
+    "distance": null
   },
   "login": {
     "email": "Twój adres e-mail",
@@ -738,8 +806,11 @@
     "reason": {
       "changed_group_member_role": null,
       "commented_on_post": null,
+      "followed_user_posted": null,
       "mentioned_in_comment": null,
       "mentioned_in_post": null,
+      "on_date": null,
+      "post_in_group": null,
       "removed_user_from_group": null,
       "user_joined_group": null,
       "user_left_group": null
@@ -785,10 +856,14 @@
       "observedSuccessfully": null,
       "pin": null,
       "pinnedSuccessfully": null,
+      "push": null,
+      "pushedSuccessfully": null,
       "unobserve": null,
       "unobservedSuccessfully": null,
       "unpin": null,
-      "unpinnedSuccessfully": null
+      "unpinnedSuccessfully": null,
+      "unpush": null,
+      "unpushedSuccessfully": null
     },
     "name": "Poczta",
     "pinned": null,
@@ -926,6 +1001,16 @@
     "title": null
   },
   "settings": {
+    "badges": {
+      "click-to-select": null,
+      "click-to-use": null,
+      "description": null,
+      "name": null,
+      "no-badges-available": null,
+      "remove": null,
+      "success-update": null,
+      "verification": null
+    },
     "blocked-users": {
       "block": null,
       "columns": {
@@ -949,6 +1034,8 @@
       "unblocked": null
     },
     "data": {
+      "givenName": null,
+      "givenNamePlaceholder": null,
       "labelBio": "O Tobie",
       "labelCity": "Twoje miasto lub region",
       "labelCityHint": null,
@@ -956,7 +1043,10 @@
       "labelSlug": null,
       "name": "Twoje dane",
       "namePlaceholder": "Anonymous",
-      "success": "Twoje dane zostały pomyślnie zaktualizowane!"
+      "realNamePlease": null,
+      "success": "Twoje dane zostały pomyślnie zaktualizowane!",
+      "surName": null,
+      "surNamePlaceholder": null
     },
     "deleteUserAccount": {
       "accountDescription": "Be aware that your Post and Comments are important to our community. If you still choose to delete them, you have to mark them below.",
@@ -1039,9 +1129,24 @@
     },
     "name": "Ustawienia",
     "notifications": {
-      "name": null,
-      "send-email-notifications": null,
-      "success-update": null
+      "chat": "Chat",
+      "chatMessage": "Wiadomość otrzymana podczas nieobecności",
+      "checkAll": "Wybierz wszystko",
+      "commentOnObservedPost": "Skomentuj wpis, który obserwuję",
+      "followingUsers": null,
+      "group": "Grupy",
+      "groupMemberJoined": "Nowy członek dołączył do mojej grupy",
+      "groupMemberLeft": "Członek opuścił moją grupę",
+      "groupMemberRemoved": "Zostałem usunięty z grupy",
+      "groupMemberRoleChanged": "Moja rola w grupie uległa zmianie",
+      "mention": "Mentioned in a contribution",
+      "name": "Powiadomienia e-mail",
+      "post": "Posty",
+      "postByFollowedUser": "Posty użytkowników, których obserwuję",
+      "postInGroup": "Posty w grupie, której jestem członkiem",
+      "send-email-notifications": "Wyślij powiadomienia e-mail",
+      "success-update": "Ustawienia powiadomień zapisane! ",
+      "uncheckAll": "Odznacz wszystko"
     },
     "organizations": {
       "name": "My Organizations"
@@ -1117,5 +1222,10 @@
     "newTermsAndConditions": null,
     "termsAndConditionsNewConfirm": null,
     "termsAndConditionsNewConfirmText": null
+  },
+  "user-teaser": {
+    "popover": {
+      "open-profile": null
+    }
   }
 }

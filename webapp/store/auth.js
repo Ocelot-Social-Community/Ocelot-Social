@@ -18,6 +18,9 @@ export const mutations = {
   SET_USER(state, user) {
     state.user = user || null
   },
+  SET_USER_PARTIAL(state, user) {
+    state.user = { ...state.user, ...user }
+  },
   SET_TOKEN(state, token) {
     state.token = token || null
   },
@@ -103,6 +106,7 @@ export const actions = {
       await this.app.$apolloHelpers.onLogin(login)
       commit('SET_TOKEN', login)
       await dispatch('fetchCurrentUser')
+      await dispatch('categories/init', null, { root: true })
       if (cookies.get(metadata.COOKIE_NAME) === undefined) {
         throw new Error('no-cookie')
       }

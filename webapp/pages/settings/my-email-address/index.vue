@@ -30,9 +30,10 @@
 import { mapGetters } from 'vuex'
 import { AddEmailAddressMutation } from '~/graphql/EmailAddress.js'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
-import normalizeEmail from '~/components/utils/NormalizeEmail'
+import scrollToContent from '../scroll-to-content.js'
 
 export default {
+  mixins: [scrollToContent],
   components: {
     SweetalertIcon,
   },
@@ -60,7 +61,7 @@ export default {
       },
     },
     formSchema() {
-      const currentEmail = normalizeEmail(this.currentUser.email)
+      const currentEmail = this.currentUser.email
       const sameEmailValidationError = this.$t('settings.email.validation.same-email')
       return {
         email: [
@@ -68,7 +69,7 @@ export default {
           {
             validator(rule, value, callback, source, options) {
               const errors = []
-              if (currentEmail === normalizeEmail(value)) {
+              if (currentEmail === value) {
                 errors.push(sameEmailValidationError)
               }
               return errors

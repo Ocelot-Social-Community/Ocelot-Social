@@ -45,7 +45,6 @@
 <script>
 import gql from 'graphql-tag'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
-import normalizeEmail from '~/components/utils/NormalizeEmail'
 
 export default {
   components: {
@@ -68,11 +67,8 @@ export default {
     }
   },
   computed: {
-    email() {
-      return normalizeEmail(this.formData.email)
-    },
     submitMessage() {
-      const { email } = this
+      const email = this.formData.email
       return this.$t('components.password-reset.request.form.submitted', { email })
     },
   },
@@ -85,13 +81,13 @@ export default {
     },
     async handleSubmit() {
       const mutation = gql`
-        mutation ($email: String!) {
-          requestPasswordReset(email: $email)
+        mutation ($email: String!, $locale: String!) {
+          requestPasswordReset(email: $email, locale: $locale)
         }
       `
       try {
-        const { email } = this
-        await this.$apollo.mutate({ mutation, variables: { email } })
+        const email = this.formData.email
+        await this.$apollo.mutate({ mutation, variables: { email, locale: this.$i18n.locale() } })
         this.submitted = true
 
         setTimeout(() => {

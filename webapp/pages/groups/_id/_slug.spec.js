@@ -1,5 +1,6 @@
-import { mount } from '@vue/test-utils'
 import GroupProfileSlug from './_slug.vue'
+import { render, screen, fireEvent } from '@testing-library/vue'
+import Vuex from 'vuex'
 
 const localVue = global.localVue
 
@@ -10,13 +11,19 @@ const stubs = {
   'v-popover': true,
   'nuxt-link': true,
   'router-link': true,
-  'infinite-loading': true,
+  // 'infinite-loading': true,
   'follow-list': true,
 }
 
+// Mock Math.random, used in Dropdown
+Object.assign(Math, {
+  random: () => 0,
+})
+
+jest.mock('vue-infinite-loading', () => ({}))
+
 describe('GroupProfileSlug', () => {
   let wrapper
-  let Wrapper
   let mocks
   let yogaPractice
   let schoolForCitizens
@@ -26,11 +33,26 @@ describe('GroupProfileSlug', () => {
   let bobDerBaumeister
   let huey
 
+  const currentUserMock = jest.fn()
+
+  const getters = {
+    'auth/user': currentUserMock,
+    'auth/isModerator': () => false,
+    'categories/categoriesActive': () => true,
+    'categories/categories': () => [{ id: 'cat1' }],
+  }
+
+  const actions = {
+    'categories/init': jest.fn(),
+  }
+
+  const store = new Vuex.Store({
+    getters,
+    actions,
+  })
+
   beforeEach(() => {
     mocks = {
-      $env: {
-        CATEGORIES_ACTIVE: true,
-      },
       // post: {
       //   id: 'p23',
       //   name: 'It is a post',
@@ -95,6 +117,7 @@ describe('GroupProfileSlug', () => {
       ],
       locationName: null,
       location: null,
+      isMutedByMe: false,
       // myRole: 'usual',
     }
     schoolForCitizens = {
@@ -128,6 +151,7 @@ describe('GroupProfileSlug', () => {
         nameDE: 'Paris',
         nameEN: 'Paris',
       },
+      isMutedByMe: true,
       // myRole: 'usual',
     }
     investigativeJournalism = {
@@ -170,6 +194,7 @@ describe('GroupProfileSlug', () => {
         nameDE: 'Hamburg',
         nameEN: 'Hamburg',
       },
+      isMutedByMe: false,
       // myRole: 'usual',
     }
     peterLustig = {
@@ -198,508 +223,118 @@ describe('GroupProfileSlug', () => {
     }
   })
 
-  describe('mount', () => {
-    Wrapper = (data = () => {}) => {
-      return mount(GroupProfileSlug, {
-        mocks,
-        localVue,
-        data,
-        stubs,
+  const Wrapper = (data = () => {}) => {
+    return render(GroupProfileSlug, {
+      mocks,
+      localVue,
+      data,
+      stubs,
+      store,
+    })
+  }
+
+  describe('given a puplic group – "yoga-practice"', () => {
+    describe('given a current user', () => {
+      describe('as group owner – "peter-lustig"', () => {
+        beforeEach(() => {
+          currentUserMock.mockReturnValue(peterLustig)
+          wrapper = Wrapper(() => {
+            return {
+              Group: [
+                {
+                  ...yogaPractice,
+                  myRole: 'owner',
+                },
+              ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
+            }
+          })
+        })
+
+        it('renders', () => {
+          expect(wrapper.container).toMatchSnapshot()
+        })
+
+        describe('after "show more" click displays full description', () => {
+          beforeEach(async () => {
+            const button = screen.getByText('comment.show.more')
+            await fireEvent.click(button)
+            // await wrapper.container.vm.$nextTick()
+          })
+
+          it('has full description', () => {
+            // test if end of full description is visible
+            expect(
+              screen.queryByText('Use the exercises (consciously) for your personal development.'),
+            ).not.toBeNull()
+          })
+
+          it('has "show less" button', () => {
+            expect(screen.queryByText('comment.show.less')).not.toBeNull()
+          })
+        })
       })
-    }
 
-    describe('given a puplic group – "yoga-practice"', () => {
-      describe('given a current user', () => {
-        describe('as group owner – "peter-lustig"', () => {
-          beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': peterLustig,
-                'auth/isModerator': () => false,
-              },
+      describe('as usual member – "jenny-rostock"', () => {
+        beforeEach(() => {
+          currentUserMock.mockReturnValue(jennyRostock)
+          wrapper = Wrapper(() => {
+            return {
+              Group: [
+                {
+                  ...yogaPractice,
+                  myRole: 'usual',
+                },
+              ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             }
-            wrapper = Wrapper(() => {
-              return {
-                Group: [
-                  {
-                    ...yogaPractice,
-                    myRole: 'owner',
-                  },
-                ],
-                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
-              }
-            })
-          })
-
-          it('has group name – to verificate the group', () => {
-            expect(wrapper.text()).toContain('Yoga Practice')
-          })
-
-          it('has AvatarUploader', () => {
-            expect(wrapper.find('.avatar-uploader').exists()).toBe(true)
-          })
-
-          it('has ProfileAvatar', () => {
-            expect(wrapper.find('.profile-avatar').exists()).toBe(true)
-          })
-
-          it('has GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(true)
-          })
-
-          it('has group slug', () => {
-            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('&yoga-practice')
-          })
-
-          describe('displays no(!) group location – because is "null"', () => {
-            it('has no(!) group location icon "map-marker"', () => {
-              expect(wrapper.find('[data-test="map-marker"]').exists()).toBe(false)
-            })
-          })
-
-          it('has group foundation', () => {
-            expect(wrapper.text()).toContain('group.foundation')
-          })
-
-          it('has members count', () => {
-            expect(wrapper.text()).toContain('group.membersCount')
-          })
-
-          it('has join/leave button disabled(!)', () => {
-            expect(wrapper.find('.join-leave-button').exists()).toBe(true)
-            expect(wrapper.find('.join-leave-button').attributes('disabled')).toBe('disabled')
-          })
-
-          it('has group role "owner"', () => {
-            expect(wrapper.text()).toContain('group.role')
-            expect(wrapper.text()).toContain('group.roles.owner')
-          })
-
-          it('has group type "public"', () => {
-            expect(wrapper.text()).toContain('group.type')
-            expect(wrapper.text()).toContain('group.types.public')
-          })
-
-          it('has group action radius "interplanetary"', () => {
-            expect(wrapper.text()).toContain('group.actionRadius')
-            expect(wrapper.text()).toContain('group.actionRadii.interplanetary')
-          })
-
-          it('has group categories "psyche", "body-and-excercise", "spirituality"', () => {
-            expect(wrapper.text()).toContain('group.categories')
-            expect(wrapper.text()).toContain('contribution.category.name.psyche')
-            expect(wrapper.text()).toContain('contribution.category.name.body-and-excercise')
-            expect(wrapper.text()).toContain('contribution.category.name.spirituality')
-          })
-
-          it('has no(!) group goal – because is "null"', () => {
-            expect(wrapper.text()).not.toContain('group.goal')
-          })
-
-          it('has ProfileList with members', () => {
-            const profileList = wrapper.find('.profile-list')
-            expect(profileList.exists()).toBe(true)
-            expect(profileList.text()).toContain('group.membersListTitle')
-            expect(profileList.text()).not.toContain(
-              'group.membersListTitleNotAllowedSeeingGroupMembers',
-            )
-            expect(profileList.text()).toContain('Peter Lustig')
-            expect(profileList.text()).toContain('Jenny Rostock')
-            expect(profileList.text()).toContain('Bob der Baumeister')
-            expect(profileList.text()).toContain('Huey')
-          })
-
-          describe('displays description – here as well the functionallity', () => {
-            let groupDescriptionBaseCard
-
-            beforeEach(async () => {
-              groupDescriptionBaseCard = wrapper.find('.group-description')
-            })
-
-            it('has description BaseCard', () => {
-              expect(groupDescriptionBaseCard.exists()).toBe(true)
-            })
-
-            describe('displays descriptionExcerpt first', () => {
-              it('has descriptionExcerpt', () => {
-                expect(groupDescriptionBaseCard.text()).toContain(
-                  `What Is yoga?Yoga is not just about practicing asanas. It's about how we do it.And practicing asanas doesn't have to be yoga, it can be more athletic than yogic.What makes practicing asanas yogic?The important thing is:Use the exercises …`,
-                )
-              })
-
-              it('has "show more" button', () => {
-                expect(wrapper.vm.isDescriptionCollapsed).toBe(true)
-                expect(groupDescriptionBaseCard.text()).toContain('comment.show.more')
-              })
-            })
-
-            describe('after "show more" click displays full description', () => {
-              beforeEach(async () => {
-                await groupDescriptionBaseCard.find('.collaps-button').trigger('click')
-                await wrapper.vm.$nextTick()
-              })
-
-              it('has full description', () => {
-                // test if end of full description is visible
-                expect(groupDescriptionBaseCard.text()).toContain(
-                  `Use the exercises (consciously) for your personal development.`,
-                )
-              })
-
-              it('has "show less" button', () => {
-                expect(wrapper.vm.isDescriptionCollapsed).toBe(false)
-                expect(groupDescriptionBaseCard.text()).toContain('comment.show.less')
-              })
-            })
-          })
-
-          it('has profile post add button', () => {
-            expect(wrapper.find('.profile-post-add-button').exists()).toBe(true)
-          })
-
-          it('has empty post list', () => {
-            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
           })
         })
 
-        describe('as usual member – "jenny-rostock"', () => {
-          beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': jennyRostock,
-                'auth/isModerator': () => false,
-              },
+        it('renders', () => {
+          expect(wrapper.container).toMatchSnapshot()
+        })
+      })
+
+      describe('as pending member – "bob-der-baumeister"', () => {
+        beforeEach(() => {
+          currentUserMock.mockReturnValue(bobDerBaumeister)
+          wrapper = Wrapper(() => {
+            return {
+              Group: [
+                {
+                  ...yogaPractice,
+                  myRole: 'pending',
+                },
+              ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             }
-            wrapper = Wrapper(() => {
-              return {
-                Group: [
-                  {
-                    ...yogaPractice,
-                    myRole: 'usual',
-                  },
-                ],
-                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
-              }
-            })
-          })
-
-          it('has group name – to verificate the group', () => {
-            expect(wrapper.text()).toContain('Yoga Practice')
-          })
-
-          it('has not(!) AvatarUploader', () => {
-            expect(wrapper.find('.avatar-uploader').exists()).toBe(false)
-          })
-
-          it('has ProfileAvatar', () => {
-            expect(wrapper.find('.profile-avatar').exists()).toBe(true)
-          })
-
-          it('has not(!) GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
-          })
-
-          it('has group slug', () => {
-            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('&yoga-practice')
-          })
-
-          describe('displays no(!) group location – because is "null"', () => {
-            it('has no(!) group location icon "map-marker"', () => {
-              expect(wrapper.find('[data-test="map-marker"]').exists()).toBe(false)
-            })
-          })
-
-          it('has group foundation', () => {
-            expect(wrapper.text()).toContain('group.foundation')
-          })
-
-          it('has members count', () => {
-            expect(wrapper.text()).toContain('group.membersCount')
-          })
-
-          it('has join/leave button enabled', () => {
-            expect(wrapper.find('.join-leave-button').exists()).toBe(true)
-            expect(wrapper.find('.join-leave-button').attributes('disabled')).toBeFalsy()
-          })
-
-          it('has group role "usual"', () => {
-            expect(wrapper.text()).toContain('group.role')
-            expect(wrapper.text()).toContain('group.roles.usual')
-          })
-
-          it('has group type "public"', () => {
-            expect(wrapper.text()).toContain('group.type')
-            expect(wrapper.text()).toContain('group.types.public')
-          })
-
-          it('has group action radius "interplanetary"', () => {
-            expect(wrapper.text()).toContain('group.actionRadius')
-            expect(wrapper.text()).toContain('group.actionRadii.interplanetary')
-          })
-
-          it('has group categories "psyche", "body-and-excercise", "spirituality"', () => {
-            expect(wrapper.text()).toContain('group.categories')
-            expect(wrapper.text()).toContain('contribution.category.name.psyche')
-            expect(wrapper.text()).toContain('contribution.category.name.body-and-excercise')
-            expect(wrapper.text()).toContain('contribution.category.name.spirituality')
-          })
-
-          it('has no(!) group goal – because is "null"', () => {
-            expect(wrapper.text()).not.toContain('group.goal')
-          })
-
-          it('has ProfileList with members', () => {
-            const profileList = wrapper.find('.profile-list')
-            expect(profileList.exists()).toBe(true)
-            expect(profileList.text()).toContain('group.membersListTitle')
-            expect(profileList.text()).not.toContain(
-              'group.membersListTitleNotAllowedSeeingGroupMembers',
-            )
-            expect(profileList.text()).toContain('Peter Lustig')
-            expect(profileList.text()).toContain('Jenny Rostock')
-            expect(profileList.text()).toContain('Bob der Baumeister')
-            expect(profileList.text()).toContain('Huey')
-          })
-
-          it('has description BaseCard', () => {
-            expect(wrapper.find('.group-description').exists()).toBe(true)
-          })
-
-          it('has profile post add button', () => {
-            expect(wrapper.find('.profile-post-add-button').exists()).toBe(true)
-          })
-
-          it('has empty post list', () => {
-            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
           })
         })
 
-        describe('as pending member – "bob-der-baumeister"', () => {
-          beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': bobDerBaumeister,
-                'auth/isModerator': () => false,
-              },
+        it('renders', () => {
+          expect(wrapper.container).toMatchSnapshot()
+        })
+      })
+
+      describe('as none(!) member – "huey"', () => {
+        beforeEach(() => {
+          currentUserMock.mockReturnValue(huey)
+          wrapper = Wrapper(() => {
+            return {
+              Group: [
+                {
+                  ...yogaPractice,
+                  myRole: null,
+                },
+              ],
+              GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             }
-            wrapper = Wrapper(() => {
-              return {
-                Group: [
-                  {
-                    ...yogaPractice,
-                    myRole: 'pending',
-                  },
-                ],
-                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
-              }
-            })
-          })
-
-          it('has group name – to verificate the group', () => {
-            expect(wrapper.text()).toContain('Yoga Practice')
-          })
-
-          it('has not(!) AvatarUploader', () => {
-            expect(wrapper.find('.avatar-uploader').exists()).toBe(false)
-          })
-
-          it('has ProfileAvatar', () => {
-            expect(wrapper.find('.profile-avatar').exists()).toBe(true)
-          })
-
-          it('has not(!) GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
-          })
-
-          it('has group slug', () => {
-            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('&yoga-practice')
-          })
-
-          describe('displays no(!) group location – because is "null"', () => {
-            it('has no(!) group location icon "map-marker"', () => {
-              expect(wrapper.find('[data-test="map-marker"]').exists()).toBe(false)
-            })
-          })
-
-          it('has group foundation', () => {
-            expect(wrapper.text()).toContain('group.foundation')
-          })
-
-          it('has members count', () => {
-            expect(wrapper.text()).toContain('group.membersCount')
-          })
-
-          it('has join/leave button enabled', () => {
-            expect(wrapper.find('.join-leave-button').exists()).toBe(true)
-            expect(wrapper.find('.join-leave-button').attributes('disabled')).toBeFalsy()
-          })
-
-          it('has group role "pending"', () => {
-            expect(wrapper.text()).toContain('group.role')
-            expect(wrapper.text()).toContain('group.roles.pending')
-          })
-
-          it('has group type "public"', () => {
-            expect(wrapper.text()).toContain('group.type')
-            expect(wrapper.text()).toContain('group.types.public')
-          })
-
-          it('has group action radius "interplanetary"', () => {
-            expect(wrapper.text()).toContain('group.actionRadius')
-            expect(wrapper.text()).toContain('group.actionRadii.interplanetary')
-          })
-
-          it('has group categories "psyche", "body-and-excercise", "spirituality"', () => {
-            expect(wrapper.text()).toContain('group.categories')
-            expect(wrapper.text()).toContain('contribution.category.name.psyche')
-            expect(wrapper.text()).toContain('contribution.category.name.body-and-excercise')
-            expect(wrapper.text()).toContain('contribution.category.name.spirituality')
-          })
-
-          it('has no(!) group goal – because is "null"', () => {
-            expect(wrapper.text()).not.toContain('group.goal')
-          })
-
-          it('has ProfileList with members', () => {
-            const profileList = wrapper.find('.profile-list')
-            expect(profileList.exists()).toBe(true)
-            expect(profileList.text()).toContain('group.membersListTitle')
-            expect(profileList.text()).not.toContain(
-              'group.membersListTitleNotAllowedSeeingGroupMembers',
-            )
-            expect(profileList.text()).toContain('Peter Lustig')
-            expect(profileList.text()).toContain('Jenny Rostock')
-            expect(profileList.text()).toContain('Bob der Baumeister')
-            expect(profileList.text()).toContain('Huey')
-          })
-
-          it('has description BaseCard', () => {
-            expect(wrapper.find('.group-description').exists()).toBe(true)
-          })
-
-          it('has no(!) profile post add button', () => {
-            expect(wrapper.find('.profile-post-add-button').exists()).toBe(false)
-          })
-
-          it('has empty post list', () => {
-            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
           })
         })
 
-        describe('as none(!) member – "huey"', () => {
-          beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': huey,
-                'auth/isModerator': () => false,
-              },
-            }
-            wrapper = Wrapper(() => {
-              return {
-                Group: [
-                  {
-                    ...yogaPractice,
-                    myRole: null,
-                  },
-                ],
-                GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
-              }
-            })
-          })
-
-          it('has group name – to verificate the group', () => {
-            expect(wrapper.text()).toContain('Yoga Practice')
-          })
-
-          it('has not(!) AvatarUploader', () => {
-            expect(wrapper.find('.avatar-uploader').exists()).toBe(false)
-          })
-
-          it('has ProfileAvatar', () => {
-            expect(wrapper.find('.profile-avatar').exists()).toBe(true)
-          })
-
-          it('has not(!) GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
-          })
-
-          it('has group slug', () => {
-            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('&yoga-practice')
-          })
-
-          describe('displays no(!) group location – because is "null"', () => {
-            it('has no(!) group location icon "map-marker"', () => {
-              expect(wrapper.find('[data-test="map-marker"]').exists()).toBe(false)
-            })
-          })
-
-          it('has group foundation', () => {
-            expect(wrapper.text()).toContain('group.foundation')
-          })
-
-          it('has members count', () => {
-            expect(wrapper.text()).toContain('group.membersCount')
-          })
-
-          it('has join/leave button enabled', () => {
-            expect(wrapper.find('.join-leave-button').exists()).toBe(true)
-            expect(wrapper.find('.join-leave-button').attributes('disabled')).toBeFalsy()
-          })
-
-          it('has no(!) group role', () => {
-            expect(wrapper.text()).not.toContain('group.role')
-            expect(wrapper.text()).not.toContain('group.roles')
-          })
-
-          it('has group type "public"', () => {
-            expect(wrapper.text()).toContain('group.type')
-            expect(wrapper.text()).toContain('group.types.public')
-          })
-
-          it('has group action radius "interplanetary"', () => {
-            expect(wrapper.text()).toContain('group.actionRadius')
-            expect(wrapper.text()).toContain('group.actionRadii.interplanetary')
-          })
-
-          it('has group categories "psyche", "body-and-excercise", "spirituality"', () => {
-            expect(wrapper.text()).toContain('group.categories')
-            expect(wrapper.text()).toContain('contribution.category.name.psyche')
-            expect(wrapper.text()).toContain('contribution.category.name.body-and-excercise')
-            expect(wrapper.text()).toContain('contribution.category.name.spirituality')
-          })
-
-          it('has no(!) group goal – because is "null"', () => {
-            expect(wrapper.text()).not.toContain('group.goal')
-          })
-
-          it('has ProfileList with members', () => {
-            const profileList = wrapper.find('.profile-list')
-            expect(profileList.exists()).toBe(true)
-            expect(profileList.text()).toContain('group.membersListTitle')
-            expect(profileList.text()).not.toContain(
-              'group.membersListTitleNotAllowedSeeingGroupMembers',
-            )
-            expect(profileList.text()).toContain('Peter Lustig')
-            expect(profileList.text()).toContain('Jenny Rostock')
-            expect(profileList.text()).toContain('Bob der Baumeister')
-            expect(profileList.text()).toContain('Huey')
-          })
-
-          it('has description BaseCard', () => {
-            expect(wrapper.find('.group-description').exists()).toBe(true)
-          })
-
-          it('has no(!) profile post add button', () => {
-            expect(wrapper.find('.profile-post-add-button').exists()).toBe(false)
-          })
-
-          it('has empty post list', () => {
-            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
-          })
+        it('renders', () => {
+          expect(wrapper.container).toMatchSnapshot()
         })
       })
     })
@@ -708,12 +343,7 @@ describe('GroupProfileSlug', () => {
       describe('given a current user', () => {
         describe('as group owner – "peter-lustig"', () => {
           beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': peterLustig,
-                'auth/isModerator': () => false,
-              },
-            }
+            currentUserMock.mockReturnValue(peterLustig)
             wrapper = Wrapper(() => {
               return {
                 Group: [
@@ -727,110 +357,14 @@ describe('GroupProfileSlug', () => {
             })
           })
 
-          it('has group name – to verificate the group', () => {
-            expect(wrapper.text()).toContain('School For Citizens')
-          })
-
-          it('has AvatarUploader', () => {
-            expect(wrapper.find('.avatar-uploader').exists()).toBe(true)
-          })
-
-          it('has ProfileAvatar', () => {
-            expect(wrapper.find('.profile-avatar').exists()).toBe(true)
-          })
-
-          it('has GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(true)
-          })
-
-          it('has group slug', () => {
-            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('&school-for-citizens')
-          })
-
-          describe('displays group location', () => {
-            it('has group location icon "map-marker"', () => {
-              expect(wrapper.find('[data-test="map-marker"]').exists()).toBe(true)
-            })
-
-            it('has group location name "Paris"', () => {
-              expect(wrapper.text()).toContain('Paris')
-            })
-          })
-
-          it('has group foundation', () => {
-            expect(wrapper.text()).toContain('group.foundation')
-          })
-
-          it('has members count', () => {
-            expect(wrapper.text()).toContain('group.membersCount')
-          })
-
-          it('has join/leave button disabled(!)', () => {
-            expect(wrapper.find('.join-leave-button').exists()).toBe(true)
-            expect(wrapper.find('.join-leave-button').attributes('disabled')).toBe('disabled')
-          })
-
-          it('has group role "owner"', () => {
-            expect(wrapper.text()).toContain('group.role')
-            expect(wrapper.text()).toContain('group.roles.owner')
-          })
-
-          it('has group type "closed"', () => {
-            expect(wrapper.text()).toContain('group.type')
-            expect(wrapper.text()).toContain('group.types.closed')
-          })
-
-          it('has group action radius "national"', () => {
-            expect(wrapper.text()).toContain('group.actionRadius')
-            expect(wrapper.text()).toContain('group.actionRadii.national')
-          })
-
-          it('has group categories "children", "science"', () => {
-            expect(wrapper.text()).toContain('group.categories')
-            expect(wrapper.text()).toContain('contribution.category.name.children')
-            expect(wrapper.text()).toContain('contribution.category.name.science')
-          })
-
-          it('has group goal', () => {
-            expect(wrapper.text()).toContain('group.goal')
-            expect(wrapper.text()).toContain('Our children shall receive education for life.')
-          })
-
-          it('has ProfileList with members', () => {
-            const profileList = wrapper.find('.profile-list')
-            expect(profileList.exists()).toBe(true)
-            expect(profileList.text()).toContain('group.membersListTitle')
-            expect(profileList.text()).not.toContain(
-              'group.membersListTitleNotAllowedSeeingGroupMembers',
-            )
-            expect(profileList.text()).toContain('Peter Lustig')
-            expect(profileList.text()).toContain('Jenny Rostock')
-            expect(profileList.text()).toContain('Bob der Baumeister')
-            expect(profileList.text()).toContain('Huey')
-          })
-
-          it('has description BaseCard', () => {
-            expect(wrapper.find('.group-description').exists()).toBe(true)
-          })
-
-          it('has profile post add button', () => {
-            expect(wrapper.find('.profile-post-add-button').exists()).toBe(true)
-          })
-
-          it('has empty post list', () => {
-            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
+          it('renders', () => {
+            expect(wrapper.container).toMatchSnapshot()
           })
         })
 
         describe('as usual member – "jenny-rostock"', () => {
           beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': jennyRostock,
-                'auth/isModerator': () => false,
-              },
-            }
+            currentUserMock.mockReturnValue(jennyRostock)
             wrapper = Wrapper(() => {
               return {
                 Group: [
@@ -844,110 +378,37 @@ describe('GroupProfileSlug', () => {
             })
           })
 
-          it('has group name – to verificate the group', () => {
-            expect(wrapper.text()).toContain('School For Citizens')
+          it('renders', () => {
+            expect(wrapper.container).toMatchSnapshot()
           })
 
-          it('has not(!) AvatarUploader', () => {
-            expect(wrapper.find('.avatar-uploader').exists()).toBe(false)
-          })
-
-          it('has ProfileAvatar', () => {
-            expect(wrapper.find('.profile-avatar').exists()).toBe(true)
-          })
-
-          it('has not(!) GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
-          })
-
-          it('has group slug', () => {
-            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('&school-for-citizens')
-          })
-
-          describe('displays group location', () => {
-            it('has group location icon "map-marker"', () => {
-              expect(wrapper.find('[data-test="map-marker"]').exists()).toBe(true)
+          describe('clicking unmute button with valid server answer', () => {
+            beforeEach(async () => {
+              const button = screen.getByText('group.unmute')
+              await fireEvent.click(button)
             })
 
-            it('has group location name "Paris"', () => {
-              expect(wrapper.text()).toContain('Paris')
+            it('shows a success message', () => {
+              expect(mocks.$toast.success).toHaveBeenCalledWith('group.unmuted')
             })
           })
 
-          it('has group foundation', () => {
-            expect(wrapper.text()).toContain('group.foundation')
-          })
+          describe('clicking unmute button with server error', () => {
+            beforeEach(async () => {
+              mocks.$apollo.mutate = jest.fn().mockRejectedValue({ message: 'Ouch!' })
+              const button = screen.getByText('group.unmute')
+              await fireEvent.click(button)
+            })
 
-          it('has members count', () => {
-            expect(wrapper.text()).toContain('group.membersCount')
-          })
-
-          it('has join/leave button enabled', () => {
-            expect(wrapper.find('.join-leave-button').exists()).toBe(true)
-            expect(wrapper.find('.join-leave-button').attributes('disabled')).toBeFalsy()
-          })
-
-          it('has group role "usual"', () => {
-            expect(wrapper.text()).toContain('group.role')
-            expect(wrapper.text()).toContain('group.roles.usual')
-          })
-
-          it('has group type "closed"', () => {
-            expect(wrapper.text()).toContain('group.type')
-            expect(wrapper.text()).toContain('group.types.closed')
-          })
-
-          it('has group action radius "national"', () => {
-            expect(wrapper.text()).toContain('group.actionRadius')
-            expect(wrapper.text()).toContain('group.actionRadii.national')
-          })
-
-          it('has group categories "children", "science"', () => {
-            expect(wrapper.text()).toContain('group.categories')
-            expect(wrapper.text()).toContain('contribution.category.name.children')
-            expect(wrapper.text()).toContain('contribution.category.name.science')
-          })
-
-          it('has group goal', () => {
-            expect(wrapper.text()).toContain('group.goal')
-            expect(wrapper.text()).toContain('Our children shall receive education for life.')
-          })
-
-          it('has ProfileList with members', () => {
-            const profileList = wrapper.find('.profile-list')
-            expect(profileList.exists()).toBe(true)
-            expect(profileList.text()).toContain('group.membersListTitle')
-            expect(profileList.text()).not.toContain(
-              'group.membersListTitleNotAllowedSeeingGroupMembers',
-            )
-            expect(profileList.text()).toContain('Peter Lustig')
-            expect(profileList.text()).toContain('Jenny Rostock')
-            expect(profileList.text()).toContain('Bob der Baumeister')
-            expect(profileList.text()).toContain('Huey')
-          })
-
-          it('has description BaseCard', () => {
-            expect(wrapper.find('.group-description').exists()).toBe(true)
-          })
-
-          it('has profile post add button', () => {
-            expect(wrapper.find('.profile-post-add-button').exists()).toBe(true)
-          })
-
-          it('has empty post list', () => {
-            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
+            it('shows error message', async () => {
+              expect(mocks.$toast.error).toHaveBeenCalledWith('Ouch!')
+            })
           })
         })
 
         describe('as pending member – "bob-der-baumeister"', () => {
           beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': bobDerBaumeister,
-                'auth/isModerator': () => false,
-              },
-            }
+            currentUserMock.mockReturnValue(bobDerBaumeister)
             wrapper = Wrapper(() => {
               return {
                 Group: [
@@ -961,110 +422,14 @@ describe('GroupProfileSlug', () => {
             })
           })
 
-          it('has group name – to verificate the group', () => {
-            expect(wrapper.text()).toContain('School For Citizens')
-          })
-
-          it('has not(!) AvatarUploader', () => {
-            expect(wrapper.find('.avatar-uploader').exists()).toBe(false)
-          })
-
-          it('has ProfileAvatar', () => {
-            expect(wrapper.find('.profile-avatar').exists()).toBe(true)
-          })
-
-          it('has not(!) GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
-          })
-
-          it('has group slug', () => {
-            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('&school-for-citizens')
-          })
-
-          describe('displays group location', () => {
-            it('has group location icon "map-marker"', () => {
-              expect(wrapper.find('[data-test="map-marker"]').exists()).toBe(true)
-            })
-
-            it('has group location name "Paris"', () => {
-              expect(wrapper.text()).toContain('Paris')
-            })
-          })
-
-          it('has group foundation', () => {
-            expect(wrapper.text()).toContain('group.foundation')
-          })
-
-          it('has no(!) members count', () => {
-            expect(wrapper.text()).not.toContain('group.membersCount')
-          })
-
-          it('has join/leave button enabled', () => {
-            expect(wrapper.find('.join-leave-button').exists()).toBe(true)
-            expect(wrapper.find('.join-leave-button').attributes('disabled')).toBeFalsy()
-          })
-
-          it('has group role "pending"', () => {
-            expect(wrapper.text()).toContain('group.role')
-            expect(wrapper.text()).toContain('group.roles.pending')
-          })
-
-          it('has group type "closed"', () => {
-            expect(wrapper.text()).toContain('group.type')
-            expect(wrapper.text()).toContain('group.types.closed')
-          })
-
-          it('has group action radius "national"', () => {
-            expect(wrapper.text()).toContain('group.actionRadius')
-            expect(wrapper.text()).toContain('group.actionRadii.national')
-          })
-
-          it('has group categories "children", "science"', () => {
-            expect(wrapper.text()).toContain('group.categories')
-            expect(wrapper.text()).toContain('contribution.category.name.children')
-            expect(wrapper.text()).toContain('contribution.category.name.science')
-          })
-
-          it('has group goal', () => {
-            expect(wrapper.text()).toContain('group.goal')
-            expect(wrapper.text()).toContain('Our children shall receive education for life.')
-          })
-
-          it('has ProfileList without(!) members', () => {
-            const profileList = wrapper.find('.profile-list')
-            expect(profileList.exists()).toBe(true)
-            // expect(profileList.text()).not.toContain('group.membersListTitle') // does not work, because is part of 'group.membersListTitleNotAllowedSeeingGroupMembers'
-            expect(profileList.text()).toContain(
-              'group.membersListTitleNotAllowedSeeingGroupMembers',
-            )
-            expect(profileList.text()).not.toContain('Peter Lustig')
-            expect(profileList.text()).not.toContain('Jenny Rostock')
-            expect(profileList.text()).not.toContain('Bob der Baumeister')
-            expect(profileList.text()).not.toContain('Huey')
-          })
-
-          it('has description BaseCard', () => {
-            expect(wrapper.find('.group-description').exists()).toBe(true)
-          })
-
-          it('has no(!) profile post add button', () => {
-            expect(wrapper.find('.profile-post-add-button').exists()).toBe(false)
-          })
-
-          it('has empty post list', () => {
-            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
+          it('renders', () => {
+            expect(wrapper.container).toMatchSnapshot()
           })
         })
 
         describe('as none(!) member – "huey"', () => {
           beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': huey,
-                'auth/isModerator': () => false,
-              },
-            }
+            currentUserMock.mockReturnValue(huey)
             wrapper = Wrapper(() => {
               return {
                 Group: [
@@ -1078,99 +443,8 @@ describe('GroupProfileSlug', () => {
             })
           })
 
-          it('has group name – to verificate the group', () => {
-            expect(wrapper.text()).toContain('School For Citizens')
-          })
-
-          it('has not(!) AvatarUploader', () => {
-            expect(wrapper.find('.avatar-uploader').exists()).toBe(false)
-          })
-
-          it('has ProfileAvatar', () => {
-            expect(wrapper.find('.profile-avatar').exists()).toBe(true)
-          })
-
-          it('has not(!) GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
-          })
-
-          it('has group slug', () => {
-            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('&school-for-citizens')
-          })
-
-          describe('displays group location', () => {
-            it('has group location icon "map-marker"', () => {
-              expect(wrapper.find('[data-test="map-marker"]').exists()).toBe(true)
-            })
-
-            it('has group location name "Paris"', () => {
-              expect(wrapper.text()).toContain('Paris')
-            })
-          })
-
-          it('has group foundation', () => {
-            expect(wrapper.text()).toContain('group.foundation')
-          })
-
-          it('has no(!) members count', () => {
-            expect(wrapper.text()).not.toContain('group.membersCount')
-          })
-
-          it('has join/leave button enabled', () => {
-            expect(wrapper.find('.join-leave-button').exists()).toBe(true)
-            expect(wrapper.find('.join-leave-button').attributes('disabled')).toBeFalsy()
-          })
-
-          it('has no(!) group role', () => {
-            expect(wrapper.text()).not.toContain('group.role')
-            expect(wrapper.text()).not.toContain('group.roles')
-          })
-
-          it('has group type "closed"', () => {
-            expect(wrapper.text()).toContain('group.type')
-            expect(wrapper.text()).toContain('group.types.closed')
-          })
-
-          it('has group action radius "national"', () => {
-            expect(wrapper.text()).toContain('group.actionRadius')
-            expect(wrapper.text()).toContain('group.actionRadii.national')
-          })
-
-          it('has group categories "children", "science"', () => {
-            expect(wrapper.text()).toContain('group.categories')
-            expect(wrapper.text()).toContain('contribution.category.name.children')
-            expect(wrapper.text()).toContain('contribution.category.name.science')
-          })
-
-          it('has group goal', () => {
-            expect(wrapper.text()).toContain('group.goal')
-            expect(wrapper.text()).toContain('Our children shall receive education for life.')
-          })
-
-          it('has ProfileList without(!) members', () => {
-            const profileList = wrapper.find('.profile-list')
-            expect(profileList.exists()).toBe(true)
-            // expect(profileList.text()).not.toContain('group.membersListTitle') // does not work, because is part of 'group.membersListTitleNotAllowedSeeingGroupMembers'
-            expect(profileList.text()).toContain(
-              'group.membersListTitleNotAllowedSeeingGroupMembers',
-            )
-            expect(profileList.text()).not.toContain('Peter Lustig')
-            expect(profileList.text()).not.toContain('Jenny Rostock')
-            expect(profileList.text()).not.toContain('Bob der Baumeister')
-            expect(profileList.text()).not.toContain('Huey')
-          })
-
-          it('has description BaseCard', () => {
-            expect(wrapper.find('.group-description').exists()).toBe(true)
-          })
-
-          it('has no(!) profile post add button', () => {
-            expect(wrapper.find('.profile-post-add-button').exists()).toBe(false)
-          })
-
-          it('has empty post list', () => {
-            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
+          it('renders', () => {
+            expect(wrapper.container).toMatchSnapshot()
           })
         })
       })
@@ -1180,12 +454,7 @@ describe('GroupProfileSlug', () => {
       describe('given a current user', () => {
         describe('as group owner – "peter-lustig"', () => {
           beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': peterLustig,
-                'auth/isModerator': () => false,
-              },
-            }
+            currentUserMock.mockReturnValue(peterLustig)
             wrapper = Wrapper(() => {
               return {
                 Group: [
@@ -1199,113 +468,14 @@ describe('GroupProfileSlug', () => {
             })
           })
 
-          it('has group name – to verificate the group', () => {
-            expect(wrapper.text()).toContain('Investigative Journalism')
-          })
-
-          it('has AvatarUploader', () => {
-            expect(wrapper.find('.avatar-uploader').exists()).toBe(true)
-          })
-
-          it('has ProfileAvatar', () => {
-            expect(wrapper.find('.profile-avatar').exists()).toBe(true)
-          })
-
-          it('has GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(true)
-          })
-
-          it('has group slug', () => {
-            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('&investigative-journalism')
-          })
-
-          describe('displays group location', () => {
-            it('has group location icon "map-marker"', () => {
-              expect(wrapper.find('[data-test="map-marker"]').exists()).toBe(true)
-            })
-
-            it('has group location name "Hamburg"', () => {
-              expect(wrapper.text()).toContain('Hamburg')
-            })
-          })
-
-          it('has group foundation', () => {
-            expect(wrapper.text()).toContain('group.foundation')
-          })
-
-          it('has members count', () => {
-            expect(wrapper.text()).toContain('group.membersCount')
-          })
-
-          it('has join/leave button disabled(!)', () => {
-            expect(wrapper.find('.join-leave-button').exists()).toBe(true)
-            expect(wrapper.find('.join-leave-button').attributes('disabled')).toBe('disabled')
-          })
-
-          it('has group role "owner"', () => {
-            expect(wrapper.text()).toContain('group.role')
-            expect(wrapper.text()).toContain('group.roles.owner')
-          })
-
-          it('has group type "hidden"', () => {
-            expect(wrapper.text()).toContain('group.type')
-            expect(wrapper.text()).toContain('group.types.hidden')
-          })
-
-          it('has group action radius "global"', () => {
-            expect(wrapper.text()).toContain('group.actionRadius')
-            expect(wrapper.text()).toContain('group.actionRadii.global')
-          })
-
-          it('has group categories "law", "politics", "it-and-media"', () => {
-            expect(wrapper.text()).toContain('group.categories')
-            expect(wrapper.text()).toContain('contribution.category.name.law')
-            expect(wrapper.text()).toContain('contribution.category.name.politics')
-            expect(wrapper.text()).toContain('contribution.category.name.it-and-media')
-          })
-
-          it('has group goal', () => {
-            expect(wrapper.text()).toContain('group.goal')
-            expect(wrapper.text()).toContain(
-              'Investigative journalists share ideas and insights and can collaborate.',
-            )
-          })
-
-          it('has ProfileList with members', () => {
-            const profileList = wrapper.find('.profile-list')
-            expect(profileList.exists()).toBe(true)
-            expect(profileList.text()).toContain('group.membersListTitle')
-            expect(profileList.text()).not.toContain(
-              'group.membersListTitleNotAllowedSeeingGroupMembers',
-            )
-            expect(profileList.text()).toContain('Peter Lustig')
-            expect(profileList.text()).toContain('Jenny Rostock')
-            expect(profileList.text()).toContain('Bob der Baumeister')
-            expect(profileList.text()).toContain('Huey')
-          })
-
-          it('has description BaseCard', () => {
-            expect(wrapper.find('.group-description').exists()).toBe(true)
-          })
-
-          it('has profile post add button', () => {
-            expect(wrapper.find('.profile-post-add-button').exists()).toBe(true)
-          })
-
-          it('has empty post list', () => {
-            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
+          it('renders', () => {
+            expect(wrapper.container).toMatchSnapshot()
           })
         })
 
         describe('as usual member – "jenny-rostock"', () => {
           beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': jennyRostock,
-                'auth/isModerator': () => false,
-              },
-            }
+            currentUserMock.mockReturnValue(jennyRostock)
             wrapper = Wrapper(() => {
               return {
                 Group: [
@@ -1319,113 +489,14 @@ describe('GroupProfileSlug', () => {
             })
           })
 
-          it('has group name – to verificate the group', () => {
-            expect(wrapper.text()).toContain('Investigative Journalism')
-          })
-
-          it('has not(!) AvatarUploader', () => {
-            expect(wrapper.find('.avatar-uploader').exists()).toBe(false)
-          })
-
-          it('has ProfileAvatar', () => {
-            expect(wrapper.find('.profile-avatar').exists()).toBe(true)
-          })
-
-          it('has not(!) GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
-          })
-
-          it('has group slug', () => {
-            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(true)
-            expect(wrapper.text()).toContain('&investigative-journalism')
-          })
-
-          describe('displays group location', () => {
-            it('has group location icon "map-marker"', () => {
-              expect(wrapper.find('[data-test="map-marker"]').exists()).toBe(true)
-            })
-
-            it('has group location name "Hamburg"', () => {
-              expect(wrapper.text()).toContain('Hamburg')
-            })
-          })
-
-          it('has group foundation', () => {
-            expect(wrapper.text()).toContain('group.foundation')
-          })
-
-          it('has members count', () => {
-            expect(wrapper.text()).toContain('group.membersCount')
-          })
-
-          it('has join/leave button enabled', () => {
-            expect(wrapper.find('.join-leave-button').exists()).toBe(true)
-            expect(wrapper.find('.join-leave-button').attributes('disabled')).toBeFalsy()
-          })
-
-          it('has group role "usual"', () => {
-            expect(wrapper.text()).toContain('group.role')
-            expect(wrapper.text()).toContain('group.roles.usual')
-          })
-
-          it('has group type "hidden"', () => {
-            expect(wrapper.text()).toContain('group.type')
-            expect(wrapper.text()).toContain('group.types.hidden')
-          })
-
-          it('has group action radius "global"', () => {
-            expect(wrapper.text()).toContain('group.actionRadius')
-            expect(wrapper.text()).toContain('group.actionRadii.global')
-          })
-
-          it('has group categories "law", "politics", "it-and-media"', () => {
-            expect(wrapper.text()).toContain('group.categories')
-            expect(wrapper.text()).toContain('contribution.category.name.law')
-            expect(wrapper.text()).toContain('contribution.category.name.politics')
-            expect(wrapper.text()).toContain('contribution.category.name.it-and-media')
-          })
-
-          it('has group goal', () => {
-            expect(wrapper.text()).toContain('group.goal')
-            expect(wrapper.text()).toContain(
-              'Investigative journalists share ideas and insights and can collaborate.',
-            )
-          })
-
-          it('has ProfileList with members', () => {
-            const profileList = wrapper.find('.profile-list')
-            expect(profileList.exists()).toBe(true)
-            expect(profileList.text()).toContain('group.membersListTitle')
-            expect(profileList.text()).not.toContain(
-              'group.membersListTitleNotAllowedSeeingGroupMembers',
-            )
-            expect(profileList.text()).toContain('Peter Lustig')
-            expect(profileList.text()).toContain('Jenny Rostock')
-            expect(profileList.text()).toContain('Bob der Baumeister')
-            expect(profileList.text()).toContain('Huey')
-          })
-
-          it('has description BaseCard', () => {
-            expect(wrapper.find('.group-description').exists()).toBe(true)
-          })
-
-          it('has profile post add button', () => {
-            expect(wrapper.find('.profile-post-add-button').exists()).toBe(true)
-          })
-
-          it('has empty post list', () => {
-            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(true)
+          it('renders', () => {
+            expect(wrapper.container).toMatchSnapshot()
           })
         })
 
         describe('as pending member – "bob-der-baumeister"', () => {
           beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': bobDerBaumeister,
-                'auth/isModerator': () => false,
-              },
-            }
+            currentUserMock.mockReturnValue(bobDerBaumeister)
             wrapper = Wrapper(() => {
               return {
                 Group: [
@@ -1439,101 +510,14 @@ describe('GroupProfileSlug', () => {
             })
           })
 
-          it('has no(!) group name – to verificate the group', () => {
-            expect(wrapper.text()).not.toContain('Investigative Journalism')
-          })
-
-          it('has not(!) AvatarUploader', () => {
-            expect(wrapper.find('.avatar-uploader').exists()).toBe(false)
-          })
-
-          it('has not(!) ProfileAvatar', () => {
-            expect(wrapper.find('.profile-avatar').exists()).toBe(false)
-          })
-
-          it('has not(!) GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
-          })
-
-          it('has no(!) group slug', () => {
-            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(false)
-            expect(wrapper.text()).not.toContain('&investigative-journalism')
-          })
-
-          describe('displays not(!) group location', () => {
-            it('has no(!) group location icon "map-marker"', () => {
-              expect(wrapper.find('[data-test="map-marker"]').exists()).toBe(false)
-            })
-
-            it('has no(!) group location name "Hamburg"', () => {
-              expect(wrapper.text()).not.toContain('Hamburg')
-            })
-          })
-
-          it('has no(!) group foundation', () => {
-            expect(wrapper.text()).not.toContain('group.foundation')
-          })
-
-          it('has no(!) members count', () => {
-            expect(wrapper.text()).not.toContain('group.membersCount')
-          })
-
-          it('has no(!) join/leave button', () => {
-            expect(wrapper.find('.join-leave-button').exists()).toBe(false)
-          })
-
-          it('has no(!) group role', () => {
-            expect(wrapper.text()).not.toContain('group.role')
-            expect(wrapper.text()).not.toContain('group.roles')
-          })
-
-          it('has no(!) group type', () => {
-            expect(wrapper.text()).not.toContain('group.type')
-            expect(wrapper.text()).not.toContain('group.types')
-          })
-
-          it('has no(!) group action radius', () => {
-            expect(wrapper.text()).not.toContain('group.actionRadius')
-            expect(wrapper.text()).not.toContain('group.actionRadii')
-          })
-
-          it('has no(!) group categories "law", "politics", "it-and-media"', () => {
-            expect(wrapper.text()).not.toContain('group.categories')
-            expect(wrapper.text()).not.toContain('contribution.category.name.law')
-            expect(wrapper.text()).not.toContain('contribution.category.name.politics')
-            expect(wrapper.text()).not.toContain('contribution.category.name.it-and-media')
-          })
-
-          it('has no(!) group goal', () => {
-            expect(wrapper.text()).not.toContain('group.goal')
-          })
-
-          it('has not(!) ProfileList', () => {
-            const profileList = wrapper.find('.profile-list')
-            expect(profileList.exists()).toBe(false)
-          })
-
-          it('has not(!) description BaseCard', () => {
-            expect(wrapper.find('.group-description').exists()).toBe(false)
-          })
-
-          it('has no(!) profile post add button', () => {
-            expect(wrapper.find('.profile-post-add-button').exists()).toBe(false)
-          })
-
-          it('has no(!) empty post list', () => {
-            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(false)
+          it('renders', () => {
+            expect(wrapper.container).toMatchSnapshot()
           })
         })
 
         describe('as none(!) member – "huey"', () => {
           beforeEach(() => {
-            mocks.$store = {
-              getters: {
-                'auth/user': huey,
-                'auth/isModerator': () => false,
-              },
-            }
+            currentUserMock.mockReturnValue(huey)
             wrapper = Wrapper(() => {
               return {
                 Group: [
@@ -1547,90 +531,8 @@ describe('GroupProfileSlug', () => {
             })
           })
 
-          it('has no(!) group name – to verificate the group', () => {
-            expect(wrapper.text()).not.toContain('Investigative Journalism')
-          })
-
-          it('has not(!) AvatarUploader', () => {
-            expect(wrapper.find('.avatar-uploader').exists()).toBe(false)
-          })
-
-          it('has not(!) ProfileAvatar', () => {
-            expect(wrapper.find('.profile-avatar').exists()).toBe(false)
-          })
-
-          it('has not(!) GroupContentMenu', () => {
-            expect(wrapper.find('.group-content-menu').exists()).toBe(false)
-          })
-
-          it('has no(!) group slug', () => {
-            // expect(wrapper.find('[data-test="ampersand"]').exists()).toBe(false)
-            expect(wrapper.text()).not.toContain('&investigative-journalism')
-          })
-
-          describe('displays not(!) group location', () => {
-            it('has no(!) group location icon "map-marker"', () => {
-              expect(wrapper.find('[data-test="map-marker"]').exists()).toBe(false)
-            })
-
-            it('has no(!) group location name "Hamburg"', () => {
-              expect(wrapper.text()).not.toContain('Hamburg')
-            })
-          })
-
-          it('has no(!) group foundation', () => {
-            expect(wrapper.text()).not.toContain('group.foundation')
-          })
-
-          it('has no(!) members count', () => {
-            expect(wrapper.text()).not.toContain('group.membersCount')
-          })
-
-          it('has no(!) join/leave button', () => {
-            expect(wrapper.find('.join-leave-button').exists()).toBe(false)
-          })
-
-          it('has no(!) group role', () => {
-            expect(wrapper.text()).not.toContain('group.role')
-            expect(wrapper.text()).not.toContain('group.roles')
-          })
-
-          it('has no(!) group type', () => {
-            expect(wrapper.text()).not.toContain('group.type')
-            expect(wrapper.text()).not.toContain('group.types')
-          })
-
-          it('has no(!) group action radius', () => {
-            expect(wrapper.text()).not.toContain('group.actionRadius')
-            expect(wrapper.text()).not.toContain('group.actionRadii')
-          })
-
-          it('has no(!) group categories "law", "politics", "it-and-media"', () => {
-            expect(wrapper.text()).not.toContain('group.categories')
-            expect(wrapper.text()).not.toContain('contribution.category.name.law')
-            expect(wrapper.text()).not.toContain('contribution.category.name.politics')
-            expect(wrapper.text()).not.toContain('contribution.category.name.it-and-media')
-          })
-
-          it('has no(!) group goal', () => {
-            expect(wrapper.text()).not.toContain('group.goal')
-          })
-
-          it('has not(!) ProfileList', () => {
-            const profileList = wrapper.find('.profile-list')
-            expect(profileList.exists()).toBe(false)
-          })
-
-          it('has not(!) description BaseCard', () => {
-            expect(wrapper.find('.group-description').exists()).toBe(false)
-          })
-
-          it('has no(!) profile post add button', () => {
-            expect(wrapper.find('.profile-post-add-button').exists()).toBe(false)
-          })
-
-          it('has no(!) empty post list', () => {
-            expect(wrapper.find('[data-test="icon-empty"]').exists()).toBe(false)
+          it('renders', () => {
+            expect(wrapper.container).toMatchSnapshot()
           })
         })
       })

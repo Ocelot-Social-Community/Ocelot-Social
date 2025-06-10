@@ -53,7 +53,7 @@
         class="footer"
         v-observe-visibility="(isVisible, entry) => visibilityChanged(isVisible, entry, post.id)"
       >
-        <div class="categories" v-if="categoriesActive">
+        <div class="categories" v-if="categoriesActive && post.categories.length > 0">
           <category
             v-for="category in post.categories"
             :key="category.id"
@@ -72,22 +72,34 @@
         <counter-icon
           icon="heart-o"
           :count="post.shoutedCount"
-          :title="$t('contribution.amount-shouts', { amount: post.shoutedCount })"
+          v-tooltip="{
+            content: $t('contribution.amount-shouts', { amount: post.shoutedCount }),
+            placement: 'bottom-start',
+          }"
         />
         <counter-icon
           icon="comments"
           :count="post.commentsCount"
-          :title="$t('contribution.amount-comments', { amount: post.commentsCount })"
+          v-tooltip="{
+            content: $t('contribution.amount-comments', { amount: post.commentsCount }),
+            placement: 'bottom-start',
+          }"
         />
         <counter-icon
           icon="hand-pointer"
           :count="post.clickedCount"
-          :title="$t('contribution.amount-clicks', { amount: post.clickedCount })"
+          v-tooltip="{
+            content: $t('contribution.amount-clicks', { amount: post.clickedCount }),
+            placement: 'bottom-start',
+          }"
         />
         <counter-icon
           icon="eye"
           :count="post.viewedTeaserCount"
-          :title="$t('contribution.amount-views', { amount: post.viewedTeaserCount })"
+          v-tooltip="{
+            content: $t('contribution.amount-views', { amount: post.viewedTeaserCount }),
+            placement: 'bottom-start',
+          }"
         />
         <client-only>
           <content-menu
@@ -97,6 +109,8 @@
             :is-owner="isAuthor"
             @pinPost="pinPost"
             @unpinPost="unpinPost"
+            @pushPost="pushPost"
+            @unpushPost="unpushPost"
             @toggleObservePost="toggleObservePost"
           />
         </client-only>
@@ -125,9 +139,11 @@ import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import { mapGetters } from 'vuex'
 import PostMutations from '~/graphql/PostMutations'
 import { postMenuModalsData, deletePostMutation } from '~/components/utils/PostHelpers'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   name: 'PostTeaser',
+  mixins: [GetCategories],
   components: {
     Category,
     ContentMenu,
@@ -151,11 +167,6 @@ export default {
       type: Object,
       default: () => {},
     },
-  },
-  data() {
-    return {
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
-    }
   },
   mounted() {
     const { image } = this.post
@@ -212,6 +223,12 @@ export default {
     },
     unpinPost(post) {
       this.$emit('unpinPost', post)
+    },
+    pushPost(post) {
+      this.$emit('pushPost', post)
+    },
+    unpushPost(post) {
+      this.$emit('unpushPost', post)
     },
     toggleObservePost(postId, value) {
       this.$emit('toggleObservePost', postId, value)

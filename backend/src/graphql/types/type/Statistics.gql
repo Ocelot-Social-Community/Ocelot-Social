@@ -1,0 +1,28 @@
+type Query {
+  statistics: Statistics!
+}
+
+type Statistics {
+  users: Int!
+  usersDeleted: Int!
+  posts: Int!
+  comments: Int!
+  notifications: Int!
+  emails: Int!
+  follows: Int!
+  shouts: Int!
+  invites: Int!
+  chatMessages: Int!
+  chatRooms: Int!
+  tags: Int!
+  locations: Int!
+  groups: Int!
+  inviteCodes: Int!
+  inviteCodesExpired: Int!
+  inviteCodesRedeemed: Int!
+  badgesRewarded: Int!
+  badgesDisplayed: Int!
+  usersVerified: Int!
+  reports: Int!
+}
+

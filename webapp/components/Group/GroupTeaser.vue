@@ -44,7 +44,7 @@
           </ds-chip>
         </div>
         <!-- group categories -->
-        <div class="categories" v-if="categoriesActive">
+        <div class="categories" v-if="categoriesActive && group.categories.length > 0">
           <category
             v-for="category in group.categories"
             :key="category.id"
@@ -79,9 +79,11 @@
 <script>
 import Category from '~/components/Category'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   name: 'GroupTeaser',
+  mixins: [GetCategories],
   components: {
     Category,
     GroupContentMenu,
@@ -95,11 +97,6 @@ export default {
       type: Object,
       default: () => {},
     },
-  },
-  data() {
-    return {
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
-    }
   },
   computed: {
     descriptionExcerpt() {

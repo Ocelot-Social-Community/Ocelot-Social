@@ -1,0 +1,15 @@
+extend ../layout.pug
+
+block content
+  .content
+  p= t('registration.introduction')
+  a.button(href=actionUrl)= t('buttons.confirmEmail')
+  p= t('registration.codeHint')
+    span= nonce
+  p= t('registration.codeHintException')
+
+  p= t('registration.notYouStart') 
+    a(href=ORGANIZATION_LINK)= APPLICATION_NAME
+    = t('registration.notYouEnd')
+
+  p= t('registration.ps')

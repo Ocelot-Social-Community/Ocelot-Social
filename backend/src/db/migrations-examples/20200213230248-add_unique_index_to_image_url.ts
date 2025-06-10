@@ -1,4 +1,8 @@
-import { getDriver } from '../../db/neo4j'
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { getDriver } from '@db/neo4j'
 
 export const description = `
   We introduced a new node label 'Image' and we need a primary key for it. Best
@@ -32,7 +36,7 @@ export async function up(next) {
       throw new Error(error)
     }
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -48,6 +52,7 @@ export async function down(next) {
     `)
     await transaction.commit()
     next()
+    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
@@ -55,6 +60,6 @@ export async function down(next) {
     // eslint-disable-next-line no-console
     console.log('rolled back')
   } finally {
-    session.close()
+    await session.close()
   }
 }

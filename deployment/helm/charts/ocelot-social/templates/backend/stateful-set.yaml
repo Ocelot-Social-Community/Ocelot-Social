@@ -18,13 +18,16 @@ spec:
         - name: {{ .Release.Name }}-backend-migrations
           image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default (include "defaultTag" .) }}"
           imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
-          command: ["/bin/sh", "-c", "yarn prod:migrate up"]
+          command: ["/bin/sh", "-c", "yarn prod:migrate init && yarn prod:migrate up"]
           {{- include "resources" .Values.backend.resources | indent 10 }}
           envFrom:
           - configMapRef:
               name: {{ .Release.Name }}-backend-env
           - secretRef:
               name: {{ .Release.Name }}-backend-secret-env
+          volumeMounts:
+            - mountPath: /app/public/uploads
+              name: uploads
       containers:
         - name: {{ .Release.Name }}-backend
           image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default (include "defaultTag" .) }}"

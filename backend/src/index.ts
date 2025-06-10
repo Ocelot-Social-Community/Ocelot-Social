@@ -1,5 +1,7 @@
-import createServer from './server'
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+
 import CONFIG from './config'
+import createServer from './server'
 
 const { server, httpServer } = createServer()
 const url = new URL(CONFIG.GRAPHQL_URI)

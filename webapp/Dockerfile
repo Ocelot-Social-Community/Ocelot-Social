@@ -1,4 +1,4 @@
-FROM node:20.12.1-alpine3.19 AS base
+FROM node:20.12.1-alpine AS base
 LABEL org.label-schema.name="ocelot.social:webapp"
 LABEL org.label-schema.description="Web Frontend of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
@@ -37,7 +37,23 @@ ONBUILD RUN cp -r ./locales /build
 ONBUILD RUN cp -r ./package.json ./yarn.lock /build
 ONBUILD RUN cd /build && yarn install --production=true --frozen-lockfile --non-interactive
 
-FROM build AS test
+FROM base AS test_build
+ENV NODE_ENV=test
+COPY . .
+RUN tools/merge-locales.sh
+RUN yarn install --production=false --frozen-lockfile --non-interactive
+RUN yarn run build
+RUN mkdir /build
+RUN cp -r ./.nuxt /build
+RUN cp -r ./nuxt.config.js /build
+RUN cp -r ./config/ /build
+RUN cp -r ./constants /build
+RUN cp -r ./static /build
+RUN cp -r ./locales /build
+RUN cp -r ./package.json ./yarn.lock /build
+RUN cd /build && yarn install --frozen-lockfile --non-interactive
+
+FROM test_build AS test
 CMD ["/bin/bash", "-c", "yarn run dev"]
 
 FROM build AS production_build

@@ -1,0 +1,239 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { createTestClient } from 'apollo-server-testing'
+
+import CONFIG from '@config/index'
+import Factory, { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
+import { createPostMutation } from '@graphql/queries/createPostMutation'
+import { filterPosts } from '@graphql/queries/filterPosts'
+import createServer from '@src/server'
+
+CONFIG.CATEGORIES_ACTIVE = false
+
+const driver = getDriver()
+const neode = getNeode()
+
+let query
+let mutate
+let authenticatedUser
+let user
+
+beforeAll(async () => {
+  await cleanDatabase()
+
+  const { server } = createServer({
+    context: () => {
+      return {
+        driver,
+        neode,
+        user: authenticatedUser,
+      }
+    },
+  })
+  query = createTestClient(server).query
+  mutate = createTestClient(server).mutate
+})
+
+afterAll(async () => {
+  await cleanDatabase()
+  await driver.close()
+})
+
+describe('Filter Posts', () => {
+  const now = new Date()
+
+  beforeAll(async () => {
+    user = await Factory.build('user', {
+      id: 'user',
+      name: 'User',
+      about: 'I am a user.',
+    })
+    authenticatedUser = await user.toJson()
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'a1',
+        title: 'I am an article',
+        content: 'I am an article written by user.',
+      },
+    })
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'a2',
+        title: 'I am anonther article',
+        content: 'I am another article written by user.',
+      },
+    })
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'e1',
+        title: 'Illegaler Kindergeburtstag',
+        content: 'Elli wird fünf. Wir feiern ihren Geburtstag.',
+        postType: 'Event',
+        eventInput: {
+          eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+          eventVenue: 'Garten der Familie Maier',
+        },
+      },
+    })
+    await mutate({
+      mutation: createPostMutation(),
+      variables: {
+        id: 'e2',
+        title: 'Räuber-Treffen',
+        content: 'Planung der nächsten Räuberereien',
+        postType: 'Event',
+        eventInput: {
+          eventStart: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString(),
+          eventVenue: 'Wirtshaus im Spessart',
+        },
+      },
+    })
+  })
+
+  describe('no filters set', () => {
+    it('finds all posts', async () => {
+      const {
+        data: { Post: result },
+      } = await query({ query: filterPosts() })
+      expect(result).toHaveLength(4)
+      expect(result).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: 'a1' }),
+          expect.objectContaining({ id: 'a2' }),
+          expect.objectContaining({ id: 'e1' }),
+          expect.objectContaining({ id: 'e2' }),
+        ]),
+      )
+    })
+  })
+
+  describe('post type filter set to ["Article"]', () => {
+    it('finds the articles', async () => {
+      const {
+        data: { Post: result },
+      } = await query({ query: filterPosts(), variables: { filter: { postType_in: ['Article'] } } })
+      expect(result).toHaveLength(2)
+      expect(result).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: 'a1' }),
+          expect.objectContaining({ id: 'a2' }),
+        ]),
+      )
+    })
+  })
+
+  describe('post type filter set to ["Event"]', () => {
+    it('finds the articles', async () => {
+      const {
+        data: { Post: result },
+      } = await query({ query: filterPosts(), variables: { filter: { postType_in: ['Event'] } } })
+      expect(result).toHaveLength(2)
+      expect(result).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: 'e1' }),
+          expect.objectContaining({ id: 'e2' }),
+        ]),
+      )
+    })
+  })
+
+  describe('post type filter set to ["Article", "Event"]', () => {
+    it('finds all posts', async () => {
+      const {
+        data: { Post: result },
+      } = await query({
+        query: filterPosts(),
+        variables: { filter: { postType_in: ['Article', 'Event'] } },
+      })
+      expect(result).toHaveLength(4)
+      expect(result).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: 'a1' }),
+          expect.objectContaining({ id: 'a2' }),
+          expect.objectContaining({ id: 'e1' }),
+          expect.objectContaining({ id: 'e2' }),
+        ]),
+      )
+    })
+  })
+
+  describe('order events by event start descending', () => {
+    it('finds the events ordered accordingly', async () => {
+      const {
+        data: { Post: result },
+      } = await query({
+        query: filterPosts(),
+        variables: { filter: { postType_in: ['Event'] }, orderBy: ['eventStart_desc'] },
+      })
+      expect(result).toHaveLength(2)
+      expect(result).toEqual([
+        expect.objectContaining({
+          id: 'e1',
+          eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+        }),
+        expect.objectContaining({
+          id: 'e2',
+          eventStart: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString(),
+        }),
+      ])
+    })
+  })
+
+  // Does not work on months end
+  // eslint-disable-next-line jest/no-disabled-tests
+  describe.skip('order events by event start ascending', () => {
+    it('finds the events ordered accordingly', async () => {
+      const {
+        data: { Post: result },
+      } = await query({
+        query: filterPosts(),
+        variables: { filter: { postType_in: ['Event'] }, orderBy: ['eventStart_asc'] },
+      })
+      expect(result).toHaveLength(2)
+      expect(result).toEqual([
+        expect.objectContaining({
+          id: 'e2',
+          eventStart: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString(),
+        }),
+        expect.objectContaining({
+          id: 'e1',
+          eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+        }),
+      ])
+    })
+  })
+
+  // Does not work on months end
+  // eslint-disable-next-line jest/no-disabled-tests
+  describe.skip('filter events by event start date', () => {
+    it('finds only events after given date', async () => {
+      const {
+        data: { Post: result },
+      } = await query({
+        query: filterPosts(),
+        variables: {
+          filter: {
+            postType_in: ['Event'],
+            eventStart_gte: new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate() + 2,
+            ).toISOString(),
+          },
+        },
+      })
+      expect(result).toHaveLength(1)
+      expect(result).toEqual([
+        expect.objectContaining({
+          id: 'e1',
+          eventStart: new Date(now.getFullYear(), now.getMonth() + 1).toISOString(),
+        }),
+      ])
+    })
+  })
+})

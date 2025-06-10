@@ -1,81 +1,61 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ObserveButton observed renders 1`] = `
-<div
-  class="ds-space text-align-center"
-  style="margin-top: 4px; margin-bottom: 4px;"
->
-  <button
-    class="base-button --icon-only --circle --filled"
-    type="button"
-  >
-    <span
-      class="base-icon"
-    >
-      <!---->
-    </span>
-     
-    <!---->
-     
-  </button>
-   
+<div>
   <div
-    class="ds-space"
-    style="margin-bottom: 4px;"
-  />
-   
-  <p
-    class="ds-text observe-button-text ds-text-soft"
+    circle=""
+    class="action-button"
   >
-    <h3
-      class="ds-heading ds-heading-h3"
-      style="display: inline;"
+    <button
+      aria-label="observeButton.observed"
+      class="base-button --icon-only --circle --filled"
+      type="button"
     >
-      1x
-    </h3>
-    
-    
-  
-  </p>
+      <span
+        class="base-icon"
+      >
+        <!---->
+      </span>
+       
+      <!---->
+       
+    </button>
+     
+    <div
+      class="count"
+    >
+      1
+    </div>
+  </div>
 </div>
 `;
 
 exports[`ObserveButton unobserved renders 1`] = `
-<div
-  class="ds-space text-align-center"
-  style="margin-top: 4px; margin-bottom: 4px;"
->
-  <button
-    class="base-button --icon-only --circle"
-    type="button"
-  >
-    <span
-      class="base-icon"
-    >
-      <!---->
-    </span>
-     
-    <!---->
-     
-  </button>
-   
+<div>
   <div
-    class="ds-space"
-    style="margin-bottom: 4px;"
-  />
-   
-  <p
-    class="ds-text observe-button-text ds-text-soft"
+    circle=""
+    class="action-button"
   >
-    <h3
-      class="ds-heading ds-heading-h3"
-      style="display: inline;"
+    <button
+      aria-label="observeButton.observed"
+      class="base-button --icon-only --circle"
+      type="button"
     >
-      1x
-    </h3>
-    
-    
-  
-  </p>
+      <span
+        class="base-icon"
+      >
+        <!---->
+      </span>
+       
+      <!---->
+       
+    </button>
+     
+    <div
+      class="count"
+    >
+      1
+    </div>
+  </div>
 </div>
 `;

@@ -1,10 +1,11 @@
-import { Given } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
+import './../../factories'
 
-Given("the following {string} are in the database:", (table,data) => {
+defineStep('the following {string} are in the database:', (table,data) => {
   switch(table){
-    case "posts":
+    case 'posts':
       data.hashes().forEach( entry => {
-        cy.factory().build("post", {
+        cy.factory().build('post', {
           ...entry,
           deleted: Boolean(entry.deleted),
           disabled: Boolean(entry.disabled),
@@ -12,29 +13,29 @@ Given("the following {string} are in the database:", (table,data) => {
         },{
           ...entry,
           tagIds: entry.tagIds ? entry.tagIds.split(',').map(item => item.trim()) : [],
-        });
+        })
       })
       break
-    case "comments":
+    case 'comments':
       data.hashes().forEach( entry => {
         cy.factory()
-          .build("comment", entry, entry);
+          .build('comment', entry, entry)
       })
       break
-    case "users":
+    case 'users':
       data.hashes().forEach( entry => {
-        cy.factory().build("user", entry, entry);
-      });
+        cy.factory().build('user', entry, entry)
+      })
       break
-    case "tags":
+    case 'tags':
       data.hashes().forEach( entry => {
-        cy.factory().build("tag", entry, entry)
-      });
+        cy.factory().build('tag', entry, entry)
+      })
       break
-    case "donations":
+    case 'donations':
       data.hashes().forEach( entry => {
-        cy.factory().build("donations", entry, entry)
-      });
+        cy.factory().build('donations', entry, entry)
+      })
       break
   }
 })

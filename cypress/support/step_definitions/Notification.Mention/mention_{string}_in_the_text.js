@@ -1,9 +1,9 @@
-import { When } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-When("mention {string} in the text", mention => {
-  cy.get(".ProseMirror")
-    .type(" @");
-  cy.get(".suggestion-list__item")
+defineStep('mention {string} in the text', mention => {
+  cy.get('.ProseMirror')
+    .type(' @')
+  cy.get('.suggestion-list__item')
     .contains(mention)
-    .click();
-});
+    .click()
+})

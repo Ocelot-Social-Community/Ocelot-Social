@@ -1,15 +1,15 @@
-import { Given } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-Given("there is an annoying user who has muted me", () => {
+defineStep('there is an annoying user who has muted me', () => {
   cy.neode()
-    .firstOf("User", {
+    .firstOf('User', {
       role: 'moderator'
     })
     .then(mutedUser => {
       cy.neode()
-        .firstOf("User", {
+        .firstOf('User', {
           id: 'user'
         })
-      .relateTo(mutedUser, "muted");
-    });
-});
+      .relateTo(mutedUser, 'muted')
+    })
+})

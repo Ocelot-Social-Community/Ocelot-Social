@@ -53,6 +53,7 @@ export default (i18n) => {
           id
           name
           slug
+          groupType
         }
       }
     }
@@ -95,6 +96,7 @@ export const filterPosts = (i18n) => {
           id
           name
           slug
+          groupType
         }
       }
     }
@@ -136,6 +138,7 @@ export const profilePagePosts = (i18n) => {
           id
           name
           slug
+          groupType
         }
       }
     }
@@ -183,6 +186,17 @@ export const relatedContributions = (i18n) => {
             ...badges
           }
         }
+      }
+    }
+  `
+}
+
+export const postsPinnedCountsQuery = () => {
+  return gql`
+    query {
+      PostsPinnedCounts {
+        maxPinnedPosts
+        currentlyPinnedPosts
       }
     }
   `

@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ActionButton.vue when disabled renders 1`] = `
+<div>
+  <div
+    class="action-button"
+  >
+    <button
+      aria-label="Click me"
+      class="base-button --icon-only --circle"
+      disabled="disabled"
+      type="button"
+    >
+      <span
+        class="base-icon"
+      >
+        <!---->
+      </span>
+       
+      <!---->
+       
+    </button>
+     
+    <div
+      class="count"
+    >
+      7
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ActionButton.vue when not disabled renders 1`] = `
+<div>
+  <div
+    class="action-button"
+  >
+    <button
+      aria-label="Click me"
+      class="base-button --icon-only --circle"
+      type="button"
+    >
+      <span
+        class="base-icon"
+      >
+        <!---->
+      </span>
+       
+      <!---->
+       
+    </button>
+     
+    <div
+      class="count"
+    >
+      7
+    </div>
+  </div>
+</div>
+`;

@@ -1,10 +1,10 @@
-import { When } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-When("open the notification menu and click on the first item", () => {
-  cy.get(".notifications-menu")
+defineStep('open the notification menu and click on the first item', () => {
+  cy.get('.notifications-menu')
     .invoke('show')
-    .click(); // "invoke('show')" because of the delay for show the menu
-  cy.get(".notification .link")
+    .click() // 'invoke('show')' because of the delay for show the menu
+  cy.get('.notification-content a')
     .first()
-    .click({force: true});
-});  
+    .click({force: true})
+})

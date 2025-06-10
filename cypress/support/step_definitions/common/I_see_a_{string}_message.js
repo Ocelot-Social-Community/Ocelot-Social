@@ -1,5 +1,5 @@
-import { Then } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-Then("I see a {string} message:", (_type, message) => {
-  cy.contains(message);
-});
+defineStep('I see a {string} message:', (_type, message) => {
+  cy.contains(message)
+})

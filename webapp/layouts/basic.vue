@@ -23,7 +23,7 @@
       </ds-container>
     </div>
     <ds-container>
-      <div style="padding: 5rem 2rem">
+      <div class="content">
         <nuxt />
       </div>
     </ds-container>
@@ -61,12 +61,22 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .main-navigation-right {
   display: flex;
   justify-content: flex-end;
 }
 .main-navigation-right .desktop-view {
   float: right;
+}
+
+.layout-blank .content {
+  padding: 5rem 2rem;
+}
+@media only screen and (max-width: 500px) {
+  .layout-blank .content {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
 }
 </style>

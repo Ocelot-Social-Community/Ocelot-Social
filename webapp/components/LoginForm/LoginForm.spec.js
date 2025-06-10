@@ -15,6 +15,9 @@ const stubs = {
 }
 
 const authUserMock = jest.fn().mockReturnValue({ activeCategories: [] })
+const categoriesMock = jest
+  .fn()
+  .mockReturnValue([{ id: 'cat0' }, { id: 'cat1' }, { id: 'cat2' }, { id: 'cat3' }, { id: 'cat4' }])
 
 describe('LoginForm', () => {
   let mocks
@@ -31,6 +34,7 @@ describe('LoginForm', () => {
         getters: {
           'auth/pending': () => false,
           'auth/user': authUserMock,
+          'categories/categories': categoriesMock,
         },
         actions: {
           'auth/login': jest.fn(),
@@ -74,7 +78,9 @@ describe('LoginForm', () => {
 
         describe('no categories saved', () => {
           it('resets the categories', async () => {
-            await fillIn(Wrapper())
+            const wrapper = Wrapper()
+            await fillIn(wrapper)
+            await wrapper.vm.$nextTick()
             expect(storeMocks.mutations['posts/RESET_CATEGORIES']).toHaveBeenCalled()
             expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).not.toHaveBeenCalled()
           })
@@ -82,13 +88,28 @@ describe('LoginForm', () => {
 
         describe('categories saved', () => {
           it('sets the categories', async () => {
-            authUserMock.mockReturnValue({ activeCategories: ['cat1', 'cat9', 'cat12'] })
-            await fillIn(Wrapper())
+            authUserMock.mockReturnValue({ activeCategories: ['cat0', 'cat2', 'cat4'] })
+            const wrapper = Wrapper()
+            await fillIn(wrapper)
+            await wrapper.vm.$nextTick()
             expect(storeMocks.mutations['posts/RESET_CATEGORIES']).toHaveBeenCalled()
             expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledTimes(3)
-            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledWith({}, 'cat1')
-            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledWith({}, 'cat9')
-            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledWith({}, 'cat12')
+            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledWith({}, 'cat0')
+            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledWith({}, 'cat2')
+            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledWith({}, 'cat4')
+          })
+        })
+
+        describe('all categories saved', () => {
+          it('resets the categories', async () => {
+            authUserMock.mockReturnValue({
+              activeCategories: ['cat0', 'cat1', 'cat2', 'cat3', 'cat4', 'cat5'],
+            })
+            const wrapper = Wrapper()
+            await fillIn(wrapper)
+            await wrapper.vm.$nextTick()
+            expect(storeMocks.mutations['posts/RESET_CATEGORIES']).toHaveBeenCalled()
+            expect(storeMocks.mutations['posts/TOGGLE_CATEGORY']).not.toHaveBeenCalled()
           })
         })
       })

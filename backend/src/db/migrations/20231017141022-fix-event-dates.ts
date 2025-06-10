@@ -1,11 +1,15 @@
-import { getDriver } from '../../db/neo4j'
+/* eslint-disable @typescript-eslint/no-base-to-string */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+
+import { getDriver } from '@db/neo4j'
 
 export const description = `
 Transform event start and end date of format 'YYYY-MM-DD HH:MM:SS' in CEST
 to ISOString in UTC.
 `
 
-export async function up(next) {
+export async function up(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
@@ -18,11 +22,11 @@ export async function up(next) {
     `)
     for (const event of events.records) {
       let [id, eventStart, eventEnd] = event
-      let date = new Date(eventStart)
+      let date = new Date(eventStart as string)
       date.setHours(date.getHours() - 1)
       eventStart = date.toISOString()
       if (eventEnd) {
-        date = new Date(eventEnd)
+        date = new Date(eventEnd as string)
         date.setHours(date.getHours() - 1)
         eventEnd = date.toISOString()
       }
@@ -34,7 +38,6 @@ export async function up(next) {
       `)
     }
     await transaction.commit()
-    next()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
@@ -43,18 +46,17 @@ export async function up(next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
-export async function down(next) {
+export async function down(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
 
   try {
     // No sense in running this down
-    next()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
@@ -63,6 +65,6 @@ export async function down(next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }

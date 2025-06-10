@@ -35,7 +35,25 @@
       <!-- leave this here in case the scoped variable is needed in the future nobody would remember this -->
       <!-- <template v-slot="{ errors }"> -->
       <template>
+        <div v-if="askForRealName" class="full-name">
+          <!-- <p>{{ $t('settings.data.realNamePlease') }}</p>-->
+          <ds-input
+            id="givenName"
+            model="givenName"
+            icon="user"
+            :label="$t('settings.data.givenName')"
+            :placeholder="$t('settings.data.givenNamePlaceholder')"
+          />
+          <ds-input
+            id="surName"
+            model="surName"
+            icon="user"
+            :label="$t('settings.data.surName')"
+            :placeholder="$t('settings.data.surNamePlaceholder')"
+          />
+        </div>
         <ds-input
+          v-else
           id="name"
           model="name"
           icon="user"
@@ -78,6 +96,15 @@
         </div>
         <password-strength class="password-strength" :password="formData.password" />
 
+        <!-- location -->
+        <location-select
+          v-if="locationRequired"
+          class="location-select"
+          v-model="locationName"
+          :canBeCleared="false"
+          :showPreviousLocation="false"
+        />
+
         <email-display-and-verify :email="sliderData.collectedInputData.email" />
         <ds-text>
           <input
@@ -102,13 +129,13 @@
           <input
             id="checkbox1"
             type="checkbox"
-            v-model="recieveCommunicationAsEmailsEtcConfirmed"
-            :checked="recieveCommunicationAsEmailsEtcConfirmed"
+            v-model="receiveCommunicationAsEmailsEtcConfirmed"
+            :checked="receiveCommunicationAsEmailsEtcConfirmed"
           />
           <label for="checkbox1">
             {{
               $t(
-                'components.registration.create-user-account.recieveCommunicationAsEmailsEtcConfirmed',
+                'components.registration.create-user-account.receiveCommunicationAsEmailsEtcConfirmed',
               )
             }}
           </label>
@@ -130,6 +157,9 @@ import EmailDisplayAndVerify from './EmailDisplayAndVerify'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
 import ShowPassword from '../ShowPassword/ShowPassword.vue'
+import LocationSelect from '~/components/Select/LocationSelect'
+
+const threePerEmSpace = ' ' // unicode u+2004;
 
 export default {
   name: 'RegistrationSlideCreate',
@@ -139,6 +169,7 @@ export default {
     PasswordStrength,
     ShowPassword,
     SweetalertIcon,
+    LocationSelect,
   },
   props: {
     sliderData: { type: Object, required: true },
@@ -149,13 +180,25 @@ export default {
       links,
       supportEmail: emails.SUPPORT_EMAIL,
       formData: {
+        givenName: '',
+        surName: '',
         name: '',
         ...passwordForm.formData,
       },
       formSchema: {
+        givenName: {
+          type: 'string',
+          required: this.$env.ASK_FOR_REAL_NAME,
+          min: 2,
+        },
+        surName: {
+          type: 'string',
+          required: this.$env.ASK_FOR_REAL_NAME,
+          min: 2,
+        },
         name: {
           type: 'string',
-          required: true,
+          required: !this.$env.ASK_FOR_REAL_NAME,
           min: 3,
         },
         ...passwordForm.formSchema,
@@ -164,48 +207,64 @@ export default {
       // TODO: Our styleguide does not support checkmarks.
       // Integrate termsAndConditionsConfirmed into `this.formData` once we
       // have checkmarks available.
+      locationName: '',
       termsAndConditionsConfirmed: false,
-      recieveCommunicationAsEmailsEtcConfirmed: false,
+      receiveCommunicationAsEmailsEtcConfirmed: false,
       showPassword: false,
       showPasswordConfirm: false,
     }
   },
   mounted: function () {
-    this.$nextTick(function () {
-      // Code that will run only after the entire view has been rendered
+    if (this.askForRealName) {
+      if (this.sliderData.collectedInputData.name) {
+        const split = this.sliderData.collectedInputData.name.split(threePerEmSpace)
+        this.formData.givenName = split[0]
+        this.formData.surName = split[1] || ''
+      } else {
+        this.formData.surName = ''
+        this.formData.givenName = ''
+      }
+    } else {
+      this.formData.name = this.sliderData.collectedInputData.name || ''
+    }
+    this.formData.password = this.sliderData.collectedInputData.password || ''
+    this.formData.passwordConfirmation =
+      this.sliderData.collectedInputData.passwordConfirmation || ''
+    this.termsAndConditionsConfirmed =
+      this.sliderData.collectedInputData.termsAndConditionsConfirmed || false
+    this.receiveCommunicationAsEmailsEtcConfirmed =
+      this.sliderData.collectedInputData.receiveCommunicationAsEmailsEtcConfirmed || false
+    this.locationName = this.sliderData.collectedInputData.locationName || ''
+    this.sendValidation()
 
-      this.formData.name = this.sliderData.collectedInputData.name
-        ? this.sliderData.collectedInputData.name
-        : ''
-      this.formData.password = this.sliderData.collectedInputData.password
-        ? this.sliderData.collectedInputData.password
-        : ''
-      this.formData.passwordConfirmation = this.sliderData.collectedInputData.passwordConfirmation
-        ? this.sliderData.collectedInputData.passwordConfirmation
-        : ''
-      this.termsAndConditionsConfirmed = this.sliderData.collectedInputData
-        .termsAndConditionsConfirmed
-        ? this.sliderData.collectedInputData.termsAndConditionsConfirmed
-        : false
-      this.recieveCommunicationAsEmailsEtcConfirmed = this.sliderData.collectedInputData
-        .recieveCommunicationAsEmailsEtcConfirmed
-        ? this.sliderData.collectedInputData.recieveCommunicationAsEmailsEtcConfirmed
-        : false
-      this.sendValidation()
-
-      this.sliderData.setSliderValuesCallback(this.validInput, {
-        sliderSettings: { buttonSliderCallback: this.onNextClick },
-      })
+    this.sliderData.setSliderValuesCallback(this.validInput, {
+      sliderSettings: { buttonSliderCallback: this.onNextClick },
     })
   },
   computed: {
+    formLocationName() {
+      // toDo: Mixin or move it to location select component
+      const isNestedValue =
+        typeof this.locationName === 'object' && typeof this.locationName.value === 'string'
+      const isDirectString = typeof this.locationName === 'string'
+      return isNestedValue ? this.locationName.value : isDirectString ? this.locationName : ''
+    },
+    locationRequired() {
+      return this.$env.REQUIRE_LOCATION
+    },
+    askForRealName() {
+      return this.$env.ASK_FOR_REAL_NAME
+    },
     validInput() {
       return (
-        this.formData.name.length >= 3 &&
+        (this.askForRealName
+          ? this.formData.givenName.length >= 2 && this.formData.surName.length >= 2
+          : this.formData.name.length >= 3) &&
         this.formData.password.length >= 1 &&
         this.formData.password === this.formData.passwordConfirmation &&
         this.termsAndConditionsConfirmed &&
-        this.recieveCommunicationAsEmailsEtcConfirmed
+        this.receiveCommunicationAsEmailsEtcConfirmed &&
+        (this.locationRequired ? this.formLocationName : true)
       )
     },
     iconNamePassword() {
@@ -219,14 +278,23 @@ export default {
     termsAndConditionsConfirmed() {
       this.sendValidation()
     },
-    recieveCommunicationAsEmailsEtcConfirmed() {
+    receiveCommunicationAsEmailsEtcConfirmed() {
+      this.sendValidation()
+    },
+    locationName() {
       this.sendValidation()
     },
   },
   methods: {
+    buildName(data) {
+      if (this.askForRealName) return `${data.givenName}${threePerEmSpace}${data.surName}`
+      return data.name
+    },
     sendValidation() {
-      const { name, password, passwordConfirmation } = this.formData
-      const { termsAndConditionsConfirmed, recieveCommunicationAsEmailsEtcConfirmed } = this
+      const { password, passwordConfirmation } = this.formData
+      const name = this.buildName(this.formData)
+      const { termsAndConditionsConfirmed, receiveCommunicationAsEmailsEtcConfirmed } = this
+      const locationName = this.formLocationName
 
       this.sliderData.setSliderValuesCallback(this.validInput, {
         collectedInputData: {
@@ -234,7 +302,8 @@ export default {
           password,
           passwordConfirmation,
           termsAndConditionsConfirmed,
-          recieveCommunicationAsEmailsEtcConfirmed,
+          receiveCommunicationAsEmailsEtcConfirmed,
+          locationName,
         },
       })
     },
@@ -245,10 +314,12 @@ export default {
       this.sendValidation()
     },
     async submit() {
-      const { name, password } = this.formData
+      const { password } = this.formData
+      const name = this.buildName(this.formData).replace(threePerEmSpace, ' ')
       const { email, inviteCode = null, nonce } = this.sliderData.collectedInputData
       const termsAndConditionsAgreedVersion = VERSION
       const locale = this.$i18n.locale()
+
       try {
         this.sliderData.setSliderValuesCallback(null, {
           sliderSettings: { buttonLoading: true },
@@ -263,13 +334,24 @@ export default {
             nonce,
             termsAndConditionsAgreedVersion,
             locale,
+            locationName: this.formLocationName,
           },
         })
         this.response = 'success'
         setTimeout(async () => {
           await this.$store.dispatch('auth/login', { email, password })
           this.$toast.success(this.$t('login.success'))
-          this.$router.push('/')
+          const { validateInviteCode } = this.sliderData.sliders[0].data.response
+          if (
+            validateInviteCode &&
+            validateInviteCode.invitedTo &&
+            validateInviteCode.invitedTo.groupType === 'public'
+          ) {
+            const { invitedTo } = validateInviteCode
+            this.$router.push(`/groups/${invitedTo.slug}`)
+          } else {
+            this.$router.push('/')
+          }
           this.sliderData.setSliderValuesCallback(null, {
             sliderSettings: { buttonLoading: false },
           })
@@ -318,7 +400,7 @@ export default {
   padding-right: 0;
   height: $input-height;
   margin-bottom: 10px;
-  margin-bottom: 16px;
+  margin-bottom: $space-small;
 
   color: $text-color-base;
   background: $background-color-disabled;
@@ -340,12 +422,20 @@ export default {
 
   .password-field {
     position: relative;
-    padding-top: 16px;
+    padding-top: $space-small;
     border: none;
     border-style: none;
     appearance: none;
     margin-left: 0;
     width: 100%;
   }
+}
+
+.full-name {
+  padding-bottom: $space-small;
+}
+
+.location-select {
+  padding-bottom: $space-base;
 }
 </style>

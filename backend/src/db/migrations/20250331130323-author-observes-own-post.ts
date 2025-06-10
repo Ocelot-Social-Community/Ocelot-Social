@@ -1,10 +1,12 @@
-import { getDriver } from '../../db/neo4j'
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
+import { getDriver } from '@db/neo4j'
 
 export const description = `
 All authors observe their posts.
 `
 
-export async function up(next) {
+export async function up(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
@@ -21,7 +23,6 @@ export async function up(next) {
       RETURN post
     `)
     await transaction.commit()
-    next()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
@@ -30,11 +31,11 @@ export async function up(next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
-export async function down(next) {
+export async function down(_next) {
   const driver = getDriver()
   const session = driver.session()
   const transaction = session.beginTransaction()
@@ -47,7 +48,6 @@ export async function down(next) {
       RETURN p
     `)
     await transaction.commit()
-    next()
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(error)
@@ -56,6 +56,6 @@ export async function down(next) {
     console.log('rolled back')
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }

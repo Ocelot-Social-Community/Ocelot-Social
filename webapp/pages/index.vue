@@ -116,6 +116,8 @@
             @removePostFromList="posts = removePostFromList(post, posts)"
             @pinPost="pinPost(post, refetchPostList)"
             @unpinPost="unpinPost(post, refetchPostList)"
+            @pushPost="pushPost(post, refetchPostList)"
+            @unpushPost="unpushPost(post, refetchPostList)"
             @toggleObservePost="
               (postId, value) => toggleObservePost(postId, value, refetchPostList)
             "
@@ -155,6 +157,7 @@ import UpdateQuery from '~/components/utils/UpdateQuery'
 import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
 import { SHOW_CONTENT_FILTER_MASONRY_GRID } from '~/constants/filter.js'
 import { POST_ADD_BUTTON_POSITION_TOP } from '~/constants/posts.js'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   components: {
@@ -167,7 +170,7 @@ export default {
     FilterMenuComponent,
     HeaderButton,
   },
-  mixins: [postListActions, mobile()],
+  mixins: [postListActions, mobile(), GetCategories],
   data() {
     const { hashtag = null } = this.$route.query
     return {
@@ -184,7 +187,6 @@ export default {
       offset: 0,
       pageSize: 12,
       hashtag,
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
       SHOW_CONTENT_FILTER_MASONRY_GRID,
       POST_ADD_BUTTON_POSITION_TOP,
     }

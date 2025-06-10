@@ -1,8 +1,12 @@
-import gql from 'graphql-tag'
-import Factory, { cleanDatabase } from '../../db/factories'
-import { getNeode, getDriver } from '../../db/neo4j'
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
-import createServer from '../../server'
+import gql from 'graphql-tag'
+
+import Factory, { cleanDatabase } from '@db/factories'
+import { getNeode, getDriver } from '@db/neo4j'
+import createServer from '@src/server'
 
 const neode = getNeode()
 const driver = getDriver()
@@ -75,7 +79,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  driver.close()
+  await driver.close()
 })
 
 beforeEach(async () => {

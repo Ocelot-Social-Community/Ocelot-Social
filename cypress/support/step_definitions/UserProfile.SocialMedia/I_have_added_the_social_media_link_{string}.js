@@ -1,6 +1,6 @@
-import { Given } from "@badeball/cypress-cucumber-preprocessor";
+import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
-Given('I have added the social media link {string}', (link) => {
+defineStep('I have added the social media link {string}', (link) => {
   cy.visit('/settings/my-social-media')
     .get('[data-test="add-save-button"]')
     .click()

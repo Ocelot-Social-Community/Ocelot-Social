@@ -17,5 +17,4 @@ build/
 maintenance-worker/
 neo4j/
 
-public/uploads/*
 !.gitkeep

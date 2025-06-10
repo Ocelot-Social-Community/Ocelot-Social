@@ -1,5 +1,11 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import trunc from 'trunc-html'
-import { DESCRIPTION_EXCERPT_HTML_LENGTH } from '../constants/groups'
+
+import { DESCRIPTION_EXCERPT_HTML_LENGTH } from '@constants/groups'
 
 export default {
   Mutation: {

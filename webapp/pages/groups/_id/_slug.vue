@@ -18,18 +18,14 @@
           <!-- Menu -->
           <client-only>
             <group-content-menu
-              v-if="isGroupOwner"
+              v-if="isGroupMemberNonePending"
               class="group-profile-content-menu"
               :usage="'groupProfile'"
               :group="group || {}"
               placement="bottom-end"
+              @mute="muteGroup"
+              @unmute="unmuteGroup"
             />
-            <!-- TODO: implement later on -->
-            <!-- @mute="muteUser"
-                 @unmute="unmuteUser"
-                 @block="blockUser"
-                 @unblock="unblockUser"
-                 @delete="deleteUser" -->
           </client-only>
           <ds-space margin="small">
             <!-- group name -->
@@ -84,19 +80,9 @@
                  </ds-flex-item> -->
           </ds-flex>
           <div class="action-buttons">
-            <!-- <base-button v-if="user.isBlocked" @click="unblockUser(user)">
-                 {{ $t('settings.blocked-users.unblock') }}
-                 </base-button>
-                 <base-button v-if="user.isMuted" @click="unmuteUser(user)">
-                 {{ $t('settings.muted-users.unmute') }}
-                 </base-button>
-                 <follow-button
-                 v-if="!user.isMuted && !user.isBlocked"
-                 :follow-id="user.id"
-                 :is-followed="user.followedByCurrentUser"
-                 @optimistic="optimisticFollow"
-                 @update="updateFollow"
-                 /> -->
+            <base-button danger v-if="group.isMutedByMe" @click="unmuteGroup" icon="volume-up">
+              {{ $t('group.unmute') }}
+            </base-button>
             <!-- Group join / leave -->
             <join-leave-button
               :group="group || {}"
@@ -108,8 +94,6 @@
               @prepare="prepareJoinLeave"
               @update="updateJoinLeave"
             />
-            <!-- implement:
-                 v-if="!user.isMuted && !user.isBlocked" -->
           </div>
           <hr />
           <ds-space margin-top="small" margin-bottom="small">
@@ -147,7 +131,9 @@
             <ds-space margin="x-small" />
           </ds-space>
           <!-- group categories -->
-          <template v-if="categoriesActive">
+          <template
+            v-if="categoriesActive && group && group.categories && group.categories.length > 0"
+          >
             <hr />
             <ds-space margin-top="small" margin-bottom="small">
               <ds-text class="centered-text hyphenate-text" color="soft" size="small">
@@ -283,6 +269,8 @@
                 @removePostFromList="posts = removePostFromList(post, posts)"
                 @pinPost="pinPost(post, refetchPostList)"
                 @unpinPost="unpinPost(post, refetchPostList)"
+                @pushPost="pushPost(post, refetchPostList)"
+                @unpushPost="unpushPost(post, refetchPostList)"
                 @toggleObservePost="
                   (postId, value) => toggleObservePost(postId, value, refetchPostList)
                 "
@@ -314,8 +302,7 @@
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
-// import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
-// import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
+import { muteGroup, unmuteGroup } from '~/graphql/settings/MutedGroups'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import postListActions from '~/mixins/postListActions'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
@@ -333,6 +320,8 @@ import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import ProfileList from '~/components/features/ProfileList/ProfileList'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
+import { mapGetters } from 'vuex'
+import GetCategories from '~/mixins/getCategoriesMixin.js'
 // import SocialMedia from '~/components/SocialMedia/SocialMedia'
 // import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
 
@@ -363,7 +352,7 @@ export default {
     // SocialMedia,
     // TabNavigation,
   },
-  mixins: [postListActions, SortCategories],
+  mixins: [postListActions, SortCategories, GetCategories],
   transition: {
     name: 'slide-up',
     mode: 'out-in',
@@ -377,7 +366,6 @@ export default {
     // const filter = tabToFilterMapping({ tab: 'post', id: this.$route.params.id })
     const filter = { group: { id: this.$route.params.id } }
     return {
-      categoriesActive: this.$env.CATEGORIES_ACTIVE,
       loadGroupMembers: false,
       posts: [],
       hasMore: true,
@@ -395,9 +383,9 @@ export default {
     }
   },
   computed: {
-    currentUser() {
-      return this.$store.getters['auth/user']
-    },
+    ...mapGetters({
+      currentUser: 'auth/user',
+    }),
     group() {
       return this.Group && this.Group[0] ? this.Group[0] : {}
     },
@@ -470,6 +458,32 @@ export default {
     //     this.resetPostList()
     //   }
     // },
+    async muteGroup() {
+      try {
+        await this.$apollo.mutate({
+          mutation: muteGroup(),
+          variables: {
+            groupId: this.group.id,
+          },
+        })
+        this.$toast.success(this.$t('group.muted'))
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
+    },
+    async unmuteGroup() {
+      try {
+        await this.$apollo.mutate({
+          mutation: unmuteGroup(),
+          variables: {
+            groupId: this.group.id,
+          },
+        })
+        this.$toast.success(this.$t('group.unmuted'))
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
+    },
     uniq(items, field = 'id') {
       return uniqBy(items, field)
     },
@@ -483,7 +497,7 @@ export default {
           offset: this.offset,
           filter: this.filter,
           first: this.pageSize,
-          orderBy: 'createdAt_desc',
+          orderBy: 'sortDate_desc',
         },
         updateQuery: UpdateQuery(this, { $state, pageKey: 'profilePagePosts' }),
       })
@@ -592,7 +606,7 @@ export default {
           filter: this.filter,
           first: this.pageSize,
           offset: 0,
-          orderBy: 'createdAt_desc',
+          orderBy: 'sortDate_desc',
         }
       },
       update({ profilePagePosts }) {

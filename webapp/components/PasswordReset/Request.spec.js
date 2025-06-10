@@ -59,7 +59,12 @@ describe('Request', () => {
       })
 
       it('delivers email to backend', () => {
-        const expected = expect.objectContaining({ variables: { email: 'mail@example.org' } })
+        const expected = expect.objectContaining({
+          variables: {
+            email: 'mail@example.org',
+            locale: 'en',
+          },
+        })
         expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
       })
 
@@ -81,19 +86,6 @@ describe('Request', () => {
         it('emits `handleSubmitted`', () => {
           expect(wrapper.emitted('handleSubmitted')).toEqual([[{ email: 'mail@example.org' }]])
         })
-      })
-    })
-
-    describe('capital letters in a gmail address', () => {
-      beforeEach(async () => {
-        wrapper = Wrapper()
-        wrapper.find('input#email').setValue('mAiL@gmail.com')
-        await wrapper.find('form').trigger('submit')
-      })
-
-      it('normalizes email to lower case letters', () => {
-        const expected = expect.objectContaining({ variables: { email: 'mail@gmail.com' } })
-        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
       })
     })
 

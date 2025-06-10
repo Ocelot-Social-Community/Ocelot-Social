@@ -1,9 +1,6 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 'use strict'
 
-module.exports.up = function (next) {
-  next()
-}
+export async function up(_next) {}
 
-module.exports.down = function (next) {
-  next()
-}
+export async function down(_next) {}
