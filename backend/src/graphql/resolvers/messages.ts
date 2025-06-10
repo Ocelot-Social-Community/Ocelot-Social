@@ -7,10 +7,11 @@
 import { withFilter } from 'graphql-subscriptions'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
+import CONFIG from '@config/index'
 import { CHAT_MESSAGE_ADDED } from '@constants/subscriptions'
 
+import { attachments } from './attachments/attachments'
 import Resolver from './helpers/Resolver'
-import { images } from './images/images'
 
 const setMessagesAsDistributed = async (undistributedMessagesIds, session) => {
   return session.writeTransaction(async (transaction) => {
@@ -117,21 +118,28 @@ export default {
         return message
       })
       try {
+        // We cannot combine the query above with the attachments, since you need the resource for matching
         const message = await writeTxResultPromise
 
         const session = context.driver.session()
         const writeFilesPromise = session.writeTransaction(async (transaction) => {
-          const attachments: any[] = []
+          const atns: any[] = []
           for await (const file of files) {
             file.alt = file.name
-            const attachemnt = await images.mergeImage(message, 'ATTACHMENT', file, { transaction })
-            attachments.push({ ...attachemnt, name: attachemnt.alt })
+            const atn = await attachments(CONFIG).add(
+              message,
+              'ATTACHMENT',
+              file,
+              {},
+              { transaction },
+            )
+            atns.push(atn)
           }
-          return attachments
+          return atns
         })
 
-        const attachments = await writeFilesPromise
-        return { ...message, files: attachments }
+        const atns = await writeFilesPromise
+        return { ...message, files: atns }
       } catch (error) {
         throw new Error(error)
       } finally {
@@ -172,7 +180,7 @@ export default {
         room: '-[:INSIDE]->(related:Room)',
       },
       hasMany: {
-        files: '-[:ATTACHMENT]-(related:Image)',
+        files: '-[:ATTACHMENT]-(related:File)',
       },
     }),
   },

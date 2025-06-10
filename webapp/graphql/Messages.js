@@ -23,7 +23,7 @@ export const createMessageMutation = () => {
         seen
         files {
           url
-          #name
+          name
           #size
           type
           #preview
@@ -56,7 +56,7 @@ export const messageQuery = () => {
         seen
         files {
           url
-          #name
+          name
           #size
           type
           #audio
@@ -91,7 +91,7 @@ export const chatMessageAdded = () => {
         seen
         files {
           url
-          #name
+          name
           #size
           type
           #audio
