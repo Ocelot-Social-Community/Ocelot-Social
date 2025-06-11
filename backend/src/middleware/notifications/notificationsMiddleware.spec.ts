@@ -981,6 +981,7 @@ describe('notifications', () => {
 
         expect(sendChatMessageMailMock).toHaveBeenCalledTimes(1)
         expect(sendChatMessageMailMock).toHaveBeenCalledWith({
+          roomId,
           email: 'user@example.org',
           senderUser: expect.objectContaining({
             name: 'chatSender',
