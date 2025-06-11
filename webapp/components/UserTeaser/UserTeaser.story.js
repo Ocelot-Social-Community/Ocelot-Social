@@ -101,7 +101,7 @@ storiesOf('UserTeaser', module)
     data: () => ({
       user,
     }),
-    template: '<user-teaser :user="user" />',
+    template: '<user-teaser :user="user" :show-slug="true" />',
   }))
   .add('with date', () => ({
     components: { UserTeaser },
@@ -109,7 +109,7 @@ storiesOf('UserTeaser', module)
     data: () => ({
       user,
     }),
-    template: '<user-teaser :user="user" :date-time="new Date()" />',
+    template: '<user-teaser :user="user" :show-slug="true" :date-time="new Date()" />',
   }))
   .add('has edited something', () => ({
     components: { UserTeaser },
@@ -118,7 +118,7 @@ storiesOf('UserTeaser', module)
       user,
     }),
     template: `
-    <user-teaser :user="user" :date-time="new Date()">
+    <user-teaser :user="user" :show-slug="true" :date-time="new Date()">
       <template #dateTime>
         - HEY! I'm edited
       </template>
@@ -131,7 +131,7 @@ storiesOf('UserTeaser', module)
     data: () => ({
       user: null,
     }),
-    template: '<user-teaser :user="user" :date-time="new Date()" />',
+    template: '<user-teaser :user="user" :show-slug="true" :date-time="new Date()" />',
   }))
   .add('with group and date', () => ({
     components: { UserTeaser },
@@ -140,7 +140,8 @@ storiesOf('UserTeaser', module)
       user,
       group,
     }),
-    template: '<user-teaser :user="user" :group="group" :date-time="new Date()" />',
+    template:
+      '<user-teaser :user="user" :show-slug="true" :group="group" :date-time="new Date()" />',
   }))
   .add('with group and date – wide', () => ({
     components: { UserTeaser },
@@ -149,5 +150,6 @@ storiesOf('UserTeaser', module)
       user,
       group,
     }),
-    template: '<user-teaser :user="user" :group="group" wide :date-time="new Date()" />',
+    template:
+      '<user-teaser :user="user" :show-slug="true" :group="group" wide :date-time="new Date()" />',
   }))
