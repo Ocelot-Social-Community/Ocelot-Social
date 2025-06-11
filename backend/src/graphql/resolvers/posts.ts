@@ -114,6 +114,10 @@ export default {
   },
   Mutation: {
     CreatePost: async (_parent, params, context: Context, _resolveInfo) => {
+      const { user } = context
+      if (!user) {
+        throw new Error('Missing authenticated user.')
+      }
       const { config } = context
       const { categoryIds, groupId } = params
       const { image: imageInput } = params
@@ -126,9 +130,6 @@ export default {
       params.id = params.id || uuid()
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        if (!context.user) {
-          throw new Error('Missing authenticated user.')
-        }
         let groupCypher = ''
         if (groupId) {
           groupCypher = `
@@ -180,7 +181,7 @@ export default {
             ${groupCypher}
             RETURN post {.*, postType: [l IN labels(post) WHERE NOT l = 'Post'] }
           `,
-          { userId: context.user.id, categoryIds, groupId, params },
+          { userId: user.id, categoryIds, groupId, params },
         )
         const [post] = createPostTransactionResponse.records.map((record) => record.get('post'))
         if (imageInput) {
