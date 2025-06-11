@@ -87,8 +87,8 @@ describe('SearchableInput.vue', () => {
       it("pushes to user's profile", async () => {
         select.element.value = 'Bob'
         select.trigger('input')
-        const users = wrapper.findAll('.slug')
-        const bob = users.filter((item) => item.text().match(/@bob-der-baumeister/))
+        const users = wrapper.findAll('.name')
+        const bob = users.filter((item) => item.text().match(/@Bob der Baumeister/))
         bob.trigger('click')
         await Vue.nextTick()
         expect(mocks.$router.push).toHaveBeenCalledWith({
