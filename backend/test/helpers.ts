@@ -6,7 +6,7 @@ import type { Context } from '@src/context'
 import { getContext } from '@src/context'
 import createServer from '@src/server'
 
-export const TEST_CONFIG: typeof CONFIG = {
+export const TEST_CONFIG = {
   NODE_ENV: 'test',
   DEBUG: undefined,
   TEST: true,
@@ -54,7 +54,7 @@ export const TEST_CONFIG: typeof CONFIG = {
   MAX_PINNED_POSTS: 1,
 
   LANGUAGE_DEFAULT: 'en',
-}
+} as const satisfies typeof CONFIG
 
 interface OverwritableContextParams {
   authenticatedUser?: Context['user']
