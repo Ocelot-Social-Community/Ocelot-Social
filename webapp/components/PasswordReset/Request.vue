@@ -24,9 +24,9 @@
       :disabled="disabled"
       :loading="$apollo.loading"
       filled
+      padding
       name="submit"
       type="submit"
-      icon="envelope"
     >
       {{ $t('components.password-reset.request.form.submit') }}
     </base-button>

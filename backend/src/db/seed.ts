@@ -1197,11 +1197,22 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const additionalUsers: any[] = []
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 3000; i++) {
       const user = await Factory.build('user')
       await jennyRostock.relateTo(user, 'following')
       await user.relateTo(jennyRostock, 'following')
       additionalUsers.push(user)
+
+      const userObj = await user.toJson()
+      authenticatedUser = userObj
+
+      await mutate({
+        mutation: joinGroupMutation(),
+        variables: {
+          groupId: 'g2',
+          userId: userObj.id,
+        },
+      })
     }
 
     // Jenny users

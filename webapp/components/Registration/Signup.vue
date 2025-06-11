@@ -29,7 +29,6 @@
         id="email"
         model="email"
         name="email"
-        icon="envelope"
       />
       <base-button
         :disabled="disabled"
@@ -37,7 +36,6 @@
         filled
         name="submit"
         type="submit"
-        icon="envelope"
       >
         {{ $t('components.registration.signup.form.submit') }}
       </base-button>
