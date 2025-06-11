@@ -5,21 +5,19 @@
       @add-chat-room="addChatRoom"
       @close-user-search="showUserSearch = false"
     />
-    <client-only>
-      <chat
-        :roomId="getShowChat.showChat ? getShowChat.roomID : null"
-        ref="chat"
-        @toggle-user-search="showUserSearch = !showUserSearch"
-        :show-room="showRoom"
-      />
-    </client-only>
+    <chat
+      :roomId="getShowChat.showChat ? getShowChat.roomID : this.$route.params.roomId"
+      ref="chat"
+      @toggle-user-search="showUserSearch = !showUserSearch"
+      :show-room="showRoom"
+    />
   </div>
 </template>
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
 import AddChatRoomByUserSearch from '~/components/Chat/AddChatRoomByUserSearch'
-import Chat from '../components/Chat/Chat.vue'
+import Chat from '~/components/Chat/Chat.vue'
 
 export default {
   components: {
