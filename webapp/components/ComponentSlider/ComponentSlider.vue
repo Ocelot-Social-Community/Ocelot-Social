@@ -38,8 +38,8 @@
           <base-button
             :class="['selection-dot']"
             style="float: left"
-            :circle="true"
-            size="small"
+            :bullet="true"
+            size="tiny"
             type="submit"
             filled
             :loading="false"
@@ -54,6 +54,7 @@
           :icon="sliderData.sliders[sliderIndex].button.icon"
           type="submit"
           filled
+          padding
           :loading="
             sliderData.sliders[sliderIndex].button.loading !== undefined
               ? sliderData.sliders[sliderIndex].button.loading

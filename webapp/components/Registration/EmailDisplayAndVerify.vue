@@ -1,6 +1,5 @@
 <template>
   <ds-text>
-    {{ $t('components.registration.email-display.yourEmail') }}
     <b v-if="emailAsString.length > 0">
       {{ emailAsString }}
       <b v-if="!isEmailFormat" class="email-warning">
