@@ -6,7 +6,7 @@ services:
     build:
       target: test
     environment:
-      - NODE_ENV="test"
+      - NODE_ENV=test
     volumes:
       - ./coverage:/app/coverage
 
