@@ -11,11 +11,11 @@ import slugify from 'slug'
 import { v4 as uuid } from 'uuid'
 
 import { generateInviteCode } from '@graphql/resolvers/inviteCodes'
-
-import { getDriver, getNeode } from './neo4j'
+import { isUniqueFor } from '@middleware/sluggifyMiddleware'
 import uniqueSlug from '@middleware/slugify/uniqueSlug'
 import { Context } from '@src/server'
-import { isUniqueFor } from '@middleware/sluggifyMiddleware'
+
+import { getDriver, getNeode } from './neo4j'
 
 const neode = getNeode()
 
