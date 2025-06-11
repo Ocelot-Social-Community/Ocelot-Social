@@ -16,7 +16,6 @@
         :rooms-loaded="roomsLoaded"
         :loading-rooms="loadingRooms"
         show-files="true"
-        accepted-files="image/png, image/jpeg, image/gif"
         show-audio="false"
         :height="'calc(100dvh - 190px)'"
         :styles="JSON.stringify(computedChatStyle)"
