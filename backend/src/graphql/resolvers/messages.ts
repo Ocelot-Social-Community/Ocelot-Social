@@ -130,7 +130,9 @@ export default {
               'ATTACHMENT',
               file,
               {},
-              { transaction },
+              {
+                transaction,
+              },
             )
             atns.push(atn)
           }

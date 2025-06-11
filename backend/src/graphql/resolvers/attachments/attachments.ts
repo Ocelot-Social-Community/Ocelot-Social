@@ -48,7 +48,7 @@ export interface Attachments {
   add: (
     resource: { id: string },
     relationshipType: 'ATTACHMENT',
-    file: FileInput | null,
+    file: FileInput,
     fileAttributes?: object,
     opts?: AddAttachmentOpts,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -85,12 +85,18 @@ export const attachments = (config: typeof CONFIG) => {
       { resource },
     )
     const [file] = txResult.records.map((record) => record.get('fileProps') as File)
-    // This behaviour differs from `mergeImage`. If you call `mergeImage`
-    // with metadata for an image that does not exist, it's an indicator
-    // of an error (so throw an error). If we bulk delete an image, it
-    // could very well be that there is no image for the resource.
     if (file) {
-      await s3Delete(file.url)
+      let { pathname } = new URL(file.url, 'http://example.org') // dummy domain to avoid invalid URL error
+      pathname = pathname.substring(1) // remove first character '/'
+      const prefix = `${Bucket}/`
+      if (pathname.startsWith(prefix)) {
+        pathname = pathname.slice(prefix.length)
+      }
+      const params = {
+        Bucket,
+        Key: pathname,
+      }
+      await s3.send(new DeleteObjectCommand(params))
     }
     return file
   }
@@ -109,48 +115,18 @@ export const attachments = (config: typeof CONFIG) => {
 
     const { upload } = fileInput
     if (!upload) throw new UserInputError('Cannot find attachment for given resource')
-    const url = await uploadFile(upload)
-    const { name, type } = fileInput
-    const file = { url, name, type, ...fileAttributes }
-    const txResult = await transaction.run(
-      `
-      MATCH (resource {id: $resource.id})
-      CREATE (file:File)
-      SET file.createdAt = toString(datetime())
-      SET file += $file
-      SET file.updatedAt = toString(datetime())
-      WITH resource, file
-      MERGE (resource)-[:${relationshipType}]->(file)
-      RETURN file {.*}
-      `,
-      { resource, file },
-    )
-    const [uploadedFile] = txResult.records.map((record) => record.get('file') as File)
-    return uploadedFile
-  }
 
-  const uploadFile = async (uploadPromise: Promise<FileUpload> | undefined) => {
-    if (!uploadPromise) return undefined
-    const upload = await uploadPromise
-    const { name, ext } = path.parse(upload.filename)
-    const uniqueFilename = `${uuid()}-${slug(name)}${ext}`
-    const Location = await s3Upload({ ...upload, uniqueFilename })
-    if (!S3_PUBLIC_GATEWAY) {
-      return Location
-    }
-    const publicLocation = new URL(S3_PUBLIC_GATEWAY)
-    publicLocation.pathname = new URL(Location).pathname
-    return publicLocation.href
-  }
+    const uploadFile = await upload
+    const { name: fileName, ext } = path.parse(uploadFile.filename)
+    const uniqueFilename = `${uuid()}-${slug(fileName)}${ext}`
 
-  const s3Upload: FileUploadCallback = async ({ createReadStream, uniqueFilename, mimetype }) => {
     const s3Location = `attachments/${uniqueFilename}`
     const params = {
       Bucket,
       Key: s3Location,
       ACL: ObjectCannedACL.public_read,
-      ContentType: mimetype,
-      Body: createReadStream(),
+      ContentType: uploadFile.mimetype,
+      Body: uploadFile.createReadStream(),
     }
     const command = new Upload({ client: s3, params })
     const data = await command.done()
@@ -158,21 +134,33 @@ export const attachments = (config: typeof CONFIG) => {
     if (!Location) {
       throw new Error('File upload did not return `Location`')
     }
-    return Location
-  }
 
-  const s3Delete: FileDeleteCallback = async (url) => {
-    let { pathname } = new URL(url, 'http://example.org') // dummy domain to avoid invalid URL error
-    pathname = pathname.substring(1) // remove first character '/'
-    const prefix = `${Bucket}/`
-    if (pathname.startsWith(prefix)) {
-      pathname = pathname.slice(prefix.length)
+    if (!S3_PUBLIC_GATEWAY) {
+      return Location
     }
-    const params = {
-      Bucket,
-      Key: pathname,
-    }
-    await s3.send(new DeleteObjectCommand(params))
+    const publicLocation = new URL(S3_PUBLIC_GATEWAY)
+    publicLocation.pathname = new URL(Location).pathname
+    const url = publicLocation.href
+
+    const { name, type } = fileInput
+    const file = { url, name, type, ...fileAttributes }
+    const mimeType = uploadFile.mimetype.split('/')[0]
+    const nodeType = `Mime${mimeType.replace(/^./, mimeType[0].toUpperCase())}`
+    const txResult = await transaction.run(
+      `
+      MATCH (resource {id: $resource.id})
+      CREATE (file:${['File', nodeType].filter(Boolean).join(':')})
+      SET file.createdAt = toString(datetime())
+      SET file += $file
+      SET file.updatedAt = toString(datetime())
+      WITH resource, file
+      MERGE (resource)-[:${relationshipType}]->(file)
+      RETURN file {.*}
+      `,
+      { resource, file, nodeType },
+    )
+    const [uploadedFile] = txResult.records.map((record) => record.get('file') as File)
+    return uploadedFile
   }
 
   const attachments: Attachments = {
