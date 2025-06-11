@@ -19,7 +19,7 @@ beforeEach(() => {
 
 beforeAll(async () => {
   await cleanDatabase()
-  const context = () => ({ config })
+  const context = () => ({ config, authenticatedUser: null })
   const apolloSetup = createApolloTestSetup({ context })
   query = apolloSetup.query
   database = apolloSetup.database

@@ -17,13 +17,13 @@ export const getContext =
   (opts?: {
     database?: ReturnType<typeof databaseContext>
     pubsub?: ReturnType<typeof pubsubContext>
-    givenUser: DecodedUser | null | undefined
+    authenticatedUser: DecodedUser | null | undefined
     config: typeof CONFIG
     fetch: Fetch
   }) =>
   async (req: { headers: { authorization?: string } }) => {
     const {
-      givenUser = undefined,
+      authenticatedUser = undefined,
       database = serverDatabase,
       pubsub = serverPubsub,
       config = CONFIG,
@@ -31,9 +31,9 @@ export const getContext =
     } = opts ?? {}
     const { driver } = database
     const user =
-      givenUser === null
+      authenticatedUser === null
         ? null
-        : (givenUser ?? (await decode({ driver, config })(req.headers.authorization)))
+        : (authenticatedUser ?? (await decode({ driver, config })(req.headers.authorization)))
     const result = {
       database,
       driver,

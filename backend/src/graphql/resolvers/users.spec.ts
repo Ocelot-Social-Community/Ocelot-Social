@@ -117,6 +117,10 @@ afterAll(async () => {
   database.neode.close()
 })
 
+beforeEach(async () => {
+  authenticatedUser = null
+})
+
 // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
@@ -127,6 +131,11 @@ describe('User', () => {
     let userQuery
 
     beforeEach(async () => {
+      const user = await Factory.build('user', {
+        id: 'user',
+        role: 'user',
+      })
+      authenticatedUser = await user.toJson()
       userQuery = gql`
         query ($email: String) {
           User(email: $email) {

@@ -32,6 +32,7 @@ afterAll(async () => {
 })
 
 beforeEach(async () => {
+  authenticatedUser = null
   variables = {}
   await database.neode.create('Category', {
     id: 'cat9',

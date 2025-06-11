@@ -68,6 +68,10 @@ describe('Message', () => {
     })
 
     describe('unauthenticated', () => {
+      beforeAll(() => {
+        authenticatedUser = null
+      })
+
       it('throws authorization error', async () => {
         await expect(
           mutate({
