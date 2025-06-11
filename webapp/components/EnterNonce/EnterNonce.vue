@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import registrationConstants from '~constants/registration'
+import registrationConstants from '~/constants/registration'
 
 export default {
   props: {
