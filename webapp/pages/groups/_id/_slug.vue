@@ -60,24 +60,6 @@
                 </ds-number>
               </client-only>
             </ds-flex-item>
-            <!-- <ds-flex-item>
-                 <client-only>
-                 <ds-number :label="$t('profile.followers')">
-                 <count-to
-                 slot="count"
-                 :start-val="followedByCountStartValue"
-                 :end-val="user.followedByCount"
-                 />
-                 </ds-number>
-                 </client-only>
-                 </ds-flex-item> -->
-            <!-- <ds-flex-item>
-                 <client-only>
-                 <ds-number :label="$t('profile.following')">
-                 <count-to slot="count" :end-val="user.followingCount" />
-                 </ds-number>
-                 </client-only>
-                 </ds-flex-item> -->
           </ds-flex>
           <div class="action-buttons">
             <base-button danger v-if="group.isMutedByMe" @click="unmuteGroup" icon="volume-up">
@@ -296,8 +278,6 @@ import Category from '~/components/Category'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CountTo from '~/components/CountTo.vue'
 import Empty from '~/components/Empty/Empty'
-// import FollowButton from '~/components/Button/FollowButton'
-// import FollowList from '~/components/features/ProfileList/FollowList'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
 import JoinLeaveButton from '~/components/Button/JoinLeaveButton'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
@@ -319,8 +299,6 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 //   }[tab]
 // }
 
-const PAGE_SIZE = 25
-
 export default {
   components: {
     AvatarUploader,
@@ -328,8 +306,6 @@ export default {
     ContentViewer,
     CountTo,
     Empty,
-    // FollowButton,
-    // FollowList,
     GroupContentMenu,
     JoinLeaveButton,
     PostTeaser,
@@ -365,7 +341,7 @@ export default {
       // followedByCount: 7,
       // followingCount: 7,
       membersCountStartValue: 0,
-      membersCountToLoad: PAGE_SIZE,
+      membersCountToLoad: 25,
       updateGroupMutation,
       isDescriptionCollapsed: true,
     }
@@ -581,10 +557,7 @@ export default {
       }
     },
     fetchAllMembers() {
-      this.membersCountToLoad = Math.min(
-        this.membersCountToLoad + PAGE_SIZE,
-        this.group.membersCount,
-      )
+      this.membersCountToLoad = this.group.membersCount
     },
   },
   apollo: {
