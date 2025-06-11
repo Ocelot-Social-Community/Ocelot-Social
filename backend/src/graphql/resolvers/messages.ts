@@ -123,6 +123,7 @@ export default {
 
         const session = context.driver.session()
         const writeFilesPromise = session.writeTransaction(async (transaction) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const atns: any[] = []
           for await (const file of files) {
             const atn = await attachments(CONFIG).add(
