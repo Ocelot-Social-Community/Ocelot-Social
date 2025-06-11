@@ -32,7 +32,7 @@
       </ul>
 
       <ds-input
-        v-if="isMoreAsVisible"
+        v-if="isMoreAsVisible && !hasMore"
         :name="uniqueName"
         :placeholder="filterPlaceholder"
         :value="filter"
