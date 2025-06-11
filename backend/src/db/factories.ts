@@ -138,8 +138,8 @@ Factory.define('user')
       )
     }
     // Ensure unique email
-    if (!buildObject.email) {
-      buildObject.email = `${buildObject.slug as string}@example.org`
+    if (!options.email) {
+      options.email = `${buildObject.slug as string}@example.org`
     }
     const [user, email, avatar] = await Promise.all([
       neode.create('User', buildObject),
