@@ -1,38 +1,38 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createTestClient } from 'apollo-server-testing'
-
-import databaseContext from '@context/database'
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Factory, { cleanDatabase } from '@db/factories'
 import { createMessageMutation } from '@graphql/queries/createMessageMutation'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { roomQuery } from '@graphql/queries/roomQuery'
 import { unreadRoomsQuery } from '@graphql/queries/unreadRoomsQuery'
-import { TEST_CONFIG } from '@src/config/test-mock'
-import createServer, { getContext } from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-let query
-let mutate
-let authenticatedUser
 let chattingUser, otherChattingUser, notChattingUser
 
-const database = databaseContext()
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser })
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
-beforeAll(async () => {
-  await cleanDatabase()
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  const contextUser = (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database, config: TEST_CONFIG })
-  const { server } = createServer({ context })
-  query = createTestClient(server).query
-  mutate = createTestClient(server).mutate
+beforeAll(() => {
+  const apolloSetup = createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await database.driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('Room', () => {
@@ -125,13 +125,13 @@ describe('Room', () => {
               userId: 'other-chatting-user',
             },
           })
-          roomId = result.data.CreateRoom.id
+          roomId = (result as any).data.CreateRoom.id
           expect(result).toMatchObject({
             errors: undefined,
             data: {
               CreateRoom: {
                 id: expect.any(String),
-                roomId: result.data.CreateRoom.id,
+                roomId: (result as any).data.CreateRoom.id,
                 roomName: 'Other Chatting User',
                 unreadCount: 0,
                 users: expect.arrayContaining([
@@ -207,7 +207,7 @@ describe('Room', () => {
               Room: [
                 {
                   id: expect.any(String),
-                  roomId: result.data.Room[0].id,
+                  roomId: (result as any).data.Room[0].id,
                   roomName: 'Other Chatting User',
                   users: expect.arrayContaining([
                     {
@@ -247,7 +247,7 @@ describe('Room', () => {
               Room: [
                 {
                   id: expect.any(String),
-                  roomId: result.data.Room[0].id,
+                  roomId: (result as any).data.Room[0].id,
                   roomName: 'Chatting User',
                   unreadCount: 0,
                   users: expect.arrayContaining([
@@ -317,7 +317,7 @@ describe('Room', () => {
             userId: 'not-chatting-user',
           },
         })
-        otherRoomId = result.data.CreateRoom.roomId
+        otherRoomId = (result as any).data.CreateRoom.roomId
         await mutate({
           mutation: createMessageMutation(),
           variables: {
@@ -346,7 +346,7 @@ describe('Room', () => {
             userId: 'not-chatting-user',
           },
         })
-        otherRoomId = result2.data.CreateRoom.roomId
+        otherRoomId = (result2 as any).data.CreateRoom.roomId
         await mutate({
           mutation: createMessageMutation(),
           variables: {
@@ -583,7 +583,6 @@ describe('Room', () => {
   })
 
   describe('query single room', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let result: any = null
 
     beforeAll(async () => {

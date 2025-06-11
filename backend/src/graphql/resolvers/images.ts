@@ -1,7 +1,7 @@
 import crypto from 'node:crypto'
 import { join as joinPath } from 'node:path/posix'
 
-import type { Context } from '@src/server'
+import type { Config } from '@src/config'
 
 import Resolver from './helpers/Resolver'
 
@@ -10,7 +10,7 @@ type UrlResolver = (
   args: { width?: number; height?: number },
   {
     config: { S3_PUBLIC_GATEWAY },
-  }: Pick<Context, 'config'>,
+  }: { config: Pick<Config, 'IMAGOR_SECRET' | 'S3_PUBLIC_GATEWAY' | 'AWS_ENDPOINT'> },
 ) => string
 
 const changeDomain: (opts: { transformations: UrlResolver[] }) => UrlResolver =

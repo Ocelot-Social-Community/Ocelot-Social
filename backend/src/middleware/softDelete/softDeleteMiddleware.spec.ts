@@ -7,18 +7,15 @@
 import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode } from '@db/neo4j'
-import { TEST_CONFIG } from '@src/config/test-mock'
-import createServer, { getContext } from '@src/server'
+import { getNeode, getDriver } from '@db/neo4j'
+import createServer from '@src/server'
 
 const neode = getNeode()
+const driver = getDriver()
 
 const categoryIds = ['cat9']
 let query, graphqlQuery, authenticatedUser, user, moderator, troll
-
-const database = databaseContext()
 
 const action = () => {
   return query({ query: graphqlQuery })
@@ -139,9 +136,15 @@ beforeAll(async () => {
     ),
   ])
 
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database, config: TEST_CONFIG })
-  const { server } = createServer({ context })
+  const { server } = createServer({
+    context: () => {
+      return {
+        driver,
+        neode,
+        user: authenticatedUser,
+      }
+    },
+  })
   const client = createTestClient(server)
   query = client.query
 
@@ -199,7 +202,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  void database.driver.close()
+  await driver.close()
 })
 
 describe('softDeleteMiddleware', () => {

@@ -1,5 +1,3 @@
-import { TEST_CONFIG } from '@src/config/test-mock'
-
 import ImageResolver from './images'
 
 describe('Image', () => {
@@ -8,7 +6,6 @@ describe('Image', () => {
   const Location =
     'https://fsn1.your-objectstorage.com/ocelot-social-staging/original/f965ea15-1f6b-43aa-a535-927410e2585e-dsc02586.jpg'
   const defaultConfig = {
-    ...TEST_CONFIG,
     AWS_ENDPOINT: 'https://fsn1.your-objectstorage.com',
     S3_PUBLIC_GATEWAY: 'https://your-public-gateway.com',
     IMAGOR_SECRET: 'IMAGOR_SECRET',

@@ -54,6 +54,8 @@ export const TEST_CONFIG = {
   MAX_PINNED_POSTS: 1,
 
   LANGUAGE_DEFAULT: 'en',
+
+  IMAGOR_SECRET: undefined,
 } as const satisfies typeof CONFIG
 
 interface OverwritableContextParams {
