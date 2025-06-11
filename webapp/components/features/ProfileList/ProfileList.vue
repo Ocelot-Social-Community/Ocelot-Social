@@ -67,7 +67,7 @@ import { RecycleScroller } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 
-export const profileListVisibleCount = 5
+export const profileListVisibleCount = 6
 const VIRTUAL_SCROLL_THRESHOLD = 50
 
 export default {
