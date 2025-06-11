@@ -28,6 +28,8 @@
 </template>
 
 <script>
+import registrationConstants from "~constants/registration";
+
 export default {
   props: {
     email: { type: String, required: true },
@@ -43,7 +45,9 @@ export default {
           min: 5,
           max: 5,
           required: true,
-          message: this.$t('components.registration.email-nonce.form.validations.length'),
+          message: this.$t('components.registration.email-nonce.form.validations.length', {
+            nonceLength: registrationConstants.NONCE_LENGTH,
+          }),
         },
       },
       disabled: true,
