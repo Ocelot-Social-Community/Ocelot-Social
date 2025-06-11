@@ -11,6 +11,9 @@ import slugify from 'slug'
 import { v4 as uuid } from 'uuid'
 
 import { generateInviteCode } from '@graphql/resolvers/inviteCodes'
+import { isUniqueFor } from '@middleware/sluggifyMiddleware'
+import uniqueSlug from '@middleware/slugify/uniqueSlug'
+import { Context } from '@src/server'
 
 import { getDriver, getNeode } from './neo4j'
 
@@ -22,8 +25,9 @@ const uniqueImageUrl = (imageUrl) => {
   return newUrl.toString()
 }
 
+const driver = getDriver()
+
 export const cleanDatabase = async ({ withMigrations } = { withMigrations: false }) => {
-  const driver = getDriver()
   const session = driver.session()
 
   const clean = `
@@ -89,9 +93,7 @@ Factory.define('basicUser')
     showShoutsPublicly: false,
     locale: 'en',
   })
-  .attr('slug', ['slug', 'name'], (slug, name) => {
-    return slug || slugify(name, { lower: true })
-  })
+  .attr('slug', null)
   .attr('encryptedPassword', ['password'], (password) => {
     // eslint-disable-next-line n/no-sync
     return hashSync(password, 10)
@@ -121,13 +123,24 @@ Factory.define('userWithAboutEmpty')
 Factory.define('user')
   .extend('basicUser')
   .option('about', faker.lorem.paragraph)
-  .option('email', faker.internet.exampleEmail)
+  .option('email', null)
   .option('avatar', () =>
     Factory.build('image', {
       url: faker.image.avatar(),
     }),
   )
   .after(async (buildObject, options) => {
+    // Ensure unique slug
+    if (!buildObject.slug) {
+      buildObject.slug = await uniqueSlug(
+        buildObject.name,
+        isUniqueFor({ driver } as unknown as Context, 'User'),
+      )
+    }
+    // Ensure unique email
+    if (!options.email) {
+      options.email = `${buildObject.slug as string}@example.org`
+    }
     const [user, email, avatar] = await Promise.all([
       neode.create('User', buildObject),
       neode.create('EmailAddress', { email: options.email }),
