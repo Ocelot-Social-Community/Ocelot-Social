@@ -7,7 +7,7 @@ import { Readable } from 'node:stream'
 
 import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
-import { Upload } from 'graphql-upload/public/index.js'
+import { Upload } from 'graphql-upload/public/index'
 
 import databaseContext from '@context/database'
 import pubsubContext from '@context/pubsub'
