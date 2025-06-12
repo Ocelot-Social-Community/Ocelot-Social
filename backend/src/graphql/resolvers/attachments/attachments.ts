@@ -6,7 +6,7 @@ import { UserInputError } from 'apollo-server-express'
 import slug from 'slug'
 import { v4 as uuid } from 'uuid'
 
-import CONFIG, { isS3configured, S3Configured } from '@config/index'
+import { isS3configured, S3Configured } from '@config/index'
 import { wrapTransaction } from '@graphql/resolvers/images/wrapTransaction'
 
 import type { FileUpload } from 'graphql-upload'
@@ -108,15 +108,17 @@ export const attachments = (config: S3Configured) => {
     fileAttributes = {},
     opts = {},
   ) => {
-    if (fileInput === null) return del(resource, relationshipType, opts)
+    console.log('abc')
     const { transaction } = opts
     if (!transaction)
       return wrapTransaction(add, [resource, relationshipType, fileInput, fileAttributes], opts)
 
+    console.log(fileInput)
     const { upload } = fileInput
     if (!upload) throw new UserInputError('Cannot find attachment for given resource')
 
     const uploadFile = await upload
+    console.log(uploadFile)
     const { name: fileName, ext } = path.parse(uploadFile.filename)
     const uniqueFilename = `${uuid()}-${slug(fileName)}${ext}`
 
@@ -128,19 +130,28 @@ export const attachments = (config: S3Configured) => {
       ContentType: uploadFile.mimetype,
       Body: uploadFile.createReadStream(),
     }
+    console.log(0)
     const command = new Upload({ client: s3, params })
+    console.log(0, 1)
     const data = await command.done()
+    console.log(0, 2)
     const { Location } = data
     if (!Location) {
       throw new Error('File upload did not return `Location`')
     }
 
+    let url
+    console.log('Location', Location)
     if (!S3_PUBLIC_GATEWAY) {
-      return Location
+      url = Location
+    } else {
+      console.log(1)
+      const publicLocation = new URL(S3_PUBLIC_GATEWAY)
+      console.log(2)
+      publicLocation.pathname = new URL(Location).pathname
+      console.log(3)
+      url = publicLocation.href
     }
-    const publicLocation = new URL(S3_PUBLIC_GATEWAY)
-    publicLocation.pathname = new URL(Location).pathname
-    const url = publicLocation.href
 
     const { name, type } = fileInput
     const file = { url, name, type, ...fileAttributes }
@@ -160,6 +171,7 @@ export const attachments = (config: S3Configured) => {
       { resource, file, nodeType },
     )
     const [uploadedFile] = txResult.records.map((record) => record.get('file') as File)
+    console.log(uploadedFile)
     return uploadedFile
   }
 

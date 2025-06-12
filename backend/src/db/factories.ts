@@ -76,6 +76,18 @@ Factory.define('image')
     return neode.create('Image', buildObject)
   })
 
+Factory.define('file')
+  .attr('name', faker.lorem.slug)
+  .attr('type', 'image/jpeg')
+  .attr('url', null)
+  .after((buildObject, _options) => {
+    if (!buildObject.url) {
+      buildObject.url = faker.image.urlPicsumPhotos()
+    }
+    buildObject.url = uniqueImageUrl(buildObject.url)
+    return neode.create('File', buildObject)
+  })
+
 Factory.define('basicUser')
   .option('password', '1234')
   .attrs({

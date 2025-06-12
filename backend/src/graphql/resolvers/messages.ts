@@ -130,8 +130,35 @@ export default {
         const writeFilesPromise = session.writeTransaction(async (transaction) => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const atns: any[] = []
+
+          const {
+            AWS_ACCESS_KEY_ID,
+            AWS_SECRET_ACCESS_KEY,
+            AWS_ENDPOINT,
+            AWS_REGION,
+            AWS_BUCKET,
+            S3_PUBLIC_GATEWAY,
+          } = CONFIG
+
+          if (
+            !AWS_ACCESS_KEY_ID ||
+            !AWS_SECRET_ACCESS_KEY ||
+            !AWS_ENDPOINT ||
+            !AWS_REGION ||
+            !AWS_BUCKET
+          ) {
+            return atns
+          }
+
           for await (const file of files) {
-            const atn = await attachments(CONFIG).add(
+            const atn = await attachments({
+              AWS_ACCESS_KEY_ID,
+              AWS_SECRET_ACCESS_KEY,
+              AWS_ENDPOINT,
+              AWS_REGION,
+              AWS_BUCKET,
+              S3_PUBLIC_GATEWAY,
+            }).add(
               message,
               'ATTACHMENT',
               file,

@@ -6,19 +6,39 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable promise/prefer-await-to-callbacks */
-import { UserInputError } from 'apollo-server'
+import { Readable } from 'node:stream'
 
+import { S3Client } from '@aws-sdk/client-s3'
+import { Upload } from '@aws-sdk/lib-storage'
+import { UserInputError } from 'apollo-server'
+import { createTestClient } from 'apollo-server-testing'
+
+import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
+import { CreateMessage } from '@graphql/queries/CreateMessage'
+import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import type { S3Configured } from '@src/config'
+import createServer, { getContext } from '@src/server'
 
 import { attachments } from './attachments'
 
 import type { FileInput } from './attachments'
-import type { FileUpload } from 'graphql-upload'
 
-const driver = getDriver()
-const neode = getNeode()
+const s3SendMock = jest.fn()
+jest.spyOn(S3Client.prototype, 'send').mockImplementation(s3SendMock)
+
+jest.mock('@aws-sdk/lib-storage')
+
+const UploadMock = {
+  done: () => {
+    return {
+      Location: 'http://your-objectstorage.com/bucket/',
+    }
+  },
+}
+
+;(Upload as unknown as jest.Mock).mockImplementation(() => UploadMock)
+
 const uuid = '[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}'
 
 const config: S3Configured = {
@@ -30,13 +50,26 @@ const config: S3Configured = {
   S3_PUBLIC_GATEWAY: undefined,
 }
 
+const database = databaseContext()
+
+let authenticatedUser, server, mutate
+
 beforeAll(async () => {
   await cleanDatabase()
+
+  const contextUser = async (_req) => authenticatedUser
+  const context = getContext({ user: contextUser, database })
+
+  server = createServer({ context }).server
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  mutate = createTestClient(server).mutate
 })
 
 afterAll(async () => {
-  await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 /*  uploadCallback = jest.fn(
@@ -44,7 +77,6 @@ afterAll(async () => {
   )
 */
 
-// TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
 })
@@ -53,36 +85,66 @@ describe('delete Attachment', () => {
   const { del: deleteAttachment } = attachments(config)
   describe('given a resource with an attachment', () => {
     let user: { id: string }
+    let chatPartner: { id: string }
+    let file: { id: string }
+    let message: { id: string }
     beforeEach(async () => {
-      const u = await Factory.build(
-        'message',
-        {},
-        {
-          files: [
-            Factory.build('file', {
-              url: 'http://localhost/some/file/url/',
-              name: 'This is a file attached to a message',
-              type: 'application/dummy',
-            }),
-          ],
-        },
-      )
+      const u = await Factory.build('user')
       user = await u.toJson()
+
+      const u2 = await Factory.build('user')
+      chatPartner = await u2.toJson()
+
+      authenticatedUser = user
+      const { data: room } = await mutate({
+        mutation: createRoomMutation(),
+        variables: {
+          userId: chatPartner.id,
+        },
+      })
+
+      const f = await Factory.build('file', {
+        url: 'http://localhost/some/file/url/',
+        name: 'This is a file attached to a message',
+        type: 'application/dummy',
+      })
+      file = await f.toJson()
+
+      const m = await mutate({
+        mutation: CreateMessage,
+        variables: {
+          roomId: room?.CreateRoom.id,
+          content: 'test messsage',
+        },
+      })
+
+      message = m.data.CreateMessage
+
+      await database.write({
+        query: `
+        MATCH (message:Message {id: $message.id}), (file:File{url: $file.url})
+        MERGE (message)-[:ATTACHMENT]->(file)
+        `,
+        variables: {
+          message,
+          file,
+        },
+      })
     })
 
     it('deletes `File` node', async () => {
-      await expect(neode.all('File')).resolves.toHaveLength(1)
-      await deleteAttachment(user, 'ATTACHMENT')
-      await expect(neode.all('File')).resolves.toHaveLength(0)
+      await expect(database.neode.all('File')).resolves.toHaveLength(1)
+      await deleteAttachment(message, 'ATTACHMENT')
+      await expect(database.neode.all('File')).resolves.toHaveLength(0)
     })
 
     describe('given a transaction parameter', () => {
       it('executes cypher statements within the transaction', async () => {
-        const session = driver.session()
+        const session = database.driver.session()
         let someString: string
         try {
           someString = await session.writeTransaction(async (transaction) => {
-            await deleteAttachment(user, 'ATTACHMENT', {
+            await deleteAttachment(message, 'ATTACHMENT', {
               transaction,
             })
             const txResult = await transaction.run('RETURN "Hello" as result')
@@ -92,16 +154,16 @@ describe('delete Attachment', () => {
         } finally {
           await session.close()
         }
-        await expect(neode.all('Image')).resolves.toHaveLength(0)
+        await expect(database.neode.all('File')).resolves.toHaveLength(0)
         expect(someString).toEqual('Hello')
       })
 
       it('rolls back the transaction in case of errors', async () => {
-        await expect(neode.all('Image')).resolves.toHaveLength(1)
-        const session = driver.session()
+        await expect(database.neode.all('File')).resolves.toHaveLength(1)
+        const session = database.driver.session()
         try {
           await session.writeTransaction(async (transaction) => {
-            await deleteAttachment(user, 'ATTACHMENT', {
+            await deleteAttachment(message, 'ATTACHMENT', {
               transaction,
             })
             throw new Error('Ouch!')
@@ -109,7 +171,7 @@ describe('delete Attachment', () => {
           // eslint-disable-next-line no-catch-all/no-catch-all
         } catch (err) {
           // nothing has been deleted
-          await expect(neode.all('Image')).resolves.toHaveLength(1)
+          await expect(database.neode.all('File')).resolves.toHaveLength(1)
           // all good
         } finally {
           await session.close()
@@ -132,19 +194,18 @@ describe('add Attachment', () => {
 
   describe('given file.upload', () => {
     beforeEach(() => {
-      const createReadStream: FileUpload['createReadStream'] = (() => ({
-        pipe: () => ({
-          on: (_, callback) => callback(),
-        }),
-      })) as unknown as FileUpload['createReadStream']
+      const file1 = Readable.from('file1')
       fileInput = {
         ...fileInput,
-        upload: Promise.resolve({
-          filename: 'image.jpg',
-          mimetype: 'image/jpeg',
-          encoding: '7bit',
-          createReadStream,
-        }),
+        // eslint-disable-next-line promise/avoid-new
+        upload: new Promise((resolve) =>
+          resolve({
+            createReadStream: () => file1 as any,
+            filename: 'file1',
+            encoding: '7bit',
+            mimetype: 'application/json',
+          }),
+        ),
       }
     })
 
@@ -161,17 +222,20 @@ describe('add Attachment', () => {
         post = await p.toJson()
       })
 
-      it('returns new image', async () => {
+      it('returns new file', async () => {
         await expect(addAttachment(post, 'ATTACHMENT', fileInput)).resolves.toMatchObject({
-          url: expect.any(String),
-          alt: 'A description of the new image',
+          updatedAt: expect.any(String),
+          createdAt: expect.any(String),
+          name: 'The name of the new attachment',
+          type: 'application/any',
+          url: 'http://your-objectstorage.com/bucket/',
         })
       })
 
-      it('creates `:Image` node', async () => {
-        await expect(neode.all('File')).resolves.toHaveLength(0)
+      it('creates `:File` node', async () => {
+        await expect(database.neode.all('File')).resolves.toHaveLength(0)
         await addAttachment(post, 'ATTACHMENT', fileInput)
-        await expect(neode.all('File')).resolves.toHaveLength(1)
+        await expect(database.neode.all('File')).resolves.toHaveLength(1)
       })
 
       it('creates a url safe name', async () => {
@@ -211,19 +275,21 @@ describe('add Attachment', () => {
 
       it('connects resource with image via given image type', async () => {
         await addAttachment(post, 'ATTACHMENT', fileInput)
-        const result = await neode.cypher(
+        const result = await database.neode.cypher(
           `MATCH(p:Post {id: "p99"})-[:HERO_IMAGE]->(i:Image) RETURN i,p`,
           {},
         )
-        post = neode.hydrateFirst<{ id: string }>(result, 'p', neode.model('Post')).properties()
-        const image = neode.hydrateFirst(result, 'i', neode.model('Image'))
+        post = database.neode
+          .hydrateFirst<{ id: string }>(result, 'p', database.neode.model('Post'))
+          .properties()
+        const image = database.neode.hydrateFirst(result, 'i', database.neode.model('Image'))
         expect(post).toBeTruthy()
         expect(image).toBeTruthy()
       })
 
       it('sets metadata', async () => {
         await addAttachment(post, 'ATTACHMENT', fileInput)
-        const image = await neode.first<typeof Image>('Image', {}, undefined)
+        const image = await database.neode.first<typeof Image>('Image', {}, undefined)
         await expect(image.toJson()).resolves.toMatchObject({
           alt: 'A description of the new image',
           createdAt: expect.any(String),
@@ -233,7 +299,7 @@ describe('add Attachment', () => {
 
       describe('given a transaction parameter', () => {
         it('executes cypher statements within the transaction', async () => {
-          const session = driver.session()
+          const session = database.driver.session()
           try {
             await session.writeTransaction(async (transaction) => {
               const image = await addAttachment(post, 'ATTACHMENT', fileInput, {
@@ -251,7 +317,7 @@ describe('add Attachment', () => {
           } finally {
             await session.close()
           }
-          const image = await neode.first<typeof Image>(
+          const image = await database.neode.first<typeof Image>(
             'Image',
             { alt: 'This alt text gets overwritten' },
             undefined,
@@ -262,7 +328,7 @@ describe('add Attachment', () => {
         })
 
         it('rolls back the transaction in case of errors', async () => {
-          const session = driver.session()
+          const session = database.driver.session()
           try {
             await session.writeTransaction(async (transaction) => {
               const image = await addAttachment(post, 'ATTACHMENT', fileInput, {
@@ -273,7 +339,7 @@ describe('add Attachment', () => {
             // eslint-disable-next-line no-catch-all/no-catch-all
           } catch (err) {
             // nothing has been created
-            await expect(neode.all('Image')).resolves.toHaveLength(0)
+            await expect(database.neode.all('Image')).resolves.toHaveLength(0)
             // all good
           } finally {
             await session.close()
@@ -284,17 +350,17 @@ describe('add Attachment', () => {
       describe('if resource has an image already', () => {
         beforeEach(async () => {
           const [post, image] = await Promise.all([
-            neode.find('Post', 'p99'),
+            database.neode.find('Post', 'p99'),
             Factory.build('image'),
           ])
           await post.relateTo(image, 'image')
         })
 
         it('updates metadata of existing image node', async () => {
-          await expect(neode.all('Image')).resolves.toHaveLength(1)
+          await expect(database.neode.all('Image')).resolves.toHaveLength(1)
           await addAttachment(post, 'ATTACHMENT', fileInput)
-          await expect(neode.all('Image')).resolves.toHaveLength(1)
-          const image = await neode.first<typeof Image>('Image', {}, undefined)
+          await expect(database.neode.all('Image')).resolves.toHaveLength(1)
+          const image = await database.neode.first<typeof Image>('Image', {}, undefined)
           await expect(image.toJson()).resolves.toMatchObject({
             alt: 'A description of the new image',
             createdAt: expect.any(String),
@@ -343,7 +409,7 @@ describe('add Attachment', () => {
 
       it('updates metadata', async () => {
         await addAttachment(post, 'ATTACHMENT', fileInput)
-        const images = await neode.all('Image')
+        const images = await database.neode.all('Image')
         expect(images).toHaveLength(1)
         await expect(images.first().toJson()).resolves.toMatchObject({
           createdAt: expect.any(String),
