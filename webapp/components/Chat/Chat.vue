@@ -399,6 +399,10 @@ export default {
           const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
           if (roomIndex !== -1) {
             const changedRoom = { ...this.rooms[roomIndex] }
+            // TODO move to backend
+            if (!changedRoom.lastMessage) {
+              changedRoom.lastMessage = {}
+            }
             changedRoom.lastMessage.content = createdMessagePayload.content.trim().substring(0, 30)
             changedRoom.lastMessage.date = createdMessagePayload.date
 
