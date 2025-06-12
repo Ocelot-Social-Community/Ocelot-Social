@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/require-await */
-
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable promise/prefer-await-to-callbacks */
+import { ReadStream } from 'node:fs'
 import { Readable } from 'node:stream'
 
 import { S3Client } from '@aws-sdk/client-s3'
@@ -15,6 +13,7 @@ import { createTestClient } from 'apollo-server-testing'
 
 import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
+import File from '@db/models/File'
 import { CreateMessage } from '@graphql/queries/CreateMessage'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import type { S3Configured } from '@src/config'
@@ -23,8 +22,6 @@ import createServer, { getContext } from '@src/server'
 import { attachments } from './attachments'
 
 import type { FileInput } from './attachments'
-
-import File from '@db/models/File'
 
 const s3SendMock = jest.fn()
 jest.spyOn(S3Client.prototype, 'send').mockImplementation(s3SendMock)
@@ -200,7 +197,7 @@ describe('add Attachment', () => {
         // eslint-disable-next-line promise/avoid-new
         upload: new Promise((resolve) =>
           resolve({
-            createReadStream: () => file1 as any,
+            createReadStream: () => file1 as ReadStream,
             filename: 'file1',
             encoding: '7bit',
             mimetype: 'application/json',
