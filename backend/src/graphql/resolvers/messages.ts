@@ -7,7 +7,7 @@
 import { withFilter } from 'graphql-subscriptions'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
-import CONFIG from '@config/index'
+import CONFIG, { isS3configured } from '@config/index'
 import { CHAT_MESSAGE_ADDED } from '@constants/subscriptions'
 
 import { attachments } from './attachments/attachments'
@@ -131,34 +131,12 @@ export default {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const atns: any[] = []
 
-          const {
-            AWS_ACCESS_KEY_ID,
-            AWS_SECRET_ACCESS_KEY,
-            AWS_ENDPOINT,
-            AWS_REGION,
-            AWS_BUCKET,
-            S3_PUBLIC_GATEWAY,
-          } = CONFIG
-
-          if (
-            !AWS_ACCESS_KEY_ID ||
-            !AWS_SECRET_ACCESS_KEY ||
-            !AWS_ENDPOINT ||
-            !AWS_REGION ||
-            !AWS_BUCKET
-          ) {
+          if (!isS3configured(CONFIG)) {
             return atns
           }
 
           for await (const file of files) {
-            const atn = await attachments({
-              AWS_ACCESS_KEY_ID,
-              AWS_SECRET_ACCESS_KEY,
-              AWS_ENDPOINT,
-              AWS_REGION,
-              AWS_BUCKET,
-              S3_PUBLIC_GATEWAY,
-            }).add(
+            const atn = await attachments(CONFIG).add(
               message,
               'ATTACHMENT',
               file,
