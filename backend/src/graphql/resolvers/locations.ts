@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { UserInputError } from 'apollo-server'
+
+import type { Context } from '@src/context'
 
 import Resolver from './helpers/Resolver'
 import { queryLocations } from './users/location'
@@ -23,7 +24,7 @@ export default {
         'nameRU',
       ],
     }),
-    distanceToMe: async (parent, _params, context, _resolveInfo) => {
+    distanceToMe: async (parent, _params, context: Context, _resolveInfo) => {
       if (!parent.id) {
         throw new Error('Can not identify selected Location!')
       }
@@ -53,9 +54,9 @@ export default {
     },
   },
   Query: {
-    queryLocations: async (_object, args, _context, _resolveInfo) => {
+    queryLocations: async (_object, args, context: Context, _resolveInfo) => {
       try {
-        return queryLocations(args)
+        return queryLocations(args, context)
       } catch (e) {
         throw new UserInputError(e.message)
       }

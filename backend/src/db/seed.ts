@@ -4,7 +4,6 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable n/no-process-exit */
 import { faker } from '@faker-js/faker'
-import { createTestClient } from 'apollo-server-testing'
 import sample from 'lodash/sample'
 
 import CONFIG from '@config/index'
@@ -16,7 +15,8 @@ import { createMessageMutation } from '@graphql/queries/createMessageMutation'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
-import createServer from '@src/server'
+import { createApolloTestSetup } from '@root/test/helpers'
+import { fetch as actualFetch } from '@src/context/fetch'
 
 import Factory from './factories'
 import { getNeode, getDriver } from './neo4j'
@@ -36,16 +36,13 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
   const neode = getNeode()
 
   try {
-    const { server } = createServer({
-      context: () => {
-        return {
-          driver,
-          neode,
-          user: authenticatedUser,
-        }
-      },
+    const context = () => ({
+      authenticatedUser,
+      config: CONFIG,
+      fetch: actualFetch,
     })
-    const { mutate } = createTestClient(server)
+    const apolloSetup = createApolloTestSetup({ context })
+    const { mutate } = apolloSetup
 
     // locations
     const Hamburg = await Factory.build('location', {

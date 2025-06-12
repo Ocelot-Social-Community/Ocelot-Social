@@ -7,7 +7,7 @@
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
-import { Context } from '@src/server'
+import { Context } from '@src/context'
 
 export const defaultTrophyBadge = {
   id: 'default_trophy',
@@ -32,7 +32,10 @@ export default {
   },
 
   Mutation: {
-    setVerificationBadge: async (_object, args, context, _resolveInfo) => {
+    setVerificationBadge: async (_object, args, context: Context, _resolveInfo) => {
+      if (!context.user) {
+        throw new Error('Missing authenticated user.')
+      }
       const {
         user: { id: currentUserId },
       } = context
@@ -70,11 +73,14 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
 
     rewardTrophyBadge: async (_object, args, context: Context, _resolveInfo) => {
+      if (!context.user) {
+        throw new Error('Missing authenticated user.')
+      }
       const {
         user: { id: currentUserId },
       } = context

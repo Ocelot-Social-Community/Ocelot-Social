@@ -1,5 +1,6 @@
 import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
-import encode from '../../../../backend/build/src/jwt/encode'
+import CONFIG from '../../../../backend/build/src/config/index'
+import { encode } from '../../../../backend/build/src/jwt/encode'
 
 defineStep('I am logged in as {string}', slug => {
   cy.neode()
@@ -13,6 +14,6 @@ defineStep('I am logged in as {string}', slug => {
       })
     })
     .then(user => {
-      cy.setCookie('ocelot-social-token', encode(user))
+      cy.setCookie('ocelot-social-token', encode({ config: CONFIG })(user))
     })
 })

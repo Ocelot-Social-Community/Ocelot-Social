@@ -6,24 +6,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable promise/avoid-new */
-/* eslint-disable promise/prefer-await-to-callbacks */
+
 import { UserInputError } from 'apollo-server'
-import request from 'request'
 
-import CONFIG from '@config/index'
-
-const fetch = (url) => {
-  return new Promise((resolve, reject) => {
-    request(url, function (error, response, body) {
-      if (error) {
-        reject(error)
-      } else {
-        resolve(JSON.parse(body))
-      }
-    })
-  })
-}
+import type { Context } from '@src/context'
 
 const locales = ['en', 'de', 'fr', 'nl', 'it', 'es', 'pt', 'pl', 'ru']
 
@@ -73,19 +59,24 @@ const createLocation = async (session, mapboxData) => {
   })
 }
 
-export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, session) => {
+export const createOrUpdateLocations = async (
+  nodeLabel,
+  nodeId,
+  locationName,
+  session,
+  context: Context,
+) => {
   if (locationName === undefined) return
 
   let locationId
 
   if (locationName !== null) {
-    const res: any = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-        locationName,
-      )}.json?access_token=${
-        CONFIG.MAPBOX_TOKEN
-      }&types=region,place,country,address&language=${locales.join(',')}`,
-    )
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+      locationName,
+    )}.json?access_token=${
+      context.config.MAPBOX_TOKEN
+    }&types=region,place,country,address&language=${locales.join(',')}`
+    const res: any = await context.fetch(url)
 
     if (!res?.features?.[0]) {
       throw new UserInputError('locationName is invalid')
@@ -159,10 +150,9 @@ export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, s
   })
 }
 
-export const queryLocations = async ({ place, lang }) => {
-  const res: any = await fetch(
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${CONFIG.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`,
-  )
+export const queryLocations = async ({ place, lang }, context: Context) => {
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${context.config.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`
+  const res: any = await context.fetch(url)
   // Return empty array if no location found or error occurred
   if (!res?.features) {
     return []
