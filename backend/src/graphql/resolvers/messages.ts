@@ -72,7 +72,7 @@ export default {
   },
   Mutation: {
     CreateMessage: async (_parent, params, context, _resolveInfo) => {
-      const { roomId, content, files } = params
+      const { roomId, content, files = [] } = params
       const {
         user: { id: currentUserId },
       } = context
