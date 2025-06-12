@@ -145,12 +145,13 @@ export const attachments = (config: S3Configured) => {
 
     const { name, type } = fileInput
     const file = { url, name, type, ...fileAttributes }
-    const mimeType = uploadFile.mimetype.split('/')[0]
-    const nodeType = `Mime${mimeType.replace(/^./, mimeType[0].toUpperCase())}`
+    // const mimeType = uploadFile.mimetype.split('/')[0]
+    // const nodeType = `Mime${mimeType.replace(/^./, mimeType[0].toUpperCase())}`
+    // CREATE (file:${['File', nodeType].filter(Boolean).join(':')})
     const txResult = await transaction.run(
       `
       MATCH (resource {id: $resource.id})
-      CREATE (file:${['File', nodeType].filter(Boolean).join(':')})
+      CREATE (file:File)
       SET file.createdAt = toString(datetime())
       SET file += $file
       SET file.updatedAt = toString(datetime())
@@ -158,7 +159,7 @@ export const attachments = (config: S3Configured) => {
       MERGE (resource)-[:${relationshipType}]->(file)
       RETURN file {.*}
       `,
-      { resource, file, nodeType },
+      { resource, file /*, nodeType */ },
     )
     const [uploadedFile] = txResult.records.map((record) => record.get('file') as File)
     return uploadedFile

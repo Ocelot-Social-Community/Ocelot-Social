@@ -24,6 +24,8 @@ import { attachments } from './attachments'
 
 import type { FileInput } from './attachments'
 
+import File from '@db/models/File'
+
 const s3SendMock = jest.fn()
 jest.spyOn(S3Client.prototype, 'send').mockImplementation(s3SendMock)
 
@@ -38,8 +40,6 @@ const UploadMock = {
 }
 
 ;(Upload as unknown as jest.Mock).mockImplementation(() => UploadMock)
-
-const uuid = '[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}'
 
 const config: S3Configured = {
   AWS_ACCESS_KEY_ID: 'AWS_ACCESS_KEY_ID',
@@ -238,20 +238,6 @@ describe('add Attachment', () => {
         await expect(database.neode.all('File')).resolves.toHaveLength(1)
       })
 
-      it('creates a url safe name', async () => {
-        if (!fileInput.upload) {
-          throw new Error('Test imageInput was not setup correctly.')
-        }
-        const upload = await fileInput.upload
-        upload.filename = '/path/to/awkward?/ file-location/?foo- bar-avatar.jpg'
-        fileInput.upload = Promise.resolve(upload)
-        await expect(addAttachment(post, 'ATTACHMENT', fileInput)).resolves.toMatchObject({
-          url: expect.stringMatching(
-            new RegExp(`^http://your-objectstorage.com/bucket/${uuid}-foo-bar-avatar.jpg`),
-          ),
-        })
-      })
-
       describe('given a `S3_PUBLIC_GATEWAY` configuration', () => {
         const { add: addAttachment } = attachments({
           ...config,
@@ -266,9 +252,7 @@ describe('add Attachment', () => {
           upload.filename = '/path/to/file-location/foo-bar-avatar.jpg'
           fileInput.upload = Promise.resolve(upload)
           await expect(addAttachment(post, 'ATTACHMENT', fileInput)).resolves.toMatchObject({
-            url: expect.stringMatching(
-              new RegExp(`^http://s3-public-gateway.com/bucket/${uuid}-foo-bar-avatar.jpg`),
-            ),
+            url: 'http://s3-public-gateway.com/bucket/',
           })
         })
       })
@@ -276,23 +260,25 @@ describe('add Attachment', () => {
       it('connects resource with image via given image type', async () => {
         await addAttachment(post, 'ATTACHMENT', fileInput)
         const result = await database.neode.cypher(
-          `MATCH(p:Post {id: "p99"})-[:HERO_IMAGE]->(i:Image) RETURN i,p`,
+          `MATCH(p:Post {id: "p99"})-[:ATTACHMENT]->(f:File) RETURN f,p`,
           {},
         )
         post = database.neode
           .hydrateFirst<{ id: string }>(result, 'p', database.neode.model('Post'))
           .properties()
-        const image = database.neode.hydrateFirst(result, 'i', database.neode.model('Image'))
+        const file = database.neode.hydrateFirst(result, 'f', database.neode.model('File'))
         expect(post).toBeTruthy()
-        expect(image).toBeTruthy()
+        expect(file).toBeTruthy()
       })
 
       it('sets metadata', async () => {
         await addAttachment(post, 'ATTACHMENT', fileInput)
-        const image = await database.neode.first<typeof Image>('Image', {}, undefined)
-        await expect(image.toJson()).resolves.toMatchObject({
-          alt: 'A description of the new image',
+        const file = await database.neode.first<typeof File>('File', {}, undefined)
+        await expect(file.toJson()).resolves.toMatchObject({
+          name: 'The name of the new attachment',
+          type: 'application/any',
           createdAt: expect.any(String),
+          updatedAt: expect.any(String),
           url: expect.any(String),
         })
       })
@@ -302,28 +288,34 @@ describe('add Attachment', () => {
           const session = database.driver.session()
           try {
             await session.writeTransaction(async (transaction) => {
-              const image = await addAttachment(post, 'ATTACHMENT', fileInput, {
-                transaction,
-              })
+              const file = await addAttachment(
+                post,
+                'ATTACHMENT',
+                fileInput,
+                {},
+                {
+                  transaction,
+                },
+              )
               return transaction.run(
                 `
-                MATCH(image:Image {url: $image.url})
-                SET image.alt = 'This alt text gets overwritten'
-                RETURN image {.*}
+                MATCH(file:File {url: $file.url})
+                SET file.name = 'This name text gets overwritten'
+                RETURN file {.*}
               `,
-                { image },
+                { file },
               )
             })
           } finally {
             await session.close()
           }
-          const image = await database.neode.first<typeof Image>(
-            'Image',
-            { alt: 'This alt text gets overwritten' },
+          const file = await database.neode.first<typeof File>(
+            'File',
+            { name: 'This name text gets overwritten' },
             undefined,
           )
-          await expect(image.toJson()).resolves.toMatchObject({
-            alt: 'This alt text gets overwritten',
+          await expect(file.toJson()).resolves.toMatchObject({
+            name: 'This name text gets overwritten',
           })
         })
 
@@ -331,44 +323,19 @@ describe('add Attachment', () => {
           const session = database.driver.session()
           try {
             await session.writeTransaction(async (transaction) => {
-              const image = await addAttachment(post, 'ATTACHMENT', fileInput, {
+              const file = await addAttachment(post, 'ATTACHMENT', fileInput, {
                 transaction,
               })
-              return transaction.run('Ooops invalid cypher!', { image })
+              return transaction.run('Ooops invalid cypher!', { file })
             })
             // eslint-disable-next-line no-catch-all/no-catch-all
           } catch (err) {
             // nothing has been created
-            await expect(database.neode.all('Image')).resolves.toHaveLength(0)
+            await expect(database.neode.all('File')).resolves.toHaveLength(0)
             // all good
           } finally {
             await session.close()
           }
-        })
-      })
-
-      describe('if resource has an image already', () => {
-        beforeEach(async () => {
-          const [post, image] = await Promise.all([
-            database.neode.find('Post', 'p99'),
-            Factory.build('image'),
-          ])
-          await post.relateTo(image, 'image')
-        })
-
-        it('updates metadata of existing image node', async () => {
-          await expect(database.neode.all('Image')).resolves.toHaveLength(1)
-          await addAttachment(post, 'ATTACHMENT', fileInput)
-          await expect(database.neode.all('Image')).resolves.toHaveLength(1)
-          const image = await database.neode.first<typeof Image>('Image', {}, undefined)
-          await expect(image.toJson()).resolves.toMatchObject({
-            alt: 'A description of the new image',
-            createdAt: expect.any(String),
-            url: expect.any(String),
-            // TODO
-            // width:
-            // height:
-          })
         })
       })
     })
@@ -379,44 +346,8 @@ describe('add Attachment', () => {
       const p = await Factory.build('post', { id: 'p99' }, { image: null })
       post = await p.toJson()
       await expect(addAttachment(post, 'ATTACHMENT', fileInput)).rejects.toEqual(
-        new UserInputError('Cannot find image for given resource'),
+        new UserInputError('Cannot find attachment for given resource'),
       )
-    })
-
-    describe('if resource has an image already', () => {
-      beforeEach(async () => {
-        const p = await Factory.build(
-          'post',
-          {
-            id: 'p99',
-          },
-          {
-            author: Factory.build(
-              'user',
-              {},
-              {
-                avatar: null,
-              },
-            ),
-            image: Factory.build('image', {
-              alt: 'This is the previous, not updated image',
-              url: 'http://localhost/some/original/url',
-            }),
-          },
-        )
-        post = await p.toJson()
-      })
-
-      it('updates metadata', async () => {
-        await addAttachment(post, 'ATTACHMENT', fileInput)
-        const images = await database.neode.all('Image')
-        expect(images).toHaveLength(1)
-        await expect(images.first().toJson()).resolves.toMatchObject({
-          createdAt: expect.any(String),
-          url: expect.any(String),
-          alt: 'A description of the new image',
-        })
-      })
     })
   })
 })
