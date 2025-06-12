@@ -9,10 +9,10 @@ import { createTestClient } from 'apollo-server-testing'
 import databaseContext from '@context/database'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
-import { createMessageMutation } from '@graphql/queries/createMessageMutation'
+import { CreateMessage } from '@graphql/queries/CreateMessage'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { markMessagesAsSeen } from '@graphql/queries/markMessagesAsSeen'
-import { messageQuery } from '@graphql/queries/messageQuery'
+import { Message } from '@graphql/queries/Message'
 import { roomQuery } from '@graphql/queries/roomQuery'
 import createServer, { getContext } from '@src/server'
 
@@ -75,7 +75,7 @@ describe('Message', () => {
       it('throws authorization error', async () => {
         await expect(
           mutate({
-            mutation: createMessageMutation(),
+            mutation: CreateMessage,
             variables: {
               roomId: 'some-id',
               content: 'Some bla bla bla',
@@ -96,7 +96,7 @@ describe('Message', () => {
         it('returns null and does not publish subscription', async () => {
           await expect(
             mutate({
-              mutation: createMessageMutation(),
+              mutation: CreateMessage,
               variables: {
                 roomId: 'some-id',
                 content: 'Some bla bla bla',
@@ -127,7 +127,7 @@ describe('Message', () => {
           it('returns the message', async () => {
             await expect(
               mutate({
-                mutation: createMessageMutation(),
+                mutation: CreateMessage,
                 variables: {
                   roomId,
                   content: 'Some nice message to other chatting user',
@@ -218,7 +218,7 @@ describe('Message', () => {
           it('returns null', async () => {
             await expect(
               mutate({
-                mutation: createMessageMutation(),
+                mutation: CreateMessage,
                 variables: {
                   roomId,
                   content: 'I have no access to this room!',
@@ -245,7 +245,7 @@ describe('Message', () => {
       it('throws authorization error', async () => {
         await expect(
           query({
-            query: messageQuery(),
+            query: Message,
             variables: {
               roomId: 'some-id',
             },
@@ -265,7 +265,7 @@ describe('Message', () => {
         it('returns null', async () => {
           await expect(
             query({
-              query: messageQuery(),
+              query: Message,
               variables: {
                 roomId: 'some-id',
               },
@@ -282,7 +282,7 @@ describe('Message', () => {
       describe('room exists with authenticated user chatting', () => {
         it('returns the messages', async () => {
           const result = await query({
-            query: messageQuery(),
+            query: Message,
             variables: {
               roomId,
             },
@@ -312,7 +312,7 @@ describe('Message', () => {
         describe('more messages', () => {
           beforeAll(async () => {
             await mutate({
-              mutation: createMessageMutation(),
+              mutation: CreateMessage,
               variables: {
                 roomId,
                 content: 'A nice response message to chatting user',
@@ -320,7 +320,7 @@ describe('Message', () => {
             })
             authenticatedUser = await chattingUser.toJson()
             await mutate({
-              mutation: createMessageMutation(),
+              mutation: CreateMessage,
               variables: {
                 roomId,
                 content: 'And another nice message to other chatting user',
@@ -331,7 +331,7 @@ describe('Message', () => {
           it('returns the messages', async () => {
             await expect(
               query({
-                query: messageQuery(),
+                query: Message,
                 variables: {
                   roomId,
                 },
@@ -384,7 +384,7 @@ describe('Message', () => {
           it('returns the messages paginated', async () => {
             await expect(
               query({
-                query: messageQuery(),
+                query: Message,
                 variables: {
                   roomId,
                   first: 2,
@@ -419,7 +419,7 @@ describe('Message', () => {
 
             await expect(
               query({
-                query: messageQuery(),
+                query: Message,
                 variables: {
                   roomId,
                   first: 2,
@@ -454,7 +454,7 @@ describe('Message', () => {
         it('returns null', async () => {
           await expect(
             query({
-              query: messageQuery(),
+              query: Message,
               variables: {
                 roomId,
               },
@@ -495,7 +495,7 @@ describe('Message', () => {
       beforeAll(async () => {
         authenticatedUser = await otherChattingUser.toJson()
         const msgs = await query({
-          query: messageQuery(),
+          query: Message,
           variables: {
             roomId,
           },
@@ -522,7 +522,7 @@ describe('Message', () => {
       it('has seen prop set to true', async () => {
         await expect(
           query({
-            query: messageQuery(),
+            query: Message,
             variables: {
               roomId,
             },

@@ -121,6 +121,11 @@ export default {
         // We cannot combine the query above with the attachments, since you need the resource for matching
         const message = await writeTxResultPromise
 
+        // this is the case if the room doesn't exist - requires refactoring for implicit rooms
+        if (!message) {
+          return null
+        }
+
         const session = context.driver.session()
         const writeFilesPromise = session.writeTransaction(async (transaction) => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
