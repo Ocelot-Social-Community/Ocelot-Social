@@ -19,10 +19,8 @@ export const Message = gql`
       seen
       files {
         url
-        #name
-        #size
+        name
         type
-        #preview
       }
     }
   }

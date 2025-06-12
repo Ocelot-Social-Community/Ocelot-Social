@@ -12,6 +12,11 @@ export const CreateMessage = gql`
       saved
       distributed
       seen
+      files {
+        url
+        name
+        type
+      }
     }
   }
 `

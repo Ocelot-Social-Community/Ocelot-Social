@@ -3,15 +3,18 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { Readable } from 'node:stream'
+
 import { ApolloServer } from 'apollo-server-express'
 import { createTestClient } from 'apollo-server-testing'
+import { Upload } from 'graphql-upload/public/index.js'
 
 import databaseContext from '@context/database'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import { CreateMessage } from '@graphql/queries/CreateMessage'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
-import { markMessagesAsSeen } from '@graphql/queries/markMessagesAsSeen'
+import { MarkMessagesAsSeen } from '@graphql/queries/MarkMessagesAsSeen'
 import { Message } from '@graphql/queries/Message'
 import { roomQuery } from '@graphql/queries/roomQuery'
 import createServer, { getContext } from '@src/server'
@@ -39,6 +42,10 @@ beforeAll(async () => {
   mutate = createTestClient(server).mutate
 })
 
+beforeEach(async () => {
+  await cleanDatabase()
+})
+
 afterAll(async () => {
   await cleanDatabase()
   void server.stop()
@@ -49,7 +56,7 @@ afterAll(async () => {
 describe('Message', () => {
   let roomId: string
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     ;[chattingUser, otherChattingUser, notChattingUser] = await Promise.all([
       Factory.build('user', {
         id: 'chatting-user',
@@ -113,7 +120,8 @@ describe('Message', () => {
       })
 
       describe('room exists', () => {
-        beforeAll(async () => {
+        beforeEach(async () => {
+          authenticatedUser = await chattingUser.toJson()
           const room = await mutate({
             mutation: createRoomMutation(),
             variables: {
@@ -147,6 +155,16 @@ describe('Message', () => {
                   distributed: false,
                   seen: false,
                 },
+              },
+            })
+          })
+
+          beforeEach(async () => {
+            await mutate({
+              mutation: CreateMessage,
+              variables: {
+                roomId,
+                content: 'Some nice message to other chatting user',
               },
             })
           })
@@ -210,8 +228,63 @@ describe('Message', () => {
           })
         })
 
+        describe('user sends files in room', () => {
+          const file1 = Readable.from('file1')
+          const upload1 = new Upload()
+          upload1.resolve({
+            createReadStream: () => file1,
+            stream: file1,
+            filename: 'file1',
+            encoding: '7bit',
+            mimetype: 'application/json',
+          })
+          const file2 = Readable.from('file2')
+          const upload2 = new Upload()
+          upload2.resolve({
+            createReadStream: () => file2,
+            stream: file2,
+            filename: 'file2',
+            encoding: '7bit',
+            mimetype: 'image/png',
+          })
+          it('returns the message', async () => {
+            await expect(
+              mutate({
+                mutation: CreateMessage,
+                variables: {
+                  roomId,
+                  content: 'Some files for other chatting user',
+                  files: [
+                    { upload: upload1, name: 'test1', type: 'application/json' },
+                    { upload: upload2, name: 'test2', type: 'image/png' },
+                  ],
+                },
+              }),
+            ).resolves.toMatchObject({
+              errors: undefined,
+              data: {
+                CreateMessage: {
+                  id: expect.any(String),
+                  content: 'Some files for other chatting user',
+                  senderId: 'chatting-user',
+                  username: 'Chatting User',
+                  avatar: expect.any(String),
+                  date: expect.any(String),
+                  saved: true,
+                  distributed: false,
+                  seen: false,
+                  files: expect.arrayContaining([
+                    { name: 'test1', type: 'application/json', url: expect.any(String) },
+                    { name: 'test2', type: 'image/png', url: expect.any(String) },
+                  ]),
+                },
+              },
+            })
+          })
+        })
+
         describe('user does not chat in room', () => {
-          beforeAll(async () => {
+          beforeEach(async () => {
             authenticatedUser = await notChattingUser.toJson()
           })
 
@@ -280,6 +353,25 @@ describe('Message', () => {
       })
 
       describe('room exists with authenticated user chatting', () => {
+        beforeEach(async () => {
+          authenticatedUser = await chattingUser.toJson()
+          const room = await mutate({
+            mutation: createRoomMutation(),
+            variables: {
+              userId: 'other-chatting-user',
+            },
+          })
+          roomId = room.data.CreateRoom.id
+
+          await mutate({
+            mutation: CreateMessage,
+            variables: {
+              roomId,
+              content: 'Some nice message to other chatting user',
+            },
+          })
+        })
+
         it('returns the messages', async () => {
           const result = await query({
             query: Message,
@@ -301,7 +393,7 @@ describe('Message', () => {
                   avatar: expect.any(String),
                   date: expect.any(String),
                   saved: true,
-                  distributed: true,
+                  distributed: false,
                   seen: false,
                 },
               ],
@@ -310,7 +402,8 @@ describe('Message', () => {
         })
 
         describe('more messages', () => {
-          beforeAll(async () => {
+          beforeEach(async () => {
+            authenticatedUser = await otherChattingUser.toJson()
             await mutate({
               mutation: CreateMessage,
               variables: {
@@ -349,7 +442,7 @@ describe('Message', () => {
                     avatar: expect.any(String),
                     date: expect.any(String),
                     saved: true,
-                    distributed: true,
+                    distributed: false,
                     seen: false,
                   }),
                   expect.objectContaining({
@@ -479,7 +572,7 @@ describe('Message', () => {
       it('throws authorization error', async () => {
         await expect(
           mutate({
-            mutation: markMessagesAsSeen(),
+            mutation: MarkMessagesAsSeen,
             variables: {
               messageIds: ['some-id'],
             },
@@ -492,7 +585,38 @@ describe('Message', () => {
 
     describe('authenticated', () => {
       const messageIds: string[] = []
-      beforeAll(async () => {
+      beforeEach(async () => {
+        authenticatedUser = await chattingUser.toJson()
+        const room = await mutate({
+          mutation: createRoomMutation(),
+          variables: {
+            userId: 'other-chatting-user',
+          },
+        })
+        roomId = room.data.CreateRoom.id
+        await mutate({
+          mutation: CreateMessage,
+          variables: {
+            roomId,
+            content: 'Some nice message to other chatting user',
+          },
+        })
+        authenticatedUser = await otherChattingUser.toJson()
+        await mutate({
+          mutation: CreateMessage,
+          variables: {
+            roomId,
+            content: 'A nice response message to chatting user',
+          },
+        })
+        authenticatedUser = await chattingUser.toJson()
+        await mutate({
+          mutation: CreateMessage,
+          variables: {
+            roomId,
+            content: 'And another nice message to other chatting user',
+          },
+        })
         authenticatedUser = await otherChattingUser.toJson()
         const msgs = await query({
           query: Message,
@@ -506,7 +630,7 @@ describe('Message', () => {
       it('returns true', async () => {
         await expect(
           mutate({
-            mutation: markMessagesAsSeen(),
+            mutation: MarkMessagesAsSeen,
             variables: {
               messageIds,
             },
@@ -520,6 +644,12 @@ describe('Message', () => {
       })
 
       it('has seen prop set to true', async () => {
+        await mutate({
+          mutation: MarkMessagesAsSeen,
+          variables: {
+            messageIds,
+          },
+        })
         await expect(
           query({
             query: Message,
