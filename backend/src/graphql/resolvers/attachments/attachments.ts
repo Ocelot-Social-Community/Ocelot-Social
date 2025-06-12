@@ -108,17 +108,14 @@ export const attachments = (config: S3Configured) => {
     fileAttributes = {},
     opts = {},
   ) => {
-    console.log('abc')
     const { transaction } = opts
     if (!transaction)
       return wrapTransaction(add, [resource, relationshipType, fileInput, fileAttributes], opts)
 
-    console.log(fileInput)
     const { upload } = fileInput
     if (!upload) throw new UserInputError('Cannot find attachment for given resource')
 
     const uploadFile = await upload
-    console.log(uploadFile)
     const { name: fileName, ext } = path.parse(uploadFile.filename)
     const uniqueFilename = `${uuid()}-${slug(fileName)}${ext}`
 
@@ -130,26 +127,19 @@ export const attachments = (config: S3Configured) => {
       ContentType: uploadFile.mimetype,
       Body: uploadFile.createReadStream(),
     }
-    console.log(0)
     const command = new Upload({ client: s3, params })
-    console.log(0, 1)
     const data = await command.done()
-    console.log(0, 2)
     const { Location } = data
     if (!Location) {
       throw new Error('File upload did not return `Location`')
     }
 
-    let url
-    console.log('Location', Location)
+    let url = ''
     if (!S3_PUBLIC_GATEWAY) {
       url = Location
     } else {
-      console.log(1)
       const publicLocation = new URL(S3_PUBLIC_GATEWAY)
-      console.log(2)
       publicLocation.pathname = new URL(Location).pathname
-      console.log(3)
       url = publicLocation.href
     }
 
@@ -171,7 +161,6 @@ export const attachments = (config: S3Configured) => {
       { resource, file, nodeType },
     )
     const [uploadedFile] = txResult.records.map((record) => record.get('file') as File)
-    console.log(uploadedFile)
     return uploadedFile
   }
 
