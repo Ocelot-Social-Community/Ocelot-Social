@@ -67,7 +67,7 @@ export default {
         }
         // send subscription to author to updated the messages
       }
-      return resolved.reverse().map((m) => m)
+      return resolved.reverse()
     },
   },
   Mutation: {
