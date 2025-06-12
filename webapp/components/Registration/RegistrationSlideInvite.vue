@@ -7,11 +7,12 @@
     @input-valid="handleInputValid"
   >
     <ds-input
-      :placeholder="$t('components.registration.invite-code.form.invite-code')"
+      :placeholder="formSchema.inviteCode.placeholder"
+      :minlength="formSchema.inviteCode.minLength"
+      :maxlength="formSchema.inviteCode.maxLength"
       model="inviteCode"
       name="inviteCode"
       id="inviteCode"
-      icon="question-circle"
     />
     <ds-text v-if="!validInput">
       {{ $t('components.registration.invite-code.form.description') }}
@@ -43,7 +44,7 @@
 </template>
 
 <script>
-import registrationConstants from '~/constants/registration'
+import registrationConstants from '~/constants/registrationBranded.js'
 import { validateInviteCode } from '~/graphql/InviteCode'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 
@@ -69,6 +70,7 @@ export default {
           message: this.$t('components.registration.invite-code.form.validations.length', {
             inviteCodeLength: registrationConstants.INVITE_CODE_LENGTH,
           }),
+          placeholder: this.$t('components.registration.invite-code.form.invite-code'),
         },
       },
       dbRequestInProgress: false,
@@ -141,11 +143,16 @@ export default {
           const validationResult = response.data.validateInviteCode
 
           if (validationResult && validationResult.isValid) {
-            this.$toast.success(
-              this.$t('components.registration.invite-code.form.validations.success', {
-                inviteCode,
-              }),
-            )
+            // Auto-advance to next slide
+            const currentIndex = this.sliderData.sliderIndex
+            const nextIndex = currentIndex + 1
+
+            if (
+              this.sliderData.sliderSelectorCallback &&
+              nextIndex < this.sliderData.sliders.length
+            ) {
+              this.sliderData.sliderSelectorCallback(nextIndex)
+            }
             return true
           } else {
             this.$toast.error(

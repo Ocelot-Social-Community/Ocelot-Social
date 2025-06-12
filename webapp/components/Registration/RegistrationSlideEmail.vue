@@ -9,14 +9,7 @@
     <ds-text>
       {{ $t('components.registration.signup.form.description') }}
     </ds-text>
-    <ds-input
-      :placeholder="$t('login.email')"
-      type="email"
-      id="email"
-      model="email"
-      name="email"
-      icon="envelope"
-    />
+    <ds-input :placeholder="$t('login.email')" type="email" id="email" model="email" name="email" />
     <slot></slot>
     <ds-text v-if="sliderData.collectedInputData.emailSend">
       <input id="checkbox" type="checkbox" v-model="sendEmailAgain" :checked="sendEmailAgain" />
@@ -111,11 +104,7 @@ export default {
               ? 'components.registration.email.buttonTitle.resend'
               : 'components.registration.email.buttonTitle.skipResend'
             : 'components.registration.email.buttonTitle.send',
-          buttonIcon: this.sliderData.collectedInputData.emailSend
-            ? this.sendEmailAgain
-              ? 'envelope'
-              : 'arrow-right'
-            : 'envelope',
+          buttonIcon: null,
         },
       }
     },
