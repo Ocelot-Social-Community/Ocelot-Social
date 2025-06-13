@@ -30,6 +30,7 @@
         @add-room="toggleUserSearch"
         @show-demo-options="showDemoOptions = $event"
         @open-user-tag="redirectToUserProfile($event.detail[0])"
+        @open-file="openFile($event.detail[0].file.file)"
       >
         <div
           v-if="selectedRoom && selectedRoom.roomId"
@@ -474,6 +475,12 @@ export default {
         .finally(() => {
           // this.loading = false
         })
+    },
+
+    openFile: function (file) {
+      if (!file || !file.url) return
+      const url = this.$filters.proxyApiUrl(file.url)
+      window.open(url, '_blank')
     },
 
     redirectToUserProfile({ user }) {
