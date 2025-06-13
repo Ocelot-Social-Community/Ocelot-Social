@@ -57,6 +57,8 @@ export default {
     },
 
     handleMouseLeave() {
+      if (!this.showPopover) return
+
       this.isHovering = false
       this.clearHoverTimer()
       this.closeMenu()
