@@ -31,6 +31,9 @@ CONFIG.SEND_MAIL = true
 const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
 ;(async function () {
+  /* eslint-disable-next-line no-console */
+  console.log('Seeded Data...')
+
   let authenticatedUser = null
   const driver = getDriver()
   const neode = getNeode()
@@ -1609,10 +1612,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         })
       }
     }
-
-    /* eslint-disable-next-line no-console */
-    console.log('Seeded Data...')
-    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
     /* eslint-disable-next-line no-console */
     console.error(err)
