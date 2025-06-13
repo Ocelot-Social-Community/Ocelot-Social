@@ -477,10 +477,28 @@ export default {
         })
     },
 
-    openFile: function (file) {
+    openFile: async function (file) {
       if (!file || !file.url) return
+      /* To make the browser download the file instead of opening it, it needs to be
+         from the same origin or from local blob storage. So we fetch it first
+         and then create a download link from blob storage. */
+
       const url = this.$filters.proxyApiUrl(file.url)
-      window.open(url, '_blank')
+      const download = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': file.type,
+        },
+      })
+      const blob = await download.blob()
+      const objectURL = window.URL.createObjectURL(blob)
+      const downloadLink = document.createElement('a')
+      downloadLink.href = objectURL
+      downloadLink.download = `${file.name}.${file.type.split('/')[1]}`
+      downloadLink.style.display = 'none'
+      document.body.appendChild(downloadLink)
+      downloadLink.click()
+      document.body.removeChild(downloadLink)
     },
 
     redirectToUserProfile({ user }) {
