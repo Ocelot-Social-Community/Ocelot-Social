@@ -1,5 +1,9 @@
 <template>
   <ds-container width="small" class="password-reset">
+    <div class="back-link">
+      <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
+    </div>
+
     <base-card>
       <template #imageColumn>
         <page-params-link :pageParams="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)">
@@ -42,3 +46,9 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.back-link {
+  height: 35px;
+}
+</style>

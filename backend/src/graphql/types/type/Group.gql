@@ -38,6 +38,8 @@ type Group {
 
   categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
 
+  membersCount: Int! @cypher(statement: "MATCH (this)<-[:MEMBER_OF]-(r:User) RETURN COUNT(DISTINCT r)")
+
   myRole: GroupMemberRole # if 'null' then the current user is no member
 
   posts: [Post] @relation(name: "IN", direction: "IN")
@@ -78,8 +80,8 @@ type Query {
 
   GroupMembers(
     id: ID!
-    # first: Int # not implemented yet
-    # offset: Int # not implemented yet
+    first: Int
+    offset: Int
     # orderBy: [_UserOrdering] # not implemented yet
     # filter: _UserFilter # not implemented yet
   ): [User]
