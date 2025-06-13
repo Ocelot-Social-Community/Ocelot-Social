@@ -5,7 +5,7 @@ import { createTestClient } from 'apollo-server-testing'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { createMessageMutation } from '@graphql/queries/createMessageMutation'
+import { CreateMessage } from '@graphql/queries/CreateMessage'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { roomQuery } from '@graphql/queries/roomQuery'
 import { unreadRoomsQuery } from '@graphql/queries/unreadRoomsQuery'
@@ -327,21 +327,21 @@ describe('Room', () => {
         })
         otherRoomId = result.data.CreateRoom.roomId
         await mutate({
-          mutation: createMessageMutation(),
+          mutation: CreateMessage,
           variables: {
             roomId: otherRoomId,
             content: 'Message to not chatting user',
           },
         })
         await mutate({
-          mutation: createMessageMutation(),
+          mutation: CreateMessage,
           variables: {
             roomId,
             content: '1st message to other chatting user',
           },
         })
         await mutate({
-          mutation: createMessageMutation(),
+          mutation: CreateMessage,
           variables: {
             roomId,
             content: '2nd message to other chatting user',
@@ -356,7 +356,7 @@ describe('Room', () => {
         })
         otherRoomId = result2.data.CreateRoom.roomId
         await mutate({
-          mutation: createMessageMutation(),
+          mutation: CreateMessage,
           variables: {
             roomId: otherRoomId,
             content: 'Other message to not chatting user',

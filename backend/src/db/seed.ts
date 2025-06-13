@@ -12,7 +12,7 @@ import { categories } from '@constants/categories'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
 import { createCommentMutation } from '@graphql/queries/createCommentMutation'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
-import { createMessageMutation } from '@graphql/queries/createMessageMutation'
+import { CreateMessage } from '@graphql/queries/CreateMessage'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
@@ -1542,7 +1542,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     for (let i = 0; i < 30; i++) {
       authenticatedUser = await huey.toJson()
       await mutate({
-        mutation: createMessageMutation(),
+        mutation: CreateMessage,
         variables: {
           roomId: roomHueyPeter?.CreateRoom.id,
           content: faker.lorem.sentence(),
@@ -1550,7 +1550,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       })
       authenticatedUser = await peterLustig.toJson()
       await mutate({
-        mutation: createMessageMutation(),
+        mutation: CreateMessage,
         variables: {
           roomId: roomHueyPeter?.CreateRoom.id,
           content: faker.lorem.sentence(),
@@ -1568,7 +1568,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     for (let i = 0; i < 1000; i++) {
       authenticatedUser = await huey.toJson()
       await mutate({
-        mutation: createMessageMutation(),
+        mutation: CreateMessage,
         variables: {
           roomId: roomHueyJenny?.CreateRoom.id,
           content: faker.lorem.sentence(),
@@ -1576,7 +1576,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       })
       authenticatedUser = await jennyRostock.toJson()
       await mutate({
-        mutation: createMessageMutation(),
+        mutation: CreateMessage,
         variables: {
           roomId: roomHueyJenny?.CreateRoom.id,
           content: faker.lorem.sentence(),
@@ -1596,7 +1596,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       for (let i = 0; i < 29; i++) {
         authenticatedUser = await jennyRostock.toJson()
         await mutate({
-          mutation: createMessageMutation(),
+          mutation: CreateMessage,
           variables: {
             roomId: room?.CreateRoom.id,
             content: faker.lorem.sentence(),
@@ -1604,7 +1604,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         })
         authenticatedUser = await user.toJson()
         await mutate({
-          mutation: createMessageMutation(),
+          mutation: CreateMessage,
           variables: {
             roomId: room?.CreateRoom.id,
             content: faker.lorem.sentence(),
