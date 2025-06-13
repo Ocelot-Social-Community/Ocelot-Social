@@ -32,7 +32,7 @@ type Mutation {
   CreateMessage(
     roomId: ID!
     content: String
-    files: [FileInput]!
+    files: [FileInput]
   ): Message
 
   MarkMessagesAsSeen(messageIds: [String!]): Boolean
