@@ -55,7 +55,7 @@ export default {
     }
 
     &.--regular {
-      height: 1.2em;
+      height: var(--icon-size, 1.2em);
     }
 
     &.--large {

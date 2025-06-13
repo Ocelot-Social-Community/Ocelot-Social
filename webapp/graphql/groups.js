@@ -194,6 +194,7 @@ export const groupQuery = (i18n) => {
           lng
           lat
         }
+        membersCount
         myRole
         inviteCodes {
           createdAt
@@ -212,8 +213,8 @@ export const groupQuery = (i18n) => {
 
 export const groupMembersQuery = () => {
   return gql`
-    query ($id: ID!) {
-      GroupMembers(id: $id) {
+    query ($id: ID!, $first: Int, $offset: Int) {
+      GroupMembers(id: $id, first: $first, offset: $offset) {
         id
         name
         slug

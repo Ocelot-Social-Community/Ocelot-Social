@@ -208,7 +208,7 @@
         "buttonTitle": "Erstellen",
         "error": "Es konnte kein Nutzerkonto erstellt werden!",
         "help": "Vielleicht war der Bestätigungscode falsch oder abgelaufen? Wenn das Problem weiterhin besteht, schicke uns gerne eine E-Mail an:",
-        "recieveCommunicationAsEmailsEtcConfirmed": "Ich stimme auch dem Erhalt von E-Mails und anderen Formen der Kommunikation (z.B. Push-Benachrichtigungen) zu.",
+        "receiveCommunicationAsEmailsEtcConfirmed": "Ich stimme auch dem Erhalt von E-Mails und anderen Formen der Kommunikation (z.B. Push-Benachrichtigungen) zu.",
         "success": "Dein Nutzerkonto wurde erstellt!",
         "termsAndCondsEtcConfirmed": "Ich habe folgendes gelesen, verstanden und stimme zu:",
         "title": "Nutzerkonto anlegen"
@@ -227,8 +227,7 @@
       },
       "email-display": {
         "warningFormat": "⚠️ E-Mail hat ein ungültiges Format!",
-        "warningUndef": "⚠️ Keine E-Mail definiert!",
-        "yourEmail": "Deine E-Mail-Adresse:"
+        "warningUndef": "⚠️ Keine E-Mail definiert!"
       },
       "email-nonce": {
         "buttonTitle": "Weiter",
@@ -856,10 +855,14 @@
       "observedSuccessfully": "Du beobachtest diesen Beitrag!",
       "pin": "Beitrag anheften",
       "pinnedSuccessfully": "Beitrag erfolgreich angeheftet!",
+      "push": "Beitrag hochschieben",
+      "pushedSuccessfully": "Beitrag erfolgreich nach oben geschoben!",
       "unobserve": "Beitrag nicht mehr beobachten",
       "unobservedSuccessfully": "Du beobachtest diesen Beitrag nicht mehr!",
       "unpin": "Beitrag loslösen",
-      "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!"
+      "unpinnedSuccessfully": "Angehefteten Beitrag erfolgreich losgelöst!",
+      "unpush": "Beitrag hochschieben aufheben",
+      "unpushedSuccessfully": "Hochschieben des Beitrags erfolgreich rückgängig gemacht!"
     },
     "name": "Beitrag",
     "pinned": "Meldung",
@@ -1030,6 +1033,8 @@
       "unblocked": "{name} ist wieder entsperrt"
     },
     "data": {
+      "givenName": "Dein Vorname",
+      "givenNamePlaceholder": "Petra",
       "labelBio": "Über dich",
       "labelCity": "Deine Stadt oder Region",
       "labelCityHint": "(zeigt ungefähre Position auf der Landkarte)",
@@ -1037,7 +1042,10 @@
       "labelSlug": "Dein eindeutiger Nutzername",
       "name": "Deine Daten",
       "namePlaceholder": "Petra Lustig",
-      "success": "Deine Daten wurden erfolgreich aktualisiert!"
+      "realNamePlease": "Bitte gib deinen Klarnamen an",
+      "success": "Deine Daten wurden erfolgreich aktualisiert!",
+      "surName": "Dein Nachname",
+      "surNamePlaceholder": "Lustig"
     },
     "deleteUserAccount": {
       "accountDescription": "Sei dir bewusst, dass deine Beiträge und Kommentare für unsere Community wichtig sind. Wenn du sie trotzdem löschen möchtest, musst du sie unten markieren.",

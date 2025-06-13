@@ -50,7 +50,7 @@ describe('PostSlug', () => {
       })
       const propsData = {}
       mocks = {
-        $t: jest.fn(),
+        $t: jest.fn((t) => t),
         $filters: {
           truncate: (a) => a,
           removeHtml: (a) => a,

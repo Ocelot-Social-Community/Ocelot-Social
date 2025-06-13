@@ -1,28 +1,28 @@
 <template>
-  <ds-space margin="xx-small" class="text-align-center">
-    <base-button
-      :loading="loading"
-      :disabled="disabled"
-      :filled="shouted"
-      icon="heart-o"
-      circle
-      @click="toggle"
-    />
-    <ds-space margin-bottom="xx-small" />
-    <ds-text color="soft" class="shout-button-text">
-      <ds-heading style="display: inline" tag="h3">{{ shoutedCount }}x</ds-heading>
-      {{ $t('shoutButton.shouted') }}
-    </ds-text>
-  </ds-space>
+  <action-button
+    :loading="loading"
+    :disabled="disabled"
+    :count="shoutedCount"
+    :text="$t('shoutButton.shouted')"
+    :filled="shouted"
+    icon="heart-o"
+    @click="toggle"
+  />
 </template>
 
 <script>
 import gql from 'graphql-tag'
 
+import ActionButton from '~/components/ActionButton.vue'
+
 export default {
+  components: {
+    ActionButton,
+  },
   props: {
     count: { type: Number, default: 0 },
-    postId: { type: String, default: null },
+    nodeType: { type: String },
+    nodeId: { type: String, default: null },
     isShouted: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
   },
@@ -58,12 +58,13 @@ export default {
       this.$apollo
         .mutate({
           mutation: gql`
-            mutation($id: ID!) {
-              ${mutation}(id: $id, type: Post)
+            mutation($id: ID!, $type: ShoutTypeEnum!) {
+              ${mutation}(id: $id, type: $type)
             }
           `,
           variables: {
-            id: this.postId,
+            id: this.nodeId,
+            type: this.nodeType,
           },
         })
         .then((res) => {
@@ -82,12 +83,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss">
-.shout-button-text {
-  user-select: none;
-}
-.text-align-center {
-  text-align: center;
-}
-</style>

@@ -208,7 +208,7 @@
         "buttonTitle": null,
         "error": null,
         "help": null,
-        "recieveCommunicationAsEmailsEtcConfirmed": null,
+        "receiveCommunicationAsEmailsEtcConfirmed": null,
         "success": null,
         "termsAndCondsEtcConfirmed": null,
         "title": null
@@ -227,8 +227,7 @@
       },
       "email-display": {
         "warningFormat": null,
-        "warningUndef": null,
-        "yourEmail": null
+        "warningUndef": null
       },
       "email-nonce": {
         "buttonTitle": null,
@@ -856,10 +855,14 @@
       "observedSuccessfully": null,
       "pin": null,
       "pinnedSuccessfully": null,
+      "push": null,
+      "pushedSuccessfully": null,
       "unobserve": null,
       "unobservedSuccessfully": null,
       "unpin": null,
-      "unpinnedSuccessfully": null
+      "unpinnedSuccessfully": null,
+      "unpush": null,
+      "unpushedSuccessfully": null
     },
     "name": "Poczta",
     "pinned": null,
@@ -1030,6 +1033,8 @@
       "unblocked": null
     },
     "data": {
+      "givenName": null,
+      "givenNamePlaceholder": null,
       "labelBio": "O Tobie",
       "labelCity": "Twoje miasto lub region",
       "labelCityHint": null,
@@ -1037,7 +1042,10 @@
       "labelSlug": null,
       "name": "Twoje dane",
       "namePlaceholder": "Anonymous",
-      "success": "Twoje dane zostały pomyślnie zaktualizowane!"
+      "realNamePlease": null,
+      "success": "Twoje dane zostały pomyślnie zaktualizowane!",
+      "surName": null,
+      "surNamePlaceholder": null
     },
     "deleteUserAccount": {
       "accountDescription": "Be aware that your Post and Comments are important to our community. If you still choose to delete them, you have to mark them below.",

@@ -53,7 +53,7 @@
         class="footer"
         v-observe-visibility="(isVisible, entry) => visibilityChanged(isVisible, entry, post.id)"
       >
-        <div class="categories" v-if="categoriesActive">
+        <div class="categories" v-if="categoriesActive && post.categories.length > 0">
           <category
             v-for="category in post.categories"
             :key="category.id"
@@ -109,6 +109,8 @@
             :is-owner="isAuthor"
             @pinPost="pinPost"
             @unpinPost="unpinPost"
+            @pushPost="pushPost"
+            @unpushPost="unpushPost"
             @toggleObservePost="toggleObservePost"
           />
         </client-only>
@@ -221,6 +223,12 @@ export default {
     },
     unpinPost(post) {
       this.$emit('unpinPost', post)
+    },
+    pushPost(post) {
+      this.$emit('pushPost', post)
+    },
+    unpushPost(post) {
+      this.$emit('unpushPost', post)
     },
     toggleObservePost(postId, value) {
       this.$emit('toggleObservePost', postId, value)

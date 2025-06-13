@@ -12,7 +12,7 @@ import { categories } from '@constants/categories'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
 import { createCommentMutation } from '@graphql/queries/createCommentMutation'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
-import { createMessageMutation } from '@graphql/queries/createMessageMutation'
+import { CreateMessage } from '@graphql/queries/CreateMessage'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
@@ -31,23 +31,26 @@ CONFIG.SEND_MAIL = true
 const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
 ;(async function () {
+  /* eslint-disable-next-line no-console */
+  console.log('Seeded Data...')
+
   let authenticatedUser = null
   const driver = getDriver()
   const neode = getNeode()
+  const { server } = createServer({
+    context: () => {
+      return {
+        driver,
+        neode,
+        user: authenticatedUser,
+      }
+    },
+  })
+  const { mutate } = createTestClient(server)
 
   try {
-    const { server } = createServer({
-      context: () => {
-        return {
-          driver,
-          neode,
-          user: authenticatedUser,
-        }
-      },
-    })
-    const { mutate } = createTestClient(server)
-
-    // locations
+    // eslint-disable-next-line no-console
+    console.log('seed', 'locations')
     const Hamburg = await Factory.build('location', {
       id: 'region.5127278006398860',
       name: 'Hamburg',
@@ -150,7 +153,9 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     } = await trophies()
 
     const { verificationAdmin, verificationModerator, verificationDeveloper } = await verification()
-    // users
+
+    // eslint-disable-next-line no-console
+    console.log('seed', 'users')
     const peterLustig = await Factory.build(
       'user',
       {
@@ -243,7 +248,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await jennyRostock.relateTo(Paris, 'isIn')
     await huey.relateTo(Paris, 'isIn')
 
-    // badges
+    // eslint-disable-next-line no-console
+    console.log('seed', 'badges')
     await peterLustig.relateTo(trophyRacoon, 'rewarded')
     await peterLustig.relateTo(trophyRhino, 'rewarded')
     await peterLustig.relateTo(trophyWolf, 'rewarded')
@@ -286,7 +292,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await louie.relateTo(trophyRabbit, 'rewarded')
     await louie.relateTo(trophyRabbit, 'selected', { slot: 4 })
 
-    // Friends
+    // eslint-disable-next-line no-console
+    console.log('seed', 'friends')
     await peterLustig.relateTo(bobDerBaumeister, 'friends')
     await peterLustig.relateTo(jennyRostock, 'friends')
     await bobDerBaumeister.relateTo(jennyRostock, 'friends')
@@ -307,7 +314,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await dagobert.relateTo(dewey, 'blocked')
     await dagobert.relateTo(louie, 'blocked')
 
-    // categories
+    // eslint-disable-next-line no-console
+    console.log('seed', 'categories')
     for (const category of categories) {
       await Factory.build('category', {
         id: category.id,
@@ -317,7 +325,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       })
     }
 
-    // tags
+    // eslint-disable-next-line no-console
+    console.log('seed', 'tags')
     const environment = await Factory.build('tag', {
       id: 'Environment',
     })
@@ -331,7 +340,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       id: 'Freedom',
     })
 
-    // groups
+    // eslint-disable-next-line no-console
+    console.log('seed', 'groups')
     authenticatedUser = await peterLustig.toJson()
     await mutate({
       mutation: createGroupMutation(),
@@ -386,7 +396,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
 
-    // post into group
+    // eslint-disable-next-line no-console
+    console.log('seed', 'group posts')
     await mutate({
       mutation: createPostMutation(),
       variables: {
@@ -484,7 +495,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         roleInGroup: 'owner',
       },
     })
-    // post into group
     await mutate({
       mutation: createPostMutation(),
       variables: {
@@ -601,7 +611,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
 
-    // Create Events (by peter lustig)
+    // eslint-disable-next-line no-console
+    console.log('seed', 'events')
     authenticatedUser = await peterLustig.toJson()
     const now = new Date()
 
@@ -659,7 +670,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       eventStart: new Date(now.getFullYear(), now.getMonth(), now.getDate() - 3).toISOString(),
     })
 
-    // posts (articles)
+    // eslint-disable-next-line no-console
+    console.log('seed', 'posts')
     const p0 = await Factory.build(
       'post',
       {
@@ -816,7 +828,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     )
 
-    // invite code
+    // eslint-disable-next-line no-console
+    console.log('seed', 'invitecodes')
     await Factory.build(
       'inviteCode',
       {
@@ -881,6 +894,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     authenticatedUser = null
 
+    // eslint-disable-next-line no-console
+    console.log('seed', 'comments')
     authenticatedUser = await dewey.toJson()
     const mentionInComment1 =
       'I heard <a class="mention" data-mention-id="u3" href="/profile/u3">@jenny-rostock</a> has practiced it for 3 years now.'
@@ -1087,6 +1102,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     await huey.relateTo(p9, 'shouted')
     await louie.relateTo(p10, 'shouted')
 
+    // eslint-disable-next-line no-console
+    console.log('seed', 'reports')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const reports: any[] = []
     reports.push(
@@ -1195,13 +1212,26 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       closed: true,
     })
 
+    // eslint-disable-next-line no-console
+    console.log('seed', 'users additional')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const additionalUsers: any[] = []
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 1000; i++) {
       const user = await Factory.build('user')
       await jennyRostock.relateTo(user, 'following')
       await user.relateTo(jennyRostock, 'following')
       additionalUsers.push(user)
+
+      const userObj = await user.toJson()
+      authenticatedUser = userObj
+
+      await mutate({
+        mutation: joinGroupMutation(),
+        variables: {
+          groupId: 'g2',
+          userId: userObj.id,
+        },
+      })
     }
 
     // Jenny users
@@ -1499,7 +1529,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     await Factory.build('donations')
 
-    // Chat
+    // eslint-disable-next-line no-console
+    console.log('seed', 'chat')
     authenticatedUser = await huey.toJson()
     const { data: roomHueyPeter } = await mutate({
       mutation: createRoomMutation(),
@@ -1511,7 +1542,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     for (let i = 0; i < 30; i++) {
       authenticatedUser = await huey.toJson()
       await mutate({
-        mutation: createMessageMutation(),
+        mutation: CreateMessage,
         variables: {
           roomId: roomHueyPeter?.CreateRoom.id,
           content: faker.lorem.sentence(),
@@ -1519,7 +1550,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       })
       authenticatedUser = await peterLustig.toJson()
       await mutate({
-        mutation: createMessageMutation(),
+        mutation: CreateMessage,
         variables: {
           roomId: roomHueyPeter?.CreateRoom.id,
           content: faker.lorem.sentence(),
@@ -1537,7 +1568,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     for (let i = 0; i < 1000; i++) {
       authenticatedUser = await huey.toJson()
       await mutate({
-        mutation: createMessageMutation(),
+        mutation: CreateMessage,
         variables: {
           roomId: roomHueyJenny?.CreateRoom.id,
           content: faker.lorem.sentence(),
@@ -1545,7 +1576,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       })
       authenticatedUser = await jennyRostock.toJson()
       await mutate({
-        mutation: createMessageMutation(),
+        mutation: CreateMessage,
         variables: {
           roomId: roomHueyJenny?.CreateRoom.id,
           content: faker.lorem.sentence(),
@@ -1553,7 +1584,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       })
     }
 
-    for (const user of additionalUsers) {
+    for (const user of additionalUsers.slice(0, 99)) {
       authenticatedUser = await jennyRostock.toJson()
       const { data: room } = await mutate({
         mutation: createRoomMutation(),
@@ -1565,7 +1596,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       for (let i = 0; i < 29; i++) {
         authenticatedUser = await jennyRostock.toJson()
         await mutate({
-          mutation: createMessageMutation(),
+          mutation: CreateMessage,
           variables: {
             roomId: room?.CreateRoom.id,
             content: faker.lorem.sentence(),
@@ -1573,7 +1604,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         })
         authenticatedUser = await user.toJson()
         await mutate({
-          mutation: createMessageMutation(),
+          mutation: CreateMessage,
           variables: {
             roomId: room?.CreateRoom.id,
             content: faker.lorem.sentence(),
@@ -1581,16 +1612,15 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         })
       }
     }
-
-    /* eslint-disable-next-line no-console */
-    console.log('Seeded Data...')
-    await driver.close()
-    neode.close()
-    process.exit(0)
-    // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
     /* eslint-disable-next-line no-console */
     console.error(err)
-    process.exit(1)
+    throw err
+  } finally {
+    await server.stop()
+    await driver.close()
+    // eslint-disable-next-line @typescript-eslint/await-thenable
+    await neode.close()
+    process.exit(0)
   }
 })()

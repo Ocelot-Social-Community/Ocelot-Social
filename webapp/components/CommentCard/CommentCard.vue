@@ -39,15 +39,25 @@
         {{ isCollapsed ? $t('comment.show.more') : $t('comment.show.less') }}
       </base-button>
     </template>
-    <base-button
-      :title="this.$t('post.comment.reply')"
-      icon="level-down"
-      class="reply-button"
-      circle
-      size="small"
-      v-scroll-to="'.editor'"
-      @click="reply"
-    />
+    <div class="actions">
+      <shout-button
+        :disabled="isAuthor"
+        :count="comment.shoutedCount"
+        :is-shouted="comment.shoutedByCurrentUser"
+        :node-id="comment.id"
+        class="shout-button"
+        node-type="Comment"
+      />
+      <base-button
+        :title="this.$t('post.comment.reply')"
+        icon="level-down"
+        class="reply-button"
+        circle
+        size="small"
+        v-scroll-to="'.editor'"
+        @click="reply"
+      />
+    </div>
   </base-card>
 </template>
 
@@ -59,6 +69,7 @@ import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
 import CommentMutations from '~/graphql/CommentMutations'
+import ShoutButton from '~/components/ShoutButton.vue'
 import scrollToAnchor from '~/mixins/scrollToAnchor.js'
 
 export default {
@@ -67,6 +78,7 @@ export default {
     ContentMenu,
     ContentViewer,
     CommentForm,
+    ShoutButton,
   },
   mixins: [scrollToAnchor],
   data() {
@@ -97,6 +109,11 @@ export default {
     }),
     hasLongContent() {
       return this.$filters.removeHtml(this.comment.content).length > COMMENT_MAX_UNTRUNCATED_LENGTH
+    },
+    isAuthor() {
+      const { author } = this.comment
+      if (!author) return false
+      return this.$store.getters['auth/user'].id === author.id
     },
     isUnavailable() {
       return (this.comment.deleted || this.comment.disabled) && !this.isModerator
@@ -192,17 +209,12 @@ export default {
     margin-bottom: $space-small;
   }
 
-  > .base-button {
-    align-self: flex-end;
+  .actions {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
   }
-}
-
-.reply-button {
-  float: right;
-  top: 0px;
-}
-.reply-button:after {
-  clear: both;
 }
 
 @keyframes highlight {
@@ -212,5 +224,19 @@ export default {
   100% {
     border: $border-size-base solid transparent;
   }
+}
+</style>
+
+<style lang="scss" scoped>
+.actions {
+  margin-top: $space-x-small;
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  gap: calc($space-base * 0.5);
+}
+
+.shout-button {
+  --circle-button-width: 28px;
 }
 </style>

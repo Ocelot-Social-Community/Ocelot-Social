@@ -208,7 +208,7 @@
         "buttonTitle": null,
         "error": "¡No se ha podido crear una cuenta de usuario!",
         "help": "¿Tal vez el código de verificación era incorrecto o expiró? Si el problema persiste, por favor envíenos un correo electrónico a:",
-        "recieveCommunicationAsEmailsEtcConfirmed": null,
+        "receiveCommunicationAsEmailsEtcConfirmed": null,
         "success": "¡Su cuenta de usuario ha sido creada!",
         "termsAndCondsEtcConfirmed": null,
         "title": "Crear una cuenta de usuario"
@@ -227,8 +227,7 @@
       },
       "email-display": {
         "warningFormat": null,
-        "warningUndef": null,
-        "yourEmail": null
+        "warningUndef": null
       },
       "email-nonce": {
         "buttonTitle": null,
@@ -856,10 +855,14 @@
       "observedSuccessfully": null,
       "pin": "Anclar contribución",
       "pinnedSuccessfully": "¡Contribución anclado con éxito!",
+      "push": null,
+      "pushedSuccessfully": null,
       "unobserve": "Dejar de observar contribución",
       "unobservedSuccessfully": null,
       "unpin": "Desanclar contribución",
-      "unpinnedSuccessfully": "¡Contribución desanclado con éxito!"
+      "unpinnedSuccessfully": "¡Contribución desanclado con éxito!",
+      "unpush": null,
+      "unpushedSuccessfully": null
     },
     "name": "Contribución",
     "pinned": "Anuncio",
@@ -1030,6 +1033,8 @@
       "unblocked": "{name} está desbloqueado nuevamente"
     },
     "data": {
+      "givenName": null,
+      "givenNamePlaceholder": null,
       "labelBio": "Acerca de usted",
       "labelCity": "Su ciudad o región",
       "labelCityHint": null,
@@ -1037,7 +1042,10 @@
       "labelSlug": "Su nombre de usuario único",
       "name": "Sus datos",
       "namePlaceholder": "Femanon Funny",
-      "success": "¡Sus datos han sido actualizados con éxito!"
+      "realNamePlease": null,
+      "success": "¡Sus datos han sido actualizados con éxito!",
+      "surName": null,
+      "surNamePlaceholder": null
     },
     "deleteUserAccount": {
       "accountDescription": "Tenga en cuenta que su contribución y sus comentarios son importantes para nuestra comunidad. Si aún decide borrarlos, debe marcarlos a continuación.",

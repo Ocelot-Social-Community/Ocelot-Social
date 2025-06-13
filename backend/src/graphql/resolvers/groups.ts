@@ -18,7 +18,7 @@ import Resolver, {
   removeUndefinedNullValuesFromObject,
   convertObjectToCypherMapLiteral,
 } from './helpers/Resolver'
-import { mergeImage } from './images/images'
+import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
 
 export default {
@@ -80,15 +80,18 @@ export default {
       }
     },
     GroupMembers: async (_object, params, context: Context, _resolveInfo) => {
-      const { id: groupId } = params
+      const { id: groupId, first = 25, offset = 0 } = params
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (txc) => {
         const groupMemberCypher = `
           MATCH (user:User)-[membership:MEMBER_OF]->(:Group {id: $groupId})
           RETURN user {.*, myRoleInGroup: membership.role}
+          SKIP toInteger($offset) LIMIT toInteger($first)
         `
         const transactionResponse = await txc.run(groupMemberCypher, {
           groupId,
+          first,
+          offset,
         })
         return transactionResponse.records.map((record) => record.get('user'))
       })
@@ -260,7 +263,7 @@ export default {
         })
         const [group] = transactionResponse.records.map((record) => record.get('group'))
         if (avatarInput) {
-          await mergeImage(group, 'AVATAR_IMAGE', avatarInput, { transaction })
+          await images.mergeImage(group, 'AVATAR_IMAGE', avatarInput, { transaction })
         }
         return group
       })
@@ -467,6 +470,9 @@ export default {
       boolean: {
         isMutedByMe:
           'MATCH (this) RETURN EXISTS( (this)<-[:MUTED]-(:User {id: $cypherParams.currentUserId}) )',
+      },
+      count: {
+        membersCount: '<-[:MEMBER_OF]-(related:User)',
       },
     }),
     name: async (parent, _args, context: Context, _resolveInfo) => {

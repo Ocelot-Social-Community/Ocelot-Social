@@ -208,7 +208,7 @@
         "buttonTitle": null,
         "error": "Не удалось создать учетную запись!",
         "help": "Может быть, подтверждение было недействительным? В случае возникновения проблем, не стесняйтесь обращаться за помощью, отправив нам письмо по электронной почте:",
-        "recieveCommunicationAsEmailsEtcConfirmed": null,
+        "receiveCommunicationAsEmailsEtcConfirmed": null,
         "success": "Учетная запись успешно создана!",
         "termsAndCondsEtcConfirmed": null,
         "title": "Создать учетную запись"
@@ -227,8 +227,7 @@
       },
       "email-display": {
         "warningFormat": null,
-        "warningUndef": null,
-        "yourEmail": null
+        "warningUndef": null
       },
       "email-nonce": {
         "buttonTitle": null,
@@ -856,10 +855,14 @@
       "observedSuccessfully": null,
       "pin": "Закрепить пост",
       "pinnedSuccessfully": "Пост больше не закреплен!",
+      "push": null,
+      "pushedSuccessfully": null,
       "unobserve": null,
       "unobservedSuccessfully": null,
       "unpin": "Открепить пост",
-      "unpinnedSuccessfully": "Пост успешно не закреплено!"
+      "unpinnedSuccessfully": "Пост успешно не закреплено!",
+      "unpush": null,
+      "unpushedSuccessfully": null
     },
     "name": "Пост",
     "pinned": "Объявление",
@@ -1030,6 +1033,8 @@
       "unblocked": "{name} - снова разблокирован"
     },
     "data": {
+      "givenName": null,
+      "givenNamePlaceholder": null,
       "labelBio": "О себе",
       "labelCity": "Город или регион",
       "labelCityHint": null,
@@ -1037,7 +1042,10 @@
       "labelSlug": "Уникальное имя пользователя",
       "name": "Персональные данные",
       "namePlaceholder": "Маша Медведева",
-      "success": "Персональные данные были успешно обновлены!"
+      "realNamePlease": null,
+      "success": "Персональные данные были успешно обновлены!",
+      "surName": null,
+      "surNamePlaceholder": null
     },
     "deleteUserAccount": {
       "accountDescription": "Обратите внимание, что ваши посты и комментарии важны для сообщества. Если вы все равно хотите их удалить, то вы должны отметить соответствующие опции ниже.",

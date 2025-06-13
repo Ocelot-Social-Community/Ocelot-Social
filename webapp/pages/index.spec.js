@@ -32,7 +32,7 @@ describe('PostIndex', () => {
         'posts/articleSetInPostTypeFilter': () => false,
         'posts/eventSetInPostTypeFilter': () => false,
         'posts/eventsEnded': () => '',
-        'posts/orderBy': () => 'createdAt_desc',
+        'posts/orderBy': () => 'sortDate_desc',
         'auth/user': () => {
           return { id: 'u23' }
         },

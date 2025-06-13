@@ -32,12 +32,14 @@
 
 <script>
 import Dropdown from '~/components/Dropdown'
+import PinnedPostsMixin from '~/mixins/pinnedPosts'
 
 export default {
   name: 'ContentMenu',
   components: {
     Dropdown,
   },
+  mixins: [PinnedPostsMixin],
   props: {
     placement: { type: String, default: 'top-end' },
     resource: { type: Object, required: true },
@@ -80,8 +82,8 @@ export default {
           })
         }
 
-        if (this.isAdmin && !this.resource.group) {
-          if (!this.resource.pinnedBy) {
+        if (this.isAdmin && (!this.resource.group || this.resource.group.groupType === 'public')) {
+          if (!this.resource.pinnedBy && this.canBePinned) {
             routes.push({
               label: this.$t(`post.menu.pin`),
               callback: () => {
@@ -90,14 +92,36 @@ export default {
               icon: 'link',
             })
           } else {
-            routes.push({
-              label: this.$t(`post.menu.unpin`),
-              callback: () => {
-                this.$emit('unpinPost', this.resource)
-              },
-              icon: 'unlink',
-            })
+            if (this.resource.pinnedBy) {
+              routes.push({
+                label: this.$t(`post.menu.unpin`),
+                callback: () => {
+                  this.$emit('unpinPost', this.resource)
+                },
+                icon: 'unlink',
+              })
+            }
           }
+        }
+
+        if (this.isAdmin) {
+          routes.push({
+            label: this.$t(`post.menu.push`),
+            callback: () => {
+              this.$emit('pushPost', this.resource)
+            },
+            icon: 'link',
+          })
+        }
+
+        if (this.isAdmin && this.resource.sortDate !== this.resource.createdAt) {
+          routes.push({
+            label: this.$t(`post.menu.unpush`),
+            callback: () => {
+              this.$emit('unpushPost', this.resource)
+            },
+            icon: 'link',
+          })
         }
 
         if (this.resource.isObservedByMe) {
@@ -227,6 +251,12 @@ export default {
     },
     isAdmin() {
       return this.$store.getters['auth/isAdmin']
+    },
+    canBePinned() {
+      return (
+        this.maxPinnedPosts === 1 ||
+        (this.maxPinnedPosts > 1 && this.currentlyPinnedPosts < this.maxPinnedPosts)
+      )
     },
   },
   methods: {

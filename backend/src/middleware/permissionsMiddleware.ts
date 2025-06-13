@@ -428,11 +428,12 @@ export default shield(
       Donations: isAuthenticated,
       userData: isAuthenticated,
       VerifyNonce: allow,
-      queryLocations: isAuthenticated,
+      queryLocations: allow,
       availableRoles: isAdmin,
       Room: isAuthenticated,
       Message: isAuthenticated,
       UnreadRooms: isAuthenticated,
+      PostsPinnedCounts: isAdmin,
 
       // Invite Code
       validateInviteCode: allow,
@@ -483,6 +484,8 @@ export default shield(
       VerifyEmailAddress: isAuthenticated,
       pinPost: isAdmin,
       unpinPost: isAdmin,
+      pushPost: isAdmin,
+      unpushPost: isAdmin,
       UpdateDonations: isAdmin,
 
       // InviteCode
@@ -506,7 +509,9 @@ export default shield(
     },
     User: {
       '*': isAuthenticated,
+      id: allow,
       name: allow,
+      slug: allow,
       avatar: allow,
       email: or(isMyOwn, isAdmin),
       emailNotificationSettings: isMyOwn,

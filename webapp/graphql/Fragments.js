@@ -73,6 +73,7 @@ export const postFragment = gql`
     contentExcerpt
     createdAt
     updatedAt
+    sortDate
     disabled
     deleted
     slug
@@ -158,5 +159,7 @@ export const commentFragment = gql`
     contentExcerpt
     isPostObservedByMe
     postObservingUsersCount
+    shoutedByCurrentUser
+    shoutedCount
   }
 `
