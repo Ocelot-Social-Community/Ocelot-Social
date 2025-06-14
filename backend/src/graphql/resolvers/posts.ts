@@ -12,6 +12,7 @@ import { v4 as uuid } from 'uuid'
 import CONFIG, { isS3configured } from '@config/index'
 import { Context } from '@src/server'
 
+import { attachments } from './attachments/attachments'
 import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
@@ -19,7 +20,6 @@ import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
-import { attachments } from './attachments/attachments'
 
 const maintainPinnedPosts = (params) => {
   const pinnedPostFilter = { pinned: true }
@@ -113,7 +113,6 @@ export default {
   Mutation: {
     CreatePost: async (_parent, params, context, _resolveInfo) => {
       const { categoryIds, groupId, image: imageInput, files = [] } = params
-      console.log(params.content)
 
       const locationName = validateEventParams(params)
 
