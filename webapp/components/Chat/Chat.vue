@@ -374,9 +374,10 @@ export default {
 
       const hasFiles = files && files.length > 0
 
+      console.log(files)
       const filesToUpload = hasFiles
         ? files.map((file) => ({
-            upload: file.blob,
+            upload: new File([file.blob], `${file.name}.${file.extension}`),
             name: file.name,
             type: file.type,
           }))
@@ -494,7 +495,7 @@ export default {
       const objectURL = window.URL.createObjectURL(blob)
       const downloadLink = document.createElement('a')
       downloadLink.href = objectURL
-      downloadLink.download = `${file.name}.${file.type.split('/')[1]}`
+      downloadLink.download = `${file.name}.${file.url.split('.').slice(-1).pop()}`
       downloadLink.style.display = 'none'
       document.body.appendChild(downloadLink)
       downloadLink.click()
