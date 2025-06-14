@@ -107,19 +107,26 @@ export default {
         this.cities = []
         return
       }
-      this.loadingGeo = true
 
-      const place = encodeURIComponent(value)
-      const lang = this.$i18n.locale()
+      try {
+        this.loadingGeo = true
 
-      const {
-        data: { queryLocations: result },
-      } = await this.$apollo.query({ query: queryLocations(), variables: { place, lang } })
+        const place = encodeURIComponent(value)
+        const lang = this.$i18n.locale()
 
-      this.cities = this.processLocationsResult(result)
-      this.loadingGeo = false
+        const {
+          data: { queryLocations: result },
+        } = await this.$apollo.query({ query: queryLocations(), variables: { place, lang } })
 
-      return this.cities.find((city) => city.value === value)
+        this.cities = this.processLocationsResult(result)
+        this.loadingGeo = false
+
+        return this.cities.find((city) => city.value === value)
+      } catch (error) {
+        this.$toast.error(error.message)
+      } finally {
+        this.loadingGeo = false
+      }
     },
     clearLocationName(event) {
       event.target.value = ''
