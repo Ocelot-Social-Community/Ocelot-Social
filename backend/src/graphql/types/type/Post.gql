@@ -216,7 +216,7 @@ type Mutation {
     title: String!
     slug: String
     content: String!
-    filesToUpload: [FileInput]
+    files: [FileInput]
     image: ImageInput,
     visibility: Visibility
     language: String

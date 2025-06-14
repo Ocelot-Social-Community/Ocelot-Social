@@ -9,7 +9,7 @@ import { isEmpty } from 'lodash'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 import { v4 as uuid } from 'uuid'
 
-import CONFIG from '@config/index'
+import CONFIG, { isS3configured } from '@config/index'
 import { Context } from '@src/server'
 
 import { validateEventParams } from './helpers/events'
@@ -19,6 +19,7 @@ import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
+import { attachments } from './attachments/attachments'
 
 const maintainPinnedPosts = (params) => {
   const pinnedPostFilter = { pinned: true }
@@ -111,14 +112,15 @@ export default {
   },
   Mutation: {
     CreatePost: async (_parent, params, context, _resolveInfo) => {
-      const { categoryIds, groupId } = params
-      const { image: imageInput } = params
+      const { categoryIds, groupId, image: imageInput, files = [] } = params
+      console.log(params.content)
 
       const locationName = validateEventParams(params)
 
       delete params.categoryIds
       delete params.image
       delete params.groupId
+      delete params.files
       params.id = params.id || uuid()
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -186,6 +188,59 @@ export default {
         if (locationName) {
           await createOrUpdateLocations('Post', post.id, locationName, session)
         }
+
+        // can this happen?
+        // if (!post) {
+        //   return null
+        // }
+
+        const writeFilesPromise = session.writeTransaction(async (transaction) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const atns: any[] = []
+
+          if (!isS3configured(CONFIG)) {
+            return atns
+          }
+
+          for await (const file of files) {
+            const atn = await attachments(CONFIG).add(
+              post,
+              'ATTACHMENT',
+              file,
+              {},
+              {
+                transaction,
+              },
+            )
+            atns.push(atn)
+          }
+          return atns
+        })
+
+        const atns = await writeFilesPromise
+
+        for await (const atn of atns) {
+          post.content = post.content.replace(
+            `<img alt="${atn.name}" />`,
+            `<img src="${atn.url}" alt="${atn.name}" />`,
+          )
+          post.contentExcerpt = post.contentExcerpt.replace(
+            `<img alt="${atn.name}"/>`,
+            `<img src="${atn.url}" alt="${atn.name}" />`,
+          )
+        }
+
+        await context.database.write({
+          query: `
+          MATCH (post:Post {id: $post.id})
+          SET post.content = $post.content
+          SET post.contentExcerpt = $post.contentExcerpt
+        `,
+          variables: {
+            post,
+          },
+        })
+
         return post
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')

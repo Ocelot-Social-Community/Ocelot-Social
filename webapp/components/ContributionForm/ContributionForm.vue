@@ -394,13 +394,14 @@ export default {
       }
       this.loading = true
 
+      console.log(content)
       this.$apollo
         .mutate({
           mutation: this.contribution.id ? PostMutations().UpdatePost : PostMutations().CreatePost,
           variables: {
             title,
             content,
-            filesToUpload: this.filesToUpload,
+            files: this.filesToUpload,
             categoryIds,
             id: this.contribution.id || null,
             image,
@@ -429,20 +430,20 @@ export default {
       const blobImages = value.match(/<img[^>]+src="blob:[^"]+"[^>]*>/g) || []
       this.filesToUpload = await Promise.all(
         blobImages
-          .map((img) => {
-            const srcMatch = img.match(/src="([^"]+)"/)
-            return srcMatch ? srcMatch[1] : null
-          })
-          .filter(Boolean)
-          .map(async (src) => {
-            const fileName = src.split('/').pop()
-            const blob = await urlToBlob(src)
+          .map(async (img) => {
+            const src = img.match(/src="([^"]+)"/)
+            const filename = img.match(/alt="([^"]+)"/)
+            if (!src) {
+              return null
+            }
+            const blob = await urlToBlob(src[1])
             return {
               upload: blob,
-              name: fileName,
+              name: filename[1],
               type: 'image/jpeg',
             }
-          }),
+          })
+          .filter(Boolean),
       )
 
       this.$refs.contributionForm.update('content', value)
