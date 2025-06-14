@@ -8,7 +8,7 @@ export default () => {
         $title: String!
         $slug: String
         $content: String!
-        $filesToUpload: [FileInput]
+        $files: [FileInput]
         $categoryIds: [ID]
         $image: ImageInput
         $groupId: ID
@@ -20,7 +20,7 @@ export default () => {
           title: $title
           slug: $slug
           content: $content
-          filesToUpload: $filesToUpload
+          files: $files
           categoryIds: $categoryIds
           image: $image
           groupId: $groupId
