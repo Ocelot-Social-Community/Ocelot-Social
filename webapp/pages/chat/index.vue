@@ -17,7 +17,7 @@
 <script>
 import { mapGetters, mapMutations } from 'vuex'
 import AddChatRoomByUserSearch from '~/components/Chat/AddChatRoomByUserSearch'
-import Chat from '../components/Chat/Chat.vue'
+import Chat from '~/components/Chat/Chat.vue'
 
 export default {
   components: {
