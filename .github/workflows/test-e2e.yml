@@ -10,6 +10,7 @@ on:
       - '.github/workflows/test-e2e.yml'
 
 jobs:
+
   build_images:
     name: Build Docker Images
     runs-on: ubuntu-latest
@@ -34,8 +35,8 @@ jobs:
       - name: Build ${{ matrix.service }} image
         uses: docker/build-push-action@v5
         with:
-          context: ./${{ matrix.context }}
-          file: ./${{ matrix.dockerfile }}
+          context: ./\${{ matrix.context }}
+          file: ./\${{ matrix.dockerfile }}
           target: ${{ matrix.target }}
           tags: ocelotsocialnetwork/${{ matrix.service }}:test
           push: false
@@ -54,19 +55,23 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Setup .env and backend deps
-        run: |
-          cp backend/.env.test_e2e backend/.env || touch backend/.env
-          cd backend
-          yarn install
-          yarn build
+      - name: Generate backend cache key
+        id: backend-key
+        run: echo "key=node-modules-${{ runner.os }}-${{ hashFiles('backend/yarn.lock') }}" >> $GITHUB_OUTPUT
       - name: Cache backend node_modules
         uses: actions/cache@v4
         with:
           path: backend/node_modules
-          key: node-modules-${{ runner.os }}-${{ hashFiles('backend/yarn.lock') }}
+          key: ${{ steps.backend-key.outputs.key }}
           restore-keys: |
             node-modules-${{ runner.os }}-
+            node-modules-
+      - name: Setup .env and backend deps
+        run: |
+          cp backend/.env.test_e2e backend/.env || touch backend/.env
+          cd backend
+          if [ ! -d "node_modules" ]; then yarn install; fi
+          yarn build
       - name: Upload backend build
         uses: actions/upload-artifact@v4
         with:
@@ -81,17 +86,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Setup .env and webapp deps
-        run: |
-          cp webapp/.env.template webapp/.env || touch webapp/.env
-          (cd webapp && yarn install || true)
+      - name: Generate webapp cache key
+        id: webapp-key
+        run: echo "key=node-modules-${{ runner.os }}-${{ hashFiles('webapp/yarn.lock') }}" >> $GITHUB_OUTPUT
       - name: Cache webapp node_modules
         uses: actions/cache@v4
         with:
           path: webapp/node_modules
-          key: node-modules-${{ runner.os }}-${{ hashFiles('webapp/yarn.lock') }}
+          key: ${{ steps.webapp-key.outputs.key }}
           restore-keys: |
             node-modules-${{ runner.os }}-
+            node-modules-
+      - name: Setup .env and webapp deps
+        run: |
+          cp webapp/.env.template webapp/.env || touch webapp/.env
+          if [ ! -d "webapp/node_modules" ]; then (cd webapp && yarn install || true); fi
 
   prepare_cypress:
     name: Prepare Cypress
@@ -137,6 +146,7 @@ jobs:
           key: node-modules-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             node-modules-${{ runner.os }}-
+            node-modules-
       - name: Download Docker image tarballs
         uses: actions/download-artifact@v4
         with:
@@ -184,4 +194,5 @@ jobs:
         run: |
           for i in {1..30}; do curl -sf http://localhost:3000 && exit 0 || sleep 2; done; exit 1
       - name: Run Cypress tests
-        run: yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }})
+        run: |
+          yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }})
