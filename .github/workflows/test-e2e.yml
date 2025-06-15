@@ -23,7 +23,7 @@ jobs:
             target: community
     steps:
       - name: Checkout code
-      - uses: actions/checkout@v4
+        uses: actions/checkout@v4
 
       - name: Wait for webapp to be ready
         run: |
