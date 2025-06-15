@@ -46,7 +46,13 @@ jobs:
   prepare_cypress:
     name: Fullstack | prepare cypress
     runs-on: ubuntu-latest
+
     steps:
+      - name: test wait function is working
+        run: |
+        npm install --no-save wait-on
+        npx wait-on http://localhost:3000 --timeout 120000
+
       - name: Checkout code
         uses: actions/checkout@v4
 
