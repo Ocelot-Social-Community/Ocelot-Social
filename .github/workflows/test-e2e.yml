@@ -6,39 +6,42 @@ jobs:
   prepare_backend_environment:
     name: Fullstack | prepare backend environment
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - service: backend
+            dockerfile: backend/Dockerfile
+            context: backend
+            target: build
+          - service: webapp
+            dockerfile: webapp/Dockerfile
+            context: webapp
+            target: build
+          - service: neo4j
+            dockerfile: neo4j/Dockerfile
+            context: neo4j
+            target: community
     steps:
       - name: Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
 
-      - name: Copy backend env file
-        run: |
-          cp backend/.env.test_e2e backend/.env
-          cp webapp/.env.template webapp/.env
-      - name: Build backend and dependencies
-        run: |
-          # Build and start all required images for backend
-          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend --build
-          
-          # Save the build images
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" > /tmp/backend.tar          
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j-community:test" > /tmp/neo4j.tar
-          docker save "quay.io/minio/minio:latest" > /tmp/minio.tar
-          docker save "quay.io/minio/mc:latest" > /tmp/minio-mc.tar
-          docker save "maildev/maildev:latest" > /tmp/mailserver.tar
-          
-          # Stop the containers
-          docker compose -f docker-compose.yml -f docker-compose.test.yml down
-      
-      - name: Cache docker images
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build ${{ matrix.service }} image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ matrix.context }}
+          file: ./${{ matrix.dockerfile }}
+          target: ${{ matrix.target }}
+          tags: ghcr.io/ocelot-social-community/ocelot-social/${{ matrix.service }}:test
+          push: false
+          outputs: type=docker,dest=/tmp/${{ matrix.service }}.tar
+
+      - name: Upload Docker image tarball
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
-          path: |
-            /tmp/backend.tar
-            /tmp/neo4j.tar
-            /tmp/minio.tar
-            /tmp/minio-mc.tar
-            /tmp/mailserver.tar
-          key: ${{ github.run_id }}-e2e-backend-environment-cache
+          name: ${{ matrix.service }}-image
+          path: /tmp/${{ matrix.service }}.tar
 
   prepare_webapp_image:
     name: Fullstack | prepare webapp image
@@ -144,11 +147,10 @@ jobs:
           docker load < /tmp/webapp.tar
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
 
-      - name: Wait for webapp
-        uses: staticdeploy/wait-on-action@v1
-        with:
-          resource: http://localhost:3000
-          timeout: 120000
+      - name: Wait for webapp to be ready
+        run: |
+          npm install --no-save wait-on
+          npx wait-on http://localhost:3000 --timeout 120000
 
       - name: Full stack tests | run tests
         id: e2e-tests
