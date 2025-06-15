@@ -27,8 +27,9 @@ jobs:
 
       - name: Wait for webapp to be ready
         run: |
-          npm install --no-save wait-on
+          yarn add --no-lockfile wait-on
           npx wait-on http://localhost:3000 --timeout 120000
+
 
       - uses: docker/setup-buildx-action@v3
 
@@ -140,8 +141,9 @@ jobs:
 
       - name: Wait for webapp to be ready
         run: |
-          npm install --no-save wait-on
+          yarn add --no-lockfile wait-on
           npx wait-on http://localhost:3000 --timeout 120000
+        
 
       - name: Full stack tests | run tests
         id: e2e-tests
