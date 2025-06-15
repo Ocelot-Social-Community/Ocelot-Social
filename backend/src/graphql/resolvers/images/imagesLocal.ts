@@ -12,7 +12,7 @@ import { existsSync, unlinkSync, createWriteStream } from 'node:fs'
 import path from 'node:path'
 
 import { UserInputError } from 'apollo-server'
-import slug from 'slug'
+import slugify from 'slugify'
 import { v4 as uuid } from 'uuid'
 
 import { wrapTransaction } from './wrapTransaction'
@@ -110,7 +110,7 @@ const uploadImageFile = async (
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { createReadStream, filename, mimetype } = await upload
   const { name, ext } = path.parse(filename)
-  const uniqueFilename = `${uuid()}-${slug(name)}${ext}`
+  const uniqueFilename = `${uuid()}-${slugify(name)}${ext}`
   return uploadCallback({ createReadStream, uniqueFilename, mimetype })
 }
 

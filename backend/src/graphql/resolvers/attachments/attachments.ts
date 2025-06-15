@@ -3,7 +3,7 @@ import path from 'node:path'
 import { DeleteObjectCommand, ObjectCannedACL, S3Client } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import { UserInputError } from 'apollo-server-express'
-import slug from 'slug'
+import slugify from 'slugify'
 import { v4 as uuid } from 'uuid'
 
 import { isS3configured, S3Configured } from '@config/index'
@@ -117,7 +117,7 @@ export const attachments = (config: S3Configured) => {
 
     const uploadFile = await upload
     const { name: fileName, ext } = path.parse(uploadFile.filename)
-    const uniqueFilename = `${uuid()}-${slug(fileName)}${ext}`
+    const uniqueFilename = `${uuid()}-${slugify(fileName)}${ext}`
 
     const s3Location = `attachments/${uniqueFilename}`
     const params = {

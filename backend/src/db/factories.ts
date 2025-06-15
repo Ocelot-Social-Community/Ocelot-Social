@@ -7,7 +7,7 @@
 import { faker } from '@faker-js/faker'
 import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'
-import slugify from 'slug'
+import slugify from 'slugify'
 import { v4 as uuid } from 'uuid'
 
 import { generateInviteCode } from '@graphql/resolvers/inviteCodes'

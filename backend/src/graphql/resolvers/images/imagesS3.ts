@@ -3,7 +3,7 @@ import path from 'node:path'
 import { S3Client, DeleteObjectCommand, ObjectCannedACL } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import { UserInputError } from 'apollo-server'
-import slug from 'slug'
+import slugify from 'slugify'
 import { v4 as uuid } from 'uuid'
 
 import { S3Configured } from '@config/index'
@@ -100,7 +100,7 @@ export const images = (config: S3Configured) => {
     if (!uploadPromise) return undefined
     const upload = await uploadPromise
     const { name, ext } = path.parse(upload.filename)
-    const uniqueFilename = `${uuid()}-${slug(name)}${ext}`
+    const uniqueFilename = `${uuid()}-${slugify(name)}${ext}`
     const Location = await uploadCallback({ ...upload, uniqueFilename })
     if (!S3_PUBLIC_GATEWAY) {
       return Location
