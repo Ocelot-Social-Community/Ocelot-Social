@@ -143,7 +143,13 @@ jobs:
           docker load < /tmp/mailserver.tar
           docker load < /tmp/webapp.tar
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
-          sleep 90s
+
+      - name: Wait for webapp to be ready
+        uses: jakejarvis/wait-action@v0.1.0
+        with:
+          url: http://localhost:3000
+          timeout: 120000
+
       - name: Full stack tests | run tests
         id: e2e-tests
         run: yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
