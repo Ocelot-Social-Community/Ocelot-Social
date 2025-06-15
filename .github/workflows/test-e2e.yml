@@ -124,7 +124,10 @@ jobs:
             ~/.cache/Cypress
             node_modules
             backend/node_modules
-          key: cypress-cache-${{ github.run_id }}
+          key: cypress-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            cypress-${{ runner.os }}-
+            cypress-
 
   fullstack_tests:
     name: Run Fullstack E2E Tests
