@@ -31,7 +31,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
-
       - name: Build ${{ matrix.service }} image
         uses: docker/build-push-action@v5
         with:
@@ -39,54 +38,135 @@ jobs:
           file: ./${{ matrix.dockerfile }}
           target: ${{ matrix.target }}
           tags: ocelotsocialnetwork/${{ matrix.service }}:test
+          push: false
           outputs: type=docker,dest=/tmp/${{ matrix.service }}.tar
+      - name: Upload Docker image tarball
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.service }}-image
+          path: /tmp/${{ matrix.service }}.tar
 
-  prepare_env:
-    name: Prepare Environment
+  prepare_backend:
+    name: Prepare backend
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Setup .env and deps
+      - name: Setup .env and backend deps
+        run: |
+          cp backend/.env.test_e2e backend/.env || touch backend/.env
+          cd backend
+          yarn install
+          yarn build
+  prepare_webapp:
+    name: Prepare webapp
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Setup .env and webapp deps
         run: |
           cp webapp/.env.template webapp/.env || touch webapp/.env
-          cp backend/.env.test_e2e backend/.env || touch backend/.env
-          yarn --version || npm install -g yarn
-          mkdir -p /tmp/bin && curl -sL https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386 -o /tmp/bin/cucumber-json-formatter
-          chmod +x /tmp/bin/cucumber-json-formatter
-          export PATH="/tmp/bin:$PATH"
-          yarn install || true
-          (cd backend && yarn install || true)
           (cd webapp && yarn install || true)
+  prepare_cypress:
+    name: Prepare Cypress
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Copy env files
+        run: |
+          cp webapp/.env.template webapp/.env
+          cp backend/.env.test_e2e backend/.env
+      - name: Install cypress requirements
+        run: |
+          wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
+          chmod +x /opt/cucumber-json-formatter
+          cd backend
+          yarn install
+          yarn build
+          cd ..
+          yarn install
+      - name: Cache cypress, node_modules and project
+        uses: actions/cache@v4
+        with:
+          path: |
+            /opt/cucumber-json-formatter
+            ~/.cache/Cypress
+            node_modules
+            backend/node_modules
+            /home/runner/work/Ocelot-Social/Ocelot-Social
+          key: ${{ github.run_id }}-e2e-cypress
 
   fullstack_tests:
     name: Run Fullstack E2E Tests
-    needs: [build_images, prepare_env]
+    needs: [build_images, prepare_backend, prepare_webapp, prepare_cypress]
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        job: [1, 2, 3, 4, 5, 6, 7, 8]
     env:
       jobs: 8
+    strategy:
+      matrix:
+        job: [1,2,3,4,5,6,7,8]
     steps:
+      - name: Restore cypress and project cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            backend/node_modules
+            /home/runner/work/Ocelot-Social/Ocelot-Social
+          key: ${{ github.run_id }}-e2e-cypress
+
       - uses: actions/checkout@v4
+
+      - name: Add node_modules/.bin to PATH
+        run: echo "$(pwd)/node_modules/.bin" >> $GITHUB_PATH
+      - name: Ensure Cypress CLI is available
+        run: |
+          if ! command -v cypress >/dev/null; then
+            echo "⚠️ Cypress CLI missing — installing now..."
+            yarn install
+          else
+            echo "✅ Cypress CLI is present"
+          fi
+      - name: Setup .env files
+        run: |
+          mkdir -p webapp backend
+          cp webapp/.env.template webapp/.env || touch webapp/.env
+          cp backend/.env.test_e2e backend/.env || touch backend/.env
+      - name: Download neo4j image tarball
+        uses: actions/download-artifact@v4
+        with:
+          name: neo4j-image
+          path: /tmp
+
+      - name: Download backend image tarball
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-image
+          path: /tmp
+
+      - name: Download webapp image tarball
+        uses: actions/download-artifact@v4
+        with:
+          name: webapp-image
+          path: /tmp
 
       - name: Load Docker images
         run: |
-          docker load < /tmp/neo4j.tar || true
-          docker load < /tmp/backend.tar || true
-          docker load < /tmp/webapp.tar || true
-
+          docker load < /tmp/neo4j.tar
+          docker load < /tmp/backend.tar
+          docker load < /tmp/webapp.tar
       - name: Start system
         run: |
-          docker compose -f docker-compose.yml -f docker-compose.test.yml up --build --detach webapp mailserver
-
+          set -e
+          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach webapp mailserver
       - name: Wait for webapp
         run: |
           for i in {1..30}; do curl -sf http://localhost:3000 && exit 0 || sleep 2; done; exit 1
-
       - name: Run Cypress tests
         run: yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }})
