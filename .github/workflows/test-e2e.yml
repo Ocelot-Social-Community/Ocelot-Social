@@ -58,7 +58,7 @@ jobs:
         id: backend-key
         run: echo "key=node-modules-${{ runner.os }}-${{ hashFiles('backend/yarn.lock') }}" >> $GITHUB_OUTPUT
       - name: Cache backend node_modules
-        uses:actions/cache@v4
+        uses: actions/cache@v4
         with:
           path: backend/node_modules
           key: ${{ steps.backend-key.outputs.key }}
