@@ -70,6 +70,12 @@ jobs:
             echo "$i..." && sleep 2
           done
           echo "❌ Webapp did not respond in time" && exit 1
+      
+      - name: Install Cypress
+        run: yarn install
+
+      - name: Run Cypress tests
+        run: yarn run cypress:run
 
   verify-summary:
     runs-on: ubuntu-latest
