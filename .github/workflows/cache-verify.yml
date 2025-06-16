@@ -14,9 +14,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: echo "key=node-modules-${{ runner.os }}-${{ env.LOCK_HASH }}" >> $GITHUB_OUTPUT
-        id: cache-key
-        env: { LOCK_HASH: ${{ hashFiles('backend/yarn.lock', 'webapp/yarn.lock') }} }
+      - id: cache-key
+        env:
+          LOCK_HASH: ${{ hashFiles('backend/yarn.lock', 'webapp/yarn.lock') }}
+        run: echo "key=node-modules-${{ runner.os }}-${{ env.LOCK_HASH }}" >> $GITHUB_OUTPUT
       - uses: actions/cache@v4
         id: restore
         with:
