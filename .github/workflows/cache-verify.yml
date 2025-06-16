@@ -7,24 +7,39 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-backend-image:
+  build-images:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: backend
+            context: ./backend
+            dockerfile: ./backend/Dockerfile
+            target: build
+          - name: webapp
+            context: ./webapp
+            dockerfile: ./webapp/Dockerfile
+            target: build
+          - name: neo4j
+            context: ./neo4j
+            dockerfile: ./neo4j/Dockerfile
+            target: community
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
-      - name: Build backend image
+      - name: Build ${{ matrix.name }} image
         uses: docker/build-push-action@v5
         with:
-          context: ./backend
-          file: ./backend/Dockerfile
-          target: build
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          target: ${{ matrix.target }}
           push: false
-          outputs: type=docker,dest=/tmp/backend.tar
-      - name: Upload backend image
+          outputs: type=docker,dest=/tmp/${{ matrix.name }}.tar
+      - name: Upload ${{ matrix.name }} image
         uses: actions/upload-artifact@v4
         with:
-          name: backend-image
-          path: /tmp/backend.tar
+          name: ${{ matrix.name }}-image
+          path: /tmp/${{ matrix.name }}.tar
 
   verify-summary:
     runs-on: ubuntu-latest
