@@ -41,9 +41,35 @@ jobs:
           name: ${{ matrix.name }}-image
           path: /tmp/${{ matrix.name }}.tar
 
+  consolidate-environment:
+    runs-on: ubuntu-latest
+    needs: [build-images, verify-cache]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download Docker image artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp
+      - name: Load Docker images
+        run: |
+          docker load < /tmp/backend-image/backend.tar
+          docker load < /tmp/webapp-image/webapp.tar
+          docker load < /tmp/neo4j-image/neo4j.tar
+      - name: Start system
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach
+      - name: Wait for webapp
+        run: |
+          echo "Waiting for http://localhost:3000..."
+          for i in {1..15}; do
+            curl -sf http://localhost:3000 && echo "✅ Ready" && exit 0
+            echo "$i..." && sleep 2
+          done
+          echo "❌ Webapp did not respond in time" && exit 1
+
   verify-summary:
     runs-on: ubuntu-latest
-    needs: [verify-cache, verify-backend, verify-webapp]
+    needs: [verify-cache, consolidate-environment]
     if: always()
     steps:
       - name: CI Summary
@@ -93,36 +119,3 @@ jobs:
           else
             echo "❌ Cache was missed."
           fi
-
-  verify-backend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - run: cd backend && yarn install && yarn build
-
-  verify-webapp:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - run: cd webapp && yarn install && yarn build
-      - run: |
-          if [ -d "webapp/out" ]; then
-            echo "Serving webapp/out statically..."
-            npx serve -s webapp/out -l 3000 &
-          else
-            echo "webapp/out not found – falling back to yarn start..."
-            cd webapp && yarn start &
-          fi
-      - run: |
-          echo "Waiting for http://localhost:3000 to respond..."
-          for i in {1..15}; do
-            curl -sf http://localhost:3000 && echo "✅ Service ready." && exit 0
-            echo "$i..." && sleep 2
-          done
-          echo "❌ Service did not respond in time." && exit 1
