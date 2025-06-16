@@ -7,29 +7,21 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-cache:
-    name: Verify Node Modules Cache
+  verify-cache:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Generate cache key
-        id: cache-key
-        run: echo "key=node-modules-${{ runner.os }}-${{ env.LOCK_HASH }}" >> $GITHUB_OUTPUT
+      - id: cache-key
         env:
           LOCK_HASH: ${{ hashFiles('backend/yarn.lock', 'webapp/yarn.lock') }}
-
+        run: echo "key=node-modules-${{ runner.os }}-${{ env.LOCK_HASH }}" >> $GITHUB_OUTPUT
       - name: Show lockfile hashes (debug)
         run: |
           echo "backend/yarn.lock hash: ${{ hashFiles('backend/yarn.lock') }}"
           echo "webapp/yarn.lock hash: ${{ hashFiles('webapp/yarn.lock') }}"
-
       - name: Restore node_modules cache
         id: restore-cache
         uses: actions/cache@v4
@@ -41,7 +33,6 @@ jobs:
           restore-keys: |
             node-modules-${{ runner.os }}-
             node-modules-
-
       - name: Show cache hit status
         run: |
           if [[ "${{ steps.restore-cache.outputs.cache-hit }}" == "true" ]]; then
@@ -50,35 +41,37 @@ jobs:
             echo "❌ Cache was missed."
           fi
 
-      - name: Install backend deps
-        run: |
-          cd backend
-          yarn install
-          yarn build
+  verify-backend:
+    runs-on: ubuntu-latest
+    needs: verify-cache
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: cd backend && yarn install && yarn build
 
-      - name: Install webapp deps
-        run: |
-          cd webapp
-          yarn install
-          yarn build
-
-      - name: Start webapp (static or fallback)
-        run: |
+  verify-webapp:
+    runs-on: ubuntu-latest
+    needs: verify-cache
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: cd webapp && yarn install && yarn build
+      - run: |
           if [ -d "webapp/out" ]; then
             echo "Serving webapp/out statically..."
             npx serve -s webapp/out -l 3000 &
           else
             echo "webapp/out not found – falling back to yarn start..."
-            cd webapp
-            yarn start &
+            cd webapp && yarn start &
           fi
-
-      - name: Test HTTP wait logic
-        run: |
+      - run: |
           echo "Waiting for http://localhost:3000 to respond..."
           for i in {1..15}; do
             curl -sf http://localhost:3000 && echo "✅ Service ready." && exit 0
-            echo "Attempt $i failed. Retrying..."
-            sleep 2
+            echo "$i..." && sleep 2
           done
           echo "❌ Service did not respond in time." && exit 1
