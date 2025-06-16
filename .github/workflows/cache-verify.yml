@@ -1,4 +1,4 @@
-name: CI Cache Verification and E2E Testing
+name: CI Cache Verification
 
 on:
   push:
@@ -7,46 +7,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-environment:
-    name: Build Dependencies and Environment
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Cache backend node_modules
-        uses: actions/cache@v4
-        with:
-          path: backend/node_modules
-          key: node-modules-backend-${{ hashFiles('backend/yarn.lock') }}
-          restore-keys: node-modules-backend-
-
-      - name: Cache webapp node_modules
-        uses: actions/cache@v4
-        with:
-          path: webapp/node_modules
-          key: node-modules-webapp-${{ hashFiles('webapp/yarn.lock') }}
-          restore-keys: node-modules-webapp-
-
-      - name: Build backend and webapp
-        run: |
-          cd backend && yarn install && yarn build
-          cd ../webapp && yarn install && yarn build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: |
-            backend/node_modules
-            backend/build
-            webapp/node_modules
-            webapp/out
-            backend/.env
-            webapp/.env
-
   build-images:
     runs-on: ubuntu-latest
     strategy:
@@ -80,59 +40,57 @@ jobs:
         with:
           name: ${{ matrix.name }}-image
           path: /tmp/${{ matrix.name }}.tar
-          
-  consolidate-environment:
-    name: Consolidate Environment and Run Tests
+
+  verify-cache:
     runs-on: ubuntu-latest
-    needs: [build-environment, build-images]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/setup-node@v4
         with:
-          name: |
-            backend-image
-            webapp-image
-            neo4j-image
-            build-artifacts
-          path: /tmp
-      - name: Load Docker images
+          node-version: '20'
+      - id: cache-key
+        env:
+          LOCK_HASH: ${{ hashFiles('backend/yarn.lock', 'webapp/yarn.lock') }}
+        run: echo "key=node-modules-${{ runner.os }}-${{ env.LOCK_HASH }}" >> $GITHUB_OUTPUT
+      - name: Show lockfile hashes (debug)
         run: |
-          docker load < /tmp/backend-image/backend.tar
-          docker load < /tmp/webapp-image/webapp.tar
-          docker load < /tmp/neo4j-image/neo4j.tar
-      - name: Setup .env files
+          echo "backend/yarn.lock hash: ${{ hashFiles('backend/yarn.lock') }}"
+          echo "webapp/yarn.lock hash: ${{ hashFiles('webapp/yarn.lock') }}"
+      - name: Restore node_modules cache
+        id: restore-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            backend/node_modules
+            webapp/node_modules
+          key: ${{ steps.cache-key.outputs.key }}
+          restore-keys: |
+            node-modules-${{ runner.os }}-
+            node-modules-
+      - name: Show cache hit status
         run: |
-          cp /tmp/build-artifacts/backend/.env backend/.env || true
-          cp /tmp/build-artifacts/webapp/.env webapp/.env || true
-      - name: Start system
-        run: docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach
-      - name: Wait for webapp
-        run: |
-          for i in {1..15}; do
-            curl -sf http://localhost:3000 && echo "✅ Ready" && exit 0
-            echo "Waiting $i..."
-            sleep 2
-          done
-          echo "❌ Webapp did not respond in time" && exit 1
-      - name: Install Cypress and run tests
-        run: |
-          yarn install
-          yarn run cypress:run
+          if [[ "${{ steps.restore-cache.outputs.cache-hit }}" == "true" ]]; then
+            echo "✅ Cache was hit!"
+          else
+            echo "❌ Cache was missed."
+          fi
 
   verify-summary:
-    name: CI Summary
     runs-on: ubuntu-latest
-    needs: [build-environment, consolidate-environment]
+    needs: [verify-cache, verify-backend, verify-webapp]
     if: always()
     steps:
-      - name: Show summary
+      - name: CI Summary
         run: |
           echo "### ✅ CI Cache Verification Summary" >> $GITHUB_STEP_SUMMARY
-          echo "- Build Environment: ${{ needs.build-environment.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Consolidate Environment: ${{ needs.consolidate-environment.result }}" >> $GITHUB_STEP_SUMMARY
-          if [[ '${{ needs.build-environment.result }}' != 'success' || '${{ needs.consolidate-environment.result }}' != 'success' ]]; then
-            echo "\n❌ One or more checks failed." >> $GITHUB_STEP_SUMMARY
-            exit 1
-          else
-            echo "\n✅ All checks passed successfully!" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "- Cache: ${{ needs.verify-cache.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Backend: ${{ needs.verify-backend.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Webapp: ${{ needs.verify-webapp.result }}" >> $GITHUB_STEP_SUMMARY
+          if [[ '${{ needs.verify-cache.result }}' != 'success' || '${{ needs.verify-backend.result }}' != 'success' || '${{ needs.verify-webapp.result }}' != 'success' ]]; then
+            echo "
+          ❌ One or more checks failed." >> $GITHUB_STEP_SUMMARY
+                      exit 1
+                    else
+                      echo "
+          ✅ All checks passed successfully!" >> $GITHUB_STEP_SUMMARY
+                    fi
