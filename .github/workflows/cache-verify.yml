@@ -41,67 +41,67 @@ jobs:
           name: ${{ matrix.name }}-image
           path: /tmp/${{ matrix.name }}.tar
 
-cache-environment:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-    - id: cache-key
-      env:
-        LOCK_HASH: ${{ hashFiles('backend/yarn.lock', 'webapp/yarn.lock', 'cypress/yarn.lock') }}
-      run: echo "key=ci-all-cache-${{ runner.os }}-${{ env.LOCK_HASH }}" >> $GITHUB_OUTPUT
+  cache-environment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - id: cache-key
+        env:
+          LOCK_HASH: ${{ hashFiles('backend/yarn.lock', 'webapp/yarn.lock', 'cypress/yarn.lock') }}
+        run: echo "key=ci-all-cache-${{ runner.os }}-${{ env.LOCK_HASH }}" >> $GITHUB_OUTPUT
 
-    - name: Show lockfile hashes (debug)
-      run: |
-        echo "backend/yarn.lock hash: ${{ hashFiles('backend/yarn.lock') }}"
-        echo "webapp/yarn.lock hash: ${{ hashFiles('webapp/yarn.lock') }}"
-        echo "cypress/yarn.lock hash: ${{ hashFiles('cypress/yarn.lock') }}"
+      - name: Show lockfile hashes (debug)
+        run: |
+          echo "backend/yarn.lock hash: ${{ hashFiles('backend/yarn.lock') }}"
+          echo "webapp/yarn.lock hash: ${{ hashFiles('webapp/yarn.lock') }}"
+          echo "cypress/yarn.lock hash: ${{ hashFiles('cypress/yarn.lock') }}"
 
-    - name: Restore full CI cache
-      id: restore-cache
-      uses: actions/cache@v4
-      with:
-        path: |
-          backend/node_modules
-          webapp/node_modules
-          cypress/node_modules
-          node_modules
-          ~/.cache/Cypress
-          /opt/cucumber-json-formatter
-        key: ${{ steps.cache-key.outputs.key }}
-        restore-keys: |
-          ci-all-cache-${{ runner.os }}-
-          ci-all-cache-
+      - name: Restore full CI cache
+        id: restore-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            backend/node_modules
+            webapp/node_modules
+            cypress/node_modules
+            node_modules
+            ~/.cache/Cypress
+            /opt/cucumber-json-formatter
+          key: ${{ steps.cache-key.outputs.key }}
+          restore-keys: |
+            ci-all-cache-${{ runner.os }}-
+            ci-all-cache-
 
-    - name: Show cache hit status
-      if: steps.restore-cache.outputs.cache-hit == 'true'
-      run: echo "✅ Cache was hit!"
+      - name: Show cache hit status
+        if: steps.restore-cache.outputs.cache-hit == 'true'
+        run: echo "✅ Cache was hit!"
 
-    - name: Show cache miss status
-      if: steps.restore-cache.outputs.cache-hit != 'true'
-      run: echo "❌ Cache was missed."
+      - name: Show cache miss status
+        if: steps.restore-cache.outputs.cache-hit != 'true'
+        run: echo "❌ Cache was missed."
 
-    - name: Ensure Cypress binary is present
-      run: |
-        if [ ! -x "$(command -v cypress)" ]; then
-          yarn global add cypress
-        fi
-        npx cypress verify
+      - name: Ensure Cypress binary is present
+        run: |
+          if [ ! -x "$(command -v cypress)" ]; then
+            yarn global add cypress
+          fi
+          npx cypress verify
 
-    - name: Ensure cucumber-json-formatter present
-      run: |
-        if [ ! -f /opt/cucumber-json-formatter ]; then
-          wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
-          chmod +x /opt/cucumber-json-formatter
-        fi
+      - name: Ensure cucumber-json-formatter present
+        run: |
+          if [ ! -f /opt/cucumber-json-formatter ]; then
+            wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
+            chmod +x /opt/cucumber-json-formatter
+          fi
 
-    - name: Print Cypress version
-      run: npx cypress --version
+      - name: Print Cypress version
+        run: npx cypress --version
 
-    - name: Check Formatter
-      run: /opt/cucumber-json-formatter --help || echo "Formatter missing"
+      - name: Check Formatter
+        run: /opt/cucumber-json-formatter --help || echo "Formatter missing"
 
   consolidate-environment:
     runs-on: ubuntu-latest
