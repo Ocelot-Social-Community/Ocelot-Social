@@ -15,7 +15,7 @@ jobs:
           - name: backend
             context: ./backend
             dockerfile: ./backend/Dockerfile
-            target: build
+            target: production
           - name: webapp
             context: ./webapp
             dockerfile: ./webapp/Dockerfile
