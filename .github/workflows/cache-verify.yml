@@ -126,6 +126,23 @@ jobs:
             ci-all-cache-${{ runner.os }}-
             ci-all-cache-
 
+      # check for node modules etc
+      - name: Check node_modules exist
+        run: |
+          [ -d backend/node_modules ] && echo "✅ backend/node_modules ok" || (echo "❌ backend/node_modules missing" && exit 1)
+          [ -d webapp/node_modules ] && echo "✅ webapp/node_modules ok" || (echo "❌ webapp/node_modules missing" && exit 1)
+      - name: Check Cypress binary cache
+        run: |
+          [ -d ~/.cache/Cypress ] && echo "✅ Cypress cache ok" || (echo "❌ Cypress cache missing" && exit 1)
+
+      - name: Check Cypress CLI & version
+        run: |
+          npx --no-install cypress --version && npx cypress verify
+
+      - name: Check cucumber-json-formatter
+        run: |
+          [ -x /opt/cucumber-json-formatter ] && /opt/cucumber-json-formatter --help || (echo "❌ Formatter missing" && exit 1)
+
       - name: Download Docker image artifacts
         uses: actions/download-artifact@v4
         with:
@@ -141,24 +158,6 @@ jobs:
         run: |
           cp webapp/.env.template webapp/.env || touch webapp/.env
           cp backend/.env.test_e2e backend/.env || touch backend/.env
-
-      # ---- Checks ----
-      - name: Check node_modules exist
-        run: |
-          [ -d backend/node_modules ] && echo "✅ backend/node_modules ok" || (echo "❌ backend/node_modules missing" && exit 1)
-          [ -d webapp/node_modules ] && echo "✅ webapp/node_modules ok" || (echo "❌ webapp/node_modules missing" && exit 1)
-
-      - name: Check Cypress binary cache
-        run: |
-          [ -d ~/.cache/Cypress ] && echo "✅ Cypress cache ok" || (echo "❌ Cypress cache missing" && exit 1)
-
-      - name: Check Cypress CLI & version
-        run: |
-          npx --no-install cypress --version && npx cypress verify
-
-      - name: Check cucumber-json-formatter
-        run: |
-          [ -x /opt/cucumber-json-formatter ] && /opt/cucumber-json-formatter --help || (echo "❌ Formatter missing" && exit 1)
 
       - name: Start system
         run: |
