@@ -73,6 +73,7 @@ jobs:
           restore-keys: |
             ci-all-cache-${{ runner.os }}-
             ci-all-cache-
+          save-always: true
 
       - name: Install backend dependencies if needed
         run: |
