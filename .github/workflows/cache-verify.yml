@@ -43,7 +43,12 @@ jobs:
             node-modules-
 
       - name: Show cache hit status
-        run: echo "Cache hit: ${{ steps.restore-cache.outputs.cache-hit }}"
+        run: |
+          if [[ "${{ steps.restore-cache.outputs.cache-hit }}" == "true" ]]; then
+            echo "✅ Cache was hit!"
+          else
+            echo "❌ Cache was missed."
+          fi
 
       - name: Install backend deps
         run: |
