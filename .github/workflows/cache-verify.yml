@@ -25,7 +25,13 @@ jobs:
         env:
           LOCK_HASH: ${{ hashFiles('backend/yarn.lock', 'webapp/yarn.lock') }}
 
+      - name: Show lockfile hashes (debug)
+        run: |
+          echo "backend/yarn.lock hash: ${{ hashFiles('backend/yarn.lock') }}"
+          echo "webapp/yarn.lock hash: ${{ hashFiles('webapp/yarn.lock') }}"
+
       - name: Restore node_modules cache
+        id: restore-cache
         uses: actions/cache@v4
         with:
           path: |
@@ -35,6 +41,9 @@ jobs:
           restore-keys: |
             node-modules-${{ runner.os }}-
             node-modules-
+
+      - name: Show cache hit status
+        run: echo "Cache hit: ${{ steps.restore-cache.outputs.cache-hit }}"
 
       - name: Install backend deps
         run: |
@@ -48,13 +57,15 @@ jobs:
           yarn install
           yarn build
 
-      - name: Serve static webapp if build output exists
+      - name: Start webapp (static or fallback)
         run: |
           if [ -d "webapp/out" ]; then
-            echo "Starting static server for webapp/out..."
+            echo "Serving webapp/out statically..."
             npx serve -s webapp/out -l 3000 &
           else
-            echo "⚠️ webapp/out does not exist. Skipping server start."
+            echo "webapp/out not found – falling back to yarn start..."
+            cd webapp
+            yarn start &
           fi
 
       - name: Test HTTP wait logic
