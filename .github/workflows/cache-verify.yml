@@ -41,7 +41,7 @@ jobs:
           name: ${{ matrix.name }}-image
           path: /tmp/${{ matrix.name }}.tar
 
-  verify-cache:
+  build-environment:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -74,3 +74,33 @@ jobs:
           else
             echo "❌ Cache was missed."
           fi
+
+  consolidate-environment:
+    runs-on: ubuntu-latest
+    needs: [build-images, build-environment]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download Docker image artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp
+      - name: Load Docker images
+        run: |
+          docker load < /tmp/backend-image/backend.tar
+          docker load < /tmp/webapp-image/webapp.tar
+          docker load < /tmp/neo4j-image/neo4j.tar
+      - name: Setup .env files
+        run: |
+          cp webapp/.env.template webapp/.env || touch webapp/.env
+          cp backend/.env.test_e2e backend/.env || touch backend/.env
+      - name: Start system
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach
+      - name: Wait for webapp
+        run: |
+          echo "Waiting for http://localhost:3000..."
+          for i in {1..15}; do
+            curl -sf http://localhost:3000 && echo "✅ Ready" && exit 0
+            echo "$i..." && sleep 2
+          done
+          echo "❌ Webapp did not respond in time" && exit 1
