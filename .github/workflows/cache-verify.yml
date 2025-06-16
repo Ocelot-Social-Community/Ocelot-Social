@@ -15,11 +15,11 @@ jobs:
           - name: backend
             context: ./backend
             dockerfile: ./backend/Dockerfile
-            target: production
+            target: build
           - name: webapp
             context: ./webapp
             dockerfile: ./webapp/Dockerfile
-            target: production
+            target: build
           - name: neo4j
             context: ./neo4j
             dockerfile: ./neo4j/Dockerfile
