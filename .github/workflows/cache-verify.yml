@@ -120,55 +120,76 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Restore full CI cache
-        id: restore-cache
-        uses: actions/cache@v4
+      - name: Restore CI cache
+        uses: actions/cache/restore@v4
         with:
           path: |
             backend/node_modules
             webapp/node_modules
+            cypress/node_modules
             ~/.cache/Cypress
             /opt/cucumber-json-formatter
           key: ${{ needs.cache-environment.outputs.cache-key }}
           restore-keys: |
             ci-all-cache-${{ runner.os }}-
-            ci-all-cache-
 
-      - name: Check backend/node_modules exist
+      # --- Checks ---
+      - name: Check backend/node_modules
         run: |
-          if [ -d backend/node_modules ] && [ -n "$(ls -A backend/node_modules)" ]; then
-            echo "✅ backend/node_modules present"
-          else
-            echo "❌ backend/node_modules missing or empty" && exit 1
-          fi
+          [ -d backend/node_modules ] && [ -n "$(ls -A backend/node_modules)" ] || (echo "❌ backend/node_modules missing" && exit 1)
 
-      - name: Check webapp/node_modules exist
+      - name: Check webapp/node_modules
         run: |
-          if [ -d webapp/node_modules ] && [ -n "$(ls -A webapp/node_modules)" ]; then
-            echo "✅ webapp/node_modules present"
-          else
-            echo "❌ webapp/node_modules missing or empty" && exit 1
-          fi
+          [ -d webapp/node_modules ] && [ -n "$(ls -A webapp/node_modules)" ] || (echo "❌ webapp/node_modules missing" && exit 1)
+
+      - name: Check cypress/node_modules
+        run: |
+          [ -d cypress/node_modules ] && [ -n "$(ls -A cypress/node_modules)" ] || (echo "❌ cypress/node_modules missing" && exit 1)
 
       - name: Check Cypress binary cache
         run: |
-          if [ -d ~/.cache/Cypress ]; then
-            echo "✅ Cypress binary cache present"
-          else
-            echo "❌ Cypress binary cache missing" && exit 1
-          fi
+          [ -d ~/.cache/Cypress ] || (echo "❌ Cypress binary cache missing" && exit 1)
 
-      - name: Check Cypress CLI & verify
+      - name: Check Cypress CLI (from local install)
         run: |
-          npx --no-install cypress --version && npx cypress verify
+          cd cypress
+          npx --yes cypress --version
+          npx --yes cypress verify
 
       - name: Check cucumber-json-formatter
         run: |
-          if [ -x /opt/cucumber-json-formatter ]; then
-            /opt/cucumber-json-formatter --help > /dev/null && echo "✅ Formatter OK"
+          [ -x /opt/cucumber-json-formatter ] && /opt/cucumber-json-formatter --help || (echo "❌ Formatter missing" && exit 1)
+
+      # --- Summary ---
+      - name: CI Cache Health Summary
+        run: |
+          echo "📦 CI Cache Health Summary:"
+          echo
+
+          check() {
+            if [ -d "$1" ] && [ -n "$(ls -A $1)" ]; then
+              echo "✅ $1 OK"
+            else
+              echo "❌ $1 missing or empty"
+            fi
+          }
+
+          check backend/node_modules
+          check webapp/node_modules
+          check cypress/node_modules
+          [ -d ~/.cache/Cypress ] && echo "✅ Cypress binary cache OK" || echo "❌ Cypress binary cache missing"
+          [ -x /opt/cucumber-json-formatter ] && echo "✅ Formatter executable OK" || echo "❌ Formatter missing"
+
+          echo
+
+          if [ -d backend/node_modules ] && [ -d webapp/node_modules ] && \
+            [ -d cypress/node_modules ] && [ -d ~/.cache/Cypress ] && \
+            [ -x /opt/cucumber-json-formatter ]; then
+            echo "🎉 ✅ All dependencies loaded from cache – ready to test"
           else
-            echo "❌ Formatter missing or not executable" && exit 1
+            echo "⚠️ Partial cache – some installs might have been required"
           fi
+
 
   consolidate-environment:
     runs-on: ubuntu-latest
