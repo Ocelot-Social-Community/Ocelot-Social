@@ -55,6 +55,10 @@ jobs:
           docker load < /tmp/backend-image/backend.tar
           docker load < /tmp/webapp-image/webapp.tar
           docker load < /tmp/neo4j-image/neo4j.tar
+      - name: Setup .env files
+        run: |
+          cp webapp/.env.template webapp/.env || touch webapp/.env
+          cp backend/.env.test_e2e backend/.env || touch backend/.env
       - name: Start system
         run: |
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach
@@ -76,16 +80,14 @@ jobs:
         run: |
           echo "### ✅ CI Cache Verification Summary" >> $GITHUB_STEP_SUMMARY
           echo "- Cache: ${{ needs.verify-cache.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Backend: ${{ needs.verify-backend.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Webapp: ${{ needs.verify-webapp.result }}" >> $GITHUB_STEP_SUMMARY
-          if [[ '${{ needs.verify-cache.result }}' != 'success' || '${{ needs.verify-backend.result }}' != 'success' || '${{ needs.verify-webapp.result }}' != 'success' ]]; then
-            echo "
-          ❌ One or more checks failed." >> $GITHUB_STEP_SUMMARY
-                      exit 1
-                    else
-                      echo "
-          ✅ All checks passed successfully!" >> $GITHUB_STEP_SUMMARY
-                    fi
+          echo "- Environment: ${{ needs.consolidate-environment.result }}" >> $GITHUB_STEP_SUMMARY
+          if [[ '${{ needs.verify-cache.result }}' != 'success' || '${{ needs.consolidate-environment.result }}' != 'success' ]]; then
+            echo "\n❌ One or more checks failed." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "\n✅ All checks passed successfully!" >> $GITHUB_STEP_SUMMARY
+          fi
+
   verify-cache:
     runs-on: ubuntu-latest
     steps:
