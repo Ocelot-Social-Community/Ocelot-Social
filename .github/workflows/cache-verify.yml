@@ -59,7 +59,6 @@ jobs:
           CYPRESS_HASH=$(sha256sum cypress/yarn.lock | cut -d' ' -f1 2>/dev/null || echo "none")
           echo "key=ci-all-cache-${{ runner.os }}-${BACKEND_HASH}-${WEBAPP_HASH}-${CYPRESS_HASH}" >> $GITHUB_OUTPUT
 
-    # tests and fallbacks
       - name: Show lockfile hashes (debug)
         run: |
           echo "backend/yarn.lock hash: $(sha256sum backend/yarn.lock | cut -d' ' -f1)"
@@ -80,35 +79,46 @@ jobs:
             ci-all-cache-${{ runner.os }}-
             ci-all-cache-
 
-      - name: Cache status > Hit
-        if: steps.restore-cache.outputs.cache-hit == 'true'
-        run: echo "✅ Cache was hit!"
-
-      - name: Cache status > Miss
-        if: steps.restore-cache.outputs.cache-hit != 'true'
-        run: echo "❌ Cache was missed."
-
-      - name: Ensure Cypress and Formatter are present
+      - name: Install backend dependencies if needed
         run: |
-          # Install Cypress CLI if needed
-          if ! npx --no-install cypress --version >/dev/null 2>&1; then
-            yarn global add cypress
+          if [ ! -d backend/node_modules ] || [ -z "$(ls -A backend/node_modules)" ]; then
+            echo "Installing backend dependencies..."
+            cd backend && yarn install
+          else
+            echo "backend/node_modules already present."
           fi
-          npx cypress verify
-          # Install cucumber-json-formatter if missing
+
+      - name: Install webapp dependencies if needed
+        run: |
+          if [ ! -d webapp/node_modules ] || [ -z "$(ls -A webapp/node_modules)" ]; then
+            echo "Installing webapp dependencies..."
+            cd webapp && yarn install
+          else
+            echo "webapp/node_modules already present."
+          fi
+
+      - name: Install Cypress binary if needed
+        run: |
+          if [ ! -d ~/.cache/Cypress ] || ! npx --no-install cypress verify >/dev/null 2>&1; then
+            echo "Installing Cypress binary..."
+            yarn global add cypress
+            npx cypress verify
+          else
+            echo "Cypress binary already cached."
+          fi
+
+      - name: Install cucumber-json-formatter if missing
+        run: |
           if [ ! -f /opt/cucumber-json-formatter ]; then
+            echo "Downloading cucumber-json-formatter..."
             wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
             chmod +x /opt/cucumber-json-formatter
+          else
+            echo "Formatter already present."
           fi
-
-      - name: Print Cypress version
-        run: npx cypress --version
-
-      - name: Print Formatter version/help
-        run: /opt/cucumber-json-formatter --help || echo "Formatter missing"
-  consolidate-environment:
+  verify-environment:
     runs-on: ubuntu-latest
-    needs: [build-images, cache-environment]
+    needs: [cache-environment]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -127,23 +137,48 @@ jobs:
             ci-all-cache-${{ runner.os }}-
             ci-all-cache-
 
-      # check for node modules etc
-      - name: Check node_modules exist
+      - name: Check backend/node_modules exist
         run: |
-          [ -d backend/node_modules ] && echo "✅ backend/node_modules ok" || (echo "❌ backend/node_modules missing" && exit 1)
-          [ -d webapp/node_modules ] && echo "✅ webapp/node_modules ok" || (echo "❌ webapp/node_modules missing" && exit 1)
+          if [ -d backend/node_modules ] && [ -n "$(ls -A backend/node_modules)" ]; then
+            echo "✅ backend/node_modules present"
+          else
+            echo "❌ backend/node_modules missing or empty" && exit 1
+          fi
+
+      - name: Check webapp/node_modules exist
+        run: |
+          if [ -d webapp/node_modules ] && [ -n "$(ls -A webapp/node_modules)" ]; then
+            echo "✅ webapp/node_modules present"
+          else
+            echo "❌ webapp/node_modules missing or empty" && exit 1
+          fi
+
       - name: Check Cypress binary cache
         run: |
-          [ -d ~/.cache/Cypress ] && echo "✅ Cypress cache ok" || (echo "❌ Cypress cache missing" && exit 1)
+          if [ -d ~/.cache/Cypress ]; then
+            echo "✅ Cypress binary cache present"
+          else
+            echo "❌ Cypress binary cache missing" && exit 1
+          fi
 
-      - name: Check Cypress CLI & version
+      - name: Check Cypress CLI & verify
         run: |
           npx --no-install cypress --version && npx cypress verify
 
       - name: Check cucumber-json-formatter
         run: |
-          [ -x /opt/cucumber-json-formatter ] && /opt/cucumber-json-formatter --help || (echo "❌ Formatter missing" && exit 1)
+          if [ -x /opt/cucumber-json-formatter ]; then
+            /opt/cucumber-json-formatter --help > /dev/null && echo "✅ Formatter OK"
+          else
+            echo "❌ Formatter missing or not executable" && exit 1
+          fi
 
+  consolidate-environment:
+    runs-on: ubuntu-latest
+    needs: [build-images, cache-environment]
+    steps:
+
+    # install images
       - name: Download Docker image artifacts
         uses: actions/download-artifact@v4
         with:
@@ -160,6 +195,25 @@ jobs:
           cp webapp/.env.template webapp/.env || touch webapp/.env
           cp backend/.env.test_e2e backend/.env || touch backend/.env
 
+    # load environment
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Restore full CI cache
+        id: restore-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            backend/node_modules
+            webapp/node_modules
+            ~/.cache/Cypress
+            /opt/cucumber-json-formatter
+          key: ${{ needs.cache-environment.outputs.cache-key }}
+          restore-keys: |
+            ci-all-cache-${{ runner.os }}-
+            ci-all-cache-
+
+    # start full system
       - name: Start system
         run: |
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach
