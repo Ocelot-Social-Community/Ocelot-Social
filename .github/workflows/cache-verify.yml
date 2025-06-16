@@ -59,6 +59,7 @@ jobs:
           CYPRESS_HASH=$(sha256sum cypress/yarn.lock | cut -d' ' -f1 2>/dev/null || echo "none")
           echo "key=ci-all-cache-${{ runner.os }}-${BACKEND_HASH}-${WEBAPP_HASH}-${CYPRESS_HASH}" >> $GITHUB_OUTPUT
 
+    # tests and fallbacks
       - name: Show lockfile hashes (debug)
         run: |
           echo "backend/yarn.lock hash: $(sha256sum backend/yarn.lock | cut -d' ' -f1)"
