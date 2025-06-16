@@ -1,0 +1,68 @@
+name: CI Cache Verification
+
+on:
+  push:
+    paths:
+      - '.github/workflows/cache-verify.yml'
+  workflow_dispatch:
+
+jobs:
+  test-cache:
+    name: Verify Node Modules Cache
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate cache key
+        id: cache-key
+        run: echo "key=node-modules-${{ runner.os }}-${{ env.LOCK_HASH }}" >> $GITHUB_OUTPUT
+        env:
+          LOCK_HASH: ${{ hashFiles('backend/yarn.lock', 'webapp/yarn.lock') }}
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            backend/node_modules
+            webapp/node_modules
+          key: ${{ steps.cache-key.outputs.key }}
+          restore-keys: |
+            node-modules-${{ runner.os }}-
+            node-modules-
+
+      - name: Install backend deps
+        run: |
+          cd backend
+          yarn install
+          yarn build
+
+      - name: Install webapp deps
+        run: |
+          cd webapp
+          yarn install
+          yarn build
+
+      - name: Serve static webapp if build output exists
+        run: |
+          if [ -d "webapp/out" ]; then
+            echo "Starting static server for webapp/out..."
+            npx serve -s webapp/out -l 3000 &
+          else
+            echo "⚠️ webapp/out does not exist. Skipping server start."
+          fi
+
+      - name: Test HTTP wait logic
+        run: |
+          echo "Waiting for http://localhost:3000 to respond..."
+          for i in {1..15}; do
+            curl -sf http://localhost:3000 && echo "✅ Service ready." && exit 0
+            echo "Attempt $i failed. Retrying..."
+            sleep 2
+          done
+          echo "❌ Service did not respond in time." && exit 1
