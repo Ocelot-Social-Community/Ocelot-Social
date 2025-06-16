@@ -58,7 +58,7 @@ jobs:
         id: backend-key
         run: echo "key=node-modules-${{ runner.os }}-${{ hashFiles('backend/yarn.lock') }}" >> $GITHUB_OUTPUT
       - name: Cache backend node_modules
-        uses: actions/cache@v4
+        uses:actions/cache@v4
         with:
           path: backend/node_modules
           key: ${{ steps.backend-key.outputs.key }}
@@ -106,6 +106,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Generate cypress cache key
+        id: cypress-key
+        run: echo "key=cypress-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}" >> $GITHUB_OUTPUT
+      - name: Cache cypress and dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            /opt/cucumber-json-formatter
+            ~/.cache/Cypress
+            node_modules
+            backend/node_modules
+          key: ${{ steps.cypress-key.outputs.key }}
+          restore-keys: |
+            cypress-${{ runner.os }}-
+            cypress-
       - name: Copy env files
         run: |
           cp webapp/.env.template webapp/.env
@@ -116,18 +131,6 @@ jobs:
           chmod +x /opt/cucumber-json-formatter
           cd backend && yarn install && yarn build && cd ..
           yarn install
-      - name: Cache cypress and dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            /opt/cucumber-json-formatter
-            ~/.cache/Cypress
-            node_modules
-            backend/node_modules
-          key: cypress-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            cypress-${{ runner.os }}-
-            cypress-
 
   fullstack_tests:
     name: Run Fullstack E2E Tests
