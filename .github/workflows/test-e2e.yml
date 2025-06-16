@@ -142,13 +142,16 @@ jobs:
       matrix:
         job: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
+      - name: Generate cache key for node_modules
+        id: cache-key
+        run: echo "key=node-modules-${{ runner.os }}-${{ hashFiles('backend/yarn.lock', 'webapp/yarn.lock') }}" >> $GITHUB_OUTPUT
       - name: Restore node_modules cache
         uses: actions/cache@v4
         with:
           path: |
             backend/node_modules
             webapp/node_modules
-          key: node-modules-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ steps.cache-key.outputs.key }}
           restore-keys: |
             node-modules-${{ runner.os }}-
             node-modules-
