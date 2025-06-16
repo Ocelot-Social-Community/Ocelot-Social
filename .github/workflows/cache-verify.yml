@@ -60,9 +60,9 @@ jobs:
           CYPRESS_HASH=$(sha256sum cypress/yarn.lock | cut -d' ' -f1 2>/dev/null || echo "none")
           echo "key=ci-all-cache-${{ runner.os }}-${BACKEND_HASH}-${WEBAPP_HASH}-${CYPRESS_HASH}" >> $GITHUB_OUTPUT
 
-      - name: Restore full CI cache
+      - name: Restore CI cache
         id: restore-cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             backend/node_modules
@@ -73,7 +73,6 @@ jobs:
           restore-keys: |
             ci-all-cache-${{ runner.os }}-
             ci-all-cache-
-          save-always: true
 
       - name: Install backend dependencies if needed
         run: |
@@ -112,6 +111,17 @@ jobs:
           else
             echo "✅ Formatter already present."
           fi
+
+      - name: Save updated CI cache
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: |
+            backend/node_modules
+            webapp/node_modules
+            ~/.cache/Cypress
+            /opt/cucumber-json-formatter
+          key: ${{ steps.cache-key.outputs.key }}
 
   verify-environment:
     runs-on: ubuntu-latest
