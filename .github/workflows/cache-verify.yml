@@ -69,6 +69,7 @@ jobs:
           path: |
             backend/node_modules
             webapp/node_modules
+            cypress/node_modules
             ~/.cache/Cypress
             /opt/cucumber-json-formatter
           key: ${{ steps.cache-key.outputs.key }}
@@ -78,39 +79,26 @@ jobs:
       - name: Install backend dependencies if needed
         run: |
           if [ ! -d backend/node_modules ] || [ -z "$(ls -A backend/node_modules)" ]; then
-            echo "Installing backend dependencies..."
             cd backend && yarn install
-          else
-            echo "✅ backend/node_modules already present."
           fi
 
       - name: Install webapp dependencies if needed
         run: |
           if [ ! -d webapp/node_modules ] || [ -z "$(ls -A webapp/node_modules)" ]; then
-            echo "Installing webapp dependencies..."
             cd webapp && yarn install
-          else
-            echo "✅ webapp/node_modules already present."
           fi
 
-      - name: Install Cypress binary if needed
+      - name: Install Cypress dependencies locally
         run: |
-          if [ ! -d ~/.cache/Cypress ] || ! npx --no-install cypress verify >/dev/null 2>&1; then
-            echo "Installing Cypress binary..."
-            yarn global add cypress
-            npx cypress verify
-          else
-            echo "✅ Cypress binary already present."
+          if [ ! -d cypress/node_modules ] || [ -z "$(ls -A cypress/node_modules)" ]; then
+            cd cypress && yarn install
           fi
 
       - name: Install cucumber-json-formatter if missing
         run: |
           if [ ! -f /opt/cucumber-json-formatter ]; then
-            echo "Downloading cucumber-json-formatter..."
             wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
             chmod +x /opt/cucumber-json-formatter
-          else
-            echo "✅ Formatter already present."
           fi
 
       - name: Save updated CI cache
@@ -120,10 +108,10 @@ jobs:
           path: |
             backend/node_modules
             webapp/node_modules
+            cypress/node_modules
             ~/.cache/Cypress
             /opt/cucumber-json-formatter
           key: ${{ steps.cache-key.outputs.key }}
-
 
   verify-environment:
     runs-on: ubuntu-latest
