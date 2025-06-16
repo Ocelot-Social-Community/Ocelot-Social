@@ -19,7 +19,7 @@ jobs:
           - name: webapp
             context: ./webapp
             dockerfile: ./webapp/Dockerfile
-            target: build
+            target: production
           - name: neo4j
             context: ./neo4j
             dockerfile: ./neo4j/Dockerfile
