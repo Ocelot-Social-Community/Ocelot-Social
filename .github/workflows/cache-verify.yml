@@ -78,11 +78,11 @@ jobs:
             ci-all-cache-${{ runner.os }}-
             ci-all-cache-
 
-      - name: Cache status: Hit
+      - name: Cache status > Hit
         if: steps.restore-cache.outputs.cache-hit == 'true'
         run: echo "✅ Cache was hit!"
 
-      - name: Cache status: Miss
+      - name: Cache status > Miss
         if: steps.restore-cache.outputs.cache-hit != 'true'
         run: echo "❌ Cache was missed."
 
