@@ -40,6 +40,8 @@ jobs:
           path: /tmp/${{ matrix.name }}.tar
   cache-environment:
     runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.key }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -55,7 +57,6 @@ jobs:
           BACKEND_HASH=$(sha256sum backend/yarn.lock | cut -d' ' -f1)
           WEBAPP_HASH=$(sha256sum webapp/yarn.lock | cut -d' ' -f1)
           CYPRESS_HASH=$(sha256sum cypress/yarn.lock | cut -d' ' -f1 2>/dev/null || echo "none")
-          echo "lock-hash=${BACKEND_HASH}-${WEBAPP_HASH}-${CYPRESS_HASH}" >> $GITHUB_OUTPUT
           echo "key=ci-all-cache-${{ runner.os }}-${BACKEND_HASH}-${WEBAPP_HASH}-${CYPRESS_HASH}" >> $GITHUB_OUTPUT
 
       - name: Show lockfile hashes (debug)
@@ -108,23 +109,61 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-images, cache-environment]
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Restore full CI cache
+        id: restore-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            backend/node_modules
+            webapp/node_modules
+            ~/.cache/Cypress
+            /opt/cucumber-json-formatter
+          key: ${{ needs.cache-environment.outputs.cache-key }}
+          restore-keys: |
+            ci-all-cache-${{ runner.os }}-
+            ci-all-cache-
+
       - name: Download Docker image artifacts
         uses: actions/download-artifact@v4
         with:
           path: /tmp
+
       - name: Load Docker images
         run: |
           docker load < /tmp/backend-image/backend.tar
           docker load < /tmp/webapp-image/webapp.tar
           docker load < /tmp/neo4j-image/neo4j.tar
+
       - name: Setup .env files
         run: |
           cp webapp/.env.template webapp/.env || touch webapp/.env
           cp backend/.env.test_e2e backend/.env || touch backend/.env
+
+      # ---- Checks ----
+      - name: Check node_modules exist
+        run: |
+          [ -d backend/node_modules ] && echo "✅ backend/node_modules ok" || (echo "❌ backend/node_modules missing" && exit 1)
+          [ -d webapp/node_modules ] && echo "✅ webapp/node_modules ok" || (echo "❌ webapp/node_modules missing" && exit 1)
+
+      - name: Check Cypress binary cache
+        run: |
+          [ -d ~/.cache/Cypress ] && echo "✅ Cypress cache ok" || (echo "❌ Cypress cache missing" && exit 1)
+
+      - name: Check Cypress CLI & version
+        run: |
+          npx --no-install cypress --version && npx cypress verify
+
+      - name: Check cucumber-json-formatter
+        run: |
+          [ -x /opt/cucumber-json-formatter ] && /opt/cucumber-json-formatter --help || (echo "❌ Formatter missing" && exit 1)
+
       - name: Start system
         run: |
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach
+
       - name: Wait for webapp
         run: |
           echo "Waiting for http://localhost:3000..."
