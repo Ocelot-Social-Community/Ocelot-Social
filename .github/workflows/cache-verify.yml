@@ -52,13 +52,15 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Compute cache key
+      - name: Compute cache key (unique per run)
         id: cache-key
         run: |
           BACKEND_HASH=$(sha256sum backend/yarn.lock | cut -d' ' -f1)
           WEBAPP_HASH=$(sha256sum webapp/yarn.lock | cut -d' ' -f1)
           CYPRESS_HASH=$(sha256sum cypress/yarn.lock | cut -d' ' -f1 2>/dev/null || echo "none")
-          echo "key=ci-all-cache-${{ runner.os }}-${BACKEND_HASH}-${WEBAPP_HASH}-${CYPRESS_HASH}" >> $GITHUB_OUTPUT
+          KEY="ci-all-cache-${{ runner.os }}-${BACKEND_HASH}-${WEBAPP_HASH}-${CYPRESS_HASH}-run${{ github.run_id }}"
+          echo "key=$KEY"
+          echo "key=$KEY" >> $GITHUB_OUTPUT
 
       - name: Restore CI cache
         id: restore-cache
@@ -72,7 +74,6 @@ jobs:
           key: ${{ steps.cache-key.outputs.key }}
           restore-keys: |
             ci-all-cache-${{ runner.os }}-
-            ci-all-cache-
 
       - name: Install backend dependencies if needed
         run: |
@@ -122,6 +123,7 @@ jobs:
             ~/.cache/Cypress
             /opt/cucumber-json-formatter
           key: ${{ steps.cache-key.outputs.key }}
+
 
   verify-environment:
     runs-on: ubuntu-latest
