@@ -18,7 +18,8 @@ jobs:
         env:
           LOCK_HASH: ${{ hashFiles('backend/yarn.lock', 'webapp/yarn.lock') }}
         run: echo "key=node-modules-${{ runner.os }}-${{ env.LOCK_HASH }}" >> $GITHUB_OUTPUT
-      - id: restore
+      - name: Restore node_modules cache
+        id: cache-restore
         uses: actions/cache@v4
         with:
           path: |
@@ -28,7 +29,7 @@ jobs:
           restore-keys: |
             node-modules-${{ runner.os }}-
             node-modules-
-      - run: echo "Cache: ${{ steps.restore.outputs.cache-hit }}"
+      - run: echo "Cache: ${{ steps.cache-restore.outputs.cache-hit }}"
       - run: cd backend && yarn install && yarn build
       - run: cd webapp && yarn install && yarn build
 
