@@ -38,6 +38,7 @@ jobs:
         with:
           name: ${{ matrix.name }}-image
           path: /tmp/${{ matrix.name }}.tar
+
   cache-environment:
     runs-on: ubuntu-latest
     outputs:
@@ -59,12 +60,6 @@ jobs:
           CYPRESS_HASH=$(sha256sum cypress/yarn.lock | cut -d' ' -f1 2>/dev/null || echo "none")
           echo "key=ci-all-cache-${{ runner.os }}-${BACKEND_HASH}-${WEBAPP_HASH}-${CYPRESS_HASH}" >> $GITHUB_OUTPUT
 
-      - name: Show lockfile hashes (debug)
-        run: |
-          echo "backend/yarn.lock hash: $(sha256sum backend/yarn.lock | cut -d' ' -f1)"
-          echo "webapp/yarn.lock hash: $(sha256sum webapp/yarn.lock | cut -d' ' -f1)"
-          echo "cypress/yarn.lock hash: $(sha256sum cypress/yarn.lock | cut -d' ' -f1 2>/dev/null || echo 'not found')"
-
       - name: Restore full CI cache
         id: restore-cache
         uses: actions/cache@v4
@@ -85,7 +80,7 @@ jobs:
             echo "Installing backend dependencies..."
             cd backend && yarn install
           else
-            echo "backend/node_modules already present."
+            echo "✅ backend/node_modules already present."
           fi
 
       - name: Install webapp dependencies if needed
@@ -94,7 +89,7 @@ jobs:
             echo "Installing webapp dependencies..."
             cd webapp && yarn install
           else
-            echo "webapp/node_modules already present."
+            echo "✅ webapp/node_modules already present."
           fi
 
       - name: Install Cypress binary if needed
@@ -104,7 +99,7 @@ jobs:
             yarn global add cypress
             npx cypress verify
           else
-            echo "Cypress binary already cached."
+            echo "✅ Cypress binary already present."
           fi
 
       - name: Install cucumber-json-formatter if missing
@@ -114,8 +109,9 @@ jobs:
             wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
             chmod +x /opt/cucumber-json-formatter
           else
-            echo "Formatter already present."
+            echo "✅ Formatter already present."
           fi
+
   verify-environment:
     runs-on: ubuntu-latest
     needs: [cache-environment]
