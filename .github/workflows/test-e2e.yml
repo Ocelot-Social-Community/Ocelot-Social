@@ -144,7 +144,9 @@ jobs:
     steps:
       - name: Generate cache key for node_modules
         id: cache-key
-        run: echo "key=node-modules-${{ runner.os }}-${{ hashFiles('backend/yarn.lock', 'webapp/yarn.lock') }}" >> $GITHUB_OUTPUT
+        run: echo "key=node-modules-${{ runner.os }}-${{ env.LOCK_HASH }}" >> $GITHUB_OUTPUT
+        env:
+          LOCK_HASH: ${{ hashFiles('backend/yarn.lock', 'webapp/yarn.lock') }}
       - name: Restore node_modules cache
         uses: actions/cache@v4
         with:
