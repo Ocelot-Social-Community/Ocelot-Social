@@ -18,7 +18,7 @@ jobs:
   prepare-env:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
 
       - name: Debug – Show repo structure
         run: tree -L 2 || ls -la
