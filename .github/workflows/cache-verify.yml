@@ -55,6 +55,7 @@ jobs:
         run: |
           cp backend/.env.test_e2e backend/.env
           cp webapp/.env.template webapp/.env
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -82,12 +83,16 @@ jobs:
           key: ${{ steps.cache-key.outputs.key }}
           restore-keys: |
             ci-unified-cache-${{ runner.os }}-
-      - name: Install all dependencies
+
+    # install dependencies
+      - name: Install and verify all dependencies
         run: |
-          yarn install
-          cd backend && yarn install && cd ..
-          cd webapp && yarn install && cd ..
+          yarn install --frozen-lockfile
+          cd backend && yarn install --frozen-lockfile && cd ..
+          cd webapp && yarn install --frozen-lockfile && cd ..
           npx cypress verify || echo "Cypress verify failed (likely not yet installed)"
+
+    
       - name: Install cucumber-json-formatter if missing
         run: |
           if [ ! -f /opt/cucumber-json-formatter ]; then
@@ -140,6 +145,7 @@ jobs:
       - name: Check cucumber-json-formatter
         run: |
           [ -x /opt/cucumber-json-formatter ] && /opt/cucumber-json-formatter --help || (echo "❌ Formatter missing" && exit 1)
+ 
   consolidate-environment:
     name: Fullstack | tests
     if: success()
@@ -182,19 +188,12 @@ jobs:
             ci-all-cache-${{ runner.os }}-
             ci-all-cache-
 
-    # rehydrate dependencies
-      - name: Rehydrate dependencies
-        run: |
-          yarn install --frozen-lockfile
-          cd backend && yarn install --frozen-lockfile && cd ..
-          cd webapp && yarn install --frozen-lockfile && cd ..
-          npx cypress verify || echo "⚠️ Cypress not yet verified"
-
     # build backend and webapp
-      - name: Build backend and webapp
-        run: |
-          cd backend && yarn build && cd ..
-          cd webapp && yarn build && cd ..
+      - name: Build backend
+        run: cd backend && yarn build
+
+    #  - name: Build webapp
+    #    run: cd webapp && yarn build
 
     # run docker compose
       - name: Boot system for tests
