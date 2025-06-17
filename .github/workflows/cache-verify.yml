@@ -120,6 +120,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Ensure directory structure exists
+        run: mkdir -p backend webapp cypress
+
       - name: Restore CI cache
         uses: actions/cache/restore@v4
         with:
@@ -133,7 +136,6 @@ jobs:
           restore-keys: |
             ci-all-cache-${{ runner.os }}-
 
-      # --- Checks ---
       - name: Check backend/node_modules
         run: |
           [ -d backend/node_modules ] && [ -n "$(ls -A backend/node_modules)" ] || (echo "❌ backend/node_modules missing" && exit 1)
@@ -160,7 +162,6 @@ jobs:
         run: |
           [ -x /opt/cucumber-json-formatter ] && /opt/cucumber-json-formatter --help || (echo "❌ Formatter missing" && exit 1)
 
-      # --- Summary ---
       - name: CI Cache Health Summary
         run: |
           echo "📦 CI Cache Health Summary:"
@@ -189,7 +190,6 @@ jobs:
           else
             echo "⚠️ Partial cache – some installs might have been required"
           fi
-
 
   consolidate-environment:
     runs-on: ubuntu-latest
