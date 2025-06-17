@@ -83,15 +83,12 @@ jobs:
           key: ${{ steps.cache-key.outputs.key }}
           restore-keys: |
             ci-unified-cache-${{ runner.os }}-
-
-    # install dependencies
-      - name: Install and verify all dependencies
+      - name: Install all dependencies
         run: |
-          yarn install --frozen-lockfile
-          cd backend && yarn install --frozen-lockfile && cd ..
-          cd webapp && yarn install --frozen-lockfile && cd ..
+          yarn install
+          cd backend && yarn install && cd ..
+          cd webapp && yarn install && cd ..
           npx cypress verify || echo "Cypress verify failed (likely not yet installed)"
-
       - name: Install cucumber-json-formatter if missing
         run: |
           if [ ! -f /opt/cucumber-json-formatter ]; then
