@@ -192,11 +192,18 @@ jobs:
           cp webapp/.env.template webapp/.env
           mkdir -p cypress/reports/json_logs
 
+      - name: Download all Docker images
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp
+
+      - name: Verify Docker image files
+        run: |
+          ls -lh /tmp/*-image/*.tar || (echo "❌ Missing Docker image tarballs" && exit 1)
+
       - name: Load Docker images
         run: |
-          docker load < /tmp/backend-image/backend.tar
-          docker load < /tmp/webapp-image/webapp.tar
-          docker load < /tmp/neo4j-image/neo4j.tar
+          find /tmp -name "*.tar" -exec docker load -i {} \;
 
       - name: Boot system for tests
         run: |
