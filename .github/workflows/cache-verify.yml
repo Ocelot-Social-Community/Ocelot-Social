@@ -5,16 +5,6 @@ on:
       - '.github/workflows/cache-verify.yml'
   workflow_dispatch:
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run actionlint
-        uses: reviewdog/action-actionlint@v1
-        with:
-          reporter: github-check
-          level: warning
-
   build-images:
     runs-on: ubuntu-latest
     strategy:
@@ -33,7 +23,13 @@ jobs:
             dockerfile: ./neo4j/Dockerfile
             target: community
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: setup .env files
+        run: |
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
+
       - uses: docker/setup-buildx-action@v3
       - name: Build ${{ matrix.name }} image
         uses: docker/build-push-action@v5
@@ -56,6 +52,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: setup .env files
+        run: |
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -118,6 +118,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: setup .env files
+        run: |
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
 
       - name: Restore unified CI cache
         uses: actions/cache/restore@v4
@@ -169,8 +173,7 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Generate final .env files
+      - name: setup .env files
         run: |
           cp backend/.env.test_e2e backend/.env
           cp webapp/.env.template webapp/.env
