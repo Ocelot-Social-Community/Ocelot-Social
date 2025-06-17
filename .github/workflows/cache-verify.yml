@@ -211,6 +211,7 @@ jobs:
     # build backend & webapp
       - name: Build backend
         run: cd backend && yarn build
+        
       - name: Build webapp
         run: |
           cd webapp
