@@ -40,125 +40,76 @@ jobs:
           tags: ocelotsocialnetwork/${{ matrix.service }}:test
           push: false
           outputs: type=docker,dest=/tmp/${{ matrix.service }}.tar
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       - name: Upload Docker image tarball
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.service }}-image
           path: /tmp/${{ matrix.service }}.tar
 
-  prepare_backend:
-    name: Prepare backend
+  prepare:
+    name: Prepare Codebase
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [backend, webapp]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Generate backend cache key
-        id: backend-key
-        run: echo "key=node-modules-${{ runner.os }}-${{ hashFiles('backend/yarn.lock') }}" >> $GITHUB_OUTPUT
-      - name: Cache backend node_modules
+      - name: Generate cache key
+        id: key
+        run: echo "key=node-modules-${{ matrix.project }}-${{ runner.os }}-${{ hashFiles(matrix.project + '/yarn.lock') }}" >> $GITHUB_OUTPUT
+      - name: Cache node_modules
         uses: actions/cache@v4
         with:
-          path: backend/node_modules
-          key: ${{ steps.backend-key.outputs.key }}
+          path: ${{ matrix.project }}/node_modules
+          key: ${{ steps.key.outputs.key }}
           restore-keys: |
-            node-modules-${{ runner.os }}-
-            node-modules-
-      - name: Setup .env and backend deps
+            node-modules-${{ matrix.project }}-${{ runner.os }}-
+            node-modules-${{ matrix.project }}-
+      - name: Setup .env and deps
         run: |
-          cp backend/.env.test_e2e backend/.env || touch backend/.env
-          cd backend
+          cp ${{ matrix.project }}/.env.* ${{ matrix.project }}/.env || touch ${{ matrix.project }}/.env
+          cd ${{ matrix.project }}
           if [ ! -d "node_modules" ]; then yarn install; fi
-          yarn build
-      - name: Upload backend build
+          if [ "${{ matrix.project }}" == "backend" ]; then yarn build; fi
+      - name: Upload build
+        if: matrix.project == 'backend'
         uses: actions/upload-artifact@v4
         with:
           name: backend-build
           path: backend/build
-
-  prepare_webapp:
-    name: Prepare webapp
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - name: Generate webapp cache key
-        id: webapp-key
-        run: echo "key=node-modules-${{ runner.os }}-${{ hashFiles('webapp/yarn.lock') }}" >> $GITHUB_OUTPUT
-      - name: Cache webapp node_modules
-        uses: actions/cache@v4
-        with:
-          path: webapp/node_modules
-          key: ${{ steps.webapp-key.outputs.key }}
-          restore-keys: |
-            node-modules-${{ runner.os }}-
-            node-modules-
-      - name: Setup .env and webapp deps
-        run: |
-          cp webapp/.env.template webapp/.env || touch webapp/.env
-          if [ ! -d "webapp/node_modules" ]; then (cd webapp && yarn install || true); fi
 
   prepare_cypress:
     name: Prepare Cypress
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Generate cypress cache key
-        id: cypress-key
-        run: echo "key=cypress-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}" >> $GITHUB_OUTPUT
-      - name: Cache cypress and dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            /opt/cucumber-json-formatter
-            ~/.cache/Cypress
-            node_modules
-            backend/node_modules
-          key: ${{ steps.cypress-key.outputs.key }}
-          restore-keys: |
-            cypress-${{ runner.os }}-
-            cypress-
-      - name: Copy env files
+      - name: Setup and Install Cypress
         run: |
-          cp webapp/.env.template webapp/.env
-          cp backend/.env.test_e2e backend/.env
-      - name: Install cypress requirements
-        run: |
-          wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
+          wget -q -O /opt/cucumber-json-formatter https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386
           chmod +x /opt/cucumber-json-formatter
-          cd backend && yarn install && yarn build && cd ..
           yarn install
 
   fullstack_tests:
     name: Run Fullstack E2E Tests
-    needs: [build_images, prepare_backend, prepare_webapp, prepare_cypress]
+    needs: [build_images, prepare, prepare_cypress]
     runs-on: ubuntu-latest
-    env:
-      jobs: 8
     strategy:
       matrix:
         job: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
-      - name: Generate cache key for node_modules
-        id: cache-key
-        run: echo "key=node-modules-${{ runner.os }}-${{ env.LOCK_HASH }}" >> $GITHUB_OUTPUT
-        env:
-          LOCK_HASH: ${{ hashFiles('backend/yarn.lock', 'webapp/yarn.lock') }}
       - name: Restore node_modules cache
         uses: actions/cache@v4
         with:
           path: |
             backend/node_modules
             webapp/node_modules
-          key: ${{ steps.cache-key.outputs.key }}
-          restore-keys: |
-            node-modules-${{ runner.os }}-
-            node-modules-
-      - name: Download Docker image tarballs
-        uses: actions/download-artifact@v4
+          key: node-modules-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+      - uses: actions/download-artifact@v4
         with:
           name: backend-image
           path: /tmp
@@ -183,26 +134,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: Add node_modules/.bin to PATH
         run: echo "$(pwd)/node_modules/.bin" >> $GITHUB_PATH
-      - name: Ensure Cypress CLI is available
-        run: |
-          if ! command -v cypress >/dev/null; then
-            echo "⚠️ Cypress CLI missing — installing now..."
-            yarn install
-          else
-            echo "✅ Cypress CLI is present"
-          fi
       - name: Setup .env files
         run: |
-          mkdir -p webapp backend
           cp webapp/.env.template webapp/.env || touch webapp/.env
           cp backend/.env.test_e2e backend/.env || touch backend/.env
       - name: Start system
-        run: |
-          set -e
-          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach webapp mailserver
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach webapp mailserver
       - name: Wait for webapp
         run: |
           for i in {1..30}; do curl -sf http://localhost:3000 && exit 0 || sleep 2; done; exit 1
       - name: Run Cypress tests
         run: |
-          yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }})
+          yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} 8)
