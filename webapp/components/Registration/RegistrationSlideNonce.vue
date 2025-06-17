@@ -91,7 +91,7 @@ export default {
       let dbValidated = false
       if (this.validInput) {
         await this.handleSubmitVerify()
-        dbValidated = this.sliderData.sliders[this.sliderIndex].data.response.VerifyNonce
+        dbValidated = this.sliderData.sliders[this.sliderIndex].data.response?.VerifyNonce
       }
       this.sliderData.setSliderValuesCallback(dbValidated)
     },
