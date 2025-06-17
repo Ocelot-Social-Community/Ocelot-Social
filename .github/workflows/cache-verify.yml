@@ -22,16 +22,39 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Generate .env files
+      - name: Check & show .env source files
+        run: |
+          echo "::group::Check backend/.env.test_e2e"
+          if [ -f backend/.env.test_e2e ]; then
+            echo "✅ backend/.env.test_e2e gefunden:"
+            cat backend/.env.test_e2e
+          else
+            echo "❌ backend/.env.test_e2e fehlt"
+            exit 1
+          fi
+          echo "::endgroup::"
+
+          echo "::group::Check webapp/.env.template"
+          if [ -f webapp/.env.template ]; then
+            echo "✅ webapp/.env.template gefunden:"
+            cat webapp/.env.template
+          else
+            echo "❌ webapp/.env.template fehlt"
+            exit 1
+          fi
+          echo "::endgroup::"
+
+      - name: Generate final .env files
         run: |
           cp backend/.env.test_e2e backend/.env
           cp webapp/.env.template webapp/.env
 
-      - name: Debug – show generated .env contents
+      - name: Show generated .env files
         run: |
           echo "::group::backend/.env"
           cat backend/.env
           echo "::endgroup::"
+
           echo "::group::webapp/.env"
           cat webapp/.env
           echo "::endgroup::"
@@ -43,7 +66,6 @@ jobs:
           path: |
             ${{ github.workspace }}/backend/.env
             ${{ github.workspace }}/webapp/.env
-
 
   build-images:
     needs: prepare-env
