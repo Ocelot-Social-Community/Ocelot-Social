@@ -1,4 +1,4 @@
-name: CI Cache Verification
+name: test_e2e_reworked
 on:
   push:
     paths:
@@ -211,7 +211,6 @@ jobs:
     # build backend & webapp
       - name: Build backend
         run: cd backend && yarn build
-        
       - name: Build webapp
         run: |
           cd webapp
