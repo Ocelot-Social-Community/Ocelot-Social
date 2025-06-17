@@ -207,21 +207,21 @@ jobs:
             sleep 2
           done
 
-      - name: Run Cypress tests (job ${{ matrix.job }})
+    # Cypress tests
+      - name: Full stack tests | run tests
         id: e2e-tests
-        run: |
-          yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }})
+        run: yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
 
-      - name: If tests failed, compile HTML report
-        if: failure() && steps.e2e-tests.conclusion == 'failure'
+      - name: Full stack tests | if tests failed, compile html report
+        if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         run: |
           cd cypress/
           node create-cucumber-html-report.js
-
-      - name: Upload report on failure
-        if: failure() && steps.e2e-tests.conclusion == 'failure'
-        uses: actions/upload-artifact@v4
+      - name: Full stack tests | if tests failed, upload report
+        id: e2e-report
+        if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: e2e-test-report-matrix-${{ matrix.job }}
-          path: cypress/reports/cucumber_html_report
+          name: ocelot-e2e-test-report-pr${{ needs.docker_preparation.outputs.pr-number }}
+          path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
 
