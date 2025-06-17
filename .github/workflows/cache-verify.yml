@@ -141,7 +141,6 @@ jobs:
           [ -d node_modules ] && [ -n "$(ls -A node_modules)" ] || (echo "❌ node_modules missing" && exit 1)
           [ -d backend/node_modules ] && [ -n "$(ls -A backend/node_modules)" ] || (echo "❌ backend/node_modules missing" && exit 1)
           [ -d webapp/node_modules ] && [ -n "$(ls -A webapp/node_modules)" ] || (echo "❌ webapp/node_modules missing" && exit 1)
-
       - name: Check Cypress binary & CLI
         run: |
           npx --yes cypress --version
@@ -163,7 +162,16 @@ jobs:
         job: [1, 2, 3, 4, 5, 6, 7, 8]
 
     steps:
+      - name: Download Docker image artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp
 
+      - name: Load Docker images
+        run: |
+          docker load < /tmp/backend-image/backend.tar
+          docker load < /tmp/webapp-image/webapp.tar
+          docker load < /tmp/neo4j-image/neo4j.tar
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: setup .env files
@@ -184,25 +192,15 @@ jobs:
           restore-keys: |
             ci-all-cache-${{ runner.os }}-
             ci-all-cache-
-
-      - name: Build backend
-        run: cd backend && yarn build
-
-      - name: Download Docker image artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: /tmp
-
-      - name: Load Docker images
+      - name: Rehydrate dependencies
         run: |
-          docker load < /tmp/backend-image/backend.tar
-          docker load < /tmp/webapp-image/webapp.tar
-          docker load < /tmp/neo4j-image/neo4j.tar
-
+          yarn install --frozen-lockfile
+          cd backend && yarn install --frozen-lockfile && cd ..
+          cd webapp && yarn install --frozen-lockfile && cd ..
+          npx cypress verify || echo "⚠️ Cypress not yet verified"
       - name: Boot system for tests
         run: |
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
-
       - name: Wait for services
         run: |
           for i in {1..30}; do
@@ -210,6 +208,9 @@ jobs:
             echo "Waiting... ($i/30)"
             sleep 2
           done
+    # build backend
+      - name: Build backend
+        run: cd backend && yarn build
 
     # Cypress tests
       - name: Full stack tests | run tests
@@ -228,4 +229,3 @@ jobs:
         with:
           name: ocelot-e2e-test-report-pr${{ needs.docker_preparation.outputs.pr-number }}
           path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
-
