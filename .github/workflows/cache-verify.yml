@@ -163,16 +163,6 @@ jobs:
         job: [1, 2, 3, 4, 5, 6, 7, 8]
 
     steps:
-      - name: Download Docker image artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: /tmp
-
-      - name: Load Docker images
-        run: |
-          docker load < /tmp/backend-image/backend.tar
-          docker load < /tmp/webapp-image/webapp.tar
-          docker load < /tmp/neo4j-image/neo4j.tar
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -195,12 +185,19 @@ jobs:
             ci-all-cache-${{ runner.os }}-
             ci-all-cache-
 
-      - name: Rehydrate dependencies
+      - name: Build backend
+        run: cd backend && yarn build
+
+      - name: Download Docker image artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp
+
+      - name: Load Docker images
         run: |
-          yarn install --frozen-lockfile
-          cd backend && yarn install --frozen-lockfile && cd ..
-          cd webapp && yarn install --frozen-lockfile && cd ..
-          npx cypress verify || echo "⚠️ Cypress not yet verified"
+          docker load < /tmp/backend-image/backend.tar
+          docker load < /tmp/webapp-image/webapp.tar
+          docker load < /tmp/neo4j-image/neo4j.tar
 
       - name: Boot system for tests
         run: |
@@ -213,10 +210,6 @@ jobs:
             echo "Waiting... ($i/30)"
             sleep 2
           done
-
-    # build backend
-      - name: Build backend
-        run: cd backend && yarn build
 
     # Cypress tests
       - name: Full stack tests | run tests
