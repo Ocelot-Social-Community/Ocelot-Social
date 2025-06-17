@@ -16,44 +16,34 @@ jobs:
           level: warning
 
   prepare-env:
+    name: Prepare shared .env files
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
-
-      - name: Debug – Show repo structure
-        run: tree -L 2 || ls -la
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Generate .env files
         run: |
-          if [ -f backend/.env.test_e2e ]; then
-            cp backend/.env.test_e2e backend/.env
-          else
-            echo "❌ backend/.env.test_e2e fehlt" && exit 1
-          fi
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
 
-          if [ -f webapp/.env.template ]; then
-            cp webapp/.env.template webapp/.env
-          else
-            echo "❌ webapp/.env.template fehlt" && exit 1
-          fi
-
-      - name: Debug – Show generated .env files
+      - name: Debug – show generated .env contents
         run: |
           echo "::group::backend/.env"
-          cat backend/.env || echo "🚫 fehlt"
+          cat backend/.env
           echo "::endgroup::"
-
           echo "::group::webapp/.env"
-          cat webapp/.env || echo "🚫 fehlt"
+          cat webapp/.env
           echo "::endgroup::"
 
-      - name: Upload .env artifacts
+      - name: Upload .env as artifact
         uses: actions/upload-artifact@v4
         with:
           name: env-files
           path: |
-            backend/.env
-            webapp/.env
+            ${{ github.workspace }}/backend/.env
+            ${{ github.workspace }}/webapp/.env
+
 
   build-images:
     needs: prepare-env
