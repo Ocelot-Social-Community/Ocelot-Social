@@ -48,6 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       cache-key: ${{ steps.cache-key.outputs.key }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -72,6 +73,7 @@ jobs:
           KEY="ci-unified-cache-${{ runner.os }}-${ROOT_HASH}-${BACKEND_HASH}-${WEBAPP_HASH}-${CYPRESS_HASH}"
           echo "key=$KEY"
           echo "key=$KEY" >> $GITHUB_OUTPUT
+
       - name: Restore unified CI cache
         id: restore-cache
         uses: actions/cache/restore@v4
@@ -96,7 +98,6 @@ jobs:
           cd backend && yarn install --frozen-lockfile && yarn build && cd ..
           cd webapp && yarn install --frozen-lockfile && yarn build && cd ..
           npx cypress verify || echo "⚠️ Cypress verify failed (non-blocking)"
-
           if [ ! -f /opt/cucumber-json-formatter ]; then
             wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
             chmod +x /opt/cucumber-json-formatter
