@@ -122,35 +122,41 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: setup .env files
-        run: |
-          cp backend/.env.test_e2e backend/.env
-          cp webapp/.env.template webapp/.env
+
       - name: Restore unified CI cache
         uses: actions/cache/restore@v4
         with:
+          key: ${{ needs.cache-environment.outputs.cache-key }}
           path: |
             node_modules
             backend/node_modules
             webapp/node_modules
+            backend/build
+            webapp/.nuxt
             ~/.cache/Cypress
             /opt/cucumber-json-formatter
-          key: ${{ needs.cache-environment.outputs.cache-key }}
-          restore-keys: |
-            ci-unified-cache-${{ runner.os }}-
-      - name: Check all node_modules exist
+
+      - name: Check required node_modules
         run: |
           [ -d node_modules ] && [ -n "$(ls -A node_modules)" ] || (echo "❌ node_modules missing" && exit 1)
           [ -d backend/node_modules ] && [ -n "$(ls -A backend/node_modules)" ] || (echo "❌ backend/node_modules missing" && exit 1)
           [ -d webapp/node_modules ] && [ -n "$(ls -A webapp/node_modules)" ] || (echo "❌ webapp/node_modules missing" && exit 1)
-      - name: Check Cypress binary & CLI
+
+      - name: Check Cypress binary
         run: |
-          npx --yes cypress --version
-          npx --yes cypress verify
+          npx cypress --version || (echo "❌ Cypress binary fehlt" && exit 1)
+          npx cypress verify
+
+      - name: Check build artifacts exist
+        run: |
+          [ -d backend/build ] || (echo "❌ backend/build fehlt" && exit 1)
+          [ -d webapp/.nuxt ] || (echo "❌ webapp/.nuxt fehlt" && exit 1)
+
       - name: Check cucumber-json-formatter
         run: |
-          [ -x /opt/cucumber-json-formatter ] && /opt/cucumber-json-formatter --help || (echo "❌ Formatter missing" && exit 1)
- 
+          [ -x /opt/cucumber-json-formatter ] || (echo "❌ Formatter fehlt" && exit 1)
+          /opt/cucumber-json-formatter --help || (echo "❌ Formatter nicht ausführbar" && exit 1)
+
   consolidate-environment:
     name: Fullstack | tests
     if: success()
@@ -165,6 +171,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: setup .env files
+        run: |
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
 
       - name: Download Docker image artifacts
         uses: actions/download-artifact@v4
