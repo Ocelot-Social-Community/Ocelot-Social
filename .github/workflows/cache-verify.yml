@@ -51,61 +51,70 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: setup .env files
-        run: |
-          cp backend/.env.test_e2e backend/.env
-          cp webapp/.env.template webapp/.env
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Compute cache key (unique per run)
+      - name: Setup .env files
+        run: |
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
+
+      - name: Compute cache key
         id: cache-key
         run: |
           ROOT_HASH=$(sha256sum yarn.lock | cut -d' ' -f1)
           BACKEND_HASH=$(sha256sum backend/yarn.lock | cut -d' ' -f1)
           WEBAPP_HASH=$(sha256sum webapp/yarn.lock | cut -d' ' -f1)
-          KEY="ci-unified-cache-${{ runner.os }}-${ROOT_HASH}-${BACKEND_HASH}-${WEBAPP_HASH}-${{ github.run_id }}"
+          CYPRESS_HASH=$(find cypress cypress.config.* -type f -exec sha256sum {} \; | sort | sha256sum | cut -d' ' -f1)
+          KEY="ci-unified-cache-${{ runner.os }}-${ROOT_HASH}-${BACKEND_HASH}-${WEBAPP_HASH}-${CYPRESS_HASH}"
           echo "key=$KEY"
           echo "key=$KEY" >> $GITHUB_OUTPUT
       - name: Restore unified CI cache
         id: restore-cache
         uses: actions/cache/restore@v4
         with:
+          key: ${{ steps.cache-key.outputs.key }}
           path: |
             node_modules
             backend/node_modules
             webapp/node_modules
+            backend/build
+            webapp/.nuxt
             ~/.cache/Cypress
             /opt/cucumber-json-formatter
-          key: ${{ steps.cache-key.outputs.key }}
           restore-keys: |
             ci-unified-cache-${{ runner.os }}-
-      - name: Install all dependencies
+
+      - name: Setup dependencies & build (if cache missed)
+        if: steps.restore-cache.outputs.cache-hit != 'true'
         run: |
-          yarn install
-          cd backend && yarn install && cd ..
-          cd webapp && yarn install && cd ..
-          npx cypress verify || echo "Cypress verify failed (likely not yet installed)"
-      - name: Install cucumber-json-formatter if missing
-        run: |
+          echo "📦 Cache miss – installing & building everything"
+          yarn install --frozen-lockfile
+          cd backend && yarn install --frozen-lockfile && yarn build && cd ..
+          cd webapp && yarn install --frozen-lockfile && yarn build && cd ..
+          npx cypress verify || echo "⚠️ Cypress verify failed (non-blocking)"
+
           if [ ! -f /opt/cucumber-json-formatter ]; then
             wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
             chmod +x /opt/cucumber-json-formatter
           fi
+
       - name: Save unified CI cache
+        if: steps.restore-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
-        if: always()
         with:
+          key: ${{ steps.cache-key.outputs.key }}
           path: |
             node_modules
             backend/node_modules
             webapp/node_modules
+            backend/build
+            webapp/.nuxt
             ~/.cache/Cypress
             /opt/cucumber-json-formatter
-          key: ${{ steps.cache-key.outputs.key }}
 
   verify-environment:
     runs-on: ubuntu-latest
@@ -154,6 +163,9 @@ jobs:
         job: [1, 2, 3, 4, 5, 6, 7, 8]
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Download Docker image artifacts
         uses: actions/download-artifact@v4
         with:
@@ -164,54 +176,39 @@ jobs:
           docker load < /tmp/backend-image/backend.tar
           docker load < /tmp/webapp-image/webapp.tar
           docker load < /tmp/neo4j-image/neo4j.tar
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: setup .env files
-        run: |
-          cp backend/.env.test_e2e backend/.env
-          cp webapp/.env.template webapp/.env
-      - name: Restore full CI cache
-        id: restore-cache
-        uses: actions/cache@v4
+
+      - name: Restore unified CI cache
+        uses: actions/cache/restore@v4
         with:
+          key: ${{ needs.cache-environment.outputs.cache-key }}
           path: |
+            node_modules
             backend/node_modules
             webapp/node_modules
+            backend/build
+            webapp/.nuxt
             ~/.cache/Cypress
             /opt/cucumber-json-formatter
-          key: ${{ needs.cache-environment.outputs.cache-key }}
           restore-keys: |
-            ci-all-cache-${{ runner.os }}-
-            ci-all-cache-
+            ci-unified-cache-${{ runner.os }}-
 
-    # rehydrate dependencies
-      - name: Rehydrate dependencies
+      - name: Ensure formatter is executable
         run: |
-          yarn install --frozen-lockfile
-          cd backend && yarn install --frozen-lockfile && cd ..
-          cd webapp && yarn install --frozen-lockfile && cd ..
-          npx cypress --version || echo "⚠️ Cypress not found"
+          chmod +x /opt/cucumber-json-formatter || true
+          sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter || true
 
-    # build backend and webapp
-      - name: Build backend
-        run: cd backend && yarn build
-
-    #  - name: Build webapp
-    #    run: cd webapp && yarn build
-
-    # run docker compose
       - name: Boot system for tests
         run: |
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
-      - name: Wait for services
+
+      - name: Wait for services to be ready
         run: |
           for i in {1..30}; do
             curl -sf http://localhost:3000 && echo "✅ Webapp ready" && break
-            echo "Waiting... ($i/30)"
+            echo "Waiting for webapp... ($i/30)"
             sleep 2
           done
 
-    # Cypress tests
       - name: Full stack tests | run tests
         id: e2e-tests
         run: yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
@@ -221,10 +218,10 @@ jobs:
         run: |
           cd cypress/
           node create-cucumber-html-report.js
+
       - name: Full stack tests | if tests failed, upload report
-        id: e2e-report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@v4
         with:
-          name: ocelot-e2e-test-report-pr${{ needs.docker_preparation.outputs.pr-number }}
-          path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
+          name: ocelot-e2e-test-report-job${{ matrix.job }}
+          path: cypress/reports/cucumber_html_report
