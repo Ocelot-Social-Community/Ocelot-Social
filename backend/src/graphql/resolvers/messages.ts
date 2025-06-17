@@ -7,8 +7,10 @@
 import { withFilter } from 'graphql-subscriptions'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
+import CONFIG, { isS3configured } from '@config/index'
 import { CHAT_MESSAGE_ADDED } from '@constants/subscriptions'
 
+import { attachments } from './attachments/attachments'
 import Resolver from './helpers/Resolver'
 
 const setMessagesAsDistributed = async (undistributedMessagesIds, session) => {
@@ -70,7 +72,7 @@ export default {
   },
   Mutation: {
     CreateMessage: async (_parent, params, context, _resolveInfo) => {
-      const { roomId, content } = params
+      const { roomId, content, files = [] } = params
       const {
         user: { id: currentUserId },
       } = context
@@ -82,7 +84,7 @@ export default {
           OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
           OPTIONAL MATCH (room)<-[:CHATS_IN]-(recipientUser:User)
             WHERE NOT recipientUser.id = $currentUserId
-          WITH MAX(m.indexId) as maxIndex, room, currentUser, image, recipientUser 
+          WITH MAX(m.indexId) as maxIndex, room, currentUser, image, recipientUser
           CREATE (currentUser)-[:CREATED]->(message:Message {
             createdAt: toString(datetime()),
             id: apoc.create.uuid(),
@@ -116,7 +118,40 @@ export default {
         return message
       })
       try {
-        return await writeTxResultPromise
+        // We cannot combine the query above with the attachments, since you need the resource for matching
+        const message = await writeTxResultPromise
+
+        // this is the case if the room doesn't exist - requires refactoring for implicit rooms
+        if (!message) {
+          return null
+        }
+
+        const session = context.driver.session()
+        const writeFilesPromise = session.writeTransaction(async (transaction) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const atns: any[] = []
+
+          if (!isS3configured(CONFIG)) {
+            return atns
+          }
+
+          for await (const file of files) {
+            const atn = await attachments(CONFIG).add(
+              message,
+              'ATTACHMENT',
+              file,
+              {},
+              {
+                transaction,
+              },
+            )
+            atns.push(atn)
+          }
+          return atns
+        })
+
+        const atns = await writeFilesPromise
+        return { ...message, files: atns }
       } catch (error) {
         throw new Error(error)
       } finally {
@@ -155,6 +190,9 @@ export default {
       hasOne: {
         author: '<-[:CREATED]-(related:User)',
         room: '-[:INSIDE]->(related:Room)',
+      },
+      hasMany: {
+        files: '-[:ATTACHMENT]-(related:File)',
       },
     }),
   },

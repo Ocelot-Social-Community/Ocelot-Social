@@ -13,7 +13,7 @@ import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
-import { createMessageMutation } from '@graphql/queries/createMessageMutation'
+import { CreateMessage } from '@graphql/queries/CreateMessage'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
@@ -918,7 +918,7 @@ describe('notifications', () => {
         isUserOnlineMock = jest.fn().mockReturnValue(true)
 
         await mutate({
-          mutation: createMessageMutation(),
+          mutation: CreateMessage,
           variables: {
             roomId,
             content: 'Some nice message to chatReceiver',
@@ -953,7 +953,7 @@ describe('notifications', () => {
         isUserOnlineMock = jest.fn().mockReturnValue(false)
 
         await mutate({
-          mutation: createMessageMutation(),
+          mutation: CreateMessage,
           variables: {
             roomId,
             content: 'Some nice message to chatReceiver',
@@ -1002,7 +1002,7 @@ describe('notifications', () => {
         await chatReceiver.relateTo(chatSender, 'blocked')
 
         await mutate({
-          mutation: createMessageMutation(),
+          mutation: CreateMessage,
           variables: {
             roomId,
             content: 'Some nice message to chatReceiver',
@@ -1022,7 +1022,7 @@ describe('notifications', () => {
         await chatReceiver.relateTo(chatSender, 'muted')
 
         await mutate({
-          mutation: createMessageMutation(),
+          mutation: CreateMessage,
           variables: {
             roomId,
             content: 'Some nice message to chatReceiver',
@@ -1042,7 +1042,7 @@ describe('notifications', () => {
         await chatReceiver.update({ emailNotificationsChatMessage: false })
 
         await mutate({
-          mutation: createMessageMutation(),
+          mutation: CreateMessage,
           variables: {
             roomId,
             content: 'Some nice message to chatReceiver',
