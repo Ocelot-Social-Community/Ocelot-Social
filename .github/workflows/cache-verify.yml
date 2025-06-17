@@ -162,6 +162,12 @@ jobs:
     needs: [build-images, cache-environment]
     steps:
 
+    # load .env
+      - name: Setup .env files (for caching context)
+        run: |
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
+      
     # install images
       - name: Download Docker image artifacts
         uses: actions/download-artifact@v4
