@@ -185,6 +185,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+    #restore cache
       - name: Restore CI cache
         uses: actions/cache/restore@v4
         with:
@@ -198,12 +199,7 @@ jobs:
             ~/.cache/Cypress
             /opt/cucumber-json-formatter
 
-      - name: Setup .env files & reports dir
-        run: |
-          cp backend/.env.test_e2e backend/.env
-          cp webapp/.env.template webapp/.env
-          mkdir -p cypress/reports/json_logs
-
+    #download docker artifacts
       - name: Download all Docker images
         uses: actions/download-artifact@v4
         with:
@@ -213,14 +209,20 @@ jobs:
         run: |
           ls -lh /tmp/*-image/*.tar || (echo "❌ Missing Docker image tarballs" && exit 1)
 
+    #load docker images
       - name: Load Docker images
         run: |
-          find /tmp -name "*.tar" -exec docker load -i {} \;
-
-      - name: Boot system for tests
+          docker load < /tmp/backend-image/backend.tar
+          docker load < /tmp/webapp-image/webapp.tar
+          docker load < /tmp/neo4j-image/neo4j.tar
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: setup .env files
         run: |
-          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
 
+    #wait for webapp
       - name: Wait for services
         run: |
           for i in {1..30}; do
@@ -229,6 +231,7 @@ jobs:
             sleep 2
           done
 
+    #run cypress fullstack tests
       - name: Run Cypress tests
         id: e2e-tests
         run: |
