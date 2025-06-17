@@ -24,6 +24,10 @@ jobs:
             target: community
     steps:
       - uses: actions/checkout@v4
+      - name: Setup .env files
+        run: |
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
       - uses: docker/setup-buildx-action@v3
       - name: Build ${{ matrix.name }} image
         uses: docker/build-push-action@v5
@@ -110,11 +114,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup .env files (strict)
-        run: |
-          cp webapp/.env.template webapp/.env
-          cp backend/.env.test_e2e backend/.env
-
       - name: Restore unified CI cache
         uses: actions/cache/restore@v4
         with:
@@ -160,11 +159,6 @@ jobs:
           docker load < /tmp/backend-image/backend.tar
           docker load < /tmp/webapp-image/webapp.tar
           docker load < /tmp/neo4j-image/neo4j.tar
-
-      - name: Setup .env files (strict)
-        run: |
-          cp webapp/.env.template webapp/.env
-          cp backend/.env.test_e2e backend/.env
 
     # load environment
       - name: Checkout repository
