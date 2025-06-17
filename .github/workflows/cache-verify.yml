@@ -20,36 +20,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Debug – check file presence
-        run: |
-          echo "::group::backend"
-          ls -la backend/
-          echo "::endgroup::"
-          echo "::group::webapp"
-          ls -la webapp/
-          echo "::endgroup::"
+      - name: Debug – Show repo structure
+        run: tree -L 2 || ls -la
 
       - name: Generate .env files
         run: |
           if [ -f backend/.env.test_e2e ]; then
             cp backend/.env.test_e2e backend/.env
           else
-            echo "❌ backend/.env.test_e2e fehlt"
-            exit 1
+            echo "❌ backend/.env.test_e2e fehlt" && exit 1
           fi
 
           if [ -f webapp/.env.template ]; then
             cp webapp/.env.template webapp/.env
           else
-            echo "❌ webapp/.env.template fehlt"
-            exit 1
+            echo "❌ webapp/.env.template fehlt" && exit 1
           fi
 
-      - name: Verify .env output
+      - name: Debug – Show generated .env files
         run: |
           echo "::group::backend/.env"
           cat backend/.env || echo "🚫 fehlt"
           echo "::endgroup::"
+
           echo "::group::webapp/.env"
           cat webapp/.env || echo "🚫 fehlt"
           echo "::endgroup::"
