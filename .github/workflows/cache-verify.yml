@@ -195,6 +195,13 @@ jobs:
             ci-all-cache-${{ runner.os }}-
             ci-all-cache-
 
+      - name: Rehydrate dependencies
+        run: |
+          yarn install --frozen-lockfile
+          cd backend && yarn install --frozen-lockfile && cd ..
+          cd webapp && yarn install --frozen-lockfile && cd ..
+          npx cypress verify || echo "⚠️ Cypress not yet verified"
+
       - name: Boot system for tests
         run: |
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
