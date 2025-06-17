@@ -34,10 +34,6 @@ jobs:
             target: community
     steps:
       - uses: actions/checkout@v4
-      - name: Setup .env files
-        run: |
-          cp backend/.env.test_e2e backend/.env
-          cp webapp/.env.template webapp/.env
       - uses: docker/setup-buildx-action@v3
       - name: Build ${{ matrix.name }} image
         uses: docker/build-push-action@v5
@@ -60,11 +56,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Setup .env files (for caching context)
-        run: |
-          cp backend/.env.test_e2e backend/.env
-          cp webapp/.env.template webapp/.env
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -156,7 +147,6 @@ jobs:
         run: |
           [ -x /opt/cucumber-json-formatter ] && /opt/cucumber-json-formatter --help || (echo "❌ Formatter missing" && exit 1)
 
-
   consolidate-environment:
     runs-on: ubuntu-latest
     needs: [build-images, cache-environment]
@@ -182,16 +172,6 @@ jobs:
         run: |
           cp backend/.env.test_e2e backend/.env
           cp webapp/.env.template webapp/.env
-
-      - name: Show generated .env files
-        run: |
-          echo "::group::backend/.env"
-          cat backend/.env
-          echo "::endgroup::"
-
-          echo "::group::webapp/.env"
-          cat webapp/.env
-          echo "::endgroup::"
 
       - name: Restore full CI cache
         id: restore-cache
