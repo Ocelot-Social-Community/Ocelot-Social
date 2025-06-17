@@ -220,6 +220,12 @@ jobs:
             sleep 2
           done
 
+      - name: Ensure Cypress binary is available
+        run: |
+          echo "📦 Verifying Cypress..."
+          npx cypress --version || (echo "⛔ Cypress fehlt – versuche Installation" && npx cypress install)
+          npx cypress verify
+
       - name: Full stack tests | run tests
         id: e2e-tests
         run: yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
