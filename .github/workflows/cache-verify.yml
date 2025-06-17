@@ -67,7 +67,7 @@ jobs:
           ROOT_HASH=$(sha256sum yarn.lock | cut -d' ' -f1)
           BACKEND_HASH=$(sha256sum backend/yarn.lock | cut -d' ' -f1)
           WEBAPP_HASH=$(sha256sum webapp/yarn.lock | cut -d' ' -f1)
-          KEY="ci-unified-cache-${{ runner.os }}-${ROOT_HASH}-${BACKEND_HASH}-${WEBAPP_HASH}"
+          KEY="ci-unified-cache-${{ runner.os }}-${ROOT_HASH}-${BACKEND_HASH}-${WEBAPP_HASH}-${{ github.run_id }}"
           echo "key=$KEY"
           echo "key=$KEY" >> $GITHUB_OUTPUT
       - name: Restore unified CI cache
@@ -92,7 +92,6 @@ jobs:
           cd webapp && yarn install --frozen-lockfile && cd ..
           npx cypress verify || echo "Cypress verify failed (likely not yet installed)"
 
-    
       - name: Install cucumber-json-formatter if missing
         run: |
           if [ ! -f /opt/cucumber-json-formatter ]; then
@@ -187,6 +186,14 @@ jobs:
           restore-keys: |
             ci-all-cache-${{ runner.os }}-
             ci-all-cache-
+
+    # rehydrate dependencies
+      - name: Rehydrate dependencies
+        run: |
+          yarn install --frozen-lockfile
+          cd backend && yarn install --frozen-lockfile && cd ..
+          cd webapp && yarn install --frozen-lockfile && cd ..
+          npx cypress --version || echo "⚠️ Cypress not found"
 
     # build backend and webapp
       - name: Build backend
