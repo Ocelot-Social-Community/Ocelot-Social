@@ -208,9 +208,14 @@ jobs:
             echo "Waiting... ($i/30)"
             sleep 2
           done
-    # build backend
+    # build backend & webapp
       - name: Build backend
         run: cd backend && yarn build
+      - name: Build webapp
+        run: |
+          cd webapp
+          yarn build
+          cd ..
 
     # Cypress tests
       - name: Full stack tests | run tests
