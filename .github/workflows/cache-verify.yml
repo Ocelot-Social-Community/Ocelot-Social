@@ -14,7 +14,24 @@ jobs:
         with:
           reporter: github-check
           level: warning
+  prepare-env:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate .env files
+        run: |
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
+      - name: Upload .env artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: env-files
+          path: |
+            backend/.env
+            webapp/.env
+
   build-images:
+    needs: prepare-env
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -53,6 +70,7 @@ jobs:
           path: /tmp/${{ matrix.name }}.tar
 
   cache-environment:
+    needs: prepare-env
     runs-on: ubuntu-latest
     outputs:
       cache-key: ${{ steps.cache-key.outputs.key }}
