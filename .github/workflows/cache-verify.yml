@@ -103,6 +103,18 @@ jobs:
             chmod +x /opt/cucumber-json-formatter
           fi
 
+    # verify cache
+      - name: Verify install output before caching
+        run: |
+          test -d node_modules && ls node_modules || (echo "❌ install failed" && exit 1)
+          test -d backend/node_modules || (echo "❌ backend install failed" && exit 1)
+          test -d webapp/node_modules || (echo "❌ webapp install failed" && exit 1)
+
+      - name: Ensure node_modules folders are always cached
+        run: |
+          mkdir -p node_modules backend/node_modules webapp/node_modules
+          touch node_modules/.keep backend/node_modules/.keep webapp/node_modules/.keep
+
       - name: Save unified CI cache
         if: steps.restore-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
