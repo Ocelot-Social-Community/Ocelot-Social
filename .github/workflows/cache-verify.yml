@@ -214,6 +214,10 @@ jobs:
             sleep 2
           done
 
+    # build backend
+      - name: Build backend
+        run: cd backend && yarn build
+
     # Cypress tests
       - name: Full stack tests | run tests
         id: e2e-tests
