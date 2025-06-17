@@ -110,6 +110,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup .env files (strict)
+        run: |
+          cp webapp/.env.template webapp/.env
+          cp backend/.env.test_e2e backend/.env
+
       - name: Restore unified CI cache
         uses: actions/cache/restore@v4
         with:
@@ -156,10 +161,10 @@ jobs:
           docker load < /tmp/webapp-image/webapp.tar
           docker load < /tmp/neo4j-image/neo4j.tar
 
-      - name: Setup .env files
+      - name: Setup .env files (strict)
         run: |
-          cp webapp/.env.template webapp/.env || touch webapp/.env
-          cp backend/.env.test_e2e backend/.env || touch backend/.env
+          cp webapp/.env.template webapp/.env
+          cp backend/.env.test_e2e backend/.env
 
     # load environment
       - name: Checkout repository
