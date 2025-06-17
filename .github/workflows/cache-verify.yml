@@ -14,14 +14,46 @@ jobs:
         with:
           reporter: github-check
           level: warning
+
   prepare-env:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Debug – check file presence
+        run: |
+          echo "::group::backend"
+          ls -la backend/
+          echo "::endgroup::"
+          echo "::group::webapp"
+          ls -la webapp/
+          echo "::endgroup::"
+
       - name: Generate .env files
         run: |
-          cp backend/.env.test_e2e backend/.env
-          cp webapp/.env.template webapp/.env
+          if [ -f backend/.env.test_e2e ]; then
+            cp backend/.env.test_e2e backend/.env
+          else
+            echo "❌ backend/.env.test_e2e fehlt"
+            exit 1
+          fi
+
+          if [ -f webapp/.env.template ]; then
+            cp webapp/.env.template webapp/.env
+          else
+            echo "❌ webapp/.env.template fehlt"
+            exit 1
+          fi
+
+      - name: Verify .env output
+        run: |
+          echo "::group::backend/.env"
+          cat backend/.env || echo "🚫 fehlt"
+          echo "::endgroup::"
+          echo "::group::webapp/.env"
+          cat webapp/.env || echo "🚫 fehlt"
+          echo "::endgroup::"
+
       - name: Upload .env artifacts
         uses: actions/upload-artifact@v4
         with:
