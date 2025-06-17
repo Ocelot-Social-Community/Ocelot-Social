@@ -149,10 +149,13 @@ jobs:
 
   consolidate-environment:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        job: [1, 2, 3, 4, 5, 6, 7, 8]
     needs: [build-images, cache-environment]
+    env:
+      jobs: 8
     steps:
-      
-    # install images
       - name: Download Docker image artifacts
         uses: actions/download-artifact@v4
         with:
@@ -164,7 +167,6 @@ jobs:
           docker load < /tmp/webapp-image/webapp.tar
           docker load < /tmp/neo4j-image/neo4j.tar
 
-    # load environment
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -187,16 +189,33 @@ jobs:
             ci-all-cache-${{ runner.os }}-
             ci-all-cache-
 
-    # start full system
-      - name: Start system
+      - name: Boot system for tests
         run: |
-          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach
+          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
 
-      - name: Wait for webapp
+      - name: Wait for services
         run: |
-          echo "Waiting for http://localhost:3000..."
-          for i in {1..15}; do
-            curl -sf http://localhost:3000 && echo "✅ Ready" && exit 0
-            echo "$i..." && sleep 2
+          for i in {1..30}; do
+            curl -sf http://localhost:3000 && echo "✅ Webapp ready" && break
+            echo "Waiting... ($i/30)"
+            sleep 2
           done
-          echo "❌ Webapp did not respond in time" && exit 1
+
+      - name: Run Cypress tests (job ${{ matrix.job }})
+        id: e2e-tests
+        run: |
+          yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }})
+
+      - name: If tests failed, compile HTML report
+        if: failure() && steps.e2e-tests.conclusion == 'failure'
+        run: |
+          cd cypress/
+          node create-cucumber-html-report.js
+
+      - name: Upload report on failure
+        if: failure() && steps.e2e-tests.conclusion == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-report-matrix-${{ matrix.job }}
+          path: cypress/reports/cucumber_html_report
+
