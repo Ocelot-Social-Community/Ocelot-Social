@@ -29,7 +29,6 @@ jobs:
         run: |
           cp backend/.env.test_e2e backend/.env
           cp webapp/.env.template webapp/.env
-
       - uses: docker/setup-buildx-action@v3
       - name: Build ${{ matrix.name }} image
         uses: docker/build-push-action@v5
@@ -56,7 +55,6 @@ jobs:
         run: |
           cp backend/.env.test_e2e backend/.env
           cp webapp/.env.template webapp/.env
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -71,7 +69,6 @@ jobs:
           KEY="ci-unified-cache-${{ runner.os }}-${ROOT_HASH}-${BACKEND_HASH}-${WEBAPP_HASH}-${{ github.run_id }}"
           echo "key=$KEY"
           echo "key=$KEY" >> $GITHUB_OUTPUT
-
       - name: Restore unified CI cache
         id: restore-cache
         uses: actions/cache/restore@v4
@@ -85,21 +82,18 @@ jobs:
           key: ${{ steps.cache-key.outputs.key }}
           restore-keys: |
             ci-unified-cache-${{ runner.os }}-
-
       - name: Install all dependencies
         run: |
           yarn install
           cd backend && yarn install && cd ..
           cd webapp && yarn install && cd ..
           npx cypress verify || echo "Cypress verify failed (likely not yet installed)"
-
       - name: Install cucumber-json-formatter if missing
         run: |
           if [ ! -f /opt/cucumber-json-formatter ]; then
             wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
             chmod +x /opt/cucumber-json-formatter
           fi
-
       - name: Save unified CI cache
         uses: actions/cache/save@v4
         if: always()
@@ -122,7 +116,6 @@ jobs:
         run: |
           cp backend/.env.test_e2e backend/.env
           cp webapp/.env.template webapp/.env
-
       - name: Restore unified CI cache
         uses: actions/cache/restore@v4
         with:
@@ -135,7 +128,6 @@ jobs:
           key: ${{ needs.cache-environment.outputs.cache-key }}
           restore-keys: |
             ci-unified-cache-${{ runner.os }}-
-
       - name: Check all node_modules exist
         run: |
           [ -d node_modules ] && [ -n "$(ls -A node_modules)" ] || (echo "❌ node_modules missing" && exit 1)
@@ -145,11 +137,9 @@ jobs:
         run: |
           npx --yes cypress --version
           npx --yes cypress verify
-
       - name: Check cucumber-json-formatter
         run: |
           [ -x /opt/cucumber-json-formatter ] && /opt/cucumber-json-formatter --help || (echo "❌ Formatter missing" && exit 1)
-
   consolidate-environment:
     name: Fullstack | tests
     if: success()
@@ -178,7 +168,6 @@ jobs:
         run: |
           cp backend/.env.test_e2e backend/.env
           cp webapp/.env.template webapp/.env
-
       - name: Restore full CI cache
         id: restore-cache
         uses: actions/cache@v4
@@ -208,14 +197,9 @@ jobs:
             echo "Waiting... ($i/30)"
             sleep 2
           done
-    # build backend & webapp
+    # build backend
       - name: Build backend
         run: cd backend && yarn build
-      - name: Build webapp
-        run: |
-          cd webapp
-          yarn build
-          cd ..
 
     # Cypress tests
       - name: Full stack tests | run tests
