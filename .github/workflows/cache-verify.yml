@@ -57,10 +57,13 @@ jobs:
         run: |
           BACKEND_HASH=$(sha256sum backend/yarn.lock | cut -d' ' -f1)
           WEBAPP_HASH=$(sha256sum webapp/yarn.lock | cut -d' ' -f1)
-          CYPRESS_HASH=$(sha256sum cypress/yarn.lock | cut -d' ' -f1 2>/dev/null || echo "none")
+          CYPRESS_HASH=$(sha256sum cypress/yarn.lock | cut -d' ' -f1 2>/dev/null || echo "nocypress")
           KEY="ci-all-cache-${{ runner.os }}-${BACKEND_HASH}-${WEBAPP_HASH}-${CYPRESS_HASH}-run${{ github.run_id }}"
           echo "key=$KEY"
           echo "key=$KEY" >> $GITHUB_OUTPUT
+
+      - name: Ensure directory structure
+        run: mkdir -p backend webapp cypress
 
       - name: Restore CI cache
         id: restore-cache
@@ -88,10 +91,19 @@ jobs:
             cd webapp && yarn install
           fi
 
-      - name: Install Cypress dependencies locally
+      - name: Install Cypress (local in cypress/)
         run: |
-          if [ ! -d cypress/node_modules ] || [ -z "$(ls -A cypress/node_modules)" ]; then
-            cd cypress && yarn install
+          if [ -f cypress/package.json ]; then
+            cd cypress
+            if [ ! -d node_modules ] || [ -z "$(ls -A node_modules)" ]; then
+              echo "Installing Cypress locally in cypress/"
+              yarn install
+              npx --yes cypress verify
+            else
+              echo "✅ cypress/node_modules already present."
+            fi
+          else
+            echo "⚠️ No cypress/package.json found — skipping local Cypress install"
           fi
 
       - name: Install cucumber-json-formatter if missing
