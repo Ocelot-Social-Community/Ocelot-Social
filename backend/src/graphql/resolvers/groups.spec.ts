@@ -15,7 +15,6 @@ import { updateGroupMutation } from '@graphql/queries/updateGroupMutation'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
-// import CONFIG from '@src/config'
 
 let user
 let noMemberUser

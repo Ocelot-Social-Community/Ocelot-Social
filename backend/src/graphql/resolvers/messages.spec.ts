@@ -40,6 +40,11 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await cleanDatabase()
+  const apolloSetup = createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {

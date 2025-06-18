@@ -14,7 +14,6 @@ import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 import type { DecodedUser } from '@src/jwt/decode'
-// import CONFIG from '@src/config'
 
 const categoryIds = ['cat9']
 let user
