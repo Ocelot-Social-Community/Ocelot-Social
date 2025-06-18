@@ -1,3 +1,8 @@
+import CONFIG from '@config/index'
+
+CONFIG.SUPPORT_EMAIL = 'devops@ocelot.social'
+
+// eslint-disable-next-line import/first
 import { sendRegistrationMail } from './sendEmail'
 
 describe('sendRegistrationMail', () => {

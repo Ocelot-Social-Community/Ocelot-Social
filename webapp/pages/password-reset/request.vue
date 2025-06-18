@@ -1,9 +1,5 @@
 <template>
-  <request @handleSubmitted="handlePasswordResetRequested">
-    <ds-space margin-bottom="xxx-small" margin-top="large" centered>
-      <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
-    </ds-space>
-  </request>
+  <request @handleSubmitted="handlePasswordResetRequested"></request>
 </template>
 
 <script>

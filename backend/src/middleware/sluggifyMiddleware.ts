@@ -5,7 +5,7 @@ import type { Context } from '@src/server'
 
 import uniqueSlug from './slugify/uniqueSlug'
 
-const isUniqueFor = (context: Context, type: string) => {
+export const isUniqueFor = (context: Context, type: string) => {
   return async (slug: string) => {
     const session = context.driver.session()
     try {

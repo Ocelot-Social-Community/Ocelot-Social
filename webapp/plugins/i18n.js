@@ -62,12 +62,10 @@ export default ({ app, req, cookie, store }) => {
   }
 
   Vue.use(vuexI18n.plugin, store, {
-    onTranslationNotFound:
-      debug &&
-      function (locale, key) {
-        /* eslint-disable-next-line no-console */
-        console.warn(`vuex-i18n :: Key '${key}' not found for locale '${locale}'`)
-      },
+    onTranslationNotFound: function (locale, key) {
+      /* eslint-disable-next-line no-console */
+      if (debug) console.warn(`vuex-i18n :: Key '${key}' not found for locale '${locale}'`)
+    },
   })
 
   let userLocale = app.$env.LANGUAGE_DEFAULT

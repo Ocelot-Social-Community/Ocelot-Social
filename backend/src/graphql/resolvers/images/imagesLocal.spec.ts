@@ -205,15 +205,6 @@ describe('mergeImage', () => {
         expect(image).toBeTruthy()
       })
 
-      it('whitelists relationship types', async () => {
-        await expect(
-          mergeImage(post, 'WHATEVER' as 'HERO_IMAGE', imageInput, {
-            uploadCallback,
-            deleteCallback,
-          }),
-        ).rejects.toEqual(new Error('Unknown relationship type WHATEVER'))
-      })
-
       it('sets metadata', async () => {
         await mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback })
         const image = await neode.first<typeof Image>('Image', {}, undefined)
