@@ -8,6 +8,7 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let Cypress: any | undefined
 export default {
+  File: typeof Cypress !== 'undefined' ? require('./File') : require('./File').default,
   Image: typeof Cypress !== 'undefined' ? require('./Image') : require('./Image').default,
   Badge: typeof Cypress !== 'undefined' ? require('./Badge') : require('./Badge').default,
   User: typeof Cypress !== 'undefined' ? require('./User') : require('./User').default,

@@ -19,6 +19,10 @@ export default {
     LoadingSpinner,
   },
   props: {
+    bullet: {
+      type: Boolean,
+      default: false,
+    },
     circle: {
       type: Boolean,
       default: false,
@@ -46,8 +50,12 @@ export default {
       type: String,
       default: 'regular',
       validator(value) {
-        return value.match(/(small|regular|large)/)
+        return value.match(/(tiny|small|regular|large)/)
       },
+    },
+    padding: {
+      type: Boolean,
+      default: false,
     },
     type: {
       type: String,
@@ -66,11 +74,14 @@ export default {
       let buttonClass = 'base-button'
 
       if (this.$slots.default === undefined) buttonClass += ' --icon-only'
+      if (this.bullet) buttonClass += ' --bullet'
       if (this.circle) buttonClass += ' --circle'
       if (this.danger) buttonClass += ' --danger'
       if (this.loading) buttonClass += ' --loading'
+      if (this.size === 'tiny') buttonClass += ' --tiny'
       if (this.size === 'small') buttonClass += ' --small'
       if (this.size === 'large') buttonClass += ' --large'
+      if (this.padding) buttonClass += ' --padding'
 
       if (this.filled) buttonClass += ' --filled'
       else if (this.ghost) buttonClass += ' --ghost'
@@ -98,6 +109,7 @@ export default {
   font-weight: $font-weight-bold;
   letter-spacing: $letter-spacing-large;
   cursor: pointer;
+  white-space: nowrap;
 
   &.--danger {
     @include buttonStates($color-scheme: danger);
@@ -117,14 +129,33 @@ export default {
     border-radius: 50%;
   }
 
+  &.--bullet {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    &[disabled] {
+      background-color: transparent;
+      border: 1px solid $color-neutral-80;
+    }
+  }
+
   &.--ghost {
     border: none;
+  }
+
+  &.--tiny {
+    height: $size-button-tiny;
+    &.--bullet,
+    &.--circle {
+      width: $size-button-tiny;
+    }
   }
 
   &.--small {
     height: $size-button-small;
     font-size: $font-size-small;
 
+    &.--bullet,
     &.--circle {
       width: $size-button-small;
     }
@@ -134,8 +165,18 @@ export default {
     height: $size-button-large;
     font-size: $font-size-large;
 
+    &.--bullet,
     &.--circle {
       width: $size-button-large;
+    }
+  }
+
+  &.--padding {
+    padding: 0 20px;
+  }
+  @media screen and (max-width: 400px) {
+    &.--padding {
+      padding: 0 15px;
     }
   }
 
