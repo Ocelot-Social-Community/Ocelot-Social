@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
+
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -9,9 +9,8 @@ import { rule, shield, deny, allow, or, and } from 'graphql-shield'
 import CONFIG from '@config/index'
 import SocialMedia from '@db/models/SocialMedia'
 import { getNeode } from '@db/neo4j'
-// eslint-disable-next-line import/no-cycle
 import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
-import { Context } from '@src/server'
+import type { Context } from '@src/context'
 
 const debug = !!CONFIG.DEBUG
 const allowExternalErrors = true
@@ -24,29 +23,29 @@ const isAuthenticated = rule({
   return !!ctx?.user?.id
 })
 
-const isModerator = rule()(async (_parent, _args, { user }, _info) => {
-  return user && (user.role === 'moderator' || user.role === 'admin')
+const isModerator = rule()(async (_parent, _args, { user }: Context, _info) => {
+  return !!(user && (user.role === 'moderator' || user.role === 'admin'))
 })
 
-const isAdmin = rule()(async (_parent, _args, { user }, _info) => {
-  return user && user.role === 'admin'
+const isAdmin = rule()(async (_parent, _args, { user }: Context, _info) => {
+  return !!(user && user.role === 'admin')
 })
 
 const onlyYourself = rule({
   cache: 'no_cache',
-})(async (_parent, args, context, _info) => {
-  return context.user.id === args.id
+})(async (_parent, args, context: Context, _info) => {
+  return context.user?.id === args.id
 })
 
 const isMyOwn = rule({
   cache: 'no_cache',
-})(async (parent, _args, { user }, _info) => {
-  return user && user.id === parent.id
+})(async (parent, _args, { user }: Context, _info) => {
+  return !!(user && user.id === parent.id)
 })
 
 const isMySocialMedia = rule({
   cache: 'no_cache',
-})(async (_, args, { user }) => {
+})(async (_, args, { user }: Context) => {
   // We need a User
   if (!user) {
     return false
@@ -65,7 +64,7 @@ const isMySocialMedia = rule({
 
 const isAllowedToChangeGroupSettings = rule({
   cache: 'no_cache',
-})(async (_parent, args, { user, driver }) => {
+})(async (_parent, args, { user, driver }: Context) => {
   if (!user?.id) return false
   const ownerId = user.id
   const { id: groupId } = args
@@ -89,13 +88,13 @@ const isAllowedToChangeGroupSettings = rule({
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 })
 
 const isAllowedSeeingGroupMembers = rule({
   cache: 'no_cache',
-})(async (_parent, args, { user, driver }) => {
+})(async (_parent, args, { user, driver }: Context) => {
   if (!user?.id) return false
   const { id: groupId } = args
   const session = driver.session()
@@ -125,13 +124,13 @@ const isAllowedSeeingGroupMembers = rule({
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 })
 
 const isAllowedToChangeGroupMemberRole = rule({
   cache: 'no_cache',
-})(async (_parent, args, { user, driver }) => {
+})(async (_parent, args, { user, driver }: Context) => {
   if (!user?.id) return false
   const currentUserId = user.id
   const { groupId, userId, roleInGroup } = args
@@ -172,13 +171,13 @@ const isAllowedToChangeGroupMemberRole = rule({
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 })
 
 const isAllowedToJoinGroup = rule({
   cache: 'no_cache',
-})(async (_parent, args, { user, driver }) => {
+})(async (_parent, args, { user, driver }: Context) => {
   if (!user?.id) return false
   const { groupId, userId } = args
   const session = driver.session()
@@ -202,13 +201,13 @@ const isAllowedToJoinGroup = rule({
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 })
 
 const isAllowedToLeaveGroup = rule({
   cache: 'no_cache',
-})(async (_parent, args, { user, driver }) => {
+})(async (_parent, args, { user, driver }: Context) => {
   if (!user?.id) return false
   const { groupId, userId } = args
   if (user.id !== userId) return false
@@ -232,13 +231,13 @@ const isAllowedToLeaveGroup = rule({
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 })
 
 const isMemberOfGroup = rule({
   cache: 'no_cache',
-})(async (_parent, args, { user, driver }) => {
+})(async (_parent, args, { user, driver }: Context) => {
   if (!user?.id) return false
   const { groupId } = args
   if (!groupId) return true
@@ -260,13 +259,13 @@ const isMemberOfGroup = rule({
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 })
 
 const canRemoveUserFromGroup = rule({
   cache: 'no_cache',
-})(async (_parent, args, { user, driver }) => {
+})(async (_parent, args, { user, driver }: Context) => {
   if (!user?.id) return false
   const { groupId, userId } = args
   const currentUserId = user.id
@@ -296,13 +295,13 @@ const canRemoveUserFromGroup = rule({
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 })
 
 const canCommentPost = rule({
   cache: 'no_cache',
-})(async (_parent, args, { user, driver }) => {
+})(async (_parent, args, { user, driver }: Context) => {
   if (!user?.id) return false
   const { postId } = args
   const userId = user.id
@@ -330,13 +329,13 @@ const canCommentPost = rule({
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 })
 
 const isAuthor = rule({
   cache: 'no_cache',
-})(async (_parent, args, { user, driver }) => {
+})(async (_parent, args, { user, driver }: Context) => {
   if (!user) return false
   const { id: resourceId } = args
   const session = driver.session()
@@ -354,14 +353,14 @@ const isAuthor = rule({
     const [author] = await authorReadTxPromise
     return !!author
   } finally {
-    session.close()
+    await session.close()
   }
 })
 
 const isDeletingOwnAccount = rule({
   cache: 'no_cache',
-})(async (_parent, args, context, _info) => {
-  return context.user.id === args.id
+})(async (_parent, args, context: Context, _info) => {
+  return context.user?.id === args.id
 })
 
 const noEmailFilter = rule({
@@ -370,10 +369,12 @@ const noEmailFilter = rule({
   return !('email' in args)
 })
 
-const publicRegistration = rule()(() => CONFIG.PUBLIC_REGISTRATION)
+const publicRegistration = rule()(
+  async (_parent, _args, context: Context) => context.config.PUBLIC_REGISTRATION,
+)
 
 const inviteRegistration = rule()(async (_parent, args, context: Context) => {
-  if (!CONFIG.INVITE_REGISTRATION) return false
+  if (!context.config.INVITE_REGISTRATION) return false
   const { inviteCode } = args
   return validateInviteCode(context, inviteCode)
 })

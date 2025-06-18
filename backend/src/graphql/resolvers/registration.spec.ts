@@ -1,36 +1,30 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import CONFIG from '@config/index'
-import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import EmailAddress from '@db/models/EmailAddress'
 import User from '@db/models/User'
-import createServer, { getContext } from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
 let variables
 
-const database = databaseContext()
-
-let server: ApolloServer
-let authenticatedUser
-let mutate
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser, config })
+let mutate: ApolloTestSetup['mutate']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+let config: Partial<Context['config']> = {}
 
 beforeAll(async () => {
   await cleanDatabase()
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database })
-
-  server = createServer({ context }).server
-
-  const createTestClientResult = createTestClient(server)
-  mutate = createTestClientResult.mutate
+  const apolloSetup = createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(() => {
@@ -40,6 +34,7 @@ afterAll(() => {
 })
 
 beforeEach(() => {
+  config = {}
   variables = {}
 })
 
@@ -62,11 +57,13 @@ describe('Signup', () => {
   describe('unauthenticated', () => {
     beforeEach(() => {
       authenticatedUser = null
+      config = {
+        INVITE_REGISTRATION: false,
+        PUBLIC_REGISTRATION: false,
+      }
     })
 
     it('throws AuthorizationError', async () => {
-      CONFIG.INVITE_REGISTRATION = false
-      CONFIG.PUBLIC_REGISTRATION = false
       await expect(mutate({ mutation, variables })).resolves.toMatchObject({
         errors: [{ message: 'Not Authorized!' }],
       })

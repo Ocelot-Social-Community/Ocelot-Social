@@ -37,6 +37,21 @@ const required = {
   PRIVATE_KEY_PASSPHRASE: env.PRIVATE_KEY_PASSPHRASE,
 }
 
+// https://stackoverflow.com/a/53050575
+type NoUndefinedField<T> = { [P in keyof T]-?: NoUndefinedField<NonNullable<T[P]>> }
+
+function assertRequiredConfig(
+  conf: typeof required,
+): asserts conf is NoUndefinedField<typeof required> {
+  Object.entries(conf).forEach(([key, value]) => {
+    if (!value) {
+      throw new Error(`ERROR: "${key}" env variable is missing.`)
+    }
+  })
+}
+
+assertRequiredConfig(required)
+
 const server = {
   CLIENT_URI: env.CLIENT_URI ?? 'http://localhost:3000',
   GRAPHQL_URI: env.GRAPHQL_URI ?? 'http://localhost:4000',
@@ -146,15 +161,7 @@ const language = {
   LANGUAGE_DEFAULT: process.env.LANGUAGE_DEFAULT ?? 'en',
 }
 
-// Check if all required configs are present
-Object.entries(required).map((entry) => {
-  if (!entry[1]) {
-    throw new Error(`ERROR: "${entry[0]}" env variable is missing.`)
-  }
-  return entry
-})
-
-export default {
+const CONFIG = {
   ...environment,
   ...server,
   ...required,
@@ -165,5 +172,8 @@ export default {
   ...options,
   ...language,
 }
+
+export type Config = typeof CONFIG
+export default CONFIG
 
 export { nodemailerTransportOptions }
