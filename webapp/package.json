@@ -34,6 +34,7 @@
     "accounting": "~0.4.1",
     "apollo-cache-inmemory": "~1.6.6",
     "apollo-client": "~2.6.10",
+    "browser-image-compression": "^2.0.2",
     "cookie-universal-nuxt": "~2.2.2",
     "cropperjs": "^1.6.2",
     "cross-env": "~7.0.3",

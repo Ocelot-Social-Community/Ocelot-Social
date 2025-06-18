@@ -187,6 +187,7 @@
   </div>
 </template>
 <script>
+import imageCompression from 'browser-image-compression'
 import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
 import { urlToBlob } from 'image-resize-compress'
@@ -437,8 +438,15 @@ export default {
               return null
             }
             const blob = await urlToBlob(src[1])
+
+            const compressedBlob = imageCompression(blob, {
+              quality: 0.8,
+              maxWidth: 1920,
+              maxHeight: 1080,
+            })
+
             return {
-              upload: blob,
+              upload: compressedBlob,
               name: filename[1],
               type: 'image/jpeg',
             }
