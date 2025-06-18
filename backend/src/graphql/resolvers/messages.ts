@@ -71,6 +71,56 @@ export default {
     },
   },
   Mutation: {
+    /*
+    CreateMessageFromPost: async (_parent, params, context, _resolveInfo) => {
+      const { roomId, postId } = params
+      const {
+        user: { id: currentUserId },
+      } = context
+      const session = context.driver.session()
+      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        const createMessageCypher = `
+          MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+          OPTIONAL MATCH (currentUser)-[:AVATAR_IMAGE]->(image:Image)
+          OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
+          OPTIONAL MATCH (room)<-[:CHATS_IN]-(recipientUser:User)
+            WHERE NOT recipientUser.id = $currentUserId
+          WITH MAX(m.indexId) as maxIndex, room, currentUser, image, recipientUser
+          MATCH (post:Post { id: $postId })
+          CREATE (currentUser)-[:CREATED]->(message:Message {
+            createdAt: toString(datetime()),
+            id: apoc.create.uuid(),
+            indexId: CASE WHEN maxIndex IS NOT NULL THEN maxIndex + 1 ELSE 0 END,
+            content: post.contentExcerpt,
+            saved: true,
+            distributed: false,
+            seen: false
+            files: collect(post { .id, .contentExcerpt, .createdAt })
+          })-[:INSIDE]->(room)
+          SET room.lastMessageAt = toString(datetime())
+          RETURN message {
+            .*,
+            indexId: toString(message.indexId),
+            recipientId: recipientUser.id,
+            senderId: currentUser.id,
+            username: currentUser.name,
+            avatar: image.url,
+            date: message.createdAt,
+            files: collect(post { .id, .contentExcerpt, .createdAt })
+          }
+        `
+        const createMessageTxResponse = await transaction.run(createMessageCypher, {
+          currentUserId,
+          roomId,
+          postId, // postId is used to fetch the post content
+        })
+        const [message] = await createMessageTxResponse.records.map((record) =>
+          record.get('message'),
+        )
+        return message
+      })
+    },
+    */
     CreateMessage: async (_parent, params, context, _resolveInfo) => {
       const { roomId, content, files = [] } = params
       const {
