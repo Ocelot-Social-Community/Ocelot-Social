@@ -69,6 +69,14 @@
           </div>
         </div>
 
+        <div
+          v-for="message in messages.filter((m) => m.isUploading)"
+          :slot="'message_' + message._id"
+          v-bind:key="message._id"
+        >
+          <div>sending message...</div>
+        </div>
+
         <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
           <div
             v-if="room.avatar"
@@ -390,6 +398,38 @@ export default {
       if (filesToUpload && filesToUpload.length > 0) {
         mutationVariables.files = filesToUpload
       }
+
+      // Immediately add new message
+      const localMessage = {
+        ...messageDetails,
+        _id: 'new',
+        seen: false,
+        saved: false,
+        date: new Date(),
+        senderId: this.currentUser.id,
+        files:
+          messageDetails.files?.map((file) => ({
+            ...file,
+            progress: 50,
+            url: URL.createObjectURL(new Blob([file.blob], { type: file.type })),
+          })) ?? [],
+        // Custom property
+        isUploading: true,
+      }
+      this.messages = [...this.messages, localMessage]
+
+      console.log('messages', this.messages)
+
+      const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
+      if (roomIndex !== -1) {
+        const changedRoom = { ...this.rooms[roomIndex] }
+        changedRoom.lastMessage.content = content
+
+        // Move changed room to the top of the list
+        changedRoom.index = changedRoom.lastMessage.date
+        this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== roomId)]
+      }
+
       try {
         const { data } = await this.$apollo.mutate({
           mutation: createMessageMutation(),
@@ -397,17 +437,10 @@ export default {
         })
         const createdMessagePayload = data.CreateMessage
 
-        if (createdMessagePayload) {
-          const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
-          if (roomIndex !== -1) {
-            const changedRoom = { ...this.rooms[roomIndex] }
-            changedRoom.lastMessage.content = createdMessagePayload.content.trim().substring(0, 30)
-            changedRoom.lastMessage.date = createdMessagePayload.date
-
-            // Move changed room to the top of the list
-            changedRoom.index = createdMessagePayload.date
-            this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== roomId)]
-          }
+        if (createdMessagePayload && roomIndex !== -1) {
+          const changedRoom = { ...this.rooms[roomIndex] }
+          changedRoom.lastMessage.content = createdMessagePayload.content.trim().substring(0, 30)
+          changedRoom.lastMessage.date = createdMessagePayload.date
         }
       } catch (error) {
         this.$toast.error(error.message)
