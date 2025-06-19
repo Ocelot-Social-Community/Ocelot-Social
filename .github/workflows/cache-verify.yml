@@ -177,7 +177,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       jobs: 8
-      PATH: "/opt:${{ env.PATH }}"
+      PATH: "/opt:${PATH}"
     strategy:
       matrix:
         job: [1, 2, 3, 4, 5, 6, 7, 8]
@@ -235,11 +235,14 @@ jobs:
 
       - name: Wait for services
         run: |
-          for i in {1..30}; do
+          for i in {1..60}; do
             curl -sf http://localhost:3000 && echo "✅ Webapp ready" && break
-            echo "Waiting... ($i/30)"
+            echo "Waiting... ($i/60)"
             sleep 2
           done
+          echo "❌ Timeout: webapp did not start in time"
+          docker compose logs
+          exit 1
 
       - name: Full stack tests | run tests
         id: e2e-tests
