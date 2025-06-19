@@ -242,18 +242,18 @@ jobs:
           wait_for() {
             local name="$1"
             local url="$2"
-            local limit=30
+            local max=20
             echo "⏳ Waiting for $name ($url)..."
-            for i in {1..limit}; do
-              if curl -sf "$url" > /dev/null; then
+            for i in $(seq 1 "$max"); do
+              if curl -sf "$url"; then
                 echo "✅ $name is ready"
                 return 0
               fi
-              echo "Waiting for $name... ($i/limit)"
+              echo "Waiting for $name... ($i/$max)"
               sleep 2
             done
-            echo "❌ Timeout: $name did not respond at $url - let's continue anyway"
-            docker compose logs "$name"
+            echo "❌ Timeout: $name did not respond at $url – continuing anyway"
+            docker compose logs || echo "(docker logs failed)"
             return 0
           }
 
@@ -271,6 +271,11 @@ jobs:
 
           echo "🎉 All services are up."
 
+      - name: Debug backend response
+        run: |
+          curl -i http://localhost:4000/ || echo "❌ curl failed"
+          curl -s -o /dev/null -w "%{http_code}" http://localhost:4000/
+          
       - name: Full stack tests | run tests
         id: e2e-tests
         run: |
