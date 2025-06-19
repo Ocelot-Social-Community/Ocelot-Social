@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 import { randomBytes } from 'node:crypto'
 
 import cloneDeep from 'lodash/cloneDeep'
@@ -12,7 +12,7 @@ export const loggerPlugin = {
     const isIntrospectionQuery = requestContext.request.operationName === 'IntrospectionQuery'
     const qID = randomBytes(4).toString('hex')
     if (!isIntrospectionQuery) {
-      const logRequest = ['Apollo Request', qID, requestContext.request.operationName]
+      const logRequest = ['Apollo Request', qID]
       logRequest.push(JSON.stringify(requestContext.request.query))
       if (requestContext.request.variables) {
         const variables = cloneDeep(requestContext.request.variables)
@@ -30,7 +30,7 @@ export const loggerPlugin = {
             ocelotLogger.error(...logResponse, JSON.stringify(requestContext.errors))
             return
           }
-          logResponse.push(JSON.stringify(requestContext.response.body))
+          logResponse.push(JSON.stringify(requestContext.response.data))
           ocelotLogger.debug(...logResponse)
         }
       },
