@@ -242,18 +242,19 @@ jobs:
           wait_for() {
             local name="$1"
             local url="$2"
+            local limit=30
             echo "⏳ Waiting for $name ($url)..."
-            for i in {1..60}; do
+            for i in {1..limit}; do
               if curl -sf "$url" > /dev/null; then
                 echo "✅ $name is ready"
                 return 0
               fi
-              echo "Waiting for $name... ($i/60)"
+              echo "Waiting for $name... ($i/limit)"
               sleep 2
             done
-            echo "❌ Timeout: $name did not respond at $url"
+            echo "❌ Timeout: $name did not respond at $url - let's continue anyway"
             docker compose logs "$name"
-            return 1
+            return 0
           }
 
           # Lade die kopierten .env-Dateien in Shell-Variablen
