@@ -182,26 +182,31 @@ jobs:
         job: [1, 2, 3, 4, 5, 6, 7, 8]
 
     steps:     
+    #download docker images
       - name: Download Docker image artifacts
         uses: actions/download-artifact@v4
         with:
           path: /tmp
 
+    #load docker images
       - name: Load Docker images
         run: |
           docker load < /tmp/backend-image/backend.tar
           docker load < /tmp/webapp-image/webapp.tar
           docker load < /tmp/neo4j-image/neo4j.tar
 
+    #checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
-
+    
+    #setup .env files, make cypress reports dir
       - name: Setup .env files & reports dir
         run: |
           cp backend/.env.test_e2e backend/.env
           cp webapp/.env.template webapp/.env
           mkdir -p cypress/reports/json_logs
 
+    #restore unified cache
       - name: Restore unified CI cache
         id: restore-cache
         uses: actions/cache/restore@v4
@@ -218,11 +223,13 @@ jobs:
           restore-keys: |
             ci-unified-cache-${{ runner.os }}-
 
+    #setup cocumber path
       - name: Run formatter or use PATH tools
         run: |
           export PATH="/opt:$PATH"
           cucumber-json-formatter --help
 
+    #rehydrate dependencies
       - name: Rehydrate dependencies
         run: |
           yarn install --frozen-lockfile
@@ -230,14 +237,23 @@ jobs:
           cd webapp && yarn install --frozen-lockfile && cd ..
           npx cypress verify || echo "⚠️ Cypress not yet verified"
 
+    #build backend
       - name: Build backend
         run: cd backend && yarn build
 
+    #boot system for tests
       - name: Boot system for tests
         run: |
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
 
-      - name: Wait for essential services (from .env)
+    #seeding database for tests
+      - name: Seed database for tests
+        run: |
+          echo "🔧 Seeding backend via docker exec..."
+          docker exec backend yarn run seed:ci || echo "⚠️ Seed failed – check backend logs"
+
+    #wait for services
+      - name: Wait for essential services
         run: |
           wait_for() {
             local name="$1"
@@ -245,16 +261,16 @@ jobs:
             local max=20
             echo "⏳ Waiting for $name ($url)..."
             for i in $(seq 1 "$max"); do
-              status=$(curl -s -o /dev/null -w "%{http_code}" "$url")
-              if [ "$status" -lt 500 ]; then
+              status=$(curl -s -o /dev/null -w "%{http_code}" "$url" || echo "000")
+              if [[ "$status" =~ ^2|3 ]]; then
                 echo "✅ $name responded with HTTP $status"
                 return 0
               fi
-              echo "Waiting for $name... ($i/$max), last HTTP $status"
+              echo "Waiting for $name... ($i/$max) – last HTTP $status"
               sleep 2
             done
             echo "❌ Timeout: $name did not respond successfully at $url"
-            docker compose logs || echo "(docker logs failed)"
+            docker compose logs "$name" || echo "(docker logs failed)"
             return 1
           }
 
@@ -272,6 +288,7 @@ jobs:
 
           echo "🎉 All services are up."
 
+    #temporary debug backend
       - name: Debug backend response
         run: |
           curl -i http://localhost:4000/ || echo "❌ curl failed"
@@ -282,6 +299,7 @@ jobs:
         run: |
           yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
 
+    #starting fullstack cypress tests
       - name: Full stack tests | if tests failed, compile html report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         run: |
