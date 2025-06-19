@@ -177,12 +177,17 @@ jobs:
     runs-on: ubuntu-latest
     env:
       jobs: 8
-      PATH: "/opt:${PATH}"
     strategy:
       matrix:
         job: [1, 2, 3, 4, 5, 6, 7, 8]
 
     steps:
+
+      - name: Run formatter or use PATH tools
+        run: |
+          export PATH="/opt:$PATH"
+          cucumber-json-formatter --help
+        
       - name: Download Docker image artifacts
         uses: actions/download-artifact@v4
         with:
