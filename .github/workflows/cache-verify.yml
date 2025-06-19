@@ -258,7 +258,7 @@ jobs:
 
           # Check each essential service
           wait_for "webapp" "http://localhost:3000"
-          wait_for "backend" "http://localhost:4000/api/health"
+          wait_for "backend" "http://localhost:4000/"
           wait_for "mailserver" "http://localhost:1080"
           wait_for "minio" "http://localhost:9000/minio/health/live"
 
