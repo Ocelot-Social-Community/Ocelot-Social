@@ -245,16 +245,17 @@ jobs:
             local max=20
             echo "⏳ Waiting for $name ($url)..."
             for i in $(seq 1 "$max"); do
-              if curl -sf "$url"; then
-                echo "✅ $name is ready"
+              status=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+              if [ "$status" -lt 500 ]; then
+                echo "✅ $name responded with HTTP $status"
                 return 0
               fi
-              echo "Waiting for $name... ($i/$max)"
+              echo "Waiting for $name... ($i/$max), last HTTP $status"
               sleep 2
             done
-            echo "❌ Timeout: $name did not respond at $url – continuing anyway"
+            echo "❌ Timeout: $name did not respond successfully at $url"
             docker compose logs || echo "(docker logs failed)"
-            return 0
+            return 1
           }
 
           # Lade die kopierten .env-Dateien in Shell-Variablen
