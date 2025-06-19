@@ -5,7 +5,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable import/no-named-as-default-member */
-import { randomBytes } from 'node:crypto'
 import http from 'node:http'
 
 import { ApolloServer } from 'apollo-server-express'
@@ -13,7 +12,6 @@ import bodyParser from 'body-parser'
 import express from 'express'
 import { graphqlUploadExpress } from 'graphql-upload'
 import helmet from 'helmet'
-import cloneDeep from 'lodash/cloneDeep'
 
 import databaseContext from '@context/database'
 import pubsubContext from '@context/pubsub'
@@ -76,37 +74,6 @@ export const context = async (options) => {
   } else {
     return getContext()(req)
   }
-}
-
-export const loggerPlugin = {
-  requestDidStart(requestContext) {
-    const isIntrospectionQuery = requestContext.request.operationName === 'IntrospectionQuery'
-    const qID = randomBytes(4).toString('hex')
-    if (!isIntrospectionQuery) {
-      const logRequest = ['Apollo Request', qID, requestContext.request.operationName]
-      logRequest.push(JSON.stringify(requestContext.request.query))
-      if (requestContext.request.variables) {
-        const variables = cloneDeep(requestContext.request.variables)
-        if (variables.password) variables.password = '***'
-        logRequest.push(JSON.stringify(variables))
-      }
-      ocelotLogger.debug(...logRequest)
-    }
-    return {
-      // eslint-disable-next-line @typescript-eslint/require-await
-      async willSendResponse(requestContext) {
-        if (!isIntrospectionQuery) {
-          const logResponse = ['Apollo Response', qID]
-          if (requestContext.errors) {
-            ocelotLogger.error(...logResponse, JSON.stringify(requestContext.errors))
-            return
-          }
-          logResponse.push(JSON.stringify(requestContext.response.body))
-          ocelotLogger.debug(...logResponse)
-        }
-      },
-    }
-  },
 }
 
 const createServer = (options?) => {

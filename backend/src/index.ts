@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 import CONFIG from './config'
-import createServer, { loggerPlugin } from './server'
+import { loggerPlugin } from './plugins/apolloLogger'
+import createServer from './server'
 
 const { server, httpServer } = createServer({
   plugins: [loggerPlugin],
