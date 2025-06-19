@@ -252,7 +252,7 @@ jobs:
           wait_for() {
             local name="$1"
             local url="$2"
-            local max=20
+            local max=40
             echo "⏳ Waiting for $name ($url)..."
             for i in $(seq 1 "$max"); do
               status=$(curl -s -o /dev/null -w "%{http_code}" "$url" || echo "000")
