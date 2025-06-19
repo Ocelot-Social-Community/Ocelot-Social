@@ -130,6 +130,7 @@
     "roomEmpty": null,
     "roomsEmpty": null,
     "search": null,
+    "transmitting": null,
     "typeMessage": null,
     "userProfileButton": {
       "label": null,

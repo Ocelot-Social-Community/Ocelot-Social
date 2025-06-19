@@ -130,6 +130,7 @@
     "roomEmpty": null,
     "roomsEmpty": null,
     "search": "Filtrer les salons de chat",
+    "transmitting": null,
     "typeMessage": null,
     "userProfileButton": {
       "label": null,

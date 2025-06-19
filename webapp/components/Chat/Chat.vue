@@ -74,7 +74,7 @@
           :slot="'message_' + message._id"
           v-bind:key="message._id"
         >
-          <div>sending message...</div>
+          {{ $t('chat.transmitting') }}
         </div>
 
         <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
@@ -410,15 +410,12 @@ export default {
         files:
           messageDetails.files?.map((file) => ({
             ...file,
-            progress: 50,
             url: URL.createObjectURL(new Blob([file.blob], { type: file.type })),
           })) ?? [],
         // Custom property
         isUploading: true,
       }
       this.messages = [...this.messages, localMessage]
-
-      console.log('messages', this.messages)
 
       const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
       if (roomIndex !== -1) {
