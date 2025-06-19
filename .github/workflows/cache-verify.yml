@@ -182,11 +182,28 @@ jobs:
         job: [1, 2, 3, 4, 5, 6, 7, 8]
 
     steps:
+      - name: Download Docker image artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp
+
+      - name: Load Docker images
+        run: |
+          docker load < /tmp/backend-image/backend.tar
+          docker load < /tmp/webapp-image/webapp.tar
+          docker load < /tmp/neo4j-image/neo4j.tar
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
-    #restore cache
-      - name: Restore CI cache
+      - name: Setup .env files & reports dir
+        run: |
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
+          mkdir -p cypress/reports/json_logs
+
+      - name: Restore unified CI cache
+        id: restore-cache
         uses: actions/cache/restore@v4
         with:
           key: ${{ needs.cache-environment.outputs.cache-key }}
@@ -198,31 +215,23 @@ jobs:
             webapp/.nuxt
             ~/.cache/Cypress
             /opt/cucumber-json-formatter
+          restore-keys: |
+            ci-unified-cache-${{ runner.os }}-
 
-    #download docker artifacts
-      - name: Download all Docker images
-        uses: actions/download-artifact@v4
-        with:
-          path: /tmp
-
-      - name: Verify Docker image files
+      - name: Rehydrate dependencies
         run: |
-          ls -lh /tmp/*-image/*.tar || (echo "❌ Missing Docker image tarballs" && exit 1)
+          yarn install --frozen-lockfile
+          cd backend && yarn install --frozen-lockfile && cd ..
+          cd webapp && yarn install --frozen-lockfile && cd ..
+          npx cypress verify || echo "⚠️ Cypress not yet verified"
 
-    #load docker images
-      - name: Load Docker images
-        run: |
-          docker load < /tmp/backend-image/backend.tar
-          docker load < /tmp/webapp-image/webapp.tar
-          docker load < /tmp/neo4j-image/neo4j.tar
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: setup .env files
-        run: |
-          cp backend/.env.test_e2e backend/.env
-          cp webapp/.env.template webapp/.env
+      - name: Build backend
+        run: cd backend && yarn build
 
-    #wait for webapp
+      - name: Boot system for tests
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
+
       - name: Wait for services
         run: |
           for i in {1..30}; do
@@ -231,20 +240,18 @@ jobs:
             sleep 2
           done
 
-    #run cypress fullstack tests
-      - name: Run Cypress tests
+      - name: Full stack tests | run tests
         id: e2e-tests
         run: |
-          npx cypress run \
-            --config-file ./cypress/cypress.config.js \
-            --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }})
+          yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
 
-      - name: Create HTML report (if failed)
+      - name: Full stack tests | if tests failed, compile html report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         run: |
-          node cypress/create-cucumber-html-report.js
+          cd cypress/
+          node create-cucumber-html-report.js
 
-      - name: Upload HTML report (if failed)
+      - name: Full stack tests | if tests failed, upload report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
@@ -256,4 +263,5 @@ jobs:
         run: |
           echo "📁 Cypress reports"
           ls -l cypress/reports/json_logs || echo "❌ Missing JSON logs"
+
 
