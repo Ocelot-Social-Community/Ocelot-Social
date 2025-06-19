@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social-frontend",
-  "version": "3.8.2",
+  "version": "3.10.0",
   "description": "ocelot.social new Frontend (in development and not fully implemented) by IT4C Boilerplate for frontends",
   "main": "build/index.js",
   "type": "module",
