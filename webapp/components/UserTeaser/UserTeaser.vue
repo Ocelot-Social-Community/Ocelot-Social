@@ -15,8 +15,9 @@
         :show-avatar="showAvatar"
         :date-time="dateTime"
         :show-popover="showPopover"
-        :injectedText="injectedText"
-        :injectedDate="injectedDate"
+        :injected-text="injectedText"
+        :injected-date="injectedDate"
+        :hover-delay="hoverDelay"
         @close="closeMenu"
       />
     </client-only>
@@ -45,6 +46,7 @@ export default {
     showPopover: { type: Boolean, default: true },
     injectedText: { type: String, default: null },
     injectedDate: { type: Boolean, default: false },
+    hoverDelay: { type: Number, default: 500 },
   },
   computed: {
     ...mapGetters({
