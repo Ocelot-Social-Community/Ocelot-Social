@@ -129,17 +129,22 @@ export const attachments = (config: S3Configured) => {
     }
     const command = new Upload({ client: s3, params })
     const data = await command.done()
-    const { Location } = data
-    if (!Location) {
+    let { Location: location } = data
+    if (!location) {
       throw new Error('File upload did not return `Location`')
+    }
+
+    if (!location.startsWith('https://') && !location.startsWith('http://')) {
+      // Ensure the location has a protocol. Hetzner does not return a protocol in the location.
+      location = `https://${location}`
     }
 
     let url = ''
     if (!S3_PUBLIC_GATEWAY) {
-      url = Location
+      url = location
     } else {
       const publicLocation = new URL(S3_PUBLIC_GATEWAY)
-      publicLocation.pathname = new URL(Location).pathname
+      publicLocation.pathname = new URL(location).pathname
       url = publicLocation.href
     }
 

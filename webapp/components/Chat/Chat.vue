@@ -376,7 +376,11 @@ export default {
 
       const filesToUpload = hasFiles
         ? files.map((file) => ({
-            upload: new File([file.blob], `${file.name}.${file.extension}`),
+            upload: new File(
+              [file.blob],
+              // Captured audio already has the right extension in the name
+              file.extension ? `${file.name}.${file.extension}` : file.name,
+            ),
             name: file.name,
             type: file.type,
           }))
