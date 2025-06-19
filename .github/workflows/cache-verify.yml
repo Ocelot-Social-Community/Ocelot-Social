@@ -246,12 +246,6 @@ jobs:
         run: |
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
 
-    #seeding database for tests
-      - name: Seed database for tests
-        run: |
-          echo "🔧 Seeding backend via docker exec..."
-          docker exec backend yarn run seed:ci || echo "⚠️ Seed failed – check backend logs"
-
     #wait for services
       - name: Wait for essential services
         run: |
@@ -288,6 +282,12 @@ jobs:
 
           echo "🎉 All services are up."
 
+    #seeding database for tests
+      - name: Seed database for tests
+        run: |
+          echo "🔧 Seeding backend via docker exec..."
+          docker exec backend yarn run seed:ci || echo "⚠️ Seed failed – check backend logs"
+          
     #temporary debug backend
       - name: Debug backend response
         run: |
