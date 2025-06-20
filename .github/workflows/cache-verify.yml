@@ -97,6 +97,7 @@ jobs:
           cd backend && yarn install --frozen-lockfile && yarn build && cd ..
           cd webapp && yarn install --frozen-lockfile && yarn build && cd ..
           npx cypress verify || echo "⚠️ Cypress verify failed (non-blocking)"
+          npx ts-node --require tsconfig-paths/register backend/src/db/seed.ts
           if [ ! -f /opt/cucumber-json-formatter ]; then
             wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
             chmod +x /opt/cucumber-json-formatter
@@ -285,10 +286,16 @@ jobs:
 
 
     #seeding database for tests
-      - name: Seed database for tests
+      - name: Seed database from host via ts-node
         run: |
-          echo "🔧 Seeding backend via docker exec..."
-          docker exec backend yarn run db:seed || echo "⚠️ Seed failed – check backend logs"
+          echo "🔧 Seeding backend from host..."
+          npx ts-node --require tsconfig-paths/register backend/src/db/seed.ts
+
+    #seeding database for tests
+    #  - name: Seed database for tests
+    #    run: |
+    #      echo "🔧 Seeding backend via docker exec..."
+    #      docker exec backend yarn run db:seed || echo "⚠️ Seed failed – check backend logs"
 
     #temporary debug backend
       - name: Debug backend response

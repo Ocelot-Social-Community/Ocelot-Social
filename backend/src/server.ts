@@ -118,8 +118,9 @@ const createServer = (options?) => {
       res.status(500).send({ status: 'unhealthy', error: err.message })
     }
   })
-  
+
   return { server, httpServer, app }
+  
 }
 
 export default createServer
