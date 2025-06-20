@@ -16,7 +16,7 @@
     "test": "cross-env NODE_ENV=test NODE_OPTIONS=--max-old-space-size=8192 jest --runInBand --coverage --forceExit --detectOpenHandles",
     "db:reset": "ts-node --require tsconfig-paths/register src/db/reset.ts",
     "db:reset:withmigrations": "ts-node --require tsconfig-paths/register src/db/reset-with-migrations.ts",
-    "db:seed": "ts-node --require tsconfig-paths/register src/db/seed.ts",
+    "db:seed": "npx ts-node --require tsconfig-paths/register src/db/seed.ts",
     "db:data:admin": "ts-node --require tsconfig-paths/register src/db/admin.ts",
     "db:data:badges": "ts-node --require tsconfig-paths/register src/db/badges.ts",
     "db:data:branding": "ts-node --require tsconfig-paths/register src/db/data-branding.ts",

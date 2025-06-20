@@ -24,7 +24,7 @@
     }
   },
   "scripts": {
-    "db:seed": "npx ts-node --require tsconfig-paths/register src/db/seed.ts",
+    "db:seed": "cd backend && yarn run db:seed",
     "db:reset": "cd backend && yarn run db:reset",
     "docs:build": "NODE_OPTIONS=--openssl-legacy-provider vuepress build .",
     "docs:dev": "NODE_OPTIONS=--openssl-legacy-provider vuepress dev .",
