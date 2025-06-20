@@ -93,7 +93,7 @@ const createServer = (options?) => {
       res.status(500).send({ status: 'unhealthy', error: err.message })
     }
   })
-  
+
   // TODO: this exception is required for the graphql playground, since the playground loads external resources
   // See: https://github.com/graphql/graphql-playground/issues/1283
   app.use(
@@ -109,6 +109,16 @@ const createServer = (options?) => {
   const httpServer = http.createServer(app)
   server.installSubscriptionHandlers(httpServer)
 
+    // new health check
+  app.get('/api/health', async (req, res) => {
+    try {
+      await serverDatabase.driver.verifyConnectivity()
+      res.status(200).send({ status: 'ok' })
+    } catch (err) {
+      res.status(500).send({ status: 'unhealthy', error: err.message })
+    }
+  })
+  
   return { server, httpServer, app }
 }
 
