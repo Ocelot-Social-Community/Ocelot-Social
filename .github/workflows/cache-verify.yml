@@ -289,7 +289,7 @@ jobs:
       - name: Seed database from host via ts-node
         run: |
           echo "🔧 Seeding backend from host..."
-          npx ts-node --require tsconfig-paths/register backend/src/db/seed.ts
+              npx ts-node --project backend/tsconfig.json --require tsconfig-paths/register backend/src/db/seed.ts
 
     #seeding database for tests
     #  - name: Seed database for tests
