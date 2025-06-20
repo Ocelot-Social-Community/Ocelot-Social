@@ -15,6 +15,7 @@ import {
   HorizontalRule,
   Placeholder,
   Underline,
+  Image,
 } from 'tiptap-extensions'
 
 export default function defaultExtensions(component) {
@@ -53,5 +54,6 @@ export default function defaultExtensions(component) {
         return embed
       },
     }),
+    new Image(),
   ]
 }
