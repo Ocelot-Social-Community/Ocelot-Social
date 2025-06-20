@@ -289,7 +289,7 @@ jobs:
       - name: Seed database for tests
         run: |
           echo "🔧 Seeding backend via docker exec..."
-          docker exec backend yarn run seed:ci || echo "⚠️ Seed failed – check backend logs"
+          docker exec backend yarn run db:seed || echo "⚠️ Seed failed – check backend logs"
 
     #temporary debug backend
       - name: Debug backend response
