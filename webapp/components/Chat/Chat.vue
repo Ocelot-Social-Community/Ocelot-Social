@@ -73,8 +73,11 @@
           v-for="message in messages.filter((m) => m.isUploading)"
           :slot="'message_' + message._id"
           v-bind:key="message._id"
+          class="vac-format-message-wrapper"
         >
-          {{ $t('chat.transmitting') }}
+          <div class="markdown">
+            <p>{{ $t('chat.transmitting') }}</p>
+          </div>
         </div>
 
         <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
@@ -406,7 +409,7 @@ export default {
       // Immediately add new message
       const localMessage = {
         ...messageDetails,
-        _id: 'new',
+        _id: 'new' + Math.random().toString(36).substring(2, 15),
         seen: false,
         saved: false,
         date: new Date().toDateString(),
