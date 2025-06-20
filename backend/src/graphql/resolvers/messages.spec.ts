@@ -283,6 +283,55 @@ describe('Message', () => {
           })
         })
 
+        describe('user sends file, but upload goes wrong', () => {
+          const file1 = Readable.from('file1')
+          const upload1 = new Upload()
+          upload1.resolve({
+            createReadStream: () => file1,
+            stream: file1,
+            filename: 'file1',
+            encoding: '7bit',
+            mimetype: 'application/json',
+          })
+          const upload2 = new Upload()
+          upload2.resolve(new Error('Upload failed'))
+
+          it('no message is created', async () => {
+            await expect(
+              mutate({
+                mutation: CreateMessage,
+                variables: {
+                  roomId,
+                  content: 'A message which should not be created',
+                  files: [
+                    { upload: upload1, name: 'test1', type: 'application/json' },
+                    { upload: upload2, name: 'test2', type: 'image/png' },
+                  ],
+                },
+              }),
+            ).resolves.toMatchObject({
+              errors: {},
+              data: {
+                CreateMessage: null,
+              },
+            })
+
+            await expect(
+              query({
+                query: Message,
+                variables: {
+                  roomId,
+                },
+              }),
+            ).resolves.toMatchObject({
+              errors: undefined,
+              data: {
+                Message: [],
+              },
+            })
+          })
+        })
+
         describe('user does not chat in room', () => {
           beforeEach(async () => {
             authenticatedUser = await notChattingUser.toJson()
