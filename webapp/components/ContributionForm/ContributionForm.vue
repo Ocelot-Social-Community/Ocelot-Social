@@ -187,10 +187,9 @@
   </div>
 </template>
 <script>
-import imageCompression from 'browser-image-compression'
 import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
-import { urlToBlob } from 'image-resize-compress'
+import { urlToBlob, fromBlob, fromURL } from 'image-resize-compress'
 import Editor from '~/components/Editor/Editor'
 import PostMutations from '~/graphql/PostMutations.js'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
@@ -437,18 +436,13 @@ export default {
             if (!src) {
               return null
             }
-            const blob = await urlToBlob(src[1])
 
-            const compressedBlob = imageCompression(blob, {
-              quality: 0.8,
-              maxWidth: 1920,
-              maxHeight: 1080,
-            })
+            const compressedBlob = await fromURL(src[1], 80)
 
             return {
               upload: compressedBlob,
               name: filename[1],
-              type: 'image/jpeg',
+              type: compressedBlob.type,
             }
           })
           .filter(Boolean),
