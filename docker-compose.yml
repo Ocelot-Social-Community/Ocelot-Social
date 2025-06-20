@@ -45,7 +45,6 @@ services:
       #- GRAPHQL_URI=http://backend:4000
 
   backend:
-    container_name: backend
     image: ghcr.io/ocelot-social-community/ocelot-social/backend:${OCELOT_VERSION:-latest}
     build:
       context: ./backend
