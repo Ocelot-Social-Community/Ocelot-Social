@@ -409,7 +409,7 @@ export default {
         _id: 'new',
         seen: false,
         saved: false,
-        date: new Date(),
+        date: new Date().toDateString(),
         senderId: this.currentUser.id,
         files:
           messageDetails.files?.map((file) => ({
