@@ -256,7 +256,7 @@ jobs:
             echo "⏳ Waiting for $name ($url)..."
             for i in $(seq 1 "$max"); do
               status=$(curl -s -o /dev/null -w "%{http_code}" "$url" || echo "000")
-              if [[ "$status" =~ ^2|3 ]]; then
+              if [[ "$status" =~ ^2|3|400$ ]]; then
                 echo "✅ $name responded with HTTP $status"
                 return 0
               fi
@@ -264,8 +264,10 @@ jobs:
               sleep 2
             done
             echo "❌ Timeout: $name did not respond successfully at $url"
+            echo "Last response body:"
+            curl -i "$url" || echo "(curl failed)"
             docker compose logs "$name" || echo "(docker logs failed)"
-            return 0
+            return 1
           }
 
           # Lade die kopierten .env-Dateien in Shell-Variablen
@@ -274,13 +276,14 @@ jobs:
           source webapp/.env
           set +o allexport
 
-          # Verwende die URIs aus .env
+          # Aufrufe
           wait_for "webapp" "$CLIENT_URI"
           wait_for "backend" "$BACKEND_HEALTH"
           wait_for "mailserver" "http://localhost:1080"
           wait_for "minio" "http://localhost:9000/minio/health/live"
 
           echo "🎉 All services are up."
+
 
     #seeding database for tests
       - name: Seed database for tests
