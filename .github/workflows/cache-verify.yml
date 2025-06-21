@@ -14,30 +14,54 @@ jobs:
             context: ./backend
             dockerfile: ./backend/Dockerfile
             target: build
+            needsSeed: true
           - name: webapp
             context: ./webapp
             dockerfile: ./webapp/Dockerfile
             target: build
+            needsSeed: false
           - name: neo4j
             context: ./neo4j
             dockerfile: ./neo4j/Dockerfile
             target: community
+            needsSeed: false
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: setup .env files
+
+      - name: Setup .env files
         run: |
           cp backend/.env.test_e2e backend/.env
           cp webapp/.env.template webapp/.env
+
+      - name: Setup Node.js (for optional seeding)
+        if: matrix.needsSeed == true
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install ts-node (only if needed)
+        if: matrix.needsSeed == true
+        run: |
+          yarn global add ts-node tsconfig-paths typescript
+
       - uses: docker/setup-buildx-action@v3
+
       - name: Build ${{ matrix.name }} image
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
           target: ${{ matrix.target }}
-          push: false
           outputs: type=docker,dest=/tmp/${{ matrix.name }}.tar
+
+      - name: Seed database (if needed)
+        if: matrix.needsSeed == true
+        run: |
+          echo "🔧 Seeding database for ${{ matrix.name }}..."
+          npx ts-node --require tsconfig-paths/register backend/src/db/seed.ts
+
       - name: Upload ${{ matrix.name }} image
         uses: actions/upload-artifact@v4
         with:
