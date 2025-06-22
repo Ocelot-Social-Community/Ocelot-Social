@@ -222,6 +222,13 @@ jobs:
           restore-keys: |
             ci-unified-cache-${{ runner.os }}-
 
+    #setup .env files, make cypress reports dir
+      - name: Setup .env files & reports dir
+        run: |
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
+          mkdir -p cypress/reports/json_logs
+
     #setup cocumber path
       - name: Run formatter or use PATH tools
         run: |
