@@ -198,13 +198,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
     
-    #setup .env files, make cypress reports dir
-      - name: Setup .env files & reports dir
-        run: |
-          cp backend/.env.test_e2e backend/.env
-          cp webapp/.env.template webapp/.env
-          mkdir -p cypress/reports/json_logs
-
     #restore unified cache
       - name: Restore unified CI cache
         id: restore-cache
