@@ -1,0 +1,18 @@
+@use '../shared/input.scss' as *;
+@use "@@/styles/shared" as *;
+
+@include input(ds-input);
+
+textarea.ds-input {
+  height: auto;
+  min-height: $input-height;
+  resize: none;
+}
+
+textarea.ds-input-size-small {
+  min-height: $input-height-small;
+}
+
+textarea.ds-input-size-large {
+  min-height: $input-height-large;
+}

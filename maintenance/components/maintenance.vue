@@ -50,7 +50,7 @@
 //  import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
   // import Logo from '~/components/Logo/Logo'
 
-  import { Container as DsContainer, Card as BaseCard, Space as DsSpace, Flex as DsFlex, FlexItem as DsFlexItem, Heading as DsHeading, Text as DsText } from 'ocelot-styleguide'
+  import { Container as DsContainer, Card as BaseCard, Space as DsSpace, Flex as DsFlex, FlexItem as DsFlexItem, Heading as DsHeading, Text as DsText } from '../lib/styleguide'
 
   export default {
     components: {

@@ -1,0 +1,15 @@
+/* GLOBAL: INCLUDES
+ *
+ * It is recommended to only include variables,
+ * mixins, etc. in this file, to prevent duplicated
+ * CSS in your final, compiled files.
+ *
+--------------------------------------------- */
+// Mixins
+@forward "./shared/functions";
+@forward "./shared/mixins";
+@forward "./shared/background";
+@forward "./shared/form";
+@forward "./shared/transitions";
+@forward "./shared/animations";
+@forward "./shared/spacing";

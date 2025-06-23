@@ -1,0 +1,63 @@
+@use "@@/styles/shared" as *;
+@use "@@/styles/tokens/tokens";
+
+.ds-copy-field {
+  @include reset;
+  @include stack-space(tokens.$space-xx-small);
+  position: relative;
+  font-family: tokens.$font-family-text;
+  line-height: tokens.$line-height-base;
+  padding: tokens.$space-x-small tokens.$space-small;
+  border-radius: tokens.$border-radius-base;
+  letter-spacing: tokens.$letter-spacing-small;
+  background-color:  tokens.$background-color-softer;
+}
+
+.ds-copy-field-small {
+  font-size: tokens.$font-size-small;
+}
+
+.ds-copy-field-large {
+  font-size: tokens.$font-size-large;
+}
+
+.ds-copy-field-link {
+  @include reset;
+  position: absolute;
+  right: tokens.$space-xx-small;
+  top: 50%;
+  transform: translateY(-50%);
+  user-select: none;
+}
+
+.ds-copy-field-message {
+  @include reset;
+  position: absolute;
+  overflow: hidden;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  user-select: none;
+  visibility: visible;
+  opacity: 1;
+  transition: all tokens.$duration-x-long tokens.$ease-out;
+}
+
+.ds-copy-field-message-text {
+  @include reset;
+  padding: tokens.$space-x-small tokens.$space-small;
+  transition: all tokens.$duration-x-long tokens.$ease-out;
+  transform: scale(1);
+  transform-origin: 0 50%;
+}
+
+.ds-copy-field-message-enter,
+.ds-copy-field-message-leave-to {
+  visibility: hidden;
+  opacity: 0;
+
+  .ds-copy-field-message-text {
+    transform: scale(1.2);
+  }
+}

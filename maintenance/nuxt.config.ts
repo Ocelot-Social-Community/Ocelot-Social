@@ -1,4 +1,6 @@
+import { resolve } from "path";
 import sourcemaps from "rollup-plugin-sourcemaps";
+import viteTsConfigPaths from 'vite-tsconfig-paths';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -25,29 +27,17 @@ export default defineNuxtConfig({
   },
 
   vite: {
-    server: {
-      sourcemapIgnoreList: (sourcePath: string, _sourcemapPath: string) => {
-        // Ignore sourcemaps for files in the node_modules directory, except ocelot-styleguide
-        if (sourcePath.includes("node_modules") && !sourcePath.includes("ocelot-styleguide")) {
-          return true;
-        }
-        // Otherwise, include the sourcemap
-        return false;
-      },
-    },
+    plugins: [viteTsConfigPaths()],
+    resolve: {
+    alias: {
+      '@@': resolve(__dirname, './src'),
+    }
+  },
     build: {
       rollupOptions: {
-        plugins: [sourcemaps()],
+        plugins: [sourcemaps, ],
         output: {
           sourcemap: true,
-          sourcemapIgnoreList: (sourcePath: string, _sourcemapPath: string) => {
-            // Ignore sourcemaps for files in the node_modules directory, except ocelot-styleguide
-            if (sourcePath.includes("node_modules") && !sourcePath.includes("ocelot-styleguide")) {
-              return true;
-            }
-            // Otherwise, include the sourcemap
-            return false;
-          },
         },
       },
     },
