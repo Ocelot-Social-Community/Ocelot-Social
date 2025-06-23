@@ -1,8 +1,8 @@
 <template>
   <transition name="ds-input-error">
     <div
-      class="ds-input-error"
-      v-show="!!error">
+      v-show="!!error"
+      class="ds-input-error">
       {{ error }}
     </div>
   </transition>

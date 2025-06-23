@@ -1,6 +1,7 @@
 <template>
   <component
-    @click.capture="handleClick"
+    v-bind="bindings"
+    :is="linkTag"
     class="ds-button"
     :class="[
       size && `ds-button-size-${size}`,
@@ -15,16 +16,15 @@
       right && `ds-button-right`
     ]"
     :name="name"
-    v-bind="bindings"
-    :is="linkTag">
+    @click.capture="handleClick">
     <div class="ds-button-wrap">
       <ds-icon
         v-if="icon"
         :name="icon"
       />
       <span
-        class="ds-button-text"
-        v-if="$slots.default">
+        v-if="$slots.default"
+        class="ds-button-text">
         <slot />
       </span>
     </div>
@@ -43,7 +43,6 @@ import { defineComponent } from 'vue';
  * @version 1.0.0
  */
 export default defineComponent({
-  emits: ['click'],
   name: 'DsButton',
 
   props: {
@@ -152,6 +151,7 @@ export default defineComponent({
       default: false
     }
   },
+  emits: ['click'],
 
   computed: {
     bindings() {

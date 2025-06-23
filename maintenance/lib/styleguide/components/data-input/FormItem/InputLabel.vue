@@ -1,7 +1,7 @@
 <template>
   <label
-    class="ds-input-label"
-    v-show="!!label">
+    v-show="!!label"
+    class="ds-input-label">
     {{ label }}
   </label>
 </template>

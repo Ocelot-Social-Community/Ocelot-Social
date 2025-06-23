@@ -1,7 +1,7 @@
 <template>
   <component
-    class="ds-code"
     :is="inline ? 'code' : 'pre'"
+    class="ds-code"
     :class="[
       inline && `ds-code-inline`
     ]"

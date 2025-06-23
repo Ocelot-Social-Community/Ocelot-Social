@@ -35,7 +35,6 @@ import { defineComponent } from 'vue';
  * @version 1.0.0
  */
 export default defineComponent({
-  emits: ['navigate'],
   name: 'DsMenu',
 
   provide() {
@@ -123,6 +122,7 @@ export default defineComponent({
       }
     }
   },
+  emits: ['navigate'],
 
   computed: {},
 

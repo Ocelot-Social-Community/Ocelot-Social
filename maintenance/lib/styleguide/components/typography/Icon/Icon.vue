@@ -6,8 +6,8 @@
     class="ds-icon"
   >
     <component
-      v-if="svgComponent"
       :is="svgComponent"
+      v-if="svgComponent"
       class="ds-icon-svg"
     />
   </component>

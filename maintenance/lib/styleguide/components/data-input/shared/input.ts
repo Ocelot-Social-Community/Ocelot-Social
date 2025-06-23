@@ -155,9 +155,9 @@ export default {
       }
       const validator = new Schema({ input: this.schema })
       // Prevent validator from printing to console
-      // eslint-disable-next-line
+       
       const warn = console.warn;
-      // eslint-disable-next-line
+       
       console.warn = () => {};
       validator.validate({ input: value }, errors => {
         if (errors) {
@@ -165,7 +165,7 @@ export default {
         } else {
           this.error = null
         }
-        // eslint-disable-next-line
+         
         console.warn = warn;
       })
     },

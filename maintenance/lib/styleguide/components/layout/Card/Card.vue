@@ -11,26 +11,26 @@
       space && `ds-card-space-${space}`
   ]">
     <div
-      class="ds-card-image"
-      v-if="image || $slots.image">
+      v-if="image || $slots.image"
+      class="ds-card-image">
       <!-- @slot Content of the card's image -->
       <slot
         name="image"
         :image="image">
         <img
-          :src="image"
           v-if="!error"
+          :src="image"
           @error="onError" >
       </slot>
     </div>
     <div
-      class="ds-card-icon"
-      v-if="icon">
+      v-if="icon"
+      class="ds-card-icon">
       <ds-icon :name="icon"/>
     </div>
     <header
-      class="ds-card-header"
-      v-if="header || $slots.header">
+      v-if="header || $slots.header"
+      class="ds-card-header">
       <!-- @slot Content of the card's header -->
       <slot name="header">
         <ds-heading
@@ -44,8 +44,8 @@
       </template>
     </div>
     <footer
-      class="ds-card-footer"
-      v-if="$slots.footer">
+      v-if="$slots.footer"
+      class="ds-card-footer">
       <!-- @slot Content of the card's footer -->
       <slot name="footer"/>
     </footer>

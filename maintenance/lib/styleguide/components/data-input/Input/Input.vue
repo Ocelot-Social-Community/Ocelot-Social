@@ -7,12 +7,13 @@
         <ds-icon :name="icon"/>
       </div>
       <component
+        :is="tag"
+        :id="id"
         class="ds-input"
         :class="[
           icon && `ds-input-has-icon`,
           iconRight && `ds-input-has-icon-right`
         ]"
-        :id="id"
         :name="name ? name : model"
         :type="type"
         :autofocus="autofocus"
@@ -20,12 +21,11 @@
         :tabindex="tabindex"
         :disabled="disabled"
         :readonly="readonly"
-        :is="tag"
-        :modelValue.prop="innerValue"
-        @update:modelValue="handleInput"
+        :model-value.prop="innerValue"
+        :rows="type === 'textarea' ? rows : null"
+        @update:model-value="handleInput"
         @focus="handleFocus"
         @blur="handleBlur"
-        :rows="type === 'textarea' ? rows : null"
         v-html="type === 'textarea' ? innerValue : null"/>
       <div
         v-if="iconRight"

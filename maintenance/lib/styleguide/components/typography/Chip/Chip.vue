@@ -12,9 +12,9 @@
     <slot />
     <button
       v-if="removable"
-      @click="remove"
       class="ds-chip-close"
       tabindex="-1"
+      @click="remove"
     >
       <ds-icon name="close" />
     </button>
@@ -30,7 +30,6 @@ import { defineComponent } from 'vue';
  * @version 1.0.0
  */
 export default defineComponent({
-  emits: ['remove'],
   name: 'DsChip',
 
   props: {
@@ -78,6 +77,7 @@ export default defineComponent({
       default: 'span'
     }
   },
+  emits: ['remove'],
 
   methods: {
     remove() {

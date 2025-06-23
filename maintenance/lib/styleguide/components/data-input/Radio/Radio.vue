@@ -6,18 +6,18 @@
       @keydown.self.down.prevent="pointerNext"
       @keydown.self.up.prevent="pointerPrev">
       <component
+        :is="buttons ? 'ds-button' : 'div'"
+        v-for="option in options"
+        :key="option[labelProp] || option"
         class="ds-radio-option"
         :class="[
           isSelected(option) && `ds-radio-option-is-selected`
         ]"
-        v-for="option in options"
-        @click="handleSelect(option)"
-        :key="option[labelProp] || option"
-        :is="buttons ? 'ds-button' : 'div'"
-        :primary="buttons && isSelected(option)">
+        :primary="buttons && isSelected(option)"
+        @click="handleSelect(option)">
         <span
-          class="ds-radio-option-mark"
-          v-if="!buttons"/>
+          v-if="!buttons"
+          class="ds-radio-option-mark"/>
         <span class="ds-radio-option-label">
           <!-- @slot Slot to provide custom option items -->
           <slot
@@ -44,17 +44,11 @@ import DsFormItem from '@@/components/data-input/FormItem/FormItem.vue'
  */
 export default defineComponent({
   name: 'DsRadio',
-  mixins: [inputMixin, multiinputMixin],
 
   components: {
     DsFormItem
   },
-
-  data() {
-    return {
-      pointer: 0
-    }
-  },
+  mixins: [inputMixin, multiinputMixin],
 
   props: {
     /**
@@ -79,6 +73,12 @@ export default defineComponent({
     labelProp: {
       type: String,
       default: 'label'
+    }
+  },
+
+  data() {
+    return {
+      pointer: 0
     }
   },
 

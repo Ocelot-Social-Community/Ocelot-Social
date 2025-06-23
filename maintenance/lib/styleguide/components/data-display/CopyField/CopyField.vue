@@ -9,18 +9,18 @@
     <div
       class="ds-copy-field-link">
       <ds-button
-        @click="copy"
         icon="copy"
         color="soft"
-        ghost/>
+        ghost
+        @click="copy"/>
     </div>
     <transition name="ds-copy-field-message">
       <div
         v-show="showMessage"
         class="ds-copy-field-message">
         <div
-          class="ds-copy-field-message-text"
-          ref="messageText"/>
+          ref="messageText"
+          class="ds-copy-field-message-text"/>
       </div>
     </transition>
   </component>

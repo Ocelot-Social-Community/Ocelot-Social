@@ -8,8 +8,8 @@
         appear>
         <div
           v-if="isOpen"
-          class="ds-modal-backdrop"
           ref="backdrop"
+          class="ds-modal-backdrop"
           @click="backdropHandler"
         >
           &nbsp;
@@ -20,12 +20,12 @@
         appear>
         <ds-card
           v-if="isOpen"
+          ref="modal"
           class="ds-modal"
           :class="[extended && 'ds-modal-extended']"
           :header="title"
           tableindex="-1"
           role="dialog"
-          ref="modal"
           style="display: block"
         >
           <ds-button
@@ -39,14 +39,14 @@
           />
           <!-- @slot Modal content -->
           <slot ref="modalBody"/>
-          <template slot="footer">
+          <template #footer>
             <!-- @slot Modal footer with action buttons -->
             <slot
               name="footer"
               :confirm="confirm"
               :cancel="cancel"
-              :cancelLabel="cancelLabel"
-              :confirmLabel="confirmLabel"
+              :cancel-label="cancelLabel"
+              :confirm-label="confirmLabel"
             >
               <ds-button
                 ghost
@@ -74,8 +74,12 @@ import { defineComponent } from 'vue';
  * @version 1.0.0
  */
 export default defineComponent({
-  emits: ['opened', 'confirm', 'cancel', 'update:isOpen', 'close'],
   name: 'DsModal',
+
+  model: {
+    prop: 'isOpen',
+    event: 'update:isOpen'
+  },
 
   props: {
     /**
@@ -121,11 +125,7 @@ export default defineComponent({
       default: 'Confirm'
     }
   },
-
-  model: {
-    prop: 'isOpen',
-    event: 'update:isOpen'
-  },
+  emits: ['opened', 'confirm', 'cancel', 'update:isOpen', 'close'],
 
   watch: {
     isOpen: {
@@ -141,26 +141,6 @@ export default defineComponent({
               .classList.remove('modal-open')
           }
         } catch (err) {}
-      }
-    }
-  },
-
-  methods: {
-    confirm(type = 'confirm') {
-      this.$emit('confirm')
-      this.close(type)
-    },
-    cancel(type = 'cancel') {
-      this.$emit('cancel')
-      this.close(type)
-    },
-    close(type) {
-      this.$emit('update:isOpen', false)
-      this.$emit('close', type)
-    },
-    backdropHandler() {
-      if (!this.force) {
-        this.cancel('backdrop')
       }
     }
   },
@@ -185,6 +165,26 @@ export default defineComponent({
 
     if (this.isOpen) {
       this.$emit('opened')
+    }
+  },
+
+  methods: {
+    confirm(type = 'confirm') {
+      this.$emit('confirm')
+      this.close(type)
+    },
+    cancel(type = 'cancel') {
+      this.$emit('cancel')
+      this.close(type)
+    },
+    close(type) {
+      this.$emit('update:isOpen', false)
+      this.$emit('close', type)
+    },
+    backdropHandler() {
+      if (!this.force) {
+        this.cancel('backdrop')
+      }
     }
   },
 });

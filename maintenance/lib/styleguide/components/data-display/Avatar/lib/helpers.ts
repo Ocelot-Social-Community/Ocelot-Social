@@ -28,10 +28,10 @@ export default {
   ],
 
   initials(name) {
-    let un = name || 'Anonymus'
-    let parts = un.split(/[ -]/)
+    const un = name || 'Anonymus'
+    const parts = un.split(/[ -]/)
     let initials = ''
-    for (var i = 0; i < parts.length; i++) {
+    for (let i = 0; i < parts.length; i++) {
       initials += parts[i].charAt(0)
     }
     if (initials.length > 3 && initials.search(/[A-Z]/) !== -1) {
@@ -45,19 +45,19 @@ export default {
   },
   lightenColor(hex, amt) {
     // From https://css-tricks.com/snippets/javascript/lighten-darken-color/
-    var usePound = false
+    let usePound = false
     if (hex[0] === '#') {
       hex = hex.slice(1)
       usePound = true
     }
-    var num = parseInt(hex, 16)
-    var r = (num >> 16) + amt
+    const num = parseInt(hex, 16)
+    let r = (num >> 16) + amt
     if (r > 255) r = 255
     else if (r < 0) r = 0
-    var b = ((num >> 8) & 0x00ff) + amt
+    let b = ((num >> 8) & 0x00ff) + amt
     if (b > 255) b = 255
     else if (b < 0) b = 0
-    var g = (num & 0x0000ff) + amt
+    let g = (num & 0x0000ff) + amt
     if (g > 255) g = 255
     else if (g < 0) g = 0
     return (usePound ? '#' : '') + (g | (b << 8) | (r << 16)).toString(16)

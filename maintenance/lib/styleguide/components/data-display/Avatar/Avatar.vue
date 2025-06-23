@@ -2,7 +2,7 @@
   <div
     class="ds-avatar"
     :class="[
-      `ds-size-${this.size}`,
+      `ds-size-${size}`,
       online && 'is-online'
     ]"
     :style="styles"

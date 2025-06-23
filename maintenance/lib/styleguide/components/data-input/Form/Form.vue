@@ -1,9 +1,9 @@
 <template>
   <form
     class="ds-form"
-    @submit.prevent="submit"
     novalidate="true"
-    autocomplete="off">
+    autocomplete="off"
+    @submit.prevent="submit">
     <slot
       :errors="errors"
       :reset="reset"/>
@@ -24,7 +24,6 @@ Schema.warning = function() {}
  * @version 1.0.0
  */
 export default defineComponent({
-  emits: ['submit', 'update:modelValue', 'input-valid', 'reset'],
   name: 'DsForm',
 
   provide() {
@@ -49,6 +48,7 @@ export default defineComponent({
       default: () => ({})
     }
   },
+  emits: ['submit', 'update:modelValue', 'input-valid', 'reset'],
 
   data() {
     return {
@@ -66,6 +66,10 @@ export default defineComponent({
       },
       deep: true
     }
+  },
+
+  created() {
+    this.newData = cloneDeep(this.modelValue)
   },
 
   methods: {
@@ -147,10 +151,6 @@ export default defineComponent({
        */
       this.$emit('reset', cloneDeep(this.modelValue))
     }
-  },
-
-  created() {
-    this.newData = cloneDeep(this.modelValue)
   },
 });
 </script>

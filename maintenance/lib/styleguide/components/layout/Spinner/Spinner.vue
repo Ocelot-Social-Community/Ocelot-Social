@@ -3,7 +3,7 @@
     viewBox="0 0 50 50"
     class="ds-spinner"
     :class="[
-      `ds-size-${this.size}`,
+      `ds-size-${size}`,
       inverse && 'ds-spinner-inverse',
       primary && !inverse && `ds-spinner-primary`,
       secondary && !inverse && `ds-spinner-secondary`,

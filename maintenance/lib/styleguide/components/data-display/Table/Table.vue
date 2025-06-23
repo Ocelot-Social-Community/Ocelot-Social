@@ -1,7 +1,7 @@
 <template>
   <div
-    class="ds-table-wrap"
-    v-if="dataArray">
+    v-if="dataArray"
+    class="ds-table-wrap">
     <table
       cellpadding="0"
       cellspacing="0"

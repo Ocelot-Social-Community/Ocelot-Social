@@ -82,7 +82,7 @@ describe('actions', () => {
 
     describe('client-side', () => {
       beforeEach(() => {
-        process.server = false
+        import.meta.server = false
       })
 
       it('returns', async () => {
@@ -94,7 +94,7 @@ describe('actions', () => {
 
     describe('server-side', () => {
       beforeEach(() => {
-        process.server = true
+        import.meta.server = true
       })
 
       it('fetches the current user', async () => {
@@ -194,7 +194,7 @@ describe('actions', () => {
       let mutate
 
       beforeEach(() => {
-        mutate = jest.fn(() => Promise.reject('This error is expected.')) // eslint-disable-line prefer-promise-reject-errors
+        mutate = jest.fn(() => Promise.reject('This error is expected.'))  
         onLogin = jest.fn(() => Promise.resolve())
         const module = {
           app: {

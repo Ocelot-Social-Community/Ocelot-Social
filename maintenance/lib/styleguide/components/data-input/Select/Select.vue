@@ -1,12 +1,12 @@
 <template>
   <ds-form-item>
     <div
+      v-click-outside="closeAndBlur"
       class="ds-select-wrap"
       :class="[
         isOpen && `ds-select-is-open`
       ]"
       :tabindex="searchable ? -1 : tabindex"
-      v-click-outside="closeAndBlur"
       @keydown.tab="closeAndBlur"
       @keydown.self.down.prevent="pointerNext"
       @keydown.self.up.prevent="pointerPrev"
@@ -19,43 +19,43 @@
       </div>
       <div
         class="ds-select"
-        @click="openAndFocus"
         :class="[
           icon && `ds-select-has-icon`,
           iconRight && `ds-select-has-icon-right`,
           multiple && `ds-select-multiple`
-      ]">
+      ]"
+        @click="openAndFocus">
         <div
           v-if="multiple"
           class="ds-selected-options">
           <div
-            class="ds-selected-option"
             v-for="(value, index) in innerValue"
-            :key="value[labelProp] || value">
+            :key="value[labelProp] || value"
+            class="ds-selected-option">
             <!-- @slot Slot to provide a custom selected option display -->
             <slot
               name="optionitem"
-              :modelValue="value">
+              :model-value="value">
               <ds-chip
                 removable
-                @remove="deselectOption(index)"
                 color="primary"
-                :size="size">
+                :size="size"
+                @remove="deselectOption(index)">
                 {{ value[labelProp] || value }}
               </ds-chip>
             </slot>
           </div>
           <input
+            :id="id"
             ref="search"
+            v-model="searchString"
             class="ds-select-search"
             autocomplete="off"
-            :id="id"
             :name="name ? name : model"
             :autofocus="autofocus"
             :placeholder="placeholder"
             :tabindex="tabindex"
             :disabled="disabled"
-            v-model="searchString"
             @focus="openAndFocus"
             @keydown.tab="closeAndBlur"
             @keydown.delete.stop="deselectLastOption"
@@ -71,7 +71,7 @@
           <slot
             v-if="innerValue"
             name="value"
-            :modelValue="innerValue">
+            :model-value="innerValue">
             {{ innerValue[labelProp] || innerValue }}
           </slot>
           <div
@@ -82,16 +82,16 @@
         </div>
         <input
           v-if="!multiple"
+          :id="id"
           ref="search"
+          v-model="searchString"
           class="ds-select-search"
           autocomplete="off"
-          :id="id"
           :name="name ? name : model"
           :autofocus="autofocus"
           :placeholder="placeholder"
           :tabindex="tabindex"
           :disabled="disabled"
-          v-model="searchString"
           @focus="openAndFocus"
           @keydown.tab="closeAndBlur"
           @keydown.delete.stop="deselectLastOption"
@@ -102,29 +102,29 @@
       </div>
       <div class="ds-select-dropdown">
         <div
-          class="ds-select-dropdown-message"
-          v-if="!options || !options.length">
+          v-if="!options || !options.length"
+          class="ds-select-dropdown-message">
           {{ noOptionsAvailable }}
         </div>
         <div
-          class="ds-select-dropdown-message"
-          v-else-if="!filteredOptions.length">
+          v-else-if="!filteredOptions.length"
+          class="ds-select-dropdown-message">
           {{ noOptionsFound }} "{{ searchString }}"
         </div>
         <ul
-          class="ds-select-options"
+          v-else
           ref="options"
-          v-else>
+          class="ds-select-options">
           <li
+            v-for="(option, index) in filteredOptions"
+            :key="option[labelProp] || option"
             class="ds-select-option"
             :class="[
               isSelected(option) && `ds-select-option-is-selected`,
               pointer === index && `ds-select-option-hover`
             ]"
-            v-for="(option, index) in filteredOptions"
             @click="handleSelect(option)"
-            @mouseover="setPointer(index)"
-            :key="option[labelProp] || option">
+            @mouseover="setPointer(index)">
             <!-- @slot Slot to provide custom option items -->
             <slot
               name="option"
@@ -165,9 +165,7 @@ import DsIcon from '@@/components/typography/Icon/Icon.vue'
  * @version 1.0.0
  */
 export default defineComponent({
-  emits: ['enter'],
   name: 'DsSelect',
-  mixins: [inputMixin, multiinputMixin],
 
   components: {
     DsFormItem,
@@ -178,14 +176,7 @@ export default defineComponent({
   directives: {
     ClickOutside
   },
-
-  data() {
-    return {
-      searchString: '',
-      pointer: 0,
-      isOpen: false
-    }
-  },
+  mixins: [inputMixin, multiinputMixin],
 
   props: {
     /**
@@ -283,6 +274,15 @@ export default defineComponent({
     noOptionsFound: {
       type: String,
       default: 'No options found for:'
+    }
+  },
+  emits: ['enter'],
+
+  data() {
+    return {
+      searchString: '',
+      pointer: 0,
+      isOpen: false
     }
   },
 

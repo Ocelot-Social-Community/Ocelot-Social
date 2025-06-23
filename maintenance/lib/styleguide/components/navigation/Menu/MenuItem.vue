@@ -1,5 +1,6 @@
 <template>
   <li
+    v-click-outside="handleClickOutside"
     class="ds-menu-item"
     :class="[
       `ds-menu-item-level-${level}`,
@@ -10,26 +11,25 @@
     @mouseover="handleMouseOver"
     @mouseout="handleMouseOut"
     @click.capture="handleClick"
-    v-click-outside="handleClickOutside"
   >
     <component
+      v-bind="bindings"
+      :is="linkTag"
       v-if="route"
+      ref="link"
       class="ds-menu-item-link"
       :class="[
         matcher && 'router-link-exact-active'
       ]"
-      v-bind="bindings"
       :exact="isExact"
-      :is="linkTag"
-      ref="link"
     >
       <slot>
         {{ name }}
       </slot>
     </component>
     <ul
-      class="ds-menu-item-submenu"
       v-if="hasSubmenu"
+      class="ds-menu-item-submenu"
     >
       <ds-menu-item
         v-for="child in route.children"
@@ -51,17 +51,16 @@ import ClickOutside from 'vue-click-outside'
  * @see DsMenu
  */
 export default defineComponent({
-  emits: ['click'],
   name: 'DsMenuItem',
+
+  directives: {
+    ClickOutside
+  },
 
   inject: {
     $parentMenu: {
       default: null
     }
-  },
-
-  directives: {
-    ClickOutside
   },
 
   props: {
@@ -99,6 +98,7 @@ export default defineComponent({
       }
     }
   },
+  emits: ['click'],
 
   data() {
     return {
