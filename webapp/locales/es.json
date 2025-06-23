@@ -130,6 +130,7 @@
     "roomEmpty": null,
     "roomsEmpty": null,
     "search": "Filtrar salas de chat",
+    "transmitting": null,
     "typeMessage": null,
     "userProfileButton": {
       "label": null,

@@ -15,14 +15,12 @@ import { UserInputError } from 'apollo-server'
 import slug from 'slug'
 import { v4 as uuid } from 'uuid'
 
-import { sanitizeRelationshipType } from './sanitizeRelationshipTypes'
 import { wrapTransaction } from './wrapTransaction'
 
 import type { Images, FileDeleteCallback, FileUploadCallback } from './images'
 import type { FileUpload } from 'graphql-upload'
 
 const deleteImage: Images['deleteImage'] = async (resource, relationshipType, opts = {}) => {
-  sanitizeRelationshipType(relationshipType)
   const { transaction, deleteCallback } = opts
   if (!transaction) return wrapTransaction(deleteImage, [resource, relationshipType], opts)
   const txResult = await transaction.run(
@@ -51,7 +49,6 @@ const mergeImage: Images['mergeImage'] = async (
 ) => {
   if (typeof imageInput === 'undefined') return
   if (imageInput === null) return deleteImage(resource, relationshipType, opts)
-  sanitizeRelationshipType(relationshipType)
   const { transaction, uploadCallback, deleteCallback } = opts
   if (!transaction)
     return wrapTransaction(mergeImage, [resource, relationshipType, imageInput], opts)

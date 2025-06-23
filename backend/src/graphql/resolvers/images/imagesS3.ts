@@ -8,7 +8,6 @@ import { v4 as uuid } from 'uuid'
 
 import { S3Configured } from '@config/index'
 
-import { sanitizeRelationshipType } from './sanitizeRelationshipTypes'
 import { wrapTransaction } from './wrapTransaction'
 
 import type { Image, Images, FileDeleteCallback, FileUploadCallback } from './images'
@@ -29,7 +28,6 @@ export const images = (config: S3Configured) => {
   })
 
   const deleteImage: Images['deleteImage'] = async (resource, relationshipType, opts = {}) => {
-    sanitizeRelationshipType(relationshipType)
     const { transaction, deleteCallback = s3Delete } = opts
     if (!transaction) return wrapTransaction(deleteImage, [resource, relationshipType], opts)
     const txResult = await transaction.run(
@@ -60,7 +58,6 @@ export const images = (config: S3Configured) => {
   ) => {
     if (typeof imageInput === 'undefined') return
     if (imageInput === null) return deleteImage(resource, relationshipType, opts)
-    sanitizeRelationshipType(relationshipType)
     const { transaction, uploadCallback, deleteCallback = s3Delete } = opts
     if (!transaction)
       return wrapTransaction(mergeImage, [resource, relationshipType, imageInput], opts)

@@ -7,8 +7,10 @@
 import { withFilter } from 'graphql-subscriptions'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
+import CONFIG, { isS3configured } from '@config/index'
 import { CHAT_MESSAGE_ADDED } from '@constants/subscriptions'
 
+import { attachments } from './attachments/attachments'
 import Resolver from './helpers/Resolver'
 
 const setMessagesAsDistributed = async (undistributedMessagesIds, session) => {
@@ -70,19 +72,22 @@ export default {
   },
   Mutation: {
     CreateMessage: async (_parent, params, context, _resolveInfo) => {
-      const { roomId, content } = params
+      const { roomId, content, files = [] } = params
       const {
         user: { id: currentUserId },
       } = context
+
       const session = context.driver.session()
-      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const createMessageCypher = `
+
+      try {
+        const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+          const createMessageCypher = `
           MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
           OPTIONAL MATCH (currentUser)-[:AVATAR_IMAGE]->(image:Image)
           OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
           OPTIONAL MATCH (room)<-[:CHATS_IN]-(recipientUser:User)
             WHERE NOT recipientUser.id = $currentUserId
-          WITH MAX(m.indexId) as maxIndex, room, currentUser, image, recipientUser 
+          WITH MAX(m.indexId) as maxIndex, room, currentUser, image, recipientUser
           CREATE (currentUser)-[:CREATED]->(message:Message {
             createdAt: toString(datetime()),
             id: apoc.create.uuid(),
@@ -103,19 +108,41 @@ export default {
             date: message.createdAt
           }
         `
-        const createMessageTxResponse = await transaction.run(createMessageCypher, {
-          currentUserId,
-          roomId,
-          content,
+          const createMessageTxResponse = await transaction.run(createMessageCypher, {
+            currentUserId,
+            roomId,
+            content,
+          })
+
+          const [message] = await createMessageTxResponse.records.map((record) =>
+            record.get('message'),
+          )
+
+          // this is the case if the room doesn't exist - requires refactoring for implicit rooms
+          if (!message) {
+            return null
+          }
+
+          const atns: File[] = []
+
+          if (isS3configured(CONFIG)) {
+            for await (const file of files) {
+              const atn = await attachments(CONFIG).add(
+                message,
+                'ATTACHMENT',
+                file,
+                {},
+                {
+                  transaction,
+                },
+              )
+              atns.push(atn)
+            }
+          }
+
+          return { ...message, files: atns }
         })
 
-        const [message] = await createMessageTxResponse.records.map((record) =>
-          record.get('message'),
-        )
-
-        return message
-      })
-      try {
         return await writeTxResultPromise
       } catch (error) {
         throw new Error(error)
@@ -155,6 +182,9 @@ export default {
       hasOne: {
         author: '<-[:CREATED]-(related:User)',
         room: '-[:INSIDE]->(related:Room)',
+      },
+      hasMany: {
+        files: '-[:ATTACHMENT]-(related:File)',
       },
     }),
   },

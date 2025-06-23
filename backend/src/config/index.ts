@@ -29,6 +29,7 @@ const environment = {
     ? (env.DISABLED_MIDDLEWARES?.split(',') ?? [])
     : [],
   SEND_MAIL: env.NODE_ENV !== 'test',
+  LOG_LEVEL: 'DEBUG',
 }
 
 const required = {
