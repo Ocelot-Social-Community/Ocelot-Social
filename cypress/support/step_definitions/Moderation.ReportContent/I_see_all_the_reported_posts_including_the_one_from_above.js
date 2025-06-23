@@ -1,14 +1,7 @@
 import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I see all the reported posts including the one from above', () => {
-  cy.intercept({
-    method: 'POST',
-    url: '/api',
-    hostname: 'localhost',
-  }).as('getReports')
-
-  cy.wait(['@getReports'],{ timeout: 30000 }).then((interception) => {
-    console.log('Cypress interception:', interception)
+  cy.wait('@reportsQuery', { timeout: 30000 }).then((interception) => {
     cy.wrap(interception.response.statusCode).should('eq', 200)
     cy.wrap(interception.request.body)
       .should('have.property', 'query', `query ($orderBy: ReportOrdering, $first: Int, $offset: Int, $reviewed: Boolean, $closed: Boolean) {
@@ -104,6 +97,6 @@ defineStep('I see all the reported posts including the one from above', () => {
   })
 
   cy.get('table tbody').within(() => {
-    cy.contains('tr', 'The Truth about the Holocaust')
+    cy.contains('tr', 'The Truth about the Holocaust').should('be.visible')
   })
 })
