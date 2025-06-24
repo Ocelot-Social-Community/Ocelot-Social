@@ -30,7 +30,7 @@ export default defineNuxtConfig({
     plugins: [viteTsConfigPaths()],
     resolve: {
     alias: {
-      '@@': resolve(__dirname, './src'),
+      '@@': resolve(__dirname, './lib/styleguide'),
     }
   },
     build: {

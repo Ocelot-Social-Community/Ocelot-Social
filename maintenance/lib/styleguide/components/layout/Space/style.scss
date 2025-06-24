@@ -1,9 +1,0 @@
-@use "@@/styles/shared" as *;
-
-.ds-space {
-  @include reset;
-}
-
-.ds-space-centered {
-  text-align: center;
-}
