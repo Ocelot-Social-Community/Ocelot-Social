@@ -27,6 +27,12 @@ let server: ApolloServer
 let authenticatedUser
 let query, mutate
 
+const loggerErrorMock: (e) => void = jest.fn()
+
+jest.mock('@src/logger', () => ({
+  error: (e) => loggerErrorMock(e),
+}))
+
 beforeAll(async () => {
   await cleanDatabase()
 
@@ -1396,6 +1402,10 @@ describe('pin posts', () => {
           errors: [{ message: 'Pinned posts are not allowed!' }],
         })
       })
+
+      it('logs the error', () => {
+        expect(loggerErrorMock).toBeCalledWith('Pinned posts are not allowed!')
+      })
     })
 
     describe('MAX_PINNED_POSTS is 1', () => {
@@ -1915,6 +1925,10 @@ describe('pin posts', () => {
                   data: { pinPost: null },
                   errors: [{ message: 'Max number of pinned posts is reached!' }],
                 })
+              })
+
+              it('logs the error', () => {
+                expect(loggerErrorMock).toBeCalledWith('Max number of pinned posts is reached!')
               })
             })
 
