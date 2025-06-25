@@ -69,6 +69,17 @@
           </div>
         </div>
 
+        <div
+          v-for="message in messages.filter((m) => m.isUploading)"
+          :slot="'message_' + message._id"
+          v-bind:key="message._id"
+          class="vac-format-message-wrapper"
+        >
+          <div class="markdown">
+            <p>{{ $t('chat.transmitting') }}</p>
+          </div>
+        </div>
+
         <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
           <div
             v-if="room.avatar"
@@ -376,7 +387,11 @@ export default {
 
       const filesToUpload = hasFiles
         ? files.map((file) => ({
-            upload: new File([file.blob], `${file.name}.${file.extension}`),
+            upload: new File(
+              [file.blob],
+              // Captured audio already has the right extension in the name
+              file.extension ? `${file.name}.${file.extension}` : file.name,
+            ),
             name: file.name,
             type: file.type,
           }))
@@ -390,6 +405,35 @@ export default {
       if (filesToUpload && filesToUpload.length > 0) {
         mutationVariables.files = filesToUpload
       }
+
+      // Immediately add new message
+      const localMessage = {
+        ...messageDetails,
+        _id: 'new' + Math.random().toString(36).substring(2, 15),
+        seen: false,
+        saved: false,
+        date: new Date().toDateString(),
+        senderId: this.currentUser.id,
+        files:
+          messageDetails.files?.map((file) => ({
+            ...file,
+            url: URL.createObjectURL(new Blob([file.blob], { type: file.type })),
+          })) ?? [],
+        // Custom property
+        isUploading: true,
+      }
+      this.messages = [...this.messages, localMessage]
+
+      const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
+      if (roomIndex !== -1) {
+        const changedRoom = { ...this.rooms[roomIndex] }
+        changedRoom.lastMessage.content = content
+
+        // Move changed room to the top of the list
+        changedRoom.index = changedRoom.lastMessage.date
+        this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== roomId)]
+      }
+
       try {
         const { data } = await this.$apollo.mutate({
           mutation: createMessageMutation(),
@@ -397,17 +441,10 @@ export default {
         })
         const createdMessagePayload = data.CreateMessage
 
-        if (createdMessagePayload) {
-          const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
-          if (roomIndex !== -1) {
-            const changedRoom = { ...this.rooms[roomIndex] }
-            changedRoom.lastMessage.content = createdMessagePayload.content.trim().substring(0, 30)
-            changedRoom.lastMessage.date = createdMessagePayload.date
-
-            // Move changed room to the top of the list
-            changedRoom.index = createdMessagePayload.date
-            this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== roomId)]
-          }
+        if (createdMessagePayload && roomIndex !== -1) {
+          const changedRoom = { ...this.rooms[roomIndex] }
+          changedRoom.lastMessage.content = createdMessagePayload.content.trim().substring(0, 30)
+          changedRoom.lastMessage.date = createdMessagePayload.date
         }
       } catch (error) {
         this.$toast.error(error.message)
