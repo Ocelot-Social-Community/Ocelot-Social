@@ -40,9 +40,6 @@ export const s3Service = (config: S3Configured, prefix: string) => {
       location = `https://${location}`
     }
 
-    console.log(`File uploaded to S3: ${location}`)
-    console.log('PUBLIC_GATEWAY:', S3_PUBLIC_GATEWAY)
-
     if (!S3_PUBLIC_GATEWAY) {
       return location
     }
