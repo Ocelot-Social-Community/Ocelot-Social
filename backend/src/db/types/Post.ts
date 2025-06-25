@@ -9,7 +9,7 @@ export interface PostDbProperties {
   disabled: boolean
   id: string
   language: string
-  postType: string // tis is a PostType[] in the graphql, mapped from the labels
+  postType: string // this is a PostType[] in the graphql, mapped from the labels
   slug: string
   sortDate: string
   title: string
