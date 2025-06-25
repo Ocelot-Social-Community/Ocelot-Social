@@ -2,18 +2,30 @@
 
 exports[`UserTeaserHelper with linkToProfile and popover enabled, on touch screen renders button 1`] = `
 <div>
-  <button />
+  <button>
+    <div>
+      Test Content
+    </div>
+  </button>
 </div>
 `;
 
 exports[`UserTeaserHelper with linkToProfile, on desktop renders link 1`] = `
 <div>
-  <a />
+  <a>
+    <div>
+      Test Content
+    </div>
+  </a>
 </div>
 `;
 
 exports[`UserTeaserHelper without linkToProfile renders span 1`] = `
 <div>
-  <span />
+  <span>
+    <div>
+      Test Content
+    </div>
+  </span>
 </div>
 `;

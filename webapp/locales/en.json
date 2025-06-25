@@ -130,6 +130,7 @@
     "roomEmpty": "No room selected",
     "roomsEmpty": "No rooms",
     "search": "Filter chat rooms",
+    "transmitting": "Transmitting message ...",
     "typeMessage": "Type message",
     "userProfileButton": {
       "label": "Chat",

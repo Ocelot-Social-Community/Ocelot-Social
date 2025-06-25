@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
+        uses: actions/checkout@09d2acae674a48949e3602304ab46fd20ae0c42f # v4.2.2
 
       - name: Copy backend env file
         run: |
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
+        uses: actions/checkout@09d2acae674a48949e3602304ab46fd20ae0c42f # v4.2.2
 
       - name: Copy backend env file
         run: |
@@ -69,7 +69,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
+        uses: actions/checkout@09d2acae674a48949e3602304ab46fd20ae0c42f # v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@08f58d1471bff7f3a07d167b4ad7df25d5fcfcb6 # v4.4.0
+        with:
+          node-version-file: 'backend/.tool-versions'
+          cache: 'yarn'
 
       - name: Copy env files
         run: |
@@ -107,6 +113,15 @@ jobs:
         # run copies of the current job in parallel
         job: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
+      - name: Checkout code
+        uses: actions/checkout@09d2acae674a48949e3602304ab46fd20ae0c42f # v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@08f58d1471bff7f3a07d167b4ad7df25d5fcfcb6 # v4.4.0
+        with:
+          node-version-file: 'backend/.tool-versions'
+          cache: 'yarn'
+
       - name: Restore cypress cache
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
@@ -172,7 +187,7 @@ jobs:
     continue-on-error: true
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
+        uses: actions/checkout@09d2acae674a48949e3602304ab46fd20ae0c42f # v4.2.2
       
       - name: Full stack tests | cleanup cache
         run: |

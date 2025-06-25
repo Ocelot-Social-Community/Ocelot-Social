@@ -76,9 +76,12 @@ export default {
       const {
         user: { id: currentUserId },
       } = context
+
       const session = context.driver.session()
-      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const createMessageCypher = `
+
+      try {
+        const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+          const createMessageCypher = `
           MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
           OPTIONAL MATCH (currentUser)-[:AVATAR_IMAGE]->(image:Image)
           OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
@@ -105,53 +108,42 @@ export default {
             date: message.createdAt
           }
         `
-        const createMessageTxResponse = await transaction.run(createMessageCypher, {
-          currentUserId,
-          roomId,
-          content,
-        })
+          const createMessageTxResponse = await transaction.run(createMessageCypher, {
+            currentUserId,
+            roomId,
+            content,
+          })
 
-        const [message] = await createMessageTxResponse.records.map((record) =>
-          record.get('message'),
-        )
+          const [message] = await createMessageTxResponse.records.map((record) =>
+            record.get('message'),
+          )
 
-        return message
-      })
-      try {
-        // We cannot combine the query above with the attachments, since you need the resource for matching
-        const message = await writeTxResultPromise
-
-        // this is the case if the room doesn't exist - requires refactoring for implicit rooms
-        if (!message) {
-          return null
-        }
-
-        const session = context.driver.session()
-        const writeFilesPromise = session.writeTransaction(async (transaction) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const atns: any[] = []
-
-          if (!isS3configured(CONFIG)) {
-            return atns
+          // this is the case if the room doesn't exist - requires refactoring for implicit rooms
+          if (!message) {
+            return null
           }
 
-          for await (const file of files) {
-            const atn = await attachments(CONFIG).add(
-              message,
-              'ATTACHMENT',
-              file,
-              {},
-              {
-                transaction,
-              },
-            )
-            atns.push(atn)
+          const atns: File[] = []
+
+          if (isS3configured(CONFIG)) {
+            for await (const file of files) {
+              const atn = await attachments(CONFIG).add(
+                message,
+                'ATTACHMENT',
+                file,
+                {},
+                {
+                  transaction,
+                },
+              )
+              atns.push(atn)
+            }
           }
-          return atns
+
+          return { ...message, files: atns }
         })
 
-        const atns = await writeFilesPromise
-        return { ...message, files: atns }
+        return await writeTxResultPromise
       } catch (error) {
         throw new Error(error)
       } finally {
