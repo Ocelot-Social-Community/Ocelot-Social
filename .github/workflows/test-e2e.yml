@@ -3,53 +3,60 @@ name: ocelot.social end-to-end test CI
 on: push
 
 jobs:
-  prepare_neo4j_image:
-    name: Fullstack | prepare neo4j image
+  prepare_backend_environment:
+    name: Fullstack | prepare backend environment
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
+        uses: actions/checkout@09d2acae674a48949e3602304ab46fd20ae0c42f # v4.2.2
 
-      - name: Build docker image
+      - name: Copy backend env file
         run: |
-          docker build --target community -t "ocelotsocialnetwork/neo4j-community:test" neo4j/
-          docker save "ocelotsocialnetwork/neo4j-community:test" > /tmp/neo4j.tar
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
+
+      - name: Build backend and dependencies
+        run: |
+          # Build and start all required images for backend
+          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend --build
+          
+          # Save the build images
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" > /tmp/backend.tar          
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j-community:test" > /tmp/neo4j.tar
+          docker save "quay.io/minio/minio:latest" > /tmp/minio.tar
+          docker save "quay.io/minio/mc:latest" > /tmp/minio-mc.tar
+          docker save "maildev/maildev:latest" > /tmp/mailserver.tar
+          
+          # Stop the containers
+          docker compose -f docker-compose.yml -f docker-compose.test.yml down
       
-      - name: Cache docker image
+      - name: Cache docker images
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
-          path: /tmp/neo4j.tar
-          key: ${{ github.run_id }}-e2e-neo4j-cache
-
-  prepare_backend_image:
-    name: Fullstack | prepare backend image
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
-
-      - name: Build docker image
-        run: |
-          docker build --target test -t "ocelotsocialnetwork/backend:test" backend/
-          docker save "ocelotsocialnetwork/backend:test" > /tmp/backend.tar
-      
-      - name: Cache docker image
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
-        with:
-          path: /tmp/backend.tar
-          key: ${{ github.run_id }}-e2e-backend-cache
+          path: |
+            /tmp/backend.tar
+            /tmp/neo4j.tar
+            /tmp/minio.tar
+            /tmp/minio-mc.tar
+            /tmp/mailserver.tar
+          key: ${{ github.run_id }}-e2e-backend-environment-cache
 
   prepare_webapp_image:
     name: Fullstack | prepare webapp image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
+        uses: actions/checkout@09d2acae674a48949e3602304ab46fd20ae0c42f # v4.2.2
 
+      - name: Copy backend env file
+        run: |
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
+      
       - name: Build docker image
         run: |
-          docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
-          docker save "ocelotsocialnetwork/webapp:test" > /tmp/webapp.tar
+          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach webapp --build --no-deps
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" > /tmp/webapp.tar
       
       - name: Cache docker image        
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
@@ -62,7 +69,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
+        uses: actions/checkout@09d2acae674a48949e3602304ab46fd20ae0c42f # v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@08f58d1471bff7f3a07d167b4ad7df25d5fcfcb6 # v4.4.0
+        with:
+          node-version-file: 'backend/.tool-versions'
+          cache: 'yarn'
 
       - name: Copy env files
         run: |
@@ -91,7 +104,7 @@ jobs:
   fullstack_tests:
     name: Fullstack | tests
     if: success()
-    needs: [prepare_neo4j_image, prepare_backend_image, prepare_webapp_image, prepare_cypress]
+    needs: [prepare_backend_environment, prepare_webapp_image, prepare_cypress]
     runs-on: ubuntu-latest
     env:
       jobs: 8
@@ -100,6 +113,15 @@ jobs:
         # run copies of the current job in parallel
         job: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
+      - name: Checkout code
+        uses: actions/checkout@09d2acae674a48949e3602304ab46fd20ae0c42f # v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@08f58d1471bff7f3a07d167b4ad7df25d5fcfcb6 # v4.4.0
+        with:
+          node-version-file: 'backend/.tool-versions'
+          cache: 'yarn'
+
       - name: Restore cypress cache
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
@@ -110,17 +132,16 @@ jobs:
           key: ${{ github.run_id }}-e2e-cypress
           restore-keys: ${{ github.run_id }}-e2e-cypress
 
-      - name: Restore neo4j cache
+      - name: Restore backend environment cache
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
         with:
-          path: /tmp/neo4j.tar
-          key: ${{ github.run_id }}-e2e-neo4j-cache
-
-      - name: Restore backend cache
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
-        with:
-          path: /tmp/backend.tar
-          key: ${{ github.run_id }}-e2e-backend-cache
+          path: |
+            /tmp/backend.tar
+            /tmp/neo4j.tar
+            /tmp/minio.tar
+            /tmp/minio-mc.tar
+            /tmp/mailserver.tar
+          key: ${{ github.run_id }}-e2e-backend-environment-cache
 
       - name: Restore webapp cache
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
@@ -134,8 +155,11 @@ jobs:
           sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
           docker load < /tmp/neo4j.tar
           docker load < /tmp/backend.tar
+          docker load < /tmp/minio.tar
+          docker load < /tmp/minio-mc.tar
+          docker load < /tmp/mailserver.tar
           docker load < /tmp/webapp.tar
-          docker compose -f docker-compose.yml -f docker-compose.test.yml up --build --detach webapp mailserver
+          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
           sleep 90s
 
       - name: Full stack tests | run tests
@@ -163,7 +187,7 @@ jobs:
     continue-on-error: true
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
+        uses: actions/checkout@09d2acae674a48949e3602304ab46fd20ae0c42f # v4.2.2
       
       - name: Full stack tests | cleanup cache
         run: |

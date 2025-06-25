@@ -130,6 +130,7 @@
     "roomEmpty": null,
     "roomsEmpty": null,
     "search": "Filtrar salas de chat",
+    "transmitting": null,
     "typeMessage": null,
     "userProfileButton": {
       "label": null,
@@ -227,8 +228,7 @@
       },
       "email-display": {
         "warningFormat": null,
-        "warningUndef": null,
-        "yourEmail": null
+        "warningUndef": null
       },
       "email-nonce": {
         "buttonTitle": null,

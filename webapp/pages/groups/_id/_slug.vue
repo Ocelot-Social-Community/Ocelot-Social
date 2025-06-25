@@ -55,29 +55,11 @@
                   <count-to
                     slot="count"
                     :start-val="membersCountStartValue"
-                    :end-val="groupMembers.length"
+                    :end-val="group.membersCount"
                   />
                 </ds-number>
               </client-only>
             </ds-flex-item>
-            <!-- <ds-flex-item>
-                 <client-only>
-                 <ds-number :label="$t('profile.followers')">
-                 <count-to
-                 slot="count"
-                 :start-val="followedByCountStartValue"
-                 :end-val="user.followedByCount"
-                 />
-                 </ds-number>
-                 </client-only>
-                 </ds-flex-item> -->
-            <!-- <ds-flex-item>
-                 <client-only>
-                 <ds-number :label="$t('profile.following')">
-                 <count-to slot="count" :end-val="user.followingCount" />
-                 </ds-number>
-                 </client-only>
-                 </ds-flex-item> -->
           </ds-flex>
           <div class="action-buttons">
             <base-button danger v-if="group.isMutedByMe" @click="unmuteGroup" icon="volume-up">
@@ -131,7 +113,9 @@
             <ds-space margin="x-small" />
           </ds-space>
           <!-- group categories -->
-          <template v-if="categoriesActive && group && group.categories.length > 0">
+          <template
+            v-if="categoriesActive && group && group.categories && group.categories.length > 0"
+          >
             <hr />
             <ds-space margin-top="small" margin-bottom="small">
               <ds-text class="centered-text hyphenate-text" color="soft" size="small">
@@ -192,25 +176,11 @@
               ? $t('group.membersListTitleNotAllowedSeeingGroupMembers')
               : null
           "
-          :allProfilesCount="isAllowedSeeingGroupMembers ? groupMembers.length : 0"
+          :allProfilesCount="isAllowedSeeingGroupMembers ? group.membersCount : 0"
           :profiles="isAllowedSeeingGroupMembers ? groupMembers : []"
           :loading="$apollo.loading"
           @fetchAllProfiles="fetchAllMembers"
         />
-        <!-- <ds-space />
-             <follow-list
-             :loading="$apollo.loading"
-             :user="user"
-             type="followedBy"
-             @fetchAllConnections="fetchAllConnections"
-             />
-             <ds-space />
-             <follow-list
-             :loading="$apollo.loading"
-             :user="user"
-             type="following"
-             @fetchAllConnections="fetchAllConnections"
-             /> -->
         <!-- <social-media :user-name="groupName" :user="user" /> -->
       </ds-flex-item>
 
@@ -308,8 +278,6 @@ import Category from '~/components/Category'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CountTo from '~/components/CountTo.vue'
 import Empty from '~/components/Empty/Empty'
-// import FollowButton from '~/components/Button/FollowButton'
-// import FollowList from '~/components/features/ProfileList/FollowList'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
 import JoinLeaveButton from '~/components/Button/JoinLeaveButton'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
@@ -338,8 +306,6 @@ export default {
     ContentViewer,
     CountTo,
     Empty,
-    // FollowButton,
-    // FollowList,
     GroupContentMenu,
     JoinLeaveButton,
     PostTeaser,
@@ -371,11 +337,8 @@ export default {
       pageSize: 6,
       // tabActive: 'post',
       filter,
-      // followedByCountStartValue: 0,
-      // followedByCount: 7,
-      // followingCount: 7,
       membersCountStartValue: 0,
-      membersCountToLoad: Infinity,
+      membersCountToLoad: 25,
       updateGroupMutation,
       isDescriptionCollapsed: true,
     }
@@ -591,7 +554,7 @@ export default {
       }
     },
     fetchAllMembers() {
-      this.membersCountToLoad = Infinity
+      this.membersCountToLoad = this.group.membersCount
     },
   },
   apollo: {
@@ -619,8 +582,6 @@ export default {
       variables() {
         return {
           id: this.$route.params.id,
-          // followedByCount: this.followedByCount,
-          // followingCount: this.followingCount,
         }
       },
       error(error) {
@@ -635,6 +596,7 @@ export default {
       variables() {
         return {
           id: this.$route.params.id,
+          first: this.membersCountToLoad,
         }
       },
       skip() {

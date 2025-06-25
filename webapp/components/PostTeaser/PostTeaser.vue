@@ -53,7 +53,10 @@
         class="footer"
         v-observe-visibility="(isVisible, entry) => visibilityChanged(isVisible, entry, post.id)"
       >
-        <div class="categories" v-if="categoriesActive && post.categories.length > 0">
+        <div
+          class="categories"
+          v-if="categoriesActive && post.categories && post.categories.length > 0"
+        >
           <category
             v-for="category in post.categories"
             :key="category.id"

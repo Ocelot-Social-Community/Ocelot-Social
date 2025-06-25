@@ -13,6 +13,7 @@ import existingEmailAddress from './helpers/existingEmailAddress'
 import generateNonce from './helpers/generateNonce'
 import normalizeEmail from './helpers/normalizeEmail'
 import { redeemInviteCode } from './inviteCodes'
+import { createOrUpdateLocations } from './users/location'
 
 const neode = getNeode()
 
@@ -43,13 +44,16 @@ export default {
       }
       args.termsAndConditionsAgreedAt = new Date().toISOString()
 
-      let { nonce, email, inviteCode } = args
+      let { nonce, email, inviteCode, locationName } = args
       email = normalizeEmail(email)
       delete args.nonce
       delete args.email
       delete args.inviteCode
       args.encryptedPassword = await hash(args.password, 10)
       delete args.password
+      delete args.locationName
+
+      if (locationName === '') locationName = null
 
       const { driver } = context
       const session = driver.session()
@@ -68,6 +72,7 @@ export default {
             SET user.updatedAt = toString(datetime())
             SET user.allowEmbedIframes = false
             SET user.showShoutsPublicly = false
+            SET user.locationName = $locationName
             SET email.verifiedAt = toString(datetime())
             WITH user
             OPTIONAL MATCH (post:Post)-[:IN]->(group:Group)
@@ -83,6 +88,7 @@ export default {
             nonce,
             email,
             inviteCode,
+            locationName,
           },
         )
         const [user] = createUserTransactionResponse.records.map((record) => record.get('user'))
@@ -100,6 +106,7 @@ export default {
           await redeemInviteCode(context, inviteCode, true)
         }
 
+        await createOrUpdateLocations('User', user.id, locationName, session)
         return user
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')

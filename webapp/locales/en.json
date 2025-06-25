@@ -130,6 +130,7 @@
     "roomEmpty": "No room selected",
     "roomsEmpty": "No rooms",
     "search": "Filter chat rooms",
+    "transmitting": "Transmitting message ...",
     "typeMessage": "Type message",
     "userProfileButton": {
       "label": "Chat",
@@ -227,8 +228,7 @@
       },
       "email-display": {
         "warningFormat": "⚠️ E-mail has wrong format!",
-        "warningUndef": "⚠️ No e-mail defined!",
-        "yourEmail": "Your e-mail address:"
+        "warningUndef": "⚠️ No e-mail defined!"
       },
       "email-nonce": {
         "buttonTitle": "Continue",

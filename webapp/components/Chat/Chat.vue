@@ -1,85 +1,91 @@
 <template>
-  <div>
-    <client-only>
-      <vue-advanced-chat
-        :theme="theme"
-        :current-user-id="currentUser.id"
-        :room-id="computedRoomId"
-        :template-actions="JSON.stringify(templatesText)"
-        :menu-actions="JSON.stringify(menuActions)"
-        :text-messages="JSON.stringify(textMessages)"
-        :message-actions="messageActions"
-        :messages="JSON.stringify(messages)"
-        :messages-loaded="messagesLoaded"
-        :rooms="JSON.stringify(rooms)"
-        :room-actions="JSON.stringify(roomActions)"
-        :rooms-loaded="roomsLoaded"
-        :loading-rooms="loadingRooms"
-        show-files="false"
-        show-audio="false"
-        :height="'calc(100dvh - 190px)'"
-        :styles="JSON.stringify(computedChatStyle)"
-        :show-footer="true"
-        :responsive-breakpoint="responsiveBreakpoint"
-        :single-room="singleRoom"
-        show-reaction-emojis="false"
-        @send-message="sendMessage($event.detail[0])"
-        @fetch-messages="fetchMessages($event.detail[0])"
-        @fetch-more-rooms="fetchRooms"
-        @add-room="toggleUserSearch"
-        @show-demo-options="showDemoOptions = $event"
-        @open-user-tag="redirectToUserProfile($event.detail[0])"
-      >
-        <div
-          v-if="selectedRoom && selectedRoom.roomId"
-          slot="room-options"
-          class="chat-room-options"
-        >
-          <ds-flex v-if="singleRoom">
-            <ds-flex-item centered class="single-chat-bubble">
-              <nuxt-link :to="{ name: 'chat' }">
-                <base-button icon="expand" size="small" circle />
-              </nuxt-link>
-            </ds-flex-item>
-            <ds-flex-item centered>
-              <div class="vac-svg-button vac-room-options">
-                <slot name="menu-icon">
-                  <base-button
-                    icon="close"
-                    size="small"
-                    circle
-                    @click="$emit('close-single-room', true)"
-                  />
-                </slot>
-              </div>
-            </ds-flex-item>
-          </ds-flex>
-        </div>
-
-        <div slot="room-header-avatar">
-          <div
-            v-if="selectedRoom && selectedRoom.avatar"
-            class="vac-avatar"
-            :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
-          />
-          <div v-else-if="selectedRoom" class="vac-avatar">
-            <span class="initials">{{ getInitialsName(selectedRoom.roomName) }}</span>
+  <vue-advanced-chat
+    :theme="theme"
+    :current-user-id="currentUser.id"
+    :room-id="computedRoomId"
+    :template-actions="JSON.stringify(templatesText)"
+    :menu-actions="JSON.stringify(menuActions)"
+    :text-messages="JSON.stringify(textMessages)"
+    :message-actions="messageActions"
+    :messages="JSON.stringify(messages)"
+    :messages-loaded="messagesLoaded"
+    :rooms="JSON.stringify(rooms)"
+    :room-actions="JSON.stringify(roomActions)"
+    :rooms-loaded="roomsLoaded"
+    :loading-rooms="loadingRooms"
+    :media-preview-enabled="isSafari ? 'false' : 'true'"
+    show-files="true"
+    show-audio="true"
+    capture-files="true"
+    :height="'calc(100dvh - 190px)'"
+    :styles="JSON.stringify(computedChatStyle)"
+    :show-footer="true"
+    :responsive-breakpoint="responsiveBreakpoint"
+    :single-room="singleRoom"
+    show-reaction-emojis="false"
+    @send-message="sendMessage($event.detail[0])"
+    @fetch-messages="fetchMessages($event.detail[0])"
+    @fetch-more-rooms="fetchRooms"
+    @add-room="toggleUserSearch"
+    @show-demo-options="showDemoOptions = $event"
+    @open-user-tag="redirectToUserProfile($event.detail[0])"
+    @open-file="openFile($event.detail[0].file.file)"
+  >
+    <div v-if="selectedRoom && selectedRoom.roomId" slot="room-options" class="chat-room-options">
+      <ds-flex v-if="singleRoom">
+        <ds-flex-item centered class="single-chat-bubble">
+          <nuxt-link :to="{ name: 'chat' }">
+            <base-button icon="expand" size="small" circle />
+          </nuxt-link>
+        </ds-flex-item>
+        <ds-flex-item centered>
+          <div class="vac-svg-button vac-room-options">
+            <slot name="menu-icon">
+              <base-button
+                icon="close"
+                size="small"
+                circle
+                @click="$emit('close-single-room', true)"
+              />
+            </slot>
           </div>
-        </div>
+        </ds-flex-item>
+      </ds-flex>
+    </div>
 
-        <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
-          <div
-            v-if="room.avatar"
-            class="vac-avatar"
-            :style="{ 'background-image': `url('${room.avatar}')` }"
-          />
-          <div v-else class="vac-avatar">
-            <span class="initials">{{ getInitialsName(room.roomName) }}</span>
-          </div>
-        </div>
-      </vue-advanced-chat>
-    </client-only>
-  </div>
+    <div slot="room-header-avatar">
+      <div
+        v-if="selectedRoom && selectedRoom.avatar"
+        class="vac-avatar"
+        :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
+      />
+      <div v-else-if="selectedRoom" class="vac-avatar">
+        <span class="initials">{{ getInitialsName(selectedRoom.roomName) }}</span>
+      </div>
+    </div>
+
+    <div
+      v-for="message in messages.filter((m) => m.isUploading)"
+      :slot="'message_' + message._id"
+      v-bind:key="message._id"
+      class="vac-format-message-wrapper"
+    >
+      <div class="markdown">
+        <p>{{ $t('chat.transmitting') }}</p>
+      </div>
+    </div>
+
+    <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
+      <div
+        v-if="room.avatar"
+        class="vac-avatar"
+        :style="{ 'background-image': `url('${room.avatar}')` }"
+      />
+      <div v-else class="vac-avatar">
+        <span class="initials">{{ getInitialsName(room.roomName) }}</span>
+      </div>
+    </div>
+  </vue-advanced-chat>
 </template>
 
 <script>
@@ -214,6 +220,9 @@ export default {
       }
 
       return roomId
+    },
+    isSafari() {
+      return /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
     },
     textMessages() {
       return {
@@ -356,6 +365,8 @@ export default {
       changedRoom.lastMessage = data.chatMessageAdded
       changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
       changedRoom.lastMessageAt = data.chatMessageAdded.date
+      // Move changed room to the top of the list
+      changedRoom.index = data.chatMessageAdded.date
       changedRoom.unreadCount++
       this.rooms[roomIndex] = changedRoom
       if (data.chatMessageAdded.room.id === this.selectedRoom?.id) {
@@ -365,31 +376,78 @@ export default {
       }
     },
 
-    async sendMessage(message) {
-      try {
-        const {
-          data: { CreateMessage: createdMessage },
-        } = await this.$apollo.mutate({
-          mutation: createMessageMutation(),
-          variables: {
-            roomId: message.roomId,
-            content: message.content,
-          },
-        })
-        const roomIndex = this.rooms.findIndex((r) => r.id === message.roomId)
+    async sendMessage(messageDetails) {
+      const { roomId, content, files } = messageDetails
+
+      const hasFiles = files && files.length > 0
+
+      const filesToUpload = hasFiles
+        ? files.map((file) => ({
+            upload: new File(
+              [file.blob],
+              // Captured audio already has the right extension in the name
+              file.extension ? `${file.name}.${file.extension}` : file.name,
+            ),
+            name: file.name,
+            type: file.type,
+          }))
+        : null
+
+      const mutationVariables = {
+        roomId,
+        content,
+      }
+
+      if (filesToUpload && filesToUpload.length > 0) {
+        mutationVariables.files = filesToUpload
+      }
+
+      // Immediately add new message
+      const localMessage = {
+        ...messageDetails,
+        _id: 'new' + Math.random().toString(36).substring(2, 15),
+        seen: false,
+        saved: false,
+        date: new Date().toDateString(),
+        senderId: this.currentUser.id,
+        files:
+          messageDetails.files?.map((file) => ({
+            ...file,
+            url: URL.createObjectURL(new Blob([file.blob], { type: file.type })),
+          })) ?? [],
+        // Custom property
+        isUploading: true,
+      }
+      this.messages = [...this.messages, localMessage]
+
+      const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
+      if (roomIndex !== -1) {
         const changedRoom = { ...this.rooms[roomIndex] }
-        changedRoom.lastMessage = createdMessage
-        changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
-        // move current room to top (not 100% working)
-        // const rooms = [...this.rooms]
-        // rooms.splice(roomIndex,1)
-        // this.rooms = [changedRoom, ...rooms]
-        this.rooms[roomIndex] = changedRoom
+        changedRoom.lastMessage.content = content
+
+        // Move changed room to the top of the list
+        changedRoom.index = changedRoom.lastMessage.date
+        this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== roomId)]
+      }
+
+      try {
+        const { data } = await this.$apollo.mutate({
+          mutation: createMessageMutation(),
+          variables: mutationVariables,
+        })
+        const createdMessagePayload = data.CreateMessage
+
+        if (createdMessagePayload && roomIndex !== -1) {
+          const changedRoom = { ...this.rooms[roomIndex] }
+          changedRoom.lastMessage.content = createdMessagePayload.content.trim().substring(0, 30)
+          changedRoom.lastMessage.date = createdMessagePayload.date
+        }
       } catch (error) {
         this.$toast.error(error.message)
       }
+
       this.fetchMessages({
-        room: this.rooms.find((r) => r.roomId === message.roomId),
+        room: this.rooms.find((r) => r.roomId === messageDetails.roomId),
         options: { refetch: true },
       })
     },
@@ -414,7 +472,7 @@ export default {
               ...room.lastMessage,
               content: room.lastMessage?.content?.trim().substring(0, 30),
             }
-          : null,
+          : {},
         users: room.users.map((u) => {
           return { ...u, username: u.name, avatar: this.$filters.proxyApiUrl(u.avatar?.url) }
         }),
@@ -450,6 +508,35 @@ export default {
         .finally(() => {
           // this.loading = false
         })
+    },
+
+    openFile: async function (file) {
+      if (!file || !file.url) return
+
+      /* For videos, this function is called only on Safari.
+         We don't want to download video files when clicking on them. */
+      if (file.type.startsWith('video/')) return
+
+      /* To make the browser download the file instead of opening it, it needs to be
+         from the same origin or from local blob storage. So we fetch it first
+         and then create a download link from blob storage. */
+
+      const url = this.$filters.proxyApiUrl(file.url)
+      const download = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': file.type,
+        },
+      })
+      const blob = await download.blob()
+      const objectURL = window.URL.createObjectURL(blob)
+      const downloadLink = document.createElement('a')
+      downloadLink.href = objectURL
+      downloadLink.download = `${file.name}.${file.url.split('.').slice(-1).pop()}`
+      downloadLink.style.display = 'none'
+      document.body.appendChild(downloadLink)
+      downloadLink.click()
+      document.body.removeChild(downloadLink)
     },
 
     redirectToUserProfile({ user }) {

@@ -6,6 +6,7 @@
         :link-to-profile="linkToProfile"
         :show-popover="showPopover"
         :user-link="userLink"
+        :hover-delay="hoverDelay"
         @open-menu="loadPopover(openMenu)"
         @close-menu="closeMenu(false)"
         data-test="avatarUserLink"
@@ -18,6 +19,7 @@
             :link-to-profile="linkToProfile"
             :show-popover="showPopover"
             :user-link="userLink"
+            :hover-delay="hoverDelay"
             @open-menu="loadPopover(openMenu)"
             @close-menu="closeMenu(false)"
           >
@@ -67,7 +69,7 @@ import UserTeaserPopover from './UserTeaserPopover'
 import UserTeaserHelper from './UserTeaserHelper.vue'
 
 export default {
-  name: 'UserTeaser',
+  name: 'UserTeaserNonAnonymous',
   components: {
     ProfileAvatar,
     UserTeaserPopover,
@@ -85,6 +87,7 @@ export default {
     showPopover: { type: Boolean, default: true },
     injectedText: { type: String, default: null },
     injectedDate: { type: Boolean, default: false },
+    hoverDelay: { type: Number, default: 500 },
   },
   computed: {
     ...mapGetters({

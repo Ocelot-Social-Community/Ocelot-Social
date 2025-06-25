@@ -45,6 +45,7 @@ export default {
       variables() {
         return {
           id: this.group.id,
+          first: 999999,
         }
       },
       error(error) {

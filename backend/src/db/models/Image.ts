@@ -5,4 +5,5 @@ export default {
   aspectRatio: { type: 'float', default: 1.0 },
   type: { type: 'string' },
   createdAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
+  updatedAt: { type: 'string', isoDate: true, default: () => new Date().toISOString() },
 }

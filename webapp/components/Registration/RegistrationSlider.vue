@@ -1,5 +1,8 @@
 <template>
   <section class="registration-slider">
+    <div v-if="registrationType !== 'no-public-registration'" class="back-link" left>
+      <nuxt-link :to="loginLink">{{ $t('site.back-to-login') }}</nuxt-link>
+    </div>
     <base-card>
       <template #imageColumn>
         <page-params-link :pageParams="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)">
@@ -26,12 +29,6 @@
 
         <template #create-user-account>
           <registration-slide-create :sliderData="sliderData" />
-        </template>
-
-        <template v-if="registrationType !== 'no-public-registration'" #footer>
-          <ds-space margin-bottom="xxx-small" margin-top="small" centered>
-            <nuxt-link :to="loginLink">{{ $t('site.back-to-login') }}</nuxt-link>
-          </ds-space>
         </template>
       </component-slider>
 
@@ -94,7 +91,7 @@ export default {
         data: { request: null, response: { isValidInviteCode: false } },
         button: {
           titleIdent: 'components.registration.invite-code.buttonTitle',
-          icon: 'arrow-right',
+          icon: null,
           callback: this.buttonCallback,
           sliderCallback: null, // optional set by slot
         },
@@ -106,7 +103,7 @@ export default {
         data: { request: null, response: null },
         button: {
           titleIdent: 'components.registration.email.buttonTitle.send', // changed by slider component
-          icon: 'envelope', // changed by slider component
+          icon: null,
           callback: this.buttonCallback,
           sliderCallback: null, // optional set by slot
         },
@@ -118,7 +115,7 @@ export default {
         data: { request: null, response: { VerifyNonce: false } },
         button: {
           titleIdent: 'components.registration.email-nonce.buttonTitle',
-          icon: 'arrow-right',
+          icon: null,
           callback: this.buttonCallback,
           sliderCallback: null, // optional set by slot
         },
@@ -130,7 +127,7 @@ export default {
         data: { request: null, response: null },
         button: {
           titleIdent: 'components.registration.create-user-account.buttonTitle',
-          icon: 'check',
+          icon: null,
           loading: false,
           callback: this.buttonCallback,
           sliderCallback: null, // optional set by slot
@@ -180,6 +177,7 @@ export default {
           passwordConfirmation: null,
           termsAndConditionsConfirmed: null,
           receiveCommunicationAsEmailsEtcConfirmed: null,
+          locationName: null,
         },
         sliderIndex:
           this.activePage === null ? 0 : sliders.findIndex((el) => el.name === this.activePage),
@@ -264,5 +262,8 @@ export default {
   width: 80vw;
   max-width: 620px;
   margin: auto;
+}
+.back-link {
+  height: 35px;
 }
 </style>
