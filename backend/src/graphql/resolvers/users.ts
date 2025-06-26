@@ -60,7 +60,7 @@ export default {
         throw new UserInputError(e.message)
       }
     },
-    blockedUsers: async (_object, _args, context, _resolveInfo) => {
+    blockedUsers: async (_object, _args, context: Context, _resolveInfo) => {
       try {
         return getBlockedUsers(context)
       } catch (e) {
@@ -122,7 +122,7 @@ export default {
       const unmutedUser = await neode.find('User', params.id)
       return unmutedUser.toJson()
     },
-    blockUser: async (_object, args, context, _resolveInfo) => {
+    blockUser: async (_object, args, context: Context, _resolveInfo) => {
       const { user: currentUser } = context
       if (currentUser.id === args.id) return null
 
@@ -147,10 +147,10 @@ export default {
         context.logger.error('blockUser mutation', error.message)
         throw new UserInputError(error.message)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    unblockUser: async (_object, args, context, _resolveInfo) => {
+    unblockUser: async (_object, args, context: Context, _resolveInfo) => {
       const { user: currentUser } = context
       if (currentUser.id === args.id) return null
 
@@ -172,10 +172,10 @@ export default {
         context.logger.error('unblockUser mutation', error.message)
         throw new UserInputError(error.message)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    UpdateUser: async (_parent, params, context, _resolveInfo) => {
+    UpdateUser: async (_parent, params, context: Context, _resolveInfo) => {
       const { avatar: avatarInput } = params
       delete params.avatar
       params.locationName = params.locationName === '' ? null : params.locationName
@@ -228,7 +228,7 @@ export default {
         context.logger.error('UpdateUser mutation', error.message)
         throw new UserInputError(error.message)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     DeleteUser: async (_object, params, context, _resolveInfo) => {
@@ -297,7 +297,7 @@ export default {
         session.close()
       }
     },
-    switchUserRole: async (_object, args, context, _resolveInfo) => {
+    switchUserRole: async (_object, args, context: Context, _resolveInfo) => {
       const { role, id } = args
 
       if (context.user.id === id) {
@@ -322,7 +322,7 @@ export default {
         const user = await writeTxResultPromise
         return user
       } finally {
-        session.close()
+        await session.close()
       }
     },
     saveCategorySettings: async (_object, args, context, _resolveInfo) => {

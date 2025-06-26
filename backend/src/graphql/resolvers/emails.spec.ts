@@ -18,6 +18,12 @@ let user
 let variables
 const driver = getDriver()
 
+const loggerErrorMock: (e) => void = jest.fn()
+
+jest.mock('@src/logger', () => ({
+  error: (e) => loggerErrorMock(e),
+}))
+
 beforeAll(async () => {
   await cleanDatabase()
 
