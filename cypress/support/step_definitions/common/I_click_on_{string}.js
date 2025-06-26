@@ -14,6 +14,18 @@ defineStep('I click on {string}', element => {
     'Moderation': 'a[href="/moderation"]',
   }
 
+  if (element === 'Moderation') {
+    cy.intercept({
+      method: 'POST',
+      url: '/api',
+      hostname: 'localhost',
+    }, (req) => {
+      if (req.body && req.body.query && req.body.query.includes('query ($orderBy: ReportOrdering')) {
+        req.alias = 'reportsQuery'
+      }
+    })
+  }
+
   cy.get(elementSelectors[element])
     .click()
     .wait(750)

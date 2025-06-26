@@ -1,98 +1,91 @@
 <template>
-  <div>
-    <client-only>
-      <vue-advanced-chat
-        :theme="theme"
-        :current-user-id="currentUser.id"
-        :room-id="computedRoomId"
-        :template-actions="JSON.stringify(templatesText)"
-        :menu-actions="JSON.stringify(menuActions)"
-        :text-messages="JSON.stringify(textMessages)"
-        :message-actions="messageActions"
-        :messages="JSON.stringify(messages)"
-        :messages-loaded="messagesLoaded"
-        :rooms="JSON.stringify(rooms)"
-        :room-actions="JSON.stringify(roomActions)"
-        :rooms-loaded="roomsLoaded"
-        :loading-rooms="loadingRooms"
-        show-files="true"
-        show-audio="true"
-        capture-files="true"
-        :height="'calc(100dvh - 190px)'"
-        :styles="JSON.stringify(computedChatStyle)"
-        :show-footer="true"
-        :responsive-breakpoint="responsiveBreakpoint"
-        :single-room="singleRoom"
-        show-reaction-emojis="false"
-        @send-message="sendMessage($event.detail[0])"
-        @fetch-messages="fetchMessages($event.detail[0])"
-        @fetch-more-rooms="fetchRooms"
-        @add-room="toggleUserSearch"
-        @show-demo-options="showDemoOptions = $event"
-        @open-user-tag="redirectToUserProfile($event.detail[0])"
-        @open-file="openFile($event.detail[0].file.file)"
-      >
-        <div
-          v-if="selectedRoom && selectedRoom.roomId"
-          slot="room-options"
-          class="chat-room-options"
-        >
-          <ds-flex v-if="singleRoom">
-            <ds-flex-item centered class="single-chat-bubble">
-              <nuxt-link :to="{ name: 'chat' }">
-                <base-button icon="expand" size="small" circle />
-              </nuxt-link>
-            </ds-flex-item>
-            <ds-flex-item centered>
-              <div class="vac-svg-button vac-room-options">
-                <slot name="menu-icon">
-                  <base-button
-                    icon="close"
-                    size="small"
-                    circle
-                    @click="$emit('close-single-room', true)"
-                  />
-                </slot>
-              </div>
-            </ds-flex-item>
-          </ds-flex>
-        </div>
-
-        <div slot="room-header-avatar">
-          <div
-            v-if="selectedRoom && selectedRoom.avatar"
-            class="vac-avatar"
-            :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
-          />
-          <div v-else-if="selectedRoom" class="vac-avatar">
-            <span class="initials">{{ getInitialsName(selectedRoom.roomName) }}</span>
+  <vue-advanced-chat
+    :theme="theme"
+    :current-user-id="currentUser.id"
+    :room-id="computedRoomId"
+    :template-actions="JSON.stringify(templatesText)"
+    :menu-actions="JSON.stringify(menuActions)"
+    :text-messages="JSON.stringify(textMessages)"
+    :message-actions="messageActions"
+    :messages="JSON.stringify(messages)"
+    :messages-loaded="messagesLoaded"
+    :rooms="JSON.stringify(rooms)"
+    :room-actions="JSON.stringify(roomActions)"
+    :rooms-loaded="roomsLoaded"
+    :loading-rooms="loadingRooms"
+    :media-preview-enabled="isSafari ? 'false' : 'true'"
+    show-files="true"
+    show-audio="true"
+    capture-files="true"
+    :height="'calc(100dvh - 190px)'"
+    :styles="JSON.stringify(computedChatStyle)"
+    :show-footer="true"
+    :responsive-breakpoint="responsiveBreakpoint"
+    :single-room="singleRoom"
+    show-reaction-emojis="false"
+    @send-message="sendMessage($event.detail[0])"
+    @fetch-messages="fetchMessages($event.detail[0])"
+    @fetch-more-rooms="fetchRooms"
+    @add-room="toggleUserSearch"
+    @show-demo-options="showDemoOptions = $event"
+    @open-user-tag="redirectToUserProfile($event.detail[0])"
+    @open-file="openFile($event.detail[0].file.file)"
+  >
+    <div v-if="selectedRoom && selectedRoom.roomId" slot="room-options" class="chat-room-options">
+      <ds-flex v-if="singleRoom">
+        <ds-flex-item centered class="single-chat-bubble">
+          <nuxt-link :to="{ name: 'chat' }">
+            <base-button icon="expand" size="small" circle />
+          </nuxt-link>
+        </ds-flex-item>
+        <ds-flex-item centered>
+          <div class="vac-svg-button vac-room-options">
+            <slot name="menu-icon">
+              <base-button
+                icon="close"
+                size="small"
+                circle
+                @click="$emit('close-single-room', true)"
+              />
+            </slot>
           </div>
-        </div>
+        </ds-flex-item>
+      </ds-flex>
+    </div>
 
-        <div
-          v-for="message in messages.filter((m) => m.isUploading)"
-          :slot="'message_' + message._id"
-          v-bind:key="message._id"
-          class="vac-format-message-wrapper"
-        >
-          <div class="markdown">
-            <p>{{ $t('chat.transmitting') }}</p>
-          </div>
-        </div>
+    <div slot="room-header-avatar">
+      <div
+        v-if="selectedRoom && selectedRoom.avatar"
+        class="vac-avatar"
+        :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
+      />
+      <div v-else-if="selectedRoom" class="vac-avatar">
+        <span class="initials">{{ getInitialsName(selectedRoom.roomName) }}</span>
+      </div>
+    </div>
 
-        <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
-          <div
-            v-if="room.avatar"
-            class="vac-avatar"
-            :style="{ 'background-image': `url('${room.avatar}')` }"
-          />
-          <div v-else class="vac-avatar">
-            <span class="initials">{{ getInitialsName(room.roomName) }}</span>
-          </div>
-        </div>
-      </vue-advanced-chat>
-    </client-only>
-  </div>
+    <div
+      v-for="message in messages.filter((m) => m.isUploading)"
+      :slot="'message_' + message._id"
+      v-bind:key="message._id"
+      class="vac-format-message-wrapper"
+    >
+      <div class="markdown">
+        <p>{{ $t('chat.transmitting') }}</p>
+      </div>
+    </div>
+
+    <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
+      <div
+        v-if="room.avatar"
+        class="vac-avatar"
+        :style="{ 'background-image': `url('${room.avatar}')` }"
+      />
+      <div v-else class="vac-avatar">
+        <span class="initials">{{ getInitialsName(room.roomName) }}</span>
+      </div>
+    </div>
+  </vue-advanced-chat>
 </template>
 
 <script>
@@ -227,6 +220,9 @@ export default {
       }
 
       return roomId
+    },
+    isSafari() {
+      return /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
     },
     textMessages() {
       return {
@@ -516,6 +512,11 @@ export default {
 
     openFile: async function (file) {
       if (!file || !file.url) return
+
+      /* For videos, this function is called only on Safari.
+         We don't want to download video files when clicking on them. */
+      if (file.type.startsWith('video/')) return
+
       /* To make the browser download the file instead of opening it, it needs to be
          from the same origin or from local blob storage. So we fetch it first
          and then create a download link from blob storage. */

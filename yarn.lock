@@ -1044,15 +1044,15 @@
     "@babel/helper-string-parser" "^7.27.1"
     "@babel/helper-validator-identifier" "^7.27.1"
 
-"@badeball/cypress-cucumber-preprocessor@^22.0.1":
-  version "22.0.1"
-  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-22.0.1.tgz#f2afa85143c64256ebbecc2424c424c4cc3eaa48"
-  integrity sha512-wGZiNI7vfapbUo9x7H65pd6YRArsnpyTyHJ6yGafS77uTFBXU0McrpWJrE8aEDgSOz8+jdCwI0eJRnUSm1mJDA==
+"@badeball/cypress-cucumber-preprocessor@^22.1.0":
+  version "22.1.0"
+  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-22.1.0.tgz#283c7d924badfbef9e08c7d13b2d672822f39909"
+  integrity sha512-6hZdi7krImbUKp8lVqwMcW5cGxMmyZahPpkWL5D3wfTYRRhVgeOx9Y7liyCqKcOZkyCoufJEx8iGtTNYKiR3SQ==
   dependencies:
     "@cucumber/ci-environment" "^10.0.1"
     "@cucumber/cucumber" "^11.0.0"
     "@cucumber/cucumber-expressions" "^18.0.0"
-    "@cucumber/gherkin" "^30.0.0"
+    "@cucumber/gherkin" "^32.0.0"
     "@cucumber/html-formatter" "^21.7.0"
     "@cucumber/message-streams" "^4.0.1"
     "@cucumber/messages" "^27.0.0"
@@ -1154,7 +1154,7 @@
     commander "13.1.0"
     source-map-support "^0.5.21"
 
-"@cucumber/gherkin@30.0.4", "@cucumber/gherkin@^30.0.0":
+"@cucumber/gherkin@30.0.4":
   version "30.0.4"
   resolved "https://registry.yarnpkg.com/@cucumber/gherkin/-/gherkin-30.0.4.tgz#047071b3122a9fb25e073aabdbc0132e98db4ee4"
   integrity sha512-pb7lmAJqweZRADTTsgnC3F5zbTh3nwOB1M83Q9ZPbUKMb3P76PzK6cTcPTJBHWy3l7isbigIv+BkDjaca6C8/g==
@@ -1167,6 +1167,13 @@
   integrity sha512-wlZfdPif7JpBWJdqvHk1Mkr21L5vl4EfxVUOS4JinWGf3FLRV6IKUekBv5bb5VX79fkDcfDvESzcQ8WQc07Wgw==
   dependencies:
     "@cucumber/messages" ">=19.1.4 <=26"
+
+"@cucumber/gherkin@^32.0.0":
+  version "32.1.2"
+  resolved "https://registry.yarnpkg.com/@cucumber/gherkin/-/gherkin-32.1.2.tgz#c03ecc77f6ec55c363111c0deb3d0cd1f4908c42"
+  integrity sha512-hj1DcaiIpXJg+mo58zpQyP8c6YsUY/NIOK8oWg1XxbXAWkuYNWr9kkM+i8Xxg1yT6YEzn1loLBG6GjL6SPYOZQ==
+  dependencies:
+    "@cucumber/messages" ">=19.1.4 <28"
 
 "@cucumber/html-formatter@21.10.1", "@cucumber/html-formatter@^21.7.0":
   version "21.10.1"
@@ -1188,7 +1195,7 @@
   resolved "https://registry.yarnpkg.com/@cucumber/message-streams/-/message-streams-4.0.1.tgz#a5339d3504594bb2edb5732aaae94dddb24d0970"
   integrity sha512-Kxap9uP5jD8tHUZVjTWgzxemi/0uOsbGjd4LBOSxcJoOCRbESFwemUzilJuzNTB8pcTQUh8D5oudUyxfkJOKmA==
 
-"@cucumber/messages@27.2.0", "@cucumber/messages@^27.0.0":
+"@cucumber/messages@27.2.0", "@cucumber/messages@>=19.1.4 <28", "@cucumber/messages@^27.0.0":
   version "27.2.0"
   resolved "https://registry.yarnpkg.com/@cucumber/messages/-/messages-27.2.0.tgz#ee0cc006a391568fb668d47a23ac2e5bf901ff3a"
   integrity sha512-f2o/HqKHgsqzFLdq6fAhfG1FNOQPdBdyMGpKwhb7hZqg0yZtx9BVqkTyuoNk83Fcvk3wjMVfouFXXHNEk4nddA==
@@ -4061,10 +4068,10 @@ cypress-network-idle@^1.15.0:
   resolved "https://registry.yarnpkg.com/cypress-network-idle/-/cypress-network-idle-1.15.0.tgz#e249f08695a46f1ddce18a95d5293937f277cbb3"
   integrity sha512-8zU16zhc7S3nMl1NTEEcNsZYlJy/ZzP2zPTTrngGxyXH32Ipake/xfHLZsgrzeWCieiS2AVhQsakhWqFzO3hpw==
 
-cypress@^14.4.1:
-  version "14.4.1"
-  resolved "https://registry.yarnpkg.com/cypress/-/cypress-14.4.1.tgz#6e586ba098503b594561d5f8f746a9db6556ed2a"
-  integrity sha512-YSGvVXtTqSGRTyHbaxHI5dHU/9xc5ymaTIM4BU85GKhj980y6XgA3fShSpj5DatS8knXMsAvYItQxVQFHGpUtw==
+cypress@^14.5.0:
+  version "14.5.0"
+  resolved "https://registry.yarnpkg.com/cypress/-/cypress-14.5.0.tgz#5b02b06993a9dcea9b9146fc02840a92f6a40584"
+  integrity sha512-1HOnKvWep0LkWuFwPeWkZ0TDl7ivi2/Mz+WNU4dfkeLJaFndS3Ow6TXT7YjuTqLFI2peJKzPKljVUFdymI2K5g==
   dependencies:
     "@cypress/request" "^3.0.8"
     "@cypress/xvfb" "^1.2.4"
@@ -4092,6 +4099,7 @@ cypress@^14.4.1:
     figures "^3.2.0"
     fs-extra "^9.1.0"
     getos "^3.2.1"
+    hasha "5.2.2"
     is-installed-globally "~0.4.0"
     lazy-ass "^1.6.0"
     listr2 "^3.8.3"
@@ -5413,6 +5421,14 @@ hash.js@^1.0.0, hash.js@^1.0.3:
     inherits "^2.0.3"
     minimalistic-assert "^1.0.1"
 
+hasha@5.2.2:
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/hasha/-/hasha-5.2.2.tgz#a48477989b3b327aea3c04f53096d816d97522a1"
+  integrity sha512-Hrp5vIK/xr5SkeN2onO32H0MgNZ0f17HRNH39WfL0SYUNOTZ5Lz1TJ8Pajo/87dYGEFlLMm7mIc/k/s6Bvz9HQ==
+  dependencies:
+    is-stream "^2.0.0"
+    type-fest "^0.8.0"
+
 hasown@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/hasown/-/hasown-2.0.0.tgz#f4c513d454a57b7c7e1650778de226b11700546c"
@@ -6354,7 +6370,7 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
-luxon@3.6.1, luxon@^3.5.0:
+luxon@3.6.1, luxon@^3.5.0, luxon@^3.6.1:
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/luxon/-/luxon-3.6.1.tgz#d283ffc4c0076cb0db7885ec6da1c49ba97e47b0"
   integrity sha512-tJLxrKJhO2ukZ5z0gyjY1zPh3Rh88Ej9P7jNrZiHMUXHae1yvI2imgOZtL1TO8TW6biMMKfTtAOoEJANgtWBMQ==
@@ -6656,18 +6672,18 @@ ms@^2.1.1, ms@^2.1.3:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.3.tgz#574c8138ce1d2b5861f0b44579dbadd60c6615b2"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
-multiple-cucumber-html-reporter@^3.9.2:
-  version "3.9.2"
-  resolved "https://registry.yarnpkg.com/multiple-cucumber-html-reporter/-/multiple-cucumber-html-reporter-3.9.2.tgz#11635c7efdbfb675bbeff57d779092e61cc047d1"
-  integrity sha512-liBtbgqucEr98qNHJ2gukcjmDjREa/oyGHSRB1jVdK0pdL7cqohIzRzk0YmUVTVP8eGe7gJQ6tTHikMgudULtQ==
+multiple-cucumber-html-reporter@^3.9.3:
+  version "3.9.3"
+  resolved "https://registry.yarnpkg.com/multiple-cucumber-html-reporter/-/multiple-cucumber-html-reporter-3.9.3.tgz#b45ded87380bea6ad75d4c38c252c294a02ce054"
+  integrity sha512-3dr3Af3GDiZK4eKenZ0tg91RO4eqfqxrdCKcXmhLRLhasy0eW+aprYc547jT+zL9Xb1lE0hPoS3cNhb5MiArpw==
   dependencies:
     find "^0.3.0"
     fs-extra "^11.3.0"
     jsonfile "^6.1.0"
     lodash "^4.17.21"
-    luxon "^3.5.0"
+    luxon "^3.6.1"
     open "^8.4.2"
-    uuid "^11.0.5"
+    uuid "^11.1.0"
 
 mz@^2.7.0:
   version "2.7.0"
@@ -8551,6 +8567,11 @@ type-fest@^0.21.3:
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.21.3.tgz#d260a24b0198436e133fa26a524a6d65fa3b2e37"
   integrity sha512-t0rzBq87m3fVcduHDUFhKmyyX+9eo6WQjZvf51Ea/M0Q7+T374Jp1aUiyUl0GKxp8M/OETVHSDvmkyPgvX+X2w==
 
+type-fest@^0.8.0:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.8.1.tgz#09e249ebde851d3b1e48d27c105444667f17b83d"
+  integrity sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==
+
 type-fest@^2.19.0:
   version "2.19.0"
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-2.19.0.tgz#88068015bb33036a598b952e55e9311a60fd3a9b"
@@ -8774,7 +8795,7 @@ uuid@11.0.5:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-11.0.5.tgz#07b46bdfa6310c92c3fb3953a8720f170427fc62"
   integrity sha512-508e6IcKLrhxKdBbcA2b4KQZlLVp2+J5UwQ6F7Drckkc5N9ZJwFa4TgWtsww9UG8fGHbm6gbV19TdM5pQ4GaIA==
 
-uuid@^11.0.5:
+uuid@^11.1.0:
   version "11.1.0"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-11.1.0.tgz#9549028be1753bb934fc96e2bca09bb4105ae912"
   integrity sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==
