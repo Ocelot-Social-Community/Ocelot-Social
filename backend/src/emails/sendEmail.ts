@@ -14,6 +14,7 @@ import CONFIG, { nodemailerTransportOptions } from '@config/index'
 import logosWebapp from '@config/logosBranded'
 import metadata from '@config/metadata'
 import { UserDbProperties } from '@db/types/User'
+import ocelotLogger from '@src/logger'
 
 const welcomeImageUrl = new URL(logosWebapp.LOGO_WELCOME_PATH, CONFIG.CLIENT_URI)
 const settingsUrl = new URL('/settings/notifications', CONFIG.CLIENT_URI)
@@ -151,6 +152,7 @@ export const sendNotificationMail = async (notification: any): Promise<OriginalM
     })
     return originalMessage as OriginalMessage
   } catch (error) {
+    ocelotLogger.error('sendNotificationMail', error)
     throw new Error(error)
   }
 }
@@ -183,6 +185,7 @@ export const sendChatMessageMail = async (
     })
     return originalMessage as OriginalMessage
   } catch (error) {
+    ocelotLogger.error('sendChatMessageMail', error)
     throw new Error(error)
   }
 }
@@ -228,6 +231,7 @@ export const sendRegistrationMail = async (
     })
     return originalMessage as OriginalMessage
   } catch (error) {
+    ocelotLogger.error('sendRegistrationMail', error)
     throw new Error(error)
   }
 }
@@ -262,6 +266,7 @@ export const sendEmailVerification = async (
     })
     return originalMessage as OriginalMessage
   } catch (error) {
+    ocelotLogger.error('sendEmailVerification', error)
     throw new Error(error)
   }
 }
@@ -291,6 +296,7 @@ export const sendResetPasswordMail = async (
     })
     return originalMessage as OriginalMessage
   } catch (error) {
+    ocelotLogger.error('sendResetPasswordMail', error)
     throw new Error(error)
   }
 }
@@ -317,6 +323,7 @@ export const sendWrongEmail = async (data: {
     })
     return originalMessage as OriginalMessage
   } catch (error) {
+    ocelotLogger.error('sendWrongEmail', error)
     throw new Error(error)
   }
 }
