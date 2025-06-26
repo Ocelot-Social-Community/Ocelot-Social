@@ -283,19 +283,6 @@ jobs:
 
           echo "🎉 All services are up."
 
-
-    #seeding database for tests
-    #  - name: Seed database from host via ts-node
-    #    run: |
-    #      echo "🔧 Seeding backend from host..."
-    #          npx ts-node --project backend/tsconfig.json --require tsconfig-paths/register backend/src/db/seed.ts
-
-    #seeding database for tests
-    #  - name: Seed database for tests
-    #    run: |
-    #      echo "🔧 Seeding backend via docker exec..."
-    #      docker exec backend yarn run db:seed || echo "⚠️ Seed failed – check backend logs"
-
     #temporary debug backend
       - name: Debug backend response
         run: |
