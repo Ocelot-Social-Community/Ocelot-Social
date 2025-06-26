@@ -53,6 +53,7 @@ jobs:
         with:
           node-version: '20'
 
+    # create cache key
       - name: Compute cache key
         id: cache-key
         run: |
@@ -64,6 +65,13 @@ jobs:
           echo "key=$KEY"
           echo "key=$KEY" >> $GITHUB_OUTPUT
 
+    # create env
+      - name: Setup .env files & reports dir
+        run: |
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
+
+    #restore cache
       - name: Restore unified CI cache
         id: restore-cache
         uses: actions/cache/restore@v4
@@ -117,8 +125,9 @@ jobs:
             webapp/node_modules
             backend/build
             webapp/.nuxt
-            ~/.cache/Cypress
             /opt/cucumber-json-formatter
+            /home/runner/.cache/Cypress
+            /home/runner/work/Ocelot-Social/Ocelot-Social
 
   verify-environment:
     runs-on: ubuntu-latest
