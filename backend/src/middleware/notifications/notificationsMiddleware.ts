@@ -13,6 +13,7 @@ import { getUnreadRoomsCount } from '@graphql/resolvers/rooms'
 import { isUserOnline } from '@middleware/helpers/isUserOnline'
 import { validateNotifyUsers } from '@middleware/validation/validationMiddleware'
 import { sendNotificationMail, sendChatMessageMail } from '@src/emails/sendEmail'
+import type { Context } from '@src/server'
 
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 
@@ -38,7 +39,7 @@ const publishNotifications = async (
   return emailsSent
 }
 
-const handleJoinGroup = async (resolve, root, args, context, resolveInfo) => {
+const handleJoinGroup = async (resolve, root, args, context: Context, resolveInfo) => {
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
@@ -51,7 +52,7 @@ const handleJoinGroup = async (resolve, root, args, context, resolveInfo) => {
   return user
 }
 
-const handleLeaveGroup = async (resolve, root, args, context, resolveInfo) => {
+const handleLeaveGroup = async (resolve, root, args, context: Context, resolveInfo) => {
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
@@ -64,7 +65,7 @@ const handleLeaveGroup = async (resolve, root, args, context, resolveInfo) => {
   return user
 }
 
-const handleChangeGroupMemberRole = async (resolve, root, args, context, resolveInfo) => {
+const handleChangeGroupMemberRole = async (resolve, root, args, context: Context, resolveInfo) => {
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
@@ -77,7 +78,7 @@ const handleChangeGroupMemberRole = async (resolve, root, args, context, resolve
   return user
 }
 
-const handleRemoveUserFromGroup = async (resolve, root, args, context, resolveInfo) => {
+const handleRemoveUserFromGroup = async (resolve, root, args, context: Context, resolveInfo) => {
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
@@ -90,7 +91,7 @@ const handleRemoveUserFromGroup = async (resolve, root, args, context, resolveIn
   return user
 }
 
-const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
+const handleContentDataOfPost = async (resolve, root, args, context: Context, resolveInfo) => {
   const { groupId } = args
   const idsOfUsers = extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
@@ -118,7 +119,7 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
   return post
 }
 
-const handleContentDataOfComment = async (resolve, root, args, context, resolveInfo) => {
+const handleContentDataOfComment = async (resolve, root, args, context: Context, resolveInfo) => {
   const { content } = args
   let idsOfMentionedUsers = extractMentionedUsers(content)
   const comment = await resolve(root, args, context, resolveInfo)
@@ -163,7 +164,7 @@ const postAuthorOfComment = async (commentId, { context }) => {
   }
 }
 
-const notifyFollowingUsers = async (postId, groupId, context) => {
+const notifyFollowingUsers = async (postId, groupId, context: Context) => {
   const reason = 'followed_user_posted'
   const cypher = `
     MATCH (post:Post { id: $postId })<-[:WROTE]-(author:User { id: $userId })<-[:FOLLOWS]-(user:User)
@@ -198,13 +199,14 @@ const notifyFollowingUsers = async (postId, groupId, context) => {
   try {
     return await writeTxResultPromise
   } catch (error) {
+    context.logger.error('notifyFollowingUsers', error)
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
-const notifyGroupMembersOfNewPost = async (postId, groupId, context) => {
+const notifyGroupMembersOfNewPost = async (postId, groupId, context: Context) => {
   if (!groupId) return []
   const reason = 'post_in_group'
   const cypher = `
@@ -244,13 +246,14 @@ const notifyGroupMembersOfNewPost = async (postId, groupId, context) => {
   try {
     return await writeTxResultPromise
   } catch (error) {
+    context.logger.error('notifyGroupMembersOfNewPost', error)
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
-const notifyOwnersOfGroup = async (groupId, userId, reason, context) => {
+const notifyOwnersOfGroup = async (groupId, userId, reason, context: Context) => {
   const cypher = `
     MATCH (user:User { id: $userId })
     MATCH (group:Group { id: $groupId })<-[membership:MEMBER_OF]-(owner:User)
@@ -278,13 +281,14 @@ const notifyOwnersOfGroup = async (groupId, userId, reason, context) => {
   try {
     return await writeTxResultPromise
   } catch (error) {
+    context.logger.error('notifyOwnersOfGroup', error)
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
-const notifyMemberOfGroup = async (groupId, userId, reason, context) => {
+const notifyMemberOfGroup = async (groupId, userId, reason, context: Context) => {
   const { user: owner } = context
   const cypher = `
     MATCH (owner:User { id: $ownerId })
@@ -316,13 +320,14 @@ const notifyMemberOfGroup = async (groupId, userId, reason, context) => {
   try {
     return await writeTxResultPromise
   } catch (error) {
+    context.logger.error('notifyMemberOfGroup', error)
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
-const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
+const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context: Context) => {
   if (!idsOfUsers?.length) return []
   await validateNotifyUsers(label, reason)
   let mentionedCypher
@@ -387,13 +392,14 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
   try {
     return await writeTxResultPromise
   } catch (error) {
+    context.logger.error('notifyUsersOfMention', error)
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
-const notifyUsersOfComment = async (label, commentId, reason, context) => {
+const notifyUsersOfComment = async (label, commentId, reason, context: Context) => {
   await validateNotifyUsers(label, reason)
   const session = context.driver.session()
   const writeTxResultPromise = await session.writeTransaction(async (transaction) => {
@@ -429,13 +435,16 @@ const notifyUsersOfComment = async (label, commentId, reason, context) => {
     return notificationTransactionResponse.records.map((record) => record.get('notification'))
   })
   try {
-    return await writeTxResultPromise
+    return writeTxResultPromise
+  } catch (error) {
+    context.logger.error('notifyUsersOfComment', error)
+    throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
-const handleCreateMessage = async (resolve, root, args, context, resolveInfo) => {
+const handleCreateMessage = async (resolve, root, args, context: Context, resolveInfo) => {
   // Execute resolver
   const message = await resolve(root, args, context, resolveInfo)
 
@@ -494,9 +503,10 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
     // Return resolver result to client
     return message
   } catch (error) {
+    context.logger.error('handleCreateMessage', error)
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
