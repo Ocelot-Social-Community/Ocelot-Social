@@ -4,10 +4,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { UserInputError } from 'apollo-server'
 import { withFilter } from 'graphql-subscriptions'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import { ROOM_COUNT_UPDATED } from '@constants/subscriptions'
+import type { Context } from '@src/server'
 
 import Resolver from './helpers/Resolver'
 
@@ -58,13 +60,13 @@ export default {
     },
   },
   Mutation: {
-    CreateRoom: async (_parent, params, context, _resolveInfo) => {
+    CreateRoom: async (_parent, params, context: Context, _resolveInfo) => {
       const { userId } = params
       const {
         user: { id: currentUserId },
       } = context
       if (userId === currentUserId) {
-        throw new Error('Cannot create a room with self')
+        throw new UserInputError('Cannot create a room with self')
       }
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -91,7 +93,7 @@ export default {
           userId,
           currentUserId,
         })
-        const [room] = await createRommTxResponse.records.map((record) => record.get('room'))
+        const [room] = createRommTxResponse.records.map((record) => record.get('room'))
         return room
       })
       try {
@@ -101,9 +103,10 @@ export default {
         }
         return room
       } catch (error) {
+        context.logger.error('CreateRoom mutation', error)
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

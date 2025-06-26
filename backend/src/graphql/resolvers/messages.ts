@@ -9,6 +9,7 @@ import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import CONFIG, { isS3configured } from '@config/index'
 import { CHAT_MESSAGE_ADDED } from '@constants/subscriptions'
+import type { Context } from '@src/server'
 
 import { attachments } from './attachments/attachments'
 import Resolver from './helpers/Resolver'
@@ -71,7 +72,7 @@ export default {
     },
   },
   Mutation: {
-    CreateMessage: async (_parent, params, context, _resolveInfo) => {
+    CreateMessage: async (_parent, params, context: Context, _resolveInfo) => {
       const { roomId, content, files = [] } = params
       const {
         user: { id: currentUserId },
@@ -114,9 +115,7 @@ export default {
             content,
           })
 
-          const [message] = await createMessageTxResponse.records.map((record) =>
-            record.get('message'),
-          )
+          const [message] = createMessageTxResponse.records.map((record) => record.get('message'))
 
           // this is the case if the room doesn't exist - requires refactoring for implicit rooms
           if (!message) {
@@ -145,9 +144,10 @@ export default {
 
         return await writeTxResultPromise
       } catch (error) {
+        context.logger.error('CreateMessage', error)
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     MarkMessagesAsSeen: async (_parent, params, context, _resolveInfo) => {

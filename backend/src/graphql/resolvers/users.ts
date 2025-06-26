@@ -52,17 +52,19 @@ export const getBlockedUsers = async (context) => {
 
 export default {
   Query: {
-    mutedUsers: async (_object, _args, context, _resolveInfo) => {
+    mutedUsers: async (_object, _args, context: Context, _resolveInfo) => {
       try {
         return getMutedUsers(context)
       } catch (e) {
+        context.logger.error('mutedUsers query', e.message)
         throw new UserInputError(e.message)
       }
     },
-    blockedUsers: async (_object, _args, context, _resolveInfo) => {
+    blockedUsers: async (_object, _args, context: Context, _resolveInfo) => {
       try {
         return getBlockedUsers(context)
       } catch (e) {
+        context.logger.error('blockedUsers query', e.message)
         throw new UserInputError(e.message)
       }
     },
@@ -120,7 +122,7 @@ export default {
       const unmutedUser = await neode.find('User', params.id)
       return unmutedUser.toJson()
     },
-    blockUser: async (_object, args, context, _resolveInfo) => {
+    blockUser: async (_object, args, context: Context, _resolveInfo) => {
       const { user: currentUser } = context
       if (currentUser.id === args.id) return null
 
@@ -142,12 +144,13 @@ export default {
       try {
         return await writeTxResultPromise
       } catch (error) {
+        context.logger.error('blockUser mutation', error.message)
         throw new UserInputError(error.message)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    unblockUser: async (_object, args, context, _resolveInfo) => {
+    unblockUser: async (_object, args, context: Context, _resolveInfo) => {
       const { user: currentUser } = context
       if (currentUser.id === args.id) return null
 
@@ -166,12 +169,13 @@ export default {
       try {
         return await writeTxResultPromise
       } catch (error) {
+        context.logger.error('unblockUser mutation', error.message)
         throw new UserInputError(error.message)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    UpdateUser: async (_parent, params, context, _resolveInfo) => {
+    UpdateUser: async (_parent, params, context: Context, _resolveInfo) => {
       const { avatar: avatarInput } = params
       delete params.avatar
       params.locationName = params.locationName === '' ? null : params.locationName
@@ -179,6 +183,7 @@ export default {
       if (termsAndConditionsAgreedVersion) {
         const regEx = /^[0-9]+\.[0-9]+\.[0-9]+$/g
         if (!regEx.test(termsAndConditionsAgreedVersion)) {
+          context.logger.error('UpdateUser query: Invalid version format!')
           throw new ForbiddenError('Invalid version format!')
         }
         params.termsAndConditionsAgreedAt = new Date().toISOString()
@@ -220,9 +225,10 @@ export default {
         await createOrUpdateLocations('User', params.id, params.locationName, session)
         return user
       } catch (error) {
+        context.logger.error('UpdateUser mutation', error.message)
         throw new UserInputError(error.message)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     DeleteUser: async (_object, params, context, _resolveInfo) => {
@@ -291,10 +297,13 @@ export default {
         session.close()
       }
     },
-    switchUserRole: async (_object, args, context, _resolveInfo) => {
+    switchUserRole: async (_object, args, context: Context, _resolveInfo) => {
       const { role, id } = args
 
-      if (context.user.id === id) throw new Error('you-cannot-change-your-own-role')
+      if (context.user.id === id) {
+        context.logger.error('switchUserRole mutation: you-cannot-change-your-own-role')
+        throw new Error('you-cannot-change-your-own-role')
+      }
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const switchUserRoleResponse = await transaction.run(
@@ -313,7 +322,7 @@ export default {
         const user = await writeTxResultPromise
         return user
       } finally {
-        session.close()
+        await session.close()
       }
     },
     saveCategorySettings: async (_object, args, context, _resolveInfo) => {
@@ -390,13 +399,16 @@ export default {
 
       return true
     },
-    setTrophyBadgeSelected: async (_object, args, context, _resolveInfo) => {
+    setTrophyBadgeSelected: async (_object, args, context: Context, _resolveInfo) => {
       const { slot, badgeId } = args
       const {
         user: { id: userId },
       } = context
 
       if (slot >= TROPHY_BADGES_SELECTED_MAX || slot < 0) {
+        context.logger.error(
+          `Invalid slot! There is only ${TROPHY_BADGES_SELECTED_MAX} badge-slots to fill`,
+        )
         throw new Error(
           `Invalid slot! There is only ${TROPHY_BADGES_SELECTED_MAX} badge-slots to fill`,
         )
@@ -431,16 +443,18 @@ export default {
       try {
         const user = await query
         if (!user) {
+          context.logger.error('You cannot set badges not rewarded to you.')
           throw new Error('You cannot set badges not rewarded to you.')
         }
         return user
       } catch (error) {
+        context.logger.error('setTrophyBadgeSelected mutation', error)
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    resetTrophyBadgesSelected: async (_object, _args, context, _resolveInfo) => {
+    resetTrophyBadgesSelected: async (_object, _args, context: Context, _resolveInfo) => {
       const {
         user: { id: userId },
       } = context
@@ -462,9 +476,10 @@ export default {
       try {
         return await query
       } catch (error) {
+        context.logger.error('resetTrophyBadgeSelected mutation', error)
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
@@ -537,7 +552,7 @@ export default {
         },
       ]
     },
-    badgeTrophiesSelected: async (parent, _params, context, _resolveInfo) => {
+    badgeTrophiesSelected: async (parent, _params, context: Context, _resolveInfo) => {
       const session = context.driver.session()
 
       const query = session.readTransaction(async (transaction) => {
@@ -561,12 +576,13 @@ export default {
         })
         return result
       } catch (error) {
+        context.logger.error('user query badgeTrophiesSelected', error)
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    badgeTrophiesUnused: async (parent, _params, context, _resolveInfo) => {
+    badgeTrophiesUnused: async (parent, _params, context: Context, _resolveInfo) => {
       const session = context.driver.session()
 
       const query = session.readTransaction(async (transaction) => {
@@ -583,12 +599,13 @@ export default {
       try {
         return await query
       } catch (error) {
+        context.logger.error('user query badgeTrophiesUnused', error)
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    badgeTrophiesUnusedCount: async (parent, _params, context, _resolveInfo) => {
+    badgeTrophiesUnusedCount: async (parent, _params, context: Context, _resolveInfo) => {
       const session = context.driver.session()
 
       const query = session.readTransaction(async (transaction) => {
@@ -605,12 +622,13 @@ export default {
       try {
         return await query
       } catch (error) {
+        context.logger.error('user query badgeTrophiesUnusedCount', error)
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    badgeVerification: async (parent, _params, context, _resolveInfo) => {
+    badgeVerification: async (parent, _params, context: Context, _resolveInfo) => {
       const session = context.driver.session()
 
       const query = session.writeTransaction(async (transaction) => {
@@ -627,9 +645,10 @@ export default {
         const result = await query
         return result ?? defaultVerificationBadge
       } catch (error) {
+        context.logger.error('user query badgeVerification', error)
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     ...Resolver('User', {

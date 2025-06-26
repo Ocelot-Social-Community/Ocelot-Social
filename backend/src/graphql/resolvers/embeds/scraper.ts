@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable n/no-extraneous-require */
+
 /* eslint-disable n/global-require */
 /* eslint-disable import/no-commonjs */
 /* eslint-disable import/no-named-as-default */
@@ -17,10 +17,11 @@ import mergeWith from 'lodash/mergeWith'
 import Metascraper from 'metascraper'
 import fetch from 'node-fetch'
 
+import ocelotLogger from '@src/logger'
+
 import findProvider from './findProvider'
 
-// eslint-disable-next-line import/no-extraneous-dependencies
-const error = require('debug')('embed:error')
+// const error = require('debug')('embed:error')
 
 const metascraper = Metascraper([
   require('metascraper-author')(),
@@ -52,7 +53,7 @@ const fetchEmbed = async (url) => {
     json = await response.json()
     // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
-    error(`Error fetching embed data: ${err.message}`)
+    ocelotLogger.error(`Error fetching embed data: ${err.message}`)
     return {}
   }
 
@@ -84,6 +85,7 @@ export default async function scrape(url) {
   })
 
   if (isEmpty(output)) {
+    ocelotLogger.error('embeds/scrape NOT_FOUND')
     throw new ApolloError('Not found', 'NOT_FOUND')
   }
 
