@@ -262,16 +262,6 @@ jobs:
           wait_for "mailserver" "http://localhost:1080"
           wait_for "minio" "http://localhost:9000/minio/health/live"
           echo "🎉 All services are up."
-    #temporary debug backend
-      - name: Debug backend response
-        run: |
-          curl -i http://localhost:4000/ || echo "❌ curl failed"
-          curl -s -o /dev/null -w "%{http_code}" http://localhost:4000/
-          
-      - name: Full stack tests | run tests
-        id: e2e-tests
-        run: |
-          yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
     #starting fullstack cypress tests
       - name: Full stack tests | if tests failed, compile html report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
