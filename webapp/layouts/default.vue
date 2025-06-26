@@ -14,7 +14,9 @@
       <modal />
     </client-only>
     <div v-if="getShowChat.showChat" class="chat-modul">
-      <chat singleRoom :roomId="getShowChat.roomID" @close-single-room="closeSingleRoom" />
+      <client-only>
+        <chat singleRoom :roomId="getShowChat.roomID" @close-single-room="closeSingleRoom" />
+      </client-only>
     </div>
   </div>
 </template>

@@ -5,12 +5,14 @@
       @add-chat-room="addChatRoom"
       @close-user-search="showUserSearch = false"
     />
-    <chat
-      :roomId="getShowChat.showChat ? getShowChat.roomID : null"
-      ref="chat"
-      @toggle-user-search="showUserSearch = !showUserSearch"
-      :show-room="showRoom"
-    />
+    <client-only>
+      <chat
+        :roomId="getShowChat.showChat ? getShowChat.roomID : null"
+        ref="chat"
+        @toggle-user-search="showUserSearch = !showUserSearch"
+        :show-room="showRoom"
+      />
+    </client-only>
   </div>
 </template>
 
