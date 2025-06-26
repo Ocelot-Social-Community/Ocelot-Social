@@ -118,7 +118,7 @@ export default {
           // context.logger.error('A user account with this email already exists.')
           throw new UserInputError('A user account with this email already exists.')
         }
-        context.logger.error('VerifyEmailAddress', e)
+        // context.logger.error('VerifyEmailAddress', e)
         throw new Error(e)
       } finally {
         await session.close()
