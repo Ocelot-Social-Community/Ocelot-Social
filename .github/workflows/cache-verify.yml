@@ -48,6 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       cache-key: ${{ steps.cache-key.outputs.key }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -185,6 +186,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
     
+    #setup .env files, make cypress reports dir
+      - name: Setup .env files & reports dir
+        run: |
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
+          mkdir -p cypress/reports/json_logs
     #restore unified cache
       - name: Restore unified CI cache
         id: restore-cache
@@ -201,12 +208,6 @@ jobs:
             /opt/cucumber-json-formatter
           restore-keys: |
             ci-unified-cache-${{ runner.os }}-
-    #setup .env files, make cypress reports dir
-      - name: Setup .env files & reports dir
-        run: |
-          cp backend/.env.test_e2e backend/.env
-          cp webapp/.env.template webapp/.env
-          mkdir -p cypress/reports/json_logs
     #setup cocumber path
       - name: Run formatter or use PATH tools
         run: |
@@ -219,7 +220,6 @@ jobs:
           cd backend && yarn install --frozen-lockfile && cd ..
           cd webapp && yarn install --frozen-lockfile && cd ..
           npx cypress verify || echo "⚠️ Cypress not yet verified"
-
     #build backend
       - name: Build backend
         run: cd backend && yarn build
@@ -262,7 +262,6 @@ jobs:
           wait_for "mailserver" "http://localhost:1080"
           wait_for "minio" "http://localhost:9000/minio/health/live"
           echo "🎉 All services are up."
-
     #temporary debug backend
       - name: Debug backend response
         run: |
