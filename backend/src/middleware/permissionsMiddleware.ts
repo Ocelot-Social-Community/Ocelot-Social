@@ -65,7 +65,7 @@ const isMySocialMedia = rule({
 
 const isAllowedToChangeGroupSettings = rule({
   cache: 'no_cache',
-})(async (_parent, args, { user, driver }) => {
+})(async (_parent, args, { user, driver, logger }) => {
   if (!user?.id) return false
   const ownerId = user.id
   const { id: groupId } = args
@@ -87,6 +87,7 @@ const isAllowedToChangeGroupSettings = rule({
     const { owner, group } = await readTxPromise
     return !!group && !!owner && ['owner'].includes(owner.myRoleInGroup)
   } catch (error) {
+    logger.error('isAllowedToChangeGroupSettings', error)
     throw new Error(error)
   } finally {
     session.close()
@@ -95,7 +96,7 @@ const isAllowedToChangeGroupSettings = rule({
 
 const isAllowedSeeingGroupMembers = rule({
   cache: 'no_cache',
-})(async (_parent, args, { user, driver }) => {
+})(async (_parent, args, { user, driver, logger }) => {
   if (!user?.id) return false
   const { id: groupId } = args
   const session = driver.session()
@@ -123,6 +124,7 @@ const isAllowedSeeingGroupMembers = rule({
           ['usual', 'admin', 'owner'].includes(member.myRoleInGroup)))
     )
   } catch (error) {
+    logger.error('isAllowedSeeingGroupMembers', error)
     throw new Error(error)
   } finally {
     session.close()
@@ -131,7 +133,7 @@ const isAllowedSeeingGroupMembers = rule({
 
 const isAllowedToChangeGroupMemberRole = rule({
   cache: 'no_cache',
-})(async (_parent, args, { user, driver }) => {
+})(async (_parent, args, { user, driver, logger }) => {
   if (!user?.id) return false
   const currentUserId = user.id
   const { groupId, userId, roleInGroup } = args
@@ -170,6 +172,7 @@ const isAllowedToChangeGroupMemberRole = rule({
       ((currentUserIsAdmin && adminCanSetRole) || (currentUserIsOwner && ownerCanSetRole))
     )
   } catch (error) {
+    logger.error('isAllowedToChangeGroupMemberRole', error)
     throw new Error(error)
   } finally {
     session.close()
@@ -178,7 +181,7 @@ const isAllowedToChangeGroupMemberRole = rule({
 
 const isAllowedToJoinGroup = rule({
   cache: 'no_cache',
-})(async (_parent, args, { user, driver }) => {
+})(async (_parent, args, { user, driver, logger }) => {
   if (!user?.id) return false
   const { groupId, userId } = args
   const session = driver.session()
@@ -200,6 +203,7 @@ const isAllowedToJoinGroup = rule({
     const { group, member } = await readTxPromise
     return !!group && (group.groupType !== 'hidden' || (!!member && !!member.myRoleInGroup))
   } catch (error) {
+    logger.error('isAllowedToJoinGroup', error)
     throw new Error(error)
   } finally {
     session.close()
@@ -208,7 +212,7 @@ const isAllowedToJoinGroup = rule({
 
 const isAllowedToLeaveGroup = rule({
   cache: 'no_cache',
-})(async (_parent, args, { user, driver }) => {
+})(async (_parent, args, { user, driver, logger }) => {
   if (!user?.id) return false
   const { groupId, userId } = args
   if (user.id !== userId) return false
@@ -230,6 +234,7 @@ const isAllowedToLeaveGroup = rule({
     const { group, member } = await readTxPromise
     return !!group && !!member && !!member.myRoleInGroup && member.myRoleInGroup !== 'owner'
   } catch (error) {
+    logger.error('isAllowedToLeaveGroup', error)
     throw new Error(error)
   } finally {
     session.close()
@@ -238,7 +243,7 @@ const isAllowedToLeaveGroup = rule({
 
 const isMemberOfGroup = rule({
   cache: 'no_cache',
-})(async (_parent, args, { user, driver }) => {
+})(async (_parent, args, { user, driver, logger }) => {
   if (!user?.id) return false
   const { groupId } = args
   if (!groupId) return true
@@ -258,6 +263,7 @@ const isMemberOfGroup = rule({
     const role = await readTxPromise
     return ['usual', 'admin', 'owner'].includes(role)
   } catch (error) {
+    logger.error('isMemberOfGroup', error)
     throw new Error(error)
   } finally {
     session.close()
@@ -266,7 +272,7 @@ const isMemberOfGroup = rule({
 
 const canRemoveUserFromGroup = rule({
   cache: 'no_cache',
-})(async (_parent, args, { user, driver }) => {
+})(async (_parent, args, { user, driver, logger }) => {
   if (!user?.id) return false
   const { groupId, userId } = args
   const currentUserId = user.id
@@ -294,6 +300,7 @@ const canRemoveUserFromGroup = rule({
       currentUserRole && ['owner'].includes(currentUserRole) && userRole && userRole !== 'owner'
     )
   } catch (error) {
+    logger.error('canRemoveUserFromGroup', error)
     throw new Error(error)
   } finally {
     session.close()
@@ -302,7 +309,7 @@ const canRemoveUserFromGroup = rule({
 
 const canCommentPost = rule({
   cache: 'no_cache',
-})(async (_parent, args, { user, driver }) => {
+})(async (_parent, args, { user, driver, logger }) => {
   if (!user?.id) return false
   const { postId } = args
   const userId = user.id
@@ -328,6 +335,7 @@ const canCommentPost = rule({
       !group || (membership && ['usual', 'admin', 'owner'].includes(membership.properties.role))
     )
   } catch (error) {
+    logger.error('canCommentPost', error)
     throw new Error(error)
   } finally {
     session.close()
