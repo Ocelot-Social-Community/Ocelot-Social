@@ -75,8 +75,10 @@ jobs:
             webapp/node_modules
             backend/build
             webapp/.nuxt
-            ~/.cache/Cypress
             /opt/cucumber-json-formatter
+            #~/.cache/Cypress
+            /home/runner/.cache/Cypress
+            /home/runner/work/Ocelot-Social/Ocelot-Social
           restore-keys: |
             ci-unified-cache-${{ runner.os }}-
 
