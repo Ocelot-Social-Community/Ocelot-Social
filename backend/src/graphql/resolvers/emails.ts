@@ -16,7 +16,7 @@ import Resolver from './helpers/Resolver'
 
 export default {
   Query: {
-    VerifyNonce: async (_parent, args, context, _resolveInfo) => {
+    VerifyNonce: async (_parent, args, context: Context, _resolveInfo) => {
       args.email = normalizeEmail(args.email)
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (txc) => {
@@ -32,8 +32,11 @@ export default {
       try {
         const txResult = await readTxResultPromise
         return txResult.records[0].get('result')
+      } catch (e) {
+        context.logger.error('VerifyNonce query', e)
+        throw new Error(e.message)
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
@@ -45,7 +48,6 @@ export default {
         const { neode } = context
         await new Validator(neode, neode.model('UnverifiedEmailAddress'), args)
       } catch (e) {
-        // context.logger.error('must be a valid email')
         throw new UserInputError('must be a valid email')
       }
 
@@ -79,6 +81,9 @@ export default {
       try {
         const txResult = await writeTxResultPromise
         response = txResult[0]
+      } catch (e) {
+        context.logger.error('AddEmailAddress mutation', e)
+        throw new Error(e.message)
       } finally {
         await session.close()
       }
@@ -115,16 +120,14 @@ export default {
         response = txResult[0]
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
-          // context.logger.error('A user account with this email already exists.')
           throw new UserInputError('A user account with this email already exists.')
         }
-        // context.logger.error('VerifyEmailAddress', e)
+        context.logger.error('VerifyEmailAddress', e)
         throw new Error(e)
       } finally {
         await session.close()
       }
       if (!response) {
-        // context.logger.error('Invalid nonce or no email address found.')
         throw new UserInputError('Invalid nonce or no email address found.')
       }
       return response
