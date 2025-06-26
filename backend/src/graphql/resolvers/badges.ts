@@ -32,7 +32,7 @@ export default {
   },
 
   Mutation: {
-    setVerificationBadge: async (_object, args, context, _resolveInfo) => {
+    setVerificationBadge: async (_object, args, context: Context, _resolveInfo) => {
       const {
         user: { id: currentUserId },
       } = context
@@ -62,12 +62,14 @@ export default {
       try {
         const { relation, user } = await writeTxResultPromise
         if (!relation) {
+          context.logger.error('Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.')
           throw new Error(
             'Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
           )
         }
         return user
       } catch (error) {
+        context.logger.error('setVerificationBadge', error)
         throw new Error(error)
       } finally {
         session.close()
@@ -125,6 +127,7 @@ export default {
       ).records.map((record) => record.get('user'))
 
       if (users.length !== 1) {
+        context.logger.error('Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.')
         throw new Error(
           'Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
         )
@@ -157,6 +160,7 @@ export default {
       try {
         return await writeTxResultPromise
       } catch (error) {
+        context.logger.error('revokeBadge', error)        
         throw new Error(error)
       } finally {
         session.close()
