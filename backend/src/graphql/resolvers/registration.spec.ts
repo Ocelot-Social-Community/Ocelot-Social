@@ -14,6 +14,12 @@ import createServer, { getContext } from '@src/server'
 
 let variables
 
+const loggerErrorMock: (e) => void = jest.fn()
+
+jest.mock('@src/logger', () => ({
+  error: (e) => loggerErrorMock(e),
+}))
+
 const database = databaseContext()
 
 let server: ApolloServer

@@ -115,9 +115,7 @@ export default {
             content,
           })
 
-          const [message] = await createMessageTxResponse.records.map((record) =>
-            record.get('message'),
-          )
+          const [message] = createMessageTxResponse.records.map((record) => record.get('message'))
 
           // this is the case if the room doesn't exist - requires refactoring for implicit rooms
           if (!message) {
@@ -149,7 +147,7 @@ export default {
         context.logger.error('CreateMessage', error)
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     MarkMessagesAsSeen: async (_parent, params, context, _resolveInfo) => {

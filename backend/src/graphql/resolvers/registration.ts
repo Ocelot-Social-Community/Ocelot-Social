@@ -19,7 +19,7 @@ const neode = getNeode()
 
 export default {
   Mutation: {
-    Signup: async (_parent, args, context) => {
+    Signup: async (_parent, args, context: Context) => {
       args.nonce = generateNonce()
       args.email = normalizeEmail(args.email)
       let emailAddress = await existingEmailAddress({ args, context })
@@ -33,6 +33,7 @@ export default {
         emailAddress = await neode.create('EmailAddress', args)
         return emailAddress.toJson()
       } catch (e) {
+        context.logger.error('Signup mutation', e)
         throw new UserInputError(e.message)
       }
     },
@@ -111,7 +112,8 @@ export default {
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
           throw new UserInputError('User with this slug already exists!')
-        throw new UserInputError(e.message)
+        context.logger.error('SignupVerification mutation', e)
+        throw new Error(e.message)
       } finally {
         await session.close()
       }
