@@ -19,8 +19,9 @@ async function setupNodeEvents(on, config) {
     browserify({
       ...preprendTransformerToOptions(config, browserify.defaultOptions),
       onBundle(bundle) {
-        // Ignore async_hooks used by tslog logger - Node.js built-in not available in browser
-        bundle.ignore('async_hooks')
+        // Ignore Node.js built-ins not available in browser
+        bundle.ignore('async_hooks')  // Used by tslog logger
+        bundle.ignore('http')         // Node.js built-in
       }
     }),
   );
