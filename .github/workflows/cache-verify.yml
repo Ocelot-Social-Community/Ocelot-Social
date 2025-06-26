@@ -76,7 +76,6 @@ jobs:
             backend/build
             webapp/.nuxt
             /opt/cucumber-json-formatter
-            #~/.cache/Cypress
             /home/runner/.cache/Cypress
             /home/runner/work/Ocelot-Social/Ocelot-Social
           restore-keys: |
