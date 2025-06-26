@@ -227,6 +227,13 @@ jobs:
           cd webapp && yarn install --frozen-lockfile && cd ..
           npx cypress verify || echo "⚠️ Cypress not yet verified"
 
+    # force rebuild regardless of cache state
+      - name: ⚙️ Always rebuild backend & webapp
+        run: |
+          echo "🔧 Forcing backend & webapp build..."
+          cd backend && yarn build && cd ..
+          cd webapp && yarn build && cd ..
+
     #build backend
       - name: Build backend
         run: cd backend && yarn build
