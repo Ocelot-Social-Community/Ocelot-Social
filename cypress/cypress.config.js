@@ -19,9 +19,9 @@ async function setupNodeEvents(on, config) {
     browserify({
       ...preprendTransformerToOptions(config, browserify.defaultOptions),
       onBundle(bundle) {
-        // Ignore Node.js built-ins not available in browser
-        bundle.ignore('async_hooks')  // Used by tslog logger
-        bundle.ignore('http')         // Node.js built-in
+        // Ignore modules not available in browser environment
+        bundle.ignore('async_hooks')  // Used by tslog logger - Node.js built-in
+        bundle.ignore('express')      // Server framework causing prototype errors
       }
     }),
   );
