@@ -48,7 +48,7 @@
       </client-only>
       <!-- TODO: replace editor content with tiptap render view -->
       <!-- eslint-disable-next-line vue/no-v-html -->
-      <div class="content hyphenate-text" v-html="excerpt" />
+      <div class="content hyphenate-text excerpt" v-html="excerpt" />
       <footer
         class="footer"
         v-observe-visibility="(isVisible, entry) => visibilityChanged(isVisible, entry, post.id)"
@@ -348,5 +348,11 @@ export default {
       }
     }
   }
+}
+</style>
+
+<style scoped>
+.excerpt {
+  overflow: hidden;
 }
 </style>

@@ -52,7 +52,7 @@ export default {
   img {
     display: block;
     max-height: 400px;
-    max-width: 400px;
+    max-width: 100%;
   }
 }
 </style>
