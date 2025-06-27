@@ -9,6 +9,10 @@ import MutationObserver from 'mutation-observer'
 
 global.MutationObserver = MutationObserver
 
+jest.mock('image-resize-compress', () => ({
+  fromURL: jest.fn((url) => new Blob([url], { type: 'image/jpeg' })),
+}))
+
 const localVue = global.localVue
 
 const stubs = {
@@ -150,6 +154,7 @@ describe('ContributionForm.vue', () => {
               image: null,
               groupId: null,
               postType: 'Article',
+              files: [],
             },
           }
           postTitleInput = wrapper.find('.ds-input')
@@ -187,6 +192,17 @@ describe('ContributionForm.vue', () => {
           )
           wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
+        })
+
+        it('can add an image to the content', async () => {
+          const content = '<img src="blob:example" alt="test image" />'
+          await wrapper.vm.updateEditorContent(content)
+          expect(wrapper.vm.filesToUpload).toHaveLength(1)
+          await wrapper.find('form').trigger('submit')
+          expectedParams.variables.content = content
+          expectedParams.variables.files = [{ name: 'test image', type: 'image/jpeg', upload: {} }]
+          expectedParams.variables.eventInput = undefined
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))
         })
 
         it("pushes the user to the post's page", async () => {
@@ -277,12 +293,13 @@ describe('ContributionForm.vue', () => {
                 sensitive: false,
               },
               postType: 'Article',
+              files: [],
             },
           }
         })
 
         it('calls the UpdatePost apollo mutation', async () => {
-          expectedParams.variables.content = postContent
+          expectedParams.variables.content = 'auf Deutsch geschrieben'
           wrapper.vm.updateEditorContent(postContent)
           await wrapper.find('form').trigger('submit')
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining(expectedParams))

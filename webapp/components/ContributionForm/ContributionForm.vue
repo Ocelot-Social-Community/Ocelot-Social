@@ -189,7 +189,7 @@
 <script>
 import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
-import { urlToBlob, fromBlob, fromURL } from 'image-resize-compress'
+import { fromURL } from 'image-resize-compress'
 import Editor from '~/components/Editor/Editor'
 import PostMutations from '~/graphql/PostMutations.js'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
