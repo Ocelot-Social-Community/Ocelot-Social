@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/require-await */
-
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable promise/prefer-await-to-callbacks */
+import { DeleteObjectCommand } from '@aws-sdk/client-s3'
+import { Upload } from '@aws-sdk/lib-storage'
 import { UserInputError } from 'apollo-server'
 
 import Factory, { cleanDatabase } from '@db/factories'
@@ -17,11 +16,30 @@ import { images } from './imagesS3'
 import type { ImageInput } from './images'
 import type { FileUpload } from 'graphql-upload'
 
+jest.mock('@aws-sdk/client-s3', () => {
+  return {
+    S3Client: jest.fn().mockImplementation(() => ({
+      send: jest.fn(),
+    })),
+    ObjectCannedACL: { public_read: 'public_read' },
+    DeleteObjectCommand: jest.fn().mockImplementation(() => ({})),
+  }
+})
+
+jest.mock('@aws-sdk/lib-storage', () => {
+  return {
+    Upload: jest.fn().mockImplementation(({ params: { Key } }: { params: { Key: string } }) => ({
+      done: () => Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
+    })),
+  }
+})
+
+const mockUpload = jest.mocked(Upload)
+const mockDeleteObjectCommand = jest.mocked(DeleteObjectCommand)
+
 const driver = getDriver()
 const neode = getNeode()
 const uuid = '[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}'
-let uploadCallback
-let deleteCallback
 
 const config: S3Configured = {
   AWS_ACCESS_KEY_ID: 'AWS_ACCESS_KEY_ID',
@@ -41,16 +59,10 @@ afterAll(async () => {
   await driver.close()
 })
 
-beforeEach(async () => {
-  uploadCallback = jest.fn(
-    ({ uniqueFilename }) => `http://your-objectstorage.com/bucket/${uniqueFilename}`,
-  )
-  deleteCallback = jest.fn()
-})
-
 // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
 afterEach(async () => {
   await cleanDatabase()
+  jest.clearAllMocks()
 })
 
 describe('deleteImage', () => {
@@ -73,13 +85,13 @@ describe('deleteImage', () => {
 
     it('deletes `Image` node', async () => {
       await expect(neode.all('Image')).resolves.toHaveLength(1)
-      await deleteImage(user, 'AVATAR_IMAGE', { deleteCallback })
+      await deleteImage(user, 'AVATAR_IMAGE')
       await expect(neode.all('Image')).resolves.toHaveLength(0)
     })
 
     it('calls deleteCallback', async () => {
-      await deleteImage(user, 'AVATAR_IMAGE', { deleteCallback })
-      expect(deleteCallback).toHaveBeenCalled()
+      await deleteImage(user, 'AVATAR_IMAGE')
+      expect(mockDeleteObjectCommand).toHaveBeenCalled()
     })
 
     describe('given a transaction parameter', () => {
@@ -89,7 +101,6 @@ describe('deleteImage', () => {
         try {
           someString = await session.writeTransaction(async (transaction) => {
             await deleteImage(user, 'AVATAR_IMAGE', {
-              deleteCallback,
               transaction,
             })
             const txResult = await transaction.run('RETURN "Hello" as result')
@@ -109,7 +120,6 @@ describe('deleteImage', () => {
         try {
           await session.writeTransaction(async (transaction) => {
             await deleteImage(user, 'AVATAR_IMAGE', {
-              deleteCallback,
               transaction,
             })
             throw new Error('Ouch!')
@@ -169,22 +179,20 @@ describe('mergeImage', () => {
       })
 
       it('returns new image', async () => {
-        await expect(
-          mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback }),
-        ).resolves.toMatchObject({
+        await expect(mergeImage(post, 'HERO_IMAGE', imageInput)).resolves.toMatchObject({
           url: expect.any(String),
           alt: 'A description of the new image',
         })
       })
 
       it('calls upload callback', async () => {
-        await mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback })
-        expect(uploadCallback).toHaveBeenCalled()
+        await mergeImage(post, 'HERO_IMAGE', imageInput)
+        expect(mockUpload).toHaveBeenCalled()
       })
 
       it('creates `:Image` node', async () => {
         await expect(neode.all('Image')).resolves.toHaveLength(0)
-        await mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback })
+        await mergeImage(post, 'HERO_IMAGE', imageInput)
         await expect(neode.all('Image')).resolves.toHaveLength(1)
       })
 
@@ -195,11 +203,9 @@ describe('mergeImage', () => {
         const upload = await imageInput.upload
         upload.filename = '/path/to/awkward?/ file-location/?foo- bar-avatar.jpg'
         imageInput.upload = Promise.resolve(upload)
-        await expect(
-          mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback }),
-        ).resolves.toMatchObject({
+        await expect(mergeImage(post, 'HERO_IMAGE', imageInput)).resolves.toMatchObject({
           url: expect.stringMatching(
-            new RegExp(`^http://your-objectstorage.com/bucket/${uuid}-foo-bar-avatar.jpg`),
+            new RegExp(`^http://your-objectstorage.com/bucket/original/${uuid}-foo-bar-avatar.jpg`),
           ),
         })
       })
@@ -210,26 +216,25 @@ describe('mergeImage', () => {
           S3_PUBLIC_GATEWAY: 'http://s3-public-gateway.com',
         })
 
-        // eslint-disable-next-line jest/no-disabled-tests
-        it.skip('changes the domain of the URL to a server that could e.g. apply image transformations', async () => {
+        it('changes the domain of the URL to a server that could e.g. apply image transformations', async () => {
           if (!imageInput.upload) {
             throw new Error('Test imageInput was not setup correctly.')
           }
           const upload = await imageInput.upload
           upload.filename = '/path/to/file-location/foo-bar-avatar.jpg'
           imageInput.upload = Promise.resolve(upload)
-          await expect(
-            mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback }),
-          ).resolves.toMatchObject({
+          await expect(mergeImage(post, 'HERO_IMAGE', imageInput)).resolves.toMatchObject({
             url: expect.stringMatching(
-              new RegExp(`^http://s3-public-gateway.com/bucket/${uuid}-foo-bar-avatar.jpg`),
+              new RegExp(
+                `^http://s3-public-gateway.com/bucket/original/${uuid}-foo-bar-avatar.jpg`,
+              ),
             ),
           })
         })
       })
 
       it('connects resource with image via given image type', async () => {
-        await mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback })
+        await mergeImage(post, 'HERO_IMAGE', imageInput)
         const result = await neode.cypher(
           `MATCH(p:Post {id: "p99"})-[:HERO_IMAGE]->(i:Image) RETURN i,p`,
           {},
@@ -241,7 +246,7 @@ describe('mergeImage', () => {
       })
 
       it('sets metadata', async () => {
-        await mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback })
+        await mergeImage(post, 'HERO_IMAGE', imageInput)
         const image = await neode.first<typeof Image>('Image', {}, undefined)
         await expect(image.toJson()).resolves.toMatchObject({
           alt: 'A description of the new image',
@@ -256,8 +261,6 @@ describe('mergeImage', () => {
           try {
             await session.writeTransaction(async (transaction) => {
               const image = await mergeImage(post, 'HERO_IMAGE', imageInput, {
-                uploadCallback,
-                deleteCallback,
                 transaction,
               })
               return transaction.run(
@@ -287,8 +290,6 @@ describe('mergeImage', () => {
           try {
             await session.writeTransaction(async (transaction) => {
               const image = await mergeImage(post, 'HERO_IMAGE', imageInput, {
-                uploadCallback,
-                deleteCallback,
                 transaction,
               })
               return transaction.run('Ooops invalid cypher!', { image })
@@ -314,18 +315,18 @@ describe('mergeImage', () => {
         })
 
         it('calls deleteCallback', async () => {
-          await mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback })
-          expect(deleteCallback).toHaveBeenCalled()
+          await mergeImage(post, 'HERO_IMAGE', imageInput)
+          expect(mockDeleteObjectCommand).toHaveBeenCalled()
         })
 
-        it('calls uploadCallback', async () => {
-          await mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback })
-          expect(uploadCallback).toHaveBeenCalled()
+        it('calls Upload', async () => {
+          await mergeImage(post, 'HERO_IMAGE', imageInput)
+          expect(mockUpload).toHaveBeenCalled()
         })
 
         it('updates metadata of existing image node', async () => {
           await expect(neode.all('Image')).resolves.toHaveLength(1)
-          await mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback })
+          await mergeImage(post, 'HERO_IMAGE', imageInput)
           await expect(neode.all('Image')).resolves.toHaveLength(1)
           const image = await neode.first<typeof Image>('Image', {}, undefined)
           await expect(image.toJson()).resolves.toMatchObject({
@@ -375,17 +376,17 @@ describe('mergeImage', () => {
       })
 
       it('does not call deleteCallback', async () => {
-        await mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback })
-        expect(deleteCallback).not.toHaveBeenCalled()
+        await mergeImage(post, 'HERO_IMAGE', imageInput)
+        expect(mockDeleteObjectCommand).not.toHaveBeenCalled()
       })
 
-      it('does not call uploadCallback', async () => {
-        await mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback })
-        expect(uploadCallback).not.toHaveBeenCalled()
+      it('does not call Upload', async () => {
+        await mergeImage(post, 'HERO_IMAGE', imageInput)
+        expect(mockUpload).not.toHaveBeenCalled()
       })
 
       it('updates metadata', async () => {
-        await mergeImage(post, 'HERO_IMAGE', imageInput, { uploadCallback, deleteCallback })
+        await mergeImage(post, 'HERO_IMAGE', imageInput)
         const images = await neode.all('Image')
         expect(images).toHaveLength(1)
         await expect(images.first().toJson()).resolves.toMatchObject({
