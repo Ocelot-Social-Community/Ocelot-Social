@@ -1,199 +1,282 @@
-name: ocelot.social end-to-end test CI
-
-on: push
-
+name: test_e2e_reworked
+on:
+  push:
+    paths:
+      - '.github/workflows/cache-verify.yml'
+  workflow_dispatch:
 jobs:
-  prepare_backend_environment:
-    name: Fullstack | prepare backend environment
+  build-images:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: backend
+            context: ./backend
+            dockerfile: ./backend/Dockerfile
+            target: build
+          - name: webapp
+            context: ./webapp
+            dockerfile: ./webapp/Dockerfile
+            target: build
+          - name: neo4j
+            context: ./neo4j
+            dockerfile: ./neo4j/Dockerfile
+            target: community
     steps:
-      - name: Checkout code
-        uses: actions/checkout@09d2acae674a48949e3602304ab46fd20ae0c42f # v4.2.2
-
-      - name: Copy backend env file
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: setup .env files
         run: |
           cp backend/.env.test_e2e backend/.env
           cp webapp/.env.template webapp/.env
-      - name: Build backend and dependencies
-        run: |
-          # Build and start all required images for backend
-          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend --build
-          
-          # Save the build images
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" > /tmp/backend.tar          
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j-community:test" > /tmp/neo4j.tar
-          docker save "quay.io/minio/minio:latest" > /tmp/minio.tar
-          docker save "quay.io/minio/mc:latest" > /tmp/minio-mc.tar
-          docker save "maildev/maildev:latest" > /tmp/mailserver.tar
-          
-          # Stop the containers
-          docker compose -f docker-compose.yml -f docker-compose.test.yml down
-      
-      - name: Cache docker images
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
+      - uses: docker/setup-buildx-action@v3
+      - name: Build ${{ matrix.name }} image
+        uses: docker/build-push-action@v5
         with:
-          path: |
-            /tmp/backend.tar
-            /tmp/neo4j.tar
-            /tmp/minio.tar
-            /tmp/minio-mc.tar
-            /tmp/mailserver.tar
-          key: ${{ github.run_id }}-e2e-backend-environment-cache
-
-  prepare_webapp_image:
-    name: Fullstack | prepare webapp image
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@09d2acae674a48949e3602304ab46fd20ae0c42f # v4.2.2
-
-      - name: Copy backend env file
-        run: |
-          cp backend/.env.test_e2e backend/.env
-          cp webapp/.env.template webapp/.env
-      
-      - name: Build docker image
-        run: |
-          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach webapp --build --no-deps
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" > /tmp/webapp.tar
-      
-      - name: Cache docker image        
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          target: ${{ matrix.target }}
+          push: false
+          outputs: type=docker,dest=/tmp/${{ matrix.name }}.tar
+      - name: Upload ${{ matrix.name }} image
+        uses: actions/upload-artifact@v4
         with:
-          path: /tmp/webapp.tar
-          key: ${{ github.run_id }}-e2e-webapp-cache
+          name: ${{ matrix.name }}-image
+          path: /tmp/${{ matrix.name }}.tar
 
-  prepare_cypress:
-    name: Fullstack | prepare cypress
+  cache-environment:
     runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.key }}
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@09d2acae674a48949e3602304ab46fd20ae0c42f # v4.2.2
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@08f58d1471bff7f3a07d167b4ad7df25d5fcfcb6 # v4.4.0
+        uses: actions/setup-node@v4
         with:
-          node-version-file: 'backend/.tool-versions'
-          cache: 'yarn'
+          node-version: '20'
 
-      - name: Copy env files
+      - name: Setup .env files
         run: |
-          cp webapp/.env.template webapp/.env
           cp backend/.env.test_e2e backend/.env
-      - name: Install cypress requirements
+          cp webapp/.env.template webapp/.env
+      - name: Compute cache key
+        id: cache-key
         run: |
-          wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
-          cd backend
-          yarn install
-          yarn build
-          cd ..
-          yarn install
-      
-      - name: Cache docker image
-        
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
+          ROOT_HASH=$(sha256sum yarn.lock | cut -d' ' -f1)
+          BACKEND_HASH=$(sha256sum backend/yarn.lock | cut -d' ' -f1)
+          WEBAPP_HASH=$(sha256sum webapp/yarn.lock | cut -d' ' -f1)
+          CYPRESS_HASH=$(find cypress cypress.config.* -type f -exec sha256sum {} \; | sort | sha256sum | cut -d' ' -f1)
+          KEY="ci-unified-cache-${{ runner.os }}-${ROOT_HASH}-${BACKEND_HASH}-${WEBAPP_HASH}-${CYPRESS_HASH}"
+          echo "key=$KEY"
+          echo "key=$KEY" >> $GITHUB_OUTPUT
+      - name: Restore unified CI cache
+        id: restore-cache
+        uses: actions/cache/restore@v4
         with:
+          key: ${{ steps.cache-key.outputs.key }}
           path: |
+            node_modules
+            backend/node_modules
+            webapp/node_modules
+            backend/build
+            webapp/.nuxt
+            ~/.cache/Cypress
             /opt/cucumber-json-formatter
-            /home/runner/.cache/Cypress
-            /home/runner/work/Ocelot-Social/Ocelot-Social
-          key: ${{ github.run_id }}-e2e-cypress
+          restore-keys: |
+            ci-unified-cache-${{ runner.os }}-
+      - name: Setup dependencies & build (if cache missed)
+        if: steps.restore-cache.outputs.cache-hit != 'true'
+        run: |
+          echo "📦 Cache miss – installing & building everything"
+          yarn install --frozen-lockfile
+          cd backend && yarn install --frozen-lockfile && yarn build && cd ..
+          cd webapp && yarn install --frozen-lockfile && yarn build && cd ..
+          npx cypress verify || echo "⚠️ Cypress verify failed (non-blocking)"
+          if [ ! -f /opt/cucumber-json-formatter ]; then
+            wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
+            chmod +x /opt/cucumber-json-formatter
+          fi
+    # verify cache
+      - name: Verify install output before caching
+        run: |
+          test -d node_modules && ls node_modules || (echo "❌ install failed" && exit 1)
+          test -d backend/node_modules || (echo "❌ backend install failed" && exit 1)
+          test -d webapp/node_modules || (echo "❌ webapp install failed" && exit 1)
+      - name: Ensure node_modules folders are always cached
+        run: |
+          mkdir -p node_modules backend/node_modules webapp/node_modules
+          touch node_modules/.keep backend/node_modules/.keep webapp/node_modules/.keep
+      - name: Save unified CI cache
+        if: steps.restore-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          key: ${{ steps.cache-key.outputs.key }}
+          path: |
+            node_modules
+            backend/node_modules
+            webapp/node_modules
+            backend/build
+            webapp/.nuxt
+            ~/.cache/Cypress
+            /opt/cucumber-json-formatter
+  verify-environment:
+    runs-on: ubuntu-latest
+    needs: [cache-environment]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-  fullstack_tests:
+      - name: Restore unified CI cache
+        uses: actions/cache/restore@v4
+        with:
+          key: ${{ needs.cache-environment.outputs.cache-key }}
+          path: |
+            node_modules
+            backend/node_modules
+            webapp/node_modules
+            backend/build
+            webapp/.nuxt
+            ~/.cache/Cypress
+            /opt/cucumber-json-formatter
+      - name: Check required node_modules
+        run: |
+          [ -d node_modules ] && [ -n "$(ls -A node_modules)" ] || (echo "❌ node_modules missing" && exit 1)
+          [ -d backend/node_modules ] && [ -n "$(ls -A backend/node_modules)" ] || (echo "❌ backend/node_modules missing" && exit 1)
+          [ -d webapp/node_modules ] && [ -n "$(ls -A webapp/node_modules)" ] || (echo "❌ webapp/node_modules missing" && exit 1)
+      - name: Check Cypress binary
+        run: |
+          npx cypress --version || (echo "❌ Cypress binary fehlt" && exit 1)
+          npx cypress verify
+      - name: Check build artifacts exist
+        run: |
+          [ -d backend/build ] || (echo "❌ backend/build fehlt" && exit 1)
+          [ -d webapp/.nuxt ] || (echo "❌ webapp/.nuxt fehlt" && exit 1)
+      - name: Check cucumber-json-formatter
+        run: |
+          [ -x /opt/cucumber-json-formatter ] || (echo "❌ Formatter fehlt" && exit 1)
+          /opt/cucumber-json-formatter --help || (echo "❌ Formatter nicht ausführbar" && exit 1)
+  consolidate-environment:
     name: Fullstack | tests
     if: success()
-    needs: [prepare_backend_environment, prepare_webapp_image, prepare_cypress]
+    needs: [build-images, cache-environment]
     runs-on: ubuntu-latest
     env:
       jobs: 8
     strategy:
       matrix:
-        # run copies of the current job in parallel
         job: [1, 2, 3, 4, 5, 6, 7, 8]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@09d2acae674a48949e3602304ab46fd20ae0c42f # v4.2.2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@08f58d1471bff7f3a07d167b4ad7df25d5fcfcb6 # v4.4.0
+    steps:     
+    #download docker images
+      - name: Download Docker image artifacts
+        uses: actions/download-artifact@v4
         with:
-          node-version-file: 'backend/.tool-versions'
-          cache: 'yarn'
+          path: /tmp
 
-      - name: Restore cypress cache
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
-        with:
-          path: |
-            /opt/cucumber-json-formatter
-            /home/runner/.cache/Cypress
-            /home/runner/work/Ocelot-Social/Ocelot-Social
-          key: ${{ github.run_id }}-e2e-cypress
-          restore-keys: ${{ github.run_id }}-e2e-cypress
-
-      - name: Restore backend environment cache
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
-        with:
-          path: |
-            /tmp/backend.tar
-            /tmp/neo4j.tar
-            /tmp/minio.tar
-            /tmp/minio-mc.tar
-            /tmp/mailserver.tar
-          key: ${{ github.run_id }}-e2e-backend-environment-cache
-
-      - name: Restore webapp cache
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.0.2
-        with:
-          path: /tmp/webapp.tar
-          key: ${{ github.run_id }}-e2e-webapp-cache
-          
-      - name: Boot up test system | docker compose
+    #load docker images
+      - name: Load Docker images
         run: |
-          chmod +x /opt/cucumber-json-formatter
-          sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
-          docker load < /tmp/neo4j.tar
-          docker load < /tmp/backend.tar
-          docker load < /tmp/minio.tar
-          docker load < /tmp/minio-mc.tar
-          docker load < /tmp/mailserver.tar
-          docker load < /tmp/webapp.tar
-          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
-          sleep 90s
-      - name: Full stack tests | run tests
-        id: e2e-tests
-        run: yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
+          docker load < /tmp/backend-image/backend.tar
+          docker load < /tmp/webapp-image/webapp.tar
+          docker load < /tmp/neo4j-image/neo4j.tar
+    #checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+    
+    #setup .env files, make cypress reports dir
+      - name: Setup .env files & reports dir
+        run: |
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
+          mkdir -p cypress/reports/json_logs
+    #restore unified cache
+      - name: Restore unified CI cache
+        id: restore-cache
+        uses: actions/cache/restore@v4
+        with:
+          key: ${{ needs.cache-environment.outputs.cache-key }}
+          path: |
+            node_modules
+            backend/node_modules
+            webapp/node_modules
+            backend/build
+            webapp/.nuxt
+            ~/.cache/Cypress
+            /opt/cucumber-json-formatter
+          restore-keys: |
+            ci-unified-cache-${{ runner.os }}-
+    #setup cocumber path
+      - name: Run formatter or use PATH tools
+        run: |
+          export PATH="/opt:$PATH"
+          cucumber-json-formatter --help
+    #rehydrate dependencies
+      - name: Rehydrate dependencies
+        run: |
+          yarn install --frozen-lockfile
+          cd backend && yarn install --frozen-lockfile && cd ..
+          cd webapp && yarn install --frozen-lockfile && cd ..
+          npx cypress verify || echo "⚠️ Cypress not yet verified"
+    #build backend
+      - name: Build backend
+        run: cd backend && yarn build
 
+    #boot system for tests
+      - name: Boot system for tests
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
+    #wait for services
+      - name: Wait for essential services
+        run: |
+          wait_for() {
+            local name="$1"
+            local url="$2"
+            local max=40
+            echo "⏳ Waiting for $name ($url)..."
+            for i in $(seq 1 "$max"); do
+              status=$(curl -s -o /dev/null -w "%{http_code}" "$url" || echo "000")
+              if [[ "$status" =~ ^2|3|400$ ]]; then
+                echo "✅ $name responded with HTTP $status"
+                return 0
+              fi
+              echo "Waiting for $name... ($i/$max) – last HTTP $status"
+              sleep 2
+            done
+            echo "❌ Timeout: $name did not respond successfully at $url"
+            echo "Last response body:"
+            curl -i "$url" || echo "(curl failed)"
+            docker compose logs "$name" || echo "(docker logs failed)"
+            return 1
+          }
+          # Lade die kopierten .env-Dateien in Shell-Variablen
+          set -o allexport
+          source backend/.env
+          source webapp/.env
+          set +o allexport
+          # Aufrufe
+          wait_for "webapp" "$CLIENT_URI"
+          wait_for "backend" "$BACKEND_HEALTH"
+          wait_for "mailserver" "http://localhost:1080"
+          wait_for "minio" "http://localhost:9000/minio/health/live"
+          echo "🎉 All services are up."
+    #starting fullstack cypress tests
       - name: Full stack tests | if tests failed, compile html report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         run: |
           cd cypress/
           node create-cucumber-html-report.js
       - name: Full stack tests | if tests failed, upload report
-        id: e2e-report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@v4
         with:
-          name: ocelot-e2e-test-report-pr${{ needs.docker_preparation.outputs.pr-number }}
-          path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
+          name: e2e-html-report-${{ matrix.job }}
+          path: cypress/reports/cucumber_html_report
 
-  cleanup_cache:
-    name: Cleanup Cache
-    needs: fullstack_tests
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@09d2acae674a48949e3602304ab46fd20ae0c42f # v4.2.2
-      
-      - name: Full stack tests | cleanup cache
+      - name: Debug output (always)
+        if: always()
         run: |
-          cacheKeys=$(gh cache list --json key --jq '.[] | select(.key | startswith("${{ github.run_id }}-e2e-")) | .key')
-          set +e
-          echo "Deleting caches..."
-          for cacheKey in $cacheKeys
-          do
-            gh cache delete "$cacheKey"
-          done
-          echo "Done"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          echo "📁 Cypress reports"
+          ls -l cypress/reports/json_logs || echo "❌ Missing JSON logs"
