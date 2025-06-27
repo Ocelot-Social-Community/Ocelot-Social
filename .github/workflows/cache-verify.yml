@@ -1,9 +1,5 @@
 name: test_e2e_reworked
-on:
-  push:
-    paths:
-      - '.github/workflows/cache-verify.yml'
-  workflow_dispatch:
+on: push
 jobs:
   build-images:
     runs-on: ubuntu-latest
