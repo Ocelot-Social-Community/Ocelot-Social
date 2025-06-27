@@ -7,7 +7,6 @@ import { v4 as uuid } from 'uuid'
 
 import type { S3Configured } from '@config/index'
 import { s3Service } from '@src/uploads/s3Service'
-import { FileUploadCallback } from '@src/uploads/types'
 
 import { wrapTransaction } from './wrapTransaction'
 
@@ -17,7 +16,7 @@ export const images = (config: S3Configured) => {
   const s3 = s3Service(config, 'original')
 
   const deleteImage: Images['deleteImage'] = async (resource, relationshipType, opts = {}) => {
-    const { transaction, deleteCallback = s3.deleteFile } = opts
+    const { transaction } = opts
     if (!transaction) return wrapTransaction(deleteImage, [resource, relationshipType], opts)
     const txResult = await transaction.run(
       `
@@ -34,7 +33,7 @@ export const images = (config: S3Configured) => {
     // of an error (so throw an error). If we bulk delete an image, it
     // could very well be that there is no image for the resource.
     if (image) {
-      await deleteCallback(image.url)
+      await s3.deleteFile(image.url)
     }
     return image
   }
@@ -47,7 +46,7 @@ export const images = (config: S3Configured) => {
   ) => {
     if (typeof imageInput === 'undefined') return
     if (imageInput === null) return deleteImage(resource, relationshipType, opts)
-    const { transaction, uploadCallback, deleteCallback = s3.deleteFile } = opts
+    const { transaction } = opts
     if (!transaction)
       return wrapTransaction(mergeImage, [resource, relationshipType, imageInput], opts)
 
@@ -62,9 +61,9 @@ export const images = (config: S3Configured) => {
     const { upload } = imageInput
     if (!(existingImage || upload)) throw new UserInputError('Cannot find image for given resource')
     if (existingImage && upload) {
-      await deleteCallback(existingImage.url)
+      await s3.deleteFile(existingImage.url)
     }
-    const url = await uploadImageFile(upload, uploadCallback)
+    const url = await uploadImageFile(upload)
     const { alt, sensitive, aspectRatio, type } = imageInput
     const image = { alt, sensitive, aspectRatio, url, type }
     txResult = await transaction.run(
@@ -82,15 +81,12 @@ export const images = (config: S3Configured) => {
     return mergedImage
   }
 
-  const uploadImageFile = async (
-    uploadPromise: Promise<FileUpload> | undefined,
-    uploadCallback: FileUploadCallback | undefined = s3.uploadFile,
-  ) => {
+  const uploadImageFile = async (uploadPromise: Promise<FileUpload> | undefined) => {
     if (!uploadPromise) return undefined
     const upload = await uploadPromise
     const { name, ext } = path.parse(upload.filename)
     const uniqueFilename = `${uuid()}-${slug(name)}${ext}`
-    return await uploadCallback({ ...upload, uniqueFilename })
+    return await s3.uploadFile({ ...upload, uniqueFilename })
   }
 
   const images: Images = {
