@@ -42,9 +42,6 @@ export default class EventHandler extends Extension {
               .replace(/(\s*<br ?\/?>\s*)+<\/p>/gim, '</p>')
             return html
           },
-          transformPasted(slice) {
-            console.log('#### transformPasted', slice.content)
-          },
           // transformPasted(slice) {
           //   // console.log('#### transformPasted', slice.content)
           //   let content = []
