@@ -24,6 +24,8 @@ jobs:
             context: ./neo4j
             dockerfile: ./neo4j/Dockerfile
             target: community
+            tags: ghcr.io/ocelot-social-community/ocelot-social/neo4j-community:test
+
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
@@ -34,6 +36,7 @@ jobs:
           file: ${{ matrix.dockerfile }}
           target: ${{ matrix.target }}
           push: false
+          tags: ${{ matrix.tags || '' }}
           outputs: type=docker,dest=/tmp/${{ matrix.name }}.tar
       - name: Upload ${{ matrix.name }} image
         uses: actions/upload-artifact@v4
