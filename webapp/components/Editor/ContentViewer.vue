@@ -1,5 +1,5 @@
 <template>
-  <editor-content :editor="editor" :key="content" />
+  <editor-content :editor="editor" :key="content" class="content" />
 </template>
 
 <script>
@@ -44,5 +44,15 @@ export default {
 .ProseMirror h4,
 .ProseMirror hr {
   margin: 24px 0 8px;
+}
+</style>
+
+<style scoped>
+.content {
+  img {
+    display: block;
+    max-height: 400px;
+    max-width: 400px;
+  }
 }
 </style>

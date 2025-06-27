@@ -323,6 +323,12 @@ li > p {
     border-color: $color-primary;
     background-color: $color-neutral-100;
   }
+
+  img {
+    display: block;
+    max-height: 400px;
+    max-width: 400px;
+  }
 }
 
 .ProseMirror {
