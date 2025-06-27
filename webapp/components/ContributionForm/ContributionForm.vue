@@ -394,7 +394,6 @@ export default {
       }
       this.loading = true
 
-      console.log(content)
       this.$apollo
         .mutate({
           mutation: this.contribution.id ? PostMutations().UpdatePost : PostMutations().CreatePost,
