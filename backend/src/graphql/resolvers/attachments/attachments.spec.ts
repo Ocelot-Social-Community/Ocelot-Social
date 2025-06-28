@@ -9,15 +9,14 @@ import { Readable } from 'node:stream'
 import { S3Client } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import { UserInputError } from 'apollo-server'
-import { createTestClient } from 'apollo-server-testing'
 
-import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import File from '@db/models/File'
 import { CreateMessage } from '@graphql/queries/CreateMessage'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
 import type { S3Configured } from '@src/config'
-import createServer, { getContext } from '@src/server'
 
 import { attachments } from './attachments'
 
@@ -47,20 +46,19 @@ const config: S3Configured = {
   S3_PUBLIC_GATEWAY: undefined,
 }
 
-const database = databaseContext()
-
-let authenticatedUser, server, mutate
+let authenticatedUser
+const context = () => ({ authenticatedUser, config })
+let mutate: ApolloTestSetup['mutate']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 beforeAll(async () => {
   await cleanDatabase()
 
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database })
-
-  server = createServer({ context }).server
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  mutate = createTestClient(server).mutate
+  const apolloSetup = createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
@@ -115,7 +113,7 @@ describe('delete Attachment', () => {
         },
       })
 
-      message = m.data.CreateMessage
+      message = (m.data as any).CreateMessage // eslint-disable-line @typescript-eslint/no-explicit-any
 
       await database.write({
         query: `

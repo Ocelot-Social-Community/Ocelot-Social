@@ -4,7 +4,6 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable n/no-process-exit */
 import { faker } from '@faker-js/faker'
-import { createTestClient } from 'apollo-server-testing'
 import sample from 'lodash/sample'
 
 import CONFIG from '@config/index'
@@ -16,10 +15,9 @@ import { CreateMessage } from '@graphql/queries/CreateMessage'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
-import createServer from '@src/server'
+import { createApolloTestSetup } from '@root/test/helpers'
 
 import Factory from './factories'
-import { getNeode, getDriver } from './neo4j'
 import { trophies, verification } from './seed/badges'
 
 if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
@@ -35,22 +33,21 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
   console.log('Seeded Data...')
 
   let authenticatedUser = null
-  const driver = getDriver()
-  const neode = getNeode()
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode,
-        user: authenticatedUser,
-      }
-    },
+
+  // locations
+  const context = () => ({
+    authenticatedUser,
+    config: CONFIG,
   })
-  const { mutate } = createTestClient(server)
+  const apolloSetup = createApolloTestSetup({ context })
+  const { mutate, server, database } = apolloSetup
+  const { neode } = database
 
   try {
     // eslint-disable-next-line no-console
     console.log('seed', 'locations')
+
+    // locations
     const Hamburg = await Factory.build('location', {
       id: 'region.5127278006398860',
       name: 'Hamburg',
@@ -1618,7 +1615,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     throw err
   } finally {
     await server.stop()
-    await driver.close()
+    await database.driver.close()
     // eslint-disable-next-line @typescript-eslint/await-thenable
     await neode.close()
     process.exit(0)

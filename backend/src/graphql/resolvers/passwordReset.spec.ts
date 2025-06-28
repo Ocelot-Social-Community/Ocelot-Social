@@ -1,51 +1,45 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import registrationConstants from '@constants/registrationBranded'
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
-import createServer from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
 
 import createPasswordReset from './helpers/createPasswordReset'
 
-const neode = getNeode()
-const driver = getDriver()
-
-let mutate
-let authenticatedUser
 let variables
 
+let mutate: ApolloTestSetup['mutate']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+
 const getAllPasswordResets = async () => {
-  const passwordResetQuery = await neode.cypher(
+  const passwordResetQuery = await database.neode.cypher(
     'MATCH (passwordReset:PasswordReset) RETURN passwordReset',
     {},
   )
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   const resets = passwordResetQuery.records.map((record) => record.get('passwordReset'))
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return resets
 }
 
 beforeAll(async () => {
   await cleanDatabase()
-
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode,
-        user: authenticatedUser,
-      }
-    },
-  })
-  mutate = createTestClient(server).mutate
+  const apolloSetup = createApolloTestSetup()
+  mutate = apolloSetup.mutate
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 beforeEach(() => {
@@ -129,7 +123,7 @@ describe('resetPassword', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const setup = async (options: any = {}) => {
     const { email = 'user@example.org', issuedAt = new Date(), nonce = '12345' } = options
-    await createPasswordReset({ driver, email, issuedAt, nonce })
+    await createPasswordReset({ driver: database.driver, email, issuedAt, nonce })
   }
 
   const mutation = gql`

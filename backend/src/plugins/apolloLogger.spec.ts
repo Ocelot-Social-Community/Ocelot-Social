@@ -1,33 +1,29 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
 
-import databaseContext from '@context/database'
+import { ApolloServer } from 'apollo-server-express'
+
 import Factory, { cleanDatabase } from '@db/factories'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 import { loginMutation } from '@src/graphql/queries/loginMutation'
 import ocelotLogger from '@src/logger'
 import { loggerPlugin } from '@src/plugins/apolloLogger'
-import createServer, { getContext } from '@src/server'
-
-const database = databaseContext()
 
 let server: ApolloServer
 
-let mutate, authenticatedUser
+const authenticatedUser: Context['user'] = null
+let mutate: ApolloTestSetup['mutate']
+let database: ApolloTestSetup['database']
+const context = () => ({ authenticatedUser })
 
 beforeAll(async () => {
   await cleanDatabase()
-
-  // eslint-disable-next-line @typescript-eslint/require-await
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database })
-
-  server = createServer({ context, plugins: [loggerPlugin] }).server
-
-  const createTestClientResult = createTestClient(server)
-  mutate = createTestClientResult.mutate
+  const apolloSetup = createApolloTestSetup({ context, plugins: [loggerPlugin] })
+  mutate = apolloSetup.mutate
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {

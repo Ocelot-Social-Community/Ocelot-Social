@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import type { Context } from '@src/server'
+import type { Context } from '@src/context'
 
 import uniqueSlug from './slugify/uniqueSlug'
 

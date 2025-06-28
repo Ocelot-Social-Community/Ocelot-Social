@@ -3,10 +3,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { createTestClient } from 'apollo-server-testing'
-
-import CONFIG from '@config/index'
-import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
@@ -16,9 +12,11 @@ import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
 import { updateGroupMutation } from '@graphql/queries/updateGroupMutation'
-import createServer, { getContext } from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
+// import CONFIG from '@src/config'
 
-let authenticatedUser
 let user
 let noMemberUser
 let pendingMemberUser
@@ -27,18 +25,21 @@ let adminMemberUser
 let ownerMemberUser
 let secondOwnerMemberUser
 
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser, config })
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+
 const categoryIds = ['cat9', 'cat4', 'cat15']
 const descriptionAdditional100 =
   ' 123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789'
 let variables = {}
-
-const database = databaseContext()
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-const contextUser = async (_req) => authenticatedUser
-const context = getContext({ user: contextUser, database })
-
-const { server } = createServer({ context })
-const { mutate, query } = createTestClient(server)
+const config = {
+  CATEGORIES_ACTIVE: true,
+  // MAPBOX_TOKEN: CONFIG.MAPBOX_TOKEN,
+}
 
 const seedBasicsAndClearAuthentication = async () => {
   variables = {}
@@ -230,7 +231,11 @@ const seedComplexScenarioAndClearAuthentication = async () => {
 }
 
 beforeAll(async () => {
-  await cleanDatabase()
+  const apolloSetup = createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
@@ -270,7 +275,7 @@ describe('in mode', () => {
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
           const { errors } = await mutate({ mutation: createGroupMutation(), variables })
-          expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+          expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
 
@@ -339,17 +344,13 @@ describe('in mode', () => {
                       '<a href="https://domain.org/0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789">0</a>',
                   },
                 })
-                expect(errors![0]).toHaveProperty('message', 'Description too short!')
+                expect(errors?.[0]).toHaveProperty('message', 'Description too short!')
               })
             })
           })
         })
 
         describe('categories', () => {
-          beforeEach(() => {
-            CONFIG.CATEGORIES_ACTIVE = true
-          })
-
           describe('with matching amount of categories', () => {
             it('has new categories', async () => {
               await expect(
@@ -382,7 +383,7 @@ describe('in mode', () => {
                   mutation: createGroupMutation(),
                   variables: { ...variables, categoryIds: null },
                 })
-                expect(errors![0]).toHaveProperty('message', 'Too few categories!')
+                expect(errors?.[0]).toHaveProperty('message', 'Too few categories!')
               })
             })
 
@@ -392,7 +393,7 @@ describe('in mode', () => {
                   mutation: createGroupMutation(),
                   variables: { ...variables, categoryIds: [] },
                 })
-                expect(errors![0]).toHaveProperty('message', 'Too few categories!')
+                expect(errors?.[0]).toHaveProperty('message', 'Too few categories!')
               })
             })
           })
@@ -403,7 +404,7 @@ describe('in mode', () => {
                 mutation: createGroupMutation(),
                 variables: { ...variables, categoryIds: ['cat9', 'cat4', 'cat15', 'cat27'] },
               })
-              expect(errors![0]).toHaveProperty('message', 'Too many categories!')
+              expect(errors?.[0]).toHaveProperty('message', 'Too many categories!')
             })
           })
         })
@@ -581,10 +582,6 @@ describe('in mode', () => {
               })
 
               describe('categories', () => {
-                beforeEach(() => {
-                  CONFIG.CATEGORIES_ACTIVE = true
-                })
-
                 it('has set categories', async () => {
                   await expect(query({ query: groupQuery, variables: {} })).resolves.toMatchObject({
                     data: {
@@ -811,7 +808,7 @@ describe('in mode', () => {
               userId: 'current-user',
             },
           })
-          expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+          expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
 
@@ -1566,7 +1563,7 @@ describe('in mode', () => {
               roleInGroup: 'pending',
             },
           })
-          expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+          expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
 
@@ -1721,7 +1718,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -1747,7 +1744,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
 
@@ -1796,7 +1793,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -1819,7 +1816,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -1842,7 +1839,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -1900,7 +1897,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -1923,7 +1920,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
 
@@ -1940,7 +1937,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -1963,7 +1960,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
 
@@ -1980,7 +1977,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -2003,7 +2000,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
 
@@ -2020,7 +2017,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -2110,7 +2107,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
 
@@ -2127,7 +2124,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -2150,7 +2147,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
 
@@ -2167,7 +2164,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -2190,7 +2187,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
 
@@ -2207,7 +2204,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -2297,7 +2294,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -2320,7 +2317,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -2343,7 +2340,7 @@ describe('in mode', () => {
                       mutation: changeGroupMemberRoleMutation(),
                       variables,
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
                   })
                 })
               })
@@ -2407,7 +2404,7 @@ describe('in mode', () => {
               userId: 'current-user',
             },
           })
-          expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+          expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
 
@@ -2524,7 +2521,7 @@ describe('in mode', () => {
                     userId: 'owner-member-user',
                   },
                 })
-                expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
 
@@ -2538,7 +2535,7 @@ describe('in mode', () => {
                     userId: 'second-owner-member-user',
                   },
                 })
-                expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
 
@@ -2552,7 +2549,7 @@ describe('in mode', () => {
                     userId: 'none-member-user',
                   },
                 })
-                expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
 
@@ -2566,7 +2563,7 @@ describe('in mode', () => {
                     userId: 'usual-member-user',
                   },
                 })
-                expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
 
@@ -2580,7 +2577,7 @@ describe('in mode', () => {
                     userId: 'admin-member-user',
                   },
                 })
-                expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+                expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
               })
             })
           })
@@ -2606,7 +2603,7 @@ describe('in mode', () => {
               slug: 'my-best-group',
             },
           })
-          expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+          expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
 
@@ -2859,17 +2856,13 @@ describe('in mode', () => {
                           '<a href="https://domain.org/0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789">0</a>',
                       },
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Description too short!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Description too short!')
                   })
                 })
               })
             })
 
             describe('categories', () => {
-              beforeEach(async () => {
-                CONFIG.CATEGORIES_ACTIVE = true
-              })
-
               describe('with matching amount of categories', () => {
                 it('has new categories', async () => {
                   await expect(
@@ -2906,7 +2899,7 @@ describe('in mode', () => {
                         categoryIds: [],
                       },
                     })
-                    expect(errors![0]).toHaveProperty('message', 'Too few categories!')
+                    expect(errors?.[0]).toHaveProperty('message', 'Too few categories!')
                   })
                 })
               })
@@ -2920,7 +2913,7 @@ describe('in mode', () => {
                       categoryIds: ['cat9', 'cat4', 'cat15', 'cat27'],
                     },
                   })
-                  expect(errors![0]).toHaveProperty('message', 'Too many categories!')
+                  expect(errors?.[0]).toHaveProperty('message', 'Too many categories!')
                 })
               })
             })
@@ -2940,7 +2933,7 @@ describe('in mode', () => {
                   categoryIds: ['cat4', 'cat27'],
                 },
               })
-              expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+              expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
             })
           })
 
@@ -2958,7 +2951,7 @@ describe('in mode', () => {
                   categoryIds: ['cat4', 'cat27'],
                 },
               })
-              expect(errors![0]).toHaveProperty('message', 'Not Authorized!')
+              expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
             })
           })
         })

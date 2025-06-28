@@ -1,33 +1,29 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import CONFIG from '@src/config'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
 import { categories } from '@src/constants/categories'
-import createServer, { getContext } from '@src/server'
+import type { Context } from '@src/context'
 
-const database = databaseContext()
+let config: Partial<Context['config']>
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
-let server: ApolloServer
-let query
+beforeEach(() => {
+  config = {}
+})
 
 beforeAll(async () => {
   await cleanDatabase()
-  const authenticatedUser = null
-
-  // eslint-disable-next-line @typescript-eslint/require-await
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database })
-
-  server = createServer({ context }).server
-
-  const createTestClientResult = createTestClient(server)
-  query = createTestClientResult.query
-
+  const context = () => ({ config, authenticatedUser: null })
+  const apolloSetup = createApolloTestSetup({ context })
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
   for (const category of categories) {
     await Factory.build('category', {
       id: category.id,
@@ -55,10 +51,10 @@ const categoriesQuery = gql`
   }
 `
 
-describe('categroeis middleware', () => {
+describe('categories middleware', () => {
   describe('categories are active', () => {
     beforeEach(() => {
-      CONFIG.CATEGORIES_ACTIVE = true
+      config = { ...config, CATEGORIES_ACTIVE: true }
     })
 
     it('returns the categories', async () => {
@@ -78,7 +74,7 @@ describe('categroeis middleware', () => {
 
   describe('categories are not active', () => {
     beforeEach(() => {
-      CONFIG.CATEGORIES_ACTIVE = false
+      config = { ...config, CATEGORIES_ACTIVE: false }
     })
 
     it('returns an empty array though there are categories in the db', async () => {

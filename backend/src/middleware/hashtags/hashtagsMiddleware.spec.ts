@@ -1,21 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
-import createServer from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-let server
-let query
-let mutate
 let hashtagingUser
-let authenticatedUser
-const driver = getDriver()
-const neode = getNeode()
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser })
+let mutate: ApolloTestSetup['mutate']
+let query: any // eslint-disable-line @typescript-eslint/no-explicit-any
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 const categoryIds = ['cat9']
 const createPostMutation = gql`
   mutation ($id: ID, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
@@ -37,34 +36,27 @@ const updatePostMutation = gql`
 
 beforeAll(async () => {
   await cleanDatabase()
-
-  const createServerResult = createServer({
-    context: () => {
-      return {
-        user: authenticatedUser,
-        neode,
-        driver,
-      }
-    },
-  })
-  server = createServerResult.server
-  const createTestClientResult = createTestClient(server)
-  query = createTestClientResult.query
-  mutate = createTestClientResult.mutate
+  const apolloSetup = createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 beforeEach(async () => {
-  hashtagingUser = await neode.create('User', {
+  hashtagingUser = await database.neode.create('User', {
     id: 'you',
     name: 'Al Capone',
     slug: 'al-capone',
   })
-  await neode.create('Category', {
+  await database.neode.create('Category', {
     id: 'cat9',
     name: 'Democracy & Politics',
     icon: 'university',

@@ -1,37 +1,32 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
-import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
 import { rewardTrophyBadge } from '@graphql/queries/rewardTrophyBadge'
 import { setTrophyBadgeSelected } from '@graphql/queries/setTrophyBadgeSelected'
-import createServer, { getContext } from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
 let regularUser, administrator, moderator, badge, verification
 
-const database = databaseContext()
-
-let server: ApolloServer
-let authenticatedUser
-let query, mutate
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser })
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 beforeAll(async () => {
   await cleanDatabase()
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database })
-
-  server = createServer({ context }).server
-
-  const createTestClientResult = createTestClient(server)
-  query = createTestClientResult.query
-  mutate = createTestClientResult.mutate
+  const apolloSetup = createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(() => {
@@ -838,7 +833,7 @@ describe('Badges', () => {
 
     describe('check test setup', () => {
       it('user has one badge and has it selected', async () => {
-        authenticatedUser = regularUser.toJson()
+        authenticatedUser = await regularUser.toJson()
         const userQuery = gql`
           {
             User(id: "regular-user-id") {

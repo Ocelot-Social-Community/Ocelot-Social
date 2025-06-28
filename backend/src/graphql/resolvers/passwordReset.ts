@@ -8,13 +8,15 @@ import bcrypt from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
 
 import registrationConstants from '@constants/registrationBranded'
+import type { Context } from '@src/context'
 
 import createPasswordReset from './helpers/createPasswordReset'
 import normalizeEmail from './helpers/normalizeEmail'
 
 export default {
   Mutation: {
-    requestPasswordReset: async (_parent, { email }, { driver }) => {
+    requestPasswordReset: async (_parent, { email }, context: Context) => {
+      const { driver } = context
       email = normalizeEmail(email)
       // TODO: why this is generated differntly from 'backend/src/schema/resolvers/helpers/generateNonce.js'?
       const nonce = uuid().substring(0, registrationConstants.NONCE_LENGTH)
