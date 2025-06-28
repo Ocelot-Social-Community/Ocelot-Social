@@ -35,7 +35,10 @@ services:
 
   neo4j:
     # name the image so that it cannot be found in a DockerHub repository, otherwise it will not be built locally from the 'dockerfile' but pulled from there
-    image: ghcr.io/ocelot-social-community/ocelot-social/neo4j-community:test
+    image: ghcr.io/ocelot-social-community/ocelot-social/neo4j:community
+    build:
+      context: ./neo4j
+      target: community
     #environment:
     #  - NEO4J_dbms_connector_bolt_enabled=true
     #  - NEO4J_dbms_connector_bolt_tls__level=OPTIONAL
