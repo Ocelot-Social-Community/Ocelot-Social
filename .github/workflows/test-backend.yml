@@ -33,7 +33,7 @@ jobs:
       - name: Neo4J | Build 'community' image
         run: |
           docker compose -f docker-compose.yml -f docker-compose.test.yml build neo4j
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community:test" > /tmp/neo4j.tar
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" > /tmp/neo4j.tar
       
       - name: Cache docker images
         id: cache-neo4j
