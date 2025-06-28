@@ -32,7 +32,7 @@ jobs:
 
       - name: Neo4J | Build 'community' image
         run: |
-          docker build --target test -t "ocelotsocialnetwork/neo4j-community:test" neo4j/
+          docker build --target community -t "ocelotsocialnetwork/neo4j-community:test" neo4j/
           docker save "ocelotsocialnetwork/neo4j-community:test" > /tmp/neo4j.tar
       
       - name: Cache docker images
