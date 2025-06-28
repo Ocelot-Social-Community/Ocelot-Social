@@ -1044,10 +1044,10 @@
     "@babel/helper-string-parser" "^7.27.1"
     "@babel/helper-validator-identifier" "^7.27.1"
 
-"@badeball/cypress-cucumber-preprocessor@^22.1.0":
-  version "22.1.0"
-  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-22.1.0.tgz#283c7d924badfbef9e08c7d13b2d672822f39909"
-  integrity sha512-6hZdi7krImbUKp8lVqwMcW5cGxMmyZahPpkWL5D3wfTYRRhVgeOx9Y7liyCqKcOZkyCoufJEx8iGtTNYKiR3SQ==
+"@badeball/cypress-cucumber-preprocessor@^22.2.0":
+  version "22.2.0"
+  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-22.2.0.tgz#503b852cf5db230eb3dfd2fd07495d3bd2244f3e"
+  integrity sha512-od4a1k5VeptXSr1AI2gi5iHMmrKQhwXeLouiuv1yF6Th/FoDstaukdPy6lvwqAuEgb4wx0H1eFVi5/rlSD+1pA==
   dependencies:
     "@cucumber/ci-environment" "^10.0.1"
     "@cucumber/cucumber" "^11.0.0"
