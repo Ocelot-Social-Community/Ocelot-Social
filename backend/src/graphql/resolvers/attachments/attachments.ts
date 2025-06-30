@@ -1,13 +1,12 @@
 import path from 'node:path'
 
-import { DeleteObjectCommand, ObjectCannedACL, S3Client } from '@aws-sdk/client-s3'
-import { Upload } from '@aws-sdk/lib-storage'
 import { UserInputError } from 'apollo-server-express'
 import slug from 'slug'
 import { v4 as uuid } from 'uuid'
 
 import { isS3configured, S3Configured } from '@config/index'
 import { wrapTransaction } from '@graphql/resolvers/images/wrapTransaction'
+import { s3Service } from '@src/uploads/s3Service'
 
 import type { FileUpload } from 'graphql-upload'
 import type { Transaction } from 'neo4j-driver'
@@ -60,17 +59,7 @@ export const attachments = (config: S3Configured) => {
     throw new Error('S3 not configured')
   }
 
-  const { AWS_BUCKET: Bucket, S3_PUBLIC_GATEWAY } = config
-
-  const { AWS_ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = config
-  const s3 = new S3Client({
-    credentials: {
-      accessKeyId: AWS_ACCESS_KEY_ID,
-      secretAccessKey: AWS_SECRET_ACCESS_KEY,
-    },
-    endpoint: AWS_ENDPOINT,
-    forcePathStyle: true,
-  })
+  const s3 = s3Service(config, 'attachments')
 
   const del: Attachments['del'] = async (resource, relationshipType, opts = {}) => {
     const { transaction } = opts
@@ -86,17 +75,7 @@ export const attachments = (config: S3Configured) => {
     )
     const [file] = txResult.records.map((record) => record.get('fileProps') as File)
     if (file) {
-      let { pathname } = new URL(file.url, 'http://example.org') // dummy domain to avoid invalid URL error
-      pathname = pathname.substring(1) // remove first character '/'
-      const prefix = `${Bucket}/`
-      if (pathname.startsWith(prefix)) {
-        pathname = pathname.slice(prefix.length)
-      }
-      const params = {
-        Bucket,
-        Key: pathname,
-      }
-      await s3.send(new DeleteObjectCommand(params))
+      await s3.deleteFile(file.url)
     }
     return file
   }
@@ -119,34 +98,10 @@ export const attachments = (config: S3Configured) => {
     const { name: fileName, ext } = path.parse(uploadFile.filename)
     const uniqueFilename = `${uuid()}-${slug(fileName)}${ext}`
 
-    const s3Location = `attachments/${uniqueFilename}`
-    const params = {
-      Bucket,
-      Key: s3Location,
-      ACL: ObjectCannedACL.public_read,
-      ContentType: uploadFile.mimetype,
-      Body: uploadFile.createReadStream(),
-    }
-    const command = new Upload({ client: s3, params })
-    const data = await command.done()
-    let { Location: location } = data
-    if (!location) {
-      throw new Error('File upload did not return `Location`')
-    }
-
-    if (!location.startsWith('https://') && !location.startsWith('http://')) {
-      // Ensure the location has a protocol. Hetzner does not return a protocol in the location.
-      location = `https://${location}`
-    }
-
-    let url = ''
-    if (!S3_PUBLIC_GATEWAY) {
-      url = location
-    } else {
-      const publicLocation = new URL(S3_PUBLIC_GATEWAY)
-      publicLocation.pathname = new URL(location).pathname
-      url = publicLocation.href
-    }
+    const url = await s3.uploadFile({
+      ...uploadFile,
+      uniqueFilename,
+    })
 
     const { name, type } = fileInput
     const file = { url, name, type, ...fileAttributes }

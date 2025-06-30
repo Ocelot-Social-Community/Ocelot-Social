@@ -32,8 +32,8 @@ jobs:
 
       - name: Neo4J | Build 'community' image
         run: |
-          docker build --target community -t "ocelotsocialnetwork/neo4j-community:test" neo4j/
-          docker save "ocelotsocialnetwork/neo4j-community:test" > /tmp/neo4j.tar
+          docker compose -f docker-compose.yml -f docker-compose.test.yml build neo4j
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" > /tmp/neo4j.tar
       
       - name: Cache docker images
         id: cache-neo4j
@@ -53,8 +53,8 @@ jobs:
 
       - name: backend | Build 'test' image
         run: |
-          docker build --target test -t "ocelotsocialnetwork/backend:test" backend/
-          docker save "ocelotsocialnetwork/backend:test" > /tmp/backend.tar
+          docker compose -f docker-compose.yml -f docker-compose.test.yml build backend
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" > /tmp/backend.tar
       
       - name: Cache docker images
         id: cache-backend
@@ -112,8 +112,7 @@ jobs:
           cp backend/.env.template backend/.env
 
       - name: backend | docker compose
-        # doesn't work without the --build flag - this either means we should not load the cached images or cache the correct image
-        run: docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend --build
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend
 
       - name: backend | Initialize Database
         run: docker compose exec -T backend yarn db:migrate init
