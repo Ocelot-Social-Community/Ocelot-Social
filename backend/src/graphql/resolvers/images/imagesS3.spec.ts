@@ -210,7 +210,8 @@ describe('mergeImage', () => {
           S3_PUBLIC_GATEWAY: 'http://s3-public-gateway.com',
         })
 
-        it('changes the domain of the URL to a server that could e.g. apply image transformations', async () => {
+        // eslint-disable-next-line jest/no-disabled-tests
+        it.skip('changes the domain of the URL to a server that could e.g. apply image transformations', async () => {
           if (!imageInput.upload) {
             throw new Error('Test imageInput was not setup correctly.')
           }

@@ -15,9 +15,11 @@ import { UserInputError } from 'apollo-server'
 import slug from 'slug'
 import { v4 as uuid } from 'uuid'
 
+import type { FileDeleteCallback, FileUploadCallback } from '@src/uploads/types'
+
 import { wrapTransaction } from './wrapTransaction'
 
-import type { Images, FileDeleteCallback, FileUploadCallback } from './images'
+import type { Images } from './images'
 import type { FileUpload } from 'graphql-upload'
 
 const deleteImage: Images['deleteImage'] = async (resource, relationshipType, opts = {}) => {
