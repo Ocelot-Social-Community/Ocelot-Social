@@ -5,12 +5,14 @@
       @add-chat-room="addChatRoom"
       @close-user-search="showUserSearch = false"
     />
-    <chat
-      :roomId="getShowChat.showChat ? getShowChat.roomID : this.$route.params.roomId"
-      ref="chat"
-      @toggle-user-search="showUserSearch = !showUserSearch"
-      :show-room="showRoom"
-    />
+    <client-only>
+      <chat
+        :roomId="getShowChat.showChat ? getShowChat.roomID : this.$route.params.roomId"
+        ref="chat"
+        @toggle-user-search="showUserSearch = !showUserSearch"
+        :show-room="showRoom"
+      />
+    </client-only>
   </div>
 </template>
 
@@ -45,6 +47,7 @@ export default {
       this.$refs.chat.newRoom(userID)
     },
     showRoom(roomId) {
+      this.$router.push({ name: 'chat', params: { roomId } })
       this.showChat({ showChat: true, roomID: roomId })
     },
   },
