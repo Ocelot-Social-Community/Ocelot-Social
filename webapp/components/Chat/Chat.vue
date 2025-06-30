@@ -173,7 +173,7 @@ export default {
       roomsLoaded: false,
       roomPage: 0,
       roomPageSize: 10,
-      selectedRoom: this.roomId,
+      selectedRoom: null,
       loadingRooms: true,
       messagesLoaded: false,
       messagePage: 0,
@@ -209,17 +209,9 @@ export default {
       return chatStyle.STYLE.light
     },
     computedRoomId() {
-      let roomId = null
+      if (this.singleRoom) return null
 
-      if (!this.singleRoom) {
-        roomId = this.roomId
-
-        if (this.getStoreRoomId.roomId) {
-          roomId = this.getStoreRoomId.roomId
-        }
-      }
-
-      return roomId
+      return this.roomId
     },
     isSafari() {
       return /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
@@ -239,6 +231,11 @@ export default {
         IS_TYPING: this.$t('chat.isTyping'),
         CANCEL_SELECT_MESSAGE: this.$t('chat.cancelSelectMessage'),
       }
+    },
+  },
+  watch: {
+    selectedRoom(newRoom) {
+      this.$emit('room-selected', newRoom.id)
     },
   },
   methods: {
@@ -293,10 +290,13 @@ export default {
     },
 
     async fetchMessages({ room, options = {} }) {
-      if (this.selectedRoom?.id !== room.id) {
+      const roomId = room.id ?? this.computedRoomId
+      if (this.selectedRoom?.id !== roomId) {
         this.messages = []
         this.messagePage = 0
-        this.selectedRoom = room
+        if (room.id) {
+          this.selectedRoom = room
+        }
       }
       this.messagesLoaded = options.refetch ? this.messagesLoaded : false
       const offset = (options.refetch ? 0 : this.messagePage) * this.messagePageSize
@@ -306,7 +306,7 @@ export default {
         } = await this.$apollo.query({
           query: messageQuery(),
           variables: {
-            roomId: room.id,
+            roomId,
             first: this.messagePageSize,
             offset,
           },
@@ -424,6 +424,7 @@ export default {
       if (roomIndex !== -1) {
         const changedRoom = { ...this.rooms[roomIndex] }
         changedRoom.lastMessage.content = content
+        changedRoom.lastMessage.date = localMessage.date
 
         // Move changed room to the top of the list
         changedRoom.index = changedRoom.lastMessage.date
