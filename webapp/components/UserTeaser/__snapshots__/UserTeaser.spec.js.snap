@@ -34,7 +34,11 @@ exports[`UserTeaser given an user avatar is disabled does not render the avatar 
             class="flex-direction-column"
           >
             <a>
-              <!---->
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
                
               <span
                 class="name"
@@ -182,7 +186,11 @@ exports[`UserTeaser given an user user is disabled current user is a moderator r
             class="flex-direction-column"
           >
             <a>
-              <!---->
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
                
               <span
                 class="name"
@@ -298,7 +306,11 @@ exports[`UserTeaser given an user with linkToProfile, on desktop renders 1`] = `
             class="flex-direction-column"
           >
             <a>
-              <!---->
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
                
               <span
                 class="name"
@@ -382,7 +394,11 @@ exports[`UserTeaser given an user with linkToProfile, on desktop when hovering t
             class="flex-direction-column"
           >
             <a>
-              <!---->
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
                
               <span
                 class="name"
@@ -466,7 +482,11 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen renders 1`
             class="flex-direction-column"
           >
             <button>
-              <!---->
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
                
               <span
                 class="name"
@@ -551,7 +571,11 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen when click
             class="flex-direction-column"
           >
             <button>
-              <!---->
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
                
               <span
                 class="name"
@@ -640,7 +664,11 @@ exports[`UserTeaser given an user without linkToProfile, on desktop renders 1`] 
             class="flex-direction-column"
           >
             <span>
-              <!---->
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
                
               <span
                 class="name"
@@ -724,7 +752,11 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
             class="flex-direction-column"
           >
             <span>
-              <!---->
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
                
               <span
                 class="name"
@@ -808,7 +840,11 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
             class="flex-direction-column"
           >
             <span>
-              <!---->
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
                
               <span
                 class="name"
@@ -892,7 +928,11 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen renders
             class="flex-direction-column"
           >
             <button>
-              <!---->
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
                
               <span
                 class="name"
@@ -977,7 +1017,11 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
             class="flex-direction-column"
           >
             <button>
-              <!---->
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
                
               <span
                 class="name"
@@ -1066,7 +1110,11 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
             class="flex-direction-column"
           >
             <button>
-              <!---->
+              <span
+                class="slug"
+              >
+                @tilda-swinton
+              </span>
                
               <span
                 class="name"
