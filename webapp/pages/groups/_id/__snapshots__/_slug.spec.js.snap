@@ -561,11 +561,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @peter-lustig
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -646,11 +642,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @jenny-rostock
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -731,11 +723,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @bob-der-baumeister
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -816,11 +804,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @huey
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -2452,11 +2436,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @peter-lustig
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -2537,11 +2517,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @jenny-rostock
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -2622,11 +2598,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @bob-der-baumeister
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -2707,11 +2679,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @huey
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -3446,11 +3414,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @peter-lustig
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -3531,11 +3495,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @jenny-rostock
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -3616,11 +3576,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @bob-der-baumeister
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -3701,11 +3657,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @huey
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -4285,11 +4237,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @peter-lustig
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -4370,11 +4318,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @jenny-rostock
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -4455,11 +4399,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @bob-der-baumeister
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -4540,11 +4480,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @huey
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -5122,11 +5058,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @peter-lustig
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -5207,11 +5139,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @jenny-rostock
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -5292,11 +5220,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @bob-der-baumeister
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -5377,11 +5301,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @huey
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -6028,11 +5948,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @peter-lustig
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -6113,11 +6029,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @jenny-rostock
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -6198,11 +6110,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @bob-der-baumeister
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -6283,11 +6191,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @huey
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -7069,11 +6973,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @peter-lustig
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -7154,11 +7054,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @jenny-rostock
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -7239,11 +7135,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @bob-der-baumeister
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -7324,11 +7216,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @huey
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -8063,11 +7951,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @peter-lustig
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -8148,11 +8032,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @jenny-rostock
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -8233,11 +8113,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @bob-der-baumeister
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
@@ -8318,11 +8194,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                         <nuxt-link-stub
                           to="[object Object]"
                         >
-                          <span
-                            class="slug"
-                          >
-                            @huey
-                          </span>
+                          <!---->
                            
                           <span
                             class="name"
