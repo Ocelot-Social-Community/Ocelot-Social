@@ -1,9 +1,5 @@
 name: ocelot.social end-to-end test CI
-on:
-  push:
-    paths:
-      - '.github/workflows/cache-verify.yml'
-  workflow_dispatch:
+on: push
 jobs:
   build-images:
     runs-on: ubuntu-latest
