@@ -2,15 +2,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
-import databaseContext from '@context/database'
 import Factory, { cleanDatabase } from '@db/factories'
-import CONFIG from '@src/config'
-import createServer, { getContext } from '@src/server'
-
-CONFIG.CATEGORIES_ACTIVE = false
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
 const sendNotificationMailMock: (notification) => void = jest.fn()
 jest.mock('@src/emails/sendEmail', () => ({
@@ -22,7 +19,12 @@ jest.mock('../helpers/isUserOnline', () => ({
   isUserOnline: () => isUserOnlineMock(),
 }))
 
-let mutate, authenticatedUser
+let authenticatedUser: Context['user']
+const config = { CATEGORIES_ACTIVE: false }
+const context = () => ({ authenticatedUser, config })
+let mutate: ApolloTestSetup['mutate']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 let postAuthor
 
@@ -36,23 +38,17 @@ const createPostMutation = gql`
   }
 `
 
-const database = databaseContext()
-
 beforeAll(async () => {
   await cleanDatabase()
-
-  // eslint-disable-next-line @typescript-eslint/require-await
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database })
-
-  const { server } = createServer({ context })
-
-  const createTestClientResult = createTestClient(server)
-  mutate = createTestClientResult.mutate
+  const apolloSetup = createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
+  void server.stop()
   await database.driver.close()
 })
 

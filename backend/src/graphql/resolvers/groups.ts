@@ -8,11 +8,10 @@
 import { UserInputError } from 'apollo-server'
 import { v4 as uuid } from 'uuid'
 
-import CONFIG from '@config/index'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '@constants/groups'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
-import type { Context } from '@src/server'
+import type { Context } from '@src/context'
 
 import Resolver, {
   removeUndefinedNullValuesFromObject,
@@ -32,6 +31,9 @@ export default {
       removeUndefinedNullValuesFromObject(matchParams)
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (txc) => {
+        if (!context.user) {
+          throw new Error('Missing authenticated user.')
+        }
         const groupMatchParamsCypher = convertObjectToCypherMapLiteral(matchParams, true)
         let groupCypher
         if (isMember === true) {
@@ -139,13 +141,14 @@ export default {
   },
   Mutation: {
     CreateGroup: async (_parent, params, context: Context, _resolveInfo) => {
+      const { config } = context
       const { categoryIds } = params
       delete params.categoryIds
       params.locationName = params.locationName === '' ? null : params.locationName
-      if (CONFIG.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
+      if (config.CATEGORIES_ACTIVE && (!categoryIds || categoryIds.length < CATEGORIES_MIN)) {
         throw new UserInputError('Too few categories!')
       }
-      if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > CATEGORIES_MAX) {
+      if (config.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > CATEGORIES_MAX) {
         throw new UserInputError('Too many categories!')
       }
       if (
@@ -158,8 +161,11 @@ export default {
       params.id = params.id || uuid()
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        if (!context.user) {
+          throw new Error('Missing authenticated user.')
+        }
         const categoriesCypher =
-          CONFIG.CATEGORIES_ACTIVE && categoryIds
+          config.CATEGORIES_ACTIVE && categoryIds
             ? `
                 WITH group, membership
                 UNWIND $categoryIds AS categoryId
@@ -194,7 +200,7 @@ export default {
       try {
         const group = await writeTxResultPromise
         // TODO: put in a middleware, see "UpdateGroup", "UpdateUser"
-        await createOrUpdateLocations('Group', params.id, params.locationName, session)
+        await createOrUpdateLocations('Group', params.id, params.locationName, session, context)
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
@@ -205,13 +211,14 @@ export default {
       }
     },
     UpdateGroup: async (_parent, params, context: Context, _resolveInfo) => {
+      const { config } = context
       const { categoryIds } = params
       delete params.categoryIds
       const { id: groupId, avatar: avatarInput } = params
       delete params.avatar
       params.locationName = params.locationName === '' ? null : params.locationName
 
-      if (CONFIG.CATEGORIES_ACTIVE && categoryIds) {
+      if (config.CATEGORIES_ACTIVE && categoryIds) {
         if (categoryIds.length < CATEGORIES_MIN) {
           throw new UserInputError('Too few categories!')
         }
@@ -226,7 +233,7 @@ export default {
         throw new UserInputError('Description too short!')
       }
       const session = context.driver.session()
-      if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
+      if (config.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
         const cypherDeletePreviousRelations = `
           MATCH (group:Group {id: $groupId})-[previousRelations:CATEGORIZED]->(category:Category)
           DELETE previousRelations
@@ -237,13 +244,16 @@ export default {
         })
       }
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        if (!context.user) {
+          throw new Error('Missing authenticated user.')
+        }
         let updateGroupCypher = `
           MATCH (group:Group {id: $groupId})
           SET group += $params
           SET group.updatedAt = toString(datetime())
           WITH group
         `
-        if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
+        if (config.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
           updateGroupCypher += `
             UNWIND $categoryIds AS categoryId
             MATCH (category:Category {id: categoryId})
@@ -263,14 +273,16 @@ export default {
         })
         const [group] = transactionResponse.records.map((record) => record.get('group'))
         if (avatarInput) {
-          await images.mergeImage(group, 'AVATAR_IMAGE', avatarInput, { transaction })
+          await images(context.config).mergeImage(group, 'AVATAR_IMAGE', avatarInput, {
+            transaction,
+          })
         }
         return group
       })
       try {
         const group = await writeTxResultPromise
         // TODO: put in a middleware, see "CreateGroup", "UpdateUser"
-        await createOrUpdateLocations('Group', params.id, params.locationName, session)
+        await createOrUpdateLocations('Group', params.id, params.locationName, session, context)
         return group
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
@@ -380,10 +392,16 @@ export default {
       }
     },
     muteGroup: async (_parent, params, context: Context, _resolveInfo) => {
+      if (!context.user) {
+        throw new Error('Missing authenticated user.')
+      }
       const { groupId } = params
       const userId = context.user.id
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        if (!context.user) {
+          throw new Error('Missing authenticated user.')
+        }
         const transactionResponse = await transaction.run(
           `
           MATCH (group:Group { id: $groupId })
@@ -409,6 +427,9 @@ export default {
       }
     },
     unmuteGroup: async (_parent, params, context: Context, _resolveInfo) => {
+      if (!context.user) {
+        throw new Error('Missing authenticated user.')
+      }
       const { groupId } = params
       const userId = context.user.id
       const session = context.driver.session()
