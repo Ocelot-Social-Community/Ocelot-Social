@@ -13,6 +13,7 @@
         :group="group"
         :wide="wide"
         :show-avatar="showAvatar"
+        :show-slug="showSlug"
         :date-time="dateTime"
         :show-popover="showPopover"
         :injected-text="injectedText"
@@ -42,6 +43,7 @@ export default {
     group: { type: Object, default: null },
     wide: { type: Boolean, default: false },
     showAvatar: { type: Boolean, default: true },
+    showSlug: { type: Boolean, default: false },
     dateTime: { type: [Date, String], default: null },
     showPopover: { type: Boolean, default: true },
     injectedText: { type: String, default: null },

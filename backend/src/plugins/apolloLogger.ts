@@ -30,7 +30,14 @@ export const loggerPlugin = {
             ocelotLogger.error(...logResponse, JSON.stringify(requestContext.errors))
             return
           }
-          logResponse.push(JSON.stringify(requestContext.response.data))
+          if (requestContext.response.data.login) {
+            // mask the token
+            const data = cloneDeep(requestContext.response.data)
+            data.login = 'token'
+            logResponse.push(JSON.stringify(data))
+          } else {
+            logResponse.push(JSON.stringify(requestContext.response.data))
+          }
           ocelotLogger.debug(...logResponse)
         }
       },

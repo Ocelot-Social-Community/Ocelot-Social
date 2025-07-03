@@ -57,7 +57,7 @@ describe('apollo logger', () => {
   })
 
   describe('login mutation', () => {
-    it('logs the request and response', async () => {
+    it('logs the request and response, masking password and token', async () => {
       await mutate({
         mutation: loginMutation,
         variables: {
@@ -77,7 +77,7 @@ describe('apollo logger', () => {
         }),
       )
 
-      expect(loggerSpy).toBeCalledWith('Apollo Response', expect.any(String), expect.any(String))
+      expect(loggerSpy).toBeCalledWith('Apollo Response', expect.any(String), '{"login":"token"}')
 
       expect(consoleSpy).toBeCalledTimes(2)
     })
