@@ -5,6 +5,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { UserInputError } from 'apollo-server'
 
+import type { Context } from '@src/server'
+
 import Resolver from './helpers/Resolver'
 import { queryLocations } from './users/location'
 
@@ -25,7 +27,7 @@ export default {
     }),
     distanceToMe: async (parent, _params, context, _resolveInfo) => {
       if (!parent.id) {
-        throw new Error('Can not identify selected Location!')
+        throw new UserInputError('Can not identify selected Location!')
       }
       const session = context.driver.session()
 
@@ -53,11 +55,12 @@ export default {
     },
   },
   Query: {
-    queryLocations: async (_object, args, _context, _resolveInfo) => {
+    queryLocations: async (_object, args, context: Context, _resolveInfo) => {
       try {
         return queryLocations(args)
       } catch (e) {
-        throw new UserInputError(e.message)
+        context.logger.error('queryLocations', e)
+        throw new Error(e.message)
       }
     },
   },

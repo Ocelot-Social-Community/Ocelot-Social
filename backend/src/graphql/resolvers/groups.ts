@@ -74,6 +74,7 @@ export default {
       try {
         return await readTxResultPromise
       } catch (error) {
+        context.logger.error('Group query', error)
         throw new Error(error)
       } finally {
         await session.close()
@@ -98,6 +99,7 @@ export default {
       try {
         return await readTxResultPromise
       } catch (error) {
+        context.logger.error('GroupMembers query', error)
         throw new Error(error)
       } finally {
         await session.close()
@@ -131,6 +133,7 @@ export default {
       try {
         return parseInt(await readTxResultPromise)
       } catch (error) {
+        context.logger.error('GroupCount query', error)
         throw new Error(error)
       } finally {
         session.close()
@@ -199,6 +202,7 @@ export default {
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
           throw new UserInputError('Group with this slug already exists!')
+        context.logger.error('CreateGroup mutation', error)
         throw new Error(error)
       } finally {
         await session.close()
@@ -275,6 +279,7 @@ export default {
       } catch (error) {
         if (error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
           throw new UserInputError('Group with this slug already exists!')
+        context.logger.error('UpdateGroup mutation', error)
         throw new Error(error)
       } finally {
         await session.close()
@@ -304,6 +309,7 @@ export default {
       try {
         return await writeTxResultPromise
       } catch (error) {
+        context.logger.error('JoinGroup mutation', error)
         throw new Error(error)
       } finally {
         await session.close()
@@ -315,6 +321,7 @@ export default {
       try {
         return await removeUserFromGroupWriteTxResultPromise(session, groupId, userId)
       } catch (error) {
+        context.logger.error('LeaveGroup mutation', error)
         throw new Error(error)
       } finally {
         await session.close()
@@ -363,6 +370,7 @@ export default {
       try {
         return await writeTxResultPromise
       } catch (error) {
+        context.logger.error('ChangeGroupMemberRole mutation', error)
         throw new Error(error)
       } finally {
         await session.close()
@@ -374,6 +382,7 @@ export default {
       try {
         return await removeUserFromGroupWriteTxResultPromise(session, groupId, userId)
       } catch (error) {
+        context.logger.error('RemoveUserFromGroup mutation', error)
         throw new Error(error)
       } finally {
         await session.close()
@@ -403,6 +412,7 @@ export default {
       try {
         return await writeTxResultPromise
       } catch (error) {
+        context.logger.error('muteGroup mutation', error)
         throw new Error(error)
       } finally {
         await session.close()
@@ -432,6 +442,7 @@ export default {
       try {
         return await writeTxResultPromise
       } catch (error) {
+        context.logger.error('unmuteGroup mutation', error)
         throw new Error(error)
       } finally {
         await session.close()

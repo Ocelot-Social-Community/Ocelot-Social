@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { UserInputError } from 'apollo-server'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
@@ -32,7 +33,7 @@ export default {
   },
 
   Mutation: {
-    setVerificationBadge: async (_object, args, context, _resolveInfo) => {
+    setVerificationBadge: async (_object, args, context: Context, _resolveInfo) => {
       const {
         user: { id: currentUserId },
       } = context
@@ -62,15 +63,16 @@ export default {
       try {
         const { relation, user } = await writeTxResultPromise
         if (!relation) {
-          throw new Error(
+          throw new UserInputError(
             'Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
           )
         }
         return user
       } catch (error) {
+        context.logger.error('setVerificationBadge', error)
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
 
@@ -125,7 +127,7 @@ export default {
       ).records.map((record) => record.get('user'))
 
       if (users.length !== 1) {
-        throw new Error(
+        throw new UserInputError(
           'Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
         )
       }
@@ -133,7 +135,7 @@ export default {
       return users[0]
     },
 
-    revokeBadge: async (_object, args, context, _resolveInfo) => {
+    revokeBadge: async (_object, args, context: Context, _resolveInfo) => {
       const { badgeId, userId } = args
       const session = context.driver.session()
 
@@ -157,9 +159,10 @@ export default {
       try {
         return await writeTxResultPromise
       } catch (error) {
+        context.logger.error('revokeBadge', error)
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

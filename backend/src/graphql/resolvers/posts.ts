@@ -110,7 +110,7 @@ export default {
     },
   },
   Mutation: {
-    CreatePost: async (_parent, params, context, _resolveInfo) => {
+    CreatePost: async (_parent, params, context: Context, _resolveInfo) => {
       const { categoryIds, groupId } = params
       const { image: imageInput } = params
 
@@ -188,11 +188,14 @@ export default {
         }
         return post
       } catch (e) {
-        if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
+        if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
+          context.logger.error('Post with this slug already exists!')
           throw new UserInputError('Post with this slug already exists!')
+        }
+        context.logger.error('CreatePost error', e.message)
         throw new Error(e)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     UpdatePost: async (_parent, params, context, _resolveInfo) => {
@@ -344,7 +347,10 @@ export default {
       }
     },
     pinPost: async (_parent, params, context: Context, _resolveInfo) => {
-      if (CONFIG.MAX_PINNED_POSTS === 0) throw new Error('Pinned posts are not allowed!')
+      if (CONFIG.MAX_PINNED_POSTS === 0) {
+        context.logger.error('Pinned posts are not allowed!')
+        throw new Error('Pinned posts are not allowed!')
+      }
       let pinnedPostWithNestedAttributes
       const { driver, user } = context
       const session = driver.session()
@@ -404,6 +410,7 @@ export default {
           })
         ).records.map((r) => Number(r.get('count').toString()))
         if (currentPinnedPostCount >= CONFIG.MAX_PINNED_POSTS) {
+          context.logger.error('Max number of pinned posts is reached!')
           throw new Error('Max number of pinned posts is reached!')
         }
         const [pinPostResult] = (
@@ -506,6 +513,7 @@ export default {
       ).records.map((record) => record.get('post'))
 
       if (posts.length !== 1) {
+        context.logger.error('pushPost: Could not find Post')
         throw new Error('Could not find Post')
       }
 
@@ -523,6 +531,7 @@ export default {
       ).records.map((record) => record.get('post'))
 
       if (posts.length !== 1) {
+        context.logger.error('unpushPost: Could not find Post')
         throw new Error('Could not find Post')
       }
 

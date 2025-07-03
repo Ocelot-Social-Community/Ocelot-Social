@@ -54,7 +54,7 @@ const validateUpdateComment = async (resolve, root, args, context, info) => {
 const validateReport = async (resolve, root, args, context, info) => {
   const { resourceId } = args
   const { user } = context
-  if (resourceId === user.id) throw new Error('You cannot report yourself!')
+  if (resourceId === user.id) throw new UserInputError('You cannot report yourself!')
   return resolve(root, args, context, info)
 }
 
@@ -62,7 +62,7 @@ const validateReview = async (resolve, root, args, context, info) => {
   const { resourceId } = args
   let existingReportedResource
   const { user, driver } = context
-  if (resourceId === user.id) throw new Error('You cannot review yourself!')
+  if (resourceId === user.id) throw new UserInputError('You cannot review yourself!')
   const session = driver.session()
   const reportReadTxPromise = session.readTransaction(async (transaction) => {
     const validateReviewTransactionResponse = await transaction.run(
@@ -88,10 +88,10 @@ const validateReview = async (resolve, root, args, context, info) => {
     const txResult = await reportReadTxPromise
     existingReportedResource = txResult
     if (!existingReportedResource?.length)
-      throw new Error(`Resource not found or is not a Post|Comment|User!`)
+      throw new UserInputError(`Resource not found or is not a Post|Comment|User!`)
     existingReportedResource = existingReportedResource[0]
     if (!existingReportedResource.filed)
-      throw new Error(
+      throw new UserInputError(
         `Before starting the review process, please report the ${existingReportedResource.label}!`,
       )
     const authorId =
@@ -99,7 +99,7 @@ const validateReview = async (resolve, root, args, context, info) => {
         ? existingReportedResource.author.properties.id
         : null
     if (authorId && authorId === user.id)
-      throw new Error(`You cannot review your own ${existingReportedResource.label}!`)
+      throw new UserInputError(`You cannot review your own ${existingReportedResource.label}!`)
   } finally {
     session.close()
   }
@@ -115,12 +115,13 @@ export const validateNotifyUsers = async (label, reason) => {
     'followed_user_posted',
     'post_in_group',
   ]
-  if (!reasonsAllowed.includes(reason)) throw new Error('Notification reason is not allowed!')
+  if (!reasonsAllowed.includes(reason))
+    throw new UserInputError('Notification reason is not allowed!')
   if (
     (label === 'Post' && reason !== 'mentioned_in_post') ||
     (label === 'Comment' && !['mentioned_in_comment', 'commented_on_post'].includes(reason))
   ) {
-    throw new Error('Notification does not fit the reason!')
+    throw new UserInputError('Notification does not fit the reason!')
   }
 }
 

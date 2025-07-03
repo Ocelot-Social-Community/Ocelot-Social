@@ -16,7 +16,14 @@ async function setupNodeEvents(on, config) {
 
   on(
     'file:preprocessor',
-    browserify(preprendTransformerToOptions(config, browserify.defaultOptions)),
+    browserify({
+      ...preprendTransformerToOptions(config, browserify.defaultOptions),
+      onBundle(bundle) {
+        // Ignore modules not available in browser environment
+        bundle.ignore('async_hooks')  // Used by tslog logger - Node.js built-in
+        bundle.ignore('express')      // Server framework causing prototype errors
+      }
+    }),
   );
 
   on('task', {

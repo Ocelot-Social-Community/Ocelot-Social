@@ -20,6 +20,12 @@ let server: ApolloServer
 let authenticatedUser
 let query, mutate
 
+const loggerErrorMock: (e) => void = jest.fn()
+
+jest.mock('@src/logger', () => ({
+  error: (e) => loggerErrorMock(e),
+}))
+
 beforeAll(async () => {
   await cleanDatabase()
 
@@ -159,7 +165,7 @@ describe('Badges', () => {
             errors: [
               {
                 message:
-                  'Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
+                  'UserInputError: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
               },
             ],
           })
@@ -178,7 +184,7 @@ describe('Badges', () => {
             errors: [
               {
                 message:
-                  'Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
+                  'UserInputError: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
               },
             ],
           })
@@ -197,7 +203,7 @@ describe('Badges', () => {
             errors: [
               {
                 message:
-                  'Error: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
+                  'UserInputError: Could not reward badge! Ensure the user and the badge exist and the badge is of the correct type.',
               },
             ],
           })

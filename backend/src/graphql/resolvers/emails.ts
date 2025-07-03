@@ -7,6 +7,8 @@ import { UserInputError } from 'apollo-server'
 // eslint-disable-next-line import/extensions
 import Validator from 'neode/build/Services/Validator.js'
 
+import { Context } from '@src/server'
+
 import existingEmailAddress from './helpers/existingEmailAddress'
 import generateNonce from './helpers/generateNonce'
 import normalizeEmail from './helpers/normalizeEmail'
@@ -14,7 +16,7 @@ import Resolver from './helpers/Resolver'
 
 export default {
   Query: {
-    VerifyNonce: async (_parent, args, context, _resolveInfo) => {
+    VerifyNonce: async (_parent, args, context: Context, _resolveInfo) => {
       args.email = normalizeEmail(args.email)
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (txc) => {
@@ -30,13 +32,16 @@ export default {
       try {
         const txResult = await readTxResultPromise
         return txResult.records[0].get('result')
+      } catch (e) {
+        context.logger.error('VerifyNonce query', e)
+        throw new Error(e.message)
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
   Mutation: {
-    AddEmailAddress: async (_parent, args, context, _resolveInfo) => {
+    AddEmailAddress: async (_parent, args, context: Context, _resolveInfo) => {
       let response
       args.email = normalizeEmail(args.email)
       try {
@@ -76,12 +81,15 @@ export default {
       try {
         const txResult = await writeTxResultPromise
         response = txResult[0]
+      } catch (e) {
+        context.logger.error('AddEmailAddress mutation', e)
+        throw new Error(e.message)
       } finally {
-        session.close()
+        await session.close()
       }
       return response
     },
-    VerifyEmailAddress: async (_parent, args, context, _resolveInfo) => {
+    VerifyEmailAddress: async (_parent, args, context: Context, _resolveInfo) => {
       let response
       const {
         user: { id: userId },
@@ -111,13 +119,17 @@ export default {
         const txResult = await writeTxResultPromise
         response = txResult[0]
       } catch (e) {
-        if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
+        if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
           throw new UserInputError('A user account with this email already exists.')
+        }
+        context.logger.error('VerifyEmailAddress', e)
         throw new Error(e)
       } finally {
-        session.close()
+        await session.close()
       }
-      if (!response) throw new UserInputError('Invalid nonce or no email address found.')
+      if (!response) {
+        throw new UserInputError('Invalid nonce or no email address found.')
+      }
       return response
     },
   },
