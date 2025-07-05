@@ -181,11 +181,29 @@ export default {
       messages: [],
     }
   },
-  mounted() {
+  async mounted() {
     if (this.singleRoom) {
       this.newRoom(this.roomId)
     } else {
-      this.fetchRooms()
+      await this.fetchRooms()
+
+      // Must be set false after initial rooms are loaded and never changed again
+      this.loadingRooms = false
+
+      // Scroll to room if roomId is provided
+      if (this.roomId) {
+        window.setTimeout(() => {
+          const vueAdvancedChatElement = document.querySelector('vue-advanced-chat')
+          const shadowRoot = vueAdvancedChatElement.shadowRoot
+          const roomElementInList = shadowRoot.getElementById(this.roomId)
+          if (!roomElementInList) return
+          roomElementInList.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+            inline: 'nearest',
+          })
+        }, 0)
+      }
     }
 
     // Subscriptions
@@ -281,12 +299,16 @@ export default {
           // reset store room id
           this.commitRoomIdFromSingleRoom(null)
         }
+
+        // Check if a room we open via URL is already loaded
+        if (this.computedRoomId && !this.rooms.find((r) => r.id === this.computedRoomId)) {
+          // If not, we need to fetch more rooms until we find the room
+          await this.fetchRooms()
+        }
       } catch (error) {
         this.rooms = []
         this.$toast.error(error.message)
       }
-      // must be set false after initial rooms are loaded and never changed again
-      this.loadingRooms = false
     },
 
     async fetchMessages({ room, options = {} }) {
@@ -321,23 +343,19 @@ export default {
           const changedRoom = { ...this.rooms[roomIndex] }
           changedRoom.unreadCount = changedRoom.unreadCount - newMsgIds.length
           this.rooms[roomIndex] = changedRoom
-          this.$apollo
-            .mutate({
-              mutation: markMessagesAsSeen(),
-              variables: {
-                messageIds: newMsgIds,
-              },
-            })
-            .then(() => {
-              this.$apollo
-                .query({
-                  query: unreadRoomsQuery(),
-                  fetchPolicy: 'network-only',
-                })
-                .then(({ data: { UnreadRooms } }) => {
-                  this.commitUnreadRoomCount(UnreadRooms)
-                })
-            })
+          await this.$apollo.mutate({
+            mutation: markMessagesAsSeen(),
+            variables: {
+              messageIds: newMsgIds,
+            },
+          })
+          const {
+            data: { UnreadRooms: unreadRooms },
+          } = await this.$apollo.query({
+            query: unreadRoomsQuery(),
+            fetchPolicy: 'network-only',
+          })
+          this.commitUnreadRoomCount(unreadRooms)
         }
 
         const msgs = []
@@ -370,9 +388,9 @@ export default {
       changedRoom.unreadCount++
       this.rooms[roomIndex] = changedRoom
       if (data.chatMessageAdded.room.id === this.selectedRoom?.id) {
-        this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
+        await this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
       } else {
-        this.fetchRooms({ options: { refetch: true } })
+        await this.fetchRooms({ options: { refetch: true } })
       }
     },
 
@@ -447,7 +465,7 @@ export default {
         this.$toast.error(error.message)
       }
 
-      this.fetchMessages({
+      await this.fetchMessages({
         room: this.rooms.find((r) => r.roomId === messageDetails.roomId),
         options: { refetch: true },
       })
@@ -493,14 +511,14 @@ export default {
             userId,
           },
         })
-        .then(({ data: { CreateRoom } }) => {
+        .then(async ({ data: { CreateRoom } }) => {
           const roomIndex = this.rooms.findIndex((r) => r.id === CreateRoom.roomId)
           const room = this.fixRoomObject(CreateRoom)
 
           if (roomIndex === -1) {
             this.rooms = [room, ...this.rooms]
           }
-          this.fetchMessages({ room, options: { refetch: true } })
+          await this.fetchMessages({ room, options: { refetch: true } })
           this.$emit('show-chat', CreateRoom.id)
         })
         .catch((error) => {
