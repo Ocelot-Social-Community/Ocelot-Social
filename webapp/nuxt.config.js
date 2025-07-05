@@ -138,6 +138,19 @@ export default {
     middleware: ['authenticated', 'termsAndConditions'],
     linkActiveClass: 'router-link-active',
     linkExactActiveClass: 'router-link-exact-active',
+    extendRoutes(routes, resolve) {
+      // Remove the default /chat route
+      const chatIndex = routes.findIndex((r) => r.name === 'chat')
+      if (chatIndex !== -1) {
+        routes.splice(chatIndex, 1)
+      }
+
+      routes.push({
+        name: 'chat',
+        path: '/chat/:id?',
+        component: resolve(__dirname, 'pages/chat.vue'),
+      })
+    },
   },
 
   /*
