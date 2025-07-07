@@ -59,7 +59,6 @@ services:
       # - PORT="4000"
       - NODE_ENV="production"
       # Application only envs
-      - DEBUG=false
       - NEO4J_URI=bolt://neo4j:7687
       - GRAPHQL_URI=http://backend:4000
       - CLIENT_URI=http://webapp:3000
