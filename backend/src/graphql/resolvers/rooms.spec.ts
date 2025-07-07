@@ -1,46 +1,38 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createTestClient } from 'apollo-server-testing'
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { CreateMessage } from '@graphql/queries/CreateMessage'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { roomQuery } from '@graphql/queries/roomQuery'
 import { unreadRoomsQuery } from '@graphql/queries/unreadRoomsQuery'
-import createServer from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-const driver = getDriver()
-const neode = getNeode()
-
-let query
-let mutate
-let authenticatedUser
 let chattingUser, otherChattingUser, notChattingUser
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser })
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 beforeAll(async () => {
   await cleanDatabase()
-
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode,
-        user: authenticatedUser,
-        cypherParams: {
-          currentUserId: authenticatedUser ? authenticatedUser.id : null,
-        },
-      }
-    },
-  })
-  query = createTestClient(server).query
-  mutate = createTestClient(server).mutate
+  const apolloSetup = createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('Room', () => {
@@ -73,6 +65,10 @@ describe('Room', () => {
 
   describe('create room', () => {
     describe('unauthenticated', () => {
+      beforeAll(() => {
+        authenticatedUser = null
+      })
+
       it('throws authorization error', async () => {
         await expect(
           mutate({
@@ -133,13 +129,13 @@ describe('Room', () => {
               userId: 'other-chatting-user',
             },
           })
-          roomId = result.data.CreateRoom.id
+          roomId = (result.data as any).CreateRoom.id
           expect(result).toMatchObject({
             errors: undefined,
             data: {
               CreateRoom: {
                 id: expect.any(String),
-                roomId: result.data.CreateRoom.id,
+                roomId: (result.data as any).CreateRoom.id,
                 roomName: 'Other Chatting User',
                 unreadCount: 0,
                 users: expect.arrayContaining([
@@ -215,7 +211,7 @@ describe('Room', () => {
               Room: [
                 {
                   id: expect.any(String),
-                  roomId: result.data.Room[0].id,
+                  roomId: (result.data as any).Room[0].id,
                   roomName: 'Other Chatting User',
                   users: expect.arrayContaining([
                     {
@@ -255,7 +251,7 @@ describe('Room', () => {
               Room: [
                 {
                   id: expect.any(String),
-                  roomId: result.data.Room[0].id,
+                  roomId: (result.data as any).Room[0].id,
                   roomName: 'Chatting User',
                   unreadCount: 0,
                   users: expect.arrayContaining([
@@ -325,7 +321,7 @@ describe('Room', () => {
             userId: 'not-chatting-user',
           },
         })
-        otherRoomId = result.data.CreateRoom.roomId
+        otherRoomId = (result.data as any).CreateRoom.roomId
         await mutate({
           mutation: CreateMessage,
           variables: {
@@ -354,7 +350,7 @@ describe('Room', () => {
             userId: 'not-chatting-user',
           },
         })
-        otherRoomId = result2.data.CreateRoom.roomId
+        otherRoomId = (result2.data as any).CreateRoom.roomId
         await mutate({
           mutation: CreateMessage,
           variables: {
@@ -591,7 +587,6 @@ describe('Room', () => {
   })
 
   describe('query single room', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let result: any = null
 
     beforeAll(async () => {
