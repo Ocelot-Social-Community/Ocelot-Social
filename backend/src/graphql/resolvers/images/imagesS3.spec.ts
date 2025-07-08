@@ -9,7 +9,7 @@ import { UserInputError } from 'apollo-server'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import type { S3Configured } from '@src/config'
+import type { S3Config } from '@src/config'
 
 import { images } from './imagesS3'
 
@@ -41,7 +41,7 @@ const driver = getDriver()
 const neode = getNeode()
 const uuid = '[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}'
 
-const config: S3Configured = {
+const config: S3Config = {
   AWS_ACCESS_KEY_ID: 'AWS_ACCESS_KEY_ID',
   AWS_SECRET_ACCESS_KEY: 'AWS_SECRET_ACCESS_KEY',
   AWS_BUCKET: 'AWS_BUCKET',
