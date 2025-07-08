@@ -16,7 +16,7 @@ import { CreateMessage } from '@graphql/queries/CreateMessage'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
-import type { S3Configured } from '@src/config'
+import type { S3Config } from '@src/config'
 
 import { attachments } from './attachments'
 
@@ -37,7 +37,7 @@ const UploadMock = {
 
 ;(Upload as unknown as jest.Mock).mockImplementation(() => UploadMock)
 
-const config: S3Configured = {
+const config: S3Config = {
   AWS_ACCESS_KEY_ID: 'AWS_ACCESS_KEY_ID',
   AWS_SECRET_ACCESS_KEY: 'AWS_SECRET_ACCESS_KEY',
   AWS_BUCKET: 'AWS_BUCKET',

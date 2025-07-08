@@ -7,7 +7,7 @@
 import { withFilter } from 'graphql-subscriptions'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
-import CONFIG, { isS3configured } from '@config/index'
+import CONFIG from '@config/index'
 import { CHAT_MESSAGE_ADDED } from '@constants/subscriptions'
 
 import { attachments } from './attachments/attachments'
@@ -125,19 +125,17 @@ export default {
 
           const atns: File[] = []
 
-          if (isS3configured(CONFIG)) {
-            for await (const file of files) {
-              const atn = await attachments(CONFIG).add(
-                message,
-                'ATTACHMENT',
-                file,
-                {},
-                {
-                  transaction,
-                },
-              )
-              atns.push(atn)
-            }
+          for await (const file of files) {
+            const atn = await attachments(CONFIG).add(
+              message,
+              'ATTACHMENT',
+              file,
+              {},
+              {
+                transaction,
+              },
+            )
+            atns.push(atn)
           }
 
           return { ...message, files: atns }

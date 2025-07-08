@@ -4,7 +4,7 @@ import { UserInputError } from 'apollo-server-express'
 import slug from 'slug'
 import { v4 as uuid } from 'uuid'
 
-import { isS3configured, S3Configured } from '@config/index'
+import type { S3Config } from '@config/index'
 import { wrapTransaction } from '@graphql/resolvers/images/wrapTransaction'
 import { s3Service } from '@src/uploads/s3Service'
 
@@ -54,11 +54,7 @@ export interface Attachments {
   ) => Promise<any>
 }
 
-export const attachments = (config: S3Configured) => {
-  if (!isS3configured(config)) {
-    throw new Error('S3 not configured')
-  }
-
+export const attachments = (config: S3Config) => {
   const s3 = s3Service(config, 'attachments')
 
   const del: Attachments['del'] = async (resource, relationshipType, opts = {}) => {

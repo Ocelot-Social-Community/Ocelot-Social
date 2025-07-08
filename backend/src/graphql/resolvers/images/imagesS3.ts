@@ -5,14 +5,14 @@ import { FileUpload } from 'graphql-upload'
 import slug from 'slug'
 import { v4 as uuid } from 'uuid'
 
-import type { S3Configured } from '@config/index'
+import type { S3Config } from '@config/index'
 import { s3Service } from '@src/uploads/s3Service'
 
 import { wrapTransaction } from './wrapTransaction'
 
 import type { Image, Images } from './images'
 
-export const images = (config: S3Configured) => {
+export const images = (config: S3Config) => {
   const s3 = s3Service(config, 'original')
 
   const deleteImage: Images['deleteImage'] = async (resource, relationshipType, opts = {}) => {
@@ -89,9 +89,9 @@ export const images = (config: S3Configured) => {
     return await s3.uploadFile({ ...upload, uniqueFilename })
   }
 
-  const images: Images = {
+  const images = {
     deleteImage,
     mergeImage,
-  }
+  } satisfies Images
   return images
 }
