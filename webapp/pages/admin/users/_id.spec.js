@@ -6,25 +6,25 @@ const localVue = global.localVue
 const availableBadges = [
   {
     id: 'verification-badge-1',
-    icon: 'icon1',
+    icon: '/icon1',
     type: 'verification',
     description: 'description-v-1',
   },
   {
     id: 'verification-badge-2',
-    icon: 'icon2',
+    icon: '/icon2',
     type: 'verification',
     description: 'description-v-2',
   },
   {
     id: 'trophy-badge-1',
-    icon: 'icon3',
+    icon: '/icon3',
     type: 'trophy',
     description: 'description-t-1',
   },
   {
     id: 'trophy-badge-2',
-    icon: 'icon4',
+    icon: '/icon4',
     type: 'trophy',
     description: 'description-t-2',
   },
