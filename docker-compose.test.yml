@@ -26,6 +26,7 @@ services:
       - AWS_ENDPOINT=http:/minio:9000
       - AWS_REGION=local
       - AWS_BUCKET=ocelot
+      - DEBUG=
     volumes:
       - ./coverage:/app/coverage
 
