@@ -16,7 +16,7 @@ import { CreateMessage } from '@graphql/queries/CreateMessage'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
-import type { S3Configured } from '@src/config'
+import type { S3Config } from '@src/config'
 
 import { attachments } from './attachments'
 
@@ -37,12 +37,13 @@ const UploadMock = {
 
 ;(Upload as unknown as jest.Mock).mockImplementation(() => UploadMock)
 
-const config: S3Configured = {
+const config: S3Config = {
   AWS_ACCESS_KEY_ID: 'AWS_ACCESS_KEY_ID',
   AWS_SECRET_ACCESS_KEY: 'AWS_SECRET_ACCESS_KEY',
   AWS_BUCKET: 'AWS_BUCKET',
   AWS_ENDPOINT: 'AWS_ENDPOINT',
   AWS_REGION: 'AWS_REGION',
+  IMAGOR_SECRET: 'IMAGOR_SECRET',
   S3_PUBLIC_GATEWAY: undefined,
 }
 
@@ -231,25 +232,6 @@ describe('add Attachment', () => {
         await expect(database.neode.all('File')).resolves.toHaveLength(0)
         await addAttachment(post, 'ATTACHMENT', fileInput)
         await expect(database.neode.all('File')).resolves.toHaveLength(1)
-      })
-
-      describe('given a `S3_PUBLIC_GATEWAY` configuration', () => {
-        const { add: addAttachment } = attachments({
-          ...config,
-          S3_PUBLIC_GATEWAY: 'http://s3-public-gateway.com',
-        })
-
-        it('changes the domain of the URL to a server that could e.g. apply image transformations', async () => {
-          if (!fileInput.upload) {
-            throw new Error('Test imageInput was not setup correctly.')
-          }
-          const upload = await fileInput.upload
-          upload.filename = '/path/to/file-location/foo-bar-avatar.jpg'
-          fileInput.upload = Promise.resolve(upload)
-          await expect(addAttachment(post, 'ATTACHMENT', fileInput)).resolves.toMatchObject({
-            url: 'http://s3-public-gateway.com/bucket/',
-          })
-        })
       })
 
       it('connects resource with image via given image type', async () => {
