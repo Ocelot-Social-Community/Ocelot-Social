@@ -161,9 +161,9 @@ export const attachments = (config: S3Config) => {
     return uploadedFile
   }
 
-  const attachments: Attachments = {
+  const attachments = {
     del,
     add,
-  }
+  } satisfies Attachments
   return attachments
 }
