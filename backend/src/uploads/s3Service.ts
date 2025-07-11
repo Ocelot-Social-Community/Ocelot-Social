@@ -1,11 +1,11 @@
 import { S3Client, DeleteObjectCommand, ObjectCannedACL } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 
-import type { S3Configured } from '@config/index'
+import type { S3Config } from '@config/index'
 
 import { FileUploadCallback, FileDeleteCallback } from './types'
 
-export const s3Service = (config: S3Configured, prefix: string) => {
+export const s3Service = (config: S3Config, prefix: string) => {
   const { AWS_BUCKET: Bucket } = config
 
   const { AWS_ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, S3_PUBLIC_GATEWAY } = config
