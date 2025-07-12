@@ -104,7 +104,7 @@
     "@types/uuid": "~9.0.1",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
-    "apollo-server-testing": "~2.11.0",
+    "apollo-server-testing": "~2.25.3",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.5",
     "eslint-config-standard": "^17.1.0",
