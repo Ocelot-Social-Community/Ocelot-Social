@@ -244,11 +244,16 @@ export default {
   },
 
   manifest,
-
   /*
    ** Build configuration
    */
   build: {
+    // Invalidate cache between versions
+    // https://www.reddit.com/r/Nuxt/comments/18i8hp2/comment/kdc2fav/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+    // https://v2.nuxt.com/docs/configuration-glossary/configuration-build/#filenames
+    filenames: {
+      chunk: `[contenthash:7]_${CONFIG.VERSION}.js`,
+    },
     /*
      ** You can extend webpack config here
      */
