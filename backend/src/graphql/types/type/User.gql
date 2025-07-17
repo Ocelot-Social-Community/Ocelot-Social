@@ -64,13 +64,13 @@ type User {
   emailNotificationSettings: [EmailNotificationSettings]! @neo4j_ignore
   locale: String
   friends: [User]! @relation(name: "FRIENDS", direction: "BOTH")
-  friendsCount: Int! @cypher(statement: "MATCH (this)<-[:FRIENDS]->(r:User) RETURN COUNT(DISTINCT r)")
+  friendsCount: Int! @cypher(statement: "MATCH (this)<-[:FRIENDS]->(r:User) RETURN COUNT(DISTINCT r) ")
 
-  following: [User]! @relation(name: "FOLLOWS", direction: "OUT")
-  followingCount: Int! @cypher(statement: "MATCH (this)-[:FOLLOWS]->(r:User) RETURN COUNT(DISTINCT r)")
+  following: [User]! @cypher(statement: "MATCH (this)<-[:FOLLOWS]-(related:User) WHERE NOT related.disabled = true AND NOT related.deleted = true RETURN related") # @relation(name: "FOLLOWS", direction: "OUT")
+  followingCount: Int! @cypher(statement: "MATCH (this)<-[:FOLLOWS]-(related:User) WHERE NOT related.disabled = true AND NOT related.deleted = true RETURN COUNT(DISTINCT related)")
 
-  followedBy: [User]! @relation(name: "FOLLOWS", direction: "IN")
-  followedByCount: Int! @cypher(statement: "MATCH (this)<-[:FOLLOWS]-(r:User) RETURN COUNT(DISTINCT r)")
+  followedBy: [User]! @cypher(statement: "MATCH (this)-[:FOLLOWS]->(related:User) WHERE NOT related.disabled = true AND NOT related.deleted = true RETURN related") # @relation(name: "FOLLOWS", direction: "IN")
+  followedByCount: Int! @cypher(statement: "MATCH (this)-[:FOLLOWS]->(related:User) WHERE NOT related.disabled = true AND NOT related.deleted = true RETURN COUNT(DISTINCT related)")
 
   # Is the currently logged in user following that user?
   followedByCurrentUser: Boolean! @cypher(
