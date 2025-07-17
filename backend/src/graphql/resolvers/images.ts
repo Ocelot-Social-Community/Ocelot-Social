@@ -78,7 +78,6 @@ export default {
     ...Resolver('Image', {
       undefinedToNull: ['sensitive', 'alt', 'aspectRatio', 'type'],
     }),
-    url: changeDomain({ transformations: [sign] }),
     transform: changeDomain({ transformations: [resize, sign] }),
   },
 }
