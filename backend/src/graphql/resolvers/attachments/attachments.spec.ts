@@ -44,7 +44,7 @@ const config: S3Config = {
   AWS_ENDPOINT: 'AWS_ENDPOINT',
   AWS_REGION: 'AWS_REGION',
   IMAGOR_SECRET: 'IMAGOR_SECRET',
-  S3_PUBLIC_URL: undefined,
+  IMAGOR_PUBLIC_URL: 'IMAGOR_PUBLIC_URL',
 }
 
 let authenticatedUser

@@ -16,6 +16,7 @@ export const TEST_CONFIG = {
   PRODUCTION_DB_CLEAN_ALLOW: false,
   DISABLED_MIDDLEWARES: [],
   SEND_MAIL: false,
+  PROXY_S3: 'http://minio:9000',
 
   CLIENT_URI: 'http://webapp:3000',
   GRAPHQL_URI: 'http://localhost:4000',
@@ -44,8 +45,7 @@ export const TEST_CONFIG = {
   AWS_BUCKET: 'ocelot',
 
   IMAGOR_SECRET: 'IMAGOR_SECRET',
-  IMAGOR_PUBLIC_URL: undefined,
-  S3_PUBLIC_URL: undefined,
+  IMAGOR_PUBLIC_URL: 'IMAGOR_PUBLIC_URL',
 
   EMAIL_DEFAULT_SENDER: '',
   SUPPORT_EMAIL: '',

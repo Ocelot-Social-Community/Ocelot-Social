@@ -30,6 +30,7 @@ const environment = {
     : [],
   SEND_MAIL: env.NODE_ENV !== 'test',
   LOG_LEVEL: 'DEBUG',
+  PROXY_S3: env.PROXY_S3,
 }
 
 const server = {
@@ -106,8 +107,6 @@ const required = {
   PRIVATE_KEY_PASSPHRASE: env.PRIVATE_KEY_PASSPHRASE,
 }
 
-const S3_PUBLIC_URL = env.S3_PUBLIC_URL
-
 // https://stackoverflow.com/a/53050575
 type NoUndefinedField<T> = { [P in keyof T]-?: NoUndefinedField<NonNullable<T[P]>> }
 
@@ -154,7 +153,6 @@ const CONFIG = {
   ...redis,
   ...options,
   ...language,
-  S3_PUBLIC_URL,
 }
 
 export type Config = typeof CONFIG
@@ -167,7 +165,6 @@ export type S3Config = Pick<
   | 'AWS_BUCKET'
   | 'IMAGOR_SECRET'
   | 'IMAGOR_PUBLIC_URL'
-  | 'S3_PUBLIC_URL'
 >
 export default CONFIG
 

@@ -9,19 +9,19 @@ type UrlResolver = (
   parent: { url: string },
   args: { width?: number; height?: number },
   {
-    config: { S3_PUBLIC_URL },
+    config: { IMAGOR_PUBLIC_URL },
   }: Pick<Context, 'config'>,
 ) => string
 
-const changeDomain: (opts: { transformations: UrlResolver[] }) => UrlResolver =
+const pointUrlToImagor: (opts: { transformations: UrlResolver[] }) => UrlResolver =
   ({ transformations }) =>
   ({ url }, _args, context) => {
     const { config } = context
-    const { S3_PUBLIC_URL, AWS_ENDPOINT } = config
-    if (!S3_PUBLIC_URL) {
+    const { IMAGOR_PUBLIC_URL, AWS_ENDPOINT } = config
+    if (!IMAGOR_PUBLIC_URL) {
       return url
     }
-    const originalUrl = new URL(url, AWS_ENDPOINT) // some S3 object storages return invalid URLs as location, so put the AWS_ENDPOINT as `base`
+    const originalUrl = new URL(url, AWS_ENDPOINT)
     if (originalUrl.host !== new URL(AWS_ENDPOINT).host) {
       // In this case it's an external upload - maybe seeded?
       // Let's not change the URL in this case
@@ -31,9 +31,9 @@ const changeDomain: (opts: { transformations: UrlResolver[] }) => UrlResolver =
     const transformedUrl = new URL(
       chain(...transformations)({ url: originalUrl.href }, _args, context),
     )
-    const publicUrl = new URL(S3_PUBLIC_URL)
-    publicUrl.pathname = joinPath(publicUrl.pathname, transformedUrl.pathname)
-    return publicUrl.href
+    const imagorUrl = new URL(IMAGOR_PUBLIC_URL)
+    imagorUrl.pathname = joinPath(imagorUrl.pathname, transformedUrl.pathname)
+    return imagorUrl.href
   }
 
 const sign: UrlResolver = ({ url }, _args, { config: { IMAGOR_SECRET } }) => {
@@ -78,7 +78,6 @@ export default {
     ...Resolver('Image', {
       undefinedToNull: ['sensitive', 'alt', 'aspectRatio', 'type'],
     }),
-    url: changeDomain({ transformations: [sign] }),
-    transform: changeDomain({ transformations: [resize, sign] }),
+    transform: pointUrlToImagor({ transformations: [resize, sign] }),
   },
 }
