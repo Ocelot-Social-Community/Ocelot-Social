@@ -9,7 +9,7 @@ type UrlResolver = (
   parent: { url: string },
   args: { width?: number; height?: number },
   {
-    config: { S3_PUBLIC_GATEWAY },
+    config: { S3_PUBLIC_URL },
   }: Pick<Context, 'config'>,
 ) => string
 
@@ -17,8 +17,8 @@ const changeDomain: (opts: { transformations: UrlResolver[] }) => UrlResolver =
   ({ transformations }) =>
   ({ url }, _args, context) => {
     const { config } = context
-    const { S3_PUBLIC_GATEWAY, AWS_ENDPOINT } = config
-    if (!S3_PUBLIC_GATEWAY) {
+    const { S3_PUBLIC_URL, AWS_ENDPOINT } = config
+    if (!S3_PUBLIC_URL) {
       return url
     }
     const originalUrl = new URL(url, AWS_ENDPOINT) // some S3 object storages return invalid URLs as location, so put the AWS_ENDPOINT as `base`
@@ -31,7 +31,7 @@ const changeDomain: (opts: { transformations: UrlResolver[] }) => UrlResolver =
     const transformedUrl = new URL(
       chain(...transformations)({ url: originalUrl.href }, _args, context),
     )
-    const publicUrl = new URL(S3_PUBLIC_GATEWAY)
+    const publicUrl = new URL(S3_PUBLIC_URL)
     publicUrl.pathname = joinPath(publicUrl.pathname, transformedUrl.pathname)
     return publicUrl.href
   }
