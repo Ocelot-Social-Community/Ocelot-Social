@@ -462,6 +462,7 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
     })
 
     return {
+      roomId,
       senderUser: await txResponse.records.map((record) => record.get('senderUser'))[0],
       recipientUser: await txResponse.records.map((record) => record.get('recipientUser'))[0],
       email: await txResponse.records.map((record) => record.get('emailAddress'))[0]?.email,
@@ -470,7 +471,7 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
 
   try {
     // Execute Query
-    const { senderUser, recipientUser, email } = await messageRecipient
+    const { senderUser, recipientUser, email, roomId } = await messageRecipient
 
     if (recipientUser) {
       // send subscriptions
@@ -487,7 +488,7 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
 
       // Send EMail if we found a user(not blocked) and he is not considered online
       if (recipientUser.emailNotificationsChatMessage !== false && !isUserOnline(recipientUser)) {
-        void sendChatMessageMail({ email, senderUser, recipientUser })
+        void sendChatMessageMail({ email, senderUser, recipientUser, roomId })
       }
     }
 
