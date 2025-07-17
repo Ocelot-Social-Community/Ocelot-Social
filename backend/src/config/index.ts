@@ -104,7 +104,8 @@ const required = {
 }
 
 const IMAGOR_SECRET = env.IMAGOR_SECRET
-const S3_PUBLIC_GATEWAY = env.S3_PUBLIC_GATEWAY
+const IMAGOR_PUBLIC_URL = env.IMAGOR_PUBLIC_URL
+const S3_PUBLIC_URL = env.S3_PUBLIC_URL
 
 // https://stackoverflow.com/a/53050575
 type NoUndefinedField<T> = { [P in keyof T]-?: NoUndefinedField<NonNullable<T[P]>> }
@@ -153,7 +154,8 @@ const CONFIG = {
   ...options,
   ...language,
   IMAGOR_SECRET,
-  S3_PUBLIC_GATEWAY,
+  IMAGOR_PUBLIC_URL,
+  S3_PUBLIC_URL,
 }
 
 export type Config = typeof CONFIG
@@ -165,7 +167,7 @@ export type S3Config = Pick<
   | 'AWS_REGION'
   | 'AWS_BUCKET'
   | 'IMAGOR_SECRET'
-  | 'S3_PUBLIC_GATEWAY'
+  | 'S3_PUBLIC_URL'
 >
 export default CONFIG
 
