@@ -651,7 +651,7 @@ export default {
       ],
       boolean: {
         followedByCurrentUser:
-          'MATCH (this)<-[:FOLLOWS]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1',
+          'MATCH (this)<-[:FOLLOWS]-(u:User {id: $cypherParams.currentUserId}) WHERE NOT related.disabled = true AND NOT related.deleted = true RETURN COUNT(u) >= 1',
         isBlocked:
           'MATCH (this)<-[:BLOCKED]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1',
         blocked:
@@ -663,8 +663,10 @@ export default {
         contributionsCount:
           '-[:WROTE]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true',
         friendsCount: '<-[:FRIENDS]->(related:User)',
-        followingCount: '-[:FOLLOWS]->(related:User)',
-        followedByCount: '<-[:FOLLOWS]-(related:User)',
+        followingCount:
+          '-[:FOLLOWS]->(related:User) WHERE NOT related.disabled = true AND NOT related.deleted = true',
+        followedByCount:
+          '<-[:FOLLOWS]-(related:User) WHERE NOT related.disabled = true AND NOT related.deleted = true',
         commentedCount:
           '-[:WROTE]->(c:Comment)-[:COMMENTS]->(related:Post) WHERE NOT related.disabled = true AND NOT related.deleted = true',
         shoutedCount:
@@ -678,8 +680,10 @@ export default {
         redeemedInviteCode: '-[:REDEEMED]->(related:InviteCode)',
       },
       hasMany: {
-        followedBy: '<-[:FOLLOWS]-(related:User)',
-        following: '-[:FOLLOWS]->(related:User)',
+        followedBy:
+          '<-[:FOLLOWS]-(related:User) WHERE NOT related.disabled = true AND NOT related.deleted = true RETURN related',
+        following:
+          '(this)-[:FOLLOWS]->(related:User) WHERE NOT related.disabled = true AND NOT related.deleted = true RETURN related',
         friends: '-[:FRIENDS]-(related:User)',
         socialMedia: '<-[:OWNED_BY]-(related:SocialMedia)',
         contributions: '-[:WROTE]->(related:Post)',
