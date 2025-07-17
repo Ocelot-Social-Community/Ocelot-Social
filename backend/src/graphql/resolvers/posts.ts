@@ -9,7 +9,7 @@ import { isEmpty } from 'lodash'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 import { v4 as uuid } from 'uuid'
 
-import CONFIG, { isS3configured } from '@config/index'
+import CONFIG from '@config/index'
 import { Context } from '@src/context'
 
 import { attachments } from './attachments/attachments'
@@ -206,10 +206,6 @@ export default {
         const writeFilesPromise = session.writeTransaction(async (transaction) => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const atns: any[] = []
-
-          if (!isS3configured(CONFIG)) {
-            return atns
-          }
 
           for await (const file of files) {
             const atn = await attachments(CONFIG).add(
