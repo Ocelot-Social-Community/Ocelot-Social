@@ -521,8 +521,7 @@ export default {
          from the same origin or from local blob storage. So we fetch it first
          and then create a download link from blob storage. */
 
-      const url = this.$filters.proxyApiUrl(file.url)
-      const download = await fetch(url, {
+      const download = await fetch(file.url, {
         method: 'GET',
         headers: {
           'Content-Type': file.type,
