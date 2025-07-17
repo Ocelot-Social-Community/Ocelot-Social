@@ -9,7 +9,7 @@
 /* eslint-disable n/no-unsupported-features/node-builtins */
 import { UserInputError } from 'apollo-server'
 
-import CONFIG from '@config/index'
+import type { Context } from '@src/context'
 
 const locales = ['en', 'de', 'fr', 'nl', 'it', 'es', 'pt', 'pl', 'ru']
 
@@ -61,7 +61,13 @@ const createLocation = async (session, mapboxData) => {
   })
 }
 
-export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, session) => {
+export const createOrUpdateLocations = async (
+  nodeLabel,
+  nodeId,
+  locationName,
+  session,
+  context: Context,
+) => {
   if (locationName === undefined) return
 
   let locationId
@@ -72,7 +78,7 @@ export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, s
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
           locationName,
         )}.json?access_token=${
-          CONFIG.MAPBOX_TOKEN
+          context.config.MAPBOX_TOKEN
         }&types=region,place,country,address&language=${locales.join(',')}`,
         {
           signal: AbortSignal.timeout(REQUEST_TIMEOUT),
@@ -156,10 +162,10 @@ export const createOrUpdateLocations = async (nodeLabel, nodeId, locationName, s
   }
 }
 
-export const queryLocations = async ({ place, lang }) => {
+export const queryLocations = async ({ place, lang }, context: Context) => {
   try {
     const res: any = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${CONFIG.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`,
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${context.config.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`,
       {
         signal: AbortSignal.timeout(REQUEST_TIMEOUT),
       },

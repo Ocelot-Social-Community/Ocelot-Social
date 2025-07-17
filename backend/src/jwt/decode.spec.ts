@@ -4,12 +4,20 @@
 import Factory, { cleanDatabase } from '@db/factories'
 import User from '@db/models/User'
 import { getDriver, getNeode } from '@db/neo4j'
+import { TEST_CONFIG } from '@root/test/helpers'
 
-import decode from './decode'
-import encode from './encode'
+import { decode } from './decode'
+import { encode } from './encode'
 
 const driver = getDriver()
 const neode = getNeode()
+const config = {
+  JWT_SECRET: 'supersecret',
+  JWT_EXPIRES: TEST_CONFIG.JWT_EXPIRES,
+  CLIENT_URI: TEST_CONFIG.CLIENT_URI,
+  GRAPHQL_URI: TEST_CONFIG.GRAPHQL_URI,
+}
+const context = { driver, config }
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -26,9 +34,9 @@ afterEach(async () => {
 })
 
 describe('decode', () => {
-  let authorizationHeader
+  let authorizationHeader: string | undefined | null
   const returnsNull = async () => {
-    await expect(decode(driver, authorizationHeader)).resolves.toBeNull()
+    await expect(decode(context)(authorizationHeader)).resolves.toBeNull()
   }
 
   describe('given `null` as JWT Bearer token', () => {
@@ -57,7 +65,8 @@ describe('decode', () => {
 
   describe('given valid JWT Bearer token', () => {
     describe('and corresponding user in the database', () => {
-      let user, validAuthorizationHeader
+      let user
+      let validAuthorizationHeader: string
       beforeEach(async () => {
         user = await Factory.build(
           'user',
@@ -74,11 +83,11 @@ describe('decode', () => {
             email: 'user@example.org',
           },
         )
-        validAuthorizationHeader = encode(await user.toJson())
+        validAuthorizationHeader = encode(context)(await user.toJson())
       })
 
       it('returns user object without email', async () => {
-        await expect(decode(driver, validAuthorizationHeader)).resolves.toMatchObject({
+        await expect(decode(context)(validAuthorizationHeader)).resolves.toMatchObject({
           role: 'user',
           name: 'Jenny Rostock',
           id: 'u3',
@@ -89,7 +98,7 @@ describe('decode', () => {
       it('sets `lastActiveAt`', async () => {
         let user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
         await expect(user.toJson()).resolves.not.toHaveProperty('lastActiveAt')
-        await decode(driver, validAuthorizationHeader)
+        await decode(context)(validAuthorizationHeader)
         user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
         await expect(user.toJson()).resolves.toMatchObject({
           lastActiveAt: expect.any(String),
@@ -107,7 +116,7 @@ describe('decode', () => {
         await expect(user.toJson()).resolves.toMatchObject({
           lastActiveAt: '2019-10-03T23:33:08.598Z',
         })
-        await decode(driver, validAuthorizationHeader)
+        await decode(context)(validAuthorizationHeader)
         user = await neode.first<typeof User>('User', { id: 'u3' }, undefined)
         await expect(user.toJson()).resolves.toMatchObject({
           // should be a different time by now ;)

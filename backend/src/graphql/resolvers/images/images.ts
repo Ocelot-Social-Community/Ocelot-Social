@@ -1,16 +1,11 @@
-import CONFIG, { isS3configured } from '@config/index'
+import type { Context } from '@src/context'
+import type { FileDeleteCallback, FileUploadCallback } from '@src/uploads/types'
 
-import { images as imagesLocal } from './imagesLocal'
 import { images as imagesS3 } from './imagesS3'
 
 import type { FileUpload } from 'graphql-upload'
 import type { Transaction } from 'neo4j-driver'
 
-export type FileDeleteCallback = (url: string) => Promise<void>
-
-export type FileUploadCallback = (
-  upload: Pick<FileUpload, 'createReadStream' | 'mimetype'> & { uniqueFilename: string },
-) => Promise<string>
 export interface DeleteImageOpts {
   transaction?: Transaction
   deleteCallback?: FileDeleteCallback
@@ -55,4 +50,4 @@ export interface Images {
   ) => Promise<any>
 }
 
-export const images = isS3configured(CONFIG) ? imagesS3(CONFIG) : imagesLocal
+export const images = (config: Context['config']) => imagesS3(config)

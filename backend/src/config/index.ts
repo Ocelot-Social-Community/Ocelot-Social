@@ -32,12 +32,6 @@ const environment = {
   LOG_LEVEL: 'DEBUG',
 }
 
-const required = {
-  MAPBOX_TOKEN: env.MAPBOX_TOKEN,
-  JWT_SECRET: env.JWT_SECRET,
-  PRIVATE_KEY_PASSPHRASE: env.PRIVATE_KEY_PASSPHRASE,
-}
-
 const server = {
   CLIENT_URI: env.CLIENT_URI ?? 'http://localhost:3000',
   GRAPHQL_URI: env.GRAPHQL_URI ?? 'http://localhost:4000',
@@ -97,33 +91,34 @@ const redis = {
   REDIS_PASSWORD: env.REDIS_PASSWORD,
 }
 
-const s3 = {
+const required = {
   AWS_ACCESS_KEY_ID: env.AWS_ACCESS_KEY_ID,
   AWS_SECRET_ACCESS_KEY: env.AWS_SECRET_ACCESS_KEY,
   AWS_ENDPOINT: env.AWS_ENDPOINT,
   AWS_REGION: env.AWS_REGION,
   AWS_BUCKET: env.AWS_BUCKET,
-  S3_PUBLIC_GATEWAY: env.S3_PUBLIC_GATEWAY,
+
+  MAPBOX_TOKEN: env.MAPBOX_TOKEN,
+  JWT_SECRET: env.JWT_SECRET,
+  PRIVATE_KEY_PASSPHRASE: env.PRIVATE_KEY_PASSPHRASE,
 }
 
-export interface S3Configured {
-  AWS_ACCESS_KEY_ID: string
-  AWS_SECRET_ACCESS_KEY: string
-  AWS_ENDPOINT: string
-  AWS_REGION: string
-  AWS_BUCKET: string
-  S3_PUBLIC_GATEWAY: string | undefined
+const S3_PUBLIC_GATEWAY = env.S3_PUBLIC_GATEWAY
+
+// https://stackoverflow.com/a/53050575
+type NoUndefinedField<T> = { [P in keyof T]-?: NoUndefinedField<NonNullable<T[P]>> }
+
+function assertRequiredConfig(
+  conf: typeof required,
+): asserts conf is NoUndefinedField<typeof required> {
+  Object.entries(conf).forEach(([key, value]) => {
+    if (!value) {
+      throw new Error(`ERROR: "${key}" env variable is missing.`)
+    }
+  })
 }
 
-export const isS3configured = (config: typeof s3): config is S3Configured => {
-  return !!(
-    config.AWS_ACCESS_KEY_ID &&
-    config.AWS_SECRET_ACCESS_KEY &&
-    config.AWS_ENDPOINT &&
-    config.AWS_REGION &&
-    config.AWS_BUCKET
-  )
-}
+assertRequiredConfig(required)
 
 const options = {
   EMAIL_DEFAULT_SENDER: env.EMAIL_DEFAULT_SENDER,
@@ -147,24 +142,28 @@ const language = {
   LANGUAGE_DEFAULT: process.env.LANGUAGE_DEFAULT ?? 'en',
 }
 
-// Check if all required configs are present
-Object.entries(required).map((entry) => {
-  if (!entry[1]) {
-    throw new Error(`ERROR: "${entry[0]}" env variable is missing.`)
-  }
-  return entry
-})
-
-export default {
+const CONFIG = {
   ...environment,
   ...server,
   ...required,
   ...neo4j,
   ...sentry,
   ...redis,
-  ...s3,
   ...options,
   ...language,
+  S3_PUBLIC_GATEWAY,
 }
+
+export type Config = typeof CONFIG
+export type S3Config = Pick<
+  Config,
+  | 'AWS_ACCESS_KEY_ID'
+  | 'AWS_SECRET_ACCESS_KEY'
+  | 'AWS_ENDPOINT'
+  | 'AWS_REGION'
+  | 'AWS_BUCKET'
+  | 'S3_PUBLIC_GATEWAY'
+>
+export default CONFIG
 
 export { nodemailerTransportOptions }
