@@ -62,6 +62,7 @@ export default () => {
         $id: ID!
         $title: String!
         $content: String!
+        $files: [FileInput]
         $image: ImageInput
         $categoryIds: [ID]
         $postType: PostType
@@ -71,6 +72,7 @@ export default () => {
           id: $id
           title: $title
           content: $content
+          files: $files
           image: $image
           categoryIds: $categoryIds
           postType: $postType

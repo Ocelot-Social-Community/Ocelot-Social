@@ -203,6 +203,7 @@ export default {
         //   return null
         // }
 
+        // Attachments
         const writeFilesPromise = session.writeTransaction(async (transaction) => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const atns: any[] = []
@@ -224,6 +225,7 @@ export default {
 
         const atns = await writeFilesPromise
 
+        // TODO: this can be removed if we can insert the file before the psot
         for await (const atn of atns) {
           post.content = post.content.replace(
             `<img alt="${atn.name}" />`,
@@ -257,13 +259,15 @@ export default {
     },
     UpdatePost: async (_parent, params, context: Context, _resolveInfo) => {
       const { config } = context
-      const { categoryIds } = params
+      const { categoryIds, files = [] } = params
+      console.log(files)
       const { image: imageInput } = params
 
       const locationName = validateEventParams(params)
 
       delete params.categoryIds
       delete params.image
+      delete params.files
       const session = context.driver.session()
       let updatePostCypher = `
         MATCH (post:Post {id: $params.id})
@@ -310,12 +314,59 @@ export default {
           )
           const [post] = updatePostTransactionResponse.records.map((record) => record.get('post'))
           await images(context.config).mergeImage(post, 'HERO_IMAGE', imageInput, { transaction })
+
           return post
         })
         const post = await writeTxResultPromise
         if (locationName) {
           await createOrUpdateLocations('Post', post.id, locationName, session, context)
         }
+
+        // Attachments
+        const writeFilesPromise = session.writeTransaction(async (transaction) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const atns: any[] = []
+
+          for await (const file of files) {
+            const atn = await attachments(CONFIG).add(
+              post,
+              'ATTACHMENT',
+              file,
+              {},
+              {
+                transaction,
+              },
+            )
+            atns.push(atn)
+          }
+          return atns
+        })
+
+        const atns = await writeFilesPromise
+
+        // TODO: this can be removed if we can insert the file before the psot
+        for await (const atn of atns) {
+          post.content = post.content.replace(
+            `<img alt="${atn.name}" />`,
+            `<img src="${atn.url}" alt="${atn.name}" />`,
+          )
+          post.contentExcerpt = post.contentExcerpt.replace(
+            `<img alt="${atn.name}"/>`,
+            `<img src="${atn.url}" alt="${atn.name}" />`,
+          )
+        }
+
+        await context.database.write({
+          query: `
+            MATCH (post:Post {id: $post.id})
+            SET post.content = $post.content
+            SET post.contentExcerpt = $post.contentExcerpt
+          `,
+          variables: {
+            post,
+          },
+        })
+
         return post
       } finally {
         await session.close()
