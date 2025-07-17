@@ -98,13 +98,14 @@ const required = {
   AWS_REGION: env.AWS_REGION,
   AWS_BUCKET: env.AWS_BUCKET,
 
+  IMAGOR_PUBLIC_URL: env.IMAGOR_PUBLIC_URL,
+  IMAGOR_SECRET: env.IMAGOR_SECRET,
+
   MAPBOX_TOKEN: env.MAPBOX_TOKEN,
   JWT_SECRET: env.JWT_SECRET,
   PRIVATE_KEY_PASSPHRASE: env.PRIVATE_KEY_PASSPHRASE,
 }
 
-const IMAGOR_SECRET = env.IMAGOR_SECRET
-const IMAGOR_PUBLIC_URL = env.IMAGOR_PUBLIC_URL
 const S3_PUBLIC_URL = env.S3_PUBLIC_URL
 
 // https://stackoverflow.com/a/53050575
@@ -153,8 +154,6 @@ const CONFIG = {
   ...redis,
   ...options,
   ...language,
-  IMAGOR_SECRET,
-  IMAGOR_PUBLIC_URL,
   S3_PUBLIC_URL,
 }
 
@@ -167,6 +166,7 @@ export type S3Config = Pick<
   | 'AWS_REGION'
   | 'AWS_BUCKET'
   | 'IMAGOR_SECRET'
+  | 'IMAGOR_PUBLIC_URL'
   | 'S3_PUBLIC_URL'
 >
 export default CONFIG
