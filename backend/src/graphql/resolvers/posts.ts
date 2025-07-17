@@ -260,7 +260,6 @@ export default {
     UpdatePost: async (_parent, params, context: Context, _resolveInfo) => {
       const { config } = context
       const { categoryIds, files = [] } = params
-      console.log(files)
       const { image: imageInput } = params
 
       const locationName = validateEventParams(params)
