@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable promise/prefer-await-to-callbacks */
 import { DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import { UserInputError } from 'apollo-server'
@@ -152,7 +151,7 @@ describe('mergeImage', () => {
     beforeEach(() => {
       const createReadStream: FileUpload['createReadStream'] = (() => ({
         pipe: () => ({
-          on: (_, callback) => callback(),
+          on: (_: unknown, callback: () => void) => callback(), // eslint-disable-line promise/prefer-await-to-callbacks
         }),
       })) as unknown as FileUpload['createReadStream']
       imageInput = {
