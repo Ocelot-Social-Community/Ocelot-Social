@@ -247,7 +247,7 @@ jobs:
       - name: Load Docker images
         run: |
           docker load < /tmp/backend-initialized.tar
-          docker load < /tmp/webapp-image/webapp.tar
+          docker load < /tmp/webapp.tar
           docker load < /tmp/neo4j-initialized.tar
           docker load < /tmp/minio.tar
           docker load < /tmp/minio-mc.tar
