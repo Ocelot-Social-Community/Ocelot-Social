@@ -109,7 +109,7 @@ describe('ReportRow', () => {
 
         it('renders the moderator who reviewed the resource', () => {
           const username = wrapper.find('[data-test="report-reviewer"]')
-          expect(username.text()).toContain('@moderator')
+          expect(username.text()).toContain('Moderator')
         })
       })
     })
@@ -132,7 +132,7 @@ describe('ReportRow', () => {
 
       it('renders the author', () => {
         const userSlug = wrapper.find('[data-test="report-author"]')
-        expect(userSlug.text()).toContain('@louie')
+        expect(userSlug.text()).toContain('Louie')
       })
     })
 
@@ -154,7 +154,7 @@ describe('ReportRow', () => {
 
       it('renders the author', () => {
         const username = wrapper.find('[data-test="report-author"]')
-        expect(username.text()).toContain('@dagobert')
+        expect(username.text()).toContain('Dagobert')
       })
     })
 
@@ -171,7 +171,7 @@ describe('ReportRow', () => {
 
       it('renders a link to the user profile', () => {
         const userLink = wrapper.find('[data-test="report-content"]')
-        expect(userLink.text()).toContain('@abusive-user')
+        expect(userLink.text()).toContain('Abusive user')
       })
     })
   })

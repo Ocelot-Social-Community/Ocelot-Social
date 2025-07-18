@@ -9,7 +9,8 @@ import bcrypt from 'bcryptjs'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import { getNeode } from '@db/neo4j'
-import encode from '@jwt/encode'
+import { encode } from '@jwt/encode'
+import type { Context } from '@src/context'
 
 import normalizeEmail from './helpers/normalizeEmail'
 
@@ -21,7 +22,8 @@ export default {
       neo4jgraphql(object, { id: context.user.id }, context, resolveInfo),
   },
   Mutation: {
-    login: async (_, { email, password }, { driver }) => {
+    login: async (_, { email, password }, context: Context) => {
+      const { driver } = context
       // if (user && user.id) {
       //   throw new Error('Already logged in.')
       // }
@@ -45,17 +47,21 @@ export default {
           !currentUser.disabled
         ) {
           delete currentUser.encryptedPassword
-          return encode(currentUser)
+          return encode(context)(currentUser)
         } else if (currentUser?.disabled) {
           throw new AuthenticationError('Your account has been disabled.')
         } else {
           throw new AuthenticationError('Incorrect email address or password.')
         }
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    changePassword: async (_, { oldPassword, newPassword }, { user }) => {
+    changePassword: async (_, { oldPassword, newPassword }, context: Context) => {
+      if (!context.user) {
+        throw new Error('Missing authenticated user.')
+      }
+      const { user } = context
       const currentUser = await neode.find('User', user.id)
 
       const encryptedPassword = currentUser.get<string>('encryptedPassword')
@@ -73,7 +79,7 @@ export default {
         updatedAt: new Date().toISOString(),
       })
 
-      return encode(await currentUser.toJson())
+      return encode(context)(await currentUser.toJson())
     },
   },
 }

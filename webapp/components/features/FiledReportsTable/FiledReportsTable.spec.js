@@ -62,7 +62,7 @@ describe('FiledReportsTable.vue', () => {
       describe('FiledReport', () => {
         it('renders the reporting user', () => {
           const userSlug = wrapper.find('[data-test="filing-user"]')
-          expect(userSlug.text()).toContain('@community-moderator')
+          expect(userSlug.text()).toContain('Community moderator')
         })
 
         it('renders the reported date', () => {

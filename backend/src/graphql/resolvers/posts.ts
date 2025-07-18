@@ -9,8 +9,7 @@ import { isEmpty } from 'lodash'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 import { v4 as uuid } from 'uuid'
 
-import CONFIG from '@config/index'
-import { Context } from '@src/server'
+import { Context } from '@src/context'
 
 import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
@@ -41,7 +40,7 @@ const filterEventDates = (params) => {
 
 export default {
   Query: {
-    Post: async (object, params, context, resolveInfo) => {
+    Post: async (object, params, context: Context, resolveInfo) => {
       params = await filterPostsOfMyGroups(params, context)
       params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
@@ -77,10 +76,13 @@ export default {
         session.close()
       }
     },
-    PostsEmotionsByCurrentUser: async (_object, params, context, _resolveInfo) => {
+    PostsEmotionsByCurrentUser: async (_object, params, context: Context, _resolveInfo) => {
       const { postId } = params
       const session = context.driver.session()
       const readTxResultPromise = session.readTransaction(async (transaction) => {
+        if (!context.user) {
+          throw new Error('Missing authenticated user.')
+        }
         const emotionsTransactionResponse = await transaction.run(
           `
             MATCH (user:User {id: $userId})-[emoted:EMOTED]->(post:Post {id: $postId})
@@ -94,23 +96,29 @@ export default {
         const [emotions] = await readTxResultPromise
         return emotions
       } finally {
-        session.close()
+        await session.close()
       }
     },
     PostsPinnedCounts: async (_object, params, context: Context, _resolveInfo) => {
+      const { config } = context
       const [postsPinnedCount] = (
         await context.database.query({
           query: 'MATCH (p:Post { pinned: true }) RETURN COUNT (p) AS count',
         })
       ).records.map((r) => Number(r.get('count').toString()))
       return {
-        maxPinnedPosts: CONFIG.MAX_PINNED_POSTS,
+        maxPinnedPosts: config.MAX_PINNED_POSTS,
         currentlyPinnedPosts: postsPinnedCount,
       }
     },
   },
   Mutation: {
-    CreatePost: async (_parent, params, context, _resolveInfo) => {
+    CreatePost: async (_parent, params, context: Context, _resolveInfo) => {
+      const { user } = context
+      if (!user) {
+        throw new Error('Missing authenticated user.')
+      }
+      const { config } = context
       const { categoryIds, groupId } = params
       const { image: imageInput } = params
 
@@ -146,7 +154,7 @@ export default {
              )`
         }
         const categoriesCypher =
-          CONFIG.CATEGORIES_ACTIVE && categoryIds
+          config.CATEGORIES_ACTIVE && categoryIds
             ? `WITH post
               UNWIND $categoryIds AS categoryId
               MATCH (category:Category {id: categoryId})
@@ -173,18 +181,18 @@ export default {
             ${groupCypher}
             RETURN post {.*, postType: [l IN labels(post) WHERE NOT l = 'Post'] }
           `,
-          { userId: context.user.id, categoryIds, groupId, params },
+          { userId: user.id, categoryIds, groupId, params },
         )
         const [post] = createPostTransactionResponse.records.map((record) => record.get('post'))
         if (imageInput) {
-          await images.mergeImage(post, 'HERO_IMAGE', imageInput, { transaction })
+          await images(context.config).mergeImage(post, 'HERO_IMAGE', imageInput, { transaction })
         }
         return post
       })
       try {
         const post = await writeTxResultPromise
         if (locationName) {
-          await createOrUpdateLocations('Post', post.id, locationName, session)
+          await createOrUpdateLocations('Post', post.id, locationName, session, context)
         }
         return post
       } catch (e) {
@@ -192,10 +200,11 @@ export default {
           throw new UserInputError('Post with this slug already exists!')
         throw new Error(e)
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    UpdatePost: async (_parent, params, context, _resolveInfo) => {
+    UpdatePost: async (_parent, params, context: Context, _resolveInfo) => {
+      const { config } = context
       const { categoryIds } = params
       const { image: imageInput } = params
 
@@ -211,7 +220,7 @@ export default {
         WITH post
       `
 
-      if (CONFIG.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
+      if (config.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
         const cypherDeletePreviousRelations = `
           MATCH (post:Post { id: $params.id })-[previousRelations:CATEGORIZED]->(category:Category)
           DELETE previousRelations
@@ -248,20 +257,20 @@ export default {
             updatePostVariables,
           )
           const [post] = updatePostTransactionResponse.records.map((record) => record.get('post'))
-          await images.mergeImage(post, 'HERO_IMAGE', imageInput, { transaction })
+          await images(context.config).mergeImage(post, 'HERO_IMAGE', imageInput, { transaction })
           return post
         })
         const post = await writeTxResultPromise
         if (locationName) {
-          await createOrUpdateLocations('Post', post.id, locationName, session)
+          await createOrUpdateLocations('Post', post.id, locationName, session, context)
         }
         return post
       } finally {
-        session.close()
+        await session.close()
       }
     },
 
-    DeletePost: async (_object, args, context, _resolveInfo) => {
+    DeletePost: async (_object, args, context: Context, _resolveInfo) => {
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const deletePostTransactionResponse = await transaction.run(
@@ -278,17 +287,17 @@ export default {
           { postId: args.id },
         )
         const [post] = deletePostTransactionResponse.records.map((record) => record.get('post'))
-        await images.deleteImage(post, 'HERO_IMAGE', { transaction })
+        await images(context.config).deleteImage(post, 'HERO_IMAGE', { transaction })
         return post
       })
       try {
         const post = await writeTxResultPromise
         return post
       } finally {
-        session.close()
+        await session.close()
       }
     },
-    AddPostEmotions: async (_object, params, context, _resolveInfo) => {
+    AddPostEmotions: async (_object, params, context: Context, _resolveInfo) => {
       const { to, data } = params
       const { user } = context
       const session = context.driver.session()
@@ -312,7 +321,7 @@ export default {
         const [emoted] = await writeTxResultPromise
         return emoted
       } finally {
-        session.close()
+        await session.close()
       }
     },
     RemovePostEmotions: async (_object, params, context, _resolveInfo) => {
@@ -344,7 +353,11 @@ export default {
       }
     },
     pinPost: async (_parent, params, context: Context, _resolveInfo) => {
-      if (CONFIG.MAX_PINNED_POSTS === 0) throw new Error('Pinned posts are not allowed!')
+      if (!context.user) {
+        throw new Error('Missing authenticated user.')
+      }
+      const { config } = context
+      if (config.MAX_PINNED_POSTS === 0) throw new Error('Pinned posts are not allowed!')
       let pinnedPostWithNestedAttributes
       const { driver, user } = context
       const session = driver.session()
@@ -358,7 +371,7 @@ export default {
         SET post.pinned = true
         RETURN post, pinned.createdAt as pinnedAt`
 
-      if (CONFIG.MAX_PINNED_POSTS === 1) {
+      if (config.MAX_PINNED_POSTS === 1) {
         let writeTxResultPromise = session.writeTransaction(async (transaction) => {
           const deletePreviousRelationsResponse = await transaction.run(
             `
@@ -403,7 +416,7 @@ export default {
             query: `MATCH (:User)-[:PINNED]->(post:Post { pinned: true }) RETURN COUNT(post) AS count`,
           })
         ).records.map((r) => Number(r.get('count').toString()))
-        if (currentPinnedPostCount >= CONFIG.MAX_PINNED_POSTS) {
+        if (currentPinnedPostCount >= config.MAX_PINNED_POSTS) {
           throw new Error('Max number of pinned posts is reached!')
         }
         const [pinPostResult] = (

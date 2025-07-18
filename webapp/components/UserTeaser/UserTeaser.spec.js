@@ -56,6 +56,7 @@ describe('UserTeaser', () => {
     withLinkToProfile = true,
     onTouchScreen = false,
     withAvatar = true,
+    showSlug = true,
     user = userTilda,
     withPopoverEnabled = true,
   }) => {
@@ -76,6 +77,7 @@ describe('UserTeaser', () => {
         user,
         linkToProfile: withLinkToProfile,
         showAvatar: withAvatar,
+        showSlug: showSlug,
         showPopover: withPopoverEnabled,
       },
       stubs: {

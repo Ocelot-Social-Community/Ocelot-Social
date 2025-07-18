@@ -32,7 +32,6 @@ services:
       target: development
     environment:
       - NODE_ENV="development"
-      - DEBUG=true
       - SMTP_PORT=1025
       - SMTP_HOST=mailserver
       - AWS_ACCESS_KEY_ID=minio
@@ -41,7 +40,6 @@ services:
       - AWS_REGION=local
       - AWS_BUCKET=ocelot
       - S3_PUBLIC_GATEWAY=http:/localhost:9000
-      - DEBUG=neo4j-graphql-js
     volumes:
       - ./backend:/app
 

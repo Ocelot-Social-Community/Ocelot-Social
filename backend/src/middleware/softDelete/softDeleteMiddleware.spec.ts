@@ -1,21 +1,25 @@
-/* eslint-disable @typescript-eslint/await-thenable */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
-import createServer from '@src/server'
-
-const neode = getNeode()
-const driver = getDriver()
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
 const categoryIds = ['cat9']
-let query, graphqlQuery, authenticatedUser, user, moderator, troll
+let graphqlQuery
+let moderator
+let user
+let troll
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser })
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 const action = () => {
   return query({ query: graphqlQuery })
@@ -23,8 +27,15 @@ const action = () => {
 
 beforeAll(async () => {
   await cleanDatabase()
+  const apolloSetup = createApolloTestSetup({ context })
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 
   // For performance reasons we do this only once
+  const avatar = await Factory.build('image', {
+    url: 'http://localhost/some/offensive/avatar.jpg',
+  })
   const users = await Promise.all([
     Factory.build('user', { id: 'u1', role: 'user' }),
     Factory.build(
@@ -47,12 +58,10 @@ beforeAll(async () => {
         about: 'This self description is very offensive',
       },
       {
-        avatar: Factory.build('image', {
-          url: 'http://localhost/some/offensive/avatar.jpg',
-        }),
+        avatar,
       },
     ),
-    neode.create('Category', {
+    database.neode.create('Category', {
       id: 'cat9',
       name: 'Democracy & Politics',
       icon: 'university',
@@ -136,18 +145,6 @@ beforeAll(async () => {
     ),
   ])
 
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode,
-        user: authenticatedUser,
-      }
-    },
-  })
-  const client = createTestClient(server)
-  query = client.query
-
   const trollingPost = resources[1]
   const trollingComment = resources[2]
 
@@ -202,7 +199,9 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('softDeleteMiddleware', () => {
@@ -222,7 +221,7 @@ describe('softDeleteMiddleware', () => {
         }
       `
       const { data } = await action()
-      subject = data.User[0].following[0].comments[0]
+      subject = (data as any).User[0].following[0].comments[0]
     }
     const beforeUser = async () => {
       graphqlQuery = gql`
@@ -240,7 +239,7 @@ describe('softDeleteMiddleware', () => {
         }
       `
       const { data } = await action()
-      subject = data.User[0].following[0]
+      subject = (data as any).User[0].following[0]
     }
     const beforePost = async () => {
       graphqlQuery = gql`
@@ -261,7 +260,7 @@ describe('softDeleteMiddleware', () => {
         }
       `
       const { data } = await action()
-      subject = data.User[0].following[0].contributions[0]
+      subject = (data as any).User[0].following[0].contributions[0]
     }
 
     describe('as moderator', () => {
@@ -276,10 +275,11 @@ describe('softDeleteMiddleware', () => {
         it('displays slug', () => expect(subject.slug).toEqual('offensive-name'))
         it('displays about', () =>
           expect(subject.about).toEqual('This self description is very offensive'))
-        it('displays avatar', () =>
+        it('displays avatar', async () => {
           expect(subject.avatar).toEqual({
             url: expect.stringMatching('http://localhost/some/offensive/avatar.jpg'),
-          }))
+          })
+        })
       })
 
       describe('Post', () => {
@@ -369,10 +369,9 @@ describe('softDeleteMiddleware', () => {
 
         it('shows disabled but hides deleted posts', async () => {
           const expected = [{ title: 'Disabled post' }, { title: 'Publicly visible post' }]
-          const {
-            data: { Post },
-          } = await action()
-          await expect(Post).toEqual(expect.arrayContaining(expected))
+          const { data } = await action()
+          const { Post } = data as any
+          expect(Post).toEqual(expect.arrayContaining(expected))
         })
       })
 
@@ -400,12 +399,11 @@ describe('softDeleteMiddleware', () => {
               { content: 'Enabled comment on public post' },
               { content: 'UNAVAILABLE' },
             ]
+            const { data } = await action()
             const {
-              data: {
-                Post: [{ comments }],
-              },
-            } = await action()
-            await expect(comments).toEqual(expect.arrayContaining(expected))
+              Post: [{ comments }],
+            } = data as any
+            expect(comments).toEqual(expect.arrayContaining(expected))
           })
         })
 
@@ -419,12 +417,11 @@ describe('softDeleteMiddleware', () => {
               { content: 'Enabled comment on public post' },
               { content: 'Disabled comment' },
             ]
+            const { data } = await action()
             const {
-              data: {
-                Post: [{ comments }],
-              },
-            } = await action()
-            await expect(comments).toEqual(expect.arrayContaining(expected))
+              Post: [{ comments }],
+            } = data as any
+            expect(comments).toEqual(expect.arrayContaining(expected))
           })
         })
       })
