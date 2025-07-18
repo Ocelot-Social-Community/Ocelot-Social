@@ -320,11 +320,17 @@ jobs:
           wait_for "minio" "http://localhost:9000/minio/health/live"
           echo "🎉 All services are up."
     #starting fullstack cypress tests
+      - name: Full stack tests | run tests
+        id: e2e-tests
+        run: yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
+
       - name: Full stack tests | if tests failed, compile html report
+        if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         run: |
           cd cypress/
           node create-cucumber-html-report.js
       - name: Full stack tests | if tests failed, upload report
+        if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: e2e-html-report-${{ matrix.job }}
