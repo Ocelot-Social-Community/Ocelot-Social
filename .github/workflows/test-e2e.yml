@@ -57,15 +57,22 @@ jobs:
           cp backend/.env.test_e2e backend/.env
           cp webapp/.env.template webapp/.env
 
-      - name: Download built images
+      - name: Download backend image
         uses: actions/download-artifact@448e3f862ab3ef47aa50ff917776823c9946035b # v4.3.0
         with:
+          name: backend-image
+          path: /tmp
+
+      - name: Download neo4j image
+        uses: actions/download-artifact@448e3f862ab3ef47aa50ff917776823c9946035b # v4.3.0
+        with:
+          name: neo4j-image
           path: /tmp
 
       - name: Load built images
         run: |
-          docker load < /tmp/backend-image/backend.tar
-          docker load < /tmp/neo4j-image/neo4j.tar
+          docker load < /tmp/backend.tar
+          docker load < /tmp/neo4j.tar
 
       - name: Initialize backend environment (like master branch)
         run: |
