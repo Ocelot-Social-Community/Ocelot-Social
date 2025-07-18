@@ -651,7 +651,7 @@ export default {
       ],
       boolean: {
         followedByCurrentUser:
-          'MATCH (this)<-[:FOLLOWS]-(u:User {id: $cypherParams.currentUserId}) WHERE NOT related.disabled = true AND NOT related.deleted = true RETURN COUNT(u) >= 1',
+          'MATCH (this)<-[:FOLLOWS]-(u:User {id: $cypherParams.currentUserId}) WHERE NOT u.disabled = true AND NOT u.deleted = true RETURN COUNT(u) >= 1',
         isBlocked:
           'MATCH (this)<-[:BLOCKED]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1',
         blocked:
@@ -681,9 +681,9 @@ export default {
       },
       hasMany: {
         followedBy:
-          '<-[:FOLLOWS]-(related:User) WHERE NOT related.disabled = true AND NOT related.deleted = true RETURN related',
+          '<-[:FOLLOWS]-(related:User) WHERE NOT related.disabled = true AND NOT related.deleted = true',
         following:
-          '(this)-[:FOLLOWS]->(related:User) WHERE NOT related.disabled = true AND NOT related.deleted = true RETURN related',
+          '(this)-[:FOLLOWS]->(related:User) WHERE NOT related.disabled = true AND NOT related.deleted = true',
         friends: '-[:FRIENDS]-(related:User)',
         socialMedia: '<-[:OWNED_BY]-(related:SocialMedia)',
         contributions: '-[:WROTE]->(related:Post)',
