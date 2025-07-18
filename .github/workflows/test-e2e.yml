@@ -40,6 +40,55 @@ jobs:
           name: ${{ matrix.name }}-image
           path: /tmp/${{ matrix.name }}.tar
 
+  initialize-backend-environment:
+    name: Initialize backend environment
+    needs: [build-images]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .env files
+        run: |
+          cp backend/.env.test_e2e backend/.env
+          cp webapp/.env.template webapp/.env
+
+      - name: Download built images
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp
+
+      - name: Load built images
+        run: |
+          docker load < /tmp/backend-image/backend.tar
+          docker load < /tmp/neo4j-image/neo4j.tar
+
+      - name: Initialize backend environment (like master branch)
+        run: |
+          # Start neo4j and backend together to allow proper initialization
+          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach neo4j backend
+
+          # Save the initialized backend environment
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" > /tmp/backend-initialized.tar
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j-community:test" > /tmp/neo4j-initialized.tar
+          docker save "quay.io/minio/minio:latest" > /tmp/minio.tar
+          docker save "quay.io/minio/mc:latest" > /tmp/minio-mc.tar
+          docker save "maildev/maildev:latest" > /tmp/mailserver.tar
+
+          # Clean shutdown
+          docker compose -f docker-compose.yml -f docker-compose.test.yml down
+
+      - name: Upload initialized backend environment
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-environment-initialized
+          path: |
+            /tmp/backend-initialized.tar
+            /tmp/neo4j-initialized.tar
+            /tmp/minio.tar
+            /tmp/minio-mc.tar
+            /tmp/mailserver.tar
+
   cache-environment:
     runs-on: ubuntu-latest
     outputs:
@@ -158,7 +207,7 @@ jobs:
   consolidate-environment:
     name: Fullstack | tests
     if: success()
-    needs: [build-images, cache-environment]
+    needs: [initialize-backend-environment, cache-environment]
     runs-on: ubuntu-latest
     env:
       jobs: 8
@@ -166,18 +215,29 @@ jobs:
       matrix:
         job: [1, 2, 3, 4, 5, 6, 7, 8]
 
-    steps:     
+    steps:
     #download docker images
-      - name: Download Docker image artifacts
+      - name: Download initialized backend environment
         uses: actions/download-artifact@v4
         with:
+          name: backend-environment-initialized
           path: /tmp
+
+      - name: Download webapp image
+        uses: actions/download-artifact@v4
+        with:
+          name: webapp-image
+          path: /tmp
+
     #load docker images
       - name: Load Docker images
         run: |
-          docker load < /tmp/backend-image/backend.tar
+          docker load < /tmp/backend-initialized.tar
           docker load < /tmp/webapp-image/webapp.tar
-          docker load < /tmp/neo4j-image/neo4j.tar
+          docker load < /tmp/neo4j-initialized.tar
+          docker load < /tmp/minio.tar
+          docker load < /tmp/minio-mc.tar
+          docker load < /tmp/mailserver.tar
     #checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -221,9 +281,10 @@ jobs:
         run: cd backend && yarn build
 
     #boot system for tests
-      - name: Boot system for tests
+      - name: Boot system for tests (using pre-initialized backend environment)
         run: |
-          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
+          # Start all services using pre-initialized backend and neo4j images
+          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach neo4j backend minio minio-mc mailserver webapp
     #wait for services
       - name: Wait for essential services
         run: |
