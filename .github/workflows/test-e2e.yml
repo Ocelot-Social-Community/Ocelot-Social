@@ -31,7 +31,7 @@ jobs:
             ${{ matrix.target }}.output=type=docker,dest=/tmp/${{ matrix.target }}.tar
 
       - name: Upload ${{ matrix.target }} image
-        uses: actions/upload-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        uses: actions/upload-artifact@de65e23aa2b7e23d713bb51fbfcb6d502f8667d8 # v4.6.2
         with:
           name: ${{ matrix.target }}-image
           path: /tmp/${{ matrix.target }}.tar
