@@ -5,44 +5,36 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - name: backend
-            context: ./backend
-            dockerfile: ./backend/Dockerfile
-            target: build
-          - name: webapp
-            context: ./webapp
-            dockerfile: ./webapp/Dockerfile
-            target: build
-          - name: neo4j
-            context: ./neo4j
-            dockerfile: ./neo4j/Dockerfile
-            target: community
+        target: [backend, webapp, neo4j]
     steps:
       - name: Checkout repository
         uses: actions/checkout@09d2acae674a48949e3602304ab46fd20ae0c42f # v4.2.2
 
-      - name: setup .env files
+      - name: Setup .env files
         run: |
           cp backend/.env.test_e2e backend/.env
           cp webapp/.env.template webapp/.env
 
-      - uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3.7.1
 
-      - name: Build ${{ matrix.name }} image
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+      - name: Build ${{ matrix.target }} image using docker-compose.test.yml
+        uses: docker/bake-action@d576212e5b026b5ea0cead59d15616980df02388 # v6.8.0
         with:
-          context: ${{ matrix.context }}
-          file: ${{ matrix.dockerfile }}
-          target: ${{ matrix.target }}
-          push: false
-          outputs: type=docker,dest=/tmp/${{ matrix.name }}.tar
+          source: .
+          files: |
+            docker-compose.yml
+            docker-compose.test.yml
+          targets: ${{ matrix.target }}
+          load: false
+          set: |
+            ${{ matrix.target }}.output=type=docker,dest=/tmp/${{ matrix.target }}.tar
 
-      - name: Upload ${{ matrix.name }} image
-        uses: actions/upload-artifact@de65e23aa2b7e23d713bb51fbfcb6d502f8667d8 # v4.6.2
+      - name: Upload ${{ matrix.target }} image
+        uses: actions/upload-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
-          name: ${{ matrix.name }}-image
-          path: /tmp/${{ matrix.name }}.tar
+          name: ${{ matrix.target }}-image
+          path: /tmp/${{ matrix.target }}.tar
 
   initialize-backend-environment:
     name: Initialize backend environment
@@ -77,14 +69,11 @@ jobs:
       - name: Initialize backend environment (like master branch)
         run: |
           # Start neo4j and backend together to allow proper initialization
-          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach neo4j backend
+          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach --build neo4j backend
 
-          # Save the initialized backend environment
+          # Save only the initialized backend and neo4j images
           docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" > /tmp/backend-initialized.tar
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j-community:test" > /tmp/neo4j-initialized.tar
-          docker save "quay.io/minio/minio:latest" > /tmp/minio.tar
-          docker save "quay.io/minio/mc:latest" > /tmp/minio-mc.tar
-          docker save "maildev/maildev:latest" > /tmp/mailserver.tar
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" > /tmp/neo4j-initialized.tar
 
           # Clean shutdown
           docker compose -f docker-compose.yml -f docker-compose.test.yml down
@@ -96,9 +85,6 @@ jobs:
           path: |
             /tmp/backend-initialized.tar
             /tmp/neo4j-initialized.tar
-            /tmp/minio.tar
-            /tmp/minio-mc.tar
-            /tmp/mailserver.tar
 
   cache-environment:
     runs-on: ubuntu-latest
@@ -249,9 +235,7 @@ jobs:
           docker load < /tmp/backend-initialized.tar
           docker load < /tmp/webapp.tar
           docker load < /tmp/neo4j-initialized.tar
-          docker load < /tmp/minio.tar
-          docker load < /tmp/minio-mc.tar
-          docker load < /tmp/mailserver.tar
+          # minio, minio-mc, and mailserver images will be pulled fresh by docker compose
 
     #checkout repository
       - name: Checkout repository
