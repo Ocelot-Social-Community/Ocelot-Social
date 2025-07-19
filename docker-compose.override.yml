@@ -25,6 +25,8 @@ services:
 
   backend:
     image: ghcr.io/ocelot-social-community/ocelot-social/backend:local-development
+    ports:
+      - 9000:9000
     depends_on:
       - minio
       - minio-mc
@@ -37,7 +39,7 @@ services:
       - SMTP_HOST=mailserver
       - AWS_ACCESS_KEY_ID=minio
       - AWS_SECRET_ACCESS_KEY=12341234
-      - AWS_ENDPOINT=http:/minio:9000
+      - AWS_ENDPOINT=http:/localhost:9000
       - AWS_REGION=local
       - AWS_BUCKET=ocelot
       - S3_PUBLIC_URL=http://localhost:9000
@@ -61,7 +63,6 @@ services:
   minio:
     image: quay.io/minio/minio
     ports:
-      - 9000:9000
       - 9001:9001
     volumes:
       - minio_data:/data
