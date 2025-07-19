@@ -17,6 +17,7 @@ import login from './login/loginMiddleware'
 import notifications from './notifications/notificationsMiddleware'
 import orderBy from './orderByMiddleware'
 import permissions from './permissionsMiddleware'
+import publicS3 from './publicS3/publicS3'
 import sentry from './sentryMiddleware'
 import sluggify from './sluggifyMiddleware'
 import softDelete from './softDelete/softDeleteMiddleware'
@@ -47,6 +48,7 @@ const ocelotMiddlewares: MiddlewareOrder[] = [
   { order: -70, name: 'orderBy', middleware: orderBy },
   { order: -60, name: 'chatMiddleware', middleware: chatMiddleware },
   { order: -50, name: 'categories', middleware: categories },
+  { order: -40, name: 'publicS3', middleware: publicS3 },
 ]
 
 export default (schema) => {

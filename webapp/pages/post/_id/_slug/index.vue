@@ -21,9 +21,13 @@
             :style="heroImageStyle"
           >
             <template #heroImage v-if="post.image">
-              <img :src="post.image | proxyApiUrl" class="image" />
+              <responsive-image
+                :image="post.image"
+                sizes="(max-width: 1024px) 640px, 1024px"
+                class="image"
+              />
               <aside v-show="post.image && post.image.sensitive" class="blur-toggle">
-                <img v-show="blurred" :src="post.image | proxyApiUrl" class="preview" />
+                <img v-show="blurred" :src="post.image.url.w320" class="preview" />
                 <base-button
                   :icon="blurred ? 'eye' : 'eye-slash'"
                   filled
@@ -167,6 +171,7 @@ import {
   deletePostMutation,
   sortTagsAlphabetically,
 } from '~/components/utils/PostHelpers'
+import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 import PostQuery from '~/graphql/PostQuery'
 import { groupQuery } from '~/graphql/groups'
 import PostMutations from '~/graphql/PostMutations'
@@ -193,6 +198,7 @@ export default {
     ObserveButton,
     LocationTeaser,
     PageParamsLink,
+    ResponsiveImage,
     UserTeaser,
   },
   mixins: [GetCategories, postListActions, SortCategories],
