@@ -15,8 +15,7 @@ jest.mock('uuid', () => ({
 }))
 
 let authenticatedUser: Context['user']
-let S3_PUBLIC_URL: string | undefined
-const context = () => ({ authenticatedUser, config: { S3_PUBLIC_URL } })
+const context = () => ({ authenticatedUser })
 let query: ApolloTestSetup['query']
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
@@ -97,51 +96,21 @@ describe('publicS3Middleware', () => {
       })
     })
 
-    describe('if no `S3_PUBLIC_URL` is set', () => {
-      beforeEach(() => {
-        S3_PUBLIC_URL = undefined
-      })
-
-      it('does absolutely nothing', async () => {
-        await expect(query({ query: messageQuery, variables: { roomId } })).resolves.toMatchObject({
-          errors: undefined,
-          data: {
-            Message: [
-              {
-                id: expect.any(String),
-                files: [
-                  {
-                    url: 'http://localhost/some/file/url?random=df62c7bb-3810-4216-8123-057b790afbc8',
-                  },
-                ],
-              },
-            ],
-          },
-        })
-      })
-    })
-
-    describe('but if a `S3_PUBLIC_URL` is set', () => {
-      beforeEach(() => {
-        S3_PUBLIC_URL = 'http://public-s3-url.com'
-      })
-
-      it('does absolutely nothing', async () => {
-        await expect(query({ query: messageQuery, variables: { roomId } })).resolves.toMatchObject({
-          errors: undefined,
-          data: {
-            Message: [
-              {
-                id: expect.any(String),
-                files: [
-                  {
-                    url: 'http://public-s3-url.com/some/file/url?random=df62c7bb-3810-4216-8123-057b790afbc8',
-                  },
-                ],
-              },
-            ],
-          },
-        })
+    it('does absolutely nothing', async () => {
+      await expect(query({ query: messageQuery, variables: { roomId } })).resolves.toMatchObject({
+        errors: undefined,
+        data: {
+          Message: [
+            {
+              id: expect.any(String),
+              files: [
+                {
+                  url: 'http://localhost/some/file/url?random=df62c7bb-3810-4216-8123-057b790afbc8',
+                },
+              ],
+            },
+          ],
+        },
       })
     })
   })
@@ -166,43 +135,17 @@ describe('publicS3Middleware', () => {
       authenticatedUser = await user.toJson()
     })
 
-    describe('if no `S3_PUBLIC_URL` is set', () => {
-      beforeEach(() => {
-        S3_PUBLIC_URL = undefined
-      })
-
-      it('does absolutely nothing', async () => {
-        await expect(query({ query: currentUserQuery })).resolves.toMatchObject({
-          errors: undefined,
-          data: {
-            currentUser: {
-              id: 'u1',
-              avatar: {
-                url: 'http://aws-endpoint.com/some/avatar.jpg?random=df62c7bb-3810-4216-8123-057b790afbc8',
-              },
+    it('does absolutely nothing', async () => {
+      await expect(query({ query: currentUserQuery })).resolves.toMatchObject({
+        errors: undefined,
+        data: {
+          currentUser: {
+            id: 'u1',
+            avatar: {
+              url: 'http://aws-endpoint.com/some/avatar.jpg?random=df62c7bb-3810-4216-8123-057b790afbc8',
             },
           },
-        })
-      })
-    })
-
-    describe('but if a `S3_PUBLIC_URL` is set', () => {
-      beforeEach(() => {
-        S3_PUBLIC_URL = 'http://public-s3-url.com'
-      })
-
-      it('replaces the host - this is necessary in a docker environment as the backend sees a different endpoint than the web frontend', async () => {
-        await expect(query({ query: currentUserQuery })).resolves.toMatchObject({
-          errors: undefined,
-          data: {
-            currentUser: {
-              id: 'u1',
-              avatar: {
-                url: 'http://public-s3-url.com/some/avatar.jpg?random=df62c7bb-3810-4216-8123-057b790afbc8',
-              },
-            },
-          },
-        })
+        },
       })
     })
   })

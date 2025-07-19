@@ -9,7 +9,6 @@ describe('Image', () => {
   const defaultConfig = {
     ...TEST_CONFIG,
     AWS_ENDPOINT: 'https://fsn1.your-objectstorage.com',
-    S3_PUBLIC_URL: 'S3_PUBLIC_URL',
     IMAGOR_PUBLIC_URL: 'https://imagor-public-url.com',
     IMAGOR_SECRET: 'IMAGOR_SECRET',
   }

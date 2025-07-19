@@ -43,7 +43,6 @@ const config: S3Config = {
   AWS_REGION: 'AWS_REGION',
   IMAGOR_SECRET: 'IMAGOR_SECRET',
   IMAGOR_PUBLIC_URL: 'IMAGOR_PUBLIC_URL',
-  S3_PUBLIC_URL: undefined,
 }
 
 describe('s3Service', () => {

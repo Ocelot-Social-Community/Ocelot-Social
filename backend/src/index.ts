@@ -21,6 +21,8 @@ const TARGET_HOST = 'minio' // The host to proxy requests to
 const TARGET_PORT = 9000 // The port of the target host
 const proxy = createProxy({ TARGET_PORT, TARGET_HOST })
 proxy.listen(PROXY_PORT, () => {
+  /* eslint-disable-next-line no-console */
   console.log(`Simple HTTP proxy listening on port ${PROXY_PORT}`)
+  /* eslint-disable-next-line no-console */
   console.log(`Proxying requests to http://${TARGET_HOST}:${TARGET_PORT}`)
 })

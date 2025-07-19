@@ -42,7 +42,6 @@ services:
       - AWS_ENDPOINT=http:/localhost:9000
       - AWS_REGION=local
       - AWS_BUCKET=ocelot
-      - S3_PUBLIC_URL=http://localhost:9000
       - IMAGOR_PUBLIC_URL=http://localhost:8000
       - IMAGOR_SECRET=mysecret
     volumes:

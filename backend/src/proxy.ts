@@ -24,6 +24,7 @@ const createProxy = ({
     req.pipe(proxyReq) // Pipe the client's request body to the target server
 
     proxyReq.on('error', (err) => {
+      /* eslint-disable-next-line no-console */
       console.error('Proxy request error:', err)
       res.writeHead(500, { 'Content-Type': 'text/plain' })
       res.end('Proxy error')
