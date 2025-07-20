@@ -5,14 +5,14 @@ const localVue = global.localVue
 
 const badge1 = {
   id: 'badge1',
-  icon: '/icon1',
+  icon: 'icon1',
   type: 'type1',
   description: 'description1',
   isActive: true,
 }
 const badge2 = {
   id: 'badge2',
-  icon: '/icon2',
+  icon: 'icon2',
   type: 'type1',
   description: 'description2',
   isActive: false,
