@@ -87,7 +87,7 @@
     "babel-plugin-require-context-hook": "^1.0.0",
     "core-js": "~2.6.10",
     "css-loader": "~3.5.2",
-    "eslint": "^7.28.0",
+    "eslint": "^9.32.0",
     "eslint-config-prettier": "~10.1.2",
     "eslint-config-standard": "~15.0.1",
     "eslint-plugin-import": "~2.31.0",
