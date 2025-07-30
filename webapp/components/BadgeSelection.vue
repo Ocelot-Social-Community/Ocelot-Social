@@ -7,7 +7,7 @@
       @click="handleBadgeClick(badge, index)"
     >
       <div class="badge-icon">
-        <img :src="badge.icon | proxyApiUrl" :alt="badge.id" />
+        <img :src="backendPath(badge.icon)" :alt="badge.id" />
       </div>
       <div class="badge-info">
         <div class="badge-description">{{ badge.description }}</div>
@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import { backendPath } from '~/helpers/backendPath'
 export default {
   name: 'BadgeSelection',
   props: {
@@ -31,6 +32,7 @@ export default {
     }
   },
   methods: {
+    backendPath,
     handleBadgeClick(badge, index) {
       if (this.selectedIndex === index) {
         this.selectedIndex = null

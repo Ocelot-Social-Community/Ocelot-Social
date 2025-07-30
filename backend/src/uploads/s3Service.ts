@@ -8,7 +8,7 @@ import { FileUploadCallback, FileDeleteCallback } from './types'
 export const s3Service = (config: S3Config, prefix: string) => {
   const { AWS_BUCKET: Bucket } = config
 
-  const { AWS_ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, S3_PUBLIC_GATEWAY } = config
+  const { AWS_ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = config
   const s3 = new S3Client({
     credentials: {
       accessKeyId: AWS_ACCESS_KEY_ID,
@@ -40,13 +40,7 @@ export const s3Service = (config: S3Config, prefix: string) => {
       location = `https://${location}`
     }
 
-    if (!S3_PUBLIC_GATEWAY) {
-      return location
-    }
-
-    const publicLocation = new URL(S3_PUBLIC_GATEWAY)
-    publicLocation.pathname = new URL(location).pathname
-    return publicLocation.href
+    return location
   }
 
   const deleteFile: FileDeleteCallback = async (url) => {
