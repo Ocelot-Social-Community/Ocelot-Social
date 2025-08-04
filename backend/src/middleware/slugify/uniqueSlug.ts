@@ -1,10 +1,11 @@
-import slugify from 'slug'
+import slugify from 'slugify'
+
+slugify.extend({ Ä: 'AE', ä: 'ae', Ö: 'OE', ö: 'oe', Ü: 'UE', ü: 'ue', ß: 'ss' })
 
 type IsUnique = (slug: string) => Promise<boolean>
 export default async function uniqueSlug(str: string, isUnique: IsUnique) {
   const slug = slugify(str || 'anonymous', {
     lower: true,
-    multicharmap: { Ä: 'AE', ä: 'ae', Ö: 'OE', ö: 'oe', Ü: 'UE', ü: 'ue', ß: 'ss' },
   })
   if (await isUnique(slug)) return slug
 
