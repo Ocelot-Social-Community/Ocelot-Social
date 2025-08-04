@@ -1,9 +1,19 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-import CONFIG from '@src/config'
+import type { Context } from '@src/context'
 
-const checkCategoriesActive = (resolve, root, args, context, resolveInfo) => {
-  if (CONFIG.CATEGORIES_ACTIVE) {
+type Resolver = (
+  root: unknown,
+  args: unknown,
+  context: Context,
+  resolveInfo: unknown,
+) => Promise<unknown>
+const checkCategoriesActive = (
+  resolve: Resolver,
+  root: unknown,
+  args: unknown,
+  context: Context,
+  resolveInfo: unknown,
+) => {
+  if (context.config.CATEGORIES_ACTIVE) {
     return resolve(root, args, context, resolveInfo)
   }
   return []

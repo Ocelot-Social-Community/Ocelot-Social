@@ -1,7 +1,6 @@
-import CONFIG, { isS3configured } from '@config/index'
+import type { Context } from '@src/context'
 import type { FileDeleteCallback, FileUploadCallback } from '@src/uploads/types'
 
-import { images as imagesLocal } from './imagesLocal'
 import { images as imagesS3 } from './imagesS3'
 
 import type { FileUpload } from 'graphql-upload'
@@ -51,4 +50,4 @@ export interface Images {
   ) => Promise<any>
 }
 
-export const images = isS3configured(CONFIG) ? imagesS3(CONFIG) : imagesLocal
+export const images = (config: Context['config']) => imagesS3(config)

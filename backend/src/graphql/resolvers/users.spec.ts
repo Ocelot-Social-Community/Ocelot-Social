@@ -3,28 +3,33 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { ApolloServer } from 'apollo-server-express'
-import { createTestClient } from 'apollo-server-testing'
 import gql from 'graphql-tag'
 
 import { categories } from '@constants/categories'
-import databaseContext from '@context/database'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import User from '@db/models/User'
 import { setTrophyBadgeSelected } from '@graphql/queries/setTrophyBadgeSelected'
-import createServer, { getContext } from '@src/server'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
+import type { DecodedUser } from '@src/jwt/decode'
+// import CONFIG from '@src/config'
 
 const categoryIds = ['cat9']
 let user
 let admin
-let authenticatedUser
 
-let query
-let mutate
 let variables
 
 const pubsub = pubsubContext()
+
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser, pubsub })
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 const deleteUserMutation = gql`
   mutation ($id: ID!, $resource: [Deletable]) {
@@ -94,21 +99,13 @@ const resetTrophyBadgesSelected = gql`
   }
 `
 
-const database = databaseContext()
-
-let server: ApolloServer
-
 beforeAll(async () => {
   await cleanDatabase()
-
-  const contextUser = async (_req) => authenticatedUser
-  const context = getContext({ user: contextUser, database, pubsub })
-
-  server = createServer({ context }).server
-
-  const createTestClientResult = createTestClient(server)
-  query = createTestClientResult.query
-  mutate = createTestClientResult.mutate
+  const apolloSetup = createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
@@ -116,6 +113,10 @@ afterAll(async () => {
   void server.stop()
   void database.driver.close()
   database.neode.close()
+})
+
+beforeEach(async () => {
+  authenticatedUser = null
 })
 
 // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
@@ -128,6 +129,11 @@ describe('User', () => {
     let userQuery
 
     beforeEach(async () => {
+      const user = await Factory.build('user', {
+        id: 'user',
+        role: 'user',
+      })
+      authenticatedUser = await user.toJson()
       userQuery = gql`
         query ($email: String) {
           User(email: $email) {
@@ -254,7 +260,7 @@ describe('UpdateUser', () => {
 
     it('is not allowed to change other user accounts', async () => {
       const { errors } = await mutate({ mutation: updateUserMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Not Authorized!')
+      expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
 
@@ -326,7 +332,7 @@ describe('UpdateUser', () => {
         termsAndConditionsAgreedVersion: 'invalid version format',
       }
       const { errors } = await mutate({ mutation: updateUserMutation, variables })
-      expect(errors[0]).toHaveProperty('message', 'Invalid version format!')
+      expect(errors?.[0]).toHaveProperty('message', 'Invalid version format!')
     })
 
     describe('supports updating location', () => {
@@ -684,7 +690,10 @@ describe('emailNotificationSettings', () => {
       it('returns the emailNotificationSettings', async () => {
         authenticatedUser = await user.toJson()
         await expect(
-          query({ query: emailNotificationSettingsQuery, variables: { id: authenticatedUser.id } }),
+          query({
+            query: emailNotificationSettingsQuery,
+            variables: { id: authenticatedUser?.id },
+          }),
         ).resolves.toEqual(
           expect.objectContaining({
             data: {
@@ -778,7 +787,7 @@ describe('emailNotificationSettings', () => {
 
     describe('as self', () => {
       it('updates the emailNotificationSettings', async () => {
-        authenticatedUser = await user.toJson()
+        authenticatedUser = (await user.toJson()) as DecodedUser
         await expect(
           mutate({
             mutation: emailNotificationSettingsMutation,
@@ -876,7 +885,7 @@ describe('save category settings', () => {
 
   describe('not authenticated', () => {
     beforeEach(async () => {
-      authenticatedUser = undefined
+      authenticatedUser = null
     })
 
     it('throws an error', async () => {
@@ -921,7 +930,7 @@ describe('save category settings', () => {
 
         it('returns the active categories when user is queried', async () => {
           await expect(
-            query({ query: userQuery, variables: { id: authenticatedUser.id } }),
+            query({ query: userQuery, variables: { id: authenticatedUser?.id } }),
           ).resolves.toEqual(
             expect.objectContaining({
               data: {
@@ -963,7 +972,7 @@ describe('save category settings', () => {
 
         it('returns the new active categories when user is queried', async () => {
           await expect(
-            query({ query: userQuery, variables: { id: authenticatedUser.id } }),
+            query({ query: userQuery, variables: { id: authenticatedUser?.id } }),
           ).resolves.toEqual(
             expect.objectContaining({
               data: {
@@ -1000,7 +1009,7 @@ describe('updateOnlineStatus', () => {
 
   describe('not authenticated', () => {
     beforeEach(async () => {
-      authenticatedUser = undefined
+      authenticatedUser = null
     })
 
     it('throws an error', async () => {
@@ -1030,7 +1039,7 @@ describe('updateOnlineStatus', () => {
         )
 
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
-        const result = await database.neode.cypher(cypher, { id: authenticatedUser.id })
+        const result = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
         await expect(dbUser.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'online',
@@ -1056,7 +1065,7 @@ describe('updateOnlineStatus', () => {
         )
 
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
-        const result = await database.neode.cypher(cypher, { id: authenticatedUser.id })
+        const result = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser = database.neode.hydrateFirst(result, 'u', database.neode.model('User'))
         await expect(dbUser.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
@@ -1072,7 +1081,7 @@ describe('updateOnlineStatus', () => {
         )
 
         const cypher = 'MATCH (u:User {id: $id}) RETURN u'
-        const result = await database.neode.cypher(cypher, { id: authenticatedUser.id })
+        const result = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser = database.neode.hydrateFirst<typeof User>(
           result,
           'u',
@@ -1091,7 +1100,7 @@ describe('updateOnlineStatus', () => {
           }),
         )
 
-        const result2 = await database.neode.cypher(cypher, { id: authenticatedUser.id })
+        const result2 = await database.neode.cypher(cypher, { id: authenticatedUser?.id })
         const dbUser2 = database.neode.hydrateFirst(result2, 'u', database.neode.model('User'))
         await expect(dbUser2.toJson()).resolves.toMatchObject({
           lastOnlineStatus: 'away',
@@ -1133,7 +1142,7 @@ describe('setTrophyBadgeSelected', () => {
 
   describe('not authenticated', () => {
     beforeEach(async () => {
-      authenticatedUser = undefined
+      authenticatedUser = null
     })
 
     it('throws an error', async () => {
@@ -1515,8 +1524,8 @@ describe('resetTrophyBadgesSelected', () => {
   })
 
   describe('not authenticated', () => {
-    beforeEach(async () => {
-      authenticatedUser = undefined
+    beforeEach(() => {
+      authenticatedUser = null
     })
 
     it('throws an error', async () => {
