@@ -66,8 +66,8 @@ describe('apollo logger', () => {
         },
       })
 
-      expect(loggerSpy).toBeCalledTimes(2)
-      expect(loggerSpy).toBeCalledWith(
+      expect(loggerSpy).toHaveBeenCalledTimes(2)
+      expect(loggerSpy).toHaveBeenCalledWith(
         'Apollo Request',
         expect.any(String),
         '"mutation ($email: String!, $password: String!) {\\n  login(email: $email, password: $password)\\n}\\n"',
@@ -77,9 +77,13 @@ describe('apollo logger', () => {
         }),
       )
 
-      expect(loggerSpy).toBeCalledWith('Apollo Response', expect.any(String), '{"login":"token"}')
+      expect(loggerSpy).toHaveBeenCalledWith(
+        'Apollo Response',
+        expect.any(String),
+        '{"login":"token"}',
+      )
 
-      expect(consoleSpy).toBeCalledTimes(2)
+      expect(consoleSpy).toHaveBeenCalledTimes(2)
     })
   })
 })
