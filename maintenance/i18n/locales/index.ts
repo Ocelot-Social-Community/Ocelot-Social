@@ -1,5 +1,4 @@
 import { enUS, de, nl, fr, es, it, pt, pl, ru } from 'date-fns/locale'
-import find from 'lodash/find'
 
 const locales = [
   {
@@ -68,7 +67,7 @@ const locales = [
 ]
 
 export default locales
-export function getDateFnsLocale({ $i18n }) {
-  const { dateFnsLocale } = find(locales, { code: $i18n.locale() }) || {}
-  return dateFnsLocale || enUS
+
+export function getDateFnsLocale(code: string) {
+  return locales.find(locale => locale.code === code)?.dateFnsLocale ?? enUS
 }

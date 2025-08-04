@@ -40,6 +40,7 @@
   },
   "devDependencies": {
     "@nuxtjs/apollo": "^5.0.0-alpha.14",
+    "@types/lodash": "^4.17.20",
     "rollup-plugin-sourcemaps": "^0.6.3"
   }
 }

@@ -1,31 +1,31 @@
 {
   "actions": {
-    "cancel": "Annuleren",
-    "create": null,
-    "delete": null,
-    "edit": null,
-    "loading": null,
-    "loadMore": null,
-    "save": null,
+    "cancel": "Odwołaj",
+    "create": "Tworzenie",
+    "delete": "Usuń",
+    "edit": "Edycja",
+    "loading": "załadunek",
+    "loadMore": "Obciążenie więcej",
+    "save": "Oszczędzaj",
     "saveCategories": null
   },
   "admin": {
     "categories": {
-      "categoryName": "Naam",
-      "name": "Categorieën",
-      "postCount": "Berichten"
+      "categoryName": "Nazwa",
+      "name": "Kategorie",
+      "postCount": "Stanowiska"
     },
     "dashboard": {
-      "comments": "Opmerkingen",
-      "follows": "Volgt",
-      "invites": "Uitnodigingen",
-      "name": "Dashboard",
-      "notifications": "Meldingen",
-      "organizations": "Organisaties",
-      "posts": "Berichten",
-      "projects": "Projecten",
-      "shouts": "Shouts",
-      "users": "Gebruikers"
+      "comments": "Komentarze",
+      "follows": "Podąża za",
+      "invites": "Zaprasza",
+      "name": "Tablica rozdzielcza",
+      "notifications": "Powiadomienia",
+      "organizations": "Organizacje",
+      "posts": "Stanowiska",
+      "projects": "Projekty",
+      "shouts": "Zalecane",
+      "users": "Użytkownicy"
     },
     "donations": {
       "goal": null,
@@ -48,23 +48,23 @@
     },
     "name": "Admin",
     "notifications": {
-      "name": "Meldingen"
+      "name": "Powiadomienia"
     },
     "organizations": {
-      "name": "Organisaties"
+      "name": "Organizacje"
     },
     "pages": {
-      "name": "Pages"
+      "name": "Strony"
     },
     "settings": {
-      "name": "Instellingen"
+      "name": "Ustawienia"
     },
     "users": {
       "empty": null,
       "form": {
         "placeholder": null
       },
-      "name": "Gebruikers",
+      "name": "Użytkownicy",
       "roleChanged": null,
       "table": {
         "columns": {
@@ -108,43 +108,43 @@
   },
   "comment": {
     "content": {
-      "unavailable-placeholder": null
+      "unavailable-placeholder": " ...ten komentarz nie jest już dostępny."
     },
     "edited": null,
     "menu": {
-      "delete": null,
-      "edit": null
+      "delete": "Usuń komentarz",
+      "edit": "Edytuj komentarz"
     },
     "show": {
-      "less": null,
-      "more": null
+      "less": "Pokaż mniej",
+      "more": "Pokaż więcej"
     }
   },
   "common": {
-    "category": "Categorie ::: Categorieën",
-    "comment": "Opmerking ::: Opmerkingen",
-    "letsTalk": "Laten we praten",
-    "loading": "inlading",
-    "loadMore": "meer laden",
-    "name": "Naam",
-    "organization": "Organisatie ::: Organisaties",
-    "post": "Bericht ::: Berichten",
-    "project": "Project ::: Projecten",
-    "reportContent": "Melden",
-    "shout": "Shout ::: Shouts",
-    "tag": "Tag ::: Tags",
-    "takeAction": "Onderneem actie",
-    "user": "Gebruiker ::: Gebruikers",
+    "category": "Kategoria ::: Kategorie",
+    "comment": "Komentarz ::: Komentarze",
+    "letsTalk": "Porozmawiajmy",
+    "loading": "załadunek",
+    "loadMore": "Obciążenie więcej",
+    "name": "Nazwa",
+    "organization": "Organization ::: Organizations",
+    "post": "Poczta ::: Posty",
+    "project": "Projekt ::: Projekty",
+    "reportContent": "Sprawozdanie",
+    "shout": "przekazanie sprawy ::: Polecam tę stronę",
+    "tag": "Znacznik ::: Znaczniki",
+    "takeAction": "Podejmij działania",
+    "user": "Użytkownik ::: Użytkownicy",
     "validations": {
       "categories": null,
-      "email": null,
+      "email": "musi być ważny adres e-mail.",
       "eventLocationNameLength": null,
       "eventLocationNameNotEmpty": null,
       "eventVenueLength": null,
       "eventVenueNotEmpty": null,
       "url": null
     },
-    "versus": "Versus"
+    "versus": "werset"
   },
   "components": {
     "dateTimeRange": {
@@ -154,17 +154,17 @@
     },
     "password-reset": {
       "change-password": {
-        "error": null,
-        "help": null,
-        "success": null
+        "error": "Zmiana hasła nie powiodła się. Może kod bezpieczeństwa nie był poprawny?",
+        "help": "W przypadku problemów, zachęcamy do zwrócenia się o pomoc, wysyłając do nas wiadomość e-mail:",
+        "success": "Zmiana hasła zakończyła się sukcesem!"
       },
       "request": {
         "form": {
-          "description": null,
-          "submit": null,
-          "submitted": null
+          "description": "Na podany adres e-mail zostanie wysłany email z resetem hasła.",
+          "submit": "Poproś o wiadomość e-mail",
+          "submitted": "Na adres <b>{email}</b> została wysłana wiadomość z dalszymi instrukcjami."
         },
-        "title": null
+        "title": "Zresetuj hasło"
       }
     },
     "registration": {
@@ -198,12 +198,12 @@
         "buttonTitle": null,
         "form": {
           "click-next": null,
-          "description": null,
-          "next": null,
-          "nonce": null,
+          "description": "Otwórz swoją skrzynkę odbiorczą i wpisz kod, który do Ciebie wysłaliśmy.",
+          "next": "Kontynuuj",
+          "nonce": "Wprowadź swój kod",
           "validations": {
             "error": null,
-            "length": null,
+            "length": "musi mieć długość {nonceLength} znaków.",
             "success": null
           }
         },
@@ -247,7 +247,7 @@
     "amount-shouts": null,
     "amount-views": null,
     "categories": {
-      "infoSelectedNoOfMaxCategories": null
+      "infoSelectedNoOfMaxCategories": "{chosen} z {max} wybrane kategorie"
     },
     "category": {
       "description": {
@@ -300,7 +300,7 @@
       "happy": null,
       "surprised": null
     },
-    "filterFollow": null,
+    "filterFollow": "Pokaż wpisy użytkowników, których śledzę",
     "filterMasonryGrid": {
       "myFriends": null,
       "myGroups": null,
@@ -311,57 +311,57 @@
     },
     "filterMyGroups": null,
     "inappropriatePicture": null,
-    "languageSelectLabel": null,
+    "languageSelectLabel": "Język",
     "languageSelectText": null,
     "newEvent": null,
-    "newPost": null,
-    "success": null,
+    "newPost": "Utwórz nowy wpis",
+    "success": "Zapisano!",
     "teaserImage": {
       "cropImage": null,
-      "cropperConfirm": "Bevestigen",
+      "cropperConfirm": "Potwierdzać",
       "errors": {
         "aspect-ratio-too-small": null,
         "unSupported-file-format": null
       },
-      "supportedFormats": "Voeg een afbeelding in met het bestandsformaat JPG, PNG of GIF!"
+      "supportedFormats": "Wstaw zdjęcie w formacie pliku JPG, PNG lub GIF!"
     },
     "title": null,
     "visibleOnlyForMembersOfGroup": null
   },
   "delete": {
-    "cancel": null,
+    "cancel": "Odwołaj",
     "comment": {
-      "message": null,
+      "message": "Czy na pewno chcesz ukryć komentarz użytkownika \" <b> {name} </b> \"?",
       "success": null,
-      "title": null,
-      "type": null
+      "title": "Usuń komentarz",
+      "type": "Komentarz"
     },
     "contribution": {
-      "message": null,
-      "success": null,
-      "title": null,
-      "type": null
+      "message": "Czy na pewno chcesz ukryć wpis \" <b> {name} </b> \"?",
+      "success": "Wyślij pomyślnie usunięty!",
+      "title": "Ukryj wpis",
+      "type": "Wpis / Post"
     },
-    "submit": null
+    "submit": "Usuń"
   },
   "disable": {
-    "cancel": null,
+    "cancel": "Anuluj",
     "comment": {
-      "message": "Wilt u de reactie van \" <b> {name} </b> \" echt uitschakelen ?",
-      "title": "Commentaar uitschakelen",
-      "type": "Melding"
+      "message": "Naprawdę chcesz wyłączyć komentarz \"<b>{name}</b>\"?",
+      "title": "Wyłącz komentarz",
+      "type": "Komentarz"
     },
     "contribution": {
-      "message": null,
-      "title": null,
-      "type": null
+      "message": "Naprawdę chcesz unieszkodliwić ten wkład \"<b>{name}</b>\"?",
+      "title": "Wyłącz Wkład",
+      "type": "Wkład"
     },
-    "submit": null,
-    "success": null,
+    "submit": "Deaktywuj",
+    "success": "Zdeaktywowano",
     "user": {
-      "message": null,
-      "title": null,
-      "type": null
+      "message": "Czy naprawdę chcesz wyłączyć użytkownika  \"<b>{name}</b>\"?",
+      "title": "Wyłączenie użytkownika",
+      "type": "Użytkownik"
     }
   },
   "donations": {
@@ -397,7 +397,7 @@
     "mention": {
       "noUsersFound": null
     },
-    "placeholder": null
+    "placeholder": "Napisz coś inspirującego..."
   },
   "error-pages": {
     "403-default": null,
@@ -463,8 +463,8 @@
     "startDate": null
   },
   "followButton": {
-    "follow": "Volgen",
-    "following": "Volgt"
+    "follow": "naśladować",
+    "following": "w skutek"
   },
   "group": {
     "actionRadii": {
@@ -570,30 +570,30 @@
   "hashtags-filter": {
     "clearSearch": null,
     "hashtag-search": null,
-    "title": null
+    "title": "Twoja bańka filtrująca"
   },
   "header": {
     "avatarMenu": {
       "button": {
         "tooltip": null
       },
-      "chats": "Chats",
-      "groups": "Groepen",
+      "chats": "Czaty",
+      "groups": "Grupy",
       "map": null,
       "myProfile": null,
-      "notifications": "Notificaties"
+      "notifications": "Powiadomienia"
     },
     "chats": {
-      "tooltip": "Chats"
+      "tooltip": "Czaty"
     },
     "groups": {
-      "tooltip": "Groepen"
+      "tooltip": "Grupy"
     },
     "map": {
       "tooltip": null
     },
     "notifications": {
-      "tooltip": "Notificaties"
+      "tooltip": "Powiadomienia"
     }
   },
   "index": {
@@ -613,17 +613,17 @@
     "tooltip": null
   },
   "login": {
-    "email": "Uw E-mail",
+    "email": "Twój adres e-mail",
     "failure": null,
-    "forgotPassword": null,
-    "hello": "Hallo",
-    "login": "Inloggen",
-    "logout": "Uitloggen",
-    "moreInfo": "Wat is {APPLICATION_NAME}?",
-    "moreInfoHint": null,
+    "forgotPassword": "Zapomniałeś hasła?",
+    "hello": "Cześć",
+    "login": "Logowanie",
+    "logout": "Wyloguj się",
+    "moreInfo": "Co to jest {APPLICATION_NAME}?",
+    "moreInfoHint": "idź po więcej szczegółów",
     "no-account": null,
     "no-cookie": null,
-    "password": "Uw Wachtwoord",
+    "password": "Twoje hasło",
     "register": null,
     "success": null
   },
@@ -660,7 +660,7 @@
     }
   },
   "moderation": {
-    "name": null,
+    "name": "Umiarkowanie",
     "reports": {
       "author": null,
       "content": null,
@@ -704,8 +704,8 @@
       "DecisionSuccess": null,
       "disabled": null,
       "disabledAt": null,
-      "disabledBy": null,
-      "empty": null,
+      "disabledBy": "deaktywowane przez",
+      "empty": "Gratulacje, moderacja nie jest potrzebna",
       "enabled": null,
       "enabledAt": null,
       "enabledBy": null,
@@ -716,7 +716,7 @@
         "unreviewed": null
       },
       "moreDetails": null,
-      "name": null,
+      "name": "Raporty",
       "noDecision": null,
       "numberOfUsers": null,
       "previousDecision": null,
@@ -724,7 +724,7 @@
       "reasonDescription": null,
       "reportedOn": null,
       "status": null,
-      "submitter": null
+      "submitter": "zgłoszone przez"
     }
   },
   "notifications": {
@@ -737,8 +737,8 @@
       "unread": null
     },
     "group": null,
-    "markAllAsRead": "Markeer alles als gelezen",
-    "pageLink": "Alle notificaties",
+    "markAllAsRead": "Oznacz wszystkie jako przeczytane",
+    "pageLink": "Wszystkie powiadomienia",
     "post": null,
     "reason": {
       "changed_group_member_role": null,
@@ -760,8 +760,8 @@
   "post": {
     "comment": {
       "reply": null,
-      "submit": null,
-      "submitted": null,
+      "submit": "Komentarz",
+      "submitted": "Komentarz dodany",
       "updated": null
     },
     "createNewEvent": {
@@ -786,8 +786,8 @@
     },
     "event": null,
     "menu": {
-      "delete": null,
-      "edit": null,
+      "delete": "Usuń wpis",
+      "edit": "Edytuj wpis",
       "observe": null,
       "observedSuccessfully": null,
       "pin": null,
@@ -797,10 +797,10 @@
       "unpin": null,
       "unpinnedSuccessfully": null
     },
-    "name": "Post",
+    "name": "Poczta",
     "pinned": null,
     "takeAction": {
-      "name": "Onderneem actie"
+      "name": "Podejmij działanie"
     },
     "viewEvent": {
       "eventEnd": null,
@@ -819,72 +819,72 @@
   },
   "profile": {
     "avatar": {
-      "submitted": null
+      "submitted": "Przesłano pomyślnie"
     },
-    "commented": null,
-    "follow": "Volgen",
-    "followers": "Volgelingen",
-    "following": "Volgt",
+    "commented": "Skomentuj",
+    "follow": "Obserwuj",
+    "followers": "Obserwujący",
+    "following": "Obserwowani",
     "invites": {
       "description": null,
       "emailPlaceholder": null,
       "title": null
     },
-    "memberSince": "Lid sinds",
+    "memberSince": "Członek od",
     "network": {
       "andMore": null,
-      "followedBy": null,
-      "followedByNobody": null,
-      "following": null,
-      "followingNobody": null,
-      "title": null
+      "followedBy": "jest obserwowany:",
+      "followedByNobody": "nikt go nie obserwuje.",
+      "following": "obserwuje:",
+      "followingNobody": "nikogo nie obserwuje.",
+      "title": "Sieć"
     },
-    "shouted": null,
-    "socialMedia": null,
-    "userAnonym": null
+    "shouted": "Krzyknij",
+    "socialMedia": "Gdzie jeszcze mogę znaleźć",
+    "userAnonym": "Anonymous"
   },
   "quotes": {
     "african": {
-      "author": "Afrikaans spreekwoord",
-      "quote": "Veel kleine mensen op veel kleine plaatsen doen veel kleine dingen, die het gezicht van de wereld kunnen veranderen."
+      "author": "Afrykańskie przysłowie",
+      "quote": "Wielu małych ludzi w wielu małych miejscowościach robi wiele małych rzeczy, które mogą zmienić oblicze świata."
     }
   },
   "release": {
-    "cancel": null,
+    "cancel": "Anuluj",
     "comment": {
       "error": null,
-      "message": null,
-      "title": null,
-      "type": null
+      "message": "Czy na pewno chcesz zgłosić komentarz użytkownika \"<b> {name} </b>\"?",
+      "title": "Zgłoś komentarz",
+      "type": "Komentarz"
     },
     "contribution": {
       "error": null,
-      "message": null,
-      "title": null,
-      "type": null
+      "message": "Czy na pewno chcesz zgłosić wpis użytkownika \"<b> {name} </b>\"?",
+      "title": "Zgłoś wpis",
+      "type": "Wpis"
     },
-    "submit": null,
-    "success": null,
+    "submit": "Zgłoś",
+    "success": "Zgłoszono pomyślnie!",
     "user": {
       "error": null,
-      "message": null,
-      "title": null,
-      "type": null
+      "message": "Czy na pewno chcesz zgłosić użytkownika \"<b> {name} </b>\"?",
+      "title": "Zgłoś użytkownika",
+      "type": "Użytkownik"
     }
   },
   "report": {
-    "cancel": "Annuleren",
+    "cancel": "Anuluj",
     "comment": {
-      "error": null,
-      "message": "Wilt u echt het commentaar van \"<b>{name}</b>\" melden?",
-      "title": "Reactie melden",
-      "type": "Melding"
+      "error": "Zgłosiłeś już komentarz!",
+      "message": "Czy na pewno chcesz zgłosić komentarz użytkownika\" <b> {name} </b> \"?",
+      "title": "Sprawozdanie Komentarz",
+      "type": "Komentarz"
     },
     "contribution": {
-      "error": null,
-      "message": "Wilt u echt het commentaar van \"<b>{name}</b>\" melden?",
-      "title": "Bijdrage melden",
-      "type": "Bijdrage"
+      "error": "Zgłosiłeś już ten wkład!",
+      "message": "Czy na pewno chcesz zgłosić ten wpis użytkownika \" <b> {name} </b> \"?",
+      "title": "Zgłoś wpis",
+      "type": "Wpis / Post"
     },
     "reason": {
       "category": {
@@ -907,17 +907,17 @@
         "placeholder": null
       }
     },
-    "submit": "Verzenden",
-    "success": null,
+    "submit": "Wyślij raport",
+    "success": "Dziękujemy za Twoje zgłoszenie!",
     "user": {
-      "error": null,
-      "message": "Wilt u echt het commentaar van \"<b>{name}</b>\" melden?",
-      "title": "Gebruiker melden",
-      "type": "Gebruiker"
+      "error": "Zgłosiłeś już użytkownika!",
+      "message": "Czy na pewno chcesz zgłosić użytkownika \" <b> {name} </b> \"?",
+      "title": "Raport Użytkownik",
+      "type": "Użytkownik"
     }
   },
   "search": {
-    "failed": "Niets gevonden",
+    "failed": "Niczego nie znaleziono",
     "for": null,
     "heading": {
       "Group": null,
@@ -925,10 +925,10 @@
       "Tag": null,
       "User": null
     },
-    "hint": "Waar zoekt u naar? Gebruik !... voor berichten, @... voor gebruikers, #... voor hashtags.",
+    "hint": "Czego szukasz? Użyj !... dla postów, {'@'}... dla użytkowników, #... dla hashtagów.",
     "no-results": null,
     "page": null,
-    "placeholder": "Zoeken",
+    "placeholder": "Szukaj",
     "results": null,
     "title": null
   },
@@ -956,32 +956,32 @@
       "unblocked": null
     },
     "data": {
-      "labelBio": null,
-      "labelCity": null,
+      "labelBio": "O Tobie",
+      "labelCity": "Twoje miasto lub region",
       "labelCityHint": null,
-      "labelName": null,
+      "labelName": "Twoje dane",
       "labelSlug": null,
-      "name": "Uw gegevens",
-      "namePlaceholder": null,
-      "success": null
+      "name": "Twoje dane",
+      "namePlaceholder": "Anonymous",
+      "success": "Twoje dane zostały pomyślnie zaktualizowane!"
     },
     "deleteUserAccount": {
-      "accountDescription": null,
-      "accountWarning": null,
+      "accountDescription": "Be aware that your Post and Comments are important to our community. If you still choose to delete them, you have to mark them below.",
+      "accountWarning": "Po usunięcie Twojego konta, nie możesz ZARZĄDZAĆ ani ODZYSKAĆ danych, wpisów oraz komentarzy!",
       "accountWarningAdmin": null,
       "accountWarningIsAdmin": null,
-      "commentedCount": null,
+      "commentedCount": "Usuń {count} moich komentarzy",
       "confirmDeleting": null,
-      "contributionsCount": null,
+      "contributionsCount": "Usuń {count} moich postów",
       "infoAdmin": null,
-      "name": null,
-      "pleaseConfirm": null,
-      "success": null
+      "name": "Usuń dane",
+      "pleaseConfirm": "Uwaga, niebezpieczeństwo! Wpisz „{confirm}”, aby potwierdzić.",
+      "success": "Konto zostało usunięte"
     },
     "download": {
       "description": null,
       "json": null,
-      "name": "Gegevens downloaden"
+      "name": "Pobierz dane"
     },
     "email": {
       "change-successful": null,
@@ -1021,10 +1021,10 @@
       }
     },
     "invites": {
-      "name": "Uitnodigingen"
+      "name": "Zaproszenia"
     },
     "languages": {
-      "name": "Talen"
+      "name": "Języki"
     },
     "muted-users": {
       "columns": {
@@ -1044,29 +1044,29 @@
       "unmute": null,
       "unmuted": null
     },
-    "name": "Instellingen",
+    "name": "Ustawienia",
     "notifications": {
       "chat": "Chat",
-      "chatMessage": "Bericht ontvangen tijdens afwezigheid",
-      "checkAll": "Vink alles aan",
-      "commentOnObservedPost": "Geef commentaar op een bijdrage die ik volg",
+      "chatMessage": "Wiadomość otrzymana podczas nieobecności",
+      "checkAll": "Wybierz wszystko",
+      "commentOnObservedPost": "Skomentuj wpis, który obserwuję",
       "followingUsers": null,
-      "group": "Groepen",
-      "groupMemberJoined": "Een nieuw lid is lid geworden van een groep van mij",
-      "groupMemberLeft": "Een lid heeft een groep van mij verlaten",
-      "groupMemberRemoved": "Ik ben verwijderd uit een groep",
-      "groupMemberRoleChanged": "Mijn rol in een groep is veranderd",
-      "mention": "Genoemd in een bijdrage",
-      "name": "Email Meldingen",
-      "post": "Berichten en reacties",
-      "postByFollowedUser": "Berichten van gebruikers die ik volg",
-      "postInGroup": "Bericht in een groep waar ik lid van ben",
-      "send-email-notifications": "E-mailmeldingen verzenden",
-      "success-update": "Meldingsinstellingen opgeslagen! ",
-      "uncheckAll": "Vink alles uit"
+      "group": "Grupy",
+      "groupMemberJoined": "Nowy członek dołączył do mojej grupy",
+      "groupMemberLeft": "Członek opuścił moją grupę",
+      "groupMemberRemoved": "Zostałem usunięty z grupy",
+      "groupMemberRoleChanged": "Moja rola w grupie uległa zmianie",
+      "mention": "Mentioned in a contribution",
+      "name": "Powiadomienia e-mail",
+      "post": "Posty",
+      "postByFollowedUser": "Posty użytkowników, których obserwuję",
+      "postInGroup": "Posty w grupie, której jestem członkiem",
+      "send-email-notifications": "Wyślij powiadomienia e-mail",
+      "success-update": "Ustawienia powiadomień zapisane! ",
+      "uncheckAll": "Odznacz wszystko"
     },
     "organizations": {
-      "name": "Mijn Organisaties"
+      "name": "My Organizations"
     },
     "privacy": {
       "make-shouts-public": null,
@@ -1075,23 +1075,23 @@
     },
     "security": {
       "change-password": {
-        "button": null,
-        "label-new-password": null,
-        "label-new-password-confirm": null,
-        "label-old-password": null,
-        "message-new-password-confirm-required": null,
-        "message-new-password-missmatch": null,
-        "message-new-password-required": null,
-        "message-old-password-required": null,
-        "passwordSecurity": null,
-        "passwordStrength0": null,
-        "passwordStrength1": null,
-        "passwordStrength2": null,
-        "passwordStrength3": null,
-        "passwordStrength4": null,
-        "success": null
+        "button": "Zmień hasło",
+        "label-new-password": "Nowe hasło",
+        "label-new-password-confirm": "Potwierdź nowe hasło",
+        "label-old-password": "Stare hasło",
+        "message-new-password-confirm-required": "Potwierdź nowe hasło",
+        "message-new-password-missmatch": "Wpisz to samo hasło ponownie",
+        "message-new-password-required": "Wprowadź nowe hasło",
+        "message-old-password-required": "Podaj stare hasło",
+        "passwordSecurity": "Siła hasła",
+        "passwordStrength0": "Hasło bardzo słabe",
+        "passwordStrength1": "Hasło słabe",
+        "passwordStrength2": "Hasło średnie",
+        "passwordStrength3": "Hasło silne",
+        "passwordStrength4": "Hasło bardzo silne",
+        "success": "Hasło zostało zmienione!"
       },
-      "name": "Veiligheid"
+      "name": "Bezpieczeństwo"
     },
     "social-media": {
       "add-new-link": null,
@@ -1101,12 +1101,12 @@
         "title": null
       },
       "edit-link": null,
-      "name": null,
-      "placeholder": null,
+      "name": "Media społecznościowe",
+      "placeholder": "Dodaj link do mediów społecznościowych",
       "requireUnique": null,
-      "submit": null,
-      "successAdd": null,
-      "successDelete": null
+      "submit": "Dodaj link",
+      "successAdd": "Dodano społeczność. Profil zaktualizowany!",
+      "successDelete": "Usunięto społeczność. Profil zaktualizowany!"
     },
     "validation": {
       "slug": {
@@ -1116,21 +1116,21 @@
     }
   },
   "shoutButton": {
-    "shouted": "uitgeroepen"
+    "shouted": "krzyczeć"
   },
   "site": {
     "back-to-login": null,
-    "bank": "bankrekening",
+    "bank": "rachunek bankowy",
     "code-of-conduct": null,
-    "contact": "contact",
-    "data-privacy": "gegevensbescherming",
+    "contact": "Kontakt",
+    "data-privacy": "ochrona danych",
     "donate": null,
     "error-occurred": null,
     "faq": null,
-    "germany": "Duitsland",
-    "imprint": "Afdruk",
-    "made": "Met ❤️ gemaakt",
-    "register": "inschrijfnummer",
+    "germany": "Niemcy",
+    "imprint": "Nadruk",
+    "made": "Z ❤️ zrobiony",
+    "register": "numer rejestracyjny",
     "support": null,
     "termsAndConditions": null,
     "thanks": null

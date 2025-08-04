@@ -28,7 +28,9 @@
     </transition>
   </template>
 
-  <script setup>
+  <script setup lang="ts">
+  // TODO add blank layout
+  // TODO refactor back to maintenance.vue
   import emails from '~/constants/emails'
   import metadata from '~/constants/metadata'
 

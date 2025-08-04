@@ -1,6 +1,7 @@
 import { resolve } from "path";
 import sourcemaps from "rollup-plugin-sourcemaps";
-import viteTsConfigPaths from 'vite-tsconfig-paths';
+import viteTsConfigPaths from "vite-tsconfig-paths";
+import locales from "./i18n/locales";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -26,16 +27,31 @@ export default defineNuxtConfig({
     },
   },
 
+  i18n: {
+    locales: locales.map((locale: typeof locales[0]) => ({
+      code: locale.code,
+      language: locale.name,
+      file: `${locale.code}.json`,
+    })),
+    defaultLocale: "en",
+    compilation: {
+      strictMessage: false,
+    },
+    bundle: {
+      optimizeTranslationDirective: false,
+    }
+  },
+
   vite: {
     plugins: [viteTsConfigPaths()],
     resolve: {
-    alias: {
-      '@@': resolve(__dirname, './lib/styleguide'),
-    }
-  },
+      alias: {
+        "@@": resolve(__dirname, "./lib/styleguide"),
+      },
+    },
     build: {
       rollupOptions: {
-        plugins: [sourcemaps, ],
+        plugins: [sourcemaps],
         output: {
           sourcemap: true,
         },

@@ -925,7 +925,7 @@
       "Tag": null,
       "User": null
     },
-    "hint": "O que você está buscando? Use !... para postagens, @... para usuários, #... para hashtags.",
+    "hint": "O que você está buscando? Use !... para postagens, {'@'}... para usuários, #... para hashtags.",
     "no-results": null,
     "page": null,
     "placeholder": "Buscar",
