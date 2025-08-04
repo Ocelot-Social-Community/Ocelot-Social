@@ -554,6 +554,40 @@ describe('Delete a User as admin', () => {
           await expect(database.neode.all('SocialMedia')).resolves.toHaveLength(0)
         })
       })
+
+      describe('connected follow relations', () => {
+        beforeEach(async () => {
+          const userIFollow = await Factory.build('user', {
+            name: 'User I Follow',
+            about: 'I follow this user',
+            id: 'uifollow',
+          })
+
+          const userFollowingMe = await Factory.build('user', {
+            name: 'User Following Me',
+            about: 'This user follows me',
+            id: 'ufollowsme',
+          })
+          await user.relateTo(userIFollow, 'following')
+          await userFollowingMe.relateTo(user, 'following')
+        })
+
+        it('will be removed completely', async () => {
+          const relation = await database.neode.cypher(
+            'MATCH (user:User {id: $id})-[relationship:FOLLOWS]-(:User) RETURN relationship',
+            { id: (await user.toJson()).id },
+          )
+          const relations = relation.records.map((record) => record.get('relationship'))
+          expect(relations).toHaveLength(2)
+          await mutate({ mutation: deleteUserMutation, variables })
+          const relation2 = await database.neode.cypher(
+            'MATCH (user:User {id: $id})-[relationship:FOLLOWS]-(:User) RETURN relationship',
+            { id: (await user.toJson()).id },
+          )
+          const relations2 = relation2.records.map((record) => record.get('relationship'))
+          expect(relations2).toHaveLength(0)
+        })
+      })
     })
   })
 })
