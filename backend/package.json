@@ -106,7 +106,7 @@
     "@typescript-eslint/parser": "^5.62.0",
     "apollo-server-testing": "~2.11.0",
     "eslint": "^8.57.1",
-    "eslint-config-prettier": "^10.1.5",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-config-standard": "^17.1.0",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
