@@ -6,6 +6,7 @@ type IsUnique = (slug: string) => Promise<boolean>
 export default async function uniqueSlug(str: string, isUnique: IsUnique) {
   const slug = slugify(str || 'anonymous', {
     lower: true,
+    remove: /[*+~.()'"!:@]/g,
   })
   if (await isUnique(slug)) return slug
 
