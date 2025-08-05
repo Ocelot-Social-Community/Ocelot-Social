@@ -7665,10 +7665,10 @@ slimsearch@^2.1.1:
   resolved "https://registry.npmjs.org/slimsearch/-/slimsearch-2.1.1.tgz"
   integrity sha512-l1utJWal8F/RIheYk88DE2+enI12nIrn5SHt4ih/CNAH81PzkTv2GVBODlLynDJb7xan5hjd8XTL5f0L4cxLQA==
 
-slug@^10.0.0:
-  version "10.0.0"
-  resolved "https://registry.npmjs.org/slug/-/slug-10.0.0.tgz"
-  integrity sha512-M8s2PWOUeSCdD4S1NH5lCzXg2zFV1fozrtfr0FSKl65x+EF1rUowj+/vyFlnHgxPxWzT+DL0VXKfYc1DHJoymg==
+slugify@^1.6.6:
+  version "1.6.6"
+  resolved "https://registry.yarnpkg.com/slugify/-/slugify-1.6.6.tgz#2d4ac0eacb47add6af9e04d3be79319cbcc7924b"
+  integrity sha512-h+z7HKHYXj6wJU+AnS/+IH8Uh9fdcX1Lrhg1/VMdf9PwoBQXFcXiAdsy2tSK0P6gKwJLXp02r90ahUCqHk9rrw==
 
 source-map-js@^1.2.0, source-map-js@^1.2.1:
   version "1.2.1"
