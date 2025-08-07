@@ -33,8 +33,8 @@
     "release": "./scripts/release.sh"
   },
   "devDependencies": {
-    "@babel/core": "^7.27.1",
-    "@babel/preset-env": "^7.27.1",
+    "@babel/core": "^7.28.0",
+    "@babel/preset-env": "^7.28.0",
     "@babel/register": "^7.27.1",
     "@badeball/cypress-cucumber-preprocessor": "^22.2.0",
     "@cucumber/cucumber": "12.1.0",
@@ -55,7 +55,7 @@
     "neo4j-driver": "^4.3.4",
     "neode": "^0.4.8",
     "rosie": "^2.1.0",
-    "slug": "^10.0.0"
+    "slugify": "^1.6.6"
   },
   "optionalDependencies": {
     "@vuepress/bundler-vite": "^2.0.0-rc.18",

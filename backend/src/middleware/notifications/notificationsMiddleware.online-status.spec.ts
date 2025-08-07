@@ -105,7 +105,7 @@ describe('online status and sending emails', () => {
       })
 
       it('sends NO email to the other user', () => {
-        expect(sendNotificationMailMock).not.toBeCalled()
+        expect(sendNotificationMailMock).not.toHaveBeenCalled()
       })
     })
   })
@@ -131,7 +131,7 @@ describe('online status and sending emails', () => {
       })
 
       it('sends email to the other user', () => {
-        expect(sendNotificationMailMock).toBeCalledTimes(1)
+        expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
       })
     })
   })
