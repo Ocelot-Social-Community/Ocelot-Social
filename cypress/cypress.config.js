@@ -27,7 +27,7 @@ async function setupNodeEvents(on, config) {
     })
   );
 
-  /* on('task', {
+  on('task', {
     pushValue({ name, value }) {
       testStore[name] = value
       return true
@@ -36,7 +36,7 @@ async function setupNodeEvents(on, config) {
       console.log('getValue',name,testStore)
       return testStore[name]
     },
-  }); */
+  });
   
   return config;
 }
