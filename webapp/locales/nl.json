@@ -160,6 +160,7 @@
   "common": {
     "category": "Categorie ::: Categorieën",
     "comment": "Opmerking ::: Opmerkingen",
+    "filter": null,
     "letsTalk": "Laten we praten",
     "loading": "inlading",
     "loadMore": "meer laden",
