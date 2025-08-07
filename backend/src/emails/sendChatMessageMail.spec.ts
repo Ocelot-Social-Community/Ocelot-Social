@@ -69,6 +69,7 @@ describe('sendChatMessageMail', () => {
           email: 'user@example.org',
           senderUser,
           recipientUser,
+          roomId: 'room123',
         }),
       ).resolves.toMatchSnapshot()
     })
@@ -85,6 +86,7 @@ describe('sendChatMessageMail', () => {
           email: 'user@example.org',
           senderUser,
           recipientUser,
+          roomId: 'room123',
         }),
       ).resolves.toMatchSnapshot()
     })

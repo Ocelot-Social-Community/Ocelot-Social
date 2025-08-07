@@ -159,12 +159,13 @@ export interface ChatMessageEmailInput {
   senderUser: UserDbProperties
   recipientUser: UserDbProperties
   email: string
+  roomId: string
 }
 
 export const sendChatMessageMail = async (
   data: ChatMessageEmailInput,
 ): Promise<OriginalMessage> => {
-  const { senderUser, recipientUser } = data
+  const { senderUser, recipientUser, roomId } = data
   const to = data.email
   try {
     const { originalMessage } = await email.send({
@@ -178,7 +179,7 @@ export const sendChatMessageMail = async (
         name: recipientUser.name,
         chattingUser: senderUser.name,
         chattingUserUrl: new URL(`/profile/${senderUser.id}/${senderUser.slug}`, CONFIG.CLIENT_URI),
-        chatUrl: new URL('/chat', CONFIG.CLIENT_URI),
+        chatUrl: new URL(`/chat/${roomId}`, CONFIG.CLIENT_URI),
       },
     })
     return originalMessage as OriginalMessage

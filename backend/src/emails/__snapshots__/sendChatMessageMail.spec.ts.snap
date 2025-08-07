@@ -92,7 +92,7 @@ footer {
       <div class="wrapper">
         <div class="content"></div>
         <p>you have received a new chat message from <a class="user" href="http://webapp:3000/profile/chatSender/chatsender">chatSender</a>.
-        </p><a class="button" href="http://webapp:3000/chat">Show Chat</a>
+        </p><a class="button" href="http://webapp:3000/chat/room123">Show Chat</a>
         <div class="text-block">
           <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– The ocelot.social Team</p><br>
@@ -114,7 +114,7 @@ footer {
 you have received a new chat message from chatSender
 [http://webapp:3000/profile/chatSender/chatsender].
 
-Show Chat [http://webapp:3000/chat]
+Show Chat [http://webapp:3000/chat/room123]
 
 See you soon on ocelot.social [https://ocelot.social]!
 
@@ -225,7 +225,7 @@ footer {
       <div class="wrapper">
         <div class="content"></div>
         <p>du hast eine neue Chat-Nachricht von <a class="user" href="http://webapp:3000/profile/chatSender/chatsender">chatSender</a> erhalten.
-        </p><a class="button" href="http://webapp:3000/chat">Chat anzeigen</a>
+        </p><a class="button" href="http://webapp:3000/chat/room123">Chat anzeigen</a>
         <div class="text-block">
           <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
           <p>– Dein ocelot.social Team</p><br>
@@ -247,7 +247,7 @@ footer {
 du hast eine neue Chat-Nachricht von chatSender
 [http://webapp:3000/profile/chatSender/chatsender] erhalten.
 
-Chat anzeigen [http://webapp:3000/chat]
+Chat anzeigen [http://webapp:3000/chat/room123]
 
 Bis bald bei ocelot.social [https://ocelot.social]!
 
