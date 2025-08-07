@@ -280,6 +280,9 @@ export default {
               WITH user
               OPTIONAL MATCH (user)<-[:OWNED_BY]-(socialMedia:SocialMedia)
               DETACH DELETE socialMedia
+              WITH user
+              OPTIONAL MATCH (user)-[follow:FOLLOWS]-(:User)
+              DELETE follow
               RETURN user {.*}
             `,
           { userId },
