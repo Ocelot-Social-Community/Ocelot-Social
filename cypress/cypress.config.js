@@ -1,22 +1,30 @@
 const dotenv = require('dotenv')
 const { defineConfig } = require('cypress');
-const browserify = require('@cypress/browserify-preprocessor');
+const createBundler = require("@bahmutov/cypress-esbuild-preprocessor");
 const {
   addCucumberPreprocessorPlugin,
 } = require('@badeball/cypress-cucumber-preprocessor');
 const {
-  preprendTransformerToOptions,
-} = require('@badeball/cypress-cucumber-preprocessor/browserify');
+  createEsbuildPlugin,
+} = require("@badeball/cypress-cucumber-preprocessor/esbuild");
 
 // Test persistent(between commands) store
 const testStore = {}
 
 async function setupNodeEvents(on, config) {
+  // This is required for the preprocessor to be able to generate JSON reports after each run, and more,
   await addCucumberPreprocessorPlugin(on, config);
 
+  const bundler = createBundler({
+      plugins: [createEsbuildPlugin(config)],
+  })
+
   on(
-    'file:preprocessor',
-    browserify(preprendTransformerToOptions(config, browserify.defaultOptions)),
+    "file:preprocessor",
+    createBundler({
+      plugins: [createEsbuildPlugin(config)],
+      platform: 'node',
+    })
   );
 
   on('task', {

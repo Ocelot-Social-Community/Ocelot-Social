@@ -87,7 +87,7 @@
     "slugify": "^1.6.6",
     "trunc-html": "~1.1.2",
     "tslog": "^4.9.3",
-    "uuid": "~9.0.1",
+    "uuid": "~11.1.0",
     "validator": "^13.15.15",
     "xregexp": "^5.1.2"
   },
@@ -101,7 +101,7 @@
     "@types/node": "^24.1.0",
     "@types/request": "^2.48.13",
     "@types/slug": "^5.0.9",
-    "@types/uuid": "~9.0.1",
+    "@types/uuid": "~10.0.0",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "apollo-server-testing": "~2.11.0",
