@@ -61,42 +61,34 @@ describe('ProfileAvatar', () => {
       })
     })
 
-    describe('with a relative avatar url', () => {
+    describe('with an avatar', () => {
       beforeEach(() => {
         propsData = {
           profile: {
             name: 'Not Anonymous',
             avatar: {
-              url: '/avatar.jpg',
+              url: 'http://localhost:8000//avatar.jpg',
+              w320: 'http://localhost:8000//avatars/avatar-w320.jpg',
+              w640: 'http://localhost:8000//avatars/avatar-w640.jpg',
+              w1024: 'http://localhost:8000//avatars/avatar-w1024.jpg',
             },
           },
         }
         wrapper = Wrapper()
       })
 
-      it('adds a prefix to load the image from the uploads service', () => {
-        expect(wrapper.find('.image').attributes('src')).toBe('/api/avatar.jpg')
-      })
-    })
-
-    describe('with an absolute avatar url', () => {
-      beforeEach(() => {
-        propsData = {
-          profile: {
-            name: 'Not Anonymous',
-            avatar: {
-              url: 'https://s3.amazonaws.com/uifaces/faces/twitter/sawalazar/128.jpg',
-            },
-          },
-        }
-        wrapper = Wrapper()
+      it('puts the original url in `src` attribute', () => {
+        expect(wrapper.find('.image').attributes('src')).toBe('http://localhost:8000//avatar.jpg')
       })
 
-      it('keeps the avatar URL as is', () => {
-        // e.g. our seeds have absolute image URLs
-        expect(wrapper.find('.image').attributes('src')).toBe(
-          'https://s3.amazonaws.com/uifaces/faces/twitter/sawalazar/128.jpg',
+      it('puts various sizes of the image in `srcset` attribute', () => {
+        expect(wrapper.find('.image').attributes('srcset')).toBe(
+          'http://localhost:8000//avatars/avatar-w320.jpg 320w, http://localhost:8000//avatars/avatar-w640.jpg 640w, http://localhost:8000//avatars/avatar-w1024.jpg 1024w',
         )
+      })
+
+      it('but because the avatar is so small, it will always ask the browser to render w320 size', () => {
+        expect(wrapper.find('.image').attributes('sizes')).toBe('320px')
       })
     })
   })

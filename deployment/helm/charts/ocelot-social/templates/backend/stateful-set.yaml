@@ -20,6 +20,9 @@ spec:
           imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
           command: ["/bin/sh", "-c", "yarn prod:migrate init && yarn prod:migrate up"]
           {{- include "resources" .Values.backend.resources | indent 10 }}
+          env:
+          - name: IMAGOR_PUBLIC_URL
+            value: "https://{{ .Values.domain }}/imagor"
           envFrom:
           - configMapRef:
               name: {{ .Release.Name }}-backend-env
@@ -38,6 +41,8 @@ spec:
             value: "http://{{ .Release.Name }}-backend:4000"
           - name: CLIENT_URI
             value: "https://{{ .Values.domain }}"
+          - name: IMAGOR_PUBLIC_URL
+            value: "https://{{ .Values.domain }}/imagor"
           envFrom:
           - configMapRef:
               name: {{ .Release.Name }}-backend-env

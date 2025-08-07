@@ -8,12 +8,13 @@
       :class="{ selectable: selectionMode && index > 0, selected: selectedIndex === index }"
       @click="handleBadgeClick(index)"
     >
-      <img :title="badge.description" :src="badge.icon | proxyApiUrl" class="hc-badge" />
+      <img :title="badge.description" :src="backendPath(badge.icon)" class="hc-badge" />
     </component>
   </div>
 </template>
 
 <script>
+import { backendPath } from '~/helpers/backendPath'
 export default {
   name: 'Badges',
   props: {
@@ -32,6 +33,7 @@ export default {
     }
   },
   methods: {
+    backendPath,
     handleBadgeClick(index) {
       if (!this.selectionMode || index === 0) {
         return

@@ -30,6 +30,7 @@ const environment = {
     : [],
   SEND_MAIL: env.NODE_ENV !== 'test',
   LOG_LEVEL: 'DEBUG',
+  PROXY_S3: env.PROXY_S3,
 }
 
 const server = {
@@ -98,12 +99,13 @@ const required = {
   AWS_REGION: env.AWS_REGION,
   AWS_BUCKET: env.AWS_BUCKET,
 
+  IMAGOR_PUBLIC_URL: env.IMAGOR_PUBLIC_URL,
+  IMAGOR_SECRET: env.IMAGOR_SECRET,
+
   MAPBOX_TOKEN: env.MAPBOX_TOKEN,
   JWT_SECRET: env.JWT_SECRET,
   PRIVATE_KEY_PASSPHRASE: env.PRIVATE_KEY_PASSPHRASE,
 }
-
-const S3_PUBLIC_GATEWAY = env.S3_PUBLIC_GATEWAY
 
 // https://stackoverflow.com/a/53050575
 type NoUndefinedField<T> = { [P in keyof T]-?: NoUndefinedField<NonNullable<T[P]>> }
@@ -151,7 +153,6 @@ const CONFIG = {
   ...redis,
   ...options,
   ...language,
-  S3_PUBLIC_GATEWAY,
 }
 
 export type Config = typeof CONFIG
@@ -162,7 +163,8 @@ export type S3Config = Pick<
   | 'AWS_ENDPOINT'
   | 'AWS_REGION'
   | 'AWS_BUCKET'
-  | 'S3_PUBLIC_GATEWAY'
+  | 'IMAGOR_SECRET'
+  | 'IMAGOR_PUBLIC_URL'
 >
 export default CONFIG
 
