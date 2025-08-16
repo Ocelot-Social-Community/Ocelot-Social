@@ -33,9 +33,9 @@
     "release": "./scripts/release.sh"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.0",
-    "@babel/preset-env": "^7.28.0",
-    "@babel/register": "^7.27.1",
+    "@babel/core": "^7.28.3",
+    "@babel/preset-env": "^7.28.3",
+    "@babel/register": "^7.28.3",
     "@badeball/cypress-cucumber-preprocessor": "^22.2.0",
     "@cucumber/cucumber": "12.1.0",
     "@cypress/browserify-preprocessor": "^3.0.2",
