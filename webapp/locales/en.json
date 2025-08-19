@@ -160,6 +160,7 @@
   "common": {
     "category": "Topic ::: Topics",
     "comment": "Comment ::: Comments",
+    "filter": "Filter …",
     "letsTalk": "Let`s Talk",
     "loading": "loading",
     "loadMore": "load more",

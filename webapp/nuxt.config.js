@@ -244,11 +244,20 @@ export default {
   },
 
   manifest,
-
   /*
    ** Build configuration
    */
   build: {
+    // Invalidate cache between versions
+    // https://www.reddit.com/r/Nuxt/comments/18i8hp2/comment/kdc1wa3/
+    // https://v2.nuxt.com/docs/configuration-glossary/configuration-build/#filenames
+    filenames: {
+      chunk: ({ isDev, isModern }) =>
+        isDev
+          ? `[name]${isModern ? '.modern' : ''}.js`
+          : `[contenthash:7]${isModern ? '.modern' : ''}_${CONFIG.VERSION}.js`,
+      css: ({ isDev }) => (isDev ? '[name].css' : `css/[contenthash:7]_${CONFIG.VERSION}.css`),
+    },
     /*
      ** You can extend webpack config here
      */

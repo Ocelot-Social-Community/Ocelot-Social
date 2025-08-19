@@ -89,7 +89,6 @@ export default {
       profileListVisibleCount,
       filter: null,
       itemHeight: 56,
-      filterPlaceholder: this.$t('common.filter', 'Filter...'),
     }
   },
   computed: {
@@ -109,6 +108,9 @@ export default {
       return this.isMoreAsVisible
         ? this.filteredConnections
         : this.filteredConnections.slice(0, this.profileListVisibleCount)
+    },
+    filterPlaceholder() {
+      return this.$t('common.filter')
     },
     filteredConnections() {
       if (!this.filter) {

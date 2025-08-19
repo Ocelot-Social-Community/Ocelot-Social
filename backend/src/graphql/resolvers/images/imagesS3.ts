@@ -2,7 +2,7 @@ import path from 'node:path'
 
 import { UserInputError } from 'apollo-server'
 import { FileUpload } from 'graphql-upload'
-import slug from 'slug'
+import slug from 'slugify'
 import { v4 as uuid } from 'uuid'
 
 import type { S3Config } from '@config/index'

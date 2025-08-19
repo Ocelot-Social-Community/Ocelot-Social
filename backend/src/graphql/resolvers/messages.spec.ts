@@ -115,7 +115,7 @@ describe('Message', () => {
               CreateMessage: null,
             },
           })
-          expect(pubsubSpy).not.toBeCalled()
+          expect(pubsubSpy).not.toHaveBeenCalled()
         })
       })
 
