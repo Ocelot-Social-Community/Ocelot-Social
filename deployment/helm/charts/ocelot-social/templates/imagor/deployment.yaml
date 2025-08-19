@@ -1,0 +1,28 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name:  {{ .Release.Name }}-imagor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-imagor
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-imagor
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: {{ .Release.Name }}-imagor
+        image: "{{ .Values.imagor.image.repository }}:{{ .Values.imagor.image.tag | default (include "defaultTag" .)  }}"
+        imagePullPolicy: {{ quote .Values.global.image.pullPolicy }}
+        {{- include "resources" .Values.imagor.resources | indent 8 }}
+        ports:
+        - containerPort: 8000
+        env:
+        - name: S3_FORCE_PATH_STYLE
+          value: "1"
+        envFrom:
+        - secretRef:
+            name: {{ .Release.Name }}-imagor-secret-env

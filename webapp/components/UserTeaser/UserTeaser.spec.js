@@ -21,7 +21,12 @@ const userTilda = {
   name: 'Tilda Swinton',
   slug: 'tilda-swinton',
   id: 'user1',
-  avatar: '/avatars/tilda-swinton',
+  avatar: {
+    url: '/avatars/tilda-swinton',
+    w320: '/avatars/tilda-swinton-w320',
+    w640: '/avatars/tilda-swinton-w640',
+    w1024: '/avatars/tilda-swinton-w1024',
+  },
   badgeVerification: {
     id: 'bv1',
     icon: '/icons/verified',

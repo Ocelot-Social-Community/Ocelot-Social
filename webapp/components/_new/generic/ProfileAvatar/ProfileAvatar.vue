@@ -3,20 +3,26 @@
     <!-- '--no-image' is neccessary, because otherwise we still have a little unwanted boarder araund the image for images with white backgrounds -->
     <span class="initials">{{ profileInitials }}</span>
     <base-icon v-if="isAnonymous" name="eye-slash" />
-    <img
+    <responsive-image
       v-if="isAvatar"
-      :src="profile.avatar | proxyApiUrl"
+      :image="profile.avatar"
       class="image"
       :alt="profile.name"
       :title="showProfileNameTitle ? profile.name : ''"
       @error="$event.target.style.display = 'none'"
+      sizes="320px"
     />
   </div>
 </template>
 
 <script>
+import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
+
 export default {
   name: 'ProfileAvatar',
+  components: {
+    ResponsiveImage,
+  },
   props: {
     size: {
       type: String,

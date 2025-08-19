@@ -43,7 +43,8 @@ const config: S3Config = {
   AWS_BUCKET: 'AWS_BUCKET',
   AWS_ENDPOINT: 'AWS_ENDPOINT',
   AWS_REGION: 'AWS_REGION',
-  S3_PUBLIC_GATEWAY: undefined,
+  IMAGOR_SECRET: 'IMAGOR_SECRET',
+  IMAGOR_PUBLIC_URL: 'IMAGOR_PUBLIC_URL',
 }
 
 let authenticatedUser
@@ -231,25 +232,6 @@ describe('add Attachment', () => {
         await expect(database.neode.all('File')).resolves.toHaveLength(0)
         await addAttachment(post, 'ATTACHMENT', fileInput)
         await expect(database.neode.all('File')).resolves.toHaveLength(1)
-      })
-
-      describe('given a `S3_PUBLIC_GATEWAY` configuration', () => {
-        const { add: addAttachment } = attachments({
-          ...config,
-          S3_PUBLIC_GATEWAY: 'http://s3-public-gateway.com',
-        })
-
-        it('changes the domain of the URL to a server that could e.g. apply image transformations', async () => {
-          if (!fileInput.upload) {
-            throw new Error('Test imageInput was not setup correctly.')
-          }
-          const upload = await fileInput.upload
-          upload.filename = '/path/to/file-location/foo-bar-avatar.jpg'
-          fileInput.upload = Promise.resolve(upload)
-          await expect(addAttachment(post, 'ATTACHMENT', fileInput)).resolves.toMatchObject({
-            url: 'http://s3-public-gateway.com/bucket/',
-          })
-        })
       })
 
       it('connects resource with image via given image type', async () => {

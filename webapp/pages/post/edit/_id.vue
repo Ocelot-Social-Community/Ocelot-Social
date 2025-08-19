@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import ContributionForm from '~/components/ContributionForm/ContributionForm'
+import ContributionForm from '~/components/ContributionForm/ContributionForm.vue'
 import PostQuery from '~/graphql/PostQuery'
 import { mapGetters } from 'vuex'
 
