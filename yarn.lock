@@ -970,18 +970,18 @@
     "@babel/helper-string-parser" "^7.27.1"
     "@babel/helper-validator-identifier" "^7.27.1"
 
-"@badeball/cypress-cucumber-preprocessor@^22.2.0":
-  version "22.2.0"
-  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-22.2.0.tgz#503b852cf5db230eb3dfd2fd07495d3bd2244f3e"
-  integrity sha512-od4a1k5VeptXSr1AI2gi5iHMmrKQhwXeLouiuv1yF6Th/FoDstaukdPy6lvwqAuEgb4wx0H1eFVi5/rlSD+1pA==
+"@badeball/cypress-cucumber-preprocessor@^23.0.0":
+  version "23.0.0"
+  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-23.0.0.tgz#11e62cc5eb319d3d4307a66b05d951ebaa90f090"
+  integrity sha512-kMev/m5Ty3BEmsgInebxBsNnmMHDEtPzoghLqWZZh+c4/m+FmZMGGI3+EXfwOMRZx0VfOLCeIQ+m93mQvPNdPA==
   dependencies:
     "@cucumber/ci-environment" "^10.0.1"
-    "@cucumber/cucumber" "^11.0.0"
+    "@cucumber/cucumber" "^12.0.0"
     "@cucumber/cucumber-expressions" "^18.0.0"
-    "@cucumber/gherkin" "^32.0.0"
+    "@cucumber/gherkin" "^33.0.0"
     "@cucumber/html-formatter" "^21.7.0"
     "@cucumber/message-streams" "^4.0.1"
-    "@cucumber/messages" "^27.0.0"
+    "@cucumber/messages" "^28.0.0"
     "@cucumber/pretty-formatter" "^1.0.1"
     "@cucumber/tag-expressions" "^6.1.0"
     base64-js "^1.5.1"
@@ -992,7 +992,7 @@
     debug "^4.3.6"
     error-stack-parser "^2.1.4"
     find-cypress-specs "^1.45.2"
-    glob "^10.4.5"
+    glob "^11.0.3"
     mocha "^11.0.0"
     seedrandom "^3.0.5"
     source-map "^0.6.1"
@@ -1016,7 +1016,7 @@
   dependencies:
     regexp-match-indices "1.0.2"
 
-"@cucumber/cucumber@12.1.0":
+"@cucumber/cucumber@12.1.0", "@cucumber/cucumber@^12.0.0":
   version "12.1.0"
   resolved "https://registry.yarnpkg.com/@cucumber/cucumber/-/cucumber-12.1.0.tgz#216daba34b6d67c0b55e3affcb8fd791c77ee3e2"
   integrity sha512-F72uKHUtHFFn4OAw6r6MoS+PWSMomQoIpW4+W/dcwNYY9oAKVAGyGJkEPIDXX00YtZY+EH3RUcNPlkD+f+dI0Q==
@@ -1061,51 +1061,6 @@
     yaml "^2.2.2"
     yup "1.6.1"
 
-"@cucumber/cucumber@^11.0.0":
-  version "11.3.0"
-  resolved "https://registry.npmjs.org/@cucumber/cucumber/-/cucumber-11.3.0.tgz"
-  integrity sha512-1YGsoAzRfDyVOnRMTSZP/EcFsOBElOKa2r+5nin0DJAeK+Mp0mzjcmSllMgApGtck7Ji87wwy3kFONfHUHMn4g==
-  dependencies:
-    "@cucumber/ci-environment" "10.0.1"
-    "@cucumber/cucumber-expressions" "18.0.1"
-    "@cucumber/gherkin" "30.0.4"
-    "@cucumber/gherkin-streams" "5.0.1"
-    "@cucumber/gherkin-utils" "9.2.0"
-    "@cucumber/html-formatter" "21.10.1"
-    "@cucumber/junit-xml-formatter" "0.7.1"
-    "@cucumber/message-streams" "4.0.1"
-    "@cucumber/messages" "27.2.0"
-    "@cucumber/tag-expressions" "6.1.2"
-    assertion-error-formatter "^3.0.0"
-    capital-case "^1.0.4"
-    chalk "^4.1.2"
-    cli-table3 "0.6.5"
-    commander "^10.0.0"
-    debug "^4.3.4"
-    error-stack-parser "^2.1.4"
-    figures "^3.2.0"
-    glob "^10.3.10"
-    has-ansi "^4.0.1"
-    indent-string "^4.0.0"
-    is-installed-globally "^0.4.0"
-    is-stream "^2.0.0"
-    knuth-shuffle-seeded "^1.0.6"
-    lodash.merge "^4.6.2"
-    lodash.mergewith "^4.6.2"
-    luxon "3.6.1"
-    mime "^3.0.0"
-    mkdirp "^2.1.5"
-    mz "^2.7.0"
-    progress "^2.0.3"
-    read-package-up "^11.0.0"
-    semver "7.7.1"
-    string-argv "0.3.1"
-    supports-color "^8.1.1"
-    type-fest "^4.41.0"
-    util-arity "^1.1.0"
-    yaml "^2.2.2"
-    yup "1.6.1"
-
 "@cucumber/gherkin-streams@5.0.1":
   version "5.0.1"
   resolved "https://registry.npmjs.org/@cucumber/gherkin-streams/-/gherkin-streams-5.0.1.tgz"
@@ -1125,14 +1080,7 @@
     commander "13.1.0"
     source-map-support "^0.5.21"
 
-"@cucumber/gherkin@30.0.4":
-  version "30.0.4"
-  resolved "https://registry.npmjs.org/@cucumber/gherkin/-/gherkin-30.0.4.tgz"
-  integrity sha512-pb7lmAJqweZRADTTsgnC3F5zbTh3nwOB1M83Q9ZPbUKMb3P76PzK6cTcPTJBHWy3l7isbigIv+BkDjaca6C8/g==
-  dependencies:
-    "@cucumber/messages" ">=19.1.4 <=26"
-
-"@cucumber/gherkin@32.2.0", "@cucumber/gherkin@^32.0.0":
+"@cucumber/gherkin@32.2.0":
   version "32.2.0"
   resolved "https://registry.yarnpkg.com/@cucumber/gherkin/-/gherkin-32.2.0.tgz#d9f0975a11815e8e091cf0faf70e4292c1e3b5a3"
   integrity sha512-X8xuVhSIqlUjxSRifRJ7t0TycVWyX58fygJH3wDNmHINLg9sYEkvQT0SO2G5YlRZnYc11TIFr4YPenscvdlBIw==
@@ -1146,10 +1094,12 @@
   dependencies:
     "@cucumber/messages" ">=19.1.4 <=26"
 
-"@cucumber/html-formatter@21.10.1":
-  version "21.10.1"
-  resolved "https://registry.npmjs.org/@cucumber/html-formatter/-/html-formatter-21.10.1.tgz"
-  integrity sha512-isaaNMNnBYThsvaHy7i+9kkk9V3+rhgdkt0pd6TCY6zY1CSRZQ7tG6ST9pYyRaECyfbCeF7UGH0KpNEnh6UNvQ==
+"@cucumber/gherkin@^33.0.0":
+  version "33.1.0"
+  resolved "https://registry.yarnpkg.com/@cucumber/gherkin/-/gherkin-33.1.0.tgz#528e3f236749d4b87e02235e8f0c886b622e85cf"
+  integrity sha512-Jynz3s+LTB872nDTHTciYNa3uwbkCfP1rRTa91ntZJ6z2Ksf/nSHNyiXoVf0AQ/KD7epCgilqzVzkUmSsBYc+A==
+  dependencies:
+    "@cucumber/messages" ">=19.1.4 <29"
 
 "@cucumber/html-formatter@21.13.0", "@cucumber/html-formatter@^21.7.0":
   version "21.13.0"
@@ -1181,6 +1131,16 @@
     reflect-metadata "0.2.2"
     uuid "11.0.5"
 
+"@cucumber/messages@>=19.1.4 <29", "@cucumber/messages@^28.0.0":
+  version "28.1.0"
+  resolved "https://registry.yarnpkg.com/@cucumber/messages/-/messages-28.1.0.tgz#5fdcfc3f9b30103cb45c69044ebe9a892bec38ce"
+  integrity sha512-2LzZtOwYKNlCuNf31ajkrekoy2M4z0Z1QGiPH40n4gf5t8VOUFb7m1ojtR4LmGvZxBGvJZP8voOmRqDWzBzYKA==
+  dependencies:
+    "@types/uuid" "10.0.0"
+    class-transformer "0.5.1"
+    reflect-metadata "0.2.2"
+    uuid "11.1.0"
+
 "@cucumber/messages@>=19.1.4 <=26":
   version "22.0.0"
   resolved "https://registry.npmjs.org/@cucumber/messages/-/messages-22.0.0.tgz"
@@ -1207,11 +1167,6 @@
   integrity sha512-QBndVZOjXB3cPBw1tmIGWMIyttSAL1voJY4uveySsP5hMH2mk/mSeUIBNGjMZKvjCyalTTg57/MT4Sk560ZffQ==
   dependencies:
     "@teppeis/multimaps" "3.0.0"
-
-"@cucumber/tag-expressions@6.1.2":
-  version "6.1.2"
-  resolved "https://registry.npmjs.org/@cucumber/tag-expressions/-/tag-expressions-6.1.2.tgz"
-  integrity sha512-xa3pER+ntZhGCxRXSguDTKEHTZpUUsp+RzTRNnit+vi5cqnk6abLdSLg5i3HZXU3c74nQ8afQC6IT507EN74oQ==
 
 "@cucumber/tag-expressions@6.2.0", "@cucumber/tag-expressions@^6.1.0":
   version "6.2.0"
@@ -3971,10 +3926,10 @@ cypress-network-idle@^1.15.0:
   resolved "https://registry.npmjs.org/cypress-network-idle/-/cypress-network-idle-1.15.0.tgz"
   integrity sha512-8zU16zhc7S3nMl1NTEEcNsZYlJy/ZzP2zPTTrngGxyXH32Ipake/xfHLZsgrzeWCieiS2AVhQsakhWqFzO3hpw==
 
-cypress@^14.5.3:
-  version "14.5.3"
-  resolved "https://registry.yarnpkg.com/cypress/-/cypress-14.5.3.tgz#1b402bc1f6a3042d5068901ef9f9affd382ecf36"
-  integrity sha512-syLwKjDeMg77FRRx68bytLdlqHXDT4yBVh0/PPkcgesChYDjUZbwxLqMXuryYKzAyJsPsQHUDW1YU74/IYEUIA==
+cypress@^15.0.0:
+  version "15.0.0"
+  resolved "https://registry.yarnpkg.com/cypress/-/cypress-15.0.0.tgz#d4e583c48bbde167a366b974cb397923982d801a"
+  integrity sha512-OH5Srk10qTzHYYt3BsP9V1DPYIAzms55s3xQn4mGmYO4k6pi25MCajDyPbiULfNDhNcthNQ2xmYvu1JdeEw1Hw==
   dependencies:
     "@cypress/request" "^3.0.9"
     "@cypress/xvfb" "^1.2.4"
@@ -4016,7 +3971,7 @@ cypress@^14.5.3:
     request-progress "^3.0.0"
     semver "^7.7.1"
     supports-color "^8.1.1"
-    tmp "~0.2.3"
+    tmp "~0.2.4"
     tree-kill "1.2.2"
     untildify "^4.0.0"
     yauzl "^2.10.0"
@@ -5078,7 +5033,7 @@ glob-parent@^5.1.2, glob-parent@~5.1.2:
   dependencies:
     is-glob "^4.0.1"
 
-glob@^10.3.10, glob@^10.4.5:
+glob@^10.4.5:
   version "10.4.5"
   resolved "https://registry.npmjs.org/glob/-/glob-10.4.5.tgz"
   integrity sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==
@@ -5090,7 +5045,7 @@ glob@^10.3.10, glob@^10.4.5:
     package-json-from-dist "^1.0.0"
     path-scurry "^1.11.1"
 
-glob@^11.0.0:
+glob@^11.0.0, glob@^11.0.3:
   version "11.0.3"
   resolved "https://registry.yarnpkg.com/glob/-/glob-11.0.3.tgz#9d8087e6d72ddb3c4707b1d2778f80ea3eaefcd6"
   integrity sha512-2Nim7dha1KVkaiF4q6Dj+ngPPMdfvLJEOpZk/jKiUAkqKebpGAWQXAq9z1xu9HKu5lWfqw/FASuccEjyznjPaA==
@@ -7514,11 +7469,6 @@ seedrandom@^3.0.5:
   resolved "https://registry.npmjs.org/seedrandom/-/seedrandom-3.0.5.tgz"
   integrity sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==
 
-semver@7.7.1:
-  version "7.7.1"
-  resolved "https://registry.npmjs.org/semver/-/semver-7.7.1.tgz"
-  integrity sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==
-
 semver@7.7.2, semver@^7.3.5, semver@^7.5.4, semver@^7.6.0, semver@^7.7.1:
   version "7.7.2"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.7.2.tgz#67d99fdcd35cec21e6f8b87a7fd515a33f982b58"
@@ -8159,10 +8109,10 @@ tldts@^6.1.32:
   dependencies:
     tldts-core "^6.1.85"
 
-tmp@~0.2.3:
-  version "0.2.3"
-  resolved "https://registry.npmjs.org/tmp/-/tmp-0.2.3.tgz"
-  integrity sha512-nZD7m9iCPC5g0pYmcaxogYKggSfLsdxl8of3Q/oIbqCqLLIO9IAF0GWjX1z9NZRHPiXv8Wex4yDCaZsgEw0Y8w==
+tmp@~0.2.4:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.2.5.tgz#b06bcd23f0f3c8357b426891726d16015abfd8f8"
+  integrity sha512-voyz6MApa1rQGUxT3E+BK7/ROe8itEx7vD8/HEvt4xwXucvQ5G5oeEiHkmHZJuBO21RpOf+YYm9MOivj709jow==
 
 to-regex-range@^5.0.1:
   version "5.0.1"
@@ -8487,6 +8437,11 @@ uuid@11.0.5:
   resolved "https://registry.npmjs.org/uuid/-/uuid-11.0.5.tgz"
   integrity sha512-508e6IcKLrhxKdBbcA2b4KQZlLVp2+J5UwQ6F7Drckkc5N9ZJwFa4TgWtsww9UG8fGHbm6gbV19TdM5pQ4GaIA==
 
+uuid@11.1.0, uuid@^11.1.0:
+  version "11.1.0"
+  resolved "https://registry.npmjs.org/uuid/-/uuid-11.1.0.tgz"
+  integrity sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==
+
 uuid@9.0.0:
   version "9.0.0"
   resolved "https://registry.npmjs.org/uuid/-/uuid-9.0.0.tgz"
@@ -8496,11 +8451,6 @@ uuid@^10.0.0:
   version "10.0.0"
   resolved "https://registry.npmjs.org/uuid/-/uuid-10.0.0.tgz"
   integrity sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ==
-
-uuid@^11.1.0:
-  version "11.1.0"
-  resolved "https://registry.npmjs.org/uuid/-/uuid-11.1.0.tgz"
-  integrity sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==
 
 uuid@^3.4.0:
   version "3.4.0"
