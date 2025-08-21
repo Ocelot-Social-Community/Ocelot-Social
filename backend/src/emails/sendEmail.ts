@@ -106,7 +106,7 @@ export const sendNotificationMail = async (notification: any): Promise<OriginalM
           notification?.from?.__typename === 'Comment'
             ? undefined
             : new URL(
-                `user/${notification?.from?.author?.id}/${notification?.from?.author?.slug}`,
+                `profile/${notification?.from?.author?.id}/${notification?.from?.author?.slug}`,
                 CONFIG.CLIENT_URI,
               ),
         commenterName:
