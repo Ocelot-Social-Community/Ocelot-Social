@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`sendNotificationMail English changed_group_member_role template 1`] = `
 {
@@ -645,8 +645,8 @@ footer {
   "subject": "ocelot.social  – Notification: Mentioned in post",
   "text": "HELLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/profile/u2/peter-lustig] mentioned you in a post
-with the title “New Post”. Click on the button to view this post:
+Peter Lustig [http://webapp:3000/profile/u2/peter-lustig] mentioned you in a
+post with the title “New Post”. Click on the button to view this post:
 
 View post [http://webapp:3000/post/p1/new-post]
 
@@ -1839,8 +1839,9 @@ footer {
   "subject": "ocelot.social  – Benachrichtigung: Erwähnung in Beitrag",
   "text": "HALLO JENNY ROSTOCK,
 
-Peter Lustig [http://webapp:3000/profile/u2/peter-lustig] hat dich in einem Beitrag
-mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Beitrag zu sehen:
+Peter Lustig [http://webapp:3000/profile/u2/peter-lustig] hat dich in einem
+Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Beitrag
+zu sehen:
 
 Beitrag ansehen [http://webapp:3000/post/p1/new-post]
 
