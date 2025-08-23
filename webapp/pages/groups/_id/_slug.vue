@@ -38,10 +38,11 @@
               {{ `&${groupSlug}` }}
             </ds-text>
             <!-- group location -->
-            <ds-text v-if="group && group.location" align="center" color="soft" size="small">
-              <base-icon name="map-marker" data-test="map-marker" />
-              {{ group && group.location ? group.location.name : '' }}
-            </ds-text>
+            <location-info
+              v-if="group.location"
+              :location-data="group.location"
+              class="location-info"
+            />
             <!-- group created at -->
             <ds-text align="center" color="soft" size="small">
               {{ $t('group.foundation') }} {{ group.createdAt | date('MMMM yyyy') }}
@@ -280,6 +281,7 @@ import CountTo from '~/components/CountTo.vue'
 import Empty from '~/components/Empty/Empty'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
 import JoinLeaveButton from '~/components/Button/JoinLeaveButton'
+import LocationInfo from '~/components/UserTeaser/LocationInfo.vue'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
@@ -308,6 +310,7 @@ export default {
     Empty,
     GroupContentMenu,
     JoinLeaveButton,
+    LocationInfo,
     PostTeaser,
     ProfileAvatar,
     ProfileList,
@@ -654,5 +657,13 @@ export default {
 }
 .collaps-button {
   float: right;
+}
+.location-info {
+  font-size: 0.8rem;
+  color: #70677e;
+  margin-bottom: 12px;
+  > .distance {
+    margin-top: 2px !important;
+  }
 }
 </style>

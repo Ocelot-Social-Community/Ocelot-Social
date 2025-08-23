@@ -160,11 +160,13 @@ export const removeUserFromGroupMutation = () => {
 
 export const groupQuery = (i18n) => {
   const lang = i18n ? i18n.locale().toUpperCase() : 'EN'
-  // ${locationFragment(lang)}
+  // ${locationFragment(lang)} // to be place directly after the return below, but we can not comment it there
+
   return gql`
 
     query ($isMember: Boolean, $id: ID, $slug: String, $first: Int, $offset: Int) {
       Group(isMember: $isMember, id: $id, slug: $slug, first: $first, offset: $offset) {
+        # ...location
         id
         name
         slug
@@ -188,11 +190,11 @@ export const groupQuery = (i18n) => {
           url
         }
         locationName
-        # ...location
         location {
           name: name${lang}
           lng
           lat
+          distanceToMe
         }
         membersCount
         myRole
