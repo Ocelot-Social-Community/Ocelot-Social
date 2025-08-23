@@ -177,7 +177,9 @@
               ? $t('group.membersListTitleNotAllowedSeeingGroupMembers')
               : null
           "
-          :allProfilesCount="isAllowedSeeingGroupMembers ? group.membersCount : 0"
+          :allProfilesCount="
+            isAllowedSeeingGroupMembers && group.membersCount ? group.membersCount : 0
+          "
           :profiles="isAllowedSeeingGroupMembers ? groupMembers : []"
           :loading="$apollo.loading"
           @fetchAllProfiles="fetchAllMembers"
