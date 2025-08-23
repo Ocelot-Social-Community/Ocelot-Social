@@ -199,19 +199,28 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           
             </p>
              
-            <p
-              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+            <div
+              class="location-info location-info"
             >
-              <span
-                class="base-icon"
-                data-test="map-marker"
+              <div
+                class="location"
               >
-                <!---->
-              </span>
-              
-            Paris
-          
-            </p>
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Paris
+  
+              </div>
+               
+              <div
+                class="distance"
+              >
+                location.distance
+              </div>
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
@@ -1072,19 +1081,28 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           
             </p>
              
-            <p
-              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+            <div
+              class="location-info location-info"
             >
-              <span
-                class="base-icon"
-                data-test="map-marker"
+              <div
+                class="location"
               >
-                <!---->
-              </span>
-              
-            Paris
-          
-            </p>
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Paris
+  
+              </div>
+               
+              <div
+                class="distance"
+              >
+                location.distance
+              </div>
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
@@ -1529,19 +1547,28 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           
             </p>
              
-            <p
-              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+            <div
+              class="location-info location-info"
             >
-              <span
-                class="base-icon"
-                data-test="map-marker"
+              <div
+                class="location"
               >
-                <!---->
-              </span>
-              
-            Paris
-          
-            </p>
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Paris
+  
+              </div>
+               
+              <div
+                class="distance"
+              >
+                location.distance
+              </div>
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
@@ -2075,19 +2102,28 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           
             </p>
              
-            <p
-              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+            <div
+              class="location-info location-info"
             >
-              <span
-                class="base-icon"
-                data-test="map-marker"
+              <div
+                class="location"
               >
-                <!---->
-              </span>
-              
-            Paris
-          
-            </p>
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Paris
+  
+              </div>
+               
+              <div
+                class="distance"
+              >
+                location.distance
+              </div>
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
@@ -6603,19 +6639,28 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           
             </p>
              
-            <p
-              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+            <div
+              class="location-info location-info"
             >
-              <span
-                class="base-icon"
-                data-test="map-marker"
+              <div
+                class="location"
               >
-                <!---->
-              </span>
-              
-            Hamburg
-          
-            </p>
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Hamburg
+  
+              </div>
+               
+              <div
+                class="distance"
+              >
+                location.distance
+              </div>
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
@@ -7582,19 +7627,28 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           
             </p>
              
-            <p
-              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+            <div
+              class="location-info location-info"
             >
-              <span
-                class="base-icon"
-                data-test="map-marker"
+              <div
+                class="location"
               >
-                <!---->
-              </span>
-              
-            Hamburg
-          
-            </p>
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Hamburg
+  
+              </div>
+               
+              <div
+                class="distance"
+              >
+                location.distance
+              </div>
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
