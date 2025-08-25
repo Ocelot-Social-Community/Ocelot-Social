@@ -211,7 +211,7 @@ import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import SocialMedia from '~/components/SocialMedia/SocialMedia'
-import LocationInfo from '~/components/UserTeaser/LocationInfo.vue'
+import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
 
 const tabToFilterMapping = ({ tab, id }) => {
   return {
