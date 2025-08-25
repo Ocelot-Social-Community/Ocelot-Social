@@ -164,7 +164,6 @@ export const groupQuery = (i18n) => {
     ${locationFragment('Group', lang)}
     query ($isMember: Boolean, $id: ID, $slug: String, $first: Int, $offset: Int) {
       Group(isMember: $isMember, id: $id, slug: $slug, first: $first, offset: $offset) {
-        ...location
         id
         name
         slug
@@ -187,6 +186,7 @@ export const groupQuery = (i18n) => {
         avatar {
           url
         }
+        ...location
         membersCount
         myRole
         inviteCodes {
