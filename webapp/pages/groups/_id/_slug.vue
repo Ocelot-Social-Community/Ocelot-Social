@@ -38,11 +38,7 @@
               {{ `&${groupSlug}` }}
             </ds-text>
             <!-- group location -->
-            <location-info
-              v-if="group.location"
-              :location-data="group.location"
-              class="location-info"
-            />
+            <location-info v-if="group.location" :location-data="group.location" size="small" />
             <!-- group created at -->
             <ds-text align="center" color="soft" size="small">
               {{ $t('group.foundation') }} {{ group.createdAt | date('MMMM yyyy') }}
@@ -659,13 +655,5 @@ export default {
 }
 .collaps-button {
   float: right;
-}
-.location-info {
-  font-size: 0.8rem;
-  color: #70677e;
-  margin-bottom: 12px;
-  > .distance {
-    margin-top: 2px !important;
-  }
 }
 </style>

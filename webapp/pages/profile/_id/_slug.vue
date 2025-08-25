@@ -34,11 +34,7 @@
               <!-- <base-icon name="at" data-test="at" /> -->
               {{ `@${userSlug}` }}
             </ds-text>
-            <location-info
-              v-if="user.location"
-              :location-data="user.location"
-              class="location-info"
-            />
+            <location-info v-if="user.location" :location-data="user.location" size="small" />
             <ds-text align="center" color="soft" size="small">
               {{ $t('profile.memberSince') }} {{ user.createdAt | date('MMMM yyyy') }}
             </ds-text>
@@ -491,16 +487,6 @@ export default {
     display: block;
     width: 100%;
     margin-bottom: $space-x-small;
-  }
-}
-
-.location-info {
-  font-size: 0.8rem;
-  color: #70677e;
-  margin-bottom: 12px;
-
-  > .distance {
-    margin-top: 2px !important;
   }
 }
 </style>

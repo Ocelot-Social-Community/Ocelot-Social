@@ -1,5 +1,5 @@
 <template>
-  <div class="location-info">
+  <div :class="`location-info size-${size}`">
     <div class="location">
       <base-icon name="map-marker" />
       {{ locationData.name }}
@@ -13,6 +13,13 @@ export default {
   name: 'LocationInfo',
   props: {
     locationData: { type: Object, default: null },
+    size: {
+      type: String,
+      default: 'base',
+      validator: (value) => {
+        return value.match(/(small|base)/)
+      },
+    },
   },
   computed: {
     distance() {
@@ -36,9 +43,21 @@ export default {
     align-items: center;
     justify-content: center;
   }
+}
 
-  .distance {
+.size-base {
+  > .distance {
     margin-top: 8px;
+  }
+}
+
+.size-small {
+  font-size: 0.8rem;
+  color: #70677e;
+  margin-bottom: 12px;
+
+  > .distance {
+    margin-top: 2px;
   }
 }
 </style>
