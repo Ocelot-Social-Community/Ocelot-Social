@@ -15,7 +15,7 @@ export const profileUserQuery = (i18n) => {
   return gql`
     ${userFragment}
     ${userCountsFragment}
-    ${locationFragment(lang, 'User')}
+    ${locationFragment('User', lang)}
     ${badgesFragment}
 
     query User($id: ID!, $followedByCount: Int!, $followingCount: Int!) {
@@ -112,7 +112,7 @@ export const mapUserQuery = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
     ${userFragment}
-    ${locationFragment(lang, 'User')}
+    ${locationFragment('User', lang)}
     ${badgesFragment}
 
     query {

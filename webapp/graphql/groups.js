@@ -161,7 +161,7 @@ export const removeUserFromGroupMutation = () => {
 export const groupQuery = (i18n) => {
   const lang = i18n ? i18n.locale().toUpperCase() : 'EN'
   return gql`
-    ${locationFragment(lang, 'Group')}
+    ${locationFragment('Group', lang)}
     query ($isMember: Boolean, $id: ID, $slug: String, $first: Int, $offset: Int) {
       Group(isMember: $isMember, id: $id, slug: $slug, first: $first, offset: $offset) {
         ...location

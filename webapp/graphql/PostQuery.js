@@ -15,7 +15,7 @@ export default (i18n) => {
   return gql`
     ${userFragment}
     ${userCountsFragment}
-    ${locationFragment(lang, 'User')}
+    ${locationFragment('User', lang)}
     ${badgesFragment}
     ${postFragment}
     ${postCountsFragment}
@@ -65,7 +65,7 @@ export const filterPosts = (i18n) => {
   return gql`
     ${userFragment}
     ${userCountsFragment}
-    ${locationFragment(lang, 'User')}
+    ${locationFragment('User', lang)}
     ${badgesFragment}
     ${postFragment}
     ${postCountsFragment}
@@ -108,7 +108,7 @@ export const profilePagePosts = (i18n) => {
   return gql`
     ${userFragment}
     ${userCountsFragment}
-    ${locationFragment(lang, 'User')}
+    ${locationFragment('User', lang)}
     ${badgesFragment}
     ${postFragment}
     ${postCountsFragment}
@@ -158,7 +158,7 @@ export const relatedContributions = (i18n) => {
   return gql`
     ${userFragment}
     ${userCountsFragment}
-    ${locationFragment(lang, 'User')}
+    ${locationFragment('User', lang)}
     ${badgesFragment}
     ${postFragment}
     ${postCountsFragment}

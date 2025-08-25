@@ -16,7 +16,7 @@ export const userFragment = gql`
   }
 `
 
-export const locationFragment = (lang, type) => gql`
+export const locationFragment = (type, lang) => gql`
   fragment location on ${type} {
     locationName
     location {
@@ -57,7 +57,7 @@ export const userCountsFragment = gql`
 
 export const userTeaserFragment = (lang) => gql`
   ${badgesFragment}
-  ${locationFragment(lang, 'User')}
+  ${locationFragment('User', lang)}
 
   fragment userTeaser on User {
     followedByCount
