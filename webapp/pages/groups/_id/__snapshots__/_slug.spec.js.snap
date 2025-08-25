@@ -200,7 +200,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             </p>
              
             <div
-              class="location-info location-info"
+              class="location-info size-small"
             >
               <div
                 class="location"
@@ -1082,7 +1082,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             </p>
              
             <div
-              class="location-info location-info"
+              class="location-info size-small"
             >
               <div
                 class="location"
@@ -1548,7 +1548,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             </p>
              
             <div
-              class="location-info location-info"
+              class="location-info size-small"
             >
               <div
                 class="location"
@@ -2103,7 +2103,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             </p>
              
             <div
-              class="location-info location-info"
+              class="location-info size-small"
             >
               <div
                 class="location"
@@ -6640,7 +6640,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             </p>
              
             <div
-              class="location-info location-info"
+              class="location-info size-small"
             >
               <div
                 class="location"
@@ -7628,7 +7628,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             </p>
              
             <div
-              class="location-info location-info"
+              class="location-info size-small"
             >
               <div
                 class="location"

@@ -3,7 +3,7 @@
 exports[`LocationInfo renders with distance 1`] = `
 <div>
   <div
-    class="location-info"
+    class="location-info size-base"
   >
     <div
       class="location"
@@ -30,7 +30,7 @@ exports[`LocationInfo renders with distance 1`] = `
 exports[`LocationInfo renders without distance 1`] = `
 <div>
   <div
-    class="location-info"
+    class="location-info size-base"
   >
     <div
       class="location"
