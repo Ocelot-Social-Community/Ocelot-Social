@@ -1,0 +1,99 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LocationInfo distance renders with distance 1`] = `
+<div>
+  <div
+    class="location-info size-base"
+  >
+    <div
+      class="location"
+    >
+      <span
+        class="base-icon"
+      >
+        <!---->
+      </span>
+      
+    Paris
+  
+    </div>
+     
+    <div
+      class="distance"
+    >
+      
+    location.distance
+  
+    </div>
+  </div>
+</div>
+`;
+
+exports[`LocationInfo distance renders without distance 1`] = `
+<div>
+  <div
+    class="location-info size-base"
+  >
+    <div
+      class="location"
+    >
+      <span
+        class="base-icon"
+      >
+        <!---->
+      </span>
+      
+    Paris
+  
+    </div>
+     
+    <!---->
+  </div>
+</div>
+`;
+
+exports[`LocationInfo size renders in base size 1`] = `
+<div>
+  <div
+    class="location-info size-base"
+  >
+    <div
+      class="location"
+    >
+      <span
+        class="base-icon"
+      >
+        <!---->
+      </span>
+      
+    Paris
+  
+    </div>
+     
+    <!---->
+  </div>
+</div>
+`;
+
+exports[`LocationInfo size renders in small size 1`] = `
+<div>
+  <div
+    class="location-info size-base"
+  >
+    <div
+      class="location"
+    >
+      <span
+        class="base-icon"
+      >
+        <!---->
+      </span>
+      
+    Paris
+  
+    </div>
+     
+    <!---->
+  </div>
+</div>
+`;

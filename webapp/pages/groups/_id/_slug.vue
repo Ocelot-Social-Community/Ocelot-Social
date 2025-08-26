@@ -38,10 +38,7 @@
               {{ `&${groupSlug}` }}
             </ds-text>
             <!-- group location -->
-            <ds-text v-if="group && group.location" align="center" color="soft" size="small">
-              <base-icon name="map-marker" data-test="map-marker" />
-              {{ group && group.location ? group.location.name : '' }}
-            </ds-text>
+            <location-info v-if="group.location" :location-data="group.location" size="small" />
             <!-- group created at -->
             <ds-text align="center" color="soft" size="small">
               {{ $t('group.foundation') }} {{ group.createdAt | date('MMMM yyyy') }}
@@ -176,7 +173,9 @@
               ? $t('group.membersListTitleNotAllowedSeeingGroupMembers')
               : null
           "
-          :allProfilesCount="isAllowedSeeingGroupMembers ? group.membersCount : 0"
+          :allProfilesCount="
+            isAllowedSeeingGroupMembers && group.membersCount ? group.membersCount : 0
+          "
           :profiles="isAllowedSeeingGroupMembers ? groupMembers : []"
           :loading="$apollo.loading"
           @fetchAllProfiles="fetchAllMembers"
@@ -280,6 +279,7 @@ import CountTo from '~/components/CountTo.vue'
 import Empty from '~/components/Empty/Empty'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
 import JoinLeaveButton from '~/components/Button/JoinLeaveButton'
+import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
@@ -308,6 +308,7 @@ export default {
     Empty,
     GroupContentMenu,
     JoinLeaveButton,
+    LocationInfo,
     PostTeaser,
     ProfileAvatar,
     ProfileList,

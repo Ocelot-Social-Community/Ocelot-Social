@@ -1,10 +1,12 @@
 <template>
-  <div class="location-info">
+  <div :class="`location-info size-${size}`">
     <div class="location">
       <base-icon name="map-marker" />
       {{ locationData.name }}
     </div>
-    <div v-if="distance" class="distance">{{ distance }}</div>
+    <div v-if="locationData.distanceToMe !== null" class="distance">
+      {{ $t('location.distance', { distance: locationData.distanceToMe }) }}
+    </div>
   </div>
 </template>
 
@@ -13,12 +15,12 @@ export default {
   name: 'LocationInfo',
   props: {
     locationData: { type: Object, default: null },
-  },
-  computed: {
-    distance() {
-      return this.locationData.distanceToMe === null
-        ? null
-        : this.$t('location.distance', { distance: this.locationData.distanceToMe })
+    size: {
+      type: String,
+      default: 'base',
+      validator: (value) => {
+        return value.match(/(small|base)/)
+      },
     },
   },
 }
@@ -36,9 +38,21 @@ export default {
     align-items: center;
     justify-content: center;
   }
+}
 
-  .distance {
+.size-base {
+  > .distance {
     margin-top: 8px;
+  }
+}
+
+.size-small {
+  font-size: 0.8rem;
+  color: #70677e;
+  margin-bottom: 12px;
+
+  > .distance {
+    margin-top: 2px;
   }
 }
 </style>

@@ -30,7 +30,7 @@
 
 <script>
 import Badges from '~/components/Badges.vue'
-import LocationInfo from '~/components/UserTeaser/LocationInfo.vue'
+import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
 import { isTouchDevice } from '~/components/utils/isTouchDevice'
 import { userTeaserQuery } from '~/graphql/User.js'
 
