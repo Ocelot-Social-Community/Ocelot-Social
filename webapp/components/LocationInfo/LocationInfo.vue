@@ -4,7 +4,9 @@
       <base-icon name="map-marker" />
       {{ locationData.name }}
     </div>
-    <div v-if="distance" class="distance">{{ distance }}</div>
+    <div v-if="locationData.distanceToMe !== null" class="distance">
+      {{ $t('location.distance', { distance: locationData.distanceToMe }) }}
+    </div>
   </div>
 </template>
 
@@ -19,13 +21,6 @@ export default {
       validator: (value) => {
         return value.match(/(small|base)/)
       },
-    },
-  },
-  computed: {
-    distance() {
-      return this.locationData.distanceToMe === null
-        ? null
-        : this.$t('location.distance', { distance: this.locationData.distanceToMe })
     },
   },
 }
