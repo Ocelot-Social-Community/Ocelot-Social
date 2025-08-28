@@ -1,45 +1,10 @@
-name: ocelot.social end-to-end test CI (Equilibrium Optimized)
+name: ocelot.social end-to-end test CI
 
 on: push
 
 jobs:
-  # Calculate content-based cache keys (replaces run-id based caching)
-  calculate_cache_keys:
-    name: Calculate Smart Cache Keys
-    runs-on: ubuntu-latest
-    outputs:
-      docker-key: ${{ steps.keys.outputs.docker-key }}
-      deps-key: ${{ steps.keys.outputs.deps-key }}
-      cypress-key: ${{ steps.keys.outputs.cypress-key }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4.2.2
-
-      - name: Calculate content-based cache keys
-        id: keys
-        run: |
-          # Docker images key (rarely changes)
-          DOCKER_KEY="docker-$(find . -name "Dockerfile*" -o -name "docker-compose*.yml" -o -name ".dockerignore" | sort | xargs sha256sum 2>/dev/null | sha256sum | cut -d' ' -f1)"
-          
-          # Dependencies key (changes occasionally)
-          DEPS_KEY="deps-$(find . -name "package*.json" -o -name "yarn.lock" | sort | xargs sha256sum 2>/dev/null | sha256sum | cut -d' ' -f1)"
-          
-          # Cypress key (very stable)
-          CYPRESS_KEY="cypress-$(sha256sum cypress.config.js 2>/dev/null | cut -d' ' -f1 || echo 'default')"
-          
-          echo "docker-key=$DOCKER_KEY" >> $GITHUB_OUTPUT
-          echo "deps-key=$DEPS_KEY" >> $GITHUB_OUTPUT
-          echo "cypress-key=$CYPRESS_KEY" >> $GITHUB_OUTPUT
-          
-          echo "🔑 Cache keys generated:"
-          echo "  Docker: $DOCKER_KEY"
-          echo "  Dependencies: $DEPS_KEY"
-          echo "  Cypress: $CYPRESS_KEY"
-
-  # Build backend with smart caching
   prepare_backend_environment:
     name: Fullstack | prepare backend environment
-    needs: calculate_cache_keys
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -50,103 +15,34 @@ jobs:
           cp backend/.env.test_e2e backend/.env
           cp webapp/.env.template webapp/.env
 
-      # Try to restore Docker images from cache
-      - name: Restore Docker images cache
-        id: docker-cache
-        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.0.2
-        with:
-          path: /tmp/docker-images/
-          key: ${{ needs.calculate_cache_keys.outputs.docker-key }}
-          restore-keys: |
-            docker-
-
-      # Verify cached Docker images
-      - name: Verify and load cached Docker images
-        if: steps.docker-cache.outputs.cache-hit == 'true'
+      - name: Build backend and dependencies
         run: |
-          echo "🔍 Verifying cached Docker images..."
-          CACHE_VALID=true
-          
-          # Load and verify each cached image
-          for img_file in /tmp/docker-images/*.tar; do
-            if [ -f "$img_file" ]; then
-              echo "Loading $(basename $img_file)..."
-              if docker load < "$img_file"; then
-                # Quick verification that image is not corrupted
-                IMG_NAME=$(basename "$img_file" .tar)
-                if ! docker image inspect "$IMG_NAME" >/dev/null 2>&1; then
-                  echo "❌ Image $IMG_NAME failed inspection"
-                  CACHE_VALID=false
-                  break
-                fi
-              else
-                echo "❌ Failed to load $(basename $img_file)"
-                CACHE_VALID=false
-                break
-              fi
-            fi
-          done
-          
-          if [ "$CACHE_VALID" = "true" ]; then
-            echo "✅ All cached images verified successfully"
-            echo "DOCKER_CACHE_VALID=true" >> $GITHUB_ENV
-          else
-            echo "❌ Cache verification failed, will rebuild"
-            rm -rf /tmp/docker-images/
-            echo "DOCKER_CACHE_VALID=false" >> $GITHUB_ENV
-          fi
-
-      # Build images (only if cache invalid or missing)
-      - name: Build Docker images
-        if: steps.docker-cache.outputs.cache-hit != 'true' || env.DOCKER_CACHE_VALID == 'false'
-        run: |
-          echo "🏗️ Building Docker images..."
-          mkdir -p /tmp/docker-images/
-          
           # Build and start all required images for backend
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach neo4j backend --build
           
-          # Save the built images with verification
-          echo "💾 Saving Docker images to cache..."
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" > /tmp/docker-images/backend.tar
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" > /tmp/docker-images/neo4j.tar
-          docker save "quay.io/minio/minio:latest" > /tmp/docker-images/minio.tar
-          docker save "quay.io/minio/mc:latest" > /tmp/docker-images/minio-mc.tar
-          docker save "maildev/maildev:latest" > /tmp/docker-images/mailserver.tar
-          
-          # Verify saved images
-          for img_file in /tmp/docker-images/*.tar; do
-            if [ ! -s "$img_file" ]; then
-              echo "❌ Failed to save $(basename $img_file)"
-              exit 1
-            fi
-          done
-          
-          echo "✅ All images built and saved successfully"
+          # Save the build images
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" > /tmp/backend.tar          
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" > /tmp/neo4j.tar
+          docker save "quay.io/minio/minio:latest" > /tmp/minio.tar
+          docker save "quay.io/minio/mc:latest" > /tmp/minio-mc.tar
+          docker save "maildev/maildev:latest" > /tmp/mailserver.tar
           
           # Stop the containers
           docker compose -f docker-compose.yml -f docker-compose.test.yml down
-
-      # Save Docker images cache (only if we built them)
-      - name: Save Docker images cache
-        if: steps.docker-cache.outputs.cache-hit != 'true' || env.DOCKER_CACHE_VALID == 'false'
+      
+      - name: Cache docker images
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.0.2
         with:
-          path: /tmp/docker-images/
-          key: ${{ needs.calculate_cache_keys.outputs.docker-key }}
+          path: |
+            /tmp/backend.tar
+            /tmp/neo4j.tar
+            /tmp/minio.tar
+            /tmp/minio-mc.tar
+            /tmp/mailserver.tar
+          key: ${{ github.run_id }}-e2e-backend-environment-cache
 
-      # Upload images for test jobs (fallback if cache system fails)
-      - name: Upload Docker images as artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: docker-images
-          path: /tmp/docker-images/
-          retention-days: 1
-
-  # Build webapp with smart caching
   prepare_webapp_image:
     name: Fullstack | prepare webapp image
-    needs: calculate_cache_keys
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -157,49 +53,19 @@ jobs:
           cp backend/.env.test_e2e backend/.env
           cp webapp/.env.template webapp/.env
       
-      # Try to restore webapp image from cache
-      - name: Restore webapp image cache
-        id: webapp-cache
-        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.0.2
-        with:
-          path: /tmp/webapp.tar
-          key: webapp-${{ needs.calculate_cache_keys.outputs.docker-key }}
-
-      # Build webapp image (only if not cached)
-      - name: Build webapp Docker image
-        if: steps.webapp-cache.outputs.cache-hit != 'true'
+      - name: Build docker image
         run: |
-          echo "🏗️ Building webapp Docker image..."
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach webapp --build --no-deps
           docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" > /tmp/webapp.tar
-          
-          # Verify saved image
-          if [ ! -s "/tmp/webapp.tar" ]; then
-            echo "❌ Failed to save webapp image"
-            exit 1
-          fi
-          echo "✅ Webapp image built and saved"
-
-      # Save webapp cache
-      - name: Save webapp image cache
-        if: steps.webapp-cache.outputs.cache-hit != 'true'
+      
+      - name: Cache docker image        
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.0.2
         with:
           path: /tmp/webapp.tar
-          key: webapp-${{ needs.calculate_cache_keys.outputs.docker-key }}
+          key: ${{ github.run_id }}-e2e-webapp-cache
 
-      # Upload webapp image
-      - name: Upload webapp image
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: webapp-image
-          path: /tmp/webapp.tar
-          retention-days: 1
-
-  # Prepare Cypress with dependency caching
   prepare_cypress:
     name: Fullstack | prepare cypress
-    needs: calculate_cache_keys
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -216,94 +82,35 @@ jobs:
           cp webapp/.env.template webapp/.env
           cp backend/.env.test_e2e backend/.env
 
-      # Smart Cypress and dependencies cache
-      - name: Restore Cypress cache
-        id: cypress-cache
-        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.0.2
-        with:
-          path: |
-            /opt/cucumber-json-formatter
-            /home/runner/.cache/Cypress
-            node_modules/
-            backend/node_modules/
-            backend/build/
-          key: ${{ needs.calculate_cache_keys.outputs.deps-key }}-${{ needs.calculate_cache_keys.outputs.cypress-key }}
-          restore-keys: |
-            ${{ needs.calculate_cache_keys.outputs.deps-key }}-
-            deps-
-
-      # Install and build (only if cache miss or partial hit)
-      - name: Install dependencies and build
-        if: steps.cypress-cache.outputs.cache-hit != 'true'
+      - name: Install cypress requirements
         run: |
-          echo "📦 Installing dependencies and building..."
-          
-          # Download cucumber formatter if not cached
-          if [ ! -f "/opt/cucumber-json-formatter" ]; then
-            echo "📥 Downloading cucumber-json-formatter..."
-            wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
-            chmod +x /opt/cucumber-json-formatter
-          fi
-          
-          # Install root dependencies
-          if [ ! -d "node_modules" ] || [ ! -n "$(ls -A node_modules)" ]; then
-            echo "📦 Installing root dependencies..."
-            yarn install --frozen-lockfile
-          fi
-          
-          # Install and build backend
+          wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
           cd backend
-          if [ ! -d "node_modules" ] || [ ! -n "$(ls -A node_modules)" ]; then
-            echo "📦 Installing backend dependencies..."
-            yarn install --frozen-lockfile
-          fi
-          if [ ! -d "build" ] || [ ! -n "$(ls -A build)" ]; then
-            echo "🏗️ Building backend..."
-            yarn build
-          fi
+          yarn install
+          yarn build
           cd ..
-          
-          # Verify Cypress
-          echo "🧪 Verifying Cypress installation..."
-          npx cypress verify || echo "⚠️ Cypress verify failed, but continuing..."
-          
-          echo "✅ Dependencies and build complete"
-
-      # Save Cypress cache
-      - name: Save Cypress cache
-        if: steps.cypress-cache.outputs.cache-hit != 'true'
+          yarn install
+      
+      - name: Cache docker image
+        
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.0.2
         with:
           path: |
             /opt/cucumber-json-formatter
             /home/runner/.cache/Cypress
-            node_modules/
-            backend/node_modules/
-            backend/build/
-          key: ${{ needs.calculate_cache_keys.outputs.deps-key }}-${{ needs.calculate_cache_keys.outputs.cypress-key }}
+            /home/runner/work/Ocelot-Social/Ocelot-Social
+          key: ${{ github.run_id }}-e2e-cypress
 
-      # Upload Cypress environment
-      - name: Upload Cypress environment
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: cypress-environment
-          path: |
-            /opt/cucumber-json-formatter
-            node_modules/
-            backend/node_modules/
-            backend/build/
-          retention-days: 1
-
-  # Fast test execution with cached environment
   fullstack_tests:
     name: Fullstack | tests
     if: success()
-    needs: [calculate_cache_keys, prepare_backend_environment, prepare_webapp_image, prepare_cypress]
+    needs: [prepare_backend_environment, prepare_webapp_image, prepare_cypress]
     runs-on: ubuntu-latest
     env:
       jobs: 8
     strategy:
       matrix:
+        # run copies of the current job in parallel
         job: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - name: Checkout code
@@ -315,140 +122,50 @@ jobs:
           node-version-file: 'backend/.tool-versions'
           cache: 'yarn'
 
-      # Fast cache restore (try cache first, fallback to artifacts)
-      - name: Restore Docker images cache
-        id: docker-cache-restore
-        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.0.2
-        with:
-          path: /tmp/docker-images/
-          key: ${{ needs.calculate_cache_keys.outputs.docker-key }}
-          restore-keys: |
-            docker-
-
-      # Fallback: Download Docker images from artifacts
-      - name: Download Docker images (fallback)
-        if: steps.docker-cache-restore.outputs.cache-hit != 'true'
-        uses: actions/download-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: docker-images
-          path: /tmp/docker-images/
-
-      # Download webapp image
-      - name: Download webapp image
-        uses: actions/download-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: webapp-image
-          path: /tmp/
-
-      # Restore Cypress environment cache
-      - name: Restore Cypress environment cache
-        id: cypress-restore
+      - name: Restore cypress cache
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.0.2
         with:
           path: |
             /opt/cucumber-json-formatter
             /home/runner/.cache/Cypress
-            node_modules/
-            backend/node_modules/
-            backend/build/
-          key: ${{ needs.calculate_cache_keys.outputs.deps-key }}-${{ needs.calculate_cache_keys.outputs.cypress-key }}
-          restore-keys: |
-            ${{ needs.calculate_cache_keys.outputs.deps-key }}-
-            deps-
+            /home/runner/work/Ocelot-Social/Ocelot-Social
+          key: ${{ github.run_id }}-e2e-cypress
+          restore-keys: ${{ github.run_id }}-e2e-cypress
 
-      # Fallback: Download Cypress environment
-      - name: Download Cypress environment (fallback)
-        if: steps.cypress-restore.outputs.cache-hit != 'true'
-        uses: actions/download-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - name: Restore backend environment cache
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.0.2
         with:
-          name: cypress-environment
-          path: /
+          path: |
+            /tmp/backend.tar
+            /tmp/neo4j.tar
+            /tmp/minio.tar
+            /tmp/minio-mc.tar
+            /tmp/mailserver.tar
+          key: ${{ github.run_id }}-e2e-backend-environment-cache
 
-      # Fast environment setup
-      - name: Quick environment setup
-        run: |
-          echo "🚀 Quick environment setup starting..."
+      - name: Restore webapp cache
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.0.2
+        with:
+          path: /tmp/webapp.tar
+          key: ${{ github.run_id }}-e2e-webapp-cache
           
-          # Ensure cucumber formatter is executable
+      - name: Boot up test system | docker compose
+        run: |
           chmod +x /opt/cucumber-json-formatter
-          sudo ln -sf /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
-          
-          # Load Docker images quickly
-          echo "📦 Loading Docker images..."
-          for img_file in /tmp/docker-images/*.tar; do
-            if [ -f "$img_file" ]; then
-              echo "Loading $(basename $img_file)..."
-              docker load < "$img_file"
-            fi
-          done
-          
-          # Load webapp image
-          if [ -f "/tmp/webapp.tar" ]; then
-            echo "Loading webapp image..."
-            docker load < /tmp/webapp.tar
-          fi
-          
-          echo "✅ All images loaded successfully"
-
-      # Smart service startup with health checks
-      - name: Smart service startup
-        run: |
-          echo "🌟 Starting services with smart health checks..."
-          
-          # Start services
+          sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
+          docker load < /tmp/neo4j.tar
+          docker load < /tmp/backend.tar
+          docker load < /tmp/minio.tar
+          docker load < /tmp/minio-mc.tar
+          docker load < /tmp/mailserver.tar
+          docker load < /tmp/webapp.tar
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
-          
-          # Smart health checks with fallback
-          echo "🔍 Performing health checks..."
-          
-          # Wait minimum time for stability (reduced from 90s)
-          echo "⏳ Initial stability wait (30s)..."
-          sleep 30
-          
-          # Then smart health checks with reasonable timeout
-          check_service() {
-            local name="$1"
-            local url="$2"
-            local timeout="$3"
-            
-            echo "Checking $name at $url..."
-            for i in $(seq 1 $timeout); do
-              if curl -sf "$url" >/dev/null 2>&1; then
-                echo "✅ $name is ready"
-                return 0
-              fi
-              echo "⏳ $name not ready yet ($i/$timeout)..."
-              sleep 2
-            done
-            
-            echo "⚠️ $name timeout, but continuing (may be false negative)"
-            return 0  # Don't fail the pipeline
-          }
-          
-          # Load environment variables
-          set -a
-          source backend/.env 2>/dev/null || echo "No backend .env found"
-          source webapp/.env 2>/dev/null || echo "No webapp .env found"
-          set +a
-          
-          # Health checks with sensible defaults
-          BACKEND_URL="${BACKEND_HEALTH:-http://localhost:4000/health}"
-          WEBAPP_URL="${CLIENT_URI:-http://localhost:3000}"
-          
-          check_service "backend" "$BACKEND_URL" 20
-          check_service "webapp" "$WEBAPP_URL" 20
-          check_service "mailserver" "http://localhost:1080" 10
-          
-          echo "🎉 Environment ready for tests!"
+          sleep 90s
 
-      # Execute tests
-      - name: Execute E2E tests
+      - name: Full stack tests | run tests
         id: e2e-tests
-        run: |
-          echo "🧪 Starting E2E test execution..."
-          yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }})
+        run: yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
 
-      # Error handling (unchanged from original)
       - name: Full stack tests | if tests failed, compile html report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         run: |
@@ -456,32 +173,31 @@ jobs:
           node create-cucumber-html-report.js
 
       - name: Full stack tests | if tests failed, upload report
+        id: e2e-report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: ocelot-e2e-test-report-job-${{ matrix.job }}
+          name: ocelot-e2e-test-report-pr${{ needs.docker_preparation.outputs.pr-number }}
           path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
 
-  # Intelligent cache cleanup
   cleanup_cache:
     name: Cleanup Cache
     needs: fullstack_tests
     runs-on: ubuntu-latest
     continue-on-error: true
-    if: always()
     steps:
       - name: Checkout code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4.2.2
       
-      - name: Smart cache cleanup
+      - name: Full stack tests | cleanup cache
         run: |
-          echo "🧹 Smart cache cleanup..."
-          
-          # Clean up artifacts (they expire anyway)
-          echo "Artifacts will auto-expire in 1 day"
-          
-          # Optional: Clean very old caches (GitHub has limits)
-          # Keep this conservative to avoid breaking concurrent runs
-          echo "Cache cleanup complete"
+          cacheKeys=$(gh cache list --json key --jq '.[] | select(.key | startswith("${{ github.run_id }}-e2e-")) | .key')
+          set +e
+          echo "Deleting caches..."
+          for cacheKey in $cacheKeys
+          do
+            gh cache delete "$cacheKey"
+          done
+          echo "Done"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
