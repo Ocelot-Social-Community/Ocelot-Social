@@ -198,10 +198,10 @@ jobs:
           key: webapp-${{ needs.calculate_cache_keys.outputs.docker-key }}
 
       # Build webapp only if needed
-      - name: Build webapp Docker image
+      - name: Build webapp Docker image (RESILIENT)
         if: steps.webapp-cache.outputs.cache-hit != 'true'
         run: |
-          echo "🏗️ Building webapp Docker image..."
+          echo "🏗️ Building webapp Docker image with resilience..."
           
           # Use Buildx if available
           if docker buildx version >/dev/null 2>&1; then
@@ -209,15 +209,59 @@ jobs:
             export COMPOSE_DOCKER_CLI_BUILD=1
           fi
           
-          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach webapp --build --no-deps
+          # Resilient build with retry logic
+          BUILD_SUCCESS=false
+          BUILD_ATTEMPT=1
+          MAX_BUILD_ATTEMPTS=3
+          
+          while [ $BUILD_ATTEMPT -le $MAX_BUILD_ATTEMPTS ] && [ "$BUILD_SUCCESS" != "true" ]; do
+            echo "🏗️ Build attempt $BUILD_ATTEMPT/$MAX_BUILD_ATTEMPTS..."
+            
+            if docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach webapp --build --no-deps; then
+              BUILD_SUCCESS=true
+              echo "✅ Build successful on attempt $BUILD_ATTEMPT"
+            else
+              BUILD_EXIT_CODE=$?
+              echo "❌ Build attempt $BUILD_ATTEMPT failed with exit code $BUILD_EXIT_CODE"
+              
+              if [ $BUILD_ATTEMPT -lt $MAX_BUILD_ATTEMPTS ]; then
+                WAIT_TIME=$((3 * $BUILD_ATTEMPT))
+                echo "⏳ Waiting ${WAIT_TIME}s before retry..."
+                sleep $WAIT_TIME
+                
+                # Cleanup for retry
+                echo "🧹 Cleaning up for retry..."
+                docker compose -f docker-compose.yml -f docker-compose.test.yml down || true
+                docker system prune -f --filter "until=5m" || true
+              fi
+            fi
+            
+            BUILD_ATTEMPT=$((BUILD_ATTEMPT + 1))
+          done
+          
+          if [ "$BUILD_SUCCESS" != "true" ]; then
+            echo "💥 All build attempts failed - this needs manual investigation"
+            echo "🚨 Possible yarn registry issue or network problems"
+            exit 1
+          fi
+          
+          # Save the image with verification
+          echo "💾 Saving webapp image..."
           docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" | gzip > /tmp/webapp.tar.gz
           
-          # Verify image was saved
+          # Verify image was saved and is valid
           if [ ! -s "/tmp/webapp.tar.gz" ]; then
             echo "❌ Failed to save webapp image"
             exit 1
           fi
-          echo "✅ Webapp image built and compressed"
+          
+          if ! gzip -t /tmp/webapp.tar.gz; then
+            echo "❌ Webapp image archive is corrupted"
+            exit 1
+          fi
+          
+          SAVED_SIZE=$(du -h /tmp/webapp.tar.gz | cut -f1)
+          echo "✅ Webapp image built and compressed successfully (${SAVED_SIZE})"
 
       # Save webapp cache
       - name: Save webapp cache
