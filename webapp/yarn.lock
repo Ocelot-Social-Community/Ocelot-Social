@@ -2531,10 +2531,10 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@faker-js/faker@9.9.0":
-  version "9.9.0"
-  resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-9.9.0.tgz#3ad015fbbaaae7af3149555e0f22b4b30134c69d"
-  integrity sha512-OEl393iCOoo/z8bMezRlJu+GlRGlsKbUAN7jKB6LhnKoqKve5DXRpalbItIIcwnCjs1k/FOPjFzcA6Qn+H+YbA==
+"@faker-js/faker@10.0.0":
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-10.0.0.tgz#df11f0ba2b2d7243574e34364948d6a25163c6f4"
+  integrity sha512-UollFEUkVXutsaP+Vndjxar40Gs5JL2HeLcl8xO1QAjJgOdhc3OmBFWyEylS+RddWaaBiAzH+5/17PLQJwDiLw==
 
 "@human-connection/styleguide@0.5.22":
   version "0.5.22"
