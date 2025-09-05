@@ -13,8 +13,6 @@ VERSION_NEW=$(node -p -e "require('$ROOT_DIR/package.json').version")
 ## packages
 cd backend
 yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $VERSION_NEW
-cd $ROOT_DIR/frontend
-yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $VERSION_NEW
 cd $ROOT_DIR/webapp
 yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $VERSION_NEW
 cd $ROOT_DIR/webapp/maintenance/source
