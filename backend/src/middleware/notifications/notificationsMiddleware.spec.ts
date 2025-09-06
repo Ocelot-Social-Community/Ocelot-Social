@@ -11,7 +11,6 @@ import Factory, { cleanDatabase } from '@db/factories'
 import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
 import { CreateGroup } from '@graphql/queries/CreateGroup'
 import { CreateMessage } from '@graphql/queries/CreateMessage'
-import { CreatePost } from '@graphql/queries/CreatePost'
 import { CreateRoom } from '@graphql/queries/CreateRoom'
 import { JoinGroup } from '@graphql/queries/JoinGroup'
 import { LeaveGroup } from '@graphql/queries/LeaveGroup'
@@ -47,6 +46,15 @@ let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
 const categoryIds = ['cat9']
+const createPostMutation = gql`
+  mutation ($id: ID, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
+    CreatePost(id: $id, title: $title, content: $postContent, categoryIds: $categoryIds) {
+      id
+      title
+      content
+    }
+  }
+`
 const createCommentMutation = gql`
   mutation ($id: ID, $postId: ID!, $commentContent: String!) {
     CreateComment(id: $id, postId: $postId, content: $commentContent) {
@@ -138,7 +146,7 @@ describe('notifications', () => {
       const createPostAction = async () => {
         authenticatedUser = await postAuthor.toJson()
         await mutate({
-          mutation: CreatePost,
+          mutation: createPostMutation,
           variables: {
             id: 'p47',
             title,
