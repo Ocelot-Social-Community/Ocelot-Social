@@ -51,6 +51,7 @@ services:
   minio:
     image: quay.io/minio/minio
     ports:
+      - 9000:9000
       - 9001:9001
     volumes:
       - minio_data:/data
