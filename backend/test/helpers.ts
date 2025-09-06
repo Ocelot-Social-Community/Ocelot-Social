@@ -16,7 +16,7 @@ export const TEST_CONFIG = {
   PRODUCTION_DB_CLEAN_ALLOW: false,
   DISABLED_MIDDLEWARES: [],
   SEND_MAIL: false,
-  PROXY_S3: 'http://minio:9000',
+  PROXY_S3: 'http://localhost:9000',
 
   CLIENT_URI: 'http://webapp:3000',
   GRAPHQL_URI: 'http://localhost:4000',
@@ -40,7 +40,7 @@ export const TEST_CONFIG = {
 
   AWS_ACCESS_KEY_ID: 'minio',
   AWS_SECRET_ACCESS_KEY: '12341234',
-  AWS_ENDPOINT: 'http:/minio:9000',
+  AWS_ENDPOINT: 'http:/localhost:9000',
   AWS_REGION: 'local',
   AWS_BUCKET: 'ocelot',
 
