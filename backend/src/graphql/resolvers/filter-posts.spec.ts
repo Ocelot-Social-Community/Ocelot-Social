@@ -3,8 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Factory, { cleanDatabase } from '@db/factories'
-import { createPostMutation } from '@graphql/queries/createPostMutation'
-import { filterPosts } from '@graphql/queries/filterPosts'
+import { createPostMutation } from '@graphql/queries/_createPostMutation'
+import { filterPosts } from '@graphql/queries/_filterPosts'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -45,7 +45,7 @@ describe('Filter Posts', () => {
     })
     authenticatedUser = await user.toJson()
     await mutate({
-      mutation: createPostMutation(),
+      mutation: createPostMutation,
       variables: {
         id: 'a1',
         title: 'I am an article',
@@ -53,7 +53,7 @@ describe('Filter Posts', () => {
       },
     })
     await mutate({
-      mutation: createPostMutation(),
+      mutation: createPostMutation,
       variables: {
         id: 'a2',
         title: 'I am anonther article',
@@ -61,7 +61,7 @@ describe('Filter Posts', () => {
       },
     })
     await mutate({
-      mutation: createPostMutation(),
+      mutation: createPostMutation,
       variables: {
         id: 'e1',
         title: 'Illegaler Kindergeburtstag',
@@ -74,7 +74,7 @@ describe('Filter Posts', () => {
       },
     })
     await mutate({
-      mutation: createPostMutation(),
+      mutation: createPostMutation,
       variables: {
         id: 'e2',
         title: 'Räuber-Treffen',
@@ -92,7 +92,7 @@ describe('Filter Posts', () => {
     it('finds all posts', async () => {
       const {
         data: { Post: result },
-      } = (await query({ query: filterPosts() })) as any
+      } = (await query({ query: filterPosts })) as any
       expect(result).toHaveLength(4)
       expect(result).toEqual(
         expect.arrayContaining([
@@ -110,7 +110,7 @@ describe('Filter Posts', () => {
       const {
         data: { Post: result },
       } = (await query({
-        query: filterPosts(),
+        query: filterPosts,
         variables: { filter: { postType_in: ['Article'] } },
       })) as any
       expect(result).toHaveLength(2)
@@ -128,7 +128,7 @@ describe('Filter Posts', () => {
       const {
         data: { Post: result },
       } = (await query({
-        query: filterPosts(),
+        query: filterPosts,
         variables: { filter: { postType_in: ['Event'] } },
       })) as any
       expect(result).toHaveLength(2)
@@ -146,7 +146,7 @@ describe('Filter Posts', () => {
       const {
         data: { Post: result },
       } = (await query({
-        query: filterPosts(),
+        query: filterPosts,
         variables: { filter: { postType_in: ['Article', 'Event'] } },
       })) as any
       expect(result).toHaveLength(4)
@@ -166,7 +166,7 @@ describe('Filter Posts', () => {
       const {
         data: { Post: result },
       } = (await query({
-        query: filterPosts(),
+        query: filterPosts,
         variables: { filter: { postType_in: ['Event'] }, orderBy: ['eventStart_desc'] },
       })) as any
       expect(result).toHaveLength(2)
@@ -190,7 +190,7 @@ describe('Filter Posts', () => {
       const {
         data: { Post: result },
       } = (await query({
-        query: filterPosts(),
+        query: filterPosts,
         variables: { filter: { postType_in: ['Event'] }, orderBy: ['eventStart_asc'] },
       })) as any
       expect(result).toHaveLength(2)
@@ -214,7 +214,7 @@ describe('Filter Posts', () => {
       const {
         data: { Post: result },
       } = (await query({
-        query: filterPosts(),
+        query: filterPosts,
         variables: {
           filter: {
             postType_in: ['Event'],

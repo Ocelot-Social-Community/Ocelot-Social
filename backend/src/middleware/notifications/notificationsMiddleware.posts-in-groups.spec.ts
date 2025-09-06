@@ -5,10 +5,10 @@
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
-import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
+import { CreateGroup } from '@graphql/queries/CreateGroup'
 import { CreatePost } from '@graphql/queries/CreatePost'
-import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
+import { JoinGroup } from '@graphql/queries/JoinGroup'
 import { muteGroup } from '@graphql/queries/muteGroup'
 import { unmuteGroup } from '@graphql/queries/unmuteGroup'
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -130,7 +130,7 @@ describe('notify group members of new posts in group', () => {
 
     authenticatedUser = await postAuthor.toJson()
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'g-1',
         name: 'A closed group',
@@ -141,7 +141,7 @@ describe('notify group members of new posts in group', () => {
     })
     authenticatedUser = await groupMember.toJson()
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'g-1',
         userId: 'group-member',
@@ -149,7 +149,7 @@ describe('notify group members of new posts in group', () => {
     })
     authenticatedUser = await pendingMember.toJson()
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'g-1',
         userId: 'pending-member',
@@ -157,7 +157,7 @@ describe('notify group members of new posts in group', () => {
     })
     authenticatedUser = await emaillessMember.toJson()
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'g-1',
         userId: 'group-member',
@@ -165,7 +165,7 @@ describe('notify group members of new posts in group', () => {
     })
     authenticatedUser = await postAuthor.toJson()
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'g-1',
         userId: 'group-member',
@@ -173,7 +173,7 @@ describe('notify group members of new posts in group', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'g-1',
         userId: 'email-less-member',

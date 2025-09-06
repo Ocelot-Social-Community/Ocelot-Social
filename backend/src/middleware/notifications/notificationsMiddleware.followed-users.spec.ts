@@ -5,7 +5,7 @@
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { CreateGroup } from '@graphql/queries/CreateGroup'
 import { CreatePost } from '@graphql/queries/CreatePost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -272,7 +272,7 @@ describe('following users notifications', () => {
     beforeAll(async () => {
       authenticatedUser = await postAuthor.toJson()
       await mutate({
-        mutation: createGroupMutation(),
+        mutation: CreateGroup,
         variables: {
           id: 'g-1',
           name: 'A group',
@@ -341,7 +341,7 @@ describe('following users notifications', () => {
     beforeAll(async () => {
       authenticatedUser = await postAuthor.toJson()
       await mutate({
-        mutation: createGroupMutation(),
+        mutation: CreateGroup,
         variables: {
           id: 'g-2',
           name: 'A closed group',
@@ -410,7 +410,7 @@ describe('following users notifications', () => {
     beforeAll(async () => {
       authenticatedUser = await postAuthor.toJson()
       await mutate({
-        mutation: createGroupMutation(),
+        mutation: CreateGroup,
         variables: {
           id: 'g-3',
           name: 'A hidden group',

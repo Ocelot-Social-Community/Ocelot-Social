@@ -8,14 +8,14 @@ import gql from 'graphql-tag'
 
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
-import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
-import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
+import { CreateGroup } from '@graphql/queries/CreateGroup'
 import { CreateMessage } from '@graphql/queries/CreateMessage'
 import { CreatePost } from '@graphql/queries/CreatePost'
-import { createRoomMutation } from '@graphql/queries/createRoomMutation'
-import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
-import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
-import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
+import { CreateRoom } from '@graphql/queries/CreateRoom'
+import { JoinGroup } from '@graphql/queries/JoinGroup'
+import { LeaveGroup } from '@graphql/queries/LeaveGroup'
+import { RemoveUserFromGroup } from '@graphql/queries/RemoveUserFromGroup'
 import { UpdatePost } from '@graphql/queries/UpdatePost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -890,7 +890,7 @@ describe('notifications', () => {
       authenticatedUser = await chatSender.toJson()
 
       const room = await mutate({
-        mutation: createRoomMutation(),
+        mutation: CreateRoom,
         variables: {
           userId: 'chatReceiver',
         },
@@ -1076,7 +1076,7 @@ describe('notifications', () => {
       )
       authenticatedUser = await groupOwner.toJson()
       await mutate({
-        mutation: createGroupMutation(),
+        mutation: CreateGroup,
         variables: {
           id: 'closed-group',
           name: 'The Closed Group',
@@ -1093,7 +1093,7 @@ describe('notifications', () => {
       const joinGroupAction = async () => {
         authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
         await mutate({
-          mutation: joinGroupMutation(),
+          mutation: JoinGroup,
           variables: {
             groupId: 'closed-group',
             userId: authenticatedUser.id,
@@ -1180,7 +1180,7 @@ describe('notifications', () => {
       const leaveGroupAction = async () => {
         authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
         await mutate({
-          mutation: leaveGroupMutation(),
+          mutation: LeaveGroup,
           variables: {
             groupId: 'closed-group',
             userId: authenticatedUser.id,
@@ -1193,7 +1193,7 @@ describe('notifications', () => {
         jest.clearAllMocks()
         authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
         await mutate({
-          mutation: joinGroupMutation(),
+          mutation: JoinGroup,
           variables: {
             groupId: 'closed-group',
             userId: authenticatedUser.id,
@@ -1305,7 +1305,7 @@ describe('notifications', () => {
       const changeGroupMemberRoleAction = async () => {
         authenticatedUser = (await groupOwner.toJson()) as DecodedUser
         await mutate({
-          mutation: changeGroupMemberRoleMutation(),
+          mutation: ChangeGroupMemberRole,
           variables: {
             groupId: 'closed-group',
             userId: 'you',
@@ -1318,7 +1318,7 @@ describe('notifications', () => {
       beforeEach(async () => {
         authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
         await mutate({
-          mutation: joinGroupMutation(),
+          mutation: JoinGroup,
           variables: {
             groupId: 'closed-group',
             userId: authenticatedUser.id,
@@ -1402,7 +1402,7 @@ describe('notifications', () => {
       const removeUserFromGroupAction = async () => {
         authenticatedUser = await groupOwner.toJson()
         await mutate({
-          mutation: removeUserFromGroupMutation(),
+          mutation: RemoveUserFromGroup,
           variables: {
             groupId: 'closed-group',
             userId: 'you',
@@ -1414,7 +1414,7 @@ describe('notifications', () => {
       beforeEach(async () => {
         authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
         await mutate({
-          mutation: joinGroupMutation(),
+          mutation: JoinGroup,
           variables: {
             groupId: 'closed-group',
             userId: authenticatedUser.id,

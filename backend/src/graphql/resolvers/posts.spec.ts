@@ -6,9 +6,9 @@ import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import Image from '@db/models/Image'
+import { createPostMutation } from '@graphql/queries/_createPostMutation'
 import { AddPostEmotions } from '@graphql/queries/AddPostEmotions'
-import { createGroupMutation } from '@graphql/queries/createGroupMutation'
-import { createPostMutation } from '@graphql/queries/createPostMutation'
+import { CreateGroup } from '@graphql/queries/CreateGroup'
 import { DeletePost } from '@graphql/queries/DeletePost'
 import { pinPost } from '@graphql/queries/pinPost'
 import { Post } from '@graphql/queries/Post'
@@ -276,7 +276,7 @@ describe('CreatePost', () => {
 
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
-      const { errors } = await mutate({ mutation: createPostMutation(), variables })
+      const { errors } = await mutate({ mutation: createPostMutation, variables })
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -291,7 +291,7 @@ describe('CreatePost', () => {
         data: { CreatePost: { title: 'I am a title', content: 'Some content' } },
         errors: undefined,
       }
-      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject(
+      await expect(mutate({ mutation: createPostMutation, variables })).resolves.toMatchObject(
         expected,
       )
     })
@@ -308,20 +308,20 @@ describe('CreatePost', () => {
         },
         errors: undefined,
       }
-      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject(
+      await expect(mutate({ mutation: createPostMutation, variables })).resolves.toMatchObject(
         expected,
       )
     })
 
     it('`disabled` and `deleted` default to `false`', async () => {
       const expected = { data: { CreatePost: { disabled: false, deleted: false } } }
-      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject(
+      await expect(mutate({ mutation: createPostMutation, variables })).resolves.toMatchObject(
         expected,
       )
     })
 
     it('has label "Article" as default', async () => {
-      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: createPostMutation, variables })).resolves.toMatchObject({
         data: { CreatePost: { postType: ['Article'] } },
       })
     })
@@ -330,7 +330,7 @@ describe('CreatePost', () => {
       it('throws an error', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation(),
+            mutation: createPostMutation,
             variables: { ...variables, postType: 'not-valid' },
           }),
         ).resolves.toMatchObject({
@@ -349,7 +349,7 @@ describe('CreatePost', () => {
         it('throws an error', async () => {
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: createPostMutation,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -369,7 +369,7 @@ describe('CreatePost', () => {
         it('throws an error', async () => {
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: createPostMutation,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -394,7 +394,7 @@ describe('CreatePost', () => {
           const eventStart = new Date(now.getFullYear(), now.getMonth() - 1).toISOString()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: createPostMutation,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -418,7 +418,7 @@ describe('CreatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: createPostMutation,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -442,7 +442,7 @@ describe('CreatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: createPostMutation,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -468,7 +468,7 @@ describe('CreatePost', () => {
           const eventEnd = new Date(now.getFullYear(), now.getMonth() + 2).toISOString()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: createPostMutation,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -493,7 +493,7 @@ describe('CreatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: createPostMutation,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -518,7 +518,7 @@ describe('CreatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: createPostMutation,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -547,7 +547,7 @@ describe('CreatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: createPostMutation,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -575,7 +575,7 @@ describe('CreatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: createPostMutation,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -600,7 +600,7 @@ describe('CreatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: createPostMutation,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -627,7 +627,7 @@ describe('CreatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: createPostMutation,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -707,7 +707,7 @@ describe('UpdatePost', () => {
     author = await Factory.build('user', { slug: 'the-author' })
     authenticatedUser = await author.toJson()
     const { data } = await mutate({
-      mutation: createPostMutation(),
+      mutation: createPostMutation,
       variables: {
         title: 'Old title',
         content: 'Old content',
@@ -1551,7 +1551,7 @@ describe('pin posts', () => {
       describe('post in public group', () => {
         beforeEach(async () => {
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               name: 'Public Group',
               id: 'public-group',
@@ -1564,7 +1564,7 @@ describe('pin posts', () => {
             },
           })
           await mutate({
-            mutation: createPostMutation(),
+            mutation: createPostMutation,
             variables: {
               id: 'public-group-post',
               title: 'Public group post',
@@ -1599,7 +1599,7 @@ describe('pin posts', () => {
       describe('post in closed group', () => {
         beforeEach(async () => {
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               name: 'Closed Group',
               id: 'closed-group',
@@ -1612,7 +1612,7 @@ describe('pin posts', () => {
             },
           })
           await mutate({
-            mutation: createPostMutation(),
+            mutation: createPostMutation,
             variables: {
               id: 'closed-group-post',
               title: 'Closed group post',
@@ -1637,7 +1637,7 @@ describe('pin posts', () => {
       describe('post in hidden group', () => {
         beforeEach(async () => {
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               name: 'Hidden Group',
               id: 'hidden-group',
@@ -1650,7 +1650,7 @@ describe('pin posts', () => {
             },
           })
           await mutate({
-            mutation: createPostMutation(),
+            mutation: createPostMutation,
             variables: {
               id: 'hidden-group-post',
               title: 'Hidden group post',

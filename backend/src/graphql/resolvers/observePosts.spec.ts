@@ -4,7 +4,7 @@
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { createPostMutation } from '@graphql/queries/createPostMutation'
+import { createPostMutation } from '@graphql/queries/_createPostMutation'
 import { toggleObservePost } from '@graphql/queries/toggleObservePost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -74,7 +74,7 @@ describe('observing posts', () => {
     it('has the author of the post observing the post', async () => {
       await expect(
         mutate({
-          mutation: createPostMutation(),
+          mutation: createPostMutation,
           variables: {
             id: 'p2',
             title: 'A post the author should observe',

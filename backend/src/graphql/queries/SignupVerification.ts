@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
 
-export const signupVerificationMutation = gql`
+export const SignupVerification = gql`
   mutation (
     $password: String!
     $email: String!

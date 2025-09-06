@@ -5,9 +5,9 @@
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { CreateGroup } from '@graphql/queries/CreateGroup'
 import { CreatePost } from '@graphql/queries/CreatePost'
-import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
+import { JoinGroup } from '@graphql/queries/JoinGroup'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -136,7 +136,7 @@ describe('emails sent for notifications', () => {
     })
     authenticatedUser = await postAuthor.toJson()
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'public-group',
         name: 'A public group',
@@ -147,7 +147,7 @@ describe('emails sent for notifications', () => {
     })
     authenticatedUser = await groupMember.toJson()
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'public-group',
         userId: 'group-member',
@@ -159,7 +159,7 @@ describe('emails sent for notifications', () => {
     })
     authenticatedUser = await emaillessMember.toJson()
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'public-group',
         userId: 'group-member',

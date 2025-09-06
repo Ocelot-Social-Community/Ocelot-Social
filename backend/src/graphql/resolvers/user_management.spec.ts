@@ -12,7 +12,7 @@ import { verify } from 'jsonwebtoken'
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
 import { changePassword } from '@graphql/queries/changePassword'
-import { loginMutation } from '@graphql/queries/loginMutation'
+import { login } from '@graphql/queries/login'
 import { saveCategorySettings } from '@graphql/queries/saveCategorySettings'
 import { decode } from '@jwt/decode'
 import { encode } from '@jwt/encode'
@@ -226,7 +226,7 @@ describe('currentUser', () => {
 
 describe('login', () => {
   const respondsWith = async (expected) => {
-    await expect(mutate({ mutation: loginMutation, variables })).resolves.toMatchObject(expected)
+    await expect(mutate({ mutation: login, variables })).resolves.toMatchObject(expected)
   }
 
   beforeEach(async () => {
@@ -245,7 +245,7 @@ describe('login', () => {
       it('responds with a JWT bearer token', async () => {
         const {
           data: { login: token },
-        } = (await mutate({ mutation: loginMutation, variables })) as any // eslint-disable-line @typescript-eslint/no-explicit-any
+        } = (await mutate({ mutation: login, variables })) as any // eslint-disable-line @typescript-eslint/no-explicit-any
         jwt.verify(token, config.JWT_SECRET, (err, data) => {
           expect(data).toMatchObject({
             id: 'acb2d923-f3af-479e-9f00-61b12e864666',
