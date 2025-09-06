@@ -35,36 +35,22 @@ export const getMutedUsers = async (context) => {
   return mutedUsers
 }
 
-export const getBlockedUsers = async (context) => {
-  const { neode } = context
-  const userModel = neode.model('User')
-  let blockedUsers = neode
-    .query()
-    .match('user', userModel)
-    .where('user.id', context.user.id)
-    .relationship(userModel.relationships().get('blocked'))
-    .to('blocked', userModel)
-    .return('blocked')
-  blockedUsers = await blockedUsers.execute()
-  blockedUsers = blockedUsers.records.map((r) => r.get('blocked').properties)
-  return blockedUsers
-}
-
 export default {
   Query: {
-    mutedUsers: async (_object, _args, context, _resolveInfo) => {
-      try {
-        return getMutedUsers(context)
-      } catch (e) {
-        throw new UserInputError(e.message)
-      }
-    },
+    mutedUsers: async (_object, _args, context, _resolveInfo) => getMutedUsers(context),
     blockedUsers: async (_object, _args, context, _resolveInfo) => {
-      try {
-        return getBlockedUsers(context)
-      } catch (e) {
-        throw new UserInputError(e.message)
-      }
+      const { neode } = context
+      const userModel = neode.model('User')
+      let blockedUsers = neode
+        .query()
+        .match('user', userModel)
+        .where('user.id', context.user.id)
+        .relationship(userModel.relationships().get('blocked'))
+        .to('blocked', userModel)
+        .return('blocked')
+      blockedUsers = await blockedUsers.execute()
+      blockedUsers = blockedUsers.records.map((r) => r.get('blocked').properties)
+      return blockedUsers
     },
     User: async (object, args, context, resolveInfo) => {
       if (args.email) {
@@ -140,9 +126,11 @@ export default {
         return unBlockUserTransactionResponse.records.map((record) => record.get('blockedUser'))[0]
       })
       try {
-        return await writeTxResultPromise
-      } catch (error) {
-        throw new UserInputError(error.message)
+        const blockedUser = await writeTxResultPromise
+        if (!blockedUser) {
+          throw new Error('Could not find User')
+        }
+        return blockedUser
       } finally {
         session.close()
       }
@@ -164,9 +152,13 @@ export default {
         return unBlockUserTransactionResponse.records.map((record) => record.get('blockedUser'))[0]
       })
       try {
-        return await writeTxResultPromise
-      } catch (error) {
-        throw new UserInputError(error.message)
+        const unblockedUser = await writeTxResultPromise
+        if (!unblockedUser) {
+          throw new Error('Could not find blocked User')
+        }
+        return unblockedUser
+      } catch {
+        throw new Error('Could not find blocked User')
       } finally {
         await session.close()
       }
