@@ -2,10 +2,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
+import { markTeaserAsViewed } from '@graphql/queries/markTeaserAsViewed'
 import createServer from '@src/server'
 
 const driver = getDriver()
@@ -37,14 +37,6 @@ afterAll(async () => {
 
 describe('count post teaser views', () => {
   let aUser, bUser
-  const markTeaserAsViewed = gql`
-    mutation ($id: ID!) {
-      markTeaserAsViewed(id: $id) {
-        id
-        viewedTeaserCount
-      }
-    }
-  `
 
   beforeAll(async () => {
     Factory.build('post', { id: 'post-to-be-viewed' })

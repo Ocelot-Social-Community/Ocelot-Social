@@ -11,7 +11,9 @@ import { verify } from 'jsonwebtoken'
 
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
+import { changePassword } from '@graphql/queries/changePassword'
 import { loginMutation } from '@graphql/queries/loginMutation'
+import { saveCategorySettings } from '@graphql/queries/saveCategorySettings'
 import { decode } from '@jwt/decode'
 import { encode } from '@jwt/encode'
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -201,11 +203,6 @@ describe('currentUser', () => {
         })
 
         describe('with categories saved for current user', () => {
-          const saveCategorySettings = gql`
-            mutation ($activeCategories: [String]) {
-              saveCategorySettings(activeCategories: $activeCategories)
-            }
-          `
           beforeEach(async () => {
             await mutate({
               mutation: saveCategorySettings,
@@ -341,16 +338,8 @@ describe('login', () => {
 })
 
 describe('change password', () => {
-  const changePasswordMutation = gql`
-    mutation ($oldPassword: String!, $newPassword: String!) {
-      changePassword(oldPassword: $oldPassword, newPassword: $newPassword)
-    }
-  `
-
   const respondsWith = async (expected) => {
-    await expect(mutate({ mutation: changePasswordMutation, variables })).resolves.toMatchObject(
-      expected,
-    )
+    await expect(mutate({ mutation: changePassword, variables })).resolves.toMatchObject(expected)
   }
 
   beforeEach(async () => {

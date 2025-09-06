@@ -6,6 +6,7 @@ import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { CreatePost } from '@graphql/queries/CreatePost'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -30,16 +31,6 @@ let postAuthor, groupMember
 const mentionString = `
   <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member">@group-member</a>
   <a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member">@email-less-member</a>`
-
-const createPostMutation = gql`
-  mutation ($id: ID, $title: String!, $content: String!, $groupId: ID) {
-    CreatePost(id: $id, title: $title, content: $content, groupId: $groupId) {
-      id
-      title
-      content
-    }
-  }
-`
 
 const createCommentMutation = gql`
   mutation ($id: ID, $postId: ID!, $content: String!) {
@@ -191,7 +182,7 @@ describe('emails sent for notifications', () => {
           jest.clearAllMocks()
           authenticatedUser = await postAuthor.toJson()
           await mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               id: 'post',
               title: 'This is the post',
@@ -269,7 +260,7 @@ describe('emails sent for notifications', () => {
           await groupMember.update({ emailNotificationsMention: false })
           authenticatedUser = await postAuthor.toJson()
           await mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               id: 'post',
               title: 'This is the post',
@@ -348,7 +339,7 @@ describe('emails sent for notifications', () => {
           await groupMember.update({ emailNotificationsFollowingUsers: false })
           authenticatedUser = await postAuthor.toJson()
           await mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               id: 'post',
               title: 'This is the post',
@@ -428,7 +419,7 @@ describe('emails sent for notifications', () => {
           await groupMember.update({ emailNotificationsPostInGroup: false })
           authenticatedUser = await postAuthor.toJson()
           await mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               id: 'post',
               title: 'This is the post',
@@ -502,7 +493,7 @@ describe('emails sent for notifications', () => {
         beforeEach(async () => {
           authenticatedUser = await postAuthor.toJson()
           await mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               id: 'post',
               title: 'This is the post',
@@ -590,7 +581,7 @@ describe('emails sent for notifications', () => {
           await groupMember.update({ emailNotificationsCommentOnObservedPost: false })
           authenticatedUser = await postAuthor.toJson()
           await mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               id: 'post',
               title: 'This is the post',
@@ -679,7 +670,7 @@ describe('emails sent for notifications', () => {
           await groupMember.update({ emailNotificationsMention: false })
           authenticatedUser = await postAuthor.toJson()
           await mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               id: 'post',
               title: 'This is the post',

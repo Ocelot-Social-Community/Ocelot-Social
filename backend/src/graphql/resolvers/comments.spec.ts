@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import { createComment } from '@graphql/queries/createComment'
+import { CreateComment } from '@graphql/queries/CreateComment'
 import { DeleteComment } from '@graphql/queries/DeleteComment'
 import { UpdateComment as updateComment } from '@graphql/queries/UpdateComment'
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -85,7 +85,7 @@ describe('CreateComment', () => {
         postId: 'p1',
         content: "I'm not authorized to comment",
       }
-      const { errors } = await mutate({ mutation: createComment, variables })
+      const { errors } = await mutate({ mutation: CreateComment, variables })
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -107,14 +107,14 @@ describe('CreateComment', () => {
       })
 
       it('creates a comment', async () => {
-        await expect(mutate({ mutation: createComment, variables })).resolves.toMatchObject({
+        await expect(mutate({ mutation: CreateComment, variables })).resolves.toMatchObject({
           data: { CreateComment: { content: "I'm authorized to comment" } },
           errors: undefined,
         })
       })
 
       it('assigns the authenticated user as author', async () => {
-        await expect(mutate({ mutation: createComment, variables })).resolves.toMatchObject({
+        await expect(mutate({ mutation: CreateComment, variables })).resolves.toMatchObject({
           data: { CreateComment: { author: { name: 'Author' } } },
           errors: undefined,
         })

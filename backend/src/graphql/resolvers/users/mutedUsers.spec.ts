@@ -7,6 +7,9 @@ import gql from 'graphql-tag'
 
 import { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
+import { mutedUsers } from '@graphql/queries/mutedUsers'
+import { muteUser } from '@graphql/queries/muteUser'
+import { unmuteUser } from '@graphql/queries/unmuteUser'
 import createServer from '@src/server'
 
 const driver = getDriver()
@@ -48,22 +51,9 @@ afterEach(async () => {
 })
 
 describe('mutedUsers', () => {
-  let mutedUserQuery
-  beforeEach(() => {
-    mutedUserQuery = gql`
-      query {
-        mutedUsers {
-          id
-          name
-          isMuted
-        }
-      }
-    `
-  })
-
   it('throws permission error', async () => {
     const { query } = createTestClient(server)
-    const result = await query({ query: mutedUserQuery })
+    const result = await query({ query: mutedUsers })
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
   })
@@ -84,7 +74,7 @@ describe('mutedUsers', () => {
 
     it('returns a list of muted users', async () => {
       const { query } = createTestClient(server)
-      await expect(query({ query: mutedUserQuery })).resolves.toEqual(
+      await expect(query({ query: mutedUsers })).resolves.toEqual(
         expect.objectContaining({
           data: {
             mutedUsers: [
@@ -108,16 +98,7 @@ describe('muteUser', () => {
     currentUser = undefined
     muteAction = (variables) => {
       const { mutate } = createTestClient(server)
-      const muteUserMutation = gql`
-        mutation ($id: ID!) {
-          muteUser(id: $id) {
-            id
-            name
-            isMuted
-          }
-        }
-      `
-      return mutate({ mutation: muteUserMutation, variables })
+      return mutate({ mutation: muteUser, variables })
     }
   })
 
@@ -325,16 +306,7 @@ describe('unmuteUser', () => {
     currentUser = undefined
     unmuteAction = (variables) => {
       const { mutate } = createTestClient(server)
-      const unmuteUserMutation = gql`
-        mutation ($id: ID!) {
-          unmuteUser(id: $id) {
-            id
-            name
-            isMuted
-          }
-        }
-      `
-      return mutate({ mutation: unmuteUserMutation, variables })
+      return mutate({ mutation: unmuteUser, variables })
     }
   })
 

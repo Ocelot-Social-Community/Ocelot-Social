@@ -7,7 +7,10 @@ import gql from 'graphql-tag'
 import Factory, { cleanDatabase } from '@db/factories'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { CreatePost } from '@graphql/queries/CreatePost'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
+import { muteGroup } from '@graphql/queries/muteGroup'
+import { unmuteGroup } from '@graphql/queries/unmuteGroup'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -26,16 +29,6 @@ let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
 let postAuthor, groupMember, pendingMember, emaillessMember
-
-const createPostMutation = gql`
-  mutation ($id: ID, $title: String!, $content: String!, $groupId: ID) {
-    CreatePost(id: $id, title: $title, content: $content, groupId: $groupId) {
-      id
-      title
-      content
-    }
-  }
-`
 
 const notificationQuery = gql`
   query ($read: Boolean) {
@@ -60,24 +53,6 @@ const notificationQuery = gql`
           id
         }
       }
-    }
-  }
-`
-
-const muteGroupMutation = gql`
-  mutation ($groupId: ID!) {
-    muteGroup(groupId: $groupId) {
-      id
-      isMutedByMe
-    }
-  }
-`
-
-const unmuteGroupMutation = gql`
-  mutation ($groupId: ID!) {
-    unmuteGroup(groupId: $groupId) {
-      id
-      isMutedByMe
     }
   }
 `
@@ -219,7 +194,7 @@ describe('notify group members of new posts in group', () => {
       authenticatedUser = await postAuthor.toJson()
       await markAllAsRead()
       await mutate({
-        mutation: createPostMutation,
+        mutation: CreatePost,
         variables: {
           id: 'post',
           title: 'This is the new post in the group',
@@ -302,7 +277,7 @@ describe('notify group members of new posts in group', () => {
       beforeEach(async () => {
         authenticatedUser = await groupMember.toJson()
         await mutate({
-          mutation: muteGroupMutation,
+          mutation: muteGroup,
           variables: {
             groupId: 'g-1',
           },
@@ -310,7 +285,7 @@ describe('notify group members of new posts in group', () => {
         jest.clearAllMocks()
         authenticatedUser = await postAuthor.toJson()
         await mutate({
-          mutation: createPostMutation,
+          mutation: CreatePost,
           variables: {
             id: 'post-1',
             title: 'This is another  post in the group',
@@ -344,7 +319,7 @@ describe('notify group members of new posts in group', () => {
         beforeEach(async () => {
           authenticatedUser = await groupMember.toJson()
           await mutate({
-            mutation: unmuteGroupMutation,
+            mutation: unmuteGroup,
             variables: {
               groupId: 'g-1',
             },
@@ -358,7 +333,7 @@ describe('notify group members of new posts in group', () => {
           await markAllAsRead()
           authenticatedUser = await postAuthor.toJson()
           await mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               id: 'post-2',
               title: 'This is yet another  post in the group',
@@ -405,7 +380,7 @@ describe('notify group members of new posts in group', () => {
         jest.clearAllMocks()
         authenticatedUser = await postAuthor.toJson()
         await mutate({
-          mutation: createPostMutation,
+          mutation: CreatePost,
           variables: {
             id: 'post-1',
             title: 'This is another  post in the group',
@@ -445,7 +420,7 @@ describe('notify group members of new posts in group', () => {
         jest.clearAllMocks()
         authenticatedUser = await postAuthor.toJson()
         await mutate({
-          mutation: createPostMutation,
+          mutation: CreatePost,
           variables: {
             id: 'post-1',
             title: 'This is another  post in the group',

@@ -4,6 +4,7 @@
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
+import { queryLocations } from '@graphql/queries/queryLocations'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -22,14 +23,6 @@ const updateUserMutation = gql`
   mutation ($id: ID!, $name: String!, $locationName: String) {
     UpdateUser(id: $id, name: $name, locationName: $locationName) {
       locationName
-    }
-  }
-`
-const queryLocations = gql`
-  query ($place: String!, $lang: String!) {
-    queryLocations(place: $place, lang: $lang) {
-      place_name
-      id
     }
   }
 `

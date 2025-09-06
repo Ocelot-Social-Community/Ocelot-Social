@@ -3,9 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import gql from 'graphql-tag'
-
 import Factory, { cleanDatabase } from '@db/factories'
+import { DeletePost } from '@graphql/queries/DeletePost'
 import { markAllAsReadMutation } from '@graphql/queries/markAllAsReadMutation'
 import { markAsReadMutation } from '@graphql/queries/markAsReadMutation'
 import { notificationQuery } from '@graphql/queries/notificationQuery'
@@ -245,16 +244,8 @@ describe('given some notifications', () => {
         describe('if a resource gets deleted', () => {
           const deletePostAction = async () => {
             authenticatedUser = await author.toJson()
-            const deletePostMutation = gql`
-              mutation ($id: ID!) {
-                DeletePost(id: $id) {
-                  id
-                  deleted
-                }
-              }
-            `
             await expect(
-              mutate({ mutation: deletePostMutation, variables: { id: 'p3' } }),
+              mutate({ mutation: DeletePost, variables: { id: 'p3' } }),
             ).resolves.toMatchObject({
               data: { DeletePost: { id: 'p3', deleted: true } },
               errors: undefined,

@@ -5,9 +5,9 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 import fetch from 'node-fetch'
 
+import { embed } from '@graphql/queries/embed'
 import createServer from '@src/server'
 
 jest.mock('node-fetch')
@@ -65,25 +65,6 @@ describe('Query', () => {
           context: () => {},
         })
         const { query } = createTestClient(server)
-        const embed = gql`
-          query ($url: String!) {
-            embed(url: $url) {
-              type
-              title
-              author
-              publisher
-              date
-              description
-              url
-              image
-              audio
-              video
-              lang
-              sources
-              html
-            }
-          }
-        `
         return query({ query: embed, variables })
       }
     })

@@ -11,10 +11,12 @@ import Factory, { cleanDatabase } from '@db/factories'
 import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
 import { CreateMessage } from '@graphql/queries/CreateMessage'
+import { CreatePost } from '@graphql/queries/CreatePost'
 import { createRoomMutation } from '@graphql/queries/createRoomMutation'
 import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
 import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
 import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
+import { UpdatePost } from '@graphql/queries/UpdatePost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -45,23 +47,6 @@ let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
 const categoryIds = ['cat9']
-const createPostMutation = gql`
-  mutation ($id: ID, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
-    CreatePost(id: $id, title: $title, content: $postContent, categoryIds: $categoryIds) {
-      id
-      title
-      content
-    }
-  }
-`
-const updatePostMutation = gql`
-  mutation ($id: ID!, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
-    UpdatePost(id: $id, content: $postContent, title: $title, categoryIds: $categoryIds) {
-      title
-      content
-    }
-  }
-`
 const createCommentMutation = gql`
   mutation ($id: ID, $postId: ID!, $commentContent: String!) {
     CreateComment(id: $id, postId: $postId, content: $commentContent) {
@@ -153,7 +138,7 @@ describe('notifications', () => {
       const createPostAction = async () => {
         authenticatedUser = await postAuthor.toJson()
         await mutate({
-          mutation: createPostMutation,
+          mutation: CreatePost,
           variables: {
             id: 'p47',
             title,
@@ -476,7 +461,7 @@ describe('notifications', () => {
             `
             authenticatedUser = await postAuthor.toJson()
             await mutate({
-              mutation: updatePostMutation,
+              mutation: UpdatePost,
               variables: {
                 id: 'p47',
                 title,

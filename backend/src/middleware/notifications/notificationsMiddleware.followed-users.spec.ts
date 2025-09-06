@@ -6,6 +6,7 @@ import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { CreatePost } from '@graphql/queries/CreatePost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -24,16 +25,6 @@ let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
 let postAuthor, firstFollower, secondFollower, thirdFollower, emaillessFollower
-
-const createPostMutation = gql`
-  mutation ($id: ID, $title: String!, $content: String!, $groupId: ID) {
-    CreatePost(id: $id, title: $title, content: $content, groupId: $groupId) {
-      id
-      title
-      content
-    }
-  }
-`
 
 const notificationQuery = gql`
   query ($read: Boolean) {
@@ -169,7 +160,7 @@ describe('following users notifications', () => {
     beforeAll(async () => {
       authenticatedUser = await postAuthor.toJson()
       await mutate({
-        mutation: createPostMutation,
+        mutation: CreatePost,
         variables: {
           id: 'post',
           title: 'This is the post',
@@ -291,7 +282,7 @@ describe('following users notifications', () => {
         },
       })
       await mutate({
-        mutation: createPostMutation,
+        mutation: CreatePost,
         variables: {
           id: 'group-post',
           title: 'This is the post in the group',
@@ -360,7 +351,7 @@ describe('following users notifications', () => {
         },
       })
       await mutate({
-        mutation: createPostMutation,
+        mutation: CreatePost,
         variables: {
           id: 'closed-group-post',
           title: 'This is the post in the closed group',
@@ -429,7 +420,7 @@ describe('following users notifications', () => {
         },
       })
       await mutate({
-        mutation: createPostMutation,
+        mutation: CreatePost,
         variables: {
           id: 'hidden-group-post',
           title: 'This is the post in the hidden group',

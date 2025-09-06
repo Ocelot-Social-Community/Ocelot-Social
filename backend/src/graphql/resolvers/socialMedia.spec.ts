@@ -8,6 +8,8 @@ import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
+import { DeleteSocialMedia } from '@graphql/queries/DeleteSocialMedia'
+import { UpdateSocialMedia } from '@graphql/queries/UpdateSocialMedia'
 import createServer from '@src/server'
 
 const driver = getDriver()
@@ -172,26 +174,17 @@ describe('SocialMedia', () => {
   })
 
   describe('update social media', () => {
-    let mutation, variables
+    let variables
 
     beforeEach(async () => {
       const socialMedia = await setUpSocialMedia()
-
-      mutation = gql`
-        mutation ($id: ID!, $url: String!) {
-          UpdateSocialMedia(id: $id, url: $url) {
-            id
-            url
-          }
-        }
-      `
       variables = { url: newUrl, id: socialMedia.id }
     })
 
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const user = null
-        const result = await socialMediaAction(user, mutation, variables)
+        const result = await socialMediaAction(user, UpdateSocialMedia, variables)
 
         expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
@@ -200,7 +193,7 @@ describe('SocialMedia', () => {
     describe('authenticated as other user', () => {
       it('throws authorization error', async () => {
         const user = someUser
-        const result = await socialMediaAction(user, mutation, variables)
+        const result = await socialMediaAction(user, UpdateSocialMedia, variables)
 
         expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
@@ -220,14 +213,14 @@ describe('SocialMedia', () => {
           },
         }
 
-        await expect(socialMediaAction(user, mutation, variables)).resolves.toEqual(
+        await expect(socialMediaAction(user, UpdateSocialMedia, variables)).resolves.toEqual(
           expect.objectContaining(expected),
         )
       })
 
       it('does not update if the the given id does not exist', async () => {
         variables.id = 'some-id'
-        const result = await socialMediaAction(user, mutation, variables)
+        const result = await socialMediaAction(user, UpdateSocialMedia, variables)
 
         expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
@@ -235,26 +228,17 @@ describe('SocialMedia', () => {
   })
 
   describe('delete social media', () => {
-    let mutation, variables
+    let variables
 
     beforeEach(async () => {
       const socialMedia = await setUpSocialMedia()
-
-      mutation = gql`
-        mutation ($id: ID!) {
-          DeleteSocialMedia(id: $id) {
-            id
-            url
-          }
-        }
-      `
       variables = { url: newUrl, id: socialMedia.id }
     })
 
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const user = null
-        const result = await socialMediaAction(user, mutation, variables)
+        const result = await socialMediaAction(user, DeleteSocialMedia, variables)
 
         expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
@@ -263,7 +247,7 @@ describe('SocialMedia', () => {
     describe('authenticated as other user', () => {
       it('throws authorization error', async () => {
         const user = someUser
-        const result = await socialMediaAction(user, mutation, variables)
+        const result = await socialMediaAction(user, DeleteSocialMedia, variables)
 
         expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
@@ -286,7 +270,7 @@ describe('SocialMedia', () => {
           },
         }
 
-        await expect(socialMediaAction(user, mutation, variables)).resolves.toEqual(
+        await expect(socialMediaAction(user, DeleteSocialMedia, variables)).resolves.toEqual(
           expect.objectContaining(expected),
         )
       })

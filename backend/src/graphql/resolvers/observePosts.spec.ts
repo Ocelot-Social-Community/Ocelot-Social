@@ -5,6 +5,7 @@ import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { createPostMutation } from '@graphql/queries/createPostMutation'
+import { toggleObservePost } from '@graphql/queries/toggleObservePost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -158,20 +159,11 @@ describe('observing posts', () => {
       authenticatedUser = await otherUser.toJson()
     })
 
-    const toggleObservePostMutation = gql`
-      mutation ($id: ID!, $value: Boolean!) {
-        toggleObservePost(id: $id, value: $value) {
-          isObservedByMe
-          observingUsersCount
-        }
-      }
-    `
-
     describe('switch off observation', () => {
       it('does not observe the post anymore', async () => {
         await expect(
           mutate({
-            mutation: toggleObservePostMutation,
+            mutation: toggleObservePost,
             variables: {
               id: 'p2',
               value: false,
@@ -232,7 +224,7 @@ describe('observing posts', () => {
       it('does observe the post again', async () => {
         await expect(
           mutate({
-            mutation: toggleObservePostMutation,
+            mutation: toggleObservePost,
             variables: {
               id: 'p2',
               value: true,
