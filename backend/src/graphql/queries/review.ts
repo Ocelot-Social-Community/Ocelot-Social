@@ -5,6 +5,33 @@ export const review = gql`
     review(resourceId: $resourceId, disable: $disable, closed: $closed) {
       createdAt
       updatedAt
+      resource {
+        __typename
+        ... on User {
+          id
+          disabled
+        }
+        ... on Post {
+          id
+          disabled
+        }
+        ... on Comment {
+          id
+          disabled
+        }
+      }
+      report {
+        id
+        createdAt
+        updatedAt
+        closed
+        reviewed {
+          createdAt
+          moderator {
+            id
+          }
+        }
+      }
     }
   }
 `
