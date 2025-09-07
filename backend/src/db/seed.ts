@@ -8,11 +8,11 @@ import sample from 'lodash/sample'
 
 import CONFIG from '@config/index'
 import { categories } from '@constants/categories'
-import { createPostMutation } from '@graphql/queries/_createPostMutation'
 import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
 import { CreateComment } from '@graphql/queries/CreateComment'
 import { CreateGroup } from '@graphql/queries/CreateGroup'
 import { CreateMessage } from '@graphql/queries/CreateMessage'
+import { CreatePost } from '@graphql/queries/CreatePost'
 import { CreateRoom } from '@graphql/queries/CreateRoom'
 import { JoinGroup } from '@graphql/queries/JoinGroup'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -396,7 +396,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     // eslint-disable-next-line no-console
     console.log('seed', 'group posts')
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'p0-g0',
         groupId: 'g0',
@@ -408,7 +408,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     authenticatedUser = await bobDerBaumeister.toJson()
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'p1-g0',
         groupId: 'g0',
@@ -493,7 +493,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'p0-g1',
         groupId: 'g1',
@@ -504,7 +504,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     })
     authenticatedUser = await peterLustig.toJson()
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'p1-g1',
         groupId: 'g1',
@@ -598,7 +598,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     authenticatedUser = await louie.toJson()
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'p0-g2',
         groupId: 'g2',
@@ -614,7 +614,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     const now = new Date()
 
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'e0',
         title: 'Illegaler Kindergeburtstag',
@@ -629,7 +629,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'e1',
         title: 'Wir Schützen den Stuttgarter Schlossgarten',
@@ -644,7 +644,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'e2',
         title: 'IT 4 Change Treffen',
@@ -848,7 +848,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       'The new physics of <a class="hashtag" data-hashtag-id="QuantenFlussTheorie" href="/?hashtag=QuantenFlussTheorie">#QuantenFlussTheorie</a> can explain <a class="hashtag" data-hashtag-id="QuantumGravity" href="/?hashtag=QuantumGravity">#QuantumGravity</a>! <a class="mention" data-mention-id="u1" href="/profile/u1">@peter-lustig</a> got that already. ;-)'
 
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'p2',
         title: `Nature Philosophy Yoga`,
@@ -857,7 +857,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'p7',
         title: 'This is post #7',
@@ -866,7 +866,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'p8',
         title: `Quantum Flow Theory explains Quantum Gravity`,
@@ -875,7 +875,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'p12',
         title: 'This is post #12',

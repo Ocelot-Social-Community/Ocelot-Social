@@ -3,8 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import { createPostMutation } from '@graphql/queries/_createPostMutation'
 import { CreateGroup } from '@graphql/queries/CreateGroup'
+import { CreatePost } from '@graphql/queries/CreatePost'
 import { SignupVerification } from '@graphql/queries/SignupVerification'
 import { UpdateGroup } from '@graphql/queries/UpdateGroup'
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -312,7 +312,7 @@ describe('slugifyMiddleware', () => {
       it('generates a slug based on title', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables,
           }),
         ).resolves.toMatchObject({
@@ -328,7 +328,7 @@ describe('slugifyMiddleware', () => {
       it('generates a slug based on given slug', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               ...variables,
               slug: 'the-post',
@@ -363,7 +363,7 @@ describe('slugifyMiddleware', () => {
       it('chooses another slug', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               ...variables,
               title: 'Pre-existing post',
@@ -386,7 +386,7 @@ describe('slugifyMiddleware', () => {
           try {
             await expect(
               mutate({
-                mutation: createPostMutation,
+                mutation: CreatePost,
                 variables: {
                   ...variables,
                   title: 'Pre-existing post',

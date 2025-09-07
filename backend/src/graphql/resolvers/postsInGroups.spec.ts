@@ -3,12 +3,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import { createPostMutation } from '@graphql/queries/_createPostMutation'
 import { filterPosts } from '@graphql/queries/_filterPosts'
 import { postQuery } from '@graphql/queries/_postQuery'
 import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
 import { CreateComment } from '@graphql/queries/CreateComment'
 import { CreateGroup } from '@graphql/queries/CreateGroup'
+import { CreatePost } from '@graphql/queries/CreatePost'
 import { LeaveGroup } from '@graphql/queries/LeaveGroup'
 import { profilePagePosts } from '@graphql/queries/profilePagePosts'
 import { searchPosts } from '@graphql/queries/searchPosts'
@@ -177,7 +177,7 @@ describe('Posts in Groups', () => {
     })
     authenticatedUser = await anyUser.toJson()
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'post-without-group',
         title: 'A post without a group',
@@ -195,7 +195,7 @@ describe('Posts in Groups', () => {
       it('throws an error for public groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               id: 'p2',
               title: 'A post to a pubic group',
@@ -211,7 +211,7 @@ describe('Posts in Groups', () => {
       it('throws an error for closed groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               id: 'p2',
               title: 'A post to a closed group',
@@ -227,7 +227,7 @@ describe('Posts in Groups', () => {
       it('throws an error for hidden groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               id: 'p2',
               title: 'A post to a closed group',
@@ -249,7 +249,7 @@ describe('Posts in Groups', () => {
       it('throws an error for public groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               id: 'p2',
               title: 'A post to a pubic group',
@@ -265,7 +265,7 @@ describe('Posts in Groups', () => {
       it('throws an error for closed groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               id: 'p2',
               title: 'A post to a closed group',
@@ -281,7 +281,7 @@ describe('Posts in Groups', () => {
       it('throws an error for hidden groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               id: 'p2',
               title: 'A post to a closed group',
@@ -303,7 +303,7 @@ describe('Posts in Groups', () => {
       it('creates a post for public groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               id: 'post-to-public-group',
               title: 'A post to a public group',
@@ -326,7 +326,7 @@ describe('Posts in Groups', () => {
       it('creates a post for closed groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               id: 'post-to-closed-group',
               title: 'A post to a closed group',
@@ -349,7 +349,7 @@ describe('Posts in Groups', () => {
       it('creates a post for hidden groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation,
+            mutation: CreatePost,
             variables: {
               id: 'post-to-hidden-group',
               title: 'A post to a hidden group',

@@ -3,8 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Factory, { cleanDatabase } from '@db/factories'
-import { createPostMutation } from '@graphql/queries/_createPostMutation'
 import { filterPosts } from '@graphql/queries/_filterPosts'
+import { CreatePost } from '@graphql/queries/CreatePost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -45,7 +45,7 @@ describe('Filter Posts', () => {
     })
     authenticatedUser = await user.toJson()
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'a1',
         title: 'I am an article',
@@ -53,7 +53,7 @@ describe('Filter Posts', () => {
       },
     })
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'a2',
         title: 'I am anonther article',
@@ -61,7 +61,7 @@ describe('Filter Posts', () => {
       },
     })
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'e1',
         title: 'Illegaler Kindergeburtstag',
@@ -74,7 +74,7 @@ describe('Filter Posts', () => {
       },
     })
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'e2',
         title: 'Räuber-Treffen',
