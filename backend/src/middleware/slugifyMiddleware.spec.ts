@@ -3,10 +3,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import { createGroupMutation } from '@graphql/queries/createGroupMutation'
-import { createPostMutation } from '@graphql/queries/createPostMutation'
-import { signupVerificationMutation } from '@graphql/queries/signupVerificationMutation'
-import { updateGroupMutation } from '@graphql/queries/updateGroupMutation'
+import { CreateGroup } from '@graphql/queries/CreateGroup'
+import { CreatePost } from '@graphql/queries/CreatePost'
+import { SignupVerification } from '@graphql/queries/SignupVerification'
+import { UpdateGroup } from '@graphql/queries/UpdateGroup'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -82,7 +82,7 @@ describe('slugifyMiddleware', () => {
       it('generates a slug based on name', async () => {
         await expect(
           mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables,
           }),
         ).resolves.toMatchObject({
@@ -103,7 +103,7 @@ describe('slugifyMiddleware', () => {
       it('generates a slug based on given slug', async () => {
         await expect(
           mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               ...variables,
               slug: 'the-group',
@@ -123,7 +123,7 @@ describe('slugifyMiddleware', () => {
     describe('if slug exists', () => {
       beforeEach(async () => {
         await mutate({
-          mutation: createGroupMutation(),
+          mutation: CreateGroup,
           variables: {
             ...variables,
             name: 'Pre-Existing Group',
@@ -136,7 +136,7 @@ describe('slugifyMiddleware', () => {
       it('chooses another slug', async () => {
         await expect(
           mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               ...variables,
               name: 'Pre-Existing Group',
@@ -158,7 +158,7 @@ describe('slugifyMiddleware', () => {
           try {
             await expect(
               mutate({
-                mutation: createGroupMutation(),
+                mutation: CreateGroup,
                 variables: {
                   ...variables,
                   name: 'Pre-Existing Group',
@@ -199,7 +199,7 @@ describe('slugifyMiddleware', () => {
 
     beforeEach(async () => {
       createGroupResult = await mutate({
-        mutation: createGroupMutation(),
+        mutation: CreateGroup,
         variables: {
           name: 'The Best Group',
           slug: 'the-best-group',
@@ -218,7 +218,7 @@ describe('slugifyMiddleware', () => {
           it('has the new slug', async () => {
             await expect(
               mutate({
-                mutation: updateGroupMutation(),
+                mutation: UpdateGroup,
                 variables: {
                   id: createGroupResult.data.CreateGroup.id,
                   slug: 'my-best-group',
@@ -245,7 +245,7 @@ describe('slugifyMiddleware', () => {
       describe('if new slug exists in another group', () => {
         beforeEach(async () => {
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               name: 'Pre-Existing Group',
               slug: 'pre-existing-group',
@@ -263,7 +263,7 @@ describe('slugifyMiddleware', () => {
             try {
               await expect(
                 mutate({
-                  mutation: updateGroupMutation(),
+                  mutation: UpdateGroup,
                   variables: {
                     id: createGroupResult.data.CreateGroup.id,
                     slug: 'pre-existing-group',
@@ -312,7 +312,7 @@ describe('slugifyMiddleware', () => {
       it('generates a slug based on title', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation(),
+            mutation: CreatePost,
             variables,
           }),
         ).resolves.toMatchObject({
@@ -328,7 +328,7 @@ describe('slugifyMiddleware', () => {
       it('generates a slug based on given slug', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation(),
+            mutation: CreatePost,
             variables: {
               ...variables,
               slug: 'the-post',
@@ -363,7 +363,7 @@ describe('slugifyMiddleware', () => {
       it('chooses another slug', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation(),
+            mutation: CreatePost,
             variables: {
               ...variables,
               title: 'Pre-existing post',
@@ -386,7 +386,7 @@ describe('slugifyMiddleware', () => {
           try {
             await expect(
               mutate({
-                mutation: createPostMutation(),
+                mutation: CreatePost,
                 variables: {
                   ...variables,
                   title: 'Pre-existing post',
@@ -450,7 +450,7 @@ describe('slugifyMiddleware', () => {
         it('generates a slug based on name', async () => {
           await expect(
             mutate({
-              mutation: signupVerificationMutation,
+              mutation: SignupVerification,
               variables,
             }),
           ).resolves.toMatchObject({
@@ -466,7 +466,7 @@ describe('slugifyMiddleware', () => {
         it('generates a slug based on given slug', async () => {
           await expect(
             mutate({
-              mutation: signupVerificationMutation,
+              mutation: SignupVerification,
               variables: {
                 ...variables,
                 slug: 'the-user',
@@ -494,7 +494,7 @@ describe('slugifyMiddleware', () => {
         it('chooses another slug', async () => {
           await expect(
             mutate({
-              mutation: signupVerificationMutation,
+              mutation: SignupVerification,
               variables,
             }),
           ).resolves.toMatchObject({
@@ -518,7 +518,7 @@ describe('slugifyMiddleware', () => {
           it('rejects SignupVerification (on FAIL Neo4j constraints may not defined in database)', async () => {
             await expect(
               mutate({
-                mutation: signupVerificationMutation,
+                mutation: SignupVerification,
                 variables,
               }),
             ).resolves.toMatchObject({

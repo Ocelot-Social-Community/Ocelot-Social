@@ -3,12 +3,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import gql from 'graphql-tag'
-
 import Factory, { cleanDatabase } from '@db/factories'
-import { markAllAsReadMutation } from '@graphql/queries/markAllAsReadMutation'
-import { markAsReadMutation } from '@graphql/queries/markAsReadMutation'
-import { notificationQuery } from '@graphql/queries/notificationQuery'
+import { DeletePost } from '@graphql/queries/DeletePost'
+import { markAllAsRead } from '@graphql/queries/markAllAsRead'
+import { markAsRead } from '@graphql/queries/markAsRead'
+import { notifications } from '@graphql/queries/notifications'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -154,7 +153,7 @@ describe('given some notifications', () => {
   describe('notifications', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
-        const { errors } = await query({ query: notificationQuery() })
+        const { errors } = await query({ query: notifications })
         expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -201,7 +200,7 @@ describe('given some notifications', () => {
             },
           ]
 
-          await expect(query({ query: notificationQuery(), variables })).resolves.toMatchObject({
+          await expect(query({ query: notifications, variables })).resolves.toMatchObject({
             data: {
               notifications: expect.arrayContaining(expected),
             },
@@ -235,7 +234,7 @@ describe('given some notifications', () => {
             },
           })
           const response = await query({
-            query: notificationQuery(),
+            query: notifications,
             variables: { ...variables, read: false },
           })
           await expect(response).toMatchObject(expected)
@@ -245,16 +244,8 @@ describe('given some notifications', () => {
         describe('if a resource gets deleted', () => {
           const deletePostAction = async () => {
             authenticatedUser = await author.toJson()
-            const deletePostMutation = gql`
-              mutation ($id: ID!) {
-                DeletePost(id: $id) {
-                  id
-                  deleted
-                }
-              }
-            `
             await expect(
-              mutate({ mutation: deletePostMutation, variables: { id: 'p3' } }),
+              mutate({ mutation: DeletePost, variables: { id: 'p3' } }),
             ).resolves.toMatchObject({
               data: { DeletePost: { id: 'p3', deleted: true } },
               errors: undefined,
@@ -264,14 +255,14 @@ describe('given some notifications', () => {
 
           it('reduces notifications list', async () => {
             await expect(
-              query({ query: notificationQuery(), variables: { ...variables, read: false } }),
+              query({ query: notifications, variables: { ...variables, read: false } }),
             ).resolves.toMatchObject({
               data: { notifications: [expect.any(Object), expect.any(Object)] },
               errors: undefined,
             })
             await deletePostAction()
             await expect(
-              query({ query: notificationQuery(), variables: { ...variables, read: false } }),
+              query({ query: notifications, variables: { ...variables, read: false } }),
             ).resolves.toMatchObject({ data: { notifications: [] }, errors: undefined })
           })
         })
@@ -283,7 +274,7 @@ describe('given some notifications', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const result = await mutate({
-          mutation: markAsReadMutation(),
+          mutation: markAsRead,
           variables: { ...variables, id: 'p1' },
         })
         expect(result.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -304,7 +295,7 @@ describe('given some notifications', () => {
         })
 
         it('returns null', async () => {
-          const response = await mutate({ mutation: markAsReadMutation(), variables })
+          const response = await mutate({ mutation: markAsRead, variables })
           expect(response.data?.markAsRead).toEqual(null)
           expect(response.errors).toBeUndefined()
         })
@@ -320,7 +311,7 @@ describe('given some notifications', () => {
           })
 
           it('updates `read` attribute and returns NOTIFIED relationship', async () => {
-            const { data } = await mutate({ mutation: markAsReadMutation(), variables })
+            const { data } = await mutate({ mutation: markAsRead, variables })
             expect(data).toEqual({
               markAsRead: {
                 from: {
@@ -341,7 +332,7 @@ describe('given some notifications', () => {
               }
             })
             it('returns null', async () => {
-              const response = await mutate({ mutation: markAsReadMutation(), variables })
+              const response = await mutate({ mutation: markAsRead, variables })
               expect(response.data?.markAsRead).toEqual(null)
               expect(response.errors).toBeUndefined()
             })
@@ -357,7 +348,7 @@ describe('given some notifications', () => {
           })
 
           it('updates `read` attribute and returns NOTIFIED relationship', async () => {
-            const { data } = await mutate({ mutation: markAsReadMutation(), variables })
+            const { data } = await mutate({ mutation: markAsRead, variables })
             expect(data).toEqual({
               markAsRead: {
                 from: {
@@ -378,7 +369,7 @@ describe('given some notifications', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const result = await mutate({
-          mutation: markAllAsReadMutation(),
+          mutation: markAllAsRead,
         })
         expect(result.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
@@ -397,7 +388,7 @@ describe('given some notifications', () => {
         })
 
         it('returns all as read', async () => {
-          const response = await mutate({ mutation: markAllAsReadMutation(), variables })
+          const response = await mutate({ mutation: markAllAsRead, variables })
           expect(response.data?.markAllAsRead).toEqual(
             expect.arrayContaining([
               {

@@ -6,6 +6,7 @@ import gql from 'graphql-tag'
 import Factory, { cleanDatabase } from '@db/factories'
 import EmailAddress from '@db/models/EmailAddress'
 import User from '@db/models/User'
+import { Signup } from '@graphql/queries/Signup'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -43,13 +44,6 @@ afterEach(async () => {
 })
 
 describe('Signup', () => {
-  const mutation = gql`
-    mutation ($email: String!, $locale: String!, $inviteCode: String) {
-      Signup(email: $email, locale: $locale, inviteCode: $inviteCode) {
-        email
-      }
-    }
-  `
   beforeEach(() => {
     variables = { ...variables, email: 'someuser@example.org', locale: 'de' }
   })
@@ -64,7 +58,7 @@ describe('Signup', () => {
     })
 
     it('throws AuthorizationError', async () => {
-      await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: Signup, variables })).resolves.toMatchObject({
         errors: [{ message: 'Not Authorized!' }],
       })
     })
@@ -85,7 +79,7 @@ describe('Signup', () => {
       })
 
       it('is allowed to signup users by email', async () => {
-        await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+        await expect(mutate({ mutation: Signup, variables })).resolves.toMatchObject({
           data: { Signup: { email: 'someuser@example.org' } },
           errors: undefined,
         })
@@ -93,7 +87,7 @@ describe('Signup', () => {
 
       describe('creates a EmailAddress node', () => {
         it('with `createdAt` attribute', async () => {
-          await mutate({ mutation, variables })
+          await mutate({ mutation: Signup, variables })
           const emailAddress = await database.neode.first<typeof EmailAddress>(
             'EmailAddress',
             { email: 'someuser@example.org' },
@@ -107,7 +101,7 @@ describe('Signup', () => {
         })
 
         it('with a cryptographic `nonce`', async () => {
-          await mutate({ mutation, variables })
+          await mutate({ mutation: Signup, variables })
           const emailAddress = await database.neode.first<typeof EmailAddress>(
             'EmailAddress',
             { email: 'someuser@example.org' },
@@ -133,7 +127,7 @@ describe('Signup', () => {
             })
 
             it('does not throw UserInputError error', async () => {
-              await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+              await expect(mutate({ mutation: Signup, variables })).resolves.toMatchObject({
                 data: { Signup: { email: 'someuser@example.org' } },
               })
             })
@@ -141,7 +135,7 @@ describe('Signup', () => {
 
           describe('but the user has not yet registered', () => {
             it('resolves with the already existing email', async () => {
-              await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+              await expect(mutate({ mutation: Signup, variables })).resolves.toMatchObject({
                 data: { Signup: { email: 'someuser@example.org' } },
                 errors: undefined,
               })
@@ -150,7 +144,7 @@ describe('Signup', () => {
             it('creates no additional `EmailAddress` node', async () => {
               // admin account and the already existing user
               await expect(database.neode.all('EmailAddress')).resolves.toHaveLength(2)
-              await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+              await expect(mutate({ mutation: Signup, variables })).resolves.toMatchObject({
                 data: { Signup: { email: 'someuser@example.org' } },
                 errors: undefined,
               })

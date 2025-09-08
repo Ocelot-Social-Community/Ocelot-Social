@@ -4,6 +4,7 @@
 import gql from 'graphql-tag'
 
 import { cleanDatabase } from '@db/factories'
+import { UpdatePost } from '@graphql/queries/UpdatePost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -20,14 +21,6 @@ const createPostMutation = gql`
   mutation ($id: ID, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
     CreatePost(id: $id, title: $title, content: $postContent, categoryIds: $categoryIds) {
       id
-      title
-      content
-    }
-  }
-`
-const updatePostMutation = gql`
-  mutation ($id: ID!, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
-    UpdatePost(id: $id, content: $postContent, title: $title, categoryIds: $categoryIds) {
       title
       content
     }
@@ -176,7 +169,7 @@ describe('hashtags', () => {
 
         it('only one previous Hashtag and the new Hashtag exists', async () => {
           await mutate({
-            mutation: updatePostMutation,
+            mutation: UpdatePost,
             variables: {
               id,
               title,

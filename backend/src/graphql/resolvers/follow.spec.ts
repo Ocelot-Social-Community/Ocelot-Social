@@ -7,6 +7,8 @@ import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver, getNeode } from '@db/neo4j'
+import { followUser } from '@graphql/queries/followUser'
+import { unfollowUser } from '@graphql/queries/unfollowUser'
 import createServer from '@src/server'
 
 const driver = getDriver()
@@ -20,30 +22,6 @@ let user1
 let user2
 let variables
 
-const mutationFollowUser = gql`
-  mutation ($id: ID!) {
-    followUser(id: $id) {
-      name
-      followedBy {
-        id
-        name
-      }
-      followedByCurrentUser
-    }
-  }
-`
-const mutationUnfollowUser = gql`
-  mutation ($id: ID!) {
-    unfollowUser(id: $id) {
-      name
-      followedBy {
-        id
-        name
-      }
-      followedByCurrentUser
-    }
-  }
-`
 const userQuery = gql`
   query ($id: ID) {
     User(id: $id) {
@@ -119,7 +97,7 @@ describe('follow', () => {
         authenticatedUser = null
         await expect(
           mutate({
-            mutation: mutationFollowUser,
+            mutation: followUser,
             variables,
           }),
         ).resolves.toMatchObject({
@@ -137,7 +115,7 @@ describe('follow', () => {
       }
       await expect(
         mutate({
-          mutation: mutationFollowUser,
+          mutation: followUser,
           variables,
         }),
       ).resolves.toMatchObject({
@@ -148,7 +126,7 @@ describe('follow', () => {
 
     test('adds `createdAt` to `FOLLOW` relationship', async () => {
       await mutate({
-        mutation: mutationFollowUser,
+        mutation: followUser,
         variables,
       })
       const relation = await neode.cypher(
@@ -163,7 +141,7 @@ describe('follow', () => {
 
     test('I can`t follow myself', async () => {
       variables.id = user1.id
-      await expect(mutate({ mutation: mutationFollowUser, variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: followUser, variables })).resolves.toMatchObject({
         data: { followUser: null },
         errors: undefined,
       })
@@ -189,13 +167,13 @@ describe('follow', () => {
   describe('unfollow user', () => {
     beforeEach(async () => {
       variables = { id: user2.id }
-      await mutate({ mutation: mutationFollowUser, variables })
+      await mutate({ mutation: followUser, variables })
     })
 
     describe('unauthenticated follow', () => {
       test('throws authorization error', async () => {
         authenticatedUser = null
-        await expect(mutate({ mutation: mutationUnfollowUser, variables })).resolves.toMatchObject({
+        await expect(mutate({ mutation: unfollowUser, variables })).resolves.toMatchObject({
           data: { unfollowUser: null },
           errors: [{ message: 'Not Authorized!' }],
         })
@@ -208,7 +186,7 @@ describe('follow', () => {
         followedBy: [],
         followedByCurrentUser: false,
       }
-      await expect(mutate({ mutation: mutationUnfollowUser, variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: unfollowUser, variables })).resolves.toMatchObject({
         data: { unfollowUser: expectedUser },
         errors: undefined,
       })

@@ -13,7 +13,7 @@ import { UserInputError } from 'apollo-server'
 import Factory, { cleanDatabase } from '@db/factories'
 import File from '@db/models/File'
 import { CreateMessage } from '@graphql/queries/CreateMessage'
-import { createRoomMutation } from '@graphql/queries/createRoomMutation'
+import { CreateRoom } from '@graphql/queries/CreateRoom'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { S3Config } from '@src/config'
@@ -93,7 +93,7 @@ describe('delete Attachment', () => {
 
       authenticatedUser = user
       const { data: room } = await mutate({
-        mutation: createRoomMutation(),
+        mutation: CreateRoom,
         variables: {
           userId: chatPartner.id,
         },

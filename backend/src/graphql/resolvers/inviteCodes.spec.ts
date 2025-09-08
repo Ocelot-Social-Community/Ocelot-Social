@@ -3,14 +3,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { CreateGroup } from '@graphql/queries/CreateGroup'
 import { currentUser } from '@graphql/queries/currentUser'
 import { generateGroupInviteCode } from '@graphql/queries/generateGroupInviteCode'
 import { generatePersonalInviteCode } from '@graphql/queries/generatePersonalInviteCode'
 import { Group } from '@graphql/queries/Group'
 import { GroupMembers } from '@graphql/queries/GroupMembers'
 import { invalidateInviteCode } from '@graphql/queries/invalidateInviteCode'
-import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
+import { JoinGroup } from '@graphql/queries/JoinGroup'
 import { redeemInviteCode } from '@graphql/queries/redeemInviteCode'
 import {
   authenticatedValidateInviteCode,
@@ -59,7 +59,7 @@ describe('validateInviteCode', () => {
 
     authenticatedUser = await invitingUser.toJson()
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'hidden-group',
         name: 'Hidden Group',
@@ -73,7 +73,7 @@ describe('validateInviteCode', () => {
     })
 
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'public-group',
         name: 'Public Group',
@@ -524,7 +524,7 @@ describe('generateGroupInviteCode', () => {
 
     authenticatedUser = await invitingUser.toJson()
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'hidden-group',
         name: 'Hidden Group',
@@ -538,7 +538,7 @@ describe('generateGroupInviteCode', () => {
     })
 
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'public-group',
         name: 'Public Group',
@@ -551,7 +551,7 @@ describe('generateGroupInviteCode', () => {
     })
 
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'closed-group',
         name: 'Closed Group',
@@ -564,7 +564,7 @@ describe('generateGroupInviteCode', () => {
     })
 
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'closed-group',
         userId: 'pending-member-user',
@@ -920,7 +920,7 @@ describe('redeemInviteCode', () => {
 
     authenticatedUser = await invitingUser.toJson()
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'hidden-group',
         name: 'Hidden Group',
@@ -934,7 +934,7 @@ describe('redeemInviteCode', () => {
     })
 
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'public-group',
         name: 'Public Group',

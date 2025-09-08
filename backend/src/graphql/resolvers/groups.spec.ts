@@ -4,14 +4,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import Factory, { cleanDatabase } from '@db/factories'
-import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
-import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
+import { CreateGroup } from '@graphql/queries/CreateGroup'
 import { Group as groupQuery } from '@graphql/queries/Group'
 import { GroupMembers as groupMembersQuery } from '@graphql/queries/GroupMembers'
-import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
-import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
-import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
-import { updateGroupMutation } from '@graphql/queries/updateGroupMutation'
+import { JoinGroup } from '@graphql/queries/JoinGroup'
+import { LeaveGroup } from '@graphql/queries/LeaveGroup'
+import { RemoveUserFromGroup } from '@graphql/queries/RemoveUserFromGroup'
+import { UpdateGroup } from '@graphql/queries/UpdateGroup'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -156,7 +156,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
   // public-group
   authenticatedUser = await usualMemberUser.toJson()
   await mutate({
-    mutation: createGroupMutation(),
+    mutation: CreateGroup,
     variables: {
       id: 'public-group',
       name: 'The Best Group',
@@ -168,14 +168,14 @@ const seedComplexScenarioAndClearAuthentication = async () => {
     },
   })
   await mutate({
-    mutation: joinGroupMutation(),
+    mutation: JoinGroup,
     variables: {
       groupId: 'public-group',
       userId: 'owner-of-closed-group',
     },
   })
   await mutate({
-    mutation: joinGroupMutation(),
+    mutation: JoinGroup,
     variables: {
       groupId: 'public-group',
       userId: 'owner-of-hidden-group',
@@ -184,7 +184,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
   // closed-group
   authenticatedUser = await ownerMemberUser.toJson()
   await mutate({
-    mutation: createGroupMutation(),
+    mutation: CreateGroup,
     variables: {
       id: 'closed-group',
       name: 'Uninteresting Group',
@@ -197,7 +197,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
   })
   // hidden-group
   await mutate({
-    mutation: createGroupMutation(),
+    mutation: CreateGroup,
     variables: {
       id: 'hidden-group',
       name: 'Investigative Journalism Group',
@@ -210,7 +210,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
   })
   // 'JoinGroup' mutation does not work in hidden groups so we join them by 'ChangeGroupMemberRole' through the owner
   await mutate({
-    mutation: changeGroupMemberRoleMutation(),
+    mutation: ChangeGroupMemberRole,
     variables: {
       groupId: 'hidden-group',
       userId: 'usual-member-user',
@@ -219,7 +219,7 @@ const seedComplexScenarioAndClearAuthentication = async () => {
   })
 
   await mutate({
-    mutation: changeGroupMemberRoleMutation(),
+    mutation: ChangeGroupMemberRole,
     variables: {
       groupId: 'hidden-group',
       userId: 'admin-member-user',
@@ -274,7 +274,7 @@ describe('in mode', () => {
 
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
-          const { errors } = await mutate({ mutation: createGroupMutation(), variables })
+          const { errors } = await mutate({ mutation: CreateGroup, variables })
           expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
         })
       })
@@ -285,9 +285,7 @@ describe('in mode', () => {
         })
 
         it('creates a group', async () => {
-          await expect(
-            mutate({ mutation: createGroupMutation(), variables }),
-          ).resolves.toMatchObject({
+          await expect(mutate({ mutation: CreateGroup, variables })).resolves.toMatchObject({
             data: {
               CreateGroup: {
                 name: 'The Best Group',
@@ -310,9 +308,7 @@ describe('in mode', () => {
         })
 
         it('assigns the authenticated user as owner', async () => {
-          await expect(
-            mutate({ mutation: createGroupMutation(), variables }),
-          ).resolves.toMatchObject({
+          await expect(mutate({ mutation: CreateGroup, variables })).resolves.toMatchObject({
             data: {
               CreateGroup: {
                 name: 'The Best Group',
@@ -324,9 +320,7 @@ describe('in mode', () => {
         })
 
         it('has "disabled" and "deleted" default to "false"', async () => {
-          await expect(
-            mutate({ mutation: createGroupMutation(), variables }),
-          ).resolves.toMatchObject({
+          await expect(mutate({ mutation: CreateGroup, variables })).resolves.toMatchObject({
             data: { CreateGroup: { disabled: false, deleted: false } },
           })
         })
@@ -336,7 +330,7 @@ describe('in mode', () => {
             describe('less then 3 chars', () => {
               it('throws error: "Description too short!"', async () => {
                 const { errors } = await mutate({
-                  mutation: createGroupMutation(),
+                  mutation: CreateGroup,
                   variables: {
                     ...variables,
                     description:
@@ -355,7 +349,7 @@ describe('in mode', () => {
             it('has new categories', async () => {
               await expect(
                 mutate({
-                  mutation: createGroupMutation(),
+                  mutation: CreateGroup,
                   variables: {
                     ...variables,
                     categoryIds: ['cat4', 'cat27'],
@@ -380,7 +374,7 @@ describe('in mode', () => {
             describe('by "categoryIds: null"', () => {
               it('throws error: "Too few categories!"', async () => {
                 const { errors } = await mutate({
-                  mutation: createGroupMutation(),
+                  mutation: CreateGroup,
                   variables: { ...variables, categoryIds: null },
                 })
                 expect(errors?.[0]).toHaveProperty('message', 'Too few categories!')
@@ -390,7 +384,7 @@ describe('in mode', () => {
             describe('by "categoryIds: []"', () => {
               it('throws error: "Too few categories!"', async () => {
                 const { errors } = await mutate({
-                  mutation: createGroupMutation(),
+                  mutation: CreateGroup,
                   variables: { ...variables, categoryIds: [] },
                 })
                 expect(errors?.[0]).toHaveProperty('message', 'Too few categories!')
@@ -401,7 +395,7 @@ describe('in mode', () => {
           describe('four', () => {
             it('throws error: "Too many categories!"', async () => {
               const { errors } = await mutate({
-                mutation: createGroupMutation(),
+                mutation: CreateGroup,
                 variables: { ...variables, categoryIds: ['cat9', 'cat4', 'cat15', 'cat27'] },
               })
               expect(errors?.[0]).toHaveProperty('message', 'Too many categories!')
@@ -458,7 +452,7 @@ describe('in mode', () => {
           )
           authenticatedUser = await otherUser.toJson()
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               id: 'others-group',
               name: 'Uninteresting Group',
@@ -471,7 +465,7 @@ describe('in mode', () => {
           })
           authenticatedUser = await ownerOfHiddenGroupUser.toJson()
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               id: 'hidden-group',
               name: 'Investigative Journalism Group',
@@ -483,7 +477,7 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               id: 'second-hidden-group',
               name: 'Second Investigative Journalism Group',
@@ -495,7 +489,7 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: changeGroupMemberRoleMutation(),
+            mutation: ChangeGroupMemberRole,
             variables: {
               groupId: 'second-hidden-group',
               userId: 'current-user',
@@ -503,7 +497,7 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               id: 'third-hidden-group',
               name: 'Third Investigative Journalism Group',
@@ -515,7 +509,7 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: changeGroupMemberRoleMutation(),
+            mutation: ChangeGroupMemberRole,
             variables: {
               groupId: 'third-hidden-group',
               userId: 'current-user',
@@ -524,7 +518,7 @@ describe('in mode', () => {
           })
           authenticatedUser = await user.toJson()
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               id: 'my-group',
               name: 'The Best Group',
@@ -802,7 +796,7 @@ describe('in mode', () => {
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
           const { errors } = await mutate({
-            mutation: joinGroupMutation(),
+            mutation: JoinGroup,
             variables: {
               groupId: 'not-existing-group',
               userId: 'current-user',
@@ -844,7 +838,7 @@ describe('in mode', () => {
           // public-group
           authenticatedUser = await ownerOfClosedGroupUser.toJson()
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               id: 'closed-group',
               name: 'Uninteresting Group',
@@ -857,7 +851,7 @@ describe('in mode', () => {
           })
           authenticatedUser = await ownerOfHiddenGroupUser.toJson()
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               id: 'hidden-group',
               name: 'Investigative Journalism Group',
@@ -870,7 +864,7 @@ describe('in mode', () => {
           })
           authenticatedUser = await user.toJson()
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               id: 'public-group',
               name: 'The Best Group',
@@ -888,7 +882,7 @@ describe('in mode', () => {
             it('has "usual" as membership role', async () => {
               await expect(
                 mutate({
-                  mutation: joinGroupMutation(),
+                  mutation: JoinGroup,
                   variables: {
                     groupId: 'public-group',
                     userId: 'owner-of-closed-group',
@@ -911,7 +905,7 @@ describe('in mode', () => {
               it('has still "owner" as membership role', async () => {
                 await expect(
                   mutate({
-                    mutation: joinGroupMutation(),
+                    mutation: JoinGroup,
                     variables: {
                       groupId: 'public-group',
                       userId: 'current-user',
@@ -936,7 +930,7 @@ describe('in mode', () => {
             it('has "pending" as membership role', async () => {
               await expect(
                 mutate({
-                  mutation: joinGroupMutation(),
+                  mutation: JoinGroup,
                   variables: {
                     groupId: 'closed-group',
                     userId: 'current-user',
@@ -959,7 +953,7 @@ describe('in mode', () => {
               it('has still "owner" as membership role', async () => {
                 await expect(
                   mutate({
-                    mutation: joinGroupMutation(),
+                    mutation: JoinGroup,
                     variables: {
                       groupId: 'closed-group',
                       userId: 'owner-of-closed-group',
@@ -983,7 +977,7 @@ describe('in mode', () => {
           describe('joined by "owner-of-closed-group"', () => {
             it('throws authorization error', async () => {
               const { errors } = await query({
-                query: joinGroupMutation(),
+                query: JoinGroup,
                 variables: {
                   groupId: 'hidden-group',
                   userId: 'owner-of-closed-group',
@@ -998,7 +992,7 @@ describe('in mode', () => {
               it('has still "owner" as membership role', async () => {
                 await expect(
                   mutate({
-                    mutation: joinGroupMutation(),
+                    mutation: JoinGroup,
                     variables: {
                       groupId: 'hidden-group',
                       userId: 'owner-of-hidden-group',
@@ -1095,7 +1089,7 @@ describe('in mode', () => {
           // public-group
           authenticatedUser = await user.toJson()
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               id: 'public-group',
               name: 'The Best Group',
@@ -1107,14 +1101,14 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: joinGroupMutation(),
+            mutation: JoinGroup,
             variables: {
               groupId: 'public-group',
               userId: 'owner-of-closed-group',
             },
           })
           await mutate({
-            mutation: joinGroupMutation(),
+            mutation: JoinGroup,
             variables: {
               groupId: 'public-group',
               userId: 'owner-of-hidden-group',
@@ -1123,7 +1117,7 @@ describe('in mode', () => {
           // closed-group
           authenticatedUser = await ownerOfClosedGroupUser.toJson()
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               id: 'closed-group',
               name: 'Uninteresting Group',
@@ -1135,14 +1129,14 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: joinGroupMutation(),
+            mutation: JoinGroup,
             variables: {
               groupId: 'closed-group',
               userId: 'current-user',
             },
           })
           await mutate({
-            mutation: changeGroupMemberRoleMutation(),
+            mutation: ChangeGroupMemberRole,
             variables: {
               groupId: 'closed-group',
               userId: 'owner-of-hidden-group',
@@ -1152,7 +1146,7 @@ describe('in mode', () => {
           // hidden-group
           authenticatedUser = await ownerOfHiddenGroupUser.toJson()
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               id: 'hidden-group',
               name: 'Investigative Journalism Group',
@@ -1165,7 +1159,7 @@ describe('in mode', () => {
           })
           // 'JoinGroup' mutation does not work in hidden groups so we join them by 'ChangeGroupMemberRole' through the owner
           await mutate({
-            mutation: changeGroupMemberRoleMutation(),
+            mutation: ChangeGroupMemberRole,
             variables: {
               groupId: 'hidden-group',
               userId: 'pending-user',
@@ -1173,7 +1167,7 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: changeGroupMemberRoleMutation(),
+            mutation: ChangeGroupMemberRole,
             variables: {
               groupId: 'hidden-group',
               userId: 'current-user',
@@ -1181,7 +1175,7 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: changeGroupMemberRoleMutation(),
+            mutation: ChangeGroupMemberRole,
             variables: {
               groupId: 'hidden-group',
               userId: 'owner-of-closed-group',
@@ -1556,7 +1550,7 @@ describe('in mode', () => {
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
           const { errors } = await mutate({
-            mutation: changeGroupMemberRoleMutation(),
+            mutation: ChangeGroupMemberRole,
             variables: {
               groupId: 'not-existing-group',
               userId: 'current-user',
@@ -1600,7 +1594,7 @@ describe('in mode', () => {
                   it('has role usual', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation(),
+                        mutation: ChangeGroupMemberRole,
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -1638,7 +1632,7 @@ describe('in mode', () => {
                   it('has role admin', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation(),
+                        mutation: ChangeGroupMemberRole,
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -1673,7 +1667,7 @@ describe('in mode', () => {
                   it('has role owner', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation(),
+                        mutation: ChangeGroupMemberRole,
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -1715,7 +1709,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1741,7 +1735,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1759,7 +1753,7 @@ describe('in mode', () => {
                   it('has role owner still', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation(),
+                        mutation: ChangeGroupMemberRole,
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -1790,7 +1784,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1813,7 +1807,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1836,7 +1830,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1869,7 +1863,7 @@ describe('in mode', () => {
                   it('has role owner', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation(),
+                        mutation: ChangeGroupMemberRole,
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -1894,7 +1888,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1917,7 +1911,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1934,7 +1928,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1957,7 +1951,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1974,7 +1968,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -1997,7 +1991,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2014,7 +2008,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2047,7 +2041,7 @@ describe('in mode', () => {
                   it('has role admin', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation(),
+                        mutation: ChangeGroupMemberRole,
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -2073,7 +2067,7 @@ describe('in mode', () => {
                   it('has role usual again', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation(),
+                        mutation: ChangeGroupMemberRole,
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -2104,7 +2098,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2121,7 +2115,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2144,7 +2138,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2161,7 +2155,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2184,7 +2178,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2201,7 +2195,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2234,7 +2228,7 @@ describe('in mode', () => {
                   it('has role usual', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation(),
+                        mutation: ChangeGroupMemberRole,
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -2260,7 +2254,7 @@ describe('in mode', () => {
                   it('has role usual again', async () => {
                     await expect(
                       mutate({
-                        mutation: changeGroupMemberRoleMutation(),
+                        mutation: ChangeGroupMemberRole,
                         variables,
                       }),
                     ).resolves.toMatchObject({
@@ -2291,7 +2285,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2314,7 +2308,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2337,7 +2331,7 @@ describe('in mode', () => {
 
                   it('throws authorization error', async () => {
                     const { errors } = await mutate({
-                      mutation: changeGroupMemberRoleMutation(),
+                      mutation: ChangeGroupMemberRole,
                       variables,
                     })
                     expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2356,7 +2350,7 @@ describe('in mode', () => {
         // closed-group
         authenticatedUser = await ownerMemberUser.toJson()
         await mutate({
-          mutation: changeGroupMemberRoleMutation(),
+          mutation: ChangeGroupMemberRole,
           variables: {
             groupId: 'closed-group',
             userId: 'pending-member-user',
@@ -2364,7 +2358,7 @@ describe('in mode', () => {
           },
         })
         await mutate({
-          mutation: changeGroupMemberRoleMutation(),
+          mutation: ChangeGroupMemberRole,
           variables: {
             groupId: 'closed-group',
             userId: 'usual-member-user',
@@ -2372,7 +2366,7 @@ describe('in mode', () => {
           },
         })
         await mutate({
-          mutation: changeGroupMemberRoleMutation(),
+          mutation: ChangeGroupMemberRole,
           variables: {
             groupId: 'closed-group',
             userId: 'admin-member-user',
@@ -2380,7 +2374,7 @@ describe('in mode', () => {
           },
         })
         await mutate({
-          mutation: changeGroupMemberRoleMutation(),
+          mutation: ChangeGroupMemberRole,
           variables: {
             groupId: 'closed-group',
             userId: 'second-owner-member-user',
@@ -2398,7 +2392,7 @@ describe('in mode', () => {
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
           const { errors } = await mutate({
-            mutation: leaveGroupMutation(),
+            mutation: LeaveGroup,
             variables: {
               groupId: 'not-existing-group',
               userId: 'current-user',
@@ -2437,7 +2431,7 @@ describe('in mode', () => {
                 authenticatedUser = await pendingMemberUser.toJson()
                 await expect(
                   mutate({
-                    mutation: leaveGroupMutation(),
+                    mutation: LeaveGroup,
                     variables: {
                       ...variables,
                       userId: 'pending-member-user',
@@ -2464,7 +2458,7 @@ describe('in mode', () => {
                 authenticatedUser = await usualMemberUser.toJson()
                 await expect(
                   mutate({
-                    mutation: leaveGroupMutation(),
+                    mutation: LeaveGroup,
                     variables: {
                       ...variables,
                       userId: 'usual-member-user',
@@ -2491,7 +2485,7 @@ describe('in mode', () => {
                 authenticatedUser = await adminMemberUser.toJson()
                 await expect(
                   mutate({
-                    mutation: leaveGroupMutation(),
+                    mutation: LeaveGroup,
                     variables: {
                       ...variables,
                       userId: 'admin-member-user',
@@ -2515,7 +2509,7 @@ describe('in mode', () => {
               it('throws authorization error', async () => {
                 authenticatedUser = await ownerMemberUser.toJson()
                 const { errors } = await mutate({
-                  mutation: leaveGroupMutation(),
+                  mutation: LeaveGroup,
                   variables: {
                     ...variables,
                     userId: 'owner-member-user',
@@ -2529,7 +2523,7 @@ describe('in mode', () => {
               it('throws authorization error', async () => {
                 authenticatedUser = await secondOwnerMemberUser.toJson()
                 const { errors } = await mutate({
-                  mutation: leaveGroupMutation(),
+                  mutation: LeaveGroup,
                   variables: {
                     ...variables,
                     userId: 'second-owner-member-user',
@@ -2543,7 +2537,7 @@ describe('in mode', () => {
               it('throws authorization error', async () => {
                 authenticatedUser = await noMemberUser.toJson()
                 const { errors } = await mutate({
-                  mutation: leaveGroupMutation(),
+                  mutation: LeaveGroup,
                   variables: {
                     ...variables,
                     userId: 'none-member-user',
@@ -2557,7 +2551,7 @@ describe('in mode', () => {
               it('throws authorization error', async () => {
                 authenticatedUser = await ownerMemberUser.toJson()
                 const { errors } = await mutate({
-                  mutation: leaveGroupMutation(),
+                  mutation: LeaveGroup,
                   variables: {
                     ...variables,
                     userId: 'usual-member-user',
@@ -2571,7 +2565,7 @@ describe('in mode', () => {
               it('throws authorization error', async () => {
                 authenticatedUser = await usualMemberUser.toJson()
                 const { errors } = await mutate({
-                  mutation: leaveGroupMutation(),
+                  mutation: LeaveGroup,
                   variables: {
                     ...variables,
                     userId: 'admin-member-user',
@@ -2597,7 +2591,7 @@ describe('in mode', () => {
       describe('unauthenticated', () => {
         it('throws authorization error', async () => {
           const { errors } = await mutate({
-            mutation: updateGroupMutation(),
+            mutation: UpdateGroup,
             variables: {
               id: 'my-group',
               slug: 'my-best-group',
@@ -2635,7 +2629,7 @@ describe('in mode', () => {
           )
           authenticatedUser = await noMemberUser.toJson()
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               id: 'others-group',
               name: 'Uninteresting Group',
@@ -2648,7 +2642,7 @@ describe('in mode', () => {
           })
           authenticatedUser = await user.toJson()
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               id: 'my-group',
               name: 'The Best Group',
@@ -2661,7 +2655,7 @@ describe('in mode', () => {
             },
           })
           await mutate({
-            mutation: changeGroupMemberRoleMutation(),
+            mutation: ChangeGroupMemberRole,
             variables: {
               groupId: 'my-group',
               userId: 'usual-member-user',
@@ -2680,7 +2674,7 @@ describe('in mode', () => {
               it('has updated the settings', async () => {
                 await expect(
                   mutate({
-                    mutation: updateGroupMutation(),
+                    mutation: UpdateGroup,
                     variables: {
                       id: 'my-group',
                       name: 'The New Group For Our Country',
@@ -2715,7 +2709,7 @@ describe('in mode', () => {
                 it('has left locaton unchanged as "Berlin"', async () => {
                   await expect(
                     mutate({
-                      mutation: updateGroupMutation(),
+                      mutation: UpdateGroup,
                       variables: {
                         id: 'my-group',
                       },
@@ -2742,7 +2736,7 @@ describe('in mode', () => {
                 it('has updated the location to unset location', async () => {
                   await expect(
                     mutate({
-                      mutation: updateGroupMutation(),
+                      mutation: UpdateGroup,
                       variables: {
                         id: 'my-group',
                         locationName: null,
@@ -2766,7 +2760,7 @@ describe('in mode', () => {
                 it('has updated the location to "Paris"', async () => {
                   await expect(
                     mutate({
-                      mutation: updateGroupMutation(),
+                      mutation: UpdateGroup,
                       variables: {
                         id: 'my-group',
                         locationName: 'Paris, France',
@@ -2794,7 +2788,7 @@ describe('in mode', () => {
                 it('has updated the location to "Hamburg"', async () => {
                   await expect(
                     mutate({
-                      mutation: updateGroupMutation(),
+                      mutation: UpdateGroup,
                       variables: {
                         id: 'my-group',
                         locationName: 'Hamburg, Germany',
@@ -2822,7 +2816,7 @@ describe('in mode', () => {
                 it('has updated the location to unset', async () => {
                   await expect(
                     mutate({
-                      mutation: updateGroupMutation(),
+                      mutation: UpdateGroup,
                       variables: {
                         id: 'my-group',
                         locationName: '', // empty string '' sets it to null
@@ -2848,7 +2842,7 @@ describe('in mode', () => {
                 describe('less then 3 chars', () => {
                   it('throws error: "Description too short!"', async () => {
                     const { errors } = await mutate({
-                      mutation: updateGroupMutation(),
+                      mutation: UpdateGroup,
                       variables: {
                         id: 'my-group',
                         description:
@@ -2867,7 +2861,7 @@ describe('in mode', () => {
                 it('has new categories', async () => {
                   await expect(
                     mutate({
-                      mutation: updateGroupMutation(),
+                      mutation: UpdateGroup,
                       variables: {
                         id: 'my-group',
                         categoryIds: ['cat4', 'cat27'],
@@ -2893,7 +2887,7 @@ describe('in mode', () => {
                 describe('by "categoryIds: []"', () => {
                   it('throws error: "Too few categories!"', async () => {
                     const { errors } = await mutate({
-                      mutation: updateGroupMutation(),
+                      mutation: UpdateGroup,
                       variables: {
                         id: 'my-group',
                         categoryIds: [],
@@ -2907,7 +2901,7 @@ describe('in mode', () => {
               describe('four', () => {
                 it('throws error: "Too many categories!"', async () => {
                   const { errors } = await mutate({
-                    mutation: updateGroupMutation(),
+                    mutation: UpdateGroup,
                     variables: {
                       id: 'my-group',
                       categoryIds: ['cat9', 'cat4', 'cat15', 'cat27'],
@@ -2923,7 +2917,7 @@ describe('in mode', () => {
             it('throws authorization error', async () => {
               authenticatedUser = await usualMemberUser.toJson()
               const { errors } = await mutate({
-                mutation: updateGroupMutation(),
+                mutation: UpdateGroup,
                 variables: {
                   id: 'my-group',
                   name: 'The New Group For Our Country',
@@ -2941,7 +2935,7 @@ describe('in mode', () => {
             it('throws authorization error', async () => {
               authenticatedUser = await noMemberUser.toJson()
               const { errors } = await mutate({
-                mutation: updateGroupMutation(),
+                mutation: UpdateGroup,
                 variables: {
                   id: 'my-group',
                   name: 'The New Group For Our Country',
@@ -2972,7 +2966,7 @@ describe('in mode', () => {
       it('throws an error', async () => {
         await expect(
           mutate({
-            mutation: removeUserFromGroupMutation(),
+            mutation: RemoveUserFromGroup,
             variables: {
               groupId: 'hidden-group',
               userId: 'usual-member-user',
@@ -2994,7 +2988,7 @@ describe('in mode', () => {
           authenticatedUser = await usualMemberUser.toJson()
           await expect(
             mutate({
-              mutation: removeUserFromGroupMutation(),
+              mutation: RemoveUserFromGroup,
               variables: {
                 groupId: 'hidden-group',
                 userId: 'admin-member-user',
@@ -3018,7 +3012,7 @@ describe('in mode', () => {
         it('removes the user from the group', async () => {
           await expect(
             mutate({
-              mutation: removeUserFromGroupMutation(),
+              mutation: RemoveUserFromGroup,
               variables: {
                 groupId: 'hidden-group',
                 userId: 'usual-member-user',
@@ -3038,7 +3032,7 @@ describe('in mode', () => {
         it('cannot remove self', async () => {
           await expect(
             mutate({
-              mutation: removeUserFromGroupMutation(),
+              mutation: RemoveUserFromGroup,
               variables: {
                 groupId: 'hidden-group',
                 userId: 'owner-member-user',
@@ -3058,7 +3052,7 @@ describe('in mode', () => {
         beforeEach(async () => {
           authenticatedUser = await adminMemberUser.toJson()
           await mutate({
-            mutation: changeGroupMemberRoleMutation(),
+            mutation: ChangeGroupMemberRole,
             variables: {
               groupId: 'hidden-group',
               userId: 'usual-member-user',
@@ -3071,7 +3065,7 @@ describe('in mode', () => {
           authenticatedUser = await usualMemberUser.toJson()
           await expect(
             mutate({
-              mutation: removeUserFromGroupMutation(),
+              mutation: RemoveUserFromGroup,
               variables: {
                 groupId: 'hidden-group',
                 userId: 'admin-member-user',
@@ -3090,7 +3084,7 @@ describe('in mode', () => {
         it('removes the user from the group', async () => {
           await expect(
             mutate({
-              mutation: removeUserFromGroupMutation(),
+              mutation: RemoveUserFromGroup,
               variables: {
                 groupId: 'hidden-group',
                 userId: 'usual-member-user',
@@ -3110,7 +3104,7 @@ describe('in mode', () => {
         it('cannot remove self', async () => {
           await expect(
             mutate({
-              mutation: removeUserFromGroupMutation(),
+              mutation: RemoveUserFromGroup,
               variables: {
                 groupId: 'hidden-group',
                 userId: 'admin-member-user',
@@ -3128,7 +3122,7 @@ describe('in mode', () => {
         it('cannot remove owner', async () => {
           await expect(
             mutate({
-              mutation: removeUserFromGroupMutation(),
+              mutation: RemoveUserFromGroup,
               variables: {
                 groupId: 'hidden-group',
                 userId: 'owner-member-user',

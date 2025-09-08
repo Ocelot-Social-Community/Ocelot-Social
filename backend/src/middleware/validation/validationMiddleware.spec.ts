@@ -6,6 +6,8 @@ import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
+import { review } from '@graphql/queries/review'
+import { UpdateUser } from '@graphql/queries/UpdateUser'
 import createServer from '@src/server'
 
 const neode = getNeode()
@@ -46,22 +48,6 @@ const reportMutation = gql`
     }
   }
 `
-const reviewMutation = gql`
-  mutation ($resourceId: ID!, $disable: Boolean, $closed: Boolean) {
-    review(resourceId: $resourceId, disable: $disable, closed: $closed) {
-      createdAt
-      updatedAt
-    }
-  }
-`
-const updateUserMutation = gql`
-  mutation ($id: ID!, $name: String) {
-    UpdateUser(id: $id, name: $name) {
-      name
-    }
-  }
-`
-
 beforeAll(async () => {
   await cleanDatabase()
 
@@ -249,9 +235,7 @@ describe('validateReview', () => {
 
   it('throws an error if a user tries to review a report against them', async () => {
     disableVariables = { ...disableVariables, resourceId: 'moderating-user' }
-    await expect(
-      mutate({ mutation: reviewMutation, variables: disableVariables }),
-    ).resolves.toMatchObject({
+    await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
       errors: [{ message: 'You cannot review yourself!' }],
     })
@@ -259,9 +243,7 @@ describe('validateReview', () => {
 
   it('throws an error for invaild resource', async () => {
     disableVariables = { ...disableVariables, resourceId: 'non-existent-resource' }
-    await expect(
-      mutate({ mutation: reviewMutation, variables: disableVariables }),
-    ).resolves.toMatchObject({
+    await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
       errors: [{ message: 'Resource not found or is not a Post|Comment|User!' }],
     })
@@ -269,9 +251,7 @@ describe('validateReview', () => {
 
   it('throws an error if no report exists', async () => {
     disableVariables = { ...disableVariables, resourceId: 'offensive-post' }
-    await expect(
-      mutate({ mutation: reviewMutation, variables: disableVariables }),
-    ).resolves.toMatchObject({
+    await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
       errors: [{ message: 'Before starting the review process, please report the Post!' }],
     })
@@ -287,9 +267,7 @@ describe('validateReview', () => {
       reportAgainstOffensivePost.relateTo(offensivePost, 'belongsTo'),
     ])
     disableVariables = { ...disableVariables, resourceId: 'offensive-post' }
-    await expect(
-      mutate({ mutation: reviewMutation, variables: disableVariables }),
-    ).resolves.toMatchObject({
+    await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
       errors: [{ message: 'You cannot review your own Post!' }],
     })
@@ -306,7 +284,7 @@ describe('validateReview', () => {
         resourceId: 'tag-id',
       }
       await expect(
-        mutate({ mutation: reviewMutation, variables: disableVariables }),
+        mutate({ mutation: review, variables: disableVariables }),
       ).resolves.toMatchObject({
         data: { review: null },
         errors: [{ message: 'Resource not found or is not a Post|Comment|User!' }],
@@ -336,7 +314,7 @@ describe('validateReview', () => {
         ...variables,
         name: '  ',
       }
-      await expect(mutate({ mutation: updateUserMutation, variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
         data: { UpdateUser: null },
         errors: [{ message: 'Username must be at least 3 character long!' }],
       })
