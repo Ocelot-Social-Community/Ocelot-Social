@@ -4,10 +4,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver, getNeode } from '@db/neo4j'
+import { AddEmailAddress } from '@graphql/queries/AddEmailAddress'
+import { VerifyEmailAddress } from '@graphql/queries/VerifyEmailAddress'
+import { VerifyNonce } from '@graphql/queries/VerifyNonce'
 import createServer from '@src/server'
 
 const neode = getNeode()
@@ -49,15 +51,6 @@ afterEach(async () => {
 })
 
 describe('AddEmailAddress', () => {
-  const mutation = gql`
-    mutation ($email: String!) {
-      AddEmailAddress(email: $email) {
-        email
-        verifiedAt
-        createdAt
-      }
-    }
-  `
   beforeEach(() => {
     variables = { ...variables, email: 'new-email@example.org' }
   })
@@ -68,7 +61,7 @@ describe('AddEmailAddress', () => {
     })
 
     it('throws AuthorizationError', async () => {
-      await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: AddEmailAddress, variables })).resolves.toMatchObject({
         data: { AddEmailAddress: null },
         errors: [{ message: 'Not Authorized!' }],
       })
@@ -87,7 +80,7 @@ describe('AddEmailAddress', () => {
       })
 
       it('throws UserInputError', async () => {
-        await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+        await expect(mutate({ mutation: AddEmailAddress, variables })).resolves.toMatchObject({
           data: { AddEmailAddress: null },
           errors: [{ message: 'must be a valid email' }],
         })
@@ -96,7 +89,7 @@ describe('AddEmailAddress', () => {
 
     describe('email attribute is a valid email', () => {
       it('creates a new unverified `EmailAddress` node', async () => {
-        await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+        await expect(mutate({ mutation: AddEmailAddress, variables })).resolves.toMatchObject({
           data: {
             AddEmailAddress: {
               email: 'new-email@example.org',
@@ -109,7 +102,7 @@ describe('AddEmailAddress', () => {
       })
 
       it('connects `UnverifiedEmailAddress` to the authenticated user', async () => {
-        await mutate({ mutation, variables })
+        await mutate({ mutation: AddEmailAddress, variables })
         const result = await neode.cypher(
           `
         MATCH(u:User)-[:PRIMARY_EMAIL]->(:EmailAddress {email: "user@example.org"})
@@ -131,7 +124,7 @@ describe('AddEmailAddress', () => {
             createdAt: '2019-09-24T14:00:01.565Z',
             email: 'new-email@example.org',
           })
-          await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+          await expect(mutate({ mutation: AddEmailAddress, variables })).resolves.toMatchObject({
             data: {
               AddEmailAddress: {
                 email: 'new-email@example.org',
@@ -146,7 +139,7 @@ describe('AddEmailAddress', () => {
       describe('but if another user owns an `EmailAddress` already with that email', () => {
         it('does not throw UserInputError', async () => {
           await Factory.build('user', {}, { email: 'new-email@example.org' })
-          await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+          await expect(mutate({ mutation: AddEmailAddress, variables })).resolves.toMatchObject({
             data: {
               AddEmailAddress: {
                 createdAt: expect.any(String),
@@ -163,16 +156,6 @@ describe('AddEmailAddress', () => {
 })
 
 describe('VerifyEmailAddress', () => {
-  const mutation = gql`
-    mutation ($email: String!, $nonce: String!) {
-      VerifyEmailAddress(email: $email, nonce: $nonce) {
-        email
-        createdAt
-        verifiedAt
-      }
-    }
-  `
-
   beforeEach(() => {
     variables = { ...variables, email: 'to-be-verified@example.org', nonce: '12345' }
   })
@@ -183,7 +166,7 @@ describe('VerifyEmailAddress', () => {
     })
 
     it('throws AuthorizationError', async () => {
-      await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: VerifyEmailAddress, variables })).resolves.toMatchObject({
         data: { VerifyEmailAddress: null },
         errors: [{ message: 'Not Authorized!' }],
       })
@@ -198,7 +181,7 @@ describe('VerifyEmailAddress', () => {
 
     describe('if no unverified `EmailAddress` node exists', () => {
       it('throws UserInputError', async () => {
-        await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+        await expect(mutate({ mutation: VerifyEmailAddress, variables })).resolves.toMatchObject({
           data: { VerifyEmailAddress: null },
           errors: [{ message: 'Invalid nonce or no email address found.' }],
         })
@@ -219,7 +202,7 @@ describe('VerifyEmailAddress', () => {
       describe('given invalid nonce', () => {
         it('throws UserInputError', async () => {
           variables.nonce = 'asdfgh'
-          await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+          await expect(mutate({ mutation: VerifyEmailAddress, variables })).resolves.toMatchObject({
             data: { VerifyEmailAddress: null },
             errors: [{ message: 'Invalid nonce or no email address found.' }],
           })
@@ -233,7 +216,9 @@ describe('VerifyEmailAddress', () => {
 
         describe('but the address does not belong to the authenticated user', () => {
           it('throws UserInputError', async () => {
-            await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+            await expect(
+              mutate({ mutation: VerifyEmailAddress, variables }),
+            ).resolves.toMatchObject({
               data: { VerifyEmailAddress: null },
               errors: [{ message: 'Invalid nonce or no email address found.' }],
             })
@@ -246,7 +231,9 @@ describe('VerifyEmailAddress', () => {
           })
 
           it('adds `verifiedAt`', async () => {
-            await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+            await expect(
+              mutate({ mutation: VerifyEmailAddress, variables }),
+            ).resolves.toMatchObject({
               data: {
                 VerifyEmailAddress: {
                   email: 'to-be-verified@example.org',
@@ -259,7 +246,7 @@ describe('VerifyEmailAddress', () => {
           })
 
           it('connects the new `EmailAddress` as PRIMARY', async () => {
-            await mutate({ mutation, variables })
+            await mutate({ mutation: VerifyEmailAddress, variables })
             const result = await neode.cypher(
               `
             MATCH(u:User {id: "567"})-[:PRIMARY_EMAIL]->(e:EmailAddress {email: "to-be-verified@example.org"})
@@ -283,7 +270,7 @@ describe('VerifyEmailAddress', () => {
             await expect(email.toJson()).resolves.toMatchObject({
               email: 'user@example.org',
             })
-            await mutate({ mutation, variables })
+            await mutate({ mutation: VerifyEmailAddress, variables })
             result = await neode.cypher(cypherStatement, {})
             email = neode.hydrateFirst(result, 'e', neode.model('EmailAddress'))
             await expect(email).toBe(false)
@@ -299,7 +286,7 @@ describe('VerifyEmailAddress', () => {
             await expect(email.toJson()).resolves.toMatchObject({
               email: 'user@example.org',
             })
-            await mutate({ mutation, variables })
+            await mutate({ mutation: VerifyEmailAddress, variables })
             result = await neode.cypher(cypherStatement, {})
             email = neode.hydrateFirst(result, 'e', neode.model('EmailAddress'))
             await expect(email).toBe(false)
@@ -311,7 +298,9 @@ describe('VerifyEmailAddress', () => {
             })
 
             it('throws UserInputError because of unique constraints', async () => {
-              await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+              await expect(
+                mutate({ mutation: VerifyEmailAddress, variables }),
+              ).resolves.toMatchObject({
                 data: { VerifyEmailAddress: null },
                 errors: [{ message: 'A user account with this email already exists.' }],
               })
@@ -324,7 +313,7 @@ describe('VerifyEmailAddress', () => {
             })
 
             it('connects the new `EmailAddress` as PRIMARY', async () => {
-              await mutate({ mutation, variables })
+              await mutate({ mutation: VerifyEmailAddress, variables })
               const result = await neode.cypher(
                 `
                 MATCH(u:User {id: "567"})-[:PRIMARY_EMAIL]->(e:EmailAddress {email: "to-be-verified@example.org"})
@@ -354,18 +343,12 @@ describe('VerifyNonce', () => {
     })
   })
 
-  const verifyNonceQuery = gql`
-    query ($email: String!, $nonce: String!) {
-      VerifyNonce(email: $email, nonce: $nonce)
-    }
-  `
-
   it('returns true when nonce and email match', async () => {
     variables = {
       email: 'to-be-verified@example.org',
       nonce: '12345',
     }
-    await expect(query({ query: verifyNonceQuery, variables })).resolves.toMatchObject({
+    await expect(query({ query: VerifyNonce, variables })).resolves.toMatchObject({
       data: { VerifyNonce: true },
     })
   })
@@ -375,7 +358,7 @@ describe('VerifyNonce', () => {
       email: 'to-be-verified@example.org',
       nonce: '---',
     }
-    await expect(query({ query: verifyNonceQuery, variables })).resolves.toMatchObject({
+    await expect(query({ query: VerifyNonce, variables })).resolves.toMatchObject({
       data: { VerifyNonce: false },
     })
   })

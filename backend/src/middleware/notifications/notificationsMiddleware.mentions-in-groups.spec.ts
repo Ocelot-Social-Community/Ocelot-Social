@@ -5,9 +5,10 @@
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
-import { createGroupMutation } from '@graphql/queries/createGroupMutation'
-import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
+import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
+import { CreateGroup } from '@graphql/queries/CreateGroup'
+import { CreatePost } from '@graphql/queries/CreatePost'
+import { JoinGroup } from '@graphql/queries/JoinGroup'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -32,16 +33,6 @@ const mentionString = `
   <a class="mention" data-mention-id="pending-member" href="/profile/pending-member/pending-member">@pending-member</a>
   <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member">@group-member</a>.
   <a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member">@email-less-member</a>.
-`
-
-const createPostMutation = gql`
-  mutation ($id: ID, $title: String!, $content: String!, $groupId: ID) {
-    CreatePost(id: $id, title: $title, content: $content, groupId: $groupId) {
-      id
-      title
-      content
-    }
-  }
 `
 
 const createCommentMutation = gql`
@@ -165,7 +156,7 @@ describe('mentions in groups', () => {
 
     authenticatedUser = await postAuthor.toJson()
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'public-group',
         name: 'A public group',
@@ -175,7 +166,7 @@ describe('mentions in groups', () => {
       },
     })
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'closed-group',
         name: 'A closed group',
@@ -185,7 +176,7 @@ describe('mentions in groups', () => {
       },
     })
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'hidden-group',
         name: 'A hidden group',
@@ -196,21 +187,21 @@ describe('mentions in groups', () => {
     })
     authenticatedUser = await groupMember.toJson()
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'public-group',
         userId: 'group-member',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'closed-group',
         userId: 'group-member',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'hidden-group',
         userId: 'group-member',
@@ -218,21 +209,21 @@ describe('mentions in groups', () => {
     })
     authenticatedUser = await pendingMember.toJson()
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'public-group',
         userId: 'pending-member',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'closed-group',
         userId: 'pending-member',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'hidden-group',
         userId: 'pending-member',
@@ -240,21 +231,21 @@ describe('mentions in groups', () => {
     })
     authenticatedUser = await emaillessMember.toJson()
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'public-group',
         userId: 'group-member',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'closed-group',
         userId: 'group-member',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'hidden-group',
         userId: 'group-member',
@@ -262,7 +253,7 @@ describe('mentions in groups', () => {
     })
     authenticatedUser = await postAuthor.toJson()
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'closed-group',
         userId: 'group-member',
@@ -270,7 +261,7 @@ describe('mentions in groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'hidden-group',
         userId: 'group-member',
@@ -278,7 +269,7 @@ describe('mentions in groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'closed-group',
         userId: 'email-less-member',
@@ -286,7 +277,7 @@ describe('mentions in groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'hidden-group',
         userId: 'email-less-member',
@@ -308,7 +299,7 @@ describe('mentions in groups', () => {
       jest.clearAllMocks()
       authenticatedUser = await postAuthor.toJson()
       await mutate({
-        mutation: createPostMutation,
+        mutation: CreatePost,
         variables: {
           id: 'public-post',
           title: 'This is the post in the public group',
@@ -414,7 +405,7 @@ describe('mentions in groups', () => {
       jest.clearAllMocks()
       authenticatedUser = await postAuthor.toJson()
       await mutate({
-        mutation: createPostMutation,
+        mutation: CreatePost,
         variables: {
           id: 'closed-post',
           title: 'This is the post in the closed group',
@@ -516,7 +507,7 @@ describe('mentions in groups', () => {
       jest.clearAllMocks()
       authenticatedUser = await postAuthor.toJson()
       await mutate({
-        mutation: createPostMutation,
+        mutation: CreatePost,
         variables: {
           id: 'hidden-post',
           title: 'This is the post in the hidden group',
@@ -618,7 +609,7 @@ describe('mentions in groups', () => {
       beforeEach(async () => {
         authenticatedUser = await postAuthor.toJson()
         await mutate({
-          mutation: createPostMutation,
+          mutation: CreatePost,
           variables: {
             id: 'public-post',
             title: 'This is the post in the public group',
@@ -713,7 +704,7 @@ describe('mentions in groups', () => {
       beforeEach(async () => {
         authenticatedUser = await postAuthor.toJson()
         await mutate({
-          mutation: createPostMutation,
+          mutation: CreatePost,
           variables: {
             id: 'closed-post',
             title: 'This is the post in the closed group',
@@ -810,7 +801,7 @@ describe('mentions in groups', () => {
       beforeEach(async () => {
         authenticatedUser = await postAuthor.toJson()
         await mutate({
-          mutation: createPostMutation,
+          mutation: CreatePost,
           variables: {
             id: 'hidden-post',
             title: 'This is the post in the hidden group',

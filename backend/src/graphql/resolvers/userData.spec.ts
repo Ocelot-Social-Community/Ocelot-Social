@@ -2,39 +2,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
+import { userData } from '@graphql/queries/userData'
 import createServer from '@src/server'
 
 let query, authenticatedUser
 
 const driver = getDriver()
 const neode = getNeode()
-
-const userDataQuery = gql`
-  query ($id: ID!) {
-    userData(id: $id) {
-      user {
-        id
-        name
-        slug
-      }
-      posts {
-        id
-        title
-        content
-        comments {
-          content
-          author {
-            slug
-          }
-        }
-      }
-    }
-  }
-`
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -72,7 +49,7 @@ describe('resolvers/userData', () => {
 
   describe('given one authenticated user who did not write anything so far', () => {
     it("returns the user's data and no posts", async () => {
-      await expect(query({ query: userDataQuery, variables })).resolves.toMatchObject({
+      await expect(query({ query: userData, variables })).resolves.toMatchObject({
         data: {
           userData: {
             user: {
@@ -100,7 +77,7 @@ describe('resolvers/userData', () => {
       })
 
       it("returns the user's data and the post", async () => {
-        await expect(query({ query: userDataQuery, variables })).resolves.toMatchObject({
+        await expect(query({ query: userData, variables })).resolves.toMatchObject({
           data: {
             userData: {
               user: {
@@ -125,7 +102,7 @@ describe('resolvers/userData', () => {
   describe('try to request data of another user', () => {
     variables = { id: 'o-user' }
     it('returns the data of the authenticated user', async () => {
-      await expect(query({ query: userDataQuery, variables })).resolves.toMatchObject({
+      await expect(query({ query: userData, variables })).resolves.toMatchObject({
         data: {
           userData: {
             user: {

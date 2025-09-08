@@ -4,6 +4,8 @@
 import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
+import { CreatePost } from '@graphql/queries/CreatePost'
+import { toggleObservePost } from '@graphql/queries/toggleObservePost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -22,16 +24,6 @@ let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
 let postAuthor, firstCommenter, secondCommenter, emaillessObserver
-
-const createPostMutation = gql`
-  mutation ($id: ID, $title: String!, $content: String!) {
-    CreatePost(id: $id, title: $title, content: $content) {
-      id
-      title
-      content
-    }
-  }
-`
 
 const createCommentMutation = gql`
   mutation ($id: ID, $postId: ID!, $content: String!) {
@@ -65,15 +57,6 @@ const notificationQuery = gql`
           id
         }
       }
-    }
-  }
-`
-
-const toggleObservePostMutation = gql`
-  mutation ($id: ID!, $value: Boolean!) {
-    toggleObservePost(id: $id, value: $value) {
-      isObservedByMe
-      observingUsersCount
     }
   }
 `
@@ -138,7 +121,7 @@ describe('notifications for users that observe a post', () => {
     })
     authenticatedUser = await postAuthor.toJson()
     await mutate({
-      mutation: createPostMutation,
+      mutation: CreatePost,
       variables: {
         id: 'post',
         title: 'This is the post',
@@ -147,7 +130,7 @@ describe('notifications for users that observe a post', () => {
     })
     authenticatedUser = await emaillessObserver.toJson()
     await mutate({
-      mutation: toggleObservePostMutation,
+      mutation: toggleObservePost,
       variables: {
         id: 'post',
         value: true,
@@ -317,7 +300,7 @@ describe('notifications for users that observe a post', () => {
         jest.clearAllMocks()
         authenticatedUser = await firstCommenter.toJson()
         await mutate({
-          mutation: toggleObservePostMutation,
+          mutation: toggleObservePost,
           variables: {
             id: 'post',
             value: false,

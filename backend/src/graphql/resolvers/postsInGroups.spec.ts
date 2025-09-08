@@ -3,16 +3,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
-import { createCommentMutation } from '@graphql/queries/createCommentMutation'
-import { createGroupMutation } from '@graphql/queries/createGroupMutation'
-import { createPostMutation } from '@graphql/queries/createPostMutation'
-import { filterPosts } from '@graphql/queries/filterPosts'
-import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
-import { postQuery } from '@graphql/queries/postQuery'
+import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
+import { CreateComment } from '@graphql/queries/CreateComment'
+import { CreateGroup } from '@graphql/queries/CreateGroup'
+import { CreatePost } from '@graphql/queries/CreatePost'
+import { LeaveGroup } from '@graphql/queries/LeaveGroup'
+import { Post } from '@graphql/queries/Post'
 import { profilePagePosts } from '@graphql/queries/profilePagePosts'
 import { searchPosts } from '@graphql/queries/searchPosts'
-import { signupVerificationMutation } from '@graphql/queries/signupVerificationMutation'
+import { SignupVerification } from '@graphql/queries/SignupVerification'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -93,7 +92,7 @@ describe('Posts in Groups', () => {
 
     authenticatedUser = await publicUser.toJson()
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'public-group',
         name: 'The Public Group',
@@ -104,7 +103,7 @@ describe('Posts in Groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'public-group',
         userId: 'pending-user',
@@ -112,7 +111,7 @@ describe('Posts in Groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'public-group',
         userId: 'all-groups-user',
@@ -121,7 +120,7 @@ describe('Posts in Groups', () => {
     })
     authenticatedUser = await closedUser.toJson()
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'closed-group',
         name: 'The Closed Group',
@@ -132,7 +131,7 @@ describe('Posts in Groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'closed-group',
         userId: 'pending-user',
@@ -140,7 +139,7 @@ describe('Posts in Groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'closed-group',
         userId: 'all-groups-user',
@@ -149,7 +148,7 @@ describe('Posts in Groups', () => {
     })
     authenticatedUser = await hiddenUser.toJson()
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'hidden-group',
         name: 'The Hidden Group',
@@ -160,7 +159,7 @@ describe('Posts in Groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'hidden-group',
         userId: 'pending-user',
@@ -168,7 +167,7 @@ describe('Posts in Groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'hidden-group',
         userId: 'all-groups-user',
@@ -177,7 +176,7 @@ describe('Posts in Groups', () => {
     })
     authenticatedUser = await anyUser.toJson()
     await mutate({
-      mutation: createPostMutation(),
+      mutation: CreatePost,
       variables: {
         id: 'post-without-group',
         title: 'A post without a group',
@@ -195,7 +194,7 @@ describe('Posts in Groups', () => {
       it('throws an error for public groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation(),
+            mutation: CreatePost,
             variables: {
               id: 'p2',
               title: 'A post to a pubic group',
@@ -211,7 +210,7 @@ describe('Posts in Groups', () => {
       it('throws an error for closed groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation(),
+            mutation: CreatePost,
             variables: {
               id: 'p2',
               title: 'A post to a closed group',
@@ -227,7 +226,7 @@ describe('Posts in Groups', () => {
       it('throws an error for hidden groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation(),
+            mutation: CreatePost,
             variables: {
               id: 'p2',
               title: 'A post to a closed group',
@@ -249,7 +248,7 @@ describe('Posts in Groups', () => {
       it('throws an error for public groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation(),
+            mutation: CreatePost,
             variables: {
               id: 'p2',
               title: 'A post to a pubic group',
@@ -265,7 +264,7 @@ describe('Posts in Groups', () => {
       it('throws an error for closed groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation(),
+            mutation: CreatePost,
             variables: {
               id: 'p2',
               title: 'A post to a closed group',
@@ -281,7 +280,7 @@ describe('Posts in Groups', () => {
       it('throws an error for hidden groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation(),
+            mutation: CreatePost,
             variables: {
               id: 'p2',
               title: 'A post to a closed group',
@@ -303,7 +302,7 @@ describe('Posts in Groups', () => {
       it('creates a post for public groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation(),
+            mutation: CreatePost,
             variables: {
               id: 'post-to-public-group',
               title: 'A post to a public group',
@@ -326,7 +325,7 @@ describe('Posts in Groups', () => {
       it('creates a post for closed groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation(),
+            mutation: CreatePost,
             variables: {
               id: 'post-to-closed-group',
               title: 'A post to a closed group',
@@ -349,7 +348,7 @@ describe('Posts in Groups', () => {
       it('creates a post for hidden groups', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation(),
+            mutation: CreatePost,
             variables: {
               id: 'post-to-hidden-group',
               title: 'A post to a hidden group',
@@ -380,7 +379,7 @@ describe('Posts in Groups', () => {
       it('throws an error for public groups', async () => {
         await expect(
           mutate({
-            mutation: createCommentMutation,
+            mutation: CreateComment,
             variables: {
               postId: 'post-to-public-group',
               content:
@@ -395,7 +394,7 @@ describe('Posts in Groups', () => {
       it('throws an error for closed groups', async () => {
         await expect(
           mutate({
-            mutation: createCommentMutation,
+            mutation: CreateComment,
             variables: {
               postId: 'post-to-closed-group',
               content:
@@ -410,7 +409,7 @@ describe('Posts in Groups', () => {
       it('throws an error for hidden groups', async () => {
         await expect(
           mutate({
-            mutation: createCommentMutation,
+            mutation: CreateComment,
             variables: {
               postId: 'post-to-hidden-group',
               content:
@@ -431,7 +430,7 @@ describe('Posts in Groups', () => {
       it('throws an error for public groups', async () => {
         await expect(
           mutate({
-            mutation: createCommentMutation,
+            mutation: CreateComment,
             variables: {
               postId: 'post-to-public-group',
               content: 'I am commenting a post in a public group as a pending member of the group',
@@ -445,7 +444,7 @@ describe('Posts in Groups', () => {
       it('throws an error for closed groups', async () => {
         await expect(
           mutate({
-            mutation: createCommentMutation,
+            mutation: CreateComment,
             variables: {
               postId: 'post-to-closed-group',
               content: 'I am commenting a post in a closed group  as a pending member of the group',
@@ -459,7 +458,7 @@ describe('Posts in Groups', () => {
       it('throws an error for hidden groups', async () => {
         await expect(
           mutate({
-            mutation: createCommentMutation,
+            mutation: CreateComment,
             variables: {
               postId: 'post-to-hidden-group',
               content: 'I am commenting a post in a hidden group as a pending member of the group',
@@ -479,7 +478,7 @@ describe('Posts in Groups', () => {
       it('comments a post in a public group', async () => {
         await expect(
           mutate({
-            mutation: createCommentMutation,
+            mutation: CreateComment,
             variables: {
               postId: 'post-to-public-group',
               content: 'I am commenting a post in a public group as a member of the group',
@@ -498,7 +497,7 @@ describe('Posts in Groups', () => {
       it('comments a post in a closed group', async () => {
         await expect(
           mutate({
-            mutation: createCommentMutation,
+            mutation: CreateComment,
             variables: {
               postId: 'post-to-closed-group',
               content: 'I am commenting a post in a closed group as a member of the group',
@@ -517,7 +516,7 @@ describe('Posts in Groups', () => {
       it('comments a post in a hidden group', async () => {
         await expect(
           mutate({
-            mutation: createCommentMutation,
+            mutation: CreateComment,
             variables: {
               postId: 'post-to-hidden-group',
               content: 'I am commenting a post in a hidden group as a member of the group',
@@ -544,15 +543,15 @@ describe('Posts in Groups', () => {
 
         it('shows a post of the public group', async () => {
           await expect(
-            query({ query: postQuery(), variables: { id: 'post-to-public-group' } }),
+            query({ query: Post, variables: { id: 'post-to-public-group' } }),
           ).resolves.toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -561,7 +560,7 @@ describe('Posts in Groups', () => {
 
         it('does not show a post of a closed group', async () => {
           await expect(
-            query({ query: postQuery(), variables: { id: 'post-to-closed-group' } }),
+            query({ query: Post, variables: { id: 'post-to-closed-group' } }),
           ).resolves.toMatchObject({
             data: {
               Post: [],
@@ -572,7 +571,7 @@ describe('Posts in Groups', () => {
 
         it('does not show a post of a hidden group', async () => {
           await expect(
-            query({ query: postQuery(), variables: { id: 'post-to-hidden-group' } }),
+            query({ query: Post, variables: { id: 'post-to-hidden-group' } }),
           ).resolves.toMatchObject({
             data: {
               Post: [],
@@ -590,7 +589,7 @@ describe('Posts in Groups', () => {
             verifiedAt: null,
           })
           const result = await mutate({
-            mutation: signupVerificationMutation,
+            mutation: SignupVerification,
             variables: {
               name: 'New User',
               slug: 'new-user',
@@ -607,15 +606,15 @@ describe('Posts in Groups', () => {
 
         it('shows a post of the public group', async () => {
           await expect(
-            query({ query: postQuery(), variables: { id: 'post-to-public-group' } }),
+            query({ query: Post, variables: { id: 'post-to-public-group' } }),
           ).resolves.toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -624,7 +623,7 @@ describe('Posts in Groups', () => {
 
         it('does not show a post of a closed group', async () => {
           await expect(
-            query({ query: postQuery(), variables: { id: 'post-to-closed-group' } }),
+            query({ query: Post, variables: { id: 'post-to-closed-group' } }),
           ).resolves.toMatchObject({
             data: {
               Post: [],
@@ -635,7 +634,7 @@ describe('Posts in Groups', () => {
 
         it('does not show a post of a hidden group', async () => {
           await expect(
-            query({ query: postQuery(), variables: { id: 'post-to-hidden-group' } }),
+            query({ query: Post, variables: { id: 'post-to-hidden-group' } }),
           ).resolves.toMatchObject({
             data: {
               Post: [],
@@ -652,15 +651,15 @@ describe('Posts in Groups', () => {
 
         it('shows a post of the public group', async () => {
           await expect(
-            query({ query: postQuery(), variables: { id: 'post-to-public-group' } }),
+            query({ query: Post, variables: { id: 'post-to-public-group' } }),
           ).resolves.toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -669,7 +668,7 @@ describe('Posts in Groups', () => {
 
         it('does not show a post of a closed group', async () => {
           await expect(
-            query({ query: postQuery(), variables: { id: 'post-to-closed-group' } }),
+            query({ query: Post, variables: { id: 'post-to-closed-group' } }),
           ).resolves.toMatchObject({
             data: {
               Post: [],
@@ -680,7 +679,7 @@ describe('Posts in Groups', () => {
 
         it('does not show a post of a hidden group', async () => {
           await expect(
-            query({ query: postQuery(), variables: { id: 'post-to-hidden-group' } }),
+            query({ query: Post, variables: { id: 'post-to-hidden-group' } }),
           ).resolves.toMatchObject({
             data: {
               Post: [],
@@ -697,15 +696,15 @@ describe('Posts in Groups', () => {
 
         it('shows a post of the public group', async () => {
           await expect(
-            query({ query: postQuery(), variables: { id: 'post-to-public-group' } }),
+            query({ query: Post, variables: { id: 'post-to-public-group' } }),
           ).resolves.toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -714,7 +713,7 @@ describe('Posts in Groups', () => {
 
         it('does not show a post of a closed group', async () => {
           await expect(
-            query({ query: postQuery(), variables: { id: 'post-to-closed-group' } }),
+            query({ query: Post, variables: { id: 'post-to-closed-group' } }),
           ).resolves.toMatchObject({
             data: {
               Post: [],
@@ -725,7 +724,7 @@ describe('Posts in Groups', () => {
 
         it('does not show a post of a hidden group', async () => {
           await expect(
-            query({ query: postQuery(), variables: { id: 'post-to-hidden-group' } }),
+            query({ query: Post, variables: { id: 'post-to-hidden-group' } }),
           ).resolves.toMatchObject({
             data: {
               Post: [],
@@ -742,15 +741,15 @@ describe('Posts in Groups', () => {
 
         it('shows post of the public group', async () => {
           await expect(
-            query({ query: postQuery(), variables: { id: 'post-to-public-group' } }),
+            query({ query: Post, variables: { id: 'post-to-public-group' } }),
           ).resolves.toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -759,15 +758,15 @@ describe('Posts in Groups', () => {
 
         it('shows post of a closed group', async () => {
           await expect(
-            query({ query: postQuery(), variables: { id: 'post-to-closed-group' } }),
+            query({ query: Post, variables: { id: 'post-to-closed-group' } }),
           ).resolves.toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-closed-group',
                   title: 'A post to a closed group',
                   content: 'I am posting into a closed group as a member of the group',
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -776,15 +775,15 @@ describe('Posts in Groups', () => {
 
         it('shows post of a hidden group', async () => {
           await expect(
-            query({ query: postQuery(), variables: { id: 'post-to-hidden-group' } }),
+            query({ query: Post, variables: { id: 'post-to-hidden-group' } }),
           ).resolves.toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-hidden-group',
                   title: 'A post to a hidden group',
                   content: 'I am posting into a hidden group as a member of the group',
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -800,23 +799,23 @@ describe('Posts in Groups', () => {
         })
 
         it('shows the post of the public group and the post without group', async () => {
-          const result = await query({ query: filterPosts(), variables: {} })
+          const result = await query({ query: Post, variables: {} })
           expect(result.data?.Post).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
                   eventStart: null,
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -830,23 +829,23 @@ describe('Posts in Groups', () => {
         })
 
         it('shows the post of the public group and the post without group', async () => {
-          const result = await query({ query: filterPosts(), variables: {} })
+          const result = await query({ query: Post, variables: {} })
           expect(result.data?.Post).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
                   eventStart: null,
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -860,23 +859,23 @@ describe('Posts in Groups', () => {
         })
 
         it('shows the post of the public group and the post without group', async () => {
-          const result = await query({ query: filterPosts(), variables: {} })
+          const result = await query({ query: Post, variables: {} })
           expect(result.data?.Post).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
                   eventStart: null,
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -890,23 +889,23 @@ describe('Posts in Groups', () => {
         })
 
         it('shows the post of the public group and the post without group', async () => {
-          const result = await query({ query: filterPosts(), variables: {} })
+          const result = await query({ query: Post, variables: {} })
           expect(result.data?.Post).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
                   eventStart: null,
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -920,35 +919,35 @@ describe('Posts in Groups', () => {
         })
 
         it('shows all posts', async () => {
-          const result = await query({ query: filterPosts(), variables: {} })
+          const result = await query({ query: Post, variables: {} })
           expect(result.data?.Post).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-closed-group',
                   title: 'A post to a closed group',
                   content: 'I am posting into a closed group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-hidden-group',
                   title: 'A post to a hidden group',
                   content: 'I am posting into a hidden group as a member of the group',
                   eventStart: null,
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -964,21 +963,21 @@ describe('Posts in Groups', () => {
         })
 
         it('shows the post of the public group and the post without group', async () => {
-          const result = await query({ query: profilePagePosts(), variables: {} })
+          const result = await query({ query: profilePagePosts, variables: {} })
           expect(result.data?.profilePagePosts).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
               profilePagePosts: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -992,21 +991,21 @@ describe('Posts in Groups', () => {
         })
 
         it('shows the post of the public group and the post without group', async () => {
-          const result = await query({ query: profilePagePosts(), variables: {} })
+          const result = await query({ query: profilePagePosts, variables: {} })
           expect(result.data?.profilePagePosts).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
               profilePagePosts: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -1020,21 +1019,21 @@ describe('Posts in Groups', () => {
         })
 
         it('shows the post of the public group and the post without group', async () => {
-          const result = await query({ query: profilePagePosts(), variables: {} })
+          const result = await query({ query: profilePagePosts, variables: {} })
           expect(result.data?.profilePagePosts).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
               profilePagePosts: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -1048,21 +1047,21 @@ describe('Posts in Groups', () => {
         })
 
         it('shows the post of the public group and the post without group', async () => {
-          const result = await query({ query: profilePagePosts(), variables: {} })
+          const result = await query({ query: profilePagePosts, variables: {} })
           expect(result.data?.profilePagePosts).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
               profilePagePosts: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -1076,31 +1075,31 @@ describe('Posts in Groups', () => {
         })
 
         it('shows all posts', async () => {
-          const result = await query({ query: profilePagePosts(), variables: {} })
+          const result = await query({ query: profilePagePosts, variables: {} })
           expect(result.data?.profilePagePosts).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
               profilePagePosts: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-closed-group',
                   title: 'A post to a closed group',
                   content: 'I am posting into a closed group as a member of the group',
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-hidden-group',
                   title: 'A post to a hidden group',
                   content: 'I am posting into a hidden group as a member of the group',
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -1117,7 +1116,7 @@ describe('Posts in Groups', () => {
 
         it('finds nothing', async () => {
           const result = await query({
-            query: searchPosts(),
+            query: searchPosts,
             variables: {
               query: 'post',
               postsOffset: 0,
@@ -1143,7 +1142,7 @@ describe('Posts in Groups', () => {
 
         it('finds the post of the public group and the post without group', async () => {
           const result = await query({
-            query: searchPosts(),
+            query: searchPosts,
             variables: {
               query: 'post',
               postsOffset: 0,
@@ -1156,16 +1155,16 @@ describe('Posts in Groups', () => {
               searchPosts: {
                 postCount: 2,
                 posts: expect.arrayContaining([
-                  {
+                  expect.objectContaining({
                     id: 'post-to-public-group',
                     title: 'A post to a public group',
                     content: 'I am posting into a public group as a member of the group',
-                  },
-                  {
+                  }),
+                  expect.objectContaining({
                     id: 'post-without-group',
                     title: 'A post without a group',
                     content: 'I am a user who does not belong to a group yet.',
-                  },
+                  }),
                 ]),
               },
             },
@@ -1180,7 +1179,7 @@ describe('Posts in Groups', () => {
 
         it('finds the post of the public group and the post without group', async () => {
           const result = await query({
-            query: searchPosts(),
+            query: searchPosts,
             variables: {
               query: 'post',
               postsOffset: 0,
@@ -1193,16 +1192,16 @@ describe('Posts in Groups', () => {
               searchPosts: {
                 postCount: 2,
                 posts: expect.arrayContaining([
-                  {
+                  expect.objectContaining({
                     id: 'post-to-public-group',
                     title: 'A post to a public group',
                     content: 'I am posting into a public group as a member of the group',
-                  },
-                  {
+                  }),
+                  expect.objectContaining({
                     id: 'post-without-group',
                     title: 'A post without a group',
                     content: 'I am a user who does not belong to a group yet.',
-                  },
+                  }),
                 ]),
               },
             },
@@ -1217,7 +1216,7 @@ describe('Posts in Groups', () => {
 
         it('finds the post of the public group and the post without group', async () => {
           const result = await query({
-            query: searchPosts(),
+            query: searchPosts,
             variables: {
               query: 'post',
               postsOffset: 0,
@@ -1230,16 +1229,16 @@ describe('Posts in Groups', () => {
               searchPosts: {
                 postCount: 2,
                 posts: expect.arrayContaining([
-                  {
+                  expect.objectContaining({
                     id: 'post-to-public-group',
                     title: 'A post to a public group',
                     content: 'I am posting into a public group as a member of the group',
-                  },
-                  {
+                  }),
+                  expect.objectContaining({
                     id: 'post-without-group',
                     title: 'A post without a group',
                     content: 'I am a user who does not belong to a group yet.',
-                  },
+                  }),
                 ]),
               },
             },
@@ -1254,7 +1253,7 @@ describe('Posts in Groups', () => {
 
         it('finds all posts', async () => {
           const result = await query({
-            query: searchPosts(),
+            query: searchPosts,
             variables: {
               query: 'post',
               postsOffset: 0,
@@ -1267,26 +1266,26 @@ describe('Posts in Groups', () => {
               searchPosts: {
                 postCount: 4,
                 posts: expect.arrayContaining([
-                  {
+                  expect.objectContaining({
                     id: 'post-to-public-group',
                     title: 'A post to a public group',
                     content: 'I am posting into a public group as a member of the group',
-                  },
-                  {
+                  }),
+                  expect.objectContaining({
                     id: 'post-without-group',
                     title: 'A post without a group',
                     content: 'I am a user who does not belong to a group yet.',
-                  },
-                  {
+                  }),
+                  expect.objectContaining({
                     id: 'post-to-closed-group',
                     title: 'A post to a closed group',
                     content: 'I am posting into a closed group as a member of the group',
-                  },
-                  {
+                  }),
+                  expect.objectContaining({
                     id: 'post-to-hidden-group',
                     title: 'A post to a hidden group',
                     content: 'I am posting into a hidden group as a member of the group',
-                  },
+                  }),
                 ]),
               },
             },
@@ -1302,7 +1301,7 @@ describe('Posts in Groups', () => {
         beforeAll(async () => {
           authenticatedUser = await closedUser.toJson()
           await mutate({
-            mutation: changeGroupMemberRoleMutation(),
+            mutation: ChangeGroupMemberRole,
             variables: {
               groupId: 'closed-group',
               userId: 'pending-user',
@@ -1313,29 +1312,29 @@ describe('Posts in Groups', () => {
         })
 
         it('shows the posts of the closed group', async () => {
-          const result = await query({ query: filterPosts(), variables: {} })
+          const result = await query({ query: Post, variables: {} })
           expect(result.data?.Post).toHaveLength(3)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-closed-group',
                   title: 'A post to a closed group',
                   content: 'I am posting into a closed group as a member of the group',
                   eventStart: null,
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -1347,7 +1346,7 @@ describe('Posts in Groups', () => {
         beforeAll(async () => {
           authenticatedUser = await hiddenUser.toJson()
           await mutate({
-            mutation: changeGroupMemberRoleMutation(),
+            mutation: ChangeGroupMemberRole,
             variables: {
               groupId: 'hidden-group',
               userId: 'pending-user',
@@ -1358,35 +1357,35 @@ describe('Posts in Groups', () => {
         })
 
         it('shows all the posts', async () => {
-          const result = await query({ query: filterPosts(), variables: {} })
+          const result = await query({ query: Post, variables: {} })
           expect(result.data?.Post).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-closed-group',
                   title: 'A post to a closed group',
                   content: 'I am posting into a closed group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-hidden-group',
                   title: 'A post to a hidden group',
                   content: 'I am posting into a hidden group as a member of the group',
                   eventStart: null,
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -1400,7 +1399,7 @@ describe('Posts in Groups', () => {
         beforeAll(async () => {
           authenticatedUser = await closedUser.toJson()
           await mutate({
-            mutation: changeGroupMemberRoleMutation(),
+            mutation: ChangeGroupMemberRole,
             variables: {
               groupId: 'closed-group',
               userId: 'pending-user',
@@ -1411,29 +1410,29 @@ describe('Posts in Groups', () => {
         })
 
         it('does not show the posts of the closed group anymore', async () => {
-          const result = await query({ query: filterPosts(), variables: {} })
+          const result = await query({ query: Post, variables: {} })
           expect(result.data?.Post).toHaveLength(3)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-hidden-group',
                   title: 'A post to a hidden group',
                   content: 'I am posting into a hidden group as a member of the group',
                   eventStart: null,
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -1445,7 +1444,7 @@ describe('Posts in Groups', () => {
         beforeAll(async () => {
           authenticatedUser = await hiddenUser.toJson()
           await mutate({
-            mutation: changeGroupMemberRoleMutation(),
+            mutation: ChangeGroupMemberRole,
             variables: {
               groupId: 'hidden-group',
               userId: 'pending-user',
@@ -1456,23 +1455,23 @@ describe('Posts in Groups', () => {
         })
 
         it('shows only the public posts', async () => {
-          const result = await query({ query: filterPosts(), variables: {} })
+          const result = await query({ query: Post, variables: {} })
           expect(result.data?.Post).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
                   eventStart: null,
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -1486,7 +1485,7 @@ describe('Posts in Groups', () => {
         beforeAll(async () => {
           authenticatedUser = await allGroupsUser.toJson()
           await mutate({
-            mutation: leaveGroupMutation(),
+            mutation: LeaveGroup,
             variables: {
               groupId: 'public-group',
               userId: 'all-groups-user',
@@ -1495,35 +1494,35 @@ describe('Posts in Groups', () => {
         })
 
         it('still shows the posts of the public group', async () => {
-          const result = await query({ query: filterPosts(), variables: {} })
+          const result = await query({ query: Post, variables: {} })
           expect(result.data?.Post).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-closed-group',
                   title: 'A post to a closed group',
                   content: 'I am posting into a closed group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-hidden-group',
                   title: 'A post to a hidden group',
                   content: 'I am posting into a hidden group as a member of the group',
                   eventStart: null,
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -1535,7 +1534,7 @@ describe('Posts in Groups', () => {
         beforeAll(async () => {
           authenticatedUser = await allGroupsUser.toJson()
           await mutate({
-            mutation: leaveGroupMutation(),
+            mutation: LeaveGroup,
             variables: {
               groupId: 'closed-group',
               userId: 'all-groups-user',
@@ -1544,35 +1543,35 @@ describe('Posts in Groups', () => {
         })
 
         it('stil shows the posts of the closed group', async () => {
-          const result = await query({ query: filterPosts(), variables: {} })
+          const result = await query({ query: Post, variables: {} })
           expect(result.data?.Post).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-closed-group',
                   title: 'A post to a closed group',
                   content: 'I am posting into a closed group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-hidden-group',
                   title: 'A post to a hidden group',
                   content: 'I am posting into a hidden group as a member of the group',
                   eventStart: null,
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -1584,7 +1583,7 @@ describe('Posts in Groups', () => {
         beforeAll(async () => {
           authenticatedUser = await allGroupsUser.toJson()
           await mutate({
-            mutation: leaveGroupMutation(),
+            mutation: LeaveGroup,
             variables: {
               groupId: 'hidden-group',
               userId: 'all-groups-user',
@@ -1593,35 +1592,35 @@ describe('Posts in Groups', () => {
         })
 
         it('still shows the post of the hidden group', async () => {
-          const result = await query({ query: filterPosts(), variables: {} })
+          const result = await query({ query: Post, variables: {} })
           expect(result.data?.Post).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-closed-group',
                   title: 'A post to a closed group',
                   content: 'I am posting into a closed group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-hidden-group',
                   title: 'A post to a hidden group',
                   content: 'I am posting into a hidden group as a member of the group',
                   eventStart: null,
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -1635,7 +1634,7 @@ describe('Posts in Groups', () => {
         beforeAll(async () => {
           authenticatedUser = await closedUser.toJson()
           await mutate({
-            mutation: changeGroupMemberRoleMutation(),
+            mutation: ChangeGroupMemberRole,
             variables: {
               groupId: 'closed-group',
               userId: 'all-groups-user',
@@ -1646,35 +1645,35 @@ describe('Posts in Groups', () => {
         })
 
         it('shows the posts of the closed group', async () => {
-          const result = await query({ query: filterPosts(), variables: {} })
+          const result = await query({ query: Post, variables: {} })
           expect(result.data?.Post).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-closed-group',
                   title: 'A post to a closed group',
                   content: 'I am posting into a closed group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-hidden-group',
                   title: 'A post to a hidden group',
                   content: 'I am posting into a hidden group as a member of the group',
                   eventStart: null,
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -1686,7 +1685,7 @@ describe('Posts in Groups', () => {
         beforeAll(async () => {
           authenticatedUser = await hiddenUser.toJson()
           await mutate({
-            mutation: changeGroupMemberRoleMutation(),
+            mutation: ChangeGroupMemberRole,
             variables: {
               groupId: 'hidden-group',
               userId: 'all-groups-user',
@@ -1697,35 +1696,35 @@ describe('Posts in Groups', () => {
         })
 
         it('shows all posts', async () => {
-          const result = await query({ query: filterPosts(), variables: {} })
+          const result = await query({ query: Post, variables: {} })
           expect(result.data?.Post).toHaveLength(4)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-public-group',
                   title: 'A post to a public group',
                   content: 'I am posting into a public group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-without-group',
                   title: 'A post without a group',
                   content: 'I am a user who does not belong to a group yet.',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-closed-group',
                   title: 'A post to a closed group',
                   content: 'I am posting into a closed group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-hidden-group',
                   title: 'A post to a hidden group',
                   content: 'I am posting into a hidden group as a member of the group',
                   eventStart: null,
-                },
+                }),
               ]),
             },
             errors: undefined,
@@ -1742,7 +1741,7 @@ describe('Posts in Groups', () => {
 
         it('finds no posts', async () => {
           const result = await query({
-            query: filterPosts(),
+            query: Post,
             variables: { filter: { postsInMyGroups: true } },
           })
           expect(result.data?.Post).toHaveLength(0)
@@ -1763,25 +1762,25 @@ describe('Posts in Groups', () => {
 
         it('finds two posts', async () => {
           const result = await query({
-            query: filterPosts(),
+            query: Post,
             variables: { filter: { postsInMyGroups: true } },
           })
           expect(result.data?.Post).toHaveLength(2)
           expect(result).toMatchObject({
             data: {
               Post: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   id: 'post-to-closed-group',
                   title: 'A post to a closed group',
                   content: 'I am posting into a closed group as a member of the group',
                   eventStart: null,
-                },
-                {
+                }),
+                expect.objectContaining({
                   id: 'post-to-hidden-group',
                   title: 'A post to a hidden group',
                   content: 'I am posting into a hidden group as a member of the group',
                   eventStart: null,
-                },
+                }),
               ]),
             },
             errors: undefined,
