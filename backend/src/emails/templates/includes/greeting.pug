@@ -4,14 +4,14 @@
   - var team = APPLICATION_NAME
   - var settingsUrl = settingsUrl
   - var renderSettingsUrl = renderSettingsUrl
-  p= t('general.seeYou')
+  p.single-line= t('general.seeYou')
     a.organization(href=organizationUrl)= team
     | !
-  p= t('general.yourTeam', { team })
+  p.single-line= t('general.yourTeam', { team })
 
   if renderSettingsUrl
     br
-    p= t('general.settingsHint')
+    p.single-line= t('general.settingsHint')
       a.settings(href=settingsUrl)= t('general.settingsName')
       | !
   
