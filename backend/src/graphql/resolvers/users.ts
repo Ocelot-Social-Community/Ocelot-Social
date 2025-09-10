@@ -38,19 +38,14 @@ export const getMutedUsers = async (context) => {
 export default {
   Query: {
     mutedUsers: async (_object, _args, context, _resolveInfo) => getMutedUsers(context),
-    blockedUsers: async (_object, _args, context, _resolveInfo) => {
-      const { neode } = context
-      const userModel = neode.model('User')
-      let blockedUsers = neode
-        .query()
-        .match('user', userModel)
-        .where('user.id', context.user.id)
-        .relationship(userModel.relationships().get('blocked'))
-        .to('blocked', userModel)
-        .return('blocked')
-      blockedUsers = await blockedUsers.execute()
-      blockedUsers = blockedUsers.records.map((r) => r.get('blocked').properties)
-      return blockedUsers
+    blockedUsers: async (_object, _args, context: Context, _resolveInfo) => {
+      return (
+        await context.database.query({
+          query: `MATCH (user:User{ id: $user.id})-[:BLOCKED]->(blocked:User)
+                  RETURN blocked {.*}`,
+          variables: { user: context.user },
+        })
+      ).records.map((r) => r.get('blocked'))
     },
     User: async (object, args, context, resolveInfo) => {
       if (args.email) {
