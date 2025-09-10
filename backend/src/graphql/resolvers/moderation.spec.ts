@@ -3,10 +3,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
+import { review } from '@graphql/queries/review'
 import createServer from '@src/server'
 
 const neode = getNeode()
@@ -19,42 +19,6 @@ let mutate,
   moderator,
   nonModerator,
   closeReportVariables
-
-const reviewMutation = gql`
-  mutation ($resourceId: ID!, $disable: Boolean, $closed: Boolean) {
-    review(resourceId: $resourceId, disable: $disable, closed: $closed) {
-      createdAt
-      updatedAt
-      resource {
-        __typename
-        ... on User {
-          id
-          disabled
-        }
-        ... on Post {
-          id
-          disabled
-        }
-        ... on Comment {
-          id
-          disabled
-        }
-      }
-      report {
-        id
-        createdAt
-        updatedAt
-        closed
-        reviewed {
-          createdAt
-          moderator {
-            id
-          }
-        }
-      }
-    }
-  }
-`
 
 describe('moderate resources', () => {
   beforeAll(async () => {
@@ -124,7 +88,7 @@ describe('moderate resources', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         await expect(
-          mutate({ mutation: reviewMutation, variables: disableVariables }),
+          mutate({ mutation: review, variables: disableVariables }),
         ).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
@@ -138,7 +102,7 @@ describe('moderate resources', () => {
 
       it('non-moderator receives an authorization error', async () => {
         await expect(
-          mutate({ mutation: reviewMutation, variables: disableVariables }),
+          mutate({ mutation: review, variables: disableVariables }),
         ).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
@@ -169,7 +133,7 @@ describe('moderate resources', () => {
 
       it('report can be closed without disabling resource', async () => {
         await expect(
-          mutate({ mutation: reviewMutation, variables: closeReportVariables }),
+          mutate({ mutation: review, variables: closeReportVariables }),
         ).resolves.toMatchObject({
           data: {
             review: {
@@ -184,11 +148,11 @@ describe('moderate resources', () => {
       it('creates only one review for multiple reviews by the same moderator on same resource', async () => {
         await Promise.all([
           mutate({
-            mutation: reviewMutation,
+            mutation: review,
             variables: { ...disableVariables, resourceId: 'should-i-be-disabled' },
           }),
           mutate({
-            mutation: reviewMutation,
+            mutation: review,
             variables: { ...enableVariables, resourceId: 'should-i-be-disabled' },
           }),
         ])
@@ -201,11 +165,11 @@ describe('moderate resources', () => {
       it('updates the updatedAt attribute', async () => {
         const [firstReview, secondReview] = await Promise.all([
           mutate({
-            mutation: reviewMutation,
+            mutation: review,
             variables: { ...disableVariables, resourceId: 'should-i-be-disabled' },
           }),
           mutate({
-            mutation: reviewMutation,
+            mutation: review,
             variables: { ...enableVariables, resourceId: 'should-i-be-disabled' },
           }),
         ])
@@ -222,7 +186,7 @@ describe('moderate resources', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         await expect(
-          mutate({ mutation: reviewMutation, variables: disableVariables }),
+          mutate({ mutation: review, variables: disableVariables }),
         ).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
@@ -236,7 +200,7 @@ describe('moderate resources', () => {
 
       it('non-moderator receives an authorization error', async () => {
         await expect(
-          mutate({ mutation: reviewMutation, variables: disableVariables }),
+          mutate({ mutation: review, variables: disableVariables }),
         ).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
@@ -270,7 +234,7 @@ describe('moderate resources', () => {
 
         it('returns disabled resource id', async () => {
           await expect(
-            mutate({ mutation: reviewMutation, variables: disableVariables }),
+            mutate({ mutation: review, variables: disableVariables }),
           ).resolves.toMatchObject({
             data: { review: { resource: { __typename: 'Comment', id: 'comment-id' } } },
             errors: undefined,
@@ -279,7 +243,7 @@ describe('moderate resources', () => {
 
         it('returns .reviewed', async () => {
           await expect(
-            mutate({ mutation: reviewMutation, variables: disableVariables }),
+            mutate({ mutation: review, variables: disableVariables }),
           ).resolves.toMatchObject({
             data: {
               review: {
@@ -298,7 +262,7 @@ describe('moderate resources', () => {
 
         it('updates .disabled on comment', async () => {
           await expect(
-            mutate({ mutation: reviewMutation, variables: disableVariables }),
+            mutate({ mutation: review, variables: disableVariables }),
           ).resolves.toMatchObject({
             data: {
               review: { resource: { __typename: 'Comment', id: 'comment-id', disabled: true } },
@@ -313,7 +277,7 @@ describe('moderate resources', () => {
             closed: true,
           }
           await expect(
-            mutate({ mutation: reviewMutation, variables: closeReportVariables }),
+            mutate({ mutation: review, variables: closeReportVariables }),
           ).resolves.toMatchObject({
             data: {
               review: {
@@ -348,7 +312,7 @@ describe('moderate resources', () => {
 
         it('returns disabled resource id', async () => {
           await expect(
-            mutate({ mutation: reviewMutation, variables: disableVariables }),
+            mutate({ mutation: review, variables: disableVariables }),
           ).resolves.toMatchObject({
             data: {
               review: {
@@ -361,7 +325,7 @@ describe('moderate resources', () => {
 
         it('returns .reviewed', async () => {
           await expect(
-            mutate({ mutation: reviewMutation, variables: disableVariables }),
+            mutate({ mutation: review, variables: disableVariables }),
           ).resolves.toMatchObject({
             data: {
               review: {
@@ -380,7 +344,7 @@ describe('moderate resources', () => {
 
         it('updates .disabled on post', async () => {
           await expect(
-            mutate({ mutation: reviewMutation, variables: disableVariables }),
+            mutate({ mutation: review, variables: disableVariables }),
           ).resolves.toMatchObject({
             data: { review: { resource: { __typename: 'Post', id: 'post-id', disabled: true } } },
             errors: undefined,
@@ -393,7 +357,7 @@ describe('moderate resources', () => {
             closed: true,
           }
           await expect(
-            mutate({ mutation: reviewMutation, variables: closeReportVariables }),
+            mutate({ mutation: review, variables: closeReportVariables }),
           ).resolves.toMatchObject({
             data: {
               review: {
@@ -428,7 +392,7 @@ describe('moderate resources', () => {
 
         it('returns disabled resource id', async () => {
           await expect(
-            mutate({ mutation: reviewMutation, variables: disableVariables }),
+            mutate({ mutation: review, variables: disableVariables }),
           ).resolves.toMatchObject({
             data: { review: { resource: { __typename: 'User', id: 'user-id' } } },
             errors: undefined,
@@ -437,7 +401,7 @@ describe('moderate resources', () => {
 
         it('returns .reviewed', async () => {
           await expect(
-            mutate({ mutation: reviewMutation, variables: disableVariables }),
+            mutate({ mutation: review, variables: disableVariables }),
           ).resolves.toMatchObject({
             data: {
               review: {
@@ -456,7 +420,7 @@ describe('moderate resources', () => {
 
         it('updates .disabled on user', async () => {
           await expect(
-            mutate({ mutation: reviewMutation, variables: disableVariables }),
+            mutate({ mutation: review, variables: disableVariables }),
           ).resolves.toMatchObject({
             data: { review: { resource: { __typename: 'User', id: 'user-id', disabled: true } } },
             errors: undefined,
@@ -469,7 +433,7 @@ describe('moderate resources', () => {
             closed: true,
           }
           await expect(
-            mutate({ mutation: reviewMutation, variables: closeReportVariables }),
+            mutate({ mutation: review, variables: closeReportVariables }),
           ).resolves.toMatchObject({
             data: {
               review: {
@@ -492,7 +456,7 @@ describe('moderate resources', () => {
           resourceId: 'post-id',
         }
         await expect(
-          mutate({ mutation: reviewMutation, variables: enableVariables }),
+          mutate({ mutation: review, variables: enableVariables }),
         ).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
@@ -511,7 +475,7 @@ describe('moderate resources', () => {
             resourceId: 'post-id',
           }
           await expect(
-            mutate({ mutation: reviewMutation, variables: enableVariables }),
+            mutate({ mutation: review, variables: enableVariables }),
           ).resolves.toMatchObject({
             errors: [{ message: 'Not Authorized!' }],
           })
@@ -552,7 +516,7 @@ describe('moderate resources', () => {
 
           it('returns enabled resource id', async () => {
             await expect(
-              mutate({ mutation: reviewMutation, variables: enableVariables }),
+              mutate({ mutation: review, variables: enableVariables }),
             ).resolves.toMatchObject({
               data: { review: { resource: { __typename: 'Comment', id: 'comment-id' } } },
             })
@@ -560,7 +524,7 @@ describe('moderate resources', () => {
 
           it('returns .reviewed', async () => {
             await expect(
-              mutate({ mutation: reviewMutation, variables: enableVariables }),
+              mutate({ mutation: review, variables: enableVariables }),
             ).resolves.toMatchObject({
               data: {
                 review: {
@@ -578,7 +542,7 @@ describe('moderate resources', () => {
 
           it('updates .disabled on comment', async () => {
             await expect(
-              mutate({ mutation: reviewMutation, variables: enableVariables }),
+              mutate({ mutation: review, variables: enableVariables }),
             ).resolves.toMatchObject({
               data: {
                 review: { resource: { __typename: 'Comment', id: 'comment-id', disabled: false } },
@@ -617,7 +581,7 @@ describe('moderate resources', () => {
 
           it('returns enabled resource id', async () => {
             await expect(
-              mutate({ mutation: reviewMutation, variables: enableVariables }),
+              mutate({ mutation: review, variables: enableVariables }),
             ).resolves.toMatchObject({
               data: { review: { resource: { __typename: 'Post', id: 'post-id' } } },
             })
@@ -625,7 +589,7 @@ describe('moderate resources', () => {
 
           it('returns .reviewed', async () => {
             await expect(
-              mutate({ mutation: reviewMutation, variables: enableVariables }),
+              mutate({ mutation: review, variables: enableVariables }),
             ).resolves.toMatchObject({
               data: {
                 review: {
@@ -643,7 +607,7 @@ describe('moderate resources', () => {
 
           it('updates .disabled on post', async () => {
             await expect(
-              mutate({ mutation: reviewMutation, variables: enableVariables }),
+              mutate({ mutation: review, variables: enableVariables }),
             ).resolves.toMatchObject({
               data: {
                 review: { resource: { __typename: 'Post', id: 'post-id', disabled: false } },
@@ -681,7 +645,7 @@ describe('moderate resources', () => {
 
           it('returns enabled resource id', async () => {
             await expect(
-              mutate({ mutation: reviewMutation, variables: enableVariables }),
+              mutate({ mutation: review, variables: enableVariables }),
             ).resolves.toMatchObject({
               data: { review: { resource: { __typename: 'User', id: 'user-id' } } },
             })
@@ -689,7 +653,7 @@ describe('moderate resources', () => {
 
           it('returns .reviewed', async () => {
             await expect(
-              mutate({ mutation: reviewMutation, variables: enableVariables }),
+              mutate({ mutation: review, variables: enableVariables }),
             ).resolves.toMatchObject({
               data: {
                 review: {
@@ -707,7 +671,7 @@ describe('moderate resources', () => {
 
           it('updates .disabled on user', async () => {
             await expect(
-              mutate({ mutation: reviewMutation, variables: enableVariables }),
+              mutate({ mutation: review, variables: enableVariables }),
             ).resolves.toMatchObject({
               data: {
                 review: { resource: { __typename: 'User', id: 'user-id', disabled: false } },

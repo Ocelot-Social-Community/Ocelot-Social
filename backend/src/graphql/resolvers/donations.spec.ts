@@ -3,38 +3,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
+import { Donations } from '@graphql/queries/Donations'
+import { UpdateDonations as updateDonations } from '@graphql/queries/UpdateDonations'
 import createServer from '@src/server'
 
 let mutate, query, authenticatedUser, variables
 const instance = getNeode()
 const driver = getDriver()
-
-const updateDonationsMutation = gql`
-  mutation ($showDonations: Boolean, $goal: Int, $progress: Int) {
-    UpdateDonations(showDonations: $showDonations, goal: $goal, progress: $progress) {
-      id
-      showDonations
-      goal
-      progress
-      createdAt
-      updatedAt
-    }
-  }
-`
-const donationsQuery = gql`
-  query {
-    Donations {
-      id
-      showDonations
-      goal
-      progress
-    }
-  }
-`
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -77,7 +55,7 @@ describe('donations', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = undefined
-        await expect(query({ query: donationsQuery, variables })).resolves.toMatchObject({
+        await expect(query({ query: Donations, variables })).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
       })
@@ -93,7 +71,7 @@ describe('donations', () => {
       })
 
       it('returns the current Donations info', async () => {
-        await expect(query({ query: donationsQuery, variables })).resolves.toMatchObject({
+        await expect(query({ query: Donations, variables })).resolves.toMatchObject({
           data: { Donations: { showDonations: true, goal: 15000, progress: 7000 } },
           errors: undefined,
         })
@@ -109,9 +87,7 @@ describe('donations', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         authenticatedUser = undefined
-        await expect(
-          mutate({ mutation: updateDonationsMutation, variables }),
-        ).resolves.toMatchObject({
+        await expect(mutate({ mutation: updateDonations, variables })).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
       })
@@ -128,9 +104,7 @@ describe('donations', () => {
         })
 
         it('throws authorization error', async () => {
-          await expect(
-            mutate({ mutation: updateDonationsMutation, variables }),
-          ).resolves.toMatchObject({
+          await expect(mutate({ mutation: updateDonations, variables })).resolves.toMatchObject({
             data: { UpdateDonations: null },
             errors: [{ message: 'Not Authorized!' }],
           })
@@ -147,9 +121,7 @@ describe('donations', () => {
         })
 
         it('throws authorization error', async () => {
-          await expect(
-            mutate({ mutation: updateDonationsMutation, variables }),
-          ).resolves.toMatchObject({
+          await expect(mutate({ mutation: updateDonations, variables })).resolves.toMatchObject({
             data: { UpdateDonations: null },
             errors: [{ message: 'Not Authorized!' }],
           })
@@ -166,9 +138,7 @@ describe('donations', () => {
         })
 
         it('updates Donations info', async () => {
-          await expect(
-            mutate({ mutation: updateDonationsMutation, variables }),
-          ).resolves.toMatchObject({
+          await expect(mutate({ mutation: updateDonations, variables })).resolves.toMatchObject({
             data: { UpdateDonations: { showDonations: false, goal: 20000, progress: 3000 } },
             errors: undefined,
           })
@@ -178,7 +148,7 @@ describe('donations', () => {
           newlyCreatedDonations = await newlyCreatedDonations.toJson()
           const {
             data: { UpdateDonations },
-          } = await mutate({ mutation: updateDonationsMutation, variables })
+          } = await mutate({ mutation: updateDonations, variables })
           expect(newlyCreatedDonations.updatedAt).toBeTruthy()
           expect(Date.parse(newlyCreatedDonations.updatedAt)).toEqual(expect.any(Number))
           expect(UpdateDonations.updatedAt).toBeTruthy()

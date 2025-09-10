@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import gql from 'graphql-tag'
-
 import Factory, { cleanDatabase } from '@db/factories'
+import { Category } from '@graphql/queries/Category'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import { categories } from '@src/constants/categories'
@@ -40,17 +39,6 @@ afterAll(() => {
   database.neode.close()
 })
 
-const categoriesQuery = gql`
-  query {
-    Category {
-      id
-      slug
-      name
-      icon
-    }
-  }
-`
-
 describe('categories middleware', () => {
   describe('categories are active', () => {
     beforeEach(() => {
@@ -60,7 +48,7 @@ describe('categories middleware', () => {
     it('returns the categories', async () => {
       await expect(
         query({
-          query: categoriesQuery,
+          query: Category,
         }),
       ).resolves.toMatchObject({
         data: {
@@ -80,7 +68,7 @@ describe('categories middleware', () => {
     it('returns an empty array though there are categories in the db', async () => {
       await expect(
         query({
-          query: categoriesQuery,
+          query: Category,
         }),
       ).resolves.toMatchObject({
         data: {

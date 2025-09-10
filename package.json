@@ -33,7 +33,7 @@
     "release": "./scripts/release.sh"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.3",
+    "@babel/core": "^7.28.4",
     "@babel/preset-env": "^7.28.3",
     "@babel/register": "^7.28.3",
     "@badeball/cypress-cucumber-preprocessor": "^23.0.0",
@@ -43,10 +43,10 @@
     "auto-changelog": "^2.5.0",
     "bcryptjs": "^3.0.2",
     "cross-env": "^10.0.0",
-    "cypress": "^15.0.0",
+    "cypress": "^15.1.0",
     "cypress-network-idle": "^1.15.0",
     "date-fns": "^3.6.0",
-    "dotenv": "^17.2.1",
+    "dotenv": "^17.2.2",
     "graphql-request": "^2.0.0",
     "import": "^0.0.6",
     "jsonwebtoken": "^9.0.2",
