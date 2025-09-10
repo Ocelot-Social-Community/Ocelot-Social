@@ -58,7 +58,7 @@ describe('count post teaser views', () => {
     })
   })
 
-  it('does not increase the viewedTeaserCount when accidently called again', async () => {
+  it('does not increase the viewedTeaserCount when accidentally called again', async () => {
     await expect(mutate({ mutation: markTeaserAsViewed, variables })).resolves.toMatchObject({
       data: {
         markTeaserAsViewed: expect.objectContaining({
