@@ -128,7 +128,7 @@ export default {
       try {
         const blockedUser = await writeTxResultPromise
         if (!blockedUser) {
-          throw new Error('Could not find User')
+          throw new UserInputError('Could not find User')
         }
         return blockedUser
       } finally {
@@ -158,7 +158,7 @@ export default {
         }
         return unblockedUser
       } catch {
-        throw new Error('Could not find blocked User')
+        throw new UserInputError('Could not find blocked User')
       } finally {
         await session.close()
       }

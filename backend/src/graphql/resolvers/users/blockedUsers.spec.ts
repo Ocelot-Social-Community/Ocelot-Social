@@ -38,19 +38,22 @@ afterAll(async () => {
   database.neode.close()
 })
 
-beforeEach(() => {
-  authenticatedUser = null
-})
-
 afterEach(async () => {
   await cleanDatabase()
 })
 
 describe('blockedUsers', () => {
-  it('throws permission error', async () => {
-    const result = await query({ query: blockedUsers })
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
+  describe('unauthenticated', () => {
+    beforeEach(() => {
+      authenticatedUser = null
+    })
+
+    it('throws authorization error', async () => {
+      await expect(query({ query: blockedUsers })).resolves.toMatchObject({
+        data: { blockedUsers: null },
+        errors: [{ message: 'Not Authorized!' }],
+      })
+    })
   })
 
   describe('authenticated and given a blocked user', () => {
@@ -68,42 +71,33 @@ describe('blockedUsers', () => {
     })
 
     it('returns a list of blocked users', async () => {
-      await expect(query({ query: blockedUsers })).resolves.toEqual(
-        expect.objectContaining({
-          data: {
-            blockedUsers: [
-              {
-                name: 'Blocked User',
-                id: 'u2',
-                isBlocked: true,
-              },
-            ],
-          },
-        }),
-      )
+      await expect(query({ query: blockedUsers })).resolves.toMatchObject({
+        data: {
+          blockedUsers: [
+            {
+              name: 'Blocked User',
+              id: 'u2',
+              isBlocked: true,
+            },
+          ],
+        },
+      })
     })
   })
 })
 
 describe('blockUser', () => {
-  const blockAction = (variables) => {
-    return mutate({ mutation: blockUser, variables })
-  }
-
-  beforeEach(() => {
-    currentUser = undefined
-  })
-
   describe('unauthenticated', () => {
-    it('throws permission error', async () => {
-      await expect(blockAction({ id: 'u2' })).resolves.toEqual(
-        expect.objectContaining({
-          errors: [
-            expect.objectContaining({
-              message: 'Not Authorized!',
-            }),
-          ],
-        }),
+    beforeEach(() => {
+      authenticatedUser = null
+    })
+
+    it('throws authorization error', async () => {
+      await expect(mutate({ mutation: blockUser, variables: { id: 'u2' } })).resolves.toMatchObject(
+        {
+          data: { blockUser: null },
+          errors: [{ message: 'Not Authorized!' }],
+        },
       )
     })
   })
@@ -119,23 +113,25 @@ describe('blockUser', () => {
 
     describe('block yourself', () => {
       it('returns null', async () => {
-        await expect(blockAction({ id: 'u1' })).resolves.toEqual(
-          expect.objectContaining({ data: { blockUser: null } }),
-        )
+        await expect(
+          mutate({ mutation: blockUser, variables: { id: 'u1' } }),
+        ).resolves.toMatchObject({
+          data: { blockUser: null },
+        })
       })
     })
 
     describe('block not existing user', () => {
       it('throws an error', async () => {
-        await expect(blockAction({ id: 'u2' })).resolves.toEqual(
-          expect.objectContaining({
-            errors: [
-              expect.objectContaining({
-                message: 'Could not find User',
-              }),
-            ],
-          }),
-        )
+        await expect(
+          mutate({ mutation: blockUser, variables: { id: 'u2' } }),
+        ).resolves.toMatchObject({
+          errors: [
+            {
+              message: 'Could not find User',
+            },
+          ],
+        })
       })
     })
 
@@ -148,13 +144,13 @@ describe('blockUser', () => {
       })
 
       it('blocks a user', async () => {
-        await expect(blockAction({ id: 'u2' })).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              blockUser: { id: 'u2', name: 'Blocked User', isBlocked: true },
-            },
-          }),
-        )
+        await expect(
+          mutate({ mutation: blockUser, variables: { id: 'u2' } }),
+        ).resolves.toMatchObject({
+          data: {
+            blockUser: { id: 'u2', name: 'Blocked User', isBlocked: true },
+          },
+        })
       })
 
       it('unfollows the user when blocking', async () => {
@@ -168,17 +164,13 @@ describe('blockUser', () => {
             }
           }
         `
-        await expect(query({ query: queryUser })).resolves.toEqual(
-          expect.objectContaining({
-            data: { User: [{ id: 'u2', isBlocked: false, followedByCurrentUser: true }] },
-          }),
-        )
-        await blockAction({ id: 'u2' })
-        await expect(query({ query: queryUser })).resolves.toEqual(
-          expect.objectContaining({
-            data: { User: [{ id: 'u2', isBlocked: true, followedByCurrentUser: false }] },
-          }),
-        )
+        await expect(query({ query: queryUser })).resolves.toMatchObject({
+          data: { User: [{ id: 'u2', isBlocked: false, followedByCurrentUser: true }] },
+        })
+        await mutate({ mutation: blockUser, variables: { id: 'u2' } })
+        await expect(query({ query: queryUser })).resolves.toMatchObject({
+          data: { User: [{ id: 'u2', isBlocked: true, followedByCurrentUser: false }] },
+        })
       })
 
       describe('given both the current user and the to-be-blocked user write a post', () => {
@@ -212,30 +204,28 @@ describe('blockUser', () => {
         })
 
         const bothPostsAreInTheNewsfeed = async () => {
-          await expect(query({ query: postQuery })).resolves.toEqual(
-            expect.objectContaining({
-              data: {
-                Post: [
-                  {
-                    id: 'p12',
-                    title: 'A post written by the current user',
-                    author: {
-                      name: 'Current User',
-                      id: 'u1',
-                    },
+          await expect(query({ query: postQuery })).resolves.toMatchObject({
+            data: {
+              Post: [
+                {
+                  id: 'p12',
+                  title: 'A post written by the current user',
+                  author: {
+                    name: 'Current User',
+                    id: 'u1',
                   },
-                  {
-                    id: 'p23',
-                    title: 'A post written by the blocked user',
-                    author: {
-                      name: 'Blocked User',
-                      id: 'u2',
-                    },
+                },
+                {
+                  id: 'p23',
+                  title: 'A post written by the blocked user',
+                  author: {
+                    name: 'Blocked User',
+                    id: 'u2',
                   },
-                ],
-              },
-            }),
-          )
+                },
+              ],
+            },
+          })
         }
 
         describe('from the perspective of the current user', () => {
@@ -248,30 +238,28 @@ describe('blockUser', () => {
 
             // TODO: clarify proper behaviour
             it("the blocked user's post still shows up in the newsfeed of the current user", async () => {
-              await expect(query({ query: postQuery })).resolves.toEqual(
-                expect.objectContaining({
-                  data: {
-                    Post: [
-                      {
-                        id: 'p12',
-                        title: 'A post written by the current user',
-                        author: {
-                          name: 'Current User',
-                          id: 'u1',
-                        },
+              await expect(query({ query: postQuery })).resolves.toMatchObject({
+                data: {
+                  Post: [
+                    {
+                      id: 'p12',
+                      title: 'A post written by the current user',
+                      author: {
+                        name: 'Current User',
+                        id: 'u1',
                       },
-                      {
-                        id: 'p23',
-                        title: 'A post written by the blocked user',
-                        author: {
-                          name: 'Blocked User',
-                          id: 'u2',
-                        },
+                    },
+                    {
+                      id: 'p23',
+                      title: 'A post written by the blocked user',
+                      author: {
+                        name: 'Blocked User',
+                        id: 'u2',
                       },
-                    ],
-                  },
-                }),
-              )
+                    },
+                  ],
+                },
+              })
             })
           })
         })
@@ -288,24 +276,22 @@ describe('blockUser', () => {
             })
 
             it("the current user's post will show up in the newsfeed of the blocked user", async () => {
-              await expect(query({ query: postQuery })).resolves.toEqual(
-                expect.objectContaining({
-                  data: {
-                    Post: expect.arrayContaining([
-                      {
-                        id: 'p23',
-                        title: 'A post written by the blocked user',
-                        author: { name: 'Blocked User', id: 'u2' },
-                      },
-                      {
-                        id: 'p12',
-                        title: 'A post written by the current user',
-                        author: { name: 'Current User', id: 'u1' },
-                      },
-                    ]),
-                  },
-                }),
-              )
+              await expect(query({ query: postQuery })).resolves.toMatchObject({
+                data: {
+                  Post: expect.arrayContaining([
+                    {
+                      id: 'p23',
+                      title: 'A post written by the blocked user',
+                      author: { name: 'Blocked User', id: 'u2' },
+                    },
+                    {
+                      id: 'p12',
+                      title: 'A post written by the current user',
+                      author: { name: 'Current User', id: 'u1' },
+                    },
+                  ]),
+                },
+              })
             })
           })
         })
@@ -315,24 +301,19 @@ describe('blockUser', () => {
 })
 
 describe('unblockUser', () => {
-  const unblockAction = (variables) => {
-    return mutate({ mutation: unblockUser, variables })
-  }
+  describe('unauthenticated', () => {
+    beforeEach(() => {
+      authenticatedUser = null
+    })
 
-  beforeEach(() => {
-    currentUser = undefined
-  })
-
-  it('throws permission error', async () => {
-    await expect(unblockAction({ id: 'u2' })).resolves.toEqual(
-      expect.objectContaining({
-        errors: [
-          expect.objectContaining({
-            message: 'Not Authorized!',
-          }),
-        ],
-      }),
-    )
+    it('throws authorization error', async () => {
+      await expect(
+        mutate({ mutation: unblockUser, variables: { id: 'u2' } }),
+      ).resolves.toMatchObject({
+        data: { unblockUser: null },
+        errors: [{ message: 'Not Authorized!' }],
+      })
+    })
   })
 
   describe('authenticated', () => {
@@ -346,23 +327,25 @@ describe('unblockUser', () => {
 
     describe('unblock yourself', () => {
       it('returns null', async () => {
-        await expect(unblockAction({ id: 'u1' })).resolves.toEqual(
-          expect.objectContaining({ data: { unblockUser: null } }),
-        )
+        await expect(
+          mutate({ mutation: unblockUser, variables: { id: 'u1' } }),
+        ).resolves.toMatchObject({
+          data: { unblockUser: null },
+        })
       })
     })
 
     describe('unblock not-existing user', () => {
       it('throws an error', async () => {
-        await expect(unblockAction({ id: 'lksjdflksfdj' })).resolves.toEqual(
-          expect.objectContaining({
-            errors: [
-              expect.objectContaining({
-                message: 'Could not find blocked User',
-              }),
-            ],
-          }),
-        )
+        await expect(
+          mutate({ mutation: unblockUser, variables: { id: 'lksjdflksfdj' } }),
+        ).resolves.toMatchObject({
+          errors: [
+            {
+              message: 'Could not find blocked User',
+            },
+          ],
+        })
       })
     })
 
@@ -376,15 +359,15 @@ describe('unblockUser', () => {
 
       describe('unblocking a not yet blocked user', () => {
         it('throws an error', async () => {
-          await expect(unblockAction({ id: 'u2' })).resolves.toEqual(
-            expect.objectContaining({
-              errors: [
-                expect.objectContaining({
-                  message: 'Could not find blocked User',
-                }),
-              ],
-            }),
-          )
+          await expect(
+            mutate({ mutation: unblockUser, variables: { id: 'u2' } }),
+          ).resolves.toMatchObject({
+            errors: [
+              {
+                message: 'Could not find blocked User',
+              },
+            ],
+          })
         })
       })
 
@@ -394,27 +377,27 @@ describe('unblockUser', () => {
         })
 
         it('unblocks a user', async () => {
-          await expect(unblockAction({ id: 'u2' })).resolves.toEqual(
-            expect.objectContaining({
-              data: {
-                unblockUser: { id: 'u2', name: 'Blocked User', isBlocked: false },
-              },
-            }),
-          )
+          await expect(
+            mutate({ mutation: unblockUser, variables: { id: 'u2' } }),
+          ).resolves.toMatchObject({
+            data: {
+              unblockUser: { id: 'u2', name: 'Blocked User', isBlocked: false },
+            },
+          })
         })
 
         describe('unblocking twice', () => {
           it('throws an error on second unblock', async () => {
-            await unblockAction({ id: 'u2' })
-            await expect(unblockAction({ id: 'u2' })).resolves.toEqual(
-              expect.objectContaining({
-                errors: [
-                  expect.objectContaining({
-                    message: 'Could not find blocked User',
-                  }),
-                ],
-              }),
-            )
+            await mutate({ mutation: unblockUser, variables: { id: 'u2' } })
+            await expect(
+              mutate({ mutation: unblockUser, variables: { id: 'u2' } }),
+            ).resolves.toMatchObject({
+              errors: [
+                {
+                  message: 'Could not find blocked User',
+                },
+              ],
+            })
           })
         })
       })
