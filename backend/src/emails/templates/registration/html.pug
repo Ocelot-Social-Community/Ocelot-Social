@@ -5,7 +5,7 @@ block content
   p!= t('registration.introduction')
   a.button(href=actionUrl)!= t('buttons.confirmEmail')
   p!= t('registration.codeHint')
-    span= nonce
+    span!= nonce
   p!= t('registration.codeHintException')
 
   p!= t('registration.notYouStart') 

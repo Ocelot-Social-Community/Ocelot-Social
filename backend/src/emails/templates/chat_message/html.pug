@@ -3,6 +3,6 @@ extend ../layout.pug
 block content
   .content
   p!= t('chatMessageStart')
-    a.user(href=chattingUserUrl)= chattingUser
+    a.user(href=chattingUserUrl)!= chattingUser
     != t('chatMessageEnd')
   a.button(href=chatUrl)!= t('buttons.viewChat')
