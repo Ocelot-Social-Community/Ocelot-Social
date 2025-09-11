@@ -5,9 +5,9 @@
   - var settingsUrl = settingsUrl
   - var renderSettingsUrl = renderSettingsUrl
   p.no-margin-top-bottom= t('general.seeYou')
-    a.organization(href=organizationUrl)= team
+    a.organization(href=organizationUrl)!= team
     | !
-  p.no-margin-top-bottom= t('general.yourTeam', { team })
+  p.no-margin-top-bottom!= t('general.yourTeam', { team })
 
   if renderSettingsUrl
     br

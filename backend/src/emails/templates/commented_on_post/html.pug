@@ -3,6 +3,6 @@ extend ../layout.pug
 block content
   .content
   p
-    a.user(href=commenterUrl)= commenterName
-    = t('commentedOnPost', { postTitle})
+    a.user(href=commenterUrl)!= commenterName
+    != t('commentedOnPost', { postTitle})
   a.button(href=commentUrl)= t('buttons.viewComment')

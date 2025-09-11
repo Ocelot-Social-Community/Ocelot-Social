@@ -9,7 +9,7 @@ block content
   p= t('registration.codeHintException')
 
   p= t('registration.notYouStart') 
-    a(href=ORGANIZATION_LINK)= APPLICATION_NAME
+    a(href=ORGANIZATION_LINK)!= APPLICATION_NAME
     = t('registration.notYouEnd')
 
   p= t('registration.ps')

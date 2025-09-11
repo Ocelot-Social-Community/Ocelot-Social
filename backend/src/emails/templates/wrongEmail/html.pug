@@ -6,5 +6,5 @@ block content
   a.button(href=actionUrl)= t('buttons.tryAgain')
 
   p= t('wrongEmail.ignoreStart') 
-    a(href=ORGANIZATION_LINK)= APPLICATION_NAME
+    a(href=ORGANIZATION_LINK)!= APPLICATION_NAME
     = t('wrongEmail.ignoreEnd')
