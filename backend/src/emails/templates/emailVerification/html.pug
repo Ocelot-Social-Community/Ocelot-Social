@@ -2,9 +2,9 @@ extend ../layout.pug
 
 block content
   .content
-  p= t('emailVerification.introduction')
-  a.button(href=actionUrl)= t('buttons.verifyEmail')
-  p= t('emailVerification.doNotChange')
+  p!= t('emailVerification.introduction')
+  a.button(href=actionUrl)!= t('buttons.verifyEmail')
+  p!= t('emailVerification.doNotChange')
 
-  p= t('emailVerification.codeHint')
+  p!= t('emailVerification.codeHint')
     span= nonce

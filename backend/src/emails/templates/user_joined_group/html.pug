@@ -5,4 +5,4 @@ block content
   p
     a.user(href=groupRelatedUserUrl)!= groupRelatedUserName  
     != t('userJoinedGroup', { groupName })
-  a.button(href=groupUrl)= t('buttons.viewGroup')
+  a.button(href=groupUrl)!= t('buttons.viewGroup')

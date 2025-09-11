@@ -4,4 +4,4 @@ block content
   .content
   - var groupUrl = groupUrl
   p!= t('changedGroupMemberRole', { groupName })
-  a.button(href=groupUrl)= t('buttons.viewGroup')
+  a.button(href=groupUrl)!= t('buttons.viewGroup')

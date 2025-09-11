@@ -5,4 +5,4 @@ block content
   p
     a.user(href=postAuthorUrl)!= postAuthorName
     != t('mentionedInPost', { postTitle })
-  a.button(href=postUrl)= t('buttons.viewPost')
+  a.button(href=postUrl)!= t('buttons.viewPost')

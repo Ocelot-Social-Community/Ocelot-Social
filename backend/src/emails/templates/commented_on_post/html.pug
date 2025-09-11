@@ -5,4 +5,4 @@ block content
   p
     a.user(href=commenterUrl)!= commenterName
     != t('commentedOnPost', { postTitle})
-  a.button(href=commentUrl)= t('buttons.viewComment')
+  a.button(href=commentUrl)!= t('buttons.viewComment')
