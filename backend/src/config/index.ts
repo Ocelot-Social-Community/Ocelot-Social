@@ -104,7 +104,6 @@ const required = {
 
   MAPBOX_TOKEN: env.MAPBOX_TOKEN,
   JWT_SECRET: env.JWT_SECRET,
-  PRIVATE_KEY_PASSPHRASE: env.PRIVATE_KEY_PASSPHRASE,
 }
 
 // https://stackoverflow.com/a/53050575
