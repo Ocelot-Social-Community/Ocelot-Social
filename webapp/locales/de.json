@@ -881,8 +881,8 @@
     },
     "viewPost": {
       "forGroup": {
-        "groupName": "„{name}“",
-        "title": "In der Gruppe:"
+        "groupName": "{name}",
+        "title": "In der Gruppe "
       },
       "title": "Beitrag"
     }

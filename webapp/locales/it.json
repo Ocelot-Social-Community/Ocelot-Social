@@ -881,6 +881,7 @@
     },
     "viewPost": {
       "forGroup": {
+        "groupName": null,
         "title": null
       },
       "title": null
