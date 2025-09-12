@@ -845,7 +845,8 @@
     "editPost": {
       "event": "Edit Your Event",
       "forGroup": {
-        "title": "For The Group “{name}”"
+        "groupName": "{name}",
+        "title": "For The Group "
       },
       "title": "Edit Your Post"
     },

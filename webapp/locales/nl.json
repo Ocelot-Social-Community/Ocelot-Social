@@ -845,6 +845,7 @@
     "editPost": {
       "event": null,
       "forGroup": {
+        "groupName": null,
         "title": null
       },
       "title": null

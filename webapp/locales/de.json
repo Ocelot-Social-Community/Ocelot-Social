@@ -845,7 +845,8 @@
     "editPost": {
       "event": "Bearbeite deine Veranstaltung",
       "forGroup": {
-        "title": "Für die Gruppe „{name}“"
+        "groupName": "{name}",
+        "title": "Für die Gruppe "
       },
       "title": "Bearbeite deinen Beitrag"
     },
