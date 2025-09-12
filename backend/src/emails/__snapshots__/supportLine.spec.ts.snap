@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`sendResetPasswordMail with support English renders correctly 1`] = `
 {
@@ -13,9 +13,10 @@ exports[`sendResetPasswordMail with support English renders correctly 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -23,9 +24,10 @@ exports[`sendResetPasswordMail with support English renders correctly 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -36,11 +38,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -51,19 +59,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -74,7 +77,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -95,12 +98,12 @@ footer {
         <p>If you didn't request a new password feel free to ignore this e-mail.</p>
         <p>If the above button doesn't work you can also copy the following code into your browser window: <span>123456</span></p>
         <div class="text-block">
-          <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– The ocelot.social Team</p>
+          <p class="no-margin-top-bottom">See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– The ocelot.social Team</p>
         </div>
       </div>
       <div class="support">
-        <p>If you have questions or problems, feel free to contact our support: <a href="mailto:support@example.org">support@example.org</a></p>
+        <p class="no-margin-top-bottom">If you have questions or problems, feel free to contact our support: <a href="mailto:support@example.org">support@example.org</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -148,9 +151,10 @@ exports[`sendResetPasswordMail with support German renders correctly 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -158,9 +162,10 @@ exports[`sendResetPasswordMail with support German renders correctly 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -171,11 +176,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -186,19 +197,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -209,7 +215,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -230,12 +236,12 @@ footer {
         <p>Falls du kein neues Passwort angefordert hast, kannst du diese E-Mail einfach ignorieren.</p>
         <p>Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in dein Browserfenster kopieren: <span>123456</span></p>
         <div class="text-block">
-          <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– Dein ocelot.social Team</p>
+          <p class="no-margin-top-bottom">Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– Dein ocelot.social Team</p>
         </div>
       </div>
       <div class="support">
-        <p>Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:support@example.org">support@example.org</a></p>
+        <p class="no-margin-top-bottom">Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:support@example.org">support@example.org</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -284,9 +290,10 @@ exports[`sendResetPasswordMail without support English renders correctly 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -294,9 +301,10 @@ exports[`sendResetPasswordMail without support English renders correctly 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -307,11 +315,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -322,19 +336,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -345,7 +354,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -366,8 +375,8 @@ footer {
         <p>If you didn't request a new password feel free to ignore this e-mail.</p>
         <p>If the above button doesn't work you can also copy the following code into your browser window: <span>123456</span></p>
         <div class="text-block">
-          <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– The ocelot.social Team</p>
+          <p class="no-margin-top-bottom">See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– The ocelot.social Team</p>
         </div>
       </div>
       <footer>
@@ -413,9 +422,10 @@ exports[`sendResetPasswordMail without support German renders correctly 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -423,9 +433,10 @@ exports[`sendResetPasswordMail without support German renders correctly 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -436,11 +447,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -451,19 +468,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -474,7 +486,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -495,8 +507,8 @@ footer {
         <p>Falls du kein neues Passwort angefordert hast, kannst du diese E-Mail einfach ignorieren.</p>
         <p>Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in dein Browserfenster kopieren: <span>123456</span></p>
         <div class="text-block">
-          <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– Dein ocelot.social Team</p>
+          <p class="no-margin-top-bottom">Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– Dein ocelot.social Team</p>
         </div>
       </div>
       <footer>
