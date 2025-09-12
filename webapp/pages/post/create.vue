@@ -6,7 +6,9 @@
       </ds-heading>
       <ds-heading v-if="group" tag="h2">
         {{ $t('post.viewPost.forGroup.title') }}
-        <i>{{ $t('post.viewPost.forGroup.groupName', { name: group.name }) }}</i>
+        <nuxt-link :to="groupLink">
+          {{ $t('post.viewPost.forGroup.groupName', { name: group.name }) }}
+        </nuxt-link>
       </ds-heading>
     </ds-space>
     <ds-space margin="large" />
@@ -51,6 +53,12 @@ export default {
   computed: {
     group() {
       return this.Group && this.Group[0] ? this.Group[0] : null
+    },
+    groupLink() {
+      if (!this.group) return ''
+      const { id, slug } = this.group
+      if (!(id && slug)) return ''
+      return { name: 'groups-id-slug', params: { slug, id } }
     },
     heading() {
       return !this.createEvent
