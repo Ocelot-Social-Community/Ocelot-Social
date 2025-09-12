@@ -1,5 +1,15 @@
 <template>
   <div>
+    <ds-space margin="small">
+      <ds-heading tag="h1">
+        {{ heading }}
+      </ds-heading>
+      <ds-heading v-if="group" tag="h2">
+        {{ $t('post.viewPost.forGroup.title') }}
+        <i>{{ $t('post.viewPost.forGroup.groupName', { name: group.name }) }}</i>
+      </ds-heading>
+    </ds-space>
+    <ds-space margin="large" />
     <ds-flex gutter="small">
       <ds-flex-item :width="{ base: '100%', md: '200px' }">
         <ds-menu class="post-type-menu" :routes="routes">
@@ -16,16 +26,7 @@
       </ds-flex-item>
       <ds-flex-item :width="{ base: '100%', md: 1 }">
         <transition name="slide-up" appear>
-          <div>
-            <ds-heading tag="h1">
-              {{ heading }}
-            </ds-heading>
-            <ds-heading v-if="group" tag="h2">
-              {{ $t('post.viewPost.forGroup.title') }}
-              <i>{{ $t('post.viewPost.forGroup.groupName', { name: group.name }) }}</i>
-            </ds-heading>
-            <contribution-form :group="group" :createEvent="createEvent" />
-          </div>
+          <contribution-form :group="group" :createEvent="createEvent" />
         </transition>
       </ds-flex-item>
     </ds-flex>
