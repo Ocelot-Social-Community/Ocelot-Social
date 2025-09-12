@@ -537,6 +537,7 @@
     "description": null,
     "editGroupSettings": {
       "groupName": null,
+      "groupTitle": null,
       "title": null
     },
     "errors": {

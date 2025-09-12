@@ -536,7 +536,8 @@
     },
     "description": "Description",
     "editGroupSettings": {
-      "groupName": "Settings Of “{name}”",
+      "groupName": "{name}",
+      "groupTitle": "Settings of ",
       "title": "Edit My Group"
     },
     "errors": {

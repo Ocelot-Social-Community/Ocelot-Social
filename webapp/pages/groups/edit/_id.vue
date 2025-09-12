@@ -3,7 +3,10 @@
     <ds-space margin="small">
       <ds-heading tag="h1">{{ $t('group.editGroupSettings.title') }}</ds-heading>
       <ds-heading tag="h2">
-        {{ $t('group.editGroupSettings.groupName', { name: group.name }) }}
+        {{ $t('group.editGroupSettings.groupTitle') }}
+        <nuxt-link :to="groupLink">
+          {{ $t('group.editGroupSettings.groupName', { name: group.name }) }}
+        </nuxt-link>
       </ds-heading>
     </ds-space>
     <ds-space margin="large" />
@@ -25,6 +28,11 @@ import { groupQuery } from '~/graphql/groups.js'
 import { mapGetters } from 'vuex'
 
 export default {
+  data() {
+    return {
+      group: {},
+    }
+  },
   computed: {
     ...mapGetters({
       user: 'auth/user',
@@ -45,11 +53,12 @@ export default {
         },
       ]
     },
-  },
-  data() {
-    return {
-      group: {},
-    }
+    groupLink() {
+      if (!this.group) return ''
+      const { id, slug } = this.group
+      if (!(id && slug)) return ''
+      return { name: 'groups-id-slug', params: { slug, id } }
+    },
   },
   async asyncData(context) {
     const {
