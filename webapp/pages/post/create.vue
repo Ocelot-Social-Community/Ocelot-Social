@@ -17,14 +17,13 @@
       <ds-flex-item :width="{ base: '100%', md: 1 }">
         <transition name="slide-up" appear>
           <div>
-            <div>
-              <h1 v-if="!createEvent" class="title">
-                {{ $t('post.createNewPost.title') }}
-              </h1>
-              <h1 v-else class="title">
-                {{ $t('post.createNewEvent.title') }}
-              </h1>
-            </div>
+            <ds-heading tag="h1">
+              {{ heading }}
+            </ds-heading>
+            <ds-heading v-if="group" tag="h2">
+              {{ $t('post.viewPost.forGroup.title') }}
+              <i>{{ $t('post.viewPost.forGroup.groupName', { name: group.name }) }}</i>
+            </ds-heading>
             <contribution-form :group="group" :createEvent="createEvent" />
           </div>
         </transition>
@@ -51,6 +50,11 @@ export default {
   computed: {
     group() {
       return this.Group && this.Group[0] ? this.Group[0] : null
+    },
+    heading() {
+      return !this.createEvent
+        ? this.$t('post.createNewPost.title')
+        : this.$t('post.createNewEvent.title')
     },
     routes() {
       return [
