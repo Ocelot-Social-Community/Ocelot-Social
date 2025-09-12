@@ -14,7 +14,7 @@
     <ds-space margin="large" />
     <ds-flex gutter="small">
       <ds-flex-item :width="{ base: '100%', md: '200px' }">
-        <ds-menu class="post-type-menu" :routes="routes">
+        <ds-menu :routes="routes">
           <ds-menu-item
             @click.prevent="switchPostType($event, item)"
             slot="menuitem"
@@ -140,11 +140,5 @@ export default {
   color: $color-primary;
   border-left: 2px solid $color-primary;
   background-color: #faf9fa;
-}
-
-@media screen and (min-width: 768px) {
-  .post-type-menu {
-    margin-top: 39px;
-  }
 }
 </style>
