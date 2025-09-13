@@ -411,7 +411,7 @@ export default shield(
       Category: allow,
       Tag: allow,
       reports: isModerator,
-      statistics: allow,
+      statistics: isAdmin,
       currentUser: isAuthenticated,
       Group: isAuthenticated,
       GroupMembers: isAllowedSeeingGroupMembers,
