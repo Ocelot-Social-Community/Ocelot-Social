@@ -37,42 +37,38 @@ export async function up(_next) {
     urls = urls.filter((url) => url.startsWith('/uploads'))
     // eslint-disable-next-line no-console
     console.log('URLS uploaded:')
-    await Promise.all(
-      urls
-        .map((url) => async () => {
-          const { pathname } = new URL(url, 'http://example.org')
-          // TODO: find a better way to do this - this is quite a hack
-          const fileLocation =
-            CONFIG.NODE_ENV === 'production'
-              ? path.join(__dirname, `../../../../public/${pathname}`) // we're in the /build folder
-              : path.join(__dirname, `../../../public/${pathname}`)
-          const s3Location = `original${pathname}`
-          const mimeType = lookup(fileLocation)
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          const fileHandle = await open(fileLocation)
-          const params = {
-            Bucket: AWS_BUCKET,
-            Key: s3Location,
-            ACL: ObjectCannedACL.public_read,
-            ContentType: mimeType || 'image/jpeg',
-            Body: fileHandle.createReadStream(),
-          }
-          const command = new Upload({ client: s3, params })
+    for await (const url of urls) {
+      const { pathname } = new URL(url, 'http://example.org')
+      // TODO: find a better way to do this - this is quite a hack
+      const fileLocation =
+        CONFIG.NODE_ENV === 'production'
+          ? path.join(__dirname, `../../../../public/${pathname}`) // we're in the /build folder
+          : path.join(__dirname, `../../../public/${pathname}`)
+      const s3Location = `original${pathname}`
+      const mimeType = lookup(fileLocation)
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      const fileHandle = await open(fileLocation)
+      const params = {
+        Bucket: AWS_BUCKET,
+        Key: s3Location,
+        ACL: ObjectCannedACL.public_read,
+        ContentType: mimeType || 'image/jpeg',
+        Body: fileHandle.createReadStream(),
+      }
+      const command = new Upload({ client: s3, params })
 
-          const data = await command.done()
-          const { Location: spacesUrl } = data
+      const data = await command.done()
+      const { Location: spacesUrl } = data
 
-          const updatedRecord = await transaction.run(
-            'MATCH (image:Image {url: $url}) SET image.url = $spacesUrl RETURN image.url as url',
-            { url, spacesUrl },
-          )
-          const [updatedUrl] = updatedRecord.records.map((record) => record.get('url') as string)
-          // eslint-disable-next-line no-console
-          console.log(updatedUrl)
-          return updatedUrl
-        })
-        .map((p) => p()),
-    )
+      const updatedRecord = await transaction.run(
+        'MATCH (image:Image {url: $url}) SET image.url = $spacesUrl RETURN image.url as url',
+        { url, spacesUrl },
+      )
+      const [updatedUrl] = updatedRecord.records.map((record) => record.get('url') as string)
+      // eslint-disable-next-line no-console
+      console.log(updatedUrl)
+      // return updatedUrl
+    }
     await transaction.commit()
   } catch (error) {
     // eslint-disable-next-line no-console
