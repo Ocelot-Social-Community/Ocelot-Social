@@ -3,7 +3,10 @@
 exports[`sendRegistrationMail with invite code English renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -94,7 +97,7 @@ footer {
       <h2>Welcome to ocelot.social!</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>Thank you for joining our cause – it's awesome to have you on board. There's just one tiny step missing before we can start shaping the world together … Please confirm your e-mail address by clicking the button below:</p><a class="button" href="http://webapp:3000/registration?email=user%40example.org&amp;nonce=123456&amp;inviteCode=welcome&amp;method=invite-code">Confirm your e-mail address</a>
+        <p>Thank you for joining our cause – it's awesome to have you on board. There's just one tiny step missing before we can start shaping the world together … Please confirm your e-mail address by clicking the button below:</p><a class="button" href="http://webapp:3000/registration?email=moderator%40example.org&amp;nonce=123456&amp;inviteCode=welcome&amp;method=invite-code">Confirm your e-mail address</a>
         <p>If the above button doesn't work, you can also copy the following code into your browser window: <span>123456</span></p>
         <p>However, this only works if you have registered through our website.</p>
         <p>If you didn't sign up for <a>ocelot.social</a> we recommend you to check it out! It's a social network from people for people who want to connect and change the world together.
@@ -122,7 +125,7 @@ just one tiny step missing before we can start shaping the world together …
 Please confirm your e-mail address by clicking the button below:
 
 Confirm your e-mail address
-[http://webapp:3000/registration?email=user%40example.org&nonce=123456&inviteCode=welcome&method=invite-code]
+[http://webapp:3000/registration?email=moderator%40example.org&nonce=123456&inviteCode=welcome&method=invite-code]
 
 If the above button doesn't work, you can also copy the following code into your
 browser window: 123456
@@ -144,14 +147,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "moderator@example.org",
+    "name": "Bob &"?@\\ Baumeister",
+  },
 }
 `;
 
 exports[`sendRegistrationMail with invite code German renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -242,7 +251,7 @@ footer {
       <h2>Willkommen bei ocelot.social!</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können … Bitte bestätige deine E-Mail Adresse:</p><a class="button" href="http://webapp:3000/registration?email=user%40example.org&amp;nonce=123456&amp;inviteCode=welcome&amp;method=invite-code">Bestätige deine E-Mail Adresse</a>
+        <p>Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können … Bitte bestätige deine E-Mail Adresse:</p><a class="button" href="http://webapp:3000/registration?email=moderator%40example.org&amp;nonce=123456&amp;inviteCode=welcome&amp;method=invite-code">Bestätige deine E-Mail Adresse</a>
         <p>Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in dein Browserfenster kopieren: <span>123456</span></p>
         <p>Das funktioniert allerdings nur, wenn du dich über unsere Website registriert hast.</p>
         <p>Falls du dich nicht selbst bei <a>ocelot.social</a> angemeldet hast, schau doch mal vorbei! Wir sind ein gemeinnütziges Aktionsnetzwerk – von Menschen für Menschen.
@@ -270,7 +279,7 @@ fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können
 … Bitte bestätige deine E-Mail Adresse:
 
 Bestätige deine E-Mail Adresse
-[http://webapp:3000/registration?email=user%40example.org&nonce=123456&inviteCode=welcome&method=invite-code]
+[http://webapp:3000/registration?email=moderator%40example.org&nonce=123456&inviteCode=welcome&method=invite-code]
 
 Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in
 dein Browserfenster kopieren: 123456
@@ -293,14 +302,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "moderator@example.org",
+    "name": "Bob &"?@\\ Baumeister",
+  },
 }
 `;
 
 exports[`sendRegistrationMail without invite code English renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -391,7 +406,7 @@ footer {
       <h2>Welcome to ocelot.social!</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>Thank you for joining our cause – it's awesome to have you on board. There's just one tiny step missing before we can start shaping the world together … Please confirm your e-mail address by clicking the button below:</p><a class="button" href="http://webapp:3000/registration?email=user%40example.org&amp;nonce=123456&amp;method=invite-mail">Confirm your e-mail address</a>
+        <p>Thank you for joining our cause – it's awesome to have you on board. There's just one tiny step missing before we can start shaping the world together … Please confirm your e-mail address by clicking the button below:</p><a class="button" href="http://webapp:3000/registration?email=moderator%40example.org&amp;nonce=123456&amp;method=invite-mail">Confirm your e-mail address</a>
         <p>If the above button doesn't work, you can also copy the following code into your browser window: <span>123456</span></p>
         <p>However, this only works if you have registered through our website.</p>
         <p>If you didn't sign up for <a>ocelot.social</a> we recommend you to check it out! It's a social network from people for people who want to connect and change the world together.
@@ -419,7 +434,7 @@ just one tiny step missing before we can start shaping the world together …
 Please confirm your e-mail address by clicking the button below:
 
 Confirm your e-mail address
-[http://webapp:3000/registration?email=user%40example.org&nonce=123456&method=invite-mail]
+[http://webapp:3000/registration?email=moderator%40example.org&nonce=123456&method=invite-mail]
 
 If the above button doesn't work, you can also copy the following code into your
 browser window: 123456
@@ -441,14 +456,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "moderator@example.org",
+    "name": "Bob &"?@\\ Baumeister",
+  },
 }
 `;
 
 exports[`sendRegistrationMail without invite code German renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -539,7 +560,7 @@ footer {
       <h2>Willkommen bei ocelot.social!</h2>
       <div class="wrapper">
         <div class="content"></div>
-        <p>Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können … Bitte bestätige deine E-Mail Adresse:</p><a class="button" href="http://webapp:3000/registration?email=user%40example.org&amp;nonce=123456&amp;method=invite-mail">Bestätige deine E-Mail Adresse</a>
+        <p>Danke, dass du dich angemeldet hast – wir freuen uns, dich dabei zu haben. Jetzt fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können … Bitte bestätige deine E-Mail Adresse:</p><a class="button" href="http://webapp:3000/registration?email=moderator%40example.org&amp;nonce=123456&amp;method=invite-mail">Bestätige deine E-Mail Adresse</a>
         <p>Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in dein Browserfenster kopieren: <span>123456</span></p>
         <p>Das funktioniert allerdings nur, wenn du dich über unsere Website registriert hast.</p>
         <p>Falls du dich nicht selbst bei <a>ocelot.social</a> angemeldet hast, schau doch mal vorbei! Wir sind ein gemeinnütziges Aktionsnetzwerk – von Menschen für Menschen.
@@ -567,7 +588,7 @@ fehlt nur noch eine Kleinigkeit, bevor wir gemeinsam die Welt verbessern können
 … Bitte bestätige deine E-Mail Adresse:
 
 Bestätige deine E-Mail Adresse
-[http://webapp:3000/registration?email=user%40example.org&nonce=123456&method=invite-mail]
+[http://webapp:3000/registration?email=moderator%40example.org&nonce=123456&method=invite-mail]
 
 Sollte der Button für dich nicht funktionieren, kannst du auch folgenden Code in
 dein Browserfenster kopieren: 123456
@@ -590,6 +611,9 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "moderator@example.org",
+    "name": "Bob &"?@\\ Baumeister",
+  },
 }
 `;

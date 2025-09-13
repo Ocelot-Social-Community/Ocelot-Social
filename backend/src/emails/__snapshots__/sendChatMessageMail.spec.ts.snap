@@ -3,7 +3,10 @@
 exports[`sendChatMessageMail English chat_message template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -132,14 +135,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "chatReceiver",
+  },
 }
 `;
 
 exports[`sendChatMessageMail German chat_message template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -268,6 +277,9 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "chatReceiver",
+  },
 }
 `;
