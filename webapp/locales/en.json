@@ -536,7 +536,8 @@
     },
     "description": "Description",
     "editGroupSettings": {
-      "groupName": "Settings Of “{name}”",
+      "groupName": "{name}",
+      "groupTitle": "Settings of ",
       "title": "Edit My Group"
     },
     "errors": {
@@ -845,7 +846,8 @@
     "editPost": {
       "event": "Edit Your Event",
       "forGroup": {
-        "title": "For The Group “{name}”"
+        "groupName": "{name}",
+        "title": "For The Group "
       },
       "title": "Edit Your Post"
     },
@@ -881,7 +883,8 @@
     },
     "viewPost": {
       "forGroup": {
-        "title": "In The Group “{name}”"
+        "groupName": "{name}",
+        "title": "In The Group "
       },
       "title": "Post"
     }

@@ -1,8 +1,20 @@
 <template>
   <div>
+    <ds-space margin="small">
+      <ds-heading tag="h1">
+        {{ heading }}
+      </ds-heading>
+      <ds-heading v-if="group" tag="h2">
+        {{ $t('post.viewPost.forGroup.title') }}
+        <nuxt-link :to="groupLink">
+          {{ $t('post.viewPost.forGroup.groupName', { name: group.name }) }}
+        </nuxt-link>
+      </ds-heading>
+    </ds-space>
+    <ds-space margin="large" />
     <ds-flex gutter="small">
       <ds-flex-item :width="{ base: '100%', md: '200px' }">
-        <ds-menu class="post-type-menu" :routes="routes">
+        <ds-menu :routes="routes">
           <ds-menu-item
             @click.prevent="switchPostType($event, item)"
             slot="menuitem"
@@ -16,17 +28,7 @@
       </ds-flex-item>
       <ds-flex-item :width="{ base: '100%', md: 1 }">
         <transition name="slide-up" appear>
-          <div>
-            <div>
-              <h1 v-if="!createEvent" class="title">
-                {{ $t('post.createNewPost.title') }}
-              </h1>
-              <h1 v-else class="title">
-                {{ $t('post.createNewEvent.title') }}
-              </h1>
-            </div>
-            <contribution-form :group="group" :createEvent="createEvent" />
-          </div>
+          <contribution-form :group="group" :createEvent="createEvent" />
         </transition>
       </ds-flex-item>
     </ds-flex>
@@ -51,6 +53,17 @@ export default {
   computed: {
     group() {
       return this.Group && this.Group[0] ? this.Group[0] : null
+    },
+    groupLink() {
+      if (!this.group) return ''
+      const { id, slug } = this.group
+      if (!(id && slug)) return ''
+      return { name: 'groups-id-slug', params: { slug, id } }
+    },
+    heading() {
+      return !this.createEvent
+        ? this.$t('post.createNewPost.title')
+        : this.$t('post.createNewEvent.title')
     },
     routes() {
       return [
@@ -127,11 +140,5 @@ export default {
   color: $color-primary;
   border-left: 2px solid $color-primary;
   background-color: #faf9fa;
-}
-
-@media screen and (min-width: 768px) {
-  .post-type-menu {
-    margin-top: 39px;
-  }
 }
 </style>

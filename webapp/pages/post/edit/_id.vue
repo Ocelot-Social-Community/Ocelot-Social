@@ -2,14 +2,13 @@
   <div>
     <ds-space margin="small">
       <ds-heading tag="h1">
-        {{
-          contribution && contribution.postType[0] === 'Event'
-            ? $t('post.editPost.event')
-            : $t('post.editPost.title')
-        }}
+        {{ heading }}
       </ds-heading>
       <ds-heading v-if="contribution && contribution.group" tag="h2">
-        {{ $t('post.editPost.forGroup.title', { name: contribution.group.name }) }}
+        {{ $t('post.editPost.forGroup.title') }}
+        <nuxt-link :to="groupLink">
+          {{ $t('post.editPost.forGroup.groupName', { name: contribution.group.name }) }}
+        </nuxt-link>
       </ds-heading>
     </ds-space>
     <ds-space margin="large" />
@@ -39,6 +38,17 @@ export default {
     ...mapGetters({
       user: 'auth/user',
     }),
+    heading() {
+      return this.contribution && this.contribution.postType[0] === 'Event'
+        ? this.$t('post.editPost.event')
+        : this.$t('post.editPost.title')
+    },
+    groupLink() {
+      if (!this.contribution || !this.contribution.group) return ''
+      const { id, slug } = this.contribution.group
+      if (!(id && slug)) return ''
+      return { name: 'groups-id-slug', params: { slug, id } }
+    },
   },
   data() {
     return {

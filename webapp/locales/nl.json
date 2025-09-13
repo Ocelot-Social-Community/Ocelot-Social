@@ -537,6 +537,7 @@
     "description": null,
     "editGroupSettings": {
       "groupName": null,
+      "groupTitle": null,
       "title": null
     },
     "errors": {
@@ -845,6 +846,7 @@
     "editPost": {
       "event": null,
       "forGroup": {
+        "groupName": null,
         "title": null
       },
       "title": null
@@ -881,6 +883,7 @@
     },
     "viewPost": {
       "forGroup": {
+        "groupName": null,
         "title": null
       },
       "title": null
