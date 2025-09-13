@@ -7,10 +7,12 @@ import { sendWrongEmail } from './sendEmail'
 
 describe('sendWrongEmail', () => {
   const data: {
+    name: string
     email: string
     locale: string
   } = {
-    email: 'user@example.org',
+    name: 'Bob &"?@\\ Baumeister',
+    email: 'moderator@example.org',
     locale: 'en',
   }
 
