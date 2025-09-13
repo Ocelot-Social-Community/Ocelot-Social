@@ -93,6 +93,8 @@ const redis = {
 }
 
 const required = {
+  EMAIL_DEFAULT_SENDER: env.EMAIL_DEFAULT_SENDER,
+
   AWS_ACCESS_KEY_ID: env.AWS_ACCESS_KEY_ID,
   AWS_SECRET_ACCESS_KEY: env.AWS_SECRET_ACCESS_KEY,
   AWS_ENDPOINT: env.AWS_ENDPOINT,
@@ -123,7 +125,6 @@ function assertRequiredConfig(
 assertRequiredConfig(required)
 
 const options = {
-  EMAIL_DEFAULT_SENDER: env.EMAIL_DEFAULT_SENDER,
   SUPPORT_EMAIL: env.SUPPORT_EMAIL,
   SUPPORT_URL: emails.SUPPORT_LINK,
   APPLICATION_NAME: metadata.APPLICATION_NAME,
