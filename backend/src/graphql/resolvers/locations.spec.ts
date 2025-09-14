@@ -23,6 +23,9 @@ beforeAll(async () => {
         driver,
         neode,
         user: authenticatedUser,
+        cypherParams: {
+          currentUserId: authenticatedUser ? authenticatedUser.id : null,
+        },
       }
     },
   })
@@ -73,7 +76,7 @@ describe('resolvers', () => {
             UpdateUser: {
               name: 'John Doughnut',
               location: {
-                name: null,
+                nameRU: null,
                 nameEN: 'Paris',
               },
             },
@@ -171,20 +174,20 @@ describe('distanceToMe', () => {
       it('returns 0', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await user.toJson()
-        await expect(query({ query: User, variables: { id: targetUser.id } })).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              User: [
-                {
-                  location: {
-                    distanceToMe: 0,
-                  },
+        await expect(
+          query({ query: User, variables: { id: targetUser.id } }),
+        ).resolves.toMatchObject({
+          data: {
+            User: [
+              expect.objectContaining({
+                location: {
+                  distanceToMe: 0,
                 },
-              ],
-            },
-            errors: undefined,
-          }),
-        )
+              }),
+            ],
+          },
+          errors: undefined,
+        })
       })
     })
 
@@ -192,20 +195,20 @@ describe('distanceToMe', () => {
       it('returns 0', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await myPlaceUser.toJson()
-        await expect(query({ query: User, variables: { id: targetUser.id } })).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              User: [
-                {
-                  location: {
-                    distanceToMe: 0,
-                  },
+        await expect(
+          query({ query: User, variables: { id: targetUser.id } }),
+        ).resolves.toMatchObject({
+          data: {
+            User: [
+              expect.objectContaining({
+                location: {
+                  distanceToMe: 0,
                 },
-              ],
-            },
-            errors: undefined,
-          }),
-        )
+              }),
+            ],
+          },
+          errors: undefined,
+        })
       })
     })
 
@@ -213,20 +216,20 @@ describe('distanceToMe', () => {
       it('returns a number', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await otherPlaceUser.toJson()
-        await expect(query({ query: User, variables: { id: targetUser.id } })).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              User: [
-                {
-                  location: {
-                    distanceToMe: 746,
-                  },
+        await expect(
+          query({ query: User, variables: { id: targetUser.id } }),
+        ).resolves.toMatchObject({
+          data: {
+            User: [
+              expect.objectContaining({
+                location: {
+                  distanceToMe: 746,
                 },
-              ],
-            },
-            errors: undefined,
-          }),
-        )
+              }),
+            ],
+          },
+          errors: undefined,
+        })
       })
     })
 
@@ -234,20 +237,20 @@ describe('distanceToMe', () => {
       it('returns null', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await noCordsPlaceUser.toJson()
-        await expect(query({ query: User, variables: { id: targetUser.id } })).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              User: [
-                {
-                  location: {
-                    distanceToMe: null,
-                  },
+        await expect(
+          query({ query: User, variables: { id: targetUser.id } }),
+        ).resolves.toMatchObject({
+          data: {
+            User: [
+              expect.objectContaining({
+                location: {
+                  distanceToMe: null,
                 },
-              ],
-            },
-            errors: undefined,
-          }),
-        )
+              }),
+            ],
+          },
+          errors: undefined,
+        })
       })
     })
 
@@ -255,18 +258,18 @@ describe('distanceToMe', () => {
       it('returns null location', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await noPlaceUser.toJson()
-        await expect(query({ query: User, variables: { id: targetUser.id } })).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              User: [
-                {
-                  location: null,
-                },
-              ],
-            },
-            errors: undefined,
-          }),
-        )
+        await expect(
+          query({ query: User, variables: { id: targetUser.id } }),
+        ).resolves.toMatchObject({
+          data: {
+            User: [
+              expect.objectContaining({
+                location: null,
+              }),
+            ],
+          },
+          errors: undefined,
+        })
       })
     })
   })
