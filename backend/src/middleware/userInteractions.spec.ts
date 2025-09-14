@@ -47,9 +47,9 @@ describe('middleware/userInteractions', () => {
       await expect(query({ query: Post, variables })).resolves.toMatchObject({
         data: {
           Post: expect.arrayContaining([
-            {
+            expect.objectContaining({
               clickedCount: 0,
-            },
+            }),
           ]),
         },
       })
@@ -60,9 +60,9 @@ describe('middleware/userInteractions', () => {
       await expect(query({ query: Post, variables })).resolves.toMatchObject({
         data: {
           Post: expect.arrayContaining([
-            {
+            expect.objectContaining({
               clickedCount: 1,
-            },
+            }),
           ]),
         },
       })
@@ -72,9 +72,9 @@ describe('middleware/userInteractions', () => {
       await expect(query({ query: Post, variables })).resolves.toMatchObject({
         data: {
           Post: expect.arrayContaining([
-            {
+            expect.objectContaining({
               clickedCount: 1,
-            },
+            }),
           ]),
         },
       })
@@ -85,9 +85,9 @@ describe('middleware/userInteractions', () => {
       await expect(query({ query: Post, variables })).resolves.toMatchObject({
         data: {
           Post: expect.arrayContaining([
-            {
+            expect.objectContaining({
               clickedCount: 2,
-            },
+            }),
           ]),
         },
       })
