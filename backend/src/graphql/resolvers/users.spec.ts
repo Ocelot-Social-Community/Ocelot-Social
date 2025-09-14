@@ -14,7 +14,7 @@ import { setTrophyBadgeSelected } from '@graphql/queries/setTrophyBadgeSelected'
 import { switchUserRole } from '@graphql/queries/switchUserRole'
 import { updateOnlineStatus } from '@graphql/queries/updateOnlineStatus'
 import { UpdateUser } from '@graphql/queries/UpdateUser'
-import { User as userQuery } from '@graphql/queries/User'
+import { UserEmailNotificationSettings, User as userQuery } from '@graphql/queries/User'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -574,7 +574,7 @@ describe('emailNotificationSettings', () => {
         authenticatedUser = await anotherUser.toJson()
         const targetUser = await user.toJson()
         await expect(
-          query({ query: userQuery, variables: { id: targetUser.id } }),
+          query({ query: UserEmailNotificationSettings, variables: { id: targetUser.id } }),
         ).resolves.toEqual(
           expect.objectContaining({
             errors: [
@@ -592,7 +592,7 @@ describe('emailNotificationSettings', () => {
         authenticatedUser = await user.toJson()
         await expect(
           query({
-            query: userQuery,
+            query: UserEmailNotificationSettings,
             variables: { id: authenticatedUser?.id },
           }),
         ).resolves.toMatchObject({
