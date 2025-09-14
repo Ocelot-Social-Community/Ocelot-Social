@@ -11,7 +11,7 @@ export const Post = gql`
       pinned
       createdAt
       pinnedAt
-      isObservedByMe # in conflict with backend/src/graphql/resolvers/shout.spec.ts
+      isObservedByMe
       observingUsersCount
       clickedCount
       emotionsCount
