@@ -28,6 +28,9 @@ describe('shout and unshout posts', () => {
           driver,
           neode: instance,
           user: authenticatedUser,
+          cypherParams: {
+            currentUserId: authenticatedUser ? authenticatedUser.id : null,
+          },
         }
       },
     })
