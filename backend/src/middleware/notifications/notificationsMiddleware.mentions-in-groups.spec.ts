@@ -587,7 +587,7 @@ describe('mentions in groups', () => {
           variables: {
             id: 'public-comment',
             postId: 'public-post',
-            commentContent: `Hey everyone ${mentionString}! Please read this`,
+            content: `Hey everyone ${mentionString}! Please read this`,
           },
         })
       })
@@ -684,7 +684,7 @@ describe('mentions in groups', () => {
           variables: {
             id: 'closed-comment',
             postId: 'closed-post',
-            commentContent: `Hey members ${mentionString}! Please read this`,
+            content: `Hey members ${mentionString}! Please read this`,
           },
         })
       })
@@ -784,7 +784,7 @@ describe('mentions in groups', () => {
           variables: {
             id: 'hidden-comment',
             postId: 'hidden-post',
-            commentContent: `Hey hiders ${mentionString}! Please read this`,
+            content: `Hey hiders ${mentionString}! Please read this`,
           },
         })
       })
