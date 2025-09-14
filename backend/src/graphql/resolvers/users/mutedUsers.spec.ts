@@ -176,10 +176,12 @@ describe('muteUser', () => {
           const post1 = await neode.create('Post', {
             id: 'p12',
             title: 'A post written by the current user',
+            content: 'content',
           })
           const post2 = await neode.create('Post', {
             id: 'p23',
             title: 'A post written by the muted user',
+            content: 'content',
           })
           await Promise.all([
             post1.relateTo(currentUser, 'author'),

@@ -5,7 +5,7 @@ export const Post = gql`
     Post(id: $id, filter: $filter, first: $first, offset: $offset, orderBy: $orderBy) {
       id
       title
-      content # in conflict with backend/src/graphql/resolvers/users/blockedUsers.spec.ts
+      content
       contentExcerpt
       eventStart
       pinned
