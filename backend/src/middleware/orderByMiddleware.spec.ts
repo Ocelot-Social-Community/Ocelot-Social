@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
+import { Post } from '@graphql/queries/Post'
 import createServer from '@src/server'
 
 const neode = getNeode()
@@ -52,17 +52,7 @@ describe('Query', () => {
           { title: 'first' },
         ]
         const expected = expect.objectContaining({ data: { Post: posts } })
-        await expect(
-          query({
-            query: gql`
-              {
-                Post {
-                  title
-                }
-              }
-            `,
-          }),
-        ).resolves.toEqual(expected)
+        await expect(query({ query: Post })).resolves.toEqual(expected)
       })
 
       describe('(orderBy: createdAt_asc)', () => {
@@ -76,13 +66,8 @@ describe('Query', () => {
           const expected = expect.objectContaining({ data: { Post: posts } })
           await expect(
             query({
-              query: gql`
-                {
-                  Post(orderBy: createdAt_asc) {
-                    title
-                  }
-                }
-              `,
+              query: Post,
+              variables: { orderBy: 'createdAt_asc' },
             }),
           ).resolves.toEqual(expected)
         })

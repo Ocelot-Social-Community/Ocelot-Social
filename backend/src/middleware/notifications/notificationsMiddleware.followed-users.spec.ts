@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
-import gql from 'graphql-tag'
-
 import Factory, { cleanDatabase } from '@db/factories'
 import { CreateGroup } from '@graphql/queries/CreateGroup'
 import { CreatePost } from '@graphql/queries/CreatePost'
+import { followUser } from '@graphql/queries/followUser'
+import { notifications } from '@graphql/queries/notifications'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -25,41 +24,6 @@ let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
 let postAuthor, firstFollower, secondFollower, thirdFollower, emaillessFollower
-
-const notificationQuery = gql`
-  query ($read: Boolean) {
-    notifications(read: $read, orderBy: updatedAt_desc) {
-      read
-      reason
-      createdAt
-      relatedUser {
-        id
-      }
-      from {
-        __typename
-        ... on Post {
-          id
-          content
-        }
-        ... on Comment {
-          id
-          content
-        }
-        ... on Group {
-          id
-        }
-      }
-    }
-  }
-`
-
-const followUserMutation = gql`
-  mutation ($id: ID!) {
-    followUser(id: $id) {
-      id
-    }
-  }
-`
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -135,22 +99,22 @@ describe('following users notifications', () => {
     await secondFollower.update({ emailNotificationsFollowingUsers: false })
     authenticatedUser = await firstFollower.toJson()
     await mutate({
-      mutation: followUserMutation,
+      mutation: followUser,
       variables: { id: 'post-author' },
     })
     authenticatedUser = await secondFollower.toJson()
     await mutate({
-      mutation: followUserMutation,
+      mutation: followUser,
       variables: { id: 'post-author' },
     })
     authenticatedUser = await thirdFollower.toJson()
     await mutate({
-      mutation: followUserMutation,
+      mutation: followUser,
       variables: { id: 'post-author' },
     })
     authenticatedUser = await emaillessFollower.toJson()
     await mutate({
-      mutation: followUserMutation,
+      mutation: followUser,
       variables: { id: 'post-author' },
     })
     jest.clearAllMocks()
@@ -172,7 +136,8 @@ describe('following users notifications', () => {
     it('sends NO notification to the post author', async () => {
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
+          variables: { orderBy: 'updatedAt_desc' },
         }),
       ).resolves.toMatchObject({
         data: {
@@ -186,7 +151,8 @@ describe('following users notifications', () => {
       authenticatedUser = await firstFollower.toJson()
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
+          variables: { orderBy: 'updatedAt_desc' },
         }),
       ).resolves.toMatchObject({
         data: {
@@ -209,7 +175,8 @@ describe('following users notifications', () => {
       authenticatedUser = await secondFollower.toJson()
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
+          variables: { orderBy: 'updatedAt_desc' },
         }),
       ).resolves.toMatchObject({
         data: {
@@ -232,7 +199,8 @@ describe('following users notifications', () => {
       authenticatedUser = await emaillessFollower.toJson()
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
+          variables: { orderBy: 'updatedAt_desc' },
         }),
       ).resolves.toMatchObject({
         data: {
@@ -295,7 +263,8 @@ describe('following users notifications', () => {
     it('sends NO notification to the post author', async () => {
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
+          variables: { orderBy: 'updatedAt_desc' },
         }),
       ).resolves.toMatchObject({
         data: {
@@ -309,7 +278,8 @@ describe('following users notifications', () => {
       authenticatedUser = await firstFollower.toJson()
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
+          variables: { orderBy: 'updatedAt_desc' },
         }),
       ).resolves.toMatchObject({
         data: {
@@ -364,7 +334,8 @@ describe('following users notifications', () => {
     it('sends NO notification to the post author', async () => {
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
+          variables: { orderBy: 'updatedAt_desc' },
         }),
       ).resolves.toMatchObject({
         data: {
@@ -378,7 +349,8 @@ describe('following users notifications', () => {
       authenticatedUser = await firstFollower.toJson()
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
+          variables: { orderBy: 'updatedAt_desc' },
         }),
       ).resolves.toMatchObject({
         data: {
@@ -433,7 +405,8 @@ describe('following users notifications', () => {
     it('sends NO notification to the post author', async () => {
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
+          variables: { orderBy: 'updatedAt_desc' },
         }),
       ).resolves.toMatchObject({
         data: {
@@ -447,7 +420,8 @@ describe('following users notifications', () => {
       authenticatedUser = await firstFollower.toJson()
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
+          variables: { orderBy: 'updatedAt_desc' },
         }),
       ).resolves.toMatchObject({
         data: {

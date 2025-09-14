@@ -8,6 +8,8 @@ export const SignupVerification = gql`
     $slug: String
     $nonce: String!
     $termsAndConditionsAgreedVersion: String!
+    $about: String
+    $locale: String
   ) {
     SignupVerification(
       email: $email
@@ -16,9 +18,13 @@ export const SignupVerification = gql`
       slug: $slug
       nonce: $nonce
       termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
+      about: $about
+      locale: $locale
     ) {
       id
       slug
+      termsAndConditionsAgreedVersion
+      termsAndConditionsAgreedAt
     }
   }
 `

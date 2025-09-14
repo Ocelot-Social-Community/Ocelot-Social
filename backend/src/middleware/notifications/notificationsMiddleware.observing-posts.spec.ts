@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import gql from 'graphql-tag'
-
 import Factory, { cleanDatabase } from '@db/factories'
+import { CreateComment } from '@graphql/queries/CreateComment'
 import { CreatePost } from '@graphql/queries/CreatePost'
+import { notifications } from '@graphql/queries/notifications'
 import { toggleObservePost } from '@graphql/queries/toggleObservePost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -25,41 +25,6 @@ let server: ApolloTestSetup['server']
 
 let postAuthor, firstCommenter, secondCommenter, emaillessObserver
 
-const createCommentMutation = gql`
-  mutation ($id: ID, $postId: ID!, $content: String!) {
-    CreateComment(id: $id, postId: $postId, content: $content) {
-      id
-      content
-    }
-  }
-`
-
-const notificationQuery = gql`
-  query ($read: Boolean) {
-    notifications(read: $read, orderBy: updatedAt_desc) {
-      read
-      reason
-      createdAt
-      relatedUser {
-        id
-      }
-      from {
-        __typename
-        ... on Post {
-          id
-          content
-        }
-        ... on Comment {
-          id
-          content
-        }
-        ... on Group {
-          id
-        }
-      }
-    }
-  }
-`
 beforeAll(async () => {
   await cleanDatabase()
   const apolloSetup = createApolloTestSetup({ context })
@@ -142,7 +107,7 @@ describe('notifications for users that observe a post', () => {
     beforeAll(async () => {
       authenticatedUser = await firstCommenter.toJson()
       await mutate({
-        mutation: createCommentMutation,
+        mutation: CreateComment,
         variables: {
           postId: 'post',
           id: 'c-1',
@@ -154,7 +119,8 @@ describe('notifications for users that observe a post', () => {
     it('sends NO notification to the commenter', async () => {
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
+          variables: { orderBy: 'updatedAt_desc' },
         }),
       ).resolves.toMatchObject({
         data: {
@@ -168,7 +134,8 @@ describe('notifications for users that observe a post', () => {
       authenticatedUser = await postAuthor.toJson()
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
+          variables: { orderBy: 'updatedAt_desc' },
         }),
       ).resolves.toMatchObject({
         data: {
@@ -202,7 +169,7 @@ describe('notifications for users that observe a post', () => {
         jest.clearAllMocks()
         authenticatedUser = await secondCommenter.toJson()
         await mutate({
-          mutation: createCommentMutation,
+          mutation: CreateComment,
           variables: {
             postId: 'post',
             id: 'c-2',
@@ -214,7 +181,8 @@ describe('notifications for users that observe a post', () => {
       it('sends NO notification to the commenter', async () => {
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
+            variables: { orderBy: 'updatedAt_desc' },
           }),
         ).resolves.toMatchObject({
           data: {
@@ -228,7 +196,8 @@ describe('notifications for users that observe a post', () => {
         authenticatedUser = await postAuthor.toJson()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
+            variables: { orderBy: 'updatedAt_desc' },
           }),
         ).resolves.toMatchObject({
           data: {
@@ -259,7 +228,8 @@ describe('notifications for users that observe a post', () => {
         authenticatedUser = await firstCommenter.toJson()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
+            variables: { orderBy: 'updatedAt_desc' },
           }),
         ).resolves.toMatchObject({
           data: {
@@ -309,7 +279,7 @@ describe('notifications for users that observe a post', () => {
 
         authenticatedUser = await postAuthor.toJson()
         await mutate({
-          mutation: createCommentMutation,
+          mutation: CreateComment,
           variables: {
             postId: 'post',
             id: 'c-3',
@@ -321,7 +291,8 @@ describe('notifications for users that observe a post', () => {
       it('sends no new notification to the post author', async () => {
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
+            variables: { orderBy: 'updatedAt_desc' },
           }),
         ).resolves.toMatchObject({
           data: {
@@ -352,7 +323,8 @@ describe('notifications for users that observe a post', () => {
         authenticatedUser = await firstCommenter.toJson()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
+            variables: { orderBy: 'updatedAt_desc' },
           }),
         ).resolves.toMatchObject({
           data: {
@@ -375,7 +347,8 @@ describe('notifications for users that observe a post', () => {
         authenticatedUser = await secondCommenter.toJson()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
+            variables: { orderBy: 'updatedAt_desc' },
           }),
         ).resolves.toMatchObject({
           data: {

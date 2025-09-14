@@ -3,13 +3,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import { mutedUsers } from '@graphql/queries/mutedUsers'
 import { muteUser } from '@graphql/queries/muteUser'
+import { Post } from '@graphql/queries/Post'
 import { unmuteUser } from '@graphql/queries/unmuteUser'
+import { User } from '@graphql/queries/User'
 import createServer from '@src/server'
 
 const driver = getDriver()
@@ -152,23 +153,14 @@ describe('muteUser', () => {
 
       it('unfollows the user', async () => {
         await currentUser.relateTo(mutedUser, 'following')
-        const queryUser = gql`
-          query {
-            User(id: "u2") {
-              id
-              isMuted
-              followedByCurrentUser
-            }
-          }
-        `
         const { query } = createTestClient(server)
-        await expect(query({ query: queryUser })).resolves.toEqual(
+        await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toEqual(
           expect.objectContaining({
             data: { User: [{ id: 'u2', isMuted: false, followedByCurrentUser: true }] },
           }),
         )
         await muteAction({ id: 'u2' })
-        await expect(query({ query: queryUser })).resolves.toEqual(
+        await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toEqual(
           expect.objectContaining({
             data: { User: [{ id: 'u2', isMuted: true, followedByCurrentUser: false }] },
           }),
@@ -176,8 +168,6 @@ describe('muteUser', () => {
       })
 
       describe('given both the current user and the to-be-muted user write a post', () => {
-        let postQuery
-
         beforeEach(async () => {
           const post1 = await neode.create('Post', {
             id: 'p12',
@@ -191,23 +181,13 @@ describe('muteUser', () => {
             post1.relateTo(currentUser, 'author'),
             post2.relateTo(mutedUser, 'author'),
           ])
-          postQuery = gql`
-            query {
-              Post(orderBy: createdAt_asc) {
-                id
-                title
-                author {
-                  id
-                  name
-                }
-              }
-            }
-          `
         })
 
         const bothPostsAreInTheNewsfeed = async () => {
           const { query } = createTestClient(server)
-          await expect(query({ query: postQuery })).resolves.toEqual(
+          await expect(
+            query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+          ).resolves.toEqual(
             expect.objectContaining({
               data: {
                 Post: [
@@ -243,7 +223,9 @@ describe('muteUser', () => {
 
             it("the muted user's post won't show up in the newsfeed of the current user", async () => {
               const { query } = createTestClient(server)
-              await expect(query({ query: postQuery })).resolves.toEqual(
+              await expect(
+                query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+              ).resolves.toEqual(
                 expect.objectContaining({
                   data: {
                     Post: [
@@ -273,7 +255,9 @@ describe('muteUser', () => {
 
             it("the current user's post will show up in the newsfeed of the muted user", async () => {
               const { query } = createTestClient(server)
-              await expect(query({ query: postQuery })).resolves.toEqual(
+              await expect(
+                query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+              ).resolves.toEqual(
                 expect.objectContaining({
                   data: {
                     Post: expect.arrayContaining([

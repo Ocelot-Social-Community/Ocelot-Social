@@ -3,8 +3,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import gql from 'graphql-tag'
-
 import { categories } from '@constants/categories'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
@@ -15,6 +13,8 @@ import { saveCategorySettings } from '@graphql/queries/saveCategorySettings'
 import { setTrophyBadgeSelected } from '@graphql/queries/setTrophyBadgeSelected'
 import { switchUserRole } from '@graphql/queries/switchUserRole'
 import { updateOnlineStatus } from '@graphql/queries/updateOnlineStatus'
+import { UpdateUser } from '@graphql/queries/UpdateUser'
+import { User as userQuery } from '@graphql/queries/User'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -63,21 +63,12 @@ afterEach(async () => {
 
 describe('User', () => {
   describe('query by email address', () => {
-    let userQuery
-
     beforeEach(async () => {
       const user = await Factory.build('user', {
         id: 'user',
         role: 'user',
       })
       authenticatedUser = await user.toJson()
-      userQuery = gql`
-        query ($email: String) {
-          User(email: $email) {
-            name
-          }
-        }
-      `
       variables = {
         email: 'any-email-address@example.org',
       }
@@ -131,35 +122,7 @@ describe('User', () => {
 })
 
 describe('UpdateUser', () => {
-  let updateUserMutation
-
   beforeEach(async () => {
-    updateUserMutation = gql`
-      mutation (
-        $id: ID!
-        $name: String
-        $termsAndConditionsAgreedVersion: String
-        $locationName: String # empty string '' sets it to null
-      ) {
-        UpdateUser(
-          id: $id
-          name: $name
-          termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
-          locationName: $locationName
-        ) {
-          id
-          name
-          termsAndConditionsAgreedVersion
-          termsAndConditionsAgreedAt
-          locationName
-          location {
-            name
-            nameDE
-            nameEN
-          }
-        }
-      }
-    `
     variables = {
       id: 'u47',
       name: 'John Doughnut',
@@ -196,7 +159,7 @@ describe('UpdateUser', () => {
     })
 
     it('is not allowed to change other user accounts', async () => {
-      const { errors } = await mutate({ mutation: updateUserMutation, variables })
+      const { errors } = await mutate({ mutation: UpdateUser, variables })
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -216,9 +179,7 @@ describe('UpdateUser', () => {
         },
         errors: undefined,
       }
-      await expect(mutate({ mutation: updateUserMutation, variables })).resolves.toMatchObject(
-        expected,
-      )
+      await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject(expected)
     })
 
     describe('given a new agreed version of terms and conditions', () => {
@@ -236,9 +197,7 @@ describe('UpdateUser', () => {
           errors: undefined,
         }
 
-        await expect(mutate({ mutation: updateUserMutation, variables })).resolves.toMatchObject(
-          expected,
-        )
+        await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject(expected)
       })
     })
 
@@ -257,9 +216,7 @@ describe('UpdateUser', () => {
           errors: undefined,
         }
 
-        await expect(mutate({ mutation: updateUserMutation, variables })).resolves.toMatchObject(
-          expected,
-        )
+        await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject(expected)
       })
     })
 
@@ -268,7 +225,7 @@ describe('UpdateUser', () => {
         ...variables,
         termsAndConditionsAgreedVersion: 'invalid version format',
       }
-      const { errors } = await mutate({ mutation: updateUserMutation, variables })
+      const { errors } = await mutate({ mutation: UpdateUser, variables })
       expect(errors?.[0]).toHaveProperty('message', 'Invalid version format!')
     })
 
@@ -276,7 +233,7 @@ describe('UpdateUser', () => {
       describe('change location to "Hamburg, New Jersey, United States"', () => {
         it('has updated location to  "Hamburg, New Jersey, United States"', async () => {
           variables = { ...variables, locationName: 'Hamburg, New Jersey, United States' }
-          await expect(mutate({ mutation: updateUserMutation, variables })).resolves.toMatchObject({
+          await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
             data: {
               UpdateUser: {
                 locationName: 'Hamburg, New Jersey, United States',
@@ -295,7 +252,7 @@ describe('UpdateUser', () => {
       describe('change location to unset location', () => {
         it('has updated location to  unset location', async () => {
           variables = { ...variables, locationName: '' }
-          await expect(mutate({ mutation: updateUserMutation, variables })).resolves.toMatchObject({
+          await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
             data: {
               UpdateUser: {
                 locationName: null,
@@ -598,33 +555,6 @@ describe('switch user role', () => {
 })
 
 let anotherUser
-const emailNotificationSettingsQuery = gql`
-  query ($id: ID!) {
-    User(id: $id) {
-      emailNotificationSettings {
-        type
-        settings {
-          name
-          value
-        }
-      }
-    }
-  }
-`
-
-const emailNotificationSettingsMutation = gql`
-  mutation ($id: ID!, $emailNotificationSettings: [EmailNotificationSettingsInput]!) {
-    UpdateUser(id: $id, emailNotificationSettings: $emailNotificationSettings) {
-      emailNotificationSettings {
-        type
-        settings {
-          name
-          value
-        }
-      }
-    }
-  }
-`
 
 describe('emailNotificationSettings', () => {
   beforeEach(async () => {
@@ -644,7 +574,7 @@ describe('emailNotificationSettings', () => {
         authenticatedUser = await anotherUser.toJson()
         const targetUser = await user.toJson()
         await expect(
-          query({ query: emailNotificationSettingsQuery, variables: { id: targetUser.id } }),
+          query({ query: userQuery, variables: { id: targetUser.id } }),
         ).resolves.toEqual(
           expect.objectContaining({
             errors: [
@@ -662,112 +592,13 @@ describe('emailNotificationSettings', () => {
         authenticatedUser = await user.toJson()
         await expect(
           query({
-            query: emailNotificationSettingsQuery,
+            query: userQuery,
             variables: { id: authenticatedUser?.id },
           }),
-        ).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              User: [
-                {
-                  emailNotificationSettings: [
-                    {
-                      type: 'post',
-                      settings: [
-                        {
-                          name: 'commentOnObservedPost',
-                          value: true,
-                        },
-                        {
-                          name: 'mention',
-                          value: true,
-                        },
-                        {
-                          name: 'followingUsers',
-                          value: true,
-                        },
-                        {
-                          name: 'postInGroup',
-                          value: true,
-                        },
-                      ],
-                    },
-                    {
-                      type: 'chat',
-                      settings: [
-                        {
-                          name: 'chatMessage',
-                          value: true,
-                        },
-                      ],
-                    },
-                    {
-                      type: 'group',
-                      settings: [
-                        {
-                          name: 'groupMemberJoined',
-                          value: true,
-                        },
-                        {
-                          name: 'groupMemberLeft',
-                          value: true,
-                        },
-                        {
-                          name: 'groupMemberRemoved',
-                          value: true,
-                        },
-                        {
-                          name: 'groupMemberRoleChanged',
-                          value: true,
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          }),
-        )
-      })
-    })
-  })
-
-  describe('mutate the field', () => {
-    const emailNotificationSettings = [{ name: 'mention', value: false }]
-
-    describe('as another user', () => {
-      it('throws an error', async () => {
-        authenticatedUser = await anotherUser.toJson()
-        const targetUser = await user.toJson()
-        await expect(
-          mutate({
-            mutation: emailNotificationSettingsMutation,
-            variables: { id: targetUser.id, emailNotificationSettings },
-          }),
-        ).resolves.toEqual(
-          expect.objectContaining({
-            errors: [
-              expect.objectContaining({
-                message: 'Not Authorized!',
-              }),
-            ],
-          }),
-        )
-      })
-    })
-
-    describe('as self', () => {
-      it('updates the emailNotificationSettings', async () => {
-        authenticatedUser = (await user.toJson()) as DecodedUser
-        await expect(
-          mutate({
-            mutation: emailNotificationSettingsMutation,
-            variables: { id: authenticatedUser.id, emailNotificationSettings },
-          }),
-        ).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              UpdateUser: {
+        ).resolves.toMatchObject({
+          data: {
+            User: [
+              {
                 emailNotificationSettings: [
                   {
                     type: 'post',
@@ -778,7 +609,7 @@ describe('emailNotificationSettings', () => {
                       },
                       {
                         name: 'mention',
-                        value: false,
+                        value: true,
                       },
                       {
                         name: 'followingUsers',
@@ -822,9 +653,104 @@ describe('emailNotificationSettings', () => {
                   },
                 ],
               },
-            },
+            ],
+          },
+        })
+      })
+    })
+  })
+
+  describe('mutate the field', () => {
+    const emailNotificationSettings = [{ name: 'mention', value: false }]
+
+    describe('as another user', () => {
+      it('throws an error', async () => {
+        authenticatedUser = await anotherUser.toJson()
+        const targetUser = await user.toJson()
+        await expect(
+          mutate({
+            mutation: UpdateUser,
+            variables: { id: targetUser.id, emailNotificationSettings },
+          }),
+        ).resolves.toEqual(
+          expect.objectContaining({
+            errors: [
+              expect.objectContaining({
+                message: 'Not Authorized!',
+              }),
+            ],
           }),
         )
+      })
+    })
+
+    describe('as self', () => {
+      it('updates the emailNotificationSettings', async () => {
+        authenticatedUser = (await user.toJson()) as DecodedUser
+        await expect(
+          mutate({
+            mutation: UpdateUser,
+            variables: { id: authenticatedUser.id, emailNotificationSettings },
+          }),
+        ).resolves.toMatchObject({
+          data: {
+            UpdateUser: {
+              emailNotificationSettings: [
+                {
+                  type: 'post',
+                  settings: [
+                    {
+                      name: 'commentOnObservedPost',
+                      value: true,
+                    },
+                    {
+                      name: 'mention',
+                      value: false,
+                    },
+                    {
+                      name: 'followingUsers',
+                      value: true,
+                    },
+                    {
+                      name: 'postInGroup',
+                      value: true,
+                    },
+                  ],
+                },
+                {
+                  type: 'chat',
+                  settings: [
+                    {
+                      name: 'chatMessage',
+                      value: true,
+                    },
+                  ],
+                },
+                {
+                  type: 'group',
+                  settings: [
+                    {
+                      name: 'groupMemberJoined',
+                      value: true,
+                    },
+                    {
+                      name: 'groupMemberLeft',
+                      value: true,
+                    },
+                    {
+                      name: 'groupMemberRemoved',
+                      value: true,
+                    },
+                    {
+                      name: 'groupMemberRoleChanged',
+                      value: true,
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        })
       })
     })
   })
@@ -877,14 +803,6 @@ describe('save category settings', () => {
       authenticatedUser = await user.toJson()
     })
 
-    const userQuery = gql`
-      query ($id: ID) {
-        User(id: $id) {
-          activeCategories
-        }
-      }
-    `
-
     describe('no categories saved', () => {
       it('returns true for active categories mutation', async () => {
         await expect(mutate({ mutation: saveCategorySettings, variables })).resolves.toEqual(
@@ -902,17 +820,15 @@ describe('save category settings', () => {
         it('returns the active categories when user is queried', async () => {
           await expect(
             query({ query: userQuery, variables: { id: authenticatedUser?.id } }),
-          ).resolves.toEqual(
-            expect.objectContaining({
-              data: {
-                User: [
-                  {
-                    activeCategories: expect.arrayContaining(['cat1', 'cat3', 'cat5']),
-                  },
-                ],
-              },
-            }),
-          )
+          ).resolves.toMatchObject({
+            data: {
+              User: [
+                {
+                  activeCategories: expect.arrayContaining(['cat1', 'cat3', 'cat5']),
+                },
+              ],
+            },
+          })
         })
       })
     })
@@ -944,23 +860,21 @@ describe('save category settings', () => {
         it('returns the new active categories when user is queried', async () => {
           await expect(
             query({ query: userQuery, variables: { id: authenticatedUser?.id } }),
-          ).resolves.toEqual(
-            expect.objectContaining({
-              data: {
-                User: [
-                  {
-                    activeCategories: expect.arrayContaining([
-                      'cat10',
-                      'cat11',
-                      'cat12',
-                      'cat8',
-                      'cat9',
-                    ]),
-                  },
-                ],
-              },
-            }),
-          )
+          ).resolves.toMatchObject({
+            data: {
+              User: [
+                {
+                  activeCategories: expect.arrayContaining([
+                    'cat10',
+                    'cat11',
+                    'cat12',
+                    'cat8',
+                    'cat9',
+                  ]),
+                },
+              ],
+            },
+          })
         })
       })
     })

@@ -3,15 +3,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import gql from 'graphql-tag'
-
 import Factory, { cleanDatabase } from '@db/factories'
+import { Post } from '@graphql/queries/Post'
+import { User } from '@graphql/queries/User'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 const categoryIds = ['cat9']
-let graphqlQuery
 let moderator
 let user
 let troll
@@ -20,10 +19,6 @@ const context = () => ({ authenticatedUser })
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
-
-const action = () => {
-  return query({ query: graphqlQuery })
-}
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -208,58 +203,15 @@ describe('softDeleteMiddleware', () => {
   describe('read disabled content', () => {
     let subject
     const beforeComment = async () => {
-      graphqlQuery = gql`
-        {
-          User(id: "u1") {
-            following {
-              comments {
-                content
-                contentExcerpt
-              }
-            }
-          }
-        }
-      `
-      const { data } = await action()
+      const { data } = await query({ query: User, variables: { id: 'u1' } })
       subject = (data as any).User[0].following[0].comments[0]
     }
     const beforeUser = async () => {
-      graphqlQuery = gql`
-        {
-          User(id: "u1") {
-            following {
-              name
-              slug
-              about
-              avatar {
-                url
-              }
-            }
-          }
-        }
-      `
-      const { data } = await action()
+      const { data } = await query({ query: User, variables: { id: 'u1' } })
       subject = (data as any).User[0].following[0]
     }
     const beforePost = async () => {
-      graphqlQuery = gql`
-        {
-          User(id: "u1") {
-            following {
-              contributions {
-                title
-                slug
-                image {
-                  url
-                }
-                content
-                contentExcerpt
-              }
-            }
-          }
-        }
-      `
-      const { data } = await action()
+      const { data } = await query({ query: User, variables: { id: 'u1' } })
       subject = (data as any).User[0].following[0].contributions[0]
     }
 
@@ -341,16 +293,6 @@ describe('softDeleteMiddleware', () => {
 
   describe('Query', () => {
     describe('Post', () => {
-      beforeEach(async () => {
-        graphqlQuery = gql`
-          {
-            Post {
-              title
-            }
-          }
-        `
-      })
-
       describe('as user', () => {
         beforeEach(async () => {
           authenticatedUser = await user.toJson()
@@ -358,7 +300,7 @@ describe('softDeleteMiddleware', () => {
 
         it('hides deleted or disabled posts', async () => {
           const expected = { data: { Post: [{ title: 'Publicly visible post' }] } }
-          await expect(action()).resolves.toMatchObject(expected)
+          await expect(query({ query: Post })).resolves.toMatchObject(expected)
         })
       })
 
@@ -369,26 +311,13 @@ describe('softDeleteMiddleware', () => {
 
         it('shows disabled but hides deleted posts', async () => {
           const expected = [{ title: 'Disabled post' }, { title: 'Publicly visible post' }]
-          const { data } = await action()
-          const { Post } = data as any
-          expect(Post).toEqual(expect.arrayContaining(expected))
+          const { data } = await query({ query: Post })
+          const { Post: PostData } = data as any
+          expect(PostData).toEqual(expect.arrayContaining(expected))
         })
       })
 
       describe('.comments', () => {
-        beforeEach(async () => {
-          graphqlQuery = gql`
-            {
-              Post(id: "p3") {
-                title
-                comments {
-                  content
-                }
-              }
-            }
-          `
-        })
-
         describe('as user', () => {
           beforeEach(async () => {
             authenticatedUser = await user.toJson()
@@ -399,7 +328,7 @@ describe('softDeleteMiddleware', () => {
               { content: 'Enabled comment on public post' },
               { content: 'UNAVAILABLE' },
             ]
-            const { data } = await action()
+            const { data } = await query({ query: Post, variables: { id: 'p3' } })
             const {
               Post: [{ comments }],
             } = data as any
@@ -417,7 +346,7 @@ describe('softDeleteMiddleware', () => {
               { content: 'Enabled comment on public post' },
               { content: 'Disabled comment' },
             ]
-            const { data } = await action()
+            const { data } = await query({ query: Post, variables: { id: 'p3' } })
             const {
               Post: [{ comments }],
             } = data as any

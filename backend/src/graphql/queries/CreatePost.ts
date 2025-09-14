@@ -45,6 +45,7 @@ export const CreatePost = gql`
       }
       isObservedByMe
       observingUsersCount
+      language
     }
   }
 `

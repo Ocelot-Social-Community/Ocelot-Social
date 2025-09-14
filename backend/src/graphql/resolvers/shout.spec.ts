@@ -3,10 +3,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
+import { Post } from '@graphql/queries/Post'
 import { shout } from '@graphql/queries/shout'
 import { unshout } from '@graphql/queries/unshout'
 import createServer from '@src/server'
@@ -14,16 +14,6 @@ import createServer from '@src/server'
 let mutate, query, authenticatedUser, variables
 const instance = getNeode()
 const driver = getDriver()
-const queryPost = gql`
-  query ($id: ID!) {
-    Post(id: $id) {
-      id
-      shoutedBy {
-        id
-      }
-    }
-  }
-`
 
 describe('shout and unshout posts', () => {
   let currentUser, postAuthor
@@ -122,7 +112,7 @@ describe('shout and unshout posts', () => {
         await expect(mutate({ mutation: shout, variables })).resolves.toMatchObject({
           data: { shout: true },
         })
-        await expect(query({ query: queryPost, variables })).resolves.toMatchObject({
+        await expect(query({ query: Post, variables })).resolves.toMatchObject({
           data: { Post: [{ id: 'another-user-post-id', shoutedBy: [{ id: 'current-user-id' }] }] },
           errors: undefined,
         })
@@ -149,7 +139,7 @@ describe('shout and unshout posts', () => {
         await expect(mutate({ mutation: shout, variables })).resolves.toMatchObject({
           data: { shout: false },
         })
-        await expect(query({ query: queryPost, variables })).resolves.toMatchObject({
+        await expect(query({ query: Post, variables })).resolves.toMatchObject({
           data: { Post: [{ id: 'current-user-post-id', shoutedBy: [] }] },
           errors: undefined,
         })
@@ -191,7 +181,7 @@ describe('shout and unshout posts', () => {
         await expect(mutate({ mutation: unshout, variables })).resolves.toMatchObject({
           data: { unshout: true },
         })
-        await expect(query({ query: queryPost, variables })).resolves.toMatchObject({
+        await expect(query({ query: Post, variables })).resolves.toMatchObject({
           data: { Post: [{ id: 'posted-by-another-user', shoutedBy: [] }] },
           errors: undefined,
         })

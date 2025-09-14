@@ -2,12 +2,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import gql from 'graphql-tag'
-
 import { cleanDatabase } from '@db/factories'
 import { blockedUsers } from '@graphql/queries/blockedUsers'
 import { blockUser } from '@graphql/queries/blockUser'
+import { Post } from '@graphql/queries/Post'
 import { unblockUser } from '@graphql/queries/unblockUser'
+import { User } from '@graphql/queries/User'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -155,27 +155,16 @@ describe('blockUser', () => {
 
       it('unfollows the user when blocking', async () => {
         await currentUser.relateTo(blockedUser, 'following')
-        const queryUser = gql`
-          query {
-            User(id: "u2") {
-              id
-              isBlocked
-              followedByCurrentUser
-            }
-          }
-        `
-        await expect(query({ query: queryUser })).resolves.toMatchObject({
+        await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
           data: { User: [{ id: 'u2', isBlocked: false, followedByCurrentUser: true }] },
         })
         await mutate({ mutation: blockUser, variables: { id: 'u2' } })
-        await expect(query({ query: queryUser })).resolves.toMatchObject({
+        await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
           data: { User: [{ id: 'u2', isBlocked: true, followedByCurrentUser: false }] },
         })
       })
 
       describe('given both the current user and the to-be-blocked user write a post', () => {
-        let postQuery
-
         beforeEach(async () => {
           const post1 = await database.neode.create('Post', {
             id: 'p12',
@@ -189,22 +178,12 @@ describe('blockUser', () => {
             post1.relateTo(currentUser, 'author'),
             post2.relateTo(blockedUser, 'author'),
           ])
-          postQuery = gql`
-            query {
-              Post(orderBy: createdAt_asc) {
-                id
-                title
-                author {
-                  id
-                  name
-                }
-              }
-            }
-          `
         })
 
         const bothPostsAreInTheNewsfeed = async () => {
-          await expect(query({ query: postQuery })).resolves.toMatchObject({
+          await expect(
+            query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+          ).resolves.toMatchObject({
             data: {
               Post: [
                 {
@@ -238,7 +217,9 @@ describe('blockUser', () => {
 
             // TODO: clarify proper behaviour
             it("the blocked user's post still shows up in the newsfeed of the current user", async () => {
-              await expect(query({ query: postQuery })).resolves.toMatchObject({
+              await expect(
+                query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+              ).resolves.toMatchObject({
                 data: {
                   Post: [
                     {
@@ -276,7 +257,9 @@ describe('blockUser', () => {
             })
 
             it("the current user's post will show up in the newsfeed of the blocked user", async () => {
-              await expect(query({ query: postQuery })).resolves.toMatchObject({
+              await expect(
+                query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+              ).resolves.toMatchObject({
                 data: {
                   Post: expect.arrayContaining([
                     {

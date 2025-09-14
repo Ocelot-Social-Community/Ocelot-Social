@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import gql from 'graphql-tag'
-
 import { cleanDatabase } from '@db/factories'
+import { CreatePost } from '@graphql/queries/CreatePost'
+import { Post } from '@graphql/queries/Post'
 import { UpdatePost } from '@graphql/queries/UpdatePost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -17,15 +17,6 @@ let query: any // eslint-disable-line @typescript-eslint/no-explicit-any
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 const categoryIds = ['cat9']
-const createPostMutation = gql`
-  mutation ($id: ID, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
-    CreatePost(id: $id, title: $title, content: $postContent, categoryIds: $categoryIds) {
-      id
-      title
-      content
-    }
-  }
-`
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -85,15 +76,6 @@ describe('hashtags', () => {
       for everyone.
     </p>
   `
-  const postWithHastagsQuery = gql`
-    query ($id: ID) {
-      Post(id: $id) {
-        tags {
-          id
-        }
-      }
-    }
-  `
   const postWithHastagsVariables = {
     id,
   }
@@ -106,11 +88,11 @@ describe('hashtags', () => {
     describe('create a Post with Hashtags', () => {
       beforeEach(async () => {
         await mutate({
-          mutation: createPostMutation,
+          mutation: CreatePost,
           variables: {
             id,
             title,
-            postContent,
+            content: postContent,
             categoryIds,
           },
         })
@@ -127,7 +109,7 @@ describe('hashtags', () => {
         ]
         await expect(
           query({
-            query: postWithHastagsQuery,
+            query: Post,
             variables: postWithHastagsVariables,
           }),
         ).resolves.toEqual(
@@ -188,7 +170,7 @@ describe('hashtags', () => {
           ]
           await expect(
             query({
-              query: postWithHastagsQuery,
+              query: Post,
               variables: postWithHastagsVariables,
             }),
           ).resolves.toEqual(

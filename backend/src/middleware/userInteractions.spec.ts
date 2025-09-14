@@ -2,24 +2,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
+import { Post } from '@graphql/queries/Post'
 import createServer from '@src/server'
 
 let query, aUser, bUser, post, authenticatedUser, variables
 
 const driver = getDriver()
 const neode = getNeode()
-
-const postQuery = gql`
-  query ($id: ID) {
-    Post(id: $id) {
-      clickedCount
-    }
-  }
-`
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -52,7 +44,7 @@ afterAll(async () => {
 describe('middleware/userInteractions', () => {
   describe('given one post', () => {
     it('does not change clickedCount when queried without ID', async () => {
-      await expect(query({ query: postQuery, variables })).resolves.toMatchObject({
+      await expect(query({ query: Post, variables })).resolves.toMatchObject({
         data: {
           Post: expect.arrayContaining([
             {
@@ -65,7 +57,7 @@ describe('middleware/userInteractions', () => {
 
     it('changes clickedCount when queried with ID', async () => {
       variables = { id: post.get('id') }
-      await expect(query({ query: postQuery, variables })).resolves.toMatchObject({
+      await expect(query({ query: Post, variables })).resolves.toMatchObject({
         data: {
           Post: expect.arrayContaining([
             {
@@ -77,7 +69,7 @@ describe('middleware/userInteractions', () => {
     })
 
     it('does not change clickedCount when same user queries the post again', async () => {
-      await expect(query({ query: postQuery, variables })).resolves.toMatchObject({
+      await expect(query({ query: Post, variables })).resolves.toMatchObject({
         data: {
           Post: expect.arrayContaining([
             {
@@ -90,7 +82,7 @@ describe('middleware/userInteractions', () => {
 
     it('changes clickedCount when another user queries the post', async () => {
       authenticatedUser = await bUser.toJson()
-      await expect(query({ query: postQuery, variables })).resolves.toMatchObject({
+      await expect(query({ query: Post, variables })).resolves.toMatchObject({
         data: {
           Post: expect.arrayContaining([
             {

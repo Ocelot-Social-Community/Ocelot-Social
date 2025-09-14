@@ -2,10 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
+import { UpdateUser } from '@graphql/queries/UpdateUser'
+import { User } from '@graphql/queries/User'
 import createServer from '@src/server'
 
 let query, mutate, authenticatedUser
@@ -43,17 +44,6 @@ describe('resolvers', () => {
   describe('Location', () => {
     describe('custom mutation, not handled by neo4j-graphql-js', () => {
       let variables
-      const updateUserMutation = gql`
-        mutation ($id: ID!, $name: String) {
-          UpdateUser(id: $id, name: $name) {
-            name
-            location {
-              name: nameRU
-              nameEN
-            }
-          }
-        }
-      `
 
       beforeEach(async () => {
         variables = {
@@ -78,7 +68,7 @@ describe('resolvers', () => {
       })
 
       it('returns `null` if location translation is not available', async () => {
-        await expect(mutate({ mutation: updateUserMutation, variables })).resolves.toMatchObject({
+        await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
           data: {
             UpdateUser: {
               name: 'John Doughnut',
@@ -95,15 +85,6 @@ describe('resolvers', () => {
   })
 })
 
-const distanceToMeQuery = gql`
-  query ($id: ID!) {
-    User(id: $id) {
-      location {
-        distanceToMe
-      }
-    }
-  }
-`
 let user, myPlaceUser, otherPlaceUser, noCordsPlaceUser, noPlaceUser
 
 describe('distanceToMe', () => {
@@ -190,9 +171,7 @@ describe('distanceToMe', () => {
       it('returns 0', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await user.toJson()
-        await expect(
-          query({ query: distanceToMeQuery, variables: { id: targetUser.id } }),
-        ).resolves.toEqual(
+        await expect(query({ query: User, variables: { id: targetUser.id } })).resolves.toEqual(
           expect.objectContaining({
             data: {
               User: [
@@ -213,9 +192,7 @@ describe('distanceToMe', () => {
       it('returns 0', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await myPlaceUser.toJson()
-        await expect(
-          query({ query: distanceToMeQuery, variables: { id: targetUser.id } }),
-        ).resolves.toEqual(
+        await expect(query({ query: User, variables: { id: targetUser.id } })).resolves.toEqual(
           expect.objectContaining({
             data: {
               User: [
@@ -236,9 +213,7 @@ describe('distanceToMe', () => {
       it('returns a number', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await otherPlaceUser.toJson()
-        await expect(
-          query({ query: distanceToMeQuery, variables: { id: targetUser.id } }),
-        ).resolves.toEqual(
+        await expect(query({ query: User, variables: { id: targetUser.id } })).resolves.toEqual(
           expect.objectContaining({
             data: {
               User: [
@@ -259,9 +234,7 @@ describe('distanceToMe', () => {
       it('returns null', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await noCordsPlaceUser.toJson()
-        await expect(
-          query({ query: distanceToMeQuery, variables: { id: targetUser.id } }),
-        ).resolves.toEqual(
+        await expect(query({ query: User, variables: { id: targetUser.id } })).resolves.toEqual(
           expect.objectContaining({
             data: {
               User: [
@@ -282,9 +255,7 @@ describe('distanceToMe', () => {
       it('returns null location', async () => {
         authenticatedUser = await user.toJson()
         const targetUser = await noPlaceUser.toJson()
-        await expect(
-          query({ query: distanceToMeQuery, variables: { id: targetUser.id } }),
-        ).resolves.toEqual(
+        await expect(query({ query: User, variables: { id: targetUser.id } })).resolves.toEqual(
           expect.objectContaining({
             data: {
               User: [
