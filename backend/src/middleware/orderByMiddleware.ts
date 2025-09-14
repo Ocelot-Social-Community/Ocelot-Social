@@ -6,13 +6,20 @@ import cloneDeep from 'lodash/cloneDeep'
 
 const defaultOrderBy = (resolve, root, args, context, resolveInfo) => {
   const copy = cloneDeep(resolveInfo)
-  const newestFirst = {
-    kind: 'Argument',
-    name: { kind: 'Name', value: 'orderBy' },
-    value: { kind: 'EnumValue', value: 'sortDate_desc' },
-  }
   const [fieldNode] = copy.fieldNodes
-  if (fieldNode) fieldNode.arguments.push(newestFirst)
+  if (fieldNode) {
+    const orderByArg = fieldNode.arguments.find((arg) => arg.name.value === 'orderBy')
+
+    if (!orderByArg) {
+      fieldNode.arguments.push({
+        kind: 'Argument',
+        name: { kind: 'Name', value: 'orderBy' },
+        value: { kind: 'EnumValue', value: 'sortDate_desc' },
+      })
+    } else if (args.orderBy === undefined) {
+      orderByArg.value = { kind: 'EnumValue', value: 'sortDate_desc' }
+    }
+  }
   return resolve(root, args, context, copy)
 }
 

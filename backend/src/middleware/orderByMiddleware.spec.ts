@@ -15,6 +15,9 @@ const { server } = createServer({
       user: null,
       neode,
       driver,
+      cypherParams: {
+        currentUserId: null,
+      },
     }
   },
 })
@@ -30,10 +33,10 @@ afterAll(async () => {
 })
 
 beforeEach(async () => {
-  await neode.create('Post', { title: 'first' })
-  await neode.create('Post', { title: 'second' })
-  await neode.create('Post', { title: 'third' })
-  await neode.create('Post', { title: 'last' })
+  await neode.create('Post', { title: 'first', content: 'content' })
+  await neode.create('Post', { title: 'second', content: 'content' })
+  await neode.create('Post', { title: 'third', content: 'content' })
+  await neode.create('Post', { title: 'last', content: 'content' })
 })
 
 // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
@@ -45,31 +48,35 @@ describe('Query', () => {
   describe('Post', () => {
     describe('orderBy', () => {
       it('createdAt descending is default', async () => {
-        const posts = [
-          { title: 'last' },
-          { title: 'third' },
-          { title: 'second' },
-          { title: 'first' },
-        ]
-        const expected = expect.objectContaining({ data: { Post: posts } })
-        await expect(query({ query: Post })).resolves.toEqual(expected)
+        await expect(query({ query: Post })).resolves.toMatchObject({
+          data: {
+            Post: [
+              expect.objectContaining({ title: 'last' }),
+              expect.objectContaining({ title: 'third' }),
+              expect.objectContaining({ title: 'second' }),
+              expect.objectContaining({ title: 'first' }),
+            ],
+          },
+        })
       })
 
       describe('(orderBy: createdAt_asc)', () => {
         it('orders by createdAt ascending', async () => {
-          const posts = [
-            { title: 'first' },
-            { title: 'second' },
-            { title: 'third' },
-            { title: 'last' },
-          ]
-          const expected = expect.objectContaining({ data: { Post: posts } })
           await expect(
             query({
               query: Post,
               variables: { orderBy: 'createdAt_asc' },
             }),
-          ).resolves.toEqual(expected)
+          ).resolves.toMatchObject({
+            data: {
+              Post: [
+                expect.objectContaining({ title: 'first' }),
+                expect.objectContaining({ title: 'second' }),
+                expect.objectContaining({ title: 'third' }),
+                expect.objectContaining({ title: 'last' }),
+              ],
+            },
+          })
         })
       })
     })
