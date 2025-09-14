@@ -107,16 +107,14 @@ describe('SocialMedia', () => {
       })
 
       it('creates social media with the given url', async () => {
-        await expect(socialMediaAction(user, CreateSocialMedia, variables)).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              CreateSocialMedia: {
-                id: expect.any(String),
-                url,
-              },
+        await expect(socialMediaAction(user, CreateSocialMedia, variables)).resolves.toMatchObject({
+          data: {
+            CreateSocialMedia: {
+              id: expect.any(String),
+              url,
             },
-          }),
-        )
+          },
+        })
       })
 
       it('rejects an empty string as url', async () => {
@@ -141,13 +139,11 @@ describe('SocialMedia', () => {
     describe('ownedBy', () => {
       it('resolves', async () => {
         const user = someUser
-        await expect(socialMediaAction(user, CreateSocialMedia, variables)).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              CreateSocialMedia: { url, ownedBy: { name: 'Kalle Blomqvist' } },
-            },
-          }),
-        )
+        await expect(socialMediaAction(user, CreateSocialMedia, variables)).resolves.toMatchObject({
+          data: {
+            CreateSocialMedia: { url, ownedBy: { name: 'Kalle Blomqvist' } },
+          },
+        })
       })
     })
   })
