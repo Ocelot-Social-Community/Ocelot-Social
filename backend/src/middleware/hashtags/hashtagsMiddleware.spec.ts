@@ -55,7 +55,7 @@ afterEach(async () => {
 describe('hashtags', () => {
   const id = 'p135'
   const title = 'Two Hashtags'
-  const postContent = `
+  const content = `
     <p>
       Hey Dude,
       <a
@@ -92,42 +92,39 @@ describe('hashtags', () => {
           variables: {
             id,
             title,
-            content: postContent,
+            content,
             categoryIds,
           },
         })
       })
 
       it('both hashtags are created with the "id" set to their "name"', async () => {
-        const expected = [
-          {
-            id: 'Democracy',
-          },
-          {
-            id: 'Liberty',
-          },
-        ]
         await expect(
           query({
             query: Post,
             variables: postWithHastagsVariables,
           }),
-        ).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              Post: [
-                {
-                  tags: expect.arrayContaining(expected),
-                },
-              ],
-            },
-          }),
-        )
+        ).resolves.toMatchObject({
+          data: {
+            Post: [
+              {
+                tags: expect.arrayContaining([
+                  expect.objectContaining({
+                    id: 'Democracy',
+                  }),
+                  expect.objectContaining({
+                    id: 'Liberty',
+                  }),
+                ]),
+              },
+            ],
+          },
+        })
       })
 
       describe('updates the Post by removing, keeping and adding one hashtag respectively', () => {
         // The already existing hashtag has no class at this point.
-        const postContent = `
+        const content = `
           <p>
             Hey Dude,
             <a
@@ -155,35 +152,32 @@ describe('hashtags', () => {
             variables: {
               id,
               title,
-              postContent,
+              content,
               categoryIds,
             },
           })
 
-          const expected = [
-            {
-              id: 'Elections',
-            },
-            {
-              id: 'Liberty',
-            },
-          ]
           await expect(
             query({
               query: Post,
               variables: postWithHastagsVariables,
             }),
-          ).resolves.toEqual(
-            expect.objectContaining({
-              data: {
-                Post: [
-                  {
-                    tags: expect.arrayContaining(expected),
-                  },
-                ],
-              },
-            }),
-          )
+          ).resolves.toMatchObject({
+            data: {
+              Post: [
+                {
+                  tags: expect.arrayContaining([
+                    expect.objectContaining({
+                      id: 'Elections',
+                    }),
+                    expect.objectContaining({
+                      id: 'Liberty',
+                    }),
+                  ]),
+                },
+              ],
+            },
+          })
         })
       })
     })
