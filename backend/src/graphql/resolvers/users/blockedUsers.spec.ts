@@ -262,16 +262,16 @@ describe('blockUser', () => {
               ).resolves.toMatchObject({
                 data: {
                   Post: expect.arrayContaining([
-                    {
+                    expect.objectContaining({
                       id: 'p23',
                       title: 'A post written by the blocked user',
                       author: { name: 'Blocked User', id: 'u2' },
-                    },
-                    {
+                    }),
+                    expect.objectContaining({
                       id: 'p12',
                       title: 'A post written by the current user',
                       author: { name: 'Current User', id: 'u1' },
-                    },
+                    }),
                   ]),
                 },
               })
