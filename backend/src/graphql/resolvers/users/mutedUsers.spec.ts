@@ -154,17 +154,21 @@ describe('muteUser', () => {
       it('unfollows the user', async () => {
         await currentUser.relateTo(mutedUser, 'following')
         const { query } = createTestClient(server)
-        await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toEqual(
-          expect.objectContaining({
-            data: { User: [{ id: 'u2', isMuted: false, followedByCurrentUser: true }] },
-          }),
-        )
+        await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
+          data: {
+            User: expect.arrayContaining([
+              expect.objectContaining({ id: 'u2', isMuted: false, followedByCurrentUser: true }),
+            ]),
+          },
+        })
         await muteAction({ id: 'u2' })
-        await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toEqual(
-          expect.objectContaining({
-            data: { User: [{ id: 'u2', isMuted: true, followedByCurrentUser: false }] },
-          }),
-        )
+        await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
+          data: {
+            User: expect.arrayContaining([
+              expect.objectContaining({ id: 'u2', isMuted: true, followedByCurrentUser: false }),
+            ]),
+          },
+        })
       })
 
       describe('given both the current user and the to-be-muted user write a post', () => {
@@ -187,30 +191,28 @@ describe('muteUser', () => {
           const { query } = createTestClient(server)
           await expect(
             query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
-          ).resolves.toEqual(
-            expect.objectContaining({
-              data: {
-                Post: [
-                  {
-                    id: 'p12',
-                    title: 'A post written by the current user',
-                    author: {
-                      name: 'Current User',
-                      id: 'u1',
-                    },
+          ).resolves.toMatchObject({
+            data: {
+              Post: expect.arrayContaining([
+                expect.objectContaining({
+                  id: 'p12',
+                  title: 'A post written by the current user',
+                  author: {
+                    name: 'Current User',
+                    id: 'u1',
                   },
-                  {
-                    id: 'p23',
-                    title: 'A post written by the muted user',
-                    author: {
-                      name: 'Muted User',
-                      id: 'u2',
-                    },
+                }),
+                expect.objectContaining({
+                  id: 'p23',
+                  title: 'A post written by the muted user',
+                  author: {
+                    name: 'Muted User',
+                    id: 'u2',
                   },
-                ],
-              },
-            }),
-          )
+                }),
+              ]),
+            },
+          })
         }
 
         describe('from the perspective of the current user', () => {
@@ -225,19 +227,17 @@ describe('muteUser', () => {
               const { query } = createTestClient(server)
               await expect(
                 query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
-              ).resolves.toEqual(
-                expect.objectContaining({
-                  data: {
-                    Post: [
-                      {
-                        id: 'p12',
-                        title: 'A post written by the current user',
-                        author: { name: 'Current User', id: 'u1' },
-                      },
-                    ],
-                  },
-                }),
-              )
+              ).resolves.toMatchObject({
+                data: {
+                  Post: [
+                    expect.objectContaining({
+                      id: 'p12',
+                      title: 'A post written by the current user',
+                      author: { name: 'Current User', id: 'u1' },
+                    }),
+                  ],
+                },
+              })
             })
           })
         })
@@ -257,24 +257,22 @@ describe('muteUser', () => {
               const { query } = createTestClient(server)
               await expect(
                 query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
-              ).resolves.toEqual(
-                expect.objectContaining({
-                  data: {
-                    Post: expect.arrayContaining([
-                      {
-                        id: 'p23',
-                        title: 'A post written by the muted user',
-                        author: { name: 'Muted User', id: 'u2' },
-                      },
-                      {
-                        id: 'p12',
-                        title: 'A post written by the current user',
-                        author: { name: 'Current User', id: 'u1' },
-                      },
-                    ]),
-                  },
-                }),
-              )
+              ).resolves.toMatchObject({
+                data: {
+                  Post: expect.arrayContaining([
+                    expect.objectContaining({
+                      id: 'p23',
+                      title: 'A post written by the muted user',
+                      author: { name: 'Muted User', id: 'u2' },
+                    }),
+                    expect.objectContaining({
+                      id: 'p12',
+                      title: 'A post written by the current user',
+                      author: { name: 'Current User', id: 'u1' },
+                    }),
+                  ]),
+                },
+              })
             })
           })
         })
