@@ -310,10 +310,14 @@ describe('softDeleteMiddleware', () => {
         })
 
         it('shows disabled but hides deleted posts', async () => {
-          const expected = [{ title: 'Disabled post' }, { title: 'Publicly visible post' }]
           const { data } = await query({ query: Post })
           const { Post: PostData } = data as any
-          expect(PostData).toEqual(expect.arrayContaining(expected))
+          expect(PostData).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({ title: 'Disabled post' }),
+              expect.objectContaining({ title: 'Publicly visible post' }),
+            ]),
+          )
         })
       })
 
