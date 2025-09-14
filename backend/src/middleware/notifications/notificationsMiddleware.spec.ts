@@ -108,7 +108,7 @@ describe('notifications', () => {
           variables: {
             id: 'p47',
             title,
-            postContent,
+            content: postContent,
             categoryIds,
           },
         })
@@ -125,7 +125,7 @@ describe('notifications', () => {
           variables: {
             id: 'c47',
             postId: 'p47',
-            commentContent,
+            content: commentContent,
           },
         })
         authenticatedUser = await notifiedUser.toJson()
@@ -438,7 +438,7 @@ describe('notifications', () => {
               variables: {
                 id: 'p47',
                 title,
-                postContent: updatedContent,
+                content: updatedContent,
                 categoryIds,
               },
             })
@@ -491,7 +491,6 @@ describe('notifications', () => {
                   query: notifications,
                   variables: {
                     orderBy: 'updatedAt_desc',
-                    read: false,
                   },
                 })
                 await updatePostAction()
@@ -521,7 +520,6 @@ describe('notifications', () => {
                   query: notifications,
                   variables: {
                     orderBy: 'updatedAt_desc',
-                    read: false,
                   },
                 })
                 await updatePostAction()
