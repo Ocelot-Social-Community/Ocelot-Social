@@ -185,6 +185,9 @@ export const groupQuery = (i18n) => {
         }
         avatar {
           url
+          w320: transform(width: 320)
+          w640: transform(width: 640)
+          w1024: transform(width: 1024)
         }
         ...location
         membersCount
@@ -214,6 +217,9 @@ export const groupMembersQuery = () => {
         myRoleInGroup
         avatar {
           url
+          w320: transform(width: 320)
+          w640: transform(width: 640)
+          w1024: transform(width: 1024)
         }
       }
     }

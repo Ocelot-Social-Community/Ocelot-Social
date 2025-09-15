@@ -9,7 +9,12 @@ import { categories } from '@constants/categories'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import User from '@db/models/User'
+import { DeleteUser } from '@graphql/queries/DeleteUser'
+import { resetTrophyBadgesSelected } from '@graphql/queries/resetTrophyBadgesSelected'
+import { saveCategorySettings } from '@graphql/queries/saveCategorySettings'
 import { setTrophyBadgeSelected } from '@graphql/queries/setTrophyBadgeSelected'
+import { switchUserRole } from '@graphql/queries/switchUserRole'
+import { updateOnlineStatus } from '@graphql/queries/updateOnlineStatus'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -30,74 +35,6 @@ let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
-
-const deleteUserMutation = gql`
-  mutation ($id: ID!, $resource: [Deletable]) {
-    DeleteUser(id: $id, resource: $resource) {
-      id
-      name
-      about
-      deleted
-      contributions {
-        id
-        content
-        contentExcerpt
-        deleted
-        comments {
-          id
-          content
-          contentExcerpt
-          deleted
-        }
-      }
-      comments {
-        id
-        content
-        contentExcerpt
-        deleted
-      }
-    }
-  }
-`
-const switchUserRoleMutation = gql`
-  mutation ($role: UserRole!, $id: ID!) {
-    switchUserRole(role: $role, id: $id) {
-      name
-      role
-      id
-      updatedAt
-      email
-    }
-  }
-`
-
-const saveCategorySettings = gql`
-  mutation ($activeCategories: [String]) {
-    saveCategorySettings(activeCategories: $activeCategories)
-  }
-`
-
-const updateOnlineStatus = gql`
-  mutation ($status: OnlineStatus!) {
-    updateOnlineStatus(status: $status)
-  }
-`
-
-const resetTrophyBadgesSelected = gql`
-  mutation {
-    resetTrophyBadgesSelected {
-      badgeTrophiesCount
-      badgeTrophiesSelected {
-        id
-        isDefault
-      }
-      badgeTrophiesUnused {
-        id
-      }
-      badgeTrophiesUnusedCount
-    }
-  }
-`
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -480,7 +417,7 @@ describe('Delete a User as admin', () => {
             },
             errors: undefined,
           }
-          await expect(mutate({ mutation: deleteUserMutation, variables })).resolves.toMatchObject(
+          await expect(mutate({ mutation: DeleteUser, variables })).resolves.toMatchObject(
             expectedResponse,
           )
         })
@@ -526,9 +463,9 @@ describe('Delete a User as admin', () => {
               },
               errors: undefined,
             }
-            await expect(
-              mutate({ mutation: deleteUserMutation, variables }),
-            ).resolves.toMatchObject(expectedResponse)
+            await expect(mutate({ mutation: DeleteUser, variables })).resolves.toMatchObject(
+              expectedResponse,
+            )
           })
         })
       })
@@ -536,7 +473,7 @@ describe('Delete a User as admin', () => {
       describe('connected `EmailAddress` nodes', () => {
         it('will be removed completely', async () => {
           await expect(database.neode.all('EmailAddress')).resolves.toHaveLength(2)
-          await mutate({ mutation: deleteUserMutation, variables })
+          await mutate({ mutation: DeleteUser, variables })
 
           await expect(database.neode.all('EmailAddress')).resolves.toHaveLength(1)
         })
@@ -550,7 +487,7 @@ describe('Delete a User as admin', () => {
 
         it('will be removed completely', async () => {
           await expect(database.neode.all('SocialMedia')).resolves.toHaveLength(1)
-          await mutate({ mutation: deleteUserMutation, variables })
+          await mutate({ mutation: DeleteUser, variables })
           await expect(database.neode.all('SocialMedia')).resolves.toHaveLength(0)
         })
       })
@@ -579,7 +516,7 @@ describe('Delete a User as admin', () => {
           )
           const relations = relation.records.map((record) => record.get('relationship'))
           expect(relations).toHaveLength(2)
-          await mutate({ mutation: deleteUserMutation, variables })
+          await mutate({ mutation: DeleteUser, variables })
           const relation2 = await database.neode.cypher(
             'MATCH (user:User {id: $id})-[relationship:FOLLOWS]-(:User) RETURN relationship',
             { id: (await user.toJson()).id },
@@ -611,7 +548,7 @@ describe('switch user role', () => {
         id: 'user',
         role: 'admin',
       }
-      await expect(mutate({ mutation: switchUserRoleMutation, variables })).resolves.toEqual(
+      await expect(mutate({ mutation: switchUserRole, variables })).resolves.toEqual(
         expect.objectContaining({
           errors: [
             expect.objectContaining({
@@ -630,7 +567,7 @@ describe('switch user role', () => {
         id: 'user',
         role: 'moderator',
       }
-      await expect(mutate({ mutation: switchUserRoleMutation, variables })).resolves.toEqual(
+      await expect(mutate({ mutation: switchUserRole, variables })).resolves.toEqual(
         expect.objectContaining({
           data: {
             switchUserRole: expect.objectContaining({
@@ -647,7 +584,7 @@ describe('switch user role', () => {
         id: 'admin',
         role: 'moderator',
       }
-      await expect(mutate({ mutation: switchUserRoleMutation, variables })).resolves.toEqual(
+      await expect(mutate({ mutation: switchUserRole, variables })).resolves.toEqual(
         expect.objectContaining({
           errors: [
             expect.objectContaining({

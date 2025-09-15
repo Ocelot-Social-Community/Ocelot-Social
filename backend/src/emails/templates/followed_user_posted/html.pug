@@ -3,6 +3,6 @@ extend ../layout.pug
 block content
   .content
   p
-    a.user(href=postAuthorUrl)= postAuthorName
-    = t('followedUserPosted', { postTitle })
-  a.button(href=postUrl)= t('buttons.viewPost')
+    a.user(href=postAuthorUrl)!= postAuthorName
+    != t('followedUserPosted', { postTitle })
+  a.button(href=postUrl)!= t('buttons.viewPost')

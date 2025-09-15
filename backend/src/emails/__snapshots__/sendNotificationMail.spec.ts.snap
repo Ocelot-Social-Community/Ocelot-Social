@@ -3,7 +3,10 @@
 exports[`sendNotificationMail English changed_group_member_role template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -13,9 +16,10 @@ exports[`sendNotificationMail English changed_group_member_role template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -23,9 +27,10 @@ exports[`sendNotificationMail English changed_group_member_role template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -36,11 +41,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -51,19 +62,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -74,7 +80,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -93,13 +99,13 @@ footer {
         <div class="content"></div>
         <p>your role in the group “The Group” has been changed. Click on the button to view this group:</p><a class="button" href="http://webapp:3000/groups/g1/the-group">View group</a>
         <div class="text-block">
-          <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p class="no-margin-top-bottom">See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– The ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -128,14 +134,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendNotificationMail English commented_on_post template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -145,9 +157,10 @@ exports[`sendNotificationMail English commented_on_post template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -155,9 +168,10 @@ exports[`sendNotificationMail English commented_on_post template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -168,11 +182,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -183,19 +203,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -206,7 +221,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -226,13 +241,13 @@ footer {
         <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> commented on a post that you are observing with the title “New Post”. Click on the button to view this comment:
         </p><a class="button" href="http://webapp:3000/post/p1/new-post#commentId-c1">View comment</a>
         <div class="text-block">
-          <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p class="no-margin-top-bottom">See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– The ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -262,14 +277,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendNotificationMail English followed_user_posted template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -279,9 +300,10 @@ exports[`sendNotificationMail English followed_user_posted template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -289,9 +311,10 @@ exports[`sendNotificationMail English followed_user_posted template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -302,11 +325,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -317,19 +346,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -340,7 +364,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -360,13 +384,13 @@ footer {
         <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a>, a user you are following, wrote a new post with the title “New Post”. Click on the button to view this post:
         </p><a class="button" href="http://webapp:3000/post/p1/new-post">View post</a>
         <div class="text-block">
-          <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p class="no-margin-top-bottom">See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– The ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -396,14 +420,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendNotificationMail English mentioned_in_comment template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -413,9 +443,10 @@ exports[`sendNotificationMail English mentioned_in_comment template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -423,9 +454,10 @@ exports[`sendNotificationMail English mentioned_in_comment template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -436,11 +468,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -451,19 +489,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -474,7 +507,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -494,13 +527,13 @@ footer {
         <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> mentioned you in a comment to the post with the title “New Post”. Click on the button to view this comment:
         </p><a class="button" href="http://webapp:3000/post/p1/new-post#commentId-c1">View comment</a>
         <div class="text-block">
-          <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p class="no-margin-top-bottom">See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– The ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -530,14 +563,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendNotificationMail English mentioned_in_post template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -547,9 +586,10 @@ exports[`sendNotificationMail English mentioned_in_post template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -557,9 +597,10 @@ exports[`sendNotificationMail English mentioned_in_post template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -570,11 +611,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -585,19 +632,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -608,7 +650,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -628,13 +670,13 @@ footer {
         <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> mentioned you in a post with the title “New Post”. Click on the button to view this post:
         </p><a class="button" href="http://webapp:3000/post/p1/new-post">View post</a>
         <div class="text-block">
-          <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p class="no-margin-top-bottom">See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– The ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -663,14 +705,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendNotificationMail English post_in_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -680,9 +728,10 @@ exports[`sendNotificationMail English post_in_group template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -690,9 +739,10 @@ exports[`sendNotificationMail English post_in_group template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -703,11 +753,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -718,19 +774,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -741,7 +792,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -760,13 +811,13 @@ footer {
         <div class="content"></div>
         <p>someone wrote a new post with the title “New Post” in one of your groups. Click on the button to view this post:</p><a class="button" href="http://webapp:3000/post/p1/new-post">View post</a>
         <div class="text-block">
-          <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p class="no-margin-top-bottom">See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– The ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -795,14 +846,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendNotificationMail English removed_user_from_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -812,9 +869,10 @@ exports[`sendNotificationMail English removed_user_from_group template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -822,9 +880,10 @@ exports[`sendNotificationMail English removed_user_from_group template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -835,11 +894,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -850,19 +915,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -873,7 +933,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -892,13 +952,13 @@ footer {
         <div class="content"></div>
         <p>you have been removed from the group “The Group”.</p>
         <div class="text-block">
-          <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p class="no-margin-top-bottom">See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– The ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -924,14 +984,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendNotificationMail English user_joined_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -941,9 +1007,10 @@ exports[`sendNotificationMail English user_joined_group template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -951,9 +1018,10 @@ exports[`sendNotificationMail English user_joined_group template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -964,11 +1032,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -979,19 +1053,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -1002,7 +1071,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -1022,13 +1091,13 @@ footer {
         <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> joined the group “The Group”. Click on the button to view this group:
         </p><a class="button" href="http://webapp:3000/groups/g1/the-group">View group</a>
         <div class="text-block">
-          <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p class="no-margin-top-bottom">See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– The ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -1057,14 +1126,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendNotificationMail English user_left_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -1074,9 +1149,10 @@ exports[`sendNotificationMail English user_left_group template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -1084,9 +1160,10 @@ exports[`sendNotificationMail English user_left_group template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -1097,11 +1174,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -1112,19 +1195,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -1135,7 +1213,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -1155,13 +1233,13 @@ footer {
         <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> left the group “The Group”. Click on the button to view this group:
         </p><a class="button" href="http://webapp:3000/groups/g1/the-group">View group</a>
         <div class="text-block">
-          <p>See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– The ocelot.social Team</p><br>
-          <p>PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
+          <p class="no-margin-top-bottom">See you soon on <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– The ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: If you don't want to receive e-mails anymore, change your <a class="settings" href="http://webapp:3000/settings/notifications">notification settings</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">If you have questions or problems, feel free to contact our support: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -1190,14 +1268,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendNotificationMail German changed_group_member_role template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1207,9 +1291,10 @@ exports[`sendNotificationMail German changed_group_member_role template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -1217,9 +1302,10 @@ exports[`sendNotificationMail German changed_group_member_role template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -1230,11 +1316,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -1245,19 +1337,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -1268,7 +1355,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -1287,13 +1374,13 @@ footer {
         <div class="content"></div>
         <p>deine Rolle in der Gruppe „The Group“ wurde geändert. Klicke auf den Knopf, um diese Gruppe zu sehen:</p><a class="button" href="http://webapp:3000/groups/g1/the-group">Gruppe ansehen</a>
         <div class="text-block">
-          <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p class="no-margin-top-bottom">Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– Dein ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -1322,14 +1409,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendNotificationMail German commented_on_post template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1339,9 +1432,10 @@ exports[`sendNotificationMail German commented_on_post template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -1349,9 +1443,10 @@ exports[`sendNotificationMail German commented_on_post template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -1362,11 +1457,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -1377,19 +1478,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -1400,7 +1496,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -1420,13 +1516,13 @@ footer {
         <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> hat einen Beitrag den du beobachtest mit dem Titel „New Post“ kommentiert. Klicke auf den Knopf, um diesen Kommentar zu sehen:
         </p><a class="button" href="http://webapp:3000/post/p1/new-post#commentId-c1">Kommentar ansehen</a>
         <div class="text-block">
-          <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p class="no-margin-top-bottom">Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– Dein ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -1456,14 +1552,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendNotificationMail German followed_user_posted template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1473,9 +1575,10 @@ exports[`sendNotificationMail German followed_user_posted template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -1483,9 +1586,10 @@ exports[`sendNotificationMail German followed_user_posted template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -1496,11 +1600,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -1511,19 +1621,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -1534,7 +1639,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -1554,13 +1659,13 @@ footer {
         <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a>, ein Nutzer dem du folgst, hat einen neuen Beitrag mit dem Titel „New Post“ geschrieben. Klicke auf den Knopf, um diesen Beitrag zu sehen:
         </p><a class="button" href="http://webapp:3000/post/p1/new-post">Beitrag ansehen</a>
         <div class="text-block">
-          <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p class="no-margin-top-bottom">Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– Dein ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -1590,14 +1695,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendNotificationMail German mentioned_in_comment template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1607,9 +1718,10 @@ exports[`sendNotificationMail German mentioned_in_comment template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -1617,9 +1729,10 @@ exports[`sendNotificationMail German mentioned_in_comment template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -1630,11 +1743,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -1645,19 +1764,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -1668,7 +1782,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -1688,13 +1802,13 @@ footer {
         <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> hat dich in einem Kommentar zu dem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Kommentar zu sehen:
         </p><a class="button" href="http://webapp:3000/post/p1/new-post#commentId-c1">Kommentar ansehen</a>
         <div class="text-block">
-          <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p class="no-margin-top-bottom">Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– Dein ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -1724,14 +1838,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendNotificationMail German mentioned_in_post template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1741,9 +1861,10 @@ exports[`sendNotificationMail German mentioned_in_post template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -1751,9 +1872,10 @@ exports[`sendNotificationMail German mentioned_in_post template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -1764,11 +1886,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -1779,19 +1907,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -1802,7 +1925,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -1822,13 +1945,13 @@ footer {
         <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> hat dich in einem Beitrag mit dem Titel „New Post“ erwähnt. Klicke auf den Knopf, um den Beitrag zu sehen:
         </p><a class="button" href="http://webapp:3000/post/p1/new-post">Beitrag ansehen</a>
         <div class="text-block">
-          <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p class="no-margin-top-bottom">Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– Dein ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -1858,14 +1981,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendNotificationMail German post_in_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -1875,9 +2004,10 @@ exports[`sendNotificationMail German post_in_group template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -1885,9 +2015,10 @@ exports[`sendNotificationMail German post_in_group template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -1898,11 +2029,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -1913,19 +2050,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -1936,7 +2068,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -1955,13 +2087,13 @@ footer {
         <div class="content"></div>
         <p>jemand hat einen neuen Beitrag mit dem Titel „New Post“ in einer deiner Gruppen geschrieben. Klicke auf den Knopf, um diesen Beitrag zu sehen:</p><a class="button" href="http://webapp:3000/post/p1/new-post">Beitrag ansehen</a>
         <div class="text-block">
-          <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p class="no-margin-top-bottom">Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– Dein ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -1990,14 +2122,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendNotificationMail German removed_user_from_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -2007,9 +2145,10 @@ exports[`sendNotificationMail German removed_user_from_group template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -2017,9 +2156,10 @@ exports[`sendNotificationMail German removed_user_from_group template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -2030,11 +2170,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -2045,19 +2191,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -2068,7 +2209,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -2087,13 +2228,13 @@ footer {
         <div class="content"></div>
         <p>du wurdest aus der Gruppe „The Group“ entfernt.</p>
         <div class="text-block">
-          <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p class="no-margin-top-bottom">Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– Dein ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -2119,14 +2260,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendNotificationMail German user_joined_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -2136,9 +2283,10 @@ exports[`sendNotificationMail German user_joined_group template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -2146,9 +2294,10 @@ exports[`sendNotificationMail German user_joined_group template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -2159,11 +2308,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -2174,19 +2329,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -2197,7 +2347,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -2217,13 +2367,13 @@ footer {
         <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> ist der Gruppe „The Group“ beigetreten. Klicke auf den Knopf, um diese Gruppe zu sehen:
         </p><a class="button" href="http://webapp:3000/groups/g1/the-group">Gruppe ansehen</a>
         <div class="text-block">
-          <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p class="no-margin-top-bottom">Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– Dein ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -2252,14 +2402,20 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendNotificationMail German user_left_group template 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -2269,9 +2425,10 @@ exports[`sendNotificationMail German user_left_group template 1`] = `
     <style>body{
   display: block;
   font-family: Lato, sans-serif;
-  font-size: 17px;
+  font-size: 16px;
   text-align: left;
   text-align: -webkit-left;
+  line-height: 24px;
   justify-content: center;
   padding: 15px;
   margin: 0px;
@@ -2279,9 +2436,10 @@ exports[`sendNotificationMail German user_left_group template 1`] = `
 
 h2 {
   margin-top: 25px;
-  font-size: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
   font-weight: normal;
-  line-height: 22px;
+  line-height: 24px;
   color: #333333;
 }
 
@@ -2292,11 +2450,17 @@ h2 {
 }
 
 .head-logo {
-  width: 60%;
+  width: 30%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
+}
+
+p.no-margin-top-bottom {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -2307,19 +2471,14 @@ a.button {
   background: #17b53e;
   font-family: Lato, sans-serif;
   font-size: 16px;
-  line-height: 15px;
   text-decoration: none;
   text-align:center;
-  padding: 13px 17px;
+  padding: 9px 18px;
   color: #ffffff;
   display: table;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;
-}
-
-span {
-  color: #17b53e;
 }
 
 .text-block {
@@ -2330,7 +2489,7 @@ span {
 footer {
   padding: 20px;
   font-family: Lato, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 15px;
   text-align: center;
   color: #888888;
@@ -2350,13 +2509,13 @@ footer {
         <p><a class="user" href="http://webapp:3000/profile/u2/peter-lustig">Peter Lustig</a> hat die Gruppe „The Group“ verlassen. Klicke auf den Knopf, um diese Gruppe zu sehen:
         </p><a class="button" href="http://webapp:3000/groups/g1/the-group">Gruppe ansehen</a>
         <div class="text-block">
-          <p>Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
-          <p>– Dein ocelot.social Team</p><br>
-          <p>PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
+          <p class="no-margin-top-bottom">Bis bald bei <a class="organization" href="https://ocelot.social">ocelot.social</a>!</p>
+          <p class="no-margin-top-bottom">– Dein ocelot.social Team</p><br>
+          <p class="no-margin-top-bottom">PS: Möchtest du keine E-Mails mehr erhalten, dann ändere deine <a class="settings" href="http://webapp:3000/settings/notifications">Benachrichtigungseinstellungen</a>!</p>
         </div>
       </div>
       <div class="support">
-        <p>Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
+        <p class="no-margin-top-bottom">Wenn du Fragen oder Probleme hast, kannst du dich gerne an den Support wenden: <a href="mailto:devops@ocelot.social">devops@ocelot.social</a></p>
       </div>
       <footer>
         <div class="footer"></div><a href="https://ocelot.social">ocelot.social Community</a>
@@ -2385,6 +2544,9 @@ devops@ocelot.social [devops@ocelot.social]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
