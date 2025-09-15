@@ -573,7 +573,7 @@ describe('emailNotificationSettings', () => {
         await expect(
           query({ query: UserEmailNotificationSettings, variables: { id: targetUser.id } }),
         ).resolves.toMatchObject({
-          data: { User: null },
+          data: { User: [null] },
           errors: [{ message: 'Not Authorized!' }],
         })
       })
@@ -881,7 +881,7 @@ describe('updateOnlineStatus', () => {
 
     it('throws an error', async () => {
       await expect(mutate({ mutation: updateOnlineStatus, variables })).resolves.toMatchObject({
-        data: { updateOnloneStatus: null },
+        data: null,
         errors: [{ message: 'Not Authorized!' }],
       })
     })
