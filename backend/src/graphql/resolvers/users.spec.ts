@@ -159,8 +159,10 @@ describe('UpdateUser', () => {
     })
 
     it('is not allowed to change other user accounts', async () => {
-      const { errors } = await mutate({ mutation: UpdateUser, variables })
-      expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
+      await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+        data: { UpdateUser: null },
+        errors: [{ message: 'Not Authorized!' }],
+      })
     })
   })
 
@@ -505,15 +507,10 @@ describe('switch user role', () => {
         id: 'user',
         role: 'admin',
       }
-      await expect(mutate({ mutation: switchUserRole, variables })).resolves.toEqual(
-        expect.objectContaining({
-          errors: [
-            expect.objectContaining({
-              message: 'Not Authorized!',
-            }),
-          ],
-        }),
-      )
+      await expect(mutate({ mutation: switchUserRole, variables })).resolves.toMatchObject({
+        data: { switchUserRole: null },
+        errors: [{ message: 'Not Authorized!' }],
+      })
     })
   })
 
@@ -575,15 +572,10 @@ describe('emailNotificationSettings', () => {
         const targetUser = await user.toJson()
         await expect(
           query({ query: UserEmailNotificationSettings, variables: { id: targetUser.id } }),
-        ).resolves.toEqual(
-          expect.objectContaining({
-            errors: [
-              expect.objectContaining({
-                message: 'Not Authorized!',
-              }),
-            ],
-          }),
-        )
+        ).resolves.toMatchObject({
+          data: { User: null },
+          errors: [{ message: 'Not Authorized!' }],
+        })
       })
     })
 
@@ -672,15 +664,10 @@ describe('emailNotificationSettings', () => {
             mutation: UpdateUser,
             variables: { id: targetUser.id, emailNotificationSettings },
           }),
-        ).resolves.toEqual(
-          expect.objectContaining({
-            errors: [
-              expect.objectContaining({
-                message: 'Not Authorized!',
-              }),
-            ],
-          }),
-        )
+        ).resolves.toMatchObject({
+          data: { UpdateUser: null },
+          errors: [{ message: 'Not Authorized!' }],
+        })
       })
     })
 
@@ -786,15 +773,10 @@ describe('save category settings', () => {
     })
 
     it('throws an error', async () => {
-      await expect(mutate({ mutation: saveCategorySettings, variables })).resolves.toEqual(
-        expect.objectContaining({
-          errors: [
-            expect.objectContaining({
-              message: 'Not Authorized!',
-            }),
-          ],
-        }),
-      )
+      await expect(mutate({ mutation: saveCategorySettings, variables })).resolves.toMatchObject({
+        data: { saveCategorySettings: null },
+        errors: [{ message: 'Not Authorized!' }],
+      })
     })
   })
 
@@ -898,15 +880,10 @@ describe('updateOnlineStatus', () => {
     })
 
     it('throws an error', async () => {
-      await expect(mutate({ mutation: updateOnlineStatus, variables })).resolves.toEqual(
-        expect.objectContaining({
-          errors: [
-            expect.objectContaining({
-              message: 'Not Authorized!',
-            }),
-          ],
-        }),
-      )
+      await expect(mutate({ mutation: updateOnlineStatus, variables })).resolves.toMatchObject({
+        data: { updateOnloneStatus: null },
+        errors: [{ message: 'Not Authorized!' }],
+      })
     })
   })
 
@@ -1036,15 +1013,10 @@ describe('setTrophyBadgeSelected', () => {
           mutation: setTrophyBadgeSelected,
           variables: { slot: 0, badgeId: 'trophy_bear' },
         }),
-      ).resolves.toEqual(
-        expect.objectContaining({
-          errors: [
-            expect.objectContaining({
-              message: 'Not Authorized!',
-            }),
-          ],
-        }),
-      )
+      ).resolves.toMatchObject({
+        data: { setTrophyBadgeSelected: null },
+        errors: [{ message: 'Not Authorized!' }],
+      })
     })
   })
 
@@ -1414,15 +1386,10 @@ describe('resetTrophyBadgesSelected', () => {
     })
 
     it('throws an error', async () => {
-      await expect(mutate({ mutation: resetTrophyBadgesSelected })).resolves.toEqual(
-        expect.objectContaining({
-          errors: [
-            expect.objectContaining({
-              message: 'Not Authorized!',
-            }),
-          ],
-        }),
-      )
+      await expect(mutate({ mutation: resetTrophyBadgesSelected })).resolves.toMatchObject({
+        data: { resetTrophyBadgesSelected: null },
+        errors: [{ message: 'Not Authorized!' }],
+      })
     })
   })
 
