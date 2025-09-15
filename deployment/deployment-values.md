@@ -37,7 +37,7 @@ However, if you need DKIM authorization and verification, you must set the appro
 ```bash
 SMTP_DKIM_DOMAINNAME=<your e-mail sender domain>
 SMTP_DKIM_KEYSELECTOR=ocelot # "free" name used in DNS as selector. we recommend this
-SMTP_DKIM_PRIVATKEY="-----BEGIN RSA PRIVATE KEY-----\\n<your base64 encoded private key data>\\n-----END RSA PRIVATE KEY-----\\n"
+SMTP_DKIM_PRIVATEKEY="-----BEGIN RSA PRIVATE KEY-----\\n<your base64 encoded private key data>\\n-----END RSA PRIVATE KEY-----\\n"
 ```
 
 You can find out how DKIM works here:
