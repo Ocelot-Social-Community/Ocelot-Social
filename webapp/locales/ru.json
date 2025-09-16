@@ -536,7 +536,6 @@
     },
     "description": null,
     "editGroupSettings": {
-      "groupName": null,
       "groupTitle": null,
       "title": null
     },
@@ -837,16 +836,12 @@
       "title": null
     },
     "createNewPost": {
-      "forGroup": {
-        "title": null
-      },
       "title": null
     },
     "edited": "Изменен",
     "editPost": {
       "event": null,
       "forGroup": {
-        "groupName": null,
         "title": null
       },
       "title": null
@@ -883,7 +878,6 @@
     },
     "viewPost": {
       "forGroup": {
-        "groupName": null,
         "title": null
       },
       "title": null

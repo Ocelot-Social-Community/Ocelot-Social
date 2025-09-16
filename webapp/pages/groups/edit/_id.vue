@@ -5,7 +5,7 @@
       <ds-heading tag="h2">
         {{ $t('group.editGroupSettings.groupTitle') }}
         <nuxt-link :to="groupLink">
-          {{ $t('group.editGroupSettings.groupName', { name: group.name }) }}
+          {{ group.name }}
         </nuxt-link>
       </ds-heading>
     </ds-space>

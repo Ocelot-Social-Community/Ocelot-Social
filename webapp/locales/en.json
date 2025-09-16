@@ -536,7 +536,6 @@
     },
     "description": "Description",
     "editGroupSettings": {
-      "groupName": "{name}",
       "groupTitle": "Settings of ",
       "title": "Edit My Group"
     },
@@ -831,22 +830,15 @@
       "updated": "Changes saved!"
     },
     "createNewEvent": {
-      "forGroup": {
-        "title": "For The Group “{name}”"
-      },
       "title": "Create an Event"
     },
     "createNewPost": {
-      "forGroup": {
-        "title": "For The Group “{name}”"
-      },
       "title": "Create an Article"
     },
     "edited": "edited",
     "editPost": {
       "event": "Edit Your Event",
       "forGroup": {
-        "groupName": "{name}",
         "title": "For The Group "
       },
       "title": "Edit Your Post"
@@ -883,7 +875,6 @@
     },
     "viewPost": {
       "forGroup": {
-        "groupName": "{name}",
         "title": "In The Group "
       },
       "title": "Post"

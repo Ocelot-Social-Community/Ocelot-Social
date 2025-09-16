@@ -7,7 +7,7 @@
       <ds-heading v-if="group" tag="h2">
         {{ $t('post.viewPost.forGroup.title') }}
         <nuxt-link :to="groupLink">
-          {{ $t('post.viewPost.forGroup.groupName', { name: group.name }) }}
+          {{ group.name }}
         </nuxt-link>
       </ds-heading>
     </ds-space>
