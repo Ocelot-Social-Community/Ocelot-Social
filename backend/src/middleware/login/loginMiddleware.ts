@@ -11,10 +11,10 @@ import {
 const sendSignupMail = async (resolve, root, args, context, resolveInfo) => {
   const { inviteCode, locale } = args
   const response = await resolve(root, args, context, resolveInfo)
-  const { email, nonce } = response
+  const { name, email, nonce } = response
   if (nonce) {
     // emails that already exist do not have a nonce
-    await sendRegistrationMail({ email, nonce, locale, inviteCode })
+    await sendRegistrationMail({ name, email, nonce, locale, inviteCode })
   }
   delete response.nonce
   return response

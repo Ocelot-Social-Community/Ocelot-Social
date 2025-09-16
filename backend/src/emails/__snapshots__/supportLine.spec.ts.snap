@@ -3,7 +3,10 @@
 exports[`sendResetPasswordMail with support English renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -134,14 +137,20 @@ support@example.org [support@example.org]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendResetPasswordMail with support German renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -273,14 +282,20 @@ support@example.org [support@example.org]
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendResetPasswordMail without support English renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -405,14 +420,20 @@ See you soon on ocelot.social [https://ocelot.social]!
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
 
 exports[`sendResetPasswordMail without support German renders correctly 1`] = `
 {
   "attachments": [],
-  "from": "ocelot.social <devops@ocelot.social>",
+  "from": {
+    "address": "devops@ocelot.social",
+    "name": "ocelot.social",
+  },
   "html": "<!DOCTYPE html>
 <html lang="de">
   <head>
@@ -538,6 +559,9 @@ Bis bald bei ocelot.social [https://ocelot.social]!
 
 
 ocelot.social Community [https://ocelot.social]",
-  "to": "user@example.org",
+  "to": {
+    "address": "user@example.org",
+    "name": "Jenny Rostock",
+  },
 }
 `;
