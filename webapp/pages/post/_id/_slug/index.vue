@@ -3,9 +3,11 @@
     <div>
       <ds-space margin="small">
         <ds-heading tag="h1">{{ heading }}</ds-heading>
-        <ds-heading v-if="post && post.group" tag="h2">
+        <ds-heading v-if="post && post.group && post.group.id && post.group.slug" tag="h2">
           {{ $t('post.viewPost.forGroup.title') }}
-          <nuxt-link :to="groupLink">
+          <nuxt-link
+            :to="{ name: 'groups-id-slug', params: { slug: post.group.slug, id: post.group.id } }"
+          >
             {{ post.group.name }}
           </nuxt-link>
         </ds-heading>
@@ -300,12 +302,6 @@ export default {
       return (
         !this.post.group || (this.group && ['usual', 'admin', 'owner'].includes(this.group.myRole))
       )
-    },
-    groupLink() {
-      if (!this.post.group) return ''
-      const { id, slug } = this.post.group
-      if (!(id && slug)) return ''
-      return { name: 'groups-id-slug', params: { slug, id } }
     },
   },
   methods: {

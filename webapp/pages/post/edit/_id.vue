@@ -4,9 +4,19 @@
       <ds-heading tag="h1">
         {{ heading }}
       </ds-heading>
-      <ds-heading v-if="contribution && contribution.group" tag="h2">
+      <ds-heading
+        v-if="
+          contribution && contribution.group && contribution.group.id && contribution.group.slug
+        "
+        tag="h2"
+      >
         {{ $t('post.editPost.forGroup.title') }}
-        <nuxt-link :to="groupLink">
+        <nuxt-link
+          :to="{
+            name: 'groups-id-slug',
+            params: { slug: contribution.group.slug, id: contribution.group.id },
+          }"
+        >
           {{ contribution.group.name }}
         </nuxt-link>
       </ds-heading>
@@ -42,12 +52,6 @@ export default {
       return this.contribution && this.contribution.postType[0] === 'Event'
         ? this.$t('post.editPost.event')
         : this.$t('post.editPost.title')
-    },
-    groupLink() {
-      if (!this.contribution || !this.contribution.group) return ''
-      const { id, slug } = this.contribution.group
-      if (!(id && slug)) return ''
-      return { name: 'groups-id-slug', params: { slug, id } }
     },
   },
   data() {

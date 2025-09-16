@@ -4,7 +4,7 @@
       <ds-heading tag="h1">{{ $t('group.editGroupSettings.title') }}</ds-heading>
       <ds-heading tag="h2">
         {{ $t('group.editGroupSettings.groupTitle') }}
-        <nuxt-link :to="groupLink">
+        <nuxt-link :to="{ name: 'groups-id-slug', params: { slug: group.slug, id: group.id } }">
           {{ group.name }}
         </nuxt-link>
       </ds-heading>
@@ -52,12 +52,6 @@ export default {
           path: `/groups/edit/${this.group.id}/invites`,
         },
       ]
-    },
-    groupLink() {
-      if (!this.group) return ''
-      const { id, slug } = this.group
-      if (!(id && slug)) return ''
-      return { name: 'groups-id-slug', params: { slug, id } }
     },
   },
   async asyncData(context) {
