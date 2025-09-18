@@ -81,3 +81,9 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.ds-heading {
+  margin-top: 0;
+}
+</style>

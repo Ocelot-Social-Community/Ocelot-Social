@@ -112,6 +112,7 @@ export default {
   },
 }
 </script>
+
 <style lang="scss">
 .inactive-tab-button {
   background-color: #ff000000 !important;
@@ -134,5 +135,11 @@ export default {
   color: $color-primary;
   border-left: 2px solid $color-primary;
   background-color: #faf9fa;
+}
+</style>
+
+<style lang="scss" scoped>
+.ds-heading {
+  margin-top: 0;
 }
 </style>

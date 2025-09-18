@@ -456,4 +456,8 @@ export default {
   margin-top: $space-small;
   margin-bottom: calc($space-base * 2);
 }
+
+.ds-heading {
+  margin-top: 0;
+}
 </style>
