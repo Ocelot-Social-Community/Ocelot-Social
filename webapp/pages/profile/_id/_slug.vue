@@ -34,7 +34,12 @@
               <!-- <base-icon name="at" data-test="at" /> -->
               {{ `@${userSlug}` }}
             </ds-text>
-            <location-info v-if="user.location" :location-data="user.location" size="small" />
+            <location-info
+              v-if="user.location"
+              :location-data="user.location"
+              :is-owner="myProfile"
+              size="small"
+            />
             <ds-text align="center" color="soft" size="small">
               {{ $t('profile.memberSince') }} {{ user.createdAt | date('MMMM yyyy') }}
             </ds-text>
