@@ -2,10 +2,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
+import { searchPosts } from '@graphql/queries/searchPosts'
 import { searchResults } from '@graphql/queries/searchResults'
 import createServer from '@src/server'
 
@@ -34,19 +34,6 @@ afterAll(async () => {
   await driver.close()
   neode.close()
 })
-const searchPostQuery = gql`
-  query ($query: String!, $firstPosts: Int, $postsOffset: Int) {
-    searchPosts(query: $query, firstPosts: $firstPosts, postsOffset: $postsOffset) {
-      postCount
-      posts {
-        __typename
-        id
-        title
-        content
-      }
-    }
-  }
-`
 
 describe('resolvers/searches', () => {
   let variables
@@ -605,7 +592,7 @@ und hinter tausend Stäben keine Welt.`,
         describe('query with limit 1', () => {
           it('has a count greater than 1', async () => {
             variables = { query: 'beitrag', firstPosts: 1, postsOffset: 0 }
-            await expect(query({ query: searchPostQuery, variables })).resolves.toMatchObject({
+            await expect(query({ query: searchPosts, variables })).resolves.toMatchObject({
               data: {
                 searchPosts: {
                   postCount: 2,
