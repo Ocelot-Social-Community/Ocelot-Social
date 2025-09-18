@@ -7,7 +7,7 @@
     <location-info
       v-if="user.location"
       :location-data="user.location"
-      :is-owner="isOwner"
+      :is-owner="userId === $store.getters['auth/user'].id"
       class="location-info"
     />
     <ul class="statistics">
@@ -55,9 +55,6 @@ export default {
     },
     user() {
       return (this.User && this.User[0]) ?? null
-    },
-    isOwner() {
-      return this.user.id === this.$store.getters['auth/user'].id
     },
   },
   apollo: {
