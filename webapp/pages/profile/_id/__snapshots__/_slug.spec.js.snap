@@ -1470,7 +1470,24 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           
             </p>
              
-            <!---->
+            <div
+              class="location-info size-small"
+            >
+              <div
+                class="location"
+              >
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Paris
+  
+              </div>
+               
+              <!---->
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
@@ -2033,7 +2050,24 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           
             </p>
              
-            <!---->
+            <div
+              class="location-info size-small"
+            >
+              <div
+                class="location"
+              >
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Paris
+  
+              </div>
+               
+              <!---->
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"

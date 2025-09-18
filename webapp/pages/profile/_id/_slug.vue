@@ -35,8 +35,9 @@
               {{ `@${userSlug}` }}
             </ds-text>
             <location-info
-              v-if="user.location && !myProfile"
+              v-if="user.location"
               :location-data="user.location"
+              :is-owner="myProfile"
               size="small"
             />
             <ds-text align="center" color="soft" size="small">

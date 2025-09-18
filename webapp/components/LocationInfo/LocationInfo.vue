@@ -4,7 +4,7 @@
       <base-icon name="map-marker" />
       {{ locationData.name }}
     </div>
-    <div v-if="locationData.distanceToMe !== null" class="distance">
+    <div v-if="locationData.distanceToMe !== null && !isOwner" class="distance">
       {{ $t('location.distance', { distance: locationData.distanceToMe }) }}
     </div>
   </div>
@@ -21,6 +21,10 @@ export default {
       validator: (value) => {
         return value.match(/(small|base)/)
       },
+    },
+    isOwner: {
+      type: Boolean,
+      required: true,
     },
   },
 }

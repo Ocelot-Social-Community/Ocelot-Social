@@ -93,7 +93,7 @@ describe('ProfileSlug', () => {
             commentedCount: 8,
             location: {
               name: 'Berlin',
-              distanceToMe: '666 km',
+              distanceToMe: '877 km',
             },
             badgeVerification: {
               id: 'bv1',
