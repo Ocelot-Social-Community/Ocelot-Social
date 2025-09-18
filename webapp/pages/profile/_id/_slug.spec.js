@@ -91,6 +91,10 @@ describe('ProfileSlug', () => {
             contributionsCount: 6,
             shoutedCount: 7,
             commentedCount: 8,
+            location: {
+              name: 'Berlin',
+              distanceToMe: '666 km',
+            },
             badgeVerification: {
               id: 'bv1',
               icon: '/path/to/icon-bv1',
@@ -149,6 +153,10 @@ describe('ProfileSlug', () => {
             contributionsCount: 6,
             shoutedCount: 7,
             commentedCount: 8,
+            location: {
+              name: 'Paris',
+              distanceToMe: '0 km',
+            },
             badgeVerification: {
               id: 'bv1',
               icon: '/path/to/icon-bv1',
