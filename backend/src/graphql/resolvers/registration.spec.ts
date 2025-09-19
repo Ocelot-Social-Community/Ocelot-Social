@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import gql from 'graphql-tag'
-
 import Factory, { cleanDatabase } from '@db/factories'
 import EmailAddress from '@db/models/EmailAddress'
 import User from '@db/models/User'
 import { Signup } from '@graphql/queries/Signup'
+import { SignupVerification } from '@graphql/queries/SignupVerification'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -158,31 +157,6 @@ describe('Signup', () => {
 })
 
 describe('SignupVerification', () => {
-  const mutation = gql`
-    mutation (
-      $name: String!
-      $password: String!
-      $email: String!
-      $nonce: String!
-      $about: String
-      $termsAndConditionsAgreedVersion: String!
-      $locale: String
-    ) {
-      SignupVerification(
-        name: $name
-        password: $password
-        email: $email
-        nonce: $nonce
-        about: $about
-        termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
-        locale: $locale
-      ) {
-        id
-        termsAndConditionsAgreedVersion
-        termsAndConditionsAgreedAt
-      }
-    }
-  `
   describe('given valid password and email', () => {
     beforeEach(() => {
       variables = {
@@ -219,7 +193,9 @@ describe('SignupVerification', () => {
           })
 
           it('rejects', async () => {
-            await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+            await expect(
+              mutate({ mutation: SignupVerification, variables }),
+            ).resolves.toMatchObject({
               errors: [{ message: 'Invalid email or nonce' }],
             })
           })
@@ -237,7 +213,9 @@ describe('SignupVerification', () => {
 
         describe('sending a valid nonce', () => {
           it('creates a user account', async () => {
-            await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+            await expect(
+              mutate({ mutation: SignupVerification, variables }),
+            ).resolves.toMatchObject({
               data: {
                 SignupVerification: expect.objectContaining({
                   id: expect.any(String),
@@ -247,7 +225,7 @@ describe('SignupVerification', () => {
           })
 
           it('sets `verifiedAt` attribute of EmailAddress', async () => {
-            await mutate({ mutation, variables })
+            await mutate({ mutation: SignupVerification, variables })
             const email = await database.neode.first(
               'EmailAddress',
               { email: 'john@example.org' },
@@ -265,14 +243,14 @@ describe('SignupVerification', () => {
                 MATCH(email:EmailAddress)-[:BELONGS_TO]->(u:User {name: $name})
                 RETURN email
               `
-            await mutate({ mutation, variables })
+            await mutate({ mutation: SignupVerification, variables })
             const { records: emails } = await database.neode.cypher(cypher, { name: 'John Doe' })
             expect(emails).toHaveLength(1)
           })
 
           it('sets `about` attribute of User', async () => {
             variables = { ...variables, about: 'Find this description in the user profile' }
-            await mutate({ mutation, variables })
+            await mutate({ mutation: SignupVerification, variables })
             const user = await database.neode.first<typeof User>(
               'User',
               { name: 'John Doe' },
@@ -285,7 +263,9 @@ describe('SignupVerification', () => {
 
           it('allowing the about field to be an empty string', async () => {
             variables = { ...variables, about: '' }
-            await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+            await expect(
+              mutate({ mutation: SignupVerification, variables }),
+            ).resolves.toMatchObject({
               data: {
                 SignupVerification: expect.objectContaining({
                   id: expect.any(String),
@@ -299,13 +279,15 @@ describe('SignupVerification', () => {
                 MATCH(email:EmailAddress)<-[:PRIMARY_EMAIL]-(u:User {name: $name})
                 RETURN email
               `
-            await mutate({ mutation, variables })
+            await mutate({ mutation: SignupVerification, variables })
             const { records: emails } = await database.neode.cypher(cypher, { name: 'John Doe' })
             expect(emails).toHaveLength(1)
           })
 
           it('updates termsAndConditionsAgreedVersion', async () => {
-            await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+            await expect(
+              mutate({ mutation: SignupVerification, variables }),
+            ).resolves.toMatchObject({
               data: {
                 SignupVerification: expect.objectContaining({
                   termsAndConditionsAgreedVersion: '0.1.0',
@@ -315,7 +297,9 @@ describe('SignupVerification', () => {
           })
 
           it('updates termsAndConditionsAgreedAt', async () => {
-            await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+            await expect(
+              mutate({ mutation: SignupVerification, variables }),
+            ).resolves.toMatchObject({
               data: {
                 SignupVerification: expect.objectContaining({
                   termsAndConditionsAgreedAt: expect.any(String),
@@ -326,7 +310,9 @@ describe('SignupVerification', () => {
 
           it('rejects if version of terms and conditions is missing', async () => {
             variables = { ...variables, termsAndConditionsAgreedVersion: null }
-            await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+            await expect(
+              mutate({ mutation: SignupVerification, variables }),
+            ).resolves.toMatchObject({
               errors: [
                 {
                   message:
@@ -338,7 +324,9 @@ describe('SignupVerification', () => {
 
           it('rejects if version of terms and conditions has wrong format', async () => {
             variables = { ...variables, termsAndConditionsAgreedVersion: 'invalid version format' }
-            await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+            await expect(
+              mutate({ mutation: SignupVerification, variables }),
+            ).resolves.toMatchObject({
               errors: [{ message: 'Invalid version format!' }],
             })
           })
@@ -350,7 +338,9 @@ describe('SignupVerification', () => {
           })
 
           it('rejects', async () => {
-            await expect(mutate({ mutation, variables })).resolves.toMatchObject({
+            await expect(
+              mutate({ mutation: SignupVerification, variables }),
+            ).resolves.toMatchObject({
               errors: [{ message: 'Invalid email or nonce' }],
             })
           })

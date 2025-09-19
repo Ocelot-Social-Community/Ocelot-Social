@@ -638,6 +638,7 @@ export default {
         'allowEmbedIframes',
         'showShoutsPublicly',
         'locale',
+        'activeCategories',
       ],
       boolean: {
         followedByCurrentUser:

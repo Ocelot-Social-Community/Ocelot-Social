@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
 import { Signup } from '@graphql/queries/Signup'
-import { User } from '@graphql/queries/User'
+import { User, UserEmail } from '@graphql/queries/User'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -116,7 +116,7 @@ describe('authorization', () => {
 
           it("exposes the owner's email address", async () => {
             variables = { name: 'Owner' }
-            await expect(query({ query: User, variables })).resolves.toMatchObject({
+            await expect(query({ query: UserEmail, variables })).resolves.toMatchObject({
               data: { User: [{ email: 'owner@example.org' }] },
               errors: undefined,
             })
@@ -130,7 +130,7 @@ describe('authorization', () => {
 
           it("throws an error and does not expose the owner's email address", async () => {
             await expect(
-              query({ query: User, variables: { name: 'Owner' } }),
+              query({ query: UserEmail, variables: { name: 'Owner' } }),
             ).resolves.toMatchObject({
               errors: [{ message: 'Not Authorized!' }],
               data: { User: [null] },
@@ -145,7 +145,7 @@ describe('authorization', () => {
 
           it("throws an error and does not expose the owner's email address", async () => {
             await expect(
-              query({ query: User, variables: { name: 'Owner' } }),
+              query({ query: UserEmail, variables: { name: 'Owner' } }),
             ).resolves.toMatchObject({
               errors: [{ message: 'Not Authorized!' }],
               data: { User: [null] },
@@ -160,7 +160,7 @@ describe('authorization', () => {
 
           it("exposes the owner's email address", async () => {
             variables = { name: 'Owner' }
-            await expect(query({ query: User, variables })).resolves.toMatchObject({
+            await expect(query({ query: UserEmail, variables })).resolves.toMatchObject({
               data: { User: [{ email: 'owner@example.org' }] },
               errors: undefined,
             })

@@ -6,10 +6,34 @@ export const Post = gql`
       id
       title
       content
+      contentExcerpt
       eventStart
       pinned
       createdAt
       pinnedAt
+      isObservedByMe
+      observingUsersCount
+      clickedCount
+      emotionsCount
+      emotions {
+        emotion
+        User {
+          id
+        }
+      }
+      author {
+        id
+        name
+      }
+      shoutedBy {
+        id
+      }
+      tags {
+        id
+      }
+      comments {
+        content
+      }
     }
   }
 `

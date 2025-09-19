@@ -6,12 +6,12 @@
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable jest/unbound-method */
-import gql from 'graphql-tag'
 import { verify } from 'jsonwebtoken'
 
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
 import { changePassword } from '@graphql/queries/changePassword'
+import { currentUser } from '@graphql/queries/currentUser'
 import { login } from '@graphql/queries/login'
 import { saveCategorySettings } from '@graphql/queries/saveCategorySettings'
 import { decode } from '@jwt/decode'
@@ -86,24 +86,8 @@ afterEach(async () => {
 })
 
 describe('currentUser', () => {
-  const currentUserQuery = gql`
-    {
-      currentUser {
-        id
-        slug
-        name
-        avatar {
-          url
-        }
-        email
-        role
-        activeCategories
-      }
-    }
-  `
-
   const respondsWith = async (expected) => {
-    await expect(query({ query: currentUserQuery, variables })).resolves.toMatchObject(expected)
+    await expect(query({ query: currentUser, variables })).resolves.toMatchObject(expected)
   }
 
   describe('unauthenticated', () => {
@@ -211,7 +195,7 @@ describe('currentUser', () => {
           })
 
           it('returns only the saved active categories', async () => {
-            const result = await query({ query: currentUserQuery, variables })
+            const result = await query({ query: currentUser, variables })
             expect(result.data?.currentUser.activeCategories).toHaveLength(4)
             expect(result.data?.currentUser.activeCategories).toContain('cat1')
             expect(result.data?.currentUser.activeCategories).toContain('cat3')
