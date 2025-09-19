@@ -49,7 +49,8 @@ export default {
     if (groupId) this.$router.replace(`/post/create/${type}`) // remove query that the route hits one of the menu paths
     return {
       groupId,
-      createEvent: false,
+      // Wolle: createEvent: false,
+      type,
     }
   },
   async asyncData({ route, redirect }) {
@@ -67,6 +68,11 @@ export default {
     }
   },
   computed: {
+    // Wolle: groupId() {
+    //   const { groupId = null } = this.$route.query
+    //   if (groupId) this.$router.replace(`/post/create/${this.type}`) // remove query that the route hits one of the menu paths
+    //   return groupId
+    // },
     group() {
       return this.Group && this.Group[0] ? this.Group[0] : null
     },
@@ -80,7 +86,7 @@ export default {
         {
           name: this.$t('post.name'),
           path: `/post/create/article`,
-          type: 'post', // Wolle: change to article?
+          type: 'article',
         },
         {
           name: this.$t('post.event'),
@@ -88,6 +94,9 @@ export default {
           type: 'event',
         },
       ]
+    },
+    createEvent() {
+      return this.type === 'event'
     },
   },
   apollo: {
@@ -98,7 +107,7 @@ export default {
       variables() {
         return {
           id: this.groupId,
-          // followedByCount: this.followedByCount,
+          // Wolle: followedByCount: this.followedByCount,
           // followingCount: this.followingCount,
         }
       },
@@ -112,19 +121,35 @@ export default {
     },
   },
   methods: {
-    switchPostType(event, route) {
-      if (route.route.type.toLowerCase() === 'event') {
-        this.createEvent = true
-      } else {
-        this.createEvent = false
+    switchPostType(_event, route) {
+      // Wolle: if (route.route.type.toLowerCase() === 'event') {
+      //   this.createEvent = true
+      // } else {
+      //   this.createEvent = false
+      // }
+      const { type: oldType } = this.$route.params
+      const newType = route.route.type.toLowerCase()
+      if (newType !== oldType) {
+        this.type = newType
+        // if (this.type === 'event') {
+        //   this.createEvent = true
+        // } else {
+        //   this.createEvent = false
+        // }
+        // console.log('this.createEvent: ', this.createEvent)
+        if (this.groupId) {
+          this.$router.replace(`/post/create/${this.type}/?groupId=${this.groupId}`)
+        } else {
+          this.$router.replace(`/post/create/${this.type}`)
+        }
       }
       // hacky way to set active element
       // Wolle
-      const menuItems = document.querySelectorAll('.post-type-menu-item')
-      menuItems.forEach((menuItem) => {
-        menuItem.firstChild.classList.remove('router-link-exact-active', 'router-link-active')
-      })
-      event.target.classList.add('router-link-exact-active')
+      // const menuItems = document.querySelectorAll('.post-type-menu-item')
+      // menuItems.forEach((menuItem) => {
+      //   menuItem.firstChild.classList.remove('router-link-exact-active', 'router-link-active')
+      // })
+      // event.target.classList.add('router-link-exact-active')
     },
   },
 }
@@ -140,7 +165,7 @@ export default {
   text-align: center;
 }
 
-// copy hover effect from ghost button to use for ds-card
+// Wolle: copy hover effect from ghost button to use for ds-card
 .create-form-btn:not(.ds-card-primary):hover {
   background-color: #faf9fa;
 }
