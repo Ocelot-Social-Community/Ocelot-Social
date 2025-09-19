@@ -10,6 +10,9 @@ describe('create.vue', () => {
   const mocks = {
     $t: jest.fn(),
     $route: {
+      params: {
+        type: 'article',
+      },
       query: {
         groupId: null,
       },
