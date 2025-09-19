@@ -206,7 +206,12 @@
           </base-card>
         </ds-space>
         <ds-space v-if="isGroupMemberNonePending" centered>
-          <nuxt-link :to="{ name: 'post-create', query: { groupId: group.id } }">
+          <nuxt-link
+            :to="{
+              name: 'post-create-type',
+              query: { groupId: group.id },
+            }"
+          >
             <base-button
               class="profile-post-add-button"
               icon="plus"

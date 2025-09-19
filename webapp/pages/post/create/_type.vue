@@ -45,9 +45,25 @@ export default {
   },
   data() {
     const { groupId = null } = this.$route.query
+    const { type } = this.$route.params
+    if (groupId) this.$router.replace(`/post/create/${type}`) // remove query that the route hits one of the menu paths
     return {
       groupId,
       createEvent: false,
+    }
+  },
+  async asyncData({ route, redirect }) {
+    // http://localhost:3000/post/create/type
+    // http://localhost:3000/post/create/type?groupId=id
+    const {
+      params: { type },
+      query: { groupId },
+    } = route
+    if (!['article', 'event'].includes(type)) {
+      const defaultType = 'article'
+      let path = `/post/create/${defaultType}`
+      if (groupId) path += `?groupId=${groupId}`
+      redirect(path)
     }
   },
   computed: {
@@ -56,19 +72,19 @@ export default {
     },
     heading() {
       return !this.createEvent
-        ? this.$t('post.createNewPost.title')
+        ? this.$t('post.createNewPost.title') // Wolle: change to article?
         : this.$t('post.createNewEvent.title')
     },
     routes() {
       return [
         {
           name: this.$t('post.name'),
-          path: `/post/create`,
-          type: 'post',
+          path: `/post/create/article`,
+          type: 'post', // Wolle: change to article?
         },
         {
           name: this.$t('post.event'),
-          path: `/`,
+          path: `/post/create/event`,
           type: 'event',
         },
       ]
@@ -103,6 +119,7 @@ export default {
         this.createEvent = false
       }
       // hacky way to set active element
+      // Wolle
       const menuItems = document.querySelectorAll('.post-type-menu-item')
       menuItems.forEach((menuItem) => {
         menuItem.firstChild.classList.remove('router-link-exact-active', 'router-link-active')
