@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import gql from 'graphql-tag'
-
 import Factory, { cleanDatabase } from '@db/factories'
+import { CreateComment } from '@graphql/queries/CreateComment'
 import { CreatePost } from '@graphql/queries/CreatePost'
+import { Post } from '@graphql/queries/Post'
 import { toggleObservePost } from '@graphql/queries/toggleObservePost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -19,25 +19,6 @@ let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
-
-const createCommentMutation = gql`
-  mutation ($id: ID, $postId: ID!, $content: String!) {
-    CreateComment(id: $id, postId: $postId, content: $content) {
-      id
-      isPostObservedByMe
-      postObservingUsersCount
-    }
-  }
-`
-
-const postQuery = gql`
-  query Post($id: ID) {
-    Post(id: $id) {
-      isObservedByMe
-      observingUsersCount
-    }
-  }
-`
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -101,7 +82,7 @@ describe('observing posts', () => {
     it('has another user NOT observing the post BEFORE commenting it', async () => {
       await expect(
         query({
-          query: postQuery,
+          query: Post,
           variables: { id: 'p2' },
         }),
       ).resolves.toMatchObject({
@@ -120,7 +101,7 @@ describe('observing posts', () => {
     it('has another user observing the post AFTER commenting it', async () => {
       await expect(
         mutate({
-          mutation: createCommentMutation,
+          mutation: CreateComment,
           variables: {
             postId: 'p2',
             content: 'After commenting the post, I should observe the post automatically',
@@ -137,7 +118,7 @@ describe('observing posts', () => {
 
       await expect(
         query({
-          query: postQuery,
+          query: Post,
           variables: { id: 'p2' },
         }),
       ).resolves.toMatchObject({
@@ -185,7 +166,7 @@ describe('observing posts', () => {
       it('does NOT alter the observation state', async () => {
         await expect(
           mutate({
-            mutation: createCommentMutation,
+            mutation: CreateComment,
             variables: {
               postId: 'p2',
               content:
@@ -203,7 +184,7 @@ describe('observing posts', () => {
 
         await expect(
           query({
-            query: postQuery,
+            query: Post,
             variables: { id: 'p2' },
           }),
         ).resolves.toMatchObject({

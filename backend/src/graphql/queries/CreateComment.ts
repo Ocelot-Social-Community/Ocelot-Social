@@ -8,6 +8,8 @@ export const CreateComment = gql`
       author {
         name
       }
+      isPostObservedByMe
+      postObservingUsersCount
     }
   }
 `

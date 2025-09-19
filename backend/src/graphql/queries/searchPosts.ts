@@ -5,6 +5,7 @@ export const searchPosts = gql`
     searchPosts(query: $query, firstPosts: $firstPosts, postsOffset: $postsOffset) {
       postCount
       posts {
+        __typename
         id
         title
         content
