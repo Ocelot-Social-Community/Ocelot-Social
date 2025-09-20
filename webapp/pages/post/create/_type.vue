@@ -71,7 +71,7 @@ export default {
     },
     heading() {
       return !this.createEvent
-        ? this.$t('post.createNewPost.title') // Wolle: change to article?
+        ? this.$t('post.createNewArticle.title')
         : this.$t('post.createNewEvent.title')
     },
     routes() {
