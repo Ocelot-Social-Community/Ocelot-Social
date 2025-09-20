@@ -829,13 +829,13 @@
       "submitted": "Comentario enviado",
       "updated": "Cambios guardados"
     },
+    "createNewArticle": {
+      "title": null
+    },
     "createNewEvent": {
       "forGroup": {
         "title": null
       },
-      "title": null
-    },
-    "createNewArticle": {
       "title": null
     },
     "edited": "editado",

@@ -829,13 +829,13 @@
       "submitted": "Komentarz dodany",
       "updated": null
     },
+    "createNewArticle": {
+      "title": null
+    },
     "createNewEvent": {
       "forGroup": {
         "title": null
       },
-      "title": null
-    },
-    "createNewArticle": {
       "title": null
     },
     "edited": null,

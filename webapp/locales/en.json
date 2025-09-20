@@ -829,11 +829,11 @@
       "submitted": "Comment submitted!",
       "updated": "Changes saved!"
     },
-    "createNewEvent": {
-      "title": "Create an Event"
-    },
     "createNewArticle": {
       "title": "Create an Article"
+    },
+    "createNewEvent": {
+      "title": "Create an Event"
     },
     "edited": "edited",
     "editPost": {

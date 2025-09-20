@@ -829,11 +829,11 @@
       "submitted": "Kommentar gesendet",
       "updated": "Änderungen gespeichert"
     },
-    "createNewEvent": {
-      "title": "Erstelle eine Veranstaltung"
-    },
     "createNewArticle": {
       "title": "Erstelle einen Beitrag"
+    },
+    "createNewEvent": {
+      "title": "Erstelle eine Veranstaltung"
     },
     "edited": "bearbeitet",
     "editPost": {

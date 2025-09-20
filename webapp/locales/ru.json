@@ -829,13 +829,13 @@
       "submitted": "Комментарий отправлен",
       "updated": "Изменения сохраненные"
     },
+    "createNewArticle": {
+      "title": null
+    },
     "createNewEvent": {
       "forGroup": {
         "title": null
       },
-      "title": null
-    },
-    "createNewArticle": {
       "title": null
     },
     "edited": "Изменен",
