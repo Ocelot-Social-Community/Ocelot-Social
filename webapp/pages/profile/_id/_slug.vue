@@ -127,14 +127,13 @@
           <!-- feed -->
           <ds-grid-item :row-span="2" column-span="fullWidth">
             <ds-space centered>
-              <nuxt-link :to="{ name: 'post-create' }">
+              <nuxt-link :to="{ name: 'post-create-type' }">
                 <base-button
                   v-if="myProfile"
                   v-tooltip="{
                     content: $t('contribution.newPost'),
                     placement: 'left',
                   }"
-                  :path="{ name: 'post-create' }"
                   class="profile-post-add-button"
                   icon="plus"
                   circle

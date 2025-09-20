@@ -536,7 +536,7 @@
     },
     "description": null,
     "editGroupSettings": {
-      "groupName": null,
+      "groupTitle": null,
       "title": null
     },
     "errors": {
@@ -829,13 +829,10 @@
       "submitted": "Komentarz dodany",
       "updated": null
     },
-    "createNewEvent": {
-      "forGroup": {
-        "title": null
-      },
+    "createNewArticle": {
       "title": null
     },
-    "createNewPost": {
+    "createNewEvent": {
       "forGroup": {
         "title": null
       },
