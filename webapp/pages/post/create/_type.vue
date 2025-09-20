@@ -20,7 +20,6 @@
             slot="menuitem"
             slot-scope="item"
             :route="item.route"
-            class="post-type-menu-item"
           >
             {{ item.route.name }}
           </ds-menu-item>
@@ -46,10 +45,9 @@ export default {
   data() {
     const { groupId = null } = this.$route.query
     const { type } = this.$route.params
-    if (groupId) this.$router.replace(`/post/create/${type}`) // remove query that the route hits one of the menu paths
+    if (groupId) this.$router.replace(`/post/create/${type}`) // remove query so that the route hits one of the menu paths
     return {
       groupId,
-      // Wolle: createEvent: false,
       type,
     }
   },
@@ -68,11 +66,6 @@ export default {
     }
   },
   computed: {
-    // Wolle: groupId() {
-    //   const { groupId = null } = this.$route.query
-    //   if (groupId) this.$router.replace(`/post/create/${this.type}`) // remove query that the route hits one of the menu paths
-    //   return groupId
-    // },
     group() {
       return this.Group && this.Group[0] ? this.Group[0] : null
     },
@@ -107,8 +100,6 @@ export default {
       variables() {
         return {
           id: this.groupId,
-          // Wolle: followedByCount: this.followedByCount,
-          // followingCount: this.followingCount,
         }
       },
       skip() {
@@ -122,63 +113,20 @@ export default {
   },
   methods: {
     switchPostType(_event, route) {
-      // Wolle: if (route.route.type.toLowerCase() === 'event') {
-      //   this.createEvent = true
-      // } else {
-      //   this.createEvent = false
-      // }
       const { type: oldType } = this.$route.params
       const newType = route.route.type.toLowerCase()
       if (newType !== oldType) {
         this.type = newType
-        // if (this.type === 'event') {
-        //   this.createEvent = true
-        // } else {
-        //   this.createEvent = false
-        // }
-        // console.log('this.createEvent: ', this.createEvent)
         if (this.groupId) {
           this.$router.replace(`/post/create/${this.type}/?groupId=${this.groupId}`)
         } else {
           this.$router.replace(`/post/create/${this.type}`)
         }
       }
-      // hacky way to set active element
-      // Wolle
-      // const menuItems = document.querySelectorAll('.post-type-menu-item')
-      // menuItems.forEach((menuItem) => {
-      //   menuItem.firstChild.classList.remove('router-link-exact-active', 'router-link-active')
-      // })
-      // event.target.classList.add('router-link-exact-active')
     },
   },
 }
 </script>
-
-<style lang="scss">
-.inactive-tab-button {
-  background-color: #ff000000 !important;
-  color: 'whitesmoke' !important;
-}
-.group-create-title {
-  font-size: 30px;
-  text-align: center;
-}
-
-// Wolle: copy hover effect from ghost button to use for ds-card
-.create-form-btn:not(.ds-card-primary):hover {
-  background-color: #faf9fa;
-}
-.create-form-btn .ds-button-ghost:hover {
-  background-color: transparent;
-}
-
-.menu-item-active {
-  color: $color-primary;
-  border-left: 2px solid $color-primary;
-  background-color: #faf9fa;
-}
-</style>
 
 <style lang="scss" scoped>
 .ds-heading {
