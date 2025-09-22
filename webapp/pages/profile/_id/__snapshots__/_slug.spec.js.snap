@@ -1790,7 +1790,6 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                 <button
                   class="profile-post-add-button base-button --icon-only --circle --filled has-tooltip"
                   data-original-title="null"
-                  path="[object Object]"
                   type="button"
                 >
                   <span
@@ -2412,7 +2411,6 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                 <button
                   class="profile-post-add-button base-button --icon-only --circle --filled has-tooltip"
                   data-original-title="null"
-                  path="[object Object]"
                   type="button"
                 >
                   <span

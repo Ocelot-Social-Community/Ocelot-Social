@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import gql from 'graphql-tag'
-
 import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
 import Factory, { cleanDatabase } from '@db/factories'
 import { revokeBadge } from '@graphql/queries/revokeBadge'
 import { rewardTrophyBadge } from '@graphql/queries/rewardTrophyBadge'
 import { setTrophyBadgeSelected } from '@graphql/queries/setTrophyBadgeSelected'
 import { setVerificationBadge } from '@graphql/queries/setVerificationBadge'
+import { User } from '@graphql/queries/User'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -800,24 +799,6 @@ describe('Badges', () => {
     describe('check test setup', () => {
       it('user has one badge and has it selected', async () => {
         authenticatedUser = await regularUser.toJson()
-        const userQuery = gql`
-          {
-            User(id: "regular-user-id") {
-              badgeTrophiesCount
-              badgeTrophies {
-                id
-              }
-              badgeVerification {
-                id
-                isDefault
-              }
-              badgeTrophiesSelected {
-                id
-                isDefault
-              }
-            }
-          }
-        `
         const expected = {
           data: {
             User: [
@@ -871,7 +852,9 @@ describe('Badges', () => {
           },
           errors: undefined,
         }
-        await expect(query({ query: userQuery })).resolves.toMatchObject(expected)
+        await expect(
+          query({ query: User, variables: { id: 'regular-user-id' } }),
+        ).resolves.toMatchObject(expected)
       })
     })
 

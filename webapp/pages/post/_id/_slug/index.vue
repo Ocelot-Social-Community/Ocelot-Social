@@ -3,8 +3,13 @@
     <div>
       <ds-space margin="small">
         <ds-heading tag="h1">{{ heading }}</ds-heading>
-        <ds-heading v-if="post && post.group" tag="h2">
-          {{ $t('post.viewPost.forGroup.title', { name: post.group.name }) }}
+        <ds-heading v-if="post && post.group && post.group.id && post.group.slug" tag="h2">
+          {{ $t('post.viewPost.forGroup.title') }}
+          <nuxt-link
+            :to="{ name: 'groups-id-slug', params: { slug: post.group.slug, id: post.group.id } }"
+          >
+            {{ post.group.name }}
+          </nuxt-link>
         </ds-heading>
       </ds-space>
       <ds-space margin="large" />
@@ -450,5 +455,9 @@ export default {
   gap: $space-small;
   margin-top: $space-small;
   margin-bottom: calc($space-base * 2);
+}
+
+.ds-heading {
+  margin-top: 0;
 }
 </style>

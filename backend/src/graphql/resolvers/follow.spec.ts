@@ -3,12 +3,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver, getNeode } from '@db/neo4j'
 import { followUser } from '@graphql/queries/followUser'
 import { unfollowUser } from '@graphql/queries/unfollowUser'
+import { User } from '@graphql/queries/User'
 import createServer from '@src/server'
 
 const driver = getDriver()
@@ -21,17 +21,6 @@ let authenticatedUser
 let user1
 let user2
 let variables
-
-const userQuery = gql`
-  query ($id: ID) {
-    User(id: $id) {
-      followedBy {
-        id
-      }
-      followedByCurrentUser
-    }
-  }
-`
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -152,7 +141,7 @@ describe('follow', () => {
       }
       await expect(
         query({
-          query: userQuery,
+          query: User,
           variables: { id: user1.id },
         }),
       ).resolves.toMatchObject({

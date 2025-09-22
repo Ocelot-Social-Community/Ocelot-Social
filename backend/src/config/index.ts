@@ -48,7 +48,7 @@ const SMTP_PASSWORD = env.SMTP_PASSWORD
 const SMTP_DKIM_DOMAINNAME = env.SMTP_DKIM_DOMAINNAME
 const SMTP_DKIM_KEYSELECTOR = env.SMTP_DKIM_KEYSELECTOR
 // PEM format = https://docs.progress.com/bundle/datadirect-hybrid-data-pipeline-installation-46/page/PEM-file-format.html
-const SMTP_DKIM_PRIVATKEY = env.SMTP_DKIM_PRIVATKEY?.replace(/\\n/g, '\n') // replace all "\n" in .env string by real line break
+const SMTP_DKIM_PRIVATEKEY = env.SMTP_DKIM_PRIVATEKEY?.replace(/\\n/g, '\n') // replace all "\n" in .env string by real line break
 const SMTP_MAX_CONNECTIONS = (env.SMTP_MAX_CONNECTIONS && parseInt(env.SMTP_MAX_CONNECTIONS)) || 5
 const SMTP_MAX_MESSAGES = (env.SMTP_MAX_MESSAGES && parseInt(env.SMTP_MAX_MESSAGES)) || 100
 
@@ -67,11 +67,11 @@ if (SMTP_USERNAME && SMTP_PASSWORD) {
     pass: SMTP_PASSWORD,
   }
 }
-if (SMTP_DKIM_DOMAINNAME && SMTP_DKIM_KEYSELECTOR && SMTP_DKIM_PRIVATKEY) {
+if (SMTP_DKIM_DOMAINNAME && SMTP_DKIM_KEYSELECTOR && SMTP_DKIM_PRIVATEKEY) {
   nodemailerTransportOptions.dkim = {
     domainName: SMTP_DKIM_DOMAINNAME,
     keySelector: SMTP_DKIM_KEYSELECTOR,
-    privateKey: SMTP_DKIM_PRIVATKEY,
+    privateKey: SMTP_DKIM_PRIVATEKEY,
   }
 }
 

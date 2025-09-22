@@ -3,13 +3,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import { mutedUsers } from '@graphql/queries/mutedUsers'
 import { muteUser } from '@graphql/queries/muteUser'
+import { Post } from '@graphql/queries/Post'
 import { unmuteUser } from '@graphql/queries/unmuteUser'
+import { User } from '@graphql/queries/User'
 import createServer from '@src/server'
 
 const driver = getDriver()
@@ -152,85 +153,68 @@ describe('muteUser', () => {
 
       it('unfollows the user', async () => {
         await currentUser.relateTo(mutedUser, 'following')
-        const queryUser = gql`
-          query {
-            User(id: "u2") {
-              id
-              isMuted
-              followedByCurrentUser
-            }
-          }
-        `
         const { query } = createTestClient(server)
-        await expect(query({ query: queryUser })).resolves.toEqual(
-          expect.objectContaining({
-            data: { User: [{ id: 'u2', isMuted: false, followedByCurrentUser: true }] },
-          }),
-        )
+        await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
+          data: {
+            User: expect.arrayContaining([
+              expect.objectContaining({ id: 'u2', isMuted: false, followedByCurrentUser: true }),
+            ]),
+          },
+        })
         await muteAction({ id: 'u2' })
-        await expect(query({ query: queryUser })).resolves.toEqual(
-          expect.objectContaining({
-            data: { User: [{ id: 'u2', isMuted: true, followedByCurrentUser: false }] },
-          }),
-        )
+        await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
+          data: {
+            User: expect.arrayContaining([
+              expect.objectContaining({ id: 'u2', isMuted: true, followedByCurrentUser: false }),
+            ]),
+          },
+        })
       })
 
       describe('given both the current user and the to-be-muted user write a post', () => {
-        let postQuery
-
         beforeEach(async () => {
           const post1 = await neode.create('Post', {
             id: 'p12',
             title: 'A post written by the current user',
+            content: 'content',
           })
           const post2 = await neode.create('Post', {
             id: 'p23',
             title: 'A post written by the muted user',
+            content: 'content',
           })
           await Promise.all([
             post1.relateTo(currentUser, 'author'),
             post2.relateTo(mutedUser, 'author'),
           ])
-          postQuery = gql`
-            query {
-              Post(orderBy: createdAt_asc) {
-                id
-                title
-                author {
-                  id
-                  name
-                }
-              }
-            }
-          `
         })
 
         const bothPostsAreInTheNewsfeed = async () => {
           const { query } = createTestClient(server)
-          await expect(query({ query: postQuery })).resolves.toEqual(
-            expect.objectContaining({
-              data: {
-                Post: [
-                  {
-                    id: 'p12',
-                    title: 'A post written by the current user',
-                    author: {
-                      name: 'Current User',
-                      id: 'u1',
-                    },
+          await expect(
+            query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+          ).resolves.toMatchObject({
+            data: {
+              Post: expect.arrayContaining([
+                expect.objectContaining({
+                  id: 'p12',
+                  title: 'A post written by the current user',
+                  author: {
+                    name: 'Current User',
+                    id: 'u1',
                   },
-                  {
-                    id: 'p23',
-                    title: 'A post written by the muted user',
-                    author: {
-                      name: 'Muted User',
-                      id: 'u2',
-                    },
+                }),
+                expect.objectContaining({
+                  id: 'p23',
+                  title: 'A post written by the muted user',
+                  author: {
+                    name: 'Muted User',
+                    id: 'u2',
                   },
-                ],
-              },
-            }),
-          )
+                }),
+              ]),
+            },
+          })
         }
 
         describe('from the perspective of the current user', () => {
@@ -243,19 +227,19 @@ describe('muteUser', () => {
 
             it("the muted user's post won't show up in the newsfeed of the current user", async () => {
               const { query } = createTestClient(server)
-              await expect(query({ query: postQuery })).resolves.toEqual(
-                expect.objectContaining({
-                  data: {
-                    Post: [
-                      {
-                        id: 'p12',
-                        title: 'A post written by the current user',
-                        author: { name: 'Current User', id: 'u1' },
-                      },
-                    ],
-                  },
-                }),
-              )
+              await expect(
+                query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+              ).resolves.toMatchObject({
+                data: {
+                  Post: [
+                    expect.objectContaining({
+                      id: 'p12',
+                      title: 'A post written by the current user',
+                      author: { name: 'Current User', id: 'u1' },
+                    }),
+                  ],
+                },
+              })
             })
           })
         })
@@ -273,24 +257,24 @@ describe('muteUser', () => {
 
             it("the current user's post will show up in the newsfeed of the muted user", async () => {
               const { query } = createTestClient(server)
-              await expect(query({ query: postQuery })).resolves.toEqual(
-                expect.objectContaining({
-                  data: {
-                    Post: expect.arrayContaining([
-                      {
-                        id: 'p23',
-                        title: 'A post written by the muted user',
-                        author: { name: 'Muted User', id: 'u2' },
-                      },
-                      {
-                        id: 'p12',
-                        title: 'A post written by the current user',
-                        author: { name: 'Current User', id: 'u1' },
-                      },
-                    ]),
-                  },
-                }),
-              )
+              await expect(
+                query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+              ).resolves.toMatchObject({
+                data: {
+                  Post: expect.arrayContaining([
+                    expect.objectContaining({
+                      id: 'p23',
+                      title: 'A post written by the muted user',
+                      author: { name: 'Muted User', id: 'u2' },
+                    }),
+                    expect.objectContaining({
+                      id: 'p12',
+                      title: 'A post written by the current user',
+                      author: { name: 'Current User', id: 'u1' },
+                    }),
+                  ]),
+                },
+              })
             })
           })
         })

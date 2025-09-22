@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
-import gql from 'graphql-tag'
-
 import Factory, { cleanDatabase } from '@db/factories'
 import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
 import { CreateGroup } from '@graphql/queries/CreateGroup'
 import { CreatePost } from '@graphql/queries/CreatePost'
 import { JoinGroup } from '@graphql/queries/JoinGroup'
+import { markAllAsRead } from '@graphql/queries/markAllAsRead'
 import { muteGroup } from '@graphql/queries/muteGroup'
+import { notifications } from '@graphql/queries/notifications'
 import { unmuteGroup } from '@graphql/queries/unmuteGroup'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -29,44 +28,6 @@ let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
 let postAuthor, groupMember, pendingMember, emaillessMember
-
-const notificationQuery = gql`
-  query ($read: Boolean) {
-    notifications(read: $read, orderBy: updatedAt_desc) {
-      read
-      reason
-      createdAt
-      relatedUser {
-        id
-      }
-      from {
-        __typename
-        ... on Post {
-          id
-          content
-        }
-        ... on Comment {
-          id
-          content
-        }
-        ... on Group {
-          id
-        }
-      }
-    }
-  }
-`
-
-const markAllAsRead = async () =>
-  mutate({
-    mutation: gql`
-      mutation {
-        markAllAsRead {
-          id
-        }
-      }
-    `,
-  })
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -190,9 +151,9 @@ describe('notify group members of new posts in group', () => {
     beforeEach(async () => {
       jest.clearAllMocks()
       authenticatedUser = await groupMember.toJson()
-      await markAllAsRead()
+      await mutate({ mutation: markAllAsRead })
       authenticatedUser = await postAuthor.toJson()
-      await markAllAsRead()
+      await mutate({ mutation: markAllAsRead })
       await mutate({
         mutation: CreatePost,
         variables: {
@@ -207,8 +168,9 @@ describe('notify group members of new posts in group', () => {
     it('sends NO notification to the author of the post', async () => {
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
           variables: {
+            orderBy: 'updatedAt_desc',
             read: false,
           },
         }),
@@ -224,8 +186,9 @@ describe('notify group members of new posts in group', () => {
       authenticatedUser = await pendingMember.toJson()
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
           variables: {
+            orderBy: 'updatedAt_desc',
             read: false,
           },
         }),
@@ -241,8 +204,9 @@ describe('notify group members of new posts in group', () => {
       authenticatedUser = await groupMember.toJson()
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
           variables: {
+            orderBy: 'updatedAt_desc',
             read: false,
           },
         }),
@@ -298,8 +262,9 @@ describe('notify group members of new posts in group', () => {
       it('sends NO notification when another post is posted', async () => {
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
             variables: {
+              orderBy: 'updatedAt_desc',
               read: false,
             },
           }),
@@ -330,7 +295,7 @@ describe('notify group members of new posts in group', () => {
 
         it('sends notification when another post is posted', async () => {
           authenticatedUser = await groupMember.toJson()
-          await markAllAsRead()
+          await mutate({ mutation: markAllAsRead })
           authenticatedUser = await postAuthor.toJson()
           await mutate({
             mutation: CreatePost,
@@ -344,8 +309,9 @@ describe('notify group members of new posts in group', () => {
           authenticatedUser = await groupMember.toJson()
           await expect(
             query({
-              query: notificationQuery,
+              query: notifications,
               variables: {
+                orderBy: 'updatedAt_desc',
                 read: false,
               },
             }),
@@ -376,7 +342,7 @@ describe('notify group members of new posts in group', () => {
       beforeEach(async () => {
         await groupMember.relateTo(postAuthor, 'blocked')
         authenticatedUser = await groupMember.toJson()
-        await markAllAsRead()
+        await mutate({ mutation: markAllAsRead })
         jest.clearAllMocks()
         authenticatedUser = await postAuthor.toJson()
         await mutate({
@@ -394,8 +360,9 @@ describe('notify group members of new posts in group', () => {
         authenticatedUser = await groupMember.toJson()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
             variables: {
+              orderBy: 'updatedAt_desc',
               read: false,
             },
           }),
@@ -416,7 +383,7 @@ describe('notify group members of new posts in group', () => {
       beforeEach(async () => {
         await groupMember.relateTo(postAuthor, 'muted')
         authenticatedUser = await groupMember.toJson()
-        await markAllAsRead()
+        await mutate({ mutation: markAllAsRead })
         jest.clearAllMocks()
         authenticatedUser = await postAuthor.toJson()
         await mutate({
@@ -434,8 +401,9 @@ describe('notify group members of new posts in group', () => {
         authenticatedUser = await groupMember.toJson()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
             variables: {
+              orderBy: 'updatedAt_desc',
               read: false,
             },
           }),
