@@ -1,13 +1,13 @@
 import gql from 'graphql-tag'
+import badges from './fragments/badges'
+import location from './fragments/location'
+
 import {
   userCountsFragment,
-  locationFragment,
-  badgesFragment,
   userFragment,
   postFragment,
   commentFragment,
   groupFragment,
-  userTeaserFragment,
 } from './Fragments'
 
 export const profileUserQuery = (i18n) => {
@@ -15,8 +15,8 @@ export const profileUserQuery = (i18n) => {
   return gql`
     ${userFragment}
     ${userCountsFragment}
-    ${locationFragment('User', lang)}
-    ${badgesFragment}
+    ${location('User', lang)}
+    ${badges}
 
     query User($id: ID!, $followedByCount: Int!, $followingCount: Int!) {
       User(id: $id) {
@@ -112,8 +112,8 @@ export const mapUserQuery = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
     ${userFragment}
-    ${locationFragment('User', lang)}
-    ${badgesFragment}
+    ${location('User', lang)}
+    ${badges}
 
     query {
       User {
@@ -501,10 +501,16 @@ export const userDataQuery = (i18n) => {
 export const userTeaserQuery = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
-    ${userTeaserFragment(lang)}
+    ${badges}
+    ${location('User', lang)}
+
     query ($id: ID!) {
       User(id: $id) {
-        ...userTeaser
+        followedByCount
+        contributionsCount
+        commentedCount
+        ...badges
+        ...location
       }
     }
   `
