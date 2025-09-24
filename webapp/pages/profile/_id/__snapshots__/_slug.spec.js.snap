@@ -181,7 +181,30 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           
             </p>
              
-            <!---->
+            <div
+              class="location-info size-small"
+            >
+              <div
+                class="location"
+              >
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Berlin
+  
+              </div>
+               
+              <div
+                class="distance"
+              >
+                
+    location.distance
+  
+              </div>
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
@@ -799,7 +822,30 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           
             </p>
              
-            <!---->
+            <div
+              class="location-info size-small"
+            >
+              <div
+                class="location"
+              >
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Berlin
+  
+              </div>
+               
+              <div
+                class="distance"
+              >
+                
+    location.distance
+  
+              </div>
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
@@ -1424,7 +1470,24 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           
             </p>
              
-            <!---->
+            <div
+              class="location-info size-small"
+            >
+              <div
+                class="location"
+              >
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Paris
+  
+              </div>
+               
+              <!---->
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
@@ -1727,7 +1790,6 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                 <button
                   class="profile-post-add-button base-button --icon-only --circle --filled has-tooltip"
                   data-original-title="null"
-                  path="[object Object]"
                   type="button"
                 >
                   <span
@@ -1987,7 +2049,24 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           
             </p>
              
-            <!---->
+            <div
+              class="location-info size-small"
+            >
+              <div
+                class="location"
+              >
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Paris
+  
+              </div>
+               
+              <!---->
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
@@ -2332,7 +2411,6 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                 <button
                   class="profile-post-add-button base-button --icon-only --circle --filled has-tooltip"
                   data-original-title="null"
-                  path="[object Object]"
                   type="button"
                 >
                   <span

@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import create from './create.vue'
+import create from './_type.vue'
 import Vuex from 'vuex'
 
 const localVue = global.localVue
@@ -10,6 +10,9 @@ describe('create.vue', () => {
   const mocks = {
     $t: jest.fn(),
     $route: {
+      params: {
+        type: 'article',
+      },
       query: {
         groupId: null,
       },
