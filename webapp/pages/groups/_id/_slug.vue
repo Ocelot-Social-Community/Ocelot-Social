@@ -38,7 +38,12 @@
               {{ `&${groupSlug}` }}
             </ds-text>
             <!-- group location -->
-            <location-info v-if="group.location" :location-data="group.location" size="small" />
+            <location-info
+              v-if="group.location"
+              :location-data="group.location"
+              :is-owner="false"
+              size="small"
+            />
             <!-- group created at -->
             <ds-text align="center" color="soft" size="small">
               {{ $t('group.foundation') }} {{ group.createdAt | date('MMMM yyyy') }}
