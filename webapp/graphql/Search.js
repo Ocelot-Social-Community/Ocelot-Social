@@ -1,15 +1,13 @@
 import gql from 'graphql-tag'
-import {
-  userFragment,
-  postFragment,
-  groupFragment,
-  tagsCategoriesAndPinnedFragment,
-} from './Fragments'
+import { user } from './fragments/user'
+import { post } from './fragments/post'
+import { group } from './fragments/group'
+import { tagsCategoriesAndPinned } from './fragments/tagsCategoriesAndPinned'
 
 export const searchQuery = gql`
-  ${userFragment}
-  ${postFragment}
-  ${groupFragment}
+  ${user}
+  ${post}
+  ${group}
 
   query ($query: String!) {
     searchResults(query: $query, limit: 5) {
@@ -38,9 +36,9 @@ export const searchQuery = gql`
 `
 
 export const searchPosts = gql`
-  ${userFragment}
-  ${postFragment}
-  ${tagsCategoriesAndPinnedFragment}
+  ${user}
+  ${post}
+  ${tagsCategoriesAndPinned}
 
   query ($query: String!, $firstPosts: Int, $postsOffset: Int) {
     searchPosts(query: $query, firstPosts: $firstPosts, postsOffset: $postsOffset) {
@@ -112,7 +110,7 @@ export const searchGroups = (i18n) => {
 }
 
 export const searchUsers = gql`
-  ${userFragment}
+  ${user}
 
   query ($query: String!, $firstUsers: Int, $usersOffset: Int) {
     searchUsers(query: $query, firstUsers: $firstUsers, usersOffset: $usersOffset) {

@@ -1,26 +1,24 @@
 import gql from 'graphql-tag'
-import {
-  userFragment,
-  postFragment,
-  commentFragment,
-  postCountsFragment,
-  userCountsFragment,
-  locationFragment,
-  badgesFragment,
-  tagsCategoriesAndPinnedFragment,
-} from './Fragments'
+import { user } from './fragments/user'
+import { post } from './fragments/post'
+import { comment } from './fragments/comment'
+import { postCounts } from './fragments/postCounts'
+import { userCounts } from './fragments/userCounts'
+import { location } from './fragments/location'
+import { badges } from './fragments/badges'
+import { tagsCategoriesAndPinned } from './fragments/tagsCategoriesAndPinned'
 
 export default (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
-    ${userFragment}
-    ${userCountsFragment}
-    ${locationFragment('User', lang)}
-    ${badgesFragment}
-    ${postFragment}
-    ${postCountsFragment}
-    ${tagsCategoriesAndPinnedFragment}
-    ${commentFragment}
+    ${user}
+    ${userCounts}
+    ${location('User', lang)}
+    ${badges}
+    ${post}
+    ${postCounts}
+    ${tagsCategoriesAndPinned}
+    ${comment}
 
     query Post($id: ID!) {
       Post(id: $id) {
@@ -63,13 +61,13 @@ export default (i18n) => {
 export const filterPosts = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
-    ${userFragment}
-    ${userCountsFragment}
-    ${locationFragment('User', lang)}
-    ${badgesFragment}
-    ${postFragment}
-    ${postCountsFragment}
-    ${tagsCategoriesAndPinnedFragment}
+    ${user}
+    ${userCounts}
+    ${location('User', lang)}
+    ${badges}
+    ${post}
+    ${postCounts}
+    ${tagsCategoriesAndPinned}
 
     query Post($filter: _PostFilter, $first: Int, $offset: Int, $orderBy: [_PostOrdering]) {
       Post(filter: $filter, first: $first, offset: $offset, orderBy: $orderBy) {
@@ -106,13 +104,13 @@ export const filterPosts = (i18n) => {
 export const profilePagePosts = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
-    ${userFragment}
-    ${userCountsFragment}
-    ${locationFragment('User', lang)}
-    ${badgesFragment}
-    ${postFragment}
-    ${postCountsFragment}
-    ${tagsCategoriesAndPinnedFragment}
+    ${user}
+    ${userCounts}
+    ${location('User', lang)}
+    ${badges}
+    ${post}
+    ${postCounts}
+    ${tagsCategoriesAndPinned}
 
     query profilePagePosts(
       $filter: _PostFilter
@@ -156,13 +154,13 @@ export const PostsEmotionsByCurrentUser = () => {
 export const relatedContributions = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
-    ${userFragment}
-    ${userCountsFragment}
-    ${locationFragment('User', lang)}
-    ${badgesFragment}
-    ${postFragment}
-    ${postCountsFragment}
-    ${tagsCategoriesAndPinnedFragment}
+    ${user}
+    ${userCounts}
+    ${location('User', lang)}
+    ${badges}
+    ${post}
+    ${postCounts}
+    ${tagsCategoriesAndPinned}
 
     query Post($slug: String!) {
       Post(slug: $slug) {

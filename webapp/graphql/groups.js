@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-import { locationFragment } from './Fragments'
+import { location } from './fragments/location'
 
 // ------ mutations
 
@@ -161,7 +161,7 @@ export const removeUserFromGroupMutation = () => {
 export const groupQuery = (i18n) => {
   const lang = i18n ? i18n.locale().toUpperCase() : 'EN'
   return gql`
-    ${locationFragment('Group', lang)}
+    ${location('Group', lang)}
     query ($isMember: Boolean, $id: ID, $slug: String, $first: Int, $offset: Int) {
       Group(isMember: $isMember, id: $id, slug: $slug, first: $first, offset: $offset) {
         id
