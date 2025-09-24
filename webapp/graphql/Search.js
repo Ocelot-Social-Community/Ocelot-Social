@@ -3,6 +3,7 @@ import { user } from './fragments/user'
 import { post } from './fragments/post'
 import { group } from './fragments/group'
 import { tagsCategoriesAndPinned } from './fragments/tagsCategoriesAndPinned'
+import { imageUrls } from './fragments/imageUrls'
 
 export const searchQuery = gql`
   ${user}
@@ -72,6 +73,8 @@ export const searchPosts = gql`
 export const searchGroups = (i18n) => {
   const lang = i18n ? i18n.locale().toUpperCase() : 'EN'
   return gql`
+    ${imageUrls}
+
     query ($query: String!, $firstGroups: Int, $groupsOffset: Int) {
       searchGroups(query: $query, firstGroups: $firstGroups, groupsOffset: $groupsOffset) {
         groupCount
@@ -96,7 +99,7 @@ export const searchGroups = (i18n) => {
             icon
          }
           avatar {
-            url
+            ...imageUrls
           }
           locationName
           location {

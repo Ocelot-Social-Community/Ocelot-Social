@@ -1,6 +1,9 @@
 import gql from 'graphql-tag'
+import { imageUrls } from './fragments/imageUrls'
 
 export const validateInviteCode = () => gql`
+  ${imageUrls}
+
   query validateInviteCode($code: String!) {
     validateInviteCode(code: $code) {
       code
@@ -10,13 +13,13 @@ export const validateInviteCode = () => gql`
         name
         about
         avatar {
-          url
+          ...imageUrls
         }
       }
       generatedBy {
         name
         avatar {
-          url
+          ...imageUrls
         }
       }
       isValid
@@ -25,6 +28,8 @@ export const validateInviteCode = () => gql`
 `
 
 export const generatePersonalInviteCode = () => gql`
+  ${imageUrls}
+
   mutation generatePersonalInviteCode($expiresAt: String, $comment: String) {
     generatePersonalInviteCode(expiresAt: $expiresAt, comment: $comment) {
       code
@@ -33,14 +38,14 @@ export const generatePersonalInviteCode = () => gql`
         id
         name
         avatar {
-          url
+          ...imageUrls
         }
       }
       redeemedBy {
         id
         name
         avatar {
-          url
+          ...imageUrls
         }
       }
       redeemedByCount
@@ -51,7 +56,7 @@ export const generatePersonalInviteCode = () => gql`
         name
         about
         avatar {
-          url
+          ...imageUrls
         }
       }
       isValid
@@ -60,6 +65,8 @@ export const generatePersonalInviteCode = () => gql`
 `
 
 export const generateGroupInviteCode = () => gql`
+  ${imageUrls}
+
   mutation generateGroupInviteCode($groupId: ID!, $expiresAt: String, $comment: String) {
     generateGroupInviteCode(groupId: $groupId, expiresAt: $expiresAt, comment: $comment) {
       code
@@ -68,14 +75,14 @@ export const generateGroupInviteCode = () => gql`
         id
         name
         avatar {
-          url
+          ...imageUrls
         }
       }
       redeemedBy {
         id
         name
         avatar {
-          url
+          ...imageUrls
         }
       }
       redeemedByCount
@@ -87,7 +94,7 @@ export const generateGroupInviteCode = () => gql`
         name
         about
         avatar {
-          url
+          ...imageUrls
         }
       }
       isValid
@@ -96,6 +103,8 @@ export const generateGroupInviteCode = () => gql`
 `
 
 export const invalidateInviteCode = () => gql`
+  ${imageUrls}
+
   mutation invalidateInviteCode($code: String!) {
     invalidateInviteCode(code: $code) {
       code
@@ -104,14 +113,14 @@ export const invalidateInviteCode = () => gql`
         id
         name
         avatar {
-          url
+          ...imageUrls
         }
       }
       redeemedBy {
         id
         name
         avatar {
-          url
+          ...imageUrls
         }
       }
       redeemedByCount
@@ -123,7 +132,7 @@ export const invalidateInviteCode = () => gql`
         name
         about
         avatar {
-          url
+          ...imageUrls
         }
       }
       isValid

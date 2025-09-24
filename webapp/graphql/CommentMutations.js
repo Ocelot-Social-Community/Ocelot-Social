@@ -1,9 +1,12 @@
 import gql from 'graphql-tag'
+import { imageUrls } from './fragments/imageUrls'
 
 export default (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return {
     CreateComment: gql`
+      ${imageUrls}
+
       mutation ($postId: ID!, $content: String!) {
         CreateComment(postId: $postId, content: $content) {
           id
@@ -20,7 +23,7 @@ export default (i18n) => {
             slug
             name
             avatar {
-              url
+              ...imageUrls
             }
             disabled
             deleted
@@ -38,6 +41,8 @@ export default (i18n) => {
       }
     `,
     UpdateComment: gql`
+      ${imageUrls}
+
       mutation ($content: String!, $id: ID!) {
         UpdateComment(content: $content, id: $id) {
           id
@@ -52,7 +57,7 @@ export default (i18n) => {
             slug
             name
             avatar {
-              url
+              ...imageUrls
             }
             disabled
             deleted
@@ -61,6 +66,8 @@ export default (i18n) => {
       }
     `,
     DeleteComment: gql`
+      ${imageUrls}
+
       mutation($id: ID!) {
         DeleteComment(id: $id) {
           id
@@ -74,7 +81,7 @@ export default (i18n) => {
             slug
             name
             avatar {
-              url
+              ...imageUrls
             }
             disabled
             deleted

@@ -6,6 +6,7 @@ import { user } from './fragments/user'
 import { post } from './fragments/post'
 import { comment } from './fragments/comment'
 import { group } from './fragments/group'
+import { imageUrls } from './fragments/imageUrls'
 
 export const profileUserQuery = (i18n) => {
   const lang = i18n.locale().toUpperCase()
@@ -51,13 +52,15 @@ export const profileUserQuery = (i18n) => {
 
 export const minimisedUserQuery = () => {
   return gql`
+    ${imageUrls}
+
     query ($slug: String) {
       User(slug: $slug, orderBy: slug_asc) {
         id
         slug
         name
         avatar {
-          url
+          ...imageUrls
         }
       }
     }
@@ -342,6 +345,8 @@ export const unfollowUserMutation = (i18n) => {
 
 export const updateUserMutation = () => {
   return gql`
+    ${imageUrls}
+
     mutation (
       $id: ID!
       $slug: String
@@ -383,7 +388,7 @@ export const updateUserMutation = () => {
         locale
         termsAndConditionsAgreedVersion
         avatar {
-          url
+          ...imageUrls
         }
         badgeVerification {
           id
