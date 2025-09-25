@@ -42,7 +42,7 @@
     "email-templates": "^12.0.3",
     "express": "^5.1.0",
     "graphql": "^14.6.0",
-    "graphql-middleware": "~4.0.2",
+    "graphql-middleware": "~6.1.35",
     "graphql-middleware-sentry": "^3.2.1",
     "graphql-redis-subscriptions": "^2.7.0",
     "graphql-shield": "~7.2.2",
