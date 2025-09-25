@@ -353,14 +353,11 @@ export default {
         session.close()
       }
     },
-    updateOnlineStatus: async (_object, args, context, _resolveInfo) => {
+    updateOnlineStatus: async (_object, args, context: Context, _resolveInfo) => {
       const { status } = args
-      const {
-        user: { id },
-      } = context
 
       const CYPHER_AWAY = `
-          MATCH (user:User {id: $id})
+          MATCH (user:User {id: $user.id})
           WITH user,
           CASE user.lastOnlineStatus
             WHEN 'away' THEN user.awaySince
@@ -370,16 +367,14 @@ export default {
           SET user.lastOnlineStatus = $status
         `
       const CYPHER_ONLINE = `
-          MATCH (user:User {id: $id})
+          MATCH (user:User {id: $user.id})
             SET user.awaySince = null
             SET user.lastOnlineStatus = $status
         `
 
-      // Last Online Time is saved as `lastActiveAt`
-      const session = context.driver.session()
-      await session.writeTransaction((transaction) => {
-        // return transaction.run(status === 'away' ? CYPHER_AWAY : CYPHER_ONLINE, { id, status })
-        return transaction.run(status === 'away' ? CYPHER_AWAY : CYPHER_ONLINE, { id, status })
+      await context.database.write({
+        query: status === 'away' ? CYPHER_AWAY : CYPHER_ONLINE,
+        variables: { user: context.user, status },
       })
 
       return true
