@@ -1,14 +1,17 @@
 import gql from 'graphql-tag'
+import { imageUrls } from '../fragments/imageUrls'
 
 export const mutedUsers = () => {
   return gql`
-    {
+    ${imageUrls}
+
+    query {
       mutedUsers {
         id
         name
         slug
         avatar {
-          url
+          ...imageUrls
         }
         about
         disabled

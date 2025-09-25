@@ -1,8 +1,11 @@
 import gql from 'graphql-tag'
+import { imageUrls } from './fragments/imageUrls'
 
 export default (app) => {
   const lang = app.$i18n.locale().toUpperCase()
   return gql`
+    ${imageUrls}
+
     query Comment($postId: ID) {
       Comment(postId: $postId) {
         id
@@ -13,7 +16,7 @@ export default (app) => {
           slug
           name
           avatar {
-            url
+            ...imageUrls
           }
           disabled
           deleted
