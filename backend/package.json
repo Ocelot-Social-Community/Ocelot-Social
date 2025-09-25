@@ -28,9 +28,9 @@
     "prod:db:data:categories": "node build/src/db/categories.js"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.888.0",
+    "@aws-sdk/client-s3": "^3.896.0",
     "@aws-sdk/lib-storage": "^3.888.0",
-    "@sentry/node": "^5.15.4",
+    "@sentry/node": "^5.30.0",
     "@types/mime-types": "^3.0.1",
     "apollo-server": "~2.14.2",
     "apollo-server-express": "^2.14.2",
@@ -112,7 +112,7 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jest": "^29.0.1",
     "eslint-plugin-jsonc": "^2.20.1",
-    "eslint-plugin-n": "^17.21.3",
+    "eslint-plugin-n": "^17.23.1",
     "eslint-plugin-no-catch-all": "^1.1.0",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-promise": "^7.2.1",

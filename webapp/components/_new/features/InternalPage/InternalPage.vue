@@ -25,10 +25,20 @@
 </template>
 
 <script>
+import { PageParams } from '~/components/utils/PageParams.js'
+
 export default {
   name: 'InternalPage',
   props: {
     pageParams: { type: Object, required: true },
+  },
+  created() {
+    const pageParamsObj = new PageParams({
+      ...this.pageParams,
+    })
+    if (!pageParamsObj.isInternalPage) {
+      pageParamsObj.redirectToPage(this)
+    }
   },
 }
 </script>
