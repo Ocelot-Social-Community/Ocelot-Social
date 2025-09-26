@@ -8560,10 +8560,10 @@ metascraper-youtube@^5.49.2:
     p-locate "~5.0.0"
     reachable-url "~1.8.2"
 
-metascraper@^5.49.2:
-  version "5.49.2"
-  resolved "https://registry.yarnpkg.com/metascraper/-/metascraper-5.49.2.tgz#9b0b43c933b45cc13139e5f80a4a4583d1cc1cdc"
-  integrity sha512-WT7+rz4q5s6Gi3ElQuTefnka22KviFIZfXgYz9P6f4FQmOydznSbuenkr7gsXyCPFdDtoO+aA2nClH94r8C+9g==
+metascraper@^5.49.4:
+  version "5.49.4"
+  resolved "https://registry.yarnpkg.com/metascraper/-/metascraper-5.49.4.tgz#7a0056cbe10d3de2f07f68b3d10f2726d64d1e38"
+  integrity sha512-ZDvntIsErYMOETK8dYaaIcqCBF/KvhPSQQBD+4Eqe1b6dqZAhk++iqCQyLJi68yEmhvzORryNoIAb7HiHg0Nig==
   dependencies:
     "@metascraper/helpers" "5.49.2"
     cheerio "~1.1.2"
