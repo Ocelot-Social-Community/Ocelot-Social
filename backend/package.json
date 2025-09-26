@@ -57,7 +57,7 @@
     "linkifyjs": "^4.3.2",
     "lodash": "~4.17.21",
     "merge-graphql-schemas": "^1.7.8",
-    "metascraper": "^5.49.2",
+    "metascraper": "^5.49.4",
     "metascraper-author": "^5.49.2",
     "metascraper-date": "^5.49.2",
     "metascraper-description": "^5.49.2",
