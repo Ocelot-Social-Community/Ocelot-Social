@@ -1,11 +1,10 @@
 .DS_Store
 node_modules
+docs
 
 # local env files
 .env.local
 .env.*.local
-
-/dist
 
 /src/system/tokens/generated
 /src/system/icons/generated
