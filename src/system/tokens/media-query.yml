@@ -33,15 +33,15 @@ props:
     category: media-size
 
   - name: media-query-x-small
-    value: "(min-width: {!xs}px)"
+    value: "'(min-width: {!xs}px)'"
   - name: media-query-small
-    value: "(min-width: {!sm}px)"
+    value: "'(min-width: {!sm}px)'"
   - name: media-query-medium
-    value: "(min-width: {!md}px)"
+    value: "'(min-width: {!md}px)'"
   - name: media-query-large
-    value: "(min-width: {!lg}px)"
+    value: "'(min-width: {!lg}px)'"
   - name: media-query-x-large
-    value: "(min-width: {!xl}px)"
+    value: "'(min-width: {!xl}px)'"
 global:
   type: ...
   category: media-query
