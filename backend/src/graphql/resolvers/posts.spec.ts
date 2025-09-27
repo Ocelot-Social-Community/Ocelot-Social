@@ -2,15 +2,21 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import gql from 'graphql-tag'
-
 import Factory, { cleanDatabase } from '@db/factories'
 import Image from '@db/models/Image'
-import { createGroupMutation } from '@graphql/queries/createGroupMutation'
-import { createPostMutation } from '@graphql/queries/createPostMutation'
+import { AddPostEmotions } from '@graphql/queries/AddPostEmotions'
+import { CreateGroup } from '@graphql/queries/CreateGroup'
+import { CreatePost } from '@graphql/queries/CreatePost'
+import { DeletePost } from '@graphql/queries/DeletePost'
+import { pinPost } from '@graphql/queries/pinPost'
 import { Post } from '@graphql/queries/Post'
+import { PostsEmotionsByCurrentUser } from '@graphql/queries/PostsEmotionsByCurrentUser'
+import { PostsEmotionsCountByEmotion } from '@graphql/queries/PostsEmotionsCountByEmotion'
 import { pushPost } from '@graphql/queries/pushPost'
+import { RemovePostEmotions } from '@graphql/queries/RemovePostEmotions'
+import { unpinPost } from '@graphql/queries/unpinPost'
 import { unpushPost } from '@graphql/queries/unpushPost'
+import { UpdatePost } from '@graphql/queries/UpdatePost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -126,18 +132,14 @@ describe('Post', () => {
 
     describe('no filter', () => {
       it('returns all posts', async () => {
-        const postQueryNoFilters = gql`
-          query Post($filter: _PostFilter) {
-            Post(filter: $filter) {
-              id
-            }
-          }
-        `
-        const expected = [{ id: 'happy-post' }, { id: 'cry-post' }, { id: 'post-by-followed-user' }]
         variables = { filter: {} }
-        await expect(query({ query: postQueryNoFilters, variables })).resolves.toMatchObject({
+        await expect(query({ query: Post, variables })).resolves.toMatchObject({
           data: {
-            Post: expect.arrayContaining(expected),
+            Post: expect.arrayContaining([
+              expect.objectContaining({ id: 'happy-post' }),
+              expect.objectContaining({ id: 'cry-post' }),
+              expect.objectContaining({ id: 'post-by-followed-user' }),
+            ]),
           },
         })
       })
@@ -171,17 +173,6 @@ describe('Post', () => {
     }) */
 
     describe('by emotions', () => {
-      const postQueryFilteredByEmotions = gql`
-        query Post($filter: _PostFilter) {
-          Post(filter: $filter) {
-            id
-            emotions {
-              emotion
-            }
-          }
-        }
-      `
-
       it('filters by single emotion', async () => {
         const expected = {
           data: {
@@ -195,30 +186,25 @@ describe('Post', () => {
         }
         await user.relateTo(happyPost, 'emoted', { emotion: 'happy' })
         variables = { ...variables, filter: { emotions_some: { emotion_in: ['happy'] } } }
-        await expect(
-          query({ query: postQueryFilteredByEmotions, variables }),
-        ).resolves.toMatchObject(expected)
+        await expect(query({ query: Post, variables })).resolves.toMatchObject(expected)
       })
 
       it('filters by multiple emotions', async () => {
-        const expected = [
-          {
-            id: 'happy-post',
-            emotions: [{ emotion: 'happy' }],
-          },
-          {
-            id: 'cry-post',
-            emotions: [{ emotion: 'cry' }],
-          },
-        ]
         await user.relateTo(happyPost, 'emoted', { emotion: 'happy' })
         await user.relateTo(cryPost, 'emoted', { emotion: 'cry' })
         variables = { ...variables, filter: { emotions_some: { emotion_in: ['happy', 'cry'] } } }
-        await expect(
-          query({ query: postQueryFilteredByEmotions, variables }),
-        ).resolves.toMatchObject({
+        await expect(query({ query: Post, variables })).resolves.toMatchObject({
           data: {
-            Post: expect.arrayContaining(expected),
+            Post: expect.arrayContaining([
+              expect.objectContaining({
+                id: 'happy-post',
+                emotions: [expect.objectContaining({ emotion: 'happy' })],
+              }),
+              expect.objectContaining({
+                id: 'cry-post',
+                emotions: [expect.objectContaining({ emotion: 'cry' })],
+              }),
+            ]),
           },
           errors: undefined,
         })
@@ -226,22 +212,9 @@ describe('Post', () => {
     })
 
     it('by followed-by', async () => {
-      const postQueryFilteredByUsersFollowed = gql`
-        query Post($filter: _PostFilter) {
-          Post(filter: $filter) {
-            id
-            author {
-              name
-            }
-          }
-        }
-      `
-
       await user.relateTo(followedUser, 'following')
       variables = { filter: { author: { followedBy_some: { id: 'current-user' } } } }
-      await expect(
-        query({ query: postQueryFilteredByUsersFollowed, variables }),
-      ).resolves.toMatchObject({
+      await expect(query({ query: Post, variables })).resolves.toMatchObject({
         data: {
           Post: [
             {
@@ -269,7 +242,7 @@ describe('CreatePost', () => {
 
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
-      const { errors } = await mutate({ mutation: createPostMutation(), variables })
+      const { errors } = await mutate({ mutation: CreatePost, variables })
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -284,9 +257,7 @@ describe('CreatePost', () => {
         data: { CreatePost: { title: 'I am a title', content: 'Some content' } },
         errors: undefined,
       }
-      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject(
-        expected,
-      )
+      await expect(mutate({ mutation: CreatePost, variables })).resolves.toMatchObject(expected)
     })
 
     it('assigns the authenticated user as author', async () => {
@@ -301,20 +272,16 @@ describe('CreatePost', () => {
         },
         errors: undefined,
       }
-      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject(
-        expected,
-      )
+      await expect(mutate({ mutation: CreatePost, variables })).resolves.toMatchObject(expected)
     })
 
     it('`disabled` and `deleted` default to `false`', async () => {
       const expected = { data: { CreatePost: { disabled: false, deleted: false } } }
-      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject(
-        expected,
-      )
+      await expect(mutate({ mutation: CreatePost, variables })).resolves.toMatchObject(expected)
     })
 
     it('has label "Article" as default', async () => {
-      await expect(mutate({ mutation: createPostMutation(), variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: CreatePost, variables })).resolves.toMatchObject({
         data: { CreatePost: { postType: ['Article'] } },
       })
     })
@@ -323,7 +290,7 @@ describe('CreatePost', () => {
       it('throws an error', async () => {
         await expect(
           mutate({
-            mutation: createPostMutation(),
+            mutation: CreatePost,
             variables: { ...variables, postType: 'not-valid' },
           }),
         ).resolves.toMatchObject({
@@ -342,7 +309,7 @@ describe('CreatePost', () => {
         it('throws an error', async () => {
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: CreatePost,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -362,7 +329,7 @@ describe('CreatePost', () => {
         it('throws an error', async () => {
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: CreatePost,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -387,7 +354,7 @@ describe('CreatePost', () => {
           const eventStart = new Date(now.getFullYear(), now.getMonth() - 1).toISOString()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: CreatePost,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -411,7 +378,7 @@ describe('CreatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: CreatePost,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -435,7 +402,7 @@ describe('CreatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: CreatePost,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -461,7 +428,7 @@ describe('CreatePost', () => {
           const eventEnd = new Date(now.getFullYear(), now.getMonth() + 2).toISOString()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: CreatePost,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -486,7 +453,7 @@ describe('CreatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: CreatePost,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -511,7 +478,7 @@ describe('CreatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: CreatePost,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -540,7 +507,7 @@ describe('CreatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: CreatePost,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -568,7 +535,7 @@ describe('CreatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: CreatePost,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -593,7 +560,7 @@ describe('CreatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: CreatePost,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -620,7 +587,7 @@ describe('CreatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: createPostMutation(),
+              mutation: CreatePost,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -654,53 +621,11 @@ describe('CreatePost', () => {
 
 describe('UpdatePost', () => {
   let author, newlyCreatedPost
-  const updatePostMutation = gql`
-    mutation (
-      $id: ID!
-      $title: String!
-      $content: String!
-      $image: ImageInput
-      $categoryIds: [ID]
-      $postType: PostType
-      $eventInput: _EventInput
-    ) {
-      UpdatePost(
-        id: $id
-        title: $title
-        content: $content
-        image: $image
-        categoryIds: $categoryIds
-        postType: $postType
-        eventInput: $eventInput
-      ) {
-        id
-        title
-        content
-        author {
-          name
-          slug
-        }
-        createdAt
-        updatedAt
-        categories {
-          id
-        }
-        postType
-        eventStart
-        eventLocationName
-        eventVenue
-        eventLocation {
-          lng
-          lat
-        }
-      }
-    }
-  `
   beforeEach(async () => {
     author = await Factory.build('user', { slug: 'the-author' })
     authenticatedUser = await author.toJson()
     const { data } = await mutate({
-      mutation: createPostMutation(),
+      mutation: CreatePost,
       variables: {
         title: 'Old title',
         content: 'Old content',
@@ -718,7 +643,7 @@ describe('UpdatePost', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       authenticatedUser = null
-      await expect(mutate({ mutation: updatePostMutation, variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: UpdatePost, variables })).resolves.toMatchObject({
         errors: [{ message: 'Not Authorized!' }],
         data: { UpdatePost: null },
       })
@@ -731,7 +656,7 @@ describe('UpdatePost', () => {
     })
 
     it('throws authorization error', async () => {
-      const { errors } = await mutate({ mutation: updatePostMutation, variables })
+      const { errors } = await mutate({ mutation: UpdatePost, variables })
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -746,9 +671,7 @@ describe('UpdatePost', () => {
         data: { UpdatePost: { id: newlyCreatedPost.id, content: 'New content' } },
         errors: undefined,
       }
-      await expect(mutate({ mutation: updatePostMutation, variables })).resolves.toMatchObject(
-        expected,
-      )
+      await expect(mutate({ mutation: UpdatePost, variables })).resolves.toMatchObject(expected)
     })
 
     it('updates a post, but maintains non-updated attributes', async () => {
@@ -762,18 +685,16 @@ describe('UpdatePost', () => {
         },
         errors: undefined,
       }
-      await expect(mutate({ mutation: updatePostMutation, variables })).resolves.toMatchObject(
-        expected,
-      )
+      await expect(mutate({ mutation: UpdatePost, variables })).resolves.toMatchObject(expected)
     })
 
     it('updates the updatedAt attribute', async () => {
       const {
-        data: { UpdatePost },
-      } = (await mutate({ mutation: updatePostMutation, variables })) as any // eslint-disable-line @typescript-eslint/no-explicit-any
-      expect(UpdatePost.updatedAt).toBeTruthy()
-      expect(Date.parse(UpdatePost.updatedAt)).toEqual(expect.any(Number))
-      expect(newlyCreatedPost.updatedAt).not.toEqual(UpdatePost.updatedAt)
+        data: { UpdatePost: UpdatePostData },
+      } = (await mutate({ mutation: UpdatePost, variables })) as any // eslint-disable-line @typescript-eslint/no-explicit-any
+      expect(UpdatePostData.updatedAt).toBeTruthy()
+      expect(Date.parse(UpdatePostData.updatedAt)).toEqual(expect.any(Number))
+      expect(newlyCreatedPost.updatedAt).not.toEqual(UpdatePostData.updatedAt)
     })
 
     describe('no new category ids provided for update', () => {
@@ -787,9 +708,7 @@ describe('UpdatePost', () => {
           },
           errors: undefined,
         }
-        await expect(mutate({ mutation: updatePostMutation, variables })).resolves.toMatchObject(
-          expected,
-        )
+        await expect(mutate({ mutation: UpdatePost, variables })).resolves.toMatchObject(expected)
       })
     })
 
@@ -808,9 +727,7 @@ describe('UpdatePost', () => {
           },
           errors: undefined,
         }
-        await expect(mutate({ mutation: updatePostMutation, variables })).resolves.toMatchObject(
-          expected,
-        )
+        await expect(mutate({ mutation: UpdatePost, variables })).resolves.toMatchObject(expected)
       })
     })
 
@@ -819,7 +736,7 @@ describe('UpdatePost', () => {
         it('throws an error', async () => {
           await expect(
             mutate({
-              mutation: updatePostMutation,
+              mutation: UpdatePost,
               variables: { ...variables, postType: 'Event' },
             }),
           ).resolves.toMatchObject({
@@ -836,7 +753,7 @@ describe('UpdatePost', () => {
         it('throws an error', async () => {
           await expect(
             mutate({
-              mutation: updatePostMutation,
+              mutation: UpdatePost,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -860,7 +777,7 @@ describe('UpdatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: updatePostMutation,
+              mutation: UpdatePost,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -884,7 +801,7 @@ describe('UpdatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: updatePostMutation,
+              mutation: UpdatePost,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -909,7 +826,7 @@ describe('UpdatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: updatePostMutation,
+              mutation: UpdatePost,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -935,7 +852,7 @@ describe('UpdatePost', () => {
           const now = new Date()
           await expect(
             mutate({
-              mutation: updatePostMutation,
+              mutation: UpdatePost,
               variables: {
                 ...variables,
                 postType: 'Event',
@@ -975,7 +892,7 @@ describe('UpdatePost', () => {
           await expect(
             database.neode.first<typeof Image>('Image', { sensitive: true }, undefined),
           ).resolves.toBeFalsy()
-          await mutate({ mutation: updatePostMutation, variables })
+          await mutate({ mutation: UpdatePost, variables })
           await expect(
             database.neode.first<typeof Image>('Image', { sensitive: true }, undefined),
           ).resolves.toBeTruthy()
@@ -988,7 +905,7 @@ describe('UpdatePost', () => {
         })
         it('deletes the image', async () => {
           await expect(database.neode.all('Image')).resolves.toHaveLength(6)
-          await mutate({ mutation: updatePostMutation, variables })
+          await mutate({ mutation: UpdatePost, variables })
           await expect(database.neode.all('Image')).resolves.toHaveLength(5)
         })
       })
@@ -1001,7 +918,7 @@ describe('UpdatePost', () => {
           await expect(
             database.neode.first<typeof Image>('Image', { sensitive: true }, undefined),
           ).resolves.toBeFalsy()
-          await mutate({ mutation: updatePostMutation, variables })
+          await mutate({ mutation: UpdatePost, variables })
           await expect(
             database.neode.first<typeof Image>('Image', { sensitive: true }, undefined),
           ).resolves.toBeFalsy()
@@ -1288,28 +1205,6 @@ describe('unpush posts', () => {
 
 describe('pin posts', () => {
   let author
-  const pinPostMutation = gql`
-    mutation ($id: ID!) {
-      pinPost(id: $id) {
-        id
-        title
-        content
-        author {
-          name
-          slug
-        }
-        pinnedBy {
-          id
-          name
-          role
-        }
-        createdAt
-        updatedAt
-        pinnedAt
-        pinned
-      }
-    }
-  `
   beforeEach(async () => {
     author = await Factory.build('user', { slug: 'the-author' })
     await Factory.build(
@@ -1332,7 +1227,7 @@ describe('pin posts', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       authenticatedUser = null
-      await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject({
         errors: [{ message: 'Not Authorized!' }],
         data: { pinPost: null },
       })
@@ -1341,7 +1236,7 @@ describe('pin posts', () => {
 
   describe('ordinary users', () => {
     it('throws authorization error', async () => {
-      await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject({
         errors: [{ message: 'Not Authorized!' }],
         data: { pinPost: null },
       })
@@ -1356,7 +1251,7 @@ describe('pin posts', () => {
     })
 
     it('throws authorization error', async () => {
-      await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject({
         errors: [{ message: 'Not Authorized!' }],
         data: { pinPost: null },
       })
@@ -1391,7 +1286,7 @@ describe('pin posts', () => {
       })
 
       it('throws with error that pinning posts is not allowed', async () => {
-        await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject({
+        await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject({
           data: { pinPost: null },
           errors: [{ message: 'Pinned posts are not allowed!' }],
         })
@@ -1435,9 +1330,7 @@ describe('pin posts', () => {
             errors: undefined,
           }
 
-          await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject(
-            expected,
-          )
+          await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject(expected)
         })
 
         it('sets createdAt date for PINNED', async () => {
@@ -1450,9 +1343,7 @@ describe('pin posts', () => {
             },
             errors: undefined,
           }
-          await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject(
-            expected,
-          )
+          await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject(expected)
         })
 
         it('sets redundant `pinned` property for performant ordering', async () => {
@@ -1461,9 +1352,7 @@ describe('pin posts', () => {
             data: { pinPost: { pinned: true } },
             errors: undefined,
           }
-          await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject(
-            expected,
-          )
+          await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject(expected)
         })
       })
 
@@ -1506,9 +1395,7 @@ describe('pin posts', () => {
             errors: undefined,
           }
 
-          await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject(
-            expected,
-          )
+          await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject(expected)
         })
       })
 
@@ -1531,9 +1418,7 @@ describe('pin posts', () => {
             errors: undefined,
           }
 
-          await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject(
-            expected,
-          )
+          await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject(expected)
         })
       })
 
@@ -1549,7 +1434,7 @@ describe('pin posts', () => {
               author: admin,
             },
           )
-          await mutate({ mutation: pinPostMutation, variables })
+          await mutate({ mutation: pinPost, variables })
         })
 
         it('removes previous `pinned` attribute', async () => {
@@ -1557,14 +1442,14 @@ describe('pin posts', () => {
           pinnedPost = await database.neode.cypher(cypher, {})
           expect(pinnedPost.records).toHaveLength(1)
           variables = { ...variables, id: 'only-pinned-post' }
-          await mutate({ mutation: pinPostMutation, variables })
+          await mutate({ mutation: pinPost, variables })
           pinnedPost = await database.neode.cypher(cypher, {})
           expect(pinnedPost.records).toHaveLength(1)
         })
 
         it('removes previous PINNED relationship', async () => {
           variables = { ...variables, id: 'only-pinned-post' }
-          await mutate({ mutation: pinPostMutation, variables })
+          await mutate({ mutation: pinPost, variables })
           pinnedPost = await database.neode.cypher(
             `MATCH (:User)-[pinned:PINNED]->(post:Post) RETURN post, pinned`,
             {},
@@ -1576,7 +1461,7 @@ describe('pin posts', () => {
       describe('post in public group', () => {
         beforeEach(async () => {
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               name: 'Public Group',
               id: 'public-group',
@@ -1589,7 +1474,7 @@ describe('pin posts', () => {
             },
           })
           await mutate({
-            mutation: createPostMutation(),
+            mutation: CreatePost,
             variables: {
               id: 'public-group-post',
               title: 'Public group post',
@@ -1602,7 +1487,7 @@ describe('pin posts', () => {
         })
 
         it('can be pinned', async () => {
-          await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject({
+          await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject({
             data: {
               pinPost: {
                 id: 'public-group-post',
@@ -1624,7 +1509,7 @@ describe('pin posts', () => {
       describe('post in closed group', () => {
         beforeEach(async () => {
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               name: 'Closed Group',
               id: 'closed-group',
@@ -1637,7 +1522,7 @@ describe('pin posts', () => {
             },
           })
           await mutate({
-            mutation: createPostMutation(),
+            mutation: CreatePost,
             variables: {
               id: 'closed-group-post',
               title: 'Closed group post',
@@ -1650,7 +1535,7 @@ describe('pin posts', () => {
         })
 
         it('can not be pinned', async () => {
-          await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject({
+          await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject({
             data: {
               pinPost: null,
             },
@@ -1662,7 +1547,7 @@ describe('pin posts', () => {
       describe('post in hidden group', () => {
         beforeEach(async () => {
           await mutate({
-            mutation: createGroupMutation(),
+            mutation: CreateGroup,
             variables: {
               name: 'Hidden Group',
               id: 'hidden-group',
@@ -1675,7 +1560,7 @@ describe('pin posts', () => {
             },
           })
           await mutate({
-            mutation: createPostMutation(),
+            mutation: CreatePost,
             variables: {
               id: 'hidden-group-post',
               title: 'Hidden group post',
@@ -1688,7 +1573,7 @@ describe('pin posts', () => {
         })
 
         it('can not be pinned', async () => {
-          await expect(mutate({ mutation: pinPostMutation, variables })).resolves.toMatchObject({
+          await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject({
             data: {
               pinPost: null,
             },
@@ -1800,7 +1685,7 @@ describe('pin posts', () => {
 
         beforeEach(async () => {
           variables = { ...variables, id: 'first-post' }
-          result = await mutate({ mutation: pinPostMutation, variables })
+          result = await mutate({ mutation: pinPost, variables })
         })
 
         it('pins the first post', () => {
@@ -1836,7 +1721,7 @@ describe('pin posts', () => {
         describe('second post', () => {
           beforeEach(async () => {
             variables = { ...variables, id: 'second-post' }
-            result = await mutate({ mutation: pinPostMutation, variables })
+            result = await mutate({ mutation: pinPost, variables })
           })
 
           it('pins the second post', () => {
@@ -1872,7 +1757,7 @@ describe('pin posts', () => {
           describe('third post', () => {
             beforeEach(async () => {
               variables = { ...variables, id: 'third-post' }
-              result = await mutate({ mutation: pinPostMutation, variables })
+              result = await mutate({ mutation: pinPost, variables })
             })
 
             it('pins the second post', () => {
@@ -1908,7 +1793,7 @@ describe('pin posts', () => {
             describe('another post', () => {
               beforeEach(async () => {
                 variables = { ...variables, id: 'another-post' }
-                result = await mutate({ mutation: pinPostMutation, variables })
+                result = await mutate({ mutation: pinPost, variables })
               })
 
               it('throws with max pinned posts is reached', () => {
@@ -1974,28 +1859,6 @@ describe('pin posts', () => {
 
 describe('unpin posts', () => {
   let pinnedPost
-  const unpinPostMutation = gql`
-    mutation ($id: ID!) {
-      unpinPost(id: $id) {
-        id
-        title
-        content
-        author {
-          name
-          slug
-        }
-        pinnedBy {
-          id
-          name
-          role
-        }
-        createdAt
-        updatedAt
-        pinned
-        pinnedAt
-      }
-    }
-  `
   beforeEach(async () => {
     pinnedPost = await Factory.build('post', { id: 'post-to-be-unpinned' })
     variables = {
@@ -2006,7 +1869,7 @@ describe('unpin posts', () => {
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
       authenticatedUser = null
-      await expect(mutate({ mutation: unpinPostMutation, variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: unpinPost, variables })).resolves.toMatchObject({
         errors: [{ message: 'Not Authorized!' }],
         data: { unpinPost: null },
       })
@@ -2015,7 +1878,7 @@ describe('unpin posts', () => {
 
   describe('users cannot unpin posts', () => {
     it('throws authorization error', async () => {
-      await expect(mutate({ mutation: unpinPostMutation, variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: unpinPost, variables })).resolves.toMatchObject({
         errors: [{ message: 'Not Authorized!' }],
         data: { unpinPost: null },
       })
@@ -2030,7 +1893,7 @@ describe('unpin posts', () => {
     })
 
     it('throws authorization error', async () => {
-      await expect(mutate({ mutation: unpinPostMutation, variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: unpinPost, variables })).resolves.toMatchObject({
         errors: [{ message: 'Not Authorized!' }],
         data: { unpinPost: null },
       })
@@ -2062,9 +1925,7 @@ describe('unpin posts', () => {
         errors: undefined,
       }
 
-      await expect(mutate({ mutation: unpinPostMutation, variables })).resolves.toMatchObject(
-        expected,
-      )
+      await expect(mutate({ mutation: unpinPost, variables })).resolves.toMatchObject(expected)
     })
 
     it('unsets `pinned` property', async () => {
@@ -2077,33 +1938,13 @@ describe('unpin posts', () => {
         },
         errors: undefined,
       }
-      await expect(mutate({ mutation: unpinPostMutation, variables })).resolves.toMatchObject(
-        expected,
-      )
+      await expect(mutate({ mutation: unpinPost, variables })).resolves.toMatchObject(expected)
     })
   })
 })
 
 describe('DeletePost', () => {
   let author
-  const deletePostMutation = gql`
-    mutation ($id: ID!) {
-      DeletePost(id: $id) {
-        id
-        deleted
-        content
-        contentExcerpt
-        image {
-          url
-        }
-        comments {
-          deleted
-          content
-          contentExcerpt
-        }
-      }
-    }
-  `
 
   beforeEach(async () => {
     author = await Factory.build('user')
@@ -2127,7 +1968,7 @@ describe('DeletePost', () => {
 
   describe('unauthenticated', () => {
     it('throws authorization error', async () => {
-      const { errors } = await mutate({ mutation: deletePostMutation, variables })
+      const { errors } = await mutate({ mutation: DeletePost, variables })
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -2138,7 +1979,7 @@ describe('DeletePost', () => {
     })
 
     it('throws authorization error', async () => {
-      const { errors } = await mutate({ mutation: deletePostMutation, variables })
+      const { errors } = await mutate({ mutation: DeletePost, variables })
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
     })
   })
@@ -2161,9 +2002,7 @@ describe('DeletePost', () => {
           },
         },
       }
-      await expect(mutate({ mutation: deletePostMutation, variables })).resolves.toMatchObject(
-        expected,
-      )
+      await expect(mutate({ mutation: DeletePost, variables })).resolves.toMatchObject(expected)
     })
 
     describe('if there are comments on the post', () => {
@@ -2200,9 +2039,7 @@ describe('DeletePost', () => {
             },
           },
         }
-        await expect(mutate({ mutation: deletePostMutation, variables })).resolves.toMatchObject(
-          expected,
-        )
+        await expect(mutate({ mutation: DeletePost, variables })).resolves.toMatchObject(expected)
       })
     })
   })
@@ -2210,25 +2047,6 @@ describe('DeletePost', () => {
 
 describe('emotions', () => {
   let author, postToEmote
-  const PostsEmotionsCountQuery = gql`
-    query ($id: ID!) {
-      Post(id: $id) {
-        emotionsCount
-      }
-    }
-  `
-  const PostsEmotionsQuery = gql`
-    query ($id: ID!) {
-      Post(id: $id) {
-        emotions {
-          emotion
-          User {
-            id
-          }
-        }
-      }
-    }
-  `
 
   beforeEach(async () => {
     author = await database.neode.create('User', { id: 'u257' })
@@ -2251,19 +2069,6 @@ describe('emotions', () => {
   })
 
   describe('AddPostEmotions', () => {
-    const addPostEmotionsMutation = gql`
-      mutation ($to: _PostInput!, $data: _EMOTEDInput!) {
-        AddPostEmotions(to: $to, data: $data) {
-          from {
-            id
-          }
-          to {
-            id
-          }
-          emotion
-        }
-      }
-    `
     let postsEmotionsQueryVariables
 
     beforeEach(() => {
@@ -2277,7 +2082,7 @@ describe('emotions', () => {
 
       it('throws authorization error', async () => {
         const addPostEmotions = await mutate({
-          mutation: addPostEmotionsMutation,
+          mutation: AddPostEmotions,
           variables,
         })
 
@@ -2300,7 +2105,7 @@ describe('emotions', () => {
             },
           },
         }
-        await expect(mutate({ mutation: addPostEmotionsMutation, variables })).resolves.toEqual(
+        await expect(mutate({ mutation: AddPostEmotions, variables })).resolves.toEqual(
           expect.objectContaining(expected),
         )
       })
@@ -2315,11 +2120,11 @@ describe('emotions', () => {
             ],
           },
         }
-        await mutate({ mutation: addPostEmotionsMutation, variables })
-        await mutate({ mutation: addPostEmotionsMutation, variables })
+        await mutate({ mutation: AddPostEmotions, variables })
+        await mutate({ mutation: AddPostEmotions, variables })
         await expect(
-          query({ query: PostsEmotionsCountQuery, variables: postsEmotionsQueryVariables }),
-        ).resolves.toEqual(expect.objectContaining(expected))
+          query({ query: Post, variables: postsEmotionsQueryVariables }),
+        ).resolves.toMatchObject(expected)
       })
 
       it('allows a user to add more than one emotion', async () => {
@@ -2335,12 +2140,12 @@ describe('emotions', () => {
             ],
           },
         }
-        await mutate({ mutation: addPostEmotionsMutation, variables })
+        await mutate({ mutation: AddPostEmotions, variables })
         variables = { ...variables, data: { emotion: 'surprised' } }
-        await mutate({ mutation: addPostEmotionsMutation, variables })
+        await mutate({ mutation: AddPostEmotions, variables })
         await expect(
-          query({ query: PostsEmotionsQuery, variables: postsEmotionsQueryVariables }),
-        ).resolves.toEqual(expect.objectContaining(expected))
+          query({ query: Post, variables: postsEmotionsQueryVariables }),
+        ).resolves.toMatchObject(expected)
       })
     })
 
@@ -2359,7 +2164,7 @@ describe('emotions', () => {
             },
           },
         }
-        await expect(mutate({ mutation: addPostEmotionsMutation, variables })).resolves.toEqual(
+        await expect(mutate({ mutation: AddPostEmotions, variables })).resolves.toEqual(
           expect.objectContaining(expected),
         )
       })
@@ -2368,19 +2173,6 @@ describe('emotions', () => {
 
   describe('RemovePostEmotions', () => {
     let removePostEmotionsVariables, postsEmotionsQueryVariables
-    const removePostEmotionsMutation = gql`
-      mutation ($to: _PostInput!, $data: _EMOTEDInput!) {
-        RemovePostEmotions(to: $to, data: $data) {
-          from {
-            id
-          }
-          to {
-            id
-          }
-          emotion
-        }
-      }
-    `
     beforeEach(async () => {
       await author.relateTo(postToEmote, 'emoted', { emotion: 'happy' })
       await user.relateTo(postToEmote, 'emoted', { emotion: 'cry' })
@@ -2399,7 +2191,7 @@ describe('emotions', () => {
 
       it('throws authorization error', async () => {
         const removePostEmotions = await mutate({
-          mutation: removePostEmotionsMutation,
+          mutation: RemovePostEmotions,
           variables: removePostEmotionsVariables,
         })
         expect(removePostEmotions.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -2414,7 +2206,7 @@ describe('emotions', () => {
 
         it('returns null if the emotion could not be found', async () => {
           const removePostEmotions = await mutate({
-            mutation: removePostEmotionsMutation,
+            mutation: RemovePostEmotions,
             variables: removePostEmotionsVariables,
           })
           expect(removePostEmotions).toEqual(
@@ -2440,7 +2232,7 @@ describe('emotions', () => {
           }
           await expect(
             mutate({
-              mutation: removePostEmotionsMutation,
+              mutation: RemovePostEmotions,
               variables: removePostEmotionsVariables,
             }),
           ).resolves.toEqual(expect.objectContaining(expected))
@@ -2452,12 +2244,12 @@ describe('emotions', () => {
             data: { Post: [{ emotions: expect.arrayContaining(expectedEmotions) }] },
           }
           await mutate({
-            mutation: removePostEmotionsMutation,
+            mutation: RemovePostEmotions,
             variables: removePostEmotionsVariables,
           })
           await expect(
-            query({ query: PostsEmotionsQuery, variables: postsEmotionsQueryVariables }),
-          ).resolves.toEqual(expect.objectContaining(expectedResponse))
+            query({ query: Post, variables: postsEmotionsQueryVariables }),
+          ).resolves.toMatchObject(expectedResponse)
         })
       })
     })
@@ -2467,17 +2259,6 @@ describe('emotions', () => {
     let PostsEmotionsCountByEmotionVariables
     let PostsEmotionsByCurrentUserVariables
 
-    const PostsEmotionsCountByEmotionQuery = gql`
-      query ($postId: ID!, $data: _EMOTEDInput!) {
-        PostsEmotionsCountByEmotion(postId: $postId, data: $data)
-      }
-    `
-
-    const PostsEmotionsByCurrentUserQuery = gql`
-      query ($postId: ID!) {
-        PostsEmotionsByCurrentUser(postId: $postId)
-      }
-    `
     beforeEach(async () => {
       await user.relateTo(postToEmote, 'emoted', { emotion: 'cry' })
 
@@ -2493,7 +2274,7 @@ describe('emotions', () => {
         const expectedResponse = { data: { PostsEmotionsCountByEmotion: 1 } }
         await expect(
           query({
-            query: PostsEmotionsCountByEmotionQuery,
+            query: PostsEmotionsCountByEmotion,
             variables: PostsEmotionsCountByEmotionVariables,
           }),
         ).resolves.toEqual(expect.objectContaining(expectedResponse))
@@ -2510,7 +2291,7 @@ describe('emotions', () => {
           const expectedResponse = { data: { PostsEmotionsByCurrentUser: ['cry'] } }
           await expect(
             query({
-              query: PostsEmotionsByCurrentUserQuery,
+              query: PostsEmotionsByCurrentUser,
               variables: PostsEmotionsByCurrentUserVariables,
             }),
           ).resolves.toEqual(expect.objectContaining(expectedResponse))

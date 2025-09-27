@@ -6,12 +6,14 @@
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable jest/unbound-method */
-import gql from 'graphql-tag'
 import { verify } from 'jsonwebtoken'
 
 import { categories } from '@constants/categories'
 import Factory, { cleanDatabase } from '@db/factories'
-import { loginMutation } from '@graphql/queries/loginMutation'
+import { changePassword } from '@graphql/queries/changePassword'
+import { currentUser } from '@graphql/queries/currentUser'
+import { login } from '@graphql/queries/login'
+import { saveCategorySettings } from '@graphql/queries/saveCategorySettings'
 import { decode } from '@jwt/decode'
 import { encode } from '@jwt/encode'
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -84,24 +86,8 @@ afterEach(async () => {
 })
 
 describe('currentUser', () => {
-  const currentUserQuery = gql`
-    {
-      currentUser {
-        id
-        slug
-        name
-        avatar {
-          url
-        }
-        email
-        role
-        activeCategories
-      }
-    }
-  `
-
   const respondsWith = async (expected) => {
-    await expect(query({ query: currentUserQuery, variables })).resolves.toMatchObject(expected)
+    await expect(query({ query: currentUser, variables })).resolves.toMatchObject(expected)
   }
 
   describe('unauthenticated', () => {
@@ -201,11 +187,6 @@ describe('currentUser', () => {
         })
 
         describe('with categories saved for current user', () => {
-          const saveCategorySettings = gql`
-            mutation ($activeCategories: [String]) {
-              saveCategorySettings(activeCategories: $activeCategories)
-            }
-          `
           beforeEach(async () => {
             await mutate({
               mutation: saveCategorySettings,
@@ -214,7 +195,7 @@ describe('currentUser', () => {
           })
 
           it('returns only the saved active categories', async () => {
-            const result = await query({ query: currentUserQuery, variables })
+            const result = await query({ query: currentUser, variables })
             expect(result.data?.currentUser.activeCategories).toHaveLength(4)
             expect(result.data?.currentUser.activeCategories).toContain('cat1')
             expect(result.data?.currentUser.activeCategories).toContain('cat3')
@@ -229,7 +210,7 @@ describe('currentUser', () => {
 
 describe('login', () => {
   const respondsWith = async (expected) => {
-    await expect(mutate({ mutation: loginMutation, variables })).resolves.toMatchObject(expected)
+    await expect(mutate({ mutation: login, variables })).resolves.toMatchObject(expected)
   }
 
   beforeEach(async () => {
@@ -248,7 +229,7 @@ describe('login', () => {
       it('responds with a JWT bearer token', async () => {
         const {
           data: { login: token },
-        } = (await mutate({ mutation: loginMutation, variables })) as any // eslint-disable-line @typescript-eslint/no-explicit-any
+        } = (await mutate({ mutation: login, variables })) as any // eslint-disable-line @typescript-eslint/no-explicit-any
         jwt.verify(token, config.JWT_SECRET, (err, data) => {
           expect(data).toMatchObject({
             id: 'acb2d923-f3af-479e-9f00-61b12e864666',
@@ -341,16 +322,8 @@ describe('login', () => {
 })
 
 describe('change password', () => {
-  const changePasswordMutation = gql`
-    mutation ($oldPassword: String!, $newPassword: String!) {
-      changePassword(oldPassword: $oldPassword, newPassword: $newPassword)
-    }
-  `
-
   const respondsWith = async (expected) => {
-    await expect(mutate({ mutation: changePasswordMutation, variables })).resolves.toMatchObject(
-      expected,
-    )
+    await expect(mutate({ mutation: changePassword, variables })).resolves.toMatchObject(expected)
   }
 
   beforeEach(async () => {

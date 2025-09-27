@@ -48,7 +48,7 @@ const SMTP_PASSWORD = env.SMTP_PASSWORD
 const SMTP_DKIM_DOMAINNAME = env.SMTP_DKIM_DOMAINNAME
 const SMTP_DKIM_KEYSELECTOR = env.SMTP_DKIM_KEYSELECTOR
 // PEM format = https://docs.progress.com/bundle/datadirect-hybrid-data-pipeline-installation-46/page/PEM-file-format.html
-const SMTP_DKIM_PRIVATKEY = env.SMTP_DKIM_PRIVATKEY?.replace(/\\n/g, '\n') // replace all "\n" in .env string by real line break
+const SMTP_DKIM_PRIVATEKEY = env.SMTP_DKIM_PRIVATEKEY?.replace(/\\n/g, '\n') // replace all "\n" in .env string by real line break
 const SMTP_MAX_CONNECTIONS = (env.SMTP_MAX_CONNECTIONS && parseInt(env.SMTP_MAX_CONNECTIONS)) || 5
 const SMTP_MAX_MESSAGES = (env.SMTP_MAX_MESSAGES && parseInt(env.SMTP_MAX_MESSAGES)) || 100
 
@@ -67,11 +67,11 @@ if (SMTP_USERNAME && SMTP_PASSWORD) {
     pass: SMTP_PASSWORD,
   }
 }
-if (SMTP_DKIM_DOMAINNAME && SMTP_DKIM_KEYSELECTOR && SMTP_DKIM_PRIVATKEY) {
+if (SMTP_DKIM_DOMAINNAME && SMTP_DKIM_KEYSELECTOR && SMTP_DKIM_PRIVATEKEY) {
   nodemailerTransportOptions.dkim = {
     domainName: SMTP_DKIM_DOMAINNAME,
     keySelector: SMTP_DKIM_KEYSELECTOR,
-    privateKey: SMTP_DKIM_PRIVATKEY,
+    privateKey: SMTP_DKIM_PRIVATEKEY,
   }
 }
 
@@ -93,6 +93,8 @@ const redis = {
 }
 
 const required = {
+  EMAIL_DEFAULT_SENDER: env.EMAIL_DEFAULT_SENDER,
+
   AWS_ACCESS_KEY_ID: env.AWS_ACCESS_KEY_ID,
   AWS_SECRET_ACCESS_KEY: env.AWS_SECRET_ACCESS_KEY,
   AWS_ENDPOINT: env.AWS_ENDPOINT,
@@ -104,7 +106,6 @@ const required = {
 
   MAPBOX_TOKEN: env.MAPBOX_TOKEN,
   JWT_SECRET: env.JWT_SECRET,
-  PRIVATE_KEY_PASSPHRASE: env.PRIVATE_KEY_PASSPHRASE,
 }
 
 // https://stackoverflow.com/a/53050575
@@ -123,7 +124,6 @@ function assertRequiredConfig(
 assertRequiredConfig(required)
 
 const options = {
-  EMAIL_DEFAULT_SENDER: env.EMAIL_DEFAULT_SENDER,
   SUPPORT_EMAIL: env.SUPPORT_EMAIL,
   SUPPORT_URL: emails.SUPPORT_LINK,
   APPLICATION_NAME: metadata.APPLICATION_NAME,

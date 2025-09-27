@@ -2,10 +2,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
+import { CreateComment } from '@graphql/queries/CreateComment'
+import { fileReport } from '@graphql/queries/fileReport'
+import { review } from '@graphql/queries/review'
+import { UpdateComment } from '@graphql/queries/UpdateComment'
+import { UpdateUser } from '@graphql/queries/UpdateUser'
 import createServer from '@src/server'
 
 const neode = getNeode()
@@ -19,48 +23,6 @@ let authenticatedUser,
   reportingUser,
   moderatingUser,
   commentingUser
-
-const createCommentMutation = gql`
-  mutation ($id: ID, $postId: ID!, $content: String!) {
-    CreateComment(id: $id, postId: $postId, content: $content) {
-      id
-    }
-  }
-`
-const updateCommentMutation = gql`
-  mutation ($content: String!, $id: ID!) {
-    UpdateComment(content: $content, id: $id) {
-      id
-    }
-  }
-`
-
-const reportMutation = gql`
-  mutation ($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
-    fileReport(
-      resourceId: $resourceId
-      reasonCategory: $reasonCategory
-      reasonDescription: $reasonDescription
-    ) {
-      reportId
-    }
-  }
-`
-const reviewMutation = gql`
-  mutation ($resourceId: ID!, $disable: Boolean, $closed: Boolean) {
-    review(resourceId: $resourceId, disable: $disable, closed: $closed) {
-      createdAt
-      updatedAt
-    }
-  }
-`
-const updateUserMutation = gql`
-  mutation ($id: ID!, $name: String) {
-    UpdateUser(id: $id, name: $name) {
-      name
-    }
-  }
-`
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -149,7 +111,7 @@ describe('validateCreateComment', () => {
   it('throws an error if content is empty', async () => {
     createCommentVariables = { ...createCommentVariables, postId: 'post-4-commenting' }
     await expect(
-      mutate({ mutation: createCommentMutation, variables: createCommentVariables }),
+      mutate({ mutation: CreateComment, variables: createCommentVariables }),
     ).resolves.toMatchObject({
       data: { CreateComment: null },
       errors: [{ message: 'Comment must be at least 1 character long!' }],
@@ -159,7 +121,7 @@ describe('validateCreateComment', () => {
   it('sanitizes content and throws an error if not longer than 1 character', async () => {
     createCommentVariables = { postId: 'post-4-commenting', content: '<a></a>' }
     await expect(
-      mutate({ mutation: createCommentMutation, variables: createCommentVariables }),
+      mutate({ mutation: CreateComment, variables: createCommentVariables }),
     ).resolves.toMatchObject({
       data: { CreateComment: null },
       errors: [{ message: 'Comment must be at least 1 character long!' }],
@@ -173,7 +135,7 @@ describe('validateCreateComment', () => {
       content: 'valid content',
     }
     await expect(
-      mutate({ mutation: createCommentMutation, variables: createCommentVariables }),
+      mutate({ mutation: CreateComment, variables: createCommentVariables }),
     ).resolves.toMatchObject({
       data: { CreateComment: null },
       errors: [{ message: 'Comment cannot be created without a post!' }],
@@ -202,7 +164,7 @@ describe('validateCreateComment', () => {
     it('throws an error if content is empty', async () => {
       updateCommentVariables = { ...updateCommentVariables, id: 'comment-id' }
       await expect(
-        mutate({ mutation: updateCommentMutation, variables: updateCommentVariables }),
+        mutate({ mutation: UpdateComment, variables: updateCommentVariables }),
       ).resolves.toMatchObject({
         data: { UpdateComment: null },
         errors: [{ message: 'Comment must be at least 1 character long!' }],
@@ -212,7 +174,7 @@ describe('validateCreateComment', () => {
     it('sanitizes content and throws an error if not longer than 1 character', async () => {
       updateCommentVariables = { id: 'comment-id', content: '<a></a>' }
       await expect(
-        mutate({ mutation: updateCommentMutation, variables: updateCommentVariables }),
+        mutate({ mutation: UpdateComment, variables: updateCommentVariables }),
       ).resolves.toMatchObject({
         data: { UpdateComment: null },
         errors: [{ message: 'Comment must be at least 1 character long!' }],
@@ -226,7 +188,7 @@ describe('validateReport', () => {
     authenticatedUser = await reportingUser.toJson()
     reportVariables = { ...reportVariables, resourceId: 'reporting-user' }
     await expect(
-      mutate({ mutation: reportMutation, variables: reportVariables }),
+      mutate({ mutation: fileReport, variables: reportVariables }),
     ).resolves.toMatchObject({
       data: { fileReport: null },
       errors: [{ message: 'You cannot report yourself!' }],
@@ -249,9 +211,7 @@ describe('validateReview', () => {
 
   it('throws an error if a user tries to review a report against them', async () => {
     disableVariables = { ...disableVariables, resourceId: 'moderating-user' }
-    await expect(
-      mutate({ mutation: reviewMutation, variables: disableVariables }),
-    ).resolves.toMatchObject({
+    await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
       errors: [{ message: 'You cannot review yourself!' }],
     })
@@ -259,9 +219,7 @@ describe('validateReview', () => {
 
   it('throws an error for invaild resource', async () => {
     disableVariables = { ...disableVariables, resourceId: 'non-existent-resource' }
-    await expect(
-      mutate({ mutation: reviewMutation, variables: disableVariables }),
-    ).resolves.toMatchObject({
+    await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
       errors: [{ message: 'Resource not found or is not a Post|Comment|User!' }],
     })
@@ -269,9 +227,7 @@ describe('validateReview', () => {
 
   it('throws an error if no report exists', async () => {
     disableVariables = { ...disableVariables, resourceId: 'offensive-post' }
-    await expect(
-      mutate({ mutation: reviewMutation, variables: disableVariables }),
-    ).resolves.toMatchObject({
+    await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
       errors: [{ message: 'Before starting the review process, please report the Post!' }],
     })
@@ -287,9 +243,7 @@ describe('validateReview', () => {
       reportAgainstOffensivePost.relateTo(offensivePost, 'belongsTo'),
     ])
     disableVariables = { ...disableVariables, resourceId: 'offensive-post' }
-    await expect(
-      mutate({ mutation: reviewMutation, variables: disableVariables }),
-    ).resolves.toMatchObject({
+    await expect(mutate({ mutation: review, variables: disableVariables })).resolves.toMatchObject({
       data: { review: null },
       errors: [{ message: 'You cannot review your own Post!' }],
     })
@@ -306,7 +260,7 @@ describe('validateReview', () => {
         resourceId: 'tag-id',
       }
       await expect(
-        mutate({ mutation: reviewMutation, variables: disableVariables }),
+        mutate({ mutation: review, variables: disableVariables }),
       ).resolves.toMatchObject({
         data: { review: null },
         errors: [{ message: 'Resource not found or is not a Post|Comment|User!' }],
@@ -336,7 +290,7 @@ describe('validateReview', () => {
         ...variables,
         name: '  ',
       }
-      await expect(mutate({ mutation: updateUserMutation, variables })).resolves.toMatchObject({
+      await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
         data: { UpdateUser: null },
         errors: [{ message: 'Username must be at least 3 character long!' }],
       })

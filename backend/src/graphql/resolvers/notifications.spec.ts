@@ -3,12 +3,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import gql from 'graphql-tag'
-
 import Factory, { cleanDatabase } from '@db/factories'
-import { markAllAsReadMutation } from '@graphql/queries/markAllAsReadMutation'
-import { markAsReadMutation } from '@graphql/queries/markAsReadMutation'
-import { notificationQuery } from '@graphql/queries/notificationQuery'
+import { DeletePost } from '@graphql/queries/DeletePost'
+import { markAllAsRead } from '@graphql/queries/markAllAsRead'
+import { markAsRead } from '@graphql/queries/markAsRead'
+import { notifications } from '@graphql/queries/notifications'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -154,7 +153,7 @@ describe('given some notifications', () => {
   describe('notifications', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
-        const { errors } = await query({ query: notificationQuery() })
+        const { errors } = await query({ query: notifications })
         expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
@@ -166,44 +165,46 @@ describe('given some notifications', () => {
 
       describe('no filters', () => {
         it('returns all notifications of current user', async () => {
-          const expected = [
-            {
-              from: {
-                __typename: 'Comment',
-                content: 'You have seen this comment mentioning already',
-              },
-              read: true,
-              createdAt: '2019-08-30T15:33:48.651Z',
-            },
-            {
-              from: {
-                __typename: 'Post',
-                content: 'Already seen post mention',
-              },
-              read: true,
-              createdAt: '2019-08-30T17:33:48.651Z',
-            },
-            {
-              from: {
-                __typename: 'Comment',
-                content: 'You have been mentioned in a comment',
-              },
-              read: false,
-              createdAt: '2019-08-30T19:33:48.651Z',
-            },
-            {
-              from: {
-                __typename: 'Post',
-                content: 'You have been mentioned in a post',
-              },
-              read: false,
-              createdAt: '2019-08-31T17:33:48.651Z',
-            },
-          ]
-
-          await expect(query({ query: notificationQuery(), variables })).resolves.toMatchObject({
+          await expect(query({ query: notifications, variables })).resolves.toMatchObject({
             data: {
-              notifications: expect.arrayContaining(expected),
+              notifications: expect.arrayContaining([
+                expect.objectContaining({
+                  from: {
+                    __typename: 'Comment',
+                    content: 'You have seen this comment mentioning already',
+                    id: 'c1',
+                  },
+                  read: true,
+                  createdAt: '2019-08-30T15:33:48.651Z',
+                }),
+                expect.objectContaining({
+                  from: {
+                    __typename: 'Post',
+                    content: 'Already seen post mention',
+                    id: 'p2',
+                  },
+                  read: true,
+                  createdAt: '2019-08-30T17:33:48.651Z',
+                }),
+                expect.objectContaining({
+                  from: {
+                    __typename: 'Comment',
+                    content: 'You have been mentioned in a comment',
+                    id: 'c2',
+                  },
+                  read: false,
+                  createdAt: '2019-08-30T19:33:48.651Z',
+                }),
+                expect.objectContaining({
+                  from: {
+                    __typename: 'Post',
+                    content: 'You have been mentioned in a post',
+                    id: 'p3',
+                  },
+                  read: false,
+                  createdAt: '2019-08-31T17:33:48.651Z',
+                }),
+              ]),
             },
             errors: undefined,
           })
@@ -212,49 +213,42 @@ describe('given some notifications', () => {
 
       describe('filter for read: false', () => {
         it('returns only unread notifications of current user', async () => {
-          const expected = expect.objectContaining({
+          const response = await query({
+            query: notifications,
+            variables: { ...variables, read: false },
+          })
+          await expect(response).toMatchObject({
             data: {
               notifications: expect.arrayContaining([
-                {
+                expect.objectContaining({
                   from: {
                     __typename: 'Comment',
                     content: 'You have been mentioned in a comment',
+                    id: 'c2',
                   },
                   read: false,
                   createdAt: '2019-08-30T19:33:48.651Z',
-                },
-                {
+                }),
+                expect.objectContaining({
                   from: {
                     __typename: 'Post',
                     content: 'You have been mentioned in a post',
+                    id: 'p3',
                   },
                   read: false,
                   createdAt: '2019-08-31T17:33:48.651Z',
-                },
+                }),
               ]),
             },
           })
-          const response = await query({
-            query: notificationQuery(),
-            variables: { ...variables, read: false },
-          })
-          await expect(response).toMatchObject(expected)
           await expect(response.data?.notifications).toHaveLength(2) // double-check
         })
 
         describe('if a resource gets deleted', () => {
           const deletePostAction = async () => {
             authenticatedUser = await author.toJson()
-            const deletePostMutation = gql`
-              mutation ($id: ID!) {
-                DeletePost(id: $id) {
-                  id
-                  deleted
-                }
-              }
-            `
             await expect(
-              mutate({ mutation: deletePostMutation, variables: { id: 'p3' } }),
+              mutate({ mutation: DeletePost, variables: { id: 'p3' } }),
             ).resolves.toMatchObject({
               data: { DeletePost: { id: 'p3', deleted: true } },
               errors: undefined,
@@ -264,14 +258,14 @@ describe('given some notifications', () => {
 
           it('reduces notifications list', async () => {
             await expect(
-              query({ query: notificationQuery(), variables: { ...variables, read: false } }),
+              query({ query: notifications, variables: { ...variables, read: false } }),
             ).resolves.toMatchObject({
               data: { notifications: [expect.any(Object), expect.any(Object)] },
               errors: undefined,
             })
             await deletePostAction()
             await expect(
-              query({ query: notificationQuery(), variables: { ...variables, read: false } }),
+              query({ query: notifications, variables: { ...variables, read: false } }),
             ).resolves.toMatchObject({ data: { notifications: [] }, errors: undefined })
           })
         })
@@ -283,7 +277,7 @@ describe('given some notifications', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const result = await mutate({
-          mutation: markAsReadMutation(),
+          mutation: markAsRead,
           variables: { ...variables, id: 'p1' },
         })
         expect(result.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
@@ -304,7 +298,7 @@ describe('given some notifications', () => {
         })
 
         it('returns null', async () => {
-          const response = await mutate({ mutation: markAsReadMutation(), variables })
+          const response = await mutate({ mutation: markAsRead, variables })
           expect(response.data?.markAsRead).toEqual(null)
           expect(response.errors).toBeUndefined()
         })
@@ -320,7 +314,7 @@ describe('given some notifications', () => {
           })
 
           it('updates `read` attribute and returns NOTIFIED relationship', async () => {
-            const { data } = await mutate({ mutation: markAsReadMutation(), variables })
+            const { data } = await mutate({ mutation: markAsRead, variables })
             expect(data).toEqual({
               markAsRead: {
                 from: {
@@ -341,7 +335,7 @@ describe('given some notifications', () => {
               }
             })
             it('returns null', async () => {
-              const response = await mutate({ mutation: markAsReadMutation(), variables })
+              const response = await mutate({ mutation: markAsRead, variables })
               expect(response.data?.markAsRead).toEqual(null)
               expect(response.errors).toBeUndefined()
             })
@@ -357,7 +351,7 @@ describe('given some notifications', () => {
           })
 
           it('updates `read` attribute and returns NOTIFIED relationship', async () => {
-            const { data } = await mutate({ mutation: markAsReadMutation(), variables })
+            const { data } = await mutate({ mutation: markAsRead, variables })
             expect(data).toEqual({
               markAsRead: {
                 from: {
@@ -378,7 +372,7 @@ describe('given some notifications', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const result = await mutate({
-          mutation: markAllAsReadMutation(),
+          mutation: markAllAsRead,
         })
         expect(result.errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       })
@@ -397,17 +391,19 @@ describe('given some notifications', () => {
         })
 
         it('returns all as read', async () => {
-          const response = await mutate({ mutation: markAllAsReadMutation(), variables })
+          const response = await mutate({ mutation: markAllAsRead, variables })
           expect(response.data?.markAllAsRead).toEqual(
             expect.arrayContaining([
               {
                 createdAt: '2019-08-30T19:33:48.651Z',
                 from: { __typename: 'Comment', content: 'You have been mentioned in a comment' },
+                id: 'mentioned_in_comment/c2/you',
                 read: true,
               },
               {
                 createdAt: '2019-08-31T17:33:48.651Z',
                 from: { __typename: 'Post', content: 'You have been mentioned in a post' },
+                id: 'mentioned_in_post/p3/you',
                 read: true,
               },
             ]),

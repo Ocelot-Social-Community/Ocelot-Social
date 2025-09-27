@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import gql from 'graphql-tag'
-
 import Factory, { cleanDatabase } from '@db/factories'
+import { Signup } from '@graphql/queries/Signup'
+import { User, UserEmail } from '@graphql/queries/User'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -93,26 +93,18 @@ describe('authorization', () => {
     })
 
     describe('access email address', () => {
-      const userQuery = gql`
-        query ($name: String) {
-          User(name: $name) {
-            email
-          }
-        }
-      `
-
       describe('unauthenticated', () => {
         beforeEach(() => {
           authenticatedUser = null
         })
 
         it("throws an error and does not expose the owner's email address", async () => {
-          await expect(
-            query({ query: userQuery, variables: { name: 'Owner' } }),
-          ).resolves.toMatchObject({
-            errors: [{ message: 'Not Authorized!' }],
-            data: { User: null },
-          })
+          await expect(query({ query: User, variables: { name: 'Owner' } })).resolves.toMatchObject(
+            {
+              errors: [{ message: 'Not Authorized!' }],
+              data: { User: null },
+            },
+          )
         })
       })
 
@@ -124,7 +116,7 @@ describe('authorization', () => {
 
           it("exposes the owner's email address", async () => {
             variables = { name: 'Owner' }
-            await expect(query({ query: userQuery, variables })).resolves.toMatchObject({
+            await expect(query({ query: UserEmail, variables })).resolves.toMatchObject({
               data: { User: [{ email: 'owner@example.org' }] },
               errors: undefined,
             })
@@ -138,7 +130,7 @@ describe('authorization', () => {
 
           it("throws an error and does not expose the owner's email address", async () => {
             await expect(
-              query({ query: userQuery, variables: { name: 'Owner' } }),
+              query({ query: UserEmail, variables: { name: 'Owner' } }),
             ).resolves.toMatchObject({
               errors: [{ message: 'Not Authorized!' }],
               data: { User: [null] },
@@ -153,7 +145,7 @@ describe('authorization', () => {
 
           it("throws an error and does not expose the owner's email address", async () => {
             await expect(
-              query({ query: userQuery, variables: { name: 'Owner' } }),
+              query({ query: UserEmail, variables: { name: 'Owner' } }),
             ).resolves.toMatchObject({
               errors: [{ message: 'Not Authorized!' }],
               data: { User: [null] },
@@ -168,7 +160,7 @@ describe('authorization', () => {
 
           it("exposes the owner's email address", async () => {
             variables = { name: 'Owner' }
-            await expect(query({ query: userQuery, variables })).resolves.toMatchObject({
+            await expect(query({ query: UserEmail, variables })).resolves.toMatchObject({
               data: { User: [{ email: 'owner@example.org' }] },
               errors: undefined,
             })
@@ -178,14 +170,6 @@ describe('authorization', () => {
     })
 
     describe('access Signup', () => {
-      const signupMutation = gql`
-        mutation ($email: String!, $locale: String!, $inviteCode: String) {
-          Signup(email: $email, locale: $locale, inviteCode: $inviteCode) {
-            email
-          }
-        }
-      `
-
       describe('admin invite only', () => {
         beforeEach(async () => {
           variables = {
@@ -211,7 +195,7 @@ describe('authorization', () => {
           })
 
           it('denies permission', async () => {
-            await expect(mutate({ mutation: signupMutation, variables })).resolves.toMatchObject({
+            await expect(mutate({ mutation: Signup, variables })).resolves.toMatchObject({
               errors: [{ message: 'Not Authorized!' }],
               data: { Signup: null },
             })
@@ -224,7 +208,7 @@ describe('authorization', () => {
           })
 
           it('returns an email', async () => {
-            await expect(mutate({ mutation: signupMutation, variables })).resolves.toMatchObject({
+            await expect(mutate({ mutation: Signup, variables })).resolves.toMatchObject({
               errors: undefined,
               data: {
                 Signup: { email: 'some@email.org' },
@@ -258,7 +242,7 @@ describe('authorization', () => {
           })
 
           it('returns an email', async () => {
-            await expect(mutate({ mutation: signupMutation, variables })).resolves.toMatchObject({
+            await expect(mutate({ mutation: Signup, variables })).resolves.toMatchObject({
               errors: undefined,
               data: {
                 Signup: { email: 'some@email.org' },
@@ -292,7 +276,7 @@ describe('authorization', () => {
           })
 
           it('returns an email', async () => {
-            await expect(mutate({ mutation: signupMutation, variables })).resolves.toMatchObject({
+            await expect(mutate({ mutation: Signup, variables })).resolves.toMatchObject({
               errors: undefined,
               data: {
                 Signup: { email: 'some@email.org' },
@@ -312,7 +296,7 @@ describe('authorization', () => {
           })
 
           it('denies permission', async () => {
-            await expect(mutate({ mutation: signupMutation, variables })).resolves.toMatchObject({
+            await expect(mutate({ mutation: Signup, variables })).resolves.toMatchObject({
               errors: [{ message: 'Not Authorized!' }],
               data: { Signup: null },
             })

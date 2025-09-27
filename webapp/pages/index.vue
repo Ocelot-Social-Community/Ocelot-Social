@@ -3,7 +3,7 @@
     <!-- create post -->
     <div :class="POST_ADD_BUTTON_POSITION_TOP ? 'box-add-button-top' : ''">
       <client-only>
-        <nuxt-link :to="{ name: 'post-create' }" :class="{ 'hide-filter': hideByScroll }">
+        <nuxt-link :to="{ name: 'post-create-type' }" :class="{ 'hide-filter': hideByScroll }">
           <base-button
             v-tooltip="{
               content: $t('contribution.newPost'),

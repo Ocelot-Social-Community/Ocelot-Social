@@ -2,8 +2,8 @@ extend ../layout.pug
 
 block content
   .content
-  p= t('resetPassword.introduction')
-  a.button(href=actionUrl)= t('buttons.confirmEmail')
-  p= t('resetPassword.ignore')
-  p= t('resetPassword.codeHint')
-    span= nonce
+  p!= t('resetPassword.introduction')
+  a.button(href=actionUrl)!= t('buttons.confirmEmail')
+  p!= t('resetPassword.ignore')
+  p!= t('resetPassword.codeHint')
+    span!= nonce

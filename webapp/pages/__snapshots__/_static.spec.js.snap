@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`_static mount renders 1`] = `
+<div>
+  <div>
+    <div
+      class="ds-space"
+      style="margin-top: 16px; margin-bottom: 16px;"
+    >
+      <h2
+        class="ds-heading ds-heading-h2"
+      >
+        
+      
+    
+      </h2>
+    </div>
+     
+    <div
+      class="ds-container ds-container-x-large"
+    >
+      <article
+        class="base-card"
+      >
+        <div />
+         
+        <!---->
+      </article>
+    </div>
+  </div>
+</div>
+`;

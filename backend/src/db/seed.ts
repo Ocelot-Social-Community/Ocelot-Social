@@ -8,13 +8,13 @@ import sample from 'lodash/sample'
 
 import CONFIG from '@config/index'
 import { categories } from '@constants/categories'
-import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
-import { createCommentMutation } from '@graphql/queries/createCommentMutation'
-import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
+import { CreateComment } from '@graphql/queries/CreateComment'
+import { CreateGroup } from '@graphql/queries/CreateGroup'
 import { CreateMessage } from '@graphql/queries/CreateMessage'
-import { createPostMutation } from '@graphql/queries/createPostMutation'
-import { createRoomMutation } from '@graphql/queries/createRoomMutation'
-import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
+import { CreatePost } from '@graphql/queries/CreatePost'
+import { CreateRoom } from '@graphql/queries/CreateRoom'
+import { JoinGroup } from '@graphql/queries/JoinGroup'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import Factory from './factories'
@@ -341,7 +341,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     console.log('seed', 'groups')
     authenticatedUser = await peterLustig.toJson()
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'g0',
         name: 'Investigative Journalism',
@@ -354,21 +354,21 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'g0',
         userId: 'u2',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'g0',
         userId: 'u4',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'g0',
         userId: 'u6',
@@ -376,7 +376,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     })
 
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'g0',
         userId: 'u2',
@@ -385,7 +385,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     })
 
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'g0',
         userId: 'u4',
@@ -396,7 +396,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     // eslint-disable-next-line no-console
     console.log('seed', 'group posts')
     await mutate({
-      mutation: createPostMutation(),
+      mutation: CreatePost,
       variables: {
         id: 'p0-g0',
         groupId: 'g0',
@@ -408,7 +408,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     authenticatedUser = await bobDerBaumeister.toJson()
     await mutate({
-      mutation: createPostMutation(),
+      mutation: CreatePost,
       variables: {
         id: 'p1-g0',
         groupId: 'g0',
@@ -420,7 +420,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     authenticatedUser = await jennyRostock.toJson()
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'g1',
         name: 'School For Citizens',
@@ -433,35 +433,35 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'g1',
         userId: 'u1',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'g1',
         userId: 'u2',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'g1',
         userId: 'u5',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'g1',
         userId: 'u6',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'g1',
         userId: 'u7',
@@ -469,7 +469,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     })
 
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'g1',
         userId: 'u1',
@@ -477,7 +477,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'g1',
         userId: 'u5',
@@ -485,7 +485,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'g1',
         userId: 'u6',
@@ -493,7 +493,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: createPostMutation(),
+      mutation: CreatePost,
       variables: {
         id: 'p0-g1',
         groupId: 'g1',
@@ -504,7 +504,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     })
     authenticatedUser = await peterLustig.toJson()
     await mutate({
-      mutation: createPostMutation(),
+      mutation: CreatePost,
       variables: {
         id: 'p1-g1',
         groupId: 'g1',
@@ -516,7 +516,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     authenticatedUser = await bobDerBaumeister.toJson()
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'g2',
         name: 'Yoga Practice',
@@ -528,35 +528,35 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'g2',
         userId: 'u3',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'g2',
         userId: 'u4',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'g2',
         userId: 'u5',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'g2',
         userId: 'u6',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'g2',
         userId: 'u7',
@@ -564,7 +564,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     })
 
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'g2',
         userId: 'u3',
@@ -572,7 +572,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'g2',
         userId: 'u4',
@@ -580,7 +580,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'g2',
         userId: 'u5',
@@ -588,7 +588,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'g2',
         userId: 'u6',
@@ -598,7 +598,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     authenticatedUser = await louie.toJson()
     await mutate({
-      mutation: createPostMutation(),
+      mutation: CreatePost,
       variables: {
         id: 'p0-g2',
         groupId: 'g2',
@@ -614,7 +614,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     const now = new Date()
 
     await mutate({
-      mutation: createPostMutation(),
+      mutation: CreatePost,
       variables: {
         id: 'e0',
         title: 'Illegaler Kindergeburtstag',
@@ -629,7 +629,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: createPostMutation(),
+      mutation: CreatePost,
       variables: {
         id: 'e1',
         title: 'Wir Schützen den Stuttgarter Schlossgarten',
@@ -644,7 +644,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: createPostMutation(),
+      mutation: CreatePost,
       variables: {
         id: 'e2',
         title: 'IT 4 Change Treffen',
@@ -848,7 +848,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       'The new physics of <a class="hashtag" data-hashtag-id="QuantenFlussTheorie" href="/?hashtag=QuantenFlussTheorie">#QuantenFlussTheorie</a> can explain <a class="hashtag" data-hashtag-id="QuantumGravity" href="/?hashtag=QuantumGravity">#QuantumGravity</a>! <a class="mention" data-mention-id="u1" href="/profile/u1">@peter-lustig</a> got that already. ;-)'
 
     await mutate({
-      mutation: createPostMutation(),
+      mutation: CreatePost,
       variables: {
         id: 'p2',
         title: `Nature Philosophy Yoga`,
@@ -857,7 +857,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: createPostMutation(),
+      mutation: CreatePost,
       variables: {
         id: 'p7',
         title: 'This is post #7',
@@ -866,7 +866,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: createPostMutation(),
+      mutation: CreatePost,
       variables: {
         id: 'p8',
         title: `Quantum Flow Theory explains Quantum Gravity`,
@@ -875,7 +875,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: createPostMutation(),
+      mutation: CreatePost,
       variables: {
         id: 'p12',
         title: 'This is post #12',
@@ -899,7 +899,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     const mentionInComment2 =
       'Did <a class="mention" data-mention-id="u1" href="/profile/u1">@peter-lustig</a> tell you?'
     await mutate({
-      mutation: createCommentMutation,
+      mutation: CreateComment,
       variables: {
         id: 'c4',
         postId: 'p2',
@@ -907,7 +907,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: createCommentMutation,
+      mutation: CreateComment,
       variables: {
         id: 'c4-1',
         postId: 'p2',
@@ -915,7 +915,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
     })
     await mutate({
-      mutation: createCommentMutation,
+      mutation: CreateComment,
       variables: {
         postId: 'p14',
         content: faker.lorem.paragraph(),
@@ -1223,7 +1223,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       authenticatedUser = userObj
 
       await mutate({
-        mutation: joinGroupMutation(),
+        mutation: JoinGroup,
         variables: {
           groupId: 'g2',
           userId: userObj.id,
@@ -1530,7 +1530,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     console.log('seed', 'chat')
     authenticatedUser = await huey.toJson()
     const { data: roomHueyPeter } = await mutate({
-      mutation: createRoomMutation(),
+      mutation: CreateRoom,
       variables: {
         userId: (await peterLustig.toJson()).id,
       },
@@ -1557,7 +1557,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     authenticatedUser = await huey.toJson()
     const { data: roomHueyJenny } = await mutate({
-      mutation: createRoomMutation(),
+      mutation: CreateRoom,
       variables: {
         userId: (await jennyRostock.toJson()).id,
       },
@@ -1584,7 +1584,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     for (const user of additionalUsers.slice(0, 99)) {
       authenticatedUser = await jennyRostock.toJson()
       const { data: room } = await mutate({
-        mutation: createRoomMutation(),
+        mutation: CreateRoom,
         variables: {
           userId: (await user.toJson()).id,
         },

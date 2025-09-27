@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
-import gql from 'graphql-tag'
-
 import Factory, { cleanDatabase } from '@db/factories'
-import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
-import { createGroupMutation } from '@graphql/queries/createGroupMutation'
-import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
+import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
+import { CreateComment } from '@graphql/queries/CreateComment'
+import { CreateGroup } from '@graphql/queries/CreateGroup'
+import { CreatePost } from '@graphql/queries/CreatePost'
+import { JoinGroup } from '@graphql/queries/JoinGroup'
+import { markAllAsRead } from '@graphql/queries/markAllAsRead'
+import { notifications } from '@graphql/queries/notifications'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -33,63 +34,6 @@ const mentionString = `
   <a class="mention" data-mention-id="group-member" href="/profile/group-member/group-member">@group-member</a>.
   <a class="mention" data-mention-id="email-less-member" href="/profile/email-less-member/email-less-member">@email-less-member</a>.
 `
-
-const createPostMutation = gql`
-  mutation ($id: ID, $title: String!, $content: String!, $groupId: ID) {
-    CreatePost(id: $id, title: $title, content: $content, groupId: $groupId) {
-      id
-      title
-      content
-    }
-  }
-`
-
-const createCommentMutation = gql`
-  mutation ($id: ID, $postId: ID!, $commentContent: String!) {
-    CreateComment(id: $id, postId: $postId, content: $commentContent) {
-      id
-      content
-    }
-  }
-`
-
-const notificationQuery = gql`
-  query ($read: Boolean) {
-    notifications(read: $read, orderBy: updatedAt_desc) {
-      read
-      reason
-      createdAt
-      relatedUser {
-        id
-      }
-      from {
-        __typename
-        ... on Post {
-          id
-          content
-        }
-        ... on Comment {
-          id
-          content
-        }
-        ... on Group {
-          id
-        }
-      }
-    }
-  }
-`
-
-const markAllAsRead = async () =>
-  mutate({
-    mutation: gql`
-      mutation {
-        markAllAsRead {
-          id
-        }
-      }
-    `,
-  })
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -165,7 +109,7 @@ describe('mentions in groups', () => {
 
     authenticatedUser = await postAuthor.toJson()
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'public-group',
         name: 'A public group',
@@ -175,7 +119,7 @@ describe('mentions in groups', () => {
       },
     })
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'closed-group',
         name: 'A closed group',
@@ -185,7 +129,7 @@ describe('mentions in groups', () => {
       },
     })
     await mutate({
-      mutation: createGroupMutation(),
+      mutation: CreateGroup,
       variables: {
         id: 'hidden-group',
         name: 'A hidden group',
@@ -196,21 +140,21 @@ describe('mentions in groups', () => {
     })
     authenticatedUser = await groupMember.toJson()
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'public-group',
         userId: 'group-member',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'closed-group',
         userId: 'group-member',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'hidden-group',
         userId: 'group-member',
@@ -218,21 +162,21 @@ describe('mentions in groups', () => {
     })
     authenticatedUser = await pendingMember.toJson()
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'public-group',
         userId: 'pending-member',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'closed-group',
         userId: 'pending-member',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'hidden-group',
         userId: 'pending-member',
@@ -240,21 +184,21 @@ describe('mentions in groups', () => {
     })
     authenticatedUser = await emaillessMember.toJson()
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'public-group',
         userId: 'group-member',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'closed-group',
         userId: 'group-member',
       },
     })
     await mutate({
-      mutation: joinGroupMutation(),
+      mutation: JoinGroup,
       variables: {
         groupId: 'hidden-group',
         userId: 'group-member',
@@ -262,7 +206,7 @@ describe('mentions in groups', () => {
     })
     authenticatedUser = await postAuthor.toJson()
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'closed-group',
         userId: 'group-member',
@@ -270,7 +214,7 @@ describe('mentions in groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'hidden-group',
         userId: 'group-member',
@@ -278,7 +222,7 @@ describe('mentions in groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'closed-group',
         userId: 'email-less-member',
@@ -286,7 +230,7 @@ describe('mentions in groups', () => {
       },
     })
     await mutate({
-      mutation: changeGroupMemberRoleMutation(),
+      mutation: ChangeGroupMemberRole,
       variables: {
         groupId: 'hidden-group',
         userId: 'email-less-member',
@@ -294,9 +238,9 @@ describe('mentions in groups', () => {
       },
     })
     authenticatedUser = await groupMember.toJson()
-    await markAllAsRead()
+    await mutate({ mutation: markAllAsRead })
     authenticatedUser = await emaillessMember.toJson()
-    await markAllAsRead()
+    await mutate({ mutation: markAllAsRead })
   })
 
   afterEach(async () => {
@@ -308,7 +252,7 @@ describe('mentions in groups', () => {
       jest.clearAllMocks()
       authenticatedUser = await postAuthor.toJson()
       await mutate({
-        mutation: createPostMutation,
+        mutation: CreatePost,
         variables: {
           id: 'public-post',
           title: 'This is the post in the public group',
@@ -322,8 +266,9 @@ describe('mentions in groups', () => {
       authenticatedUser = await noMember.toJson()
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
           variables: {
+            orderBy: 'updatedAt_desc',
             read: false,
           },
         }),
@@ -348,8 +293,9 @@ describe('mentions in groups', () => {
       authenticatedUser = await groupMember.toJson()
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
           variables: {
+            orderBy: 'updatedAt_desc',
             read: false,
           },
         }),
@@ -414,7 +360,7 @@ describe('mentions in groups', () => {
       jest.clearAllMocks()
       authenticatedUser = await postAuthor.toJson()
       await mutate({
-        mutation: createPostMutation,
+        mutation: CreatePost,
         variables: {
           id: 'closed-post',
           title: 'This is the post in the closed group',
@@ -428,8 +374,9 @@ describe('mentions in groups', () => {
       authenticatedUser = await noMember.toJson()
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
           variables: {
+            orderBy: 'updatedAt_desc',
             read: false,
           },
         }),
@@ -445,8 +392,9 @@ describe('mentions in groups', () => {
       authenticatedUser = await pendingMember.toJson()
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
           variables: {
+            orderBy: 'updatedAt_desc',
             read: false,
           },
         }),
@@ -462,8 +410,9 @@ describe('mentions in groups', () => {
       authenticatedUser = await groupMember.toJson()
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
           variables: {
+            orderBy: 'updatedAt_desc',
             read: false,
           },
         }),
@@ -516,7 +465,7 @@ describe('mentions in groups', () => {
       jest.clearAllMocks()
       authenticatedUser = await postAuthor.toJson()
       await mutate({
-        mutation: createPostMutation,
+        mutation: CreatePost,
         variables: {
           id: 'hidden-post',
           title: 'This is the post in the hidden group',
@@ -530,8 +479,9 @@ describe('mentions in groups', () => {
       authenticatedUser = await noMember.toJson()
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
           variables: {
+            orderBy: 'updatedAt_desc',
             read: false,
           },
         }),
@@ -547,8 +497,9 @@ describe('mentions in groups', () => {
       authenticatedUser = await pendingMember.toJson()
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
           variables: {
+            orderBy: 'updatedAt_desc',
             read: false,
           },
         }),
@@ -564,8 +515,9 @@ describe('mentions in groups', () => {
       authenticatedUser = await groupMember.toJson()
       await expect(
         query({
-          query: notificationQuery,
+          query: notifications,
           variables: {
+            orderBy: 'updatedAt_desc',
             read: false,
           },
         }),
@@ -618,7 +570,7 @@ describe('mentions in groups', () => {
       beforeEach(async () => {
         authenticatedUser = await postAuthor.toJson()
         await mutate({
-          mutation: createPostMutation,
+          mutation: CreatePost,
           variables: {
             id: 'public-post',
             title: 'This is the post in the public group',
@@ -627,15 +579,15 @@ describe('mentions in groups', () => {
           },
         })
         authenticatedUser = await groupMember.toJson()
-        await markAllAsRead()
+        await mutate({ mutation: markAllAsRead })
         authenticatedUser = await postAuthor.toJson()
         jest.clearAllMocks()
         await mutate({
-          mutation: createCommentMutation,
+          mutation: CreateComment,
           variables: {
             id: 'public-comment',
             postId: 'public-post',
-            commentContent: `Hey everyone ${mentionString}! Please read this`,
+            content: `Hey everyone ${mentionString}! Please read this`,
           },
         })
       })
@@ -644,8 +596,9 @@ describe('mentions in groups', () => {
         authenticatedUser = await noMember.toJson()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
             variables: {
+              orderBy: 'updatedAt_desc',
               read: false,
             },
           }),
@@ -670,8 +623,9 @@ describe('mentions in groups', () => {
         authenticatedUser = await groupMember.toJson()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
             variables: {
+              orderBy: 'updatedAt_desc',
               read: false,
             },
           }),
@@ -713,7 +667,7 @@ describe('mentions in groups', () => {
       beforeEach(async () => {
         authenticatedUser = await postAuthor.toJson()
         await mutate({
-          mutation: createPostMutation,
+          mutation: CreatePost,
           variables: {
             id: 'closed-post',
             title: 'This is the post in the closed group',
@@ -722,15 +676,15 @@ describe('mentions in groups', () => {
           },
         })
         authenticatedUser = await groupMember.toJson()
-        await markAllAsRead()
+        await mutate({ mutation: markAllAsRead })
         authenticatedUser = await postAuthor.toJson()
         jest.clearAllMocks()
         await mutate({
-          mutation: createCommentMutation,
+          mutation: CreateComment,
           variables: {
             id: 'closed-comment',
             postId: 'closed-post',
-            commentContent: `Hey members ${mentionString}! Please read this`,
+            content: `Hey members ${mentionString}! Please read this`,
           },
         })
       })
@@ -739,8 +693,9 @@ describe('mentions in groups', () => {
         authenticatedUser = await noMember.toJson()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
             variables: {
+              orderBy: 'updatedAt_desc',
               read: false,
             },
           }),
@@ -756,8 +711,9 @@ describe('mentions in groups', () => {
         authenticatedUser = await pendingMember.toJson()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
             variables: {
+              orderBy: 'updatedAt_desc',
               read: false,
             },
           }),
@@ -773,8 +729,9 @@ describe('mentions in groups', () => {
         authenticatedUser = await groupMember.toJson()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
             variables: {
+              orderBy: 'updatedAt_desc',
               read: false,
             },
           }),
@@ -810,7 +767,7 @@ describe('mentions in groups', () => {
       beforeEach(async () => {
         authenticatedUser = await postAuthor.toJson()
         await mutate({
-          mutation: createPostMutation,
+          mutation: CreatePost,
           variables: {
             id: 'hidden-post',
             title: 'This is the post in the hidden group',
@@ -819,15 +776,15 @@ describe('mentions in groups', () => {
           },
         })
         authenticatedUser = await groupMember.toJson()
-        await markAllAsRead()
+        await mutate({ mutation: markAllAsRead })
         authenticatedUser = await postAuthor.toJson()
         jest.clearAllMocks()
         await mutate({
-          mutation: createCommentMutation,
+          mutation: CreateComment,
           variables: {
             id: 'hidden-comment',
             postId: 'hidden-post',
-            commentContent: `Hey hiders ${mentionString}! Please read this`,
+            content: `Hey hiders ${mentionString}! Please read this`,
           },
         })
       })
@@ -836,8 +793,9 @@ describe('mentions in groups', () => {
         authenticatedUser = await noMember.toJson()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
             variables: {
+              orderBy: 'updatedAt_desc',
               read: false,
             },
           }),
@@ -853,8 +811,9 @@ describe('mentions in groups', () => {
         authenticatedUser = await pendingMember.toJson()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
             variables: {
+              orderBy: 'updatedAt_desc',
               read: false,
             },
           }),
@@ -870,8 +829,9 @@ describe('mentions in groups', () => {
         authenticatedUser = await groupMember.toJson()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
             variables: {
+              orderBy: 'updatedAt_desc',
               read: false,
             },
           }),

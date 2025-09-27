@@ -34,7 +34,12 @@
               <!-- <base-icon name="at" data-test="at" /> -->
               {{ `@${userSlug}` }}
             </ds-text>
-            <location-info v-if="user.location" :location-data="user.location" size="small" />
+            <location-info
+              v-if="user.location"
+              :location-data="user.location"
+              :is-owner="myProfile"
+              size="small"
+            />
             <ds-text align="center" color="soft" size="small">
               {{ $t('profile.memberSince') }} {{ user.createdAt | date('MMMM yyyy') }}
             </ds-text>
@@ -127,14 +132,13 @@
           <!-- feed -->
           <ds-grid-item :row-span="2" column-span="fullWidth">
             <ds-space centered>
-              <nuxt-link :to="{ name: 'post-create' }">
+              <nuxt-link :to="{ name: 'post-create-type' }">
                 <base-button
                   v-if="myProfile"
                   v-tooltip="{
                     content: $t('contribution.newPost'),
                     placement: 'left',
                   }"
-                  :path="{ name: 'post-create' }"
                   class="profile-post-add-button"
                   icon="plus"
                   circle

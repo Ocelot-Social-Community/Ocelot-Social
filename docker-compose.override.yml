@@ -11,18 +11,6 @@ services:
     volumes:
       - ./webapp:/app
 
-  frontend:
-    image: ghcr.io/ocelot-social-community/ocelot-social/frontend:local-development
-    build:
-      target: development
-    environment:
-      - NODE_ENV=development
-    ports:
-      # port required for npm run dev
-      - 24678:24678
-    volumes:
-      - ./frontend:/app
-
   backend:
     image: ghcr.io/ocelot-social-community/ocelot-social/backend:local-development
     ports:

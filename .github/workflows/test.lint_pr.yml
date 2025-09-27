@@ -30,7 +30,6 @@ jobs:
           scopes: |
             backend
             webapp
-            frontend
             maintenance
             database
             docu

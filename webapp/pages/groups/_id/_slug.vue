@@ -38,7 +38,12 @@
               {{ `&${groupSlug}` }}
             </ds-text>
             <!-- group location -->
-            <location-info v-if="group.location" :location-data="group.location" size="small" />
+            <location-info
+              v-if="group.location"
+              :location-data="group.location"
+              :is-owner="false"
+              size="small"
+            />
             <!-- group created at -->
             <ds-text align="center" color="soft" size="small">
               {{ $t('group.foundation') }} {{ group.createdAt | date('MMMM yyyy') }}
@@ -206,7 +211,12 @@
           </base-card>
         </ds-space>
         <ds-space v-if="isGroupMemberNonePending" centered>
-          <nuxt-link :to="{ name: 'post-create', query: { groupId: group.id } }">
+          <nuxt-link
+            :to="{
+              name: 'post-create-type',
+              query: { groupId: group.id },
+            }"
+          >
             <base-button
               class="profile-post-add-button"
               icon="plus"

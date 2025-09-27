@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import gql from 'graphql-tag'
-
 import Factory, { cleanDatabase } from '@db/factories'
+import { queryLocations } from '@graphql/queries/queryLocations'
+import { UpdateUser } from '@graphql/queries/UpdateUser'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -18,21 +18,6 @@ let query: any // eslint-disable-line @typescript-eslint/no-explicit-any
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
-const updateUserMutation = gql`
-  mutation ($id: ID!, $name: String!, $locationName: String) {
-    UpdateUser(id: $id, name: $name, locationName: $locationName) {
-      locationName
-    }
-  }
-`
-const queryLocations = gql`
-  query ($place: String!, $lang: String!) {
-    queryLocations(place: $place, lang: $lang) {
-      place_name
-      id
-    }
-  }
-`
 const newlyCreatedNodesWithLocales = [
   {
     city: {
@@ -210,7 +195,7 @@ describe('userMiddleware', () => {
         name: 'Updating user',
         locationName: 'Welzheim, Baden-Württemberg, Germany',
       }
-      await mutate({ mutation: updateUserMutation, variables })
+      await mutate({ mutation: UpdateUser, variables })
       const locations = await database.neode.cypher(
         `MATCH (city:Location)-[:IS_IN]->(district:Location)-[:IS_IN]->(state:Location)-[:IS_IN]->(country:Location) return city {.*}, state {.*}, country {.*}`,
         {},
