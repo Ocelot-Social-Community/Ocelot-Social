@@ -361,14 +361,14 @@
     "@smithy/types" "^4.5.0"
     tslib "^2.6.2"
 
-"@aws-sdk/lib-storage@^3.888.0":
-  version "3.888.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/lib-storage/-/lib-storage-3.888.0.tgz#d39ee4403282784fc0eea032661f3f657a402326"
-  integrity sha512-UCZsVxjnQ6QpVWI1ZiNGmxfd1+8YBNbriQJ5lssR2IudQt5ThGhamGkwoYBmFV4iwhmgIT2fn5+gErugFZuUhw==
+"@aws-sdk/lib-storage@^3.896.0":
+  version "3.896.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/lib-storage/-/lib-storage-3.896.0.tgz#c65350f32867c1e2783dde2f7a1d4b85b5922104"
+  integrity sha512-EJWXL/5LxBJFujsOud3+EfRbIwy/SZiWy5ld70RdoqLS/RsfZh9+mZMJGvd3hewy7xHgDYVbxZfDh14bsvfYIQ==
   dependencies:
-    "@smithy/abort-controller" "^4.0.5"
-    "@smithy/middleware-endpoint" "^4.2.1"
-    "@smithy/smithy-client" "^4.6.1"
+    "@smithy/abort-controller" "^4.1.1"
+    "@smithy/middleware-endpoint" "^4.2.4"
+    "@smithy/smithy-client" "^4.6.4"
     buffer "5.6.0"
     events "3.3.0"
     stream-browserify "3.0.0"
@@ -1326,10 +1326,10 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-2.0.3.tgz#4a2868d75d6d6963e423bcf90b7fd1be343409d3"
   integrity sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==
 
-"@ioredis/commands@^1.3.0":
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/@ioredis/commands/-/commands-1.3.0.tgz#4dc3ae9bfa7146b63baf27672a61db0ea86e35e5"
-  integrity sha512-M/T6Zewn7sDaBQEqIZ8Rb+i9y8qfGmq+5SDFSf9sA2lUZTmdDLVdOiQaeDp+Q4wElZ9HG1GAX5KhDaidp6LQsQ==
+"@ioredis/commands@1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@ioredis/commands/-/commands-1.4.0.tgz#9f657d51cdd5d2fdb8889592aa4a355546151f25"
+  integrity sha512-aFT2yemJJo+TZCmieA7qnYGQooOS7QfNmYrzGtsYd3g9j5iDP8AimYYAesf79ohjbLG12XxC4nG5DyEnC88AsQ==
 
 "@isaacs/balanced-match@^4.0.1":
   version "4.0.1"
@@ -2045,7 +2045,7 @@
   dependencies:
     "@sinonjs/commons" "^3.0.1"
 
-"@smithy/abort-controller@^4.0.5", "@smithy/abort-controller@^4.1.1":
+"@smithy/abort-controller@^4.1.1":
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/@smithy/abort-controller/-/abort-controller-4.1.1.tgz#9b3872ab6b2c061486175c281dadc0a853260533"
   integrity sha512-vkzula+IwRvPR6oKQhMYioM3A/oX/lFCZiwuxkQbRhqJS2S4YRY2k7k/SyR2jMf3607HLtbEwlRxi0ndXHMjRg==
@@ -2231,7 +2231,7 @@
     "@smithy/types" "^4.5.0"
     tslib "^2.6.2"
 
-"@smithy/middleware-endpoint@^4.2.1", "@smithy/middleware-endpoint@^4.2.4":
+"@smithy/middleware-endpoint@^4.2.4":
   version "4.2.4"
   resolved "https://registry.yarnpkg.com/@smithy/middleware-endpoint/-/middleware-endpoint-4.2.4.tgz#d815d27b7869a66ee97b41932053ca5d5ec6315e"
   integrity sha512-FZ4hzupOmthm8Q8ujYrd0I+/MHwVMuSTdkDtIQE0xVuvJt9pLT6Q+b0p4/t+slDyrpcf+Wj7SN+ZqT5OryaaZg==
@@ -2360,7 +2360,7 @@
     "@smithy/util-utf8" "^4.1.0"
     tslib "^2.6.2"
 
-"@smithy/smithy-client@^4.6.1", "@smithy/smithy-client@^4.6.4":
+"@smithy/smithy-client@^4.6.4":
   version "4.6.4"
   resolved "https://registry.yarnpkg.com/@smithy/smithy-client/-/smithy-client-4.6.4.tgz#3a66bb71c91dadf1806adab664ba2e164a1139ab"
   integrity sha512-qL7O3VDyfzCSN9r+sdbQXGhaHtrfSJL30En6Jboj0I3bobf2g1/T0eP2L4qxqrEW26gWhJ4THI4ElVVLjYyBHg==
@@ -6972,12 +6972,12 @@ internal-slot@^1.1.0:
     hasown "^2.0.2"
     side-channel "^1.1.0"
 
-ioredis@^5.3.2, ioredis@^5.7.0:
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/ioredis/-/ioredis-5.7.0.tgz#be8f4a09bfb67bfa84ead297ff625973a5dcefc3"
-  integrity sha512-NUcA93i1lukyXU+riqEyPtSEkyFq8tX90uL659J+qpCZ3rEdViB/APC58oAhIh3+bJln2hzdlZbBZsGNrlsR8g==
+ioredis@^5.3.2, ioredis@^5.8.0:
+  version "5.8.0"
+  resolved "https://registry.yarnpkg.com/ioredis/-/ioredis-5.8.0.tgz#a1c4ef6be2e274cc8e99c9e22794ef1ef06dc24a"
+  integrity sha512-AUXbKn9gvo9hHKvk6LbZJQSKn/qIfkWXrnsyL9Yrf+oeXmla9Nmf6XEumOddyhM8neynpK5oAV6r9r99KBuwzA==
   dependencies:
-    "@ioredis/commands" "^1.3.0"
+    "@ioredis/commands" "1.4.0"
     cluster-key-slot "^1.1.0"
     debug "^4.3.4"
     denque "^2.1.0"
@@ -8560,10 +8560,10 @@ metascraper-youtube@^5.49.2:
     p-locate "~5.0.0"
     reachable-url "~1.8.2"
 
-metascraper@^5.49.2:
-  version "5.49.2"
-  resolved "https://registry.yarnpkg.com/metascraper/-/metascraper-5.49.2.tgz#9b0b43c933b45cc13139e5f80a4a4583d1cc1cdc"
-  integrity sha512-WT7+rz4q5s6Gi3ElQuTefnka22KviFIZfXgYz9P6f4FQmOydznSbuenkr7gsXyCPFdDtoO+aA2nClH94r8C+9g==
+metascraper@^5.49.4:
+  version "5.49.4"
+  resolved "https://registry.yarnpkg.com/metascraper/-/metascraper-5.49.4.tgz#7a0056cbe10d3de2f07f68b3d10f2726d64d1e38"
+  integrity sha512-ZDvntIsErYMOETK8dYaaIcqCBF/KvhPSQQBD+4Eqe1b6dqZAhk++iqCQyLJi68yEmhvzORryNoIAb7HiHg0Nig==
   dependencies:
     "@metascraper/helpers" "5.49.2"
     cheerio "~1.1.2"
@@ -10955,10 +10955,10 @@ ts-invariant@^0.4.0:
   dependencies:
     tslib "^1.9.3"
 
-ts-jest@^29.4.1:
-  version "29.4.1"
-  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-29.4.1.tgz#42d33beb74657751d315efb9a871fe99e3b9b519"
-  integrity sha512-SaeUtjfpg9Uqu8IbeDKtdaS0g8lS6FT6OzM3ezrDfErPJPHNDo/Ey+VFGP1bQIDfagYDLyRpd7O15XpG1Es2Uw==
+ts-jest@^29.4.4:
+  version "29.4.4"
+  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-29.4.4.tgz#fc6fefe28652ed81b8e1381ef8391901d9f81417"
+  integrity sha512-ccVcRABct5ZELCT5U0+DZwkXMCcOCLi2doHRrKy1nK/s7J7bch6TzJMsrY09WxgUUIP/ITfmcDS8D2yl63rnXw==
   dependencies:
     bs-logger "^0.2.6"
     fast-json-stable-stringify "^2.1.0"
