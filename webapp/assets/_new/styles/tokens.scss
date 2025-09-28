@@ -354,11 +354,11 @@ $z-index-surface: 1;
  * @tokens Media Query
  */
 
-$media-query-x-small: (min-width: 480px);
-$media-query-small: (min-width: 600px);
-$media-query-medium: (min-width: 768px);
-$media-query-large: (min-width: 1024px);
-$media-query-x-large: (min-width: 1200px);
+$media-query-x-small: "(min-width: 480px)";
+$media-query-small: "(min-width: 600px)";
+$media-query-medium: "(min-width: 768px)";
+$media-query-large: "(min-width: 1024px)";
+$media-query-x-large: "(min-width: 1200px)";
 
 /**
  * @tokens Background Images

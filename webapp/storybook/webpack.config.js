@@ -21,7 +21,8 @@ module.exports = async ({ config, mode }) => {
           patterns: [
             path.resolve(
               __dirname,
-              '../node_modules/@human-connection/styleguide/dist/shared.scss',
+              '../styleguide/src/system/styles/main.scss',
+              '../styleguide/src/system/styles/shared.scss',
             ),
             path.resolve(__dirname, '../assets/_new/styles/tokens.scss'),
           ],

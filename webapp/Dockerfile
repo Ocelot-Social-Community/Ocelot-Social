@@ -1,3 +1,11 @@
+FROM node:24.9.0-alpine as styleguide
+RUN apk --no-cache add git python3 make g++
+Run mkdir -p /app
+WORKDIR /app
+COPY styleguide .
+RUN yarn install --production=false --frozen-lockfile --non-interactive
+RUN yarn run build
+
 FROM node:20.12.1-alpine AS base
 LABEL org.label-schema.name="ocelot.social:webapp"
 LABEL org.label-schema.description="Web Frontend of the Social Network Software ocelot.social"
@@ -13,14 +21,15 @@ EXPOSE ${PORT}
 RUN apk --no-cache add git python3 make g++ bash jq
 RUN mkdir -p /app
 WORKDIR /app
+COPY --from=styleguide ./app/ /styleguide/
 CMD ["/bin/bash", "-c", "yarn run start"]
 
 FROM base AS development
 CMD ["/bin/bash", "-c", "yarn install && yarn run dev"]
 
 FROM base AS build
-COPY . .
-ONBUILD COPY ./branding .
+COPY webapp/ .
+ONBUILD COPY webapp/branding .
 ONBUILD RUN tools/merge-locales.sh
 ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
 ONBUILD RUN yarn run build
@@ -39,7 +48,7 @@ ONBUILD RUN cd /build && yarn install --production=true --frozen-lockfile --non-
 
 FROM base AS test_build
 ENV NODE_ENV=test
-COPY . .
+COPY webapp/. .
 RUN tools/merge-locales.sh
 RUN yarn install --production=false --frozen-lockfile --non-interactive
 RUN yarn run build
