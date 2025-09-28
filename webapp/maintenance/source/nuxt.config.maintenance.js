@@ -2,8 +2,12 @@ import defaultConfig from './nuxt.config.js'
 
 const { css, styleResources, manifest, build, mode, buildModules } = defaultConfig
 
+const CONFIG = require('./config').default // we need to use require since this is only evaluated at compile time.
+
 export default {
   mode,
+
+  env: CONFIG,
 
   head: {
     title: manifest.name,
@@ -50,7 +54,12 @@ export default {
     },
   },
 
-  modules: ['cookie-universal-nuxt', '@nuxtjs/style-resources'],
+  modules: [
+    ['@nuxtjs/dotenv', { only: Object.keys(CONFIG) }],
+    ['nuxt-env', { keys: Object.keys(CONFIG) }],
+    'cookie-universal-nuxt',
+    '@nuxtjs/style-resources',
+  ],
 
   buildModules,
   manifest,
