@@ -1,11 +1,9 @@
 import defaultConfig from './nuxt.config.js'
 
-const { css, styleResources, manifest } = defaultConfig
+const { css, styleResources, manifest, build, mode, buildModules } = defaultConfig
 
 export default {
-  css,
-  styleResources,
-  manifest,
+  mode,
 
   head: {
     title: manifest.name,
@@ -32,13 +30,15 @@ export default {
     ],
   },
 
+  css,
+  styleResources,
+
   plugins: [
+    { src: '~/plugins/base-components.js', ssr: true },
     { src: `~/plugins/styleguide.js`, ssr: true },
     { src: '~/plugins/i18n.js', ssr: true },
     { src: '~/plugins/v-tooltip.js', ssr: false },
   ],
-
-  modules: ['cookie-universal-nuxt', '@nuxtjs/style-resources'],
 
   router: {
     extendRoutes(routes, resolve) {
@@ -49,14 +49,10 @@ export default {
       })
     },
   },
-  build: {
-    extend(config, ctx) {
-      config.module.rules.push({
-        enforce: 'pre',
-        test: /\.html$/,
-        loader: 'raw-loader',
-        exclude: /(node_modules)/,
-      })
-    },
-  },
+
+  modules: ['cookie-universal-nuxt', '@nuxtjs/style-resources'],
+
+  buildModules,
+  manifest,
+  build,
 }

@@ -22,21 +22,7 @@ RUN apk --no-cache add git python3 make g++ bash jq
 COPY --from=styleguide ./app/ /styleguide/
 RUN mkdir -p /app
 WORKDIR /app
-COPY webapp/assets assets
-COPY webapp/components/LocaleSwitch/ components/LocaleSwitch
-COPY webapp/components/Dropdown.vue components/Dropdown.vue
-COPY webapp/layouts/blank.vue layouts/blank.vue
-COPY webapp/locales locales
-COPY webapp/mixins mixins
-COPY webapp/plugins/i18n.js webapp/plugins/v-tooltip.js webapp/plugins/styleguide.js plugins/
-COPY webapp/static static
-COPY webapp/constants constants
-COPY webapp/nuxt.config.js nuxt.config.js
-COPY webapp/config/ config/
-COPY webapp/tools/ tools/
-COPY webapp/maintenance/nginx maintenance/nginx
-COPY webapp/maintenance/source maintenance/source
-COPY webapp/package.json webapp/yarn.lock ./
+COPY webapp/ .
 ONBUILD COPY webapp/branding .
 ONBUILD RUN tools/merge-locales.sh
 ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive

@@ -5,7 +5,6 @@ import metadata from './constants/metadata.js'
 const CONFIG = require('./config').default // we need to use require since this is only evaluated at compile time.
 
 const styleguidePath = '../styleguide'
-/* const styleguideStyles = `${styleguidePath}/src/system/styles/main.scss` */
 const styleguideStyles = [
   `${styleguidePath}/src/system/styles/main.scss`,
   `${styleguidePath}/src/system/styles/shared.scss`,
@@ -273,10 +272,6 @@ export default {
         config.devtool = 'source-map'
       }
 
-      config.resolve.alias['~@'] = path.resolve(__dirname, '/')
-      // config.resolve.alias['@@'] = path.resolve(__dirname, '/')
-
-      // config.resolve.alias['@styleguide'] = path.resolve(__dirname, `${styleguidePath}/src/system`)
       config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/src/system`)
       config.module.rules.push({
         resourceQuery: /blockType=docs/,
