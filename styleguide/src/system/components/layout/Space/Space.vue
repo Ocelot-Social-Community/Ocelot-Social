@@ -13,7 +13,7 @@
 
 <script>
 import { getSpace } from '@@/utils'
-import { mediaQuery } from '@@/mixins'
+import { mediaQuery } from '../../../mixins'
 
 /**
  * Use this component for grouping and separation.
