@@ -4,7 +4,6 @@ RUN mkdir -p /app
 WORKDIR /app
 COPY styleguide .
 RUN yarn install --production=false --frozen-lockfile --non-interactive
-RUN yarn run build
 RUN yarn run build:lib
 
 FROM node:20.12.1-alpine AS base
