@@ -12,6 +12,7 @@ docker: &docker
 webapp: &webapp
   - '.github/workflows/test-webapp.yml'
   - 'webapp/**/*'
+  - 'styleguide/**/*'
   - 'package.json'
 
 docs-check: &docs-check

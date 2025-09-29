@@ -46,7 +46,7 @@ jobs:
 
       - name: Webapp | Build 'test' image
         run: |
-          docker build --target test -t "ocelotsocialnetwork/webapp:test" webapp/
+          docker build --target test -f webapp/Dockerfile -t "ocelotsocialnetwork/webapp:test" .
           docker save "ocelotsocialnetwork/webapp:test" > /tmp/webapp.tar
 
       - name: Cache docker image
