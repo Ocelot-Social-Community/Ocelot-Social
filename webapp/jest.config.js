@@ -34,6 +34,7 @@ module.exports = {
     '@mapbox/mapbox-gl-geocoder': 'identity-obj-proxy',
     'vue2-datepicker/locale/undefined': 'vue2-datepicker/locale/en',
     '^@/(.*)$': '<rootDir>/src/$1',
+    // jest is unable to build the styleguide on its own, as it uses webpack.
     '^@@/': '<rootDir>/../styleguide/dist/system.umd.min.js',
     '^~/(.*)$': '<rootDir>/$1',
   },
