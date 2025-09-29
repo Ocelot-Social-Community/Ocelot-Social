@@ -34,6 +34,7 @@ module.exports = {
     '@mapbox/mapbox-gl-geocoder': 'identity-obj-proxy',
     'vue2-datepicker/locale/undefined': 'vue2-datepicker/locale/en',
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^@@/': '<rootDir>/../styleguide/dist/system.umd.min.js',
     '^~/(.*)$': '<rootDir>/$1',
   },
   moduleFileExtensions: ['js', 'json', 'vue'],
