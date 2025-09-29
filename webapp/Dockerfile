@@ -1,6 +1,6 @@
-FROM node:24.9.0-alpine as styleguide
+FROM node:24.9.0-alpine AS styleguide
 RUN apk --no-cache add git python3 make g++
-Run mkdir -p /app
+RUN mkdir -p /app
 WORKDIR /app
 COPY styleguide .
 RUN yarn install --production=false --frozen-lockfile --non-interactive
