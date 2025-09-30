@@ -32,6 +32,8 @@ jobs:
             webapp
             maintenance
             database
+            deps
+            deps-dev
             docu
             docker
             release
