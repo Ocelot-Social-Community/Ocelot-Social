@@ -5,12 +5,10 @@ import metadata from './constants/metadata.js'
 const CONFIG = require('./config').default // we need to use require since this is only evaluated at compile time.
 
 const styleguidePath = '../styleguide'
-const styleguideStyles = CONFIG.STYLEGUIDE_DEV
-  ? [
-      `${styleguidePath}/src/system/styles/main.scss`,
-      `${styleguidePath}/src/system/styles/shared.scss`,
-    ]
-  : '@human-connection/styleguide/dist/shared.scss'
+const styleguideStyles = [
+  `${styleguidePath}/src/system/styles/main.scss`,
+  `${styleguidePath}/src/system/styles/shared.scss`,
+]
 
 export default {
   buildDir: CONFIG.NUXT_BUILD,
@@ -103,7 +101,7 @@ export default {
   styleResources: {
     scss: [
       '~assets/_new/styles/uses.scss',
-      styleguideStyles,
+      ...styleguideStyles,
       '~assets/_new/styles/tokens.scss',
       '~assets/styles/imports/_branding.scss',
       '~assets/_new/styles/export.scss',
@@ -117,7 +115,7 @@ export default {
   plugins: [
     { src: '~/plugins/base-components.js', ssr: true },
     {
-      src: `~/plugins/styleguide${CONFIG.STYLEGUIDE_DEV ? '-dev' : ''}.js`,
+      src: `~/plugins/styleguide.js`,
       ssr: true,
     },
     { src: '~/plugins/i18n.js', ssr: true },
@@ -274,16 +272,11 @@ export default {
         config.devtool = 'source-map'
       }
 
-      config.resolve.alias['~@'] = path.resolve(__dirname, '/')
-      config.resolve.alias['@@'] = path.resolve(__dirname, '/')
-
-      if (CONFIG.STYLEGUIDE_DEV) {
-        config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/src/system`)
-        config.module.rules.push({
-          resourceQuery: /blockType=docs/,
-          loader: require.resolve(`${styleguidePath}/src/loader/docs-trim-loader.js`),
-        })
-      }
+      config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/src/system`)
+      config.module.rules.push({
+        resourceQuery: /blockType=docs/,
+        loader: require.resolve(`${styleguidePath}/src/loader/docs-trim-loader.js`),
+      })
 
       const svgRule = config.module.rules.find((rule) => rule.test.test('.svg'))
       svgRule.test = /\.(png|jpe?g|gif|webp)$/

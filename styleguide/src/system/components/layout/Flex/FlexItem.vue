@@ -9,7 +9,7 @@
 
 <script>
 import { getSpace } from '@@/utils'
-import { mediaQuery } from '@@/mixins'
+import { mediaQuery } from '../../../mixins'
 
 /**
  * @version 1.0.0

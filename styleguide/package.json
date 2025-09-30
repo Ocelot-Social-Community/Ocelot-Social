@@ -4,11 +4,11 @@
   "private": false,
   "scripts": {
     "serve": "http-server ./docs -o -s",
-    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider yarn theo && vue-cli-service build --no-fix",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider yarn theo && cross-env NODE_OPTIONS=--openssl-legacy-provider vue-cli-service build --no-fix",
     "lint": "vue-cli-service lint --no-fix-warning",
     "dev": "npm-run-all --parallel theo:onchange theo servedev",
     "servedev": "vue-cli-service serve --open --no-fix",
-    "build:lib": "yarn theo && cross-env BUILD=library vue-cli-service build --target lib --name system ./src/library.js --no-fix",
+    "build:lib": "cross-env NODE_OPTIONS=--openssl-legacy-provider yarn theo && cross-env BUILD=library NODE_OPTIONS=--openssl-legacy-provider vue-cli-service build --target lib --name system ./src/library.js --no-fix",
     "theo": "theo ./src/system/tokens/tokens.yml --transform web --format map.scss,scss,raw.json,json --dest ./src/system/tokens/generated",
     "theo:onchange": "onchange \"./src/system/tokens/*.yml\" -- npm run theo",
     "test": "echo 'TODO: FIX & ADD TESTING!'",

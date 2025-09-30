@@ -4,7 +4,7 @@ services:
     image: ghcr.io/ocelot-social-community/ocelot-social/webapp-build:${OCELOT_VERSION:-latest}
     build:
       target: build
-      context: webapp
+      context: .
 
   backend:
     image: ghcr.io/ocelot-social-community/ocelot-social/backend-build:${OCELOT_VERSION:-latest}
@@ -16,5 +16,5 @@ services:
     image: ghcr.io/ocelot-social-community/ocelot-social/maintenance-build:${OCELOT_VERSION:-latest}
     build:
       target: build
-      context: webapp
+      context: .
       dockerfile: ./Dockerfile.maintenance

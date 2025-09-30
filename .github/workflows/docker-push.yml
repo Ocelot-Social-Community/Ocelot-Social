@@ -24,27 +24,27 @@ jobs:
             file: backend/Dockerfile
             target: production
           - name: webapp-base
-            context: webapp
+            context: .
             file: webapp/Dockerfile
             target: base
           - name: webapp-build
-            context: webapp
+            context: .
             file: webapp/Dockerfile
             target: build
           - name: webapp
-            context: webapp
+            context: .
             file: webapp/Dockerfile
             target: production
           - name: maintenance-base
-            context: webapp
+            context: .
             file: webapp/Dockerfile.maintenance
             target: base
           - name: maintenance-build
-            context: webapp
+            context: .
             file: webapp/Dockerfile.maintenance
             target: build
           - name: maintenance
-            context: webapp
+            context: .
             file: webapp/Dockerfile.maintenance
             target: production
     runs-on: ubuntu-latest

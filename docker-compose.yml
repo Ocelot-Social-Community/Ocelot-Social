@@ -7,7 +7,8 @@ services:
   webapp:
     image: ghcr.io/ocelot-social-community/ocelot-social/webapp:${OCELOT_VERSION:-latest}
     build:
-      context: ./webapp
+      context: .
+      dockerfile: ./webapp/Dockerfile
       target: production
     depends_on:
       - backend
@@ -50,8 +51,8 @@ services:
   maintenance:
     image: ghcr.io/ocelot-social-community/ocelot-social/maintenance:${OCELOT_VERSION:-latest}
     build:
-      context: ./webapp
-      dockerfile: Dockerfile.maintenance
+      context: .
+      dockerfile: ./webapp/Dockerfile.maintenance
     ports:
       - 3001:80
 

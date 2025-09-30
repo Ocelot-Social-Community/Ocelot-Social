@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import Styleguide from '@human-connection/styleguide'
-import '@human-connection/styleguide/dist/system.css'
+import Styleguide from '@@/'
 
 Vue.use(Styleguide)

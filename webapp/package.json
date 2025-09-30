@@ -8,7 +8,6 @@
   "private": false,
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt",
-    "dev:styleguide": "cross-env STYLEGUIDE_DEV=true yarn run dev",
     "storybook": "cross-env NODE_OPTIONS=--openssl-legacy-provider start-storybook -p 3002  -s ./static -c storybook/",
     "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt build",
     "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider nuxt start",
@@ -22,7 +21,6 @@
     "test:unit:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --no-cache --runInBand"
   },
   "dependencies": {
-    "@human-connection/styleguide": "0.5.22",
     "@mapbox/mapbox-gl-geocoder": "^5.0.2",
     "@nuxtjs/apollo": "^4.0.0-rc19",
     "@nuxtjs/axios": "~5.9.7",
