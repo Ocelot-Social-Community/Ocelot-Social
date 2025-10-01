@@ -56,6 +56,9 @@ server {
 # contents of /etc/nginx/http.d/default.conf
 
 service nginx reload
+
+# delete htdocs/ folder to allow creation of symlink
+rm -r /var/www/localhost/htdocs
 ```
 
 For the github webhook configure the following:
