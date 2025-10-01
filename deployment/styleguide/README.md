@@ -39,6 +39,7 @@ server {
 
     location / {
         index index.html;
+        try_files $uri $uri/ /index.html;
     }
 
     location /hooks/ {
