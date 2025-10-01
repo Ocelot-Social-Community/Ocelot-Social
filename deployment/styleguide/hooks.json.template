@@ -1,0 +1,37 @@
+[
+    {
+      "id": "github",
+      "execute-command": "$PROJECT_ROOT/deployment/styleguide/deploy-styleguide.sh",
+      "pass-arguments-to-command": [
+        {
+          "source": "string",
+          "name": "$DEPLOY_DIR"
+        }
+      ],
+      "command-working-directory": "$PROJECT_ROOT",
+      "trigger-rule": {
+        "and": [
+          {
+            "match": {
+              "type": "payload-hash-sha1",
+              "secret": "$WEBHOOK_GITHUB_SECRET",
+              "parameter": {
+                "source": "header",
+                "name": "X-Hub-Signature"
+              }
+            }
+          },
+          {
+            "match": {
+              "type": "value",
+              "value": "refs/heads/$WEBHOOK_GITHUB_BRANCH",
+              "parameter": {
+                "source": "payload",
+                "name": "ref"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
