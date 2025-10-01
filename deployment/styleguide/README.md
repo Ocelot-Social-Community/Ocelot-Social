@@ -4,6 +4,7 @@ You can use the webhook template `webhook.conf.template` and the `deploy-stylegu
 
 For this to work follow these steps (using alpine):
 
+Setup webhook service
 ```sh
 apk add webhook
 cp deployment/styleguide/hooks.json.template deployment/styleguide/hooks.json
@@ -19,27 +20,42 @@ chmod +x /etc/init.d/webhook
 
 service webhook start
 rc-update add webhook boot
+```
 
+Setup nginx
+```sh
 vi /etc/nginx/http.d/default.conf
-# adjust the nginx config
-# location /hooks/ {
-#     proxy_http_version 1.1;
-#     proxy_set_header   Upgrade $http_upgrade;
-#     proxy_set_header   Connection 'upgrade';
-#     proxy_set_header   X-Forwarded-For $remote_addr;
-#     proxy_set_header   X-Real-IP  $remote_addr;
-#     proxy_set_header   Host $host;
-# 
-#     proxy_pass         http://127.0.0.1:9000/hooks/;
-#     proxy_redirect     off;
-# 
-#     #access_log $LOG_PATH/nginx-access.hooks.log hooks_log;
-#     #error_log $LOG_PATH/nginx-error.backend.hook.log warn;
-# }
 
-# The github payload is quite big sometimes, hence those two lines can prevent an reoccurring error message on nginx
-# client_body_buffer_size     10M;
-# client_max_body_size        10M;
+# contents of /etc/nginx/http.d/default.conf
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/localhost/htdocs;
+
+    # The github payload is quite big sometimes, hence  those two lines can prevent an reoccurring error message on nginx
+    client_body_buffer_size     10M;
+    client_max_body_size        10M;
+
+    location / {
+        index index.html;
+    }
+
+    location /hooks/ {
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade $http_upgrade;
+        proxy_set_header   Connection 'upgrade';
+        proxy_set_header   X-Forwarded-For $remote_addr;
+        proxy_set_header   X-Real-IP  $remote_addr;
+        proxy_set_header   Host $host;
+
+        proxy_pass         http://127.0.0.1:9000/hooks/;
+        proxy_redirect     off;
+    }
+}
+# contents of /etc/nginx/http.d/default.conf
+
+service nginx reload
 ```
 
 For the github webhook configure the following:
