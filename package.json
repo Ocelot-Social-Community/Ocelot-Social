@@ -42,7 +42,7 @@
     "@faker-js/faker": "9.9.0",
     "auto-changelog": "^2.5.0",
     "bcryptjs": "^3.0.2",
-    "cross-env": "^10.0.0",
+    "cross-env": "^10.1.0",
     "cypress": "^15.3.0",
     "cypress-network-idle": "^1.15.0",
     "date-fns": "^3.6.0",
