@@ -133,12 +133,3 @@
 
   @return $output;
 }
-
-@function strip-unit($number) {
-  @if type-of($number) == 'number' and not unitless($number) {
-    $oneUnit: $number * 0 + 1;
-    @return calc($number / $oneUnit);
-  }
-
-  @return $number;
-}
