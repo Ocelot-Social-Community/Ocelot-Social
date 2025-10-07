@@ -1238,11 +1238,6 @@
     gonzales-pe "^4.3.0"
     node-source-walk "^7.0.0"
 
-"@epic-web/invariant@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@epic-web/invariant/-/invariant-1.0.0.tgz#1073e5dee6dd540410784990eb73e4acd25c9813"
-  integrity sha512-lrTPqgvfFQtR/eY/qkIzp98OGdNJu0m5ji3q/nJI8v3SXkRKEnWiOxMmbvcSoAIzv/cGiuvRy57k4suKQSAdwA==
-
 "@esbuild/aix-ppc64@0.21.5":
   version "0.21.5"
   resolved "https://registry.npmjs.org/@esbuild/aix-ppc64/-/aix-ppc64-0.21.5.tgz"
@@ -3809,14 +3804,6 @@ create-hmac@^1.1.0, create-hmac@^1.1.4, create-hmac@^1.1.7:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
-cross-env@^10.0.0:
-  version "10.0.0"
-  resolved "https://registry.yarnpkg.com/cross-env/-/cross-env-10.0.0.tgz#ba25823cfa1ed6af293dcded8796fa16cd162456"
-  integrity sha512-aU8qlEK/nHYtVuN4p7UQgAwVljzMg8hB4YK5ThRqD2l/ziSnryncPNn7bMLt5cFYsKVKBh8HqLqyCoTupEUu7Q==
-  dependencies:
-    "@epic-web/invariant" "^1.0.0"
-    cross-spawn "^7.0.6"
-
 cross-spawn@^7.0.0, cross-spawn@^7.0.3, cross-spawn@^7.0.6:
   version "7.0.6"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-7.0.6.tgz#8a58fe78f00dcd70c370451759dfbfaf03e8ee9f"
@@ -4225,11 +4212,6 @@ domutils@^3.0.1, domutils@^3.1.0:
     dom-serializer "^2.0.0"
     domelementtype "^2.3.0"
     domhandler "^5.0.3"
-
-dotenv@^17.2.2:
-  version "17.2.2"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-17.2.2.tgz#4010cfe1c2be4fc0f46fd3d951afb424bc067ac6"
-  integrity sha512-Sf2LSQP+bOlhKWWyhFsn0UsfdK/kCWRv1iuA2gXAwt3dyNabr6QSj00I2V10pidqz69soatm9ZwZvpQMTIOd5Q==
 
 dunder-proto@^1.0.1:
   version "1.0.1"
@@ -5277,13 +5259,6 @@ import-from@^3.0.0:
   integrity sha512-CiuXOFFSzkU5x/CR0+z7T91Iht4CXgfCxVOFRhh2Zyhg5wOpWvvDLQUsWl+gcN+QscYBjez8hDCt85O7RLDttQ==
   dependencies:
     resolve-from "^5.0.0"
-
-import@^0.0.6:
-  version "0.0.6"
-  resolved "https://registry.npmjs.org/import/-/import-0.0.6.tgz"
-  integrity sha512-QPhTdjy9J4wUzmWSG7APkSgMFuPGPw+iJTYUblcfc2AfpqaatbwgCldK1HoLYx+v/+lWvab63GWZtNkcnj9JcQ==
-  dependencies:
-    optimist "0.3.x"
 
 indent-string@^4.0.0:
   version "4.0.0"
@@ -6436,13 +6411,6 @@ open@^8.4.2:
     define-lazy-prop "^2.0.0"
     is-docker "^2.1.1"
     is-wsl "^2.2.0"
-
-optimist@0.3.x:
-  version "0.3.7"
-  resolved "https://registry.npmjs.org/optimist/-/optimist-0.3.7.tgz"
-  integrity sha512-TCx0dXQzVtSCg2OgY/bO9hjM9cV4XYx09TVK+s3+FhkjT6LovsLe+pPMzpWf+6yXK/hUizs2gUoTw3jHM0VaTQ==
-  dependencies:
-    wordwrap "~0.0.2"
 
 ora@^8.1.0:
   version "8.1.0"
@@ -8552,11 +8520,6 @@ wordwrap@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/wordwrap/-/wordwrap-1.0.0.tgz"
   integrity sha512-gvVzJFlPycKc5dZN4yPkP8w7Dc37BtP1yczEneOb4uq34pXZcvrtRTmWV8W+Ume+XCxKgbjM+nevkyFPMybd4Q==
-
-wordwrap@~0.0.2:
-  version "0.0.3"
-  resolved "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.3.tgz"
-  integrity sha512-1tMA907+V4QmxV7dbRvb4/8MaRALK6q9Abid3ndMYnbyo8piisCmeONVqVSXqQA3KaP4SLt5b7ud6E2sqP8TFw==
 
 workerpool@^6.5.1:
   version "6.5.1"

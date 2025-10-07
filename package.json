@@ -40,13 +40,10 @@
     "@cucumber/cucumber": "12.2.0",
     "@cypress/browserify-preprocessor": "^3.0.2",
     "auto-changelog": "^2.5.0",
-    "cross-env": "^10.0.0",
     "cypress": "^15.3.0",
     "cypress-network-idle": "^1.15.0",
     "date-fns": "^3.6.0",
-    "dotenv": "^17.2.2",
     "graphql-request": "^2.0.0",
-    "import": "^0.0.6",
     "mock-socket": "^9.0.3",
     "multiple-cucumber-html-reporter": "^3.9.3"
   },
