@@ -39,9 +39,7 @@
     "@badeball/cypress-cucumber-preprocessor": "^23.2.0",
     "@cucumber/cucumber": "12.2.0",
     "@cypress/browserify-preprocessor": "^3.0.2",
-    "@faker-js/faker": "9.9.0",
     "auto-changelog": "^2.5.0",
-    "bcryptjs": "^3.0.2",
     "cross-env": "^10.0.0",
     "cypress": "^15.3.0",
     "cypress-network-idle": "^1.15.0",
@@ -50,8 +48,7 @@
     "graphql-request": "^2.0.0",
     "import": "^0.0.6",
     "mock-socket": "^9.0.3",
-    "multiple-cucumber-html-reporter": "^3.9.3",
-    "slugify": "^1.6.6"
+    "multiple-cucumber-html-reporter": "^3.9.3"
   },
   "optionalDependencies": {
     "@vuepress/bundler-vite": "^2.0.0-rc.18",
