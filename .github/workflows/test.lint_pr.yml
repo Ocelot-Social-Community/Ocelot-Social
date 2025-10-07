@@ -32,7 +32,7 @@ jobs:
             webapp
             maintenance
             database
-            styleguide
+            e2e
             docu
             docker
             release
