@@ -3930,11 +3930,6 @@ dashdash@^1.12.0:
   dependencies:
     assert-plus "^1.0.0"
 
-date-fns@^3.6.0:
-  version "3.6.0"
-  resolved "https://registry.npmjs.org/date-fns/-/date-fns-3.6.0.tgz"
-  integrity sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==
-
 dayjs@^1.10.4, dayjs@^1.11.13:
   version "1.11.13"
   resolved "https://registry.npmjs.org/dayjs/-/dayjs-1.11.13.tgz"
@@ -5042,7 +5037,7 @@ graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.4:
 
 graphql-request@^2.0.0:
   version "2.0.0"
-  resolved "https://registry.npmjs.org/graphql-request/-/graphql-request-2.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/graphql-request/-/graphql-request-2.0.0.tgz#8dd12cf1eb2ce0c80f4114fd851741e091134862"
   integrity sha512-Ww3Ax+G3l2d+mPT8w7HC9LfrKjutnCKtnDq7ZZp2ghVk5IQDjwAk3/arRF1ix17Ky15rm0hrSKVKxRhIVlSuoQ==
 
 gray-matter@^4.0.3:
