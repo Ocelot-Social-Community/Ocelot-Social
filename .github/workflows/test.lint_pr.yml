@@ -32,6 +32,7 @@ jobs:
             webapp
             maintenance
             database
+            styleguide
             docu
             docker
             release
