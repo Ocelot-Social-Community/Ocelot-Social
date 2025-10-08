@@ -26,7 +26,6 @@ export default {
     userId: { type: String, required: true },
     isMember: { type: Boolean, required: true },
     isNonePendingMember: { type: Boolean, required: true },
-    labelOnNoneMember: { type: String, default: null },
     filledOnNoneMember: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
@@ -56,10 +55,6 @@ export default {
             : this.$t('group.joinLeaveButton.iAmMember')
         } else {
           return this.$t('group.joinLeaveButton.pendingMember')
-        }
-      } else {
-        if (this.labelOnNoneMember) {
-          return this.labelOnNoneMember
         }
       }
       return this.$t('group.joinLeaveButton.join')
