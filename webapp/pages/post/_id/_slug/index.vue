@@ -125,27 +125,81 @@
                 @toggleObservePost="toggleObservePost"
               />
             </div>
-            <!-- Comments -->
+            <!-- comments -->
             <ds-section>
+              <!-- comment list -->
               <comment-list
                 :post="post"
                 @toggleNewCommentForm="toggleNewCommentForm"
                 @reply="reply"
               />
               <ds-space margin-bottom="large" />
+              <!-- commenting form -->
               <comment-form
                 v-if="showNewCommentForm && !isBlocked && canCommentPost"
                 ref="commentForm"
                 :post="post"
                 @createComment="createComment"
               />
-              <ds-placeholder v-if="isBlocked">
-                {{ $t('settings.blocked-users.explanation.commenting-disabled') }}
-                <br />
-                {{ $t('settings.blocked-users.explanation.commenting-explanation') }}
-                <page-params-link :pageParams="links.FAQ">
-                  {{ $t('site.faq') }}
-                </page-params-link>
+              <!-- commenting impossible -->
+              <ds-placeholder v-else>
+                <hc-empty
+                  margin="xxx-small"
+                  icon="messages"
+                  :message="$t('settings.blocked-users.explanation.commenting-disabled')"
+                />
+                <!-- blocked author -->
+                <ds-space v-if="isBlocked" centered margin="xxx-small">
+                  <ds-space margin-bottom="small" />
+                  <ds-heading tag="h4">
+                    {{ $t('contribution.comment.commenting-disabled.blocked-author.reason') }}
+                  </ds-heading>
+                  <ds-text>
+                    {{
+                      $t('contribution.comment.commenting-disabled.blocked-author.call-to-action')
+                    }}
+                  </ds-text>
+                  <nuxt-link :to="authorLink">
+                    <base-button icon="arrow-right" filled>
+                      {{
+                        $t(
+                          'contribution.comment.commenting-disabled.blocked-author.button-label',
+                          { name: post.author.name },
+                        )
+                      }}
+                    </base-button>
+                  </nuxt-link>
+                </ds-space>
+                <!-- no group member -->
+                <ds-space v-else-if="!canCommentPost" centered margin="xxx-small">
+                  <ds-space margin-bottom="small" />
+                  <ds-heading tag="h4">
+                    {{ $t('contribution.comment.commenting-disabled.no-group-member.reason') }}
+                    <nuxt-link
+                      :to="{
+                        name: 'groups-id-slug',
+                        params: { slug: post.group.slug, id: post.group.id },
+                      }"
+                    >
+                      {{ post.group.name }}
+                    </nuxt-link>
+                  </ds-heading>
+                  <ds-text>
+                    {{
+                      $t(
+                        'contribution.comment.commenting-disabled.no-group-member.call-to-action',
+                      )
+                    }}
+                  </ds-text>
+                  <join-leave-button
+                    :group="post.group || {}"
+                    :userId="$store.getters['auth/user'].id"
+                    :isMember="isGroupMember"
+                    :isNonePendingMember="isGroupMemberNonePending"
+                    :filledOnNoneMember="true"
+                    @update="updateJoinLeave"
+                  />
+                </ds-space>
               </ds-placeholder>
             </ds-section>
           </base-card>
@@ -166,11 +220,12 @@ import CommentForm from '~/components/CommentForm/CommentForm'
 import CommentList from '~/components/CommentList/CommentList'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
+import HcEmpty from '~/components/Empty/Empty'
+import JoinLeaveButton from '~/components/Button/JoinLeaveButton'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import ShoutButton from '~/components/ShoutButton.vue'
 import ObserveButton from '~/components/ObserveButton.vue'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
-import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 import {
   postMenuModalsData,
   deletePostMutation,
@@ -198,11 +253,12 @@ export default {
     ContentViewer,
     DateTimeRange,
     HcCategory,
+    HcEmpty,
     HcHashtag,
+    JoinLeaveButton,
     ShoutButton,
     ObserveButton,
     LocationTeaser,
-    PageParamsLink,
     ResponsiveImage,
     UserTeaser,
   },
@@ -282,6 +338,16 @@ export default {
       if (!author) return false
       return this.$store.getters['auth/user'].id === author.id
     },
+    authorLink() {
+      const { id, slug } = this.post.author
+      return { name: 'profile-id-slug', params: { slug, id } }
+    },
+    isGroupMember() {
+      return this.group ? !!this.group.myRole : false
+    },
+    isGroupMemberNonePending() {
+      return this.group ? ['usual', 'admin', 'owner'].includes(this.group.myRole) : false
+    },
     sortedTags() {
       return sortTagsAlphabetically(this.post.tags)
     },
@@ -342,6 +408,10 @@ export default {
     },
     toggleNewCommentForm(showNewCommentForm) {
       this.showNewCommentForm = showNewCommentForm
+    },
+    updateJoinLeave({ myRoleInGroup }) {
+      this.post.group.myRole = myRoleInGroup
+      this.$apollo.queries.Group.refetch()
     },
   },
   apollo: {
@@ -445,6 +515,11 @@ export default {
     }
   }
 }
+
+.join-leave-button {
+  width: auto;
+  margin: auto !important;
+}
 </style>
 
 <style lang="scss" scoped>
@@ -455,9 +530,5 @@ export default {
   gap: $space-small;
   margin-top: $space-small;
   margin-bottom: calc($space-base * 2);
-}
-
-.ds-heading {
-  margin-top: 0;
 }
 </style>

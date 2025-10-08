@@ -333,6 +333,19 @@
         "spirituality": null
       }
     },
+    "comment": {
+      "commenting-disabled": {
+        "blocked-author": {
+          "button-label": null,
+          "call-to-action": null,
+          "reason": null
+        },
+        "no-group-member": {
+          "call-to-action": null,
+          "reason": null
+        }
+      }
+    },
     "emotions-label": {
       "angry": "Irritado",
       "cry": "Chorando",
@@ -833,9 +846,6 @@
       "title": null
     },
     "createNewEvent": {
-      "forGroup": {
-        "title": null
-      },
       "title": null
     },
     "edited": "editado",
@@ -1020,7 +1030,6 @@
       "explanation": {
         "closing": "Isso deve ser suficiente por enquanto para que os usuários bloqueados não possam mais incomodá-lo.",
         "commenting-disabled": null,
-        "commenting-explanation": null,
         "intro": "Se outro usuário foi bloqueado por você, isto é o que acontece:",
         "notifications": "Usuários bloqueados não receberão mais notificações se forem mencionados em suas mensagens.",
         "their-perspective": "Vice versa: A pessoa bloqueada também não verá mais suas mensagens em seu feed de notícias.",

@@ -333,6 +333,19 @@
         "spirituality": "Spiritualität"
       }
     },
+    "comment": {
+      "commenting-disabled": {
+        "blocked-author": {
+          "button-label": "Besuche „{name}“",
+          "call-to-action": "Möchtest du kommentieren, dann deblockiere ihn auf seinem Profil.",
+          "reason": "Du blockierst den Beitragsautor."
+        },
+        "no-group-member": {
+          "call-to-action": "Möchtest du kommentieren, dann trete der Gruppe bei.",
+          "reason": "Du bist kein Mitglied der Gruppe:"
+        }
+      }
+    },
     "emotions-label": {
       "angry": "Verärgert",
       "cry": "Zum Weinen",
@@ -1017,7 +1030,6 @@
       "explanation": {
         "closing": "Das sollte fürs Erste genügen, damit blockierte Nutzer dich nicht mehr länger belästigen können.",
         "commenting-disabled": "Du kannst den Beitrag derzeit nicht kommentieren.",
-        "commenting-explanation": "Dafür kann es mehrere Gründe geben, bitte schau in unsere ",
         "intro": "Wenn ein anderer Nutzer durch dich blockiert wurde, dann passiert Folgendes:",
         "notifications": "Von Dir blockierte Nutzer werden keine Benachrichtigungen mehr erhalten, falls sie in deinen Beiträgen erwähnt werden.",
         "their-perspective": "Umgekehrt das gleiche: Die blockierte Person bekommt auch in ihren Benachrichtigungen deine Beiträge nicht mehr zu sehen.",

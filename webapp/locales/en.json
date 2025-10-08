@@ -333,6 +333,19 @@
         "spirituality": "Spirituality"
       }
     },
+    "comment": {
+      "commenting-disabled": {
+        "blocked-author": {
+          "button-label": "Visit “{name}”",
+          "call-to-action": "If you want to leave a comment, unblock them in their profile.",
+          "reason": "You are blocking the author of the post."
+        },
+        "no-group-member": {
+          "call-to-action": "If you want to comment, join the group.",
+          "reason": "You are not a member of the group:"
+        }
+      }
+    },
     "emotions-label": {
       "angry": "Angry",
       "cry": "Cry",
@@ -1016,8 +1029,7 @@
       "empty": "So far, you have not blocked anybody.",
       "explanation": {
         "closing": "This should be sufficient for now so that blocked users can no longer bother you.",
-        "commenting-disabled": "Commenting is not possible at this time on this post.",
-        "commenting-explanation": "This can happen for several reasons, please see our ",
+        "commenting-disabled": "You cannot comment on this post at this time.",
         "intro": "If another user has been blocked by you, this is what happens:",
         "notifications": "Blocked users will no longer receive notifications if they mention each other.",
         "their-perspective": "Vice versa: The blocked person will also no longer be able to interact with your contributions.",
