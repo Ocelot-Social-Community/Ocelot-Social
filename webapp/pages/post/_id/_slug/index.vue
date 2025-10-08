@@ -162,10 +162,9 @@
                   <nuxt-link :to="authorLink">
                     <base-button icon="arrow-right" filled>
                       {{
-                        $t(
-                          'contribution.comment.commenting-disabled.blocked-author.button-label',
-                          { name: post.author.name },
-                        )
+                        $t('contribution.comment.commenting-disabled.blocked-author.button-label', {
+                          name: post.author.name,
+                        })
                       }}
                     </base-button>
                   </nuxt-link>
@@ -186,9 +185,7 @@
                   </ds-heading>
                   <ds-text>
                     {{
-                      $t(
-                        'contribution.comment.commenting-disabled.no-group-member.call-to-action',
-                      )
+                      $t('contribution.comment.commenting-disabled.no-group-member.call-to-action')
                     }}
                   </ds-text>
                   <join-leave-button
