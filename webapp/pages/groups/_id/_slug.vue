@@ -598,7 +598,7 @@ export default {
       error(error) {
         this.$toast.error(error.message)
       },
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: 'network-only',
     },
     GroupMembers: {
       query() {
