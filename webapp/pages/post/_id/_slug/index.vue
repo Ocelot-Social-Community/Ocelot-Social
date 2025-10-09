@@ -141,7 +141,7 @@
                 :post="post"
                 @createComment="createComment"
               />
-              <!-- commenting impossible -->
+              <!-- commenting disabled -->
               <ds-placeholder v-else>
                 <hc-empty
                   margin="xxx-small"
