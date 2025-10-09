@@ -406,7 +406,7 @@ export default {
     toggleNewCommentForm(showNewCommentForm) {
       this.showNewCommentForm = showNewCommentForm
     },
-    async updateJoinGroup({ myRoleInGroup }) {
+    updateJoinGroup({ myRoleInGroup }) {
       this.post.group.myRole = myRoleInGroup
       this.$apollo.queries.Group.refetch({ fetchPolicy: 'network-only' })
       this.$toast.success(this.$t('post.comment.joinGroup', { name: this.post.group.name }))
