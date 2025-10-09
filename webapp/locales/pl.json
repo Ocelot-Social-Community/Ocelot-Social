@@ -840,7 +840,8 @@
       "reply": null,
       "submit": "Komentarz",
       "submitted": "Komentarz dodany",
-      "updated": null
+      "updated": null,
+      "joinGroup": null
     },
     "createNewArticle": {
       "title": null

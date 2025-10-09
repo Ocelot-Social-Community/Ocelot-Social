@@ -840,7 +840,8 @@
       "reply": null,
       "submit": "Commentar",
       "submitted": "Comentário Enviado",
-      "updated": "Alterações salvas"
+      "updated": "Alterações salvas",
+      "joinGroup": null
     },
     "createNewArticle": {
       "title": null

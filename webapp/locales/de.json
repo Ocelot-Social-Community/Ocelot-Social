@@ -840,7 +840,8 @@
       "reply": "Antworten",
       "submit": "Kommentiere",
       "submitted": "Kommentar gesendet",
-      "updated": "Änderungen gespeichert"
+      "updated": "Änderungen gespeichert",
+      "joinGroup": "Gruppe „<b>{name}</b>“ beigetreten"
     },
     "createNewArticle": {
       "title": "Erstelle einen Beitrag"

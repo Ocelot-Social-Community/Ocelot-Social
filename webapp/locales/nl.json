@@ -840,7 +840,8 @@
       "reply": null,
       "submit": null,
       "submitted": null,
-      "updated": null
+      "updated": null,
+      "joinGroup": null
     },
     "createNewArticle": {
       "title": null
