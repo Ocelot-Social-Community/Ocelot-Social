@@ -193,7 +193,7 @@
                     :userId="$store.getters['auth/user'].id"
                     :isMember="isGroupMember"
                     :isNonePendingMember="isGroupMemberNonePending"
-                    :filledOnNoneMember="true"
+                    :filled="true"
                     @update="updateJoinLeave"
                   />
                 </ds-space>
