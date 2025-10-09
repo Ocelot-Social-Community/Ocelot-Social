@@ -840,7 +840,8 @@
       "reply": "Ответ",
       "submit": "Комментировать",
       "submitted": "Комментарий отправлен",
-      "updated": "Изменения сохраненные"
+      "updated": "Изменения сохраненные",
+      "joinGroup": null
     },
     "createNewArticle": {
       "title": null

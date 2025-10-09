@@ -194,7 +194,7 @@
                     :isMember="isGroupMember"
                     :isNonePendingMember="isGroupMemberNonePending"
                     :filled="true"
-                    @update="updateJoinLeave"
+                    @update="updateJoinGroup"
                   />
                 </ds-space>
               </ds-placeholder>
@@ -406,9 +406,10 @@ export default {
     toggleNewCommentForm(showNewCommentForm) {
       this.showNewCommentForm = showNewCommentForm
     },
-    updateJoinLeave({ myRoleInGroup }) {
+    async updateJoinGroup({ myRoleInGroup }) {
       this.post.group.myRole = myRoleInGroup
-      this.$apollo.queries.Group.refetch()
+      this.$apollo.queries.Group.refetch({ fetchPolicy: 'network-only' })
+      this.$toast.success(this.$t('post.comment.joinGroup', { name: this.post.group.name }))
     },
   },
   apollo: {

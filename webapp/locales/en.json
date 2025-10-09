@@ -840,7 +840,8 @@
       "reply": "Reply",
       "submit": "Comment",
       "submitted": "Comment submitted!",
-      "updated": "Changes saved!"
+      "updated": "Changes saved!",
+      "joinGroup": "Joined group „<b>{name}</b>“"
     },
     "createNewArticle": {
       "title": "Create an Article"

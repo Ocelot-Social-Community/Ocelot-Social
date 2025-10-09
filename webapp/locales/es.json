@@ -840,7 +840,8 @@
       "reply": "Contestar",
       "submit": "Comentario",
       "submitted": "Comentario enviado",
-      "updated": "Cambios guardados"
+      "updated": "Cambios guardados",
+      "joinGroup": null
     },
     "createNewArticle": {
       "title": null
