@@ -195,8 +195,6 @@ import links from '~/constants/links.js'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import postListActions from '~/mixins/postListActions'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
-import UnblockAuthor from '~/components/Empty/CallToAction/UnblockAuthor.vue'
-import JoinLeaveGroup from '~/components/Empty/CallToAction/JoinLeaveGroup.vue'
 
 export default {
   name: 'PostSlug',
