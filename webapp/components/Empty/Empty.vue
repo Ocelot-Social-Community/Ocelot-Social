@@ -1,19 +1,22 @@
 <template>
-  <ds-space class="hc-empty" centered :margin="margin">
-    <ds-text>
-      <img
-        :src="iconPath"
-        width="80"
-        class="hc-empty-icon"
-        style="margin-bottom: 5px"
-        alt="Empty"
-      />
-      <br />
-      <ds-text v-show="message" class="hc-empty-message" color="softer">
-        {{ message }}
+  <div>
+    <ds-space class="hc-empty" centered :margin="margin">
+      <ds-text>
+        <img
+          :src="iconPath"
+          width="80"
+          class="hc-empty-icon"
+          style="margin-bottom: 5px"
+          alt="Empty"
+        />
+        <br />
+        <ds-text v-show="message" class="hc-empty-message" color="softer">
+          {{ message }}
+        </ds-text>
       </ds-text>
-    </ds-text>
-  </ds-space>
+    </ds-space>
+    <slot />
+  </div>
 </template>
 
 <script>

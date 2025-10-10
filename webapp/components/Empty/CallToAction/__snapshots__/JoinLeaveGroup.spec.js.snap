@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`JoinLeaveGroup.vue shallowMount renders 1`] = `
+<div class="ds-space ds-space-centered" style="margin-top: 2px; margin-bottom: 2px;">
+  <div class="ds-space" style="margin-bottom: 16px;"></div>
+  <h4 class="ds-heading ds-heading-h4">
+    contribution.comment.commenting-disabled.no-group-member.reason
+    <a>
+      Group 123
+    </a>
+  </h4>
+  <p class="ds-text">
+    contribution.comment.commenting-disabled.no-group-member.call-to-action
+  </p> <button type="button" class="join-leave-button base-button --filled has-tooltip" data-original-title="null"><span class="base-icon"><!----></span>
+    <!---->
+    group.joinLeaveButton.iAmMember
+  </button>
+</div>
+`;
