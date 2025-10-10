@@ -136,7 +136,11 @@
               <ds-space margin-bottom="large" />
               <!-- commenting form -->
               <comment-form
-                v-if="showNewCommentForm && !isBlocked && canCommentPost"
+                v-if="
+                  showNewCommentForm &&
+                  !isBlocked &&
+                  (!this.post.group || commentingAllowedByGroupRole)
+                "
                 ref="commentForm"
                 :post="post"
                 @createComment="createComment"
@@ -150,7 +154,7 @@
                 >
                   <cta-unblock-author v-if="isBlocked" :author="post.author" />
                   <cta-join-leave-group
-                    v-else-if="!canCommentPost"
+                    v-else-if="!commentingAllowedByGroupRole"
                     :group="post.group"
                     @update="updateJoinLeave"
                   />
@@ -311,10 +315,8 @@ export default {
         '--hero-image-aspect-ratio': 1.0 / this.post.image.aspectRatio,
       }
     },
-    canCommentPost() {
-      return (
-        !this.post.group || (this.group && ['usual', 'admin', 'owner'].includes(this.group.myRole))
-      )
+    commentingAllowedByGroupRole() {
+      return this.group && ['usual', 'admin', 'owner'].includes(this.group.myRole)
     },
   },
   methods: {
