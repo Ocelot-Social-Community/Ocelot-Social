@@ -333,6 +333,19 @@
         "spirituality": null
       }
     },
+    "comment": {
+      "commenting-disabled": {
+        "blocked-author": {
+          "button-label": null,
+          "call-to-action": null,
+          "reason": null
+        },
+        "no-group-member": {
+          "call-to-action": null,
+          "reason": null
+        }
+      }
+    },
     "emotions-label": {
       "angry": "Enfadado",
       "cry": "Llorar",
@@ -824,6 +837,7 @@
   },
   "post": {
     "comment": {
+      "joinGroup": null,
       "reply": "Contestar",
       "submit": "Comentario",
       "submitted": "Comentario enviado",
@@ -833,9 +847,6 @@
       "title": null
     },
     "createNewEvent": {
-      "forGroup": {
-        "title": null
-      },
       "title": null
     },
     "edited": "editado",
@@ -1020,7 +1031,6 @@
       "explanation": {
         "closing": "Esto debería ser suficiente por ahora para que los usuarios bloqueados no puedan molestarle más.",
         "commenting-disabled": "No es posible hacer comentarios en este momento en esta contribución",
-        "commenting-explanation": "Esto puede suceder por varias razones, por favor vea nuestra ",
         "intro": "Si otro usuario ha sido bloqueado por usted, esto es lo que sucede:",
         "notifications": "Los usuarios bloqueados no recibirán más notificaciones si se mencionan en sus contribuciones.",
         "their-perspective": "Viceversa: la persona bloqueada tampoco verá más sus contribuciones en sus noticias.",

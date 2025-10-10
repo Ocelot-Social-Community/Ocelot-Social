@@ -333,6 +333,19 @@
         "spirituality": null
       }
     },
+    "comment": {
+      "commenting-disabled": {
+        "blocked-author": {
+          "button-label": null,
+          "call-to-action": null,
+          "reason": null
+        },
+        "no-group-member": {
+          "call-to-action": null,
+          "reason": null
+        }
+      }
+    },
     "emotions-label": {
       "angry": null,
       "cry": null,
@@ -824,6 +837,7 @@
   },
   "post": {
     "comment": {
+      "joinGroup": null,
       "reply": null,
       "submit": null,
       "submitted": null,
@@ -833,9 +847,6 @@
       "title": null
     },
     "createNewEvent": {
-      "forGroup": {
-        "title": null
-      },
       "title": null
     },
     "edited": null,
@@ -1020,7 +1031,6 @@
       "explanation": {
         "closing": null,
         "commenting-disabled": null,
-        "commenting-explanation": null,
         "intro": null,
         "notifications": null,
         "their-perspective": null,
