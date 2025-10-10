@@ -352,15 +352,13 @@ export default {
       membersCountToLoad: 25,
       updateGroupMutation,
       isDescriptionCollapsed: true,
+      group: {},
     }
   },
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
-    group() {
-      return this.Group && this.Group[0] ? this.Group[0] : {}
-    },
     groupName() {
       const { name } = this.group || {}
       return name || this.$t('profile.userAnonym')
@@ -556,8 +554,8 @@ export default {
       // "membersCountStartValue" is updated to avoid counting from 0 when join/leave
       this.membersCountStartValue = (this.GroupMembers && this.GroupMembers.length) || 0
     },
-    updateJoinLeave({ myRoleInGroup }) {
-      this.Group[0].myRole = myRoleInGroup
+    updateJoinLeave() {
+      this.$apollo.queries.Group.refetch()
       if (this.isAllowedSeeingGroupMembers) {
         this.$apollo.queries.GroupMembers.refetch()
       } else {
@@ -594,6 +592,9 @@ export default {
         return {
           id: this.$route.params.id,
         }
+      },
+      update({ Group }) {
+        this.group = Group && Group[0] ? Group[0] : {}
       },
       error(error) {
         this.$toast.error(error.message)
