@@ -155,7 +155,7 @@
                   <cta-unblock-author v-if="isBlocked" :author="post.author" />
                   <cta-join-leave-group
                     v-else-if="!commentingAllowedByGroupRole"
-                    :group="post.group"
+                    :group="group"
                     @update="updateJoinLeave"
                   />
                 </hc-empty>
