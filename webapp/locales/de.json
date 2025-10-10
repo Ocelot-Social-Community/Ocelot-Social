@@ -837,11 +837,11 @@
   },
   "post": {
     "comment": {
+      "joinGroup": "Gruppe „<b>{name}</b>“ beigetreten",
       "reply": "Antworten",
       "submit": "Kommentiere",
       "submitted": "Kommentar gesendet",
-      "updated": "Änderungen gespeichert",
-      "joinGroup": "Gruppe „<b>{name}</b>“ beigetreten"
+      "updated": "Änderungen gespeichert"
     },
     "createNewArticle": {
       "title": "Erstelle einen Beitrag"

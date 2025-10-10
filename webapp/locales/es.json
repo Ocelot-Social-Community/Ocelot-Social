@@ -837,11 +837,11 @@
   },
   "post": {
     "comment": {
+      "joinGroup": null,
       "reply": "Contestar",
       "submit": "Comentario",
       "submitted": "Comentario enviado",
-      "updated": "Cambios guardados",
-      "joinGroup": null
+      "updated": "Cambios guardados"
     },
     "createNewArticle": {
       "title": null
