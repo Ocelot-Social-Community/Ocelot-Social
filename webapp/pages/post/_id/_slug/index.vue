@@ -406,9 +406,8 @@ export default {
     toggleNewCommentForm(showNewCommentForm) {
       this.showNewCommentForm = showNewCommentForm
     },
-    updateJoinLeave({ myRoleInGroup }) {
-      this.post.group.myRole = myRoleInGroup
-      this.$apollo.queries.Group.refetch({ fetchPolicy: 'network-only' })
+    updateJoinLeave() {
+      this.$apollo.queries.Group.refetch()
       this.$toast.success(this.$t('post.comment.joinGroup', { name: this.post.group.name }))
     },
   },
@@ -446,6 +445,7 @@ export default {
       skip() {
         return !(this.post && this.post.group)
       },
+      fetchPolicy: 'cache-and-network',
     },
   },
 }
