@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`JoinLeaveButton.vue shallowMount renders 1`] = `
+<base-button-stub icon="plus" size="regular" type="button" class="join-leave-button has-tooltip" data-original-title="null">
+  group.joinLeaveButton.join
+</base-button-stub>
+`;

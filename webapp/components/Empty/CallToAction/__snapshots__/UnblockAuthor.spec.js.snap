@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UnblockAuthor.vue shallowMount renders 1`] = `
+<ds-space-stub marginbottom="large" margin="xxx-small" centered="true" tag="div">
+  <ds-space-stub marginbottom="small" tag="div"></ds-space-stub>
+  <ds-heading-stub tag="h4">
+    contribution.comment.commenting-disabled.blocked-author.reason
+  </ds-heading-stub>
+  <ds-text-stub tag="p">
+    contribution.comment.commenting-disabled.blocked-author.call-to-action
+  </ds-text-stub>
+  <nuxt-link to="[object Object]">
+    <base-button-stub filled="true" icon="arrow-right" size="regular" type="button">
+      contribution.comment.commenting-disabled.blocked-author.button-label
+    </base-button-stub>
+  </nuxt-link>
+</ds-space-stub>
+`;
