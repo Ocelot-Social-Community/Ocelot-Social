@@ -1,10 +1,10 @@
 import { mount, RouterLinkStub } from '@vue/test-utils'
 
-import Component from './JoinLeaveGroup.vue'
+import Component from './CtaJoinLeaveGroup.vue'
 
 const localVue = global.localVue
 
-describe('JoinLeaveGroup.vue', () => {
+describe('CtaJoinLeaveGroup.vue', () => {
   let propsData, wrapper, mocks, stubs
 
   beforeEach(() => {

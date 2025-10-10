@@ -1,10 +1,10 @@
 import { shallowMount } from '@vue/test-utils'
 
-import Component from './UnblockAuthor.vue'
+import Component from './CtaUnblockAuthor.vue'
 
 const localVue = global.localVue
 
-describe('UnblockAuthor.vue', () => {
+describe('CtaUnblockAuthor.vue', () => {
   let propsData, wrapper, mocks
 
   beforeEach(() => {

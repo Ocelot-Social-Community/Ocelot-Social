@@ -169,25 +169,25 @@
 
 <script>
 import ContentViewer from '~/components/Editor/ContentViewer'
-import HcCategory from '~/components/Category'
-import HcHashtag from '~/components/Hashtag/Hashtag'
 import CommentForm from '~/components/CommentForm/CommentForm'
 import CommentList from '~/components/CommentList/CommentList'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
+import CtaUnblockAuthor from '~/components/Empty/CallToAction/CtaUnblockAuthor.vue'
+import CtaJoinLeaveGroup from '~/components/Empty/CallToAction/CtaJoinLeaveGroup.vue'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
+import HcCategory from '~/components/Category'
 import HcEmpty from '~/components/Empty/Empty'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
-import ShoutButton from '~/components/ShoutButton.vue'
-import ObserveButton from '~/components/ObserveButton.vue'
+import HcHashtag from '~/components/Hashtag/Hashtag'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
-import CtaUnblockAuthor from '~/components/Empty/CallToAction/UnblockAuthor.vue'
-import CtaJoinLeaveGroup from '~/components/Empty/CallToAction/JoinLeaveGroup.vue'
+import ObserveButton from '~/components/ObserveButton.vue'
+import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
+import ShoutButton from '~/components/ShoutButton.vue'
+import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import {
   postMenuModalsData,
   deletePostMutation,
   sortTagsAlphabetically,
 } from '~/components/utils/PostHelpers'
-import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 import PostQuery from '~/graphql/PostQuery'
 import { groupQuery } from '~/graphql/groups'
 import PostMutations from '~/graphql/PostMutations'
@@ -203,20 +203,20 @@ export default {
     mode: 'out-in',
   },
   components: {
-    ContentMenu,
     CommentForm,
     CommentList,
+    ContentMenu,
     ContentViewer,
+    CtaUnblockAuthor,
+    CtaJoinLeaveGroup,
     DateTimeRange,
     HcCategory,
     HcEmpty,
     HcHashtag,
-    CtaUnblockAuthor,
-    CtaJoinLeaveGroup,
-    ShoutButton,
-    ObserveButton,
     LocationTeaser,
+    ObserveButton,
     ResponsiveImage,
+    ShoutButton,
     UserTeaser,
   },
   mixins: [GetCategories, postListActions, SortCategories],

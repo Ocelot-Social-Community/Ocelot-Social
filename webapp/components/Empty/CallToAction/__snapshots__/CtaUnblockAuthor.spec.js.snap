@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`UnblockAuthor.vue shallowMount renders 1`] = `
+exports[`CtaUnblockAuthor.vue shallowMount renders 1`] = `
 <ds-space-stub marginbottom="large" margin="xxx-small" centered="true" tag="div">
   <ds-space-stub marginbottom="small" tag="div"></ds-space-stub>
   <ds-heading-stub tag="h4">

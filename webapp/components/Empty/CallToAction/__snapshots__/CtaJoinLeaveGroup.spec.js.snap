@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`JoinLeaveGroup.vue mount renders 1`] = `
+exports[`CtaJoinLeaveGroup.vue mount renders 1`] = `
 <div class="ds-space ds-space-centered" style="margin-top: 2px; margin-bottom: 2px;">
   <div class="ds-space" style="margin-bottom: 16px;"></div>
   <h4 class="ds-heading ds-heading-h4">
