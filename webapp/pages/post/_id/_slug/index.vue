@@ -147,56 +147,14 @@
                   margin="xxx-small"
                   icon="messages"
                   :message="$t('settings.blocked-users.explanation.commenting-disabled')"
-                />
-                <!-- blocked author -->
-                <ds-space v-if="isBlocked" centered margin="xxx-small">
-                  <ds-space margin-bottom="small" />
-                  <ds-heading tag="h4">
-                    {{ $t('contribution.comment.commenting-disabled.blocked-author.reason') }}
-                  </ds-heading>
-                  <ds-text>
-                    {{
-                      $t('contribution.comment.commenting-disabled.blocked-author.call-to-action')
-                    }}
-                  </ds-text>
-                  <nuxt-link :to="authorLink">
-                    <base-button icon="arrow-right" filled>
-                      {{
-                        $t('contribution.comment.commenting-disabled.blocked-author.button-label', {
-                          name: post.author.name,
-                        })
-                      }}
-                    </base-button>
-                  </nuxt-link>
-                </ds-space>
-                <!-- no group member -->
-                <ds-space v-else-if="!canCommentPost" centered margin="xxx-small">
-                  <ds-space margin-bottom="small" />
-                  <ds-heading tag="h4">
-                    {{ $t('contribution.comment.commenting-disabled.no-group-member.reason') }}
-                    <nuxt-link
-                      :to="{
-                        name: 'groups-id-slug',
-                        params: { slug: post.group.slug, id: post.group.id },
-                      }"
-                    >
-                      {{ post.group.name }}
-                    </nuxt-link>
-                  </ds-heading>
-                  <ds-text>
-                    {{
-                      $t('contribution.comment.commenting-disabled.no-group-member.call-to-action')
-                    }}
-                  </ds-text>
-                  <join-leave-button
-                    :group="post.group || {}"
-                    :userId="$store.getters['auth/user'].id"
-                    :isMember="isGroupMember"
-                    :isNonePendingMember="isGroupMemberNonePending"
-                    :filled="true"
+                >
+                  <cta-unblock-author v-if="isBlocked" :author="post.author" />
+                  <cta-join-leave-group
+                    v-else-if="!canCommentPost"
+                    :group="post.group"
                     @update="updateJoinLeave"
                   />
-                </ds-space>
+                </hc-empty>
               </ds-placeholder>
             </ds-section>
           </base-card>
@@ -218,11 +176,12 @@ import CommentList from '~/components/CommentList/CommentList'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import HcEmpty from '~/components/Empty/Empty'
-import JoinLeaveButton from '~/components/Button/JoinLeaveButton'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import ShoutButton from '~/components/ShoutButton.vue'
 import ObserveButton from '~/components/ObserveButton.vue'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
+import CtaUnblockAuthor from '~/components/Empty/CallToAction/UnblockAuthor.vue'
+import CtaJoinLeaveGroup from '~/components/Empty/CallToAction/JoinLeaveGroup.vue'
 import {
   postMenuModalsData,
   deletePostMutation,
@@ -236,6 +195,8 @@ import links from '~/constants/links.js'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import postListActions from '~/mixins/postListActions'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
+import UnblockAuthor from '~/components/Empty/CallToAction/UnblockAuthor.vue'
+import JoinLeaveGroup from '~/components/Empty/CallToAction/JoinLeaveGroup.vue'
 
 export default {
   name: 'PostSlug',
@@ -252,7 +213,8 @@ export default {
     HcCategory,
     HcEmpty,
     HcHashtag,
-    JoinLeaveButton,
+    CtaUnblockAuthor,
+    CtaJoinLeaveGroup,
     ShoutButton,
     ObserveButton,
     LocationTeaser,
@@ -334,16 +296,6 @@ export default {
       const { author } = this.post
       if (!author) return false
       return this.$store.getters['auth/user'].id === author.id
-    },
-    authorLink() {
-      const { id, slug } = this.post.author
-      return { name: 'profile-id-slug', params: { slug, id } }
-    },
-    isGroupMember() {
-      return this.group ? !!this.group.myRole : false
-    },
-    isGroupMemberNonePending() {
-      return this.group ? ['usual', 'admin', 'owner'].includes(this.group.myRole) : false
     },
     sortedTags() {
       return sortTagsAlphabetically(this.post.tags)
@@ -512,11 +464,6 @@ export default {
       min-height: 0px;
     }
   }
-}
-
-.join-leave-button {
-  width: auto;
-  margin: auto !important;
 }
 </style>
 
