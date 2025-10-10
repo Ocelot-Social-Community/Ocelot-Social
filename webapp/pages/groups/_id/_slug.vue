@@ -599,7 +599,7 @@ export default {
       error(error) {
         this.$toast.error(error.message)
       },
-      fetchPolicy: 'network-only',
+      fetchPolicy: 'cache-and-network',
     },
     GroupMembers: {
       query() {
