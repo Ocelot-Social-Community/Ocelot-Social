@@ -240,12 +240,10 @@ describe('GroupProfileSlug', () => {
           currentUserMock.mockReturnValue(peterLustig)
           wrapper = Wrapper(() => {
             return {
-              Group: [
-                {
-                  ...yogaPractice,
-                  myRole: 'owner',
-                },
-              ],
+              group: {
+                ...yogaPractice,
+                myRole: 'owner',
+              },
               GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             }
           })
@@ -280,12 +278,10 @@ describe('GroupProfileSlug', () => {
           currentUserMock.mockReturnValue(jennyRostock)
           wrapper = Wrapper(() => {
             return {
-              Group: [
-                {
-                  ...yogaPractice,
-                  myRole: 'usual',
-                },
-              ],
+              group: {
+                ...yogaPractice,
+                myRole: 'usual',
+              },
               GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             }
           })
@@ -301,12 +297,10 @@ describe('GroupProfileSlug', () => {
           currentUserMock.mockReturnValue(bobDerBaumeister)
           wrapper = Wrapper(() => {
             return {
-              Group: [
-                {
-                  ...yogaPractice,
-                  myRole: 'pending',
-                },
-              ],
+              group: {
+                ...yogaPractice,
+                myRole: 'pending',
+              },
               GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             }
           })
@@ -322,12 +316,10 @@ describe('GroupProfileSlug', () => {
           currentUserMock.mockReturnValue(huey)
           wrapper = Wrapper(() => {
             return {
-              Group: [
-                {
-                  ...yogaPractice,
-                  myRole: null,
-                },
-              ],
+              group: {
+                ...yogaPractice,
+                myRole: null,
+              },
               GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
             }
           })
@@ -346,12 +338,10 @@ describe('GroupProfileSlug', () => {
             currentUserMock.mockReturnValue(peterLustig)
             wrapper = Wrapper(() => {
               return {
-                Group: [
-                  {
-                    ...schoolForCitizens,
-                    myRole: 'owner',
-                  },
-                ],
+                group: {
+                  ...schoolForCitizens,
+                  myRole: 'owner',
+                },
                 GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
               }
             })
@@ -367,12 +357,10 @@ describe('GroupProfileSlug', () => {
             currentUserMock.mockReturnValue(jennyRostock)
             wrapper = Wrapper(() => {
               return {
-                Group: [
-                  {
-                    ...schoolForCitizens,
-                    myRole: 'usual',
-                  },
-                ],
+                group: {
+                  ...schoolForCitizens,
+                  myRole: 'usual',
+                },
                 GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
               }
             })
@@ -411,12 +399,10 @@ describe('GroupProfileSlug', () => {
             currentUserMock.mockReturnValue(bobDerBaumeister)
             wrapper = Wrapper(() => {
               return {
-                Group: [
-                  {
-                    ...schoolForCitizens,
-                    myRole: 'pending',
-                  },
-                ],
+                group: {
+                  ...schoolForCitizens,
+                  myRole: 'pending',
+                },
                 GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
               }
             })
@@ -432,12 +418,10 @@ describe('GroupProfileSlug', () => {
             currentUserMock.mockReturnValue(huey)
             wrapper = Wrapper(() => {
               return {
-                Group: [
-                  {
-                    ...schoolForCitizens,
-                    myRole: null,
-                  },
-                ],
+                group: {
+                  ...schoolForCitizens,
+                  myRole: null,
+                },
                 GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
               }
             })
@@ -457,12 +441,10 @@ describe('GroupProfileSlug', () => {
             currentUserMock.mockReturnValue(peterLustig)
             wrapper = Wrapper(() => {
               return {
-                Group: [
-                  {
-                    ...investigativeJournalism,
-                    myRole: 'owner',
-                  },
-                ],
+                group: {
+                  ...investigativeJournalism,
+                  myRole: 'owner',
+                },
                 GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
               }
             })
@@ -478,12 +460,10 @@ describe('GroupProfileSlug', () => {
             currentUserMock.mockReturnValue(jennyRostock)
             wrapper = Wrapper(() => {
               return {
-                Group: [
-                  {
-                    ...investigativeJournalism,
-                    myRole: 'usual',
-                  },
-                ],
+                group: {
+                  ...investigativeJournalism,
+                  myRole: 'usual',
+                },
                 GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
               }
             })
@@ -499,12 +479,10 @@ describe('GroupProfileSlug', () => {
             currentUserMock.mockReturnValue(bobDerBaumeister)
             wrapper = Wrapper(() => {
               return {
-                Group: [
-                  {
-                    ...investigativeJournalism,
-                    myRole: 'pending',
-                  },
-                ],
+                group: {
+                  ...investigativeJournalism,
+                  myRole: 'pending',
+                },
                 GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
               }
             })
@@ -520,12 +498,10 @@ describe('GroupProfileSlug', () => {
             currentUserMock.mockReturnValue(huey)
             wrapper = Wrapper(() => {
               return {
-                Group: [
-                  {
-                    ...investigativeJournalism,
-                    myRole: null,
-                  },
-                ],
+                group: {
+                  ...investigativeJournalism,
+                  myRole: null,
+                },
                 GroupMembers: [peterLustig, jennyRostock, bobDerBaumeister, huey],
               }
             })

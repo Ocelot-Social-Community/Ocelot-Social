@@ -551,32 +551,35 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           <div
             style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
           >
-            <div
-              class="ds-space hc-empty ds-space-centered"
-              style="margin-top: 64px; margin-bottom: 64px;"
-            >
-              <p
-                class="ds-text"
+            <div>
+              <div
+                class="ds-space hc-empty ds-space-centered"
+                style="margin-top: 64px; margin-bottom: 64px;"
               >
-                <img
-                  alt="Empty"
-                  class="hc-empty-icon"
-                  src="/img/empty/file.svg"
-                  style="margin-bottom: 5px;"
-                  width="80"
-                />
-                 
-                <br />
-                 
-                <span
-                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
-                  style="display: none;"
+                <p
+                  class="ds-text"
                 >
-                  
+                  <img
+                    alt="Empty"
+                    class="hc-empty-icon"
+                    src="/img/empty/file.svg"
+                    style="margin-bottom: 5px;"
+                    width="80"
+                  />
+                   
+                  <br />
+                   
+                  <span
+                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    style="display: none;"
+                  >
+                    
+        
       
-    
-                </span>
-              </p>
+                  </span>
+                </p>
+              </div>
+               
             </div>
           </div>
         </div>
@@ -1229,32 +1232,35 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           <div
             style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
           >
-            <div
-              class="ds-space hc-empty ds-space-centered"
-              style="margin-top: 64px; margin-bottom: 64px;"
-            >
-              <p
-                class="ds-text"
+            <div>
+              <div
+                class="ds-space hc-empty ds-space-centered"
+                style="margin-top: 64px; margin-bottom: 64px;"
               >
-                <img
-                  alt="Empty"
-                  class="hc-empty-icon"
-                  src="/img/empty/file.svg"
-                  style="margin-bottom: 5px;"
-                  width="80"
-                />
-                 
-                <br />
-                 
-                <span
-                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
-                  style="display: none;"
+                <p
+                  class="ds-text"
                 >
-                  
+                  <img
+                    alt="Empty"
+                    class="hc-empty-icon"
+                    src="/img/empty/file.svg"
+                    style="margin-bottom: 5px;"
+                    width="80"
+                  />
+                   
+                  <br />
+                   
+                  <span
+                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    style="display: none;"
+                  >
+                    
+        
       
-    
-                </span>
-              </p>
+                  </span>
+                </p>
+              </div>
+               
             </div>
           </div>
         </div>
@@ -1808,32 +1814,35 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           <div
             style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
           >
-            <div
-              class="ds-space hc-empty ds-space-centered"
-              style="margin-top: 64px; margin-bottom: 64px;"
-            >
-              <p
-                class="ds-text"
+            <div>
+              <div
+                class="ds-space hc-empty ds-space-centered"
+                style="margin-top: 64px; margin-bottom: 64px;"
               >
-                <img
-                  alt="Empty"
-                  class="hc-empty-icon"
-                  src="/img/empty/file.svg"
-                  style="margin-bottom: 5px;"
-                  width="80"
-                />
-                 
-                <br />
-                 
-                <span
-                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
-                  style="display: none;"
+                <p
+                  class="ds-text"
                 >
-                  
+                  <img
+                    alt="Empty"
+                    class="hc-empty-icon"
+                    src="/img/empty/file.svg"
+                    style="margin-bottom: 5px;"
+                    width="80"
+                  />
+                   
+                  <br />
+                   
+                  <span
+                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    style="display: none;"
+                  >
+                    
+        
       
-    
-                </span>
-              </p>
+                  </span>
+                </p>
+              </div>
+               
             </div>
           </div>
         </div>
@@ -2429,32 +2438,35 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           <div
             style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
           >
-            <div
-              class="ds-space hc-empty ds-space-centered"
-              style="margin-top: 64px; margin-bottom: 64px;"
-            >
-              <p
-                class="ds-text"
+            <div>
+              <div
+                class="ds-space hc-empty ds-space-centered"
+                style="margin-top: 64px; margin-bottom: 64px;"
               >
-                <img
-                  alt="Empty"
-                  class="hc-empty-icon"
-                  src="/img/empty/file.svg"
-                  style="margin-bottom: 5px;"
-                  width="80"
-                />
-                 
-                <br />
-                 
-                <span
-                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
-                  style="display: none;"
+                <p
+                  class="ds-text"
                 >
-                  
+                  <img
+                    alt="Empty"
+                    class="hc-empty-icon"
+                    src="/img/empty/file.svg"
+                    style="margin-bottom: 5px;"
+                    width="80"
+                  />
+                   
+                  <br />
+                   
+                  <span
+                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    style="display: none;"
+                  >
+                    
+        
       
-    
-                </span>
-              </p>
+                  </span>
+                </p>
+              </div>
+               
             </div>
           </div>
         </div>
