@@ -13,7 +13,7 @@ describe('CtaJoinLeaveGroup.vue', () => {
         id: 'g-123',
         slug: 'group-123',
         name: 'Group 123',
-        myRole: 'usual',
+        myRole: null,
       },
     }
     mocks = {
@@ -24,6 +24,9 @@ describe('CtaJoinLeaveGroup.vue', () => {
             id: 'u-1',
           },
         },
+      },
+      $apollo: {
+        mutate: jest.fn(),
       },
     }
     stubs = {
@@ -46,11 +49,30 @@ describe('CtaJoinLeaveGroup.vue', () => {
 
     describe('clicking on button', () => {
       beforeEach(async () => {
+        mocks.$apollo.mutate = jest.fn().mockResolvedValue({
+          data: {
+            JoinGroup: {
+              id: 'g-123',
+              slug: 'group-123',
+              name: 'Group 123',
+              myRoleInGroup: 'usual',
+            },
+          },
+        })
         wrapper.find('.base-button').trigger('click')
+        await wrapper.vm.$nextTick()
       })
       it('emits update event', async () => {
-        // TODO: the event is not properly triggered - unsure why
-        expect(wrapper.emitted().update).toEqual(undefined)
+        expect(wrapper.emitted().update).toEqual([
+          [
+            {
+              id: 'g-123',
+              slug: 'group-123',
+              name: 'Group 123',
+              myRoleInGroup: 'usual',
+            },
+          ],
+        ])
       })
     })
   })

@@ -13,7 +13,7 @@ exports[`CtaJoinLeaveGroup.vue mount renders 1`] = `
     contribution.comment.commenting-disabled.no-group-member.call-to-action
   </p> <button type="button" class="join-leave-button base-button --filled has-tooltip" data-original-title="null"><span class="base-icon"><!----></span>
     <!---->
-    group.joinLeaveButton.iAmMember
+    group.joinLeaveButton.join
   </button>
 </div>
 `;
