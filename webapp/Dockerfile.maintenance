@@ -1,4 +1,4 @@
-FROM nginx:1.29.1-alpine AS base
+FROM nginx:1.29.2-alpine AS base
 LABEL org.label-schema.name="ocelot.social:maintenance"
 LABEL org.label-schema.description="Maintenance page of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
