@@ -962,18 +962,18 @@
     "@babel/helper-string-parser" "^7.27.1"
     "@babel/helper-validator-identifier" "^7.27.1"
 
-"@badeball/cypress-cucumber-preprocessor@^23.2.0":
-  version "23.2.0"
-  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-23.2.0.tgz#6087d0ff11e81904eabb87802f2af7c3446308f6"
-  integrity sha512-9FK6m2oI5AwozPcRIe6Clz4+lZkQZkiev5YsidcLIg7lO9AWC0Uv0OeB60ioGOiwBKTq4YUbgWGKsoDsLKH5SA==
+"@badeball/cypress-cucumber-preprocessor@^23.2.1":
+  version "23.2.1"
+  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-23.2.1.tgz#89efe9c50d48e27b1aadf49f6f7f708c8fff40d5"
+  integrity sha512-yMEQCdjxhCww+mGhb/xvxlHNYUpsm2oiDuG3xb236+LwNFhfpT/RckvNktip44ETEZKSZe2xqxQDxOYKyXJctA==
   dependencies:
     "@cucumber/ci-environment" "^10.0.1"
     "@cucumber/cucumber" "^12.0.0"
     "@cucumber/cucumber-expressions" "^18.0.0"
     "@cucumber/gherkin" "^35.0.0"
-    "@cucumber/html-formatter" "^21.7.0"
+    "@cucumber/html-formatter" "^22.0.0"
     "@cucumber/message-streams" "^4.0.1"
-    "@cucumber/messages" "^29.0.0"
+    "@cucumber/messages" "^30.0.0"
     "@cucumber/pretty-formatter" "^1.0.1"
     "@cucumber/tag-expressions" "^6.1.0"
     base64-js "^1.5.1"
@@ -1094,10 +1094,15 @@
   dependencies:
     "@cucumber/messages" ">=19.1.4 <30"
 
-"@cucumber/html-formatter@21.14.0", "@cucumber/html-formatter@^21.7.0":
+"@cucumber/html-formatter@21.14.0":
   version "21.14.0"
   resolved "https://registry.yarnpkg.com/@cucumber/html-formatter/-/html-formatter-21.14.0.tgz#beb29b66892189f8e242243aa8b807f7b9dc1c6c"
   integrity sha512-vQqbmQZc0QiN4c+cMCffCItpODJlOlYtPG7pH6We096dBOa7u0ttDMjT6KrMAnQlcln54rHL46r408IFpuznAw==
+
+"@cucumber/html-formatter@^22.0.0":
+  version "22.0.0"
+  resolved "https://registry.yarnpkg.com/@cucumber/html-formatter/-/html-formatter-22.0.0.tgz#03121c0fd3a12d32721cb2543743456cc09e9b86"
+  integrity sha512-buWuKcXRErQWE8E3daFo0R+TKfyAQVbYnad0Ee5HK2zRNJyXhMmPXGJeaTVFQVPoyXA12m83Wy1kx9WeyEqVOQ==
 
 "@cucumber/junit-xml-formatter@0.8.1":
   version "0.8.1"
@@ -1124,7 +1129,7 @@
     reflect-metadata "0.2.2"
     uuid "11.1.0"
 
-"@cucumber/messages@>=19.1.4 <30", "@cucumber/messages@^29.0.0":
+"@cucumber/messages@>=19.1.4 <30":
   version "29.0.1"
   resolved "https://registry.yarnpkg.com/@cucumber/messages/-/messages-29.0.1.tgz#68de23447af07123aca97008f20b885a4106f5b2"
   integrity sha512-aAvIYfQD6/aBdF8KFQChC3CQ1Q+GX9orlR6GurGiX6oqaCnBkxA4WU3OQUVepDynEFrPayerqKRFcAMhdcXReQ==
@@ -1151,6 +1156,14 @@
     class-transformer "0.5.1"
     reflect-metadata "0.2.2"
     uuid "11.0.5"
+
+"@cucumber/messages@^30.0.0":
+  version "30.1.0"
+  resolved "https://registry.yarnpkg.com/@cucumber/messages/-/messages-30.1.0.tgz#a0ccbbe7b81b7d889142b6d8cb4dae0dbc88ab21"
+  integrity sha512-KxnsSjHz9EGF23GeZc3BRMK2+bagt2p87mwwNfisBK7BfuyvnXJumyBQJJN4xv5SLSzBKxH3FsZnuOf8LwsHhg==
+  dependencies:
+    class-transformer "0.5.1"
+    reflect-metadata "0.2.2"
 
 "@cucumber/pretty-formatter@1.0.1", "@cucumber/pretty-formatter@^1.0.1":
   version "1.0.1"
@@ -3856,10 +3869,10 @@ cypress-network-idle@^1.15.0:
   resolved "https://registry.npmjs.org/cypress-network-idle/-/cypress-network-idle-1.15.0.tgz"
   integrity sha512-8zU16zhc7S3nMl1NTEEcNsZYlJy/ZzP2zPTTrngGxyXH32Ipake/xfHLZsgrzeWCieiS2AVhQsakhWqFzO3hpw==
 
-cypress@^15.3.0:
-  version "15.3.0"
-  resolved "https://registry.yarnpkg.com/cypress/-/cypress-15.3.0.tgz#cb9416e5261ee419c8a42e839d4f2d73eef8797c"
-  integrity sha512-g9rDhoK9y8wW4Vx3Ppr8dtfvThXxPL3mJsV5e98fG+6EerrhXKmeRT2sL86cvNRtEZouXJfsuVL1lqiMuGNGcg==
+cypress@^15.4.0:
+  version "15.4.0"
+  resolved "https://registry.yarnpkg.com/cypress/-/cypress-15.4.0.tgz#067c414830c98c561742a106d03813a5e0e82459"
+  integrity sha512-+GC/Y/LXAcaMCzfuM7vRx5okRmonceZbr0ORUAoOrZt/5n2eGK8yh04bok1bWSjZ32wRHrZESqkswQ6biArN5w==
   dependencies:
     "@cypress/request" "^3.0.9"
     "@cypress/xvfb" "^1.2.4"
