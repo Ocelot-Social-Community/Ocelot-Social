@@ -29,7 +29,7 @@ CMD ["/bin/bash", "-c", "yarn install && yarn run dev"]
 
 FROM base AS build
 COPY webapp/ .
-ONBUILD COPY webapp/branding .
+ONBUILD COPY ./branding .
 ONBUILD RUN tools/merge-locales.sh
 ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
 ONBUILD RUN yarn run build

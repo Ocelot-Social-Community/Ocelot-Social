@@ -25,7 +25,7 @@ WORKDIR /app
 COPY webapp/ .
 # Delete all Pages
 RUN rm -rf ./pages
-ONBUILD COPY webapp/branding .
+ONBUILD COPY ./branding .
 ONBUILD RUN tools/merge-locales.sh
 ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
 ONBUILD RUN cp -r maintenance/source/* ./
