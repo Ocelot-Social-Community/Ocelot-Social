@@ -276,6 +276,7 @@ export default {
         __dirname,
         `${styleguidePath}/src/system/dist/system.umd.min.js`,
       )
+      config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/src/system`)
       config.module.rules.push({
         resourceQuery: /blockType=docs/,
         loader: require.resolve(`${styleguidePath}/src/loader/docs-trim-loader.js`),
