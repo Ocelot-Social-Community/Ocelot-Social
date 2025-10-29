@@ -30,8 +30,8 @@ CMD ["/bin/bash", "-c", "yarn install && yarn run dev"]
 FROM base AS build
 COPY webapp/ .
 # branding is unified in /branding in branding repositories
-ONBUILD COPY ./webapp?/branding? .
-ONBUILD COPY ./branding? .
+ONBUILD COPY webapp?/branding? .
+ONBUILD COPY branding? .
 ONBUILD RUN tools/merge-locales.sh
 ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
 ONBUILD RUN yarn run build
@@ -40,7 +40,7 @@ ONBUILD RUN cp -r ./.nuxt /build
 ONBUILD RUN cp -r ./nuxt.config.js /build
 # Copy static files
 # TODO - this seems not be needed anymore for the new rebranding
-# TODO - this should be one Folder containign all stuff needed to be copied
+# TODO - this should be one Folder containing all stuff needed to be copied
 ONBUILD RUN cp -r ./config/ /build
 ONBUILD RUN cp -r ./constants /build
 ONBUILD RUN cp -r ./static /build
