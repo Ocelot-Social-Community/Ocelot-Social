@@ -25,7 +25,9 @@ WORKDIR /app
 COPY webapp/ .
 # Delete all Pages
 RUN rm -rf ./pages
-ONBUILD COPY webapp/branding .
+# branding is unified in /branding in branding repositories
+ONBUILD COPY webap[p]/brandin[g]/ .
+ONBUILD COPY brandin[g]/ .
 ONBUILD RUN tools/merge-locales.sh
 ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
 ONBUILD RUN cp -r maintenance/source/* ./
