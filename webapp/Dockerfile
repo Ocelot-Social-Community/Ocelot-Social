@@ -30,8 +30,8 @@ CMD ["/bin/bash", "-c", "yarn install && yarn run dev"]
 FROM base AS build
 COPY webapp/ .
 # branding is unified in /branding in branding repositories
-ONBUILD COPY webapp?/branding? .
-ONBUILD COPY branding? .
+ONBUILD COPY webap[p]/brandin[g]/ .
+ONBUILD COPY brandin[g]/ .
 ONBUILD RUN tools/merge-locales.sh
 ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
 ONBUILD RUN yarn run build
