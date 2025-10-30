@@ -14,6 +14,6 @@ defineStep('I am logged in as {string}', slug => {
       })
     })
     .then(user => {
-      cy.setCookie('ocelot-social-token', encode({ config: CONFIG })(user))
+      cy.setCookie('ocelot-social-token', encode({ config: { ...CONFIG, JWT_SECRET: 'test' } })(user))
     })
 })
