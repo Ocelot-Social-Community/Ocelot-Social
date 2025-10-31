@@ -8,7 +8,7 @@ LABEL org.label-schema.vendor="ocelot.social Community"
 LABEL org.label-schema.schema-version="1.0"
 LABEL maintainer="devops@ocelot.social"
 
-FROM node:24.9.0-alpine AS styleguide
+FROM node:25.1.0-alpine AS styleguide
 RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
@@ -16,7 +16,7 @@ COPY styleguide .
 RUN yarn install --production=false --frozen-lockfile --non-interactive
 RUN yarn run build:lib
 
-FROM node:20.12.1-alpine AS build
+FROM node:25.1.0-alpine AS build
 ENV NODE_ENV="production"
 RUN apk --no-cache add git python3 make g++ bash jq
 COPY --from=styleguide ./app/ /styleguide/
@@ -25,7 +25,9 @@ WORKDIR /app
 COPY webapp/ .
 # Delete all Pages
 RUN rm -rf ./pages
-ONBUILD COPY webapp/branding .
+# branding is unified in /branding in branding repositories
+ONBUILD COPY webap[p]/brandin[g]/ .
+ONBUILD COPY brandin[g]/ .
 ONBUILD RUN tools/merge-locales.sh
 ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
 ONBUILD RUN cp -r maintenance/source/* ./

@@ -1,4 +1,4 @@
-FROM node:24.9.0-alpine AS styleguide
+FROM node:25.1.0-alpine AS styleguide
 RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
@@ -6,7 +6,7 @@ COPY styleguide .
 RUN yarn install --production=false --frozen-lockfile --non-interactive
 RUN yarn run build:lib
 
-FROM node:20.12.1-alpine AS base
+FROM node:25.1.0-alpine AS base
 LABEL org.label-schema.name="ocelot.social:webapp"
 LABEL org.label-schema.description="Web Frontend of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
@@ -29,7 +29,9 @@ CMD ["/bin/bash", "-c", "yarn install && yarn run dev"]
 
 FROM base AS build
 COPY webapp/ .
-ONBUILD COPY webapp/branding .
+# branding is unified in /branding in branding repositories
+ONBUILD COPY webap[p]/brandin[g]/ .
+ONBUILD COPY brandin[g]/ .
 ONBUILD RUN tools/merge-locales.sh
 ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
 ONBUILD RUN yarn run build
@@ -38,7 +40,7 @@ ONBUILD RUN cp -r ./.nuxt /build
 ONBUILD RUN cp -r ./nuxt.config.js /build
 # Copy static files
 # TODO - this seems not be needed anymore for the new rebranding
-# TODO - this should be one Folder containign all stuff needed to be copied
+# TODO - this should be one Folder containing all stuff needed to be copied
 ONBUILD RUN cp -r ./config/ /build
 ONBUILD RUN cp -r ./constants /build
 ONBUILD RUN cp -r ./static /build
