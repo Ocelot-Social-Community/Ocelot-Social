@@ -6,8 +6,9 @@ const CONFIG = require('./config').default // we need to use require since this 
 
 const styleguidePath = '../styleguide'
 const styleguideStyles = [
-  `${styleguidePath}/src/system/styles/main.scss`,
-  `${styleguidePath}/src/system/styles/shared.scss`,
+  // `${styleguidePath}/src/system/styles/main.scss`,
+  // `${styleguidePath}/src/system/styles/shared.scss`,
+  `${styleguidePath}/dist/shared.scss`,
 ]
 
 export default {
@@ -256,6 +257,11 @@ export default {
           : `[contenthash:7]${isModern ? '.modern' : ''}_${CONFIG.VERSION}.js`,
       css: ({ isDev }) => (isDev ? '[name].css' : `css/[contenthash:7]_${CONFIG.VERSION}.css`),
     },
+    // babel config
+    babel: {
+      // To prevent  ERROR  [BABEL] Note: The code generator has deoptimised the styling of [..] as it exceeds the max of 500KB.
+      compact: true,
+    },
     /*
      ** You can extend webpack config here
      */
@@ -272,7 +278,7 @@ export default {
         config.devtool = 'source-map'
       }
 
-      config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/src/system`)
+      config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/dist`)
       config.module.rules.push({
         resourceQuery: /blockType=docs/,
         loader: require.resolve(`${styleguidePath}/src/loader/docs-trim-loader.js`),
