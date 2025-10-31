@@ -6,8 +6,9 @@ const CONFIG = require('./config').default // we need to use require since this 
 
 const styleguidePath = '../styleguide'
 const styleguideStyles = [
-  `${styleguidePath}/src/system/styles/main.scss`,
-  `${styleguidePath}/src/system/styles/shared.scss`,
+  // `${styleguidePath}/src/system/styles/main.scss`,
+  // `${styleguidePath}/src/system/styles/shared.scss`,
+  `${styleguidePath}/dist/shared.scss`,
 ]
 
 export default {
@@ -272,7 +273,7 @@ export default {
         config.devtool = 'source-map'
       }
 
-      config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/src/system`)
+      config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/dist`)
       config.module.rules.push({
         resourceQuery: /blockType=docs/,
         loader: require.resolve(`${styleguidePath}/src/loader/docs-trim-loader.js`),
