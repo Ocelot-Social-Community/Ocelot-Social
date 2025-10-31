@@ -257,6 +257,11 @@ export default {
           : `[contenthash:7]${isModern ? '.modern' : ''}_${CONFIG.VERSION}.js`,
       css: ({ isDev }) => (isDev ? '[name].css' : `css/[contenthash:7]_${CONFIG.VERSION}.css`),
     },
+    // babel config
+    babel: {
+      // To prevent  ERROR  [BABEL] Note: The code generator has deoptimised the styling of [..] as it exceeds the max of 500KB.
+      compact: true,
+    },
     /*
      ** You can extend webpack config here
      */
