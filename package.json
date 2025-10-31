@@ -33,8 +33,8 @@
     "release": "./scripts/release.sh"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.4",
-    "@babel/preset-env": "^7.28.3",
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
     "@babel/register": "^7.28.3",
     "@badeball/cypress-cucumber-preprocessor": "^23.2.1",
     "@cucumber/cucumber": "12.2.0",
