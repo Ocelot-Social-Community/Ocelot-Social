@@ -73,7 +73,7 @@
     "metascraper-youtube": "^5.49.5",
     "migrate": "^2.1.0",
     "mime-types": "^3.0.1",
-    "minimatch": "^10.0.3",
+    "minimatch": "^10.1.1",
     "mustache": "^4.2.0",
     "neo4j-driver": "^4.4.11",
     "neo4j-graphql-js": "^2.11.5",
