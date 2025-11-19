@@ -40,7 +40,7 @@
     "@cucumber/cucumber": "12.2.0",
     "@cypress/browserify-preprocessor": "^3.0.2",
     "auto-changelog": "^2.5.0",
-    "cypress": "^15.5.0",
+    "cypress": "^15.6.0",
     "cypress-network-idle": "^1.15.0",
     "date-fns": "^3.6.0",
     "dotenv": "^17.2.3",
