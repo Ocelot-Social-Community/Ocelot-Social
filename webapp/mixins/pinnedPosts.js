@@ -14,6 +14,6 @@ export default {
     }),
   },
   async created() {
-    if (this.isAdmin && this.maxPinnedPosts === 0) await this.fetchPinnedPostsCount()
+    /* if (this.isAdmin && this.maxPinnedPosts === 0) */ await this.fetchPinnedPostsCount()
   },
 }

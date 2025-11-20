@@ -48,6 +48,8 @@
                 @removePostFromList="posts = removePostFromList(post, posts)"
                 @pinPost="pinPost(post, refetchPostList)"
                 @unpinPost="unpinPost(post, refetchPostList)"
+                @pinGroupPost="pinGroupPost(post, refetchPostList)"
+                @unpinGroupPost="unpinGroupPost(post, refetchPostList)"
                 @pushPost="pushPost(post, refetchPostList)"
                 @unpushPost="unpushPost(post, refetchPostList)"
                 @toggleObservePost="

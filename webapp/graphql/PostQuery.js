@@ -52,6 +52,8 @@ export default (i18n) => {
           name
           slug
           groupType
+          myRole
+          currentlyPinnedPostsCount
         }
       }
     }
@@ -95,6 +97,8 @@ export const filterPosts = (i18n) => {
           name
           slug
           groupType
+          myRole
+          currentlyPinnedPostsCount
         }
       }
     }
@@ -137,6 +141,8 @@ export const profilePagePosts = (i18n) => {
           name
           slug
           groupType
+          myRole
+          currentlyPinnedPostsCount
         }
       }
     }

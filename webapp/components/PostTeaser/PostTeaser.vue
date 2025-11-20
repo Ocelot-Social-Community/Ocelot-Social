@@ -112,6 +112,8 @@
             :is-owner="isAuthor"
             @pinPost="pinPost"
             @unpinPost="unpinPost"
+            @pinGroupPost="pinGroupPost"
+            @unpinGroupPost="unpinGroupPost"
             @pushPost="pushPost"
             @unpushPost="unpushPost"
             @toggleObservePost="toggleObservePost"
@@ -227,6 +229,12 @@ export default {
       this.$emit('pinPost', post)
     },
     unpinPost(post) {
+      this.$emit('unpinPost', post)
+    },
+    pinGroupPost(post) {
+      this.$emit('pinGroupPost', post)
+    },
+    unpinGroupPost(post) {
       this.$emit('unpinPost', post)
     },
     pushPost(post) {

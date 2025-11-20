@@ -48,6 +48,8 @@ type Group {
 
   "inviteCodes to this group the current user has generated"
   inviteCodes: [InviteCode]! @neo4j_ignore
+
+  currentlyPinnedPostsCount: Int! @neo4j_ignore
 }
 
 
