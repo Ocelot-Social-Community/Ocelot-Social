@@ -453,6 +453,65 @@ export default {
       }
       return unpinnedPost
     },
+    pinGroupPost: async (_parent, params, context: Context, _resolveInfo) => {
+      if (!context.user) {
+        throw new Error('Missing authenticated user.')
+      }
+      const { config } = context
+
+      if (config.MAX_PINNED_POSTS === 0) {
+        throw new Error('Pinned posts are not allowed!')
+      }
+
+      // If MAX_PINNED_POSTS === 1 -> Delete old pin
+      if (config.MAX_PINNED_POSTS === 1) {
+        await context.database.write({
+          query: `
+          MATCH (post:Post {id: $postId})-[:IN]->(group:Group)
+          MATCH (:User)-[pinned:GROUP_PINNED]->(:Post)-[:IN]->(:Group {id: group.id})
+          DELETE pinned
+          RETURN post`,
+          variables: { user: context.user, postId: params.id },
+        })
+        // If MAX_PINNED_POSTS !== 1 -> Check if max is reached
+      } else {
+        const result = await context.database.write({
+          query: `
+          MATCH (post:Post {id: $params.id})-[:IN]->(group:Group)
+          MATCH (:User)-[pinned:GROUP_PINNED]->(pinnedPosts:Post)-[:IN]->(:Group {id: group.id})
+          RETURN count(pinnedPosts) as count`,
+          variables: { user: context.user },
+        })
+        if (result.records[0].get('count') >= config.MAX_PINNED_POSTS) {
+          throw new Error('Reached maxed pinned posts already. Unpin a post first-')
+        }
+      }
+
+      // Set new pin
+      const result = await context.database.write({
+        query: `
+          MATCH (user:User {id: $user.id})
+          MATCH (post:Post {id: $params.id})-[:IN]->(group:Group)
+          MERGE (user)-[pinned:GROUP_PINNED{createdAt: toString(datetime())}]->(post)
+          RETURN post, pinned.createdAt as pinnedAt`,
+        variables: { user: context.user },
+      })
+
+      // Return post
+      return result.records[0].get('post')
+    },
+    unpinGroupPost: async (_parent, params, context, _resolveInfo) => {
+      const result = await context.database.write({
+        query: `
+          MATCH [pinned:GROUP_PINNED]->(post:Post {id: $postId})
+          DELETE pinned
+          RETURN post`,
+        variables: { postId: params.id },
+      })
+
+      // Return post
+      return result.records[0].get('post')
+    },
     markTeaserAsViewed: async (_parent, params, context, _resolveInfo) => {
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
