@@ -478,6 +478,9 @@ export default {
         })
       ).records.map((r) => r.get('inviteCodes'))
     },
+    currentlyPinnedPostsCount: async (parent, _args, context: Context, _resolveInfo) => {
+      return 0
+    },
     ...Resolver('Group', {
       undefinedToNull: ['deleted', 'disabled', 'locationName', 'about'],
       hasMany: {
