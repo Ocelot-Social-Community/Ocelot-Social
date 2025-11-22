@@ -41,7 +41,7 @@
     "jest-serializer-vue": "^3.1.0",
     "linkify-it": "~5.0.0",
     "mapbox-gl": "1.13.3",
-    "nuxt": "^2.18.1",
+    "nuxt": "^4.2.1",
     "nuxt-dropzone": "^1.0.4",
     "nuxt-env": "~0.1.0",
     "sass": "1.77.6",
