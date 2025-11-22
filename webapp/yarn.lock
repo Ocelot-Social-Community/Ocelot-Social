@@ -21644,10 +21644,10 @@ vue-svg-loader@~0.16.0:
     loader-utils "^1.2.3"
     svg-to-vue "^0.7.0"
 
-vue-sweetalert-icons@~4.3.1:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/vue-sweetalert-icons/-/vue-sweetalert-icons-4.3.1.tgz#dad763abb5084b015ba3e209dd28dcf1371b030c"
-  integrity sha512-FqKcMB8Ebgb32UyzvhIBzj23U0NRP91cTXovDYfYwNHpJ1TAFBEHoemgyu01h2Wp+UJhytvQ+13GL+GAs8QkWw==
+vue-sweetalert-icons@~5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/vue-sweetalert-icons/-/vue-sweetalert-icons-5.0.0.tgz#6a4d2e50849ec304d81f9ea50b7d3be059d22ba4"
+  integrity sha512-qNL9hfG4OWHZKe1jIBnPsIL6Qro06c6Kr/uvHXQCuCPDwQ/2/BB8dQlBJa6aLuXRuOfiTkUl5t0oll7bJY+IAA==
   dependencies:
     color "^3.1.2"
     validate-color "^2.1.0"
