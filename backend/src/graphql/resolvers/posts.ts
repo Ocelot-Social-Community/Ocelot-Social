@@ -475,7 +475,7 @@ export default {
         })
         // If MAX_PINNED_POSTS !== 1 -> Check if max is reached
       } else {
-        const result = await context.database.write({
+        const result = await context.database.query({
           query: `
           MATCH (post:Post {id: $params.id})-[:IN]->(group:Group)
           MATCH (:User)-[pinned:GROUP_PINNED]->(pinnedPosts:Post)-[:IN]->(:Group {id: group.id})
