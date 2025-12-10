@@ -478,7 +478,7 @@ export default {
       const result = await context.database.query({
         query: `
           MATCH (:User)-[pinned:GROUP_PINNED]->(pinnedPosts:Post)-[:IN]->(:Group {id: $group.id})
-          RETURN count(pinnedPosts) as count`,
+          RETURN toString(count(pinnedPosts)) as count`,
         variables: { group: parent },
       })
       return result.records[0].get('count')
