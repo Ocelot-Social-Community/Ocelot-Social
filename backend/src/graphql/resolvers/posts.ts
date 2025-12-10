@@ -467,11 +467,10 @@ export default {
       if (config.MAX_PINNED_POSTS === 1) {
         await context.database.write({
           query: `
-          MATCH (post:Post {id: $postId})-[:IN]->(group:Group)
+          MATCH (post:Post {id: $params.id})-[:IN]->(group:Group)
           MATCH (:User)-[pinned:GROUP_PINNED]->(:Post)-[:IN]->(:Group {id: group.id})
-          DELETE pinned
-          RETURN post`,
-          variables: { user: context.user, postId: params.id },
+          DELETE pinned`,
+          variables: { user: context.user, params },
         })
         // If MAX_PINNED_POSTS !== 1 -> Check if max is reached
       } else {
@@ -479,8 +478,8 @@ export default {
           query: `
           MATCH (post:Post {id: $params.id})-[:IN]->(group:Group)
           MATCH (:User)-[pinned:GROUP_PINNED]->(pinnedPosts:Post)-[:IN]->(:Group {id: group.id})
-          RETURN count(pinnedPosts) as count`,
-          variables: { user: context.user },
+          RETURN toString(count(pinnedPosts)) as count`,
+          variables: { user: context.user, params },
         })
         if (result.records[0].get('count') >= config.MAX_PINNED_POSTS) {
           throw new Error('Reached maxed pinned posts already. Unpin a post first-')
@@ -493,8 +492,8 @@ export default {
           MATCH (user:User {id: $user.id})
           MATCH (post:Post {id: $params.id})-[:IN]->(group:Group)
           MERGE (user)-[pinned:GROUP_PINNED{createdAt: toString(datetime())}]->(post)
-          RETURN post, pinned.createdAt as pinnedAt`,
-        variables: { user: context.user },
+          RETURN post {.*, pinnedAt: pinned.createdAt}`,
+        variables: { user: context.user, params },
       })
 
       // Return post
