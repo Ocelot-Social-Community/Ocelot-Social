@@ -95,6 +95,10 @@ export default {
         type: 'image/x-icon',
         href: '/favicon.ico',
       },
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Dosis:wght@400;600&display=swap',
+      },
     ],
   },
 
