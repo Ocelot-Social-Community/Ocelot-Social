@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@mapbox/mapbox-gl-geocoder": "^5.0.2",
-    "@nuxtjs/apollo": "^4.0.0-rc19",
+    "@nuxtjs/apollo": "^5.0.0-alpha.15",
     "@nuxtjs/axios": "~5.9.7",
     "@nuxtjs/composition-api": "0.32.0",
     "@nuxtjs/dotenv": "~1.4.1",
