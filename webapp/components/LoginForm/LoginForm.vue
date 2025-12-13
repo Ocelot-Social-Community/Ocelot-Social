@@ -36,7 +36,7 @@
         <nuxt-link to="/password-reset/request">
           {{ $t('login.forgotPassword') }}
         </nuxt-link>
-        <base-button :loading="pending" filled name="submit" type="submit" icon="sign-in">
+        <base-button :loading="pending" name="submit" type="submit" icon="sign-in">
           {{ $t('login.login') }}
         </base-button>
         <p>
