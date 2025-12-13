@@ -4,7 +4,6 @@
     *
 */
 
-// Todo: Download and add locally
 // <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;600&display=swap" rel="stylesheet">
 
 $font-family-heading: 'Dosis', Helvetica, Arial, Lucida, sans-serif;
@@ -240,9 +239,9 @@ div.ds-number > p.ds-number-count {
 /* active tab border bottom color */
 div.tab-navigation li.Tabs__tab {
   border-bottom-color: $color-primary;
+}
 
-
-/* ds-button with primary color  */
+/* ds-button with primary color */
 .ds-button-primary {
   background-color: transparent;
   color: $color-headings; // Blue text
