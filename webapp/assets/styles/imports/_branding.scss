@@ -1,5 +1,405 @@
-/* 
+/*
     *
-    * Here, all SCSS variables and classes can be adapted to your custom design. 
+    * Here, all SCSS variables and classes can be adapted to your custom design.
     *
 */
+
+// Todo: Download and add locally
+// <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;600&display=swap" rel="stylesheet">
+
+$font-family-heading: 'Dosis', Helvetica, Arial, Lucida, sans-serif;
+$font-family-text: 'Dosis', Helvetica, Arial, Lucida, sans-serif;
+
+// Brand colors
+$color-brand: #DC3C22; // MARKE (red)
+$color-headings: #3D7AB6; // ÜBERSCHRIFTEN (blue)
+$color-text: #112033; // TEXT (dark blue/black)
+$color-borders: #FBF5DE; // RÄNDER (beige)
+$color-bg: #FBFBFD; // BG (white)
+$color-bg-alt: #EAC8A6; // BG ALT (light brown)
+
+// Primary colors
+$color-primary: $color-headings; // Blue for primary button outline
+$color-primary-hover: $color-brand; // Red for hover state
+$color-primary-active: $color-text; // Dark blue/black for active state
+$color-primary-light: color.adjust($color-brand, $lightness: 10%);
+$color-primary-dark: color.adjust($color-brand, $lightness: -20%);
+$color-primary-inverse: $color-bg;
+
+// Secondary colors
+$color-secondary: $color-headings;
+$color-secondary-light: color.adjust($color-headings, $lightness: 30%);
+$color-secondary-dark: #112033; // TEXT color for dark variant
+$color-secondary-active: color.adjust($color-headings, $lightness: -10%);
+$color-secondary-inverse: $color-bg;
+
+// Tertiary colors for compatibility
+$color-tertiary: $color-headings;
+$color-tertiary-light: color.adjust($color-headings, $lightness: 30%);
+
+$text-color-link: $color-primary;
+$text-color-link-active: $color-primary-light;
+
+$background-color-primary: $color-primary;
+$background-color-primary-active: $color-primary-active;
+$background-color-primary-inverse: $color-bg-alt;
+
+$border-color-active: $color-primary;
+
+// Header uses alternative background color (beige)
+$color-header-background: $color-bg-alt;
+$color-footer-background: $color-secondary-dark;
+$color-body-background: $color-bg;
+$color-filter-menu-background: $color-bg;
+
+// Logo dimensions (desktop)
+$logo-header-max-width: 60px;
+$logo-header-margin-left: 20px;
+$logo-header-margin-right: 10px;
+
+// Logo dimensions (mobile)
+$logo-header-max-width-mobile: 60px;
+$logo-header-margin-left-mobile: 10px;
+$logo-header-margin-right-mobile: 10px;
+
+$color-locale-menu: $color-primary;
+
+$color-donation-bar: $color-secondary;
+$color-donation-bar-light: $color-secondary-light;
+$color-donation-bar-background: $color-borders; // Beige background for empty part
+$color-donation-bar-border: $color-secondary; // Blue border
+
+$color-toast-blue: $color-secondary;
+$color-toast-green: $color-tertiary-light;
+
+$color-ribbon-announcement: $color-secondary;
+$color-ribbon-announcement-shadow: color.adjust($color-ribbon-announcement, $lightness: -20%);
+$color-ribbon-article: $color-tertiary;
+$color-ribbon-article-shadow: color.adjust($color-ribbon-article, $lightness: -20%);
+$color-ribbon-event: $color-bg-alt;
+$color-ribbon-event-shadow: color.adjust($color-bg-alt, $lightness: -20%);
+
+$chat-sidemenu-background-over: color.adjust($color-bg-alt, $lightness: -10%);
+$chat-sidemenu-background-active: $color-bg-alt;
+$chat-message-color: $color-text;
+$chat-message-bg-me: $color-bg-alt;
+$chat-message-bg-others: $color-bg;
+$chat-message-checkmark-seen: $color-primary;
+$chat-message-checkmark: white;
+$chat-room-color-counter-badge: white;
+$chat-room-background-counter-badge: $color-primary;
+$chat-icon-add: $color-secondary;
+$chat-icon-send: $color-secondary;
+$chat-icon-emoji: $color-secondary;
+
+.vac-avatar {
+  background-color: $color-secondary !important;
+}
+
+body {
+  background-color: $color-body-background !important;
+  font-family: $font-family-text !important;
+}
+
+.ds-button, .ds-chip, .ds-copy-field, .ds-list, .ds-select-search, .ds-tag, .ds-text {
+  font-family: $font-family-text !important;
+}
+.ds-heading {
+  font-family: $font-family-heading !important;
+}
+
+/* "a" link colors */
+a {
+  color: $color-primary;
+}
+a:hover {
+  color: $color-primary-light;
+}
+
+.base-button.--circle.post-add-button-top {
+  background-color: $color-secondary-active;
+  border-color: $color-secondary-active;
+}
+a:hover > .base-button.--circle.post-add-button-top {
+  background-color: $color-secondary;
+  border-color: $color-secondary-dark;
+}
+
+/* ds-menu-item link colors */
+a.ds-menu-item-link {
+  color: $color-secondary;
+}
+a:hover.ds-menu-item-link {
+  color: black;
+}
+.ds-menu-item-link.router-link-exact-active {
+  color: $color-secondary;
+  border-left-color: $color-secondary;
+}
+
+/* Avatar menu dropdown text color */
+.avatar-menu-popover {
+  color: $color-text;
+
+  .ds-menu-item {
+    color: $color-text;
+  }
+
+  a {
+    color: $color-text;
+
+    &:hover {
+      color: $color-primary-hover;
+    }
+  }
+}
+
+.v-popover.open .trigger a {
+  color: $color-primary;
+}
+
+.main-navigation a {
+  color: $color-text;
+}
+.main-navigation .router-link-exact-active {
+  color: $color-primary !important;
+}
+
+.main-navigation .locale-menu {
+  color: $color-text;
+}
+
+.main-navigation .base-button {
+  color: $color-text;
+
+  &:hover {
+    background-color: $color-primary;
+    color: white;
+    border-color: $color-primary;
+  }
+}
+
+.hc-hashtag a {
+  color: $color-primary;
+}
+.hc-hashtag a:hover {
+  color: $color-primary-light;
+}
+
+.user-teaser .info {
+  a .slug {
+    color: $color-text;
+  }
+  a:hover .slug {
+    color: $color-primary;
+  }
+}
+.profile-avatar.--no-image {
+  background-color: $color-secondary;
+}
+.profile-avatar.--no-image .initials {
+  font-weight: 600;
+  color: white;
+}
+.profile-page-avatar.profile-avatar.--no-image {
+  background-color: $color-primary;
+}
+.profile-page-avatar.profile-avatar.--no-image .initials {
+  color: white;
+}
+
+#footer {
+  background-color: $color-secondary-dark;
+}
+#footer a {
+  color: white;
+  font-weight: 400;
+}
+#footer a:hover {
+  color: $color-bg-alt;
+}
+
+.avatar-menu .profile-avatar {
+  color: $color-primary;
+}
+
+.profile-avatar .initials {
+  color: white;
+}
+
+/* chips with primary color */
+.ds-chip-primary {
+  background-color: $color-tertiary;
+}
+
+/* number count color */
+div.ds-number > p.ds-number-count {
+  color: $text-color-base;
+}
+
+/* active tab border bottom color */
+div.tab-navigation li.Tabs__tab {
+  border-bottom-color: $color-primary;
+
+
+/* ds-button with primary color  */
+.ds-button-primary {
+  background-color: transparent;
+  color: $color-headings; // Blue text
+  border-color: $color-headings; // Blue border
+
+  &:hover {
+    background-color: transparent;
+    color: $color-brand; // Red text on hover
+    border-color: $color-brand; // Red border on hover
+  }
+
+  &:active, &.active {
+    background-color: transparent;
+    color: $color-headings; // Blue text when active
+    border-color: $color-text; // Black border when active
+  }
+}
+
+/* ds-button with secondary color */
+.ds-button-secondary {
+  background-color: $color-headings; // Blue background
+  color: white;
+  border-color: $color-headings;
+
+  &:hover {
+    background-color: $color-text; // Dark/black background on hover
+    color: white;
+    border-color: $color-text;
+  }
+
+  &:active, &.active {
+    background-color: $color-headings; // Blue background when active
+    color: white;
+    border-color: $color-headings;
+  }
+}
+
+/* base-button default (non-filled) */
+.base-button:not(.--filled):not(.--danger) {
+  background-color: transparent;
+  color: $color-primary; // Blue text
+  border-color: $color-primary; // Blue border
+
+  &:enabled:hover {
+    background-color: transparent;
+    color: $color-primary-hover; // Red text on hover
+    border-color: $color-primary-hover; // Red border on hover
+  }
+
+  &:enabled:active {
+    background-color: transparent;
+    color: $color-primary; // Blue text when active
+    border-color: $color-primary-active; // Black border when active
+  }
+}
+
+/* base-button with filled prop */
+.base-button.--filled {
+  background-color: $color-secondary; // Blue background
+  color: white;
+  border-color: $color-secondary;
+
+  &:enabled:hover {
+    background-color: $color-secondary-dark; // Dark/black background on hover
+    color: white;
+    border-color: $color-secondary-dark;
+  }
+
+  &:enabled:active {
+    background-color: $color-secondary; // Blue background when active
+    color: white;
+    border-color: $color-secondary;
+  }
+}
+
+/* color of active filter tags in post teaser */
+span.category-tag.filterActive {
+  background-color: $color-primary;
+}
+
+/* input */
+div.ds-input-wrap > input:focus-within.ds-input {
+  border-color: $color-primary;
+}
+.ds-input:focus {
+  border-color: $color-primary;
+}
+.ds-form-item.ds-input-has-focus {
+  .ds-select,
+  .ds-select-dropdown {
+    border-color: $color-primary;
+  }
+}
+
+
+// div .ds-form-item .ds-input-has-focus {
+//   border-color: $color-primary;
+// }
+// div.ds-input-has-focus {
+//   border-color: $color-primary;
+// }
+// div.ds-select:focus {
+//   border-color: $color-primary;
+// }
+
+/* checkbox */
+[type="checkbox"] {
+  accent-color: $color-primary-light;
+}
+
+/* Donation progress bar */
+.progress-bar__goal {
+  border-color: $color-donation-bar-border !important;
+  background: $color-donation-bar-background !important;
+}
+
+.progress-bar__progress.color-repeating-linear-gradient {
+  background: repeating-linear-gradient(
+    120deg,
+    $color-donation-bar 0px,
+    $color-donation-bar 30px,
+    $color-donation-bar-light 50px,
+    $color-donation-bar-light 75px,
+    $color-donation-bar 95px
+  ) !important;
+}
+
+.progress-bar__label {
+  color: $color-text;
+  font-weight: $font-weight-bold;
+}
+
+/* Main navigation logo max-width and spacing */
+.logo-wrapper {
+  max-width: $logo-header-max-width;
+  margin-left: $logo-header-margin-left;
+  margin-right: $logo-header-margin-right;
+}
+
+.mobil-header-box .logo-container {
+  max-width: $logo-header-max-width-mobile !important;
+  margin-left: $logo-header-margin-left-mobile;
+  margin-right: $logo-header-margin-right-mobile;
+}
+
+/* Filter button menu background */
+.filterButtonMenu {
+  background-color: $color-filter-menu-background !important;
+}
+
+.editor .base-button {
+  color: $color-secondary;
+  border-color: $color-secondary;
+
+  &:hover {
+    color: white;
+    background-color: black;
+    border-color: black;
+  }
+}
