@@ -4,7 +4,7 @@ GraphQL is a data query language which provides an alternative to REST and ad-ho
 
 We have a closer description for the [GraphQL Playground](./src/graphql/GraphQL-Playground.md).
 
-![GraphQL Playground](../.gitbook/assets/graphql-playground%20%281%29.png)
+![GraphQL Playground](../.gitbook/assets/graphql-playground.png)
 
 ## Middleware keeps resolvers clean
 

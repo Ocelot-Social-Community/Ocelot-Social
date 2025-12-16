@@ -42,7 +42,7 @@ To use this feature run:
 $ yarn cypress:open
 ```
 
-![Interactive Cypress Environment](../.gitbook/assets/grafik-1%20%281%29.png)
+![Interactive Cypress Environment](../.gitbook/assets/grafik-1.png)
 
 ## Run cypress
 
@@ -54,7 +54,7 @@ $ yarn cypress:run
 
 This is used to run cypress in CI or in console
 
-![Console output after running cypress test](../.gitbook/assets/grafik%20%281%29.png)
+![Console output after running cypress test](../.gitbook/assets/grafik.png)
 
 ## Write some Tests
 
