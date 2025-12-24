@@ -1,4 +1,5 @@
 import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
+import 'cypress-network-idle'
 
 defineStep('I log out', () => {
   cy.get('.avatar-menu').then(($menu) => {
@@ -12,4 +13,5 @@ defineStep('I log out', () => {
   cy.get('.avatar-menu-popover')
     .find('a[href="/logout"]')
     .click()
+  cy.waitForNetworkIdle(2000)
 })
