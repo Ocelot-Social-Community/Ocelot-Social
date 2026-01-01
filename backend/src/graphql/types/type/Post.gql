@@ -241,8 +241,12 @@ type Mutation {
   DeletePost(id: ID!): Post
   AddPostEmotions(to: _PostInput!, data: _EMOTEDInput!): EMOTED
   RemovePostEmotions(to: _PostInput!, data: _EMOTEDInput!): EMOTED
+
   pinPost(id: ID!): Post
   unpinPost(id: ID!): Post
+  pinGroupPost(id: ID!): Post
+  unpinGroupPost(id: ID!): Post
+
   markTeaserAsViewed(id: ID!): Post
   pushPost(id: ID!): Post!
   unpushPost(id: ID!): Post!
