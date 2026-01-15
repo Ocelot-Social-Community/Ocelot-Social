@@ -18,7 +18,6 @@ import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
-import { r } from '@faker-js/faker/dist/airline-CLphikKp'
 
 const maintainPinnedPosts = (params) => {
   const pinnedPostFilter = { pinned: true }
