@@ -69,7 +69,7 @@
             </base-button>
             <!-- Group join / leave -->
             <join-leave-button
-              :group="group || {}"
+              :group="group"
               :userId="currentUser.id"
               :isMember="isGroupMember"
               :isNonePendingMember="isGroupMemberNonePending"
