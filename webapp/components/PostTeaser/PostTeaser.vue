@@ -174,6 +174,10 @@ export default {
       type: Object,
       default: () => {},
     },
+    showGroupPinned: {
+      type: Boolean,
+      default: false,
+    },
   },
   mounted() {
     const { image } = this.post
@@ -205,10 +209,11 @@ export default {
       )
     },
     isPinned() {
-      return this.post && (this.post.pinned || this.post.groupPinned)
+      return this.post && (this.post.pinned || (this.showGroupPinned && this.post.groupPinned))
     },
     ribbonText() {
-      if (this.post.pinned || this.post.groupPinned) return this.$t('post.pinned')
+      if (this.post && (this.post.pinned || (this.showGroupPinned && this.post.groupPinned)))
+        return this.$t('post.pinned')
       if (this.post.postType[0] === 'Event') return this.$t('post.event')
       return this.$t('post.name')
     },
