@@ -49,6 +49,7 @@ input _PostFilter {
   language_in: [String!]
   language_not_in: [String!]
   pinned: Boolean # required for `maintainPinnedPost`
+  groupPinned: Boolean # required for `maintainGroupPinnedPost`
   tags: _TagFilter
   tags_not: _TagFilter
   tags_in: [_TagFilter!]
@@ -86,6 +87,7 @@ input _PostFilter {
   postType_in: [PostType]
   eventStart_gte: String
   eventEnd_gte: String
+
 }
 
 enum _PostOrdering {
@@ -111,6 +113,8 @@ enum _PostOrdering {
   pinned_desc
   eventStart_asc
   eventStart_desc
+  groupPinned_asc
+  groupPinned_desc
 }
 
 

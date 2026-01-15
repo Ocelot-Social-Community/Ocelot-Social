@@ -470,7 +470,7 @@ export default {
           offset: this.offset,
           filter: this.filter,
           first: this.pageSize,
-          orderBy: 'sortDate_desc',
+          orderBy: ['groupPinned_asc', 'sortDate_desc'],
         },
         updateQuery: UpdateQuery(this, { $state, pageKey: 'profilePagePosts' }),
       })
@@ -579,7 +579,7 @@ export default {
           filter: this.filter,
           first: this.pageSize,
           offset: 0,
-          orderBy: 'sortDate_desc',
+          orderBy: ['groupPinned_asc', 'sortDate_desc'],
         }
       },
       update({ profilePagePosts }) {

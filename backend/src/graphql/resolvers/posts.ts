@@ -29,6 +29,16 @@ const maintainPinnedPosts = (params) => {
   return params
 }
 
+const maintainGroupPinnedPosts = (params) => {
+  const pinnedPostFilter = { groupPinned: true, group: params.filter.group }
+  if (isEmpty(params.filter)) {
+    params.filter = { OR: [pinnedPostFilter, {}] }
+  } else {
+    params.filter = { OR: [pinnedPostFilter, { ...params.filter }] }
+  }
+  return params
+}
+
 const filterEventDates = (params) => {
   if (params.filter?.eventStart_gte) {
     const date = params.filter.eventStart_gte
@@ -52,6 +62,7 @@ export default {
       params = await filterPostsOfMyGroups(params, context)
       params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
+      params = await maintainGroupPinnedPosts(params)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
     PostsEmotionsCountByEmotion: async (_object, params, context, _resolveInfo) => {
@@ -468,7 +479,8 @@ export default {
         await context.database.write({
           query: `
           MATCH (post:Post {id: $params.id})-[:IN]->(group:Group)
-          MATCH (:User)-[pinned:GROUP_PINNED]->(:Post)-[:IN]->(:Group {id: group.id})
+          MATCH (:User)-[pinned:GROUP_PINNED]->(oldPinnedPost:Post)-[:IN]->(:Group {id: group.id})
+          REMOVE oldPinnedPost.groupPinned
           DELETE pinned`,
           variables: { user: context.user, params },
         })
@@ -492,6 +504,7 @@ export default {
           MATCH (user:User {id: $user.id})
           MATCH (post:Post {id: $params.id})-[:IN]->(group:Group)
           MERGE (user)-[pinned:GROUP_PINNED{createdAt: toString(datetime())}]->(post)
+          SET post.groupPinned = true
           RETURN post {.*, pinnedAt: pinned.createdAt}`,
         variables: { user: context.user, params },
       })
@@ -505,6 +518,7 @@ export default {
           MATCH (post:Post {id: $postId})
           OPTIONAL MATCH (:User)-[pinned:GROUP_PINNED]->(post)
           DELETE pinned
+          REMOVE post.groupPinned
           RETURN post {.*}`,
         variables: { postId: params.id },
       })
