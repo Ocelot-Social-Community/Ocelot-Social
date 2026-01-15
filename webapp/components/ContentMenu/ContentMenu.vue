@@ -249,19 +249,16 @@ export default {
         this.resourceType === 'contribution' &&
         this.resource.group &&
         this.resource.group.myRole === 'owner' &&
-        (this.canBeGroupPinned || this.resource.groupPinnedBy)
+        (this.canBeGroupPinned || this.resource.groupPinned)
       ) {
         routes.push({
-          label: this.resource.groupPinnedBy
+          label: this.resource.groupPinned
             ? this.$t(`post.menu.groupUnpin`)
             : this.$t(`post.menu.groupPin`),
           callback: () => {
-            this.$emit(
-              this.resource.groupPinnedBy ? 'unpinGroupPost' : 'pinGroupPost',
-              this.resource,
-            )
+            this.$emit(this.resource.groupPinned ? 'unpinGroupPost' : 'pinGroupPost', this.resource)
           },
-          icon: this.resource.groupPinnedBy ? 'unlink' : 'link',
+          icon: this.resource.groupPinned ? 'unlink' : 'link',
         })
       }
 

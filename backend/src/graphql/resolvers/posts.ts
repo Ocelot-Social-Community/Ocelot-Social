@@ -503,9 +503,10 @@ export default {
     unpinGroupPost: async (_parent, params, context, _resolveInfo) => {
       const result = await context.database.write({
         query: `
-          MATCH [pinned:GROUP_PINNED]->(post:Post {id: $postId})
+          MATCH (post:Post {id: $postId})
+          OPTIONAL MATCH (:User)-[pinned:GROUP_PINNED]->(post)
           DELETE pinned
-          RETURN post`,
+          RETURN post {.*}`,
         variables: { postId: params.id },
       })
 

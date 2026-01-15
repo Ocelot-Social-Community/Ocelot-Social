@@ -240,7 +240,7 @@ export default {
       this.$emit('pinGroupPost', post)
     },
     unpinGroupPost(post) {
-      this.$emit('unpinPost', post)
+      this.$emit('unpinGroupPost', post)
     },
     pushPost(post) {
       this.$emit('pushPost', post)
