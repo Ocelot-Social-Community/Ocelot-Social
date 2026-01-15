@@ -460,6 +460,23 @@ export default {
     },
   },
   Group: {
+    myRole: async (parent, _args, context: Context, _resolveInfo) => {
+      if (!parent.id) {
+        throw new Error('Can not identify selected Group!')
+      }
+      return (
+        await context.database.query({
+          query: `
+        MATCH (:User {id: $user.id})-[membership:MEMBER_OF]->(group:Group {id: $parent.id})
+        RETURN membership.role as role
+        `,
+          variables: {
+            user: context.user,
+            parent,
+          },
+        })
+      ).records.map((r) => r.get('role'))[0]
+    },
     inviteCodes: async (parent, _args, context: Context, _resolveInfo) => {
       if (!parent.id) {
         throw new Error('Can not identify selected Group!')
