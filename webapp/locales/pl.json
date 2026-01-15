@@ -861,6 +861,8 @@
     "menu": {
       "delete": "Usuń wpis",
       "edit": "Edytuj wpis",
+      "groupPin": null,
+      "groupUnpin": null,
       "observe": null,
       "observedSuccessfully": null,
       "pin": null,

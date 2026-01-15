@@ -861,6 +861,8 @@
     "menu": {
       "delete": "Delete post",
       "edit": "Edit post",
+      "groupPin": "Pin post (Group)",
+      "groupUnpin": "Unpin post (Group)",
       "observe": "Observe post",
       "observedSuccessfully": "You are now observing this post!",
       "pin": "Pin post",

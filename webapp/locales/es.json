@@ -861,6 +861,8 @@
     "menu": {
       "delete": "Borrar contribución",
       "edit": "Editar contribución",
+      "groupPin": null,
+      "groupUnpin": null,
       "observe": "Observar contribución",
       "observedSuccessfully": null,
       "pin": "Anclar contribución",

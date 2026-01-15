@@ -861,6 +861,8 @@
     "menu": {
       "delete": "Excluir publicação",
       "edit": "Editar publicação",
+      "groupPin": null,
+      "groupUnpin": null,
       "observe": "Observar publicação",
       "observedSuccessfully": null,
       "pin": "Fixar publicação",

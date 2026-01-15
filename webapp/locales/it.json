@@ -861,6 +861,8 @@
     "menu": {
       "delete": null,
       "edit": null,
+      "groupPin": null,
+      "groupUnpin": null,
       "observe": null,
       "observedSuccessfully": null,
       "pin": null,
