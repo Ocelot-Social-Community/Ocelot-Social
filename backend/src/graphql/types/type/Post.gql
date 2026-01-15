@@ -128,6 +128,7 @@ type Post {
   deleted: Boolean
   disabled: Boolean
   pinned: Boolean
+  groupPinned: Boolean
   createdAt: String
   updatedAt: String
   sortDate: String

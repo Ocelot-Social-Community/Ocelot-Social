@@ -27,6 +27,7 @@ export const post = gql`
     }
     pinnedAt
     pinned
+    groupPinned
     isObservedByMe
     observingUsersCount
   }

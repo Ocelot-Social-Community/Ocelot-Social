@@ -18,6 +18,7 @@ import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
+import { r } from '@faker-js/faker/dist/airline-CLphikKp'
 
 const maintainPinnedPosts = (params) => {
   const pinnedPostFilter = { pinned: true }
@@ -647,6 +648,18 @@ export default {
           'MATCH (this)<-[obs:OBSERVES]-(related:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(related) >= 1',
       },
     }),
+    groupPinned: async (parent, _params, context, _resolveInfo) => {
+      return (
+        (
+          await context.database.query({
+            query: `
+          MATCH (:User)-[pinned:GROUP_PINNED]->(:Post {id: $parent.id})
+          RETURN pinned`,
+            variables: { parent },
+          })
+        ).records.length === 1
+      )
+    },
     relatedContributions: async (parent, _params, context, _resolveInfo) => {
       if (typeof parent.relatedContributions !== 'undefined') return parent.relatedContributions
       const { id } = parent
