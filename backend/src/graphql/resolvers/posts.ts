@@ -30,6 +30,10 @@ const maintainPinnedPosts = (params) => {
 }
 
 const maintainGroupPinnedPosts = (params) => {
+  // only show GroupPinnedPosts when Groups is selected
+  if (!params.filter?.group) {
+    return params
+  }
   const pinnedPostFilter = { groupPinned: true, group: params.filter.group }
   if (isEmpty(params.filter)) {
     params.filter = { OR: [pinnedPostFilter, {}] }
