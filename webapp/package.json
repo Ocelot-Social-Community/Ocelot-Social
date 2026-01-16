@@ -16,7 +16,6 @@
     "locales": "../scripts/translations/missing-keys.sh && ../scripts/translations/sort.sh",
     "locales:normalize": "../scripts/translations/normalize.sh",
     "precommit": "yarn lint",
-    "postinstall": "rm -rf ../node_modules/@vue/compiler-core ../node_modules/@vue/compiler-dom ../node_modules/@vue/compiler-sfc",
     "test": "cross-env NODE_ENV=test jest --coverage --forceExit --detectOpenHandles",
     "test:unit:update": "yarn test -- --updateSnapshot",
     "test:unit:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --no-cache --runInBand"
