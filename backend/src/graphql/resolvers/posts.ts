@@ -662,7 +662,9 @@ export default {
           'MATCH (this)<-[obs:OBSERVES]-(related:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(related) >= 1',
       },
     }),
-    groupPinned: async (parent, _params, context, _resolveInfo) => {
+    // As long as we rely on the filter capabilities of the neo3jgrahql library,
+    // we cannot filter on this type of field. Hence we need to save the value to the database.
+    /* groupPinned: async (parent, _params, context, _resolveInfo) => {
       return (
         (
           await context.database.query({
@@ -673,7 +675,7 @@ export default {
           })
         ).records.length === 1
       )
-    },
+    }, */
     relatedContributions: async (parent, _params, context, _resolveInfo) => {
       if (typeof parent.relatedContributions !== 'undefined') return parent.relatedContributions
       const { id } = parent
