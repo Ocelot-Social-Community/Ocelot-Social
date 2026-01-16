@@ -37,7 +37,7 @@ export default {
           OPTIONAL MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group)
           WITH group, membership
           ${(isMember === true && "WHERE membership IS NOT NULL AND (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])") || ''}
-          ${(isMember === false && 'WHERE NOT membership') || ''}
+          ${(isMember === false && "WHERE membership IS NULL AND (group.groupType IN ['public', 'closed'])") || ''}
           ${(isMember === undefined && "WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])") || ''}
           RETURN group {.*}
           ORDER BY group.createdAt DESC
