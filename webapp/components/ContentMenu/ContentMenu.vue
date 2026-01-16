@@ -244,7 +244,6 @@ export default {
         }
       }
 
-      console.log(this.resourceType, this.resource)
       if (
         this.resourceType === 'contribution' &&
         this.resource.group &&
