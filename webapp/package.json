@@ -16,6 +16,7 @@
     "locales": "../scripts/translations/missing-keys.sh && ../scripts/translations/sort.sh",
     "locales:normalize": "../scripts/translations/normalize.sh",
     "precommit": "yarn lint",
+    "postinstall": "rm -rf ../node_modules/@vue/compiler-core ../node_modules/@vue/compiler-dom ../node_modules/@vue/compiler-sfc",
     "test": "cross-env NODE_ENV=test jest --coverage --forceExit --detectOpenHandles",
     "test:unit:update": "yarn test -- --updateSnapshot",
     "test:unit:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --no-cache --runInBand"
@@ -24,7 +25,7 @@
     "@mapbox/mapbox-gl-geocoder": "^5.0.2",
     "@nuxtjs/apollo": "^4.0.0-rc19",
     "@nuxtjs/axios": "~5.9.7",
-    "@nuxtjs/composition-api": "0.32.0",
+    "@nuxtjs/composition-api": "0.34.0",
     "@nuxtjs/dotenv": "~1.4.1",
     "@nuxtjs/pwa": "^3.0.0-beta.20",
     "@nuxtjs/sentry": "^4.0.0",
