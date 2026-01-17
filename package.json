@@ -48,6 +48,7 @@
     "mock-socket": "^9.0.3",
     "multiple-cucumber-html-reporter": "^3.9.3",
     "node-polyfill-webpack-plugin": "^4.1.0",
+    "sass-embedded": "^1.97.2",
     "webpack": "^5.104.1"
   },
   "optionalDependencies": {
