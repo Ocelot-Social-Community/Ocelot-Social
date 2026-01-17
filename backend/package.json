@@ -50,7 +50,7 @@
     "graphql-tag": "~2.10.3",
     "graphql-upload": "^13.0.0",
     "helmet": "~8.1.0",
-    "ioredis": "^5.9.1",
+    "ioredis": "^5.9.2",
     "jsonwebtoken": "~8.5.1",
     "languagedetect": "^2.0.0",
     "linkify-html": "^4.3.2",
@@ -92,7 +92,7 @@
     "xregexp": "^5.1.2"
   },
   "devDependencies": {
-    "@eslint-community/eslint-plugin-eslint-comments": "^4.5.0",
+    "@eslint-community/eslint-plugin-eslint-comments": "^4.6.0",
     "@faker-js/faker": "9.9.0",
     "@types/email-templates": "^10.0.4",
     "@types/jest": "^30.0.0",
@@ -114,7 +114,7 @@
     "eslint-plugin-jsonc": "^2.21.0",
     "eslint-plugin-n": "^17.23.1",
     "eslint-plugin-no-catch-all": "^1.1.0",
-    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-promise": "^7.2.1",
     "eslint-plugin-security": "^3.0.1",
     "jest": "^30.2.0",
