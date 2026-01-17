@@ -1,36 +1,41 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable n/no-missing-require */
 /* eslint-disable n/global-require */
 // NOTE: We cannot use `fs` here to clean up the code. Cypress breaks on any npm
 // module that is not browser-compatible. Node's `fs` module is server-side only
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare let Cypress: any | undefined
+
+import type Neode from 'neode'
+
+type SchemaObject = Neode.SchemaObject
+
+/**
+ * Loads a model's default export.
+ *
+ * All model files use `export default { ... }` which TypeScript compiles to
+ * CommonJS with `__esModule: true` marker. Both Node.js and Webpack handle
+ * this consistently, so we can safely access `.default` directly.
+ */
+/* eslint-disable import/no-dynamic-require, security/detect-non-literal-require,
+   @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
+const loadModel = (modulePath: string): SchemaObject => require(modulePath).default
+/* eslint-enable import/no-dynamic-require, security/detect-non-literal-require,
+   @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
+
 export default {
-  File: typeof Cypress !== 'undefined' ? require('./File') : require('./File').default,
-  Image: typeof Cypress !== 'undefined' ? require('./Image') : require('./Image').default,
-  Badge: typeof Cypress !== 'undefined' ? require('./Badge') : require('./Badge').default,
-  User: typeof Cypress !== 'undefined' ? require('./User') : require('./User').default,
-  Group: typeof Cypress !== 'undefined' ? require('./Group') : require('./Group').default,
-  EmailAddress:
-    typeof Cypress !== 'undefined' ? require('./EmailAddress') : require('./EmailAddress').default,
-  UnverifiedEmailAddress:
-    typeof Cypress !== 'undefined'
-      ? require('./UnverifiedEmailAddress')
-      : require('./UnverifiedEmailAddress').default,
-  SocialMedia:
-    typeof Cypress !== 'undefined' ? require('./SocialMedia') : require('./SocialMedia').default,
-  Post: typeof Cypress !== 'undefined' ? require('./Post') : require('./Post').default,
-  Comment: typeof Cypress !== 'undefined' ? require('./Comment') : require('./Comment').default,
-  Category: typeof Cypress !== 'undefined' ? require('./Category') : require('./Category').default,
-  Tag: typeof Cypress !== 'undefined' ? require('./Tag') : require('./Tag').default,
-  Location: typeof Cypress !== 'undefined' ? require('./Location') : require('./Location').default,
-  Donations:
-    typeof Cypress !== 'undefined' ? require('./Donations') : require('./Donations').default,
-  Report: typeof Cypress !== 'undefined' ? require('./Report') : require('./Report').default,
-  Migration:
-    typeof Cypress !== 'undefined' ? require('./Migration') : require('./Migration').default,
-  InviteCode:
-    typeof Cypress !== 'undefined' ? require('./InviteCode') : require('./InviteCode').default,
+  File: loadModel('./File'),
+  Image: loadModel('./Image'),
+  Badge: loadModel('./Badge'),
+  User: loadModel('./User'),
+  Group: loadModel('./Group'),
+  EmailAddress: loadModel('./EmailAddress'),
+  UnverifiedEmailAddress: loadModel('./UnverifiedEmailAddress'),
+  SocialMedia: loadModel('./SocialMedia'),
+  Post: loadModel('./Post'),
+  Comment: loadModel('./Comment'),
+  Category: loadModel('./Category'),
+  Tag: loadModel('./Tag'),
+  Location: loadModel('./Location'),
+  Donations: loadModel('./Donations'),
+  Report: loadModel('./Report'),
+  Migration: loadModel('./Migration'),
+  InviteCode: loadModel('./InviteCode'),
 }

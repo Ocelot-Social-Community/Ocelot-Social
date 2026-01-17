@@ -18,10 +18,11 @@ async function setupNodeEvents(on, config) {
     'file:preprocessor',
     webpackPreprocessor({
       webpackOptions: {
+        mode: 'development',
+        devtool: 'source-map',
         resolve: {
           extensions: ['.js', '.json'],
           fallback: {
-            // Additional fallbacks for Node.js modules used by backend code
             fs: false,
             net: false,
             tls: false,
