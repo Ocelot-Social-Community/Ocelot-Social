@@ -403,14 +403,14 @@
     "@smithy/types" "^4.12.0"
     tslib "^2.6.2"
 
-"@aws-sdk/lib-storage@^3.958.0":
-  version "3.958.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/lib-storage/-/lib-storage-3.958.0.tgz#522933af25c262af146723129bbab44baddda9d9"
-  integrity sha512-cd8CTiJ165ep2DKTc2PHHhVCxDn3byv10BXMGn+lkDY3KwMoatcgZ1uhFWCBuJvsCUnSExqGouJN/Q0qgjkWtg==
+"@aws-sdk/lib-storage@^3.971.0":
+  version "3.971.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/lib-storage/-/lib-storage-3.971.0.tgz#92761be9ccf0d09b639b9e421bb72df97b0cc68b"
+  integrity sha512-THTCXZiYjuAU2kPD8rIuvtYRT83BxEzbv4uayPlQJ8v5bybLTYDbNEbpfZGilyAqUAdSGTMOkoLu9ROryCJ3/g==
   dependencies:
-    "@smithy/abort-controller" "^4.2.7"
-    "@smithy/middleware-endpoint" "^4.4.1"
-    "@smithy/smithy-client" "^4.10.2"
+    "@smithy/abort-controller" "^4.2.8"
+    "@smithy/middleware-endpoint" "^4.4.7"
+    "@smithy/smithy-client" "^4.10.8"
     buffer "5.6.0"
     events "3.3.0"
     stream-browserify "3.0.0"
@@ -2105,14 +2105,6 @@
   dependencies:
     "@sinonjs/commons" "^3.0.1"
 
-"@smithy/abort-controller@^4.2.7":
-  version "4.2.7"
-  resolved "https://registry.yarnpkg.com/@smithy/abort-controller/-/abort-controller-4.2.7.tgz#b475e8d7bb1aeee45fdc8d984c35e6ca9bb0428c"
-  integrity sha512-rzMY6CaKx2qxrbYbqjXWS0plqEy7LOdKHS0bg4ixJ6aoGDPNUcLWk/FRNuCILh7GKLG9TFUXYYeQQldMBBwuyw==
-  dependencies:
-    "@smithy/types" "^4.11.0"
-    tslib "^2.6.2"
-
 "@smithy/abort-controller@^4.2.8":
   version "4.2.8"
   resolved "https://registry.yarnpkg.com/@smithy/abort-controller/-/abort-controller-4.2.8.tgz#3bfd7a51acce88eaec9a65c3382542be9f3a053a"
@@ -2300,7 +2292,7 @@
     "@smithy/types" "^4.12.0"
     tslib "^2.6.2"
 
-"@smithy/middleware-endpoint@^4.4.1", "@smithy/middleware-endpoint@^4.4.7", "@smithy/middleware-endpoint@^4.4.8":
+"@smithy/middleware-endpoint@^4.4.7", "@smithy/middleware-endpoint@^4.4.8":
   version "4.4.8"
   resolved "https://registry.yarnpkg.com/@smithy/middleware-endpoint/-/middleware-endpoint-4.4.8.tgz#86aef87c2e0d5f727f172a663b9d31be9919e66a"
   integrity sha512-TV44qwB/T0OMMzjIuI+JeS0ort3bvlPJ8XIH0MSlGADraXpZqmyND27ueuAL3E14optleADWqtd7dUgc2w+qhQ==
@@ -2429,7 +2421,7 @@
     "@smithy/util-utf8" "^4.2.0"
     tslib "^2.6.2"
 
-"@smithy/smithy-client@^4.10.2", "@smithy/smithy-client@^4.10.8", "@smithy/smithy-client@^4.10.9":
+"@smithy/smithy-client@^4.10.8", "@smithy/smithy-client@^4.10.9":
   version "4.10.9"
   resolved "https://registry.yarnpkg.com/@smithy/smithy-client/-/smithy-client-4.10.9.tgz#fc19348ff77749ebb40f948d7f1b09daa14c313f"
   integrity sha512-Je0EvGXVJ0Vrrr2lsubq43JGRIluJ/hX17aN/W/A0WfE+JpoMdI8kwk2t9F0zTX9232sJDGcoH4zZre6m6f/sg==
@@ -2442,7 +2434,7 @@
     "@smithy/util-stream" "^4.5.10"
     tslib "^2.6.2"
 
-"@smithy/types@^4.11.0", "@smithy/types@^4.12.0":
+"@smithy/types@^4.12.0":
   version "4.12.0"
   resolved "https://registry.yarnpkg.com/@smithy/types/-/types-4.12.0.tgz#55d2479080922bda516092dbf31916991d9c6fee"
   integrity sha512-9YcuJVTOBDjg9LWo23Qp0lTQ3D7fQsQtwle0jVfpbUHy9qBwCEgKuVH4FqFB3VYu0nwdHKiEMA+oXz7oV8X1kw==
