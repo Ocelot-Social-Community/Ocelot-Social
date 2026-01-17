@@ -236,6 +236,16 @@ describe('pin groupPosts', () => {
       })
     })
 
+    it('no error thrown when pinned post was pinned again', async () => {
+      await mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } })
+      await expect(
+        mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
+      ).resolves.toMatchObject({
+        errors: undefined,
+        data: { pinGroupPost: { id: 'post-1-to-public-group', groupPinned: true } },
+      })
+    })
+
     it('returns post-2-to-public-group as first, pinned post', async () => {
       authenticatedUser = await publicUser.toJson()
       await mutate({ mutation: pinGroupPost, variables: { id: 'post-2-to-public-group' } })
