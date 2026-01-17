@@ -498,7 +498,7 @@ export default {
           variables: { user: context.user, params },
         })
         if (result.records[0].get('count') >= config.MAX_PINNED_POSTS) {
-          throw new Error('Reached maxed pinned posts already. Unpin a post first-')
+          throw new Error('Reached maxed pinned posts already. Unpin a post first.')
         }
       }
 

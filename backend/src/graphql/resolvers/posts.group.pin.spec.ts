@@ -6,6 +6,8 @@ import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
 import { CreateGroup } from '@graphql/queries/CreateGroup'
 import { CreatePost } from '@graphql/queries/CreatePost'
 import { pinGroupPost } from '@graphql/queries/pinGroupPost'
+import { profilePagePosts } from '@graphql/queries/profilePagePosts'
+import { unpinGroupPost } from '@graphql/queries/unpinGroupPost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -17,12 +19,8 @@ let config: Partial<Context['config']>
 
 let anyUser
 let allGroupsUser
-let pendingUser
 let publicUser
 let publicAdminUser
-let closedUser
-let hiddenUser
-let newUser
 let authenticatedUser: Context['user']
 const context = () => ({ authenticatedUser, config })
 let mutate: ApolloTestSetup['mutate']
@@ -60,11 +58,6 @@ beforeEach(async () => {
     name: 'All Groups User',
     about: 'I am a member of all groups.',
   })
-  pendingUser = await Factory.build('user', {
-    id: 'pending-user',
-    name: 'Pending User',
-    about: 'I am a pending member of all groups.',
-  })
   publicUser = await Factory.build('user', {
     id: 'public-user',
     name: 'Public User',
@@ -74,18 +67,6 @@ beforeEach(async () => {
     id: 'public-admin-user',
     name: 'Public Admin User',
     about: 'I am the admin of the public group.',
-  })
-
-  closedUser = await Factory.build('user', {
-    id: 'closed-user',
-    name: 'Private User',
-    about: 'I am the owner of the closed group.',
-  })
-
-  hiddenUser = await Factory.build('user', {
-    id: 'hidden-user',
-    name: 'Secret User',
-    about: 'I am the owner of the hidden group.',
   })
 
   authenticatedUser = await publicUser.toJson()
@@ -104,14 +85,6 @@ beforeEach(async () => {
     mutation: ChangeGroupMemberRole,
     variables: {
       groupId: 'public-group',
-      userId: 'pending-user',
-      roleInGroup: 'pending',
-    },
-  })
-  await mutate({
-    mutation: ChangeGroupMemberRole,
-    variables: {
-      groupId: 'public-group',
       userId: 'all-groups-user',
       roleInGroup: 'usual',
     },
@@ -124,58 +97,10 @@ beforeEach(async () => {
       roleInGroup: 'admin',
     },
   })
-  authenticatedUser = await closedUser.toJson()
-  await mutate({
-    mutation: CreateGroup,
-    variables: {
-      id: 'closed-group',
-      name: 'The Closed Group',
-      about: 'The closed group!',
-      description: 'Only members of this group can see the posts of this group.',
-      groupType: 'closed',
-      actionRadius: 'regional',
-    },
-  })
   await mutate({
     mutation: ChangeGroupMemberRole,
     variables: {
       groupId: 'closed-group',
-      userId: 'pending-user',
-      roleInGroup: 'pending',
-    },
-  })
-  await mutate({
-    mutation: ChangeGroupMemberRole,
-    variables: {
-      groupId: 'closed-group',
-      userId: 'all-groups-user',
-      roleInGroup: 'usual',
-    },
-  })
-  authenticatedUser = await hiddenUser.toJson()
-  await mutate({
-    mutation: CreateGroup,
-    variables: {
-      id: 'hidden-group',
-      name: 'The Hidden Group',
-      about: 'The hidden group!',
-      description: 'Only members of this group can see the posts of this group.',
-      groupType: 'hidden',
-      actionRadius: 'regional',
-    },
-  })
-  await mutate({
-    mutation: ChangeGroupMemberRole,
-    variables: {
-      groupId: 'hidden-group',
-      userId: 'pending-user',
-      roleInGroup: 'pending',
-    },
-  })
-  await mutate({
-    mutation: ChangeGroupMemberRole,
-    variables: {
-      groupId: 'hidden-group',
       userId: 'all-groups-user',
       roleInGroup: 'usual',
     },
@@ -234,666 +159,200 @@ describe('pin groupPosts', () => {
         data: { pinGroupPost: null },
       })
     })
+  })
 
-    describe('ordinary users', () => {
-      it('throws authorization error', async () => {
-        authenticatedUser = await anyUser.toJson()
-        await expect(
-          mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
-        ).resolves.toMatchObject({
-          errors: [{ message: 'Not Authorized!' }],
-          data: { pinGroupPost: null },
-        })
-      })
-    })
-
-    describe('group usual', () => {
-      it('throws authorization error', async () => {
-        authenticatedUser = await allGroupsUser.toJson()
-        await expect(
-          mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
-        ).resolves.toMatchObject({
-          errors: [{ message: 'Not Authorized!' }],
-          data: { pinGroupPost: null },
-        })
-      })
-    })
-
-    describe('group admin', () => {
-      it('resolves without error', async () => {
-        authenticatedUser = await publicAdminUser.toJson()
-        await expect(
-          mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
-        ).resolves.toMatchObject({
-          errors: undefined,
-          data: { pinGroupPost: { id: 'post-1-to-public-group' } },
-        })
-      })
-    })
-
-    describe('group owner', () => {
-      it('resolves without error', async () => {
-        authenticatedUser = await publicUser.toJson()
-        await expect(
-          mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
-        ).resolves.toMatchObject({
-          errors: undefined,
-          data: { pinGroupPost: { id: 'post-1-to-public-group' } },
-        })
-      })
-    })
-
-    /* describe('group owner', () => {
-    let moderator
-    beforeEach(async () => {
-      moderator = await user.update({ role: 'moderator', updatedAt: new Date().toISOString() })
-      authenticatedUser = await moderator.toJson()
-    })
-
+  describe('ordinary users', () => {
     it('throws authorization error', async () => {
-      await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject({
+      authenticatedUser = await anyUser.toJson()
+      await expect(
+        mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
+      ).resolves.toMatchObject({
         errors: [{ message: 'Not Authorized!' }],
-        data: { pinPost: null },
+        data: { pinGroupPost: null },
       })
     })
   })
 
-  describe('admins', () => {
-    let admin
+  describe('group usual', () => {
+    it('throws authorization error', async () => {
+      authenticatedUser = await allGroupsUser.toJson()
+      await expect(
+        mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
+      ).resolves.toMatchObject({
+        errors: [{ message: 'Not Authorized!' }],
+        data: { pinGroupPost: null },
+      })
+    })
+  })
+
+  describe('group admin', () => {
+    it('resolves without error', async () => {
+      authenticatedUser = await publicAdminUser.toJson()
+      await expect(
+        mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
+      ).resolves.toMatchObject({
+        errors: undefined,
+        data: { pinGroupPost: { id: 'post-1-to-public-group', groupPinned: true } },
+      })
+    })
+  })
+
+  describe('group owner', () => {
+    it('resolves without error', async () => {
+      authenticatedUser = await publicUser.toJson()
+      await expect(
+        mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } }),
+      ).resolves.toMatchObject({
+        errors: undefined,
+        data: { pinGroupPost: { id: 'post-1-to-public-group', groupPinned: true } },
+      })
+    })
+  })
+
+  describe('MAX_GROUP_PINNED_POSTS is 1', () => {
     beforeEach(async () => {
-      admin = await user.update({
-        role: 'admin',
-        name: 'Admin',
-        updatedAt: new Date().toISOString(),
-      })
-      authenticatedUser = await admin.toJson()
+      config = { ...defaultConfig, MAX_PINNED_POSTS: 1 }
+      authenticatedUser = await publicUser.toJson()
     })
-
-    describe('MAX_PINNED_POSTS is 0', () => {
-      beforeEach(async () => {
-        config = { ...defaultConfig, MAX_PINNED_POSTS: 0 }
-
-        await Factory.build(
-          'post',
-          {
-            id: 'created-and-pinned-by-same-admin',
+    it('returns post-1-to-public-group as first, pinned post', async () => {
+      await mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } })
+      await expect(
+        query({
+          query: profilePagePosts,
+          variables: {
+            filter: { group: { id: 'public-group' } },
+            orderBy: ['groupPinned_asc', 'sortDate_desc'],
           },
-          {
-            author: admin,
-          },
-        )
-        variables = { ...variables, id: 'created-and-pinned-by-same-admin' }
-      })
-
-      it('throws with error that pinning posts is not allowed', async () => {
-        await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject({
-          data: { pinPost: null },
-          errors: [{ message: 'Pinned posts are not allowed!' }],
-        })
+        }),
+      ).resolves.toMatchObject({
+        errors: undefined,
+        data: {
+          profilePagePosts: [
+            expect.objectContaining({ id: 'post-1-to-public-group', groupPinned: true }),
+            expect.objectContaining({ id: 'post-3-to-public-group', groupPinned: null }),
+            expect.objectContaining({ id: 'post-2-to-public-group', groupPinned: null }),
+          ],
+        },
       })
     })
 
-    describe('MAX_PINNED_POSTS is 1', () => {
-      beforeEach(() => {
-        config = { ...defaultConfig, MAX_PINNED_POSTS: 1 }
-      })
-
-      describe('are allowed to pin posts', () => {
-        beforeEach(async () => {
-          await Factory.build(
-            'post',
-            {
-              id: 'created-and-pinned-by-same-admin',
-            },
-            {
-              author: admin,
-            },
-          )
-          variables = { ...variables, id: 'created-and-pinned-by-same-admin' }
-        })
-
-        it('responds with the updated Post', async () => {
-          const expected = {
-            data: {
-              pinPost: {
-                id: 'created-and-pinned-by-same-admin',
-                author: {
-                  name: 'Admin',
-                },
-                pinnedBy: {
-                  id: 'current-user',
-                  name: 'Admin',
-                  role: 'admin',
-                },
-              },
-            },
-            errors: undefined,
-          }
-
-          await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject(expected)
-        })
-
-        it('sets createdAt date for PINNED', async () => {
-          const expected = {
-            data: {
-              pinPost: {
-                id: 'created-and-pinned-by-same-admin',
-                pinnedAt: expect.any(String),
-              },
-            },
-            errors: undefined,
-          }
-          await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject(expected)
-        })
-
-        it('sets redundant `pinned` property for performant ordering', async () => {
-          variables = { ...variables, id: 'created-and-pinned-by-same-admin' }
-          const expected = {
-            data: { pinPost: { pinned: true } },
-            errors: undefined,
-          }
-          await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject(expected)
-        })
-      })
-
-      describe('post created by another admin', () => {
-        let otherAdmin
-        beforeEach(async () => {
-          otherAdmin = await Factory.build('user', {
-            role: 'admin',
-            name: 'otherAdmin',
-          })
-          authenticatedUser = await otherAdmin.toJson()
-          await Factory.build(
-            'post',
-            {
-              id: 'created-by-one-admin-pinned-by-different-one',
-            },
-            {
-              author: otherAdmin,
-            },
-          )
-        })
-
-        it('responds with the updated Post', async () => {
-          authenticatedUser = await admin.toJson()
-          variables = { ...variables, id: 'created-by-one-admin-pinned-by-different-one' }
-          const expected = {
-            data: {
-              pinPost: {
-                id: 'created-by-one-admin-pinned-by-different-one',
-                author: {
-                  name: 'otherAdmin',
-                },
-                pinnedBy: {
-                  id: 'current-user',
-                  name: 'Admin',
-                  role: 'admin',
-                },
-              },
-            },
-            errors: undefined,
-          }
-
-          await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject(expected)
-        })
-      })
-
-      describe('post created by another user', () => {
-        it('responds with the updated Post', async () => {
-          const expected = {
-            data: {
-              pinPost: {
-                id: 'p9876',
-                author: {
-                  slug: 'the-author',
-                },
-                pinnedBy: {
-                  id: 'current-user',
-                  name: 'Admin',
-                  role: 'admin',
-                },
-              },
-            },
-            errors: undefined,
-          }
-
-          await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject(expected)
-        })
-      })
-
-      describe('pinned post already exists', () => {
-        let pinnedPost
-        beforeEach(async () => {
-          await Factory.build(
-            'post',
-            {
-              id: 'only-pinned-post',
-            },
-            {
-              author: admin,
-            },
-          )
-          await mutate({ mutation: pinPost, variables })
-        })
-
-        it('removes previous `pinned` attribute', async () => {
-          const cypher = 'MATCH (post:Post) WHERE post.pinned IS NOT NULL RETURN post'
-          pinnedPost = await database.neode.cypher(cypher, {})
-          expect(pinnedPost.records).toHaveLength(1)
-          variables = { ...variables, id: 'only-pinned-post' }
-          await mutate({ mutation: pinPost, variables })
-          pinnedPost = await database.neode.cypher(cypher, {})
-          expect(pinnedPost.records).toHaveLength(1)
-        })
-
-        it('removes previous PINNED relationship', async () => {
-          variables = { ...variables, id: 'only-pinned-post' }
-          await mutate({ mutation: pinPost, variables })
-          pinnedPost = await database.neode.cypher(
-            `MATCH (:User)-[pinned:PINNED]->(post:Post) RETURN post, pinned`,
-            {},
-          )
-          expect(pinnedPost.records).toHaveLength(1)
-        })
-      })
-
-      describe('post in public group', () => {
-        beforeEach(async () => {
-          await mutate({
-            mutation: CreateGroup,
-            variables: {
-              name: 'Public Group',
-              id: 'public-group',
-              about: 'This is a public group',
-              groupType: 'public',
-              actionRadius: 'regional',
-              description:
-                'This is a public group to test if the posts of this group can be pinned.',
-              categoryIds,
-            },
-          })
-          await mutate({
-            mutation: CreatePost,
-            variables: {
-              id: 'public-group-post',
-              title: 'Public group post',
-              content: 'This is a post in a public group',
-              groupId: 'public-group',
-              categoryIds,
-            },
-          })
-          variables = { ...variables, id: 'public-group-post' }
-        })
-
-        it('can be pinned', async () => {
-          await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject({
-            data: {
-              pinPost: {
-                id: 'public-group-post',
-                author: {
-                  slug: 'testuser',
-                },
-                pinnedBy: {
-                  id: 'current-user',
-                  name: 'Admin',
-                  role: 'admin',
-                },
-              },
-            },
-            errors: undefined,
-          })
-        })
-      })
-
-      describe('post in closed group', () => {
-        beforeEach(async () => {
-          await mutate({
-            mutation: CreateGroup,
-            variables: {
-              name: 'Closed Group',
-              id: 'closed-group',
-              about: 'This is a closed group',
-              groupType: 'closed',
-              actionRadius: 'regional',
-              description:
-                'This is a closed group to test if the posts of this group can be pinned.',
-              categoryIds,
-            },
-          })
-          await mutate({
-            mutation: CreatePost,
-            variables: {
-              id: 'closed-group-post',
-              title: 'Closed group post',
-              content: 'This is a post in a closed group',
-              groupId: 'closed-group',
-              categoryIds,
-            },
-          })
-          variables = { ...variables, id: 'closed-group-post' }
-        })
-
-        it('can not be pinned', async () => {
-          await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject({
-            data: {
-              pinPost: null,
-            },
-            errors: undefined,
-          })
-        })
-      })
-
-      describe('post in hidden group', () => {
-        beforeEach(async () => {
-          await mutate({
-            mutation: CreateGroup,
-            variables: {
-              name: 'Hidden Group',
-              id: 'hidden-group',
-              about: 'This is a hidden group',
-              groupType: 'hidden',
-              actionRadius: 'regional',
-              description:
-                'This is a hidden group to test if the posts of this group can be pinned.',
-              categoryIds,
-            },
-          })
-          await mutate({
-            mutation: CreatePost,
-            variables: {
-              id: 'hidden-group-post',
-              title: 'Hidden group post',
-              content: 'This is a post in a hidden group',
-              groupId: 'hidden-group',
-              categoryIds,
-            },
-          })
-          variables = { ...variables, id: 'hidden-group-post' }
-        })
-
-        it('can not be pinned', async () => {
-          await expect(mutate({ mutation: pinPost, variables })).resolves.toMatchObject({
-            data: {
-              pinPost: null,
-            },
-            errors: undefined,
-          })
-        })
-      })
-
-      describe('PostOrdering', () => {
-        beforeEach(async () => {
-          await Factory.build('post', {
-            id: 'im-a-pinned-post',
-            createdAt: '2019-11-22T17:26:29.070Z',
-            pinned: true,
-          })
-          await Factory.build('post', {
-            id: 'i-was-created-before-pinned-post',
-            // fairly old, so this should be 3rd
-            createdAt: '2019-10-22T17:26:29.070Z',
-          })
-        })
-
-        describe('order by `pinned_asc` and `createdAt_desc`', () => {
-          beforeEach(() => {
-            // this is the ordering in the frontend
-            variables = { orderBy: ['pinned_asc', 'createdAt_desc'] }
-          })
-
-          it('pinned post appear first even when created before other posts', async () => {
-            await expect(query({ query: Post, variables })).resolves.toMatchObject({
-              data: {
-                Post: [
-                  {
-                    id: 'im-a-pinned-post',
-                    pinned: true,
-                    createdAt: '2019-11-22T17:26:29.070Z',
-                    pinnedAt: expect.any(String),
-                  },
-                  {
-                    id: 'p9876',
-                    pinned: null,
-                    createdAt: expect.any(String),
-                    pinnedAt: null,
-                  },
-                  {
-                    id: 'i-was-created-before-pinned-post',
-                    pinned: null,
-                    createdAt: '2019-10-22T17:26:29.070Z',
-                    pinnedAt: null,
-                  },
-                ],
-              },
-              errors: undefined,
-            })
-          })
-        })
+    it('returns post-2-to-public-group as first, pinned post', async () => {
+      authenticatedUser = await publicUser.toJson()
+      await mutate({ mutation: pinGroupPost, variables: { id: 'post-2-to-public-group' } })
+      await expect(
+        query({
+          query: profilePagePosts,
+          variables: {
+            filter: { group: { id: 'public-group' } },
+            orderBy: ['groupPinned_asc', 'sortDate_desc'],
+          },
+        }),
+      ).resolves.toMatchObject({
+        errors: undefined,
+        data: {
+          profilePagePosts: [
+            expect.objectContaining({ id: 'post-2-to-public-group', groupPinned: true }),
+            expect.objectContaining({ id: 'post-3-to-public-group', groupPinned: null }),
+            expect.objectContaining({ id: 'post-1-to-public-group', groupPinned: null }),
+          ],
+        },
       })
     })
 
-    describe('MAX_PINNED_POSTS = 3', () => {
-      const postsPinnedCountsQuery = `query { PostsPinnedCounts { maxPinnedPosts, currentlyPinnedPosts } }`
-
-      beforeEach(async () => {
-        config = { ...defaultConfig, MAX_PINNED_POSTS: 3 }
-
-        await Factory.build(
-          'post',
-          {
-            id: 'first-post',
-            createdAt: '2019-10-22T17:26:29.070Z',
+    it('returns post-3-to-public-group as first, pinned post, when multiple are pinned', async () => {
+      authenticatedUser = await publicUser.toJson()
+      await mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } })
+      await mutate({ mutation: pinGroupPost, variables: { id: 'post-2-to-public-group' } })
+      await mutate({ mutation: pinGroupPost, variables: { id: 'post-3-to-public-group' } })
+      await expect(
+        query({
+          query: profilePagePosts,
+          variables: {
+            filter: { group: { id: 'public-group' } },
+            orderBy: ['groupPinned_asc', 'sortDate_desc'],
           },
-          {
-            author: admin,
-          },
-        )
-        await Factory.build(
-          'post',
-          {
-            id: 'second-post',
-            createdAt: '2018-10-22T17:26:29.070Z',
-          },
-          {
-            author: admin,
-          },
-        )
-        await Factory.build(
-          'post',
-          {
-            id: 'third-post',
-            createdAt: '2017-10-22T17:26:29.070Z',
-          },
-          {
-            author: admin,
-          },
-        )
-        await Factory.build(
-          'post',
-          {
-            id: 'another-post',
-          },
-          {
-            author: admin,
-          },
-        )
+        }),
+      ).resolves.toMatchObject({
+        errors: undefined,
+        data: {
+          profilePagePosts: [
+            expect.objectContaining({ id: 'post-3-to-public-group', groupPinned: true }),
+            expect.objectContaining({ id: 'post-2-to-public-group', groupPinned: null }),
+            expect.objectContaining({ id: 'post-1-to-public-group', groupPinned: null }),
+          ],
+        },
       })
+    })
+  })
 
-      describe('first post', () => {
-        let result
-
-        beforeEach(async () => {
-          variables = { ...variables, id: 'first-post' }
-          result = await mutate({ mutation: pinPost, variables })
-        })
-
-        it('pins the first post', () => {
-          expect(result).toMatchObject({
-            data: {
-              pinPost: {
-                id: 'first-post',
-                pinned: true,
-                pinnedAt: expect.any(String),
-                pinnedBy: {
-                  id: 'current-user',
-                },
-              },
-            },
-          })
-        })
-
-        it('returns the correct counts', async () => {
-          await expect(
-            query({
-              query: postsPinnedCountsQuery,
-            }),
-          ).resolves.toMatchObject({
-            data: {
-              PostsPinnedCounts: {
-                maxPinnedPosts: 3,
-                currentlyPinnedPosts: 1,
-              },
-            },
-          })
-        })
-
-        describe('second post', () => {
-          beforeEach(async () => {
-            variables = { ...variables, id: 'second-post' }
-            result = await mutate({ mutation: pinPost, variables })
-          })
-
-          it('pins the second post', () => {
-            expect(result).toMatchObject({
-              data: {
-                pinPost: {
-                  id: 'second-post',
-                  pinned: true,
-                  pinnedAt: expect.any(String),
-                  pinnedBy: {
-                    id: 'current-user',
-                  },
-                },
-              },
-            })
-          })
-
-          it('returns the correct counts', async () => {
-            await expect(
-              query({
-                query: postsPinnedCountsQuery,
-              }),
-            ).resolves.toMatchObject({
-              data: {
-                PostsPinnedCounts: {
-                  maxPinnedPosts: 3,
-                  currentlyPinnedPosts: 2,
-                },
-              },
-            })
-          })
-
-          describe('third post', () => {
-            beforeEach(async () => {
-              variables = { ...variables, id: 'third-post' }
-              result = await mutate({ mutation: pinPost, variables })
-            })
-
-            it('pins the second post', () => {
-              expect(result).toMatchObject({
-                data: {
-                  pinPost: {
-                    id: 'third-post',
-                    pinned: true,
-                    pinnedAt: expect.any(String),
-                    pinnedBy: {
-                      id: 'current-user',
-                    },
-                  },
-                },
-              })
-            })
-
-            it('returns the correct counts', async () => {
-              await expect(
-                query({
-                  query: postsPinnedCountsQuery,
-                }),
-              ).resolves.toMatchObject({
-                data: {
-                  PostsPinnedCounts: {
-                    maxPinnedPosts: 3,
-                    currentlyPinnedPosts: 3,
-                  },
-                },
-              })
-            })
-
-            describe('another post', () => {
-              beforeEach(async () => {
-                variables = { ...variables, id: 'another-post' }
-                result = await mutate({ mutation: pinPost, variables })
-              })
-
-              it('throws with max pinned posts is reached', () => {
-                expect(result).toMatchObject({
-                  data: { pinPost: null },
-                  errors: [{ message: 'Max number of pinned posts is reached!' }],
-                })
-              })
-            })
-
-            describe('post ordering', () => {
-              beforeEach(() => {
-                // this is the ordering in the frontend
-                variables = { orderBy: ['pinned_asc', 'createdAt_desc'] }
-              })
-
-              it('places the pinned posts first, though they are much older', async () => {
-                await expect(query({ query: Post, variables })).resolves.toMatchObject({
-                  data: {
-                    Post: [
-                      {
-                        id: 'first-post',
-                        pinned: true,
-                        pinnedAt: expect.any(String),
-                        createdAt: '2019-10-22T17:26:29.070Z',
-                      },
-                      {
-                        id: 'second-post',
-                        pinned: true,
-                        pinnedAt: expect.any(String),
-                        createdAt: '2018-10-22T17:26:29.070Z',
-                      },
-                      {
-                        id: 'third-post',
-                        pinned: true,
-                        pinnedAt: expect.any(String),
-                        createdAt: '2017-10-22T17:26:29.070Z',
-                      },
-                      {
-                        id: 'another-post',
-                        pinned: null,
-                        pinnedAt: null,
-                        createdAt: expect.any(String),
-                      },
-                      {
-                        id: 'p9876',
-                        pinned: null,
-                        pinnedAt: null,
-                        createdAt: expect.any(String),
-                      },
-                    ],
-                  },
-                  errors: undefined,
-                })
-              })
-            })
-          })
-        })
+  describe('MAX_GROUP_PINNED_POSTS is 2', () => {
+    beforeEach(async () => {
+      config = { ...defaultConfig, MAX_PINNED_POSTS: 2 }
+      authenticatedUser = await publicUser.toJson()
+    })
+    it('returns post-1-to-public-group as first, post-2-to-public-group as second pinned post', async () => {
+      await mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } })
+      await mutate({ mutation: pinGroupPost, variables: { id: 'post-2-to-public-group' } })
+      await expect(
+        query({
+          query: profilePagePosts,
+          variables: {
+            filter: { group: { id: 'public-group' } },
+            orderBy: ['groupPinned_asc', 'sortDate_desc'],
+          },
+        }),
+      ).resolves.toMatchObject({
+        errors: undefined,
+        data: {
+          profilePagePosts: [
+            expect.objectContaining({ id: 'post-2-to-public-group', groupPinned: true }),
+            expect.objectContaining({ id: 'post-1-to-public-group', groupPinned: true }),
+            expect.objectContaining({ id: 'post-3-to-public-group', groupPinned: null }),
+          ],
+        },
       })
-    }) 
-  }) */
+    })
+
+    it('throws an error when three posts are pinned', async () => {
+      await mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } })
+      await mutate({ mutation: pinGroupPost, variables: { id: 'post-2-to-public-group' } })
+      await expect(
+        mutate({ mutation: pinGroupPost, variables: { id: 'post-3-to-public-group' } }),
+      ).resolves.toMatchObject({
+        errors: [{ message: 'Reached maxed pinned posts already. Unpin a post first.' }],
+        data: {
+          pinGroupPost: null,
+        },
+      })
+    })
+
+    it('throws no error when first unpinned before a third post is pinned', async () => {
+      await mutate({ mutation: pinGroupPost, variables: { id: 'post-1-to-public-group' } })
+      await mutate({ mutation: pinGroupPost, variables: { id: 'post-2-to-public-group' } })
+      await mutate({ mutation: unpinGroupPost, variables: { id: 'post-1-to-public-group' } })
+      await expect(
+        mutate({ mutation: pinGroupPost, variables: { id: 'post-3-to-public-group' } }),
+      ).resolves.toMatchObject({
+        errors: undefined,
+      })
+      await expect(
+        query({
+          query: profilePagePosts,
+          variables: {
+            filter: { group: { id: 'public-group' } },
+            orderBy: ['groupPinned_asc', 'sortDate_desc'],
+          },
+        }),
+      ).resolves.toMatchObject({
+        errors: undefined,
+        data: {
+          profilePagePosts: [
+            expect.objectContaining({ id: 'post-3-to-public-group', groupPinned: true }),
+            expect.objectContaining({ id: 'post-2-to-public-group', groupPinned: true }),
+            expect.objectContaining({ id: 'post-1-to-public-group', groupPinned: null }),
+          ],
+        },
+      })
+    })
   })
 })
