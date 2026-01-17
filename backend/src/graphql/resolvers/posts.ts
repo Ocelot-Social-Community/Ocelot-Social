@@ -474,12 +474,12 @@ export default {
       }
       const { config } = context
 
-      if (config.MAX_PINNED_POSTS === 0) {
+      if (config.MAX_GROUP_PINNED_POSTS === 0) {
         throw new Error('Pinned posts are not allowed!')
       }
 
-      // If MAX_PINNED_POSTS === 1 -> Delete old pin
-      if (config.MAX_PINNED_POSTS === 1) {
+      // If MAX_GROUP_PINNED_POSTS === 1 -> Delete old pin
+      if (config.MAX_GROUP_PINNED_POSTS === 1) {
         await context.database.write({
           query: `
           MATCH (post:Post {id: $params.id})-[:IN]->(group:Group)
@@ -488,7 +488,7 @@ export default {
           DELETE pinned`,
           variables: { user: context.user, params },
         })
-        // If MAX_PINNED_POSTS !== 1 -> Check if max is reached
+        // If MAX_GROUP_PINNED_POSTS !== 1 -> Check if max is reached
       } else {
         const result = await context.database.query({
           query: `
@@ -497,7 +497,7 @@ export default {
           RETURN toString(count(pinnedPosts)) as count`,
           variables: { user: context.user, params },
         })
-        if (result.records[0].get('count') >= config.MAX_PINNED_POSTS) {
+        if (result.records[0].get('count') >= config.MAX_GROUP_PINNED_POSTS) {
           throw new Error('Reached maxed pinned posts already. Unpin a post first.')
         }
       }

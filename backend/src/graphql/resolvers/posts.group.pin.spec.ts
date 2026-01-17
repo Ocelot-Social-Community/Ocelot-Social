@@ -211,7 +211,7 @@ describe('pin groupPosts', () => {
 
   describe('MAX_GROUP_PINNED_POSTS is 1', () => {
     beforeEach(async () => {
-      config = { ...defaultConfig, MAX_PINNED_POSTS: 1 }
+      config = { ...defaultConfig, MAX_GROUP_PINNED_POSTS: 1 }
       authenticatedUser = await publicUser.toJson()
     })
     it('returns post-1-to-public-group as first, pinned post', async () => {
@@ -297,7 +297,7 @@ describe('pin groupPosts', () => {
 
   describe('MAX_GROUP_PINNED_POSTS is 2', () => {
     beforeEach(async () => {
-      config = { ...defaultConfig, MAX_PINNED_POSTS: 2 }
+      config = { ...defaultConfig, MAX_GROUP_PINNED_POSTS: 2 }
       authenticatedUser = await publicUser.toJson()
     })
     it('returns post-1-to-public-group as first, post-2-to-public-group as second pinned post', async () => {
