@@ -92,7 +92,7 @@
     "xregexp": "^5.1.2"
   },
   "devDependencies": {
-    "@eslint-community/eslint-plugin-eslint-comments": "^4.5.0",
+    "@eslint-community/eslint-plugin-eslint-comments": "^4.6.0",
     "@faker-js/faker": "9.9.0",
     "@types/email-templates": "^10.0.4",
     "@types/jest": "^30.0.0",
