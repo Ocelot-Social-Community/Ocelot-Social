@@ -154,7 +154,7 @@ export default {
              )`
         }
         const categoriesCypher =
-          config.CATEGORIES_ACTIVE && categoryIds
+          config.CATEGORIES_ACTIVE && categoryIds && categoryIds.length > 0
             ? `WITH post
               UNWIND $categoryIds AS categoryId
               MATCH (category:Category {id: categoryId})
