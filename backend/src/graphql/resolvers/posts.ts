@@ -627,6 +627,7 @@ export default {
         'language',
         'pinnedAt',
         'pinned',
+        'groupPinned',
         'eventVenue',
         'eventLocation',
         'eventLocationName',
