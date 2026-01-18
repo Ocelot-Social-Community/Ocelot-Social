@@ -4,46 +4,46 @@
 // We use static imports instead of dynamic require() to ensure compatibility
 // with both Node.js and Webpack (used by Cypress cucumber preprocessor).
 
-import type Neode from 'neode'
-
-import File from './File'
-import Image from './Image'
 import Badge from './Badge'
-import User from './User'
-import Group from './Group'
-import EmailAddress from './EmailAddress'
-import UnverifiedEmailAddress from './UnverifiedEmailAddress'
-import SocialMedia from './SocialMedia'
-import Post from './Post'
-import Comment from './Comment'
 import Category from './Category'
-import Tag from './Tag'
-import Location from './Location'
+import Comment from './Comment'
 import Donations from './Donations'
-import Report from './Report'
-import Migration from './Migration'
+import EmailAddress from './EmailAddress'
+import File from './File'
+import Group from './Group'
+import Image from './Image'
 import InviteCode from './InviteCode'
+import Location from './Location'
+import Migration from './Migration'
+import Post from './Post'
+import Report from './Report'
+import SocialMedia from './SocialMedia'
+import Tag from './Tag'
+import UnverifiedEmailAddress from './UnverifiedEmailAddress'
+import User from './User'
+
+import type Neode from 'neode'
 
 // Type assertion needed because TypeScript infers literal types from the model
 // objects (e.g., type: 'string' as literal), but Neode expects the broader
 // SchemaObject type with PropertyTypes union. The Neode type definitions are
 // incomplete/incorrect, so we use double assertion to bypass the check.
 export default {
-  File,
-  Image,
   Badge,
-  User,
-  Group,
-  EmailAddress,
-  UnverifiedEmailAddress,
-  SocialMedia,
-  Post,
-  Comment,
   Category,
-  Tag,
-  Location,
+  Comment,
   Donations,
-  Report,
-  Migration,
+  EmailAddress,
+  File,
+  Group,
+  Image,
   InviteCode,
-} as unknown as { [index: string]: Neode.SchemaObject }
+  Location,
+  Migration,
+  Post,
+  Report,
+  SocialMedia,
+  Tag,
+  UnverifiedEmailAddress,
+  User,
+} as unknown as Record<string, Neode.SchemaObject>
