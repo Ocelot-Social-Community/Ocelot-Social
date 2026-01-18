@@ -1,41 +1,49 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable n/global-require */
 // NOTE: We cannot use `fs` here to clean up the code. Cypress breaks on any npm
 // module that is not browser-compatible. Node's `fs` module is server-side only
+//
+// We use static imports instead of dynamic require() to ensure compatibility
+// with both Node.js and Webpack (used by Cypress cucumber preprocessor).
 
 import type Neode from 'neode'
 
-type SchemaObject = Neode.SchemaObject
+import File from './File'
+import Image from './Image'
+import Badge from './Badge'
+import User from './User'
+import Group from './Group'
+import EmailAddress from './EmailAddress'
+import UnverifiedEmailAddress from './UnverifiedEmailAddress'
+import SocialMedia from './SocialMedia'
+import Post from './Post'
+import Comment from './Comment'
+import Category from './Category'
+import Tag from './Tag'
+import Location from './Location'
+import Donations from './Donations'
+import Report from './Report'
+import Migration from './Migration'
+import InviteCode from './InviteCode'
 
-/**
- * Loads a model's default export.
- *
- * All model files use `export default { ... }` which TypeScript compiles to
- * CommonJS with `__esModule: true` marker. Both Node.js and Webpack handle
- * this consistently, so we can safely access `.default` directly.
- */
-/* eslint-disable import/no-dynamic-require, security/detect-non-literal-require,
-   @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
-const loadModel = (modulePath: string): SchemaObject => require(modulePath).default
-/* eslint-enable import/no-dynamic-require, security/detect-non-literal-require,
-   @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
-
+// Type assertion needed because TypeScript infers literal types from the model
+// objects (e.g., type: 'string' as literal), but Neode expects the broader
+// SchemaObject type with PropertyTypes union. The Neode type definitions are
+// incomplete/incorrect, so we use double assertion to bypass the check.
 export default {
-  File: loadModel('./File'),
-  Image: loadModel('./Image'),
-  Badge: loadModel('./Badge'),
-  User: loadModel('./User'),
-  Group: loadModel('./Group'),
-  EmailAddress: loadModel('./EmailAddress'),
-  UnverifiedEmailAddress: loadModel('./UnverifiedEmailAddress'),
-  SocialMedia: loadModel('./SocialMedia'),
-  Post: loadModel('./Post'),
-  Comment: loadModel('./Comment'),
-  Category: loadModel('./Category'),
-  Tag: loadModel('./Tag'),
-  Location: loadModel('./Location'),
-  Donations: loadModel('./Donations'),
-  Report: loadModel('./Report'),
-  Migration: loadModel('./Migration'),
-  InviteCode: loadModel('./InviteCode'),
-}
+  File,
+  Image,
+  Badge,
+  User,
+  Group,
+  EmailAddress,
+  UnverifiedEmailAddress,
+  SocialMedia,
+  Post,
+  Comment,
+  Category,
+  Tag,
+  Location,
+  Donations,
+  Report,
+  Migration,
+  InviteCode,
+} as unknown as { [index: string]: Neode.SchemaObject }
