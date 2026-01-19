@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import { createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import VTooltip from 'v-tooltip'
@@ -9,6 +10,11 @@ import Directives from '~/plugins/vue-directives'
 import VueObserveVisibility from '~/plugins/vue-observe-visibility'
 
 require('intersection-observer')
+
+// Fail tests on Vue warnings
+Vue.config.warnHandler = (msg, vm, trace) => {
+  throw new Error(`[Vue warn]: ${msg}${trace}`)
+}
 
 global.localVue = createLocalVue()
 
