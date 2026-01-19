@@ -11,7 +11,7 @@ jobs:
       backend: ${{ steps.changes.outputs.backend }}
       docker: ${{ steps.changes.outputs.docker }}
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4.1.7
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.7
 
       - name: Check for backend file changes
         uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4.1.7
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.7
 
       - name: Neo4J | Build 'community' image
         run: |
@@ -37,7 +37,7 @@ jobs:
       
       - name: Cache docker images
         id: cache-neo4j
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.0.2
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v4.0.2
         with:
           path: /tmp/neo4j.tar
           key: ${{ github.run_id }}-backend-neo4j-cache
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4.1.7
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.7
 
       - name: backend | Build 'test' image
         run: |
@@ -58,7 +58,7 @@ jobs:
       
       - name: Cache docker images
         id: cache-backend
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.0.2
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v4.0.2
         with:
           path: /tmp/backend.tar
           key: ${{ github.run_id }}-backend-cache
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4.1.7
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.7
 
       - name: backend | Lint
         run: cd backend && yarn && yarn run lint
@@ -84,17 +84,17 @@ jobs:
       checks: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4.1.7
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.7
 
       - name: Restore Neo4J cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.0.2
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v4.0.2
         with:
           path: /tmp/neo4j.tar
           key: ${{ github.run_id }}-backend-neo4j-cache
           fail-on-cache-miss: true
 
       - name: Restore Backend cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.0.2
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v4.0.2
         with:
           path: /tmp/backend.tar
           key: ${{ github.run_id }}-backend-cache

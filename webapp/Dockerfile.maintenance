@@ -1,4 +1,4 @@
-FROM nginx:1.29.3-alpine AS base
+FROM nginx:1.29.4-alpine AS base
 LABEL org.label-schema.name="ocelot.social:maintenance"
 LABEL org.label-schema.description="Maintenance page of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
@@ -8,7 +8,7 @@ LABEL org.label-schema.vendor="ocelot.social Community"
 LABEL org.label-schema.schema-version="1.0"
 LABEL maintainer="devops@ocelot.social"
 
-FROM node:25.2.1-alpine AS styleguide
+FROM node:25.3.0-alpine AS styleguide
 RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
@@ -16,7 +16,7 @@ COPY styleguide .
 RUN yarn install --production=false --frozen-lockfile --non-interactive
 RUN yarn run build:lib
 
-FROM node:25.2.1-alpine AS build
+FROM node:25.3.0-alpine AS build
 ENV NODE_ENV="production"
 RUN apk --no-cache add git python3 make g++ bash jq
 COPY --from=styleguide ./app/ /styleguide/
