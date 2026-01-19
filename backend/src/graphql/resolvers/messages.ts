@@ -13,6 +13,8 @@ import { CHAT_MESSAGE_ADDED } from '@constants/subscriptions'
 import { attachments } from './attachments/attachments'
 import Resolver from './helpers/Resolver'
 
+import type { File } from './attachments/attachments'
+
 const setMessagesAsDistributed = async (undistributedMessagesIds, session) => {
   return session.writeTransaction(async (transaction) => {
     const setDistributedCypher = `

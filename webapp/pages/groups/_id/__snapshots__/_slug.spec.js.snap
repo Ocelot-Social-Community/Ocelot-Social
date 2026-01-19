@@ -199,19 +199,30 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           
             </p>
              
-            <p
-              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+            <div
+              class="location-info size-small"
             >
-              <span
-                class="base-icon"
-                data-test="map-marker"
+              <div
+                class="location"
               >
-                <!---->
-              </span>
-              
-            Paris
-          
-            </p>
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Paris
+  
+              </div>
+               
+              <div
+                class="distance"
+              >
+                
+    location.distance
+  
+              </div>
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
@@ -922,32 +933,36 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
           >
             <div
-              class="ds-space hc-empty ds-space-centered"
               data-test="icon-empty"
-              style="margin-top: 64px; margin-bottom: 64px;"
             >
-              <p
-                class="ds-text"
+              <div
+                class="ds-space hc-empty ds-space-centered"
+                style="margin-top: 64px; margin-bottom: 64px;"
               >
-                <img
-                  alt="Empty"
-                  class="hc-empty-icon"
-                  src="/img/empty/file.svg"
-                  style="margin-bottom: 5px;"
-                  width="80"
-                />
-                 
-                <br />
-                 
-                <span
-                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
-                  style="display: none;"
+                <p
+                  class="ds-text"
                 >
-                  
+                  <img
+                    alt="Empty"
+                    class="hc-empty-icon"
+                    src="/img/empty/file.svg"
+                    style="margin-bottom: 5px;"
+                    width="80"
+                  />
+                   
+                  <br />
+                   
+                  <span
+                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    style="display: none;"
+                  >
+                    
+        
       
-    
-                </span>
-              </p>
+                  </span>
+                </p>
+              </div>
+               
             </div>
           </div>
         </div>
@@ -1072,19 +1087,30 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           
             </p>
              
-            <p
-              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+            <div
+              class="location-info size-small"
             >
-              <span
-                class="base-icon"
-                data-test="map-marker"
+              <div
+                class="location"
               >
-                <!---->
-              </span>
-              
-            Paris
-          
-            </p>
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Paris
+  
+              </div>
+               
+              <div
+                class="distance"
+              >
+                
+    location.distance
+  
+              </div>
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
@@ -1379,32 +1405,36 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
           >
             <div
-              class="ds-space hc-empty ds-space-centered"
               data-test="icon-empty"
-              style="margin-top: 64px; margin-bottom: 64px;"
             >
-              <p
-                class="ds-text"
+              <div
+                class="ds-space hc-empty ds-space-centered"
+                style="margin-top: 64px; margin-bottom: 64px;"
               >
-                <img
-                  alt="Empty"
-                  class="hc-empty-icon"
-                  src="/img/empty/file.svg"
-                  style="margin-bottom: 5px;"
-                  width="80"
-                />
-                 
-                <br />
-                 
-                <span
-                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
-                  style="display: none;"
+                <p
+                  class="ds-text"
                 >
-                  
+                  <img
+                    alt="Empty"
+                    class="hc-empty-icon"
+                    src="/img/empty/file.svg"
+                    style="margin-bottom: 5px;"
+                    width="80"
+                  />
+                   
+                  <br />
+                   
+                  <span
+                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    style="display: none;"
+                  >
+                    
+        
       
-    
-                </span>
-              </p>
+                  </span>
+                </p>
+              </div>
+               
             </div>
           </div>
         </div>
@@ -1529,19 +1559,30 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           
             </p>
              
-            <p
-              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+            <div
+              class="location-info size-small"
             >
-              <span
-                class="base-icon"
-                data-test="map-marker"
+              <div
+                class="location"
               >
-                <!---->
-              </span>
-              
-            Paris
-          
-            </p>
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Paris
+  
+              </div>
+               
+              <div
+                class="distance"
+              >
+                
+    location.distance
+  
+              </div>
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
@@ -1856,32 +1897,36 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
           >
             <div
-              class="ds-space hc-empty ds-space-centered"
               data-test="icon-empty"
-              style="margin-top: 64px; margin-bottom: 64px;"
             >
-              <p
-                class="ds-text"
+              <div
+                class="ds-space hc-empty ds-space-centered"
+                style="margin-top: 64px; margin-bottom: 64px;"
               >
-                <img
-                  alt="Empty"
-                  class="hc-empty-icon"
-                  src="/img/empty/file.svg"
-                  style="margin-bottom: 5px;"
-                  width="80"
-                />
-                 
-                <br />
-                 
-                <span
-                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
-                  style="display: none;"
+                <p
+                  class="ds-text"
                 >
-                  
+                  <img
+                    alt="Empty"
+                    class="hc-empty-icon"
+                    src="/img/empty/file.svg"
+                    style="margin-bottom: 5px;"
+                    width="80"
+                  />
+                   
+                  <br />
+                   
+                  <span
+                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    style="display: none;"
+                  >
+                    
+        
       
-    
-                </span>
-              </p>
+                  </span>
+                </p>
+              </div>
+               
             </div>
           </div>
         </div>
@@ -2075,19 +2120,30 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           
             </p>
              
-            <p
-              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+            <div
+              class="location-info size-small"
             >
-              <span
-                class="base-icon"
-                data-test="map-marker"
+              <div
+                class="location"
               >
-                <!---->
-              </span>
-              
-            Paris
-          
-            </p>
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Paris
+  
+              </div>
+               
+              <div
+                class="distance"
+              >
+                
+    location.distance
+  
+              </div>
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
@@ -2797,32 +2853,36 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
           >
             <div
-              class="ds-space hc-empty ds-space-centered"
               data-test="icon-empty"
-              style="margin-top: 64px; margin-bottom: 64px;"
             >
-              <p
-                class="ds-text"
+              <div
+                class="ds-space hc-empty ds-space-centered"
+                style="margin-top: 64px; margin-bottom: 64px;"
               >
-                <img
-                  alt="Empty"
-                  class="hc-empty-icon"
-                  src="/img/empty/file.svg"
-                  style="margin-bottom: 5px;"
-                  width="80"
-                />
-                 
-                <br />
-                 
-                <span
-                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
-                  style="display: none;"
+                <p
+                  class="ds-text"
                 >
-                  
+                  <img
+                    alt="Empty"
+                    class="hc-empty-icon"
+                    src="/img/empty/file.svg"
+                    style="margin-bottom: 5px;"
+                    width="80"
+                  />
+                   
+                  <br />
+                   
+                  <span
+                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    style="display: none;"
+                  >
+                    
+        
       
-    
-                </span>
-              </p>
+                  </span>
+                </p>
+              </div>
+               
             </div>
           </div>
         </div>
@@ -3780,32 +3840,36 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
           >
             <div
-              class="ds-space hc-empty ds-space-centered"
               data-test="icon-empty"
-              style="margin-top: 64px; margin-bottom: 64px;"
             >
-              <p
-                class="ds-text"
+              <div
+                class="ds-space hc-empty ds-space-centered"
+                style="margin-top: 64px; margin-bottom: 64px;"
               >
-                <img
-                  alt="Empty"
-                  class="hc-empty-icon"
-                  src="/img/empty/file.svg"
-                  style="margin-bottom: 5px;"
-                  width="80"
-                />
-                 
-                <br />
-                 
-                <span
-                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
-                  style="display: none;"
+                <p
+                  class="ds-text"
                 >
-                  
+                  <img
+                    alt="Empty"
+                    class="hc-empty-icon"
+                    src="/img/empty/file.svg"
+                    style="margin-bottom: 5px;"
+                    width="80"
+                  />
+                   
+                  <br />
+                   
+                  <span
+                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    style="display: none;"
+                  >
+                    
+        
       
-    
-                </span>
-              </p>
+                  </span>
+                </p>
+              </div>
+               
             </div>
           </div>
         </div>
@@ -4581,32 +4645,36 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
           >
             <div
-              class="ds-space hc-empty ds-space-centered"
               data-test="icon-empty"
-              style="margin-top: 64px; margin-bottom: 64px;"
             >
-              <p
-                class="ds-text"
+              <div
+                class="ds-space hc-empty ds-space-centered"
+                style="margin-top: 64px; margin-bottom: 64px;"
               >
-                <img
-                  alt="Empty"
-                  class="hc-empty-icon"
-                  src="/img/empty/file.svg"
-                  style="margin-bottom: 5px;"
-                  width="80"
-                />
-                 
-                <br />
-                 
-                <span
-                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
-                  style="display: none;"
+                <p
+                  class="ds-text"
                 >
-                  
+                  <img
+                    alt="Empty"
+                    class="hc-empty-icon"
+                    src="/img/empty/file.svg"
+                    style="margin-bottom: 5px;"
+                    width="80"
+                  />
+                   
+                  <br />
+                   
+                  <span
+                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    style="display: none;"
+                  >
+                    
+        
       
-    
-                </span>
-              </p>
+                  </span>
+                </p>
+              </div>
+               
             </div>
           </div>
         </div>
@@ -5402,32 +5470,36 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
           >
             <div
-              class="ds-space hc-empty ds-space-centered"
               data-test="icon-empty"
-              style="margin-top: 64px; margin-bottom: 64px;"
             >
-              <p
-                class="ds-text"
+              <div
+                class="ds-space hc-empty ds-space-centered"
+                style="margin-top: 64px; margin-bottom: 64px;"
               >
-                <img
-                  alt="Empty"
-                  class="hc-empty-icon"
-                  src="/img/empty/file.svg"
-                  style="margin-bottom: 5px;"
-                  width="80"
-                />
-                 
-                <br />
-                 
-                <span
-                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
-                  style="display: none;"
+                <p
+                  class="ds-text"
                 >
-                  
+                  <img
+                    alt="Empty"
+                    class="hc-empty-icon"
+                    src="/img/empty/file.svg"
+                    style="margin-bottom: 5px;"
+                    width="80"
+                  />
+                   
+                  <br />
+                   
+                  <span
+                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    style="display: none;"
+                  >
+                    
+        
       
-    
-                </span>
-              </p>
+                  </span>
+                </p>
+              </div>
+               
             </div>
           </div>
         </div>
@@ -6314,32 +6386,36 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
           >
             <div
-              class="ds-space hc-empty ds-space-centered"
               data-test="icon-empty"
-              style="margin-top: 64px; margin-bottom: 64px;"
             >
-              <p
-                class="ds-text"
+              <div
+                class="ds-space hc-empty ds-space-centered"
+                style="margin-top: 64px; margin-bottom: 64px;"
               >
-                <img
-                  alt="Empty"
-                  class="hc-empty-icon"
-                  src="/img/empty/file.svg"
-                  style="margin-bottom: 5px;"
-                  width="80"
-                />
-                 
-                <br />
-                 
-                <span
-                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
-                  style="display: none;"
+                <p
+                  class="ds-text"
                 >
-                  
+                  <img
+                    alt="Empty"
+                    class="hc-empty-icon"
+                    src="/img/empty/file.svg"
+                    style="margin-bottom: 5px;"
+                    width="80"
+                  />
+                   
+                  <br />
+                   
+                  <span
+                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    style="display: none;"
+                  >
+                    
+        
       
-    
-                </span>
-              </p>
+                  </span>
+                </p>
+              </div>
+               
             </div>
           </div>
         </div>
@@ -6603,19 +6679,30 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           
             </p>
              
-            <p
-              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+            <div
+              class="location-info size-small"
             >
-              <span
-                class="base-icon"
-                data-test="map-marker"
+              <div
+                class="location"
               >
-                <!---->
-              </span>
-              
-            Hamburg
-          
-            </p>
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Hamburg
+  
+              </div>
+               
+              <div
+                class="distance"
+              >
+                
+    location.distance
+  
+              </div>
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
@@ -7351,32 +7438,36 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
           >
             <div
-              class="ds-space hc-empty ds-space-centered"
               data-test="icon-empty"
-              style="margin-top: 64px; margin-bottom: 64px;"
             >
-              <p
-                class="ds-text"
+              <div
+                class="ds-space hc-empty ds-space-centered"
+                style="margin-top: 64px; margin-bottom: 64px;"
               >
-                <img
-                  alt="Empty"
-                  class="hc-empty-icon"
-                  src="/img/empty/file.svg"
-                  style="margin-bottom: 5px;"
-                  width="80"
-                />
-                 
-                <br />
-                 
-                <span
-                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
-                  style="display: none;"
+                <p
+                  class="ds-text"
                 >
-                  
+                  <img
+                    alt="Empty"
+                    class="hc-empty-icon"
+                    src="/img/empty/file.svg"
+                    style="margin-bottom: 5px;"
+                    width="80"
+                  />
+                   
+                  <br />
+                   
+                  <span
+                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    style="display: none;"
+                  >
+                    
+        
       
-    
-                </span>
-              </p>
+                  </span>
+                </p>
+              </div>
+               
             </div>
           </div>
         </div>
@@ -7582,19 +7673,30 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           
             </p>
              
-            <p
-              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+            <div
+              class="location-info size-small"
             >
-              <span
-                class="base-icon"
-                data-test="map-marker"
+              <div
+                class="location"
               >
-                <!---->
-              </span>
-              
-            Hamburg
-          
-            </p>
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+                
+    Hamburg
+  
+              </div>
+               
+              <div
+                class="distance"
+              >
+                
+    location.distance
+  
+              </div>
+            </div>
              
             <p
               class="ds-text ds-text-size-small ds-text-soft ds-text-center"
@@ -8329,32 +8431,36 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
           >
             <div
-              class="ds-space hc-empty ds-space-centered"
               data-test="icon-empty"
-              style="margin-top: 64px; margin-bottom: 64px;"
             >
-              <p
-                class="ds-text"
+              <div
+                class="ds-space hc-empty ds-space-centered"
+                style="margin-top: 64px; margin-bottom: 64px;"
               >
-                <img
-                  alt="Empty"
-                  class="hc-empty-icon"
-                  src="/img/empty/file.svg"
-                  style="margin-bottom: 5px;"
-                  width="80"
-                />
-                 
-                <br />
-                 
-                <span
-                  class="ds-text hc-empty-message ds-text-softer ds-text-inline"
-                  style="display: none;"
+                <p
+                  class="ds-text"
                 >
-                  
+                  <img
+                    alt="Empty"
+                    class="hc-empty-icon"
+                    src="/img/empty/file.svg"
+                    style="margin-bottom: 5px;"
+                    width="80"
+                  />
+                   
+                  <br />
+                   
+                  <span
+                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    style="display: none;"
+                  >
+                    
+        
       
-    
-                </span>
-              </p>
+                  </span>
+                </p>
+              </div>
+               
             </div>
           </div>
         </div>

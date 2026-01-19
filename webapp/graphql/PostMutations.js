@@ -1,8 +1,11 @@
 import gql from 'graphql-tag'
+import { imageUrls } from './fragments/imageUrls'
 
 export default () => {
   return {
     CreatePost: gql`
+      ${imageUrls}
+
       mutation (
         $id: ID
         $title: String!
@@ -34,7 +37,7 @@ export default () => {
           contentExcerpt
           language
           image {
-            url
+            ...imageUrls
             sensitive
           }
           disabled
@@ -58,6 +61,8 @@ export default () => {
       }
     `,
     UpdatePost: gql`
+      ${imageUrls}
+
       mutation (
         $id: ID!
         $title: String!
@@ -85,7 +90,7 @@ export default () => {
           contentExcerpt
           language
           image {
-            url
+            ...imageUrls
             sensitive
             aspectRatio
           }

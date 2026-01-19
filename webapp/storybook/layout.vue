@@ -5,7 +5,8 @@
 </template>
 
 <style lang="scss">
-@import '../node_modules/@human-connection/styleguide/dist/system.css';
+@import '../styleguide/src/system/styles/main.scss';
+@import '../styleguide/src/system/styles/shared.scss';
 @import '~/assets/styles/main.scss';
 
 .container {

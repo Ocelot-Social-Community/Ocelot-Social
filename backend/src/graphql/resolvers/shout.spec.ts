@@ -3,36 +3,17 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
+import { Post } from '@graphql/queries/Post'
+import { shout } from '@graphql/queries/shout'
+import { unshout } from '@graphql/queries/unshout'
 import createServer from '@src/server'
 
 let mutate, query, authenticatedUser, variables
 const instance = getNeode()
 const driver = getDriver()
-
-const mutationShoutPost = gql`
-  mutation ($id: ID!) {
-    shout(id: $id, type: Post)
-  }
-`
-const mutationUnshoutPost = gql`
-  mutation ($id: ID!) {
-    unshout(id: $id, type: Post)
-  }
-`
-const queryPost = gql`
-  query ($id: ID!) {
-    Post(id: $id) {
-      id
-      shoutedBy {
-        id
-      }
-    }
-  }
-`
 
 describe('shout and unshout posts', () => {
   let currentUser, postAuthor
@@ -47,6 +28,9 @@ describe('shout and unshout posts', () => {
           driver,
           neode: instance,
           user: authenticatedUser,
+          cypherParams: {
+            currentUserId: authenticatedUser ? authenticatedUser.id : null,
+          },
         }
       },
     })
@@ -95,7 +79,7 @@ describe('shout and unshout posts', () => {
       it('throws authorization error', async () => {
         variables = { id: 'post-to-shout-id' }
         authenticatedUser = undefined
-        await expect(mutate({ mutation: mutationShoutPost, variables })).resolves.toMatchObject({
+        await expect(mutate({ mutation: shout, variables })).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
       })
@@ -128,10 +112,10 @@ describe('shout and unshout posts', () => {
 
       it("can shout another user's post", async () => {
         variables = { id: 'another-user-post-id' }
-        await expect(mutate({ mutation: mutationShoutPost, variables })).resolves.toMatchObject({
+        await expect(mutate({ mutation: shout, variables })).resolves.toMatchObject({
           data: { shout: true },
         })
-        await expect(query({ query: queryPost, variables })).resolves.toMatchObject({
+        await expect(query({ query: Post, variables })).resolves.toMatchObject({
           data: { Post: [{ id: 'another-user-post-id', shoutedBy: [{ id: 'current-user-id' }] }] },
           errors: undefined,
         })
@@ -139,7 +123,7 @@ describe('shout and unshout posts', () => {
 
       it('adds `createdAt` to `SHOUT` relationship', async () => {
         variables = { id: 'another-user-post-id' }
-        await mutate({ mutation: mutationShoutPost, variables })
+        await mutate({ mutation: shout, variables })
         const relation = await instance.cypher(
           'MATCH (user:User {id: $userId1})-[relationship:SHOUTED]->(node {id: $userId2}) WHERE relationship.createdAt IS NOT NULL RETURN relationship',
           {
@@ -155,10 +139,10 @@ describe('shout and unshout posts', () => {
 
       it('can not shout my own post', async () => {
         variables = { id: 'current-user-post-id' }
-        await expect(mutate({ mutation: mutationShoutPost, variables })).resolves.toMatchObject({
+        await expect(mutate({ mutation: shout, variables })).resolves.toMatchObject({
           data: { shout: false },
         })
-        await expect(query({ query: queryPost, variables })).resolves.toMatchObject({
+        await expect(query({ query: Post, variables })).resolves.toMatchObject({
           data: { Post: [{ id: 'current-user-post-id', shoutedBy: [] }] },
           errors: undefined,
         })
@@ -170,7 +154,7 @@ describe('shout and unshout posts', () => {
       it('throws authorization error', async () => {
         authenticatedUser = undefined
         variables = { id: 'post-to-shout-id' }
-        await expect(mutate({ mutation: mutationUnshoutPost, variables })).resolves.toMatchObject({
+        await expect(mutate({ mutation: unshout, variables })).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
       })
@@ -190,17 +174,17 @@ describe('shout and unshout posts', () => {
           },
         )
         await mutate({
-          mutation: mutationShoutPost,
+          mutation: shout,
           variables: { id: 'posted-by-another-user' },
         })
       })
 
       it("can unshout another user's post", async () => {
         variables = { id: 'posted-by-another-user' }
-        await expect(mutate({ mutation: mutationUnshoutPost, variables })).resolves.toMatchObject({
+        await expect(mutate({ mutation: unshout, variables })).resolves.toMatchObject({
           data: { unshout: true },
         })
-        await expect(query({ query: queryPost, variables })).resolves.toMatchObject({
+        await expect(query({ query: Post, variables })).resolves.toMatchObject({
           data: { Post: [{ id: 'posted-by-another-user', shoutedBy: [] }] },
           errors: undefined,
         })

@@ -1,0 +1,4 @@
+#!/sbin/openrc-run
+
+command=webhook
+command_args="-hooks $PROJECT_ROOT/deployment/styleguide/hooks.json &"

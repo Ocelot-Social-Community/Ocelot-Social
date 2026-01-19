@@ -2,10 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
+import { searchPosts } from '@graphql/queries/searchPosts'
+import { searchResults } from '@graphql/queries/searchResults'
 import createServer from '@src/server'
 
 let query, authenticatedUser, user
@@ -34,41 +35,6 @@ afterAll(async () => {
   neode.close()
 })
 
-const searchQuery = gql`
-  query ($query: String!) {
-    searchResults(query: $query, limit: 5) {
-      __typename
-      ... on Post {
-        id
-        title
-        content
-      }
-      ... on User {
-        id
-        slug
-        name
-      }
-      ... on Tag {
-        id
-      }
-    }
-  }
-`
-
-const searchPostQuery = gql`
-  query ($query: String!, $firstPosts: Int, $postsOffset: Int) {
-    searchPosts(query: $query, firstPosts: $firstPosts, postsOffset: $postsOffset) {
-      postCount
-      posts {
-        __typename
-        id
-        title
-        content
-      }
-    }
-  }
-`
-
 describe('resolvers/searches', () => {
   let variables
 
@@ -85,7 +51,7 @@ describe('resolvers/searches', () => {
     describe('query contains first name of user', () => {
       it('finds the user', async () => {
         variables = { query: 'John' }
-        await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+        await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
           data: {
             searchResults: [
               {
@@ -115,7 +81,7 @@ describe('resolvers/searches', () => {
       describe('query contains title of post', () => {
         it('finds the post', async () => {
           variables = { query: 'beitrag' }
-          await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+          await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
             data: {
               searchResults: [
                 {
@@ -134,7 +100,7 @@ describe('resolvers/searches', () => {
       describe('casing', () => {
         it('does not matter', async () => {
           variables = { query: 'BEITRAG' }
-          await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+          await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
             data: {
               searchResults: [
                 {
@@ -153,7 +119,7 @@ describe('resolvers/searches', () => {
       describe('query consists of words not present in the corpus', () => {
         it('returns empty search results', async () => {
           await expect(
-            query({ query: searchQuery, variables: { query: 'Unfug' } }),
+            query({ query: searchResults, variables: { query: 'Unfug' } }),
           ).resolves.toMatchObject({ data: { searchResults: [] } })
         })
       })
@@ -209,7 +175,7 @@ und hinter tausend Stäben keine Welt.`,
           describe('query contains the title of the first post', () => {
             it('finds both posts', async () => {
               variables = { query: 'beitrag' }
-              await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+              await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
                 data: {
                   searchResults: expect.arrayContaining([
                     {
@@ -236,7 +202,7 @@ und hinter tausend Stäben keine Welt.`,
           describe('hyphens in query', () => {
             it('will be treated as ordinary characters', async () => {
               variables = { query: 'tee-ei' }
-              await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+              await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
                 data: {
                   searchResults: [
                     {
@@ -255,7 +221,7 @@ und hinter tausend Stäben keine Welt.`,
           describe('German quotation marks in query to test unicode characters (\u201E ... \u201C)', () => {
             it('will be treated as ordinary characters', async () => {
               variables = { query: '„teeei“' }
-              await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+              await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
                 data: {
                   searchResults: [
                     {
@@ -276,7 +242,7 @@ und hinter tausend Stäben keine Welt.`,
           describe('query a part of the mathematical expression', () => {
             it('finds that post', async () => {
               variables = { query: '(a - b)²' }
-              await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+              await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
                 data: {
                   searchResults: [
                     {
@@ -297,7 +263,7 @@ und hinter tausend Stäben keine Welt.`,
           describe('query the same part of the mathematical expression without spaces', () => {
             it('finds that post', async () => {
               variables = { query: '(a-b)²' }
-              await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+              await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
                 data: {
                   searchResults: [
                     {
@@ -318,7 +284,7 @@ und hinter tausend Stäben keine Welt.`,
           describe('query the mathematical expression over line break', () => {
             it('finds that post', async () => {
               variables = { query: '+ b² 2.' }
-              await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+              await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
                 data: {
                   searchResults: [
                     {
@@ -341,7 +307,7 @@ und hinter tausend Stäben keine Welt.`,
           describe('query for more than one word, e.g. the title of the poem', () => {
             it('finds the poem and another post that contains only one word but with lower score', async () => {
               variables = { query: 'der panther' }
-              await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+              await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
                 data: {
                   searchResults: [
                     {
@@ -369,7 +335,7 @@ und hinter tausend Stäben keine Welt.`,
           describe('query for the first four letters of two longer words', () => {
             it('finds the posts that contain words starting with these four letters', async () => {
               variables = { query: 'Vorü Subs' }
-              await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+              await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
                 data: {
                   searchResults: expect.arrayContaining([
                     {
@@ -415,7 +381,7 @@ und hinter tausend Stäben keine Welt.`,
         describe('query the word that both slugs contain', () => {
           it('finds both users', async () => {
             variables = { query: '-maria-' }
-            await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+            await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
               data: {
                 searchResults: expect.arrayContaining([
                   {
@@ -453,7 +419,7 @@ und hinter tausend Stäben keine Welt.`,
         describe('query the word that contains the post, the hashtag and the name of the user', () => {
           it('finds the user, the post and the hashtag', async () => {
             variables = { query: 'panther' }
-            await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+            await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
               data: {
                 searchResults: expect.arrayContaining([
                   {
@@ -485,7 +451,7 @@ und hinter tausend Stäben keine Welt.`,
         describe('@query the word that contains the post, the hashtag and the name of the user', () => {
           it('only finds the user', async () => {
             variables = { query: '@panther' }
-            await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+            await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
               data: {
                 searchResults: expect.not.arrayContaining([
                   {
@@ -511,7 +477,7 @@ und hinter tausend Stäben keine Welt.`,
         describe('!query the word that contains the post, the hashtag and the name of the user', () => {
           it('only finds the post', async () => {
             variables = { query: '!panther' }
-            await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+            await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
               data: {
                 searchResults: expect.not.arrayContaining([
                   {
@@ -534,7 +500,7 @@ und hinter tausend Stäben keine Welt.`,
         describe('#query the word that contains the post, the hashtag and the name of the user', () => {
           it('only finds the hashtag', async () => {
             variables = { query: '#panther' }
-            await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+            await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
               data: {
                 searchResults: expect.not.arrayContaining([
                   {
@@ -582,7 +548,7 @@ und hinter tausend Stäben keine Welt.`,
         describe('query for text in a post written by a muted user', () => {
           it('does not include the post of the muted user in the results', async () => {
             variables = { query: 'beitrag' }
-            await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+            await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
               data: {
                 searchResults: expect.not.arrayContaining([
                   {
@@ -607,7 +573,7 @@ und hinter tausend Stäben keine Welt.`,
         describe('query the first four characters of the tag', () => {
           it('finds the tag', async () => {
             variables = { query: 'myha' }
-            await expect(query({ query: searchQuery, variables })).resolves.toMatchObject({
+            await expect(query({ query: searchResults, variables })).resolves.toMatchObject({
               data: {
                 searchResults: [
                   {
@@ -626,7 +592,7 @@ und hinter tausend Stäben keine Welt.`,
         describe('query with limit 1', () => {
           it('has a count greater than 1', async () => {
             variables = { query: 'beitrag', firstPosts: 1, postsOffset: 0 }
-            await expect(query({ query: searchPostQuery, variables })).resolves.toMatchObject({
+            await expect(query({ query: searchPosts, variables })).resolves.toMatchObject({
               data: {
                 searchPosts: {
                   postCount: 2,

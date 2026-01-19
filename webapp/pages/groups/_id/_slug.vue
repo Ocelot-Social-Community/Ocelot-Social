@@ -38,10 +38,12 @@
               {{ `&${groupSlug}` }}
             </ds-text>
             <!-- group location -->
-            <ds-text v-if="group && group.location" align="center" color="soft" size="small">
-              <base-icon name="map-marker" data-test="map-marker" />
-              {{ group && group.location ? group.location.name : '' }}
-            </ds-text>
+            <location-info
+              v-if="group.location"
+              :location-data="group.location"
+              :is-owner="false"
+              size="small"
+            />
             <!-- group created at -->
             <ds-text align="center" color="soft" size="small">
               {{ $t('group.foundation') }} {{ group.createdAt | date('MMMM yyyy') }}
@@ -176,7 +178,9 @@
               ? $t('group.membersListTitleNotAllowedSeeingGroupMembers')
               : null
           "
-          :allProfilesCount="isAllowedSeeingGroupMembers ? group.membersCount : 0"
+          :allProfilesCount="
+            isAllowedSeeingGroupMembers && group.membersCount ? group.membersCount : 0
+          "
           :profiles="isAllowedSeeingGroupMembers ? groupMembers : []"
           :loading="$apollo.loading"
           @fetchAllProfiles="fetchAllMembers"
@@ -207,7 +211,12 @@
           </base-card>
         </ds-space>
         <ds-space v-if="isGroupMemberNonePending" centered>
-          <nuxt-link :to="{ name: 'post-create', query: { groupId: group.id } }">
+          <nuxt-link
+            :to="{
+              name: 'post-create-type',
+              query: { groupId: group.id },
+            }"
+          >
             <base-button
               class="profile-post-add-button"
               icon="plus"
@@ -280,6 +289,7 @@ import CountTo from '~/components/CountTo.vue'
 import Empty from '~/components/Empty/Empty'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
 import JoinLeaveButton from '~/components/Button/JoinLeaveButton'
+import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
@@ -308,6 +318,7 @@ export default {
     Empty,
     GroupContentMenu,
     JoinLeaveButton,
+    LocationInfo,
     PostTeaser,
     ProfileAvatar,
     ProfileList,
@@ -341,15 +352,13 @@ export default {
       membersCountToLoad: 25,
       updateGroupMutation,
       isDescriptionCollapsed: true,
+      group: {},
     }
   },
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
-    group() {
-      return this.Group && this.Group[0] ? this.Group[0] : {}
-    },
     groupName() {
       const { name } = this.group || {}
       return name || this.$t('profile.userAnonym')
@@ -545,8 +554,8 @@ export default {
       // "membersCountStartValue" is updated to avoid counting from 0 when join/leave
       this.membersCountStartValue = (this.GroupMembers && this.GroupMembers.length) || 0
     },
-    updateJoinLeave({ myRoleInGroup }) {
-      this.Group[0].myRole = myRoleInGroup
+    updateJoinLeave() {
+      this.$apollo.queries.Group.refetch()
       if (this.isAllowedSeeingGroupMembers) {
         this.$apollo.queries.GroupMembers.refetch()
       } else {
@@ -583,6 +592,9 @@ export default {
         return {
           id: this.$route.params.id,
         }
+      },
+      update({ Group }) {
+        this.group = Group && Group[0] ? Group[0] : {}
       },
       error(error) {
         this.$toast.error(error.message)

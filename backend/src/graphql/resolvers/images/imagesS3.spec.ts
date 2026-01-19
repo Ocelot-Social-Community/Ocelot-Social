@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable promise/prefer-await-to-callbacks */
 import { DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import { UserInputError } from 'apollo-server'
@@ -47,7 +46,8 @@ const config: S3Config = {
   AWS_BUCKET: 'AWS_BUCKET',
   AWS_ENDPOINT: 'AWS_ENDPOINT',
   AWS_REGION: 'AWS_REGION',
-  S3_PUBLIC_GATEWAY: undefined,
+  IMAGOR_SECRET: 'IMAGOR_SECRET',
+  IMAGOR_PUBLIC_URL: 'IMAGOR_PUBLIC_URL',
 }
 
 beforeAll(async () => {
@@ -151,7 +151,7 @@ describe('mergeImage', () => {
     beforeEach(() => {
       const createReadStream: FileUpload['createReadStream'] = (() => ({
         pipe: () => ({
-          on: (_, callback) => callback(),
+          on: (_: unknown, callback: () => void) => callback(), // eslint-disable-line promise/prefer-await-to-callbacks
         }),
       })) as unknown as FileUpload['createReadStream']
       imageInput = {
@@ -207,29 +207,6 @@ describe('mergeImage', () => {
           url: expect.stringMatching(
             new RegExp(`^http://your-objectstorage.com/bucket/original/${uuid}-foo-bar-avatar.jpg`),
           ),
-        })
-      })
-
-      describe('given a `S3_PUBLIC_GATEWAY` configuration', () => {
-        const { mergeImage } = images({
-          ...config,
-          S3_PUBLIC_GATEWAY: 'http://s3-public-gateway.com',
-        })
-
-        it('changes the domain of the URL to a server that could e.g. apply image transformations', async () => {
-          if (!imageInput.upload) {
-            throw new Error('Test imageInput was not setup correctly.')
-          }
-          const upload = await imageInput.upload
-          upload.filename = '/path/to/file-location/foo-bar-avatar.jpg'
-          imageInput.upload = Promise.resolve(upload)
-          await expect(mergeImage(post, 'HERO_IMAGE', imageInput)).resolves.toMatchObject({
-            url: expect.stringMatching(
-              new RegExp(
-                `^http://s3-public-gateway.com/bucket/original/${uuid}-foo-bar-avatar.jpg`,
-              ),
-            ),
-          })
         })
       })
 

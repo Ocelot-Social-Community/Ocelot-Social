@@ -4,9 +4,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Factory, { cleanDatabase } from '@db/factories'
 import { CreateMessage } from '@graphql/queries/CreateMessage'
-import { createRoomMutation } from '@graphql/queries/createRoomMutation'
-import { roomQuery } from '@graphql/queries/roomQuery'
-import { unreadRoomsQuery } from '@graphql/queries/unreadRoomsQuery'
+import { CreateRoom } from '@graphql/queries/CreateRoom'
+import { Room } from '@graphql/queries/Room'
+import { UnreadRooms } from '@graphql/queries/UnreadRooms'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -72,7 +72,7 @@ describe('Room', () => {
       it('throws authorization error', async () => {
         await expect(
           mutate({
-            mutation: createRoomMutation(),
+            mutation: CreateRoom,
             variables: {
               userId: 'some-id',
             },
@@ -92,7 +92,7 @@ describe('Room', () => {
         it('returns null', async () => {
           await expect(
             mutate({
-              mutation: createRoomMutation(),
+              mutation: CreateRoom,
               variables: {
                 userId: 'not-existing-user',
               },
@@ -110,7 +110,7 @@ describe('Room', () => {
         it('throws error', async () => {
           await expect(
             mutate({
-              mutation: createRoomMutation(),
+              mutation: CreateRoom,
               variables: {
                 userId: 'chatting-user',
               },
@@ -124,7 +124,7 @@ describe('Room', () => {
       describe('user id exists', () => {
         it('returns the id of the room', async () => {
           const result = await mutate({
-            mutation: createRoomMutation(),
+            mutation: CreateRoom,
             variables: {
               userId: 'other-chatting-user',
             },
@@ -166,7 +166,7 @@ describe('Room', () => {
         it('returns the id of the room', async () => {
           await expect(
             mutate({
-              mutation: createRoomMutation(),
+              mutation: CreateRoom,
               variables: {
                 userId: 'other-chatting-user',
               },
@@ -191,7 +191,7 @@ describe('Room', () => {
       })
 
       it('throws authorization error', async () => {
-        await expect(query({ query: roomQuery() })).resolves.toMatchObject({
+        await expect(query({ query: Room })).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
       })
@@ -204,7 +204,7 @@ describe('Room', () => {
         })
 
         it('returns the room', async () => {
-          const result = await query({ query: roomQuery() })
+          const result = await query({ query: Room })
           expect(result).toMatchObject({
             errors: undefined,
             data: {
@@ -244,7 +244,7 @@ describe('Room', () => {
         })
 
         it('returns the room', async () => {
-          const result = await query({ query: roomQuery() })
+          const result = await query({ query: Room })
           expect(result).toMatchObject({
             errors: undefined,
             data: {
@@ -285,7 +285,7 @@ describe('Room', () => {
         })
 
         it('returns no rooms', async () => {
-          await expect(query({ query: roomQuery() })).resolves.toMatchObject({
+          await expect(query({ query: Room })).resolves.toMatchObject({
             errors: undefined,
             data: {
               Room: [],
@@ -302,7 +302,7 @@ describe('Room', () => {
         authenticatedUser = null
         await expect(
           query({
-            query: unreadRoomsQuery(),
+            query: UnreadRooms,
           }),
         ).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
@@ -316,7 +316,7 @@ describe('Room', () => {
       beforeAll(async () => {
         authenticatedUser = await chattingUser.toJson()
         const result = await mutate({
-          mutation: createRoomMutation(),
+          mutation: CreateRoom,
           variables: {
             userId: 'not-chatting-user',
           },
@@ -345,7 +345,7 @@ describe('Room', () => {
         })
         authenticatedUser = await otherChattingUser.toJson()
         const result2 = await mutate({
-          mutation: createRoomMutation(),
+          mutation: CreateRoom,
           variables: {
             userId: 'not-chatting-user',
           },
@@ -365,7 +365,7 @@ describe('Room', () => {
           authenticatedUser = await chattingUser.toJson()
           await expect(
             query({
-              query: unreadRoomsQuery(),
+              query: UnreadRooms,
             }),
           ).resolves.toMatchObject({
             data: {
@@ -380,7 +380,7 @@ describe('Room', () => {
           authenticatedUser = await otherChattingUser.toJson()
           await expect(
             query({
-              query: unreadRoomsQuery(),
+              query: UnreadRooms,
             }),
           ).resolves.toMatchObject({
             data: {
@@ -394,7 +394,7 @@ describe('Room', () => {
           await otherChattingUser.relateTo(chattingUser, 'blocked')
           await expect(
             query({
-              query: unreadRoomsQuery(),
+              query: UnreadRooms,
             }),
           ).resolves.toMatchObject({
             data: {
@@ -408,7 +408,7 @@ describe('Room', () => {
           await otherChattingUser.relateTo(chattingUser, 'muted')
           await expect(
             query({
-              query: unreadRoomsQuery(),
+              query: UnreadRooms,
             }),
           ).resolves.toMatchObject({
             data: {
@@ -423,7 +423,7 @@ describe('Room', () => {
           authenticatedUser = await notChattingUser.toJson()
           await expect(
             query({
-              query: unreadRoomsQuery(),
+              query: UnreadRooms,
             }),
           ).resolves.toMatchObject({
             data: {
@@ -439,13 +439,13 @@ describe('Room', () => {
     beforeAll(async () => {
       authenticatedUser = await chattingUser.toJson()
       await mutate({
-        mutation: createRoomMutation(),
+        mutation: CreateRoom,
         variables: {
           userId: 'second-chatting-user',
         },
       })
       await mutate({
-        mutation: createRoomMutation(),
+        mutation: CreateRoom,
         variables: {
           userId: 'third-chatting-user',
         },
@@ -454,7 +454,7 @@ describe('Room', () => {
 
     it('returns the rooms paginated', async () => {
       await expect(
-        query({ query: roomQuery(), variables: { first: 3, offset: 0 } }),
+        query({ query: Room, variables: { first: 3, offset: 0 } }),
       ).resolves.toMatchObject({
         errors: undefined,
         data: {
@@ -552,7 +552,7 @@ describe('Room', () => {
         },
       })
       await expect(
-        query({ query: roomQuery(), variables: { first: 3, offset: 3 } }),
+        query({ query: Room, variables: { first: 3, offset: 3 } }),
       ).resolves.toMatchObject({
         errors: undefined,
         data: {
@@ -591,14 +591,14 @@ describe('Room', () => {
 
     beforeAll(async () => {
       authenticatedUser = await chattingUser.toJson()
-      result = await query({ query: roomQuery() })
+      result = await query({ query: Room })
     })
 
     describe('as chatter of room', () => {
       it('returns the room', async () => {
         expect(
           await query({
-            query: roomQuery(),
+            query: Room,
             variables: { first: 2, offset: 0, id: result.data.Room[0].id },
           }),
         ).toMatchObject({
@@ -625,7 +625,7 @@ describe('Room', () => {
           authenticatedUser = await notChattingUser.toJson()
           expect(
             await query({
-              query: roomQuery(),
+              query: Room,
               variables: { first: 2, offset: 0, id: result.data.Room[0].id },
             }),
           ).toMatchObject({

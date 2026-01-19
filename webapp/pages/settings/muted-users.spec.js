@@ -1,6 +1,6 @@
 import { mount, createLocalVue } from '@vue/test-utils'
 import MutedUsers from './muted-users.vue'
-import Styleguide from '@human-connection/styleguide'
+import Styleguide from '@@/'
 import Filters from '~/plugins/vue-filters'
 import { unmuteUser } from '~/graphql/settings/MutedUsers'
 

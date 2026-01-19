@@ -24,7 +24,7 @@ The default value is `neo4j` if it is not set.
 - We have the new option to configure DKIM for sent e-mails in environment variables (`.env`, `docker-compose.yml` or `values.yaml`), see [deployment-values.md](deployment-values.md):
   - `SMTP_DKIM_DOMAINNAME=`
   - `SMTP_DKIM_KEYSELECTOR=`
-  - `SMTP_DKIM_PRIVATKEY=`
+  - `SMTP_DKIM_PRIVATEKEY=`
 
 ## Version >= 2.7.0 with 'ocelotDockerVersionTag' 2.7.0-470
 

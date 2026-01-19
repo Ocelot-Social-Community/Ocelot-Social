@@ -7,12 +7,14 @@ import { sendRegistrationMail } from './sendEmail'
 
 describe('sendRegistrationMail', () => {
   const data: {
+    name: string
     email: string
     nonce: string
     locale: string
     inviteCode?: string
   } = {
-    email: 'user@example.org',
+    name: 'Bob &"?@\\ Baumeister',
+    email: 'moderator@example.org',
     nonce: '123456',
     locale: 'en',
     inviteCode: 'welcome',

@@ -160,6 +160,7 @@
   "common": {
     "category": "Catégorie ::: Catégories",
     "comment": "Commentaire ::: Commentaires",
+    "filter": null,
     "letsTalk": "Parlons-en",
     "loading": "chargement",
     "loadMore": "charger plus",
@@ -330,6 +331,19 @@
         "psyche": null,
         "science": null,
         "spirituality": null
+      }
+    },
+    "comment": {
+      "commenting-disabled": {
+        "blocked-author": {
+          "button-label": null,
+          "call-to-action": null,
+          "reason": null
+        },
+        "no-group-member": {
+          "call-to-action": null,
+          "reason": null
+        }
       }
     },
     "emotions-label": {
@@ -535,7 +549,7 @@
     },
     "description": null,
     "editGroupSettings": {
-      "groupName": null,
+      "groupTitle": null,
       "title": null
     },
     "errors": {
@@ -823,21 +837,16 @@
   },
   "post": {
     "comment": {
+      "joinGroup": null,
       "reply": null,
       "submit": "Commenté",
       "submitted": "Commentaire soumis",
       "updated": "Changements sauvegardés"
     },
-    "createNewEvent": {
-      "forGroup": {
-        "title": null
-      },
+    "createNewArticle": {
       "title": null
     },
-    "createNewPost": {
-      "forGroup": {
-        "title": null
-      },
+    "createNewEvent": {
       "title": null
     },
     "edited": "édité",
@@ -1022,7 +1031,6 @@
       "explanation": {
         "closing": "Ceci devrait être suffisant pour le moment afin que les utilisateurs bloqués ne puissent plus vous déranger.",
         "commenting-disabled": null,
-        "commenting-explanation": null,
         "intro": "Si vous avez bloqué un autre utilisateur, voici ce qui se passe:",
         "notifications": "Les utilisateurs bloqués ne recevront plus de notifications s'ils sont mentionnés dans vos postes.",
         "their-perspective": "Vice versa: la personne bloquée ne verra plus non plus vos postes dans son fil d'actualités.",

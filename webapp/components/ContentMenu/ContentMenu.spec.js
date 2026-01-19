@@ -1,7 +1,7 @@
 import { mount, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import VTooltip from 'v-tooltip'
-import Styleguide from '@human-connection/styleguide'
+import Styleguide from '@@/'
 import ContentMenu from './ContentMenu.vue'
 
 const localVue = createLocalVue()

@@ -160,6 +160,7 @@
   "common": {
     "category": "Categoría ::: Categorías",
     "comment": "Comentario ::: Comentarios",
+    "filter": null,
     "letsTalk": "Hablemos",
     "loading": "cargando",
     "loadMore": "cargar más",
@@ -330,6 +331,19 @@
         "psyche": null,
         "science": null,
         "spirituality": null
+      }
+    },
+    "comment": {
+      "commenting-disabled": {
+        "blocked-author": {
+          "button-label": null,
+          "call-to-action": null,
+          "reason": null
+        },
+        "no-group-member": {
+          "call-to-action": null,
+          "reason": null
+        }
       }
     },
     "emotions-label": {
@@ -535,7 +549,7 @@
     },
     "description": null,
     "editGroupSettings": {
-      "groupName": null,
+      "groupTitle": null,
       "title": null
     },
     "errors": {
@@ -823,21 +837,16 @@
   },
   "post": {
     "comment": {
+      "joinGroup": null,
       "reply": "Contestar",
       "submit": "Comentario",
       "submitted": "Comentario enviado",
       "updated": "Cambios guardados"
     },
-    "createNewEvent": {
-      "forGroup": {
-        "title": null
-      },
+    "createNewArticle": {
       "title": null
     },
-    "createNewPost": {
-      "forGroup": {
-        "title": null
-      },
+    "createNewEvent": {
       "title": null
     },
     "edited": "editado",
@@ -1022,7 +1031,6 @@
       "explanation": {
         "closing": "Esto debería ser suficiente por ahora para que los usuarios bloqueados no puedan molestarle más.",
         "commenting-disabled": "No es posible hacer comentarios en este momento en esta contribución",
-        "commenting-explanation": "Esto puede suceder por varias razones, por favor vea nuestra ",
         "intro": "Si otro usuario ha sido bloqueado por usted, esto es lo que sucede:",
         "notifications": "Los usuarios bloqueados no recibirán más notificaciones si se mencionan en sus contribuciones.",
         "their-perspective": "Viceversa: la persona bloqueada tampoco verá más sus contribuciones en sus noticias.",

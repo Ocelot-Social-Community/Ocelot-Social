@@ -29,7 +29,7 @@ export const defaultParams = {
   renderSettingsUrl: true,
 }
 
-const from = `${CONFIG.APPLICATION_NAME} <${CONFIG.EMAIL_DEFAULT_SENDER}>`
+const from = { name: CONFIG.APPLICATION_NAME, address: CONFIG.EMAIL_DEFAULT_SENDER }
 
 const transport = createTransport(nodemailerTransportOptions)
 
@@ -74,8 +74,8 @@ interface OriginalMessage {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const sendNotificationMail = async (notification: any): Promise<OriginalMessage> => {
   const locale = notification?.to?.locale
-  const to = notification?.email
   const name = notification?.to?.name
+  const to = { name, address: notification?.email }
   const template = notification?.reason
 
   try {
@@ -106,7 +106,7 @@ export const sendNotificationMail = async (notification: any): Promise<OriginalM
           notification?.from?.__typename === 'Comment'
             ? undefined
             : new URL(
-                `user/${notification?.from?.author?.id}/${notification?.from?.author?.slug}`,
+                `profile/${notification?.from?.author?.id}/${notification?.from?.author?.slug}`,
                 CONFIG.CLIENT_URI,
               ),
         commenterName:
@@ -165,7 +165,7 @@ export const sendChatMessageMail = async (
   data: ChatMessageEmailInput,
 ): Promise<OriginalMessage> => {
   const { senderUser, recipientUser } = data
-  const to = data.email
+  const to = { name: recipientUser.name, address: data.email }
   try {
     const { originalMessage } = await email.send({
       template: path.join(__dirname, 'templates', 'chat_message'),
@@ -188,6 +188,7 @@ export const sendChatMessageMail = async (
 }
 
 interface VerifyMailInput {
+  name: string
   email: string
   nonce: string
   locale: string
@@ -200,10 +201,10 @@ interface RegistrationMailInput extends VerifyMailInput {
 export const sendRegistrationMail = async (
   data: RegistrationMailInput,
 ): Promise<OriginalMessage> => {
-  const { nonce, locale, inviteCode } = data
-  const to = data.email
+  const { name, nonce, locale, inviteCode } = data
+  const to = { name, address: data.email }
   const actionUrl = new URL('/registration', CONFIG.CLIENT_URI)
-  actionUrl.searchParams.set('email', to)
+  actionUrl.searchParams.set('email', to.address)
   actionUrl.searchParams.set('nonce', nonce)
   if (inviteCode) {
     actionUrl.searchParams.set('inviteCode', inviteCode)
@@ -240,9 +241,9 @@ export const sendEmailVerification = async (
   data: EmailVerificationInput,
 ): Promise<OriginalMessage> => {
   const { nonce, locale, name } = data
-  const to = data.email
+  const to = { name, address: data.email }
   const actionUrl = new URL('/settings/my-email-address/verify', CONFIG.CLIENT_URI)
-  actionUrl.searchParams.set('email', to)
+  actionUrl.searchParams.set('email', to.address)
   actionUrl.searchParams.set('nonce', nonce)
 
   try {
@@ -270,9 +271,9 @@ export const sendResetPasswordMail = async (
   data: EmailVerificationInput,
 ): Promise<OriginalMessage> => {
   const { nonce, locale, name } = data
-  const to = data.email
+  const to = { name, address: data.email }
   const actionUrl = new URL('/password-reset/change-password', CONFIG.CLIENT_URI)
-  actionUrl.searchParams.set('email', to)
+  actionUrl.searchParams.set('email', to.address)
   actionUrl.searchParams.set('nonce', nonce)
   try {
     const { originalMessage } = await email.send({
@@ -296,11 +297,12 @@ export const sendResetPasswordMail = async (
 }
 
 export const sendWrongEmail = async (data: {
+  name: string
   locale: string
   email: string
 }): Promise<OriginalMessage> => {
-  const { locale } = data
-  const to = data.email
+  const { locale, name } = data
+  const to = { name, address: data.email }
   const actionUrl = new URL('/password-reset/request', CONFIG.CLIENT_URI)
   try {
     const { originalMessage } = await email.send({

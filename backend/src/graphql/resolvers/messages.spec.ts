@@ -10,10 +10,10 @@ import { Upload } from 'graphql-upload/public/index'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import { CreateMessage } from '@graphql/queries/CreateMessage'
-import { createRoomMutation } from '@graphql/queries/createRoomMutation'
+import { CreateRoom } from '@graphql/queries/CreateRoom'
 import { MarkMessagesAsSeen } from '@graphql/queries/MarkMessagesAsSeen'
 import { Message } from '@graphql/queries/Message'
-import { roomQuery } from '@graphql/queries/roomQuery'
+import { Room } from '@graphql/queries/Room'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -115,7 +115,7 @@ describe('Message', () => {
               CreateMessage: null,
             },
           })
-          expect(pubsubSpy).not.toBeCalled()
+          expect(pubsubSpy).not.toHaveBeenCalled()
         })
       })
 
@@ -123,7 +123,7 @@ describe('Message', () => {
         beforeEach(async () => {
           authenticatedUser = await chattingUser.toJson()
           const room = await mutate({
-            mutation: createRoomMutation(),
+            mutation: CreateRoom,
             variables: {
               userId: 'other-chatting-user',
             },
@@ -171,7 +171,7 @@ describe('Message', () => {
 
           describe('room is updated as well', () => {
             it('has last message set', async () => {
-              const result = await query({ query: roomQuery() })
+              const result = await query({ query: Room })
               await expect(result).toMatchObject({
                 errors: undefined,
                 data: {
@@ -201,7 +201,7 @@ describe('Message', () => {
           describe('unread count for other user', () => {
             it('has unread count = 1', async () => {
               authenticatedUser = await otherChattingUser.toJson()
-              await expect(query({ query: roomQuery() })).resolves.toMatchObject({
+              await expect(query({ query: Room })).resolves.toMatchObject({
                 errors: undefined,
                 data: {
                   Room: [
@@ -405,7 +405,7 @@ describe('Message', () => {
         beforeEach(async () => {
           authenticatedUser = await chattingUser.toJson()
           const room = await mutate({
-            mutation: createRoomMutation(),
+            mutation: CreateRoom,
             variables: {
               userId: 'other-chatting-user',
             },
@@ -637,7 +637,7 @@ describe('Message', () => {
       beforeEach(async () => {
         authenticatedUser = await chattingUser.toJson()
         const room = await mutate({
-          mutation: createRoomMutation(),
+          mutation: CreateRoom,
           variables: {
             userId: 'other-chatting-user',
           },

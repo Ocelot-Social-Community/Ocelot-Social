@@ -2,9 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import gql from 'graphql-tag'
-
 import Factory, { cleanDatabase } from '@db/factories'
+import { CreatePost } from '@graphql/queries/CreatePost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -27,16 +26,6 @@ let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
 let postAuthor
-
-const createPostMutation = gql`
-  mutation ($id: ID, $title: String!, $content: String!, $groupId: ID) {
-    CreatePost(id: $id, title: $title, content: $content, groupId: $groupId) {
-      id
-      title
-      content
-    }
-  }
-`
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -94,7 +83,7 @@ describe('online status and sending emails', () => {
         jest.clearAllMocks()
         authenticatedUser = await postAuthor.toJson()
         await mutate({
-          mutation: createPostMutation,
+          mutation: CreatePost,
           variables: {
             id: 'post-online-1',
             title: 'This post mentions the other user',
@@ -105,7 +94,7 @@ describe('online status and sending emails', () => {
       })
 
       it('sends NO email to the other user', () => {
-        expect(sendNotificationMailMock).not.toBeCalled()
+        expect(sendNotificationMailMock).not.toHaveBeenCalled()
       })
     })
   })
@@ -120,7 +109,7 @@ describe('online status and sending emails', () => {
         jest.clearAllMocks()
         authenticatedUser = await postAuthor.toJson()
         await mutate({
-          mutation: createPostMutation,
+          mutation: CreatePost,
           variables: {
             id: 'post-offline-1',
             title: 'This post mentions the other user',
@@ -131,7 +120,7 @@ describe('online status and sending emails', () => {
       })
 
       it('sends email to the other user', () => {
-        expect(sendNotificationMailMock).toBeCalledTimes(1)
+        expect(sendNotificationMailMock).toHaveBeenCalledTimes(1)
       })
     })
   })

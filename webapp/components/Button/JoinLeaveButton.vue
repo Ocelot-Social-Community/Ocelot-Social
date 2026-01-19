@@ -4,7 +4,7 @@
     :disabled="disabled"
     :loading="localLoading"
     :icon="icon"
-    :filled="isMember && !hovered"
+    :filled="filled || (isMember && !hovered)"
     :danger="isMember && hovered"
     v-tooltip="tooltip"
     @mouseenter.native="onHover"
@@ -26,6 +26,7 @@ export default {
     userId: { type: String, required: true },
     isMember: { type: Boolean, required: true },
     isNonePendingMember: { type: Boolean, required: true },
+    filled: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
   },

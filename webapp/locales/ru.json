@@ -160,6 +160,7 @@
   "common": {
     "category": "Категория ::: Категории ::: Категории",
     "comment": "Комментарий::: Комментарии::: Комментарии",
+    "filter": null,
     "letsTalk": "Давай поговорим",
     "loading": "загрузка",
     "loadMore": "Загрузить ещё",
@@ -330,6 +331,19 @@
         "psyche": null,
         "science": null,
         "spirituality": null
+      }
+    },
+    "comment": {
+      "commenting-disabled": {
+        "blocked-author": {
+          "button-label": null,
+          "call-to-action": null,
+          "reason": null
+        },
+        "no-group-member": {
+          "call-to-action": null,
+          "reason": null
+        }
       }
     },
     "emotions-label": {
@@ -535,7 +549,7 @@
     },
     "description": null,
     "editGroupSettings": {
-      "groupName": null,
+      "groupTitle": null,
       "title": null
     },
     "errors": {
@@ -823,21 +837,16 @@
   },
   "post": {
     "comment": {
+      "joinGroup": null,
       "reply": "Ответ",
       "submit": "Комментировать",
       "submitted": "Комментарий отправлен",
       "updated": "Изменения сохраненные"
     },
-    "createNewEvent": {
-      "forGroup": {
-        "title": null
-      },
+    "createNewArticle": {
       "title": null
     },
-    "createNewPost": {
-      "forGroup": {
-        "title": null
-      },
+    "createNewEvent": {
       "title": null
     },
     "edited": "Изменен",
@@ -1022,7 +1031,6 @@
       "explanation": {
         "closing": "На данный момент этого должно быть достаточно, чтобы заблокированные пользователи больше вас не беспокоили.",
         "commenting-disabled": "Комментировать этот пост на данный момент невозможно.",
-        "commenting-explanation": "Это может произойти по нескольким причинам, пожалуйста, смотрите наш",
         "intro": "Если блокируете другого пользователя, происходит следующее:",
         "notifications": "Заблокированные пользователи больше не будут получать уведомления об упоминаниях в ваших постах.",
         "their-perspective": "И наоборот — заблокированный пользователь больше не видит ваши посты в своей ленте.",

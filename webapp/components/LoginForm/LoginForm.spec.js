@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import LoginForm from './LoginForm.vue'
-import Styleguide from '@human-connection/styleguide'
+import Styleguide from '@@/'
 import Vuex from 'vuex'
 import { mount, createLocalVue } from '@vue/test-utils'
 

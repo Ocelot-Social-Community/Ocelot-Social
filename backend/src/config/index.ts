@@ -30,6 +30,7 @@ const environment = {
     : [],
   SEND_MAIL: env.NODE_ENV !== 'test',
   LOG_LEVEL: 'DEBUG',
+  PROXY_S3: env.PROXY_S3,
 }
 
 const server = {
@@ -47,7 +48,7 @@ const SMTP_PASSWORD = env.SMTP_PASSWORD
 const SMTP_DKIM_DOMAINNAME = env.SMTP_DKIM_DOMAINNAME
 const SMTP_DKIM_KEYSELECTOR = env.SMTP_DKIM_KEYSELECTOR
 // PEM format = https://docs.progress.com/bundle/datadirect-hybrid-data-pipeline-installation-46/page/PEM-file-format.html
-const SMTP_DKIM_PRIVATKEY = env.SMTP_DKIM_PRIVATKEY?.replace(/\\n/g, '\n') // replace all "\n" in .env string by real line break
+const SMTP_DKIM_PRIVATEKEY = env.SMTP_DKIM_PRIVATEKEY?.replace(/\\n/g, '\n') // replace all "\n" in .env string by real line break
 const SMTP_MAX_CONNECTIONS = (env.SMTP_MAX_CONNECTIONS && parseInt(env.SMTP_MAX_CONNECTIONS)) || 5
 const SMTP_MAX_MESSAGES = (env.SMTP_MAX_MESSAGES && parseInt(env.SMTP_MAX_MESSAGES)) || 100
 
@@ -66,11 +67,11 @@ if (SMTP_USERNAME && SMTP_PASSWORD) {
     pass: SMTP_PASSWORD,
   }
 }
-if (SMTP_DKIM_DOMAINNAME && SMTP_DKIM_KEYSELECTOR && SMTP_DKIM_PRIVATKEY) {
+if (SMTP_DKIM_DOMAINNAME && SMTP_DKIM_KEYSELECTOR && SMTP_DKIM_PRIVATEKEY) {
   nodemailerTransportOptions.dkim = {
     domainName: SMTP_DKIM_DOMAINNAME,
     keySelector: SMTP_DKIM_KEYSELECTOR,
-    privateKey: SMTP_DKIM_PRIVATKEY,
+    privateKey: SMTP_DKIM_PRIVATEKEY,
   }
 }
 
@@ -92,18 +93,20 @@ const redis = {
 }
 
 const required = {
+  EMAIL_DEFAULT_SENDER: env.EMAIL_DEFAULT_SENDER,
+
   AWS_ACCESS_KEY_ID: env.AWS_ACCESS_KEY_ID,
   AWS_SECRET_ACCESS_KEY: env.AWS_SECRET_ACCESS_KEY,
   AWS_ENDPOINT: env.AWS_ENDPOINT,
   AWS_REGION: env.AWS_REGION,
   AWS_BUCKET: env.AWS_BUCKET,
 
+  IMAGOR_PUBLIC_URL: env.IMAGOR_PUBLIC_URL,
+  IMAGOR_SECRET: env.IMAGOR_SECRET,
+
   MAPBOX_TOKEN: env.MAPBOX_TOKEN,
   JWT_SECRET: env.JWT_SECRET,
-  PRIVATE_KEY_PASSPHRASE: env.PRIVATE_KEY_PASSPHRASE,
 }
-
-const S3_PUBLIC_GATEWAY = env.S3_PUBLIC_GATEWAY
 
 // https://stackoverflow.com/a/53050575
 type NoUndefinedField<T> = { [P in keyof T]-?: NoUndefinedField<NonNullable<T[P]>> }
@@ -121,7 +124,6 @@ function assertRequiredConfig(
 assertRequiredConfig(required)
 
 const options = {
-  EMAIL_DEFAULT_SENDER: env.EMAIL_DEFAULT_SENDER,
   SUPPORT_EMAIL: env.SUPPORT_EMAIL,
   SUPPORT_URL: emails.SUPPORT_LINK,
   APPLICATION_NAME: metadata.APPLICATION_NAME,
@@ -151,7 +153,6 @@ const CONFIG = {
   ...redis,
   ...options,
   ...language,
-  S3_PUBLIC_GATEWAY,
 }
 
 export type Config = typeof CONFIG
@@ -162,7 +163,8 @@ export type S3Config = Pick<
   | 'AWS_ENDPOINT'
   | 'AWS_REGION'
   | 'AWS_BUCKET'
-  | 'S3_PUBLIC_GATEWAY'
+  | 'IMAGOR_SECRET'
+  | 'IMAGOR_PUBLIC_URL'
 >
 export default CONFIG
 

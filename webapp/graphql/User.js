@@ -1,22 +1,20 @@
 import gql from 'graphql-tag'
-import {
-  userCountsFragment,
-  locationFragment,
-  badgesFragment,
-  userFragment,
-  postFragment,
-  commentFragment,
-  groupFragment,
-  userTeaserFragment,
-} from './Fragments'
+import { badges } from './fragments/badges'
+import { location } from './fragments/location'
+import { userCounts } from './fragments/userCounts'
+import { user } from './fragments/user'
+import { post } from './fragments/post'
+import { comment } from './fragments/comment'
+import { group } from './fragments/group'
+import { imageUrls } from './fragments/imageUrls'
 
 export const profileUserQuery = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
-    ${userFragment}
-    ${userCountsFragment}
-    ${locationFragment(lang)}
-    ${badgesFragment}
+    ${user}
+    ${userCounts}
+    ${location('User', lang)}
+    ${badges}
 
     query User($id: ID!, $followedByCount: Int!, $followingCount: Int!) {
       User(id: $id) {
@@ -54,13 +52,15 @@ export const profileUserQuery = (i18n) => {
 
 export const minimisedUserQuery = () => {
   return gql`
+    ${imageUrls}
+
     query ($slug: String) {
       User(slug: $slug, orderBy: slug_asc) {
         id
         slug
         name
         avatar {
-          url
+          ...imageUrls
         }
       }
     }
@@ -111,9 +111,9 @@ export const adminUserBadgesQuery = () => {
 export const mapUserQuery = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
-    ${userFragment}
-    ${locationFragment(lang)}
-    ${badgesFragment}
+    ${user}
+    ${location('User', lang)}
+    ${badges}
 
     query {
       User {
@@ -128,10 +128,10 @@ export const mapUserQuery = (i18n) => {
 
 export const notificationQuery = () => {
   return gql`
-    ${userFragment}
-    ${commentFragment}
-    ${postFragment}
-    ${groupFragment}
+    ${user}
+    ${comment}
+    ${post}
+    ${group}
 
     query ($read: Boolean, $orderBy: NotificationOrdering, $first: Int, $offset: Int) {
       notifications(read: $read, orderBy: $orderBy, first: $first, offset: $offset) {
@@ -177,10 +177,10 @@ export const notificationQuery = () => {
 
 export const markAsReadMutation = (_i18n) => {
   return gql`
-    ${userFragment}
-    ${commentFragment}
-    ${postFragment}
-    ${groupFragment}
+    ${user}
+    ${comment}
+    ${post}
+    ${group}
 
     mutation ($id: ID!) {
       markAsRead(id: $id) {
@@ -217,10 +217,10 @@ export const markAsReadMutation = (_i18n) => {
 
 export const markAllAsReadMutation = (_i18n) => {
   return gql`
-    ${userFragment}
-    ${commentFragment}
-    ${postFragment}
-    ${groupFragment}
+    ${user}
+    ${comment}
+    ${post}
+    ${group}
 
     mutation {
       markAllAsRead {
@@ -257,10 +257,10 @@ export const markAllAsReadMutation = (_i18n) => {
 
 export const notificationAdded = () => {
   return gql`
-    ${userFragment}
-    ${commentFragment}
-    ${postFragment}
-    ${groupFragment}
+    ${user}
+    ${comment}
+    ${post}
+    ${group}
 
     subscription notifications {
       notificationAdded {
@@ -305,8 +305,8 @@ export const notificationAdded = () => {
 }
 export const followUserMutation = (i18n) => {
   return gql`
-    ${userFragment}
-    ${userCountsFragment}
+    ${user}
+    ${userCounts}
 
     mutation ($id: ID!) {
       followUser(id: $id) {
@@ -325,8 +325,8 @@ export const followUserMutation = (i18n) => {
 
 export const unfollowUserMutation = (i18n) => {
   return gql`
-    ${userFragment}
-    ${userCountsFragment}
+    ${user}
+    ${userCounts}
 
     mutation ($id: ID!) {
       unfollowUser(id: $id) {
@@ -345,6 +345,8 @@ export const unfollowUserMutation = (i18n) => {
 
 export const updateUserMutation = () => {
   return gql`
+    ${imageUrls}
+
     mutation (
       $id: ID!
       $slug: String
@@ -386,7 +388,7 @@ export const updateUserMutation = () => {
         locale
         termsAndConditionsAgreedVersion
         avatar {
-          url
+          ...imageUrls
         }
         badgeVerification {
           id
@@ -407,7 +409,7 @@ export const checkSlugAvailableQuery = gql`
 `
 
 export const currentUserQuery = gql`
-  ${userFragment}
+  ${user}
   query {
     currentUser {
       ...user
@@ -461,7 +463,7 @@ export const currentUserQuery = gql`
 `
 
 export const currentUserCountQuery = () => gql`
-  ${userCountsFragment}
+  ${userCounts}
   query {
     currentUser {
       ...userCounts
@@ -471,9 +473,9 @@ export const currentUserCountQuery = () => gql`
 
 export const userDataQuery = (i18n) => {
   return gql`
-    ${userFragment}
-    ${postFragment}
-    ${commentFragment}
+    ${user}
+    ${post}
+    ${comment}
     query ($id: ID!) {
       userData(id: $id) {
         user {
@@ -501,10 +503,16 @@ export const userDataQuery = (i18n) => {
 export const userTeaserQuery = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
-    ${userTeaserFragment(lang)}
+    ${badges}
+    ${location('User', lang)}
+
     query ($id: ID!) {
       User(id: $id) {
-        ...userTeaser
+        followedByCount
+        contributionsCount
+        commentedCount
+        ...badges
+        ...location
       }
     }
   `

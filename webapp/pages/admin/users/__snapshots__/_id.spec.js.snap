@@ -51,7 +51,7 @@ exports[`.vue renders 1`] = `
                 >
                   <img
                     alt="description-v-1"
-                    src="icon1"
+                    src="/api/icon1"
                   />
                 </button>
                 <button
@@ -59,7 +59,7 @@ exports[`.vue renders 1`] = `
                 >
                   <img
                     alt="description-v-2"
-                    src="icon2"
+                    src="/api/icon2"
                   />
                 </button>
               </div>
@@ -80,7 +80,7 @@ exports[`.vue renders 1`] = `
                 >
                   <img
                     alt="description-t-1"
-                    src="icon3"
+                    src="/api/icon3"
                   />
                 </button>
                 <button
@@ -88,7 +88,7 @@ exports[`.vue renders 1`] = `
                 >
                   <img
                     alt="description-t-2"
-                    src="icon4"
+                    src="/api/icon4"
                   />
                 </button>
               </div>

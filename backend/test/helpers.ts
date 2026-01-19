@@ -16,6 +16,7 @@ export const TEST_CONFIG = {
   PRODUCTION_DB_CLEAN_ALLOW: false,
   DISABLED_MIDDLEWARES: [],
   SEND_MAIL: false,
+  PROXY_S3: 'http://localhost:9000',
 
   CLIENT_URI: 'http://webapp:3000',
   GRAPHQL_URI: 'http://localhost:4000',
@@ -24,7 +25,6 @@ export const TEST_CONFIG = {
   MAPBOX_TOKEN:
     'pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g',
   JWT_SECRET: 'JWT_SECRET',
-  PRIVATE_KEY_PASSPHRASE: 'PRIVATE_KEY_PASSPHRASE',
 
   NEO4J_URI: 'bolt://localhost:7687',
   NEO4J_USERNAME: 'neo4j',
@@ -39,11 +39,12 @@ export const TEST_CONFIG = {
 
   AWS_ACCESS_KEY_ID: 'minio',
   AWS_SECRET_ACCESS_KEY: '12341234',
-  AWS_ENDPOINT: 'http:/minio:9000',
+  AWS_ENDPOINT: 'http:/localhost:9000',
   AWS_REGION: 'local',
   AWS_BUCKET: 'ocelot',
 
-  S3_PUBLIC_GATEWAY: undefined,
+  IMAGOR_SECRET: 'IMAGOR_SECRET',
+  IMAGOR_PUBLIC_URL: 'IMAGOR_PUBLIC_URL',
 
   EMAIL_DEFAULT_SENDER: '',
   SUPPORT_EMAIL: '',

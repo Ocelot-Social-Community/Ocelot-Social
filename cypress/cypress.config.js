@@ -1,22 +1,55 @@
 const dotenv = require('dotenv')
 const { defineConfig } = require('cypress');
-const browserify = require('@cypress/browserify-preprocessor');
+const webpackPreprocessor = require('@cypress/webpack-preprocessor');
 const {
   addCucumberPreprocessorPlugin,
 } = require('@badeball/cypress-cucumber-preprocessor');
-const {
-  preprendTransformerToOptions,
-} = require('@badeball/cypress-cucumber-preprocessor/browserify');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+const webpack = require('webpack');
 
 // Test persistent(between commands) store
 const testStore = {}
 
 async function setupNodeEvents(on, config) {
+  // This is required for the preprocessor to be able to generate JSON reports after each run, and more
   await addCucumberPreprocessorPlugin(on, config);
 
   on(
     'file:preprocessor',
-    browserify(preprendTransformerToOptions(config, browserify.defaultOptions)),
+    webpackPreprocessor({
+      webpackOptions: {
+        mode: 'development',
+        devtool: 'source-map',
+        resolve: {
+          extensions: ['.js', '.json'],
+          fallback: {
+            fs: false,
+            net: false,
+            tls: false,
+          },
+        },
+        module: {
+          rules: [
+            {
+              test: /\.feature$/,
+              use: [
+                {
+                  loader: '@badeball/cypress-cucumber-preprocessor/webpack',
+                  options: config,
+                },
+              ],
+            },
+          ],
+        },
+        plugins: [
+          new NodePolyfillPlugin(),
+          new webpack.ProvidePlugin({
+            process: 'process/browser',
+            Buffer: ['buffer', 'Buffer'],
+          }),
+        ],
+      },
+    }),
   );
 
   on('task', {

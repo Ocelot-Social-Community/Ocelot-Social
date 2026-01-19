@@ -24,27 +24,27 @@ jobs:
             file: backend/Dockerfile
             target: production
           - name: webapp-base
-            context: webapp
+            context: .
             file: webapp/Dockerfile
             target: base
           - name: webapp-build
-            context: webapp
+            context: .
             file: webapp/Dockerfile
             target: build
           - name: webapp
-            context: webapp
+            context: .
             file: webapp/Dockerfile
             target: production
           - name: maintenance-base
-            context: webapp
+            context: .
             file: webapp/Dockerfile.maintenance
             target: base
           - name: maintenance-build
-            context: webapp
+            context: .
             file: webapp/Dockerfile.maintenance
             target: build
           - name: maintenance
-            context: webapp
+            context: .
             file: webapp/Dockerfile.maintenance
             target: production
     runs-on: ubuntu-latest
@@ -59,16 +59,16 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.7
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.7
       - name: Log in to the Container registry
-        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |

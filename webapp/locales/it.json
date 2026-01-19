@@ -160,6 +160,7 @@
   "common": {
     "category": "Categoria ::: Categorie",
     "comment": "Commento ::: Commenti",
+    "filter": null,
     "letsTalk": "Discutiamo",
     "loading": "Caricamento in corso",
     "loadMore": "Caricare di più",
@@ -330,6 +331,19 @@
         "psyche": null,
         "science": null,
         "spirituality": null
+      }
+    },
+    "comment": {
+      "commenting-disabled": {
+        "blocked-author": {
+          "button-label": null,
+          "call-to-action": null,
+          "reason": null
+        },
+        "no-group-member": {
+          "call-to-action": null,
+          "reason": null
+        }
       }
     },
     "emotions-label": {
@@ -535,7 +549,7 @@
     },
     "description": null,
     "editGroupSettings": {
-      "groupName": null,
+      "groupTitle": null,
       "title": null
     },
     "errors": {
@@ -823,21 +837,16 @@
   },
   "post": {
     "comment": {
+      "joinGroup": null,
       "reply": null,
       "submit": null,
       "submitted": null,
       "updated": null
     },
-    "createNewEvent": {
-      "forGroup": {
-        "title": null
-      },
+    "createNewArticle": {
       "title": null
     },
-    "createNewPost": {
-      "forGroup": {
-        "title": null
-      },
+    "createNewEvent": {
       "title": null
     },
     "edited": null,
@@ -1022,7 +1031,6 @@
       "explanation": {
         "closing": null,
         "commenting-disabled": null,
-        "commenting-explanation": null,
         "intro": null,
         "notifications": null,
         "their-perspective": null,

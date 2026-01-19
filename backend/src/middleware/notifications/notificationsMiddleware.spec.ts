@@ -4,17 +4,20 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import gql from 'graphql-tag'
-
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
-import { changeGroupMemberRoleMutation } from '@graphql/queries/changeGroupMemberRoleMutation'
-import { createGroupMutation } from '@graphql/queries/createGroupMutation'
+import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
+import { CreateComment } from '@graphql/queries/CreateComment'
+import { CreateGroup } from '@graphql/queries/CreateGroup'
 import { CreateMessage } from '@graphql/queries/CreateMessage'
-import { createRoomMutation } from '@graphql/queries/createRoomMutation'
-import { joinGroupMutation } from '@graphql/queries/joinGroupMutation'
-import { leaveGroupMutation } from '@graphql/queries/leaveGroupMutation'
-import { removeUserFromGroupMutation } from '@graphql/queries/removeUserFromGroupMutation'
+import { CreatePost } from '@graphql/queries/CreatePost'
+import { CreateRoom } from '@graphql/queries/CreateRoom'
+import { JoinGroup } from '@graphql/queries/JoinGroup'
+import { LeaveGroup } from '@graphql/queries/LeaveGroup'
+import { markAsRead } from '@graphql/queries/markAsRead'
+import { notifications } from '@graphql/queries/notifications'
+import { RemoveUserFromGroup } from '@graphql/queries/RemoveUserFromGroup'
+import { UpdatePost } from '@graphql/queries/UpdatePost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -45,31 +48,6 @@ let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
 const categoryIds = ['cat9']
-const createPostMutation = gql`
-  mutation ($id: ID, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
-    CreatePost(id: $id, title: $title, content: $postContent, categoryIds: $categoryIds) {
-      id
-      title
-      content
-    }
-  }
-`
-const updatePostMutation = gql`
-  mutation ($id: ID!, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
-    UpdatePost(id: $id, content: $postContent, title: $title, categoryIds: $categoryIds) {
-      title
-      content
-    }
-  }
-`
-const createCommentMutation = gql`
-  mutation ($id: ID, $postId: ID!, $commentContent: String!) {
-    CreateComment(id: $id, postId: $postId, content: $commentContent) {
-      id
-      content
-    }
-  }
-`
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -113,33 +91,6 @@ afterEach(async () => {
 })
 
 describe('notifications', () => {
-  const notificationQuery = gql`
-    query ($read: Boolean) {
-      notifications(read: $read, orderBy: updatedAt_desc) {
-        read
-        reason
-        createdAt
-        relatedUser {
-          id
-        }
-        from {
-          __typename
-          ... on Post {
-            id
-            content
-          }
-          ... on Comment {
-            id
-            content
-          }
-          ... on Group {
-            id
-          }
-        }
-      }
-    }
-  `
-
   describe('authenticated', () => {
     beforeEach(async () => {
       authenticatedUser = await notifiedUser.toJson()
@@ -153,11 +104,11 @@ describe('notifications', () => {
       const createPostAction = async () => {
         authenticatedUser = await postAuthor.toJson()
         await mutate({
-          mutation: createPostMutation,
+          mutation: CreatePost,
           variables: {
             id: 'p47',
             title,
-            postContent,
+            content: postContent,
             categoryIds,
           },
         })
@@ -170,11 +121,11 @@ describe('notifications', () => {
         await createPostAction()
         authenticatedUser = await commentAuthor.toJson()
         await mutate({
-          mutation: createCommentMutation,
+          mutation: CreateComment,
           variables: {
             id: 'c47',
             postId: 'p47',
-            commentContent,
+            content: commentContent,
           },
         })
         authenticatedUser = await notifiedUser.toJson()
@@ -209,8 +160,9 @@ describe('notifications', () => {
             await createCommentOnPostAction()
             await expect(
               query({
-                query: notificationQuery,
+                query: notifications,
                 variables: {
+                  orderBy: 'updatedAt_desc',
                   read: false,
                 },
               }),
@@ -250,8 +202,9 @@ describe('notifications', () => {
               await createCommentOnPostAction()
               await expect(
                 query({
-                  query: notificationQuery,
+                  query: notifications,
                   variables: {
+                    orderBy: 'updatedAt_desc',
                     read: false,
                   },
                 }),
@@ -290,8 +243,9 @@ describe('notifications', () => {
 
               await expect(
                 query({
-                  query: notificationQuery,
+                  query: notifications,
                   variables: {
+                    orderBy: 'updatedAt_desc',
                     read: false,
                   },
                 }),
@@ -309,8 +263,9 @@ describe('notifications', () => {
 
               await expect(
                 query({
-                  query: notificationQuery,
+                  query: notifications,
                   variables: {
+                    orderBy: 'updatedAt_desc',
                     read: false,
                   },
                 }),
@@ -333,8 +288,9 @@ describe('notifications', () => {
 
             await expect(
               query({
-                query: notificationQuery,
+                query: notifications,
                 variables: {
+                  orderBy: 'updatedAt_desc',
                   read: false,
                 },
               }),
@@ -373,8 +329,9 @@ describe('notifications', () => {
             'Hey <a class="mention" data-mention-id="you" href="/profile/you/al-capone" target="_blank">@al-capone</a> how do you do?'
           await expect(
             query({
-              query: notificationQuery,
+              query: notifications,
               variables: {
+                orderBy: 'updatedAt_desc',
                 read: false,
               },
             }),
@@ -414,8 +371,9 @@ describe('notifications', () => {
               'Hey <a class="mention" data-mention-id="you" href="/profile/you/al-capone" target="_blank">@al-capone</a> how do you do?'
             await expect(
               query({
-                query: notificationQuery,
+                query: notifications,
                 variables: {
+                  orderBy: 'updatedAt_desc',
                   read: false,
                 },
               }),
@@ -476,11 +434,11 @@ describe('notifications', () => {
             `
             authenticatedUser = await postAuthor.toJson()
             await mutate({
-              mutation: updatePostMutation,
+              mutation: UpdatePost,
               variables: {
                 id: 'p47',
                 title,
-                postContent: updatedContent,
+                content: updatedContent,
                 categoryIds,
               },
             })
@@ -511,8 +469,9 @@ describe('notifications', () => {
             })
             await expect(
               query({
-                query: notificationQuery,
+                query: notifications,
                 variables: {
+                  orderBy: 'updatedAt_desc',
                   read: false,
                 },
               }),
@@ -520,27 +479,19 @@ describe('notifications', () => {
           })
 
           describe('if the notification was marked as read earlier', () => {
-            const markAsReadAction = async () => {
-              const mutation = gql`
-                mutation ($id: ID!) {
-                  markAsRead(id: $id) {
-                    read
-                  }
-                }
-              `
-              await mutate({ mutation, variables: { id: 'p47' } })
-            }
-
             describe('but the next mention happens after the notification was marked as read', () => {
               it('sets the `read` attribute to false again', async () => {
                 await createPostAction()
-                await markAsReadAction()
+                await mutate({ mutation: markAsRead, variables: { id: 'p47' } })
                 const {
                   data: {
                     notifications: [{ read: readBefore }],
                   },
                 } = await query({
-                  query: notificationQuery,
+                  query: notifications,
+                  variables: {
+                    orderBy: 'updatedAt_desc',
+                  },
                 })
                 await updatePostAction()
                 const {
@@ -548,7 +499,11 @@ describe('notifications', () => {
                     notifications: [{ read: readAfter }],
                   },
                 } = await query({
-                  query: notificationQuery,
+                  query: notifications,
+                  variables: {
+                    orderBy: 'updatedAt_desc',
+                    read: false,
+                  },
                 })
                 expect(readBefore).toEqual(true)
                 expect(readAfter).toEqual(false)
@@ -556,13 +511,16 @@ describe('notifications', () => {
 
               it('does not update the `createdAt` attribute', async () => {
                 await createPostAction()
-                await markAsReadAction()
+                await mutate({ mutation: markAsRead, variables: { id: 'p47' } })
                 const {
                   data: {
                     notifications: [{ createdAt: createdAtBefore }],
                   },
                 } = await query({
-                  query: notificationQuery,
+                  query: notifications,
+                  variables: {
+                    orderBy: 'updatedAt_desc',
+                  },
                 })
                 await updatePostAction()
                 const {
@@ -570,7 +528,11 @@ describe('notifications', () => {
                     notifications: [{ createdAt: createdAtAfter }],
                   },
                 } = await query({
-                  query: notificationQuery,
+                  query: notifications,
+                  variables: {
+                    orderBy: 'updatedAt_desc',
+                    read: false,
+                  },
                 })
                 expect(createdAtBefore).toBeTruthy()
                 expect(Date.parse(createdAtBefore)).toEqual(expect.any(Number))
@@ -595,8 +557,9 @@ describe('notifications', () => {
 
             await expect(
               query({
-                query: notificationQuery,
+                query: notifications,
                 variables: {
+                  orderBy: 'updatedAt_desc',
                   read: false,
                 },
               }),
@@ -637,8 +600,9 @@ describe('notifications', () => {
 
             await expect(
               query({
-                query: notificationQuery,
+                query: notifications,
                 variables: {
+                  orderBy: 'updatedAt_desc',
                   read: false,
                 },
               }),
@@ -711,8 +675,9 @@ describe('notifications', () => {
 
             await expect(
               query({
-                query: notificationQuery,
+                query: notifications,
                 variables: {
+                  orderBy: 'updatedAt_desc',
                   read: false,
                 },
               }),
@@ -746,8 +711,9 @@ describe('notifications', () => {
 
             await expect(
               query({
-                query: notificationQuery,
+                query: notifications,
                 variables: {
+                  orderBy: 'updatedAt_desc',
                   read: false,
                 },
               }),
@@ -778,8 +744,9 @@ describe('notifications', () => {
             await createCommentOnPostAction()
             await expect(
               query({
-                query: notificationQuery,
+                query: notifications,
                 variables: {
+                  orderBy: 'updatedAt_desc',
                   read: false,
                 },
               }),
@@ -829,8 +796,9 @@ describe('notifications', () => {
             await createCommentOnPostAction()
             await expect(
               query({
-                query: notificationQuery,
+                query: notifications,
                 variables: {
+                  orderBy: 'updatedAt_desc',
                   read: false,
                 },
               }),
@@ -905,7 +873,7 @@ describe('notifications', () => {
       authenticatedUser = await chatSender.toJson()
 
       const room = await mutate({
-        mutation: createRoomMutation(),
+        mutation: CreateRoom,
         variables: {
           userId: 'chatReceiver',
         },
@@ -1091,7 +1059,7 @@ describe('notifications', () => {
       )
       authenticatedUser = await groupOwner.toJson()
       await mutate({
-        mutation: createGroupMutation(),
+        mutation: CreateGroup,
         variables: {
           id: 'closed-group',
           name: 'The Closed Group',
@@ -1108,7 +1076,7 @@ describe('notifications', () => {
       const joinGroupAction = async () => {
         authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
         await mutate({
-          mutation: joinGroupMutation(),
+          mutation: JoinGroup,
           variables: {
             groupId: 'closed-group',
             userId: authenticatedUser.id,
@@ -1125,7 +1093,11 @@ describe('notifications', () => {
         await joinGroupAction()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
+            variables: {
+              orderBy: 'updatedAt_desc',
+              read: false,
+            },
           }),
         ).resolves.toMatchObject({
           data: {
@@ -1163,7 +1135,11 @@ describe('notifications', () => {
           await joinGroupAction()
           await expect(
             query({
-              query: notificationQuery,
+              query: notifications,
+              variables: {
+                orderBy: 'updatedAt_desc',
+                read: false,
+              },
             }),
           ).resolves.toMatchObject({
             data: {
@@ -1195,7 +1171,7 @@ describe('notifications', () => {
       const leaveGroupAction = async () => {
         authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
         await mutate({
-          mutation: leaveGroupMutation(),
+          mutation: LeaveGroup,
           variables: {
             groupId: 'closed-group',
             userId: authenticatedUser.id,
@@ -1208,7 +1184,7 @@ describe('notifications', () => {
         jest.clearAllMocks()
         authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
         await mutate({
-          mutation: joinGroupMutation(),
+          mutation: JoinGroup,
           variables: {
             groupId: 'closed-group',
             userId: authenticatedUser.id,
@@ -1220,7 +1196,11 @@ describe('notifications', () => {
         await leaveGroupAction()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
+            variables: {
+              orderBy: 'updatedAt_desc',
+              read: false,
+            },
           }),
         ).resolves.toMatchObject({
           data: {
@@ -1276,7 +1256,11 @@ describe('notifications', () => {
           await leaveGroupAction()
           await expect(
             query({
-              query: notificationQuery,
+              query: notifications,
+              variables: {
+                orderBy: 'updatedAt_desc',
+                read: false,
+              },
             }),
           ).resolves.toMatchObject({
             data: {
@@ -1320,7 +1304,7 @@ describe('notifications', () => {
       const changeGroupMemberRoleAction = async () => {
         authenticatedUser = (await groupOwner.toJson()) as DecodedUser
         await mutate({
-          mutation: changeGroupMemberRoleMutation(),
+          mutation: ChangeGroupMemberRole,
           variables: {
             groupId: 'closed-group',
             userId: 'you',
@@ -1333,7 +1317,7 @@ describe('notifications', () => {
       beforeEach(async () => {
         authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
         await mutate({
-          mutation: joinGroupMutation(),
+          mutation: JoinGroup,
           variables: {
             groupId: 'closed-group',
             userId: authenticatedUser.id,
@@ -1347,7 +1331,11 @@ describe('notifications', () => {
         await changeGroupMemberRoleAction()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
+            variables: {
+              orderBy: 'updatedAt_desc',
+              read: false,
+            },
           }),
         ).resolves.toMatchObject({
           data: {
@@ -1385,7 +1373,11 @@ describe('notifications', () => {
           await changeGroupMemberRoleAction()
           await expect(
             query({
-              query: notificationQuery,
+              query: notifications,
+              variables: {
+                orderBy: 'updatedAt_desc',
+                read: false,
+              },
             }),
           ).resolves.toMatchObject({
             data: {
@@ -1417,7 +1409,7 @@ describe('notifications', () => {
       const removeUserFromGroupAction = async () => {
         authenticatedUser = await groupOwner.toJson()
         await mutate({
-          mutation: removeUserFromGroupMutation(),
+          mutation: RemoveUserFromGroup,
           variables: {
             groupId: 'closed-group',
             userId: 'you',
@@ -1429,7 +1421,7 @@ describe('notifications', () => {
       beforeEach(async () => {
         authenticatedUser = (await notifiedUser.toJson()) as DecodedUser
         await mutate({
-          mutation: joinGroupMutation(),
+          mutation: JoinGroup,
           variables: {
             groupId: 'closed-group',
             userId: authenticatedUser.id,
@@ -1443,7 +1435,11 @@ describe('notifications', () => {
         await removeUserFromGroupAction()
         await expect(
           query({
-            query: notificationQuery,
+            query: notifications,
+            variables: {
+              orderBy: 'updatedAt_desc',
+              read: false,
+            },
           }),
         ).resolves.toMatchObject({
           data: {
@@ -1481,7 +1477,11 @@ describe('notifications', () => {
           await removeUserFromGroupAction()
           await expect(
             query({
-              query: notificationQuery,
+              query: notifications,
+              variables: {
+                orderBy: 'updatedAt_desc',
+                read: false,
+              },
             }),
           ).resolves.toMatchObject({
             data: {

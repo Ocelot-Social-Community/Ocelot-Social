@@ -34,10 +34,12 @@
               <!-- <base-icon name="at" data-test="at" /> -->
               {{ `@${userSlug}` }}
             </ds-text>
-            <ds-text v-if="user.location" align="center" color="soft" size="small">
-              <base-icon name="map-marker" />
-              {{ user.location.name }}
-            </ds-text>
+            <location-info
+              v-if="user.location"
+              :location-data="user.location"
+              :is-owner="myProfile"
+              size="small"
+            />
             <ds-text align="center" color="soft" size="small">
               {{ $t('profile.memberSince') }} {{ user.createdAt | date('MMMM yyyy') }}
             </ds-text>
@@ -130,14 +132,13 @@
           <!-- feed -->
           <ds-grid-item :row-span="2" column-span="fullWidth">
             <ds-space centered>
-              <nuxt-link :to="{ name: 'post-create' }">
+              <nuxt-link :to="{ name: 'post-create-type' }">
                 <base-button
                   v-if="myProfile"
                   v-tooltip="{
                     content: $t('contribution.newPost'),
                     placement: 'left',
                   }"
-                  :path="{ name: 'post-create' }"
                   class="profile-post-add-button"
                   icon="plus"
                   circle
@@ -210,6 +211,7 @@ import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import SocialMedia from '~/components/SocialMedia/SocialMedia'
+import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
 
 const tabToFilterMapping = ({ tab, id }) => {
   return {
@@ -234,6 +236,7 @@ export default {
     MasonryGridItem,
     FollowList,
     TabNavigation,
+    LocationInfo,
   },
   mixins: [postListActions],
   transition: {

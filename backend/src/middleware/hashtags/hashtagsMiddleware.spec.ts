@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import gql from 'graphql-tag'
-
 import { cleanDatabase } from '@db/factories'
+import { CreatePost } from '@graphql/queries/CreatePost'
+import { Post } from '@graphql/queries/Post'
+import { UpdatePost } from '@graphql/queries/UpdatePost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -16,23 +17,6 @@ let query: any // eslint-disable-line @typescript-eslint/no-explicit-any
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 const categoryIds = ['cat9']
-const createPostMutation = gql`
-  mutation ($id: ID, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
-    CreatePost(id: $id, title: $title, content: $postContent, categoryIds: $categoryIds) {
-      id
-      title
-      content
-    }
-  }
-`
-const updatePostMutation = gql`
-  mutation ($id: ID!, $title: String!, $postContent: String!, $categoryIds: [ID]!) {
-    UpdatePost(id: $id, content: $postContent, title: $title, categoryIds: $categoryIds) {
-      title
-      content
-    }
-  }
-`
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -71,7 +55,7 @@ afterEach(async () => {
 describe('hashtags', () => {
   const id = 'p135'
   const title = 'Two Hashtags'
-  const postContent = `
+  const content = `
     <p>
       Hey Dude,
       <a
@@ -92,15 +76,6 @@ describe('hashtags', () => {
       for everyone.
     </p>
   `
-  const postWithHastagsQuery = gql`
-    query ($id: ID) {
-      Post(id: $id) {
-        tags {
-          id
-        }
-      }
-    }
-  `
   const postWithHastagsVariables = {
     id,
   }
@@ -113,46 +88,43 @@ describe('hashtags', () => {
     describe('create a Post with Hashtags', () => {
       beforeEach(async () => {
         await mutate({
-          mutation: createPostMutation,
+          mutation: CreatePost,
           variables: {
             id,
             title,
-            postContent,
+            content,
             categoryIds,
           },
         })
       })
 
       it('both hashtags are created with the "id" set to their "name"', async () => {
-        const expected = [
-          {
-            id: 'Democracy',
-          },
-          {
-            id: 'Liberty',
-          },
-        ]
         await expect(
           query({
-            query: postWithHastagsQuery,
+            query: Post,
             variables: postWithHastagsVariables,
           }),
-        ).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              Post: [
-                {
-                  tags: expect.arrayContaining(expected),
-                },
-              ],
-            },
-          }),
-        )
+        ).resolves.toMatchObject({
+          data: {
+            Post: [
+              {
+                tags: expect.arrayContaining([
+                  expect.objectContaining({
+                    id: 'Democracy',
+                  }),
+                  expect.objectContaining({
+                    id: 'Liberty',
+                  }),
+                ]),
+              },
+            ],
+          },
+        })
       })
 
       describe('updates the Post by removing, keeping and adding one hashtag respectively', () => {
         // The already existing hashtag has no class at this point.
-        const postContent = `
+        const content = `
           <p>
             Hey Dude,
             <a
@@ -176,39 +148,36 @@ describe('hashtags', () => {
 
         it('only one previous Hashtag and the new Hashtag exists', async () => {
           await mutate({
-            mutation: updatePostMutation,
+            mutation: UpdatePost,
             variables: {
               id,
               title,
-              postContent,
+              content,
               categoryIds,
             },
           })
 
-          const expected = [
-            {
-              id: 'Elections',
-            },
-            {
-              id: 'Liberty',
-            },
-          ]
           await expect(
             query({
-              query: postWithHastagsQuery,
+              query: Post,
               variables: postWithHastagsVariables,
             }),
-          ).resolves.toEqual(
-            expect.objectContaining({
-              data: {
-                Post: [
-                  {
-                    tags: expect.arrayContaining(expected),
-                  },
-                ],
-              },
-            }),
-          )
+          ).resolves.toMatchObject({
+            data: {
+              Post: [
+                {
+                  tags: expect.arrayContaining([
+                    expect.objectContaining({
+                      id: 'Elections',
+                    }),
+                    expect.objectContaining({
+                      id: 'Liberty',
+                    }),
+                  ]),
+                },
+              ],
+            },
+          })
         })
       })
     })

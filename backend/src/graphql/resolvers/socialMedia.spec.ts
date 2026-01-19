@@ -4,10 +4,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { createTestClient } from 'apollo-server-testing'
-import gql from 'graphql-tag'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
+import { CreateSocialMedia } from '@graphql/queries/CreateSocialMedia'
+import { DeleteSocialMedia } from '@graphql/queries/DeleteSocialMedia'
+import { UpdateSocialMedia } from '@graphql/queries/UpdateSocialMedia'
 import createServer from '@src/server'
 
 const driver = getDriver()
@@ -82,24 +84,16 @@ describe('SocialMedia', () => {
   })
 
   describe('create social media', () => {
-    let mutation, variables
+    let variables
 
     beforeEach(() => {
-      mutation = gql`
-        mutation ($url: String!) {
-          CreateSocialMedia(url: $url) {
-            id
-            url
-          }
-        }
-      `
       variables = { url }
     })
 
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const user = null
-        const result = await socialMediaAction(user, mutation, variables)
+        const result = await socialMediaAction(user, CreateSocialMedia, variables)
 
         expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
@@ -113,21 +107,19 @@ describe('SocialMedia', () => {
       })
 
       it('creates social media with the given url', async () => {
-        await expect(socialMediaAction(user, mutation, variables)).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              CreateSocialMedia: {
-                id: expect.any(String),
-                url,
-              },
+        await expect(socialMediaAction(user, CreateSocialMedia, variables)).resolves.toMatchObject({
+          data: {
+            CreateSocialMedia: {
+              id: expect.any(String),
+              url,
             },
-          }),
-        )
+          },
+        })
       })
 
       it('rejects an empty string as url', async () => {
         variables = { url: '' }
-        const result = await socialMediaAction(user, mutation, variables)
+        const result = await socialMediaAction(user, CreateSocialMedia, variables)
 
         expect(result.errors[0].message).toEqual(
           expect.stringContaining('"url" is not allowed to be empty'),
@@ -136,7 +128,7 @@ describe('SocialMedia', () => {
 
       it('rejects invalid urls', async () => {
         variables = { url: 'not-a-url' }
-        const result = await socialMediaAction(user, mutation, variables)
+        const result = await socialMediaAction(user, CreateSocialMedia, variables)
 
         expect(result.errors[0].message).toEqual(
           expect.stringContaining('"url" must be a valid uri'),
@@ -145,53 +137,29 @@ describe('SocialMedia', () => {
     })
 
     describe('ownedBy', () => {
-      beforeEach(() => {
-        mutation = gql`
-          mutation ($url: String!) {
-            CreateSocialMedia(url: $url) {
-              url
-              ownedBy {
-                name
-              }
-            }
-          }
-        `
-      })
-
       it('resolves', async () => {
         const user = someUser
-        await expect(socialMediaAction(user, mutation, variables)).resolves.toEqual(
-          expect.objectContaining({
-            data: {
-              CreateSocialMedia: { url, ownedBy: { name: 'Kalle Blomqvist' } },
-            },
-          }),
-        )
+        await expect(socialMediaAction(user, CreateSocialMedia, variables)).resolves.toMatchObject({
+          data: {
+            CreateSocialMedia: { url, ownedBy: { name: 'Kalle Blomqvist' } },
+          },
+        })
       })
     })
   })
 
   describe('update social media', () => {
-    let mutation, variables
+    let variables
 
     beforeEach(async () => {
       const socialMedia = await setUpSocialMedia()
-
-      mutation = gql`
-        mutation ($id: ID!, $url: String!) {
-          UpdateSocialMedia(id: $id, url: $url) {
-            id
-            url
-          }
-        }
-      `
       variables = { url: newUrl, id: socialMedia.id }
     })
 
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const user = null
-        const result = await socialMediaAction(user, mutation, variables)
+        const result = await socialMediaAction(user, UpdateSocialMedia, variables)
 
         expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
@@ -200,7 +168,7 @@ describe('SocialMedia', () => {
     describe('authenticated as other user', () => {
       it('throws authorization error', async () => {
         const user = someUser
-        const result = await socialMediaAction(user, mutation, variables)
+        const result = await socialMediaAction(user, UpdateSocialMedia, variables)
 
         expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
@@ -220,14 +188,14 @@ describe('SocialMedia', () => {
           },
         }
 
-        await expect(socialMediaAction(user, mutation, variables)).resolves.toEqual(
+        await expect(socialMediaAction(user, UpdateSocialMedia, variables)).resolves.toEqual(
           expect.objectContaining(expected),
         )
       })
 
       it('does not update if the the given id does not exist', async () => {
         variables.id = 'some-id'
-        const result = await socialMediaAction(user, mutation, variables)
+        const result = await socialMediaAction(user, UpdateSocialMedia, variables)
 
         expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
@@ -235,26 +203,17 @@ describe('SocialMedia', () => {
   })
 
   describe('delete social media', () => {
-    let mutation, variables
+    let variables
 
     beforeEach(async () => {
       const socialMedia = await setUpSocialMedia()
-
-      mutation = gql`
-        mutation ($id: ID!) {
-          DeleteSocialMedia(id: $id) {
-            id
-            url
-          }
-        }
-      `
       variables = { url: newUrl, id: socialMedia.id }
     })
 
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         const user = null
-        const result = await socialMediaAction(user, mutation, variables)
+        const result = await socialMediaAction(user, DeleteSocialMedia, variables)
 
         expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
@@ -263,7 +222,7 @@ describe('SocialMedia', () => {
     describe('authenticated as other user', () => {
       it('throws authorization error', async () => {
         const user = someUser
-        const result = await socialMediaAction(user, mutation, variables)
+        const result = await socialMediaAction(user, DeleteSocialMedia, variables)
 
         expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
       })
@@ -286,7 +245,7 @@ describe('SocialMedia', () => {
           },
         }
 
-        await expect(socialMediaAction(user, mutation, variables)).resolves.toEqual(
+        await expect(socialMediaAction(user, DeleteSocialMedia, variables)).resolves.toEqual(
           expect.objectContaining(expected),
         )
       })

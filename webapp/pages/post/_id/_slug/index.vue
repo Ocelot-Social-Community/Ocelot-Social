@@ -3,8 +3,13 @@
     <div>
       <ds-space margin="small">
         <ds-heading tag="h1">{{ heading }}</ds-heading>
-        <ds-heading v-if="post && post.group" tag="h2">
-          {{ $t('post.viewPost.forGroup.title', { name: post.group.name }) }}
+        <ds-heading v-if="post && post.group && post.group.id && post.group.slug" tag="h2">
+          {{ $t('post.viewPost.forGroup.title') }}
+          <nuxt-link
+            :to="{ name: 'groups-id-slug', params: { slug: post.group.slug, id: post.group.id } }"
+          >
+            {{ post.group.name }}
+          </nuxt-link>
         </ds-heading>
       </ds-space>
       <ds-space margin="large" />
@@ -21,9 +26,13 @@
             :style="heroImageStyle"
           >
             <template #heroImage v-if="post.image">
-              <img :src="post.image | proxyApiUrl" class="image" />
+              <responsive-image
+                :image="post.image"
+                sizes="(max-width: 1024px) 640px, 1024px"
+                class="image"
+              />
               <aside v-show="post.image && post.image.sensitive" class="blur-toggle">
-                <img v-show="blurred" :src="post.image | proxyApiUrl" class="preview" />
+                <img v-show="blurred" :src="post.image.url.w320" class="preview" />
                 <base-button
                   :icon="blurred ? 'eye' : 'eye-slash'"
                   filled
@@ -116,27 +125,40 @@
                 @toggleObservePost="toggleObservePost"
               />
             </div>
-            <!-- Comments -->
+            <!-- comments -->
             <ds-section>
+              <!-- comment list -->
               <comment-list
                 :post="post"
                 @toggleNewCommentForm="toggleNewCommentForm"
                 @reply="reply"
               />
               <ds-space margin-bottom="large" />
+              <!-- commenting form -->
               <comment-form
-                v-if="showNewCommentForm && !isBlocked && canCommentPost"
+                v-if="
+                  showNewCommentForm &&
+                  !isBlocked &&
+                  (!this.post.group || commentingAllowedByGroupRole)
+                "
                 ref="commentForm"
                 :post="post"
                 @createComment="createComment"
               />
-              <ds-placeholder v-if="isBlocked">
-                {{ $t('settings.blocked-users.explanation.commenting-disabled') }}
-                <br />
-                {{ $t('settings.blocked-users.explanation.commenting-explanation') }}
-                <page-params-link :pageParams="links.FAQ">
-                  {{ $t('site.faq') }}
-                </page-params-link>
+              <!-- commenting disabled -->
+              <ds-placeholder v-else>
+                <hc-empty
+                  margin="xxx-small"
+                  icon="messages"
+                  :message="$t('settings.blocked-users.explanation.commenting-disabled')"
+                >
+                  <cta-unblock-author v-if="isBlocked" :author="post.author" />
+                  <cta-join-leave-group
+                    v-else-if="!commentingAllowedByGroupRole"
+                    :group="group"
+                    @update="updateJoinLeave"
+                  />
+                </hc-empty>
               </ds-placeholder>
             </ds-section>
           </base-card>
@@ -151,17 +173,20 @@
 
 <script>
 import ContentViewer from '~/components/Editor/ContentViewer'
-import HcCategory from '~/components/Category'
-import HcHashtag from '~/components/Hashtag/Hashtag'
 import CommentForm from '~/components/CommentForm/CommentForm'
 import CommentList from '~/components/CommentList/CommentList'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
+import CtaUnblockAuthor from '~/components/Empty/CallToAction/CtaUnblockAuthor.vue'
+import CtaJoinLeaveGroup from '~/components/Empty/CallToAction/CtaJoinLeaveGroup.vue'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
-import ShoutButton from '~/components/ShoutButton.vue'
-import ObserveButton from '~/components/ObserveButton.vue'
+import HcCategory from '~/components/Category'
+import HcEmpty from '~/components/Empty/Empty'
+import HcHashtag from '~/components/Hashtag/Hashtag'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
-import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
+import ObserveButton from '~/components/ObserveButton.vue'
+import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
+import ShoutButton from '~/components/ShoutButton.vue'
+import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import {
   postMenuModalsData,
   deletePostMutation,
@@ -182,17 +207,20 @@ export default {
     mode: 'out-in',
   },
   components: {
-    ContentMenu,
     CommentForm,
     CommentList,
+    ContentMenu,
     ContentViewer,
+    CtaUnblockAuthor,
+    CtaJoinLeaveGroup,
     DateTimeRange,
     HcCategory,
+    HcEmpty,
     HcHashtag,
-    ShoutButton,
-    ObserveButton,
     LocationTeaser,
-    PageParamsLink,
+    ObserveButton,
+    ResponsiveImage,
+    ShoutButton,
     UserTeaser,
   },
   mixins: [GetCategories, postListActions, SortCategories],
@@ -287,10 +315,8 @@ export default {
         '--hero-image-aspect-ratio': 1.0 / this.post.image.aspectRatio,
       }
     },
-    canCommentPost() {
-      return (
-        !this.post.group || (this.group && ['usual', 'admin', 'owner'].includes(this.group.myRole))
-      )
+    commentingAllowedByGroupRole() {
+      return this.group && ['usual', 'admin', 'owner'].includes(this.group.myRole)
     },
   },
   methods: {
@@ -332,6 +358,10 @@ export default {
     toggleNewCommentForm(showNewCommentForm) {
       this.showNewCommentForm = showNewCommentForm
     },
+    updateJoinLeave() {
+      this.$apollo.queries.Group.refetch()
+      this.$toast.success(this.$t('post.comment.joinGroup', { name: this.post.group.name }))
+    },
   },
   apollo: {
     Post: {
@@ -367,6 +397,7 @@ export default {
       skip() {
         return !(this.post && this.post.group)
       },
+      fetchPolicy: 'cache-and-network',
     },
   },
 }
@@ -444,5 +475,9 @@ export default {
   gap: $space-small;
   margin-top: $space-small;
   margin-bottom: calc($space-base * 2);
+}
+
+.ds-heading {
+  margin-top: 0;
 }
 </style>

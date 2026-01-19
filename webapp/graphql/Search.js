@@ -1,15 +1,14 @@
 import gql from 'graphql-tag'
-import {
-  userFragment,
-  postFragment,
-  groupFragment,
-  tagsCategoriesAndPinnedFragment,
-} from './Fragments'
+import { user } from './fragments/user'
+import { post } from './fragments/post'
+import { group } from './fragments/group'
+import { tagsCategoriesAndPinned } from './fragments/tagsCategoriesAndPinned'
+import { imageUrls } from './fragments/imageUrls'
 
 export const searchQuery = gql`
-  ${userFragment}
-  ${postFragment}
-  ${groupFragment}
+  ${user}
+  ${post}
+  ${group}
 
   query ($query: String!) {
     searchResults(query: $query, limit: 5) {
@@ -38,9 +37,9 @@ export const searchQuery = gql`
 `
 
 export const searchPosts = gql`
-  ${userFragment}
-  ${postFragment}
-  ${tagsCategoriesAndPinnedFragment}
+  ${user}
+  ${post}
+  ${tagsCategoriesAndPinned}
 
   query ($query: String!, $firstPosts: Int, $postsOffset: Int) {
     searchPosts(query: $query, firstPosts: $firstPosts, postsOffset: $postsOffset) {
@@ -74,6 +73,8 @@ export const searchPosts = gql`
 export const searchGroups = (i18n) => {
   const lang = i18n ? i18n.locale().toUpperCase() : 'EN'
   return gql`
+    ${imageUrls}
+
     query ($query: String!, $firstGroups: Int, $groupsOffset: Int) {
       searchGroups(query: $query, firstGroups: $firstGroups, groupsOffset: $groupsOffset) {
         groupCount
@@ -98,7 +99,7 @@ export const searchGroups = (i18n) => {
             icon
          }
           avatar {
-            url
+            ...imageUrls
           }
           locationName
           location {
@@ -112,7 +113,7 @@ export const searchGroups = (i18n) => {
 }
 
 export const searchUsers = gql`
-  ${userFragment}
+  ${user}
 
   query ($query: String!, $firstUsers: Int, $usersOffset: Int) {
     searchUsers(query: $query, firstUsers: $firstUsers, usersOffset: $usersOffset) {

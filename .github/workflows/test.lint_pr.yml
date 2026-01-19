@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
-      - uses: amannn/action-semantic-pull-request@335288255954904a41ddda8947c8f2c844b8bfeb # v5.5.3
+      - uses: amannn/action-semantic-pull-request@069817c298f23fab00a8f29a2e556a5eac0f6390 # v5.5.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -30,9 +30,9 @@ jobs:
           scopes: |
             backend
             webapp
-            frontend
             maintenance
             database
+            e2e
             docu
             docker
             release

@@ -4,7 +4,12 @@
       v-if="$env.BADGES_ENABLED && user.badgeVerification"
       :badges="[user.badgeVerification, ...user.badgeTrophiesSelected]"
     />
-    <location-info v-if="user.location" :location-data="user.location" class="location-info" />
+    <location-info
+      v-if="user.location"
+      :location-data="user.location"
+      :is-owner="userId === $store.getters['auth/user'].id"
+      class="location-info"
+    />
     <ul class="statistics">
       <li>
         <ds-number :count="user.followedByCount" :label="$t('profile.followers')" />
@@ -30,7 +35,7 @@
 
 <script>
 import Badges from '~/components/Badges.vue'
-import LocationInfo from '~/components/UserTeaser/LocationInfo.vue'
+import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
 import { isTouchDevice } from '~/components/utils/isTouchDevice'
 import { userTeaserQuery } from '~/graphql/User.js'
 

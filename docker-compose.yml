@@ -7,7 +7,8 @@ services:
   webapp:
     image: ghcr.io/ocelot-social-community/ocelot-social/webapp:${OCELOT_VERSION:-latest}
     build:
-      context: ./webapp
+      context: .
+      dockerfile: ./webapp/Dockerfile
       target: production
     depends_on:
       - backend
@@ -25,24 +26,6 @@ services:
       - GRAPHQL_URI=http://backend:4000
     env_file:
       - ./webapp/.env
-
-  frontend:
-    image: ghcr.io/ocelot-social-community/ocelot-social/frontend:${OCELOT_VERSION:-latest}
-    build:
-      context: ./frontend
-      target: production
-    depends_on:
-      - backend
-    ports:
-      - 3002:3002
-    environment:
-      # Envs used in Dockerfile
-      # - DOCKER_WORKDIR="/app"
-      # - PORT="3002"
-      - NODE_ENV="production"
-      # Application only envs
-      #- HOST=0.0.0.0 # This is nuxt specific, alternative value is HOST=webapp
-      #- GRAPHQL_URI=http://backend:4000
 
   backend:
     image: ghcr.io/ocelot-social-community/ocelot-social/backend:${OCELOT_VERSION:-latest}
@@ -68,8 +51,8 @@ services:
   maintenance:
     image: ghcr.io/ocelot-social-community/ocelot-social/maintenance:${OCELOT_VERSION:-latest}
     build:
-      context: ./webapp
-      dockerfile: Dockerfile.maintenance
+      context: .
+      dockerfile: ./webapp/Dockerfile.maintenance
     ports:
       - 3001:80
 

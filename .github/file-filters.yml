@@ -12,6 +12,7 @@ docker: &docker
 webapp: &webapp
   - '.github/workflows/test-webapp.yml'
   - 'webapp/**/*'
+  - 'styleguide/**/*'
   - 'package.json'
 
 docs-check: &docs-check
@@ -31,23 +32,3 @@ vuepress: &vuepress
 documentation: &documentation
   - *vuepress
   - *markdown
-
-# frontend
-frontend-test-lint-code: &frontend-test-lint-code
-  - 'frontend/**/*'
-
-frontend-test-unit-code: &frontend-test-unit-code
-  - 'frontend/**/*'
-
-frontend-test-build-code: &frontend-test-build-code
-  - 'frontend/**/*'
-
-frontend-test-build-docker: &frontend-test-build-docker
-  - 'frontend/**/*'
-
-frontend-test-build-docs: &frontend-test-build-docs
-  - 'frontend/**/*.md'
-  - 'frontend/.vuepress/*'
-
-frontend-test-build-storybook: &frontend-test-build-storybook
-  - 'frontend/**/*'

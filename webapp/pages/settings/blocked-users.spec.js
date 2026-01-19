@@ -1,6 +1,6 @@
 import { mount, createLocalVue } from '@vue/test-utils'
 import BlockedUsers from './blocked-users.vue'
-import Styleguide from '@human-connection/styleguide'
+import Styleguide from '@@/'
 import Filters from '~/plugins/vue-filters'
 import { unblockUser } from '~/graphql/settings/BlockedUsers'
 

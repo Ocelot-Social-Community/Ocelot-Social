@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import gql from 'graphql-tag'
-
 import Factory, { cleanDatabase } from '@db/factories'
+import { CreatePost } from '@graphql/queries/CreatePost'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -30,14 +29,6 @@ afterAll(async () => {
   database.neode.close()
 })
 
-const createPostMutation = gql`
-  mutation ($title: String!, $content: String!, $categoryIds: [ID]) {
-    CreatePost(title: $title, content: $content, categoryIds: $categoryIds) {
-      language
-    }
-  }
-`
-
 describe('languagesMiddleware', () => {
   variables = {
     title: 'Test post languages',
@@ -61,7 +52,7 @@ describe('languagesMiddleware', () => {
     }
     await expect(
       mutate({
-        mutation: createPostMutation,
+        mutation: CreatePost,
         variables,
       }),
     ).resolves.toMatchObject({
@@ -80,7 +71,7 @@ describe('languagesMiddleware', () => {
     }
     await expect(
       mutate({
-        mutation: createPostMutation,
+        mutation: CreatePost,
         variables,
       }),
     ).resolves.toMatchObject({
@@ -99,7 +90,7 @@ describe('languagesMiddleware', () => {
     }
     await expect(
       mutate({
-        mutation: createPostMutation,
+        mutation: CreatePost,
         variables,
       }),
     ).resolves.toMatchObject({
@@ -119,7 +110,7 @@ describe('languagesMiddleware', () => {
     }
     await expect(
       mutate({
-        mutation: createPostMutation,
+        mutation: CreatePost,
         variables,
       }),
     ).resolves.toMatchObject({
@@ -139,7 +130,7 @@ describe('languagesMiddleware', () => {
       }
       await expect(
         mutate({
-          mutation: createPostMutation,
+          mutation: CreatePost,
           variables,
         }),
       ).resolves.toMatchObject({

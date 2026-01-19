@@ -6,14 +6,19 @@ import Factory, { cleanDatabase } from '@db/factories'
 import { statistics } from '@graphql/queries/statistics'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
+let currentUser
+
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser })
+let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
-let query: ApolloTestSetup['query']
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup()
+  const apolloSetup = createApolloTestSetup({ context })
   query = apolloSetup.query
   database = apolloSetup.database
   server = apolloSetup.server
@@ -31,99 +36,158 @@ afterEach(async () => {
 })
 
 describe('statistics', () => {
-  describe('countUsers', () => {
-    beforeEach(async () => {
-      await Promise.all(
-        [...Array(6).keys()].map(() => {
-          return Factory.build('user')
-        }),
-      )
+  describe('unauthenticated', () => {
+    beforeEach(() => {
+      authenticatedUser = null
     })
 
-    it('returns the count of all users', async () => {
+    it('throws authorization error', async () => {
       await expect(query({ query: statistics })).resolves.toMatchObject({
-        data: { statistics: { users: 6 } },
-        errors: undefined,
+        data: null,
+        errors: [{ message: 'Not Authorized!' }],
       })
     })
   })
 
-  describe('countPosts', () => {
+  describe('authenticated as user ', () => {
     beforeEach(async () => {
-      await Promise.all(
-        [...Array(3).keys()].map(() => {
-          return Factory.build('post')
-        }),
-      )
+      currentUser = await database.neode.create('User', {
+        name: 'Current User',
+        id: 'u1',
+      })
+      authenticatedUser = await currentUser.toJson()
     })
 
-    it('returns the count of all posts', async () => {
+    it('throws authorization error', async () => {
       await expect(query({ query: statistics })).resolves.toMatchObject({
-        data: { statistics: { posts: 3 } },
-        errors: undefined,
+        data: null,
+        errors: [{ message: 'Not Authorized!' }],
       })
     })
   })
 
-  describe('countComments', () => {
+  describe('authenticated as moderator ', () => {
     beforeEach(async () => {
-      await Promise.all(
-        [...Array(2).keys()].map(() => {
-          return Factory.build('comment')
-        }),
-      )
+      currentUser = await database.neode.create('User', {
+        name: 'Current User',
+        id: 'u1',
+        role: 'moderator',
+      })
+      authenticatedUser = await currentUser.toJson()
     })
 
-    it('returns the count of all comments', async () => {
+    it('throws authorization error', async () => {
       await expect(query({ query: statistics })).resolves.toMatchObject({
-        data: { statistics: { comments: 2 } },
-        errors: undefined,
+        data: null,
+        errors: [{ message: 'Not Authorized!' }],
       })
     })
   })
 
-  describe('countFollows', () => {
-    let users
+  describe('authenticated as admin ', () => {
     beforeEach(async () => {
-      users = await Promise.all(
-        [...Array(2).keys()].map(() => {
-          return Factory.build('user')
-        }),
-      )
-      await users[0].relateTo(users[1], 'following')
+      currentUser = await database.neode.create('User', {
+        name: 'Current User',
+        id: 'u1',
+        role: 'admin',
+      })
+      authenticatedUser = await currentUser.toJson()
     })
 
-    it('returns the count of all follows', async () => {
-      await expect(query({ query: statistics })).resolves.toMatchObject({
-        data: { statistics: { follows: 1 } },
-        errors: undefined,
+    describe('countUsers', () => {
+      beforeEach(async () => {
+        await Promise.all(
+          [...Array(6).keys()].map(() => {
+            return Factory.build('user')
+          }),
+        )
+      })
+
+      it('returns the count of all users', async () => {
+        await expect(query({ query: statistics })).resolves.toMatchObject({
+          data: { statistics: { users: 6 } },
+          errors: undefined,
+        })
       })
     })
-  })
 
-  describe('countShouts', () => {
-    let users, posts
-    beforeEach(async () => {
-      users = await Promise.all(
-        [...Array(2).keys()].map(() => {
-          return Factory.build('user')
-        }),
-      )
-      posts = await Promise.all(
-        [...Array(3).keys()].map(() => {
-          return Factory.build('post')
-        }),
-      )
-      await Promise.all([
-        users[0].relateTo(posts[1], 'shouted'),
-        users[1].relateTo(posts[0], 'shouted'),
-      ])
+    describe('countPosts', () => {
+      beforeEach(async () => {
+        await Promise.all(
+          [...Array(3).keys()].map(() => {
+            return Factory.build('post')
+          }),
+        )
+      })
+
+      it('returns the count of all posts', async () => {
+        await expect(query({ query: statistics })).resolves.toMatchObject({
+          data: { statistics: { posts: 3 } },
+          errors: undefined,
+        })
+      })
     })
 
-    it('returns the count of all shouts', async () => {
-      await expect(query({ query: statistics })).resolves.toMatchObject({
-        data: { statistics: { shouts: 2 } },
-        errors: undefined,
+    describe('countComments', () => {
+      beforeEach(async () => {
+        await Promise.all(
+          [...Array(2).keys()].map(() => {
+            return Factory.build('comment')
+          }),
+        )
+      })
+
+      it('returns the count of all comments', async () => {
+        await expect(query({ query: statistics })).resolves.toMatchObject({
+          data: { statistics: { comments: 2 } },
+          errors: undefined,
+        })
+      })
+    })
+
+    describe('countFollows', () => {
+      let users
+      beforeEach(async () => {
+        users = await Promise.all(
+          [...Array(2).keys()].map(() => {
+            return Factory.build('user')
+          }),
+        )
+        await users[0].relateTo(users[1], 'following')
+      })
+
+      it('returns the count of all follows', async () => {
+        await expect(query({ query: statistics })).resolves.toMatchObject({
+          data: { statistics: { follows: 1 } },
+          errors: undefined,
+        })
+      })
+    })
+
+    describe('countShouts', () => {
+      let users, posts
+      beforeEach(async () => {
+        users = await Promise.all(
+          [...Array(2).keys()].map(() => {
+            return Factory.build('user')
+          }),
+        )
+        posts = await Promise.all(
+          [...Array(3).keys()].map(() => {
+            return Factory.build('post')
+          }),
+        )
+        await Promise.all([
+          users[0].relateTo(posts[1], 'shouted'),
+          users[1].relateTo(posts[0], 'shouted'),
+        ])
+      })
+
+      it('returns the count of all shouts', async () => {
+        await expect(query({ query: statistics })).resolves.toMatchObject({
+          data: { statistics: { shouts: 2 } },
+          errors: undefined,
+        })
       })
     })
   })

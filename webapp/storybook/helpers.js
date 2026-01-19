@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import vuexI18n from 'vuex-i18n/dist/vuex-i18n.umd.js'
-import Styleguide from '@human-connection/styleguide'
+import Styleguide from '@@/'
 import { faker } from '@faker-js/faker'
 import Filters from '~/plugins/vue-filters'
 import Directives from '~/plugins/vue-directives'

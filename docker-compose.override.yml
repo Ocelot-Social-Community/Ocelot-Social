@@ -11,23 +11,14 @@ services:
     volumes:
       - ./webapp:/app
 
-  frontend:
-    image: ghcr.io/ocelot-social-community/ocelot-social/frontend:local-development
-    build:
-      target: development
-    environment:
-      - NODE_ENV=development
-    ports:
-      # port required for npm run dev
-      - 24678:24678
-    volumes:
-      - ./frontend:/app
-
   backend:
     image: ghcr.io/ocelot-social-community/ocelot-social/backend:local-development
+    ports:
+      - 9000:9000
     depends_on:
       - minio
       - minio-mc
+      - imagor
     build:
       target: development
     environment:
@@ -36,10 +27,12 @@ services:
       - SMTP_HOST=mailserver
       - AWS_ACCESS_KEY_ID=minio
       - AWS_SECRET_ACCESS_KEY=12341234
-      - AWS_ENDPOINT=http:/minio:9000
+      - AWS_ENDPOINT=http:/localhost:9000
       - AWS_REGION=local
       - AWS_BUCKET=ocelot
-      - S3_PUBLIC_GATEWAY=http:/localhost:9000
+      - IMAGOR_PUBLIC_URL=http://localhost:8000
+      - IMAGOR_SECRET=mysecret
+      - PROXY_S3=http://minio:9000
     volumes:
       - ./backend:/app
 
@@ -58,7 +51,6 @@ services:
   minio:
     image: quay.io/minio/minio
     ports:
-      - 9000:9000
       - 9001:9001
     volumes:
       - minio_data:/data
@@ -81,6 +73,23 @@ services:
       /usr/bin/mc mb --ignore-existing dockerminio/ocelot;
       /usr/bin/mc anonymous set-json /tmp/readonly-policy.json dockerminio/ocelot;
       "
+
+  imagor:
+    image: shumc/imagor:latest
+    ports:
+      - 8000:8000
+    environment:
+      PORT: 8000
+      IMAGOR_SECRET: mysecret # secret key for URL signature
+      # IMAGOR_UNSAFE: 1 # unsafe URL for testing
+      AWS_ACCESS_KEY_ID: minio
+      AWS_SECRET_ACCESS_KEY: 12341234
+      AWS_ENDPOINT: http:/minio:9000
+      S3_FORCE_PATH_STYLE: 1
+      S3_LOADER_BUCKET: ocelot # enable S3 loader by specifying bucket
+      S3_STORAGE_BUCKET: ocelot # enable S3 storage by specifying bucket
+      S3_RESULT_STORAGE_BUCKET: ocelot # enable S3 result storage by specifying bucket
+      HTTP_LOADER_BASE_URL: http://minio:9000
 
 volumes:
   minio_data:

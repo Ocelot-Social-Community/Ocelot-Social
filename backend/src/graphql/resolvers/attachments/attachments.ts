@@ -1,11 +1,11 @@
 import path from 'node:path'
 
 import { UserInputError } from 'apollo-server-express'
-import slug from 'slug'
+import slug from 'slugify'
 import { v4 as uuid } from 'uuid'
 
 import type { S3Config } from '@config/index'
-import { wrapTransaction } from '@graphql/resolvers/images/wrapTransaction'
+import { getDriver } from '@db/neo4j'
 import { s3Service } from '@src/uploads/s3Service'
 
 import type { FileUpload } from 'graphql-upload'
@@ -41,8 +41,7 @@ export interface Attachments {
     resource: { id: string },
     relationshipType: 'ATTACHMENT',
     opts?: DeleteAttachmentsOpts,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ) => Promise<any>
+  ) => Promise<File>
 
   add: (
     resource: { id: string },
@@ -50,8 +49,44 @@ export interface Attachments {
     file: FileInput,
     fileAttributes?: object,
     opts?: AddAttachmentOpts,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ) => Promise<any>
+  ) => Promise<File>
+}
+
+const wrapTransactionDeleteAttachment = async (
+  wrappedCallback: Attachments['del'],
+  args: [resource: { id: string }, relationshipType: 'ATTACHMENT'],
+  opts: DeleteAttachmentsOpts,
+): ReturnType<Attachments['del']> => {
+  const session = getDriver().session()
+  try {
+    const result = await session.writeTransaction((transaction) => {
+      return wrappedCallback(...args, { ...opts, transaction })
+    })
+    return result
+  } finally {
+    await session.close()
+  }
+}
+
+const wrapTransactionMergeAttachment = async (
+  wrappedCallback: Attachments['add'],
+  args: [
+    resource: { id: string },
+    relationshipType: 'ATTACHMENT',
+    file: FileInput,
+    fileAttributes?: object,
+  ],
+  opts: AddAttachmentOpts,
+): ReturnType<Attachments['add']> => {
+  const session = getDriver().session()
+  try {
+    const result = await session.writeTransaction((transaction) => {
+      return wrappedCallback(...args, { ...opts, transaction })
+    })
+    return result
+  } finally {
+    await session.close()
+  }
 }
 
 export const attachments = (config: S3Config) => {
@@ -59,7 +94,8 @@ export const attachments = (config: S3Config) => {
 
   const del: Attachments['del'] = async (resource, relationshipType, opts = {}) => {
     const { transaction } = opts
-    if (!transaction) return wrapTransaction(del, [resource, relationshipType], opts)
+    if (!transaction)
+      return wrapTransactionDeleteAttachment(del, [resource, relationshipType], opts)
     const txResult = await transaction.run(
       `
       MATCH (resource {id: $resource.id})-[rel:${relationshipType}]->(file:File)
@@ -85,7 +121,11 @@ export const attachments = (config: S3Config) => {
   ) => {
     const { transaction } = opts
     if (!transaction)
-      return wrapTransaction(add, [resource, relationshipType, fileInput, fileAttributes], opts)
+      return wrapTransactionMergeAttachment(
+        add,
+        [resource, relationshipType, fileInput, fileAttributes],
+        opts,
+      )
 
     const { upload } = fileInput
     if (!upload) throw new UserInputError('Cannot find attachment for given resource')
@@ -121,9 +161,9 @@ export const attachments = (config: S3Config) => {
     return uploadedFile
   }
 
-  const attachments: Attachments = {
+  const attachments = {
     del,
     add,
-  }
+  } satisfies Attachments
   return attachments
 }

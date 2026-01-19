@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-imagor
+spec:
+  ports:
+    - name: {{ .Release.Name }}-http
+      port: 8000
+      targetPort: 8000
+  selector:
+    app: {{ .Release.Name }}-imagor

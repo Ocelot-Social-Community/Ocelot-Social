@@ -1,0 +1,7 @@
+> 1%
+last 2 versions
+not ie <= 8
+chrome >= 59
+firefox >= 55
+safari >= 10
+ios_saf >= 9

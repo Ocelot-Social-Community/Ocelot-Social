@@ -7,7 +7,7 @@ import Factory, { cleanDatabase } from '@db/factories'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
-import { loginMutation } from '@src/graphql/queries/loginMutation'
+import { login } from '@src/graphql/queries/login'
 import ocelotLogger from '@src/logger'
 import { loggerPlugin } from '@src/plugins/apolloLogger'
 
@@ -59,15 +59,15 @@ describe('apollo logger', () => {
   describe('login mutation', () => {
     it('logs the request and response, masking password and token', async () => {
       await mutate({
-        mutation: loginMutation,
+        mutation: login,
         variables: {
           email: 'test@example.org',
           password: '1234',
         },
       })
 
-      expect(loggerSpy).toBeCalledTimes(2)
-      expect(loggerSpy).toBeCalledWith(
+      expect(loggerSpy).toHaveBeenCalledTimes(2)
+      expect(loggerSpy).toHaveBeenCalledWith(
         'Apollo Request',
         expect.any(String),
         '"mutation ($email: String!, $password: String!) {\\n  login(email: $email, password: $password)\\n}\\n"',
@@ -77,9 +77,13 @@ describe('apollo logger', () => {
         }),
       )
 
-      expect(loggerSpy).toBeCalledWith('Apollo Response', expect.any(String), '{"login":"token"}')
+      expect(loggerSpy).toHaveBeenCalledWith(
+        'Apollo Response',
+        expect.any(String),
+        '{"login":"token"}',
+      )
 
-      expect(consoleSpy).toBeCalledTimes(2)
+      expect(consoleSpy).toHaveBeenCalledTimes(2)
     })
   })
 })

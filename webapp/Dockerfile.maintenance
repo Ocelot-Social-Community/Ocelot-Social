@@ -1,4 +1,4 @@
-FROM nginx:alpine AS base
+FROM nginx:1.29.4-alpine AS base
 LABEL org.label-schema.name="ocelot.social:maintenance"
 LABEL org.label-schema.description="Maintenance page of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
@@ -8,27 +8,26 @@ LABEL org.label-schema.vendor="ocelot.social Community"
 LABEL org.label-schema.schema-version="1.0"
 LABEL maintainer="devops@ocelot.social"
 
-FROM node:20.12.1-alpine AS build
-ENV NODE_ENV="production"
-RUN apk --no-cache add git python3 make g++ bash jq
+FROM node:25.3.0-alpine AS styleguide
+RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
-COPY assets assets
-COPY components/LocaleSwitch/ components/LocaleSwitch
-COPY components/Dropdown.vue components/Dropdown.vue
-COPY layouts/blank.vue layouts/blank.vue
-COPY locales locales
-COPY mixins mixins
-COPY plugins/i18n.js plugins/v-tooltip.js plugins/styleguide.js plugins/
-COPY static static
-COPY constants constants
-COPY nuxt.config.js nuxt.config.js
-COPY config/ config/
-COPY tools/ tools/
-COPY maintenance/nginx maintenance/nginx
-COPY maintenance/source maintenance/source
-COPY package.json yarn.lock ./
-ONBUILD COPY ./branding .
+COPY styleguide .
+RUN yarn install --production=false --frozen-lockfile --non-interactive
+RUN yarn run build:lib
+
+FROM node:25.3.0-alpine AS build
+ENV NODE_ENV="production"
+RUN apk --no-cache add git python3 make g++ bash jq
+COPY --from=styleguide ./app/ /styleguide/
+RUN mkdir -p /app
+WORKDIR /app
+COPY webapp/ .
+# Delete all Pages
+RUN rm -rf ./pages
+# branding is unified in /branding in branding repositories
+ONBUILD COPY webap[p]/brandin[g]/ .
+ONBUILD COPY brandin[g]/ .
 ONBUILD RUN tools/merge-locales.sh
 ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
 ONBUILD RUN cp -r maintenance/source/* ./

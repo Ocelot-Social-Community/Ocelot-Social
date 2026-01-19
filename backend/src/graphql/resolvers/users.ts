@@ -35,36 +35,17 @@ export const getMutedUsers = async (context) => {
   return mutedUsers
 }
 
-export const getBlockedUsers = async (context) => {
-  const { neode } = context
-  const userModel = neode.model('User')
-  let blockedUsers = neode
-    .query()
-    .match('user', userModel)
-    .where('user.id', context.user.id)
-    .relationship(userModel.relationships().get('blocked'))
-    .to('blocked', userModel)
-    .return('blocked')
-  blockedUsers = await blockedUsers.execute()
-  blockedUsers = blockedUsers.records.map((r) => r.get('blocked').properties)
-  return blockedUsers
-}
-
 export default {
   Query: {
-    mutedUsers: async (_object, _args, context, _resolveInfo) => {
-      try {
-        return getMutedUsers(context)
-      } catch (e) {
-        throw new UserInputError(e.message)
-      }
-    },
-    blockedUsers: async (_object, _args, context, _resolveInfo) => {
-      try {
-        return getBlockedUsers(context)
-      } catch (e) {
-        throw new UserInputError(e.message)
-      }
+    mutedUsers: async (_object, _args, context, _resolveInfo) => getMutedUsers(context),
+    blockedUsers: async (_object, _args, context: Context, _resolveInfo) => {
+      return (
+        await context.database.query({
+          query: `MATCH (user:User{ id: $user.id})-[:BLOCKED]->(blocked:User)
+                  RETURN blocked {.*}`,
+          variables: { user: context.user },
+        })
+      ).records.map((r) => r.get('blocked'))
     },
     User: async (object, args, context, resolveInfo) => {
       if (args.email) {
@@ -140,9 +121,11 @@ export default {
         return unBlockUserTransactionResponse.records.map((record) => record.get('blockedUser'))[0]
       })
       try {
-        return await writeTxResultPromise
-      } catch (error) {
-        throw new UserInputError(error.message)
+        const blockedUser = await writeTxResultPromise
+        if (!blockedUser) {
+          throw new UserInputError('Could not find User')
+        }
+        return blockedUser
       } finally {
         session.close()
       }
@@ -164,9 +147,13 @@ export default {
         return unBlockUserTransactionResponse.records.map((record) => record.get('blockedUser'))[0]
       })
       try {
-        return await writeTxResultPromise
-      } catch (error) {
-        throw new UserInputError(error.message)
+        const unblockedUser = await writeTxResultPromise
+        if (!unblockedUser) {
+          throw new Error('Could not find blocked User')
+        }
+        return unblockedUser
+      } catch {
+        throw new UserInputError('Could not find blocked User')
       } finally {
         await session.close()
       }
@@ -280,6 +267,9 @@ export default {
               WITH user
               OPTIONAL MATCH (user)<-[:OWNED_BY]-(socialMedia:SocialMedia)
               DETACH DELETE socialMedia
+              WITH user
+              OPTIONAL MATCH (user)-[follow:FOLLOWS]-(:User)
+              DELETE follow
               RETURN user {.*}
             `,
           { userId },
@@ -363,14 +353,11 @@ export default {
         session.close()
       }
     },
-    updateOnlineStatus: async (_object, args, context, _resolveInfo) => {
+    updateOnlineStatus: async (_object, args, context: Context, _resolveInfo) => {
       const { status } = args
-      const {
-        user: { id },
-      } = context
 
       const CYPHER_AWAY = `
-          MATCH (user:User {id: $id})
+          MATCH (user:User {id: $user.id})
           WITH user,
           CASE user.lastOnlineStatus
             WHEN 'away' THEN user.awaySince
@@ -380,16 +367,14 @@ export default {
           SET user.lastOnlineStatus = $status
         `
       const CYPHER_ONLINE = `
-          MATCH (user:User {id: $id})
+          MATCH (user:User {id: $user.id})
             SET user.awaySince = null
             SET user.lastOnlineStatus = $status
         `
 
-      // Last Online Time is saved as `lastActiveAt`
-      const session = context.driver.session()
-      await session.writeTransaction((transaction) => {
-        // return transaction.run(status === 'away' ? CYPHER_AWAY : CYPHER_ONLINE, { id, status })
-        return transaction.run(status === 'away' ? CYPHER_AWAY : CYPHER_ONLINE, { id, status })
+      await context.database.write({
+        query: status === 'away' ? CYPHER_AWAY : CYPHER_ONLINE,
+        variables: { user: context.user, status },
       })
 
       return true
@@ -648,6 +633,7 @@ export default {
         'allowEmbedIframes',
         'showShoutsPublicly',
         'locale',
+        'activeCategories',
       ],
       boolean: {
         followedByCurrentUser:
