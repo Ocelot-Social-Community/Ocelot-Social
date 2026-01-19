@@ -275,8 +275,8 @@ export default {
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const joinGroupCypher = `
-          MATCH (member:User {id: $userId}), (group:Group {id: $groupId})
-          MERGE (member)-[membership:MEMBER_OF]->(group)
+          MATCH (user:User {id: $userId}), (group:Group {id: $groupId})
+          MERGE (user)-[membership:MEMBER_OF]->(group)
           ON CREATE SET
             membership.createdAt = toString(datetime()),
             membership.updatedAt = null,
@@ -285,7 +285,7 @@ export default {
                 THEN 'usual'
                 ELSE 'pending'
                 END
-          RETURN member {.*} as user, membership {.*}
+          RETURN user {.*}, membership {.*}
         `
         const transactionResponse = await transaction.run(joinGroupCypher, { groupId, userId })
         return transactionResponse.records.map((record) => {
@@ -293,7 +293,7 @@ export default {
         })
       })
       try {
-        return await writeTxResultPromise
+        return (await writeTxResultPromise)[0]
       } catch (error) {
         throw new Error(error)
       } finally {
@@ -521,7 +521,7 @@ const removeUserFromGroupWriteTxResultPromise = async (session, groupId, userId)
       WITH user, collect(p) AS posts
       FOREACH (post IN posts |
         MERGE (user)-[:CANNOT_SEE]->(post))
-      RETURN user {.*}, membership: NULL
+      RETURN user {.*}, NULL as membership
     `
 
     const transactionResponse = await transaction.run(removeUserFromGroupCypher, {

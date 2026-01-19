@@ -1228,28 +1228,28 @@ describe('in mode', () => {
                   data: {
                     GroupMembers: expect.arrayContaining([
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'current-user',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'owner',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'owner-of-closed-group',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'usual',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'owner-of-hidden-group',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'usual',
-                        },
+                        }),
                       }),
                     ]),
                   },
@@ -1273,28 +1273,28 @@ describe('in mode', () => {
                   data: {
                     GroupMembers: expect.arrayContaining([
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'current-user',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'owner',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'owner-of-closed-group',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'usual',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'owner-of-hidden-group',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'usual',
-                        },
+                        }),
                       }),
                     ]),
                   },
@@ -1318,28 +1318,28 @@ describe('in mode', () => {
                   data: {
                     GroupMembers: expect.arrayContaining([
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'current-user',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'owner',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'owner-of-closed-group',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'usual',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'owner-of-hidden-group',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'usual',
-                        },
+                        }),
                       }),
                     ]),
                   },
@@ -1373,28 +1373,28 @@ describe('in mode', () => {
                   data: {
                     GroupMembers: expect.arrayContaining([
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'current-user',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'pending',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'owner-of-closed-group',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'owner',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'owner-of-hidden-group',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'usual',
-                        },
+                        }),
                       }),
                     ]),
                   },
@@ -1418,28 +1418,28 @@ describe('in mode', () => {
                   data: {
                     GroupMembers: expect.arrayContaining([
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'current-user',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'pending',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'owner-of-closed-group',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'owner',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'owner-of-hidden-group',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'usual',
-                        },
+                        }),
                       }),
                     ]),
                   },
@@ -1495,36 +1495,36 @@ describe('in mode', () => {
                   data: {
                     GroupMembers: expect.arrayContaining([
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'pending-user',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'pending',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'current-user',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'usual',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'owner-of-closed-group',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'admin',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'owner-of-hidden-group',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'owner',
-                        },
+                        }),
                       }),
                     ]),
                   },
@@ -1548,36 +1548,36 @@ describe('in mode', () => {
                   data: {
                     GroupMembers: expect.arrayContaining([
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'pending-user',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'pending',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'current-user',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'usual',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'owner-of-closed-group',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'admin',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'owner-of-hidden-group',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'owner',
-                        },
+                        }),
                       }),
                     ]),
                   },
@@ -1601,36 +1601,36 @@ describe('in mode', () => {
                   data: {
                     GroupMembers: expect.arrayContaining([
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'pending-user',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'pending',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'current-user',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'usual',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'owner-of-closed-group',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'admin',
-                        },
+                        }),
                       }),
                       expect.objectContaining({
-                        user: {
+                        user: expect.objectContaining({
                           id: 'owner-of-hidden-group',
-                        },
-                        membership: {
+                        }),
+                        membership: expect.objectContaining({
                           role: 'owner',
-                        },
+                        }),
                       }),
                     ]),
                   },
@@ -2577,7 +2577,7 @@ describe('in mode', () => {
                 },
               })
               return result.data?.GroupMembers
-                ? !!result.data.GroupMembers.find((member) => member.id === userId)
+                ? !!result.data.GroupMembers.find((member) => member.user.id === userId)
                 : null
             }
 
@@ -3191,9 +3191,9 @@ describe('in mode', () => {
           ).resolves.toMatchObject({
             data: {
               RemoveUserFromGroup: expect.objectContaining({
-                user: {
+                user: expect.objectContaining({
                   id: 'usual-member-user',
-                },
+                }),
                 membership: null,
               }),
             },
