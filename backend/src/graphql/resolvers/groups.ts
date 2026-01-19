@@ -24,9 +24,6 @@ export default {
   Query: {
     Group: async (_object, params, context: Context, _resolveInfo) => {
       const { isMember, id, slug, first, offset } = params
-      let pagination = ''
-      const orderBy = 'ORDER BY group.createdAt DESC'
-      if (first !== undefined && offset !== undefined) pagination = `SKIP ${offset} LIMIT ${first}`
       const matchParams = { id, slug }
       removeUndefinedNullValuesFromObject(matchParams)
       const session = context.driver.session()
@@ -34,43 +31,22 @@ export default {
         if (!context.user) {
           throw new Error('Missing authenticated user.')
         }
-        const groupMatchParamsCypher = convertObjectToCypherMapLiteral(matchParams, true)
-        let groupCypher
-        if (isMember === true) {
-          groupCypher = `
-            MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group:Group${groupMatchParamsCypher})
-            WITH group, membership
-            WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])
-            RETURN group {.*, myRole: membership.role}
-            ${orderBy}
-            ${pagination}
+        const transactionResponse = await txc.run(
           `
-        } else {
-          if (isMember === false) {
-            groupCypher = `
-              MATCH (group:Group${groupMatchParamsCypher})
-              WHERE (NOT (:User {id: $userId})-[:MEMBER_OF]->(group))
-              WITH group
-              WHERE group.groupType IN ['public', 'closed']
-              RETURN group {.*, myRole: NULL}
-              ${orderBy}
-              ${pagination}
-            `
-          } else {
-            groupCypher = `
-              MATCH (group:Group${groupMatchParamsCypher})
-              OPTIONAL MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group)
-              WITH group, membership
-              WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])
-              RETURN group {.*, myRole: membership.role}
-              ${orderBy}
-              ${pagination}
-            `
-          }
-        }
-        const transactionResponse = await txc.run(groupCypher, {
-          userId: context.user.id,
-        })
+          MATCH (group:Group${convertObjectToCypherMapLiteral(matchParams, true)})
+          OPTIONAL MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group)
+          WITH group, membership
+          ${(isMember === true && "WHERE membership IS NOT NULL AND (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])") || ''}
+          ${(isMember === false && "WHERE membership IS NULL AND (group.groupType IN ['public', 'closed'])") || ''}
+          ${(isMember === undefined && "WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])") || ''}
+          RETURN group {.*, myRole: membership.role}
+          ORDER BY group.createdAt DESC
+          ${first !== undefined && offset !== undefined ? `SKIP ${offset} LIMIT ${first}` : ''}
+        `,
+          {
+            userId: context.user.id,
+          },
+        )
         return transactionResponse.records.map((record) => record.get('group'))
       })
       try {
@@ -460,6 +436,23 @@ export default {
     },
   },
   Group: {
+    myRole: async (parent, _args, context: Context, _resolveInfo) => {
+      if (!parent.id) {
+        throw new Error('Can not identify selected Group!')
+      }
+      return (
+        await context.database.query({
+          query: `
+        MATCH (:User {id: $user.id})-[membership:MEMBER_OF]->(group:Group {id: $parent.id})
+        RETURN membership.role as role
+        `,
+          variables: {
+            user: context.user,
+            parent,
+          },
+        })
+      ).records.map((r) => r.get('role'))[0]
+    },
     inviteCodes: async (parent, _args, context: Context, _resolveInfo) => {
       if (!parent.id) {
         throw new Error('Can not identify selected Group!')
