@@ -2,7 +2,6 @@
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import path from 'node:path'
 
 import Email from 'email-templates'
@@ -177,7 +176,10 @@ export const sendChatMessageMail = async (
         locale: recipientUser.locale,
         name: recipientUser.name,
         chattingUser: senderUser.name,
-        chattingUserUrl: new URL(`/profile/${encodeURIComponent(senderUser.id)}/${encodeURIComponent(senderUser.slug)}`, CONFIG.CLIENT_URI),
+        chattingUserUrl: new URL(
+          `/profile/${encodeURIComponent(senderUser.id)}/${encodeURIComponent(senderUser.slug)}`,
+          CONFIG.CLIENT_URI,
+        ),
         chatUrl: new URL('/chat', CONFIG.CLIENT_URI),
       },
     })
