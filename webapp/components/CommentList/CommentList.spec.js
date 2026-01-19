@@ -52,7 +52,7 @@ describe('CommentList.vue', () => {
         },
       })
       mocks = {
-        $t: jest.fn(),
+        $t: (key) => key,
         $filters: {
           truncate: (a) => a,
           removeHtml: (a) => a,
