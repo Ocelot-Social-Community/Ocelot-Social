@@ -8,14 +8,22 @@ const propsData = {
   groupId: 'group-id',
   groupMembers: [
     {
-      slug: 'owner',
-      id: 'owner',
-      myRoleInGroup: 'owner',
+      user: {
+        slug: 'owner',
+        id: 'owner',
+      },
+      membership: {
+        role: 'owner',
+      },
     },
     {
-      slug: 'user',
-      id: 'user',
-      myRoleInGroup: 'usual',
+      user: {
+        slug: 'user',
+        id: 'user',
+      },
+      membership: {
+        role: 'usual',
+      },
     },
   ],
 }
@@ -30,9 +38,13 @@ const apolloMock = jest
   .mockResolvedValue({
     data: {
       ChangeGroupMemberRole: {
-        slug: 'user',
-        id: 'user',
-        myRoleInGroup: 'admin',
+        user: {
+          slug: 'user',
+          id: 'user',
+        },
+        membership: {
+          role: 'admin',
+        },
       },
     },
   })
@@ -117,9 +129,11 @@ describe('GroupMember', () => {
         apolloMock.mockRejectedValueOnce({ message: 'Oh no!!' }).mockResolvedValue({
           data: {
             RemoveUserFromGroup: {
-              slug: 'user',
-              id: 'user',
-              myRoleInGroup: null,
+              user: {
+                slug: 'user',
+                id: 'user',
+              },
+              membership: null,
             },
           },
         })
