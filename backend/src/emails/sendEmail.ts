@@ -94,8 +94,8 @@ export const sendNotificationMail = async (notification: any): Promise<OriginalM
             : notification?.from?.title,
         postUrl: new URL(
           notification?.from?.__typename === 'Comment'
-            ? `/post/${notification?.from?.post?.id}/${notification?.from?.post?.slug}`
-            : `/post/${notification?.from?.id}/${notification?.from?.slug}`,
+            ? `/post/${encodeURIComponent(notification?.from?.post?.id)}/${encodeURIComponent(notification?.from?.post?.slug)}`
+            : `/post/${encodeURIComponent(notification?.from?.id)}/${encodeURIComponent(notification?.from?.slug)}`,
           CONFIG.CLIENT_URI,
         ),
         postAuthorName:
@@ -106,7 +106,7 @@ export const sendNotificationMail = async (notification: any): Promise<OriginalM
           notification?.from?.__typename === 'Comment'
             ? undefined
             : new URL(
-                `profile/${notification?.from?.author?.id}/${notification?.from?.author?.slug}`,
+                `profile/${encodeURIComponent(notification?.from?.author?.id)}/${encodeURIComponent(notification?.from?.author?.slug)}`,
                 CONFIG.CLIENT_URI,
               ),
         commenterName:
@@ -116,14 +116,14 @@ export const sendNotificationMail = async (notification: any): Promise<OriginalM
         commenterUrl:
           notification?.from?.__typename === 'Comment'
             ? new URL(
-                `/profile/${notification?.from?.author?.id}/${notification?.from?.author?.slug}`,
+                `/profile/${encodeURIComponent(notification?.from?.author?.id)}/${encodeURIComponent(notification?.from?.author?.slug)}`,
                 CONFIG.CLIENT_URI,
               )
             : undefined,
         commentUrl:
           notification?.from?.__typename === 'Comment'
             ? new URL(
-                `/post/${notification?.from?.post?.id}/${notification?.from?.post?.slug}#commentId-${notification?.from?.id}`,
+                `/post/${encodeURIComponent(notification?.from?.post?.id)}/${encodeURIComponent(notification?.from?.post?.slug)}#commentId-${encodeURIComponent(notification?.from?.id)}`,
                 CONFIG.CLIENT_URI,
               )
             : undefined,
@@ -132,7 +132,7 @@ export const sendNotificationMail = async (notification: any): Promise<OriginalM
         groupUrl:
           notification?.from?.__typename === 'Group'
             ? new URL(
-                `/groups/${notification?.from?.id}/${notification?.from?.slug}`,
+                `/groups/${encodeURIComponent(notification?.from?.id)}/${encodeURIComponent(notification?.from?.slug)}`,
                 CONFIG.CLIENT_URI,
               )
             : undefined,
@@ -143,7 +143,7 @@ export const sendNotificationMail = async (notification: any): Promise<OriginalM
         groupRelatedUserUrl:
           notification?.from?.__typename === 'Group'
             ? new URL(
-                `/profile/${notification?.relatedUser?.id}/${notification?.relatedUser?.slug}`,
+                `/profile/${encodeURIComponent(notification?.relatedUser?.id)}/${encodeURIComponent(notification?.relatedUser?.slug)}`,
                 CONFIG.CLIENT_URI,
               )
             : undefined,
@@ -177,7 +177,7 @@ export const sendChatMessageMail = async (
         locale: recipientUser.locale,
         name: recipientUser.name,
         chattingUser: senderUser.name,
-        chattingUserUrl: new URL(`/profile/${senderUser.id}/${senderUser.slug}`, CONFIG.CLIENT_URI),
+        chattingUserUrl: new URL(`/profile/${encodeURIComponent(senderUser.id)}/${encodeURIComponent(senderUser.slug)}`, CONFIG.CLIENT_URI),
         chatUrl: new URL('/chat', CONFIG.CLIENT_URI),
       },
     })
