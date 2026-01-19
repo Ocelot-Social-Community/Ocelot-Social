@@ -1,36 +1,49 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable n/no-missing-require */
-/* eslint-disable n/global-require */
 // NOTE: We cannot use `fs` here to clean up the code. Cypress breaks on any npm
 // module that is not browser-compatible. Node's `fs` module is server-side only
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare let Cypress: any | undefined
+//
+// We use static imports instead of dynamic require() to ensure compatibility
+// with both Node.js and Webpack (used by Cypress cucumber preprocessor).
+
+import Badge from './Badge'
+import Category from './Category'
+import Comment from './Comment'
+import Donations from './Donations'
+import EmailAddress from './EmailAddress'
+import File from './File'
+import Group from './Group'
+import Image from './Image'
+import InviteCode from './InviteCode'
+import Location from './Location'
+import Migration from './Migration'
+import Post from './Post'
+import Report from './Report'
+import SocialMedia from './SocialMedia'
+import Tag from './Tag'
+import UnverifiedEmailAddress from './UnverifiedEmailAddress'
+import User from './User'
+
+import type Neode from 'neode'
+
+// Type assertion needed because TypeScript infers literal types from the model
+// objects (e.g., type: 'string' as literal), but Neode expects the broader
+// SchemaObject type with PropertyTypes union. The Neode type definitions are
+// incomplete/incorrect, so we use double assertion to bypass the check.
 export default {
-  File: typeof Cypress !== 'undefined' ? require('./File') : require('./File').default,
-  Image: typeof Cypress !== 'undefined' ? require('./Image') : require('./Image').default,
-  Badge: typeof Cypress !== 'undefined' ? require('./Badge') : require('./Badge').default,
-  User: typeof Cypress !== 'undefined' ? require('./User') : require('./User').default,
-  Group: typeof Cypress !== 'undefined' ? require('./Group') : require('./Group').default,
-  EmailAddress:
-    typeof Cypress !== 'undefined' ? require('./EmailAddress') : require('./EmailAddress').default,
-  UnverifiedEmailAddress:
-    typeof Cypress !== 'undefined'
-      ? require('./UnverifiedEmailAddress')
-      : require('./UnverifiedEmailAddress').default,
-  SocialMedia:
-    typeof Cypress !== 'undefined' ? require('./SocialMedia') : require('./SocialMedia').default,
-  Post: typeof Cypress !== 'undefined' ? require('./Post') : require('./Post').default,
-  Comment: typeof Cypress !== 'undefined' ? require('./Comment') : require('./Comment').default,
-  Category: typeof Cypress !== 'undefined' ? require('./Category') : require('./Category').default,
-  Tag: typeof Cypress !== 'undefined' ? require('./Tag') : require('./Tag').default,
-  Location: typeof Cypress !== 'undefined' ? require('./Location') : require('./Location').default,
-  Donations:
-    typeof Cypress !== 'undefined' ? require('./Donations') : require('./Donations').default,
-  Report: typeof Cypress !== 'undefined' ? require('./Report') : require('./Report').default,
-  Migration:
-    typeof Cypress !== 'undefined' ? require('./Migration') : require('./Migration').default,
-  InviteCode:
-    typeof Cypress !== 'undefined' ? require('./InviteCode') : require('./InviteCode').default,
-}
+  Badge,
+  Category,
+  Comment,
+  Donations,
+  EmailAddress,
+  File,
+  Group,
+  Image,
+  InviteCode,
+  Location,
+  Migration,
+  Post,
+  Report,
+  SocialMedia,
+  Tag,
+  UnverifiedEmailAddress,
+  User,
+} as unknown as Record<string, Neode.SchemaObject>
