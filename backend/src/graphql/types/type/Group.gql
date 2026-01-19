@@ -50,6 +50,11 @@ type Group {
   inviteCodes: [InviteCode]! @neo4j_ignore
 }
 
+type GroupMember {
+  user: User
+  membership: MEMBER_OF
+}
+
 
 input _GroupFilter {
   AND: [_GroupFilter!]
@@ -84,7 +89,7 @@ type Query {
     offset: Int
     # orderBy: [_UserOrdering] # not implemented yet
     # filter: _UserFilter # not implemented yet
-  ): [User]
+  ): [GroupMember]
 
   GroupCount(isMember: Boolean): Int
   
@@ -127,23 +132,23 @@ type Mutation {
   JoinGroup(
     groupId: ID!
     userId: ID!
-  ): User
+  ): GroupMember
 
   LeaveGroup(
     groupId: ID!
     userId: ID!
-  ): User
+  ): GroupMember
 
   ChangeGroupMemberRole(
     groupId: ID!
     userId: ID!
     roleInGroup: GroupMemberRole!
-  ): User
+  ): GroupMember
 
   RemoveUserFromGroup(
     groupId: ID!
     userId: ID!
-  ): User
+  ): GroupMember
 
   muteGroup(groupId: ID!): Group
   unmuteGroup(groupId: ID!): Group  

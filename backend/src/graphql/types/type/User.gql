@@ -144,8 +144,6 @@ type User {
   RETURN collect(category.id)
   """
   )
-
-  myRoleInGroup: GroupMemberRole
 }
 
 
