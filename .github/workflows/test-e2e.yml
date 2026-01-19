@@ -31,7 +31,7 @@ jobs:
           docker compose -f docker-compose.yml -f docker-compose.test.yml down
       
       - name: Cache docker images
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v4.0.2
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v4.0.2
         with:
           path: |
             /tmp/backend.tar
@@ -59,7 +59,7 @@ jobs:
           docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" > /tmp/webapp.tar
       
       - name: Cache docker image        
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v4.0.2
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v4.0.2
         with:
           path: /tmp/webapp.tar
           key: ${{ github.run_id }}-e2e-webapp-cache
@@ -75,7 +75,7 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.2.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v4.4.0
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v4.4.0
         with:
           node-version-file: 'backend/.tool-versions'
           cache: 'yarn'
@@ -96,7 +96,7 @@ jobs:
       
       - name: Cache docker image
         
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v4.0.2
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v4.0.2
         with:
           path: |
             /opt/cucumber-json-formatter
@@ -123,13 +123,13 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.2.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v4.4.0
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v4.4.0
         with:
           node-version-file: 'backend/.tool-versions'
           cache: 'yarn'
 
       - name: Restore cypress cache
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v4.0.2
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v4.0.2
         with:
           path: |
             /opt/cucumber-json-formatter
@@ -139,7 +139,7 @@ jobs:
           restore-keys: ${{ github.run_id }}-e2e-cypress
 
       - name: Restore backend environment cache
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v4.0.2
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v4.0.2
         with:
           path: |
             /tmp/backend.tar
@@ -150,7 +150,7 @@ jobs:
           key: ${{ github.run_id }}-e2e-backend-environment-cache
 
       - name: Restore webapp cache
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v4.0.2
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v4.0.2
         with:
           path: /tmp/webapp.tar
           key: ${{ github.run_id }}-e2e-webapp-cache
