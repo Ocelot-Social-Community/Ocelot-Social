@@ -25,5 +25,6 @@ throw new Error('vue/compiler-sfc is not available in Vue 2.6')
 `
 
   fs.writeFileSync(indexFile, content)
+  // eslint-disable-next-line no-console
   console.log('Created vue/compiler-sfc mock for vue2-jest compatibility')
 }
