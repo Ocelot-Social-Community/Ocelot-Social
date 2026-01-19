@@ -18,7 +18,8 @@
     "precommit": "yarn lint",
     "test": "cross-env NODE_ENV=test jest --coverage --forceExit --detectOpenHandles",
     "test:unit:update": "yarn test -- --updateSnapshot",
-    "test:unit:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --no-cache --runInBand"
+    "test:unit:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --no-cache --runInBand",
+    "postinstall": "node scripts/fix-vue2-jest.js"
   },
   "dependencies": {
     "@mapbox/mapbox-gl-geocoder": "^5.0.2",
