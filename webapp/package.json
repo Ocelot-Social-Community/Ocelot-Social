@@ -19,7 +19,7 @@
     "test": "cross-env NODE_ENV=test jest --coverage --forceExit --detectOpenHandles",
     "test:unit:update": "yarn test -- --updateSnapshot",
     "test:unit:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --no-cache --runInBand",
-    "postinstall": "node scripts/fix-vue2-jest.js"
+    "postinstall": "node scripts/fix-vue2-jest.js && node scripts/fix-v-mapbox.js"
   },
   "dependencies": {
     "@mapbox/mapbox-gl-geocoder": "^5.0.2",
@@ -30,6 +30,7 @@
     "@nuxtjs/pwa": "^3.0.0-beta.20",
     "@nuxtjs/sentry": "^4.0.0",
     "@nuxtjs/style-resources": "~1.1.0",
+    "@vue/composition-api": "^1.7.2",
     "accounting": "~0.4.1",
     "apollo-cache-inmemory": "~1.6.6",
     "apollo-client": "~2.6.10",

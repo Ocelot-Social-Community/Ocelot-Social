@@ -266,9 +266,6 @@ export default {
      ** You can extend webpack config here
      */
     extend(config, ctx) {
-      // Fix composition api reference for v-mapbox
-      config.resolve.alias['@vue/composition-api'] = '@nuxtjs/composition-api'
-
       // Add the compilerOptions
       ctx.loaders.vue.compilerOptions = {
         // Add your compilerOptions here
