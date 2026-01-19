@@ -72,6 +72,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v4.1.7
 
+      - name: Setup Node.js
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v4.0.3
+        with:
+          node-version-file: 'backend/.nvmrc'
+
       - name: backend | Lint
         run: cd backend && yarn && yarn run lint
 
