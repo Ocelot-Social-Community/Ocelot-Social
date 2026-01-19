@@ -10,8 +10,8 @@ between different local Node versions:
 ```bash
 # install Node
 $ cd webapp
-$ nvm install v20.12.1
-$ nvm use v20.12.1
+$ nvm install v25.3.0
+$ nvm use v25.3.0
 ```
 
 Install node dependencies with [yarn](https://yarnpkg.com/en/):
