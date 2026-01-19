@@ -10,20 +10,29 @@
 const fs = require('fs')
 const path = require('path')
 
-const vmapboxFile = path.join(__dirname, '..', 'node_modules', 'v-mapbox', 'dist', 'v-mapbox.esm.js')
+const vmapboxFile = path.join(
+  __dirname,
+  '..',
+  'node_modules',
+  'v-mapbox',
+  'dist',
+  'v-mapbox.esm.js',
+)
 
 if (fs.existsSync(vmapboxFile)) {
   let content = fs.readFileSync(vmapboxFile, 'utf8')
 
   // Check if already patched
   if (content.includes('// PATCHED for Vue 2.6')) {
+    // eslint-disable-next-line no-console
     console.log('v-mapbox already patched')
     process.exit(0)
   }
 
   // Find and replace the problematic setup function
   // Original: setup(_, context) { const templateRefs = ref(context.refs); return { templateRefs }; }
-  const originalSetup = /setup\(_, context\)\s*\{\s*const templateRefs\s*=\s*ref\(context\.refs\);\s*return\s*\{\s*templateRefs\s*\};\s*\}/
+  const originalSetup =
+    /setup\(_, context\)\s*\{\s*const templateRefs\s*=\s*ref\(context\.refs\);\s*return\s*\{\s*templateRefs\s*\};\s*\}/
 
   const patchedSetup = `setup(_, context) {
     // PATCHED for Vue 2.6 + @vue/composition-api compatibility
@@ -38,14 +47,17 @@ if (fs.existsSync(vmapboxFile)) {
     // Also patch the $_loadMap method to use this.$refs directly
     content = content.replace(
       /container:\s*this\.templateRefs\.container/g,
-      'container: this.$refs.container'
+      'container: this.$refs.container',
     )
 
     fs.writeFileSync(vmapboxFile, content)
+    // eslint-disable-next-line no-console
     console.log('Patched v-mapbox for Vue 2.6 compatibility')
   } else {
+    // eslint-disable-next-line no-console
     console.log('v-mapbox setup pattern not found - may already be compatible or structure changed')
   }
 } else {
+  // eslint-disable-next-line no-console
   console.log('v-mapbox not installed, skipping patch')
 }
