@@ -87,7 +87,8 @@ jobs:
 
       - name: Install cypress requirements
         run: |
-          wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
+          sudo wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
+          sudo chmod +x /opt/cucumber-json-formatter
           cd backend
           yarn install
           yarn build
