@@ -172,7 +172,7 @@ export default {
   },
   mixins: [postListActions, mobile(), GetCategories],
   data() {
-    const { hashtag = null } = this.$route.query
+    const { hashtag = null } = this.$route.query // Wolle remove with the rest?
     return {
       hideByScroll: false,
       revScrollpos: 0,
