@@ -114,6 +114,12 @@
       }
     }
   },
+  "changemediaRebranding": {
+    "header": {
+      "about": "Club",
+      "newsFeed": "News Feed"
+    }
+  },
   "chat": {
     "addRoomHeadline": "Search User for new Chat",
     "cancelSelectMessage": "Cancel",
