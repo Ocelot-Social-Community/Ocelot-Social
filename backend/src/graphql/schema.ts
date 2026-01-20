@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { makeAugmentedSchema } from 'neo4j-graphql-js'
 
 import typeDefs from '@graphql/types/index'
