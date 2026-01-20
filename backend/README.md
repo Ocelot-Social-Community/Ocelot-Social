@@ -19,18 +19,16 @@ Wait a little until your backend is up and running at [http://localhost:4000/](h
 ## Installation without Docker
 
 For the local installation you need a recent version of
-[Node](https://nodejs.org/en/) (&gt;= `v16.19.0`). We are using
-`v25.3.0` and therefore we recommend to use the same version
-([see](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4082)
-some known problems with more recent node versions). You can use the
+[Node](https://nodejs.org/en/). We are using
+`v25.3.0` and therefore we recommend to use the same version. You can use the
 [node version manager](https://github.com/nvm-sh/nvm) `nvm` to switch
 between different local Node versions:
 
 ```sh
-# install Node
+# install Node using '.nvmrc' file
 $ cd backend
-$ nvm install v25.3.0
-$ nvm use v25.3.0
+$ nvm install
+$ nvm use
 ```
 
 Install node dependencies with [yarn](https://yarnpkg.com/en/):
