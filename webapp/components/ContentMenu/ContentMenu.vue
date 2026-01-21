@@ -276,11 +276,12 @@ export default {
       )
     },
     canBeGroupPinned() {
+      const maxGroupPinnedPosts = this.$env.MAX_GROUP_PINNED_POSTS
       return (
-        this.maxPinnedPosts === 1 ||
-        (this.maxPinnedPosts > 1 &&
+        maxGroupPinnedPosts === 1 ||
+        (maxGroupPinnedPosts > 1 &&
           this.resource.group &&
-          this.resource.group.currentlyPinnedPostsCount < this.maxPinnedPosts)
+          this.resource.group.currentlyPinnedPostsCount < maxGroupPinnedPosts)
       )
     },
   },
