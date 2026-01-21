@@ -387,7 +387,7 @@ const isAllowedToGenerateGroupInviteCode = rule({
   return !!(
     await context.database.query({
       query: `
-    MATCH (user:User{id: user.id})-[membership:MEMBER_OF]->(group:Group {id: $args.groupId})
+    MATCH (user:User{id: $user.id})-[membership:MEMBER_OF]->(group:Group {id: $args.groupId})
     WHERE (group.type IN ['closed','hidden'] AND membership.role IN ['admin', 'owner'])
       OR (NOT group.type IN ['closed','hidden'] AND NOT membership.role = 'pending')
     RETURN count(group) as count

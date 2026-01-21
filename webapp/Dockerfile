@@ -46,6 +46,7 @@ ONBUILD RUN cp -r ./constants /build
 ONBUILD RUN cp -r ./static /build
 ONBUILD RUN cp -r ./locales /build
 ONBUILD RUN cp -r ./package.json ./yarn.lock /build
+ONBUILD RUN cp -r ./scripts /build
 ONBUILD RUN cd /build && yarn install --production=true --frozen-lockfile --non-interactive
 
 FROM base AS test_build
@@ -62,6 +63,7 @@ RUN cp -r ./constants /build
 RUN cp -r ./static /build
 RUN cp -r ./locales /build
 RUN cp -r ./package.json ./yarn.lock /build
+RUN cp -r ./scripts /build
 RUN cd /build && yarn install --frozen-lockfile --non-interactive
 
 FROM test_build AS test

@@ -4,7 +4,7 @@ import LocationInfo from './LocationInfo.vue'
 const localVue = global.localVue
 
 describe('LocationInfo', () => {
-  const Wrapper = ({ withDistance }) => {
+  const Wrapper = ({ withDistance, size = 'base', isOwner = false }) => {
     return render(LocationInfo, {
       localVue,
       propsData: {
@@ -12,6 +12,8 @@ describe('LocationInfo', () => {
           name: 'Paris',
           distanceToMe: withDistance ? 100 : null,
         },
+        size,
+        isOwner,
       },
       mocks: {
         $t: jest.fn((t) => t),
@@ -33,12 +35,12 @@ describe('LocationInfo', () => {
 
   describe('size', () => {
     it('renders in base size', () => {
-      const wrapper = Wrapper({ size: 'base' })
+      const wrapper = Wrapper({ withDistance: false, size: 'base' })
       expect(wrapper.container).toMatchSnapshot()
     })
 
     it('renders in small size', () => {
-      const wrapper = Wrapper({ size: 'small' })
+      const wrapper = Wrapper({ withDistance: false, size: 'small' })
       expect(wrapper.container).toMatchSnapshot()
     })
   })
