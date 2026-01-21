@@ -397,11 +397,427 @@ describe('ContentMenu.vue - Group', () => {
     })
   })
 
-  /* describe('as group admin', () => {
+  describe('as group admin', () => {
     const myRole = 'admin'
-  }) */
 
-  /* describe('as group usual', () => {
+    describe('when maxGroupPinnedPosts = 0', () => {
+      beforeEach(() => {
+        mocks.$env = {
+          MAX_GROUP_PINNED_POSTS: 0,
+        }
+      })
+
+      it('can not pin unpinned post', async () => {
+        const wrapper = await openContentMenu({
+          isOwner: false,
+          resourceType: 'contribution',
+          resource: {
+            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+            groupPinned: false,
+            group: {
+              myRole,
+            },
+          },
+        })
+        expect(
+          wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.groupPin'),
+        ).toHaveLength(0)
+      })
+
+      it('can unpin pinned post', async () => {
+        const wrapper = await openContentMenu({
+          isOwner: false,
+          resourceType: 'contribution',
+          resource: {
+            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+            groupPinned: true,
+            group: {
+              myRole,
+            },
+          },
+        })
+        wrapper
+          .findAll('.ds-menu-item')
+          .filter((item) => item.text() === 'post.menu.groupUnpin')
+          .at(0)
+          .trigger('click')
+        expect(wrapper.emitted('unpinGroupPost')).toEqual([
+          [
+            {
+              id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+              groupPinned: true,
+              group: {
+                myRole,
+              },
+            },
+          ],
+        ])
+      })
+    })
+
+    describe('when maxPinnedPosts = 1', () => {
+      beforeEach(() => {
+        mocks.$env = {
+          MAX_GROUP_PINNED_POSTS: 1,
+        }
+      })
+
+      describe('when currentlyPinnedPostsCount = 0', () => {
+        const currentlyPinnedPostsCount = 0
+
+        it('pin unpinned post', async () => {
+          const wrapper = await openContentMenu({
+            isOwner: false,
+            resourceType: 'contribution',
+            resource: {
+              id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+              groupPinned: false,
+              group: {
+                myRole,
+                currentlyPinnedPostsCount,
+              },
+            },
+          })
+          wrapper
+            .findAll('.ds-menu-item')
+            .filter((item) => item.text() === 'post.menu.groupPin')
+            .at(0)
+            .trigger('click')
+          expect(wrapper.emitted('pinGroupPost')).toEqual([
+            [
+              {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                groupPinned: false,
+                group: {
+                  myRole,
+                  currentlyPinnedPostsCount,
+                },
+              },
+            ],
+          ])
+        })
+
+        it('unpin pinned post', async () => {
+          const wrapper = await openContentMenu({
+            isOwner: false,
+            resourceType: 'contribution',
+            resource: {
+              id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+              groupPinned: true,
+              group: {
+                myRole,
+                currentlyPinnedPostsCount,
+              },
+            },
+          })
+          wrapper
+            .findAll('.ds-menu-item')
+            .filter((item) => item.text() === 'post.menu.groupUnpin')
+            .at(0)
+            .trigger('click')
+          expect(wrapper.emitted('unpinGroupPost')).toEqual([
+            [
+              {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                groupPinned: true,
+                group: {
+                  myRole,
+                  currentlyPinnedPostsCount,
+                },
+              },
+            ],
+          ])
+        })
+      })
+
+      describe('when currentlyPinnedPostsCount = 1', () => {
+        const currentlyPinnedPostsCount = 1
+
+        it('pin unpinned post', async () => {
+          const wrapper = await openContentMenu({
+            isOwner: false,
+            resourceType: 'contribution',
+            resource: {
+              id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+              groupPinned: false,
+              group: {
+                myRole,
+                currentlyPinnedPostsCount,
+              },
+            },
+          })
+          wrapper
+            .findAll('.ds-menu-item')
+            .filter((item) => item.text() === 'post.menu.groupPin')
+            .at(0)
+            .trigger('click')
+          expect(wrapper.emitted('pinGroupPost')).toEqual([
+            [
+              {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                groupPinned: false,
+                group: {
+                  myRole,
+                  currentlyPinnedPostsCount,
+                },
+              },
+            ],
+          ])
+        })
+
+        it('unpin pinned post', async () => {
+          const wrapper = await openContentMenu({
+            isOwner: false,
+            resourceType: 'contribution',
+            resource: {
+              id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+              groupPinned: true,
+              group: {
+                myRole,
+                currentlyPinnedPostsCount,
+              },
+            },
+          })
+          wrapper
+            .findAll('.ds-menu-item')
+            .filter((item) => item.text() === 'post.menu.groupUnpin')
+            .at(0)
+            .trigger('click')
+          expect(wrapper.emitted('unpinGroupPost')).toEqual([
+            [
+              {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                groupPinned: true,
+                group: {
+                  myRole,
+                  currentlyPinnedPostsCount,
+                },
+              },
+            ],
+          ])
+        })
+      })
+    })
+
+    describe('when maxPinnedPosts = 2', () => {
+      beforeEach(() => {
+        mocks.$env = {
+          MAX_GROUP_PINNED_POSTS: 2,
+        }
+      })
+
+      describe('when currentlyPinnedPostsCount = 1', () => {
+        const currentlyPinnedPostsCount = 1
+
+        it('pin unpinned post', async () => {
+          const wrapper = await openContentMenu({
+            isOwner: false,
+            resourceType: 'contribution',
+            resource: {
+              id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+              groupPinned: false,
+              group: {
+                myRole,
+                currentlyPinnedPostsCount,
+              },
+            },
+          })
+          wrapper
+            .findAll('.ds-menu-item')
+            .filter((item) => item.text() === 'post.menu.groupPin')
+            .at(0)
+            .trigger('click')
+          expect(wrapper.emitted('pinGroupPost')).toEqual([
+            [
+              {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                groupPinned: false,
+                group: {
+                  myRole,
+                  currentlyPinnedPostsCount,
+                },
+              },
+            ],
+          ])
+        })
+
+        it('unpin pinned post', async () => {
+          const wrapper = await openContentMenu({
+            isOwner: false,
+            resourceType: 'contribution',
+            resource: {
+              id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+              groupPinned: true,
+              group: {
+                myRole,
+                currentlyPinnedPostsCount,
+              },
+            },
+          })
+          wrapper
+            .findAll('.ds-menu-item')
+            .filter((item) => item.text() === 'post.menu.groupUnpin')
+            .at(0)
+            .trigger('click')
+          expect(wrapper.emitted('unpinGroupPost')).toEqual([
+            [
+              {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                groupPinned: true,
+                group: {
+                  myRole,
+                  currentlyPinnedPostsCount,
+                },
+              },
+            ],
+          ])
+        })
+      })
+
+      describe('when currentlyPinnedPostsCount = 2', () => {
+        const currentlyPinnedPostsCount = 2
+
+        it('pin unpinned post', async () => {
+          const wrapper = await openContentMenu({
+            isOwner: false,
+            resourceType: 'contribution',
+            resource: {
+              id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+              groupPinned: false,
+              group: {
+                myRole,
+                currentlyPinnedPostsCount,
+              },
+            },
+          })
+          expect(
+            wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.groupPin')
+              .length,
+          ).toEqual(0)
+        })
+
+        it('unpin pinned post', async () => {
+          const wrapper = await openContentMenu({
+            isOwner: false,
+            resourceType: 'contribution',
+            resource: {
+              id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+              groupPinned: true,
+              group: {
+                myRole,
+                currentlyPinnedPostsCount,
+              },
+            },
+          })
+          wrapper
+            .findAll('.ds-menu-item')
+            .filter((item) => item.text() === 'post.menu.groupUnpin')
+            .at(0)
+            .trigger('click')
+          expect(wrapper.emitted('unpinGroupPost')).toEqual([
+            [
+              {
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                groupPinned: true,
+                group: {
+                  myRole,
+                  currentlyPinnedPostsCount,
+                },
+              },
+            ],
+          ])
+        })
+      })
+    })
+  })
+
+  describe('as group usual', () => {
     const myRole = 'usual'
-  }) */
+
+    describe('when maxGroupPinnedPosts = 0', () => {
+      beforeEach(() => {
+        mocks.$env = {
+          MAX_GROUP_PINNED_POSTS: 0,
+        }
+      })
+
+      it('can not pin unpinned post', async () => {
+        const wrapper = await openContentMenu({
+          isOwner: false,
+          resourceType: 'contribution',
+          resource: {
+            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+            groupPinned: false,
+            group: {
+              myRole,
+            },
+          },
+        })
+        expect(
+          wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.groupPin'),
+        ).toHaveLength(0)
+      })
+
+      it('can not unpin pinned post', async () => {
+        const wrapper = await openContentMenu({
+          isOwner: false,
+          resourceType: 'contribution',
+          resource: {
+            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+            groupPinned: true,
+            group: {
+              myRole,
+            },
+          },
+        })
+        expect(
+          wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.groupUnpin'),
+        ).toHaveLength(0)
+      })
+    })
+
+    describe('when maxPinnedPosts = 1', () => {
+      beforeEach(() => {
+        mocks.$env = {
+          MAX_GROUP_PINNED_POSTS: 1,
+        }
+      })
+
+      it('can not pin unpinned post', async () => {
+        const wrapper = await openContentMenu({
+          isOwner: false,
+          resourceType: 'contribution',
+          resource: {
+            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+            groupPinned: false,
+            group: {
+              myRole,
+              currentlyPinnedPostsCount: 0,
+            },
+          },
+        })
+        expect(
+          wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.groupPin'),
+        ).toHaveLength(0)
+      })
+
+      it('can not unpin pinned post', async () => {
+        const wrapper = await openContentMenu({
+          isOwner: false,
+          resourceType: 'contribution',
+          resource: {
+            id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+            groupPinned: true,
+            group: {
+              myRole,
+              currentlyPinnedPostsCount: 1,
+            },
+          },
+        })
+        expect(
+          wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.groupUnpin'),
+        ).toHaveLength(0)
+      })
+    })
+  })
 })
