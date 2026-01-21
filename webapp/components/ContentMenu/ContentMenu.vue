@@ -247,7 +247,7 @@ export default {
       if (
         this.resourceType === 'contribution' &&
         this.resource.group &&
-        (this.resource.group.myRole === 'owner' || this.resource.group.myRole === 'admin') &&
+        ['admin', 'owner'].includes(this.resource.group.myRole) &&
         (this.canBeGroupPinned || this.resource.groupPinned)
       ) {
         routes.push({
