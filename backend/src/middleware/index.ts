@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { applyMiddleware, IMiddleware } from 'graphql-middleware'
+import { applyMiddleware, IMiddleware, IMiddlewareGenerator } from 'graphql-middleware'
 
 import CONFIG from '@config/index'
 
-// eslint-disable-next-line import/no-cycle
 import brandingMiddlewares from './branding/brandingMiddlewares'
 import categories from './categories'
 import chatMiddleware from './chatMiddleware'
@@ -24,42 +23,89 @@ import userInteractions from './userInteractions'
 import validation from './validation/validationMiddleware'
 import xss from './xssMiddleware'
 
-export interface MiddlewareOrder {
-  order: number
-  name: string
-  middleware: IMiddleware
+export interface OrderPosition {
+  /*
+    - null = push ontop
+    - undefined = append
+    - string = append before/after middleware with name
+  */
+  at?: string | null
+  /*
+    append before or after. Undefined behaves like after.
+  */
+  mode?: 'before' | 'after'
 }
 
-const ocelotMiddlewares: MiddlewareOrder[] = [
-  { order: -200, name: 'sentry', middleware: sentry },
-  { order: -190, name: 'permissions', middleware: permissions },
-  { order: -180, name: 'xss', middleware: xss },
-  { order: -170, name: 'validation', middleware: validation },
-  { order: -160, name: 'userInteractions', middleware: userInteractions },
-  { order: -150, name: 'sluggify', middleware: sluggify },
-  { order: -140, name: 'languages', middleware: languages },
-  { order: -130, name: 'excerpt', middleware: excerpt },
-  { order: -120, name: 'login', middleware: login },
-  { order: -110, name: 'notifications', middleware: notifications },
-  { order: -100, name: 'hashtags', middleware: hashtags },
-  { order: -90, name: 'softDelete', middleware: softDelete },
-  { order: -80, name: 'includedFields', middleware: includedFields },
-  { order: -70, name: 'orderBy', middleware: orderBy },
-  { order: -60, name: 'chatMiddleware', middleware: chatMiddleware },
-  { order: -50, name: 'categories', middleware: categories },
-]
+export interface MiddlewareOrder {
+  position: OrderPosition
+  name: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  middleware: IMiddleware | IMiddlewareGenerator<any, any, any>
+}
+
+const ocelotMiddlewares: MiddlewareOrder[] = []
+
+export const addMiddleware = (middleware: MiddlewareOrder) => {
+  switch (middleware.position.at) {
+    case undefined:
+      ocelotMiddlewares.push(middleware)
+      break
+    case null:
+      ocelotMiddlewares.unshift(middleware)
+      break
+    default: {
+      const appendMiddlewareAt = ocelotMiddlewares.findIndex(
+        (m) => m.name === middleware.position.at,
+      )
+      if (appendMiddlewareAt === -1) {
+        throw new Error(
+          `Could not find middleware "${middleware.position.at}" to append the middleware "${middleware.name}"`,
+        )
+      }
+      ocelotMiddlewares.splice(
+        appendMiddlewareAt + (middleware.position.mode === 'before' ? 0 : 1),
+        0,
+        middleware,
+      )
+    }
+  }
+}
+
+addMiddleware({ name: 'sentry', middleware: sentry, position: { at: null } })
+addMiddleware({ name: 'permissions', middleware: permissions, position: { at: 'sentry' } })
+addMiddleware({ name: 'xss', middleware: xss, position: { at: 'permissions' } })
+addMiddleware({ name: 'validation', middleware: validation, position: { at: 'xss' } })
+addMiddleware({
+  name: 'userInteractions',
+  middleware: userInteractions,
+  position: { at: 'validation' },
+})
+addMiddleware({ name: 'sluggify', middleware: sluggify, position: { at: 'userInteractions' } })
+addMiddleware({ name: 'languages', middleware: languages, position: { at: 'sluggify' } })
+addMiddleware({ name: 'excerpt', middleware: excerpt, position: { at: 'languages' } })
+addMiddleware({ name: 'login', middleware: login, position: { at: 'excerpt' } })
+addMiddleware({ name: 'notifications', middleware: notifications, position: { at: 'login' } })
+addMiddleware({ name: 'hashtags', middleware: hashtags, position: { at: 'notifications' } })
+addMiddleware({ name: 'softDelete', middleware: softDelete, position: { at: 'hashtags' } })
+addMiddleware({
+  name: 'includedFields',
+  middleware: includedFields,
+  position: { at: 'softDelete' },
+})
+addMiddleware({ name: 'orderBy', middleware: orderBy, position: { at: 'includedFields' } })
+addMiddleware({ name: 'chatMiddleware', middleware: chatMiddleware, position: { at: 'orderBy' } })
+addMiddleware({ name: 'categories', middleware: categories, position: { at: 'chatMiddleware' } })
 
 export default (schema) => {
-  const middlewares = ocelotMiddlewares
-    .concat(brandingMiddlewares())
-    .sort((a, b) => a.order - b.order)
+  // execute branding middleware function
+  brandingMiddlewares()
 
-  const filteredMiddlewares = middlewares.filter(
+  const filteredMiddlewares = ocelotMiddlewares.filter(
     (middleware) => !CONFIG.DISABLED_MIDDLEWARES.includes(middleware.name),
   )
 
   // Warn if we filtered
-  if (middlewares.length < filteredMiddlewares.length) {
+  if (ocelotMiddlewares.length < filteredMiddlewares.length) {
     // eslint-disable-next-line no-console
     console.log(`Warning: Disabled "${CONFIG.DISABLED_MIDDLEWARES.join(', ')}" middleware.`)
   }
