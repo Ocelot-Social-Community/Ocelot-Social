@@ -30,5 +30,13 @@ export const post = gql`
     groupPinned
     isObservedByMe
     observingUsersCount
+    group {
+      id
+      name
+      slug
+      groupType
+      myRole
+      currentlyPinnedPostsCount
+    }
   }
 `

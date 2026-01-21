@@ -47,14 +47,6 @@ export default (i18n) => {
             ...badges
           }
         }
-        group {
-          id
-          name
-          slug
-          groupType
-          myRole
-          currentlyPinnedPostsCount
-        }
       }
     }
   `
@@ -92,14 +84,6 @@ export const filterPosts = (i18n) => {
           ...location
           ...badges
         }
-        group {
-          id
-          name
-          slug
-          groupType
-          myRole
-          currentlyPinnedPostsCount
-        }
       }
     }
   `
@@ -135,14 +119,6 @@ export const profilePagePosts = (i18n) => {
           ...userCounts
           ...location
           ...badges
-        }
-        group {
-          id
-          name
-          slug
-          groupType
-          myRole
-          currentlyPinnedPostsCount
         }
       }
     }
