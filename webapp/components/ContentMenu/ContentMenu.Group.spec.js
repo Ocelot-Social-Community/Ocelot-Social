@@ -10,16 +10,23 @@ localVue.use(Styleguide)
 localVue.use(VTooltip)
 localVue.use(Vuex)
 
+let mocks
+
 describe('ContentMenu.vue - Group', () => {
-  const mocks = {
-    $t: jest.fn((str) => str),
-    $i18n: {
-      locale: () => 'en',
-    },
-    $router: {
-      push: jest.fn(),
-    },
-  }
+  beforeEach(() => {
+    mocks = {
+      $t: jest.fn((str) => str),
+      $i18n: {
+        locale: () => 'en',
+      },
+      $router: {
+        push: jest.fn(),
+      },
+      $env: {
+        MAX_GROUP_PINNED_POSTS: 0,
+      },
+    }
+  })
 
   const stubs = {
     'router-link': {
@@ -33,8 +40,8 @@ describe('ContentMenu.vue - Group', () => {
   const getters = {
     'auth/isModerator': () => false,
     'auth/isAdmin': () => false,
-    'pinnedPosts/maxPinnedPosts': 1,
-    'pinnedPosts/currentlyPinnedPosts': 1,
+    'pinnedPosts/maxPinnedPosts': () => 1,
+    'pinnedPosts/currentlyPinnedPosts': () => 1,
   }
   const actions = {
     'pinnedPosts/fetch': jest.fn(),
@@ -62,7 +69,7 @@ describe('ContentMenu.vue - Group', () => {
     describe('when maxGroupPinnedPosts = 0', () => {
       beforeEach(() => {
         mocks.$env = {
-          MAX_PINNED_GROUP_POSTS: 0,
+          MAX_GROUP_PINNED_POSTS: 0,
         }
       })
 
@@ -117,7 +124,7 @@ describe('ContentMenu.vue - Group', () => {
     describe('when maxPinnedPosts = 1', () => {
       beforeEach(() => {
         mocks.$env = {
-          MAX_PINNED_GROUP_POSTS: 1,
+          MAX_GROUP_PINNED_POSTS: 1,
         }
       })
 
@@ -145,15 +152,11 @@ describe('ContentMenu.vue - Group', () => {
           expect(wrapper.emitted('pinGroupPost')).toEqual([
             [
               {
-                isOwner: false,
-                resourceType: 'contribution',
-                resource: {
-                  id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
-                  groupPinned: false,
-                  group: {
-                    myRole,
-                    currentlyPinnedPostsCount,
-                  },
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                groupPinned: false,
+                group: {
+                  myRole,
+                  currentlyPinnedPostsCount,
                 },
               },
             ],
@@ -181,15 +184,11 @@ describe('ContentMenu.vue - Group', () => {
           expect(wrapper.emitted('unpinGroupPost')).toEqual([
             [
               {
-                isOwner: false,
-                resourceType: 'contribution',
-                resource: {
-                  id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
-                  groupPinned: true,
-                  group: {
-                    myRole,
-                    currentlyPinnedPostsCount,
-                  },
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                groupPinned: true,
+                group: {
+                  myRole,
+                  currentlyPinnedPostsCount,
                 },
               },
             ],
@@ -221,15 +220,11 @@ describe('ContentMenu.vue - Group', () => {
           expect(wrapper.emitted('pinGroupPost')).toEqual([
             [
               {
-                isOwner: false,
-                resourceType: 'contribution',
-                resource: {
-                  id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
-                  groupPinned: false,
-                  group: {
-                    myRole,
-                    currentlyPinnedPostsCount,
-                  },
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                groupPinned: false,
+                group: {
+                  myRole,
+                  currentlyPinnedPostsCount,
                 },
               },
             ],
@@ -257,15 +252,11 @@ describe('ContentMenu.vue - Group', () => {
           expect(wrapper.emitted('unpinGroupPost')).toEqual([
             [
               {
-                isOwner: false,
-                resourceType: 'contribution',
-                resource: {
-                  id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
-                  groupPinned: true,
-                  group: {
-                    myRole,
-                    currentlyPinnedPostsCount,
-                  },
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                groupPinned: true,
+                group: {
+                  myRole,
+                  currentlyPinnedPostsCount,
                 },
               },
             ],
@@ -277,7 +268,7 @@ describe('ContentMenu.vue - Group', () => {
     describe('when maxPinnedPosts = 2', () => {
       beforeEach(() => {
         mocks.$env = {
-          MAX_PINNED_GROUP_POSTS: 2,
+          MAX_GROUP_PINNED_POSTS: 2,
         }
       })
 
@@ -305,15 +296,11 @@ describe('ContentMenu.vue - Group', () => {
           expect(wrapper.emitted('pinGroupPost')).toEqual([
             [
               {
-                isOwner: false,
-                resourceType: 'contribution',
-                resource: {
-                  id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
-                  groupPinned: false,
-                  group: {
-                    myRole,
-                    currentlyPinnedPostsCount,
-                  },
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                groupPinned: false,
+                group: {
+                  myRole,
+                  currentlyPinnedPostsCount,
                 },
               },
             ],
@@ -341,15 +328,11 @@ describe('ContentMenu.vue - Group', () => {
           expect(wrapper.emitted('unpinGroupPost')).toEqual([
             [
               {
-                isOwner: false,
-                resourceType: 'contribution',
-                resource: {
-                  id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
-                  groupPinned: true,
-                  group: {
-                    myRole,
-                    currentlyPinnedPostsCount,
-                  },
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                groupPinned: true,
+                group: {
+                  myRole,
+                  currentlyPinnedPostsCount,
                 },
               },
             ],
@@ -400,15 +383,11 @@ describe('ContentMenu.vue - Group', () => {
           expect(wrapper.emitted('unpinGroupPost')).toEqual([
             [
               {
-                isOwner: false,
-                resourceType: 'contribution',
-                resource: {
-                  id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
-                  groupPinned: true,
-                  group: {
-                    myRole,
-                    currentlyPinnedPostsCount,
-                  },
+                id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
+                groupPinned: true,
+                group: {
+                  myRole,
+                  currentlyPinnedPostsCount,
                 },
               },
             ],
