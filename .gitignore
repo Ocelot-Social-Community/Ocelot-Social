@@ -13,7 +13,8 @@ backup-cron-job.log
 .nuxt
 
 node_modules/
-cypress/videos
+cypress/videos/
+cypress/reports/
 cypress/screenshots/
 cypress.env.json
 deployment/configurations/

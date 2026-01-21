@@ -184,7 +184,7 @@ jobs:
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: ocelot-e2e-test-report-pr${{ needs.docker_preparation.outputs.pr-number }}
-          path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
+          path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/failure
 
   cleanup_cache:
     name: Cleanup Cache

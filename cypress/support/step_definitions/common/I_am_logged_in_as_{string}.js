@@ -8,7 +8,7 @@ defineStep('I am logged in as {string}', slug => {
     .then(user => {
       return new Cypress.Promise((resolve, reject) => {
         if(!user) {
-          return reject(`User ${email} not found in database`)
+          return reject(`User ${slug} not found in database`)
         }
         return user.toJson().then((user) => resolve(user))
       })

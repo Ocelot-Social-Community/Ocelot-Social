@@ -78,11 +78,17 @@ module.exports = defineConfig({
     baseUrl: 'http://localhost:3000',
     specPattern: '**/*.feature',
     supportFile: false,
+    includeShadowDom: true,
     retries:  0,
-    video: false,
+    video: true,
+    videosFolder: 'cypress/reports/failure/',
     viewportHeight: 720,
     viewportWidth: 1290,
     setupNodeEvents,
   },
-  env: parsed
+  env: {
+    ...parsed,
+    mailserverURL: 'http://localhost:1080',
+    backendURL: 'http://localhost:4000',
+  }
 });
