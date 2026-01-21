@@ -507,7 +507,7 @@ export default {
         query: `
           MATCH (user:User {id: $user.id})
           MATCH (post:Post {id: $params.id})-[:IN]->(group:Group)
-          MERGE (user)-[pinned:GROUP_PINNED{createdAt: toString(datetime())}]->(post)
+          MERGE (user)-[pinned:GROUP_PINNED {createdAt: toString(datetime())}]->(post)
           SET post.groupPinned = true
           RETURN post {.*, pinnedAt: pinned.createdAt}`,
         variables: { user: context.user, params },
