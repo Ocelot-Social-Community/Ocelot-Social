@@ -76,7 +76,7 @@
     "mime-types": "^3.0.2",
     "minimatch": "^10.1.1",
     "mustache": "^4.2.0",
-    "neo4j-driver": "^4.4.11",
+    "neo4j-driver": "^6.0.1",
     "neo4j-graphql-js": "^2.11.5",
     "neode": "^0.4.9",
     "node-fetch": "^2.7.0",
