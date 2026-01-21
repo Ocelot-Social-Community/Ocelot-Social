@@ -38,7 +38,9 @@ const options = {
   NETWORK_NAME: process.env.NETWORK_NAME || 'Ocelot.social',
   ASK_FOR_REAL_NAME: process.env.ASK_FOR_REAL_NAME === 'true' || false,
   REQUIRE_LOCATION: process.env.REQUIRE_LOCATION === 'true' || false,
-  MAX_GROUP_PINNED_POSTS: process.env.MAX_GROUP_PINNED_POSTS ?? 1,
+  MAX_GROUP_PINNED_POSTS: Number.isNaN(Number(process.env.MAX_GROUP_PINNED_POSTS))
+    ? 1
+    : Number(process.env.MAX_GROUP_PINNED_POSTS),
 }
 
 const language = {
