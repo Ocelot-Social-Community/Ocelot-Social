@@ -470,7 +470,7 @@ export default {
         })
       ).records.map((record) => record.get('inviteCodes'))
     },
-    emailNotificationSettings: async (parent, _params, _context, _resolveInfo) => {
+    emailNotificationSettings: (parent, _params, _context, _resolveInfo) => {
       return [
         {
           type: 'post',
