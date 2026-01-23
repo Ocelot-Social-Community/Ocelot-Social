@@ -470,35 +470,26 @@ export default {
         })
       ).records.map((record) => record.get('inviteCodes'))
     },
-    emailNotificationSettings: async (_parent, _params, context, _resolveInfo) => {
-      const [user] = (
-        await context.database.query({
-          query: `
-          MATCH (user:User {id: $user.id})
-          RETURN user {.*}
-          `,
-          variables: { user: context.user },
-        })
-      ).records.map((record) => record.get('user'))
+    emailNotificationSettings: async (parent, _params, _context, _resolveInfo) => {
       return [
         {
           type: 'post',
           settings: [
             {
               name: 'commentOnObservedPost',
-              value: user.emailNotificationsCommentOnObservedPost ?? true,
+              value: parent.emailNotificationsCommentOnObservedPost ?? true,
             },
             {
               name: 'mention',
-              value: user.emailNotificationsMention ?? true,
+              value: parent.emailNotificationsMention ?? true,
             },
             {
               name: 'followingUsers',
-              value: user.emailNotificationsFollowingUsers ?? true,
+              value: parent.emailNotificationsFollowingUsers ?? true,
             },
             {
               name: 'postInGroup',
-              value: user.emailNotificationsPostInGroup ?? true,
+              value: parent.emailNotificationsPostInGroup ?? true,
             },
           ],
         },
@@ -507,7 +498,7 @@ export default {
           settings: [
             {
               name: 'chatMessage',
-              value: user.emailNotificationsChatMessage !== false,
+              value: parent.emailNotificationsChatMessage ?? true,
             },
           ],
         },
@@ -516,19 +507,19 @@ export default {
           settings: [
             {
               name: 'groupMemberJoined',
-              value: user.emailNotificationsGroupMemberJoined !== false,
+              value: parent.emailNotificationsGroupMemberJoined ?? true,
             },
             {
               name: 'groupMemberLeft',
-              value: user.emailNotificationsGroupMemberLeft !== false,
+              value: parent.emailNotificationsGroupMemberLeft ?? true,
             },
             {
               name: 'groupMemberRemoved',
-              value: user.emailNotificationsGroupMemberRemoved !== false,
+              value: parent.emailNotificationsGroupMemberRemoved ?? true,
             },
             {
               name: 'groupMemberRoleChanged',
-              value: user.emailNotificationsGroupMemberRoleChanged !== false,
+              value: parent.emailNotificationsGroupMemberRoleChanged ?? true,
             },
           ],
         },

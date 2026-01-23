@@ -5,7 +5,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { AuthenticationError } from 'apollo-server'
 import bcrypt from 'bcryptjs'
-import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import { getNeode } from '@db/neo4j'
 import { encode } from '@jwt/encode'
@@ -17,8 +16,21 @@ const neode = getNeode()
 
 export default {
   Query: {
-    currentUser: async (object, params, context, resolveInfo) =>
-      await neo4jgraphql(object, { id: context.user.id }, context, resolveInfo),
+    currentUser: async (_object, _params, context: Context, _resolveInfo) => {
+      if (!context.user) {
+        throw new Error('You must be logged in')
+      }
+      const [user] = (
+        await context.database.query({
+          query: `
+          MATCH (user:User {id: $user.id})-[:PRIMARY_EMAIL]->(e:EmailAddress)
+          RETURN user {.*, email: e.email}
+        `,
+          variables: { user: context.user },
+        })
+      ).records.map((record) => record.get('user'))
+      return user
+    },
   },
   Mutation: {
     login: async (_, { email, password }, context: Context) => {
