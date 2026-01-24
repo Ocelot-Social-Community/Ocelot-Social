@@ -40,7 +40,7 @@
     "@babel/preset-env": "^7.28.5",
     "@babel/register": "^7.28.3",
     "@badeball/cypress-cucumber-preprocessor": "^24.0.0",
-    "@cucumber/cucumber": "12.5.0",
+    "@cucumber/cucumber": "12.6.0",
     "@cypress/webpack-preprocessor": "^7.0.2",
     "auto-changelog": "^2.5.0",
     "cypress": "^15.9.0",
