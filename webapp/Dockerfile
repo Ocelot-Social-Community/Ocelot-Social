@@ -1,4 +1,4 @@
-FROM node:25.3.0-alpine AS styleguide
+FROM node:25.4.0-alpine AS styleguide
 RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
@@ -6,7 +6,7 @@ COPY styleguide .
 RUN yarn install --production=false --frozen-lockfile --non-interactive
 RUN yarn run build:lib
 
-FROM node:25.3.0-alpine AS base
+FROM node:25.4.0-alpine AS base
 LABEL org.label-schema.name="ocelot.social:webapp"
 LABEL org.label-schema.description="Web Frontend of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
