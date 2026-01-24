@@ -1,41 +1,34 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createTestClient } from 'apollo-server-testing'
-
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { UpdateUser } from '@graphql/queries/UpdateUser'
 import { User } from '@graphql/queries/User'
-import createServer from '@src/server'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-let query, mutate, authenticatedUser
-
-const driver = getDriver()
-const neode = getNeode()
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser })
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 beforeAll(async () => {
   await cleanDatabase()
-
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode,
-        user: authenticatedUser,
-        cypherParams: {
-          currentUserId: authenticatedUser ? authenticatedUser.id : null,
-        },
-      }
-    },
-  })
-  query = createTestClient(server).query
-  mutate = createTestClient(server).mutate
+  const apolloSetup = createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
