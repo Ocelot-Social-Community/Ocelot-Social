@@ -46,6 +46,7 @@ describe('PostSlug', () => {
         },
         actions: {
           'categories/init': jest.fn(),
+          'pinnedPosts/fetch': jest.fn(),
         },
       })
       const propsData = {}
