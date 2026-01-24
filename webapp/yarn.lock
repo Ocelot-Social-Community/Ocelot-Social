@@ -2898,10 +2898,10 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@faker-js/faker@9.9.0":
-  version "9.9.0"
-  resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-9.9.0.tgz#3ad015fbbaaae7af3149555e0f22b4b30134c69d"
-  integrity sha512-OEl393iCOoo/z8bMezRlJu+GlRGlsKbUAN7jKB6LhnKoqKve5DXRpalbItIIcwnCjs1k/FOPjFzcA6Qn+H+YbA==
+"@faker-js/faker@10.2.0":
+  version "10.2.0"
+  resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-10.2.0.tgz#91028d4086969825795de331c305e8b91414bcb7"
+  integrity sha512-rTXwAsIxpCqzUnZvrxVh3L0QA0NzToqWBLAhV+zDV3MIIwiQhAZHMdPCIaj5n/yADu/tyk12wIPgL6YHGXJP+g==
 
 "@gar/promisify@^1.0.1":
   version "1.1.3"
