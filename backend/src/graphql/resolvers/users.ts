@@ -457,6 +457,18 @@ export default {
     },
   },
   User: {
+    activeCategories: async (parent, _args, context: Context, _resolveInfo) => {
+      return (
+        await context.database.query({
+          query: `
+          MATCH (category:Category)
+          WHERE NOT ((:User{id: $user.id})-[:NOT_INTERESTED_IN]->(category))
+          RETURN collect(category.id) as categories
+          `,
+          variables: { user: parent },
+        })
+      ).records.map((record) => record.get('categories'))[0]
+    },
     inviteCodes: async (_parent, _args, context: Context, _resolveInfo) => {
       return (
         await context.database.query({
@@ -632,7 +644,6 @@ export default {
         'allowEmbedIframes',
         'showShoutsPublicly',
         'locale',
-        'activeCategories',
       ],
       boolean: {
         followedByCurrentUser:
