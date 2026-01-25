@@ -62,6 +62,9 @@ describe('CommentCard.vue', () => {
     Wrapper = () => {
       const store = new Vuex.Store({
         getters,
+        actions: {
+          'pinnedPosts/fetch': jest.fn(),
+        },
       })
       return mount(CommentCard, {
         store,

@@ -9,7 +9,10 @@
     "url": "https://github.com/Ocelot-Social-Community/Ocelot-Social.git"
   },
   "cypress-cucumber-preprocessor": {
-    "stepDefinitions": "cypress/support/step_definitions/**/*.js",
+    "stepDefinitions": [
+      "cypress/support/step_definitions/[filepart]/**/*.js",
+      "cypress/support/step_definitions/common/**/*.js"
+    ],
     "json": {
       "enabled": true,
       "output": "cypress/reports/json_logs/cucumber_log.json",
@@ -37,7 +40,7 @@
     "@babel/preset-env": "^7.28.5",
     "@babel/register": "^7.28.3",
     "@badeball/cypress-cucumber-preprocessor": "^24.0.0",
-    "@cucumber/cucumber": "12.5.0",
+    "@cucumber/cucumber": "12.6.0",
     "@cypress/webpack-preprocessor": "^7.0.2",
     "auto-changelog": "^2.5.0",
     "cypress": "^15.9.0",
@@ -48,7 +51,7 @@
     "mock-socket": "^9.0.3",
     "multiple-cucumber-html-reporter": "^3.9.3",
     "node-polyfill-webpack-plugin": "^4.1.0",
-    "sass-embedded": "^1.97.2",
+    "sass-embedded": "^1.97.3",
     "webpack": "^5.104.1"
   },
   "optionalDependencies": {
