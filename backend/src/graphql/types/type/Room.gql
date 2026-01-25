@@ -5,7 +5,8 @@
 #   users_some: _UserFilter
 # }
 
-"TODO change this to last message date"
+# TODO change this to last message date
+
 enum _RoomOrdering {
   lastMessageAt_desc
   createdAt_desc
