@@ -39,9 +39,6 @@ describe('SearchResults', () => {
       'auth/isModerator': () => false,
       'categories/categoriesActive': () => false,
     }
-    actions = {
-      'categories/init': jest.fn(),
-    }
     propsData = {
       pageSize: 12,
       search: '',
