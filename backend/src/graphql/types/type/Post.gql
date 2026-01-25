@@ -87,7 +87,6 @@ input _PostFilter {
   postType_in: [PostType]
   eventStart_gte: String
   eventEnd_gte: String
-
 }
 
 enum _PostOrdering {
