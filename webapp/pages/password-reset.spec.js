@@ -7,6 +7,7 @@ const localVue = global.localVue
 const stubs = {
   'client-only': true,
   'nuxt-child': true,
+  'nuxt-link': true,
 }
 
 describe('password-reset.vue', () => {
