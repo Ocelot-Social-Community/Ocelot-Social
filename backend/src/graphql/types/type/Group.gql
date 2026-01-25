@@ -38,12 +38,16 @@ type Group {
 
   categories: [Category] @relation(name: "CATEGORIZED", direction: "OUT")
 
-  membersCount: Int! @cypher(statement: "MATCH (this)<-[:MEMBER_OF]-(r:User) RETURN COUNT(DISTINCT r)")
+  membersCount: Int!
+    @cypher(statement: "MATCH (this)<-[:MEMBER_OF]-(r:User) RETURN COUNT(DISTINCT r)")
 
   myRole: GroupMemberRole # if 'null' then the current user is no member
   posts: [Post] @relation(name: "IN", direction: "IN")
 
-  isMutedByMe: Boolean! @cypher(statement: "MATCH (this) RETURN EXISTS( (this)<-[:MUTED]-(:User {id: $cypherParams.currentUserId}) )")
+  isMutedByMe: Boolean!
+    @cypher(
+      statement: "MATCH (this) RETURN EXISTS( (this)<-[:MUTED]-(:User {id: $cypherParams.currentUserId}) )"
+    )
 
   "inviteCodes to this group the current user has generated"
   inviteCodes: [InviteCode]! @neo4j_ignore
@@ -76,13 +80,9 @@ type Query {
   # orderBy: [_GroupOrdering] # not implemented yet
   # filter: _GroupFilter # not implemented yet
 
-  GroupMembers(
-    id: ID!
-    first: Int
-    offset: Int
-    # orderBy: [_UserOrdering] # not implemented yet
-    # filter: _UserFilter # not implemented yet
-  ): [User]
+  GroupMembers(id: ID!, first: Int, offset: Int): [User]
+  # orderBy: [_UserOrdering] # not implemented yet
+  # filter: _UserFilter # not implemented yet
 
   GroupCount(isMember: Boolean): Int
 

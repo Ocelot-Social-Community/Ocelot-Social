@@ -1,5 +1,5 @@
 type Image {
-  url: ID!,
+  url: ID!
   transform(width: Int, height: Int): String
 
   # urlW34: String,

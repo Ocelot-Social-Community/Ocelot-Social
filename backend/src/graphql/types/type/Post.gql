@@ -252,9 +252,9 @@ type Mutation {
   pushPost(id: ID!): Post!
   unpushPost(id: ID!): Post!
 
-  # Shout the given Type and ID
+  "Shout the given Type and ID"
   shout(id: ID!, type: ShoutTypeEnum!): Boolean!
-  # Unshout the given Type and ID
+  "Unshout the given Type and ID"
   unshout(id: ID!, type: ShoutTypeEnum!): Boolean!
 
   toggleObservePost(id: ID!, value: Boolean!): Post!
