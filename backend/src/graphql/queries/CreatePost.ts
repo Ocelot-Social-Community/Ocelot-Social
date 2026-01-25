@@ -6,6 +6,7 @@ export const CreatePost = gql`
     $title: String!
     $slug: String
     $content: String!
+    $files: [FileInput]
     $categoryIds: [ID]
     $groupId: ID
     $postType: PostType
@@ -16,6 +17,7 @@ export const CreatePost = gql`
       title: $title
       slug: $slug
       content: $content
+      files: $files
       categoryIds: $categoryIds
       groupId: $groupId
       postType: $postType
