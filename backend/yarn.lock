@@ -153,7 +153,7 @@
     "@smithy/util-utf8" "^2.0.0"
     tslib "^2.6.2"
 
-"@aws-sdk/client-s3@^3.971.0":
+"@aws-sdk/client-s3@^3.975.0":
   version "3.975.0"
   resolved "https://registry.yarnpkg.com/@aws-sdk/client-s3/-/client-s3-3.975.0.tgz#58a7b3c7097a73b2ee37c3e6eb534078ddf49ba1"
   integrity sha512-aF1M/iMD29BPcpxjqoym0YFa4WR9Xie1/IhVumwOGH6TB45DaqYO7vLwantDBcYNRn/cZH6DFHksO7RmwTFBhw==
@@ -422,7 +422,7 @@
     "@smithy/types" "^4.12.0"
     tslib "^2.6.2"
 
-"@aws-sdk/lib-storage@^3.971.0":
+"@aws-sdk/lib-storage@^3.975.0":
   version "3.975.0"
   resolved "https://registry.yarnpkg.com/@aws-sdk/lib-storage/-/lib-storage-3.975.0.tgz#3be458b88ad64e1987633ca441b8135e4c7f34c4"
   integrity sha512-F6vrnZ3F7oqr3oONCIpx+uZDTwXWfh8sBoNNJollDn5pIn7TI+R+7WxVIXAMq/JWLXE6N8T3M6ogWk4Y4JWPPw==
@@ -2979,7 +2979,7 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*", "@types/node@^25.0.9":
+"@types/node@*", "@types/node@^25.0.10":
   version "25.0.10"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-25.0.10.tgz#4864459c3c9459376b8b75fd051315071c8213e7"
   integrity sha512-zWW5KPngR/yvakJgGOmZ5vTBemDoSqF3AcV/LrO5u5wTWyEAVVh+IT39G4gtyAkh3CtTZs8aX/yRM82OfzHJRg==
@@ -4412,6 +4412,23 @@ cheerio@~1.1.2:
     undici "^7.12.0"
     whatwg-mimetype "^4.0.0"
 
+cheerio@~1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/cheerio/-/cheerio-1.2.0.tgz#f23b777c49021ead7475dcf3390d3535a7f896d6"
+  integrity sha512-WDrybc/gKFpTYQutKIK6UvfcuxijIZfMfXaYm8NMsPQxSYvf+13fXUJ4rztGGbJcBQ/GF55gvrZ0Bc0bj/mqvg==
+  dependencies:
+    cheerio-select "^2.1.0"
+    dom-serializer "^2.0.0"
+    domhandler "^5.0.3"
+    domutils "^3.2.2"
+    encoding-sniffer "^0.2.1"
+    htmlparser2 "^10.1.0"
+    parse5 "^7.3.0"
+    parse5-htmlparser2-tree-adapter "^7.1.0"
+    parse5-parser-stream "^7.1.2"
+    undici "^7.19.0"
+    whatwg-mimetype "^4.0.0"
+
 chokidar@^3.5.2, chokidar@^3.5.3:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-3.6.0.tgz#197c6cc669ef2a8dc5e7b4d97ee4e092c3eb0d5b"
@@ -5221,7 +5238,7 @@ entities@^6.0.0:
   resolved "https://registry.yarnpkg.com/entities/-/entities-6.0.1.tgz#c28c34a43379ca7f61d074130b2f5f7020a30694"
   integrity sha512-aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g==
 
-entities@~7.0.1:
+entities@^7.0.1, entities@~7.0.1:
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/entities/-/entities-7.0.1.tgz#26e8a88889db63417dcb9a1e79a3f1bc92b5976b"
   integrity sha512-TWrgLOFUQTH994YUyl1yT4uyavY5nNB5muff+RtWaqNVCAK408b5ZnnbNAUEWLTCpum9w6arT70i1XdQ4UeOPA==
@@ -6901,6 +6918,16 @@ htmlparser2@^10.0.0:
     domhandler "^5.0.3"
     domutils "^3.2.1"
     entities "^6.0.0"
+
+htmlparser2@^10.1.0:
+  version "10.1.0"
+  resolved "https://registry.yarnpkg.com/htmlparser2/-/htmlparser2-10.1.0.tgz#fe3f2e12c73b6e462d4e10395db9c1119e4d6ae4"
+  integrity sha512-VTZkM9GWRAtEpveh7MSF6SjjrpNVNNVJfFup7xTY3UpFtm67foy9HDVXneLtFVt4pMz5kZtgNcvCniNFb1hlEQ==
+  dependencies:
+    domelementtype "^2.3.0"
+    domhandler "^5.0.3"
+    domutils "^3.2.2"
+    entities "^7.0.1"
 
 htmlparser2@^5.0.0:
   version "5.0.1"
@@ -11502,6 +11529,11 @@ undici@^7.12.0:
   version "7.12.0"
   resolved "https://registry.yarnpkg.com/undici/-/undici-7.12.0.tgz#e93244fa49383e8a0e1a4295048fd454541c7ccb"
   integrity sha512-GrKEsc3ughskmGA9jevVlIOPMiiAHJ4OFUtaAH+NhfTUSiZ1wMPIQqQvAJUrJspFXJt3EBWgpAeoHEDVT1IBug==
+
+undici@^7.19.0:
+  version "7.19.1"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-7.19.1.tgz#b8a35742564a27601efa893a8800ce60d5502019"
+  integrity sha512-Gpq0iNm5M6cQWlyHQv9MV+uOj1jWk7LpkoE5vSp/7zjb4zMdAcUD+VL5y0nH4p9EbUklq00eVIIX/XcDHzu5xg==
 
 unique-filename@^5.0.0:
   version "5.0.0"
