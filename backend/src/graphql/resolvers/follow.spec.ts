@@ -2,21 +2,20 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createTestClient } from 'apollo-server-testing'
-
 import Factory, { cleanDatabase } from '@db/factories'
-import { getDriver, getNeode } from '@db/neo4j'
 import { followUser } from '@graphql/queries/followUser'
 import { unfollowUser } from '@graphql/queries/unfollowUser'
 import { User } from '@graphql/queries/User'
-import createServer from '@src/server'
+import { createApolloTestSetup } from '@root/test/helpers'
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-const driver = getDriver()
-const neode = getNeode()
-
-let query
-let mutate
-let authenticatedUser
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser })
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 let user1
 let user2
@@ -24,26 +23,18 @@ let variables
 
 beforeAll(async () => {
   await cleanDatabase()
-
-  const { server } = createServer({
-    context: () => ({
-      driver,
-      neode,
-      user: authenticatedUser,
-      cypherParams: {
-        currentUserId: authenticatedUser ? authenticatedUser.id : null,
-      },
-    }),
-  })
-
-  const testClient = createTestClient(server)
-  query = testClient.query
-  mutate = testClient.mutate
+  const apolloSetup = createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 beforeEach(async () => {
@@ -118,7 +109,7 @@ describe('follow', () => {
         mutation: followUser,
         variables,
       })
-      const relation = await neode.cypher(
+      const relation = await database.neode.cypher(
         'MATCH (user:User {id: $id})-[relationship:FOLLOWS]->(followed:User) WHERE relationship.createdAt IS NOT NULL RETURN relationship',
         { id: 'u1' },
       )
