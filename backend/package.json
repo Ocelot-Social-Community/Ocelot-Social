@@ -41,7 +41,7 @@
     "cross-env": "~10.1.0",
     "dotenv": "~17.0.1",
     "email-templates": "^12.0.3",
-    "express": "^5.2.1",
+    "express": "^4.22.1",
     "graphql": "^14.6.0",
     "graphql-middleware": "~6.1.35",
     "graphql-middleware-sentry": "^3.2.1",
@@ -77,7 +77,7 @@
     "minimatch": "^10.1.1",
     "mustache": "^4.2.0",
     "neo4j-driver": "^4.4.11",
-    "neo4j-graphql-js": "^2.11.5",
+    "neo4j-graphql-js": "2.11.5",
     "neode": "^0.4.9",
     "node-fetch": "^2.7.0",
     "nodemailer": "^7.0.12",
@@ -135,7 +135,8 @@
     "**/strip-ansi": "6.0.1",
     "**/string-width": "4.2.0",
     "**/wrap-ansi": "7.0.0",
-    "**/jwa": "^2.0.1"
+    "**/jwa": "^2.0.1",
+    "**/@types/express": "4.17.25"
   },
   "engines": {
     "node": ">=20.12.1"

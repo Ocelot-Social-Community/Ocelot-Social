@@ -24,6 +24,7 @@ jest.mock('@aws-sdk/lib-storage', () => {
 
 const uploadMock = Upload as unknown as jest.Mock
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const createReadStream: FileUpload['createReadStream'] = (() => ({
   pipe: () => ({
     on: (_: unknown, callback: () => void) => callback(), // eslint-disable-line promise/prefer-await-to-callbacks
@@ -32,6 +33,7 @@ const createReadStream: FileUpload['createReadStream'] = (() => ({
 const input = {
   uniqueFilename: 'unique-filename.jpg',
   mimetype: 'image/jpeg',
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   createReadStream,
 }
 
