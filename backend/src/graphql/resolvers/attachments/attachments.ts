@@ -130,10 +130,13 @@ export const attachments = (config: S3Config) => {
     const { upload } = fileInput
     if (!upload) throw new UserInputError('Cannot find attachment for given resource')
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const uploadFile = await upload
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
     const { name: fileName, ext } = path.parse(uploadFile.filename)
     const uniqueFilename = `${uuid()}-${slug(fileName)}${ext}`
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const url = await s3.uploadFile({
       ...uploadFile,
       uniqueFilename,

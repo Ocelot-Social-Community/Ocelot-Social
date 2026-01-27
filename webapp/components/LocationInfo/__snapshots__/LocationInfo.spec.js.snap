@@ -78,7 +78,7 @@ exports[`LocationInfo size renders in base size 1`] = `
 exports[`LocationInfo size renders in small size 1`] = `
 <div>
   <div
-    class="location-info size-base"
+    class="location-info size-small"
   >
     <div
       class="location"
