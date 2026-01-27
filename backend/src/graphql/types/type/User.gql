@@ -152,14 +152,7 @@ type User {
 
   emotions: [EMOTED]
 
-  activeCategories: [String]
-    @cypher(
-      statement: """
-      MATCH (category:Category)
-      WHERE NOT ((this)-[:NOT_INTERESTED_IN]->(category))
-      RETURN collect(category.id)
-      """
-    )
+  activeCategories: [String] @neo4j_ignore
 
   myRoleInGroup: GroupMemberRole
 }
