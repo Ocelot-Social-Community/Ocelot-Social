@@ -11,6 +11,7 @@ export const profilePagePosts = gql`
       id
       title
       content
+      groupPinned
     }
   }
 `
