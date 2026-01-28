@@ -18,7 +18,7 @@
         />
       </base-button>
     </a>
-    <nuxt-link v-else :to="settings.toolTipIdent">
+    <nuxt-link v-else :to="settings.path">
       <base-button
         class="custom-button"
         circle
