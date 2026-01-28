@@ -15,11 +15,15 @@ const stubs = {
 }
 
 describe('SearchResults', () => {
-  let mocks, getters, actions, propsData, wrapper
+  let mocks, getters, propsData, wrapper
+
   const Wrapper = () => {
     const store = new Vuex.Store({
       getters,
-      actions,
+      actions: {
+        'categories/init': jest.fn(),
+        'pinnedPosts/fetch': jest.fn(),
+      },
     })
     return mount(SearchResults, { mocks, localVue, propsData, store, stubs })
   }
@@ -34,9 +38,6 @@ describe('SearchResults', () => {
       },
       'auth/isModerator': () => false,
       'categories/categoriesActive': () => false,
-    }
-    actions = {
-      'categories/init': jest.fn(),
     }
     propsData = {
       pageSize: 12,

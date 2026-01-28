@@ -53,6 +53,7 @@ input _PostFilter {
   language_in: [String!]
   language_not_in: [String!]
   pinned: Boolean # required for `maintainPinnedPost`
+  groupPinned: Boolean # required for `maintainGroupPinnedPost`
   tags: _TagFilter
   tags_not: _TagFilter
   tags_in: [_TagFilter!]
@@ -115,6 +116,8 @@ enum _PostOrdering {
   pinned_desc
   eventStart_asc
   eventStart_desc
+  groupPinned_asc
+  groupPinned_desc
 }
 
 type Post {
@@ -131,6 +134,7 @@ type Post {
   deleted: Boolean
   disabled: Boolean
   pinned: Boolean
+  groupPinned: Boolean
   createdAt: String
   updatedAt: String
   sortDate: String
@@ -246,8 +250,12 @@ type Mutation {
   DeletePost(id: ID!): Post
   AddPostEmotions(to: _PostInput!, data: _EMOTEDInput!): EMOTED
   RemovePostEmotions(to: _PostInput!, data: _EMOTEDInput!): EMOTED
+
   pinPost(id: ID!): Post
   unpinPost(id: ID!): Post
+  pinGroupPost(id: ID!): Post
+  unpinGroupPost(id: ID!): Post
+
   markTeaserAsViewed(id: ID!): Post
   pushPost(id: ID!): Post!
   unpushPost(id: ID!): Post!

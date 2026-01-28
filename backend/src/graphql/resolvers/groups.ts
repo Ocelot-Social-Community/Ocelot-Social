@@ -471,6 +471,18 @@ export default {
         })
       ).records.map((r) => r.get('inviteCodes'))
     },
+    currentlyPinnedPostsCount: async (parent, _args, context: Context, _resolveInfo) => {
+      if (!parent.id) {
+        throw new Error('Can not identify selected Group!')
+      }
+      const result = await context.database.query({
+        query: `
+          MATCH (:User)-[pinned:GROUP_PINNED]->(pinnedPosts:Post)-[:IN]->(:Group {id: $group.id})
+          RETURN toString(count(pinnedPosts)) as count`,
+        variables: { group: parent },
+      })
+      return result.records[0].get('count')
+    },
     ...Resolver('Group', {
       undefinedToNull: ['deleted', 'disabled', 'locationName', 'about'],
       hasMany: {
