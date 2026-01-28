@@ -51,13 +51,17 @@ describe('PostTeaser', () => {
     }
     getters = {
       'auth/isModerator': () => false,
+      'auth/isAdmin': () => false,
       'auth/user': () => {
         return {}
       },
       'categories/categoriesActive': () => false,
+      'pinnedPosts/maxPinnedPosts': () => 0,
+      'pinnedPosts/currentlyPinnedPosts': () => 0,
     }
     actions = {
       'categories/init': jest.fn(),
+      'pinnedPosts/fetch': jest.fn().mockResolvedValue(),
     }
   })
 

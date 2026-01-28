@@ -84,9 +84,12 @@ export const images = (config: S3Config) => {
 
   const uploadImageFile = async (uploadPromise: Promise<FileUpload> | undefined) => {
     if (!uploadPromise) return undefined
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const upload = await uploadPromise
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
     const { name, ext } = path.parse(upload.filename)
     const uniqueFilename = `${uuid()}-${slug(name)}${ext}`
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return await s3.uploadFile({ ...upload, uniqueFilename })
   }
 

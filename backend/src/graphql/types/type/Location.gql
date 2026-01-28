@@ -18,6 +18,7 @@ type Location {
 }
 
 # This is not smart - we need one location for everything - use the same type everywhere!
+
 type LocationMapBox {
   id: ID!
   place_name: String!

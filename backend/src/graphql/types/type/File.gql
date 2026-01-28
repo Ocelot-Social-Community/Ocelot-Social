@@ -1,16 +1,16 @@
 type File {
-  url: ID!,
-  name: String,
-  #size: Int,
-  type: String,
-  #audio: Boolean,
-  #duration: Float,
-  #preview: String,
-  #progress: Int,
+  url: ID!
+  name: String
+  type: String
+  # size: Int
+  # audio: Boolean
+  # duration: Float
+  # preview: String
+  # progress: Int
 }
 
 input FileInput {
-  upload: Upload,
-  name: String,
-  type: String,
+  upload: Upload
+  name: String
+  type: String
 }

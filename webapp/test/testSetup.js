@@ -16,6 +16,15 @@ Vue.config.warnHandler = (msg, vm, trace) => {
   throw new Error(`[Vue warn]: ${msg}${trace}`)
 }
 
+// Fail tests on console.error (catches Vuex errors like "unknown action type")
+// eslint-disable-next-line no-console
+const originalConsoleError = console.error
+// eslint-disable-next-line no-console
+console.error = (...args) => {
+  originalConsoleError.apply(console, args)
+  throw new Error(`console.error was called: ${args.join(' ')}`)
+}
+
 global.localVue = createLocalVue()
 
 global.localVue.use(Vuex)
