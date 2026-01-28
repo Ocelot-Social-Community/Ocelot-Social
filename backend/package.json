@@ -12,7 +12,7 @@
     "build": "tsc && tsc-alias && ./scripts/build.copy.files.sh",
     "dev": "nodemon --exec ts-node --require tsconfig-paths/register src/index.ts -e js,ts,gql",
     "dev:debug": "nodemon --exec node --inspect=0.0.0.0:9229 build/src/index.js -e js,ts,gql",
-    "lint": "eslint --max-warnings=0 --report-unused-disable-directives --ext .js,.ts,.cjs,.json,.json5,.jsonc .",
+    "lint": "eslint --max-warnings=0 --report-unused-disable-directives --ext .js,.ts,.cjs,.json,.json5,.jsonc,.graphql,.gql .",
     "test": "cross-env NODE_ENV=test NODE_OPTIONS=--max-old-space-size=8192 jest --runInBand --coverage --forceExit --detectOpenHandles",
     "db:reset": "ts-node --require tsconfig-paths/register src/db/reset.ts",
     "db:reset:withmigrations": "ts-node --require tsconfig-paths/register src/db/reset-with-migrations.ts",
@@ -41,7 +41,7 @@
     "cross-env": "~10.1.0",
     "dotenv": "~17.0.1",
     "email-templates": "^12.0.3",
-    "express": "^5.2.1",
+    "express": "^4.22.1",
     "graphql": "^14.6.0",
     "graphql-middleware": "~6.1.35",
     "graphql-middleware-sentry": "^3.2.1",
@@ -77,7 +77,7 @@
     "minimatch": "^10.1.1",
     "mustache": "^4.2.0",
     "neo4j-driver": "^4.4.11",
-    "neo4j-graphql-js": "^2.11.5",
+    "neo4j-graphql-js": "2.11.5",
     "neode": "^0.4.9",
     "node-fetch": "^2.7.0",
     "nodemailer": "^7.0.12",
@@ -95,6 +95,7 @@
   "devDependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "^4.6.0",
     "@faker-js/faker": "9.9.0",
+    "@graphql-eslint/eslint-plugin": "^3.20.1",
     "@types/email-templates": "^10.0.4",
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "~8.5.1",
@@ -135,7 +136,8 @@
     "**/strip-ansi": "6.0.1",
     "**/string-width": "4.2.0",
     "**/wrap-ansi": "7.0.0",
-    "**/jwa": "^2.0.1"
+    "**/jwa": "^2.0.1",
+    "**/@types/express": "4.17.25"
   },
   "engines": {
     "node": ">=20.12.1"

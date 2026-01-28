@@ -17,6 +17,10 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.1.7
         with:
           fetch-depth: 0 # Fetch full History for changelog
+      - name: Setup Node.js
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v4.0.3
+        with:
+          node-version-file: '.nvmrc'
       - name: Setup env
         run: |
           echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV
@@ -57,6 +61,10 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.1.7
         with:
           fetch-depth: 0 # Fetch full History for changelog
+      - name: Setup Node.js
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v4.0.3
+        with:
+          node-version-file: '.nvmrc'
       - name: Setup env
         run: |
           echo "VERSION=$(node -p -e "require('./package.json').version")" >> $GITHUB_ENV

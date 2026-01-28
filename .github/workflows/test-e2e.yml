@@ -77,7 +77,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v4.4.0
         with:
-          node-version-file: 'backend/.tool-versions'
+          node-version-file: 'backend/.nvmrc'
           cache: 'yarn'
 
       - name: Copy env files
@@ -87,7 +87,8 @@ jobs:
 
       - name: Install cypress requirements
         run: |
-          wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
+          sudo wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
+          sudo chmod +x /opt/cucumber-json-formatter
           cd backend
           yarn install
           yarn build
@@ -125,7 +126,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v4.4.0
         with:
-          node-version-file: 'backend/.tool-versions'
+          node-version-file: 'backend/.nvmrc'
           cache: 'yarn'
 
       - name: Restore cypress cache

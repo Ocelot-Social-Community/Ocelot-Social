@@ -4,7 +4,5 @@ type UserData {
 }
 
 type Query {
-  userData(
-    id: ID
-  ): UserData
+  userData(id: ID): UserData
 }
