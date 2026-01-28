@@ -1089,16 +1089,24 @@ describe('redeemInviteCode', () => {
         data: {
           GroupMembers: expect.arrayContaining([
             {
-              id: 'inviting-user',
-              myRoleInGroup: 'owner',
-              name: 'Inviting User',
-              slug: 'inviting-user',
+              user: {
+                id: 'inviting-user',
+                name: 'Inviting User',
+                slug: 'inviting-user',
+              },
+              membership: {
+                role: 'owner',
+              },
             },
             {
-              id: 'other-user',
-              myRoleInGroup: 'pending',
-              name: 'Other User',
-              slug: 'other-user',
+              user: {
+                id: 'other-user',
+                name: 'Other User',
+                slug: 'other-user',
+              },
+              membership: {
+                role: 'pending',
+              },
             },
           ]),
         },

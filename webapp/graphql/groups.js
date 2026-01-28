@@ -111,10 +111,14 @@ export const joinGroupMutation = () => {
   return gql`
     mutation ($groupId: ID!, $userId: ID!) {
       JoinGroup(groupId: $groupId, userId: $userId) {
-        id
-        name
-        slug
-        myRoleInGroup
+        user {
+          id
+          name
+          slug
+        }
+        membership {
+          role
+        }
       }
     }
   `
@@ -124,10 +128,14 @@ export const leaveGroupMutation = () => {
   return gql`
     mutation ($groupId: ID!, $userId: ID!) {
       LeaveGroup(groupId: $groupId, userId: $userId) {
-        id
-        name
-        slug
-        myRoleInGroup
+        user {
+          id
+          name
+          slug
+        }
+        membership {
+          role
+        }
       }
     }
   `
@@ -137,10 +145,14 @@ export const changeGroupMemberRoleMutation = () => {
   return gql`
     mutation ($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {
       ChangeGroupMemberRole(groupId: $groupId, userId: $userId, roleInGroup: $roleInGroup) {
-        id
-        name
-        slug
-        myRoleInGroup
+        user {
+          id
+          name
+          slug
+        }
+        membership {
+          role
+        }
       }
     }
   `
@@ -150,10 +162,14 @@ export const removeUserFromGroupMutation = () => {
   return gql`
     mutation ($groupId: ID!, $userId: ID!) {
       RemoveUserFromGroup(groupId: $groupId, userId: $userId) {
-        id
-        name
-        slug
-        myRoleInGroup
+        user {
+          id
+          name
+          slug
+        }
+        membership {
+          role
+        }
       }
     }
   `
@@ -215,12 +231,16 @@ export const groupMembersQuery = () => {
 
     query ($id: ID!, $first: Int, $offset: Int) {
       GroupMembers(id: $id, first: $first, offset: $offset) {
-        id
-        name
-        slug
-        myRoleInGroup
-        avatar {
-          ...imageUrls
+        user {
+          id
+          name
+          slug
+          avatar {
+            ...imageUrls
+          }
+        }
+        membership {
+          role
         }
       }
     }

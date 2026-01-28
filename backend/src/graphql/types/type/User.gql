@@ -153,8 +153,6 @@ type User {
   emotions: [EMOTED]
 
   activeCategories: [String] @neo4j_ignore
-
-  myRoleInGroup: GroupMemberRole
 }
 
 input _UserFilter {
