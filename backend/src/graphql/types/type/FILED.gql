@@ -5,7 +5,7 @@ type FILED {
   submitter: User
 }
 
-# this list equals the strings of an array in file "webapp/constants/modals.js"
+"this list equals the strings of an array in file `webapp/constants/modals.js`"
 enum ReasonCategory {
   other
   discrimination_etc
@@ -26,5 +26,9 @@ type FiledReport {
 }
 
 type Mutation {
-  fileReport(resourceId: ID!, reasonCategory: ReasonCategory!, reasonDescription: String!): FiledReport
+  fileReport(
+    resourceId: ID!
+    reasonCategory: ReasonCategory!
+    reasonDescription: String!
+  ): FiledReport
 }

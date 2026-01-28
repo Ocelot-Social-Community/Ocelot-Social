@@ -1,3 +1,7 @@
+input _CategoryFilter {
+  AND: [_CategoryFilter!]
+  OR: [_CategoryFilter!]
+}
 input _PostFilter {
   AND: [_PostFilter!]
   OR: [_PostFilter!]
@@ -113,7 +117,6 @@ enum _PostOrdering {
   eventStart_desc
 }
 
-
 type Post {
   id: ID!
   activityId: String
@@ -132,10 +135,11 @@ type Post {
   updatedAt: String
   sortDate: String
   language: String
-  pinnedAt: String @cypher(
+  pinnedAt: String
+    @cypher(
       statement: "MATCH (this)<-[pinned:PINNED]-(:User) WHERE NOT this.deleted = true AND NOT this.disabled = true RETURN pinned.createdAt"
     )
-  pinnedBy: User @relation(name:"PINNED", direction: "IN")
+  pinnedBy: User @relation(name: "PINNED", direction: "IN")
   relatedContributions: [Post]!
     @cypher(
       statement: """
@@ -160,7 +164,7 @@ type Post {
       statement: "MATCH (this)<-[:SHOUTED]-(r:User) WHERE NOT r.deleted = true AND NOT r.disabled = true RETURN COUNT(DISTINCT r)"
     )
 
-  # Has the currently logged in user shouted that post?
+  "Has the currently logged in user shouted that post?"
   shoutedByCurrentUser: Boolean!
     @cypher(
       statement: "MATCH (this)<-[:SHOUTED]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1"
@@ -173,15 +177,14 @@ type Post {
     @cypher(
       statement: "MATCH (this)<-[:VIEWED_TEASER]-(u:User {id: $cypherParams.currentUserId}) RETURN COUNT(u) >= 1"
     )
-  
+
   emotions: [EMOTED]
   emotionsCount: Int!
     @cypher(statement: "MATCH (this)<-[emoted:EMOTED]-(:User) RETURN COUNT(DISTINCT emoted)")
 
   group: Group @relation(name: "IN", direction: "OUT")
 
-  postType: [PostType]
-    @cypher(statement: "RETURN [l IN labels(this) WHERE NOT l = 'Post']")
+  postType: [PostType] @cypher(statement: "RETURN [l IN labels(this) WHERE NOT l = 'Post']")
 
   eventLocationName: String
   eventLocation: Location @cypher(statement: "MATCH (this)-[:IS_IN]->(l:Location) RETURN l")
@@ -193,9 +196,11 @@ type Post {
   isObservedByMe: Boolean!
     @cypher(
       statement: "MATCH (this)<-[obs:OBSERVES]-(u:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(u) >= 1"
-  )
+    )
   observingUsersCount: Int!
-    @cypher(statement: "MATCH (this)<-[obs:OBSERVES]-(u:User) WHERE obs.active = true AND NOT u.deleted = true AND NOT u.disabled = true RETURN COUNT(DISTINCT u)")  
+    @cypher(
+      statement: "MATCH (this)<-[obs:OBSERVES]-(u:User) WHERE obs.active = true AND NOT u.deleted = true AND NOT u.disabled = true RETURN COUNT(DISTINCT u)"
+    )
 }
 
 input _PostInput {
@@ -216,7 +221,7 @@ type Mutation {
     title: String!
     slug: String
     content: String!
-    image: ImageInput,
+    image: ImageInput
     visibility: Visibility
     language: String
     categoryIds: [ID]
@@ -231,7 +236,7 @@ type Mutation {
     slug: String
     content: String!
     contentExcerpt: String
-    image: ImageInput,
+    image: ImageInput
     visibility: Visibility
     language: String
     categoryIds: [ID]
@@ -247,9 +252,9 @@ type Mutation {
   pushPost(id: ID!): Post!
   unpushPost(id: ID!): Post!
 
-  # Shout the given Type and ID
+  "Shout the given Type and ID"
   shout(id: ID!, type: ShoutTypeEnum!): Boolean!
-  # Unshout the given Type and ID
+  "Unshout the given Type and ID"
   unshout(id: ID!, type: ShoutTypeEnum!): Boolean!
 
   toggleObservePost(id: ID!, value: Boolean!): Post!
