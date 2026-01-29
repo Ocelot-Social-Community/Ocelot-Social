@@ -16,9 +16,14 @@ const stubs = {
 
 describe('SearchResults', () => {
   let mocks, getters, propsData, wrapper
+
   const Wrapper = () => {
     const store = new Vuex.Store({
       getters,
+      actions: {
+        'categories/init': jest.fn(),
+        'pinnedPosts/fetch': jest.fn(),
+      },
     })
     return mount(SearchResults, { mocks, localVue, propsData, store, stubs })
   }

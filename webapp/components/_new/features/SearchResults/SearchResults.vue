@@ -45,9 +45,12 @@
               <post-teaser
                 :post="post"
                 :width="{ base: '100%', md: '100%', xl: '50%' }"
+                :showGroupPinned="true"
                 @removePostFromList="posts = removePostFromList(post, posts)"
                 @pinPost="pinPost(post, refetchPostList)"
                 @unpinPost="unpinPost(post, refetchPostList)"
+                @pinGroupPost="pinGroupPost(post, refetchPostList)"
+                @unpinGroupPost="unpinGroupPost(post, refetchPostList)"
                 @pushPost="pushPost(post, refetchPostList)"
                 @unpushPost="unpushPost(post, refetchPostList)"
                 @toggleObservePost="

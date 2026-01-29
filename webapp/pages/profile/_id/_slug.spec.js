@@ -78,7 +78,11 @@ describe('ProfileSlug', () => {
           'auth/user': {
             id: 'u23',
           },
+          'auth/isAdmin': () => false,
+          'pinnedPosts/maxPinnedPosts': () => 0,
+          'pinnedPosts/currentlyPinnedPosts': () => 0,
         },
+        dispatch: jest.fn().mockResolvedValue(),
       }
     })
 

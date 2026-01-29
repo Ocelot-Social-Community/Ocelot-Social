@@ -397,6 +397,26 @@ const isAllowedToGenerateGroupInviteCode = rule({
   ).records[0].get('count')
 })
 
+const isAllowedToPinGroupPost = rule({
+  cache: 'no_cache',
+})(async (_parent, args, context: Context) => {
+  if (!context.user) return false
+
+  return (
+    (
+      await context.database.query({
+        query: `
+    MATCH (post:Post{id: $args.id})-[:IN]->(group:Group)
+    MATCH (user:User{id: $user.id})-[membership:MEMBER_OF]->(group)
+    WHERE (membership.role IN ['admin', 'owner'])
+    RETURN toString(count(group)) as count
+    `,
+        variables: { user: context.user, args },
+      })
+    ).records[0].get('count') === '1'
+  )
+})
+
 // Permissions
 export default shield(
   {
@@ -485,6 +505,8 @@ export default shield(
       VerifyEmailAddress: isAuthenticated,
       pinPost: isAdmin,
       unpinPost: isAdmin,
+      pinGroupPost: isAllowedToPinGroupPost,
+      unpinGroupPost: isAllowedToPinGroupPost,
       pushPost: isAdmin,
       unpushPost: isAdmin,
       UpdateDonations: isAdmin,

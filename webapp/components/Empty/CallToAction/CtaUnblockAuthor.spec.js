@@ -4,6 +4,10 @@ import Component from './CtaUnblockAuthor.vue'
 
 const localVue = global.localVue
 
+const stubs = {
+  'nuxt-link': true,
+}
+
 describe('CtaUnblockAuthor.vue', () => {
   let propsData, wrapper, mocks
 
@@ -21,7 +25,7 @@ describe('CtaUnblockAuthor.vue', () => {
   })
 
   const Wrapper = () => {
-    return shallowMount(Component, { propsData, localVue, mocks })
+    return shallowMount(Component, { propsData, localVue, mocks, stubs })
   }
 
   describe('shallowMount', () => {

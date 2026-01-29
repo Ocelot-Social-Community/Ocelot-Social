@@ -1,4 +1,4 @@
-FROM node:25.3.0-alpine AS styleguide
+FROM node:25.4.0-alpine AS styleguide
 RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
@@ -6,7 +6,7 @@ COPY styleguide .
 RUN yarn install --production=false --frozen-lockfile --non-interactive
 RUN yarn run build:lib
 
-FROM node:25.3.0-alpine AS base
+FROM node:25.4.0-alpine AS base
 LABEL org.label-schema.name="ocelot.social:webapp"
 LABEL org.label-schema.description="Web Frontend of the Social Network Software ocelot.social"
 LABEL org.label-schema.usage="https://github.com/Ocelot-Social-Community/Ocelot-Social/blob/master/README.md"
@@ -46,6 +46,7 @@ ONBUILD RUN cp -r ./constants /build
 ONBUILD RUN cp -r ./static /build
 ONBUILD RUN cp -r ./locales /build
 ONBUILD RUN cp -r ./package.json ./yarn.lock /build
+ONBUILD RUN cp -r ./scripts /build
 ONBUILD RUN cd /build && yarn install --production=true --frozen-lockfile --non-interactive
 
 FROM base AS test_build
@@ -62,6 +63,7 @@ RUN cp -r ./constants /build
 RUN cp -r ./static /build
 RUN cp -r ./locales /build
 RUN cp -r ./package.json ./yarn.lock /build
+RUN cp -r ./scripts /build
 RUN cd /build && yarn install --frozen-lockfile --non-interactive
 
 FROM test_build AS test

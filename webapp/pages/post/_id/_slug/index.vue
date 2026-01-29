@@ -58,6 +58,8 @@
                   :is-owner="isAuthor"
                   @pinPost="pinPost"
                   @unpinPost="unpinPost"
+                  @pinGroupPost="pinGroupPost"
+                  @unpinGroupPost="unpinGroupPost"
                   @pushPost="pushPost"
                   @unpushPost="unpushPost"
                   @toggleObservePost="toggleObservePost"

@@ -38,6 +38,36 @@ export default {
         })
         .catch((error) => this.$toast.error(error.message))
     },
+    pinGroupPost(post, refetchPostList = () => {}) {
+      this.$apollo
+        .mutate({
+          mutation: PostMutations().pinGroupPost,
+          variables: {
+            id: post.id,
+          },
+        })
+        .then(() => {
+          this.$toast.success(this.$t('post.menu.groupPinnedSuccessfully'))
+          // this.storePinGroupPost()
+          refetchPostList()
+        })
+        .catch((error) => this.$toast.error(error.message))
+    },
+    unpinGroupPost(post, refetchPostList = () => {}) {
+      this.$apollo
+        .mutate({
+          mutation: PostMutations().unpinGroupPost,
+          variables: {
+            id: post.id,
+          },
+        })
+        .then(() => {
+          this.$toast.success(this.$t('post.menu.groupUnpinnedSuccessfully'))
+          // this.storeUnpinGroupPost()
+          refetchPostList()
+        })
+        .catch((error) => this.$toast.error(error.message))
+    },
     pushPost(post, refetchPostList = () => {}) {
       this.$apollo
         .mutate({

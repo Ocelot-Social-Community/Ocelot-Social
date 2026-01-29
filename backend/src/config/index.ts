@@ -138,6 +138,9 @@ const options = {
   MAX_PINNED_POSTS: Number.isNaN(Number(process.env.MAX_PINNED_POSTS))
     ? 1
     : Number(process.env.MAX_PINNED_POSTS),
+  MAX_GROUP_PINNED_POSTS: Number.isNaN(Number(process.env.MAX_GROUP_PINNED_POSTS))
+    ? 1
+    : Number(process.env.MAX_GROUP_PINNED_POSTS),
 }
 
 const language = {

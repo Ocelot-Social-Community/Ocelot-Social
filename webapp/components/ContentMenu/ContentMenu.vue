@@ -244,6 +244,23 @@ export default {
         }
       }
 
+      if (
+        this.resourceType === 'contribution' &&
+        this.resource.group &&
+        ['admin', 'owner'].includes(this.resource.group.myRole) &&
+        (this.canBeGroupPinned || this.resource.groupPinned)
+      ) {
+        routes.push({
+          label: this.resource.groupPinned
+            ? this.$t(`post.menu.groupUnpin`)
+            : this.$t(`post.menu.groupPin`),
+          callback: () => {
+            this.$emit(this.resource.groupPinned ? 'unpinGroupPost' : 'pinGroupPost', this.resource)
+          },
+          icon: this.resource.groupPinned ? 'unlink' : 'link',
+        })
+      }
+
       return routes
     },
     isModerator() {
@@ -256,6 +273,15 @@ export default {
       return (
         this.maxPinnedPosts === 1 ||
         (this.maxPinnedPosts > 1 && this.currentlyPinnedPosts < this.maxPinnedPosts)
+      )
+    },
+    canBeGroupPinned() {
+      const maxGroupPinnedPosts = this.$env.MAX_GROUP_PINNED_POSTS
+      return (
+        maxGroupPinnedPosts === 1 ||
+        (maxGroupPinnedPosts > 1 &&
+          this.resource.group &&
+          this.resource.group.currentlyPinnedPostsCount < maxGroupPinnedPosts)
       )
     },
   },

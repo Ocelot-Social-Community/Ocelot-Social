@@ -50,9 +50,12 @@ describe('CommentList.vue', () => {
             return { id: 'some-user' }
           },
         },
+        actions: {
+          'pinnedPosts/fetch': jest.fn(),
+        },
       })
       mocks = {
-        $t: jest.fn(),
+        $t: (key) => key,
         $filters: {
           truncate: (a) => a,
           removeHtml: (a) => a,
