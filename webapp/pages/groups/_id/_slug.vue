@@ -181,7 +181,7 @@
           :allProfilesCount="
             isAllowedSeeingGroupMembers && group.membersCount ? group.membersCount : 0
           "
-          :profiles="isAllowedSeeingGroupMembers ? groupMembers : []"
+          :profiles="isAllowedSeeingGroupMembers ? groupMembers.map((d) => d.user) : []"
           :loading="$apollo.loading"
           @fetchAllProfiles="fetchAllMembers"
         />

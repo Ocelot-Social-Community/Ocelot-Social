@@ -55,6 +55,11 @@ type Group {
   currentlyPinnedPostsCount: Int! @neo4j_ignore
 }
 
+type GroupMember {
+  user: User
+  membership: MEMBER_OF
+}
+
 input _GroupFilter {
   AND: [_GroupFilter!]
   OR: [_GroupFilter!]
@@ -82,7 +87,7 @@ type Query {
   # orderBy: [_GroupOrdering] # not implemented yet
   # filter: _GroupFilter # not implemented yet
 
-  GroupMembers(id: ID!, first: Int, offset: Int): [User]
+  GroupMembers(id: ID!, first: Int, offset: Int): [GroupMember]
   # orderBy: [_UserOrdering] # not implemented yet
   # filter: _UserFilter # not implemented yet
 
@@ -128,13 +133,13 @@ type Mutation {
 
   # DeleteGroup(id: ID!): Group
 
-  JoinGroup(groupId: ID!, userId: ID!): User
+  JoinGroup(groupId: ID!, userId: ID!): GroupMember
 
-  LeaveGroup(groupId: ID!, userId: ID!): User
+  LeaveGroup(groupId: ID!, userId: ID!): GroupMember
 
-  ChangeGroupMemberRole(groupId: ID!, userId: ID!, roleInGroup: GroupMemberRole!): User
+  ChangeGroupMemberRole(groupId: ID!, userId: ID!, roleInGroup: GroupMemberRole!): GroupMember
 
-  RemoveUserFromGroup(groupId: ID!, userId: ID!): User
+  RemoveUserFromGroup(groupId: ID!, userId: ID!): GroupMember
 
   muteGroup(groupId: ID!): Group
   unmuteGroup(groupId: ID!): Group

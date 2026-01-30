@@ -7,21 +7,21 @@
         <nuxt-link
           :to="{
             name: 'profile-id-slug',
-            params: { id: scope.row.id, slug: scope.row.slug },
+            params: { id: scope.row.user.id, slug: scope.row.user.slug },
           }"
         >
-          <profile-avatar :profile="scope.row" size="small" />
+          <profile-avatar :profile="scope.row.user" size="small" />
         </nuxt-link>
       </template>
       <template #name="scope">
         <nuxt-link
           :to="{
             name: 'profile-id-slug',
-            params: { id: scope.row.id, slug: scope.row.slug },
+            params: { id: scope.row.user.id, slug: scope.row.user.slug },
           }"
         >
           <ds-text>
-            <b>{{ scope.row.name | truncate(20) }}</b>
+            <b>{{ scope.row.user.name | truncate(20) }}</b>
           </ds-text>
         </nuxt-link>
       </template>
@@ -29,37 +29,37 @@
         <nuxt-link
           :to="{
             name: 'profile-id-slug',
-            params: { id: scope.row.id, slug: scope.row.slug },
+            params: { id: scope.row.user.id, slug: scope.row.user.slug },
           }"
         >
           <ds-text>
-            <b>{{ `@${scope.row.slug}` | truncate(20) }}</b>
+            <b>{{ `@${scope.row.user.slug}` | truncate(20) }}</b>
           </ds-text>
         </nuxt-link>
       </template>
       <template #roleInGroup="scope">
         <select
-          v-if="scope.row.myRoleInGroup !== 'owner'"
+          v-if="scope.row.membership.role !== 'owner'"
           :options="['pending', 'usual', 'admin', 'owner']"
-          :value="`${scope.row.myRoleInGroup}`"
-          @change="changeMemberRole(scope.row.id, $event)"
+          :value="`${scope.row.membership.role}`"
+          @change="changeMemberRole(scope.row.user.id, $event)"
         >
           <option v-for="role in ['pending', 'usual', 'admin', 'owner']" :key="role" :value="role">
             {{ $t(`group.roles.${role}`) }}
           </option>
         </select>
         <ds-chip v-else color="primary">
-          {{ $t(`group.roles.${scope.row.myRoleInGroup}`) }}
+          {{ $t(`group.roles.${scope.row.membership.role}`) }}
         </ds-chip>
       </template>
       <template #edit="scope">
         <base-button
-          v-if="scope.row.myRoleInGroup !== 'owner'"
+          v-if="scope.row.membership.role !== 'owner'"
           size="small"
           primary
           @click="
             isOpen = true
-            userId = scope.row.id
+            userId = scope.row.user.id
           "
         >
           {{ $t('group.removeMemberButton') }}
