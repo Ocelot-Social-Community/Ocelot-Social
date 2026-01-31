@@ -23,21 +23,8 @@ import userInteractions from './userInteractions'
 import validation from './validation/validationMiddleware'
 import xss from './xssMiddleware'
 
-export interface OrderPosition {
-  /*
-    - null = push ontop
-    - undefined = append
-    - string = append before/after middleware with name
-  */
-  at?: string | null
-  /*
-    append before or after. Undefined behaves like after.
-  */
-  mode?: 'before' | 'after'
-}
-
 export interface MiddlewareOrder {
-  position: OrderPosition
+  position: 'prepend' | 'append' | { before: string } | { after: string }
   name: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   middleware: IMiddleware | IMiddlewareGenerator<any, any, any>
@@ -46,24 +33,24 @@ export interface MiddlewareOrder {
 const ocelotMiddlewares: MiddlewareOrder[] = []
 
 export const addMiddleware = (middleware: MiddlewareOrder) => {
-  switch (middleware.position.at) {
-    case undefined:
+  switch (middleware.position) {
+    case 'append':
       ocelotMiddlewares.push(middleware)
       break
-    case null:
+    case 'prepend':
       ocelotMiddlewares.unshift(middleware)
       break
     default: {
-      const appendMiddlewareAt = ocelotMiddlewares.findIndex(
-        (m) => m.name === middleware.position.at,
-      )
+      const anchor =
+        'before' in middleware.position ? middleware.position.before : middleware.position.after
+      const appendMiddlewareAt = ocelotMiddlewares.findIndex((m) => m.name === anchor)
       if (appendMiddlewareAt === -1) {
         throw new Error(
-          `Could not find middleware "${middleware.position.at}" to append the middleware "${middleware.name}"`,
+          `Could not find middleware "${anchor}" to append the middleware "${middleware.name}"`,
         )
       }
       ocelotMiddlewares.splice(
-        appendMiddlewareAt + (middleware.position.mode === 'before' ? 0 : 1),
+        appendMiddlewareAt + ('before' in middleware.position ? 0 : 1),
         0,
         middleware,
       )
@@ -71,30 +58,34 @@ export const addMiddleware = (middleware: MiddlewareOrder) => {
   }
 }
 
-addMiddleware({ name: 'sentry', middleware: sentry, position: { at: null } })
-addMiddleware({ name: 'permissions', middleware: permissions, position: { at: 'sentry' } })
-addMiddleware({ name: 'xss', middleware: xss, position: { at: 'permissions' } })
-addMiddleware({ name: 'validation', middleware: validation, position: { at: 'xss' } })
+addMiddleware({ name: 'sentry', middleware: sentry, position: 'append' })
+addMiddleware({ name: 'permissions', middleware: permissions, position: { after: 'sentry' } })
+addMiddleware({ name: 'xss', middleware: xss, position: { after: 'permissions' } })
+addMiddleware({ name: 'validation', middleware: validation, position: { after: 'xss' } })
 addMiddleware({
   name: 'userInteractions',
   middleware: userInteractions,
-  position: { at: 'validation' },
+  position: { after: 'validation' },
 })
-addMiddleware({ name: 'sluggify', middleware: sluggify, position: { at: 'userInteractions' } })
-addMiddleware({ name: 'languages', middleware: languages, position: { at: 'sluggify' } })
-addMiddleware({ name: 'excerpt', middleware: excerpt, position: { at: 'languages' } })
-addMiddleware({ name: 'login', middleware: login, position: { at: 'excerpt' } })
-addMiddleware({ name: 'notifications', middleware: notifications, position: { at: 'login' } })
-addMiddleware({ name: 'hashtags', middleware: hashtags, position: { at: 'notifications' } })
-addMiddleware({ name: 'softDelete', middleware: softDelete, position: { at: 'hashtags' } })
+addMiddleware({ name: 'sluggify', middleware: sluggify, position: { after: 'userInteractions' } })
+addMiddleware({ name: 'languages', middleware: languages, position: { after: 'sluggify' } })
+addMiddleware({ name: 'excerpt', middleware: excerpt, position: { after: 'languages' } })
+addMiddleware({ name: 'login', middleware: login, position: { after: 'excerpt' } })
+addMiddleware({ name: 'notifications', middleware: notifications, position: { after: 'login' } })
+addMiddleware({ name: 'hashtags', middleware: hashtags, position: { after: 'notifications' } })
+addMiddleware({ name: 'softDelete', middleware: softDelete, position: { after: 'hashtags' } })
 addMiddleware({
   name: 'includedFields',
   middleware: includedFields,
-  position: { at: 'softDelete' },
+  position: { after: 'softDelete' },
 })
-addMiddleware({ name: 'orderBy', middleware: orderBy, position: { at: 'includedFields' } })
-addMiddleware({ name: 'chatMiddleware', middleware: chatMiddleware, position: { at: 'orderBy' } })
-addMiddleware({ name: 'categories', middleware: categories, position: { at: 'chatMiddleware' } })
+addMiddleware({ name: 'orderBy', middleware: orderBy, position: { after: 'includedFields' } })
+addMiddleware({
+  name: 'chatMiddleware',
+  middleware: chatMiddleware,
+  position: { after: 'orderBy' },
+})
+addMiddleware({ name: 'categories', middleware: categories, position: { after: 'chatMiddleware' } })
 
 export default (schema) => {
   // execute branding middleware function
