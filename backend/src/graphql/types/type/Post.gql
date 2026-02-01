@@ -226,7 +226,7 @@ type Mutation {
     slug: String
     content: String!
     files: [FileInput]
-    image: ImageInput,
+    image: ImageInput
     visibility: Visibility
     language: String
     categoryIds: [ID]
@@ -242,7 +242,7 @@ type Mutation {
     content: String!
     contentExcerpt: String
     files: [FileInput]
-    image: ImageInput,
+    image: ImageInput
     visibility: Visibility
     language: String
     categoryIds: [ID]
