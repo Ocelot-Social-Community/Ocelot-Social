@@ -112,6 +112,8 @@
             :is-owner="isAuthor"
             @pinPost="pinPost"
             @unpinPost="unpinPost"
+            @pinGroupPost="pinGroupPost"
+            @unpinGroupPost="unpinGroupPost"
             @pushPost="pushPost"
             @unpushPost="unpushPost"
             @toggleObservePost="toggleObservePost"
@@ -172,6 +174,10 @@ export default {
       type: Object,
       default: () => {},
     },
+    showGroupPinned: {
+      type: Boolean,
+      default: false,
+    },
   },
   mounted() {
     const { image } = this.post
@@ -203,10 +209,11 @@ export default {
       )
     },
     isPinned() {
-      return this.post && this.post.pinned
+      return this.post && (this.post.pinned || (this.showGroupPinned && this.post.groupPinned))
     },
     ribbonText() {
-      if (this.post.pinned) return this.$t('post.pinned')
+      if (this.post && (this.post.pinned || (this.showGroupPinned && this.post.groupPinned)))
+        return this.$t('post.pinned')
       if (this.post.postType[0] === 'Event') return this.$t('post.event')
       return this.$t('post.name')
     },
@@ -228,6 +235,12 @@ export default {
     },
     unpinPost(post) {
       this.$emit('unpinPost', post)
+    },
+    pinGroupPost(post) {
+      this.$emit('pinGroupPost', post)
+    },
+    unpinGroupPost(post) {
+      this.$emit('unpinGroupPost', post)
     },
     pushPost(post) {
       this.$emit('pushPost', post)

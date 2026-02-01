@@ -52,10 +52,14 @@ describe('CtaJoinLeaveGroup.vue', () => {
         mocks.$apollo.mutate = jest.fn().mockResolvedValue({
           data: {
             JoinGroup: {
-              id: 'g-123',
-              slug: 'group-123',
-              name: 'Group 123',
-              myRoleInGroup: 'usual',
+              user: {
+                id: 'g-123',
+                slug: 'group-123',
+                name: 'Group 123',
+              },
+              membership: {
+                role: 'usual',
+              },
             },
           },
         })
@@ -66,10 +70,14 @@ describe('CtaJoinLeaveGroup.vue', () => {
         expect(wrapper.emitted().update).toEqual([
           [
             {
-              id: 'g-123',
-              slug: 'group-123',
-              name: 'Group 123',
-              myRoleInGroup: 'usual',
+              user: {
+                id: 'g-123',
+                slug: 'group-123',
+                name: 'Group 123',
+              },
+              membership: {
+                role: 'usual',
+              },
             },
           ],
         ])

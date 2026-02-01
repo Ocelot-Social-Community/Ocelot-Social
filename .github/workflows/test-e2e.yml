@@ -31,7 +31,7 @@ jobs:
           docker compose -f docker-compose.yml -f docker-compose.test.yml down
       
       - name: Cache docker images
-        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v4.0.2
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v4.0.2
         with:
           path: |
             /tmp/backend.tar
@@ -59,7 +59,7 @@ jobs:
           docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" > /tmp/webapp.tar
       
       - name: Cache docker image        
-        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v4.0.2
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v4.0.2
         with:
           path: /tmp/webapp.tar
           key: ${{ github.run_id }}-e2e-webapp-cache
@@ -77,7 +77,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v4.4.0
         with:
-          node-version-file: 'backend/.tool-versions'
+          node-version-file: 'backend/.nvmrc'
           cache: 'yarn'
 
       - name: Copy env files
@@ -87,7 +87,8 @@ jobs:
 
       - name: Install cypress requirements
         run: |
-          wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
+          sudo wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
+          sudo chmod +x /opt/cucumber-json-formatter
           cd backend
           yarn install
           yarn build
@@ -96,7 +97,7 @@ jobs:
       
       - name: Cache docker image
         
-        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v4.0.2
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v4.0.2
         with:
           path: |
             /opt/cucumber-json-formatter
@@ -125,11 +126,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v4.4.0
         with:
-          node-version-file: 'backend/.tool-versions'
+          node-version-file: 'backend/.nvmrc'
           cache: 'yarn'
 
       - name: Restore cypress cache
-        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v4.0.2
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v4.0.2
         with:
           path: |
             /opt/cucumber-json-formatter
@@ -139,7 +140,7 @@ jobs:
           restore-keys: ${{ github.run_id }}-e2e-cypress
 
       - name: Restore backend environment cache
-        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v4.0.2
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v4.0.2
         with:
           path: |
             /tmp/backend.tar
@@ -150,7 +151,7 @@ jobs:
           key: ${{ github.run_id }}-e2e-backend-environment-cache
 
       - name: Restore webapp cache
-        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v4.0.2
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v4.0.2
         with:
           path: /tmp/webapp.tar
           key: ${{ github.run_id }}-e2e-webapp-cache

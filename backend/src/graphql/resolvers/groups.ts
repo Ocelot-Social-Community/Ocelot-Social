@@ -63,7 +63,7 @@ export default {
       const readTxResultPromise = session.readTransaction(async (txc) => {
         const groupMemberCypher = `
           MATCH (user:User)-[membership:MEMBER_OF]->(:Group {id: $groupId})
-          RETURN user {.*, myRoleInGroup: membership.role}
+          RETURN user {.*}, membership {.*}
           SKIP toInteger($offset) LIMIT toInteger($first)
         `
         const transactionResponse = await txc.run(groupMemberCypher, {
@@ -71,7 +71,9 @@ export default {
           first,
           offset,
         })
-        return transactionResponse.records.map((record) => record.get('user'))
+        return transactionResponse.records.map((record) => {
+          return { user: record.get('user'), membership: record.get('membership') }
+        })
       })
       try {
         return await readTxResultPromise
@@ -273,8 +275,8 @@ export default {
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
         const joinGroupCypher = `
-          MATCH (member:User {id: $userId}), (group:Group {id: $groupId})
-          MERGE (member)-[membership:MEMBER_OF]->(group)
+          MATCH (user:User {id: $userId}), (group:Group {id: $groupId})
+          MERGE (user)-[membership:MEMBER_OF]->(group)
           ON CREATE SET
             membership.createdAt = toString(datetime()),
             membership.updatedAt = null,
@@ -283,14 +285,15 @@ export default {
                 THEN 'usual'
                 ELSE 'pending'
                 END
-          RETURN member {.*, myRoleInGroup: membership.role}
+          RETURN user {.*}, membership {.*}
         `
         const transactionResponse = await transaction.run(joinGroupCypher, { groupId, userId })
-        const [member] = transactionResponse.records.map((record) => record.get('member'))
-        return member
+        return transactionResponse.records.map((record) => {
+          return { user: record.get('user'), membership: record.get('membership') }
+        })
       })
       try {
-        return await writeTxResultPromise
+        return (await writeTxResultPromise)[0]
       } catch (error) {
         throw new Error(error)
       } finally {
@@ -337,7 +340,7 @@ export default {
             membership.updatedAt = toString(datetime()),
             membership.role = $roleInGroup
           ${postRestrictionCypher}
-          RETURN member {.*, myRoleInGroup: membership.role}
+          RETURN member {.*} as user, membership {.*}
         `
 
         const transactionResponse = await transaction.run(joinGroupCypher, {
@@ -345,7 +348,9 @@ export default {
           userId,
           roleInGroup,
         })
-        const [member] = transactionResponse.records.map((record) => record.get('member'))
+        const [member] = transactionResponse.records.map((record) => {
+          return { user: record.get('user'), membership: record.get('membership') }
+        })
         return member
       })
       try {
@@ -471,6 +476,18 @@ export default {
         })
       ).records.map((r) => r.get('inviteCodes'))
     },
+    currentlyPinnedPostsCount: async (parent, _args, context: Context, _resolveInfo) => {
+      if (!parent.id) {
+        throw new Error('Can not identify selected Group!')
+      }
+      const result = await context.database.query({
+        query: `
+          MATCH (:User)-[pinned:GROUP_PINNED]->(pinnedPosts:Post)-[:IN]->(:Group {id: $group.id})
+          RETURN toString(count(pinnedPosts)) as count`,
+        variables: { group: parent },
+      })
+      return result.records[0].get('count')
+    },
     ...Resolver('Group', {
       undefinedToNull: ['deleted', 'disabled', 'locationName', 'about'],
       hasMany: {
@@ -516,14 +533,16 @@ const removeUserFromGroupWriteTxResultPromise = async (session, groupId, userId)
       WITH user, collect(p) AS posts
       FOREACH (post IN posts |
         MERGE (user)-[:CANNOT_SEE]->(post))
-      RETURN user {.*, myRoleInGroup: NULL}
+      RETURN user {.*}, NULL as membership
     `
 
     const transactionResponse = await transaction.run(removeUserFromGroupCypher, {
       groupId,
       userId,
     })
-    const [user] = await transactionResponse.records.map((record) => record.get('user'))
+    const [user] = await transactionResponse.records.map((record) => {
+      return { user: record.get('user'), membership: record.get('membership') }
+    })
     return user
   })
 }

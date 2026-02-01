@@ -861,6 +861,10 @@
     "menu": {
       "delete": "Supprimer le Post",
       "edit": "Modifier le Post",
+      "groupPin": null,
+      "groupPinnedSuccessfully": null,
+      "groupUnpin": null,
+      "groupUnpinnedSuccessfully": null,
       "observe": "Observer le Post",
       "observedSuccessfully": null,
       "pin": "Épingler le Post",

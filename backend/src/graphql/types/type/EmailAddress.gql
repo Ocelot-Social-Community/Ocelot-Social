@@ -9,11 +9,7 @@ type Query {
 }
 
 type Mutation {
-  Signup(
-    email: String!
-    locale: String!
-    inviteCode: String = null
-  ): EmailAddress
+  Signup(email: String!, locale: String!, inviteCode: String = null): EmailAddress
   SignupVerification(
     nonce: String!
     email: String!
@@ -27,8 +23,5 @@ type Mutation {
     locationName: String = null
   ): User
   AddEmailAddress(email: String!): EmailAddress
-  VerifyEmailAddress(
-    nonce: String!
-    email: String!
-  ): EmailAddress
+  VerifyEmailAddress(nonce: String!, email: String!): EmailAddress
 }

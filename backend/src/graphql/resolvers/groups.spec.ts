@@ -891,8 +891,12 @@ describe('in mode', () => {
               ).resolves.toMatchObject({
                 data: {
                   JoinGroup: {
-                    id: 'owner-of-closed-group',
-                    myRoleInGroup: 'usual',
+                    user: {
+                      id: 'owner-of-closed-group',
+                    },
+                    membership: {
+                      role: 'usual',
+                    },
                   },
                 },
                 errors: undefined,
@@ -914,8 +918,12 @@ describe('in mode', () => {
                 ).resolves.toMatchObject({
                   data: {
                     JoinGroup: {
-                      id: 'current-user',
-                      myRoleInGroup: 'owner',
+                      user: {
+                        id: 'current-user',
+                      },
+                      membership: {
+                        role: 'owner',
+                      },
                     },
                   },
                   errors: undefined,
@@ -939,8 +947,12 @@ describe('in mode', () => {
               ).resolves.toMatchObject({
                 data: {
                   JoinGroup: {
-                    id: 'current-user',
-                    myRoleInGroup: 'pending',
+                    user: {
+                      id: 'current-user',
+                    },
+                    membership: {
+                      role: 'pending',
+                    },
                   },
                 },
                 errors: undefined,
@@ -962,8 +974,12 @@ describe('in mode', () => {
                 ).resolves.toMatchObject({
                   data: {
                     JoinGroup: {
-                      id: 'owner-of-closed-group',
-                      myRoleInGroup: 'owner',
+                      user: {
+                        id: 'owner-of-closed-group',
+                      },
+                      membership: {
+                        role: 'owner',
+                      },
                     },
                   },
                   errors: undefined,
@@ -1001,8 +1017,12 @@ describe('in mode', () => {
                 ).resolves.toMatchObject({
                   data: {
                     JoinGroup: {
-                      id: 'owner-of-hidden-group',
-                      myRoleInGroup: 'owner',
+                      user: {
+                        id: 'owner-of-hidden-group',
+                      },
+                      membership: {
+                        role: 'owner',
+                      },
                     },
                   },
                   errors: undefined,
@@ -1208,16 +1228,28 @@ describe('in mode', () => {
                   data: {
                     GroupMembers: expect.arrayContaining([
                       expect.objectContaining({
-                        id: 'current-user',
-                        myRoleInGroup: 'owner',
+                        user: expect.objectContaining({
+                          id: 'current-user',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'owner',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'owner-of-closed-group',
-                        myRoleInGroup: 'usual',
+                        user: expect.objectContaining({
+                          id: 'owner-of-closed-group',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'usual',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'owner-of-hidden-group',
-                        myRoleInGroup: 'usual',
+                        user: expect.objectContaining({
+                          id: 'owner-of-hidden-group',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'usual',
+                        }),
                       }),
                     ]),
                   },
@@ -1241,16 +1273,28 @@ describe('in mode', () => {
                   data: {
                     GroupMembers: expect.arrayContaining([
                       expect.objectContaining({
-                        id: 'current-user',
-                        myRoleInGroup: 'owner',
+                        user: expect.objectContaining({
+                          id: 'current-user',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'owner',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'owner-of-closed-group',
-                        myRoleInGroup: 'usual',
+                        user: expect.objectContaining({
+                          id: 'owner-of-closed-group',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'usual',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'owner-of-hidden-group',
-                        myRoleInGroup: 'usual',
+                        user: expect.objectContaining({
+                          id: 'owner-of-hidden-group',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'usual',
+                        }),
                       }),
                     ]),
                   },
@@ -1274,16 +1318,28 @@ describe('in mode', () => {
                   data: {
                     GroupMembers: expect.arrayContaining([
                       expect.objectContaining({
-                        id: 'current-user',
-                        myRoleInGroup: 'owner',
+                        user: expect.objectContaining({
+                          id: 'current-user',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'owner',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'owner-of-closed-group',
-                        myRoleInGroup: 'usual',
+                        user: expect.objectContaining({
+                          id: 'owner-of-closed-group',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'usual',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'owner-of-hidden-group',
-                        myRoleInGroup: 'usual',
+                        user: expect.objectContaining({
+                          id: 'owner-of-hidden-group',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'usual',
+                        }),
                       }),
                     ]),
                   },
@@ -1317,16 +1373,28 @@ describe('in mode', () => {
                   data: {
                     GroupMembers: expect.arrayContaining([
                       expect.objectContaining({
-                        id: 'current-user',
-                        myRoleInGroup: 'pending',
+                        user: expect.objectContaining({
+                          id: 'current-user',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'pending',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'owner-of-closed-group',
-                        myRoleInGroup: 'owner',
+                        user: expect.objectContaining({
+                          id: 'owner-of-closed-group',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'owner',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'owner-of-hidden-group',
-                        myRoleInGroup: 'usual',
+                        user: expect.objectContaining({
+                          id: 'owner-of-hidden-group',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'usual',
+                        }),
                       }),
                     ]),
                   },
@@ -1350,16 +1418,28 @@ describe('in mode', () => {
                   data: {
                     GroupMembers: expect.arrayContaining([
                       expect.objectContaining({
-                        id: 'current-user',
-                        myRoleInGroup: 'pending',
+                        user: expect.objectContaining({
+                          id: 'current-user',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'pending',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'owner-of-closed-group',
-                        myRoleInGroup: 'owner',
+                        user: expect.objectContaining({
+                          id: 'owner-of-closed-group',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'owner',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'owner-of-hidden-group',
-                        myRoleInGroup: 'usual',
+                        user: expect.objectContaining({
+                          id: 'owner-of-hidden-group',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'usual',
+                        }),
                       }),
                     ]),
                   },
@@ -1415,20 +1495,36 @@ describe('in mode', () => {
                   data: {
                     GroupMembers: expect.arrayContaining([
                       expect.objectContaining({
-                        id: 'pending-user',
-                        myRoleInGroup: 'pending',
+                        user: expect.objectContaining({
+                          id: 'pending-user',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'pending',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'current-user',
-                        myRoleInGroup: 'usual',
+                        user: expect.objectContaining({
+                          id: 'current-user',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'usual',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'owner-of-closed-group',
-                        myRoleInGroup: 'admin',
+                        user: expect.objectContaining({
+                          id: 'owner-of-closed-group',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'admin',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'owner-of-hidden-group',
-                        myRoleInGroup: 'owner',
+                        user: expect.objectContaining({
+                          id: 'owner-of-hidden-group',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'owner',
+                        }),
                       }),
                     ]),
                   },
@@ -1452,20 +1548,36 @@ describe('in mode', () => {
                   data: {
                     GroupMembers: expect.arrayContaining([
                       expect.objectContaining({
-                        id: 'pending-user',
-                        myRoleInGroup: 'pending',
+                        user: expect.objectContaining({
+                          id: 'pending-user',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'pending',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'current-user',
-                        myRoleInGroup: 'usual',
+                        user: expect.objectContaining({
+                          id: 'current-user',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'usual',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'owner-of-closed-group',
-                        myRoleInGroup: 'admin',
+                        user: expect.objectContaining({
+                          id: 'owner-of-closed-group',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'admin',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'owner-of-hidden-group',
-                        myRoleInGroup: 'owner',
+                        user: expect.objectContaining({
+                          id: 'owner-of-hidden-group',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'owner',
+                        }),
                       }),
                     ]),
                   },
@@ -1489,20 +1601,36 @@ describe('in mode', () => {
                   data: {
                     GroupMembers: expect.arrayContaining([
                       expect.objectContaining({
-                        id: 'pending-user',
-                        myRoleInGroup: 'pending',
+                        user: expect.objectContaining({
+                          id: 'pending-user',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'pending',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'current-user',
-                        myRoleInGroup: 'usual',
+                        user: expect.objectContaining({
+                          id: 'current-user',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'usual',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'owner-of-closed-group',
-                        myRoleInGroup: 'admin',
+                        user: expect.objectContaining({
+                          id: 'owner-of-closed-group',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'admin',
+                        }),
                       }),
                       expect.objectContaining({
-                        id: 'owner-of-hidden-group',
-                        myRoleInGroup: 'owner',
+                        user: expect.objectContaining({
+                          id: 'owner-of-hidden-group',
+                        }),
+                        membership: expect.objectContaining({
+                          role: 'owner',
+                        }),
                       }),
                     ]),
                   },
@@ -1600,8 +1728,12 @@ describe('in mode', () => {
                     ).resolves.toMatchObject({
                       data: {
                         ChangeGroupMemberRole: {
-                          id: 'usual-member-user',
-                          myRoleInGroup: 'usual',
+                          user: {
+                            id: 'usual-member-user',
+                          },
+                          membership: {
+                            role: 'usual',
+                          },
                         },
                       },
                       errors: undefined,
@@ -1638,8 +1770,12 @@ describe('in mode', () => {
                     ).resolves.toMatchObject({
                       data: {
                         ChangeGroupMemberRole: {
-                          id: 'admin-member-user',
-                          myRoleInGroup: 'admin',
+                          user: {
+                            id: 'admin-member-user',
+                          },
+                          membership: {
+                            role: 'admin',
+                          },
                         },
                       },
                       errors: undefined,
@@ -1673,8 +1809,12 @@ describe('in mode', () => {
                     ).resolves.toMatchObject({
                       data: {
                         ChangeGroupMemberRole: {
-                          id: 'second-owner-member-user',
-                          myRoleInGroup: 'owner',
+                          user: {
+                            id: 'second-owner-member-user',
+                          },
+                          membership: {
+                            role: 'owner',
+                          },
                         },
                       },
                       errors: undefined,
@@ -1759,8 +1899,12 @@ describe('in mode', () => {
                     ).resolves.toMatchObject({
                       data: {
                         ChangeGroupMemberRole: {
-                          id: 'owner-member-user',
-                          myRoleInGroup: 'owner',
+                          user: {
+                            id: 'owner-member-user',
+                          },
+                          membership: {
+                            role: 'owner',
+                          },
                         },
                       },
                       errors: undefined,
@@ -1869,8 +2013,12 @@ describe('in mode', () => {
                     ).resolves.toMatchObject({
                       data: {
                         ChangeGroupMemberRole: {
-                          id: 'admin-member-user',
-                          myRoleInGroup: 'owner',
+                          user: {
+                            id: 'admin-member-user',
+                          },
+                          membership: {
+                            role: 'owner',
+                          },
                         },
                       },
                       errors: undefined,
@@ -2047,8 +2195,12 @@ describe('in mode', () => {
                     ).resolves.toMatchObject({
                       data: {
                         ChangeGroupMemberRole: {
-                          id: 'usual-member-user',
-                          myRoleInGroup: 'admin',
+                          user: {
+                            id: 'usual-member-user',
+                          },
+                          membership: {
+                            role: 'admin',
+                          },
                         },
                       },
                       errors: undefined,
@@ -2073,8 +2225,12 @@ describe('in mode', () => {
                     ).resolves.toMatchObject({
                       data: {
                         ChangeGroupMemberRole: {
-                          id: 'usual-member-user',
-                          myRoleInGroup: 'usual',
+                          user: {
+                            id: 'usual-member-user',
+                          },
+                          membership: {
+                            role: 'usual',
+                          },
                         },
                       },
                       errors: undefined,
@@ -2234,8 +2390,12 @@ describe('in mode', () => {
                     ).resolves.toMatchObject({
                       data: {
                         ChangeGroupMemberRole: {
-                          id: 'pending-member-user',
-                          myRoleInGroup: 'usual',
+                          user: {
+                            id: 'pending-member-user',
+                          },
+                          membership: {
+                            role: 'usual',
+                          },
                         },
                       },
                       errors: undefined,
@@ -2260,8 +2420,12 @@ describe('in mode', () => {
                     ).resolves.toMatchObject({
                       data: {
                         ChangeGroupMemberRole: {
-                          id: 'pending-member-user',
-                          myRoleInGroup: 'pending',
+                          user: {
+                            id: 'pending-member-user',
+                          },
+                          membership: {
+                            role: 'pending',
+                          },
                         },
                       },
                       errors: undefined,
@@ -2413,7 +2577,7 @@ describe('in mode', () => {
                 },
               })
               return result.data?.GroupMembers
-                ? !!result.data.GroupMembers.find((member) => member.id === userId)
+                ? !!result.data.GroupMembers.find((member) => member.user.id === userId)
                 : null
             }
 
@@ -2440,8 +2604,10 @@ describe('in mode', () => {
                 ).resolves.toMatchObject({
                   data: {
                     LeaveGroup: {
-                      id: 'pending-member-user',
-                      myRoleInGroup: null,
+                      user: {
+                        id: 'pending-member-user',
+                      },
+                      membership: null,
                     },
                   },
                   errors: undefined,
@@ -2467,8 +2633,10 @@ describe('in mode', () => {
                 ).resolves.toMatchObject({
                   data: {
                     LeaveGroup: {
-                      id: 'usual-member-user',
-                      myRoleInGroup: null,
+                      user: {
+                        id: 'usual-member-user',
+                      },
+                      membership: null,
                     },
                   },
                   errors: undefined,
@@ -2494,8 +2662,10 @@ describe('in mode', () => {
                 ).resolves.toMatchObject({
                   data: {
                     LeaveGroup: {
-                      id: 'admin-member-user',
-                      myRoleInGroup: null,
+                      user: {
+                        id: 'admin-member-user',
+                      },
+                      membership: null,
                     },
                   },
                   errors: undefined,
@@ -3021,8 +3191,10 @@ describe('in mode', () => {
           ).resolves.toMatchObject({
             data: {
               RemoveUserFromGroup: expect.objectContaining({
-                id: 'usual-member-user',
-                myRoleInGroup: null,
+                user: expect.objectContaining({
+                  id: 'usual-member-user',
+                }),
+                membership: null,
               }),
             },
             errors: undefined,
@@ -3093,8 +3265,10 @@ describe('in mode', () => {
           ).resolves.toMatchObject({
             data: {
               RemoveUserFromGroup: expect.objectContaining({
-                id: 'usual-member-user',
-                myRoleInGroup: null,
+                user: {
+                  id: 'usual-member-user',
+                },
+                membership: null,
               }),
             },
             errors: undefined,

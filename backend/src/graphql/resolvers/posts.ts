@@ -31,6 +31,20 @@ const maintainPinnedPosts = (params) => {
   return params
 }
 
+const maintainGroupPinnedPosts = (params) => {
+  // only show GroupPinnedPosts when Groups is selected
+  if (!params.filter?.group) {
+    return params
+  }
+  const pinnedPostFilter = { groupPinned: true, group: params.filter.group }
+  if (isEmpty(params.filter)) {
+    params.filter = { OR: [pinnedPostFilter, {}] }
+  } else {
+    params.filter = { OR: [pinnedPostFilter, { ...params.filter }] }
+  }
+  return params
+}
+
 const filterEventDates = (params) => {
   if (params.filter?.eventStart_gte) {
     const date = params.filter.eventStart_gte
@@ -54,6 +68,7 @@ export default {
       params = await filterPostsOfMyGroups(params, context)
       params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
+      params = await maintainGroupPinnedPosts(params)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
     PostsEmotionsCountByEmotion: async (_object, params, context, _resolveInfo) => {
@@ -555,6 +570,68 @@ export default {
       }
       return unpinnedPost
     },
+    pinGroupPost: async (_parent, params, context: Context, _resolveInfo) => {
+      if (!context.user) {
+        throw new Error('Missing authenticated user.')
+      }
+      const { config } = context
+
+      if (config.MAX_GROUP_PINNED_POSTS === 0) {
+        throw new Error('Pinned posts are not allowed!')
+      }
+
+      // If MAX_GROUP_PINNED_POSTS === 1 -> Delete old pin
+      if (config.MAX_GROUP_PINNED_POSTS === 1) {
+        await context.database.write({
+          query: `
+          MATCH (post:Post {id: $params.id})-[:IN]->(group:Group)
+          MATCH (:User)-[pinned:GROUP_PINNED]->(oldPinnedPost:Post)-[:IN]->(:Group {id: group.id})
+          REMOVE oldPinnedPost.groupPinned
+          DELETE pinned`,
+          variables: { user: context.user, params },
+        })
+        // If MAX_GROUP_PINNED_POSTS !== 1 -> Check if max is reached
+      } else {
+        const result = await context.database.query({
+          query: `
+          MATCH (post:Post {id: $params.id})-[:IN]->(group:Group)
+          MATCH (:User)-[pinned:GROUP_PINNED]->(pinnedPosts:Post)-[:IN]->(:Group {id: group.id})
+          RETURN toString(count(pinnedPosts)) as count`,
+          variables: { user: context.user, params },
+        })
+        if (result.records[0].get('count') >= config.MAX_GROUP_PINNED_POSTS) {
+          throw new Error('Reached maxed pinned posts already. Unpin a post first.')
+        }
+      }
+
+      // Set new pin
+      const result = await context.database.write({
+        query: `
+          MATCH (user:User {id: $user.id})
+          MATCH (post:Post {id: $params.id})-[:IN]->(group:Group)
+          MERGE (user)-[pinned:GROUP_PINNED {createdAt: toString(datetime())}]->(post)
+          SET post.groupPinned = true
+          RETURN post {.*, pinnedAt: pinned.createdAt}`,
+        variables: { user: context.user, params },
+      })
+
+      // Return post
+      return result.records[0].get('post')
+    },
+    unpinGroupPost: async (_parent, params, context, _resolveInfo) => {
+      const result = await context.database.write({
+        query: `
+          MATCH (post:Post {id: $postId})
+          OPTIONAL MATCH (:User)-[pinned:GROUP_PINNED]->(post)
+          DELETE pinned
+          REMOVE post.groupPinned
+          RETURN post {.*}`,
+        variables: { postId: params.id },
+      })
+
+      // Return post
+      return result.records[0].get('post')
+    },
     markTeaserAsViewed: async (_parent, params, context, _resolveInfo) => {
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -652,6 +729,7 @@ export default {
         'language',
         'pinnedAt',
         'pinned',
+        'groupPinned',
         'eventVenue',
         'eventLocation',
         'eventLocationName',
@@ -691,6 +769,21 @@ export default {
           'MATCH (this)<-[obs:OBSERVES]-(related:User {id: $cypherParams.currentUserId}) WHERE obs.active = true RETURN COUNT(related) >= 1',
       },
     }),
+    // As long as we rely on the filter capabilities of the neo4jgraphql library,
+    // we cannot filter on a relation or their properties.
+    // Hence we need to save the value to the group node in the database.
+    /* groupPinned: async (parent, _params, context, _resolveInfo) => {
+      return (
+        (
+          await context.database.query({
+            query: `
+          MATCH (:User)-[pinned:GROUP_PINNED]->(:Post {id: $parent.id})
+          RETURN pinned`,
+            variables: { parent },
+          })
+        ).records.length === 1
+      )
+    }, */
     relatedContributions: async (parent, _params, context, _resolveInfo) => {
       if (typeof parent.relatedContributions !== 'undefined') return parent.relatedContributions
       const { id } = parent

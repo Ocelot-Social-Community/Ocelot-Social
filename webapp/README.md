@@ -4,14 +4,16 @@
 
 ## Installation
 
-For preparation we need Node and recommend to use [node version manager](https://github.com/nvm-sh/nvm) `nvm` to switch
+For preparation you need a recent version of
+[Node](https://nodejs.org/en/). We are using
+`v25.3.0` and recommend to use [node version manager](https://github.com/nvm-sh/nvm) `nvm` to switch
 between different local Node versions:
 
 ```bash
-# install Node
+# install Node using '.nvmrc' file
 $ cd webapp
-$ nvm install v20.12.1
-$ nvm use v20.12.1
+$ nvm install
+$ nvm use
 ```
 
 Install node dependencies with [yarn](https://yarnpkg.com/en/):

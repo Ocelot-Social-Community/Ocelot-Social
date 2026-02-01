@@ -69,7 +69,7 @@
             </base-button>
             <!-- Group join / leave -->
             <join-leave-button
-              :group="group || {}"
+              :group="group"
               :userId="currentUser.id"
               :isMember="isGroupMember"
               :isNonePendingMember="isGroupMemberNonePending"
@@ -181,7 +181,7 @@
           :allProfilesCount="
             isAllowedSeeingGroupMembers && group.membersCount ? group.membersCount : 0
           "
-          :profiles="isAllowedSeeingGroupMembers ? groupMembers : []"
+          :profiles="isAllowedSeeingGroupMembers ? groupMembers.map((d) => d.user) : []"
           :loading="$apollo.loading"
           @fetchAllProfiles="fetchAllMembers"
         />
@@ -243,9 +243,12 @@
               <post-teaser
                 :post="post"
                 :width="{ base: '100%', md: '100%', xl: '50%' }"
+                :showGroupPinned="true"
                 @removePostFromList="posts = removePostFromList(post, posts)"
                 @pinPost="pinPost(post, refetchPostList)"
                 @unpinPost="unpinPost(post, refetchPostList)"
+                @pinGroupPost="pinGroupPost(post, refetchPostList)"
+                @unpinGroupPost="unpinGroupPost(post, refetchPostList)"
                 @pushPost="pushPost(post, refetchPostList)"
                 @unpushPost="unpushPost(post, refetchPostList)"
                 @toggleObservePost="
@@ -467,7 +470,7 @@ export default {
           offset: this.offset,
           filter: this.filter,
           first: this.pageSize,
-          orderBy: 'sortDate_desc',
+          orderBy: ['groupPinned_asc', 'sortDate_desc'],
         },
         updateQuery: UpdateQuery(this, { $state, pageKey: 'profilePagePosts' }),
       })
@@ -576,7 +579,7 @@ export default {
           filter: this.filter,
           first: this.pageSize,
           offset: 0,
-          orderBy: 'sortDate_desc',
+          orderBy: ['groupPinned_asc', 'sortDate_desc'],
         }
       },
       update({ profilePagePosts }) {

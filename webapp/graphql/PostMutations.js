@@ -177,6 +177,40 @@ export default () => {
         }
       }
     `,
+    pinGroupPost: gql`
+      mutation ($id: ID!) {
+        pinGroupPost(id: $id) {
+          id
+          title
+          slug
+          content
+          contentExcerpt
+          language
+          pinnedBy {
+            id
+            name
+            role
+          }
+        }
+      }
+    `,
+    unpinGroupPost: gql`
+      mutation ($id: ID!) {
+        unpinGroupPost(id: $id) {
+          id
+          title
+          slug
+          content
+          contentExcerpt
+          language
+          pinnedBy {
+            id
+            name
+            role
+          }
+        }
+      }
+    `,
     pushPost: gql`
       mutation ($id: ID!) {
         pushPost(id: $id) {
