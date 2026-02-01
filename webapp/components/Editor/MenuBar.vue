@@ -60,6 +60,10 @@
         icon="minus"
       />
 
+      <menu-bar-button :isActive="isActive.image()" icon="image" :onClick="openFileDialog" />
+
+      <input id="fileInput" type="file" @change="fileChange" ref="file" hidden multiple />
+
       <menu-legend class="legend-button" />
     </div>
   </editor-menu-bar>
@@ -79,6 +83,23 @@ export default {
   props: {
     editor: Object,
     toggleLinkInput: Function,
+  },
+  methods: {
+    openFileDialog() {
+      this.$refs.file.click()
+    },
+    fileChange(event) {
+      const files = event.target.files
+      if (files.length === 0) return
+      for (const file of files) {
+        this.editor.commands.image({
+          src: URL.createObjectURL(file),
+          alt: file.name,
+        })
+      }
+      // Reset the input value
+      event.target.value = ''
+    },
   },
 }
 </script>

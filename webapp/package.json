@@ -39,6 +39,7 @@
     "cross-env": "~10.1.0",
     "date-fns": "2.22.1",
     "graphql": "14.7.0",
+    "image-resize-compress": "^2.1.1",
     "intersection-observer": "^0.12.0",
     "jest-serializer-vue": "^3.1.0",
     "linkify-it": "~5.0.0",
@@ -48,8 +49,8 @@
     "nuxt-env": "~0.1.0",
     "sass": "1.77.6",
     "tippy.js": "^4.3.5",
-    "tiptap": "~1.26.6",
-    "tiptap-extensions": "~1.28.8",
+    "tiptap": "~1.32.2",
+    "tiptap-extensions": "~1.35.2",
     "trunc-html": "^1.1.2",
     "v-mapbox": "^1.11.2",
     "v-tooltip": "~2.1.3",
@@ -113,6 +114,10 @@
   },
   "resolutions": {
     "nan": "2.17.0",
+    "prosemirror-model": "1.8.2",
+    "prosemirror-state": "1.3.2",
+    "prosemirror-transform": "1.2.2",
+    "prosemirror-view": "1.13.4",
     "vue": "2.6.14",
     "vue-server-renderer": "2.6.14"
   }

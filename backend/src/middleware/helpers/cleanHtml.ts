@@ -41,7 +41,7 @@ const standardSanitizeHtmlOptions = {
   allowedAttributes: {
     a: ['href', 'class', 'target', 'data-*', 'contenteditable'],
     span: ['contenteditable', 'class', 'data-*'],
-    img: ['src'],
+    img: ['src', 'alt'],
   },
   allowedIframeHostnames: ['www.youtube.com', 'player.vimeo.com'],
   parser: {

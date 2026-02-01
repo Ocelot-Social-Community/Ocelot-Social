@@ -189,6 +189,7 @@
 <script>
 import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
+import { fromURL } from 'image-resize-compress'
 import Editor from '~/components/Editor/Editor'
 import PostMutations from '~/graphql/PostMutations.js'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
@@ -243,6 +244,7 @@ export default {
     } = image || {}
     return {
       links,
+      filesToUpload: [],
       formData: {
         title: title || '',
         content: content || '',
@@ -398,6 +400,7 @@ export default {
           variables: {
             title,
             content,
+            files: this.filesToUpload,
             categoryIds,
             id: this.contribution.id || null,
             image,
@@ -421,7 +424,29 @@ export default {
           this.loading = false
         })
     },
-    updateEditorContent(value) {
+    async updateEditorContent(value) {
+      // If value contains img tags with src in blob storage, add them to files to upload
+      const blobImages = value.match(/<img[^>]+src="blob:[^"]+"[^>]*>/g) || []
+      this.filesToUpload = await Promise.all(
+        blobImages
+          .map(async (img) => {
+            const src = img.match(/src="([^"]+)"/)
+            const filename = img.match(/alt="([^"]+)"/)
+            if (!src) {
+              return null
+            }
+
+            const compressedBlob = await fromURL(src[1], 80)
+
+            return {
+              upload: compressedBlob,
+              name: filename[1],
+              type: compressedBlob.type,
+            }
+          })
+          .filter(Boolean),
+      )
+
       this.$refs.contributionForm.update('content', value)
     },
     changeEventIsOnline(event) {

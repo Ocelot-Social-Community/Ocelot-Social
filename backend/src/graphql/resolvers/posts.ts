@@ -9,8 +9,10 @@ import { isEmpty } from 'lodash'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 import { v4 as uuid } from 'uuid'
 
+import CONFIG from '@config/index'
 import { Context } from '@src/context'
 
+import { attachments } from './attachments/attachments'
 import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
@@ -134,7 +136,7 @@ export default {
         throw new Error('Missing authenticated user.')
       }
       const { config } = context
-      const { categoryIds, groupId } = params
+      const { categoryIds, groupId, files = [] } = params
       const { image: imageInput } = params
 
       const locationName = validateEventParams(params)
@@ -142,6 +144,7 @@ export default {
       delete params.categoryIds
       delete params.image
       delete params.groupId
+      delete params.files
       params.id = params.id || uuid()
       const session = context.driver.session()
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
@@ -209,6 +212,57 @@ export default {
         if (locationName) {
           await createOrUpdateLocations('Post', post.id, locationName, session, context)
         }
+
+        // can this happen?
+        // if (!post) {
+        //   return null
+        // }
+
+        // Attachments
+        const writeFilesPromise = session.writeTransaction(async (transaction) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const atns: any[] = []
+
+          for await (const file of files) {
+            const atn = await attachments(CONFIG).add(
+              post,
+              'ATTACHMENT',
+              file,
+              {},
+              {
+                transaction,
+              },
+            )
+            atns.push(atn)
+          }
+          return atns
+        })
+
+        const atns = await writeFilesPromise
+
+        // TODO: this can be removed if we can insert the file before the psot
+        for await (const atn of atns) {
+          post.content = post.content.replace(
+            `<img alt="${atn.name}" />`,
+            `<img src="${atn.url}" alt="${atn.name}" />`,
+          )
+          post.contentExcerpt = post.contentExcerpt.replace(
+            `<img alt="${atn.name}"/>`,
+            `<img src="${atn.url}" alt="${atn.name}" />`,
+          )
+        }
+
+        await context.database.write({
+          query: `
+          MATCH (post:Post {id: $post.id})
+          SET post.content = $post.content
+          SET post.contentExcerpt = $post.contentExcerpt
+        `,
+          variables: {
+            post,
+          },
+        })
+
         return post
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
@@ -220,13 +274,14 @@ export default {
     },
     UpdatePost: async (_parent, params, context: Context, _resolveInfo) => {
       const { config } = context
-      const { categoryIds } = params
+      const { categoryIds, files = [] } = params
       const { image: imageInput } = params
 
       const locationName = validateEventParams(params)
 
       delete params.categoryIds
       delete params.image
+      delete params.files
       const session = context.driver.session()
       let updatePostCypher = `
         MATCH (post:Post {id: $params.id})
@@ -273,12 +328,59 @@ export default {
           )
           const [post] = updatePostTransactionResponse.records.map((record) => record.get('post'))
           await images(context.config).mergeImage(post, 'HERO_IMAGE', imageInput, { transaction })
+
           return post
         })
         const post = await writeTxResultPromise
         if (locationName) {
           await createOrUpdateLocations('Post', post.id, locationName, session, context)
         }
+
+        // Attachments
+        const writeFilesPromise = session.writeTransaction(async (transaction) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const atns: any[] = []
+
+          for await (const file of files) {
+            const atn = await attachments(CONFIG).add(
+              post,
+              'ATTACHMENT',
+              file,
+              {},
+              {
+                transaction,
+              },
+            )
+            atns.push(atn)
+          }
+          return atns
+        })
+
+        const atns = await writeFilesPromise
+
+        // TODO: this can be removed if we can insert the file before the psot
+        for await (const atn of atns) {
+          post.content = post.content.replace(
+            `<img alt="${atn.name}" />`,
+            `<img src="${atn.url}" alt="${atn.name}" />`,
+          )
+          post.contentExcerpt = post.contentExcerpt.replace(
+            `<img alt="${atn.name}"/>`,
+            `<img src="${atn.url}" alt="${atn.name}" />`,
+          )
+        }
+
+        await context.database.write({
+          query: `
+            MATCH (post:Post {id: $post.id})
+            SET post.content = $post.content
+            SET post.contentExcerpt = $post.contentExcerpt
+          `,
+          variables: {
+            post,
+          },
+        })
+
         return post
       } finally {
         await session.close()
