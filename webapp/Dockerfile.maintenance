@@ -8,7 +8,7 @@ LABEL org.label-schema.vendor="ocelot.social Community"
 LABEL org.label-schema.schema-version="1.0"
 LABEL maintainer="devops@ocelot.social"
 
-FROM node:25.4.0-alpine AS styleguide
+FROM node:25.5.0-alpine AS styleguide
 RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
@@ -16,7 +16,7 @@ COPY styleguide .
 RUN yarn install --production=false --frozen-lockfile --non-interactive
 RUN yarn run build:lib
 
-FROM node:25.4.0-alpine AS build
+FROM node:25.5.0-alpine AS build
 ENV NODE_ENV="production"
 RUN apk --no-cache add git python3 make g++ bash jq
 COPY --from=styleguide ./app/ /styleguide/
