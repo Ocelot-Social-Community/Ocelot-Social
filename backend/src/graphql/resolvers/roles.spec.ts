@@ -36,6 +36,6 @@ describe('availableRoles', () => {
   it('returns available roles', async () => {
     const { data, errors } = await query({ query: availableRoles })
     expect(errors).toBeUndefined()
-    expect(data.availableRoles).toEqual(['admin', 'moderator', 'user'])
+    expect(data?.availableRoles).toEqual(['admin', 'moderator', 'user'])
   })
 })
