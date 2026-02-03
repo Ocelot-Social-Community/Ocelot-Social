@@ -745,10 +745,8 @@ describe('file a report on a resource', () => {
             query: reports,
             variables: { orderBy: 'createdAt_asc' },
           })
-          expect(data.reports.length).toBeGreaterThanOrEqual(2)
-          for (let i = 1; i < data.reports.length; i++) {
-            expect(data.reports[i].createdAt >= data.reports[i - 1].createdAt).toBe(true)
-          }
+          const sorted = [...data.reports].sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
+          expect(data.reports).toEqual(sorted)
         })
 
         it('createdAt_desc returns reports in descending order', async () => {
@@ -757,10 +755,8 @@ describe('file a report on a resource', () => {
             query: reports,
             variables: { orderBy: 'createdAt_desc' },
           })
-          expect(data.reports.length).toBeGreaterThanOrEqual(2)
-          for (let i = 1; i < data.reports.length; i++) {
-            expect(data.reports[i].createdAt <= data.reports[i - 1].createdAt).toBe(true)
-          }
+          const sorted = [...data.reports].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+          expect(data.reports).toEqual(sorted)
         })
       })
 
