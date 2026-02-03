@@ -737,6 +737,88 @@ describe('file a report on a resource', () => {
         const { data } = await query({ query: reports })
         expect(data).toEqual(expected)
       })
+
+      describe('orderBy', () => {
+        it('createdAt_asc returns reports in ascending order', async () => {
+          authenticatedUser = await moderator.toJson()
+          const { data } = await query({
+            query: reports,
+            variables: { orderBy: 'createdAt_asc' },
+          })
+          expect(data.reports.length).toBeGreaterThanOrEqual(2)
+          for (let i = 1; i < data.reports.length; i++) {
+            expect(data.reports[i].createdAt >= data.reports[i - 1].createdAt).toBe(true)
+          }
+        })
+
+        it('createdAt_desc returns reports in descending order', async () => {
+          authenticatedUser = await moderator.toJson()
+          const { data } = await query({
+            query: reports,
+            variables: { orderBy: 'createdAt_desc' },
+          })
+          expect(data.reports.length).toBeGreaterThanOrEqual(2)
+          for (let i = 1; i < data.reports.length; i++) {
+            expect(data.reports[i].createdAt <= data.reports[i - 1].createdAt).toBe(true)
+          }
+        })
+      })
+
+      describe('reviewed filter', () => {
+        it('reviewed: false returns only unreviewed reports', async () => {
+          authenticatedUser = await moderator.toJson()
+          const { data } = await query({
+            query: reports,
+            variables: { reviewed: false },
+          })
+          expect(data.reports).toHaveLength(3)
+        })
+
+        it('reviewed: true returns only reviewed reports', async () => {
+          authenticatedUser = await moderator.toJson()
+          // review one report
+          await mutate({
+            mutation: review,
+            variables: { resourceId: 'abusive-post-1', disable: false, closed: false },
+          })
+          const { data } = await query({
+            query: reports,
+            variables: { reviewed: true },
+          })
+          expect(data.reports).toHaveLength(1)
+          expect(data.reports[0].resource.id).toBe('abusive-post-1')
+        })
+      })
+
+      describe('closed filter', () => {
+        it('closed: false returns only open reports', async () => {
+          authenticatedUser = await moderator.toJson()
+          const { data } = await query({
+            query: reports,
+            variables: { closed: false },
+          })
+          expect(data.reports).toHaveLength(3)
+          data.reports.forEach((report) => {
+            expect(report.closed).toBe(false)
+          })
+        })
+
+        it('closed: true returns only closed reports', async () => {
+          authenticatedUser = await moderator.toJson()
+          // close one report via review
+          await mutate({
+            mutation: review,
+            variables: { resourceId: 'abusive-post-1', disable: false, closed: true },
+          })
+          const { data } = await query({
+            query: reports,
+            variables: { closed: true },
+          })
+          expect(data.reports).toHaveLength(1)
+          expect(data.reports[0].resource.id).toBe('abusive-post-1')
+          expect(data.reports[0].closed).toBe(true)
+        })
+      })
     })
   })
 })
