@@ -59,6 +59,16 @@ describe('default', () => {
       expect(getCapturedMiddlewares()).toHaveLength(16)
     })
   })
+
+  it('calls brandingMiddlewares', () => {
+    jest.isolateModules(() => {
+      const { mod } = loadModule()
+      // eslint-disable-next-line n/no-missing-require
+      const brandingMiddlewares = require('./branding/brandingMiddlewares') as jest.Mock
+      mod.default({})
+      expect(brandingMiddlewares).toHaveBeenCalledTimes(1)
+    })
+  })
 })
 
 describe('addMiddleware', () => {
