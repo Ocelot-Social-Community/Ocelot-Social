@@ -19,8 +19,8 @@ const setupMocks = (extraMocks?: Record<string, unknown>) => {
   jest.doMock('./login/loginMiddleware', () => ({}))
   jest.doMock('./notifications/notificationsMiddleware', () => ({}))
   jest.doMock('./orderByMiddleware', () => ({}))
-  jest.doMock('./permissionsMiddleware', () => extraMocks?.['./permissionsMiddleware'] ?? ({}))
-  jest.doMock('./sentryMiddleware', () => extraMocks?.['./sentryMiddleware'] ?? ({}))
+  jest.doMock('./permissionsMiddleware', () => extraMocks?.['./permissionsMiddleware'] ?? {})
+  jest.doMock('./sentryMiddleware', () => extraMocks?.['./sentryMiddleware'] ?? {})
   jest.doMock('./sluggifyMiddleware', () => ({}))
   jest.doMock('./softDelete/softDeleteMiddleware', () => ({}))
   jest.doMock('./userInteractions', () => ({}))
@@ -40,6 +40,7 @@ const loadModule = (
     },
   }))
   setupMocks(extraMocks)
+  // eslint-disable-next-line n/no-missing-require
   const mod = require('./index') as MiddlewareModule
   return {
     mod,
@@ -148,11 +149,11 @@ describe('addMiddleware', () => {
         const { mod } = loadModule()
         expect(() =>
           mod.addMiddleware({
-            name: 'fail',
+            name: 'failure',
             middleware: {},
             position: { before: 'nonexistent' },
           }),
-        ).toThrow('Could not find middleware "nonexistent" to append the middleware "fail"')
+        ).toThrow('Could not find middleware "nonexistent" to append the middleware "failure"')
       })
     })
 
@@ -161,11 +162,11 @@ describe('addMiddleware', () => {
         const { mod } = loadModule()
         expect(() =>
           mod.addMiddleware({
-            name: 'fail2',
+            name: 'failure',
             middleware: {},
             position: { after: 'nonexistent' },
           }),
-        ).toThrow('Could not find middleware "nonexistent" to append the middleware "fail2"')
+        ).toThrow('Could not find middleware "nonexistent" to append the middleware "failure"')
       })
     })
   })
