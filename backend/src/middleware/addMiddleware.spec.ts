@@ -29,7 +29,7 @@ interface MiddlewareModule {
   default: (schema: unknown) => unknown
 }
 
-describe.only('default', () => {
+describe('default', () => {
   it('registers the 16 default middlewares', () => {
     let capturedArgs: unknown[] = []
     jest.doMock('graphql-middleware', () => ({
