@@ -819,6 +819,54 @@ describe('file a report on a resource', () => {
           expect(data.reports[0].closed).toBe(true)
         })
       })
+
+      describe('pagination', () => {
+        it('first: 2 returns only 2 reports', async () => {
+          authenticatedUser = await moderator.toJson()
+          const { data } = await query({
+            query: reports,
+            variables: { first: 2 },
+          })
+          expect(data.reports).toHaveLength(2)
+        })
+
+        it('first: 1 returns only 1 report', async () => {
+          authenticatedUser = await moderator.toJson()
+          const { data } = await query({
+            query: reports,
+            variables: { first: 1 },
+          })
+          expect(data.reports).toHaveLength(1)
+        })
+
+        it('offset: 1 skips the first report', async () => {
+          authenticatedUser = await moderator.toJson()
+          const { data: allData } = await query({
+            query: reports,
+            variables: { orderBy: 'createdAt_asc' },
+          })
+          const { data: offsetData } = await query({
+            query: reports,
+            variables: { orderBy: 'createdAt_asc', offset: 1 },
+          })
+          expect(offsetData.reports).toHaveLength(allData.reports.length - 1)
+          expect(offsetData.reports[0].id).toBe(allData.reports[1].id)
+        })
+
+        it('first and offset combined for paging', async () => {
+          authenticatedUser = await moderator.toJson()
+          const { data: allData } = await query({
+            query: reports,
+            variables: { orderBy: 'createdAt_asc' },
+          })
+          const { data: pageData } = await query({
+            query: reports,
+            variables: { orderBy: 'createdAt_asc', first: 1, offset: 1 },
+          })
+          expect(pageData.reports).toHaveLength(1)
+          expect(pageData.reports[0].id).toBe(allData.reports[1].id)
+        })
+      })
     })
   })
 })
