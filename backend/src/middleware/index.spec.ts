@@ -95,10 +95,13 @@ describe('default', () => {
         },
         disabledMiddlewares: ['sentry', 'xss'],
       })
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation()
       const middlewares = getCapturedMiddlewares()
       expect(middlewares).toHaveLength(14)
       expect(middlewares).not.toContain(sentryMarker)
       expect(middlewares).not.toContain(xssMarker)
+      expect(consoleSpy).toHaveBeenCalledWith('Warning: Disabled "sentry, xss" middleware.')
+      consoleSpy.mockRestore()
     })
   })
 })
