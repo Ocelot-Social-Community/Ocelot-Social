@@ -42,7 +42,7 @@ describe('availableRoles', () => {
     it('throws authorization error', async () => {
       authenticatedUser = null
       const { data, errors } = await query({ query: availableRoles })
-      expect(data).toEqual({ availableRoles: null })
+      expect(data).toEqual(null)
       expect(errors).toEqual([expect.objectContaining({ message: 'Not Authorized!' })])
     })
   })
