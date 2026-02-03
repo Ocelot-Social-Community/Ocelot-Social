@@ -149,7 +149,7 @@ export default {
       return filed
     }, */
     reviewed: async (parent, _params, context, _resolveInfo) => {
-      if (typeof parent.reviewed !== 'undefined') return parent.reviewed
+      // if (typeof parent.reviewed !== 'undefined') return parent.reviewed
       const session = context.driver.session()
       const { id } = parent
       let reviewed
