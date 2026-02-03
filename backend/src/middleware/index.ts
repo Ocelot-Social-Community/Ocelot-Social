@@ -96,7 +96,7 @@ export default (schema) => {
   )
 
   // Warn if we filtered
-  if (ocelotMiddlewares.length < filteredMiddlewares.length) {
+  if (ocelotMiddlewares.length !== filteredMiddlewares.length) {
     // eslint-disable-next-line no-console
     console.log(`Warning: Disabled "${CONFIG.DISABLED_MIDDLEWARES.join(', ')}" middleware.`)
   }
