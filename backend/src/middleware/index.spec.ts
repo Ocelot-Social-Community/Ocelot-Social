@@ -9,29 +9,43 @@ interface MiddlewareModule {
   default: (schema: unknown) => unknown
 }
 
-const setupMocks = (extraMocks?: Record<string, unknown>) => {
+interface MockOptions {
+  extraMocks?: Record<string, unknown>
+  disabledMiddlewares?: string[]
+}
+
+const middlewareModules = [
+  './categories',
+  './chatMiddleware',
+  './excerptMiddleware',
+  './hashtags/hashtagsMiddleware',
+  './includedFieldsMiddleware',
+  './languages/languages',
+  './login/loginMiddleware',
+  './notifications/notificationsMiddleware',
+  './orderByMiddleware',
+  './permissionsMiddleware',
+  './sentryMiddleware',
+  './sluggifyMiddleware',
+  './softDelete/softDeleteMiddleware',
+  './userInteractions',
+  './validation/validationMiddleware',
+  './xssMiddleware',
+]
+
+const setupMocks = ({ extraMocks, disabledMiddlewares = [] }: MockOptions = {}) => {
   jest.doMock('./branding/brandingMiddlewares', () => jest.fn())
-  jest.doMock('./categories', () => ({}))
-  jest.doMock('./chatMiddleware', () => ({}))
-  jest.doMock('./excerptMiddleware', () => ({}))
-  jest.doMock('./hashtags/hashtagsMiddleware', () => ({}))
-  jest.doMock('./includedFieldsMiddleware', () => ({}))
-  jest.doMock('./languages/languages', () => ({}))
-  jest.doMock('./login/loginMiddleware', () => ({}))
-  jest.doMock('./notifications/notificationsMiddleware', () => ({}))
-  jest.doMock('./orderByMiddleware', () => ({}))
-  jest.doMock('./permissionsMiddleware', () => extraMocks?.['./permissionsMiddleware'] ?? {})
-  jest.doMock('./sentryMiddleware', () => extraMocks?.['./sentryMiddleware'] ?? {})
-  jest.doMock('./sluggifyMiddleware', () => ({}))
-  jest.doMock('./softDelete/softDeleteMiddleware', () => ({}))
-  jest.doMock('./userInteractions', () => ({}))
-  jest.doMock('./validation/validationMiddleware', () => ({}))
-  jest.doMock('./xssMiddleware', () => ({}))
-  jest.doMock('@config/index', () => ({ DISABLED_MIDDLEWARES: [] }))
+  jest.doMock('@config/index', () => ({ DISABLED_MIDDLEWARES: disabledMiddlewares }))
+
+  // Mock all middlewares and allow to override its mock
+  for (const mod of middlewareModules) {
+    // eslint-disable-next-line security/detect-object-injection
+    jest.doMock(mod, () => extraMocks?.[mod] ?? {})
+  }
 }
 
 const loadModule = (
-  extraMocks?: Record<string, unknown>,
+  options?: MockOptions,
 ): { mod: MiddlewareModule; getCapturedMiddlewares: () => unknown[] } => {
   let capturedArgs: unknown[] = []
   jest.doMock('graphql-middleware', () => ({
@@ -40,7 +54,7 @@ const loadModule = (
       return _schema
     },
   }))
-  setupMocks(extraMocks)
+  setupMocks(options)
   // eslint-disable-next-line n/no-missing-require
   const mod = require('./index') as MiddlewareModule
   return {
@@ -67,6 +81,24 @@ describe('default', () => {
       const brandingMiddlewares = require('./branding/brandingMiddlewares') as jest.Mock
       mod.default({})
       expect(brandingMiddlewares).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it('filters out disabled middlewares', () => {
+    jest.isolateModules(() => {
+      const sentryMarker = { __test: 'sentry' }
+      const xssMarker = { __test: 'xss' }
+      const { getCapturedMiddlewares } = loadModule({
+        extraMocks: {
+          './sentryMiddleware': sentryMarker,
+          './xssMiddleware': xssMarker,
+        },
+        disabledMiddlewares: ['sentry', 'xss'],
+      })
+      const middlewares = getCapturedMiddlewares()
+      expect(middlewares).toHaveLength(14)
+      expect(middlewares).not.toContain(sentryMarker)
+      expect(middlewares).not.toContain(xssMarker)
     })
   })
 })
@@ -104,8 +136,10 @@ describe('addMiddleware', () => {
         const sentryMarker = { __test: 'sentry' }
         const permissionsMarker = { __test: 'permissions' }
         const { mod, getCapturedMiddlewares } = loadModule({
-          './sentryMiddleware': sentryMarker,
-          './permissionsMiddleware': permissionsMarker,
+          extraMocks: {
+            './sentryMiddleware': sentryMarker,
+            './permissionsMiddleware': permissionsMarker,
+          },
         })
 
         const m = { __test: 'before-permissions' }
@@ -132,8 +166,10 @@ describe('addMiddleware', () => {
         const sentryMarker = { __test: 'sentry' }
         const permissionsMarker = { __test: 'permissions' }
         const { mod, getCapturedMiddlewares } = loadModule({
-          './sentryMiddleware': sentryMarker,
-          './permissionsMiddleware': permissionsMarker,
+          extraMocks: {
+            './sentryMiddleware': sentryMarker,
+            './permissionsMiddleware': permissionsMarker,
+          },
         })
 
         const m = { __test: 'after-sentry' }
