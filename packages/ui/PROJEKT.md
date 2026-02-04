@@ -11,7 +11,7 @@
 Neue Vue 3 Komponentenbibliothek aufbauen, die später die Vue 2 Komponenten in der Webapp ersetzen soll.
 
 **Hintergrund:**
-- Bestehendes Projekt nutzt Vue 2.6 mit Nuxt 2
+- Bestehendes Projekt nutzt Vue 2.6 mit Nuxt 2 (Upgrade auf Vue 2.7 erforderlich)
 - Existierender `styleguide` Ordner als Git-Submodul (Vue 2, Vue CLI 3)
 - Design-Token-System mit Theo vorhanden
 - Branding erfolgt über SCSS-Dateien mit Variablen-Overrides
@@ -50,7 +50,7 @@ Migration vorbereiten - schrittweise neue Komponenten in Vue 3 entwickeln, die d
 
 | Aspekt | Entscheidung | Notizen |
 |--------|--------------|---------|
-| Vue API | **`<script setup>`** | Composition API mit script setup |
+| Vue API | **`<script setup>`** | Composition API mit script setup (erfordert Vue 2.7+) |
 | Sprache | **Englisch** | Code, Comments, Dokumentation |
 | Package Manager | **npm** | Bereits im Projekt verwendet |
 | Test Coverage | **100%** | Vollständige Testabdeckung |
@@ -106,6 +106,33 @@ import '@ocelot-social/ui/styles.css'
 
 **Beide Varianten nutzen CSS Custom Properties** - Branding ist identisch.
 
+### Webapp-Integration (Entwicklung)
+
+**Lokale Entwicklung mit Nuxt Alias:**
+```js
+// webapp/nuxt.config.js
+export default {
+  alias: {
+    '@ocelot-social/ui': process.env.LOCAL_UI
+      ? path.resolve(__dirname, '../packages/ui/src')
+      : '@ocelot-social/ui'
+  }
+}
+```
+
+**Entwickler startet mit:**
+```bash
+LOCAL_UI=true yarn dev
+```
+
+**Release-Check:**
+Bei Ocelot-Release wird geprüft, ob `packages/ui` unreleased Änderungen hat:
+```bash
+# Commits seit letztem ui-Tag?
+git log --oneline $(git describe --tags --match "ui-v*" --abbrev=0)..HEAD -- packages/ui/
+```
+→ Wenn Output vorhanden: UI muss zuerst released werden.
+
 ---
 
 ## 4. CI/CD & Release-Automatisierung
@@ -113,7 +140,7 @@ import '@ocelot-social/ui/styles.css'
 ### Release-Workflow (release-please)
 
 **Manifest-Modus für Monorepo:**
-- Nur Commits in `styleguide-vue3/` werden betrachtet
+- Nur Commits in `packages/ui/` werden betrachtet
 - Eigene Versionierung unabhängig vom Hauptrepo
 - Automatischer Changelog nur für dieses Paket
 
@@ -165,6 +192,29 @@ Alle grün → Merge erlaubt
 | Release erstellt | npm publish |
 | Release erstellt | Histoire build + deploy auf Server |
 
+**Histoire Deploy (Webhook):**
+1. GitHub sendet Webhook bei Release-Event
+2. Server empfängt Webhook
+3. Server führt `scripts/deploy-histoire.sh` aus (Teil des Repos)
+4. Script: git pull → npm ci → histoire build → copy to webroot
+
+### GitHub Workflows (vollständige Liste)
+
+| Workflow | Trigger | Tool | Beschreibung |
+|----------|---------|------|--------------|
+| **lint** | Push/PR | eslint-config-it4c | Code-Stil prüfen |
+| **typecheck** | Push/PR | TypeScript | Typ-Fehler finden |
+| **test** | Push/PR | Vitest | Unit-Tests |
+| **test-a11y** | Push/PR | axe-core | Accessibility-Tests |
+| **test-visual** | Push/PR | Playwright | Visual Regression Screenshots |
+| **build** | Push/PR | Vite | Build verifizieren |
+| **build-histoire** | Push/PR | Histoire | Dokumentation bauen |
+| **size-check** | Push/PR | size-limit | Bundle-Größe prüfen |
+| **release** | Push main | release-please | Release-PR erstellen |
+| **publish** | Release | npm | Auf npm veröffentlichen |
+| **deploy-docs** | Release | Webhook | Histoire auf Server deployen |
+| **check-ui-release** | Ocelot Release | Git | Prüft unreleased UI-Änderungen |
+
 ### Erweiterte Qualitätssicherung
 
 | Maßnahme | Tool | Beschreibung |
@@ -195,7 +245,7 @@ Nach erfolgreicher Migration einer Komponente werden in der Vue 2 Webapp Warnung
 ```js
 // In alter Komponente
 if (process.env.NODE_ENV === 'development') {
-  console.warn('[DEPRECATED] Button: Bitte @ocelot/styleguide-vue3 verwenden')
+  console.warn('[DEPRECATED] Button: Bitte @ocelot-social/ui verwenden')
 }
 ```
 
@@ -296,17 +346,32 @@ Jedes Branding kann auf jeder Ebene eingreifen:
 ### Ablauf pro Komponente
 
 ```
-┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
-│   ANALYSE    │ →  │    SPEC      │ →  │   DEVELOP    │ →  │  INTEGRATE   │
-├──────────────┤    ├──────────────┤    ├──────────────┤    ├──────────────┤
-│ Bestehende   │    │ Props        │    │ Vue 3 Code   │    │ In Vue 2     │
-│ Varianten    │    │ Varianten    │    │ Tests        │    │ Projekt      │
-│ identifiz.   │    │ Zustände     │    │ Histoire     │    │ einbinden    │
-│ Duplikate    │    │ A11y         │    │ Stories      │    │              │
-│ finden       │    │ Tokens       │    │              │    │ Alte Komp.   │
-│              │    │              │    │              │    │ entfernen    │
-└──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│   ANALYSE    │ →  │    SPEC      │ →  │   DEVELOP    │ →  │     QA       │ →  │  INTEGRATE   │
+├──────────────┤    ├──────────────┤    ├──────────────┤    ├──────────────┤    ├──────────────┤
+│ Bestehende   │    │ Props        │    │ Vue 3 Code   │    │ Alle Tests   │    │ In Vue 2     │
+│ Varianten    │    │ Varianten    │    │ Unit Tests   │    │ grün         │    │ Projekt      │
+│ identifiz.   │    │ Zustände     │    │ Histoire     │    │ Visual Regr. │    │ einbinden    │
+│ Duplikate    │    │ A11y         │    │ Stories      │    │ A11y Check   │    │              │
+│ finden       │    │ Tokens       │    │              │    │ Review       │    │ Alte Komp.   │
+│              │    │              │    │              │    │              │    │ entfernen    │
+└──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
 ```
+
+### Komponenten-Protokoll
+
+Pro Komponente wird eine Dokumentationsdatei geführt:
+
+```
+packages/ui/docs/components/OsButton.md
+```
+
+**Inhalt:**
+- Ursprung (Webapp/Styleguide/Beide)
+- Zusammengeführte Komponenten (falls vorhanden)
+- Entscheidungen und Begründungen
+- Abweichungen von Original
+- Migration History
 
 ### Qualitätsanforderungen pro Komponente
 
@@ -333,12 +398,19 @@ Bei der Migration werden:
 
 ## 8. Meilensteine
 
-### Phase 0: Analyse (NEU)
-- [ ] Vollständige Katalogisierung aller bestehenden Komponenten
+### Phase 0: Analyse & Katalogisierung
+- [ ] Vollständige Katalogisierung Webapp-Komponenten (siehe KATALOG.md)
+- [ ] Vollständige Katalogisierung Styleguide-Komponenten (siehe KATALOG.md)
 - [ ] Duplikate identifizieren und dokumentieren
 - [ ] Inkonsistenzen und Probleme erfassen
 - [ ] Konsolidierungsplan erstellen
 - [ ] Priorisierung der zu migrierenden Komponenten
+
+### Phase 0.5: Vue 2.7 Upgrade
+- [ ] Vue 2.6 → Vue 2.7 Upgrade in Webapp
+- [ ] Abhängigkeiten aktualisieren
+- [ ] Tests durchführen
+- [ ] Regressionstests
 
 ### Phase 1: Projekt-Setup
 - [ ] Vite + Vue 3 Projekt initialisieren
@@ -383,7 +455,38 @@ Bei der Migration werden:
 
 ---
 
-## 9. Aktueller Stand
+## 9. Fortschritt
+
+### Gesamtprojekt
+```
+Phase 0:   ░░░░░░░░░░  0% (0/6 Aufgaben)
+Phase 0.5: ░░░░░░░░░░  0% (0/4 Aufgaben)
+Phase 1:   ░░░░░░░░░░  0% (0/19 Aufgaben)
+Phase 2:   ░░░░░░░░░░  0% (0/6 Aufgaben)
+Phase 3:   ░░░░░░░░░░  0% (0/? Komponenten)
+Phase 4:   ░░░░░░░░░░  0% (0/4 Aufgaben)
+───────────────────────────────────────
+Gesamt:    ░░░░░░░░░░  0%
+```
+
+### Katalogisierung (Details in KATALOG.md)
+```
+Webapp:     ░░░░░░░░░░  0% (0/? Komponenten)
+Styleguide: ░░░░░░░░░░  0% (0/? Komponenten)
+```
+
+### Komponenten-Migration
+```
+Analysiert:  0
+Spezifiziert: 0
+Entwickelt:   0
+QA bestanden: 0
+Integriert:   0
+```
+
+---
+
+## 10. Aktueller Stand
 
 **Letzte Aktualisierung:** 2026-02-04
 
@@ -405,7 +508,7 @@ Bei der Migration werden:
 
 ---
 
-## 10. Entscheidungen
+## 11. Entscheidungen
 
 | # | Frage | Entscheidung | Begründung |
 |---|-------|--------------|------------|
@@ -451,10 +554,18 @@ Bei der Migration werden:
 | 40 | Breakpoints | Tailwind Standard | sm, md, lg, xl, 2xl |
 | 41 | TypeScript | strict: true | Strikte Typisierung |
 | 42 | Ordnerstruktur | packages/ui | Monorepo-Standard, erweiterbar |
+| 43 | Vue 2 Minimum | Vue 2.7 | Erforderlich für `<script setup>` Support |
+| 44 | Dev-Linking | Nuxt Alias | LOCAL_UI=true für lokale Library |
+| 45 | Release-Check | Git-basiert | Prüft unreleased UI-Änderungen vor Ocelot-Release |
+| 46 | Histoire Deploy | Webhook + Script | Server zieht und baut bei Release |
+| 47 | Komponenten-Protokoll | Markdown pro Komponente | docs/components/OsButton.md |
+| 48 | Katalogisierung | KATALOG.md | Unterbrechbar, Webapp + Styleguide |
+| 49 | Fortschritt | Berechenbar | Pro Phase und Gesamt |
+| 50 | GitHub Workflows | 12 Workflows | Vollständige CI/CD Pipeline |
 
 ---
 
-## 11. Arbeitsprotokoll
+## 12. Arbeitsprotokoll
 
 | Datum | Beschreibung | Ergebnis |
 |-------|--------------|----------|
@@ -472,28 +583,39 @@ Bei der Migration werden:
 | 2026-02-04 | Konventionen | script setup, Englisch, npm, 100% Coverage, PascalCase |
 | 2026-02-04 | Weitere | Nur Props (kein i18n), Tailwind Breakpoints, strict TS |
 | 2026-02-04 | Ordnerstruktur | packages/ui statt styleguide-vue3 |
+| 2026-02-04 | Konfliktanalyse | Vue 2.7 Upgrade als Voraussetzung für script setup |
+| 2026-02-04 | Webapp-Integration | Nuxt Alias für lokale Entwicklung, Git-basierter Release-Check |
+| 2026-02-04 | Prozesse | QA-Schritt pro Komponente, Komponenten-Protokoll, KATALOG.md |
+| 2026-02-04 | Fortschritt | Berechenbar für Gesamt und Einzelschritte |
 
 ---
 
-## 12. Komponenten-Katalog
+## 13. Komponenten-Katalog
 
-> Wird in Phase 0 (Analyse) ausgefüllt
+> **Detaillierte Katalogisierung in separater Datei: [KATALOG.md](./KATALOG.md)**
 
-| Komponente | Status | Duplikate | Varianten | Priorität | Notizen |
-|------------|--------|-----------|-----------|-----------|---------|
-| _Button_ | _Ausstehend_ | _?_ | _?_ | _?_ | |
-| _Card_ | _Ausstehend_ | _?_ | _?_ | _?_ | |
-| _..._ | | | | | |
+### Zusammenfassung (wird automatisch aus KATALOG.md übernommen)
+
+| Quelle | Gesamt | Analysiert | Duplikate | Zu migrieren |
+|--------|--------|------------|-----------|--------------|
+| Webapp | ~60+ | 0 | 0 | ? |
+| Styleguide | ~15 | 0 | 0 | ? |
+| **Gesamt** | **~75+** | **0** | **0** | **?** |
 
 ---
 
-## 13. Ressourcen & Links
+## 14. Ressourcen & Links
 
 **Projekt:**
 - [Ocelot-Social Repository](https://github.com/Ocelot-Social-Community/Ocelot-Social)
-- Bestehender Styleguide: `../styleguide/`
-- Bestehende Webapp: `../webapp/`
-- Design Tokens: `../styleguide/src/system/tokens/`
+- [Styleguide (Live)](http://styleguide.ocelot.social/)
+- Bestehender Styleguide Code: `../../styleguide/`
+- Bestehende Webapp: `../../webapp/`
+- Design Tokens: `../../styleguide/src/system/tokens/`
+
+**Tracking:**
+- Katalogisierung: `./KATALOG.md`
+- Komponenten-Docs: `./docs/components/`
 
 **Dokumentation:**
 - [Vue 3](https://vuejs.org/)
@@ -502,6 +624,7 @@ Bei der Migration werden:
 - [Histoire](https://histoire.dev/)
 - [Vitest](https://vitest.dev/)
 - [vue-demi](https://github.com/vueuse/vue-demi)
+- [unplugin-icons](https://github.com/unplugin/unplugin-icons)
 
 ---
 
@@ -511,7 +634,8 @@ Bei der Migration werden:
 > "Lass uns am @ocelot-social/ui Projekt weiterarbeiten" (packages/ui)
 
 **Nach jeder Session aktualisieren:**
-- Abschnitt 9: "Aktueller Stand"
-- Abschnitt 11: "Arbeitsprotokoll"
-- Abschnitt 12: "Komponenten-Katalog" (ab Phase 0)
+- Abschnitt 9: "Fortschritt"
+- Abschnitt 10: "Aktueller Stand"
+- Abschnitt 12: "Arbeitsprotokoll"
+- KATALOG.md (ab Phase 0)
 - Meilenstein-Checklisten in Abschnitt 8
