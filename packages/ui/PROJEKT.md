@@ -600,6 +600,7 @@ Integriert:   0
 | 55 | Komponenten-Abgrenzung | Entscheidungsbaum | Library: präsentational, Webapp: Business-Logik (siehe §17) |
 | 56 | Externe Abhängigkeiten | Dokumentiert in §18 | eslint-config-it4c muss modularisiert werden |
 | 57 | Kompatibilitätstests | 4er-Matrix + CI | Vue 2/3 × Tailwind/CSS (siehe §19) |
+| 58 | Komplexitätsanalyse | Dokumentiert in §20 | Risikofaktoren, Parallelisierbarkeit, Aufwandstreiber |
 
 ---
 
@@ -632,6 +633,8 @@ Integriert:   0
 | 2026-02-04 | **Externe Abhängigkeit** | eslint-config-it4c blockiert Linting-Setup, Workaround dokumentiert |
 | 2026-02-04 | **Kompatibilitätstests** | 4er-Matrix (Vue 2/3 × Tailwind/CSS), Example Apps, Playwright E2E |
 | 2026-02-04 | **Phasen umbenannt** | 0.5→1, 1→2, 2→3, 3→4, 4→5 (nur ganzzahlige Phasen) |
+| 2026-02-04 | **Dokument-Konsolidierung** | §13 Zahlen korrigiert, §14 Link entfernt, §16 Reihenfolge, Terminologie vereinheitlicht |
+| 2026-02-04 | **Komplexitätsanalyse** | §20 hinzugefügt: Risikofaktoren, Parallelisierbarkeit, Aufwandstreiber pro Komponente |
 
 ---
 
@@ -1490,6 +1493,79 @@ jobs:
 [ ] Visual Regression Baseline erstellt
 [ ] Keine Vue 3-only APIs verwendet (oder via vue-demi abstrahiert)
 ```
+
+---
+
+## 20. Komplexitätsanalyse & Risikofaktoren
+
+### Umfang nach Phasen
+
+| Phase | Aufgaben | Komplexität | Abhängigkeiten |
+|-------|----------|-------------|----------------|
+| Phase 0: Analyse | 6 Tasks | ✅ Erledigt | - |
+| Phase 1: Vue 2.7 | 6 Tasks | ✅ Erledigt | - |
+| Phase 2: Setup | 26 Tasks | Mittel | ⚠️ eslint-config-it4c (extern) |
+| Phase 3: Tokens | 6 Tasks | Niedrig | Keine externen |
+| Phase 4: Migration | 15 Komponenten | Hoch | Pro Komponente: Spec→Dev→Test→Integrate |
+| Phase 5: Finalisierung | 7 Tasks | Niedrig | Alle vorherigen Phasen |
+
+### Bekannte Risikofaktoren
+
+| Risiko | Beschreibung | Auswirkung | Mitigation |
+|--------|--------------|------------|------------|
+| **eslint-config-it4c** | Externes Projekt muss zuerst modularisiert werden | Blockiert Linting-Setup in Phase 2 | Temporäre lokale ESLint-Config als Workaround |
+| **vue-demi Kompatibilität** | Unbekannte Edge-Cases bei Vue 2/3 Dual-Support | Unerwartete Bugs bei Integration | Frühzeitig in Example Apps testen |
+| **Visual Regression Baselines** | Können bei Design-Änderungen viel Nacharbeit erfordern | Zusätzlicher Aufwand bei Änderungen | Baselines erst nach Design-Freeze erstellen |
+| **Feature-Parity** | Alte Komponenten haben undokumentierte Verhaltensweisen | Regressions bei Migration | Gründliche Analyse vor Implementierung |
+| **Tailwind + CSS Dual-Build** | Komplexe Build-Konfiguration | Build-Fehler, Inkonsistenzen | Früh beide Varianten parallel testen |
+
+### Parallelisierbarkeit
+
+| Phase | Parallelisierbar | Details |
+|-------|------------------|---------|
+| Phase 2 | Teilweise | Die meisten Tasks sind sequentiell (Setup-Reihenfolge wichtig) |
+| Phase 3 | Nein | Token-Ebenen bauen aufeinander auf (Base → Semantic → Component) |
+| Phase 4 | Ja (nach Tier 1) | Tier 2/3 Komponenten können parallel entwickelt werden |
+| Phase 5 | Teilweise | Dokumentation kann parallel zur letzten Integration |
+
+**Parallelisierbare Aufgaben in Phase 2:**
+- 4 Example Apps (vue3-tailwind, vue3-css, vue2-tailwind, vue2-css)
+- GitHub Workflows (unabhängig voneinander)
+- LICENSE, README.md, CONTRIBUTING.md
+
+**Sequentielle Abhängigkeiten in Phase 2:**
+1. Vite + Vue 3 Projekt → vue-demi → Tailwind → Build-Pipeline
+2. Vitest → Tests → Visual Regression
+3. Package-Struktur → release-please → npm Publish Workflow
+
+### Aufwandstreiber pro Komponente (Phase 4)
+
+Jede Komponente durchläuft:
+
+```
+┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
+│  ANALYSE    │ → │    SPEC     │ → │   DEVELOP   │ → │     QA      │ → │  INTEGRATE  │
+├─────────────┤   ├─────────────┤   ├─────────────┤   ├─────────────┤   ├─────────────┤
+│ Bestehende  │   │ Props       │   │ Vue 3 Code  │   │ Unit Tests  │   │ In Webapp   │
+│ Varianten   │   │ Events      │   │ TypeScript  │   │ Vue 2 Tests │   │ einbinden   │
+│ analysieren │   │ Slots       │   │ Tailwind    │   │ A11y Tests  │   │             │
+│             │   │ Tokens      │   │ Histoire    │   │ Visual Reg. │   │ Alte Komp.  │
+│             │   │ A11y        │   │ Stories     │   │ 4 Examples  │   │ entfernen   │
+└─────────────┘   └─────────────┘   └─────────────┘   └─────────────┘   └─────────────┘
+```
+
+**Aufwand variiert stark nach Komponente:**
+
+| Komponente | Komplexität | Grund |
+|------------|-------------|-------|
+| OsIcon | Niedrig | Einfache Wrapper-Komponente |
+| OsSpinner | Niedrig | Nur Animation + Größen |
+| OsButton | Hoch | Viele Varianten, Link-Support, States |
+| OsCard | Niedrig | Einfaches Layout |
+| OsModal | Hoch | Teleport, Focus-Trap, Animations, A11y |
+| OsDropdown | Hoch | Positioning, Click-Outside, Hover-States |
+| OsInput | Mittel | Validierung, States, Icons |
+| OsAvatar | Niedrig | Bild + Fallback |
 
 ---
 
