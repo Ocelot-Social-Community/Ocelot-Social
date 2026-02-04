@@ -421,12 +421,12 @@ Bei der Migration werden:
 - [ ] vue-demi einrichten für Vue 2 Kompatibilität
 - [ ] Tailwind CSS einrichten
 - [ ] Dual-Build konfigurieren (Tailwind Preset + vorkompilierte CSS)
-- [ ] unplugin-icons einrichten
+- [ ] System-Icons einrichten (Hybrid-Architektur, ~10 Icons)
 - [ ] CSS Custom Properties Token-System aufsetzen
 - [ ] Dark Mode Grundstruktur
 - [ ] Histoire für Dokumentation einrichten
 - [ ] Vitest konfigurieren
-- [ ] eslint-config-it4c einrichten (inkl. TypeScript, Vue, Prettier)
+- [ ] eslint-config-it4c einrichten (inkl. TypeScript, Vue, Prettier, JSDoc)
 - [ ] npm Package-Struktur (@ocelot-social/ui)
 - [ ] Build-Pipeline für Vue 2/3 Dual-Support
 - [ ] GitHub Workflows einrichten (Lint, Test, Build)
@@ -437,6 +437,10 @@ Bei der Migration werden:
 - [ ] npm Publish Workflow
 - [ ] Histoire Deploy Workflow
 - [ ] LICENSE Datei (Apache 2.0)
+- [ ] README.md Grundgerüst (Installation, Quick Start, Struktur)
+- [ ] CONTRIBUTING.md
+- [ ] Docs-Generierung einrichten (vue-component-meta)
+- [ ] CI docs-check Workflow
 
 ### Phase 2: Token-System & Basis
 - [ ] Base Tokens definieren (Farben, Spacing, Typography)
@@ -455,7 +459,10 @@ Bei der Migration werden:
 - [ ] Alle Komponenten migriert und getestet
 - [ ] Alte Komponenten aus Vue 2 Projekt entfernt
 - [ ] Build als npm Library verifiziert
-- [ ] Dokumentation vollständig
+- [ ] README.md finalisieren (alle Sektionen vollständig)
+- [ ] ARCHITECTURE.md erstellen (aus PROJEKT.md §2, §6, §11, §15, §16)
+- [ ] PROJEKT.md und KATALOG.md archivieren (docs/archive/)
+- [ ] Dokumentation vollständig und CI-geprüft
 
 ---
 
@@ -465,10 +472,10 @@ Bei der Migration werden:
 ```
 Phase 0:   ██████████ 100% (6/6 Aufgaben) ✅
 Phase 0.5: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 1:   ░░░░░░░░░░   0% (0/19 Aufgaben)
+Phase 1:   ░░░░░░░░░░   0% (0/23 Aufgaben)
 Phase 2:   ░░░░░░░░░░   0% (0/6 Aufgaben)
 Phase 3:   ░░░░░░░░░░   0% (0/15 Komponenten)
-Phase 4:   ░░░░░░░░░░   0% (0/4 Aufgaben)
+Phase 4:   ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
 Gesamt:    ██░░░░░░░░  ~15%
 ```
@@ -584,6 +591,9 @@ Integriert:   0
 | 49 | Fortschritt | Berechenbar | Pro Phase und Gesamt |
 | 50 | GitHub Workflows | 12 Workflows | Vollständige CI/CD Pipeline |
 | 51 | Icon-Architektur | Hybrid | ~10 System-Icons in Library, Rest in App (siehe §15) |
+| 52 | Docs-Generierung | vue-component-meta | Komponenten-Tabelle aus Code generiert |
+| 53 | Docs CI-Check | GitHub Workflow | Prüft JSDoc-Coverage und README-Aktualität |
+| 54 | Nach Migration | ARCHITECTURE.md | PROJEKT.md → ARCHITECTURE.md, KATALOG.md archivieren |
 
 ---
 
@@ -611,6 +621,7 @@ Integriert:   0
 | 2026-02-04 | Fortschritt | Berechenbar für Gesamt und Einzelschritte |
 | 2026-02-04 | **Phase 0.5 abgeschlossen** | Vue 2.7 Upgrade erfolgreich, alle Tests bestanden |
 | 2026-02-04 | **Icon-Architektur** | Hybrid-Ansatz: ~10 System-Icons in Library, Feature-Icons in App |
+| 2026-02-04 | **Dokumentationsstrategie** | Hybrid: Generiert (vue-component-meta) + Manuell, CI-geprüft |
 
 ---
 
@@ -751,6 +762,210 @@ export default defineNuxtPlugin((nuxtApp) => {
 | Styleguide (_all) | 616 | Nicht übernehmen (FontAwesome 4 komplett) |
 | Webapp (svgs) | 238 | Feature-Icons, bleiben in Webapp |
 | **Library (system)** | **~10** | Nur essenzielle System-Icons |
+
+---
+
+## 16. Dokumentationsstrategie
+
+### Übersicht
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  GENERIERT (aus Code) - Single Source of Truth              │
+├─────────────────────────────────────────────────────────────┤
+│  • README.md Komponenten-Tabelle                            │
+│  • Props/Events/Slots Dokumentation                         │
+│  • TypeScript-Typen                                         │
+└─────────────────────────────────────────────────────────────┘
+                            +
+┌─────────────────────────────────────────────────────────────┐
+│  MANUELL                                                    │
+├─────────────────────────────────────────────────────────────┤
+│  • README.md Installation, Quick Start, Theming             │
+│  • Histoire Stories (interaktive Beispiele)                 │
+│  • ARCHITECTURE.md (Entscheidungen)                         │
+│  • Best Practices, Patterns                                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### README.md Struktur
+
+```markdown
+# @ocelot-social/ui
+
+## Übersicht
+- Was ist die Library?
+- Link zu Histoire (Live-Dokumentation)
+
+## Installation
+- npm install
+- Peer Dependencies (vue, vue-demi)
+
+## Quick Start
+- Minimal-Beispiel (Import + Nutzung)
+- Mit Tailwind / Ohne Tailwind
+
+## Theming / Branding
+- CSS Custom Properties überschreiben
+- Beispiel-Branding
+
+## Icon-System
+- System-Icons (enthalten)
+- Eigene Icons registrieren
+
+## Vue 2 / Vue 3
+- vue-demi Erklärung
+- Kompatibilitätshinweise
+
+## Komponenten                    ← GENERIERT
+- Tabelle aller Komponenten
+- Link zu Histoire für Details
+
+## Contributing
+- Link zu CONTRIBUTING.md
+
+## License
+- Apache 2.0
+```
+
+### Generierung mit vue-component-meta
+
+**Tool:** `vue-component-meta` (offizielles Vue-Tool)
+
+```typescript
+// scripts/generate-docs.ts
+import { createComponentMetaChecker } from 'vue-component-meta'
+
+// Extrahiert aus .vue Dateien:
+{
+  name: "OsButton",
+  description: "Primary button component for user actions",
+  props: [
+    {
+      name: "variant",
+      type: "'primary' | 'secondary' | 'danger'",
+      default: "'primary'",
+      required: false,
+      description: "Visual style variant"
+    }
+  ],
+  events: [{ name: "click", type: "(event: MouseEvent) => void" }],
+  slots: [{ name: "default", description: "Button content" }]
+}
+```
+
+**Generierte Komponenten-Tabelle:**
+```markdown
+| Komponente | Beschreibung | Props | Events | Slots |
+|------------|--------------|-------|--------|-------|
+| OsButton | Primary button for actions | 8 | 1 | 2 |
+| OsCard | Container with header/footer | 5 | 0 | 3 |
+| ... | ... | ... | ... | ... |
+```
+
+### CI-Workflow: docs-check
+
+```yaml
+# .github/workflows/docs-check.yml
+name: Documentation Check
+
+on: [push, pull_request]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate docs from components
+        run: npm run docs:generate
+
+      - name: Check for undocumented props
+        run: npm run docs:check-coverage
+        # Fails if props/events/slots missing JSDoc
+
+      - name: Verify README is up-to-date
+        run: npm run docs:verify
+        # Compares generated table with README
+        # Fails if differences found
+```
+
+**Scripts in package.json:**
+```json
+{
+  "scripts": {
+    "docs:generate": "tsx scripts/generate-docs.ts",
+    "docs:check-coverage": "tsx scripts/check-doc-coverage.ts",
+    "docs:verify": "tsx scripts/verify-readme.ts",
+    "docs:update": "npm run docs:generate && npm run docs:inject-readme"
+  }
+}
+```
+
+### ESLint-Regeln für Dokumentation
+
+```javascript
+// eslint.config.js
+{
+  rules: {
+    // Erzwingt JSDoc für exportierte Funktionen/Komponenten
+    "jsdoc/require-jsdoc": ["error", {
+      require: {
+        FunctionDeclaration: true,
+        ClassDeclaration: true
+      }
+    }],
+    "jsdoc/require-description": "error",
+    "jsdoc/require-param-description": "error"
+  }
+}
+```
+
+### Dokumentations-Phasen
+
+| Phase | Dokumentation | Status |
+|-------|---------------|--------|
+| **Phase 1** | README.md Grundgerüst (Installation, Setup) | Manuell |
+| **Phase 1** | CONTRIBUTING.md | Manuell |
+| **Phase 1** | docs:generate Script einrichten | Automatisiert |
+| **Phase 1** | CI docs-check Workflow | Automatisiert |
+| **Phase 3** | Histoire Stories pro Komponente | Manuell |
+| **Phase 3** | JSDoc in Komponenten | Im Code |
+| **Phase 3** | README Komponenten-Tabelle | Generiert |
+| **Phase 4** | ARCHITECTURE.md (aus PROJEKT.md) | Manuell |
+| **Phase 4** | README Finalisierung | Manuell |
+
+### Nach der Migration: Datei-Transformation
+
+```
+Während Migration:
+├── PROJEKT.md          # Planungs- und Statusdokument
+├── KATALOG.md          # Komponenten-Tracking
+
+Nach Phase 4 (Migration abgeschlossen):
+├── README.md           # Nutzer-Dokumentation (teilweise generiert)
+├── CONTRIBUTING.md     # Beitragende
+├── CHANGELOG.md        # Automatisch via release-please
+├── docs/
+│   ├── ARCHITECTURE.md # Entscheidungen aus PROJEKT.md §2, §6, §11, §15
+│   └── archive/        # Historische Referenz (optional)
+│       ├── PROJEKT.md
+│       └── KATALOG.md
+```
+
+**Was wird übernommen nach ARCHITECTURE.md:**
+- §2 Tech-Stack (gekürzt)
+- §6 Token-System (Design-Token-Architektur)
+- §11 Entscheidungen (relevante, nicht Prozess-bezogene)
+- §15 Icon-Architektur
+- §16 Dokumentationsstrategie (gekürzt)
+
+**Was wird archiviert/gelöscht:**
+- §8 Meilensteine → erledigt
+- §9 Fortschritt → erledigt
+- §10 Aktueller Stand → erledigt
+- §12 Arbeitsprotokoll → historisch interessant, archivieren
+- KATALOG.md → nur für Migration relevant, archivieren
 
 ---
 
