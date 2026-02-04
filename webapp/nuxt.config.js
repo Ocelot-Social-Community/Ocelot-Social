@@ -161,8 +161,8 @@ export default {
   ],
 
   buildModules: [
-    // https://composition-api.nuxtjs.org/getting-started/setup#quick-start
-    '@nuxtjs/composition-api/module',
+    // Vue 2.7 has built-in Composition API support
+    // '@nuxtjs/composition-api/module' removed - no longer needed
   ],
 
   /*
@@ -279,6 +279,8 @@ export default {
       }
 
       config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/dist`)
+      // Vue 2.7 has built-in Composition API - redirect old imports
+      config.resolve.alias['@vue/composition-api'] = 'vue'
       config.module.rules.push({
         resourceQuery: /blockType=docs/,
         loader: require.resolve(`${styleguidePath}/src/loader/docs-trim-loader.js`),
@@ -312,6 +314,13 @@ export default {
         test: /\.html$/,
         loader: 'raw-loader',
         exclude: /(node_modules)/,
+      })
+
+      // Fix for ESM modules in node_modules (linkify-it, uc.micro)
+      config.module.rules.push({
+        test: /\.mjs$/,
+        include: /node_modules/,
+        type: 'javascript/auto',
       })
 
       const tagAttributesForTesting = ['data-test', ':data-test', 'v-bind:data-test']
