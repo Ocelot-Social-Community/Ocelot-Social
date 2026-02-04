@@ -421,7 +421,6 @@ Bei der Migration werden:
 - [ ] vue-demi einrichten für Vue 2 Kompatibilität
 - [ ] Tailwind CSS einrichten
 - [ ] Dual-Build konfigurieren (Tailwind Preset + vorkompilierte CSS)
-- [ ] System-Icons einrichten (Hybrid-Architektur, ~10 Icons)
 - [ ] CSS Custom Properties Token-System aufsetzen
 - [ ] Dark Mode Grundstruktur
 - [ ] Histoire für Dokumentation einrichten
@@ -442,8 +441,7 @@ Bei der Migration werden:
 - [ ] LICENSE Datei (Apache 2.0)
 - [ ] README.md Grundgerüst (Installation, Quick Start, Struktur)
 - [ ] CONTRIBUTING.md
-- [ ] Docs-Generierung einrichten (vue-component-meta)
-- [ ] CI docs-check Workflow
+- [ ] Docs-Generierung einrichten (scripts/generate-docs.ts)
 
 ### Phase 3: Token-System & Basis
 - [ ] Base Tokens definieren (Farben, Spacing, Typography)
@@ -451,12 +449,15 @@ Bei der Migration werden:
 - [ ] Component Tokens definieren
 - [ ] Branding-System implementieren (CSS Variables)
 - [ ] Beispiel-Branding erstellen (Standard + Yunite)
+- [ ] Histoire Theme-Farben anpassen (ocelot.social Branding)
 - [ ] Token-Dokumentation in Histoire
 
 ### Phase 4: Komponenten-Migration
 - [ ] _Komponenten werden nach Analyse-Ergebnis priorisiert_
 - [ ] _Für jede Komponente: Spec → Develop → Test → Integrate_
 - [ ] _Liste wird in Phase 0 erstellt_
+- [ ] System-Icons einrichten (bei Bedarf pro Komponente)
+- [ ] CI docs-check Workflow (Prüft JSDoc-Coverage, README-Aktualität)
 
 ### Phase 5: Finalisierung
 - [ ] Alle Komponenten migriert und getestet
@@ -476,8 +477,8 @@ Bei der Migration werden:
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ░░░░░░░░░░   0% (0/26 Aufgaben)
-Phase 3: ░░░░░░░░░░   0% (0/6 Aufgaben)
-Phase 4: ░░░░░░░░░░   0% (0/15 Komponenten)
+Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
+Phase 4: ░░░░░░░░░░   0% (0/18 Aufgaben)
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
 Gesamt:  ██░░░░░░░░  ~15%
