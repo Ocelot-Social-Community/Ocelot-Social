@@ -1,8 +1,20 @@
 import gql from 'graphql-tag'
 
 export const reports = gql`
-  query ($closed: Boolean) {
-    reports(orderBy: createdAt_desc, closed: $closed) {
+  query (
+    $orderBy: ReportOrdering
+    $reviewed: Boolean
+    $closed: Boolean
+    $first: Int
+    $offset: Int
+  ) {
+    reports(
+      orderBy: $orderBy
+      reviewed: $reviewed
+      closed: $closed
+      first: $first
+      offset: $offset
+    ) {
       id
       createdAt
       updatedAt
