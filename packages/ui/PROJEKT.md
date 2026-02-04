@@ -594,6 +594,7 @@ Integriert:   0
 | 52 | Docs-Generierung | vue-component-meta | Komponenten-Tabelle aus Code generiert |
 | 53 | Docs CI-Check | GitHub Workflow | Prüft JSDoc-Coverage und README-Aktualität |
 | 54 | Nach Migration | ARCHITECTURE.md | PROJEKT.md → ARCHITECTURE.md, KATALOG.md archivieren |
+| 55 | Komponenten-Abgrenzung | Entscheidungsbaum | Library: präsentational, Webapp: Business-Logik (siehe §17) |
 
 ---
 
@@ -622,6 +623,7 @@ Integriert:   0
 | 2026-02-04 | **Phase 0.5 abgeschlossen** | Vue 2.7 Upgrade erfolgreich, alle Tests bestanden |
 | 2026-02-04 | **Icon-Architektur** | Hybrid-Ansatz: ~10 System-Icons in Library, Feature-Icons in App |
 | 2026-02-04 | **Dokumentationsstrategie** | Hybrid: Generiert (vue-component-meta) + Manuell, CI-geprüft |
+| 2026-02-04 | **Abgrenzung Library/Webapp** | Entscheidungsbaum + Checkliste für Komponenten-Zuordnung |
 
 ---
 
@@ -959,6 +961,7 @@ Nach Phase 4 (Migration abgeschlossen):
 - §11 Entscheidungen (relevante, nicht Prozess-bezogene)
 - §15 Icon-Architektur
 - §16 Dokumentationsstrategie (gekürzt)
+- §17 Abgrenzung Library vs. Webapp
 
 **Was wird archiviert/gelöscht:**
 - §8 Meilensteine → erledigt
@@ -966,6 +969,181 @@ Nach Phase 4 (Migration abgeschlossen):
 - §10 Aktueller Stand → erledigt
 - §12 Arbeitsprotokoll → historisch interessant, archivieren
 - KATALOG.md → nur für Migration relevant, archivieren
+
+---
+
+## 17. Abgrenzung: Library vs. Webapp
+
+### Grundprinzip
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  @ocelot-social/ui (Library)                                │
+├─────────────────────────────────────────────────────────────┤
+│  • Rein präsentational                                      │
+│  • Keine Business-Logik                                     │
+│  • Keine API-Calls                                          │
+│  • Kein App-State                                           │
+│  • Wiederverwendbar in jedem Vue-Projekt                    │
+└─────────────────────────────────────────────────────────────┘
+                            ▲
+                            │ nutzt
+┌─────────────────────────────────────────────────────────────┐
+│  Webapp (Ocelot)                                            │
+├─────────────────────────────────────────────────────────────┤
+│  • Business-Logik (GraphQL, Auth, etc.)                     │
+│  • App-State (Vuex/Pinia)                                   │
+│  • i18n Texte                                               │
+│  • Routing-Logik                                            │
+│  • Ocelot-spezifische Features                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Entscheidungs-Checkliste
+
+| Kriterium | Library ✅ | Webapp ✅ |
+|-----------|-----------|----------|
+| **Business-Logik** | Keine | Hat GraphQL/API-Calls |
+| **App-State** | Kein Vuex/Pinia | Braucht Store |
+| **i18n** | Nur via Props | Nutzt `$t()` direkt |
+| **Routing** | Nur via Props (`to`) | Nutzt `$router` direkt |
+| **Wiederverwendbar** | In jedem Vue-Projekt | Nur in Ocelot |
+| **Abhängigkeiten** | Nur Vue + vue-demi | Ocelot-spezifisch |
+| **Styling** | Design-Tokens | App-spezifische Styles |
+| **Daten** | Erhält via Props | Fetcht selbst |
+
+### Entscheidungsbaum
+
+```
+Komponente X
+    │
+    ▼
+┌─────────────────────────────────────┐
+│ Hat sie Business-Logik?             │
+│ (API-Calls, Mutations, Auth-Check)  │
+└─────────────────────────────────────┘
+    │
+    ├── JA ──► WEBAPP
+    │
+    ▼ NEIN
+┌─────────────────────────────────────┐
+│ Braucht sie App-State?              │
+│ (Vuex, Pinia, globaler State)       │
+└─────────────────────────────────────┘
+    │
+    ├── JA ──► WEBAPP
+    │
+    ▼ NEIN
+┌─────────────────────────────────────┐
+│ Nutzt sie $t() oder $router direkt? │
+└─────────────────────────────────────┘
+    │
+    ├── JA ──► WEBAPP (oder refactoren)
+    │
+    ▼ NEIN
+┌─────────────────────────────────────┐
+│ Ist sie generisch wiederverwendbar? │
+│ (Könnte in anderem Projekt helfen)  │
+└─────────────────────────────────────┘
+    │
+    ├── NEIN ──► WEBAPP
+    │
+    ▼ JA
+
+    ══► LIBRARY
+```
+
+### Quantitative Regel
+
+> **Wenn ≥2 Kriterien auf "Webapp" zeigen → Webapp**
+> **Wenn alle Kriterien auf "Library" zeigen → Library**
+
+### Konkrete Beispiele
+
+| Komponente | Entscheidung | Begründung |
+|------------|--------------|------------|
+| `OsButton` | **Library** | Rein präsentational, keine Logik |
+| `OsModal` | **Library** | UI-Container, Logik via Events |
+| `OsInput` | **Library** | Generisches Form-Element |
+| `OsAvatar` | **Library** | Nur Bild + Fallback-Initialen |
+| `OsCard` | **Library** | Layout-Container |
+| `OsDropdown` | **Library** | Popover-Mechanik |
+| `FollowButton` | **Webapp** | GraphQL Mutation, User-State |
+| `PostTeaser` | **Webapp** | Ocelot-Datenstruktur, Links |
+| `CommentForm` | **Webapp** | API-Call, Auth-Check |
+| `ConfirmModal` | **Webapp** | Nutzt OsModal + Callbacks |
+| `LoginForm` | **Webapp** | Auth-Logik, Routing, i18n |
+| `UserAvatar` | **Webapp** | Nutzt OsAvatar + User-Daten |
+| `NotificationMenu` | **Webapp** | GraphQL, Store, i18n |
+
+### Composition Pattern für Grenzfälle
+
+Wenn eine Komponente UI- und Business-Anteile hat: **Aufteilen**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  LIBRARY: OsModal                                           │
+│  - Overlay, Animation, Backdrop                             │
+│  - close/confirm Events                                     │
+│  - Slots für Content                                        │
+│  - Props: title, confirmLabel, cancelLabel                  │
+└─────────────────────────────────────────────────────────────┘
+                        ▲
+                        │ nutzt
+┌─────────────────────────────────────────────────────────────┐
+│  WEBAPP: DeleteUserModal                                    │
+│  - Wraps OsModal                                            │
+│  - GraphQL Mutation                                         │
+│  - i18n Texte via $t()                                      │
+│  - Redirect nach Löschung                                   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Beispiel-Code:**
+
+```vue
+<!-- Webapp: DeleteUserModal.vue -->
+<template>
+  <OsModal
+    :title="$t('user.delete.title')"
+    :confirm-label="$t('common.delete')"
+    confirm-variant="danger"
+    @confirm="handleDelete"
+    @cancel="$emit('close')"
+  >
+    <p>{{ $t('user.delete.warning', { name: user.name }) }}</p>
+  </OsModal>
+</template>
+
+<script setup>
+import { OsModal } from '@ocelot-social/ui'
+import { useDeleteUserMutation } from '~/graphql/mutations'
+import { useRouter } from 'vue-router'
+
+const props = defineProps(['user'])
+const emit = defineEmits(['close'])
+const router = useRouter()
+const { mutate: deleteUser } = useDeleteUserMutation()
+
+const handleDelete = async () => {
+  await deleteUser({ id: props.user.id })
+  emit('close')
+  router.push('/')
+}
+</script>
+```
+
+### Checkliste bei neuer Komponente
+
+Vor dem Erstellen einer Komponente diese Fragen beantworten:
+
+```
+[ ] Wo gehört die Komponente hin? (Entscheidungsbaum durchlaufen)
+[ ] Falls Library: Sind alle Texte via Props?
+[ ] Falls Library: Keine direkten Store/Router Imports?
+[ ] Falls Webapp: Welche Library-Komponenten werden genutzt?
+[ ] Falls Grenzfall: Kann sie aufgeteilt werden?
+```
 
 ---
 
