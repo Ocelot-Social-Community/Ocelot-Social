@@ -439,7 +439,7 @@ Bei der Migration werden:
 - [ ] release-please Manifest-Konfiguration
 - [ ] npm Publish Workflow
 - [ ] Histoire Deploy Workflow
-- [ ] LICENSE Datei (Apache 2.0)
+- [x] LICENSE Datei (Apache 2.0)
 - [x] README.md Grundgerüst (Installation, Quick Start, Struktur)
 - [ ] CONTRIBUTING.md
 - [ ] Docs-Generierung einrichten (scripts/generate-docs.ts)
@@ -477,7 +477,7 @@ Bei der Migration werden:
 ```
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 2: ██░░░░░░░░  19% (5/27 Aufgaben)
+Phase 2: ██░░░░░░░░  22% (6/27 Aufgaben)
 Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Phase 4: ░░░░░░░░░░   0% (0/18 Aufgaben)
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
