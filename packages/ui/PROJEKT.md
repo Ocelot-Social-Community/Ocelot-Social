@@ -57,6 +57,12 @@ Migration vorbereiten - schrittweise neue Komponenten in Vue 3 entwickeln, die d
 | Dateinamen | **PascalCase** | OsButton.vue, OsCard.vue |
 | i18n | **Nur Props** | Keine Default-Texte in Komponenten |
 | Breakpoints | **Tailwind Standard** | sm:640, md:768, lg:1024, xl:1280, 2xl:1536 |
+| Size Props | **Tailwind-Skala (vollständig)** | xs, sm, md, lg, xl, 2xl |
+| Rounded Props | **Tailwind-Skala (vollständig)** | none, sm, md, lg, xl, 2xl, 3xl, full |
+| Shadow Props | **Tailwind-Skala (vollständig)** | none, sm, md, lg, xl, 2xl |
+| Variant Props | **Semantisch (vollständig)** | primary, secondary, danger, warning, success, info |
+| Dark Mode | **Tailwind CSS-Klassen** | Via `dark:` Prefix, kein "inverse" Prop |
+| Prop-Vollständigkeit | **Alle oder keine** | Wenn Komponente einen Prop unterstützt, dann die gesamte Skala |
 | TypeScript | **strict: true** | Strikte Typisierung |
 
 ---
@@ -614,6 +620,12 @@ Integriert:   0
 | 56 | Externe Abhängigkeiten | Dokumentiert in §18 | eslint-config-it4c muss modularisiert werden |
 | 57 | Kompatibilitätstests | 4er-Matrix + CI | Vue 2/3 × Tailwind/CSS (siehe §19) |
 | 58 | Komplexitätsanalyse | Dokumentiert in §20 | Risikofaktoren, Parallelisierbarkeit, Aufwandstreiber |
+| 59 | Size Props | Tailwind-Skala (xs, sm, md, lg, xl, 2xl) | Konsistenz mit Tailwind, intuitive Benennung |
+| 60 | Rounded Props | Tailwind-Skala (none, sm, md, lg, xl, 2xl, 3xl, full) | Konsistenz mit Tailwind border-radius |
+| 61 | Shadow Props | Tailwind-Skala (none, sm, md, lg, xl, 2xl) | Konsistenz mit Tailwind box-shadow |
+| 62 | Variant Props | Semantisch (primary, secondary, danger, warning, success, info) | Übliche UI-Farbvarianten |
+| 63 | Dark Mode Handling | CSS-Klassen (`dark:` Prefix) | Standard-Tailwind-Pattern, keine "inverse" Props |
+| 64 | Prop-Vollständigkeit | Alle Werte einer Skala | Konsistente API, keine Teilmengen pro Komponente |
 
 ---
 
@@ -652,6 +664,7 @@ Integriert:   0
 | 2026-02-04 | **Build-System** | vite.config.ts mit Library-Mode, vite-plugin-dts für Types, vite-tsconfig-paths |
 | 2026-02-04 | **Testing** | Vitest in vite.config.ts integriert, Plugin-Tests geschrieben |
 | 2026-02-04 | **Dokumentation** | README.md mit Installation und Usage (Tree-Shaking vs Plugin) |
+| 2026-02-04 | **Tailwind-Konventionen** | Size, Rounded, Shadow, Variant - vollständige Skalen, Dark Mode via CSS |
 
 ---
 
