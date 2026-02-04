@@ -406,11 +406,15 @@ Bei der Migration werden:
 - [x] Konsolidierungsplan erstellen (3 Phasen, Token-Liste)
 - [x] Priorisierung der zu migrierenden Komponenten (15 Komponenten in 4 Tiers)
 
-### Phase 0.5: Vue 2.7 Upgrade
-- [ ] Vue 2.6 → Vue 2.7 Upgrade in Webapp
-- [ ] Abhängigkeiten aktualisieren
-- [ ] Tests durchführen
-- [ ] Regressionstests
+### Phase 0.5: Vue 2.7 Upgrade ✅
+- [x] Vue 2.6 → Vue 2.7 Upgrade in Webapp (2.6.14 → 2.7.16)
+- [x] Abhängigkeiten aktualisieren:
+  - [x] vue-template-compiler entfernt (in Vue 2.7 eingebaut)
+  - [x] @vue/composition-api entfernt (in Vue 2.7 eingebaut)
+  - [x] @nuxtjs/composition-api entfernt (nicht mehr nötig)
+  - [x] vue-server-renderer auf 2.7.16 aktualisiert
+- [x] Tests durchführen: **157 Suites, 979 passed, 87 Snapshots** ✅
+- [x] Regressionstests (`yarn dev` und manuelle Prüfung) ✅
 
 ### Phase 1: Projekt-Setup
 - [ ] Vite + Vue 3 Projekt initialisieren
@@ -460,13 +464,13 @@ Bei der Migration werden:
 ### Gesamtprojekt
 ```
 Phase 0:   ██████████ 100% (6/6 Aufgaben) ✅
-Phase 0.5: ░░░░░░░░░░   0% (0/4 Aufgaben)
+Phase 0.5: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1:   ░░░░░░░░░░   0% (0/19 Aufgaben)
 Phase 2:   ░░░░░░░░░░   0% (0/6 Aufgaben)
 Phase 3:   ░░░░░░░░░░   0% (0/15 Komponenten)
 Phase 4:   ░░░░░░░░░░   0% (0/4 Aufgaben)
 ───────────────────────────────────────
-Gesamt:    █░░░░░░░░░  ~12%
+Gesamt:    ██░░░░░░░░  ~15%
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -491,7 +495,7 @@ Integriert:   0
 
 **Letzte Aktualisierung:** 2026-02-04
 
-**Aktuelle Phase:** Phase 0 abgeschlossen ✅ → Phase 1 (Projekt-Setup) als nächstes
+**Aktuelle Phase:** Phase 1 (Projekt-Setup) - Bereit zum Start
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -505,13 +509,22 @@ Integriert:   0
 - [x] Menu-Familie detailiert analysiert (3 Patterns identifiziert)
 - [x] Priorisierung erstellt (15 Komponenten in 4 Tiers)
 - [x] Konsolidierungsplan finalisiert
+- [x] **Phase 0.5: Vue 2.7 Upgrade** ✅
+  - Vue 2.6.14 → 2.7.16
+  - vue-template-compiler entfernt
+  - @vue/composition-api entfernt
+  - @nuxtjs/composition-api entfernt
+  - Webpack-Alias für @vue/composition-api → vue
+  - Webpack-Regel für ESM .mjs Module
+  - **Unit-Tests: 157 Suites, 979 passed, 87 Snapshots** ✅
+  - **Integrationstests: bestanden** ✅
 
 **Aktuell in Arbeit:**
-- Nichts (Phase 0 abgeschlossen)
+- Nichts - Bereit für Phase 1
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
-2. Phase 0.5: Vue 2.7 Upgrade (optional, kann parallel laufen)
+2. ~~Phase 0.5: Vue 2.7 Upgrade~~ ✅
 3. **Phase 1: Projekt-Setup** (Vite + Vue 3 + Histoire)
 
 ---
@@ -595,6 +608,7 @@ Integriert:   0
 | 2026-02-04 | Webapp-Integration | Nuxt Alias für lokale Entwicklung, Git-basierter Release-Check |
 | 2026-02-04 | Prozesse | QA-Schritt pro Komponente, Komponenten-Protokoll, KATALOG.md |
 | 2026-02-04 | Fortschritt | Berechenbar für Gesamt und Einzelschritte |
+| 2026-02-04 | **Phase 0.5 abgeschlossen** | Vue 2.7 Upgrade erfolgreich, alle Tests bestanden |
 
 ---
 
