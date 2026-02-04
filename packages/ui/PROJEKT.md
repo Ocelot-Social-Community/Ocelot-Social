@@ -71,7 +71,7 @@ Die Library bietet zwei Nutzungsmöglichkeiten:
 @ocelot-social/ui
 ├── dist/
 │   ├── index.js              # Vue Komponenten
-│   ├── styles.css            # Vorkompilierte Styles (für Nicht-Tailwind)
+│   ├── style.css             # Vorkompilierte Styles (für Nicht-Tailwind)
 │   └── tailwind.preset.js    # Tailwind Preset (für Tailwind-Nutzer)
 ```
 
@@ -91,7 +91,7 @@ import { OsButton } from '@ocelot-social/ui'
 ```js
 // main.js
 import { OsButton } from '@ocelot-social/ui'
-import '@ocelot-social/ui/styles.css'
+import '@ocelot-social/ui/style.css'
 ```
 
 ### Branding (funktioniert für beide)
@@ -417,16 +417,17 @@ Bei der Migration werden:
 - [x] Regressionstests (`yarn dev` und manuelle Prüfung) ✅
 
 ### Phase 2: Projekt-Setup
-- [ ] Vite + Vue 3 Projekt initialisieren
-- [ ] vue-demi einrichten für Vue 2 Kompatibilität
+- [x] Vite + Vue 3 Projekt initialisieren
+- [x] vue-demi einrichten für Vue 2 Kompatibilität
 - [ ] Tailwind CSS einrichten
 - [ ] Dual-Build konfigurieren (Tailwind Preset + vorkompilierte CSS)
 - [ ] CSS Custom Properties Token-System aufsetzen
 - [ ] Dark Mode Grundstruktur
 - [ ] Histoire für Dokumentation einrichten
-- [ ] Vitest konfigurieren (mit Vue 2/3 Matrix)
+- [x] Vitest konfigurieren
+- [ ] Vitest Vue 2/3 Matrix einrichten
 - [ ] eslint-config-it4c einrichten (inkl. TypeScript, Vue, Prettier, JSDoc) ⚠️ **BLOCKED: siehe §18**
-- [ ] npm Package-Struktur (@ocelot-social/ui) mit korrekten exports
+- [x] npm Package-Struktur (@ocelot-social/ui) mit korrekten exports
 - [ ] Build-Pipeline für Vue 2/3 Dual-Support
 - [ ] GitHub Workflows einrichten (Lint, Test, Build)
 - [ ] Visual Regression Tests einrichten (Playwright)
@@ -439,7 +440,7 @@ Bei der Migration werden:
 - [ ] npm Publish Workflow
 - [ ] Histoire Deploy Workflow
 - [ ] LICENSE Datei (Apache 2.0)
-- [ ] README.md Grundgerüst (Installation, Quick Start, Struktur)
+- [x] README.md Grundgerüst (Installation, Quick Start, Struktur)
 - [ ] CONTRIBUTING.md
 - [ ] Docs-Generierung einrichten (scripts/generate-docs.ts)
 
@@ -476,12 +477,12 @@ Bei der Migration werden:
 ```
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 2: ░░░░░░░░░░   0% (0/26 Aufgaben)
+Phase 2: ██░░░░░░░░  19% (5/27 Aufgaben)
 Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Phase 4: ░░░░░░░░░░   0% (0/18 Aufgaben)
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ██░░░░░░░░  ~15%
+Gesamt:  ██░░░░░░░░  ~18%
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -506,7 +507,7 @@ Integriert:   0
 
 **Letzte Aktualisierung:** 2026-02-04
 
-**Aktuelle Phase:** Phase 2 (Projekt-Setup) - Bereit zum Start
+**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (19%)
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -529,14 +530,25 @@ Integriert:   0
   - Webpack-Regel für ESM .mjs Module
   - **Unit-Tests: 157 Suites, 979 passed, 87 Snapshots** ✅
   - **Integrationstests: bestanden** ✅
+- [x] **Phase 2: Projekt-Setup** (in Arbeit)
+  - Vite + Vue 3 Projekt initialisiert
+  - vue-demi für Vue 2/3 Kompatibilität
+  - Vitest konfiguriert (integriert in vite.config.ts)
+  - npm Package-Struktur mit korrekten exports
+  - README.md Grundgerüst
+  - Plugin-Tests geschrieben
 
 **Aktuell in Arbeit:**
-- Nichts - Bereit für Phase 2
+- Phase 2: Projekt-Setup (5/27 Aufgaben erledigt)
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
-3. **Phase 2: Projekt-Setup** (Vite + Vue 3 + Histoire)
+3. **Phase 2: Projekt-Setup** - Fortsetzen mit:
+   - Tailwind CSS einrichten
+   - Histoire für Dokumentation
+   - GitHub Workflows
+   - LICENSE Datei
 
 ---
 
@@ -636,6 +648,10 @@ Integriert:   0
 | 2026-02-04 | **Phasen umbenannt** | 0.5→1, 1→2, 2→3, 3→4, 4→5 (nur ganzzahlige Phasen) |
 | 2026-02-04 | **Dokument-Konsolidierung** | §13 Zahlen korrigiert, §14 Link entfernt, §16 Reihenfolge, Terminologie vereinheitlicht |
 | 2026-02-04 | **Komplexitätsanalyse** | §20 hinzugefügt: Risikofaktoren, Parallelisierbarkeit, Aufwandstreiber pro Komponente |
+| 2026-02-04 | **Phase 2 gestartet** | Vite + Vue 3 Projekt initialisiert, vue-demi, Vitest, Package-Struktur |
+| 2026-02-04 | **Build-System** | vite.config.ts mit Library-Mode, vite-plugin-dts für Types, vite-tsconfig-paths |
+| 2026-02-04 | **Testing** | Vitest in vite.config.ts integriert, Plugin-Tests geschrieben |
+| 2026-02-04 | **Dokumentation** | README.md mit Installation und Usage (Tree-Shaking vs Plugin) |
 
 ---
 
@@ -1272,17 +1288,17 @@ packages/ui/
 │   │   ├── tailwind.config.js  # Nutzt @ocelot-social/ui/tailwind.preset
 │   │   └── src/App.vue         # Importiert alle Komponenten
 │   │
-│   ├── vue3-css/          # Vite + Vue 3 + styles.css
+│   ├── vue3-css/          # Vite + Vue 3 + style.css
 │   │   ├── package.json
 │   │   ├── vite.config.ts
 │   │   └── src/
-│   │       ├── main.ts         # import '@ocelot-social/ui/styles.css'
+│   │       ├── main.ts         # import '@ocelot-social/ui/style.css'
 │   │       └── App.vue
 │   │
 │   ├── vue2-tailwind/     # Vue CLI / Nuxt 2 + Tailwind
 │   │   └── ...
 │   │
-│   └── vue2-css/          # Vue CLI / Nuxt 2 + styles.css
+│   └── vue2-css/          # Vue CLI / Nuxt 2 + style.css
 │       └── ...
 ```
 
@@ -1360,7 +1376,7 @@ for (const example of examples) {
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
     },
-    "./styles.css": "./dist/styles.css",
+    "./style.css": "./dist/style.css",
     "./tailwind.preset": {
       "import": "./dist/tailwind.preset.mjs",
       "require": "./dist/tailwind.preset.cjs",
