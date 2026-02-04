@@ -398,13 +398,13 @@ Bei der Migration werden:
 
 ## 8. Meilensteine
 
-### Phase 0: Analyse & Katalogisierung
-- [ ] Vollständige Katalogisierung Webapp-Komponenten (siehe KATALOG.md)
-- [ ] Vollständige Katalogisierung Styleguide-Komponenten (siehe KATALOG.md)
-- [ ] Duplikate identifizieren und dokumentieren
-- [ ] Inkonsistenzen und Probleme erfassen
-- [ ] Konsolidierungsplan erstellen
-- [ ] Priorisierung der zu migrierenden Komponenten
+### Phase 0: Analyse & Katalogisierung ✅
+- [x] Vollständige Katalogisierung Webapp-Komponenten (139 Komponenten)
+- [x] Vollständige Katalogisierung Styleguide-Komponenten (38 Komponenten)
+- [x] Duplikate identifizieren und dokumentieren (5 direkte + 3 Familien)
+- [x] Inkonsistenzen und Probleme erfassen (Button/Modal/Menu analysiert)
+- [x] Konsolidierungsplan erstellen (3 Phasen, Token-Liste)
+- [x] Priorisierung der zu migrierenden Komponenten (15 Komponenten in 4 Tiers)
 
 ### Phase 0.5: Vue 2.7 Upgrade
 - [ ] Vue 2.6 → Vue 2.7 Upgrade in Webapp
@@ -459,25 +459,26 @@ Bei der Migration werden:
 
 ### Gesamtprojekt
 ```
-Phase 0:   ░░░░░░░░░░  0% (0/6 Aufgaben)
-Phase 0.5: ░░░░░░░░░░  0% (0/4 Aufgaben)
-Phase 1:   ░░░░░░░░░░  0% (0/19 Aufgaben)
-Phase 2:   ░░░░░░░░░░  0% (0/6 Aufgaben)
-Phase 3:   ░░░░░░░░░░  0% (0/? Komponenten)
-Phase 4:   ░░░░░░░░░░  0% (0/4 Aufgaben)
+Phase 0:   ██████████ 100% (6/6 Aufgaben) ✅
+Phase 0.5: ░░░░░░░░░░   0% (0/4 Aufgaben)
+Phase 1:   ░░░░░░░░░░   0% (0/19 Aufgaben)
+Phase 2:   ░░░░░░░░░░   0% (0/6 Aufgaben)
+Phase 3:   ░░░░░░░░░░   0% (0/15 Komponenten)
+Phase 4:   ░░░░░░░░░░   0% (0/4 Aufgaben)
 ───────────────────────────────────────
-Gesamt:    ░░░░░░░░░░  0%
+Gesamt:    █░░░░░░░░░  ~12%
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
 ```
-Webapp:     ░░░░░░░░░░  0% (0/? Komponenten)
-Styleguide: ░░░░░░░░░░  0% (0/? Komponenten)
+Webapp:     ██████████ 100% (139 Komponenten erfasst)
+Styleguide: ██████████ 100% (38 Komponenten erfasst)
+Analyse:    ██████████ 100% (Button, Modal, Menu detailiert)
 ```
 
-### Komponenten-Migration
+### Komponenten-Migration (Priorisiert: 15)
 ```
-Analysiert:  0
+Analysiert:   3 Familien (Button, Modal, Menu)
 Spezifiziert: 0
 Entwickelt:   0
 QA bestanden: 0
@@ -490,7 +491,7 @@ Integriert:   0
 
 **Letzte Aktualisierung:** 2026-02-04
 
-**Aktuelle Phase:** Planung abgeschlossen → Phase 0 (Analyse) steht bevor
+**Aktuelle Phase:** Phase 0 abgeschlossen ✅ → Phase 1 (Projekt-Setup) als nächstes
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -498,13 +499,20 @@ Integriert:   0
 - [x] Tech-Stack entschieden
 - [x] Branding-Architektur definiert
 - [x] Migrationsstrategie definiert
+- [x] **Phase 0: Komponenten-Analyse** (177 Komponenten katalogisiert)
+- [x] Button-Familie detailiert analysiert (Props, Styles, Konsolidierung)
+- [x] Modal-Familie detailiert analysiert (Architektur erkannt)
+- [x] Menu-Familie detailiert analysiert (3 Patterns identifiziert)
+- [x] Priorisierung erstellt (15 Komponenten in 4 Tiers)
+- [x] Konsolidierungsplan finalisiert
 
 **Aktuell in Arbeit:**
-- Entscheidungen finalisieren
+- Nichts (Phase 0 abgeschlossen)
 
 **Nächste Schritte:**
-1. Phase 0: Komponenten-Analyse starten
-2. Phase 1: Projekt-Setup
+1. ~~Phase 0: Komponenten-Analyse~~ ✅
+2. Phase 0.5: Vue 2.7 Upgrade (optional, kann parallel laufen)
+3. **Phase 1: Projekt-Setup** (Vite + Vue 3 + Histoire)
 
 ---
 

@@ -9,10 +9,9 @@
 
 ### Übersicht
 ```
-Webapp:     ░░░░░░░░░░  0% (0/139 Komponenten)
-Styleguide: ░░░░░░░░░░  0% (0/38 Komponenten)
+Phase 0: Analyse    ██████████ 100% (8/8 Schritte)
 ───────────────────────────────────────────
-Gesamt:     ░░░░░░░░░░  0% (0/177 Komponenten)
+Nächste Phase: Phase 1 (Projekt-Setup)
 ```
 
 ### Statistiken
@@ -21,9 +20,9 @@ Gesamt:     ░░░░░░░░░░  0% (0/177 Komponenten)
 | Webapp Komponenten | 139 |
 | Styleguide Komponenten | 38 |
 | **Gesamt** | **177** |
-| Analysiert | 0 |
-| Duplikate gefunden | 0 |
-| Zur Konsolidierung markiert | 0 |
+| Detailiert analysiert | 3 Familien (Button, Modal, Menu) |
+| Duplikate gefunden | 5 direkte + 3 Familien |
+| Zur Migration priorisiert | 15 Kern-Komponenten |
 
 ---
 
@@ -369,6 +368,12 @@ Diese sollten zuerst migriert werden:
 |-------|------------|--------|---------|
 | 2026-02-04 | Claude | Katalog erstellt | 177 Komponenten erfasst |
 | 2026-02-04 | Claude | Duplikate identifiziert | Button, Modal, Menu Familien |
+| 2026-02-04 | Claude | Button-Analyse | Props-Vergleich, Konsolidierungsvorschlag, Token-Extraktion |
+| 2026-02-04 | Claude | Modal-Analyse | Architektur erkannt: DsModal = Basis, Feature-Modals nutzen DsModal |
+| 2026-02-04 | Claude | Menu-Analyse | DsMenu, Dropdown, Feature-Menus - 3 separate Patterns identifiziert |
+| 2026-02-04 | Claude | Priorisierung | 15 Komponenten in 4 Tiers priorisiert |
+| 2026-02-04 | Claude | Konsolidierungsplan | 3 Phasen definiert, Token-Liste erstellt |
+| 2026-02-04 | Claude | **Phase 0 abgeschlossen** | Bereit für Phase 1 (Projekt-Setup) |
 
 ---
 
@@ -377,8 +382,691 @@ Diese sollten zuerst migriert werden:
 1. [x] Webapp-Komponenten auflisten
 2. [x] Styleguide-Komponenten auflisten
 3. [x] Offensichtliche Duplikate identifizieren
-4. [ ] Button-Familie im Detail analysieren
-5. [ ] Modal-Familie im Detail analysieren
-6. [ ] Menu-Familie im Detail analysieren
-7. [ ] Priorisierung festlegen
-8. [ ] Konsolidierungsplan finalisieren
+4. [x] Button-Familie im Detail analysieren
+5. [x] Modal-Familie im Detail analysieren
+6. [x] Menu-Familie im Detail analysieren
+7. [x] Priorisierung festlegen
+8. [x] Konsolidierungsplan finalisieren
+
+---
+
+**✅ Phase 0 abgeschlossen!** Weiter mit Phase 1 (Projekt-Setup).
+
+---
+
+## Detailanalyse: Button-Familie
+
+### Styleguide Button (DsButton)
+
+**Pfad:** `styleguide/src/system/components/navigation/Button/Button.vue`
+
+**Props:**
+| Prop | Typ | Default | Beschreibung |
+|------|-----|---------|--------------|
+| path | String\|Object | null | URL oder Vue Router Pfad |
+| size | String | null | `small` \| `base` \| `large` |
+| linkTag | String | auto | `router-link` \| `a` \| `button` |
+| name | String | null | Accessibility name |
+| primary | Boolean | false | Primärer Stil (grün) |
+| secondary | Boolean | false | Sekundärer Stil (blau) |
+| danger | Boolean | false | Danger Stil (rot) |
+| hover | Boolean | false | Hover-State erzwingen |
+| ghost | Boolean | false | Transparenter Hintergrund |
+| icon | String | null | Icon-Name |
+| right | Boolean | false | Icon rechts positionieren |
+| fullwidth | Boolean | false | Volle Breite |
+| loading | Boolean | false | Ladezustand |
+
+**Besonderheiten:**
+- Automatische Link-Erkennung (router-link/a/button)
+- Icon-Only Modus wenn kein Slot-Content
+- Spinner bei loading
+- CSS-Klassen: `ds-button`, `ds-button-primary`, etc.
+
+---
+
+### Webapp BaseButton
+
+**Pfad:** `webapp/components/_new/generic/BaseButton/BaseButton.vue`
+
+**Props:**
+| Prop | Typ | Default | Beschreibung |
+|------|-----|---------|--------------|
+| bullet | Boolean | false | Kleiner runder Punkt (18px) |
+| circle | Boolean | false | Runder Button |
+| danger | Boolean | false | Danger-Farbschema |
+| filled | Boolean | false | Gefüllter Hintergrund |
+| ghost | Boolean | false | Ohne Border |
+| icon | String | - | Icon-Name |
+| loading | Boolean | false | Ladezustand |
+| size | String | 'regular' | `tiny` \| `small` \| `regular` \| `large` |
+| padding | Boolean | false | Extra Padding |
+| type | String | 'button' | `button` \| `submit` |
+| disabled | Boolean | false | Deaktiviert |
+
+**Besonderheiten:**
+- Kein automatischer Link-Support (nur `<button>`)
+- Nutzt `buttonStates` Mixin für Farben
+- CSS-Klassen: `base-button`, `--filled`, `--ghost`, etc.
+- Zusätzliche Größe: `tiny`
+- Zusätzliche Form: `bullet`
+
+---
+
+### Vergleich: Styleguide vs Webapp
+
+| Feature | Styleguide (DsButton) | Webapp (BaseButton) |
+|---------|----------------------|---------------------|
+| **Sizes** | small, base, large | tiny, small, regular, large |
+| **Varianten** | primary, secondary, danger | danger (+ filled) |
+| **Formen** | icon-only (auto) | circle, bullet, icon-only (auto) |
+| **Ghost** | ✅ | ✅ |
+| **Loading** | ✅ Spinner | ✅ LoadingSpinner |
+| **Link-Support** | ✅ path prop | ❌ |
+| **Fullwidth** | ✅ | ❌ |
+| **Icon-Position** | ✅ left/right | ❌ nur links |
+| **Submit-Type** | ❌ | ✅ |
+| **CSS-Prefix** | ds-button | base-button |
+
+---
+
+### Wrapper-Komponenten (nutzen BaseButton)
+
+| Komponente | Zweck | Eigene Props | Migration |
+|------------|-------|--------------|-----------|
+| **ActionButton** | Button + Counter Badge | count, text, icon, filled | Eigene Komponente behalten |
+| **LabeledButton** | Button + Label darunter | icon, label, filled | Eigene Komponente behalten |
+| **HeaderButton** | Filter-Button + Remove | title, clickButton, titleRemove, clickRemove | Feature-spezifisch |
+| **MenuBarButton** | Editor-Toolbar | isActive, icon, label, onClick | Feature-spezifisch |
+| **CustomButton** | Button mit externem Icon | settings (Object) | Feature-spezifisch |
+
+**Erkenntnis:** Diese Wrapper fügen Layout/Logik hinzu, nicht Button-Varianten.
+
+---
+
+### Feature-Buttons (Business-Logik)
+
+Diese Buttons enthalten Business-Logik und sollten **nicht** in OsButton konsolidiert werden:
+
+| Komponente | Beschreibung | Migration |
+|------------|--------------|-----------|
+| FollowButton | Folgen/Entfolgen Logik | Bleibt Feature-Komponente |
+| GroupButton | Gruppen-Aktionen | Bleibt Feature-Komponente |
+| InviteButton | Einladungs-Logik | Bleibt Feature-Komponente |
+| LoginButton | Auth-Logik | Bleibt Feature-Komponente |
+| ShoutButton | Shout-Logik | Bleibt Feature-Komponente |
+| ObserveButton | Beobachten-Logik | Bleibt Feature-Komponente |
+| EmotionButton | Reaktions-Logik | Bleibt Feature-Komponente |
+| JoinLeaveButton | Gruppen Beitreten/Verlassen | Bleibt Feature-Komponente |
+| MapButton | Karten-Toggle | Bleibt Feature-Komponente |
+| MapStylesButtons | Kartenstil-Auswahl | Bleibt Feature-Komponente |
+| PaginationButtons | Seitennavigation | Bleibt Feature-Komponente |
+
+---
+
+### Konsolidierungsvorschlag: OsButton
+
+```typescript
+interface OsButtonProps {
+  // Variante
+  variant?: 'default' | 'primary' | 'secondary' | 'danger'
+
+  // Stil
+  filled?: boolean      // Gefüllter Hintergrund (default: false = outline)
+  ghost?: boolean       // Komplett transparent
+
+  // Größe
+  size?: 'tiny' | 'small' | 'base' | 'large'
+
+  // Form
+  circle?: boolean      // Runder Button
+  fullWidth?: boolean   // Volle Breite
+
+  // Icon
+  icon?: string
+  iconPosition?: 'left' | 'right'
+
+  // Zustände
+  loading?: boolean
+  disabled?: boolean
+
+  // Link-Support
+  to?: string | RouteLocationRaw  // Router-Link
+  href?: string                    // Externer Link
+
+  // Button-Typ
+  type?: 'button' | 'submit'
+}
+```
+
+**Nicht übernommen:**
+- `bullet` → zu spezifisch, kann mit `circle` + custom size erreicht werden
+- `hover` prop → unnötig, CSS :hover reicht
+- `padding` prop → sollte über size geregelt werden
+
+---
+
+### Verwendete Design-Tokens (tatsächlich genutzt)
+
+**Farben:**
+- `$color-primary`, `$color-primary-dark`, `$color-primary-light`
+- `$color-danger`, `$color-danger-dark`, `$color-danger-light`
+- `$color-neutral-60`, `$color-neutral-80`, `$color-neutral-100`
+- `$text-color-base`, `$text-color-primary-inverse`, etc.
+- `$background-color-*`
+
+**Größen:**
+- `$size-button-tiny`, `$size-button-small`, `$size-button-base`, `$size-button-large`
+- `$input-height`, `$input-height-small`, `$input-height-large`, `$input-height-x-large`
+
+**Spacing:**
+- `$space-x-small`, `$space-xx-small`, `$space-small`, `$space-base`
+
+**Typography:**
+- `$font-size-small`, `$font-size-base`, `$font-size-large`
+- `$font-weight-bold`
+- `$letter-spacing-large`
+
+**Border:**
+- `$border-size-base`
+- `$border-radius-x-large`, `$border-radius-base`, `$border-radius-rounded`
+
+**Animation:**
+- `$duration-short`
+
+---
+
+### Offene Fragen
+
+1. **secondary Variante:** Styleguide hat `secondary` (blau), Webapp nicht. Wird es gebraucht?
+2. **x-large Size:** Styleguide hat `x-large` in CSS, aber nicht als Prop. Übernehmen?
+3. **bullet Form:** Webapp-spezifisch. Brauchen wir das in OsButton?
+
+---
+
+## Detailanalyse: Modal-Familie
+
+### Architektur-Übersicht
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  DsModal (Styleguide)                                       │
+│  = Basis-Modal-Komponente                                   │
+├─────────────────────────────────────────────────────────────┤
+│       ↓ wird genutzt von                                    │
+├─────────────────────────────────────────────────────────────┤
+│  ConfirmModal, DisableModal, ReportModal, etc.              │
+│  = Feature-Modals mit Business-Logik                        │
+├─────────────────────────────────────────────────────────────┤
+│       ↓ werden gerendert von                                │
+├─────────────────────────────────────────────────────────────┤
+│  Modal.vue (Webapp)                                         │
+│  = Modal-Manager (Router via Vuex-State)                    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Erkenntnis:** Die Webapp `Modal.vue` ist **KEIN Duplikat** von DsModal, sondern ein State-basierter Modal-Router.
+
+---
+
+### Styleguide DsModal
+
+**Pfad:** `styleguide/src/system/components/layout/Modal/Modal.vue`
+
+**Props:**
+| Prop | Typ | Default | Beschreibung |
+|------|-----|---------|--------------|
+| title | String | null | Modal-Titel |
+| isOpen | Boolean | false | Geöffnet-Status (v-model) |
+| force | Boolean | false | Schließen verhindern (kein ESC, kein Backdrop-Click) |
+| extended | Boolean | false | Breiterer Modal (600px statt 400px) |
+| cancelLabel | String | 'Cancel' | Text für Abbrechen-Button |
+| confirmLabel | String | 'Confirm' | Text für Bestätigen-Button |
+
+**Events:**
+- `@opened` - Modal wurde geöffnet
+- `@cancel` - Abbrechen geklickt
+- `@confirm` - Bestätigen geklickt
+- `@close` - Modal geschlossen (mit type: 'close', 'cancel', 'confirm', 'backdrop')
+- `@update:isOpen` - v-model Support
+
+**Slots:**
+- `default` - Modal-Inhalt
+- `footer` - Footer mit Buttons (erhält confirm/cancel Funktionen als Slot-Props)
+
+**Features:**
+- ESC-Taste zum Schließen
+- Backdrop-Click zum Schließen
+- Scroll-Lock auf Body
+- Animations (fade + scale)
+- Nutzt DsCard für Layout
+
+---
+
+### Feature-Modals (nutzen DsModal)
+
+| Modal | Business-Logik | Migration |
+|-------|----------------|-----------|
+| **ConfirmModal** | Generischer Confirm-Dialog mit Callbacks | Bleibt, nutzt OsModal |
+| **DisableModal** | GraphQL Mutation für Disable | Bleibt, nutzt OsModal |
+| **ReportModal** | Report-Logik | Bleibt, nutzt OsModal |
+| **DeleteUserModal** | User-Lösch-Logik | Bleibt, nutzt OsModal |
+| **ReleaseModal** | Release-Logik | Bleibt, nutzt OsModal |
+
+**Erkenntnis:** Alle Feature-Modals nutzen bereits DsModal als Basis und fügen nur spezifische Business-Logik hinzu. Dies ist das gewünschte Pattern!
+
+---
+
+### Webapp Modal.vue (Modal-Manager)
+
+**Pfad:** `webapp/components/Modal.vue`
+
+**Funktion:** Kein UI-Modal, sondern ein **State-basierter Modal-Router**:
+- Liest `modal/open` und `modal/data` aus Vuex
+- Rendert das passende Feature-Modal basierend auf State
+- Leitet Props an Feature-Modals weiter
+
+**Mögliche Migration:**
+- Als `OsModalManager` beibehalten oder
+- Durch Vue 3 `<Teleport>` + Composable ersetzen
+
+---
+
+### Konsolidierungsvorschlag: OsModal
+
+```typescript
+interface OsModalProps {
+  // Basis
+  title?: string
+  isOpen: boolean           // v-model:open
+
+  // Verhalten
+  persistent?: boolean      // = force (Schließen verhindern)
+  closeOnBackdrop?: boolean // Default: true
+  closeOnEsc?: boolean      // Default: true
+
+  // Größe
+  size?: 'default' | 'large' | 'fullscreen'
+
+  // Footer
+  showFooter?: boolean
+  cancelLabel?: string
+  confirmLabel?: string
+  confirmVariant?: 'primary' | 'danger'
+}
+```
+
+**Slots:**
+- `default` - Inhalt
+- `header` - Custom Header (ersetzt title)
+- `footer` - Custom Footer
+
+**Nicht übernommen:**
+- `extended` prop → wird zu `size="large"`
+
+---
+
+### Verwendete Design-Tokens (tatsächlich genutzt)
+
+**Layout:**
+- `$z-index-modal` (9999)
+- `$space-base`, `$space-small`, `$space-x-small`, `$space-large`
+- `$border-radius-x-large`
+
+**Farben:**
+- `$background-color-softer` (Footer)
+
+**Shadows:**
+- `$box-shadow-x-large`
+
+**Animation:**
+- `$ease-out-bounce`
+
+---
+
+## Detailanalyse: Menu-Familie
+
+### Architektur-Übersicht
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  DsMenu / DsMenuItem (Styleguide)                           │
+│  = Routen-basierte Navigationskomponenten                   │
+├─────────────────────────────────────────────────────────────┤
+│       ↓ wird genutzt von                                    │
+├─────────────────────────────────────────────────────────────┤
+│  ContentMenu, GroupContentMenu                              │
+│  = Dropdown + DsMenu für Kontext-Menüs                      │
+├─────────────────────────────────────────────────────────────┤
+│  Dropdown (Webapp)                                          │
+│  = Eigenständiger Popover-Wrapper (v-popover)               │
+├─────────────────────────────────────────────────────────────┤
+│  HeaderMenu                                                 │
+│  = Komplexes Layout (DsFlex-basiert), KEIN DsMenu           │
+├─────────────────────────────────────────────────────────────┤
+│  AvatarMenu, NotificationMenu, FilterMenu, etc.             │
+│  = Feature-spezifische Menüs mit eigener Logik              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Erkenntnis:** DsMenu wird nur für strukturierte Routen-Navigation verwendet. Die meisten Webapp-Menüs sind Feature-spezifisch und bauen eigene Strukturen.
+
+---
+
+### Styleguide DsMenu
+
+**Pfad:** `styleguide/src/system/components/navigation/Menu/Menu.vue`
+
+**Props:**
+| Prop | Typ | Default | Beschreibung |
+|------|-----|---------|--------------|
+| routes | Array | null | Array von Route-Objekten |
+| inverse | Boolean | false | Dunkler Hintergrund |
+| navbar | Boolean | false | Horizontale Navbar-Darstellung |
+| linkTag | String | 'router-link' | Link-Komponente |
+| urlParser | Function | default | URL-Parser für Routes |
+| nameParser | Function | default | Name-Parser für Routes |
+| matcher | Function | default | Active-State Matcher |
+| isExact | Function | default | Exact-Match Checker |
+
+**Slots:**
+- `default` - Custom Menu-Items
+- `menuitem` (scoped) - Custom MenuItem Template
+
+**Features:**
+- Automatische URL-Generierung aus Route-Namen
+- Submenu-Support via `route.children`
+- Active-State Tracking
+
+---
+
+### Styleguide DsMenuItem
+
+**Pfad:** `styleguide/src/system/components/navigation/Menu/MenuItem.vue`
+
+**Props:**
+| Prop | Typ | Default | Beschreibung |
+|------|-----|---------|--------------|
+| route | Object | null | Route-Objekt |
+| parents | Array | [] | Parent-Routes (für Submenu) |
+| linkTag | String | from parent | Link-Komponente |
+
+**Features:**
+- Automatische Submenu-Erkennung via `route.children`
+- Hover/Click Submenu Toggle (bei navbar)
+- Click-Outside zum Schließen
+- Level-basierte CSS-Klassen
+
+---
+
+### Webapp Dropdown
+
+**Pfad:** `webapp/components/Dropdown.vue`
+
+**Props:**
+| Prop | Typ | Default | Beschreibung |
+|------|-----|---------|--------------|
+| placement | String | 'bottom-end' | Popover-Position |
+| disabled | Boolean | false | Deaktiviert |
+| offset | String\|Number | '16' | Abstand vom Trigger |
+| noMouseLeaveClosing | Boolean | false | Verhindert Schließen bei Mouse-Leave |
+
+**Slot-Props:**
+- `toggleMenu()` - Toggle Funktion
+- `openMenu()` - Öffnen Funktion
+- `closeMenu()` - Schließen Funktion
+- `isOpen` - Geöffnet-State
+
+**Features:**
+- Nutzt v-popover
+- Hover-Verzögerung (500ms open, 300ms close)
+- Body-Class bei Open
+
+**Erkenntnis:** Dies ist das **primäre Dropdown-Pattern** in der Webapp - nicht DsMenu!
+
+---
+
+### Kategorisierung der Menu-Komponenten
+
+| Komponente | Typ | Nutzt DsMenu | Migration |
+|------------|-----|--------------|-----------|
+| **ContentMenu** | Kontext-Menü | ✅ | OsDropdown + OsMenu |
+| **GroupContentMenu** | Kontext-Menü | ✅ | OsDropdown + OsMenu |
+| **HeaderMenu** | Layout | ❌ | Bleibt Feature-spezifisch |
+| **AvatarMenu** | Feature | ❌ | Bleibt Feature-spezifisch |
+| **NotificationMenu** | Feature | ❌ | Bleibt Feature-spezifisch |
+| **FilterMenu** | Feature | ❌ | Bleibt Feature-spezifisch |
+| **CategoriesMenu** | Feature | ❌ | Bleibt Feature-spezifisch |
+| **ChatNotificationMenu** | Feature | ❌ | Bleibt Feature-spezifisch |
+| **MenuBar** | Editor | ❌ | Bleibt Feature-spezifisch |
+| **ContextMenu** (Editor) | Editor | ❌ | Bleibt Feature-spezifisch |
+
+---
+
+### Konsolidierungsvorschlag
+
+**Drei separate Komponenten:**
+
+1. **OsMenu** (für Navigation)
+```typescript
+interface OsMenuProps {
+  routes?: RouteItem[]
+  orientation?: 'vertical' | 'horizontal'
+  inverse?: boolean
+}
+```
+
+2. **OsMenuItem** (für Menu-Items)
+```typescript
+interface OsMenuItemProps {
+  to?: string | RouteLocationRaw
+  href?: string
+  icon?: string
+  active?: boolean
+}
+```
+
+3. **OsDropdown** (für Popover-Menüs) - **NEU**
+```typescript
+interface OsDropdownProps {
+  placement?: 'top' | 'bottom' | 'left' | 'right' | 'top-start' | 'top-end' | ...
+  offset?: number
+  disabled?: boolean
+  closeOnClick?: boolean
+  closeOnOutsideClick?: boolean
+}
+```
+
+**Erkenntnis:** OsDropdown ist wichtiger als OsMenu, da es häufiger verwendet wird!
+
+---
+
+### Verwendete Design-Tokens (tatsächlich genutzt)
+
+**Spacing:**
+- `$space-x-small`, `$space-xx-small`
+
+**Typography:**
+- Font-Size via DsText
+
+**Farben:**
+- Inverse-Modus Farben
+
+---
+
+## Priorisierung der Komponenten
+
+### Tier 1: Kern-Komponenten (höchste Priorität)
+
+Diese Komponenten sind die Basis für alle anderen und sollten zuerst migriert werden:
+
+| # | Komponente | Begründung | Abhängigkeiten |
+|---|------------|------------|----------------|
+| 1 | **OsButton** | Meistgenutzte Komponente, Basis für viele Features | OsIcon |
+| 2 | **OsIcon** | Wird von Button, Menu, etc. benötigt | - |
+| 3 | **OsSpinner** | Loading-States für Button, Modal, etc. | - |
+| 4 | **OsCard** | Layout-Basis für viele Komponenten | - |
+
+### Tier 2: Layout & Feedback (mittlere Priorität)
+
+| # | Komponente | Begründung | Abhängigkeiten |
+|---|------------|------------|----------------|
+| 5 | **OsModal** | Dialoge, Bestätigungen, Formulare | OsButton, OsCard |
+| 6 | **OsDropdown** | Dropdown-Menüs, Selects | OsButton |
+| 7 | **OsAvatar** | Benutzerprofile, Kommentare | - |
+| 8 | **OsInput** | Formulare | - |
+
+### Tier 3: Navigation & Typography (niedrigere Priorität)
+
+| # | Komponente | Begründung | Abhängigkeiten |
+|---|------------|------------|----------------|
+| 9 | **OsMenu** | Navigation (weniger kritisch) | OsMenuItem |
+| 10 | **OsMenuItem** | Menu-Items | - |
+| 11 | **OsHeading** | Überschriften | - |
+| 12 | **OsText** | Text-Formatierung | - |
+
+### Tier 4: Spezial-Komponenten (später)
+
+| # | Komponente | Begründung |
+|---|------------|------------|
+| 13 | OsSelect | Komplexere Formular-Komponente |
+| 14 | OsTable | Datentabellen |
+| 15 | OsTag/OsChip | Tags und Badges |
+
+---
+
+## Finaler Konsolidierungsplan
+
+### Phase 1: Kern-Komponenten
+
+```
+1. OsIcon
+   └── Vereint: DsIcon (Styleguide), BaseIcon (Webapp)
+   └── Token: Keine eigenen (nur Größen via Props)
+
+2. OsSpinner
+   └── Vereint: DsSpinner (Styleguide), LoadingSpinner (Webapp)
+   └── Token: Farben, Größen
+
+3. OsButton
+   └── Vereint: DsButton (Styleguide), BaseButton (Webapp)
+   └── NICHT übernommen: Feature-Buttons (FollowButton, etc.)
+   └── Token: Farben, Größen, Border-Radius, Spacing
+
+4. OsCard
+   └── Vereint: DsCard (Styleguide), BaseCard (Webapp)
+   └── Token: Shadows, Border-Radius, Spacing
+```
+
+### Phase 2: Layout & Feedback
+
+```
+5. OsModal
+   └── Basis: DsModal (Styleguide) - bereits gut!
+   └── Feature-Modals bleiben in Webapp, nutzen OsModal
+   └── Token: Z-Index, Shadows, Spacing
+
+6. OsDropdown (NEU!)
+   └── Basis: Dropdown (Webapp)
+   └── Erkenntnis: Wichtiger als gedacht!
+   └── Token: Spacing, Shadows
+
+7. OsAvatar
+   └── Vereint: DsAvatar (Styleguide), ProfileAvatar (Webapp)
+   └── Token: Größen, Border-Radius
+
+8. OsInput
+   └── Basis: DsInput (Styleguide), InputField Patterns (Webapp)
+   └── Token: Border, Farben, Spacing
+```
+
+### Phase 3: Navigation
+
+```
+9. OsMenu + OsMenuItem
+   └── Basis: DsMenu/DsMenuItem (Styleguide)
+   └── Feature-Menus bleiben in Webapp
+   └── Token: Spacing, Farben
+```
+
+---
+
+## Erkenntnisse aus der Analyse
+
+### Was funktioniert gut (beibehalten):
+1. **DsModal als Basis** - Feature-Modals nutzen bereits DsModal
+2. **BaseButton als Standard** - Webapp hat konsolidiert auf BaseButton
+3. **Dropdown-Pattern** - Funktioniert gut mit v-popover
+
+### Was problematisch ist (verbessern):
+1. **Button-Varianten** - Zu viele unterschiedliche Buttons
+2. **Inkonsistente Naming** - ds-* vs base-* vs kebab-case
+3. **Doppelte Komponenten** - Logo, Icon, Card existieren doppelt
+
+### Was überflüssig ist (nicht migrieren):
+1. **bullet Button** - Zu spezifisch, kann mit circle erreicht werden
+2. **hover Prop** - CSS :hover reicht
+3. **Viele Feature-Buttons** - Behalten Business-Logik, nutzen OsButton
+
+---
+
+## Token-Extraktion (aus Analyse)
+
+### Benötigte Design-Tokens für Phase 1
+
+**Farben:**
+```scss
+// Primär/Sekundär/Danger
+$color-primary, $color-primary-dark, $color-primary-light
+$color-secondary, $color-secondary-dark, $color-secondary-light
+$color-danger, $color-danger-dark, $color-danger-light
+
+// Neutral
+$color-neutral-60, $color-neutral-80, $color-neutral-100
+
+// Semantisch
+$text-color-base, $text-color-inverse
+$background-color-softer, $background-color-soft
+$border-color-base
+```
+
+**Größen:**
+```scss
+$size-button-tiny: 24px
+$size-button-small: 32px
+$size-button-base: 40px
+$size-button-large: 48px
+```
+
+**Spacing:**
+```scss
+$space-xx-small: 4px
+$space-x-small: 8px
+$space-small: 16px
+$space-base: 24px
+```
+
+**Border:**
+```scss
+$border-size-base: 1px
+$border-radius-base: 4px
+$border-radius-x-large: 5px
+$border-radius-rounded: 2em
+```
+
+**Animation:**
+```scss
+$duration-short: 0.08s
+```
+
+**Z-Index:**
+```scss
+$z-index-modal: 9999
+$z-index-dropdown: 8888
+```
+
+**Shadows:**
+```scss
+$box-shadow-x-large: 0 15px 30px 0 rgba(0,0,0,.11), ...
+$box-shadow-small-inset: inset 0 0 0 1px rgba(0,0,0,.05)
+```
