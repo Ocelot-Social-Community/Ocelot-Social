@@ -11,7 +11,7 @@
 ```
 Phase 0: Analyse    ██████████ 100% (8/8 Schritte)
 ───────────────────────────────────────────
-Nächste Phase: Phase 1 (Projekt-Setup)
+Nächste Phase: Phase 2 (Projekt-Setup)
 ```
 
 ### Statistiken
@@ -373,7 +373,7 @@ Diese sollten zuerst migriert werden:
 | 2026-02-04 | Claude | Menu-Analyse | DsMenu, Dropdown, Feature-Menus - 3 separate Patterns identifiziert |
 | 2026-02-04 | Claude | Priorisierung | 15 Komponenten in 4 Tiers priorisiert |
 | 2026-02-04 | Claude | Konsolidierungsplan | 3 Phasen definiert, Token-Liste erstellt |
-| 2026-02-04 | Claude | **Phase 0 abgeschlossen** | Bereit für Phase 1 (Projekt-Setup) |
+| 2026-02-04 | Claude | **Phase 0 abgeschlossen** | Bereit für Phase 2 (Projekt-Setup) |
 
 ---
 
@@ -390,7 +390,7 @@ Diese sollten zuerst migriert werden:
 
 ---
 
-**✅ Phase 0 abgeschlossen!** Weiter mit Phase 1 (Projekt-Setup).
+**✅ Phase 0 abgeschlossen!** Weiter mit Phase 2 (Projekt-Setup).
 
 ---
 

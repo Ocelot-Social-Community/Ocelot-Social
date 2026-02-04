@@ -403,10 +403,10 @@ Bei der Migration werden:
 - [x] Vollständige Katalogisierung Styleguide-Komponenten (38 Komponenten)
 - [x] Duplikate identifizieren und dokumentieren (5 direkte + 3 Familien)
 - [x] Inkonsistenzen und Probleme erfassen (Button/Modal/Menu analysiert)
-- [x] Konsolidierungsplan erstellen (3 Phasen, Token-Liste)
+- [x] Konsolidierungsplan erstellen (Token-Liste)
 - [x] Priorisierung der zu migrierenden Komponenten (15 Komponenten in 4 Tiers)
 
-### Phase 0.5: Vue 2.7 Upgrade ✅
+### Phase 1: Vue 2.7 Upgrade ✅
 - [x] Vue 2.6 → Vue 2.7 Upgrade in Webapp (2.6.14 → 2.7.16)
 - [x] Abhängigkeiten aktualisieren:
   - [x] vue-template-compiler entfernt (in Vue 2.7 eingebaut)
@@ -416,7 +416,7 @@ Bei der Migration werden:
 - [x] Tests durchführen: **157 Suites, 979 passed, 87 Snapshots** ✅
 - [x] Regressionstests (`yarn dev` und manuelle Prüfung) ✅
 
-### Phase 1: Projekt-Setup
+### Phase 2: Projekt-Setup
 - [ ] Vite + Vue 3 Projekt initialisieren
 - [ ] vue-demi einrichten für Vue 2 Kompatibilität
 - [ ] Tailwind CSS einrichten
@@ -445,7 +445,7 @@ Bei der Migration werden:
 - [ ] Docs-Generierung einrichten (vue-component-meta)
 - [ ] CI docs-check Workflow
 
-### Phase 2: Token-System & Basis
+### Phase 3: Token-System & Basis
 - [ ] Base Tokens definieren (Farben, Spacing, Typography)
 - [ ] Semantic Tokens definieren
 - [ ] Component Tokens definieren
@@ -453,12 +453,12 @@ Bei der Migration werden:
 - [ ] Beispiel-Branding erstellen (Standard + Yunite)
 - [ ] Token-Dokumentation in Histoire
 
-### Phase 3: Komponenten-Migration
+### Phase 4: Komponenten-Migration
 - [ ] _Komponenten werden nach Analyse-Ergebnis priorisiert_
 - [ ] _Für jede Komponente: Spec → Develop → Test → Integrate_
 - [ ] _Liste wird in Phase 0 erstellt_
 
-### Phase 4: Finalisierung
+### Phase 5: Finalisierung
 - [ ] Alle Komponenten migriert und getestet
 - [ ] Alte Komponenten aus Vue 2 Projekt entfernt
 - [ ] Build als npm Library verifiziert
@@ -473,14 +473,14 @@ Bei der Migration werden:
 
 ### Gesamtprojekt
 ```
-Phase 0:   ██████████ 100% (6/6 Aufgaben) ✅
-Phase 0.5: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 1:   ░░░░░░░░░░   0% (0/26 Aufgaben)
-Phase 2:   ░░░░░░░░░░   0% (0/6 Aufgaben)
-Phase 3:   ░░░░░░░░░░   0% (0/15 Komponenten)
-Phase 4:   ░░░░░░░░░░   0% (0/7 Aufgaben)
+Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
+Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
+Phase 2: ░░░░░░░░░░   0% (0/26 Aufgaben)
+Phase 3: ░░░░░░░░░░   0% (0/6 Aufgaben)
+Phase 4: ░░░░░░░░░░   0% (0/15 Komponenten)
+Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:    ██░░░░░░░░  ~15%
+Gesamt:  ██░░░░░░░░  ~15%
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -505,7 +505,7 @@ Integriert:   0
 
 **Letzte Aktualisierung:** 2026-02-04
 
-**Aktuelle Phase:** Phase 1 (Projekt-Setup) - Bereit zum Start
+**Aktuelle Phase:** Phase 2 (Projekt-Setup) - Bereit zum Start
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -519,7 +519,7 @@ Integriert:   0
 - [x] Menu-Familie detailiert analysiert (3 Patterns identifiziert)
 - [x] Priorisierung erstellt (15 Komponenten in 4 Tiers)
 - [x] Konsolidierungsplan finalisiert
-- [x] **Phase 0.5: Vue 2.7 Upgrade** ✅
+- [x] **Phase 1: Vue 2.7 Upgrade** ✅
   - Vue 2.6.14 → 2.7.16
   - vue-template-compiler entfernt
   - @vue/composition-api entfernt
@@ -530,12 +530,12 @@ Integriert:   0
   - **Integrationstests: bestanden** ✅
 
 **Aktuell in Arbeit:**
-- Nichts - Bereit für Phase 1
+- Nichts - Bereit für Phase 2
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
-2. ~~Phase 0.5: Vue 2.7 Upgrade~~ ✅
-3. **Phase 1: Projekt-Setup** (Vite + Vue 3 + Histoire)
+2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
+3. **Phase 2: Projekt-Setup** (Vite + Vue 3 + Histoire)
 
 ---
 
@@ -625,12 +625,13 @@ Integriert:   0
 | 2026-02-04 | Webapp-Integration | Nuxt Alias für lokale Entwicklung, Git-basierter Release-Check |
 | 2026-02-04 | Prozesse | QA-Schritt pro Komponente, Komponenten-Protokoll, KATALOG.md |
 | 2026-02-04 | Fortschritt | Berechenbar für Gesamt und Einzelschritte |
-| 2026-02-04 | **Phase 0.5 abgeschlossen** | Vue 2.7 Upgrade erfolgreich, alle Tests bestanden |
+| 2026-02-04 | **Phase 1 abgeschlossen** | Vue 2.7 Upgrade erfolgreich, alle Tests bestanden |
 | 2026-02-04 | **Icon-Architektur** | Hybrid-Ansatz: ~10 System-Icons in Library, Feature-Icons in App |
 | 2026-02-04 | **Dokumentationsstrategie** | Hybrid: Generiert (vue-component-meta) + Manuell, CI-geprüft |
 | 2026-02-04 | **Abgrenzung Library/Webapp** | Entscheidungsbaum + Checkliste für Komponenten-Zuordnung |
 | 2026-02-04 | **Externe Abhängigkeit** | eslint-config-it4c blockiert Linting-Setup, Workaround dokumentiert |
 | 2026-02-04 | **Kompatibilitätstests** | 4er-Matrix (Vue 2/3 × Tailwind/CSS), Example Apps, Playwright E2E |
+| 2026-02-04 | **Phasen umbenannt** | 0.5→1, 1→2, 2→3, 3→4, 4→5 (nur ganzzahlige Phasen) |
 
 ---
 
@@ -934,14 +935,14 @@ jobs:
 
 | Phase | Dokumentation | Status |
 |-------|---------------|--------|
-| **Phase 1** | README.md Grundgerüst (Installation, Setup) | Manuell |
-| **Phase 1** | CONTRIBUTING.md | Manuell |
-| **Phase 1** | docs:generate Script einrichten | Automatisiert |
-| **Phase 1** | CI docs-check Workflow | Automatisiert |
-| **Phase 3** | Histoire Stories pro Komponente | Manuell |
-| **Phase 3** | JSDoc in Komponenten | Im Code |
-| **Phase 3** | README Komponenten-Tabelle | Generiert |
-| **Phase 4** | ARCHITECTURE.md (aus PROJEKT.md) | Manuell |
+| **Phase 2** | README.md Grundgerüst (Installation, Setup) | Manuell |
+| **Phase 2** | CONTRIBUTING.md | Manuell |
+| **Phase 2** | docs:generate Script einrichten | Automatisiert |
+| **Phase 2** | CI docs-check Workflow | Automatisiert |
+| **Phase 4** | Histoire Stories pro Komponente | Manuell |
+| **Phase 4** | JSDoc in Komponenten | Im Code |
+| **Phase 4** | README Komponenten-Tabelle | Generiert |
+| **Phase 5** | ARCHITECTURE.md (aus PROJEKT.md) | Manuell |
 | **Phase 4** | README Finalisierung | Manuell |
 
 ### Nach der Migration: Datei-Transformation
@@ -951,7 +952,7 @@ Während Migration:
 ├── PROJEKT.md          # Planungs- und Statusdokument
 ├── KATALOG.md          # Komponenten-Tracking
 
-Nach Phase 4 (Migration abgeschlossen):
+Nach Phase 5 (Migration abgeschlossen):
 ├── README.md           # Nutzer-Dokumentation (teilweise generiert)
 ├── CONTRIBUTING.md     # Beitragende
 ├── CHANGELOG.md        # Automatisch via release-please
@@ -1162,7 +1163,7 @@ Einige Aufgaben in diesem Projekt sind von externen Projekten abhängig, die zue
 
 | Abhängigkeit | Status | Blockiert | Beschreibung |
 |--------------|--------|-----------|--------------|
-| **eslint-config-it4c** | ⚠️ Offen | Phase 1: Linting | Paket muss modularer werden |
+| **eslint-config-it4c** | ⚠️ Offen | Phase 2: Linting | Paket muss modularer werden |
 
 ### eslint-config-it4c
 
@@ -1472,12 +1473,12 @@ jobs:
 
 | Werkzeug | Zweck | Phase |
 |----------|-------|-------|
-| **vue-demi** | Vue 2/3 API-Kompatibilität im Code | Phase 1 |
-| **Vitest + Matrix** | Unit Tests für Vue 2.7 und Vue 3.4 | Phase 1 |
-| **Example Apps (4x)** | Echte Projekte für jede Kombination | Phase 1 |
-| **Playwright** | E2E + Visual Regression für alle 4 | Phase 1 |
-| **publint** | Package.json Export-Validierung | Phase 1 |
-| **arethetypeswrong** | TypeScript Entry Points Check | Phase 1 |
+| **vue-demi** | Vue 2/3 API-Kompatibilität im Code | Phase 2 |
+| **Vitest + Matrix** | Unit Tests für Vue 2.7 und Vue 3.4 | Phase 2 |
+| **Example Apps (4x)** | Echte Projekte für jede Kombination | Phase 2 |
+| **Playwright** | E2E + Visual Regression für alle 4 | Phase 2 |
+| **publint** | Package.json Export-Validierung | Phase 2 |
+| **arethetypeswrong** | TypeScript Entry Points Check | Phase 2 |
 | **pkg-pr-new** | Preview-Releases in PRs (optional) | Optional |
 
 ### Checkliste für neue Komponenten
