@@ -426,7 +426,7 @@ Bei der Migration werden:
 - [ ] Dark Mode Grundstruktur
 - [ ] Histoire für Dokumentation einrichten
 - [ ] Vitest konfigurieren
-- [ ] eslint-config-it4c einrichten (inkl. TypeScript, Vue, Prettier, JSDoc)
+- [ ] eslint-config-it4c einrichten (inkl. TypeScript, Vue, Prettier, JSDoc) ⚠️ **BLOCKED: siehe §18**
 - [ ] npm Package-Struktur (@ocelot-social/ui)
 - [ ] Build-Pipeline für Vue 2/3 Dual-Support
 - [ ] GitHub Workflows einrichten (Lint, Test, Build)
@@ -595,6 +595,7 @@ Integriert:   0
 | 53 | Docs CI-Check | GitHub Workflow | Prüft JSDoc-Coverage und README-Aktualität |
 | 54 | Nach Migration | ARCHITECTURE.md | PROJEKT.md → ARCHITECTURE.md, KATALOG.md archivieren |
 | 55 | Komponenten-Abgrenzung | Entscheidungsbaum | Library: präsentational, Webapp: Business-Logik (siehe §17) |
+| 56 | Externe Abhängigkeiten | Dokumentiert in §18 | eslint-config-it4c muss modularisiert werden |
 
 ---
 
@@ -624,6 +625,7 @@ Integriert:   0
 | 2026-02-04 | **Icon-Architektur** | Hybrid-Ansatz: ~10 System-Icons in Library, Feature-Icons in App |
 | 2026-02-04 | **Dokumentationsstrategie** | Hybrid: Generiert (vue-component-meta) + Manuell, CI-geprüft |
 | 2026-02-04 | **Abgrenzung Library/Webapp** | Entscheidungsbaum + Checkliste für Komponenten-Zuordnung |
+| 2026-02-04 | **Externe Abhängigkeit** | eslint-config-it4c blockiert Linting-Setup, Workaround dokumentiert |
 
 ---
 
@@ -1144,6 +1146,70 @@ Vor dem Erstellen einer Komponente diese Fragen beantworten:
 [ ] Falls Webapp: Welche Library-Komponenten werden genutzt?
 [ ] Falls Grenzfall: Kann sie aufgeteilt werden?
 ```
+
+---
+
+## 18. Externe Abhängigkeiten
+
+### Übersicht
+
+Einige Aufgaben in diesem Projekt sind von externen Projekten abhängig, die zuerst angepasst werden müssen.
+
+| Abhängigkeit | Status | Blockiert | Beschreibung |
+|--------------|--------|-----------|--------------|
+| **eslint-config-it4c** | ⚠️ Offen | Phase 1: Linting | Paket muss modularer werden |
+
+### eslint-config-it4c
+
+**Repository:** [it4c/eslint-config-it4c](https://github.com/IT4Change/eslint-config-it4c) _(vermutlich)_
+
+**Problem:**
+Das Paket ist aktuell nicht modular genug, um in der UI-Library eingesetzt zu werden. Es muss angepasst werden, um:
+- Einzelne Regelsets separat importierbar zu machen (TypeScript, Vue, Prettier, JSDoc)
+- Flexible Konfiguration für verschiedene Projekttypen zu ermöglichen
+- Kompatibel mit dem Flat Config Format (ESLint 9+) zu sein
+
+**Erforderliche Änderungen im externen Projekt:**
+```
+eslint-config-it4c/
+├── base.js           # Basis-Regeln
+├── typescript.js     # TypeScript-Regeln (optional)
+├── vue.js            # Vue-Regeln (optional)
+├── prettier.js       # Prettier-Integration (optional)
+├── jsdoc.js          # JSDoc-Regeln (optional)
+└── index.js          # Alles kombiniert (Vollversion)
+```
+
+**Gewünschte Nutzung in @ocelot-social/ui:**
+```javascript
+// eslint.config.js
+import baseConfig from 'eslint-config-it4c/base'
+import typescriptConfig from 'eslint-config-it4c/typescript'
+import vueConfig from 'eslint-config-it4c/vue'
+import prettierConfig from 'eslint-config-it4c/prettier'
+import jsdocConfig from 'eslint-config-it4c/jsdoc'
+
+export default [
+  ...baseConfig,
+  ...typescriptConfig,
+  ...vueConfig,
+  ...prettierConfig,
+  ...jsdocConfig,
+  {
+    // Projekt-spezifische Overrides
+  }
+]
+```
+
+**Workaround bis Abhängigkeit erfüllt:**
+- Temporär eigene ESLint-Konfiguration in packages/ui erstellen
+- Nach Modularisierung von eslint-config-it4c migrieren
+
+**Tracking:**
+- [ ] Issue in eslint-config-it4c erstellen
+- [ ] Modulare Struktur implementieren
+- [ ] Neue Version releasen
+- [ ] In @ocelot-social/ui einbinden
 
 ---
 
