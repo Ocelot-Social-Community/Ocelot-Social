@@ -11,7 +11,7 @@
 Neue Vue 3 Komponentenbibliothek aufbauen, die später die Vue 2 Komponenten in der Webapp ersetzen soll.
 
 **Hintergrund:**
-- Bestehendes Projekt nutzt Vue 2.6 mit Nuxt 2 (Upgrade auf Vue 2.7 erforderlich)
+- Bestehendes Projekt nutzt Vue 2.7 mit Nuxt 2 (Upgrade von 2.6 → 2.7 in Phase 1 erledigt ✅)
 - Existierender `styleguide` Ordner als Git-Submodul (Vue 2, Vue CLI 3)
 - Design-Token-System mit Theo vorhanden
 - Branding erfolgt über SCSS-Dateien mit Variablen-Overrides
@@ -557,7 +557,7 @@ Integriert:   0
 | 12 | Spezifikation | Detailliert vor Implementierung | Props, Varianten, A11y vorher definieren |
 | 13 | Doku-Hosting | Eigener Server | Öffentlich zugängliche Komponenten-Doku |
 | 14 | Doku-Zugang | Öffentlich | Für alle Entwickler frei zugänglich |
-| 15 | Release-Tool | release-please (Manifest) | Monorepo-kompatibel, nur styleguide-vue3 Änderungen |
+| 15 | Release-Tool | release-please (Manifest) | Monorepo-kompatibel, nur packages/ui Änderungen |
 | 16 | Linting | eslint-config-it4c | TypeScript + Vue + Prettier + weitere Regeln |
 | 17 | CI Workflows | Lint, Test, Build | Qualitätssicherung bei jedem PR |
 | 18 | npm Publish | Automatisch bei Release | Nach release-please PR merge |
@@ -616,7 +616,7 @@ Integriert:   0
 | 2026-02-04 | Migrations-Absicherung | Feature Parity Checklist, Deprecation Warnings |
 | 2026-02-04 | Naming & Paket | @ocelot-social/ui, Os-Prefix |
 | 2026-02-04 | Plattform | Modern Browsers, SSR-kompatibel, Dark Mode |
-| 2026-02-04 | Build & Icons | Dual-Build (Tailwind + CSS), unplugin-icons |
+| 2026-02-04 | Build & Icons | Dual-Build (Tailwind + CSS), Hybrid-Architektur (~10 System-Icons) |
 | 2026-02-04 | Organisatorisch | Apache 2.0, bleibt im Monorepo |
 | 2026-02-04 | Konventionen | script setup, Englisch, npm, 100% Coverage, PascalCase |
 | 2026-02-04 | Weitere | Nur Props (kein i18n), Tailwind Breakpoints, strict TS |
@@ -639,13 +639,13 @@ Integriert:   0
 
 > **Detaillierte Katalogisierung in separater Datei: [KATALOG.md](./KATALOG.md)**
 
-### Zusammenfassung (wird automatisch aus KATALOG.md übernommen)
+### Zusammenfassung (aus KATALOG.md)
 
 | Quelle | Gesamt | Analysiert | Duplikate | Zu migrieren |
 |--------|--------|------------|-----------|--------------|
-| Webapp | ~60+ | 0 | 0 | ? |
-| Styleguide | ~15 | 0 | 0 | ? |
-| **Gesamt** | **~75+** | **0** | **0** | **?** |
+| Webapp | 139 | ✅ | 5 | Priorisiert |
+| Styleguide | 38 | ✅ | 5 | Priorisiert |
+| **Gesamt** | **177** | **✅** | **5 direkte + 3 Familien** | **15 Kern-Komponenten** |
 
 ---
 
@@ -669,7 +669,6 @@ Integriert:   0
 - [Histoire](https://histoire.dev/)
 - [Vitest](https://vitest.dev/)
 - [vue-demi](https://github.com/vueuse/vue-demi)
-- [unplugin-icons](https://github.com/unplugin/unplugin-icons)
 
 ---
 
@@ -942,8 +941,8 @@ jobs:
 | **Phase 4** | Histoire Stories pro Komponente | Manuell |
 | **Phase 4** | JSDoc in Komponenten | Im Code |
 | **Phase 4** | README Komponenten-Tabelle | Generiert |
-| **Phase 5** | ARCHITECTURE.md (aus PROJEKT.md) | Manuell |
 | **Phase 4** | README Finalisierung | Manuell |
+| **Phase 5** | ARCHITECTURE.md (aus PROJEKT.md) | Manuell |
 
 ### Nach der Migration: Datei-Transformation
 

@@ -937,7 +937,10 @@ Diese Komponenten sind die Basis für alle anderen und sollten zuerst migriert w
 
 ## Finaler Konsolidierungsplan
 
-### Phase 1: Kern-Komponenten
+> **Hinweis:** "Tier 1/2/3" bezeichnet die Migrations-Reihenfolge innerhalb von Phase 4 (Komponenten-Migration).
+> Dies ist unabhängig von den Haupt-Phasen 0-5 des Projekts.
+
+### Tier 1: Kern-Komponenten
 
 ```
 1. OsIcon
@@ -958,7 +961,7 @@ Diese Komponenten sind die Basis für alle anderen und sollten zuerst migriert w
    └── Token: Shadows, Border-Radius, Spacing
 ```
 
-### Phase 2: Layout & Feedback
+### Tier 2: Layout & Feedback
 
 ```
 5. OsModal
@@ -980,7 +983,7 @@ Diese Komponenten sind die Basis für alle anderen und sollten zuerst migriert w
    └── Token: Border, Farben, Spacing
 ```
 
-### Phase 3: Navigation
+### Tier 3: Navigation
 
 ```
 9. OsMenu + OsMenuItem
