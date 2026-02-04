@@ -63,6 +63,7 @@ Migration vorbereiten - schrittweise neue Komponenten in Vue 3 entwickeln, die d
 | Variant Props | **Semantisch (vollständig)** | primary, secondary, danger, warning, success, info |
 | Dark Mode | **Tailwind CSS-Klassen** | Via `dark:` Prefix, kein "inverse" Prop |
 | Prop-Vollständigkeit | **Alle oder keine** | Wenn Komponente einen Prop unterstützt, dann die gesamte Skala |
+| CSS Variables | **Keine Defaults in Library** | Webapp definiert Default-Branding, spezialisierte Brandings überschreiben |
 | TypeScript | **strict: true** | Strikte Typisierung |
 
 ---
@@ -138,6 +139,39 @@ Bei Ocelot-Release wird geprüft, ob `packages/ui` unreleased Änderungen hat:
 git log --oneline $(git describe --tags --match "ui-v*" --abbrev=0)..HEAD -- packages/ui/
 ```
 → Wenn Output vorhanden: UI muss zuerst released werden.
+
+### Webapp-Aufgaben (TODO für Ocelot-Webapp)
+
+Die folgenden Aufgaben müssen in der Webapp umgesetzt werden, nicht in der UI-Library:
+
+| Aufgabe | Beschreibung | Status |
+|---------|--------------|--------|
+| **Branding-Validierung** | Test/Workflow der `validateCssVariables()` aufruft und sicherstellt, dass das Default-Branding alle von der Library geforderten CSS-Variablen definiert | ⏳ Offen |
+
+**Beispiel-Implementierung (Webapp):**
+```ts
+// webapp/tests/branding.spec.ts
+import { validateCssVariables, requiredCssVariables } from '@ocelot-social/ui/tailwind.preset'
+
+describe('Default Branding', () => {
+  it('defines all required CSS variables', () => {
+    // Load default branding CSS
+    // ...
+
+    const styles = getComputedStyle(document.documentElement)
+    const missing: string[] = []
+
+    for (const variable of requiredCssVariables) {
+      const value = styles.getPropertyValue(variable).trim()
+      if (!value) {
+        missing.push(variable)
+      }
+    }
+
+    expect(missing).toEqual([])
+  })
+})
+```
 
 ---
 
@@ -425,10 +459,10 @@ Bei der Migration werden:
 ### Phase 2: Projekt-Setup
 - [x] Vite + Vue 3 Projekt initialisieren
 - [x] vue-demi einrichten für Vue 2 Kompatibilität
-- [ ] Tailwind CSS einrichten
-- [ ] Dual-Build konfigurieren (Tailwind Preset + vorkompilierte CSS)
-- [ ] CSS Custom Properties Token-System aufsetzen
-- [ ] Dark Mode Grundstruktur
+- [x] Tailwind CSS einrichten (v4 mit @tailwindcss/vite)
+- [x] Dual-Build konfigurieren (Tailwind Preset + vorkompilierte CSS)
+- [ ] CSS Custom Properties Token-System aufsetzen (Infrastruktur bereit, Tokens folgen mit Komponenten)
+- [x] Dark Mode Grundstruktur (via Tailwind `dark:` Prefix, dokumentiert)
 - [ ] Histoire für Dokumentation einrichten
 - [x] Vitest konfigurieren
 - [ ] Vitest Vue 2/3 Matrix einrichten
@@ -459,12 +493,34 @@ Bei der Migration werden:
 - [ ] Histoire Theme-Farben anpassen (ocelot.social Branding)
 - [ ] Token-Dokumentation in Histoire
 
-### Phase 4: Komponenten-Migration
-- [ ] _Komponenten werden nach Analyse-Ergebnis priorisiert_
-- [ ] _Für jede Komponente: Spec → Develop → Test → Integrate_
-- [ ] _Liste wird in Phase 0 erstellt_
-- [ ] System-Icons einrichten (bei Bedarf pro Komponente)
-- [ ] CI docs-check Workflow (Prüft JSDoc-Coverage, README-Aktualität)
+### Phase 4: Komponenten-Migration (15 Komponenten + 2 Infrastruktur)
+
+**Tier 1: Kern-Komponenten**
+- [ ] OsIcon (vereint DsIcon + BaseIcon)
+- [ ] OsSpinner (vereint DsSpinner + LoadingSpinner)
+- [ ] OsButton (vereint DsButton + BaseButton)
+- [ ] OsCard (vereint DsCard + BaseCard)
+
+**Tier 2: Layout & Feedback**
+- [ ] OsModal (Basis: DsModal)
+- [ ] OsDropdown (Basis: Webapp Dropdown)
+- [ ] OsAvatar (vereint DsAvatar + ProfileAvatar)
+- [ ] OsInput (Basis: DsInput)
+
+**Tier 3: Navigation & Typography**
+- [ ] OsMenu (Basis: DsMenu)
+- [ ] OsMenuItem (Basis: DsMenuItem)
+- [ ] OsHeading (Basis: DsHeading)
+- [ ] OsText (Basis: DsText)
+
+**Tier 4: Spezial-Komponenten**
+- [ ] OsSelect
+- [ ] OsTable
+- [ ] OsTag
+
+**Infrastruktur**
+- [ ] System-Icons einrichten
+- [ ] CI docs-check Workflow (JSDoc-Coverage, README-Aktualität)
 
 ### Phase 5: Finalisierung
 - [ ] Alle Komponenten migriert und getestet
@@ -483,12 +539,13 @@ Bei der Migration werden:
 ```
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 2: ██░░░░░░░░  22% (6/27 Aufgaben)
+Phase 2: ███░░░░░░░  33% (9/27 Aufgaben)
 Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
-Phase 4: ░░░░░░░░░░   0% (0/18 Aufgaben)
+Phase 4: ░░░░░░░░░░   0% (0/17 Aufgaben)
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
+Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ██░░░░░░░░  ~18%
+Gesamt:  ███░░░░░░░  ~30% (21/71 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -513,7 +570,7 @@ Integriert:   0
 
 **Letzte Aktualisierung:** 2026-02-04
 
-**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (19%)
+**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (33%)
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -542,10 +599,16 @@ Integriert:   0
   - Vitest konfiguriert (integriert in vite.config.ts)
   - npm Package-Struktur mit korrekten exports
   - README.md Grundgerüst
+  - LICENSE (Apache 2.0)
   - Plugin-Tests geschrieben
+  - Tailwind CSS v4 mit @tailwindcss/vite
+  - Dual-Build (style.css + tailwind.preset)
+  - Dark Mode Grundstruktur (via Tailwind dark: Prefix)
+  - Prop-Types definiert (Size, Rounded, Shadow, Variant)
+  - Branding-Architektur (keine Defaults, validateCssVariables)
 
 **Aktuell in Arbeit:**
-- Phase 2: Projekt-Setup (5/27 Aufgaben erledigt)
+- Phase 2: Projekt-Setup (9/27 Aufgaben erledigt)
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
@@ -626,6 +689,10 @@ Integriert:   0
 | 62 | Variant Props | Semantisch (primary, secondary, danger, warning, success, info) | Übliche UI-Farbvarianten |
 | 63 | Dark Mode Handling | CSS-Klassen (`dark:` Prefix) | Standard-Tailwind-Pattern, keine "inverse" Props |
 | 64 | Prop-Vollständigkeit | Alle Werte einer Skala | Konsistente API, keine Teilmengen pro Komponente |
+| 65 | CSS Variable Defaults | Keine Defaults in Library | Webapp definiert Branding, Library ist design-agnostisch |
+| 66 | Branding-Hierarchie | Webapp → Spezialisiertes Branding | Default-Branding in Webapp, Overrides pro Instanz |
+| 67 | Variable-Validierung | Runtime-Check in Development | `validateCssVariables()` warnt bei fehlenden Variablen |
+| 68 | Branding-Test (Webapp) | CI-Test in Webapp | Webapp testet, dass Default-Branding alle Library-Variablen definiert |
 
 ---
 
@@ -665,6 +732,9 @@ Integriert:   0
 | 2026-02-04 | **Testing** | Vitest in vite.config.ts integriert, Plugin-Tests geschrieben |
 | 2026-02-04 | **Dokumentation** | README.md mit Installation und Usage (Tree-Shaking vs Plugin) |
 | 2026-02-04 | **Tailwind-Konventionen** | Size, Rounded, Shadow, Variant - vollständige Skalen, Dark Mode via CSS |
+| 2026-02-04 | **Tailwind v4 Setup** | @tailwindcss/vite Plugin, Dual-Build (style.css + tailwind.preset) |
+| 2026-02-04 | **Prop-Types** | src/types.d.ts mit Size, Rounded, Shadow, Variant |
+| 2026-02-04 | **Branding-Architektur** | Keine Defaults in Library, Webapp definiert Branding, validateCssVariables() |
 
 ---
 

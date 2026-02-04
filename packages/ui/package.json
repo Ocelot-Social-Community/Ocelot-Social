@@ -9,6 +9,12 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
+    },
+    "./style.css": "./dist/style.css",
+    "./tailwind.preset": {
+      "types": "./dist/tailwind.preset.d.ts",
+      "import": "./dist/tailwind.preset.mjs",
+      "require": "./dist/tailwind.preset.cjs"
     }
   },
   "main": "./dist/index.cjs",
@@ -28,17 +34,25 @@
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
-    "vue": "^2.7.0 || ^3.0.0"
+    "vue": "^2.7.0 || ^3.0.0",
+    "tailwindcss": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "tailwindcss": {
+      "optional": true
+    }
   },
   "dependencies": {
     "vue-demi": "^0.14.10"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.1.18",
     "@types/node": "^25.2.0",
     "@vitejs/plugin-vue": "^6.0.4",
     "@vitest/coverage-v8": "^4.0.18",
     "@vue/test-utils": "^2.4.6",
     "jsdom": "^28.0.0",
+    "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4",
