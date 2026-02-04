@@ -425,14 +425,17 @@ Bei der Migration werden:
 - [ ] CSS Custom Properties Token-System aufsetzen
 - [ ] Dark Mode Grundstruktur
 - [ ] Histoire für Dokumentation einrichten
-- [ ] Vitest konfigurieren
+- [ ] Vitest konfigurieren (mit Vue 2/3 Matrix)
 - [ ] eslint-config-it4c einrichten (inkl. TypeScript, Vue, Prettier, JSDoc) ⚠️ **BLOCKED: siehe §18**
-- [ ] npm Package-Struktur (@ocelot-social/ui)
+- [ ] npm Package-Struktur (@ocelot-social/ui) mit korrekten exports
 - [ ] Build-Pipeline für Vue 2/3 Dual-Support
 - [ ] GitHub Workflows einrichten (Lint, Test, Build)
 - [ ] Visual Regression Tests einrichten (Playwright)
 - [ ] Accessibility Tests einrichten (axe-core)
 - [ ] Bundle Size Check einrichten (size-limit)
+- [ ] Package-Validierung einrichten (publint, arethetypeswrong)
+- [ ] Example Apps erstellen (vue3-tailwind, vue3-css, vue2-tailwind, vue2-css)
+- [ ] Kompatibilitätstest-Workflow einrichten (siehe §19)
 - [ ] release-please Manifest-Konfiguration
 - [ ] npm Publish Workflow
 - [ ] Histoire Deploy Workflow
@@ -472,7 +475,7 @@ Bei der Migration werden:
 ```
 Phase 0:   ██████████ 100% (6/6 Aufgaben) ✅
 Phase 0.5: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 1:   ░░░░░░░░░░   0% (0/23 Aufgaben)
+Phase 1:   ░░░░░░░░░░   0% (0/26 Aufgaben)
 Phase 2:   ░░░░░░░░░░   0% (0/6 Aufgaben)
 Phase 3:   ░░░░░░░░░░   0% (0/15 Komponenten)
 Phase 4:   ░░░░░░░░░░   0% (0/7 Aufgaben)
@@ -596,6 +599,7 @@ Integriert:   0
 | 54 | Nach Migration | ARCHITECTURE.md | PROJEKT.md → ARCHITECTURE.md, KATALOG.md archivieren |
 | 55 | Komponenten-Abgrenzung | Entscheidungsbaum | Library: präsentational, Webapp: Business-Logik (siehe §17) |
 | 56 | Externe Abhängigkeiten | Dokumentiert in §18 | eslint-config-it4c muss modularisiert werden |
+| 57 | Kompatibilitätstests | 4er-Matrix + CI | Vue 2/3 × Tailwind/CSS (siehe §19) |
 
 ---
 
@@ -626,6 +630,7 @@ Integriert:   0
 | 2026-02-04 | **Dokumentationsstrategie** | Hybrid: Generiert (vue-component-meta) + Manuell, CI-geprüft |
 | 2026-02-04 | **Abgrenzung Library/Webapp** | Entscheidungsbaum + Checkliste für Komponenten-Zuordnung |
 | 2026-02-04 | **Externe Abhängigkeit** | eslint-config-it4c blockiert Linting-Setup, Workaround dokumentiert |
+| 2026-02-04 | **Kompatibilitätstests** | 4er-Matrix (Vue 2/3 × Tailwind/CSS), Example Apps, Playwright E2E |
 
 ---
 
@@ -1210,6 +1215,281 @@ export default [
 - [ ] Modulare Struktur implementieren
 - [ ] Neue Version releasen
 - [ ] In @ocelot-social/ui einbinden
+
+---
+
+## 19. Kompatibilitätstests (Vue 2/3 + Tailwind/CSS)
+
+### Testmatrix
+
+Die Library muss in 4 Kombinationen funktionieren:
+
+```
+                    │  Tailwind         │  CSS (vorkompiliert)
+────────────────────┼───────────────────┼──────────────────────
+Vue 3.4+            │  ✓ Muss testen    │  ✓ Muss testen
+Vue 2.7             │  ✓ Muss testen    │  ✓ Muss testen
+```
+
+### Werkzeuge & Strategien
+
+#### 1. vue-demi (Code-Ebene)
+
+Abstrahiert Vue 2/3 API-Unterschiede:
+
+```typescript
+// Komponente importiert von vue-demi, nicht vue
+import { ref, computed, defineComponent } from 'vue-demi'
+```
+
+#### 2. Unit Tests mit Vitest (Vue 2/3 Matrix)
+
+```typescript
+// vitest.config.ts
+export default defineConfig({
+  test: {
+    alias: {
+      'vue': process.env.VUE_VERSION === '2'
+        ? 'vue2.7'
+        : 'vue'
+    }
+  }
+})
+```
+
+#### 3. Example Apps (4 Kombinationen)
+
+```
+packages/ui/
+├── examples/
+│   ├── vue3-tailwind/     # Vite + Vue 3 + Tailwind Preset
+│   │   ├── package.json
+│   │   ├── vite.config.ts
+│   │   ├── tailwind.config.js  # Nutzt @ocelot-social/ui/tailwind.preset
+│   │   └── src/App.vue         # Importiert alle Komponenten
+│   │
+│   ├── vue3-css/          # Vite + Vue 3 + styles.css
+│   │   ├── package.json
+│   │   ├── vite.config.ts
+│   │   └── src/
+│   │       ├── main.ts         # import '@ocelot-social/ui/styles.css'
+│   │       └── App.vue
+│   │
+│   ├── vue2-tailwind/     # Vue CLI / Nuxt 2 + Tailwind
+│   │   └── ...
+│   │
+│   └── vue2-css/          # Vue CLI / Nuxt 2 + styles.css
+│       └── ...
+```
+
+**Jede Example App:**
+- Importiert `@ocelot-social/ui` via Workspace-Link
+- Rendert alle exportierten Komponenten
+- Kann lokal gestartet werden (`npm run dev`)
+- Wird in CI gebaut und getestet
+
+#### 4. Playwright E2E Tests
+
+```typescript
+// e2e/compatibility.spec.ts
+import { test, expect } from '@playwright/test'
+
+const examples = [
+  { name: 'vue3-tailwind', port: 3001 },
+  { name: 'vue3-css', port: 3002 },
+  { name: 'vue2-tailwind', port: 3003 },
+  { name: 'vue2-css', port: 3004 },
+]
+
+for (const example of examples) {
+  test.describe(example.name, () => {
+    test('all components render', async ({ page }) => {
+      await page.goto(`http://localhost:${example.port}`)
+
+      // Prüfe dass alle Komponenten sichtbar sind
+      await expect(page.locator('[data-testid="os-button"]')).toBeVisible()
+      await expect(page.locator('[data-testid="os-card"]')).toBeVisible()
+      await expect(page.locator('[data-testid="os-modal"]')).toBeVisible()
+    })
+
+    test('styles are applied correctly', async ({ page }) => {
+      await page.goto(`http://localhost:${example.port}`)
+      const button = page.locator('[data-testid="os-button-primary"]')
+
+      // Prüfe dass CSS korrekt angewendet wird
+      await expect(button).toHaveCSS('background-color', /rgb/)
+    })
+
+    test('visual regression', async ({ page }) => {
+      await page.goto(`http://localhost:${example.port}`)
+      await expect(page).toHaveScreenshot(`${example.name}.png`)
+    })
+  })
+}
+```
+
+#### 5. Package Validation
+
+| Tool | Zweck |
+|------|-------|
+| **publint** | Prüft package.json auf Export-Fehler |
+| **arethetypeswrong** | Prüft TypeScript-Typen für alle Entry Points |
+
+```json
+{
+  "scripts": {
+    "check:exports": "publint && attw --pack .",
+    "prepublishOnly": "npm run check:exports"
+  }
+}
+```
+
+#### 6. package.json Exports (korrekte Struktur)
+
+```json
+{
+  "name": "@ocelot-social/ui",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./tailwind.preset": {
+      "import": "./dist/tailwind.preset.mjs",
+      "require": "./dist/tailwind.preset.cjs",
+      "types": "./dist/tailwind.preset.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "vue": "^2.7.0 || ^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "tailwindcss": {
+      "optional": true
+    }
+  }
+}
+```
+
+### CI Workflow: Compatibility Matrix
+
+```yaml
+# .github/workflows/compatibility.yml
+name: Compatibility Tests
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: packages/ui/dist
+
+  test-unit:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        vue-version: ['2.7', '3.4']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: packages/ui/dist
+      - run: npm ci
+      - run: npm test
+        env:
+          VUE_VERSION: ${{ matrix.vue-version }}
+
+  test-e2e:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example: ['vue3-tailwind', 'vue3-css', 'vue2-tailwind', 'vue2-css']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: packages/ui/dist
+
+      - name: Setup example app
+        working-directory: packages/ui/examples/${{ matrix.example }}
+        run: |
+          npm ci
+          npm run build
+
+      - name: Start preview server
+        working-directory: packages/ui/examples/${{ matrix.example }}
+        run: npm run preview &
+
+      - name: Wait for server
+        run: npx wait-on http://localhost:4173 --timeout 30000
+
+      - name: Run Playwright tests
+        working-directory: packages/ui
+        run: npx playwright test --grep "${{ matrix.example }}"
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-${{ matrix.example }}
+          path: packages/ui/playwright-report/
+
+  validate-package:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: packages/ui/dist
+      - run: npm ci
+      - name: Validate exports
+        run: |
+          npx publint packages/ui
+          npx @arethetypeswrong/cli packages/ui
+```
+
+### Werkzeug-Übersicht
+
+| Werkzeug | Zweck | Phase |
+|----------|-------|-------|
+| **vue-demi** | Vue 2/3 API-Kompatibilität im Code | Phase 1 |
+| **Vitest + Matrix** | Unit Tests für Vue 2.7 und Vue 3.4 | Phase 1 |
+| **Example Apps (4x)** | Echte Projekte für jede Kombination | Phase 1 |
+| **Playwright** | E2E + Visual Regression für alle 4 | Phase 1 |
+| **publint** | Package.json Export-Validierung | Phase 1 |
+| **arethetypeswrong** | TypeScript Entry Points Check | Phase 1 |
+| **pkg-pr-new** | Preview-Releases in PRs (optional) | Optional |
+
+### Checkliste für neue Komponenten
+
+```
+[ ] Unit Tests laufen mit VUE_VERSION=2.7
+[ ] Unit Tests laufen mit VUE_VERSION=3.4
+[ ] Komponente in allen 4 Example Apps hinzugefügt
+[ ] E2E Tests für Komponente geschrieben
+[ ] Visual Regression Baseline erstellt
+[ ] Keine Vue 3-only APIs verwendet (oder via vue-demi abstrahiert)
+```
 
 ---
 
