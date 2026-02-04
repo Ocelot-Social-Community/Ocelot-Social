@@ -39,7 +39,7 @@ Migration vorbereiten - schrittweise neue Komponenten in Vue 3 entwickeln, die d
 | Vue 2 Kompatibilität | **vue-demi** | Library funktioniert in Vue 2 und Vue 3 |
 | Linting | **eslint-config-it4c** | Enthält: TypeScript, Vue, Prettier, weitere Regeln |
 | Release | **release-please** | Automatische Versionen und Changelogs |
-| Icons | **unplugin-icons** | Eigene SVGs + Icon-Libraries kombinierbar |
+| Icons | **Hybrid-Architektur** | System-Icons in Library, Feature-Icons in App (siehe Abschnitt 15) |
 | Browser-Support | **Modern only** | Chrome, Firefox, Safari, Edge (letzte 2 Versionen) |
 | SSR | **Ja** | Nuxt-kompatibel |
 | Dark Mode | **Ja, von Anfang an** | Alle Komponenten mit Light/Dark Varianten |
@@ -562,7 +562,7 @@ Integriert:   0
 | 27 | Browser-Support | Modern only | Letzte 2 Versionen von Chrome, Firefox, Safari, Edge |
 | 28 | SSR | Ja | Nuxt-kompatibel |
 | 29 | Dark Mode | Ja, von Anfang an | Alle Komponenten mit Light/Dark |
-| 30 | Icons | unplugin-icons | Eigene SVGs + Icon-Libraries kombinierbar |
+| 30 | Icons | Hybrid-Architektur | System-Icons in Library, Feature-Icons in App |
 | 31 | Build-Strategie | Dual-Build | Tailwind Preset + Vorkompilierte CSS |
 | 32 | Lizenz | Apache 2.0 | Permissiv mit Patent-Schutz |
 | 33 | Repository | Monorepo | Ocelot-Social/packages/ui/ |
@@ -583,6 +583,7 @@ Integriert:   0
 | 48 | Katalogisierung | KATALOG.md | Unterbrechbar, Webapp + Styleguide |
 | 49 | Fortschritt | Berechenbar | Pro Phase und Gesamt |
 | 50 | GitHub Workflows | 12 Workflows | Vollständige CI/CD Pipeline |
+| 51 | Icon-Architektur | Hybrid | ~10 System-Icons in Library, Rest in App (siehe §15) |
 
 ---
 
@@ -609,6 +610,7 @@ Integriert:   0
 | 2026-02-04 | Prozesse | QA-Schritt pro Komponente, Komponenten-Protokoll, KATALOG.md |
 | 2026-02-04 | Fortschritt | Berechenbar für Gesamt und Einzelschritte |
 | 2026-02-04 | **Phase 0.5 abgeschlossen** | Vue 2.7 Upgrade erfolgreich, alle Tests bestanden |
+| 2026-02-04 | **Icon-Architektur** | Hybrid-Ansatz: ~10 System-Icons in Library, Feature-Icons in App |
 
 ---
 
@@ -647,6 +649,108 @@ Integriert:   0
 - [Vitest](https://vitest.dev/)
 - [vue-demi](https://github.com/vueuse/vue-demi)
 - [unplugin-icons](https://github.com/unplugin/unplugin-icons)
+
+---
+
+## 15. Icon-Architektur
+
+### Entscheidung: Hybrid-Ansatz
+
+Die Library verwendet eine **Hybrid-Architektur** für Icons:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  @ocelot-social/ui (Library)                                │
+├─────────────────────────────────────────────────────────────┤
+│  icons/system/           # ~10 System-Icons                 │
+│  ├── close.svg           # Modal, Chip, Dialoge             │
+│  ├── check.svg           # Modal confirm, Checkboxen        │
+│  ├── chevron-down.svg    # Select, Dropdown                 │
+│  ├── chevron-up.svg      # Select, Accordion                │
+│  ├── spinner.svg         # Loading-States                   │
+│  ├── bars.svg            # Hamburger-Menu                   │
+│  ├── copy.svg            # CopyField                        │
+│  ├── eye.svg             # Password-Toggle                  │
+│  ├── eye-slash.svg       # Password-Toggle, Anonym          │
+│  └── search.svg          # Search-Input                     │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│  Webapp / Konsumierendes Projekt                            │
+├─────────────────────────────────────────────────────────────┤
+│  assets/icons/           # Feature-Icons (beliebig viele)   │
+│  ├── user.svg            │
+│  ├── bell.svg            │
+│  ├── heart.svg           │
+│  ├── settings.svg        │
+│  └── ...                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Begründung
+
+1. **Library muss standalone funktionieren** - Ein OsModal braucht einen Close-Button ohne zusätzliche Konfiguration
+2. **616 Icons sind zu viel** - Der Styleguide hat 616 Icons, die meisten werden nie gebraucht
+3. **Feature-Icons gehören zur App** - Icons wie `user`, `bell`, `heart` sind Business-Logik
+4. **Branding-Flexibilität** - Verschiedene Ocelot-Instanzen können unterschiedliche Icon-Sets verwenden
+
+### System-Icons (in Library enthalten)
+
+| Icon | Verwendung in Komponenten |
+|------|---------------------------|
+| `close` | OsModal, OsChip, OsDialog, OsAlert |
+| `check` | OsModal (confirm), OsCheckbox |
+| `chevron-down` | OsSelect, OsDropdown, OsAccordion |
+| `chevron-up` | OsSelect, OsAccordion |
+| `spinner` | OsButton (loading), OsSpinner |
+| `bars` | OsPage (mobile menu) |
+| `copy` | OsCopyField |
+| `eye` | OsInput (password toggle) |
+| `eye-slash` | OsInput (password toggle), OsAvatar (anonym) |
+| `search` | OsInput (search variant) |
+
+### API-Design
+
+```typescript
+// OsIcon akzeptiert verschiedene Formate:
+
+// 1. System-Icon (String) - aus Library
+<OsIcon name="close" />
+
+// 2. Vue-Komponente - für App-Icons
+<OsIcon :icon="UserIcon" />
+
+// 3. In Komponenten mit icon-Prop
+<OsButton icon="close" />           // System-Icon
+<OsButton :icon="CustomIcon" />     // Komponente
+```
+
+### Webapp-Integration
+
+```typescript
+// webapp/plugins/icons.ts
+import { provideIcons } from '@ocelot-social/ui'
+import * as appIcons from '~/assets/icons'
+
+export default defineNuxtPlugin((nuxtApp) => {
+  // App-Icons global registrieren
+  provideIcons(appIcons)
+})
+```
+
+```vue
+<!-- Dann in der Webapp nutzbar -->
+<OsButton :icon="icons.user" />
+<OsIcon :icon="icons.bell" />
+```
+
+### Aktuelle Icon-Statistik
+
+| Quelle | Anzahl | Status |
+|--------|--------|--------|
+| Styleguide (_all) | 616 | Nicht übernehmen (FontAwesome 4 komplett) |
+| Webapp (svgs) | 238 | Feature-Icons, bleiben in Webapp |
+| **Library (system)** | **~10** | Nur essenzielle System-Icons |
 
 ---
 
