@@ -5,6 +5,261 @@
 
 ---
 
+## Inhaltsverzeichnis
+
+### Schnellzugriff (Status)
+| Abschnitt | Beschreibung |
+|-----------|--------------|
+| [Fortschritt](#fortschritt) | Visuelle Fortschrittsanzeige |
+| [Aktueller Stand](#aktueller-stand) | Was zuletzt erledigt wurde |
+| [Meilensteine](#meilensteine) | Phasen 0-5 mit Checklisten |
+
+### Nach Thema
+
+**[VISION](#vision)**
+| # | Abschnitt |
+|---|-----------|
+| 1 | [Projektziel & Vision](#1-projektziel--vision) |
+
+**[TECHNISCHE GRUNDLAGEN](#technische-grundlagen)**
+| # | Abschnitt |
+|---|-----------|
+| 2 | [Tech-Stack](#2-tech-stack) |
+| 3 | [Build & Distribution](#3-build--distribution) |
+| 4 | [Icon-Architektur](#4-icon-architektur) |
+| 5 | [Design-Token & Branding](#5-design-token--branding) |
+
+**[PROZESSE & QUALITÄT](#prozesse--qualität)**
+| # | Abschnitt |
+|---|-----------|
+| 6 | [CI/CD & Release](#6-cicd--release) |
+| 7 | [Dokumentation & DX](#7-dokumentation--dx) |
+| 8 | [Migrationsstrategie](#8-migrationsstrategie) |
+| 9 | [Dokumentationsstrategie](#9-dokumentationsstrategie) |
+| 10 | [Kompatibilitätstests](#10-kompatibilitätstests) |
+
+**[REFERENZ & HISTORIE](#referenz--historie)**
+| # | Abschnitt |
+|---|-----------|
+| 11 | [Entscheidungen](#11-entscheidungen) |
+| 12 | [Arbeitsprotokoll](#12-arbeitsprotokoll) |
+| 13 | [Komponenten-Katalog](#13-komponenten-katalog) |
+| 14 | [Ressourcen & Links](#14-ressourcen--links) |
+| 15 | [Dokumentationsstrategie (Details)](#15-dokumentationsstrategie-details) |
+
+**[ABGRENZUNGEN](#abgrenzungen)**
+| # | Abschnitt |
+|---|-----------|
+| 16 | [Library vs. Webapp](#16-library-vs-webapp) |
+| 17 | [Externe Abhängigkeiten](#17-externe-abhängigkeiten) |
+| 18 | [Kompatibilitätstests (Details)](#18-kompatibilitätstests-details) |
+| 19 | [Komplexitätsanalyse](#19-komplexitätsanalyse) |
+
+---
+
+### Wie dieses Dokument verwendet wird
+
+**Zum Fortsetzen der Arbeit:**
+> "Lass uns am @ocelot-social/ui Projekt weiterarbeiten" (packages/ui)
+
+**Nach jeder Session aktualisieren:**
+- "Fortschritt" – Balkendiagramme aktualisieren
+- "Aktueller Stand" – Zuletzt erledigte Aufgaben
+- "Meilensteine" – Checklisten abhaken
+- §12 "Arbeitsprotokoll" – Neue Einträge hinzufügen
+- `KATALOG.md` – Komponenten-Status pflegen
+
+---
+
+## Fortschritt
+
+### Gesamtprojekt
+```
+Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
+Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
+Phase 2: ███░░░░░░░  33% (9/27 Aufgaben)
+Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
+Phase 4: ░░░░░░░░░░   0% (0/17 Aufgaben)
+Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
+Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
+───────────────────────────────────────
+Gesamt:  ███░░░░░░░  ~30% (21/71 Aufgaben)
+```
+
+### Katalogisierung (Details in KATALOG.md)
+```
+Webapp:     ██████████ 100% (139 Komponenten erfasst)
+Styleguide: ██████████ 100% (38 Komponenten erfasst)
+Analyse:    ██████████ 100% (Button, Modal, Menu detailiert)
+```
+
+### Komponenten-Migration (Priorisiert: 15)
+```
+Analysiert:   3 Familien (Button, Modal, Menu)
+Spezifiziert: 0
+Entwickelt:   0
+QA bestanden: 0
+Integriert:   0
+```
+
+---
+
+## Aktueller Stand
+
+**Letzte Aktualisierung:** 2026-02-04
+
+**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (33%)
+
+**Zuletzt abgeschlossen:**
+- [x] Projektordner erstellt
+- [x] Planungsdokument erstellt
+- [x] Tech-Stack entschieden
+- [x] Branding-Architektur definiert
+- [x] Migrationsstrategie definiert
+- [x] **Phase 0: Komponenten-Analyse** (177 Komponenten katalogisiert)
+- [x] Button-Familie detailiert analysiert (Props, Styles, Konsolidierung)
+- [x] Modal-Familie detailiert analysiert (Architektur erkannt)
+- [x] Menu-Familie detailiert analysiert (3 Patterns identifiziert)
+- [x] Priorisierung erstellt (15 Komponenten in 4 Tiers)
+- [x] Konsolidierungsplan finalisiert
+- [x] **Phase 1: Vue 2.7 Upgrade** ✅
+  - Vue 2.6.14 → 2.7.16
+  - vue-template-compiler entfernt
+  - @vue/composition-api entfernt
+  - @nuxtjs/composition-api entfernt
+  - Webpack-Alias für @vue/composition-api → vue
+  - Webpack-Regel für ESM .mjs Module
+  - **Unit-Tests: 157 Suites, 979 passed, 87 Snapshots** ✅
+  - **Integrationstests: bestanden** ✅
+- [x] **Phase 2: Projekt-Setup** (in Arbeit)
+  - Vite + Vue 3 Projekt initialisiert
+  - vue-demi für Vue 2/3 Kompatibilität
+  - Vitest konfiguriert (integriert in vite.config.ts)
+  - npm Package-Struktur mit korrekten exports
+  - README.md Grundgerüst
+  - LICENSE (Apache 2.0)
+  - Plugin-Tests geschrieben
+  - Tailwind CSS v4 mit @tailwindcss/vite
+  - Dual-Build (style.css + tailwind.preset)
+  - Dark Mode Grundstruktur (via Tailwind dark: Prefix)
+  - Prop-Types definiert (Size, Rounded, Shadow, Variant)
+  - Branding-Architektur (keine Defaults, validateCssVariables)
+
+**Aktuell in Arbeit:**
+- Phase 2: Projekt-Setup (9/27 Aufgaben erledigt)
+
+**Nächste Schritte:**
+1. ~~Phase 0: Komponenten-Analyse~~ ✅
+2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
+3. **Phase 2: Projekt-Setup** - Fortsetzen mit:
+   - Tailwind CSS einrichten
+   - Histoire für Dokumentation
+   - GitHub Workflows
+   - LICENSE Datei
+
+---
+
+## Meilensteine
+
+### Phase 0: Analyse & Katalogisierung ✅
+- [x] Vollständige Katalogisierung Webapp-Komponenten (139 Komponenten)
+- [x] Vollständige Katalogisierung Styleguide-Komponenten (38 Komponenten)
+- [x] Duplikate identifizieren und dokumentieren (5 direkte + 3 Familien)
+- [x] Inkonsistenzen und Probleme erfassen (Button/Modal/Menu analysiert)
+- [x] Konsolidierungsplan erstellen (Token-Liste)
+- [x] Priorisierung der zu migrierenden Komponenten (15 Komponenten in 4 Tiers)
+
+### Phase 1: Vue 2.7 Upgrade ✅
+- [x] Vue 2.6 → Vue 2.7 Upgrade in Webapp (2.6.14 → 2.7.16)
+- [x] Abhängigkeiten aktualisieren:
+  - [x] vue-template-compiler entfernt (in Vue 2.7 eingebaut)
+  - [x] @vue/composition-api entfernt (in Vue 2.7 eingebaut)
+  - [x] @nuxtjs/composition-api entfernt (nicht mehr nötig)
+  - [x] vue-server-renderer auf 2.7.16 aktualisiert
+- [x] Tests durchführen: **157 Suites, 979 passed, 87 Snapshots** ✅
+- [x] Regressionstests (`yarn dev` und manuelle Prüfung) ✅
+
+### Phase 2: Projekt-Setup
+- [x] Vite + Vue 3 Projekt initialisieren
+- [x] vue-demi einrichten für Vue 2 Kompatibilität
+- [x] Tailwind CSS einrichten (v4 mit @tailwindcss/vite)
+- [x] Dual-Build konfigurieren (Tailwind Preset + vorkompilierte CSS)
+- [ ] CSS Custom Properties Token-System aufsetzen (Infrastruktur bereit, Tokens folgen mit Komponenten)
+- [x] Dark Mode Grundstruktur (via Tailwind `dark:` Prefix, dokumentiert)
+- [ ] Histoire für Dokumentation einrichten
+- [x] Vitest konfigurieren
+- [ ] Vitest Vue 2/3 Matrix einrichten
+- [ ] eslint-config-it4c einrichten (inkl. TypeScript, Vue, Prettier, JSDoc) ⚠️ **BLOCKED: siehe §17**
+- [x] npm Package-Struktur (@ocelot-social/ui) mit korrekten exports
+- [ ] Build-Pipeline für Vue 2/3 Dual-Support
+- [ ] GitHub Workflows einrichten (Lint, Test, Build)
+- [ ] Visual Regression Tests einrichten (Playwright)
+- [ ] Accessibility Tests einrichten (axe-core)
+- [ ] Bundle Size Check einrichten (size-limit)
+- [ ] Package-Validierung einrichten (publint, arethetypeswrong)
+- [ ] Example Apps erstellen (vue3-tailwind, vue3-css, vue2-tailwind, vue2-css)
+- [ ] Kompatibilitätstest-Workflow einrichten (siehe §18)
+- [ ] release-please Manifest-Konfiguration
+- [ ] npm Publish Workflow
+- [ ] Histoire Deploy Workflow
+- [x] LICENSE Datei (Apache 2.0)
+- [x] README.md Grundgerüst (Installation, Quick Start, Struktur)
+- [ ] CONTRIBUTING.md
+- [ ] Docs-Generierung einrichten (scripts/generate-docs.ts)
+
+### Phase 3: Token-System & Basis
+- [ ] Base Tokens definieren (Farben, Spacing, Typography)
+- [ ] Semantic Tokens definieren
+- [ ] Component Tokens definieren
+- [ ] Branding-System implementieren (CSS Variables)
+- [ ] Beispiel-Branding erstellen (Standard + Yunite)
+- [ ] Histoire Theme-Farben anpassen (ocelot.social Branding)
+- [ ] Token-Dokumentation in Histoire
+
+### Phase 4: Komponenten-Migration (15 Komponenten + 2 Infrastruktur)
+
+**Tier 1: Kern-Komponenten**
+- [ ] OsIcon (vereint DsIcon + BaseIcon)
+- [ ] OsSpinner (vereint DsSpinner + LoadingSpinner)
+- [ ] OsButton (vereint DsButton + BaseButton)
+- [ ] OsCard (vereint DsCard + BaseCard)
+
+**Tier 2: Layout & Feedback**
+- [ ] OsModal (Basis: DsModal)
+- [ ] OsDropdown (Basis: Webapp Dropdown)
+- [ ] OsAvatar (vereint DsAvatar + ProfileAvatar)
+- [ ] OsInput (Basis: DsInput)
+
+**Tier 3: Navigation & Typography**
+- [ ] OsMenu (Basis: DsMenu)
+- [ ] OsMenuItem (Basis: DsMenuItem)
+- [ ] OsHeading (Basis: DsHeading)
+- [ ] OsText (Basis: DsText)
+
+**Tier 4: Spezial-Komponenten**
+- [ ] OsSelect
+- [ ] OsTable
+- [ ] OsTag
+
+**Infrastruktur**
+- [ ] System-Icons einrichten
+- [ ] CI docs-check Workflow (JSDoc-Coverage, README-Aktualität)
+
+### Phase 5: Finalisierung
+- [ ] Alle Komponenten migriert und getestet
+- [ ] Alte Komponenten aus Vue 2 Projekt entfernt
+- [ ] Build als npm Library verifiziert
+- [ ] README.md finalisieren (alle Sektionen vollständig)
+- [ ] ARCHITECTURE.md erstellen (aus PROJEKT.md §2, §4, §5, §11, §15, §16)
+- [ ] PROJEKT.md und KATALOG.md archivieren (docs/archive/)
+- [ ] Dokumentation vollständig und CI-geprüft
+
+---
+
+---
+
+# VISION
+
 ## 1. Projektziel & Vision
 
 **Kurzbeschreibung:**
@@ -25,6 +280,8 @@ Migration vorbereiten - schrittweise neue Komponenten in Vue 3 entwickeln, die d
 
 ---
 
+# TECHNISCHE GRUNDLAGEN
+
 ## 2. Tech-Stack
 
 | Komponente | Entscheidung | Notizen |
@@ -39,7 +296,7 @@ Migration vorbereiten - schrittweise neue Komponenten in Vue 3 entwickeln, die d
 | Vue 2 Kompatibilität | **vue-demi** | Library funktioniert in Vue 2 und Vue 3 |
 | Linting | **eslint-config-it4c** | Enthält: TypeScript, Vue, Prettier, weitere Regeln |
 | Release | **release-please** | Automatische Versionen und Changelogs |
-| Icons | **Hybrid-Architektur** | System-Icons in Library, Feature-Icons in App (siehe Abschnitt 15) |
+| Icons | **Hybrid-Architektur** | System-Icons in Library, Feature-Icons in App (siehe §4) |
 | Browser-Support | **Modern only** | Chrome, Firefox, Safari, Edge (letzte 2 Versionen) |
 | SSR | **Ja** | Nuxt-kompatibel |
 | Dark Mode | **Ja, von Anfang an** | Alle Komponenten mit Light/Dark Varianten |
@@ -175,7 +432,162 @@ describe('Default Branding', () => {
 
 ---
 
-## 4. CI/CD & Release-Automatisierung
+## 4. Icon-Architektur
+
+### Entscheidung: Hybrid-Ansatz
+
+Die Library verwendet eine **Hybrid-Architektur** für Icons:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  @ocelot-social/ui (Library)                                │
+├─────────────────────────────────────────────────────────────┤
+│  icons/system/           # ~10 System-Icons                 │
+│  ├── close.svg           # Modal, Chip, Dialoge             │
+│  ├── check.svg           # Modal confirm, Checkboxen        │
+│  ├── chevron-down.svg    # Select, Dropdown                 │
+│  ├── chevron-up.svg      # Select, Accordion                │
+│  ├── spinner.svg         # Loading-States                   │
+│  ├── bars.svg            # Hamburger-Menu                   │
+│  ├── copy.svg            # CopyField                        │
+│  ├── eye.svg             # Password-Toggle                  │
+│  ├── eye-slash.svg       # Password-Toggle, Anonym          │
+│  └── search.svg          # Search-Input                     │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│  Webapp / Konsumierendes Projekt                            │
+├─────────────────────────────────────────────────────────────┤
+│  assets/icons/           # Feature-Icons (beliebig viele)   │
+│  ├── user.svg            │
+│  ├── bell.svg            │
+│  ├── heart.svg           │
+│  ├── settings.svg        │
+│  └── ...                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Begründung
+
+1. **Library muss standalone funktionieren** - Ein OsModal braucht einen Close-Button ohne zusätzliche Konfiguration
+2. **616 Icons sind zu viel** - Der Styleguide hat 616 Icons, die meisten werden nie gebraucht
+3. **Feature-Icons gehören zur App** - Icons wie `user`, `bell`, `heart` sind Business-Logik
+4. **Branding-Flexibilität** - Verschiedene Ocelot-Instanzen können unterschiedliche Icon-Sets verwenden
+
+### System-Icons (in Library enthalten)
+
+| Icon | Verwendung in Komponenten |
+|------|---------------------------|
+| `close` | OsModal, OsChip, OsDialog, OsAlert |
+| `check` | OsModal (confirm), OsCheckbox |
+| `chevron-down` | OsSelect, OsDropdown, OsAccordion |
+| `chevron-up` | OsSelect, OsAccordion |
+| `spinner` | OsButton (loading), OsSpinner |
+| `bars` | OsPage (mobile menu) |
+| `copy` | OsCopyField |
+| `eye` | OsInput (password toggle) |
+| `eye-slash` | OsInput (password toggle), OsAvatar (anonym) |
+| `search` | OsInput (search variant) |
+
+### API-Design
+
+```typescript
+// OsIcon akzeptiert verschiedene Formate:
+
+// 1. System-Icon (String) - aus Library
+<OsIcon name="close" />
+
+// 2. Vue-Komponente - für App-Icons
+<OsIcon :icon="UserIcon" />
+
+// 3. In Komponenten mit icon-Prop
+<OsButton icon="close" />           // System-Icon
+<OsButton :icon="CustomIcon" />     // Komponente
+```
+
+### Webapp-Integration
+
+```typescript
+// webapp/plugins/icons.ts
+import { provideIcons } from '@ocelot-social/ui'
+import * as appIcons from '~/assets/icons'
+
+export default defineNuxtPlugin((nuxtApp) => {
+  // App-Icons global registrieren
+  provideIcons(appIcons)
+})
+```
+
+```vue
+<!-- Dann in der Webapp nutzbar -->
+<OsButton :icon="icons.user" />
+<OsIcon :icon="icons.bell" />
+```
+
+### Aktuelle Icon-Statistik
+
+| Quelle | Anzahl | Status |
+|--------|--------|--------|
+| Styleguide (_all) | 616 | Nicht übernehmen (FontAwesome 4 komplett) |
+| Webapp (svgs) | 238 | Feature-Icons, bleiben in Webapp |
+| **Library (system)** | **~10** | Nur essenzielle System-Icons |
+
+---
+
+## 5. Design-Token & Branding
+
+### 3-Stufen Token-System
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  1. BASE TOKENS (Rohwerte)                              │
+│     --color-green: rgb(23, 181, 63);                    │
+│     --color-teal: rgb(110, 139, 135);                   │
+│     --space-small: 16px;                                │
+└────────────────────────┬────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────┐
+│  2. SEMANTIC TOKENS (Bedeutung)                         │
+│     --color-primary: var(--color-green);                │
+│     --color-secondary: var(--color-teal);               │
+│     --text-color-base: var(--color-neutral-20);         │
+└────────────────────────┬────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────┐
+│  3. COMPONENT TOKENS (Komponenten-spezifisch)           │
+│     --button-primary-bg: var(--color-primary);          │
+│     --button-primary-text: var(--color-primary-inverse);│
+│     --card-bg: var(--background-color-base);            │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Branding-Flexibilität
+
+Jedes Branding kann auf jeder Ebene eingreifen:
+
+```css
+/* Standard */
+:root {
+  --button-primary-bg: var(--color-primary);
+}
+
+/* Yunite-Branding: Button nutzt Secondary statt Primary */
+:root {
+  --button-primary-bg: var(--color-secondary);
+}
+```
+
+### Kompatibilität mit bestehendem System
+
+- Bestehende SCSS-Variablen (`$color-primary`) → CSS Custom Properties (`--color-primary`)
+- Theo bleibt als Token-Quelle, generiert zusätzlich CSS Variables
+- Tailwind Theme nutzt CSS Variables: `bg-primary` → `var(--color-primary)`
+
+---
+
+# PROZESSE & QUALITÄT
+
+## 6. CI/CD & Release
 
 ### Release-Workflow (release-please)
 
@@ -291,7 +703,7 @@ if (process.env.NODE_ENV === 'development') {
 
 ---
 
-## 5. Dokumentation & Developer Experience
+## 7. Dokumentation & DX
 
 ### Histoire als Komponenten-Dokumentation
 
@@ -316,58 +728,7 @@ Komponente entwickeln → Histoire Story schreiben → Build → Deploy auf Serv
 
 ---
 
-## 6. Design-Token & Branding-Architektur
-
-### 3-Stufen Token-System
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  1. BASE TOKENS (Rohwerte)                              │
-│     --color-green: rgb(23, 181, 63);                    │
-│     --color-teal: rgb(110, 139, 135);                   │
-│     --space-small: 16px;                                │
-└────────────────────────┬────────────────────────────────┘
-                         ↓
-┌─────────────────────────────────────────────────────────┐
-│  2. SEMANTIC TOKENS (Bedeutung)                         │
-│     --color-primary: var(--color-green);                │
-│     --color-secondary: var(--color-teal);               │
-│     --text-color-base: var(--color-neutral-20);         │
-└────────────────────────┬────────────────────────────────┘
-                         ↓
-┌─────────────────────────────────────────────────────────┐
-│  3. COMPONENT TOKENS (Komponenten-spezifisch)           │
-│     --button-primary-bg: var(--color-primary);          │
-│     --button-primary-text: var(--color-primary-inverse);│
-│     --card-bg: var(--background-color-base);            │
-└─────────────────────────────────────────────────────────┘
-```
-
-### Branding-Flexibilität
-
-Jedes Branding kann auf jeder Ebene eingreifen:
-
-```css
-/* Standard */
-:root {
-  --button-primary-bg: var(--color-primary);
-}
-
-/* Yunite-Branding: Button nutzt Secondary statt Primary */
-:root {
-  --button-primary-bg: var(--color-secondary);
-}
-```
-
-### Kompatibilität mit bestehendem System
-
-- Bestehende SCSS-Variablen (`$color-primary`) → CSS Custom Properties (`--color-primary`)
-- Theo bleibt als Token-Quelle, generiert zusätzlich CSS Variables
-- Tailwind Theme nutzt CSS Variables: `bg-primary` → `var(--color-primary)`
-
----
-
-## 7. Migrationsstrategie
+## 8. Migrationsstrategie
 
 ### Grundprinzipien
 
@@ -436,253 +797,95 @@ Bei der Migration werden:
 
 ---
 
-## 8. Meilensteine
+## 9. Dokumentationsstrategie
 
-### Phase 0: Analyse & Katalogisierung ✅
-- [x] Vollständige Katalogisierung Webapp-Komponenten (139 Komponenten)
-- [x] Vollständige Katalogisierung Styleguide-Komponenten (38 Komponenten)
-- [x] Duplikate identifizieren und dokumentieren (5 direkte + 3 Familien)
-- [x] Inkonsistenzen und Probleme erfassen (Button/Modal/Menu analysiert)
-- [x] Konsolidierungsplan erstellen (Token-Liste)
-- [x] Priorisierung der zu migrierenden Komponenten (15 Komponenten in 4 Tiers)
-
-### Phase 1: Vue 2.7 Upgrade ✅
-- [x] Vue 2.6 → Vue 2.7 Upgrade in Webapp (2.6.14 → 2.7.16)
-- [x] Abhängigkeiten aktualisieren:
-  - [x] vue-template-compiler entfernt (in Vue 2.7 eingebaut)
-  - [x] @vue/composition-api entfernt (in Vue 2.7 eingebaut)
-  - [x] @nuxtjs/composition-api entfernt (nicht mehr nötig)
-  - [x] vue-server-renderer auf 2.7.16 aktualisiert
-- [x] Tests durchführen: **157 Suites, 979 passed, 87 Snapshots** ✅
-- [x] Regressionstests (`yarn dev` und manuelle Prüfung) ✅
-
-### Phase 2: Projekt-Setup
-- [x] Vite + Vue 3 Projekt initialisieren
-- [x] vue-demi einrichten für Vue 2 Kompatibilität
-- [x] Tailwind CSS einrichten (v4 mit @tailwindcss/vite)
-- [x] Dual-Build konfigurieren (Tailwind Preset + vorkompilierte CSS)
-- [ ] CSS Custom Properties Token-System aufsetzen (Infrastruktur bereit, Tokens folgen mit Komponenten)
-- [x] Dark Mode Grundstruktur (via Tailwind `dark:` Prefix, dokumentiert)
-- [ ] Histoire für Dokumentation einrichten
-- [x] Vitest konfigurieren
-- [ ] Vitest Vue 2/3 Matrix einrichten
-- [ ] eslint-config-it4c einrichten (inkl. TypeScript, Vue, Prettier, JSDoc) ⚠️ **BLOCKED: siehe §18**
-- [x] npm Package-Struktur (@ocelot-social/ui) mit korrekten exports
-- [ ] Build-Pipeline für Vue 2/3 Dual-Support
-- [ ] GitHub Workflows einrichten (Lint, Test, Build)
-- [ ] Visual Regression Tests einrichten (Playwright)
-- [ ] Accessibility Tests einrichten (axe-core)
-- [ ] Bundle Size Check einrichten (size-limit)
-- [ ] Package-Validierung einrichten (publint, arethetypeswrong)
-- [ ] Example Apps erstellen (vue3-tailwind, vue3-css, vue2-tailwind, vue2-css)
-- [ ] Kompatibilitätstest-Workflow einrichten (siehe §19)
-- [ ] release-please Manifest-Konfiguration
-- [ ] npm Publish Workflow
-- [ ] Histoire Deploy Workflow
-- [x] LICENSE Datei (Apache 2.0)
-- [x] README.md Grundgerüst (Installation, Quick Start, Struktur)
-- [ ] CONTRIBUTING.md
-- [ ] Docs-Generierung einrichten (scripts/generate-docs.ts)
-
-### Phase 3: Token-System & Basis
-- [ ] Base Tokens definieren (Farben, Spacing, Typography)
-- [ ] Semantic Tokens definieren
-- [ ] Component Tokens definieren
-- [ ] Branding-System implementieren (CSS Variables)
-- [ ] Beispiel-Branding erstellen (Standard + Yunite)
-- [ ] Histoire Theme-Farben anpassen (ocelot.social Branding)
-- [ ] Token-Dokumentation in Histoire
-
-### Phase 4: Komponenten-Migration (15 Komponenten + 2 Infrastruktur)
-
-**Tier 1: Kern-Komponenten**
-- [ ] OsIcon (vereint DsIcon + BaseIcon)
-- [ ] OsSpinner (vereint DsSpinner + LoadingSpinner)
-- [ ] OsButton (vereint DsButton + BaseButton)
-- [ ] OsCard (vereint DsCard + BaseCard)
-
-**Tier 2: Layout & Feedback**
-- [ ] OsModal (Basis: DsModal)
-- [ ] OsDropdown (Basis: Webapp Dropdown)
-- [ ] OsAvatar (vereint DsAvatar + ProfileAvatar)
-- [ ] OsInput (Basis: DsInput)
-
-**Tier 3: Navigation & Typography**
-- [ ] OsMenu (Basis: DsMenu)
-- [ ] OsMenuItem (Basis: DsMenuItem)
-- [ ] OsHeading (Basis: DsHeading)
-- [ ] OsText (Basis: DsText)
-
-**Tier 4: Spezial-Komponenten**
-- [ ] OsSelect
-- [ ] OsTable
-- [ ] OsTag
-
-**Infrastruktur**
-- [ ] System-Icons einrichten
-- [ ] CI docs-check Workflow (JSDoc-Coverage, README-Aktualität)
-
-### Phase 5: Finalisierung
-- [ ] Alle Komponenten migriert und getestet
-- [ ] Alte Komponenten aus Vue 2 Projekt entfernt
-- [ ] Build als npm Library verifiziert
-- [ ] README.md finalisieren (alle Sektionen vollständig)
-- [ ] ARCHITECTURE.md erstellen (aus PROJEKT.md §2, §6, §11, §15, §16)
-- [ ] PROJEKT.md und KATALOG.md archivieren (docs/archive/)
-- [ ] Dokumentation vollständig und CI-geprüft
+> Siehe ausführliche Version in §15 Dokumentationsstrategie (Details).
+> Kurzzusammenfassung: Generierte Docs (vue-component-meta) + Manuell (Histoire).
 
 ---
 
-## 9. Fortschritt
+## 10. Kompatibilitätstests
 
-### Gesamtprojekt
-```
-Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 2: ███░░░░░░░  33% (9/27 Aufgaben)
-Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
-Phase 4: ░░░░░░░░░░   0% (0/17 Aufgaben)
-Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
-Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
-───────────────────────────────────────
-Gesamt:  ███░░░░░░░  ~30% (21/71 Aufgaben)
-```
+> Vue 2/3 × Tailwind/CSS Testmatrix. Details siehe §18.
 
-### Katalogisierung (Details in KATALOG.md)
-```
-Webapp:     ██████████ 100% (139 Komponenten erfasst)
-Styleguide: ██████████ 100% (38 Komponenten erfasst)
-Analyse:    ██████████ 100% (Button, Modal, Menu detailiert)
-```
-
-### Komponenten-Migration (Priorisiert: 15)
-```
-Analysiert:   3 Familien (Button, Modal, Menu)
-Spezifiziert: 0
-Entwickelt:   0
-QA bestanden: 0
-Integriert:   0
-```
+**Kurzfassung:**
+- 4 Example Apps: vue3-tailwind, vue3-css, vue2-tailwind, vue2-css
+- Vitest Unit-Tests mit Vue 2.7 und Vue 3.4
+- Playwright E2E für alle 4 Kombinationen
+- Package-Validierung: publint, arethetypeswrong
 
 ---
 
-## 10. Aktueller Stand
-
-**Letzte Aktualisierung:** 2026-02-04
-
-**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (33%)
-
-**Zuletzt abgeschlossen:**
-- [x] Projektordner erstellt
-- [x] Planungsdokument erstellt
-- [x] Tech-Stack entschieden
-- [x] Branding-Architektur definiert
-- [x] Migrationsstrategie definiert
-- [x] **Phase 0: Komponenten-Analyse** (177 Komponenten katalogisiert)
-- [x] Button-Familie detailiert analysiert (Props, Styles, Konsolidierung)
-- [x] Modal-Familie detailiert analysiert (Architektur erkannt)
-- [x] Menu-Familie detailiert analysiert (3 Patterns identifiziert)
-- [x] Priorisierung erstellt (15 Komponenten in 4 Tiers)
-- [x] Konsolidierungsplan finalisiert
-- [x] **Phase 1: Vue 2.7 Upgrade** ✅
-  - Vue 2.6.14 → 2.7.16
-  - vue-template-compiler entfernt
-  - @vue/composition-api entfernt
-  - @nuxtjs/composition-api entfernt
-  - Webpack-Alias für @vue/composition-api → vue
-  - Webpack-Regel für ESM .mjs Module
-  - **Unit-Tests: 157 Suites, 979 passed, 87 Snapshots** ✅
-  - **Integrationstests: bestanden** ✅
-- [x] **Phase 2: Projekt-Setup** (in Arbeit)
-  - Vite + Vue 3 Projekt initialisiert
-  - vue-demi für Vue 2/3 Kompatibilität
-  - Vitest konfiguriert (integriert in vite.config.ts)
-  - npm Package-Struktur mit korrekten exports
-  - README.md Grundgerüst
-  - LICENSE (Apache 2.0)
-  - Plugin-Tests geschrieben
-  - Tailwind CSS v4 mit @tailwindcss/vite
-  - Dual-Build (style.css + tailwind.preset)
-  - Dark Mode Grundstruktur (via Tailwind dark: Prefix)
-  - Prop-Types definiert (Size, Rounded, Shadow, Variant)
-  - Branding-Architektur (keine Defaults, validateCssVariables)
-
-**Aktuell in Arbeit:**
-- Phase 2: Projekt-Setup (9/27 Aufgaben erledigt)
-
-**Nächste Schritte:**
-1. ~~Phase 0: Komponenten-Analyse~~ ✅
-2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
-3. **Phase 2: Projekt-Setup** - Fortsetzen mit:
-   - Tailwind CSS einrichten
-   - Histoire für Dokumentation
-   - GitHub Workflows
-   - LICENSE Datei
-
----
+# REFERENZ & HISTORIE
 
 ## 11. Entscheidungen
+
+> 68 Entscheidungen in 9 Kategorien
+
+### Vision & Ziele
 
 | # | Frage | Entscheidung | Begründung |
 |---|-------|--------------|------------|
 | 1 | Hauptziel | Migration vorbereiten | Schrittweise Vue 2 → Vue 3 |
+
+### Tech-Stack
+
+| # | Frage | Entscheidung | Begründung |
+|---|-------|--------------|------------|
 | 2 | Framework | Vue 3 + Vite | Modern, schnell, gute DX |
 | 3 | Dokumentation | Histoire | Vite-nativ, schneller als Storybook |
 | 4 | Styling | Tailwind + CSS Variables | Modern + Branding-kompatibel |
-| 5 | Token-System | 3-Stufen (Base/Semantic/Component) | Maximale Branding-Flexibilität |
 | 6 | Testing | Vitest | Vite-nativ, Jest-kompatibel |
-| 7 | Komponenten-Reihenfolge | Nach Bedarf | Flexibel, Token-System zuerst |
-| 8 | Paket-Format | npm Library | Wiederverwendbar |
 | 9 | Vue 2 Kompatibilität | vue-demi | Library funktioniert in beiden Vue-Versionen |
-| 10 | Migrations-Ablauf | Komponente für Komponente | Kontrolliert, schrittweise |
-| 11 | Vor-Analyse | Vollständige Analyse | Duplikate/Probleme vor Migration identifizieren |
-| 12 | Spezifikation | Detailliert vor Implementierung | Props, Varianten, A11y vorher definieren |
-| 13 | Doku-Hosting | Eigener Server | Öffentlich zugängliche Komponenten-Doku |
-| 14 | Doku-Zugang | Öffentlich | Für alle Entwickler frei zugänglich |
-| 15 | Release-Tool | release-please (Manifest) | Monorepo-kompatibel, nur packages/ui Änderungen |
 | 16 | Linting | eslint-config-it4c | TypeScript + Vue + Prettier + weitere Regeln |
+| 34 | Vue API | `<script setup>` | Composition API mit script setup |
+| 36 | Package Manager | npm | Bereits im Projekt verwendet |
+| 41 | TypeScript | strict: true | Strikte Typisierung |
+| 43 | Vue 2 Minimum | Vue 2.7 | Erforderlich für `<script setup>` Support |
+
+### Build & Distribution
+
+| # | Frage | Entscheidung | Begründung |
+|---|-------|--------------|------------|
+| 8 | Paket-Format | npm Library | Wiederverwendbar |
+| 25 | Paket-Name | @ocelot-social/ui | Unter ocelot-social npm Org |
+| 31 | Build-Strategie | Dual-Build | Tailwind Preset + Vorkompilierte CSS |
+| 32 | Lizenz | Apache 2.0 | Permissiv mit Patent-Schutz |
+| 33 | Repository | Monorepo | Ocelot-Social/packages/ui/ |
+| 42 | Ordnerstruktur | packages/ui | Monorepo-Standard, erweiterbar |
+| 44 | Dev-Linking | Nuxt Alias | LOCAL_UI=true für lokale Library |
+
+### CI/CD & Release
+
+| # | Frage | Entscheidung | Begründung |
+|---|-------|--------------|------------|
+| 15 | Release-Tool | release-please (Manifest) | Monorepo-kompatibel, nur packages/ui Änderungen |
 | 17 | CI Workflows | Lint, Test, Build | Qualitätssicherung bei jedem PR |
 | 18 | npm Publish | Automatisch bei Release | Nach release-please PR merge |
 | 19 | Doku-Deploy | Automatisch bei Release | Histoire build + deploy |
+| 45 | Release-Check | Git-basiert | Prüft unreleased UI-Änderungen vor Ocelot-Release |
+| 46 | Histoire Deploy | Webhook + Script | Server zieht und baut bei Release |
+| 50 | GitHub Workflows | 12 Workflows | Vollständige CI/CD Pipeline |
+
+### Testing & Qualität
+
+| # | Frage | Entscheidung | Begründung |
+|---|-------|--------------|------------|
 | 20 | Visual Regression | Playwright Screenshots | Visueller Vergleich bei Änderungen |
 | 21 | Accessibility | axe-core + vitest-axe | Automatische A11y-Prüfung |
 | 22 | Bundle Size | size-limit | Warnung bei Größenüberschreitung |
 | 23 | Feature Parity | Checkliste pro Komponente | Sicherstellen dass alle Features migriert |
-| 24 | Deprecation Warnings | Console Warnings | Hinweise in alter Codebase |
-| 25 | Paket-Name | @ocelot-social/ui | Unter ocelot-social npm Org |
-| 26 | Komponenten-Prefix | Os | OsButton, OsCard, etc. |
-| 27 | Browser-Support | Modern only | Letzte 2 Versionen von Chrome, Firefox, Safari, Edge |
-| 28 | SSR | Ja | Nuxt-kompatibel |
+| 37 | Test Coverage | 100% | Vollständige Testabdeckung |
+| 57 | Kompatibilitätstests | 4er-Matrix + CI | Vue 2/3 × Tailwind/CSS (siehe §18) |
+
+### Design-System & Branding
+
+| # | Frage | Entscheidung | Begründung |
+|---|-------|--------------|------------|
+| 5 | Token-System | 3-Stufen (Base/Semantic/Component) | Maximale Branding-Flexibilität |
 | 29 | Dark Mode | Ja, von Anfang an | Alle Komponenten mit Light/Dark |
 | 30 | Icons | Hybrid-Architektur | System-Icons in Library, Feature-Icons in App |
-| 31 | Build-Strategie | Dual-Build | Tailwind Preset + Vorkompilierte CSS |
-| 32 | Lizenz | Apache 2.0 | Permissiv mit Patent-Schutz |
-| 33 | Repository | Monorepo | Ocelot-Social/packages/ui/ |
-| 34 | Vue API | `<script setup>` | Composition API mit script setup |
-| 35 | Sprache | Englisch | Code, Comments, Docs |
-| 36 | Package Manager | npm | Bereits im Projekt verwendet |
-| 37 | Test Coverage | 100% | Vollständige Testabdeckung |
-| 38 | Dateinamen | PascalCase | OsButton.vue, OsCard.vue |
-| 39 | i18n | Nur Props | Keine Default-Texte in Komponenten |
-| 40 | Breakpoints | Tailwind Standard | sm, md, lg, xl, 2xl |
-| 41 | TypeScript | strict: true | Strikte Typisierung |
-| 42 | Ordnerstruktur | packages/ui | Monorepo-Standard, erweiterbar |
-| 43 | Vue 2 Minimum | Vue 2.7 | Erforderlich für `<script setup>` Support |
-| 44 | Dev-Linking | Nuxt Alias | LOCAL_UI=true für lokale Library |
-| 45 | Release-Check | Git-basiert | Prüft unreleased UI-Änderungen vor Ocelot-Release |
-| 46 | Histoire Deploy | Webhook + Script | Server zieht und baut bei Release |
-| 47 | Komponenten-Protokoll | Markdown pro Komponente | docs/components/OsButton.md |
-| 48 | Katalogisierung | KATALOG.md | Unterbrechbar, Webapp + Styleguide |
-| 49 | Fortschritt | Berechenbar | Pro Phase und Gesamt |
-| 50 | GitHub Workflows | 12 Workflows | Vollständige CI/CD Pipeline |
-| 51 | Icon-Architektur | Hybrid | ~10 System-Icons in Library, Rest in App (siehe §15) |
-| 52 | Docs-Generierung | vue-component-meta | Komponenten-Tabelle aus Code generiert |
-| 53 | Docs CI-Check | GitHub Workflow | Prüft JSDoc-Coverage und README-Aktualität |
-| 54 | Nach Migration | ARCHITECTURE.md | PROJEKT.md → ARCHITECTURE.md, KATALOG.md archivieren |
-| 55 | Komponenten-Abgrenzung | Entscheidungsbaum | Library: präsentational, Webapp: Business-Logik (siehe §17) |
-| 56 | Externe Abhängigkeiten | Dokumentiert in §18 | eslint-config-it4c muss modularisiert werden |
-| 57 | Kompatibilitätstests | 4er-Matrix + CI | Vue 2/3 × Tailwind/CSS (siehe §19) |
-| 58 | Komplexitätsanalyse | Dokumentiert in §20 | Risikofaktoren, Parallelisierbarkeit, Aufwandstreiber |
+| 51 | Icon-Architektur | Hybrid | ~10 System-Icons in Library, Rest in App (siehe §4) |
 | 59 | Size Props | Tailwind-Skala (xs, sm, md, lg, xl, 2xl) | Konsistenz mit Tailwind, intuitive Benennung |
 | 60 | Rounded Props | Tailwind-Skala (none, sm, md, lg, xl, 2xl, 3xl, full) | Konsistenz mit Tailwind border-radius |
 | 61 | Shadow Props | Tailwind-Skala (none, sm, md, lg, xl, 2xl) | Konsistenz mit Tailwind box-shadow |
@@ -693,6 +896,44 @@ Integriert:   0
 | 66 | Branding-Hierarchie | Webapp → Spezialisiertes Branding | Default-Branding in Webapp, Overrides pro Instanz |
 | 67 | Variable-Validierung | Runtime-Check in Development | `validateCssVariables()` warnt bei fehlenden Variablen |
 | 68 | Branding-Test (Webapp) | CI-Test in Webapp | Webapp testet, dass Default-Branding alle Library-Variablen definiert |
+
+### Komponenten-API & Konventionen
+
+| # | Frage | Entscheidung | Begründung |
+|---|-------|--------------|------------|
+| 26 | Komponenten-Prefix | Os | OsButton, OsCard, etc. |
+| 27 | Browser-Support | Modern only | Letzte 2 Versionen von Chrome, Firefox, Safari, Edge |
+| 28 | SSR | Ja | Nuxt-kompatibel |
+| 35 | Sprache | Englisch | Code, Comments, Docs |
+| 38 | Dateinamen | PascalCase | OsButton.vue, OsCard.vue |
+| 39 | i18n | Nur Props | Keine Default-Texte in Komponenten |
+| 40 | Breakpoints | Tailwind Standard | sm, md, lg, xl, 2xl |
+| 55 | Komponenten-Abgrenzung | Entscheidungsbaum | Library: präsentational, Webapp: Business-Logik (siehe §16) |
+
+### Dokumentation
+
+| # | Frage | Entscheidung | Begründung |
+|---|-------|--------------|------------|
+| 13 | Doku-Hosting | Eigener Server | Öffentlich zugängliche Komponenten-Doku |
+| 14 | Doku-Zugang | Öffentlich | Für alle Entwickler frei zugänglich |
+| 47 | Komponenten-Protokoll | Markdown pro Komponente | docs/components/OsButton.md |
+| 52 | Docs-Generierung | vue-component-meta | Komponenten-Tabelle aus Code generiert |
+| 53 | Docs CI-Check | GitHub Workflow | Prüft JSDoc-Coverage und README-Aktualität |
+| 54 | Nach Migration | ARCHITECTURE.md | PROJEKT.md → ARCHITECTURE.md, KATALOG.md archivieren |
+
+### Migration & Prozess
+
+| # | Frage | Entscheidung | Begründung |
+|---|-------|--------------|------------|
+| 7 | Komponenten-Reihenfolge | Nach Bedarf | Flexibel, Token-System zuerst |
+| 10 | Migrations-Ablauf | Komponente für Komponente | Kontrolliert, schrittweise |
+| 11 | Vor-Analyse | Vollständige Analyse | Duplikate/Probleme vor Migration identifizieren |
+| 12 | Spezifikation | Detailliert vor Implementierung | Props, Varianten, A11y vorher definieren |
+| 24 | Deprecation Warnings | Console Warnings | Hinweise in alter Codebase |
+| 48 | Katalogisierung | KATALOG.md | Unterbrechbar, Webapp + Styleguide |
+| 49 | Fortschritt | Berechenbar | Pro Phase und Gesamt |
+| 56 | Externe Abhängigkeiten | Dokumentiert in §17 | eslint-config-it4c muss modularisiert werden |
+| 58 | Komplexitätsanalyse | Dokumentiert in §19 | Risikofaktoren, Parallelisierbarkeit, Aufwandstreiber |
 
 ---
 
@@ -775,109 +1016,7 @@ Integriert:   0
 
 ---
 
-## 15. Icon-Architektur
-
-### Entscheidung: Hybrid-Ansatz
-
-Die Library verwendet eine **Hybrid-Architektur** für Icons:
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  @ocelot-social/ui (Library)                                │
-├─────────────────────────────────────────────────────────────┤
-│  icons/system/           # ~10 System-Icons                 │
-│  ├── close.svg           # Modal, Chip, Dialoge             │
-│  ├── check.svg           # Modal confirm, Checkboxen        │
-│  ├── chevron-down.svg    # Select, Dropdown                 │
-│  ├── chevron-up.svg      # Select, Accordion                │
-│  ├── spinner.svg         # Loading-States                   │
-│  ├── bars.svg            # Hamburger-Menu                   │
-│  ├── copy.svg            # CopyField                        │
-│  ├── eye.svg             # Password-Toggle                  │
-│  ├── eye-slash.svg       # Password-Toggle, Anonym          │
-│  └── search.svg          # Search-Input                     │
-└─────────────────────────────────────────────────────────────┘
-                            ↓
-┌─────────────────────────────────────────────────────────────┐
-│  Webapp / Konsumierendes Projekt                            │
-├─────────────────────────────────────────────────────────────┤
-│  assets/icons/           # Feature-Icons (beliebig viele)   │
-│  ├── user.svg            │
-│  ├── bell.svg            │
-│  ├── heart.svg           │
-│  ├── settings.svg        │
-│  └── ...                 │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### Begründung
-
-1. **Library muss standalone funktionieren** - Ein OsModal braucht einen Close-Button ohne zusätzliche Konfiguration
-2. **616 Icons sind zu viel** - Der Styleguide hat 616 Icons, die meisten werden nie gebraucht
-3. **Feature-Icons gehören zur App** - Icons wie `user`, `bell`, `heart` sind Business-Logik
-4. **Branding-Flexibilität** - Verschiedene Ocelot-Instanzen können unterschiedliche Icon-Sets verwenden
-
-### System-Icons (in Library enthalten)
-
-| Icon | Verwendung in Komponenten |
-|------|---------------------------|
-| `close` | OsModal, OsChip, OsDialog, OsAlert |
-| `check` | OsModal (confirm), OsCheckbox |
-| `chevron-down` | OsSelect, OsDropdown, OsAccordion |
-| `chevron-up` | OsSelect, OsAccordion |
-| `spinner` | OsButton (loading), OsSpinner |
-| `bars` | OsPage (mobile menu) |
-| `copy` | OsCopyField |
-| `eye` | OsInput (password toggle) |
-| `eye-slash` | OsInput (password toggle), OsAvatar (anonym) |
-| `search` | OsInput (search variant) |
-
-### API-Design
-
-```typescript
-// OsIcon akzeptiert verschiedene Formate:
-
-// 1. System-Icon (String) - aus Library
-<OsIcon name="close" />
-
-// 2. Vue-Komponente - für App-Icons
-<OsIcon :icon="UserIcon" />
-
-// 3. In Komponenten mit icon-Prop
-<OsButton icon="close" />           // System-Icon
-<OsButton :icon="CustomIcon" />     // Komponente
-```
-
-### Webapp-Integration
-
-```typescript
-// webapp/plugins/icons.ts
-import { provideIcons } from '@ocelot-social/ui'
-import * as appIcons from '~/assets/icons'
-
-export default defineNuxtPlugin((nuxtApp) => {
-  // App-Icons global registrieren
-  provideIcons(appIcons)
-})
-```
-
-```vue
-<!-- Dann in der Webapp nutzbar -->
-<OsButton :icon="icons.user" />
-<OsIcon :icon="icons.bell" />
-```
-
-### Aktuelle Icon-Statistik
-
-| Quelle | Anzahl | Status |
-|--------|--------|--------|
-| Styleguide (_all) | 616 | Nicht übernehmen (FontAwesome 4 komplett) |
-| Webapp (svgs) | 238 | Feature-Icons, bleiben in Webapp |
-| **Library (system)** | **~10** | Nur essenzielle System-Icons |
-
----
-
-## 16. Dokumentationsstrategie
+## 15. Dokumentationsstrategie (Details)
 
 ### Übersicht
 
@@ -1059,7 +1198,7 @@ Nach Phase 5 (Migration abgeschlossen):
 ├── CONTRIBUTING.md     # Beitragende
 ├── CHANGELOG.md        # Automatisch via release-please
 ├── docs/
-│   ├── ARCHITECTURE.md # Entscheidungen aus PROJEKT.md §2, §6, §11, §15
+│   ├── ARCHITECTURE.md # Entscheidungen aus PROJEKT.md §2, §4, §5, §11, §15, §16
 │   └── archive/        # Historische Referenz (optional)
 │       ├── PROJEKT.md
 │       └── KATALOG.md
@@ -1067,22 +1206,24 @@ Nach Phase 5 (Migration abgeschlossen):
 
 **Was wird übernommen nach ARCHITECTURE.md:**
 - §2 Tech-Stack (gekürzt)
-- §6 Token-System (Design-Token-Architektur)
+- §5 Design-Token & Branding (Token-Architektur)
 - §11 Entscheidungen (relevante, nicht Prozess-bezogene)
-- §15 Icon-Architektur
-- §16 Dokumentationsstrategie (gekürzt)
-- §17 Abgrenzung Library vs. Webapp
+- §4 Icon-Architektur
+- §9/§15 Dokumentationsstrategie (gekürzt)
+- §16 Library vs. Webapp
 
 **Was wird archiviert/gelöscht:**
-- §8 Meilensteine → erledigt
-- §9 Fortschritt → erledigt
-- §10 Aktueller Stand → erledigt
+- Fortschritt → erledigt
+- Aktueller Stand → erledigt
+- Meilensteine → erledigt
 - §12 Arbeitsprotokoll → historisch interessant, archivieren
 - KATALOG.md → nur für Migration relevant, archivieren
 
 ---
 
-## 17. Abgrenzung: Library vs. Webapp
+# ABGRENZUNGEN
+
+## 16. Library vs. Webapp
 
 ### Grundprinzip
 
@@ -1257,7 +1398,7 @@ Vor dem Erstellen einer Komponente diese Fragen beantworten:
 
 ---
 
-## 18. Externe Abhängigkeiten
+## 17. Externe Abhängigkeiten
 
 ### Übersicht
 
@@ -1321,7 +1462,7 @@ export default [
 
 ---
 
-## 19. Kompatibilitätstests (Vue 2/3 + Tailwind/CSS)
+## 18. Kompatibilitätstests (Details)
 
 ### Testmatrix
 
@@ -1596,7 +1737,7 @@ jobs:
 
 ---
 
-## 20. Komplexitätsanalyse & Risikofaktoren
+## 19. Komplexitätsanalyse
 
 ### Umfang nach Phasen
 
@@ -1667,16 +1808,3 @@ Jede Komponente durchläuft:
 | OsInput | Mittel | Validierung, States, Icons |
 | OsAvatar | Niedrig | Bild + Fallback |
 
----
-
-## Wie dieses Dokument verwendet wird
-
-**Zum Fortsetzen der Arbeit:**
-> "Lass uns am @ocelot-social/ui Projekt weiterarbeiten" (packages/ui)
-
-**Nach jeder Session aktualisieren:**
-- Abschnitt 9: "Fortschritt"
-- Abschnitt 10: "Aktueller Stand"
-- Abschnitt 12: "Arbeitsprotokoll"
-- KATALOG.md (ab Phase 0)
-- Meilenstein-Checklisten in Abschnitt 8
