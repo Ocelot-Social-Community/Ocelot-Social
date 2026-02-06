@@ -51,12 +51,13 @@ export function validateCssVariables(): void {
 
   const styles = getComputedStyle(document.documentElement)
   const missing = requiredCssVariables.filter(
-    (variable) => !styles.getPropertyValue(variable).trim()
+    (variable) => !styles.getPropertyValue(variable).trim(),
   )
 
   if (missing.length > 0) {
+    // eslint-disable-next-line no-console
     console.warn(
-      `[@ocelot-social/ui] Missing required CSS variables:\n${missing.map((v) => `  - ${v}`).join('\n')}\n\nDefine these in your app's CSS.`
+      `[@ocelot-social/ui] Missing required CSS variables:\n${missing.map((v) => `  - ${v}`).join('\n')}\n\nDefine these in your app's CSS.`,
     )
   }
 }

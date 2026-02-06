@@ -1,8 +1,10 @@
 import { describe, it, expect, vi } from 'vitest'
-import OcelotUI from './plugin'
-import * as components from './components'
 
-describe('OcelotUI Plugin', () => {
+// eslint-disable-next-line import-x/no-namespace -- needed to verify all components are registered
+import * as components from './components'
+import OcelotUI from './plugin'
+
+describe('ocelotUI Plugin', () => {
   it('has an install function', () => {
     expect(OcelotUI.install).toBeTypeOf('function')
   })
@@ -12,7 +14,7 @@ describe('OcelotUI Plugin', () => {
       component: vi.fn(),
     }
 
-    OcelotUI.install!(mockApp as never)
+    OcelotUI.install?.(mockApp as never)
 
     const componentEntries = Object.entries(components)
 
@@ -28,6 +30,8 @@ describe('OcelotUI Plugin', () => {
       component: vi.fn(),
     }
 
-    expect(() => OcelotUI.install!(mockApp as never)).not.toThrow()
+    expect(() => {
+      OcelotUI.install?.(mockApp as never)
+    }).not.toThrow()
   })
 })

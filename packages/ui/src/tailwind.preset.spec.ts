@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
+
 import { ocelotPreset, requiredCssVariables, validateCssVariables } from './tailwind.preset'
 
 describe('tailwind.preset', () => {
@@ -12,7 +13,7 @@ describe('tailwind.preset', () => {
 
   describe('requiredCssVariables', () => {
     it('exports an array', () => {
-      expect(Array.isArray(requiredCssVariables)).toBe(true)
+      expect(Array.isArray(requiredCssVariables)).toBeTruthy()
     })
 
     it('contains only strings', () => {
@@ -24,26 +25,25 @@ describe('tailwind.preset', () => {
     it('all variables start with --', () => {
       // This test validates the format constraint.
       for (const variable of requiredCssVariables) {
-        expect(variable.startsWith('--')).toBe(true)
+        expect(variable.startsWith('--')).toBeTruthy()
       }
       // Ensure test runs even with empty array
-      expect(requiredCssVariables.every((v) => v.startsWith('--'))).toBe(true)
+      expect(requiredCssVariables.every((v) => v.startsWith('--'))).toBeTruthy()
     })
   })
 
   describe('validateCssVariables', () => {
-    const originalWindow = global.window
-
     afterEach(() => {
-      global.window = originalWindow
+      vi.unstubAllGlobals()
       vi.restoreAllMocks()
     })
 
     it('does nothing when window is undefined (SSR)', () => {
-      // @ts-expect-error - simulating SSR environment
-      global.window = undefined
+      vi.stubGlobal('window', undefined)
 
-      expect(() => validateCssVariables()).not.toThrow()
+      expect(() => {
+        validateCssVariables()
+      }).not.toThrow()
     })
 
     it('does not warn when all variables are defined', () => {
@@ -82,11 +82,9 @@ describe('tailwind.preset', () => {
       validateCssVariables()
 
       expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Missing required CSS variables')
+        expect.stringContaining('Missing required CSS variables'),
       )
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('--test-variable')
-      )
+      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('--test-variable'))
 
       // Restore original state
       requiredCssVariables.length = 0

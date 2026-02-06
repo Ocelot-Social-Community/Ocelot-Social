@@ -77,13 +77,13 @@
 ```
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 2: ███░░░░░░░  33% (9/27 Aufgaben)
+Phase 2: ████░░░░░░  37% (10/27 Aufgaben)
 Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Phase 4: ░░░░░░░░░░   0% (0/17 Aufgaben)
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ███░░░░░░░  ~30% (21/71 Aufgaben)
+Gesamt:  ███░░░░░░░  ~31% (22/71 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -106,9 +106,9 @@ Integriert:   0
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-04
+**Letzte Aktualisierung:** 2026-02-07
 
-**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (33%)
+**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (37%)
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -144,18 +144,20 @@ Integriert:   0
   - Dark Mode Grundstruktur (via Tailwind dark: Prefix)
   - Prop-Types definiert (Size, Rounded, Shadow, Variant)
   - Branding-Architektur (keine Defaults, validateCssVariables)
+  - eslint-config-it4c eingerichtet (v0.8.0)
+  - ESLint Flat Config mit Vue 3 + Vitest Modulen
+  - Prettier-Integration via eslint-plugin-prettier
 
 **Aktuell in Arbeit:**
-- Phase 2: Projekt-Setup (9/27 Aufgaben erledigt)
+- Phase 2: Projekt-Setup (10/27 Aufgaben erledigt)
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
 3. **Phase 2: Projekt-Setup** - Fortsetzen mit:
-   - Tailwind CSS einrichten
    - Histoire für Dokumentation
    - GitHub Workflows
-   - LICENSE Datei
+   - Example Apps
 
 ---
 
@@ -189,7 +191,7 @@ Integriert:   0
 - [ ] Histoire für Dokumentation einrichten
 - [x] Vitest konfigurieren
 - [ ] Vitest Vue 2/3 Matrix einrichten
-- [ ] eslint-config-it4c einrichten (inkl. TypeScript, Vue, Prettier, JSDoc) ⚠️ **BLOCKED: siehe §17**
+- [x] eslint-config-it4c einrichten (v0.8.0: TypeScript, Vue 3, Vitest, Prettier)
 - [x] npm Package-Struktur (@ocelot-social/ui) mit korrekten exports
 - [ ] Build-Pipeline für Vue 2/3 Dual-Support
 - [ ] GitHub Workflows einrichten (Lint, Test, Build)
@@ -932,7 +934,7 @@ Bei der Migration werden:
 | 24 | Deprecation Warnings | Console Warnings | Hinweise in alter Codebase |
 | 48 | Katalogisierung | KATALOG.md | Unterbrechbar, Webapp + Styleguide |
 | 49 | Fortschritt | Berechenbar | Pro Phase und Gesamt |
-| 56 | Externe Abhängigkeiten | Dokumentiert in §17 | eslint-config-it4c muss modularisiert werden |
+| 56 | Externe Abhängigkeiten | ✅ Gelöst | eslint-config-it4c v0.8.0 ist modular |
 | 58 | Komplexitätsanalyse | Dokumentiert in §19 | Risikofaktoren, Parallelisierbarkeit, Aufwandstreiber |
 
 ---
@@ -976,6 +978,7 @@ Bei der Migration werden:
 | 2026-02-04 | **Tailwind v4 Setup** | @tailwindcss/vite Plugin, Dual-Build (style.css + tailwind.preset) |
 | 2026-02-04 | **Prop-Types** | src/types.d.ts mit Size, Rounded, Shadow, Variant |
 | 2026-02-04 | **Branding-Architektur** | Keine Defaults in Library, Webapp definiert Branding, validateCssVariables() |
+| 2026-02-07 | **ESLint Setup** | eslint-config-it4c v0.8.0 eingerichtet (Vue 3, Vitest, Prettier) |
 
 ---
 
@@ -1402,63 +1405,36 @@ Vor dem Erstellen einer Komponente diese Fragen beantworten:
 
 ### Übersicht
 
-Einige Aufgaben in diesem Projekt sind von externen Projekten abhängig, die zuerst angepasst werden müssen.
+| Abhängigkeit | Status | Beschreibung |
+|--------------|--------|--------------|
+| **eslint-config-it4c** | ✅ Gelöst | v0.8.0 ist modular und wurde eingebunden |
 
-| Abhängigkeit | Status | Blockiert | Beschreibung |
-|--------------|--------|-----------|--------------|
-| **eslint-config-it4c** | ⚠️ Offen | Phase 2: Linting | Paket muss modularer werden |
+### eslint-config-it4c ✅
 
-### eslint-config-it4c
+**Status:** Gelöst (2026-02-07)
 
-**Repository:** [it4c/eslint-config-it4c](https://github.com/IT4Change/eslint-config-it4c) _(vermutlich)_
+**Lösung:**
+Das Paket wurde in Version 0.8.0 modularisiert und unterstützt jetzt ESLint Flat Config.
 
-**Problem:**
-Das Paket ist aktuell nicht modular genug, um in der UI-Library eingesetzt zu werden. Es muss angepasst werden, um:
-- Einzelne Regelsets separat importierbar zu machen (TypeScript, Vue, Prettier, JSDoc)
-- Flexible Konfiguration für verschiedene Projekttypen zu ermöglichen
-- Kompatibel mit dem Flat Config Format (ESLint 9+) zu sein
-
-**Erforderliche Änderungen im externen Projekt:**
-```
-eslint-config-it4c/
-├── base.js           # Basis-Regeln
-├── typescript.js     # TypeScript-Regeln (optional)
-├── vue.js            # Vue-Regeln (optional)
-├── prettier.js       # Prettier-Integration (optional)
-├── jsdoc.js          # JSDoc-Regeln (optional)
-└── index.js          # Alles kombiniert (Vollversion)
-```
-
-**Gewünschte Nutzung in @ocelot-social/ui:**
-```javascript
-// eslint.config.js
-import baseConfig from 'eslint-config-it4c/base'
-import typescriptConfig from 'eslint-config-it4c/typescript'
-import vueConfig from 'eslint-config-it4c/vue'
-import prettierConfig from 'eslint-config-it4c/prettier'
-import jsdocConfig from 'eslint-config-it4c/jsdoc'
+**Aktuelle Nutzung in @ocelot-social/ui:**
+```typescript
+// eslint.config.ts
+import config, { vue3, vitest } from 'eslint-config-it4c'
 
 export default [
-  ...baseConfig,
-  ...typescriptConfig,
-  ...vueConfig,
-  ...prettierConfig,
-  ...jsdocConfig,
-  {
-    // Projekt-spezifische Overrides
-  }
+  ...config,    // Base + TypeScript + Prettier + weitere
+  ...vue3,      // Vue 3 Regeln
+  ...vitest,    // Vitest Test-Regeln
+  // Projekt-spezifische Overrides...
 ]
 ```
 
-**Workaround bis Abhängigkeit erfüllt:**
-- Temporär eigene ESLint-Konfiguration in packages/ui erstellen
-- Nach Modularisierung von eslint-config-it4c migrieren
-
-**Tracking:**
-- [ ] Issue in eslint-config-it4c erstellen
-- [ ] Modulare Struktur implementieren
-- [ ] Neue Version releasen
-- [ ] In @ocelot-social/ui einbinden
+**Projekt-spezifische Anpassungen:**
+- `n/file-extension-in-import`: Ausnahmen für `.css`, `.scss`, `.json`
+- `import-x/no-unassigned-import`: CSS-Imports erlaubt
+- `vitest/consistent-test-filename`: Pattern `*.spec.ts`
+- `vitest/prefer-expect-assertions`: Ausgeschaltet
+- `vitest/no-hooks`: Ausgeschaltet
 
 ---
 

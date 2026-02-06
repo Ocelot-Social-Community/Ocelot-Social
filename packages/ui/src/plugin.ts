@@ -1,5 +1,7 @@
-import type { App, Component, Plugin } from 'vue-demi'
+// eslint-disable-next-line import-x/no-namespace -- needed for dynamic component registration
 import * as components from './components'
+
+import type { App, Component, Plugin } from 'vue-demi'
 
 /**
  * Vue plugin for global component registration

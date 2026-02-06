@@ -9,7 +9,7 @@
 import './styles/index.css'
 
 // Re-export all components
-export * from './components'
+export type * from './components'
 
 // Export Vue plugin for global registration
 export { default as OcelotUI } from './plugin'

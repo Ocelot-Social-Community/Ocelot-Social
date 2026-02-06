@@ -1,9 +1,10 @@
-import { defineConfig } from 'vitest/config'
-import vue from '@vitejs/plugin-vue'
+import { resolve } from 'node:path'
+
 import tailwindcss from '@tailwindcss/vite'
+import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
 import tsconfigPaths from 'vite-tsconfig-paths'
-import { resolve } from 'path'
+import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   plugins: [
@@ -47,11 +48,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       include: ['src/**/*.{ts,vue}'],
-      exclude: [
-        'src/**/*.d.ts',
-        'src/**/*.{test,spec}.ts',
-        'src/**/index.ts',
-      ],
+      exclude: ['src/**/*.d.ts', 'src/**/*.{test,spec}.ts', 'src/**/index.ts'],
     },
   },
 })
