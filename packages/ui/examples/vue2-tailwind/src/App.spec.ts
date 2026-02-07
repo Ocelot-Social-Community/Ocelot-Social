@@ -11,6 +11,6 @@ describe('vue 2 Example App', () => {
 
   it('displays the correct heading', () => {
     const wrapper = mount(App)
-    expect(wrapper.find('h1').text()).toBe('Vue 2.7 + @ocelot-social/ui')
+    expect(wrapper.find('h1').text()).toBe('Vue 2.7 + Tailwind + @ocelot-social/ui')
   })
 })

@@ -7,7 +7,12 @@ export default [
   { ignores: ['dist/', 'node_modules/'] },
   {
     rules: {
-      'n/file-extension-in-import': ['error', 'never', { '.vue': 'always', '.json': 'always', '.css': 'always' }],
+      'n/file-extension-in-import': [
+        'error',
+        'never',
+        { '.vue': 'always', '.json': 'always', '.css': 'always' },
+      ],
+      'import-x/no-unassigned-import': ['error', { allow: ['**/*.css'] }],
     },
   },
   {

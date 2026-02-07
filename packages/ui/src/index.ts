@@ -3,10 +3,9 @@
  *
  * Vue component library for ocelot.social
  * Works with Vue 2.7+ and Vue 3
+ *
+ * Note: CSS is built separately - import '@ocelot-social/ui/style.css' in your app
  */
-
-// Import styles (extracted to style.css during build)
-import './styles/index.css'
 
 // Re-export all components
 export type * from './components'

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// Example app to verify @ocelot-social/ui works with Vue 3 + Tailwind
+  // Example app to verify @ocelot-social/ui works with Vue 3 + Tailwind
 </script>
 
 <template>

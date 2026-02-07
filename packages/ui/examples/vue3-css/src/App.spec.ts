@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import App from './App.vue'
 
-describe('vue 3 Example App', () => {
+describe('vue 3 CSS Example App', () => {
   it('mounts successfully', () => {
     const wrapper = mount(App)
     expect(wrapper.exists()).toBeTruthy()
@@ -11,6 +11,6 @@ describe('vue 3 Example App', () => {
 
   it('displays the correct heading', () => {
     const wrapper = mount(App)
-    expect(wrapper.find('h1').text()).toBe('Vue 3 + Tailwind + @ocelot-social/ui')
+    expect(wrapper.find('h1').text()).toBe('Vue 3 + CSS + @ocelot-social/ui')
   })
 })

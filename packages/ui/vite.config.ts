@@ -1,11 +1,15 @@
+import { exec } from 'node:child_process'
 import { copyFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
+import { promisify } from 'node:util'
 
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
+
+const execAsync = promisify(exec)
 
 export default defineConfig({
   plugins: [
@@ -23,6 +27,13 @@ export default defineConfig({
         await copyFile('dist/tailwind.preset.d.ts', 'dist/tailwind.preset.d.cts')
       },
     }),
+    // Build CSS separately using Tailwind CLI
+    {
+      name: 'build-css',
+      closeBundle: async () => {
+        await execAsync('npx @tailwindcss/cli -i src/styles/index.css -o dist/style.css --minify')
+      },
+    },
   ],
   build: {
     lib: {
@@ -40,7 +51,7 @@ export default defineConfig({
           vue: 'Vue',
           'vue-demi': 'VueDemi',
         },
-        assetFileNames: 'style.[ext]',
+        assetFileNames: '[name].[ext]',
       },
     },
     cssCodeSplit: false,

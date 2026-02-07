@@ -1,10 +1,10 @@
 <script lang="ts">
-import { defineComponent } from 'vue'
+  import { defineComponent } from 'vue'
 
-// Example app to verify @ocelot-social/ui works with Vue 2.7 + Tailwind
-export default defineComponent({
-  name: 'App',
-})
+  // Example app to verify @ocelot-social/ui works with Vue 2.7 + Tailwind
+  export default defineComponent({
+    name: 'App',
+  })
 </script>
 
 <template>

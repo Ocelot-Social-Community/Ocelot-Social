@@ -1,2 +1,4 @@
 @import 'tailwindcss';
-@import '@ocelot-social/ui/tailwind.preset' source('../../../src');
+
+/* Scan UI library dist for utility classes */
+@source '../../../dist/**/*.mjs';

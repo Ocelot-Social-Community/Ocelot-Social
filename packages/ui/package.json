@@ -17,6 +17,7 @@
     },
     "./style.css": "./dist/style.css",
     "./tailwind.preset": {
+      "style": "./dist/tailwind.preset.mjs",
       "import": {
         "types": "./dist/tailwind.preset.d.ts",
         "default": "./dist/tailwind.preset.mjs"
@@ -24,7 +25,8 @@
       "require": {
         "types": "./dist/tailwind.preset.d.cts",
         "default": "./dist/tailwind.preset.cjs"
-      }
+      },
+      "default": "./dist/tailwind.preset.mjs"
     }
   },
   "main": "./dist/index.cjs",
@@ -63,6 +65,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
     "@size-limit/file": "^11.2.0",
+    "@tailwindcss/cli": "^4.1.18",
     "@tailwindcss/vite": "^4.1.18",
     "@types/node": "^25.2.0",
     "@vitejs/plugin-vue": "^6.0.4",
