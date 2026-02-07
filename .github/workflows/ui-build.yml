@@ -51,8 +51,11 @@ jobs:
             "dist/index.mjs"
             "dist/index.cjs"
             "dist/index.d.ts"
+            "dist/index.d.cts"
             "dist/tailwind.preset.mjs"
             "dist/tailwind.preset.cjs"
+            "dist/tailwind.preset.d.ts"
+            "dist/tailwind.preset.d.cts"
             "dist/style.css"
           )
 
@@ -66,6 +69,9 @@ jobs:
 
           echo ""
           echo "All build outputs verified!"
+
+      - name: Validate package
+        run: npm run validate
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

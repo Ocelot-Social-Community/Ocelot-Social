@@ -6,15 +6,25 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./style.css": "./dist/style.css",
     "./tailwind.preset": {
-      "types": "./dist/tailwind.preset.d.ts",
-      "import": "./dist/tailwind.preset.mjs",
-      "require": "./dist/tailwind.preset.cjs"
+      "import": {
+        "types": "./dist/tailwind.preset.d.ts",
+        "default": "./dist/tailwind.preset.mjs"
+      },
+      "require": {
+        "types": "./dist/tailwind.preset.d.cts",
+        "default": "./dist/tailwind.preset.cjs"
+      }
     }
   },
   "main": "./dist/index.cjs",
@@ -33,11 +43,14 @@
     "typecheck": "vue-tsc --noEmit",
     "lint": "eslint --max-warnings 0 .",
     "lint:fix": "eslint --fix .",
-    "prepublishOnly": "npm run build"
+    "size": "size-limit",
+    "size:check": "size-limit --json",
+    "validate": "publint && attw --pack . --profile node16 --exclude-entrypoints ./style.css",
+    "prepublishOnly": "npm run build && npm run validate"
   },
   "peerDependencies": {
-    "vue": "^2.7.0 || ^3.0.0",
-    "tailwindcss": "^4.0.0"
+    "tailwindcss": "^4.0.0",
+    "vue": "^2.7.0 || ^3.0.0"
   },
   "peerDependenciesMeta": {
     "tailwindcss": {
@@ -48,6 +61,8 @@
     "vue-demi": "^0.14.10"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.2",
+    "@size-limit/file": "^11.2.0",
     "@tailwindcss/vite": "^4.1.18",
     "@types/node": "^25.2.0",
     "@vitejs/plugin-vue": "^6.0.4",
@@ -56,6 +71,8 @@
     "eslint": "^9.18.0",
     "eslint-config-it4c": "^0.8.0",
     "jsdom": "^28.0.0",
+    "publint": "^0.3.17",
+    "size-limit": "^11.2.0",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
@@ -70,7 +87,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Ocelot-Social-Community/Ocelot-Social.git",
+    "url": "git+https://github.com/Ocelot-Social-Community/Ocelot-Social.git",
     "directory": "packages/ui"
   },
   "bugs": {
@@ -88,5 +105,19 @@
   ],
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "size-limit": [
+    {
+      "path": "dist/index.mjs",
+      "limit": "5 kB"
+    },
+    {
+      "path": "dist/tailwind.preset.mjs",
+      "limit": "2 kB"
+    },
+    {
+      "path": "dist/style.css",
+      "limit": "10 kB"
+    }
+  ]
 }

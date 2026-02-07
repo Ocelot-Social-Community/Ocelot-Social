@@ -1,3 +1,4 @@
+import { copyFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
 import tailwindcss from '@tailwindcss/vite'
@@ -16,6 +17,11 @@ export default defineConfig({
       outDir: 'dist',
       rollupTypes: true,
       copyDtsFiles: true,
+      afterBuild: async () => {
+        // Generate .d.cts files for CJS compatibility
+        await copyFile('dist/index.d.ts', 'dist/index.d.cts')
+        await copyFile('dist/tailwind.preset.d.ts', 'dist/tailwind.preset.d.cts')
+      },
     }),
   ],
   build: {
