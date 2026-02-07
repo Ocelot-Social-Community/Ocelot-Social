@@ -1,10 +1,10 @@
 import config, { vue3, vitest } from 'eslint-config-it4c'
 
 export default [
+  { ignores: ['dist/', 'coverage/', 'storybook-static/', '**/node_modules/', 'examples/'] },
   ...config,
   ...vue3,
   ...vitest,
-  { ignores: ['dist/', 'coverage/', '**/node_modules/', 'examples/'] },
   {
     rules: {
       // Extends eslint-config-it4c rule: keep .json exception, add .css/.scss

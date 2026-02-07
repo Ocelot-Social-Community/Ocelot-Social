@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/vue3'
-
 import OsButton from './OsButton.vue'
+
+import type { Meta, StoryObj } from '@storybook/vue3'
 
 const meta: Meta<typeof OsButton> = {
   title: 'Components/OsButton',

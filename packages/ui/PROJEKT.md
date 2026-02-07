@@ -77,13 +77,13 @@
 ```
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 2: █████████░  88% (23/26 Aufgaben)
+Phase 2: █████████░  92% (24/26 Aufgaben)
 Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Phase 4: ░░░░░░░░░░   0% (0/17 Aufgaben)
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  █████░░░░░  50% (35/70 Aufgaben)
+Gesamt:  █████░░░░░  51% (36/70 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -166,23 +166,25 @@ Integriert:   0
   - cn() Utility für Tailwind-Klassen-Merge (clsx + tailwind-merge)
   - OsButton Komponente mit CVA-Varianten implementiert
   - ESLint-Konfiguration angepasst (vue/max-attributes-per-line, import-x/no-relative-parent-imports)
-  - Storybook 10 für Dokumentation eingerichtet
+  - Storybook 10 für Dokumentation eingerichtet (Greyscale-Theme)
   - OsButton.stories.ts mit allen Varianten
+  - Storybook Build-Konfiguration (viteFinal entfernt Library-Plugins)
+  - Docker Setup (Dockerfile, docker-compose, ui-docker.yml)
 
 **Aktuell in Arbeit:**
-- Phase 2: Projekt-Setup (23/26 Aufgaben erledigt)
+- Phase 2: Projekt-Setup (24/26 Aufgaben erledigt)
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
-3. **Phase 2: Projekt-Setup** - Verbleibende 3 Aufgaben:
+3. **Phase 2: Projekt-Setup** - Verbleibende 2 Aufgaben:
    - [x] CSS Custom Properties Token-System aufsetzen
    - [x] Storybook für Dokumentation einrichten
    - [x] Docker Setup (Dockerfile, docker-compose, ui-docker.yml)
    - [ ] Visual Regression Tests (Playwright)
    - [ ] Accessibility Tests (axe-core)
    - [x] Storybook Build Workflow (ui-storybook.yml)
-   - [ ] Docs-Generierung (scripts/generate-docs.ts)
+   - ~~Docs-Generierung~~ (nicht mehr nötig - Storybook autodocs)
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
 - [ ] `NPM_TOKEN` als GitHub Secret einrichten (für npm publish in ui-release.yml)
@@ -241,7 +243,7 @@ Integriert:   0
 - [x] LICENSE Datei (Apache 2.0)
 - [x] README.md Grundgerüst (Installation, Quick Start, Struktur)
 - [x] CONTRIBUTING.md
-- [ ] Docs-Generierung einrichten (scripts/generate-docs.ts)
+- ~~Docs-Generierung einrichten~~ (nicht mehr nötig - Storybook autodocs)
 
 ### Phase 3: Token-System & Basis
 - [ ] Base Tokens definieren (Farben, Spacing, Typography)
@@ -1126,6 +1128,7 @@ Bei der Migration werden:
 | 2026-02-07 | **CSS Token-System** | requiredCssVariables mit 18 Farb-Variablen (6 Farben × 3 Werte) befüllt. |
 | 2026-02-07 | **Storybook Workflow** | ui-storybook.yml für Build + Artifact Upload. |
 | 2026-02-07 | **Docker Setup** | Dockerfile (dev + prod), ui-docker.yml Workflow, docker-compose Services. |
+| 2026-02-07 | **Storybook Build Fix** | viteFinal entfernt vite-plugin-dts und build-css für Storybook-Build. Stories aus Coverage ausgeschlossen. |
 | 2026-02-04 | **Phasen umbenannt** | 0.5→1, 1→2, 2→3, 3→4, 4→5 (nur ganzzahlige Phasen) |
 | 2026-02-04 | **Dokument-Konsolidierung** | §13 Zahlen korrigiert, §14 Link entfernt, §16 Reihenfolge, Terminologie vereinheitlicht |
 | 2026-02-04 | **Komplexitätsanalyse** | §20 hinzugefügt: Risikofaktoren, Parallelisierbarkeit, Aufwandstreiber pro Komponente |

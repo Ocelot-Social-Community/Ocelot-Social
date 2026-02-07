@@ -6,9 +6,20 @@ const config: StorybookConfig = {
     name: '@storybook/vue3-vite',
     options: {},
   },
-  viteFinal: async (config) => {
-    // Ensure Vite plugins from vite.config.ts are used
-    return config
+  viteFinal(viteConfig) {
+    // Remove plugins that are only needed for library build
+    viteConfig.plugins = viteConfig.plugins?.filter((plugin) => {
+      const name = plugin && 'name' in plugin ? plugin.name : ''
+      return name !== 'vite:dts' && name !== 'build-css'
+    })
+
+    // Remove library build config
+    if (viteConfig.build) {
+      delete viteConfig.build.lib
+      delete viteConfig.build.rollupOptions
+    }
+
+    return viteConfig
   },
 }
 
