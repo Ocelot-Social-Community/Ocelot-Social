@@ -3,6 +3,8 @@ import Vue from 'vue'
 
 import App from './App.vue'
 
+import './style.css'
+
 import type { PluginObject } from 'vue'
 
 // Type assertion needed for CI where types can't be resolved from linked package

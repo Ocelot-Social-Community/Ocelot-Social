@@ -77,13 +77,13 @@
 ```
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 2: ██████░░░░  56% (15/27 Aufgaben)
+Phase 2: ██████░░░░  59% (16/27 Aufgaben)
 Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Phase 4: ░░░░░░░░░░   0% (0/17 Aufgaben)
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████░░░░░░  ~38% (27/71 Aufgaben)
+Gesamt:  ████░░░░░░  ~39% (28/71 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -108,7 +108,7 @@ Integriert:   0
 
 **Letzte Aktualisierung:** 2026-02-07
 
-**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (56%)
+**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (59%)
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -150,15 +150,16 @@ Integriert:   0
   - GitHub Workflows (ui-lint.yml, ui-test.yml, ui-build.yml)
   - 100% Test-Coverage Requirement
   - .tool-versions (Node 25.5.0, konsistent mit Dockerfiles)
-  - Example Apps (vue2-app, vue3-app) für Kompatibilitätstests
+  - Example Apps für Kompatibilitätstests (4er-Matrix)
   - GitHub Workflow ui-compatibility.yml für Vue 2/3 Tests (inkl. Lint)
   - Eigene ESLint + Prettier Configs für Example Apps
   - Type Assertions für CI-Kompatibilität (`as unknown as Plugin`)
   - Bundle Size Check (size-limit) mit ui-size.yml Workflow
   - Package-Validierung (publint, arethetypeswrong) mit CJS/ESM Types
+  - Kompatibilitätstest-Workflow mit 4 Example Apps (Vue 2/3 × Tailwind/CSS)
 
 **Aktuell in Arbeit:**
-- Phase 2: Projekt-Setup (15/27 Aufgaben erledigt)
+- Phase 2: Projekt-Setup (16/27 Aufgaben erledigt)
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
@@ -166,6 +167,7 @@ Integriert:   0
 3. **Phase 2: Projekt-Setup** - Fortsetzen mit:
    - Histoire für Dokumentation
    - Visual Regression Tests (Playwright)
+   - Accessibility Tests (axe-core)
 
 ---
 
@@ -206,8 +208,8 @@ Integriert:   0
 - [ ] Accessibility Tests einrichten (axe-core)
 - [x] Bundle Size Check einrichten (size-limit, ui-size.yml)
 - [x] Package-Validierung einrichten (publint, arethetypeswrong)
-- [x] Example Apps erstellen (vue2-app, vue3-app)
-- [ ] Kompatibilitätstest-Workflow einrichten (siehe §18)
+- [x] Example Apps erstellen (vue3-tailwind, vue3-css, vue2-tailwind, vue2-css)
+- [x] Kompatibilitätstest-Workflow einrichten (4er-Matrix, siehe §18)
 - [ ] release-please Manifest-Konfiguration
 - [ ] npm Publish Workflow
 - [ ] Histoire Deploy Workflow
@@ -994,6 +996,7 @@ Bei der Migration werden:
 | 2026-02-07 | **ESLint Examples** | Eigene eslint.config.ts + prettier.config.mjs pro Example App, Lint im Compatibility-Workflow |
 | 2026-02-07 | **Type Assertions** | `as unknown as Plugin` für CI-Kompatibilität bei verlinkten Packages |
 | 2026-02-07 | **Package-Validierung** | publint + arethetypeswrong, separate .d.cts für CJS, afterBuild Hook in vite-plugin-dts |
+| 2026-02-07 | **4er Example Apps Matrix** | vue3-tailwind, vue3-css, vue2-tailwind, vue2-css; Workflow mit Matrix-Strategie |
 
 ---
 
