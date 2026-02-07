@@ -108,20 +108,3 @@ jobs:
 
       - name: webapp | Unit tests incl. coverage check
         run: docker compose exec -T webapp yarn test
-
-  cleanup:
-    name: Cleanup
-    if: ${{ needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true' }}
-    needs: [files-changed, unit_test_webapp]
-    runs-on: ubuntu-latest
-    permissions: write-all
-    continue-on-error: true
-    steps:
-      - name: Delete cache
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh extension install actions/gh-actions-cache
-          KEY="${{ github.run_id }}-webapp-cache"
-          gh actions-cache delete $KEY -R Ocelot-Social-Community/Ocelot-Social --confirm
-

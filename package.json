@@ -43,7 +43,7 @@
     "@cucumber/cucumber": "12.6.0",
     "@cypress/webpack-preprocessor": "^7.0.2",
     "auto-changelog": "^2.5.0",
-    "cypress": "^15.9.0",
+    "cypress": "^15.10.0",
     "cypress-network-idle": "^1.15.0",
     "date-fns": "^3.6.0",
     "dotenv": "^17.2.3",
@@ -52,7 +52,7 @@
     "multiple-cucumber-html-reporter": "^3.9.3",
     "node-polyfill-webpack-plugin": "^4.1.0",
     "sass-embedded": "^1.97.3",
-    "webpack": "^5.104.1"
+    "webpack": "^5.105.0"
   },
   "optionalDependencies": {
     "@vuepress/bundler-vite": "^2.0.0-rc.18",
