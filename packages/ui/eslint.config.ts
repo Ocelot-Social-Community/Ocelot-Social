@@ -1,4 +1,5 @@
 import config, { vue3, vitest } from 'eslint-config-it4c'
+import jsdocPlugin from 'eslint-plugin-jsdoc'
 
 export default [
   { ignores: ['dist/', 'coverage/', 'storybook-static/', '**/node_modules/', 'examples/'] },
@@ -45,6 +46,39 @@ export default [
       'vitest/consistent-test-filename': ['error', { pattern: '.*\\.spec\\.[tj]sx?$' }],
       'vitest/prefer-expect-assertions': 'off',
       'vitest/no-hooks': 'off',
+    },
+  },
+  {
+    // CLI scripts - allow sync methods and console
+    files: ['scripts/**/*.ts'],
+    rules: {
+      'n/shebang': 'off',
+      'n/no-sync': 'off',
+      'no-console': 'off',
+      'security/detect-non-literal-fs-filename': 'off',
+    },
+  },
+  {
+    // Require JSDoc comments on Props interface properties
+    files: ['src/components/**/*.vue'],
+    plugins: {
+      jsdoc: jsdocPlugin,
+    },
+    rules: {
+      'jsdoc/require-jsdoc': [
+        'error',
+        {
+          contexts: ['TSPropertySignature'],
+          require: {
+            ClassDeclaration: false,
+            ClassExpression: false,
+            ArrowFunctionExpression: false,
+            FunctionDeclaration: false,
+            FunctionExpression: false,
+            MethodDefinition: false,
+          },
+        },
+      ],
     },
   },
 ]

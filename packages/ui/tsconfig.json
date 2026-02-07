@@ -35,6 +35,7 @@
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
+    "scripts/**/*.ts",
     "vite.config.ts",
     "eslint.config.ts",
     "prettier.config.ts",

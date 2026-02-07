@@ -184,7 +184,7 @@ Integriert:   0
    - [ ] Visual Regression Tests (Playwright)
    - [ ] Accessibility Tests (axe-core)
    - [x] Storybook Build Workflow (ui-storybook.yml)
-   - ~~Docs-Generierung~~ (nicht mehr nötig - Storybook autodocs)
+   - [x] Docs-Check Script (scripts/check-docs.ts, ui-docs.yml)
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
 - [ ] `NPM_TOKEN` als GitHub Secret einrichten (für npm publish in ui-release.yml)
@@ -243,7 +243,7 @@ Integriert:   0
 - [x] LICENSE Datei (Apache 2.0)
 - [x] README.md Grundgerüst (Installation, Quick Start, Struktur)
 - [x] CONTRIBUTING.md
-- ~~Docs-Generierung einrichten~~ (nicht mehr nötig - Storybook autodocs)
+- [x] Docs-Check Script (Story-Existenz, JSDoc-Props, Varianten-Abdeckung)
 
 ### Phase 3: Token-System & Basis
 - [ ] Base Tokens definieren (Farben, Spacing, Typography)
@@ -1129,6 +1129,7 @@ Bei der Migration werden:
 | 2026-02-07 | **Storybook Workflow** | ui-storybook.yml für Build + Artifact Upload. |
 | 2026-02-07 | **Docker Setup** | Dockerfile (dev + prod), ui-docker.yml Workflow, docker-compose Services. |
 | 2026-02-07 | **Storybook Build Fix** | viteFinal entfernt vite-plugin-dts und build-css für Storybook-Build. Stories aus Coverage ausgeschlossen. |
+| 2026-02-07 | **Docs-Check Script** | scripts/check-docs.ts prüft: Story-Existenz, JSDoc für Props, Varianten-Abdeckung. ui-docs.yml Workflow. |
 | 2026-02-04 | **Phasen umbenannt** | 0.5→1, 1→2, 2→3, 3→4, 4→5 (nur ganzzahlige Phasen) |
 | 2026-02-04 | **Dokument-Konsolidierung** | §13 Zahlen korrigiert, §14 Link entfernt, §16 Reihenfolge, Terminologie vereinheitlicht |
 | 2026-02-04 | **Komplexitätsanalyse** | §20 hinzugefügt: Risikofaktoren, Parallelisierbarkeit, Aufwandstreiber pro Komponente |
