@@ -77,13 +77,13 @@
 ```
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 2: ████░░░░░░  41% (11/27 Aufgaben)
+Phase 2: █████░░░░░  48% (13/27 Aufgaben)
 Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Phase 4: ░░░░░░░░░░   0% (0/17 Aufgaben)
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ███░░░░░░░  ~32% (23/71 Aufgaben)
+Gesamt:  ████░░░░░░  ~35% (25/71 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -108,7 +108,7 @@ Integriert:   0
 
 **Letzte Aktualisierung:** 2026-02-07
 
-**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (37%)
+**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (48%)
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -150,17 +150,20 @@ Integriert:   0
   - GitHub Workflows (ui-lint.yml, ui-test.yml, ui-build.yml)
   - 100% Test-Coverage Requirement
   - .tool-versions (Node 25.5.0, konsistent mit Dockerfiles)
+  - Example Apps (vue2-app, vue3-app) für Kompatibilitätstests
+  - GitHub Workflow ui-compatibility.yml für Vue 2/3 Tests (inkl. Lint)
+  - Eigene ESLint + Prettier Configs für Example Apps
+  - Type Assertions für CI-Kompatibilität (`as unknown as Plugin`)
 
 **Aktuell in Arbeit:**
-- Phase 2: Projekt-Setup (11/27 Aufgaben erledigt)
+- Phase 2: Projekt-Setup (13/27 Aufgaben erledigt)
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
 3. **Phase 2: Projekt-Setup** - Fortsetzen mit:
    - Histoire für Dokumentation
-   - Example Apps
-   - Build-Pipeline für Vue 2/3
+   - Package-Validierung (publint, arethetypeswrong)
 
 ---
 
@@ -193,16 +196,15 @@ Integriert:   0
 - [x] Dark Mode Grundstruktur (via Tailwind `dark:` Prefix, dokumentiert)
 - [ ] Histoire für Dokumentation einrichten
 - [x] Vitest konfigurieren
-- [ ] Vitest Vue 2/3 Matrix einrichten
 - [x] eslint-config-it4c einrichten (v0.8.0: TypeScript, Vue 3, Vitest, Prettier)
 - [x] npm Package-Struktur (@ocelot-social/ui) mit korrekten exports
-- [ ] Build-Pipeline für Vue 2/3 Dual-Support
-- [x] GitHub Workflows einrichten (ui-lint.yml, ui-test.yml, ui-build.yml)
+- [x] Vue 2/3 Kompatibilitätstests (via Example Apps)
+- [x] GitHub Workflows einrichten (ui-lint.yml, ui-test.yml, ui-build.yml, ui-compatibility.yml)
 - [ ] Visual Regression Tests einrichten (Playwright)
 - [ ] Accessibility Tests einrichten (axe-core)
 - [ ] Bundle Size Check einrichten (size-limit)
 - [ ] Package-Validierung einrichten (publint, arethetypeswrong)
-- [ ] Example Apps erstellen (vue3-tailwind, vue3-css, vue2-tailwind, vue2-css)
+- [x] Example Apps erstellen (vue2-app, vue3-app)
 - [ ] Kompatibilitätstest-Workflow einrichten (siehe §18)
 - [ ] release-please Manifest-Konfiguration
 - [ ] npm Publish Workflow
@@ -984,6 +986,11 @@ Bei der Migration werden:
 | 2026-02-07 | **ESLint Setup** | eslint-config-it4c v0.8.0 eingerichtet (Vue 3, Vitest, Prettier) |
 | 2026-02-07 | **GitHub Workflows** | ui-lint.yml, ui-test.yml (100% Coverage), ui-build.yml (Build + Verify) |
 | 2026-02-07 | **.tool-versions** | Node 25.5.0 zentral definiert, Workflows nutzen node-version-file |
+| 2026-02-07 | **Vue 2/3 Matrix** | vue2 + @vitejs/plugin-vue2, CI Matrix-Tests, .npmrc legacy-peer-deps |
+| 2026-02-07 | **Vue 2 Test-Strategie geändert** | Inline-Matrix entfernt (Peer-Dependency-Konflikte), Vue 2 wird via Example Apps getestet |
+| 2026-02-07 | **Example Apps erstellt** | vue2-app und vue3-app mit Vitest, ui-compatibility.yml Workflow |
+| 2026-02-07 | **ESLint Examples** | Eigene eslint.config.ts + prettier.config.mjs pro Example App, Lint im Compatibility-Workflow |
+| 2026-02-07 | **Type Assertions** | `as unknown as Plugin` für CI-Kompatibilität bei verlinkten Packages |
 
 ---
 
@@ -1435,11 +1442,12 @@ export default [
 ```
 
 **Projekt-spezifische Anpassungen:**
-- `n/file-extension-in-import`: Ausnahmen für `.css`, `.scss`, `.json`
+- `n/file-extension-in-import`: Ausnahmen für `.vue`, `.css`, `.scss`, `.json`
 - `import-x/no-unassigned-import`: CSS-Imports erlaubt
 - `vitest/consistent-test-filename`: Pattern `*.spec.ts`
 - `vitest/prefer-expect-assertions`: Ausgeschaltet
 - `vitest/no-hooks`: Ausgeschaltet
+- Example Apps: Eigene ESLint-Configs (ignoriert in Hauptpaket, gelintet im Compatibility-Workflow)
 
 ---
 
@@ -1467,22 +1475,14 @@ Abstrahiert Vue 2/3 API-Unterschiede:
 import { ref, computed, defineComponent } from 'vue-demi'
 ```
 
-#### 2. Unit Tests mit Vitest (Vue 2/3 Matrix)
+#### 2. Unit Tests mit Vitest
 
-```typescript
-// vitest.config.ts
-export default defineConfig({
-  test: {
-    alias: {
-      'vue': process.env.VUE_VERSION === '2'
-        ? 'vue2.7'
-        : 'vue'
-    }
-  }
-})
-```
+Hauptpaket testet nur mit Vue 3 (Entwicklungsumgebung).
+Vue 2 Kompatibilität wird via vue-demi gewährleistet und in Example Apps getestet.
 
-#### 3. Example Apps (4 Kombinationen)
+**Begründung:** Inline Vue 2/3 Matrix verursacht Peer-Dependency-Konflikte.
+
+#### 3. Example Apps (4 Kombinationen) - Hauptstrategie für Vue 2 Tests
 
 ```
 packages/ui/

@@ -4,9 +4,7 @@ export default [
   ...config,
   ...vue3,
   ...vitest,
-  {
-    ignores: ['dist/', 'coverage/', 'node_modules/', 'examples/'],
-  },
+  { ignores: ['dist/', 'coverage/', '**/node_modules/', 'examples/'] },
   {
     rules: {
       // Extends eslint-config-it4c rule: keep .json exception, add .css/.scss
@@ -14,6 +12,7 @@ export default [
         'error',
         'never',
         {
+          '.vue': 'always',
           '.json': 'always',
           '.css': 'always',
           '.scss': 'always',
