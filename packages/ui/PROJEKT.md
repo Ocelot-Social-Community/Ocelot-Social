@@ -77,13 +77,13 @@
 ```
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 2: ████░░░░░░  37% (10/27 Aufgaben)
+Phase 2: ████░░░░░░  41% (11/27 Aufgaben)
 Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Phase 4: ░░░░░░░░░░   0% (0/17 Aufgaben)
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ███░░░░░░░  ~31% (22/71 Aufgaben)
+Gesamt:  ███░░░░░░░  ~32% (23/71 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -147,17 +147,20 @@ Integriert:   0
   - eslint-config-it4c eingerichtet (v0.8.0)
   - ESLint Flat Config mit Vue 3 + Vitest Modulen
   - Prettier-Integration via eslint-plugin-prettier
+  - GitHub Workflows (ui-lint.yml, ui-test.yml, ui-build.yml)
+  - 100% Test-Coverage Requirement
+  - .tool-versions (Node 25.5.0, konsistent mit Dockerfiles)
 
 **Aktuell in Arbeit:**
-- Phase 2: Projekt-Setup (10/27 Aufgaben erledigt)
+- Phase 2: Projekt-Setup (11/27 Aufgaben erledigt)
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
 3. **Phase 2: Projekt-Setup** - Fortsetzen mit:
    - Histoire für Dokumentation
-   - GitHub Workflows
    - Example Apps
+   - Build-Pipeline für Vue 2/3
 
 ---
 
@@ -194,7 +197,7 @@ Integriert:   0
 - [x] eslint-config-it4c einrichten (v0.8.0: TypeScript, Vue 3, Vitest, Prettier)
 - [x] npm Package-Struktur (@ocelot-social/ui) mit korrekten exports
 - [ ] Build-Pipeline für Vue 2/3 Dual-Support
-- [ ] GitHub Workflows einrichten (Lint, Test, Build)
+- [x] GitHub Workflows einrichten (ui-lint.yml, ui-test.yml, ui-build.yml)
 - [ ] Visual Regression Tests einrichten (Playwright)
 - [ ] Accessibility Tests einrichten (axe-core)
 - [ ] Bundle Size Check einrichten (size-limit)
@@ -979,6 +982,8 @@ Bei der Migration werden:
 | 2026-02-04 | **Prop-Types** | src/types.d.ts mit Size, Rounded, Shadow, Variant |
 | 2026-02-04 | **Branding-Architektur** | Keine Defaults in Library, Webapp definiert Branding, validateCssVariables() |
 | 2026-02-07 | **ESLint Setup** | eslint-config-it4c v0.8.0 eingerichtet (Vue 3, Vitest, Prettier) |
+| 2026-02-07 | **GitHub Workflows** | ui-lint.yml, ui-test.yml (100% Coverage), ui-build.yml (Build + Verify) |
+| 2026-02-07 | **.tool-versions** | Node 25.5.0 zentral definiert, Workflows nutzen node-version-file |
 
 ---
 
