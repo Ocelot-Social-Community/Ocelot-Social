@@ -77,13 +77,13 @@
 ```
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 2: ██████░░░░  59% (16/27 Aufgaben)
+Phase 2: ███████░░░  67% (18/27 Aufgaben)
 Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Phase 4: ░░░░░░░░░░   0% (0/17 Aufgaben)
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████░░░░░░  ~39% (28/71 Aufgaben)
+Gesamt:  ████░░░░░░  ~42% (30/71 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -108,7 +108,7 @@ Integriert:   0
 
 **Letzte Aktualisierung:** 2026-02-07
 
-**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (59%)
+**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (67%)
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -157,9 +157,11 @@ Integriert:   0
   - Bundle Size Check (size-limit) mit ui-size.yml Workflow
   - Package-Validierung (publint, arethetypeswrong) mit CJS/ESM Types
   - Kompatibilitätstest-Workflow mit 4 Example Apps (Vue 2/3 × Tailwind/CSS)
+  - release-please Manifest-Konfiguration (Monorepo-Setup)
+  - npm Publish Workflow (ui-release.yml)
 
 **Aktuell in Arbeit:**
-- Phase 2: Projekt-Setup (16/27 Aufgaben erledigt)
+- Phase 2: Projekt-Setup (18/27 Aufgaben erledigt)
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
@@ -210,8 +212,8 @@ Integriert:   0
 - [x] Package-Validierung einrichten (publint, arethetypeswrong)
 - [x] Example Apps erstellen (vue3-tailwind, vue3-css, vue2-tailwind, vue2-css)
 - [x] Kompatibilitätstest-Workflow einrichten (4er-Matrix, siehe §18)
-- [ ] release-please Manifest-Konfiguration
-- [ ] npm Publish Workflow
+- [x] release-please Manifest-Konfiguration
+- [x] npm Publish Workflow (ui-release.yml)
 - [ ] Histoire Deploy Workflow
 - [x] LICENSE Datei (Apache 2.0)
 - [x] README.md Grundgerüst (Installation, Quick Start, Struktur)
@@ -997,6 +999,7 @@ Bei der Migration werden:
 | 2026-02-07 | **Type Assertions** | `as unknown as Plugin` für CI-Kompatibilität bei verlinkten Packages |
 | 2026-02-07 | **Package-Validierung** | publint + arethetypeswrong, separate .d.cts für CJS, afterBuild Hook in vite-plugin-dts |
 | 2026-02-07 | **4er Example Apps Matrix** | vue3-tailwind, vue3-css, vue2-tailwind, vue2-css; Workflow mit Matrix-Strategie |
+| 2026-02-07 | **Release & Publish** | release-please Manifest-Config, ui-release.yml Workflow mit npm publish |
 
 ---
 
