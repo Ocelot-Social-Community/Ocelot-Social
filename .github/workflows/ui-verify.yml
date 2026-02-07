@@ -1,4 +1,4 @@
-name: UI Docs
+name: UI Verify
 
 on:
   push:
@@ -15,8 +15,8 @@ defaults:
     working-directory: packages/ui
 
 jobs:
-  check:
-    name: Documentation Check
+  verify:
+    name: Completeness Check
     runs-on: ubuntu-latest
 
     steps:
@@ -33,5 +33,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Check documentation completeness
-        run: npm run docs:check
+      - name: Check component completeness
+        run: npm run verify

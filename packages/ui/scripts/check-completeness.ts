@@ -1,10 +1,11 @@
 #!/usr/bin/env npx tsx
 /**
- * Documentation completeness checker for @ocelot-social/ui
+ * Completeness checker for @ocelot-social/ui components
  *
  * Checks:
- * 1. Every component has a story file
- * 2. All variant values are demonstrated in stories
+ * 1. Every component has a story file (documentation)
+ * 2. Every component has an accessibility test file (quality)
+ * 3. All variant values are demonstrated in stories (coverage)
  *
  * Note: JSDoc comments on props are checked via ESLint (jsdoc/require-jsdoc)
  */
@@ -30,6 +31,7 @@ for (const componentPath of components) {
   const componentName = basename(componentPath, '.vue')
   const componentDir = dirname(componentPath)
   const storyPath = join(componentDir, `${componentName}.stories.ts`)
+  const a11yTestPath = join(componentDir, `${componentName}.a11y.spec.ts`)
   const variantsPath = join(
     componentDir,
     `${componentName.toLowerCase().replace('os', '')}.variants.ts`,
@@ -46,7 +48,12 @@ for (const componentPath of components) {
     result.errors.push(`Missing story file: ${storyPath}`)
   }
 
-  // Check 2: Variant values are demonstrated in stories
+  // Check 2: Accessibility test file exists
+  if (!existsSync(a11yTestPath)) {
+    result.errors.push(`Missing accessibility test file: ${a11yTestPath}`)
+  }
+
+  // Check 3: Variant values are demonstrated in stories
   if (existsSync(storyPath) && existsSync(variantsPath)) {
     const variantsContent = readFileSync(variantsPath, 'utf-8')
     const storyContent = readFileSync(storyPath, 'utf-8')
@@ -97,9 +104,9 @@ for (const componentPath of components) {
 
 // Output results
 if (results.length === 0) {
-  console.log('✓ All documentation checks passed!')
+  console.log('✓ All completeness checks passed!')
 } else {
-  console.log('Documentation check results:\n')
+  console.log('Completeness check results:\n')
 
   for (const result of results) {
     console.log(`${result.component}:`)
@@ -116,9 +123,9 @@ if (results.length === 0) {
   }
 
   if (hasErrors) {
-    console.log('Documentation check failed with errors.')
+    console.log('Completeness check failed with errors.')
     process.exit(1)
   } else {
-    console.log('Documentation check passed with warnings.')
+    console.log('Completeness check passed with warnings.')
   }
 }

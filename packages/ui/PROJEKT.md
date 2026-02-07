@@ -77,13 +77,13 @@
 ```
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 2: █████████░  92% (24/26 Aufgaben)
+Phase 2: █████████░  96% (25/26 Aufgaben)
 Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Phase 4: ░░░░░░░░░░   0% (0/17 Aufgaben)
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  █████░░░░░  51% (36/70 Aufgaben)
+Gesamt:  █████░░░░░  53% (37/70 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -170,21 +170,22 @@ Integriert:   0
   - OsButton.stories.ts mit allen Varianten
   - Storybook Build-Konfiguration (viteFinal entfernt Library-Plugins)
   - Docker Setup (Dockerfile, docker-compose, ui-docker.yml)
+  - Accessibility Tests (vitest-axe mit axe-core)
 
 **Aktuell in Arbeit:**
-- Phase 2: Projekt-Setup (24/26 Aufgaben erledigt)
+- Phase 2: Projekt-Setup (25/26 Aufgaben erledigt)
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
-3. **Phase 2: Projekt-Setup** - Verbleibende 2 Aufgaben:
+3. **Phase 2: Projekt-Setup** - Verbleibende 1 Aufgabe:
    - [x] CSS Custom Properties Token-System aufsetzen
    - [x] Storybook für Dokumentation einrichten
    - [x] Docker Setup (Dockerfile, docker-compose, ui-docker.yml)
    - [ ] Visual Regression Tests (Playwright)
-   - [ ] Accessibility Tests (axe-core)
+   - [x] Accessibility Tests (vitest-axe)
    - [x] Storybook Build Workflow (ui-storybook.yml)
-   - [x] Docs-Check Script (scripts/check-docs.ts, ui-docs.yml)
+   - [x] Completeness Check Script (scripts/check-completeness.ts, ui-verify.yml)
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
 - [ ] `NPM_TOKEN` als GitHub Secret einrichten (für npm publish in ui-release.yml)
@@ -232,7 +233,7 @@ Integriert:   0
 - [x] GitHub Workflows einrichten (ui-lint.yml, ui-test.yml, ui-build.yml, ui-compatibility.yml)
 - [x] Docker Setup (Dockerfile, docker-compose, ui-docker.yml Workflow)
 - [ ] Visual Regression Tests einrichten (Playwright)
-- [ ] Accessibility Tests einrichten (axe-core)
+- [x] Accessibility Tests einrichten (vitest-axe)
 - [x] Bundle Size Check einrichten (size-limit, ui-size.yml)
 - [x] Package-Validierung einrichten (publint, arethetypeswrong)
 - [x] Example Apps erstellen (vue3-tailwind, vue3-css, vue2-tailwind, vue2-css)
@@ -243,7 +244,7 @@ Integriert:   0
 - [x] LICENSE Datei (Apache 2.0)
 - [x] README.md Grundgerüst (Installation, Quick Start, Struktur)
 - [x] CONTRIBUTING.md
-- [x] Docs-Check Script (Story-Existenz, JSDoc-Props, Varianten-Abdeckung)
+- [x] Completeness Check Script (Story, A11y-Test, Varianten-Abdeckung)
 
 ### Phase 3: Token-System & Basis
 - [ ] Base Tokens definieren (Farben, Spacing, Typography)
@@ -1162,6 +1163,8 @@ Bei der Migration werden:
 | 2026-02-07 | **STATUS.md Konvention** | Komponenten-Status als STATUS.md im Komponenten-Ordner (Colocation statt docs/) |
 | 2026-02-07 | **OsButton STATUS.md** | Status-Datei erstellt mit Feature-Übersicht, fehlenden Features, Test-Coverage, Architektur |
 | 2026-02-07 | **CVA-Dokumentation** | §5 erweitert: CVA + Tailwind + CSS-Variablen Architektur, Branding-Überschreibbarkeit |
+| 2026-02-07 | **Accessibility Tests** | vitest-axe mit axe-core, Custom TypeScript-Declarations, OsButton a11y-Tests |
+| 2026-02-07 | **Completeness Check** | check-docs.ts → check-completeness.ts, docs:check → verify, ui-docs.yml → ui-verify.yml |
 
 ---
 
