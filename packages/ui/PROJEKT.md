@@ -77,13 +77,13 @@
 ```
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 2: ███████░░░  67% (18/27 Aufgaben)
+Phase 2: ███████░░░  70% (19/27 Aufgaben)
 Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Phase 4: ░░░░░░░░░░   0% (0/17 Aufgaben)
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████░░░░░░  ~42% (30/71 Aufgaben)
+Gesamt:  ████░░░░░░  ~44% (31/71 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -108,7 +108,7 @@ Integriert:   0
 
 **Letzte Aktualisierung:** 2026-02-07
 
-**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (67%)
+**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (70%)
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -159,9 +159,10 @@ Integriert:   0
   - Kompatibilitätstest-Workflow mit 4 Example Apps (Vue 2/3 × Tailwind/CSS)
   - release-please Manifest-Konfiguration (Monorepo-Setup)
   - npm Publish Workflow (ui-release.yml)
+  - CONTRIBUTING.md (Entwickler-Leitfaden)
 
 **Aktuell in Arbeit:**
-- Phase 2: Projekt-Setup (18/27 Aufgaben erledigt)
+- Phase 2: Projekt-Setup (19/27 Aufgaben erledigt)
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
@@ -217,7 +218,7 @@ Integriert:   0
 - [ ] Histoire Deploy Workflow
 - [x] LICENSE Datei (Apache 2.0)
 - [x] README.md Grundgerüst (Installation, Quick Start, Struktur)
-- [ ] CONTRIBUTING.md
+- [x] CONTRIBUTING.md
 - [ ] Docs-Generierung einrichten (scripts/generate-docs.ts)
 
 ### Phase 3: Token-System & Basis
@@ -1000,6 +1001,7 @@ Bei der Migration werden:
 | 2026-02-07 | **Package-Validierung** | publint + arethetypeswrong, separate .d.cts für CJS, afterBuild Hook in vite-plugin-dts |
 | 2026-02-07 | **4er Example Apps Matrix** | vue3-tailwind, vue3-css, vue2-tailwind, vue2-css; Workflow mit Matrix-Strategie |
 | 2026-02-07 | **Release & Publish** | release-please Manifest-Config, ui-release.yml Workflow mit npm publish |
+| 2026-02-07 | **CONTRIBUTING.md** | Entwickler-Leitfaden mit Setup, Komponenten-Erstellung, Code-Standards, Testing, Commits |
 
 ---
 
