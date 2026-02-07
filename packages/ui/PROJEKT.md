@@ -77,13 +77,13 @@
 ```
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 2: ████████░░  85% (22/26 Aufgaben)
+Phase 2: █████████░  88% (23/26 Aufgaben)
 Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Phase 4: ░░░░░░░░░░   0% (0/17 Aufgaben)
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  █████░░░░░  ~49% (34/70 Aufgaben)
+Gesamt:  █████░░░░░  50% (35/70 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -170,15 +170,15 @@ Integriert:   0
   - OsButton.stories.ts mit allen Varianten
 
 **Aktuell in Arbeit:**
-- Phase 2: Projekt-Setup (22/26 Aufgaben erledigt)
+- Phase 2: Projekt-Setup (23/26 Aufgaben erledigt)
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
-3. **Phase 2: Projekt-Setup** - Verbleibende 4 Aufgaben:
+3. **Phase 2: Projekt-Setup** - Verbleibende 3 Aufgaben:
    - [x] CSS Custom Properties Token-System aufsetzen
    - [x] Storybook für Dokumentation einrichten
-   - [ ] Docker Setup (Dockerfile, docker-compose)
+   - [x] Docker Setup (Dockerfile, docker-compose, ui-docker.yml)
    - [ ] Visual Regression Tests (Playwright)
    - [ ] Accessibility Tests (axe-core)
    - [x] Storybook Build Workflow (ui-storybook.yml)
@@ -228,7 +228,7 @@ Integriert:   0
 - [x] npm Package-Struktur (@ocelot-social/ui) mit korrekten exports
 - [x] Vue 2/3 Kompatibilitätstests (via Example Apps)
 - [x] GitHub Workflows einrichten (ui-lint.yml, ui-test.yml, ui-build.yml, ui-compatibility.yml)
-- [ ] Docker Setup (Dockerfile, docker-compose für lokale Entwicklung)
+- [x] Docker Setup (Dockerfile, docker-compose, ui-docker.yml Workflow)
 - [ ] Visual Regression Tests einrichten (Playwright)
 - [ ] Accessibility Tests einrichten (axe-core)
 - [x] Bundle Size Check einrichten (size-limit, ui-size.yml)
@@ -1125,6 +1125,7 @@ Bei der Migration werden:
 | 2026-02-07 | **Storybook Greyscale-Theme** | Komponenten in Graustufen - verdeutlicht, dass Farben von der App kommen, nicht von der Library. |
 | 2026-02-07 | **CSS Token-System** | requiredCssVariables mit 18 Farb-Variablen (6 Farben × 3 Werte) befüllt. |
 | 2026-02-07 | **Storybook Workflow** | ui-storybook.yml für Build + Artifact Upload. |
+| 2026-02-07 | **Docker Setup** | Dockerfile (dev + prod), ui-docker.yml Workflow, docker-compose Services. |
 | 2026-02-04 | **Phasen umbenannt** | 0.5→1, 1→2, 2→3, 3→4, 4→5 (nur ganzzahlige Phasen) |
 | 2026-02-04 | **Dokument-Konsolidierung** | §13 Zahlen korrigiert, §14 Link entfernt, §16 Reihenfolge, Terminologie vereinheitlicht |
 | 2026-02-04 | **Komplexitätsanalyse** | §20 hinzugefügt: Risikofaktoren, Parallelisierbarkeit, Aufwandstreiber pro Komponente |
