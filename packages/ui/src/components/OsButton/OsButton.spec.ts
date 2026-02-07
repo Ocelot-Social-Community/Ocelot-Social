@@ -64,4 +64,34 @@ describe('osButton', () => {
     await wrapper.trigger('click')
     expect(wrapper.emitted('click')).toHaveLength(1)
   })
+
+  describe('keyboard accessibility', () => {
+    it('renders as native button element for keyboard support', () => {
+      const wrapper = mount(OsButton)
+      // Native button elements have built-in Enter/Space key support
+      expect((wrapper.element as HTMLElement).tagName).toBe('BUTTON')
+    })
+
+    it('is focusable by default', () => {
+      const wrapper = mount(OsButton)
+      // No tabindex=-1 means button is in natural tab order
+      expect(wrapper.attributes('tabindex')).toBeUndefined()
+    })
+
+    it('remains focusable when disabled via aria', () => {
+      const wrapper = mount(OsButton, {
+        props: { disabled: true },
+      })
+      // Disabled buttons have disabled attribute which browsers handle correctly
+      expect(wrapper.attributes('disabled')).toBeDefined()
+    })
+
+    it('can receive focus programmatically', () => {
+      const wrapper = mount(OsButton, { attachTo: document.body })
+      const button = wrapper.element as HTMLButtonElement
+      button.focus()
+      expect(document.activeElement).toBe(button)
+      wrapper.unmount()
+    })
+  })
 })

@@ -4,10 +4,11 @@
  *
  * Checks:
  * 1. Every component has a story file (documentation)
- * 2. Every component has an accessibility test file (quality)
- * 3. Every component has a visual regression test file (quality)
- * 4. All variant values are demonstrated in stories (coverage)
- * 5. All stories have visual regression tests (coverage)
+ * 2. Every component has a visual regression test file (quality)
+ * 3. Visual tests include accessibility checks via checkA11y() (quality)
+ * 4. Every component has keyboard accessibility tests (quality)
+ * 5. All variant values are demonstrated in stories (coverage)
+ * 6. All stories have visual regression tests (coverage)
  *
  * Note: JSDoc comments on props are checked via ESLint (jsdoc/require-jsdoc)
  */
@@ -40,8 +41,8 @@ for (const componentPath of components) {
   const componentName = basename(componentPath, '.vue')
   const componentDir = dirname(componentPath)
   const storyPath = join(componentDir, `${componentName}.stories.ts`)
-  const a11yTestPath = join(componentDir, `${componentName}.a11y.spec.ts`)
   const visualTestPath = join(componentDir, `${componentName}.visual.spec.ts`)
+  const unitTestPath = join(componentDir, `${componentName}.spec.ts`)
   const variantsPath = join(
     componentDir,
     `${componentName.toLowerCase().replace('os', '')}.variants.ts`,
@@ -58,17 +59,30 @@ for (const componentPath of components) {
     result.errors.push(`Missing story file: ${storyPath}`)
   }
 
-  // Check 2: Accessibility test file exists
-  if (!existsSync(a11yTestPath)) {
-    result.errors.push(`Missing accessibility test file: ${a11yTestPath}`)
-  }
-
-  // Check 3: Visual regression test file exists
+  // Check 2: Visual regression test file exists
   if (!existsSync(visualTestPath)) {
     result.errors.push(`Missing visual test file: ${visualTestPath}`)
   }
 
-  // Check 4: All stories have visual regression tests
+  // Check 3: Visual tests include accessibility checks
+  if (existsSync(visualTestPath)) {
+    const visualTestContent = readFileSync(visualTestPath, 'utf-8')
+    if (!visualTestContent.includes('checkA11y(')) {
+      result.errors.push(`Missing checkA11y() calls in visual tests: ${visualTestPath}`)
+    }
+  }
+
+  // Check 4: Keyboard accessibility tests exist
+  if (existsSync(unitTestPath)) {
+    const unitTestContent = readFileSync(unitTestPath, 'utf-8')
+    if (!unitTestContent.includes("describe('keyboard accessibility'")) {
+      result.errors.push(`Missing keyboard accessibility tests in: ${unitTestPath}`)
+    }
+  } else {
+    result.errors.push(`Missing unit test file: ${unitTestPath}`)
+  }
+
+  // Check 5 & 6: Story and visual test coverage
   if (existsSync(storyPath) && existsSync(visualTestPath)) {
     const storyContent = readFileSync(storyPath, 'utf-8')
     const visualTestContent = readFileSync(visualTestPath, 'utf-8')

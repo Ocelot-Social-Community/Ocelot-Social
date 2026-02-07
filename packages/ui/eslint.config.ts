@@ -1,5 +1,9 @@
+// TODO: Update eslint-config-it4c to support ESLint 10 (currently incompatible)
 import config, { vue3, vitest } from 'eslint-config-it4c'
 import jsdocPlugin from 'eslint-plugin-jsdoc'
+import playwrightPlugin from 'eslint-plugin-playwright'
+import storybookPlugin from 'eslint-plugin-storybook'
+import vuejsAccessibilityPlugin from 'eslint-plugin-vuejs-accessibility'
 
 export default [
   {
@@ -17,8 +21,9 @@ export default [
   ...vue3,
   ...vitest,
   {
+    // TODO: Move these Vue-standard rules to eslint-config-it4c
     rules: {
-      // Extends eslint-config-it4c rule: keep .json exception, add .css/.scss
+      // TODO(it4c): Add .css/.scss to vue3 config
       'n/file-extension-in-import': [
         'error',
         'never',
@@ -29,16 +34,16 @@ export default [
           '.scss': 'always',
         },
       ],
-      // Allow CSS/SCSS side-effect imports
+      // TODO(it4c): Add CSS/SCSS exception to vue3 config
       'import-x/no-unassigned-import': [
         'error',
         {
           allow: ['**/*.css', '**/*.scss'],
         },
       ],
-      // Allow @/ alias imports (not actually relative parent imports)
+      // TODO(it4c): Disable in vue3 config (alias imports)
       'import-x/no-relative-parent-imports': 'off',
-      // Let prettier handle attribute formatting
+      // TODO(it4c): Disable in vue3 config (Prettier handles)
       'vue/max-attributes-per-line': 'off',
     },
   },
@@ -50,11 +55,14 @@ export default [
     },
   },
   {
-    // Vitest test file conventions
+    // TODO: Move these Vitest rules to eslint-config-it4c vitest config
     files: ['**/*.spec.ts', '**/*.spec.tsx'],
     rules: {
+      // TODO(it4c): Add to vitest config (standard pattern)
       'vitest/consistent-test-filename': ['error', { pattern: '.*\\.spec\\.[tj]sx?$' }],
+      // TODO(it4c): Disable in vitest config
       'vitest/prefer-expect-assertions': 'off',
+      // TODO(it4c): Disable in vitest config
       'vitest/no-hooks': 'off',
     },
   },
@@ -69,20 +77,34 @@ export default [
     },
   },
   {
-    // Playwright config and visual tests
-    files: ['playwright.config.ts', '**/*.visual.spec.ts'],
+    // Playwright visual tests
+    files: ['**/*.visual.spec.ts'],
+    ...playwrightPlugin.configs['flat/recommended'],
     rules: {
+      ...playwrightPlugin.configs['flat/recommended'].rules,
       'n/no-process-env': 'off',
       'vitest/require-hook': 'off',
     },
   },
   {
-    // Require JSDoc comments on Props interface properties
+    // Playwright config
+    files: ['playwright.config.ts'],
+    rules: {
+      'n/no-process-env': 'off',
+    },
+  },
+  // Storybook files
+  // eslint-disable-next-line import-x/no-named-as-default-member -- flat config access pattern
+  ...storybookPlugin.configs['flat/recommended'],
+  {
+    // Vue components - accessibility and JSDoc
     files: ['src/components/**/*.vue'],
     plugins: {
       jsdoc: jsdocPlugin,
+      'vuejs-accessibility': vuejsAccessibilityPlugin,
     },
     rules: {
+      // Require JSDoc comments on Props interface properties
       'jsdoc/require-jsdoc': [
         'error',
         {
@@ -97,6 +119,8 @@ export default [
           },
         },
       ],
+      // Accessibility rules
+      ...vuejsAccessibilityPlugin.configs.recommended.rules,
     },
   },
 ]

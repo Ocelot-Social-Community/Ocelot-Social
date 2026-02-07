@@ -28,7 +28,7 @@
     },
 
     /* Types */
-    "types": ["vite/client", "vitest/globals", "vitest-axe"]
+    "types": ["vite/client", "vitest/globals"]
   },
   "include": [
     "src/**/*.ts",

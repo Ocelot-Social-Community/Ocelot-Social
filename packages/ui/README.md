@@ -15,7 +15,7 @@ npm install @ocelot-social/ui
 Import only the components you need. This enables tree-shaking for smaller bundle sizes.
 
 ```ts
-import { OsButton, OsCard } from '@ocelot-social/ui'
+import { OsButton } from '@ocelot-social/ui'
 ```
 
 ```vue

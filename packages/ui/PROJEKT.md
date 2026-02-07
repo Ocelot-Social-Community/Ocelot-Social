@@ -79,11 +79,11 @@ Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
 Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
-Phase 4: ░░░░░░░░░░   0% (0/17 Aufgaben)
+Phase 4: █░░░░░░░░░   6% (1/17 Aufgaben) - OsButton ✅
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  █████░░░░░  54% (38/70 Aufgaben)
+Gesamt:  █████░░░░░  56% (39/70 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -98,7 +98,7 @@ Analyse:    ██████████ 100% (Button, Modal, Menu detailiert)
 Analysiert:   3 Familien (Button, Modal, Menu)
 Spezifiziert: 1 (OsButton)
 Entwickelt:   1 (OsButton mit CVA)
-QA bestanden: 0
+QA bestanden: 1 (OsButton: 100% Coverage, Visual, A11y, Keyboard)
 Integriert:   0
 ```
 
@@ -106,7 +106,7 @@ Integriert:   0
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-07
+**Letzte Aktualisierung:** 2026-02-08
 
 **Aktuelle Phase:** Phase 3 (Token-System & Basis) - Bereit zum Start
 
@@ -131,7 +131,7 @@ Integriert:   0
   - Webpack-Regel für ESM .mjs Module
   - **Unit-Tests: 157 Suites, 979 passed, 87 Snapshots** ✅
   - **Integrationstests: bestanden** ✅
-- [x] **Phase 2: Projekt-Setup** (in Arbeit)
+- [x] **Phase 2: Projekt-Setup** ✅
   - Vite + Vue 3 Projekt initialisiert
   - vue-demi für Vue 2/3 Kompatibilität
   - Vitest konfiguriert (integriert in vite.config.ts)
@@ -170,12 +170,12 @@ Integriert:   0
   - OsButton.stories.ts mit allen Varianten
   - Storybook Build-Konfiguration (viteFinal entfernt Library-Plugins)
   - Docker Setup (Dockerfile, docker-compose, ui-docker.yml)
-  - Accessibility Tests (vitest-axe mit axe-core)
-  - Visual Regression Tests (Playwright, colocated)
-  - Completeness Check (verify Script prüft Story, A11y, Visual, Varianten)
+  - Visual Regression Tests (Playwright, colocated) mit integriertem A11y-Check
+  - Completeness Check (verify Script prüft Story, Visual, checkA11y, Keyboard, Varianten)
+  - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 
 **Aktuell in Arbeit:**
-- Phase 2: Projekt-Setup ✅ ABGESCHLOSSEN
+- Bereit für Phase 3: Token-System & Basis
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
@@ -184,10 +184,11 @@ Integriert:   0
    - [x] CSS Custom Properties Token-System aufsetzen
    - [x] Storybook für Dokumentation einrichten
    - [x] Docker Setup (Dockerfile, docker-compose, ui-docker.yml)
-   - [x] Visual Regression Tests (Playwright, colocated)
-   - [x] Accessibility Tests (vitest-axe)
+   - [x] Visual Regression Tests (Playwright + @axe-core/playwright)
+   - [x] Keyboard Accessibility Tests
+   - [x] ESLint Plugins (storybook, playwright, vuejs-accessibility, jsdoc)
    - [x] Storybook Build Workflow (ui-storybook.yml)
-   - [x] Completeness Check Script (verify: Story, A11y, Visual, Varianten)
+   - [x] Completeness Check Script (verify: Story, Visual, checkA11y, Keyboard, Varianten)
 4. **Phase 3: Token-System & Basis** - Nächste Phase
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
@@ -236,7 +237,9 @@ Integriert:   0
 - [x] GitHub Workflows einrichten (ui-lint.yml, ui-test.yml, ui-build.yml, ui-compatibility.yml)
 - [x] Docker Setup (Dockerfile, docker-compose, ui-docker.yml Workflow)
 - [x] Visual Regression Tests einrichten (Playwright, colocated mit Komponenten)
-- [x] Accessibility Tests einrichten (vitest-axe)
+- [x] Accessibility Tests in Visual Tests integriert (@axe-core/playwright)
+- [x] Keyboard Accessibility Tests (describe('keyboard accessibility'))
+- [x] ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 - [x] Bundle Size Check einrichten (size-limit, ui-size.yml)
 - [x] Package-Validierung einrichten (publint, arethetypeswrong)
 - [x] Example Apps erstellen (vue3-tailwind, vue3-css, vue2-tailwind, vue2-css)
@@ -247,7 +250,7 @@ Integriert:   0
 - [x] LICENSE Datei (Apache 2.0)
 - [x] README.md Grundgerüst (Installation, Quick Start, Struktur)
 - [x] CONTRIBUTING.md
-- [x] Completeness Check Script (Story, A11y-Test, Visual-Test, Varianten-Abdeckung)
+- [x] Completeness Check Script (Story, Visual+checkA11y, Keyboard, Varianten)
 
 ### Phase 3: Token-System & Basis
 - [ ] Base Tokens definieren (Farben, Spacing, Typography)
@@ -263,7 +266,7 @@ Integriert:   0
 **Tier 1: Kern-Komponenten**
 - [ ] OsIcon (vereint DsIcon + BaseIcon)
 - [ ] OsSpinner (vereint DsSpinner + LoadingSpinner)
-- [ ] OsButton (vereint DsButton + BaseButton)
+- [x] OsButton (vereint DsButton + BaseButton) ✅ Entwickelt in Phase 2
 - [ ] OsCard (vereint DsCard + BaseCard)
 
 **Tier 2: Layout & Feedback**
@@ -818,7 +821,7 @@ Alle grün → Merge erlaubt
 | Maßnahme | Tool | Beschreibung |
 |----------|------|--------------|
 | **Visual Regression** | Playwright | Screenshot-Vergleiche bei Änderungen |
-| **Accessibility** | axe-core + vitest-axe | Automatische A11y-Prüfung aller Komponenten |
+| **Accessibility** | @axe-core/playwright | A11y-Prüfung integriert in Visual Tests |
 | **Bundle Size** | size-limit | Warnung wenn Library-Größe Schwellwert überschreitet |
 
 ### Migrations-Absicherung
@@ -1034,7 +1037,7 @@ Bei der Migration werden:
 | # | Frage | Entscheidung | Begründung |
 |---|-------|--------------|------------|
 | 20 | Visual Regression | Playwright Screenshots | Visueller Vergleich bei Änderungen |
-| 21 | Accessibility | axe-core + vitest-axe | Automatische A11y-Prüfung |
+| 21 | Accessibility | @axe-core/playwright | A11y integriert in Visual Tests |
 | 22 | Bundle Size | size-limit | Warnung bei Größenüberschreitung |
 | 23 | Feature Parity | Checkliste pro Komponente | Sicherstellen dass alle Features migriert |
 | 37 | Test Coverage | 100% | Vollständige Testabdeckung |
@@ -1172,6 +1175,16 @@ Bei der Migration werden:
 | 2026-02-07 | **Colocated Screenshots** | __screenshots__/ im Komponenten-Ordner statt separatem e2e/ |
 | 2026-02-07 | **Visual Test Coverage** | verify prüft ob alle Stories Visual Tests haben (--kebab-case URL) |
 | 2026-02-07 | **Phase 2 abgeschlossen** | Alle 26 Aufgaben erledigt, bereit für Phase 3 |
+| 2026-02-08 | **Keyboard Tests** | describe('keyboard accessibility') mit 4 Tests, verify prüft Existenz |
+| 2026-02-08 | **ESLint Plugins** | eslint-plugin-storybook installiert, flat/recommended Config |
+| 2026-02-08 | **A11y Konsolidierung** | vitest-axe → @axe-core/playwright, checkA11y() in Visual Tests |
+| 2026-02-08 | **Greyscale Theme WCAG** | Farben für 4.5:1 Kontrast angepasst (warning, info, secondary) |
+| 2026-02-08 | **Test-Vereinfachung** | *.a11y.spec.ts entfernt, A11y via checkA11y() in Visual Tests |
+| 2026-02-08 | **Completeness Update** | verify prüft: Story, Visual, checkA11y(), Keyboard, Varianten |
+| 2026-02-08 | **Phase 2 Konsolidierung** | Dependencies aufgeräumt (vitest-axe, axe-core entfernt) |
+| 2026-02-08 | **Projekt-Optimierung** | src/test/setup.ts entfernt, @storybook/vue3 entfernt, README.md fix |
+| 2026-02-08 | **Package Updates** | size-limit 12.0.0, eslint-plugin-jsdoc 62.5.4, vite-tsconfig-paths 6.1.0 |
+| 2026-02-08 | **TODO: eslint-config-it4c** | Muss auf ESLint 10 aktualisiert werden (aktuell inkompatibel) |
 
 ---
 
@@ -1601,11 +1614,13 @@ Vor dem Erstellen einer Komponente diese Fragen beantworten:
 
 | Abhängigkeit | Status | Beschreibung |
 |--------------|--------|--------------|
-| **eslint-config-it4c** | ✅ Gelöst | v0.8.0 ist modular und wurde eingebunden |
+| **eslint-config-it4c** | ⚠️ ESLint 10 ausstehend | v0.8.0 eingebunden, ESLint 10 inkompatibel |
 
-### eslint-config-it4c ✅
+### eslint-config-it4c
 
-**Status:** Gelöst (2026-02-07)
+**Status:** Funktional, ESLint 10 Update ausstehend
+
+**TODO:** eslint-config-it4c muss für ESLint 10 aktualisiert werden (aktuell inkompatibel wegen @typescript-eslint/utils).
 
 **Lösung:**
 Das Paket wurde in Version 0.8.0 modularisiert und unterstützt jetzt ESLint Flat Config.
