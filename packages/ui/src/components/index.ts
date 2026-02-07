@@ -7,4 +7,4 @@
  * - Registered globally when using the plugin: app.use(OcelotUI)
  */
 
-// export { default as OsButton } from './OsButton/OsButton.vue'
+export { OsButton, buttonVariants, type ButtonVariants } from './OsButton'

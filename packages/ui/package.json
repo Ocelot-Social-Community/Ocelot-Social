@@ -60,6 +60,9 @@
     }
   },
   "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.3.0",
     "vue-demi": "^0.14.10"
   },
   "devDependencies": {
@@ -112,7 +115,8 @@
   "size-limit": [
     {
       "path": "dist/index.mjs",
-      "limit": "5 kB"
+      "limit": "15 kB",
+      "brotli": true
     },
     {
       "path": "dist/tailwind.preset.mjs",

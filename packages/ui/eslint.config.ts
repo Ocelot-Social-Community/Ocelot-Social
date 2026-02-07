@@ -25,6 +25,10 @@ export default [
           allow: ['**/*.css', '**/*.scss'],
         },
       ],
+      // Allow @/ alias imports (not actually relative parent imports)
+      'import-x/no-relative-parent-imports': 'off',
+      // Let prettier handle attribute formatting
+      'vue/max-attributes-per-line': 'off',
     },
   },
   {

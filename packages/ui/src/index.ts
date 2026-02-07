@@ -8,10 +8,13 @@
  */
 
 // Re-export all components
-export type * from './components'
+export * from './components'
 
 // Export Vue plugin for global registration
 export { default as OcelotUI } from './plugin'
+
+// Export utilities
+export { cn } from './utils'
 
 // Export prop types
 export type { Size, Rounded, Shadow, Variant } from './types'

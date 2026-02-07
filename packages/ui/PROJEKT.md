@@ -77,13 +77,13 @@
 ```
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 2: ███████░░░  70% (19/27 Aufgaben)
+Phase 2: ███████░░░  73% (19/26 Aufgaben)
 Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Phase 4: ░░░░░░░░░░   0% (0/17 Aufgaben)
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████░░░░░░  ~44% (31/71 Aufgaben)
+Gesamt:  ████░░░░░░  ~44% (31/70 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -96,8 +96,8 @@ Analyse:    ██████████ 100% (Button, Modal, Menu detailiert)
 ### Komponenten-Migration (Priorisiert: 15)
 ```
 Analysiert:   3 Familien (Button, Modal, Menu)
-Spezifiziert: 0
-Entwickelt:   0
+Spezifiziert: 1 (OsButton)
+Entwickelt:   1 (OsButton mit CVA)
 QA bestanden: 0
 Integriert:   0
 ```
@@ -108,7 +108,7 @@ Integriert:   0
 
 **Letzte Aktualisierung:** 2026-02-07
 
-**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (70%)
+**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (73%)
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -160,17 +160,32 @@ Integriert:   0
   - release-please Manifest-Konfiguration (Monorepo-Setup)
   - npm Publish Workflow (ui-release.yml)
   - CONTRIBUTING.md (Entwickler-Leitfaden)
+  - Dependabot für UI-Package und Example Apps konfiguriert
+  - CSS-Build separat via Tailwind CLI (closeBundle Hook)
+  - CVA (class-variance-authority) für typsichere Varianten
+  - cn() Utility für Tailwind-Klassen-Merge (clsx + tailwind-merge)
+  - OsButton Komponente mit CVA-Varianten implementiert
+  - ESLint-Konfiguration angepasst (vue/max-attributes-per-line, import-x/no-relative-parent-imports)
 
 **Aktuell in Arbeit:**
-- Phase 2: Projekt-Setup (19/27 Aufgaben erledigt)
+- Phase 2: Projekt-Setup (19/26 Aufgaben erledigt)
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
-3. **Phase 2: Projekt-Setup** - Fortsetzen mit:
-   - Histoire für Dokumentation
-   - Visual Regression Tests (Playwright)
-   - Accessibility Tests (axe-core)
+3. **Phase 2: Projekt-Setup** - Verbleibende 7 Aufgaben:
+   - [ ] CSS Custom Properties Token-System aufsetzen
+   - [ ] Histoire für Dokumentation einrichten
+   - [ ] Docker Setup (Dockerfile, docker-compose)
+   - [ ] Visual Regression Tests (Playwright)
+   - [ ] Accessibility Tests (axe-core)
+   - [ ] Histoire Deploy Workflow
+   - [ ] Docs-Generierung (scripts/generate-docs.ts)
+
+**Manuelle Setup-Aufgaben (außerhalb Code):**
+- [ ] `NPM_TOKEN` als GitHub Secret einrichten (für npm publish in ui-release.yml)
+  - npm Token erstellen: https://www.npmjs.com/settings/ocelot-social/tokens
+  - GitHub Secret: Repository → Settings → Secrets → Actions → New secret
 
 ---
 
@@ -207,6 +222,7 @@ Integriert:   0
 - [x] npm Package-Struktur (@ocelot-social/ui) mit korrekten exports
 - [x] Vue 2/3 Kompatibilitätstests (via Example Apps)
 - [x] GitHub Workflows einrichten (ui-lint.yml, ui-test.yml, ui-build.yml, ui-compatibility.yml)
+- [ ] Docker Setup (Dockerfile, docker-compose für lokale Entwicklung)
 - [ ] Visual Regression Tests einrichten (Playwright)
 - [ ] Accessibility Tests einrichten (axe-core)
 - [x] Bundle Size Check einrichten (size-limit, ui-size.yml)
@@ -308,6 +324,8 @@ Migration vorbereiten - schrittweise neue Komponenten in Vue 3 entwickeln, die d
 | Paket-Name | **@ocelot-social/ui** | Unter ocelot-social npm Org |
 | Komponenten-Prefix | **Os** | OsButton, OsCard, etc. |
 | Vue 2 Kompatibilität | **vue-demi** | Library funktioniert in Vue 2 und Vue 3 |
+| Varianten-System | **CVA** | class-variance-authority für typsichere Prop-Varianten |
+| Klassen-Merge | **cn()** | clsx + tailwind-merge für Klassen-Kombination |
 | Linting | **eslint-config-it4c** | Enthält: TypeScript, Vue, Prettier, weitere Regeln |
 | Release | **release-please** | Automatische Versionen und Changelogs |
 | Icons | **Hybrid-Architektur** | System-Icons in Library, Feature-Icons in App (siehe §4) |
@@ -597,6 +615,108 @@ Jedes Branding kann auf jeder Ebene eingreifen:
 - Theo bleibt als Token-Quelle, generiert zusätzlich CSS Variables
 - Tailwind Theme nutzt CSS Variables: `bg-primary` → `var(--color-primary)`
 
+### CVA + Tailwind + CSS-Variablen
+
+**Wie CVA funktioniert:**
+
+CVA (Class Variance Authority) mappt Props typsicher auf Tailwind-Klassen:
+
+```typescript
+// button.variants.ts
+export const buttonVariants = cva(
+  'inline-flex items-center font-medium',  // Basis-Klassen
+  {
+    variants: {
+      variant: {
+        primary: 'bg-[var(--color-primary)] text-[var(--color-primary-contrast)]',
+        danger: 'bg-[var(--color-danger)] text-[var(--color-danger-contrast)]',
+      },
+      size: {
+        sm: 'h-8 px-3 text-sm',
+        md: 'h-10 px-4 text-base',
+      },
+    },
+    defaultVariants: { variant: 'primary', size: 'md' },
+  }
+)
+
+// Aufruf:
+buttonVariants({ variant: 'primary', size: 'sm' })
+// → 'inline-flex items-center font-medium bg-[var(--color-primary)] ... h-8 px-3 text-sm'
+```
+
+**Was ist via Branding überschreibbar?**
+
+| Ebene | Überschreibbar | Beispiel |
+|-------|----------------|----------|
+| **Farben** | ✅ Ja (CSS-Variablen) | `--color-primary`, `--color-danger` |
+| **Hover-Farben** | ✅ Ja (CSS-Variablen) | `--color-primary-hover` |
+| **Kontrast** | ✅ Ja (CSS-Variablen) | `--color-primary-contrast` |
+| **Größen** | ❌ Nein (Tailwind-Skala) | `h-10`, `px-4`, `text-base` |
+| **Abstände** | ❌ Nein (Tailwind-Skala) | `rounded-md`, `gap-2` |
+| **Einzelne Instanz** | ✅ Ja (class-Prop) | `<OsButton class="h-12" />` |
+
+**Branding-Beispiel:**
+
+```css
+/* branding/default.css */
+:root {
+  --color-primary: rgb(23, 181, 63);
+  --color-primary-contrast: rgb(255, 255, 255);
+  --color-primary-hover: rgb(18, 140, 49);
+}
+
+/* branding/yunite.css (überschreibt) */
+:root {
+  --color-primary: rgb(110, 139, 135);
+  --color-primary-contrast: rgb(255, 255, 255);
+  --color-primary-hover: rgb(90, 115, 112);
+}
+```
+
+**Die Rolle von cn() (clsx + tailwind-merge):**
+
+```typescript
+import { clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+export function cn(...inputs) {
+  return twMerge(clsx(inputs))
+}
+
+// Beispiel: Custom class überschreibt CVA-Werte
+cn('h-10 px-4', 'h-12 px-8')  // → 'h-12 px-8' (letzte gewinnt)
+```
+
+**Architektur-Übersicht:**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  CSS-Variablen (Branding-überschreibbar)                    │
+│  --color-primary, --color-danger, --color-*-hover, etc.     │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│  CVA-Varianten (nutzen CSS-Variablen)                       │
+│  bg-[var(--color-primary)], text-[var(--color-contrast)]    │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│  Tailwind-Klassen (feste Skala, konsistent)                 │
+│  h-8, h-10, h-12, px-3, px-4, rounded-md, text-sm           │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│  cn() + class-Prop (Escape-Hatch für Einzelfälle)           │
+│  <OsButton class="h-20 rounded-full" />                     │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Designentscheidung:**
+- Farben sind flexibel (Branding via CSS-Variablen)
+- Größen sind konsistent (Tailwind-Skala, nicht überschreibbar)
+- `class`-Prop erlaubt Ausnahmen für Einzelfälle
+
 ---
 
 # PROZESSE & QUALITÄT
@@ -775,18 +895,31 @@ Komponente entwickeln → Histoire Story schreiben → Build → Deploy auf Serv
 
 ### Komponenten-Protokoll
 
-Pro Komponente wird eine Dokumentationsdatei geführt:
+Pro Komponente wird eine Status-Datei **im Komponenten-Ordner** geführt (Colocation):
 
 ```
-packages/ui/docs/components/OsButton.md
+packages/ui/src/components/OsButton/
+├── OsButton.vue
+├── OsButton.spec.ts
+├── button.variants.ts
+├── index.ts
+└── STATUS.md          ← Status-Datei hier
 ```
 
 **Inhalt:**
-- Ursprung (Webapp/Styleguide/Beide)
-- Zusammengeführte Komponenten (falls vorhanden)
-- Entscheidungen und Begründungen
-- Abweichungen von Original
-- Migration History
+- Übersicht (Implementierungsstatus, Tests, A11y)
+- Implementierte Features (Props, Slots, Events)
+- Fehlende Features (aus KATALOG.md)
+- Test-Coverage
+- Architektur (Datei-Struktur, CVA-Pattern)
+- Nächste Schritte
+- Changelog
+
+**Begründung für Colocation:**
+- Status-Datei direkt beim Code auffindbar
+- Einfacher zu aktualisieren bei Änderungen
+- Kein separater docs/ Ordner notwendig
+- Folgt dem Prinzip "Code und Dokumentation zusammen"
 
 ### Qualitätsanforderungen pro Komponente
 
@@ -834,7 +967,7 @@ Bei der Migration werden:
 
 ## 11. Entscheidungen
 
-> 68 Entscheidungen in 9 Kategorien
+> 70 Entscheidungen in 9 Kategorien
 
 ### Vision & Ziele
 
@@ -856,6 +989,9 @@ Bei der Migration werden:
 | 36 | Package Manager | npm | Bereits im Projekt verwendet |
 | 41 | TypeScript | strict: true | Strikte Typisierung |
 | 43 | Vue 2 Minimum | Vue 2.7 | Erforderlich für `<script setup>` Support |
+| 69 | Varianten-System | CVA (class-variance-authority) | Typsichere Props, Composable, DX wie shadcn/ui |
+| 70 | Klassen-Utility | cn() (clsx + tailwind-merge) | Bedingte Klassen + Tailwind-Deduplizierung |
+| 71 | Komponenten-Status | STATUS.md im Komponenten-Ordner | Colocated mit Code, nicht in separatem docs/ |
 
 ### Build & Distribution
 
@@ -930,7 +1066,7 @@ Bei der Migration werden:
 |---|-------|--------------|------------|
 | 13 | Doku-Hosting | Eigener Server | Öffentlich zugängliche Komponenten-Doku |
 | 14 | Doku-Zugang | Öffentlich | Für alle Entwickler frei zugänglich |
-| 47 | Komponenten-Protokoll | Markdown pro Komponente | docs/components/OsButton.md |
+| 47 | Komponenten-Protokoll | STATUS.md im Komponenten-Ordner | Colocated: src/components/OsButton/STATUS.md |
 | 52 | Docs-Generierung | vue-component-meta | Komponenten-Tabelle aus Code generiert |
 | 53 | Docs CI-Check | GitHub Workflow | Prüft JSDoc-Coverage und README-Aktualität |
 | 54 | Nach Migration | ARCHITECTURE.md | PROJEKT.md → ARCHITECTURE.md, KATALOG.md archivieren |
@@ -1002,6 +1138,15 @@ Bei der Migration werden:
 | 2026-02-07 | **4er Example Apps Matrix** | vue3-tailwind, vue3-css, vue2-tailwind, vue2-css; Workflow mit Matrix-Strategie |
 | 2026-02-07 | **Release & Publish** | release-please Manifest-Config, ui-release.yml Workflow mit npm publish |
 | 2026-02-07 | **CONTRIBUTING.md** | Entwickler-Leitfaden mit Setup, Komponenten-Erstellung, Code-Standards, Testing, Commits |
+| 2026-02-07 | **Dependabot** | Konfiguration für UI-Package und alle 4 Example Apps hinzugefügt |
+| 2026-02-07 | **CSS-Build** | Tailwind CLI im closeBundle Hook für style.css Generierung |
+| 2026-02-07 | **CVA Setup** | class-variance-authority, clsx, tailwind-merge als Dependencies |
+| 2026-02-07 | **cn() Utility** | Tailwind-Klassen-Merge Funktion (clsx + tailwind-merge) mit Tests |
+| 2026-02-07 | **OsButton** | Erste Komponente mit CVA-Varianten (variant, size, fullWidth) implementiert |
+| 2026-02-07 | **ESLint Fixes** | vue/max-attributes-per-line off (Prettier), import-x/no-relative-parent-imports off |
+| 2026-02-07 | **STATUS.md Konvention** | Komponenten-Status als STATUS.md im Komponenten-Ordner (Colocation statt docs/) |
+| 2026-02-07 | **OsButton STATUS.md** | Status-Datei erstellt mit Feature-Übersicht, fehlenden Features, Test-Coverage, Architektur |
+| 2026-02-07 | **CVA-Dokumentation** | §5 erweitert: CVA + Tailwind + CSS-Variablen Architektur, Branding-Überschreibbarkeit |
 
 ---
 
@@ -1030,7 +1175,7 @@ Bei der Migration werden:
 
 **Tracking:**
 - Katalogisierung: `./KATALOG.md`
-- Komponenten-Docs: `./docs/components/`
+- Komponenten-Status: `./src/components/*/STATUS.md` (colocated)
 
 **Dokumentation:**
 - [Vue 3](https://vuejs.org/)
@@ -1223,11 +1368,12 @@ Nach Phase 5 (Migration abgeschlossen):
 ├── README.md           # Nutzer-Dokumentation (teilweise generiert)
 ├── CONTRIBUTING.md     # Beitragende
 ├── CHANGELOG.md        # Automatisch via release-please
-├── docs/
-│   ├── ARCHITECTURE.md # Entscheidungen aus PROJEKT.md §2, §4, §5, §11, §15, §16
-│   └── archive/        # Historische Referenz (optional)
-│       ├── PROJEKT.md
-│       └── KATALOG.md
+├── ARCHITECTURE.md     # Entscheidungen aus PROJEKT.md §2, §4, §5, §11, §15, §16
+├── src/components/*/STATUS.md  # Komponenten-Status (colocated, werden beibehalten)
+└── docs/
+    └── archive/        # Historische Referenz (optional)
+        ├── PROJEKT.md
+        └── KATALOG.md
 ```
 
 **Was wird übernommen nach ARCHITECTURE.md:**

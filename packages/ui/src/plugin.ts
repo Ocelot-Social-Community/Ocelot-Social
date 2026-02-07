@@ -15,7 +15,10 @@ import type { App, Component, Plugin } from 'vue-demi'
 const OcelotUI: Plugin = {
   install(app: App) {
     for (const [name, component] of Object.entries(components)) {
-      app.component(name, component as Component)
+      // Only register Vue components (starting with 'Os')
+      if (name.startsWith('Os')) {
+        app.component(name, component as Component)
+      }
     }
   },
 }
