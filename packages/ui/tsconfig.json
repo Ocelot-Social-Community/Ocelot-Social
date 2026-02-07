@@ -39,6 +39,7 @@
     "vite.config.ts",
     "eslint.config.ts",
     "prettier.config.ts",
+    "playwright.config.ts",
     ".storybook/**/*.ts"
   ],
   "exclude": ["node_modules", "dist"]

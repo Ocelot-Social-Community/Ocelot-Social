@@ -2,7 +2,17 @@ import config, { vue3, vitest } from 'eslint-config-it4c'
 import jsdocPlugin from 'eslint-plugin-jsdoc'
 
 export default [
-  { ignores: ['dist/', 'coverage/', 'storybook-static/', '**/node_modules/', 'examples/'] },
+  {
+    ignores: [
+      'dist/',
+      'coverage/',
+      'storybook-static/',
+      '**/node_modules/',
+      'examples/',
+      'test-results/',
+      'playwright-report/',
+    ],
+  },
   ...config,
   ...vue3,
   ...vitest,
@@ -56,6 +66,14 @@ export default [
       'n/no-sync': 'off',
       'no-console': 'off',
       'security/detect-non-literal-fs-filename': 'off',
+    },
+  },
+  {
+    // Playwright config and visual tests
+    files: ['playwright.config.ts', '**/*.visual.spec.ts'],
+    rules: {
+      'n/no-process-env': 'off',
+      'vitest/require-hook': 'off',
     },
   },
   {

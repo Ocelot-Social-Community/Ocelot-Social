@@ -77,13 +77,13 @@
 ```
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 2: █████████░  96% (25/26 Aufgaben)
+Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
 Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Phase 4: ░░░░░░░░░░   0% (0/17 Aufgaben)
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  █████░░░░░  53% (37/70 Aufgaben)
+Gesamt:  █████░░░░░  54% (38/70 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -108,7 +108,7 @@ Integriert:   0
 
 **Letzte Aktualisierung:** 2026-02-07
 
-**Aktuelle Phase:** Phase 2 (Projekt-Setup) - In Arbeit (73%)
+**Aktuelle Phase:** Phase 3 (Token-System & Basis) - Bereit zum Start
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -171,21 +171,24 @@ Integriert:   0
   - Storybook Build-Konfiguration (viteFinal entfernt Library-Plugins)
   - Docker Setup (Dockerfile, docker-compose, ui-docker.yml)
   - Accessibility Tests (vitest-axe mit axe-core)
+  - Visual Regression Tests (Playwright, colocated)
+  - Completeness Check (verify Script prüft Story, A11y, Visual, Varianten)
 
 **Aktuell in Arbeit:**
-- Phase 2: Projekt-Setup (25/26 Aufgaben erledigt)
+- Phase 2: Projekt-Setup ✅ ABGESCHLOSSEN
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
-3. **Phase 2: Projekt-Setup** - Verbleibende 1 Aufgabe:
+3. ~~**Phase 2: Projekt-Setup**~~ ✅ ABGESCHLOSSEN
    - [x] CSS Custom Properties Token-System aufsetzen
    - [x] Storybook für Dokumentation einrichten
    - [x] Docker Setup (Dockerfile, docker-compose, ui-docker.yml)
-   - [ ] Visual Regression Tests (Playwright)
+   - [x] Visual Regression Tests (Playwright, colocated)
    - [x] Accessibility Tests (vitest-axe)
    - [x] Storybook Build Workflow (ui-storybook.yml)
-   - [x] Completeness Check Script (scripts/check-completeness.ts, ui-verify.yml)
+   - [x] Completeness Check Script (verify: Story, A11y, Visual, Varianten)
+4. **Phase 3: Token-System & Basis** - Nächste Phase
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
 - [ ] `NPM_TOKEN` als GitHub Secret einrichten (für npm publish in ui-release.yml)
@@ -218,7 +221,7 @@ Integriert:   0
 - [x] Tests durchführen: **157 Suites, 979 passed, 87 Snapshots** ✅
 - [x] Regressionstests (`yarn dev` und manuelle Prüfung) ✅
 
-### Phase 2: Projekt-Setup
+### Phase 2: Projekt-Setup ✅
 - [x] Vite + Vue 3 Projekt initialisieren
 - [x] vue-demi einrichten für Vue 2 Kompatibilität
 - [x] Tailwind CSS einrichten (v4 mit @tailwindcss/vite)
@@ -232,7 +235,7 @@ Integriert:   0
 - [x] Vue 2/3 Kompatibilitätstests (via Example Apps)
 - [x] GitHub Workflows einrichten (ui-lint.yml, ui-test.yml, ui-build.yml, ui-compatibility.yml)
 - [x] Docker Setup (Dockerfile, docker-compose, ui-docker.yml Workflow)
-- [ ] Visual Regression Tests einrichten (Playwright)
+- [x] Visual Regression Tests einrichten (Playwright, colocated mit Komponenten)
 - [x] Accessibility Tests einrichten (vitest-axe)
 - [x] Bundle Size Check einrichten (size-limit, ui-size.yml)
 - [x] Package-Validierung einrichten (publint, arethetypeswrong)
@@ -244,7 +247,7 @@ Integriert:   0
 - [x] LICENSE Datei (Apache 2.0)
 - [x] README.md Grundgerüst (Installation, Quick Start, Struktur)
 - [x] CONTRIBUTING.md
-- [x] Completeness Check Script (Story, A11y-Test, Varianten-Abdeckung)
+- [x] Completeness Check Script (Story, A11y-Test, Visual-Test, Varianten-Abdeckung)
 
 ### Phase 3: Token-System & Basis
 - [ ] Base Tokens definieren (Farben, Spacing, Typography)
@@ -1165,6 +1168,10 @@ Bei der Migration werden:
 | 2026-02-07 | **CVA-Dokumentation** | §5 erweitert: CVA + Tailwind + CSS-Variablen Architektur, Branding-Überschreibbarkeit |
 | 2026-02-07 | **Accessibility Tests** | vitest-axe mit axe-core, Custom TypeScript-Declarations, OsButton a11y-Tests |
 | 2026-02-07 | **Completeness Check** | check-docs.ts → check-completeness.ts, docs:check → verify, ui-docs.yml → ui-verify.yml |
+| 2026-02-07 | **Visual Regression Tests** | Playwright mit colocated Tests (*.visual.spec.ts), ui-visual.yml Workflow |
+| 2026-02-07 | **Colocated Screenshots** | __screenshots__/ im Komponenten-Ordner statt separatem e2e/ |
+| 2026-02-07 | **Visual Test Coverage** | verify prüft ob alle Stories Visual Tests haben (--kebab-case URL) |
+| 2026-02-07 | **Phase 2 abgeschlossen** | Alle 26 Aufgaben erledigt, bereit für Phase 3 |
 
 ---
 
