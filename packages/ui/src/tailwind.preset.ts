@@ -29,8 +29,30 @@ import type { Config } from 'tailwindcss'
  * This list grows as components are added to the library.
  */
 export const requiredCssVariables: string[] = [
-  // Currently empty - will be populated as components are added
-  // Example: '--color-primary', '--color-primary-hover', '--color-primary-contrast'
+  // Primary
+  '--color-primary',
+  '--color-primary-hover',
+  '--color-primary-contrast',
+  // Secondary
+  '--color-secondary',
+  '--color-secondary-hover',
+  '--color-secondary-contrast',
+  // Danger
+  '--color-danger',
+  '--color-danger-hover',
+  '--color-danger-contrast',
+  // Warning
+  '--color-warning',
+  '--color-warning-hover',
+  '--color-warning-contrast',
+  // Success
+  '--color-success',
+  '--color-success-hover',
+  '--color-success-contrast',
+  // Info
+  '--color-info',
+  '--color-info-hover',
+  '--color-info-contrast',
 ]
 
 /**

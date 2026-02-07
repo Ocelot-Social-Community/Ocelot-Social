@@ -37,7 +37,8 @@
     "src/**/*.vue",
     "vite.config.ts",
     "eslint.config.ts",
-    "prettier.config.ts"
+    "prettier.config.ts",
+    ".storybook/**/*.ts"
   ],
   "exclude": ["node_modules", "dist"]
 }

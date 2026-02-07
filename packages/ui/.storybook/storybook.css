@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+/* Greyscale theme for Storybook - demonstrates that colors come from the app */
+:root {
+  --color-primary: #404040;
+  --color-primary-hover: #262626;
+  --color-primary-contrast: #ffffff;
+
+  --color-secondary: #737373;
+  --color-secondary-hover: #525252;
+  --color-secondary-contrast: #ffffff;
+
+  --color-danger: #525252;
+  --color-danger-hover: #404040;
+  --color-danger-contrast: #ffffff;
+
+  --color-warning: #a3a3a3;
+  --color-warning-hover: #737373;
+  --color-warning-contrast: #000000;
+
+  --color-success: #6b6b6b;
+  --color-success-hover: #525252;
+  --color-success-contrast: #ffffff;
+
+  --color-info: #8b8b8b;
+  --color-info-hover: #6b6b6b;
+  --color-info-contrast: #ffffff;
+}

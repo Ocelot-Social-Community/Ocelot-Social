@@ -18,8 +18,8 @@ Thumbs.db
 # Test coverage
 coverage/
 
-# Histoire
-.histoire/
+# Storybook
+storybook-static/
 
 # Logs
 *.log

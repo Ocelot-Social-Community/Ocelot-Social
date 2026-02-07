@@ -77,13 +77,13 @@
 ```
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
-Phase 2: ███████░░░  73% (19/26 Aufgaben)
+Phase 2: ████████░░  85% (22/26 Aufgaben)
 Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Phase 4: ░░░░░░░░░░   0% (0/17 Aufgaben)
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████░░░░░░  ~44% (31/70 Aufgaben)
+Gesamt:  █████░░░░░  ~49% (34/70 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -166,26 +166,32 @@ Integriert:   0
   - cn() Utility für Tailwind-Klassen-Merge (clsx + tailwind-merge)
   - OsButton Komponente mit CVA-Varianten implementiert
   - ESLint-Konfiguration angepasst (vue/max-attributes-per-line, import-x/no-relative-parent-imports)
+  - Storybook 10 für Dokumentation eingerichtet
+  - OsButton.stories.ts mit allen Varianten
 
 **Aktuell in Arbeit:**
-- Phase 2: Projekt-Setup (19/26 Aufgaben erledigt)
+- Phase 2: Projekt-Setup (22/26 Aufgaben erledigt)
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
-3. **Phase 2: Projekt-Setup** - Verbleibende 7 Aufgaben:
-   - [ ] CSS Custom Properties Token-System aufsetzen
-   - [ ] Histoire für Dokumentation einrichten
+3. **Phase 2: Projekt-Setup** - Verbleibende 4 Aufgaben:
+   - [x] CSS Custom Properties Token-System aufsetzen
+   - [x] Storybook für Dokumentation einrichten
    - [ ] Docker Setup (Dockerfile, docker-compose)
    - [ ] Visual Regression Tests (Playwright)
    - [ ] Accessibility Tests (axe-core)
-   - [ ] Histoire Deploy Workflow
+   - [x] Storybook Build Workflow (ui-storybook.yml)
    - [ ] Docs-Generierung (scripts/generate-docs.ts)
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
 - [ ] `NPM_TOKEN` als GitHub Secret einrichten (für npm publish in ui-release.yml)
   - npm Token erstellen: https://www.npmjs.com/settings/ocelot-social/tokens
   - GitHub Secret: Repository → Settings → Secrets → Actions → New secret
+- [ ] Storybook auf externem Host deployen (via Webhook)
+  - Server einrichten für Storybook-Hosting
+  - Webhook-Endpoint erstellen (zieht + baut bei Release)
+  - GitHub Webhook konfigurieren (trigger bei Release)
 
 ---
 
@@ -214,9 +220,9 @@ Integriert:   0
 - [x] vue-demi einrichten für Vue 2 Kompatibilität
 - [x] Tailwind CSS einrichten (v4 mit @tailwindcss/vite)
 - [x] Dual-Build konfigurieren (Tailwind Preset + vorkompilierte CSS)
-- [ ] CSS Custom Properties Token-System aufsetzen (Infrastruktur bereit, Tokens folgen mit Komponenten)
+- [x] CSS Custom Properties Token-System aufsetzen (requiredCssVariables + validateCssVariables)
 - [x] Dark Mode Grundstruktur (via Tailwind `dark:` Prefix, dokumentiert)
-- [ ] Histoire für Dokumentation einrichten
+- [x] Storybook für Dokumentation einrichten
 - [x] Vitest konfigurieren
 - [x] eslint-config-it4c einrichten (v0.8.0: TypeScript, Vue 3, Vitest, Prettier)
 - [x] npm Package-Struktur (@ocelot-social/ui) mit korrekten exports
@@ -231,7 +237,7 @@ Integriert:   0
 - [x] Kompatibilitätstest-Workflow einrichten (4er-Matrix, siehe §18)
 - [x] release-please Manifest-Konfiguration
 - [x] npm Publish Workflow (ui-release.yml)
-- [ ] Histoire Deploy Workflow
+- [x] Storybook Build Workflow (ui-storybook.yml)
 - [x] LICENSE Datei (Apache 2.0)
 - [x] README.md Grundgerüst (Installation, Quick Start, Struktur)
 - [x] CONTRIBUTING.md
@@ -243,8 +249,8 @@ Integriert:   0
 - [ ] Component Tokens definieren
 - [ ] Branding-System implementieren (CSS Variables)
 - [ ] Beispiel-Branding erstellen (Standard + Yunite)
-- [ ] Histoire Theme-Farben anpassen (ocelot.social Branding)
-- [ ] Token-Dokumentation in Histoire
+- [ ] Storybook Theme-Farben anpassen (ocelot.social Branding)
+- [ ] Token-Dokumentation in Storybook
 
 ### Phase 4: Komponenten-Migration (15 Komponenten + 2 Infrastruktur)
 
@@ -318,7 +324,7 @@ Migration vorbereiten - schrittweise neue Komponenten in Vue 3 entwickeln, die d
 |------------|--------------|---------|
 | Framework | **Vue 3 + Vite** | Schnellstes Setup, modernes Tooling |
 | Build-Tool | **Vite** | Schnelles HMR, einfache Konfiguration |
-| Dokumentation | **Histoire** | Vite-native Storybook-Alternative |
+| Dokumentation | **Storybook 10** | Komponenten-Dokumentation mit Vue 3 + Vite |
 | Styling | **Tailwind CSS** | Mit CSS Custom Properties für Branding |
 | Testing | **Vitest** | Vite-nativ, Jest-kompatible API |
 | Paket-Name | **@ocelot-social/ui** | Unter ocelot-social npm Org |
@@ -737,7 +743,7 @@ cn('h-10 px-4', 'h-12 px-8')  // → 'h-12 px-8' (letzte gewinnt)
 │  1. Commit mit Conventional Commits Format                      │
 │  2. release-please erstellt Release-PR                          │
 │  3. PR merge → Version bump + Changelog                         │
-│  4. Automatisch: npm publish + Histoire deploy                  │
+│  4. Automatisch: npm publish + Storybook deploy                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -753,7 +759,7 @@ cn('h-10 px-4', 'h-12 px-8')  // → 'h-12 px-8' (letzte gewinnt)
 | **Test** | Push/PR | Vitest Unit-Tests |
 | **Build** | Push/PR | Vite Build verifizieren |
 | **Release** | Push to main | release-please PR erstellen |
-| **Publish** | Release created | npm publish + Histoire deploy |
+| **Publish** | Release created | npm publish + Storybook deploy |
 
 ### Qualitätssicherung bei PRs
 
@@ -776,9 +782,9 @@ Alle grün → Merge erlaubt
 | Event | Aktion |
 |-------|--------|
 | Release erstellt | npm publish |
-| Release erstellt | Histoire build + deploy auf Server |
+| Release erstellt | Storybook build + deploy auf Server |
 
-**Histoire Deploy (Webhook):**
+**Storybook Deploy (Webhook):**
 1. GitHub sendet Webhook bei Release-Event
 2. Server empfängt Webhook
 3. Server führt `scripts/deploy-histoire.sh` aus (Teil des Repos)
@@ -794,11 +800,11 @@ Alle grün → Merge erlaubt
 | **test-a11y** | Push/PR | axe-core | Accessibility-Tests |
 | **test-visual** | Push/PR | Playwright | Visual Regression Screenshots |
 | **build** | Push/PR | Vite | Build verifizieren |
-| **build-histoire** | Push/PR | Histoire | Dokumentation bauen |
+| **build-histoire** | Push/PR | Storybook | Dokumentation bauen |
 | **size-check** | Push/PR | size-limit | Bundle-Größe prüfen |
 | **release** | Push main | release-please | Release-PR erstellen |
 | **publish** | Release | npm | Auf npm veröffentlichen |
-| **deploy-docs** | Release | Webhook | Histoire auf Server deployen |
+| **deploy-docs** | Release | Webhook | Storybook auf Server deployen |
 | **check-ui-release** | Ocelot Release | Git | Prüft unreleased UI-Änderungen |
 
 ### Erweiterte Qualitätssicherung
@@ -839,9 +845,9 @@ if (process.env.NODE_ENV === 'development') {
 
 ## 7. Dokumentation & DX
 
-### Histoire als Komponenten-Dokumentation
+### Storybook als Komponenten-Dokumentation
 
-Die Komponenten werden über Histoire dokumentiert und auf einer öffentlichen Webseite für Entwickler zugänglich gemacht.
+Die Komponenten werden über Storybook dokumentiert und auf einer öffentlichen Webseite für Entwickler zugänglich gemacht.
 
 **Features für Entwickler:**
 - Interaktive Playgrounds zum Ausprobieren
@@ -857,7 +863,7 @@ Die Komponenten werden über Histoire dokumentiert und auf einer öffentlichen W
 
 **Workflow:**
 ```
-Komponente entwickeln → Histoire Story schreiben → Build → Deploy auf Server
+Komponente entwickeln → Storybook Story schreiben → Build → Deploy auf Server
 ```
 
 ---
@@ -873,7 +879,7 @@ Komponente entwickeln → Histoire Story schreiben → Build → Deploy auf Serv
 │  1. Library vollständig in Vue 3 schreiben                      │
 │  2. vue-demi für Vue 2 Kompatibilität                           │
 │  3. Komponente für Komponente migrieren                         │
-│  4. Jede Komponente: vollständig getestet + in Histoire         │
+│  4. Jede Komponente: vollständig getestet + in Storybook         │
 │  5. Nach Migration: Duplikate entfernen, Varianten konsolidieren│
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -886,7 +892,7 @@ Komponente entwickeln → Histoire Story schreiben → Build → Deploy auf Serv
 ├──────────────┤    ├──────────────┤    ├──────────────┤    ├──────────────┤    ├──────────────┤
 │ Bestehende   │    │ Props        │    │ Vue 3 Code   │    │ Alle Tests   │    │ In Vue 2     │
 │ Varianten    │    │ Varianten    │    │ Unit Tests   │    │ grün         │    │ Projekt      │
-│ identifiz.   │    │ Zustände     │    │ Histoire     │    │ Visual Regr. │    │ einbinden    │
+│ identifiz.   │    │ Zustände     │    │ Storybook     │    │ Visual Regr. │    │ einbinden    │
 │ Duplikate    │    │ A11y         │    │ Stories      │    │ A11y Check   │    │              │
 │ finden       │    │ Tokens       │    │              │    │ Review       │    │ Alte Komp.   │
 │              │    │              │    │              │    │              │    │ entfernen    │
@@ -926,7 +932,7 @@ packages/ui/src/components/OsButton/
 | Anforderung | Beschreibung |
 |-------------|--------------|
 | **Vollständig getestet** | Unit-Tests für alle Props, Varianten, Edge-Cases |
-| **Histoire Stories** | Alle Varianten und Zustände dokumentiert |
+| **Storybook Stories** | Alle Varianten und Zustände dokumentiert |
 | **Detaillierte Spec** | Props, Events, Slots, A11y vor Implementierung definiert |
 | **Token-basiert** | Nutzt ausschließlich Design Tokens, keine hardcoded Werte |
 | **Vue 2 kompatibel** | Funktioniert via vue-demi im bestehenden Projekt |
@@ -947,7 +953,7 @@ Bei der Migration werden:
 ## 9. Dokumentationsstrategie
 
 > Siehe ausführliche Version in §15 Dokumentationsstrategie (Details).
-> Kurzzusammenfassung: Generierte Docs (vue-component-meta) + Manuell (Histoire).
+> Kurzzusammenfassung: Generierte Docs (vue-component-meta) + Manuell (Storybook).
 
 ---
 
@@ -980,7 +986,7 @@ Bei der Migration werden:
 | # | Frage | Entscheidung | Begründung |
 |---|-------|--------------|------------|
 | 2 | Framework | Vue 3 + Vite | Modern, schnell, gute DX |
-| 3 | Dokumentation | Histoire | Vite-nativ, schneller als Storybook |
+| 3 | Dokumentation | Storybook 10 | Storybook 1.0-beta hängt mit Tailwind v4 + Node 25, Storybook funktioniert sofort |
 | 4 | Styling | Tailwind + CSS Variables | Modern + Branding-kompatibel |
 | 6 | Testing | Vitest | Vite-nativ, Jest-kompatibel |
 | 9 | Vue 2 Kompatibilität | vue-demi | Library funktioniert in beiden Vue-Versionen |
@@ -1012,9 +1018,9 @@ Bei der Migration werden:
 | 15 | Release-Tool | release-please (Manifest) | Monorepo-kompatibel, nur packages/ui Änderungen |
 | 17 | CI Workflows | Lint, Test, Build | Qualitätssicherung bei jedem PR |
 | 18 | npm Publish | Automatisch bei Release | Nach release-please PR merge |
-| 19 | Doku-Deploy | Automatisch bei Release | Histoire build + deploy |
+| 19 | Doku-Deploy | Automatisch bei Release | storybook build + deploy |
 | 45 | Release-Check | Git-basiert | Prüft unreleased UI-Änderungen vor Ocelot-Release |
-| 46 | Histoire Deploy | Webhook + Script | Server zieht und baut bei Release |
+| 46 | Storybook Deploy | Webhook + Script | Server zieht und baut bei Release |
 | 50 | GitHub Workflows | 12 Workflows | Vollständige CI/CD Pipeline |
 
 ### Testing & Qualität
@@ -1094,7 +1100,7 @@ Bei der Migration werden:
 | 2026-02-04 | Projektstart | Ordner und Planungsdokument erstellt |
 | 2026-02-04 | Tech-Stack Entscheidungen | Alle Kernentscheidungen getroffen |
 | 2026-02-04 | Migrationsstrategie | vue-demi, Komponente-für-Komponente, Analyse-First |
-| 2026-02-04 | Dokumentation | Histoire auf eigenem Server, öffentlich zugänglich |
+| 2026-02-04 | Dokumentation | Komponenten-Doku auf eigenem Server, öffentlich zugänglich |
 | 2026-02-04 | CI/CD & Release | release-please, GitHub Workflows, automatisches npm publish |
 | 2026-02-04 | Erweiterte QA | Visual Regression, A11y Tests, Bundle Size Check |
 | 2026-02-04 | Migrations-Absicherung | Feature Parity Checklist, Deprecation Warnings |
@@ -1115,6 +1121,10 @@ Bei der Migration werden:
 | 2026-02-04 | **Abgrenzung Library/Webapp** | Entscheidungsbaum + Checkliste für Komponenten-Zuordnung |
 | 2026-02-04 | **Externe Abhängigkeit** | eslint-config-it4c blockiert Linting-Setup, Workaround dokumentiert |
 | 2026-02-04 | **Kompatibilitätstests** | 4er-Matrix (Vue 2/3 × Tailwind/CSS), Example Apps, Playwright E2E |
+| 2026-02-07 | **Storybook statt Histoire** | Histoire 1.0-beta hängt mit Tailwind v4 + Node 25 (kein Output, 100% CPU). Storybook 10 funktioniert sofort. |
+| 2026-02-07 | **Storybook Greyscale-Theme** | Komponenten in Graustufen - verdeutlicht, dass Farben von der App kommen, nicht von der Library. |
+| 2026-02-07 | **CSS Token-System** | requiredCssVariables mit 18 Farb-Variablen (6 Farben × 3 Werte) befüllt. |
+| 2026-02-07 | **Storybook Workflow** | ui-storybook.yml für Build + Artifact Upload. |
 | 2026-02-04 | **Phasen umbenannt** | 0.5→1, 1→2, 2→3, 3→4, 4→5 (nur ganzzahlige Phasen) |
 | 2026-02-04 | **Dokument-Konsolidierung** | §13 Zahlen korrigiert, §14 Link entfernt, §16 Reihenfolge, Terminologie vereinheitlicht |
 | 2026-02-04 | **Komplexitätsanalyse** | §20 hinzugefügt: Risikofaktoren, Parallelisierbarkeit, Aufwandstreiber pro Komponente |
@@ -1181,7 +1191,7 @@ Bei der Migration werden:
 - [Vue 3](https://vuejs.org/)
 - [Vite](https://vitejs.dev/)
 - [Tailwind CSS](https://tailwindcss.com/)
-- [Histoire](https://histoire.dev/)
+- [Storybook](https://storybook.js.org/)
 - [Vitest](https://vitest.dev/)
 - [vue-demi](https://github.com/vueuse/vue-demi)
 
@@ -1204,7 +1214,7 @@ Bei der Migration werden:
 │  MANUELL                                                    │
 ├─────────────────────────────────────────────────────────────┤
 │  • README.md Installation, Quick Start, Theming             │
-│  • Histoire Stories (interaktive Beispiele)                 │
+│  • Storybook Stories (interaktive Beispiele)                 │
 │  • ARCHITECTURE.md (Entscheidungen)                         │
 │  • Best Practices, Patterns                                 │
 └─────────────────────────────────────────────────────────────┘
@@ -1217,7 +1227,7 @@ Bei der Migration werden:
 
 ## Übersicht
 - Was ist die Library?
-- Link zu Histoire (Live-Dokumentation)
+- Link zu Storybook (Live-Dokumentation)
 
 ## Installation
 - npm install
@@ -1241,7 +1251,7 @@ Bei der Migration werden:
 
 ## Komponenten                    ← GENERIERT
 - Tabelle aller Komponenten
-- Link zu Histoire für Details
+- Link zu Storybook für Details
 
 ## Contributing
 - Link zu CONTRIBUTING.md
@@ -1351,7 +1361,7 @@ jobs:
 | **Phase 2** | CONTRIBUTING.md | Manuell |
 | **Phase 2** | docs:generate Script einrichten | Automatisiert |
 | **Phase 2** | CI docs-check Workflow | Automatisiert |
-| **Phase 4** | Histoire Stories pro Komponente | Manuell |
+| **Phase 4** | Storybook Stories pro Komponente | Manuell |
 | **Phase 4** | JSDoc in Komponenten | Im Code |
 | **Phase 4** | README Komponenten-Tabelle | Generiert |
 | **Phase 4** | README Finalisierung | Manuell |
@@ -1928,7 +1938,7 @@ Jede Komponente durchläuft:
 │ Bestehende  │   │ Props       │   │ Vue 3 Code  │   │ Unit Tests  │   │ In Webapp   │
 │ Varianten   │   │ Events      │   │ TypeScript  │   │ Vue 2 Tests │   │ einbinden   │
 │ analysieren │   │ Slots       │   │ Tailwind    │   │ A11y Tests  │   │             │
-│             │   │ Tokens      │   │ Histoire    │   │ Visual Reg. │   │ Alte Komp.  │
+│             │   │ Tokens      │   │ Storybook    │   │ Visual Reg. │   │ Alte Komp.  │
 │             │   │ A11y        │   │ Stories     │   │ 4 Examples  │   │ entfernen   │
 └─────────────┘   └─────────────┘   └─────────────┘   └─────────────┘   └─────────────┘
 ```
