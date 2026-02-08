@@ -43,7 +43,7 @@
     "@cucumber/cucumber": "12.6.0",
     "@cypress/webpack-preprocessor": "^7.0.2",
     "auto-changelog": "^2.5.0",
-    "cypress": "^15.9.0",
+    "cypress": "^15.10.0",
     "cypress-network-idle": "^1.15.0",
     "date-fns": "^3.6.0",
     "dotenv": "^17.2.3",
