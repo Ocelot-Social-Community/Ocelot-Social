@@ -30,42 +30,39 @@ type Story = StoryObj<typeof OsButton>
 export const Primary: Story = {
   args: {
     variant: 'primary',
-    default: 'Primary Button',
   },
   render: (args) => ({
     components: { OsButton },
     setup() {
       return { args }
     },
-    template: '<OsButton v-bind="args">{{ args.default }}</OsButton>',
+    template: '<OsButton v-bind="args">Primary Button</OsButton>',
   }),
 }
 
 export const Secondary: Story = {
   args: {
     variant: 'secondary',
-    default: 'Secondary Button',
   },
   render: (args) => ({
     components: { OsButton },
     setup() {
       return { args }
     },
-    template: '<OsButton v-bind="args">{{ args.default }}</OsButton>',
+    template: '<OsButton v-bind="args">Secondary Button</OsButton>',
   }),
 }
 
 export const Danger: Story = {
   args: {
     variant: 'danger',
-    default: 'Danger Button',
   },
   render: (args) => ({
     components: { OsButton },
     setup() {
       return { args }
     },
-    template: '<OsButton v-bind="args">{{ args.default }}</OsButton>',
+    template: '<OsButton v-bind="args">Danger Button</OsButton>',
   }),
 }
 
@@ -105,27 +102,25 @@ export const AllSizes: Story = {
 export const Disabled: Story = {
   args: {
     disabled: true,
-    default: 'Disabled Button',
   },
   render: (args) => ({
     components: { OsButton },
     setup() {
       return { args }
     },
-    template: '<OsButton v-bind="args">{{ args.default }}</OsButton>',
+    template: '<OsButton v-bind="args">Disabled Button</OsButton>',
   }),
 }
 
 export const FullWidth: Story = {
   args: {
     fullWidth: true,
-    default: 'Full Width Button',
   },
   render: (args) => ({
     components: { OsButton },
     setup() {
       return { args }
     },
-    template: '<OsButton v-bind="args">{{ args.default }}</OsButton>',
+    template: '<OsButton v-bind="args">Full Width Button</OsButton>',
   }),
 }

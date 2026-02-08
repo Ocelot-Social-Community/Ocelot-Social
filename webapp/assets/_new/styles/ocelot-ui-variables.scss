@@ -1,0 +1,40 @@
+/**
+ * CSS Custom Properties für @ocelot-social/ui
+ *
+ * Diese Datei mappt die bestehenden SCSS-Variablen auf die CSS Custom Properties,
+ * die von der UI-Library erwartet werden.
+ *
+ * Hinweis: Die SCSS-Variablen werden über styleResources global geladen (nuxt.config.js).
+ */
+
+:root {
+  // Primary (grün)
+  --color-primary: #{$color-primary};
+  --color-primary-hover: #{$color-primary-dark};
+  --color-primary-contrast: #{$color-neutral-100};
+
+  // Secondary (blau)
+  --color-secondary: #{$color-secondary};
+  --color-secondary-hover: #{$color-secondary-active};
+  --color-secondary-contrast: #{$color-neutral-100};
+
+  // Danger (rot)
+  --color-danger: #{$color-danger};
+  --color-danger-hover: #{$color-danger-dark};
+  --color-danger-contrast: #{$color-neutral-100};
+
+  // Warning (orange)
+  --color-warning: #{$color-warning};
+  --color-warning-hover: #{$color-warning-active};
+  --color-warning-contrast: #{$color-neutral-100};
+
+  // Success (grün, wie primary)
+  --color-success: #{$color-success};
+  --color-success-hover: #{$color-success-active};
+  --color-success-contrast: #{$color-neutral-100};
+
+  // Info (blau, wie secondary)
+  --color-info: #{$color-secondary};
+  --color-info-hover: #{$color-secondary-active};
+  --color-info-contrast: #{$color-neutral-100};
+}
