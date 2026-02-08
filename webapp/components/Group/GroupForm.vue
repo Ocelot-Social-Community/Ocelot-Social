@@ -133,7 +133,7 @@
         <!-- submit -->
         <ds-space margin-top="large">
           <nuxt-link to="/groups">
-            <ds-button>{{ $t('actions.cancel') }}</ds-button>
+            <os-button variant="secondary">{{ $t('actions.cancel') }}</os-button>
           </nuxt-link>
           <ds-button type="submit" icon="save" primary :disabled="checkFormError(errors)" fill>
             {{ update ? $t('group.update') : $t('group.save') }}
@@ -145,6 +145,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
 import {
@@ -165,6 +166,7 @@ export default {
     Editor,
     ActionRadiusSelect,
     LocationSelect,
+    OsButton,
   },
   props: {
     update: {

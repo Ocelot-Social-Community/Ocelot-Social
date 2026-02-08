@@ -5,16 +5,18 @@
       <input id="allow-shouts" type="checkbox" v-model="shoutsAllowed" />
       <label for="allow-shouts">{{ $t('settings.privacy.make-shouts-public') }}</label>
     </ds-space>
-    <base-button filled @click="submit" :disabled="disabled">{{ $t('actions.save') }}</base-button>
+    <os-button variant="primary" @click="submit" :disabled="disabled">{{ $t('actions.save') }}</os-button>
   </base-card>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 import { updateUserMutation } from '~/graphql/User'
 import scrollToContent from './scroll-to-content.js'
 
 export default {
+  components: { OsButton },
   mixins: [scrollToContent],
   data() {
     return {

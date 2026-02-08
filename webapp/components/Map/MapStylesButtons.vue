@@ -1,20 +1,23 @@
 <template>
   <div>
-    <base-button
-      :class="['map-style-button', actualStyle === style.url ? '' : '--deactivated']"
+    <os-button
+      :custom-class="'map-style-button' + (actualStyle === style.url ? '' : ' --deactivated')"
       v-for="style in styles"
       :key="style.title"
-      filled
-      size="small"
+      variant="primary"
+      size="sm"
       @click="setStyle(style.url)"
     >
       {{ style.title }}
-    </base-button>
+    </os-button>
   </div>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
+
 export default {
+  components: { OsButton },
   name: 'MapStylesButtons',
   props: {
     styles: { type: Array, required: true },
