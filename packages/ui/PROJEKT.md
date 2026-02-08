@@ -108,7 +108,7 @@ Integriert:   0
 
 **Letzte Aktualisierung:** 2026-02-08
 
-**Aktuelle Phase:** Phase 3 (Token-System & Basis) - Bereit zum Start
+**Aktuelle Phase:** Phase 3 (Webapp-Integration) - In Arbeit
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -175,21 +175,17 @@ Integriert:   0
   - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 
 **Aktuell in Arbeit:**
-- Bereit für Phase 3: Token-System & Basis
+- Phase 3, Milestone 1: Library-Einbindung in Webapp
+- Einsatzstellen analysiert: 6 gefunden (2 minimal, 4 mit zusätzlichem Aufwand)
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
 3. ~~**Phase 2: Projekt-Setup**~~ ✅ ABGESCHLOSSEN
-   - [x] CSS Custom Properties Token-System aufsetzen
-   - [x] Storybook für Dokumentation einrichten
-   - [x] Docker Setup (Dockerfile, docker-compose, ui-docker.yml)
-   - [x] Visual Regression Tests (Playwright + @axe-core/playwright)
-   - [x] Keyboard Accessibility Tests
-   - [x] ESLint Plugins (storybook, playwright, vuejs-accessibility, jsdoc)
-   - [x] Storybook Build Workflow (ui-storybook.yml)
-   - [x] Completeness Check Script (verify: Story, Visual, checkA11y, Keyboard, Varianten)
-4. **Phase 3: Token-System & Basis** - Nächste Phase
+4. **Phase 3: Webapp-Integration** - In Arbeit
+   - [ ] npm link in Webapp
+   - [ ] CSS-Variablen definieren
+   - [ ] UserTeaserPopover.vue migrieren (einfachste Stelle)
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
 - [ ] `NPM_TOKEN` als GitHub Secret einrichten (für npm publish in ui-release.yml)
@@ -252,14 +248,54 @@ Integriert:   0
 - [x] CONTRIBUTING.md
 - [x] Completeness Check Script (Story, Visual+checkA11y, Keyboard, Varianten)
 
-### Phase 3: Token-System & Basis
-- [ ] Base Tokens definieren (Farben, Spacing, Typography)
-- [ ] Semantic Tokens definieren
-- [ ] Component Tokens definieren
-- [ ] Branding-System implementieren (CSS Variables)
-- [ ] Beispiel-Branding erstellen (Standard + Yunite)
-- [ ] Storybook Theme-Farben anpassen (ocelot.social Branding)
-- [ ] Token-Dokumentation in Storybook
+### Phase 3: Webapp-Integration (Validierung)
+
+**Ziel:** OsButton in der Webapp einbinden, ohne visuelle oder funktionale Änderungen.
+
+**Ansatz:** Integration First - Library einbinden, dann schrittweise OsButton ersetzen, beginnend mit einfachsten Stellen.
+
+**Milestone 1: Library-Einbindung**
+- [ ] @ocelot-social/ui in Webapp installieren (npm link)
+- [ ] CSS Custom Properties in Webapp definieren (--color-primary, etc.)
+- [ ] Import-Pfade testen
+
+**Milestone 2: Erste Integration (Minimaler Aufwand)**
+- [ ] OsButton in UserTeaserPopover.vue einsetzen (nur `variant="primary"`)
+- [ ] Manueller visueller Vergleich
+- [ ] Webapp-Tests bestehen
+
+**Milestone 3: Schrittweise Erweiterung**
+- [ ] GroupForm.vue Cancel-Button migrieren
+- [ ] Bei Bedarf: icon-Prop zu OsButton hinzufügen
+- [ ] GroupForm.vue Submit-Button migrieren
+
+**Milestone 4: Vollständige BaseButton-Migration**
+- [ ] Bei Bedarf: circle-Variant hinzufügen
+- [ ] Bei Bedarf: loading-Prop hinzufügen
+- [ ] Invitation.vue migrieren
+- [ ] data-download.vue migrieren
+
+**Milestone 5: Validierung & Dokumentation**
+- [ ] Keine visuellen Änderungen bestätigt
+- [ ] Keine funktionalen Änderungen bestätigt
+- [ ] Webapp-Tests bestehen weiterhin
+- [ ] Erkenntnisse in KATALOG.md dokumentiert
+
+**Einsatzstellen-Analyse:** (Details in KATALOG.md)
+| Stelle | Aufwand | Status |
+|--------|---------|--------|
+| UserTeaserPopover.vue | Minimal | ⬜ Ausstehend |
+| GroupForm.vue (Cancel) | Minimal | ⬜ Ausstehend |
+| GroupForm.vue (Submit) | Mittel (icon) | ⬜ Ausstehend |
+| Invitation.vue | Mittel (icon, circle) | ⬜ Ausstehend |
+| data-download.vue | Hoch (icon, loading) | ⬜ Ausstehend |
+
+**Erfolgskriterien:**
+| Kriterium | Prüfung |
+|-----------|---------|
+| Visuell identisch | Manueller Screenshot-Vergleich |
+| Funktional identisch | Click, Disabled funktionieren |
+| Keine Regression | Webapp Unit-Tests bestehen |
 
 ### Phase 4: Komponenten-Migration (15 Komponenten + 2 Infrastruktur)
 
