@@ -251,6 +251,9 @@ export default {
    ** Build configuration
    */
   build: {
+    // Transpile ESM modules for SSR compatibility
+    // vue-demi and @ocelot-social/ui must be transpiled to ensure isVue2 is consistent
+    transpile: ['vue-demi', '@ocelot-social/ui'],
     // Invalidate cache between versions
     // https://www.reddit.com/r/Nuxt/comments/18i8hp2/comment/kdc1wa3/
     // https://v2.nuxt.com/docs/configuration-glossary/configuration-build/#filenames

@@ -35,7 +35,12 @@
     />
     <template v-else>
       <content-viewer :content="commentContent" class="content" />
-      <os-button v-if="hasLongContent" size="sm" variant="ghost" @click="isCollapsed = !isCollapsed">
+      <os-button
+        v-if="hasLongContent"
+        size="sm"
+        variant="ghost"
+        @click="isCollapsed = !isCollapsed"
+      >
         {{ isCollapsed ? $t('comment.show.more') : $t('comment.show.less') }}
       </os-button>
     </template>

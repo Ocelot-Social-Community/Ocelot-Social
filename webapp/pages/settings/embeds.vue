@@ -18,10 +18,18 @@
         {{ $t('settings.embeds.status.change.question') }}
       </ds-text>
       <ds-space margin-top="small" margin-bottom="base">
-        <os-button @click="submit" :variant="!disabled ? 'primary' : 'secondary'" :disabled="!disabled">
+        <os-button
+          @click="submit"
+          :variant="!disabled ? 'primary' : 'secondary'"
+          :disabled="!disabled"
+        >
           {{ $t('settings.embeds.status.change.deny') }}
         </os-button>
-        <os-button @click="submit" :variant="disabled ? 'primary' : 'secondary'" :disabled="disabled">
+        <os-button
+          @click="submit"
+          :variant="disabled ? 'primary' : 'secondary'"
+          :disabled="disabled"
+        >
           {{ $t('settings.embeds.status.change.allow') }}
         </os-button>
       </ds-space>
