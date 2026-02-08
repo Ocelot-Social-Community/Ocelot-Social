@@ -38,7 +38,8 @@
       <os-button
         v-if="hasLongContent"
         size="sm"
-        variant="ghost"
+        appearance="ghost"
+        variant="primary"
         @click="isCollapsed = !isCollapsed"
       >
         {{ isCollapsed ? $t('comment.show.more') : $t('comment.show.less') }}
@@ -214,13 +215,6 @@ export default {
     display: flex;
     justify-content: space-between;
     margin-bottom: $space-small;
-  }
-
-  .actions {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
   }
 }
 

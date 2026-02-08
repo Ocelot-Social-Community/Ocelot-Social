@@ -20,14 +20,16 @@
       <ds-space margin-top="small" margin-bottom="base">
         <os-button
           @click="submit"
-          :variant="!disabled ? 'primary' : 'secondary'"
+          :appearance="!disabled ? 'filled' : 'outline'"
+          variant="primary"
           :disabled="!disabled"
         >
           {{ $t('settings.embeds.status.change.deny') }}
         </os-button>
         <os-button
           @click="submit"
-          :variant="disabled ? 'primary' : 'secondary'"
+          :appearance="disabled ? 'filled' : 'outline'"
+          variant="primary"
           :disabled="disabled"
         >
           {{ $t('settings.embeds.status.change.allow') }}

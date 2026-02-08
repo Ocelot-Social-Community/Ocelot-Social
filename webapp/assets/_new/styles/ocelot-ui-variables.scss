@@ -8,33 +8,50 @@
  */
 
 :root {
-  // Primary (grün)
+  // Default (grau) - entspricht ds-button ohne Modifier
+  --color-default: #{$background-color-softer}; // neutral-90: rgb(245, 244, 246)
+  --color-default-hover: #{$color-neutral-70}; // rgb(203, 199, 209) - deutlich dunkler
+  --color-default-active: #{$color-neutral-60}; // rgb(177, 171, 186) - noch dunkler
+  --color-default-contrast: #{$text-color-base};
+  --color-default-contrast-inverse: #{$color-neutral-100}; // weiß für dunkle Hintergründe
+
+  // Primary (grün) - verwendet $text-color-primary-inverse wie ds-button
   --color-primary: #{$color-primary};
-  --color-primary-hover: #{$color-primary-dark};
-  --color-primary-contrast: #{$color-neutral-100};
+  --color-primary-hover: #{$color-primary-light}; // filled buttons hover to lighter color
+  --color-primary-active: #{$color-primary-dark}; // active state uses darker color
+  --color-primary-contrast: #{$text-color-primary-inverse};
 
   // Secondary (blau)
   --color-secondary: #{$color-secondary};
   --color-secondary-hover: #{$color-secondary-active};
-  --color-secondary-contrast: #{$color-neutral-100};
+  --color-secondary-active: #{darken($color-secondary, 15%)};
+  --color-secondary-contrast: #{$text-color-secondary-inverse};
 
   // Danger (rot)
   --color-danger: #{$color-danger};
-  --color-danger-hover: #{$color-danger-dark};
-  --color-danger-contrast: #{$color-neutral-100};
+  --color-danger-hover: #{$color-danger-light}; // filled buttons hover to lighter color
+  --color-danger-active: #{$color-danger-dark}; // active state uses darker color
+  --color-danger-contrast: #{$text-color-danger-inverse};
 
   // Warning (orange)
   --color-warning: #{$color-warning};
   --color-warning-hover: #{$color-warning-active};
-  --color-warning-contrast: #{$color-neutral-100};
+  --color-warning-active: #{darken($color-warning, 15%)};
+  --color-warning-contrast: #{$text-color-primary-inverse};
 
   // Success (grün, wie primary)
   --color-success: #{$color-success};
   --color-success-hover: #{$color-success-active};
-  --color-success-contrast: #{$color-neutral-100};
+  --color-success-active: #{darken($color-success, 15%)};
+  --color-success-contrast: #{$text-color-primary-inverse};
 
   // Info (blau, wie secondary)
   --color-info: #{$color-secondary};
   --color-info-hover: #{$color-secondary-active};
-  --color-info-contrast: #{$color-neutral-100};
+  --color-info-active: #{darken($color-secondary, 15%)};
+  --color-info-contrast: #{$text-color-secondary-inverse};
+
+  // Disabled state
+  --color-disabled: #{$color-neutral-60}; // rgb(177, 171, 186)
+  --color-disabled-contrast: #{$color-neutral-100}; // weiß
 }

@@ -9,11 +9,15 @@ const meta: Meta<typeof OsButton> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'danger', 'warning', 'success', 'info', 'ghost', 'outline'],
+      options: ['default', 'primary', 'secondary', 'danger', 'warning', 'success', 'info'],
+    },
+    appearance: {
+      control: 'select',
+      options: ['filled', 'outline', 'ghost'],
     },
     size: {
       control: 'select',
-      options: ['xs', 'sm', 'md', 'lg', 'xl'],
+      options: ['sm', 'md', 'lg', 'xl'],
     },
     fullWidth: {
       control: 'boolean',
@@ -66,19 +70,31 @@ export const Danger: Story = {
   }),
 }
 
+export const Default: Story = {
+  args: {
+    variant: 'default',
+  },
+  render: (args) => ({
+    components: { OsButton },
+    setup() {
+      return { args }
+    },
+    template: '<OsButton v-bind="args">Default Button</OsButton>',
+  }),
+}
+
 export const AllVariants: Story = {
   render: () => ({
     components: { OsButton },
     template: `
       <div class="flex flex-wrap gap-2">
+        <OsButton variant="default">Default</OsButton>
         <OsButton variant="primary">Primary</OsButton>
         <OsButton variant="secondary">Secondary</OsButton>
         <OsButton variant="danger">Danger</OsButton>
         <OsButton variant="warning">Warning</OsButton>
         <OsButton variant="success">Success</OsButton>
         <OsButton variant="info">Info</OsButton>
-        <OsButton variant="ghost">Ghost</OsButton>
-        <OsButton variant="outline">Outline</OsButton>
       </div>
     `,
   }),
@@ -89,11 +105,72 @@ export const AllSizes: Story = {
     components: { OsButton },
     template: `
       <div class="flex flex-col gap-2 items-start">
-        <OsButton size="xs">Extra Small</OsButton>
-        <OsButton size="sm">Small</OsButton>
-        <OsButton size="md">Medium</OsButton>
+        <OsButton size="sm">Small (26px)</OsButton>
+        <OsButton size="md">Medium (36px)</OsButton>
         <OsButton size="lg">Large</OsButton>
         <OsButton size="xl">Extra Large</OsButton>
+      </div>
+    `,
+  }),
+}
+
+export const Outline: Story = {
+  args: {
+    appearance: 'outline',
+    variant: 'primary',
+  },
+  render: (args) => ({
+    components: { OsButton },
+    setup() {
+      return { args }
+    },
+    template: '<OsButton v-bind="args">Outline Button</OsButton>',
+  }),
+}
+
+export const Ghost: Story = {
+  args: {
+    appearance: 'ghost',
+    variant: 'primary',
+  },
+  render: (args) => ({
+    components: { OsButton },
+    setup() {
+      return { args }
+    },
+    template: '<OsButton v-bind="args">Ghost Button</OsButton>',
+  }),
+}
+
+export const AllAppearances: Story = {
+  render: () => ({
+    components: { OsButton },
+    template: `
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-sm font-bold mb-2">Filled (default)</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton appearance="filled" variant="default">Default</OsButton>
+            <OsButton appearance="filled" variant="primary">Primary</OsButton>
+            <OsButton appearance="filled" variant="danger">Danger</OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Outline</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton appearance="outline" variant="default">Default</OsButton>
+            <OsButton appearance="outline" variant="primary">Primary</OsButton>
+            <OsButton appearance="outline" variant="danger">Danger</OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Ghost</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton appearance="ghost" variant="default">Default</OsButton>
+            <OsButton appearance="ghost" variant="primary">Primary</OsButton>
+            <OsButton appearance="ghost" variant="danger">Danger</OsButton>
+          </div>
+        </div>
       </div>
     `,
   }),

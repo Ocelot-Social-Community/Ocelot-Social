@@ -55,8 +55,9 @@
       <template #edit="scope">
         <os-button
           v-if="scope.row.membership.role !== 'owner'"
-          size="sm"
+          appearance="outline"
           variant="primary"
+          size="sm"
           @click="
             isOpen = true
             userId = scope.row.user.id

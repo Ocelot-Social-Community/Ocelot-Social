@@ -133,7 +133,7 @@
         <!-- submit -->
         <ds-space margin-top="large">
           <nuxt-link to="/groups">
-            <os-button variant="secondary">{{ $t('actions.cancel') }}</os-button>
+            <os-button>{{ $t('actions.cancel') }}</os-button>
           </nuxt-link>
           <ds-button type="submit" icon="save" primary :disabled="checkFormError(errors)" fill>
             {{ update ? $t('group.update') : $t('group.save') }}

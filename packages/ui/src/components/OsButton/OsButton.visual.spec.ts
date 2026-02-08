@@ -24,6 +24,14 @@ async function checkA11y(page: Page) {
 }
 
 test.describe('OsButton visual regression', () => {
+  test('default variant', async ({ page }) => {
+    await page.goto(`${STORY_URL}--default&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await expect(root.locator('button')).toHaveScreenshot('default.png')
+    await checkA11y(page)
+  })
+
   test('primary variant', async ({ page }) => {
     await page.goto(`${STORY_URL}--primary&viewMode=story`)
     const root = page.locator(STORY_ROOT)
@@ -61,6 +69,30 @@ test.describe('OsButton visual regression', () => {
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
     await expect(root.locator('.flex')).toHaveScreenshot('all-sizes.png')
+    await checkA11y(page)
+  })
+
+  test('outline appearance', async ({ page }) => {
+    await page.goto(`${STORY_URL}--outline&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await expect(root.locator('button')).toHaveScreenshot('outline.png')
+    await checkA11y(page)
+  })
+
+  test('ghost appearance', async ({ page }) => {
+    await page.goto(`${STORY_URL}--ghost&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await expect(root.locator('button')).toHaveScreenshot('ghost.png')
+    await checkA11y(page)
+  })
+
+  test('all appearances', async ({ page }) => {
+    await page.goto(`${STORY_URL}--all-appearances&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await expect(root.locator('.flex-col').first()).toHaveScreenshot('all-appearances.png')
     await checkA11y(page)
   })
 

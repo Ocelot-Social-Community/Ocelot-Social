@@ -24,10 +24,21 @@
       <h3>{{ $t('editor.embed.data_privacy_warning') }}</h3>
       <ds-text>{{ $t('editor.embed.data_privacy_info') }} {{ embedPublisher }}</ds-text>
       <div class="buttons">
-        <os-button @click="closeOverlay()" data-test="cancel-button" variant="danger">
+        <os-button
+          @click="closeOverlay()"
+          data-test="cancel-button"
+          appearance="outline"
+          variant="danger"
+          custom-class="embed-button"
+        >
           {{ $t('actions.cancel') }}
         </os-button>
-        <os-button @click="allowEmbed()" data-test="play-now-button" variant="primary">
+        <os-button
+          @click="allowEmbed()"
+          data-test="play-now-button"
+          variant="primary"
+          custom-class="embed-button"
+        >
           {{ $t('editor.embed.play_now') }}
         </os-button>
       </div>
@@ -226,9 +237,8 @@ export default {
     background-color: $color-neutral-100;
 
     > .buttons {
-      .base-button {
+      button {
         margin-right: $space-small;
-        white-space: nowrap;
       }
     }
 

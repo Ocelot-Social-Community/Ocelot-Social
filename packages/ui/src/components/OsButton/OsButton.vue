@@ -15,7 +15,11 @@
     props: {
       variant: {
         type: String as PropType<ButtonVariants['variant']>,
-        default: 'primary',
+        default: 'default',
+      },
+      appearance: {
+        type: String as PropType<ButtonVariants['appearance']>,
+        default: 'filled',
       },
       size: {
         type: String as PropType<ButtonVariants['size']>,
@@ -43,6 +47,7 @@
         cn(
           buttonVariants({
             variant: props.variant,
+            appearance: props.appearance,
             size: props.size,
             fullWidth: props.fullWidth,
           }),

@@ -11,24 +11,73 @@ describe('osButton', () => {
     expect(wrapper.text()).toBe('Click me')
   })
 
-  it('applies default variant classes', () => {
-    const wrapper = mount(OsButton)
-    expect(wrapper.classes()).toContain('bg-[var(--color-primary)]')
+  describe('variant prop', () => {
+    it('applies default variant classes by default', () => {
+      const wrapper = mount(OsButton)
+      // Default variant with filled appearance
+      expect(wrapper.classes()).toContain('bg-[var(--color-default)]')
+    })
+
+    it('applies primary variant classes', () => {
+      const wrapper = mount(OsButton, {
+        props: { variant: 'primary' },
+      })
+      expect(wrapper.classes()).toContain('bg-[var(--color-primary)]')
+    })
+
+    it('applies danger variant classes', () => {
+      const wrapper = mount(OsButton, {
+        props: { variant: 'danger' },
+      })
+      expect(wrapper.classes()).toContain('bg-[var(--color-danger)]')
+    })
   })
 
-  it('applies size variant classes', () => {
-    const wrapper = mount(OsButton, {
-      props: { size: 'sm' },
+  describe('appearance prop', () => {
+    it('applies filled appearance by default', () => {
+      const wrapper = mount(OsButton)
+      expect(wrapper.classes()).toContain('shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]')
     })
-    expect(wrapper.classes()).toContain('h-8')
-    expect(wrapper.classes()).toContain('text-sm')
+
+    it('applies outline appearance classes', () => {
+      const wrapper = mount(OsButton, {
+        props: { appearance: 'outline', variant: 'primary' },
+      })
+      expect(wrapper.classes()).toContain('bg-transparent')
+      expect(wrapper.classes()).toContain('border-[0.8px]')
+      expect(wrapper.classes()).toContain('border-[var(--color-primary)]')
+    })
+
+    it('applies ghost appearance classes', () => {
+      const wrapper = mount(OsButton, {
+        props: { appearance: 'ghost', variant: 'primary' },
+      })
+      expect(wrapper.classes()).toContain('bg-transparent')
+      expect(wrapper.classes()).toContain('border-none')
+      expect(wrapper.classes()).toContain('text-[var(--color-primary)]')
+    })
   })
 
-  it('applies variant classes', () => {
-    const wrapper = mount(OsButton, {
-      props: { variant: 'danger' },
+  describe('size prop', () => {
+    it('applies md size by default', () => {
+      const wrapper = mount(OsButton)
+      expect(wrapper.classes()).toContain('h-[36px]')
     })
-    expect(wrapper.classes()).toContain('bg-[var(--color-danger)]')
+
+    it('applies sm size classes', () => {
+      const wrapper = mount(OsButton, {
+        props: { size: 'sm' },
+      })
+      expect(wrapper.classes()).toContain('h-[26px]')
+      expect(wrapper.classes()).toContain('text-[12px]')
+    })
+
+    it('applies lg size classes', () => {
+      const wrapper = mount(OsButton, {
+        props: { size: 'lg' },
+      })
+      expect(wrapper.classes()).toContain('h-12')
+    })
   })
 
   it('applies fullWidth class', () => {
@@ -63,6 +112,21 @@ describe('osButton', () => {
     const wrapper = mount(OsButton)
     await wrapper.trigger('click')
     expect(wrapper.emitted('click')).toHaveLength(1)
+  })
+
+  describe('focus styles', () => {
+    it('default variant has no focus outline', () => {
+      const wrapper = mount(OsButton)
+      expect(wrapper.classes()).toContain('focus:outline-none')
+    })
+
+    it('colored variants have dashed outline focus style', () => {
+      const wrapper = mount(OsButton, {
+        props: { variant: 'primary' },
+      })
+      expect(wrapper.classes()).toContain('focus:outline-dashed')
+      expect(wrapper.classes()).toContain('focus:outline-1')
+    })
   })
 
   describe('keyboard accessibility', () => {

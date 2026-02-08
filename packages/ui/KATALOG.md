@@ -10,7 +10,7 @@
 ### Übersicht
 ```
 Phase 0: Analyse    ██████████ 100% (8/8 Schritte)
-Phase 3: Migration  ███████░░░  75% (15/20 Buttons)
+Phase 3: Migration  ██░░░░░░░░  18% (16/90 Buttons)
 ───────────────────────────────────────────
 Aktuelle Phase: Phase 3 (Webapp-Integration)
 ```
@@ -28,11 +28,12 @@ Aktuelle Phase: Phase 3 (Webapp-Integration)
 ### OsButton Migration (Phase 3)
 | Status | Anzahl | Details |
 |--------|--------|---------|
-| ✅ Migriert | 15 | Buttons ohne icon/circle/loading |
-| ⏳ Ausstehend | 5 | Benötigen icon/circle/loading Props |
-| **Gesamt** | **20** | In 16 Dateien |
+| ✅ Migriert | 16 | Erste Welle (validiert) |
+| ⏳ Ausstehend (ohne neue Props) | 14 | Milestone 4a |
+| ⏳ Ausstehend (mit neuen Props) | ~60 | Milestone 4c (benötigen icon/circle/loading) |
+| **Gesamt** | **~90** | In ~50 Dateien |
 
-**Migrierte Komponenten:**
+**Migrierte Komponenten (16):**
 - UserTeaserPopover.vue (1 Button)
 - GroupForm.vue (1 Button - Cancel)
 - EmbedComponent.vue (2 Buttons - Cancel, Play Now)
@@ -45,12 +46,83 @@ Aktuelle Phase: Phase 3 (Webapp-Integration)
 - privacy.vue (1 Button)
 - terms-and-conditions-confirm.vue (2 Buttons)
 
-**Ausstehend (benötigen Props):**
-- GroupForm.vue Submit (icon)
-- CommentCard.vue Reply (icon, circle)
-- EmbedComponent.vue Close (icon, circle)
-- Invitation.vue (icon, circle)
-- data-download.vue (icon, loading)
+**Neu identifiziert - ohne neue Props (14):**
+- Modal/DisableModal.vue (1 Button - Cancel)
+- Modal/DeleteUserModal.vue (1 Button - Cancel)
+- Modal/ReleaseModal.vue (1 Button - Cancel)
+- ContributionForm.vue (1 Button - Cancel)
+- EnterNonce.vue (1 Button - Submit)
+- MySomethingList.vue (1 Button - Cancel)
+- ImageUploader.vue (2 Buttons - Crop)
+- admin/donations.vue (1 Button - Save)
+- profile/_id/_slug.vue (2 Buttons - Unblock, Unmute)
+- settings/badges.vue (1 Button - Remove)
+- notifications/index.vue (1 Button - Mark All Read)
+- ReportRow.vue (1 Button - More Details)
+
+**Ausstehend - benötigen neue Props (~60):**
+
+*Button-Komponenten mit icon/circle/loading:*
+- ActionButton.vue: 3 Buttons (icon, circle)
+- LabeledButton.vue: 1 Button (icon)
+- MenuBarButton.vue: 1 Button (icon)
+- EmotionButton.vue: 1 Button (icon)
+- ShoutButton.vue: 1 Button (icon)
+- FollowButton.vue: 1 Button (icon, loading)
+- JoinLeaveButton.vue: 1 Button (icon, loading)
+- ObserveButton.vue: 1 Button (icon, loading)
+- InviteButton.vue: 1 Button (icon, loading)
+- MapButton.vue: 1 Button (icon)
+- PaginationButtons.vue: 2 Buttons (icon, circle)
+
+*Navigation mit icon:*
+- LocaleSwitch.vue: 1 Button (icon)
+- HeaderMenu.vue: 2 Buttons (icon)
+- AvatarMenu.vue: 1 Button (icon, circle)
+- NotificationMenu.vue: 1 Button (icon, circle)
+- ChatNotificationMenu.vue: 1 Button (icon, circle)
+- FilterMenu.vue: 1 Button (icon)
+
+*Editor-Buttons:*
+- Editor.vue: ~10 Toolbar-Buttons (icon)
+- ContextMenu.vue: 3 Buttons (icon)
+- LinkInput.vue: 2 Buttons (icon, circle)
+
+*Filter-Buttons:*
+- CategoriesFilter.vue: 1 Button (icon)
+- HashtagsFilter.vue: 1 Button (icon)
+- DropdownFilter.vue: 1 Button (icon)
+- FilterMenuSection.vue: 2 Buttons (icon)
+- DateTimeRange.vue: 2 Buttons (icon)
+
+*Chat-Buttons:*
+- Chat.vue: 2 Buttons (icon)
+- AddChatRoomByUserSearch.vue: 1 Button (icon, circle)
+
+*Form-Buttons:*
+- CommentForm.vue: 1 Button (icon, loading)
+- SearchField.vue: 1 Button (icon, circle)
+- ShowPassword.vue: 1 Button (icon)
+
+*Modal-Buttons:*
+- ConfirmModal.vue: 1 Button (loading)
+- ReportModal.vue: 1 Button (loading)
+
+*Feature-Buttons:*
+- CreateInvitation.vue: 1 Button (icon)
+- Invitation.vue: 1 Button (icon, circle)
+- SocialMediaListItem.vue: 1 Button (icon, circle)
+- Request.vue: 1 Button (icon, loading)
+- GroupButton.vue: 1 Button (icon)
+- CtaJoinLeaveGroup.vue: 1 Button (icon)
+- data-download.vue: 1 Button (icon, loading)
+- AddGroupMember.vue: 1 Button (icon)
+- GroupForm.vue Submit: 1 Button (icon)
+
+*Page-Buttons:*
+- CommentCard.vue Reply: 1 Button (icon, circle)
+- EmbedComponent.vue Close: 1 Button (icon, circle)
+- PostTeaser.vue: 2 Buttons (icon)
 
 ---
 
@@ -78,7 +150,7 @@ Aktuelle Phase: Phase 3 (Webapp-Integration)
 ### Data Input
 | # | Komponente | Status | Webapp-Duplikat | Varianten | Priorität | Notizen |
 |---|------------|--------|-----------------|-----------|-----------|---------|
-| 13 | Button | ⏳ Migration | BaseButton, CustomButton, ActionButton, ... | | | → OsButton (15/20 migriert) |
+| 13 | Button | ⏳ Migration | BaseButton, CustomButton, ActionButton, ... | | | → OsButton (16/90 migriert) |
 | 14 | CopyField | ⬜ Ausstehend | | | | |
 | 15 | Form | ⬜ Ausstehend | | | | |
 | 16 | FormItem | ⬜ Ausstehend | | | | |
@@ -143,7 +215,7 @@ Aktuelle Phase: Phase 3 (Webapp-Integration)
 | 7 | BadgeSelection | ⬜ Ausstehend | Input | | |
 | 8 | Badges | ⬜ Ausstehend | Display | | |
 | 9 | BadgesSection | ⬜ Ausstehend | Display | | |
-| 10 | BaseButton | ⏳ Migration | Button | Button | 🔄 → OsButton (15/20 migriert) |
+| 10 | BaseButton | ⏳ Migration | Button | Button | 🔄 → OsButton (16/90 migriert) |
 | 11 | BaseCard | ⬜ Ausstehend | Layout | Card | 🔗 DUPLIKAT |
 | 12 | BaseIcon | ⬜ Ausstehend | Display | Icon | 🔗 DUPLIKAT |
 
@@ -207,7 +279,7 @@ Aktuelle Phase: Phase 3 (Webapp-Integration)
 | 59 | GroupForm | ⏳ Teilweise | Input | Form | 1/2 Buttons → OsButton |
 | 60 | GroupLink | ⬜ Ausstehend | Navigation | | |
 | 61 | GroupList | ⬜ Ausstehend | Display | List | |
-| 62 | GroupMember | ⬜ Ausstehend | Display | | |
+| 62 | GroupMember | ✅ Migriert | Display | | Button → OsButton |
 | 63 | GroupTeaser | ⬜ Ausstehend | Display | Card | |
 
 ### H-L
@@ -239,7 +311,7 @@ Aktuelle Phase: Phase 3 (Webapp-Integration)
 | # | Komponente | Status | Kategorie | Styleguide-Pendant | Notizen |
 |---|------------|--------|-----------|-------------------|---------|
 | 85 | MapButton | ⬜ Ausstehend | Button | Button | |
-| 86 | MapStylesButtons | ⬜ Ausstehend | Button | Button | |
+| 86 | MapStylesButtons | ✅ Migriert | Button | Button | Button → OsButton |
 | 87 | MasonryGrid | ⬜ Ausstehend | Layout | Grid | |
 | 88 | MasonryGridItem | ⬜ Ausstehend | Layout | GridItem | |
 | 89 | MenuBar | ⬜ Ausstehend | Navigation | Menu | |
@@ -302,7 +374,7 @@ Aktuelle Phase: Phase 3 (Webapp-Integration)
 | 134 | UserTeaser | ⬜ Ausstehend | Display | Card | |
 | 135 | UserTeaserHelper | ⬜ Ausstehend | Display | | |
 | 136 | UserTeaserNonAnonymous | ⬜ Ausstehend | Display | | |
-| 137 | UserTeaserPopover | ⬜ Ausstehend | Display | | |
+| 137 | UserTeaserPopover | ✅ Migriert | Display | | Button → OsButton |
 
 ---
 
@@ -404,8 +476,9 @@ Diese sollten zuerst migriert werden:
 | 2026-02-04 | Claude | **Phase 0 abgeschlossen** | Bereit für Phase 2 (Projekt-Setup) |
 | 2026-02-08 | Claude | OsButton entwickelt | CVA-Varianten, Vue 2/3 kompatibel via vue-demi |
 | 2026-02-08 | Claude | Webapp-Integration | Jest Mock, Docker Build, CI-Kompatibilität |
-| 2026-02-08 | Claude | **15 Buttons migriert** | Alle ohne icon/circle/loading Props |
+| 2026-02-08 | Claude | **16 Buttons migriert** | Alle ohne icon/circle/loading Props, validiert |
 | 2026-02-08 | Claude | OsButton erweitert | attrs/listeners Forwarding für Vue 2 ($listeners) |
+| 2026-02-09 | Claude | Scope erweitert | ~90 Buttons identifiziert (16 migriert, 14 ohne Props, ~60 mit Props) |
 
 ---
 
@@ -424,15 +497,30 @@ Diese sollten zuerst migriert werden:
 ### Phase 3: OsButton Migration (in Arbeit)
 9. [x] OsButton entwickeln (CVA, vue-demi)
 10. [x] Webapp-Integration (Jest, Docker, CI)
-11. [x] 15 Buttons migrieren (ohne icon/circle/loading)
-12. [ ] icon-Prop zu OsButton hinzufügen
-13. [ ] circle-Variant zu OsButton hinzufügen
-14. [ ] loading-Prop zu OsButton hinzufügen
-15. [ ] Verbleibende 5 Buttons migrieren
+11. [x] 16 Buttons migrieren (validiert ✅)
+
+**Milestone 4a: 14 Buttons ohne neue Props**
+12. [ ] Modal Cancel-Buttons (3)
+13. [ ] Form Cancel/Submit-Buttons (3)
+14. [ ] ImageUploader Crop-Buttons (2)
+15. [ ] Page Buttons (6)
+
+**Milestone 4b: Props für ~60 Buttons hinzufügen**
+16. [ ] icon-Prop zu OsButton hinzufügen
+17. [ ] circle-Variant zu OsButton hinzufügen
+18. [ ] loading-Prop zu OsButton hinzufügen
+
+**Milestone 4c: ~60 Buttons mit neuen Props migrieren**
+19. [ ] Button-Komponenten (~15)
+20. [ ] Navigation (~8)
+21. [ ] Editor (~15)
+22. [ ] Filter/Chat (~10)
+23. [ ] Forms/Modals (~5)
+24. [ ] Features/Pages (~12)
 
 ---
 
-**✅ Phase 0 abgeschlossen!** Phase 3 zu 75% erledigt.
+**✅ Phase 0 abgeschlossen!** Phase 3 zu 18% erledigt (16/90 Buttons migriert, 16/16 validiert ✅).
 
 ---
 
@@ -1120,42 +1208,91 @@ $box-shadow-small-inset: inset 0 0 0 1px rgba(0,0,0,.05)
 
 ## Phase 3: Webapp-Integration (Tracking)
 
-### OsButton Einsatzstellen in Webapp
+### OsButton Migration - Abgeschlossen (16/90)
 
-| # | Datei | Aktueller Button | Props verwendet | Status | Aufwand |
-|---|-------|------------------|-----------------|--------|---------|
-| 1 | UserTeaserPopover.vue | `ds-button` | `primary` | ⬜ Ausstehend | **Minimal** |
-| 2 | GroupForm.vue (Cancel) | `ds-button` | keine | ⬜ Ausstehend | **Minimal** |
-| 3 | GroupForm.vue (Submit) | `ds-button` | `icon`, `primary`, `fill`, `disabled` | ⬜ Ausstehend | Mittel |
-| 4 | Invitation.vue (Copy) | `base-button` | `circle`, `icon`, `disabled` | ⬜ Ausstehend | Mittel |
-| 5 | Invitation.vue (Delete) | `base-button` | `circle`, `icon` | ⬜ Ausstehend | Mittel |
-| 6 | data-download.vue | `base-button` | `icon`, `secondary`, `filled`, `loading`, `disabled` | ⬜ Ausstehend | Hoch |
+| # | Datei | Button | Status |
+|---|-------|--------|--------|
+| 1 | UserTeaserPopover.vue | Open Profile | ✅ Migriert |
+| 2 | GroupForm.vue | Cancel | ✅ Migriert |
+| 3 | EmbedComponent.vue | Cancel | ✅ Migriert |
+| 4 | EmbedComponent.vue | Play Now | ✅ Migriert |
+| 5 | DonationInfo.vue | Donate | ✅ Migriert |
+| 6 | CommentCard.vue | Show More | ✅ Migriert |
+| 7 | MapStylesButtons.vue | Style Toggle | ✅ Migriert |
+| 8 | GroupMember.vue | Remove | ✅ Migriert |
+| 9 | embeds.vue | Allow All | ✅ Migriert |
+| 10 | embeds.vue | Deny All | ✅ Migriert |
+| 11 | notifications.vue | Check All | ✅ Migriert |
+| 12 | notifications.vue | Uncheck All | ✅ Migriert |
+| 13 | notifications.vue | Save | ✅ Migriert |
+| 14 | privacy.vue | Save | ✅ Migriert |
+| 15 | terms-and-conditions-confirm.vue | Read T&C | ✅ Migriert |
+| 16 | terms-and-conditions-confirm.vue | Save | ✅ Migriert |
 
-### Status-Legende
-- ⬜ Ausstehend
-- ⏳ In Arbeit
-- ✅ Migriert
-- ❌ Blockiert (fehlende Features)
+### OsButton Migration - Ausstehend ohne neue Props (Milestone 4a: 14/90)
 
-### Fehlende OsButton-Features für vollständige Migration
+| # | Datei | Button | OsButton Props | Status |
+|---|-------|--------|----------------|--------|
+| 17 | Modal/DisableModal.vue | Cancel | `default` | ⬜ Ausstehend |
+| 18 | Modal/DeleteUserModal.vue | Cancel | `default` | ⬜ Ausstehend |
+| 19 | Modal/ReleaseModal.vue | Cancel | `default` | ⬜ Ausstehend |
+| 20 | ContributionForm.vue | Cancel | `:disabled` | ⬜ Ausstehend |
+| 21 | EnterNonce.vue | Submit | `variant="primary" :disabled` | ⬜ Ausstehend |
+| 22 | MySomethingList.vue | Cancel | `default` | ⬜ Ausstehend |
+| 23 | ImageUploader.vue | Crop Confirm 1 | `variant="primary"` | ⬜ Ausstehend |
+| 24 | ImageUploader.vue | Crop Confirm 2 | `variant="primary"` | ⬜ Ausstehend |
+| 25 | admin/donations.vue | Save | `variant="primary"` | ⬜ Ausstehend |
+| 26 | profile/_id/_slug.vue | Unblock | `default` | ⬜ Ausstehend |
+| 27 | profile/_id/_slug.vue | Unmute | `default` | ⬜ Ausstehend |
+| 28 | settings/badges.vue | Remove | `default` | ⬜ Ausstehend |
+| 29 | notifications/index.vue | Mark All Read | `variant="primary" :disabled` | ⬜ Ausstehend |
+| 30 | ReportRow.vue | More Details | `size="sm"` | ⬜ Ausstehend |
 
-| Feature | Benötigt für | Status | Priorität |
-|---------|-------------|--------|-----------|
-| `icon` Prop | #3, #4, #5, #6 | ⬜ Fehlt | Hoch |
-| `circle` Variant | #4, #5 | ⬜ Fehlt | Mittel |
-| `loading` Prop | #6 | ⬜ Fehlt | Mittel |
-| Outline-Stil (default) | BaseButton-Kompatibilität | ⬜ Fehlt | Hoch |
+### OsButton Migration - Ausstehend mit neuen Props (Milestone 4c: ~60/90)
 
-### Migrations-Reihenfolge (empfohlen)
+> Diese Buttons benötigen icon, circle, und/oder loading Props.
+> Siehe "Ausstehend - benötigen neue Props (~60)" oben für vollständige Liste.
 
-1. **UserTeaserPopover.vue** - Nur `variant="primary"` nötig ✅
-2. **GroupForm.vue Cancel** - Kein Prop nötig ✅
-3. Icon-Prop zu OsButton hinzufügen
-4. GroupForm.vue Submit migrieren
-5. Circle-Variant zu OsButton hinzufügen
-6. Invitation.vue migrieren
-7. Loading-Prop zu OsButton hinzufügen
-8. data-download.vue migrieren
+**Kategorien:**
+| Kategorie | Anzahl | Props benötigt |
+|-----------|--------|----------------|
+| Button-Komponenten | ~15 | icon, circle, loading |
+| Navigation | ~8 | icon, circle |
+| Editor | ~15 | icon |
+| Filter/Chat | ~10 | icon, circle |
+| Forms/Modals | ~5 | icon, loading |
+| Features/Pages | ~12 | icon, circle, loading |
+
+### Fehlende OsButton-Features
+
+| Feature | Benötigt für | Status |
+|---------|-------------|--------|
+| `icon` Prop | ~55 Buttons | ⬜ Fehlt |
+| `circle` Variant | ~25 Buttons | ⬜ Fehlt |
+| `loading` Prop | ~10 Buttons | ⬜ Fehlt |
+| `appearance="outline"` | ✅ Implementiert | ✅ Erledigt |
+| `appearance="ghost"` | ✅ Implementiert | ✅ Erledigt |
+
+### Nächste Schritte
+
+**Milestone 4a: 14 Buttons ohne neue Props migrieren**
+1. Modal Cancel-Buttons (3)
+2. Form Cancel/Submit-Buttons (3)
+3. ImageUploader Crop-Buttons (2)
+4. Page Buttons (6)
+
+**Milestone 4b: Props für ~60 Buttons hinzufügen**
+1. Icon-Prop zu OsButton hinzufügen
+2. Circle-Variant zu OsButton hinzufügen
+3. Loading-Prop zu OsButton hinzufügen
+
+**Milestone 4c: ~60 Buttons mit neuen Props migrieren**
+1. Button-Komponenten (~15)
+2. Navigation (~8)
+3. Editor (~15)
+4. Filter/Chat (~10)
+5. Forms/Modals (~5)
+6. Features/Pages (~12)
 
 ### Integrations-Protokoll
 

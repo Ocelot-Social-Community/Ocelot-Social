@@ -78,11 +78,11 @@
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
-Phase 3: ███████░░░  75% (18/24 Aufgaben) - Webapp-Integration
+Phase 3: ████████░░  79% (19/24 Aufgaben) - Webapp-Integration (M5 ✅)
 Phase 4: █░░░░░░░░░   6% (1/17 Aufgaben) - OsButton ✅
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ███████░░░  66% (57/86 Aufgaben)
+Gesamt:  ███████░░░  67% (58/86 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -92,22 +92,30 @@ Styleguide: ██████████ 100% (38 Komponenten erfasst)
 Analyse:    ██████████ 100% (Button, Modal, Menu detailiert)
 ```
 
-### Komponenten-Migration (Priorisiert: 15)
+### OsButton Migration (Phase 3)
 ```
-Analysiert:   3 Familien (Button, Modal, Menu)
-Spezifiziert: 1 (OsButton)
-Entwickelt:   1 (OsButton mit CVA)
-QA bestanden: 1 (OsButton: 100% Coverage, Visual, A11y, Keyboard)
-Integriert:   15 Buttons in 11 Komponenten (ohne icon/circle/loading)
+Scope gesamt:     ~90 Buttons in Webapp
+├─ Migriert:       16 Buttons (18%) ✅
+├─ Ohne neue Props: 14 Buttons (Milestone 4a)
+└─ Mit icon/circle/loading: ~60 Buttons (Milestone 4c)
+
+OsButton Features:
+├─ variant:     ✅ primary, secondary, danger, warning, success, info, default
+├─ appearance:  ✅ filled, outline, ghost
+├─ size:        ✅ xs, sm, md, lg, xl
+├─ disabled:    ✅ mit hover/active-Override
+├─ icon:        ⬜ TODO (Milestone 4b)
+├─ circle:      ⬜ TODO (Milestone 4b)
+└─ loading:     ⬜ TODO (Milestone 4b)
 ```
 
 ---
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-08 (Session 6)
+**Letzte Aktualisierung:** 2026-02-09 (Session 7)
 
-**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 1-3 abgeschlossen, Milestone 4-5 offen
+**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 1-3 & 5 abgeschlossen ✅
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -174,7 +182,14 @@ Integriert:   15 Buttons in 11 Komponenten (ohne icon/circle/loading)
   - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 
 **Aktuell in Arbeit:**
-- Phase 3, Milestone 3+4: Weitere Props (icon, circle, loading) für verbleibende Buttons
+- Phase 3, Milestone 4a: 14 weitere Buttons migrieren (ohne neue Props)
+- Phase 3, Milestone 4b: 5 Buttons mit neuen Props (icon, circle, loading)
+
+**Zuletzt abgeschlossen (Milestone 5 + Analyse):**
+- [x] Visuelle Validierung: 16/16 Buttons validiert ✅
+- [x] OsButton Features: `appearance` (outline, ghost), `xs` size, focus/active states
+- [x] Disabled-Styles: CSS-Variablen, hover/active-Override, Border-Fix
+- [x] Codebase-Analyse: 14 weitere migrierbare Buttons identifiziert (Scope: 16/35)
 
 **Zuletzt erledigt (Phase 3):**
 - [x] vue-demi zur Webapp hinzugefügt (Vue 2.7 Kompatibilität)
@@ -202,23 +217,36 @@ Integriert:   15 Buttons in 11 Komponenten (ohne icon/circle/loading)
   - getCurrentInstance() für $listeners Zugriff in Vue 2
   - inheritAttrs: false für manuelle Weiterleitung
   - Jest Mock um alle Composition API Funktionen erweitert
-- [x] **15 Buttons migriert** (ohne icon/circle/loading) ✅
+- [x] **16 Buttons migriert** (ohne icon/circle/loading) ✅
   - GroupForm.vue, EmbedComponent.vue, DonationInfo.vue, CommentCard.vue
   - MapStylesButtons.vue, GroupMember.vue, embeds.vue
-  - notifications.vue, privacy.vue, terms-and-conditions-confirm.vue
+  - notifications.vue, privacy.vue, terms-and-conditions-confirm.vue, UserTeaserPopover.vue
+- [x] **Disabled-Styles korrigiert** ✅
+  - CSS-Variablen `--color-disabled` und `--color-disabled-contrast` hinzugefügt
+  - Filled-Buttons: Grauer Hintergrund statt opacity (wie buttonStates Mixin)
+  - Outline/Ghost: Graue Border/Text
+- [x] terms-and-conditions-confirm.vue: Read T&C Button → `appearance="outline" variant="primary"`
+- [x] **Disabled:active/hover Spezifität** ✅
+  - CSS-Regeln in index.css mit höherer Spezifität für disabled:hover und disabled:active
+  - Button zeigt sofort disabled-Farben, auch wenn während :active disabled wird
+- [x] notifications.vue: Check All + Uncheck All → `appearance="outline" variant="primary"`
+- [x] embeds.vue: Allow All → `appearance="outline" variant="primary"`
+- [x] **Disabled Border-Fix** ✅
+  - CSS-Regeln in index.css: `border-style: solid` und `border-width: 0.8px` bei disabled
+  - Verhindert Layout-Sprung wenn Button disabled wird
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
 3. ~~**Phase 2: Projekt-Setup**~~ ✅ ABGESCHLOSSEN
-4. **Phase 3: Webapp-Integration** - 15/20 Buttons migriert (75%)
+4. **Phase 3: Webapp-Integration** - 16/90 Buttons migriert (18%)
    - [x] yarn link / Webpack-Alias in Webapp
    - [x] CSS-Variablen definieren (ocelot-ui-variables.scss)
-   - [x] 15 Buttons ohne icon/circle/loading migriert
+   - [x] 16 Buttons migriert & validiert ✅
    - [x] Docker Build + CI-Kompatibilität
-   - [ ] icon-Prop zu OsButton hinzufügen (5 Buttons)
-   - [ ] circle-Variant hinzufügen (3 Buttons)
-   - [ ] loading-Prop hinzufügen (1 Button)
+   - [ ] **Milestone 4a:** 14 weitere Buttons (ohne neue Props)
+   - [ ] **Milestone 4b:** icon/circle/loading Props implementieren
+   - [ ] **Milestone 4c:** ~60 Buttons mit icon/circle/loading migrieren
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
 - [ ] `NPM_TOKEN` als GitHub Secret einrichten (für npm publish in ui-release.yml)
@@ -311,38 +339,108 @@ Integriert:   15 Buttons in 11 Komponenten (ohne icon/circle/loading)
 - [x] OsButton attrs/listeners Forwarding (Vue 2 $listeners via getCurrentInstance)
 - [x] 14 weitere Buttons migriert (alle ohne icon/circle/loading)
 
-**Milestone 4: Props für verbleibende Buttons**
-- [ ] icon-Prop zu OsButton hinzufügen
-- [ ] circle-Variant zu OsButton hinzufügen
-- [ ] loading-Prop zu OsButton hinzufügen
-- [ ] GroupForm.vue Submit-Button migrieren (icon)
-- [ ] Verbleibende Buttons migrieren (5 mit icon/circle/loading)
+**Milestone 4a: Weitere Buttons migrieren (14 ohne neue Props)**
+- [ ] Modal Cancel-Buttons (DisableModal, DeleteUserModal, ReleaseModal)
+- [ ] Form Cancel/Submit-Buttons (ContributionForm, EnterNonce, MySomethingList)
+- [ ] ImageUploader.vue (2× Crop-Buttons)
+- [ ] Page-Buttons (donations, badges, notifications/index, profile Unblock/Unmute)
+- [ ] ReportRow.vue More-Details-Button
 
-**Milestone 5: Validierung & Dokumentation**
-- [ ] Keine visuellen Änderungen bestätigt
-- [ ] Keine funktionalen Änderungen bestätigt
-- [ ] Webapp-Tests bestehen weiterhin
+**Milestone 4b: OsButton Props erweitern**
+- [ ] `icon` Prop implementieren (slot-basiert oder Icon-Komponente)
+- [ ] `circle` Variant zu CVA hinzufügen
+- [ ] `loading` Prop mit Spinner implementieren
+
+**Milestone 4c: Buttons mit icon/circle/loading migrieren (~60 Buttons)**
+
+*Button-Komponenten (Wrapper):*
+- [ ] Button/JoinLeaveButton.vue (icon, loading)
+- [ ] Button/FollowButton.vue (icon, loading)
+- [ ] LoginButton/LoginButton.vue (icon, circle)
+- [ ] InviteButton/InviteButton.vue (icon, circle)
+- [ ] EmotionButton/EmotionButton.vue (circle)
+- [ ] CustomButton/CustomButton.vue (2× circle)
+- [ ] LabeledButton/LabeledButton.vue (icon, circle)
+
+*Navigation & Menus:*
+- [ ] ContentMenu/ContentMenu.vue (icon, circle)
+- [ ] ContentMenu/GroupContentMenu.vue (icon, circle)
+- [ ] ChatNotificationMenu.vue (circle)
+- [ ] NotificationMenu.vue (3× icon, circle)
+- [ ] HeaderMenu/HeaderMenu.vue (icon, circle)
+- [ ] Map/MapButton.vue (circle)
+
+*Editor:*
+- [ ] Editor/MenuBarButton.vue (icon, circle)
+- [ ] Editor/MenuLegend.vue (~10× icon, circle)
+
+*Filter & Input:*
+- [ ] HashtagsFilter.vue (icon, circle)
+- [ ] CategoriesSelect.vue (icon)
+- [ ] SearchableInput.vue (icon, circle)
+- [ ] Select/LocationSelect.vue (icon)
+- [ ] PaginationButtons.vue (2× icon, circle)
+
+*Chat:*
+- [ ] Chat/Chat.vue (2× icon, circle)
+- [ ] Chat/AddChatRoomByUserSearch.vue (icon, circle)
+
+*Forms & Auth:*
+- [ ] LoginForm/LoginForm.vue (icon, loading)
+- [ ] PasswordReset/Request.vue (loading)
+- [ ] PasswordReset/ChangePassword.vue (loading)
+- [ ] Password/Change.vue (loading)
+- [ ] ContributionForm.vue Submit (icon, loading)
+- [ ] GroupForm.vue Submit (icon)
+- [ ] CommentForm/CommentForm.vue (loading)
+
+*Modals:*
+- [ ] Modal/ConfirmModal.vue (2× icon, loading)
+- [ ] Modal/ReportModal.vue (2× icon, loading)
+- [ ] Modal/DisableModal.vue Confirm (icon)
+- [ ] Modal/DeleteUserModal.vue Confirm (icon)
+- [ ] Modal/ReleaseModal.vue Confirm (icon)
+
+*Features:*
+- [ ] ComponentSlider.vue (2× icon, loading)
+- [ ] MySomethingList.vue (3× icon, circle, loading)
+- [ ] CreateInvitation.vue (icon, circle)
+- [ ] Invitation.vue (2× icon, circle)
+- [ ] ProfileList.vue (loading)
+- [ ] ReportRow.vue Confirm (icon)
+- [ ] ImageUploader.vue Delete/Cancel (2× icon, circle)
+- [ ] CommentCard.vue Reply (icon, circle)
+- [ ] EmbedComponent.vue Close (icon, circle)
+- [ ] CtaUnblockAuthor.vue (icon)
+- [ ] data-download.vue (icon, loading)
+
+*Pages:*
+- [ ] pages/groups/_id/_slug.vue (3× icon, circle, loading)
+- [ ] pages/admin/users/index.vue (2× icon, circle, loading)
+- [ ] pages/settings/index.vue (icon, loading)
+- [ ] pages/settings/blocked-users.vue (icon, circle)
+- [ ] pages/settings/muted-users.vue (icon, circle)
+- [ ] pages/settings/my-email-address/*.vue (2× icon)
+- [ ] pages/profile/_id/_slug.vue Chat (icon)
+- [ ] pages/post/_id/_slug/index.vue (icon, circle)
+
+**Milestone 5: Validierung & Dokumentation** ✅
+- [x] Keine visuellen Änderungen bestätigt (16/16 Buttons validiert)
+- [x] Keine funktionalen Änderungen bestätigt
+- [x] Disabled-Styles korrigiert (hover/active-Override, Border-Fix)
+- [ ] Webapp-Tests bestehen weiterhin (TODO: Regressionstest)
 - [ ] Erkenntnisse in KATALOG.md dokumentiert
 
-**Einsatzstellen-Analyse:** (Details in KATALOG.md)
-| Stelle | Aufwand | Status |
-|--------|---------|--------|
-| UserTeaserPopover.vue | Minimal | ✅ Erledigt |
-| GroupForm.vue (Cancel) | Minimal | ✅ Erledigt |
-| EmbedComponent.vue (2×) | Minimal | ✅ Erledigt |
-| DonationInfo.vue | Minimal | ✅ Erledigt |
-| CommentCard.vue (1×) | Minimal | ✅ Erledigt |
-| MapStylesButtons.vue | Minimal | ✅ Erledigt |
-| GroupMember.vue | Minimal | ✅ Erledigt |
-| embeds.vue (2×) | Minimal | ✅ Erledigt |
-| notifications.vue (3×) | Minimal | ✅ Erledigt |
-| privacy.vue | Minimal | ✅ Erledigt |
-| terms-and-conditions-confirm.vue (2×) | Minimal | ✅ Erledigt |
-| GroupForm.vue (Submit) | Mittel (icon) | ⬜ Ausstehend |
-| Invitation.vue | Mittel (icon, circle) | ⬜ Ausstehend |
-| CommentCard.vue (Reply) | Mittel (icon, circle) | ⬜ Ausstehend |
-| EmbedComponent.vue (Close) | Mittel (icon, circle) | ⬜ Ausstehend |
-| data-download.vue | Hoch (icon, loading) | ⬜ Ausstehend |
+**Einsatzstellen-Übersicht:**
+
+| Kategorie | Buttons | Status |
+|-----------|---------|--------|
+| ✅ Migriert & Validiert | 16 | Erledigt |
+| ⬜ Ohne neue Props (M4a) | 14 | Ausstehend |
+| ⬜ Mit icon/circle/loading (M4c) | ~60 | Ausstehend |
+| **Gesamt** | **~90** | **18% erledigt** |
+
+**Details siehe KATALOG.md** (vollständige Tracking-Tabellen)
 
 **Erfolgskriterien:**
 | Kriterium | Prüfung |
@@ -350,6 +448,36 @@ Integriert:   15 Buttons in 11 Komponenten (ohne icon/circle/loading)
 | Visuell identisch | Manueller Screenshot-Vergleich |
 | Funktional identisch | Click, Disabled funktionieren |
 | Keine Regression | Webapp Unit-Tests bestehen |
+
+**Visuelle Validierung (OsButton vs Original):**
+
+Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Active, Disabled.
+
+| Datei | Button | Props | Validiert |
+|-------|--------|-------|-----------|
+| `components/Group/GroupForm.vue` | Cancel | `default` | ✅ |
+| `components/Group/GroupMember.vue` | Remove Member | `appearance="outline" variant="primary" size="sm"` | ✅ |
+| `components/CommentCard/CommentCard.vue` | Show more/less | `appearance="ghost" variant="primary" size="sm"` | ✅ |
+| `components/UserTeaser/UserTeaserPopover.vue` | Open Profile | `variant="primary"` | ✅ |
+| `components/DonationInfo/DonationInfo.vue` | Donate Now | `size="sm" variant="primary"` | ✅ |
+| `components/Map/MapStylesButtons.vue` | Map Styles | `:appearance` dynamisch + custom CSS | ✅ |
+| `components/Embed/EmbedComponent.vue` | Cancel | `appearance="outline" variant="danger"` + custom CSS | ✅ |
+| `components/Embed/EmbedComponent.vue` | Play Now | `variant="primary"` + custom CSS | ✅ |
+| `pages/terms-and-conditions-confirm.vue` | Read T&C | `appearance="outline" variant="primary"` | ✅ |
+| `pages/terms-and-conditions-confirm.vue` | Save | `variant="primary"` + disabled | ✅ |
+| `pages/settings/privacy.vue` | Save | `variant="primary"` + disabled | ✅ |
+| `pages/settings/notifications.vue` | Check All | `appearance="outline" variant="primary"` + disabled | ✅ |
+| `pages/settings/notifications.vue` | Uncheck All | `appearance="outline" variant="primary"` + disabled | ✅ |
+| `pages/settings/notifications.vue` | Save | `variant="primary"` + disabled | ✅ |
+| `pages/settings/embeds.vue` | Allow All | `appearance="outline" variant="primary"` + disabled | ✅ |
+| `pages/settings/embeds.vue` | Deny All | `variant="primary"` + disabled | ✅ |
+
+**Validierung abgeschlossen:** 16/16 (100%) ✅
+
+**Nach Abschluss aller Validierungen:**
+- [ ] Gesamt-Regressionstest durchführen
+- [ ] Alle Unit-Tests bestehen
+- [ ] Dokumentation aktualisieren
 
 ### Phase 4: Komponenten-Migration (15 Komponenten + 2 Infrastruktur)
 
@@ -1291,6 +1419,29 @@ Bei der Migration werden:
 | 2026-02-08 | **Phase 3: Jest Mock erweitert** | Alle Composition API Funktionen (computed, ref, watch, etc.) im Mock |
 | 2026-02-08 | **Phase 3: 15 Buttons migriert** | GroupForm, EmbedComponent, DonationInfo, CommentCard, MapStylesButtons, GroupMember, embeds, notifications, privacy, terms-and-conditions-confirm |
 | 2026-02-08 | **Phase 3: Test-Updates** | privacy.spec.js Selektoren, notifications Snapshot, DonationInfo.spec.js |
+| 2026-02-08 | **OsButton: appearance Prop** | Neue `appearance` Prop: `filled` (default), `outline`, `ghost` - ermöglicht base-button Stile |
+| 2026-02-08 | **OsButton: xs Size** | Exakte Pixel-Werte für base-button --small: h-26px, px-8px, text-12px, rounded-5px |
+| 2026-02-08 | **OsButton: outline primary** | Grüner Rahmen + grüner Text + hellgrüner Hintergrund-Tint (rgba(25,122,49,0.18)) |
+| 2026-02-08 | **OsButton: ghost primary** | Transparenter Hintergrund, grüner Text, Hover füllt grün, Active dunkler |
+| 2026-02-08 | **OsButton: Focus Style** | `focus:outline-dashed focus:outline-1` statt ring (wie base-button) |
+| 2026-02-08 | **OsButton: Active State** | `active:bg-[var(--color-*-hover)]` für dunkleren Hintergrund beim Drücken |
+| 2026-02-08 | **Visuelle Validierung** | Tracking-Tabelle in PROJEKT.md für manuelle Button-Vergleiche (4/16 validiert) |
+| 2026-02-08 | **Storybook Grayscale Theme** | Vollständige CSS-Variablen: default, active-states, contrast-inverse |
+| 2026-02-08 | **Tailwind Source Filter** | `@import "tailwindcss" source(none)` - verhindert Markdown-Scanning |
+| 2026-02-08 | **Button Variants Konsistenz** | Alle 21 compound variants mit korrekten active-states (`--color-*-active`) |
+| 2026-02-08 | **CSS-Variablen erweitert** | `--color-secondary/warning/success/info-active` in ocelot-ui-variables.scss |
+| 2026-02-08 | **Story Dokumentation** | "Medium (37.5px)" → "Medium (36px)" korrigiert |
+| 2026-02-08 | **Playwright Toleranz** | `maxDiffPixelRatio: 0.03` für Cross-Platform Font-Rendering |
+| 2026-02-09 | **Disabled-Styles korrigiert** | CSS-Variablen `--color-disabled`, filled: grauer Hintergrund statt opacity |
+| 2026-02-09 | **terms-and-conditions-confirm** | Read T&C Button → `appearance="outline" variant="primary"` |
+| 2026-02-09 | **Visuelle Validierung** | 10/16 Buttons validiert (terms-and-conditions-confirm.vue abgeschlossen) |
+| 2026-02-09 | **Disabled:active/hover Fix** | CSS-Regeln in index.css mit höherer Spezifität für sofortige disabled-Darstellung |
+| 2026-02-09 | **notifications.vue** | Check All + Uncheck All → `appearance="outline" variant="primary"` |
+| 2026-02-09 | **Visuelle Validierung** | 14/16 Buttons validiert (notifications.vue abgeschlossen) |
+| 2026-02-09 | **embeds.vue** | Allow All → `appearance="outline" variant="primary"` |
+| 2026-02-09 | **Disabled Border-Fix** | CSS-Regeln in index.css: `border-style: solid` + `border-width: 0.8px` bei :disabled |
+| 2026-02-09 | **Visuelle Validierung abgeschlossen** | 16/16 Buttons validiert (100%) ✅ Milestone 5 erfolgreich |
+| 2026-02-09 | **Button-Analyse erweitert** | 14 weitere Buttons identifiziert (ohne icon/circle/loading) → Scope: 16/35 |
 
 ---
 

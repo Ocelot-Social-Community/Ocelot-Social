@@ -4,7 +4,7 @@
       <base-icon name="balance-scale" />
       <h2 class="title">{{ $t(`termsAndConditions.newTermsAndConditions`) }}</h2>
       <nuxt-link :to="{ name: 'terms-and-conditions' }" target="_blank">
-        <os-button variant="secondary">
+        <os-button appearance="outline" variant="primary">
           {{ $t(`termsAndConditions.termsAndConditionsNewConfirmText`) }}
         </os-button>
       </nuxt-link>

@@ -20,10 +20,20 @@
       </div>
     </ds-space>
     <ds-space margin-top="base" margin-bottom="x-small">
-      <os-button @click="checkAll" :disabled="isCheckAllDisabled" variant="secondary">
+      <os-button
+        appearance="outline"
+        variant="primary"
+        @click="checkAll"
+        :disabled="isCheckAllDisabled"
+      >
         {{ $t('settings.notifications.checkAll') }}
       </os-button>
-      <os-button @click="uncheckAll" :disabled="isUncheckAllDisabled" variant="secondary">
+      <os-button
+        appearance="outline"
+        variant="primary"
+        @click="uncheckAll"
+        :disabled="isUncheckAllDisabled"
+      >
         {{ $t('settings.notifications.uncheckAll') }}
       </os-button>
       <os-button
