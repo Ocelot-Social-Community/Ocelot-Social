@@ -1073,3 +1073,50 @@ $z-index-dropdown: 8888
 $box-shadow-x-large: 0 15px 30px 0 rgba(0,0,0,.11), ...
 $box-shadow-small-inset: inset 0 0 0 1px rgba(0,0,0,.05)
 ```
+
+---
+
+## Phase 3: Webapp-Integration (Tracking)
+
+### OsButton Einsatzstellen in Webapp
+
+| # | Datei | Aktueller Button | Props verwendet | Status | Aufwand |
+|---|-------|------------------|-----------------|--------|---------|
+| 1 | UserTeaserPopover.vue | `ds-button` | `primary` | ⬜ Ausstehend | **Minimal** |
+| 2 | GroupForm.vue (Cancel) | `ds-button` | keine | ⬜ Ausstehend | **Minimal** |
+| 3 | GroupForm.vue (Submit) | `ds-button` | `icon`, `primary`, `fill`, `disabled` | ⬜ Ausstehend | Mittel |
+| 4 | Invitation.vue (Copy) | `base-button` | `circle`, `icon`, `disabled` | ⬜ Ausstehend | Mittel |
+| 5 | Invitation.vue (Delete) | `base-button` | `circle`, `icon` | ⬜ Ausstehend | Mittel |
+| 6 | data-download.vue | `base-button` | `icon`, `secondary`, `filled`, `loading`, `disabled` | ⬜ Ausstehend | Hoch |
+
+### Status-Legende
+- ⬜ Ausstehend
+- ⏳ In Arbeit
+- ✅ Migriert
+- ❌ Blockiert (fehlende Features)
+
+### Fehlende OsButton-Features für vollständige Migration
+
+| Feature | Benötigt für | Status | Priorität |
+|---------|-------------|--------|-----------|
+| `icon` Prop | #3, #4, #5, #6 | ⬜ Fehlt | Hoch |
+| `circle` Variant | #4, #5 | ⬜ Fehlt | Mittel |
+| `loading` Prop | #6 | ⬜ Fehlt | Mittel |
+| Outline-Stil (default) | BaseButton-Kompatibilität | ⬜ Fehlt | Hoch |
+
+### Migrations-Reihenfolge (empfohlen)
+
+1. **UserTeaserPopover.vue** - Nur `variant="primary"` nötig ✅
+2. **GroupForm.vue Cancel** - Kein Prop nötig ✅
+3. Icon-Prop zu OsButton hinzufügen
+4. GroupForm.vue Submit migrieren
+5. Circle-Variant zu OsButton hinzufügen
+6. Invitation.vue migrieren
+7. Loading-Prop zu OsButton hinzufügen
+8. data-download.vue migrieren
+
+### Integrations-Protokoll
+
+| Datum | Aktion | Details |
+|-------|--------|---------|
+| 2026-02-08 | Analyse | 6 Einsatzstellen identifiziert, 2 minimal (nur variant) |
