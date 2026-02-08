@@ -1,0 +1,19 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    "packages/ui": {
+      "release-type": "node",
+      "package-name": "@ocelot-social/ui",
+      "changelog-path": "CHANGELOG.md",
+      "include-component-in-tag": true,
+      "component": "ui",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
+      "draft": false,
+      "prerelease": false
+    }
+  },
+  "separate-pull-requests": true,
+  "pull-request-title-pattern": "chore(${component}): release ${version}",
+  "include-v-in-tag": true
+}

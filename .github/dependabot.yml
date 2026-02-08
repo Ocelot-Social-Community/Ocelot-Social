@@ -126,3 +126,71 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+
+# ui library
+- package-ecosystem: npm
+  open-pull-requests-limit: 99
+  directory: "/packages/ui"
+  rebase-strategy: "disabled"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
+  groups:
+    vue:
+      applies-to: version-updates
+      patterns:
+        - "vue*"
+        - "@vue*"
+    vite:
+      applies-to: version-updates
+      patterns:
+        - "vite*"
+        - "@vitejs*"
+    vitest:
+      applies-to: version-updates
+      patterns:
+        - "vitest*"
+        - "@vitest*"
+
+# ui examples
+- package-ecosystem: npm
+  open-pull-requests-limit: 99
+  directory: "/packages/ui/examples/vue3-tailwind"
+  rebase-strategy: "disabled"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
+
+- package-ecosystem: npm
+  open-pull-requests-limit: 99
+  directory: "/packages/ui/examples/vue3-css"
+  rebase-strategy: "disabled"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
+
+- package-ecosystem: npm
+  open-pull-requests-limit: 99
+  directory: "/packages/ui/examples/vue2-tailwind"
+  rebase-strategy: "disabled"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
+
+- package-ecosystem: npm
+  open-pull-requests-limit: 99
+  directory: "/packages/ui/examples/vue2-css"
+  rebase-strategy: "disabled"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"

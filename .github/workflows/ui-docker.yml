@@ -1,0 +1,45 @@
+name: UI Docker
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'packages/ui/**'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'packages/ui/**'
+
+jobs:
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build development image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./packages/ui
+          file: ./packages/ui/Dockerfile
+          target: development
+          push: false
+          tags: ocelot-social/ui:development
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build production image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./packages/ui
+          file: ./packages/ui/Dockerfile
+          target: production
+          push: false
+          tags: ocelot-social/ui:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

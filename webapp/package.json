@@ -62,6 +62,7 @@
     "vue-virtual-scroller": "^1.1.2",
     "vue2-datepicker": "^3.11.1",
     "vue": "~2.7.16",
+    "vue-demi": "^0.14.10",
     "vuex-i18n": "~1.13.1",
     "xregexp": "^5.1.2",
     "zxcvbn": "^4.4.2"

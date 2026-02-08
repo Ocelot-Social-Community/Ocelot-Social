@@ -83,5 +83,13 @@ services:
     # bring the database in offline mode to export or load dumps
     # command: ["tail", "-f", "/dev/null"]
 
+  ui:
+    image: ghcr.io/ocelot-social-community/ocelot-social/ui:${OCELOT_VERSION:-latest}
+    build:
+      context: ./packages/ui
+      target: production
+    ports:
+      - 6006:80
+
 volumes:
   neo4j_data:
