@@ -22,6 +22,7 @@
     "postinstall": "node scripts/fix-vue2-jest.js && node scripts/fix-v-mapbox.js"
   },
   "dependencies": {
+    "@ocelot-social/ui": "file:../packages/ui",
     "@mapbox/mapbox-gl-geocoder": "^5.0.2",
     "@nuxtjs/apollo": "^4.0.0-rc19",
     "@nuxtjs/axios": "~5.9.7",
@@ -62,6 +63,7 @@
     "vue-virtual-scroller": "^1.1.2",
     "vue2-datepicker": "^3.11.1",
     "vue": "~2.7.16",
+    "vue-demi": "^0.14.10",
     "vuex-i18n": "~1.13.1",
     "xregexp": "^5.1.2",
     "zxcvbn": "^4.4.2"

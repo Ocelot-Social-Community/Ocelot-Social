@@ -11,11 +11,13 @@ import type { VariantProps } from 'class-variance-authority'
  * - Easy customization via class prop
  */
 export const buttonVariants = cva(
-  // Base classes (always applied)
+  // Base classes (always applied) - matching ds-button styles
   [
     'inline-flex items-center justify-center',
-    'font-medium',
-    'transition-colors duration-200',
+    'font-semibold tracking-wide',
+    'rounded',
+    'shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]',
+    'transition-colors duration-100 ease-out',
     'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
     'disabled:pointer-events-none disabled:opacity-50',
   ],
@@ -52,19 +54,19 @@ export const buttonVariants = cva(
           'hover:bg-[var(--color-info-hover)]',
           'focus-visible:ring-[var(--color-info)]',
         ],
-        ghost: ['bg-transparent', 'hover:bg-gray-100', 'focus-visible:ring-gray-400'],
+        ghost: ['bg-transparent shadow-none', 'hover:bg-gray-100', 'focus-visible:ring-gray-400'],
         outline: [
-          'border border-current bg-transparent',
+          'border border-current bg-transparent shadow-none',
           'hover:bg-gray-100',
           'focus-visible:ring-gray-400',
         ],
       },
       size: {
-        xs: 'h-6 px-2 text-xs rounded',
-        sm: 'h-8 px-3 text-sm rounded-md',
-        md: 'h-10 px-4 text-base rounded-md',
-        lg: 'h-12 px-6 text-lg rounded-lg',
-        xl: 'h-14 px-8 text-xl rounded-lg',
+        xs: 'h-6 px-2 py-1 text-xs',
+        sm: 'h-8 px-3 py-1.5 text-sm',
+        md: 'h-[37.5px] px-4 py-2 text-[15px]',
+        lg: 'h-12 px-6 py-3 text-lg',
+        xl: 'h-14 px-8 py-4 text-xl',
       },
       fullWidth: {
         true: 'w-full',

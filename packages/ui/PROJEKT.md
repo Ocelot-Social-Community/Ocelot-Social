@@ -78,12 +78,11 @@
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
-Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
+Phase 3: ██████░░░░  58% (15/26 Aufgaben) - Webapp-Integration
 Phase 4: █░░░░░░░░░   6% (1/17 Aufgaben) - OsButton ✅
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
-Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  █████░░░░░  56% (39/70 Aufgaben)
+Gesamt:  ██████░░░░  62% (54/88 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -99,16 +98,16 @@ Analysiert:   3 Familien (Button, Modal, Menu)
 Spezifiziert: 1 (OsButton)
 Entwickelt:   1 (OsButton mit CVA)
 QA bestanden: 1 (OsButton: 100% Coverage, Visual, A11y, Keyboard)
-Integriert:   0
+Integriert:   1 (OsButton in UserTeaserPopover.vue)
 ```
 
 ---
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-08
+**Letzte Aktualisierung:** 2026-02-08 (Session 5)
 
-**Aktuelle Phase:** Phase 3 (Webapp-Integration) - In Arbeit
+**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 1+2 abgeschlossen, Milestone 3-5 offen
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -175,17 +174,41 @@ Integriert:   0
   - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 
 **Aktuell in Arbeit:**
-- Phase 3, Milestone 1: Library-Einbindung in Webapp
-- Einsatzstellen analysiert: 6 gefunden (2 minimal, 4 mit zusätzlichem Aufwand)
+- Phase 3, Milestone 3: Schrittweise Erweiterung (GroupForm.vue)
+
+**Zuletzt erledigt (Phase 3):**
+- [x] vue-demi zur Webapp hinzugefügt (Vue 2.7 Kompatibilität)
+- [x] Webpack-Alias für vue-demi (nutzt Webapp's Vue 2.7 statt UI-Library's Vue 3)
+- [x] Webpack-Alias für @ocelot-social/ui (dist Pfade mit $ für exakten Match)
+- [x] OsButton mit isVue2 Render-Funktion (Vue 2: attrs-Objekt, Vue 3: flat props)
+- [x] CSS-Reihenfolge angepasst (UI-Library nach Styleguide für korrekte Spezifität)
+- [x] Manueller visueller Vergleich ✅
+- [x] **Jest-Integration für vue-demi** ✅
+  - Custom Mock (`test/__mocks__/@ocelot-social/ui.js`) statt direktem Import
+  - Problem: Jest's moduleNameMapper greift nicht für verschachtelte requires in CJS
+  - Problem: Jest lädt `vue.runtime.common.js` mit exports unter `default`
+  - Lösung: Module._load Patch für vue-demi + defineComponent von Vue.default
+  - Setup-File (`test/vueDemiSetup.js`) für Module._resolveFilename Patch
+  - **979 Tests bestehen ✅**
+- [x] Button-Variants an ds-button angepasst (font-semibold, rounded, box-shadow)
+- [x] UserTeaserPopover.vue migriert (verwendet `<os-button>`)
+- [x] **Docker Build für UI-Library** ✅
+  - ui-library Stage in Dockerfile + Dockerfile.maintenance
+  - COPY --from=ui-library ./app/ /packages/ui/
+- [x] **CI-Kompatibilität** ✅
+  - Relativer Pfad `file:../packages/ui` statt absolut `/packages/ui`
+  - Funktioniert lokal, in CI und in Docker
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
 3. ~~**Phase 2: Projekt-Setup**~~ ✅ ABGESCHLOSSEN
-4. **Phase 3: Webapp-Integration** - In Arbeit
-   - [ ] npm link in Webapp
-   - [ ] CSS-Variablen definieren
-   - [ ] UserTeaserPopover.vue migrieren (einfachste Stelle)
+4. **Phase 3: Webapp-Integration** - In Arbeit (58%)
+   - [x] yarn link / Webpack-Alias in Webapp
+   - [x] CSS-Variablen definieren (ocelot-ui-variables.scss)
+   - [x] UserTeaserPopover.vue migrieren (OsButton)
+   - [x] Docker Build + CI-Kompatibilität
+   - [ ] Weitere Einsatzstellen migrieren (4 verbleibend)
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
 - [ ] `NPM_TOKEN` als GitHub Secret einrichten (für npm publish in ui-release.yml)
@@ -254,15 +277,24 @@ Integriert:   0
 
 **Ansatz:** Integration First - Library einbinden, dann schrittweise OsButton ersetzen, beginnend mit einfachsten Stellen.
 
-**Milestone 1: Library-Einbindung**
-- [ ] @ocelot-social/ui in Webapp installieren (npm link)
-- [ ] CSS Custom Properties in Webapp definieren (--color-primary, etc.)
-- [ ] Import-Pfade testen
+**Milestone 1: Library-Einbindung** ✅
+- [x] @ocelot-social/ui in Webapp installieren (yarn link + Webpack-Alias)
+- [x] vue-demi zur Webapp hinzugefügt (für Vue 2.7 Kompatibilität)
+- [x] Webpack-Alias für vue-demi (nutzt Webapp's Vue 2.7)
+- [x] Webpack-Alias für @ocelot-social/ui$ und style.css$
+- [x] CSS Custom Properties in Webapp definieren (ocelot-ui-variables.scss)
+- [x] CSS-Reihenfolge angepasst (UI-Library nach Styleguide)
+- [x] Import-Pfade testen
+- [x] Docker Build Stage für UI-Library (Dockerfile + Dockerfile.maintenance)
+- [x] Relativer Pfad für CI-Kompatibilität (file:../packages/ui)
+- [x] Jest Mock für @ocelot-social/ui (test/__mocks__/@ocelot-social/ui.js)
 
-**Milestone 2: Erste Integration (Minimaler Aufwand)**
-- [ ] OsButton in UserTeaserPopover.vue einsetzen (nur `variant="primary"`)
-- [ ] Manueller visueller Vergleich
-- [ ] Webapp-Tests bestehen
+**Milestone 2: Erste Integration (Minimaler Aufwand)** ✅
+- [x] OsButton mit isVue2 Render-Funktion (Vue 2/3 kompatibel)
+- [x] Button-Variants an ds-button angepasst (font-semibold, rounded, box-shadow)
+- [x] OsButton in UserTeaserPopover.vue eingesetzt (`variant="primary"`)
+- [x] Manueller visueller Vergleich ✅
+- [x] Webapp-Tests bestehen ✅ (979 Tests, jest moduleNameMapper für vue-demi)
 
 **Milestone 3: Schrittweise Erweiterung**
 - [ ] GroupForm.vue Cancel-Button migrieren
@@ -284,7 +316,7 @@ Integriert:   0
 **Einsatzstellen-Analyse:** (Details in KATALOG.md)
 | Stelle | Aufwand | Status |
 |--------|---------|--------|
-| UserTeaserPopover.vue | Minimal | ⬜ Ausstehend |
+| UserTeaserPopover.vue | Minimal | ✅ Erledigt |
 | GroupForm.vue (Cancel) | Minimal | ⬜ Ausstehend |
 | GroupForm.vue (Submit) | Mittel (icon) | ⬜ Ausstehend |
 | Invitation.vue | Mittel (icon, circle) | ⬜ Ausstehend |
@@ -1221,6 +1253,18 @@ Bei der Migration werden:
 | 2026-02-08 | **Projekt-Optimierung** | src/test/setup.ts entfernt, @storybook/vue3 entfernt, README.md fix |
 | 2026-02-08 | **Package Updates** | size-limit 12.0.0, eslint-plugin-jsdoc 62.5.4, vite-tsconfig-paths 6.1.0 |
 | 2026-02-08 | **TODO: eslint-config-it4c** | Muss auf ESLint 10 aktualisiert werden (aktuell inkompatibel) |
+| 2026-02-08 | **Phase 3: vue-demi Integration** | vue-demi zur Webapp hinzugefügt, Webpack-Alias für Vue 2.7 Kompatibilität |
+| 2026-02-08 | **Phase 3: Webpack-Alias** | @ocelot-social/ui$ und style.css$ Aliase für yarn-linked Package |
+| 2026-02-08 | **Phase 3: isVue2 Render** | OsButton mit isVue2 Check: Vue 2 attrs-Objekt, Vue 3 flat props |
+| 2026-02-08 | **Phase 3: CSS-Spezifität** | UI-Library CSS nach Styleguide laden (styleguide.js Plugin) |
+| 2026-02-08 | **Phase 3: Jest vue-demi** | Custom Mock (`__mocks__/@ocelot-social/ui.js`) mit Module._load Patch, defineComponent von Vue.default, vueDemiSetup.js, 979 Tests ✅ |
+| 2026-02-08 | **Phase 3: Button-Styles** | Variants angepasst: font-semibold, rounded, box-shadow, h-[37.5px] |
+| 2026-02-08 | **Phase 3: Erste Integration** | UserTeaserPopover.vue verwendet `<os-button>` |
+| 2026-02-08 | **Phase 3: Visueller Test** | Manueller Vergleich OsButton vs ds-button erfolgreich ✅ |
+| 2026-02-08 | **Phase 3: v8 ignore** | Vue 2 Branch in OsButton mit `/* v8 ignore */` für 100% Coverage in Vitest |
+| 2026-02-08 | **Phase 3: Docker Build** | ui-library Stage in Dockerfile + Dockerfile.maintenance, COPY --from=ui-library |
+| 2026-02-08 | **Phase 3: CI-Fix** | Relativer Pfad `file:../packages/ui` statt absolut für yarn install außerhalb Docker |
+| 2026-02-08 | **Phase 3: Storybook Fix** | TypeScript-Fehler in Stories behoben (`default` aus args entfernt) |
 
 ---
 
