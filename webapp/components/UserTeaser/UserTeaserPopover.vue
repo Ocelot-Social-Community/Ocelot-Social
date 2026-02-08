@@ -28,12 +28,13 @@
       </li>
     </ul>
     <nuxt-link v-if="isTouchDevice && userLink" :to="userLink" class="link">
-      <ds-button primary>{{ $t('user-teaser.popover.open-profile') }}</ds-button>
+      <os-button variant="primary">{{ $t('user-teaser.popover.open-profile') }}</os-button>
     </nuxt-link>
   </div>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import Badges from '~/components/Badges.vue'
 import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
 import { isTouchDevice } from '~/components/utils/isTouchDevice'
@@ -44,6 +45,7 @@ export default {
   components: {
     Badges,
     LocationInfo,
+    OsButton,
   },
   props: {
     userId: { type: String },

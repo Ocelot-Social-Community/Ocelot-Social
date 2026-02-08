@@ -1,5 +1,36 @@
-@import "tailwindcss";
+/*
+ * Tailwind CSS ohne Preflight (Reset)
+ * Preflight überschreibt globale Styles und kollidiert mit bestehenden Apps.
+ * Stattdessen importieren wir nur Theme und Utilities.
+ */
+@import "tailwindcss/theme";
+@import "tailwindcss/utilities";
 
 /* Scan component files for utility classes */
 @source "../components/**/*.vue";
 @source "../**/*.ts";
+
+/*
+ * Button Reset (ersetzt Preflight für Buttons)
+ * Diese Styles sind nötig, da wir Preflight deaktiviert haben.
+ */
+@layer base {
+  button {
+    font-family: inherit;
+    font-size: 100%;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    cursor: pointer;
+    -webkit-appearance: button;
+  }
+
+  button:focus {
+    outline: none;
+  }
+}

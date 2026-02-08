@@ -94,6 +94,9 @@ export default {
     '~assets/_new/styles/resets.scss',
     '~assets/styles/main.scss',
     '~assets/styles/imports/_branding.scss',
+    // @ocelot-social/ui CSS variables (loaded before styleguide)
+    '~assets/_new/styles/ocelot-ui-variables.scss',
+    // Note: @ocelot-social/ui/style.css is loaded via plugin after styleguide
   ],
 
   /*
@@ -281,6 +284,17 @@ export default {
       config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/dist`)
       // Vue 2.7 has built-in Composition API - redirect old imports
       config.resolve.alias['@vue/composition-api'] = 'vue'
+      // Ensure vue-demi uses webapp's Vue 2.7 (not UI library's Vue 3)
+      config.resolve.alias['vue-demi'] = path.resolve(__dirname, 'node_modules/vue-demi')
+      // UI library alias - point to dist folder
+      config.resolve.alias['@ocelot-social/ui$'] = path.resolve(
+        __dirname,
+        '../packages/ui/dist/index.mjs',
+      )
+      config.resolve.alias['@ocelot-social/ui/style.css$'] = path.resolve(
+        __dirname,
+        '../packages/ui/dist/style.css',
+      )
       config.module.rules.push({
         resourceQuery: /blockType=docs/,
         loader: require.resolve(`${styleguidePath}/src/loader/docs-trim-loader.js`),
