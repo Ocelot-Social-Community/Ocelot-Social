@@ -91,5 +91,15 @@ services:
       S3_RESULT_STORAGE_BUCKET: ocelot # enable S3 result storage by specifying bucket
       HTTP_LOADER_BASE_URL: http://minio:9000
 
+  ui:
+    image: ghcr.io/ocelot-social-community/ocelot-social/ui:local-development
+    build:
+      target: development
+    ports:
+      - 6006:6006
+    volumes:
+      - ./packages/ui:/app
+      - /app/node_modules
+
 volumes:
   minio_data:

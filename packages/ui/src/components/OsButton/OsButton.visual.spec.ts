@@ -1,0 +1,82 @@
+import { AxeBuilder } from '@axe-core/playwright'
+import { expect, test } from '@playwright/test'
+
+import type { Page } from '@playwright/test'
+
+/**
+ * Visual regression tests for OsButton component
+ *
+ * These tests capture screenshots of Storybook stories and compare them
+ * against baseline images to detect unintended visual changes.
+ * Each test also runs accessibility checks using axe-core.
+ */
+
+const STORY_URL = '/iframe.html?id=components-osbutton'
+const STORY_ROOT = '#storybook-root'
+
+/**
+ * Helper to run accessibility check on the current page
+ */
+async function checkA11y(page: Page) {
+  const results = await new AxeBuilder({ page }).include(STORY_ROOT).analyze()
+
+  expect(results.violations).toEqual([])
+}
+
+test.describe('OsButton visual regression', () => {
+  test('primary variant', async ({ page }) => {
+    await page.goto(`${STORY_URL}--primary&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await expect(root.locator('button')).toHaveScreenshot('primary.png')
+    await checkA11y(page)
+  })
+
+  test('secondary variant', async ({ page }) => {
+    await page.goto(`${STORY_URL}--secondary&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await expect(root.locator('button')).toHaveScreenshot('secondary.png')
+    await checkA11y(page)
+  })
+
+  test('danger variant', async ({ page }) => {
+    await page.goto(`${STORY_URL}--danger&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await expect(root.locator('button')).toHaveScreenshot('danger.png')
+    await checkA11y(page)
+  })
+
+  test('all variants', async ({ page }) => {
+    await page.goto(`${STORY_URL}--all-variants&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await expect(root.locator('.flex')).toHaveScreenshot('all-variants.png')
+    await checkA11y(page)
+  })
+
+  test('all sizes', async ({ page }) => {
+    await page.goto(`${STORY_URL}--all-sizes&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await expect(root.locator('.flex')).toHaveScreenshot('all-sizes.png')
+    await checkA11y(page)
+  })
+
+  test('disabled state', async ({ page }) => {
+    await page.goto(`${STORY_URL}--disabled&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await expect(root.locator('button')).toHaveScreenshot('disabled.png')
+    await checkA11y(page)
+  })
+
+  test('full width', async ({ page }) => {
+    await page.goto(`${STORY_URL}--full-width&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await expect(root.locator('button')).toHaveScreenshot('full-width.png')
+    await checkA11y(page)
+  })
+})

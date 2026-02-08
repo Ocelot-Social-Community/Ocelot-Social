@@ -1,0 +1,60 @@
+name: UI Storybook
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'packages/ui/**'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'packages/ui/**'
+
+defaults:
+  run:
+    working-directory: packages/ui
+
+jobs:
+  build:
+    name: Build Storybook
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: 'packages/ui/.tool-versions'
+          cache: 'npm'
+          cache-dependency-path: packages/ui/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Storybook
+        run: npm run storybook:build
+
+      - name: Verify build output
+        run: |
+          echo "Checking Storybook build output..."
+
+          if [ ! -d "storybook-static" ]; then
+            echo "::error::storybook-static directory not found"
+            exit 1
+          fi
+
+          if [ ! -f "storybook-static/index.html" ]; then
+            echo "::error::index.html not found in storybook-static"
+            exit 1
+          fi
+
+          echo "✓ Storybook build verified!"
+
+      - name: Upload Storybook artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-static
+          path: packages/ui/storybook-static/
+          retention-days: 7
