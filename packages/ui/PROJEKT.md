@@ -78,11 +78,11 @@
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
-Phase 3: ██████░░░░  58% (15/26 Aufgaben) - Webapp-Integration
+Phase 3: ███████░░░  75% (18/24 Aufgaben) - Webapp-Integration
 Phase 4: █░░░░░░░░░   6% (1/17 Aufgaben) - OsButton ✅
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ██████░░░░  62% (54/88 Aufgaben)
+Gesamt:  ███████░░░  66% (57/86 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -98,16 +98,16 @@ Analysiert:   3 Familien (Button, Modal, Menu)
 Spezifiziert: 1 (OsButton)
 Entwickelt:   1 (OsButton mit CVA)
 QA bestanden: 1 (OsButton: 100% Coverage, Visual, A11y, Keyboard)
-Integriert:   1 (OsButton in UserTeaserPopover.vue)
+Integriert:   15 Buttons in 11 Komponenten (ohne icon/circle/loading)
 ```
 
 ---
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-08 (Session 5)
+**Letzte Aktualisierung:** 2026-02-08 (Session 6)
 
-**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 1+2 abgeschlossen, Milestone 3-5 offen
+**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 1-3 abgeschlossen, Milestone 4-5 offen
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -174,7 +174,7 @@ Integriert:   1 (OsButton in UserTeaserPopover.vue)
   - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 
 **Aktuell in Arbeit:**
-- Phase 3, Milestone 3: Schrittweise Erweiterung (GroupForm.vue)
+- Phase 3, Milestone 3+4: Weitere Props (icon, circle, loading) für verbleibende Buttons
 
 **Zuletzt erledigt (Phase 3):**
 - [x] vue-demi zur Webapp hinzugefügt (Vue 2.7 Kompatibilität)
@@ -198,17 +198,27 @@ Integriert:   1 (OsButton in UserTeaserPopover.vue)
 - [x] **CI-Kompatibilität** ✅
   - Relativer Pfad `file:../packages/ui` statt absolut `/packages/ui`
   - Funktioniert lokal, in CI und in Docker
+- [x] **OsButton attrs/listeners Forwarding** ✅
+  - getCurrentInstance() für $listeners Zugriff in Vue 2
+  - inheritAttrs: false für manuelle Weiterleitung
+  - Jest Mock um alle Composition API Funktionen erweitert
+- [x] **15 Buttons migriert** (ohne icon/circle/loading) ✅
+  - GroupForm.vue, EmbedComponent.vue, DonationInfo.vue, CommentCard.vue
+  - MapStylesButtons.vue, GroupMember.vue, embeds.vue
+  - notifications.vue, privacy.vue, terms-and-conditions-confirm.vue
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
 3. ~~**Phase 2: Projekt-Setup**~~ ✅ ABGESCHLOSSEN
-4. **Phase 3: Webapp-Integration** - In Arbeit (58%)
+4. **Phase 3: Webapp-Integration** - 15/20 Buttons migriert (75%)
    - [x] yarn link / Webpack-Alias in Webapp
    - [x] CSS-Variablen definieren (ocelot-ui-variables.scss)
-   - [x] UserTeaserPopover.vue migrieren (OsButton)
+   - [x] 15 Buttons ohne icon/circle/loading migriert
    - [x] Docker Build + CI-Kompatibilität
-   - [ ] Weitere Einsatzstellen migrieren (4 verbleibend)
+   - [ ] icon-Prop zu OsButton hinzufügen (5 Buttons)
+   - [ ] circle-Variant hinzufügen (3 Buttons)
+   - [ ] loading-Prop hinzufügen (1 Button)
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
 - [ ] `NPM_TOKEN` als GitHub Secret einrichten (für npm publish in ui-release.yml)
@@ -296,16 +306,17 @@ Integriert:   1 (OsButton in UserTeaserPopover.vue)
 - [x] Manueller visueller Vergleich ✅
 - [x] Webapp-Tests bestehen ✅ (979 Tests, jest moduleNameMapper für vue-demi)
 
-**Milestone 3: Schrittweise Erweiterung**
-- [ ] GroupForm.vue Cancel-Button migrieren
-- [ ] Bei Bedarf: icon-Prop zu OsButton hinzufügen
-- [ ] GroupForm.vue Submit-Button migrieren
+**Milestone 3: Schrittweise Erweiterung** ✅
+- [x] GroupForm.vue Cancel-Button migriert
+- [x] OsButton attrs/listeners Forwarding (Vue 2 $listeners via getCurrentInstance)
+- [x] 14 weitere Buttons migriert (alle ohne icon/circle/loading)
 
-**Milestone 4: Vollständige BaseButton-Migration**
-- [ ] Bei Bedarf: circle-Variant hinzufügen
-- [ ] Bei Bedarf: loading-Prop hinzufügen
-- [ ] Invitation.vue migrieren
-- [ ] data-download.vue migrieren
+**Milestone 4: Props für verbleibende Buttons**
+- [ ] icon-Prop zu OsButton hinzufügen
+- [ ] circle-Variant zu OsButton hinzufügen
+- [ ] loading-Prop zu OsButton hinzufügen
+- [ ] GroupForm.vue Submit-Button migrieren (icon)
+- [ ] Verbleibende Buttons migrieren (5 mit icon/circle/loading)
 
 **Milestone 5: Validierung & Dokumentation**
 - [ ] Keine visuellen Änderungen bestätigt
@@ -317,9 +328,20 @@ Integriert:   1 (OsButton in UserTeaserPopover.vue)
 | Stelle | Aufwand | Status |
 |--------|---------|--------|
 | UserTeaserPopover.vue | Minimal | ✅ Erledigt |
-| GroupForm.vue (Cancel) | Minimal | ⬜ Ausstehend |
+| GroupForm.vue (Cancel) | Minimal | ✅ Erledigt |
+| EmbedComponent.vue (2×) | Minimal | ✅ Erledigt |
+| DonationInfo.vue | Minimal | ✅ Erledigt |
+| CommentCard.vue (1×) | Minimal | ✅ Erledigt |
+| MapStylesButtons.vue | Minimal | ✅ Erledigt |
+| GroupMember.vue | Minimal | ✅ Erledigt |
+| embeds.vue (2×) | Minimal | ✅ Erledigt |
+| notifications.vue (3×) | Minimal | ✅ Erledigt |
+| privacy.vue | Minimal | ✅ Erledigt |
+| terms-and-conditions-confirm.vue (2×) | Minimal | ✅ Erledigt |
 | GroupForm.vue (Submit) | Mittel (icon) | ⬜ Ausstehend |
 | Invitation.vue | Mittel (icon, circle) | ⬜ Ausstehend |
+| CommentCard.vue (Reply) | Mittel (icon, circle) | ⬜ Ausstehend |
+| EmbedComponent.vue (Close) | Mittel (icon, circle) | ⬜ Ausstehend |
 | data-download.vue | Hoch (icon, loading) | ⬜ Ausstehend |
 
 **Erfolgskriterien:**
@@ -1265,6 +1287,10 @@ Bei der Migration werden:
 | 2026-02-08 | **Phase 3: Docker Build** | ui-library Stage in Dockerfile + Dockerfile.maintenance, COPY --from=ui-library |
 | 2026-02-08 | **Phase 3: CI-Fix** | Relativer Pfad `file:../packages/ui` statt absolut für yarn install außerhalb Docker |
 | 2026-02-08 | **Phase 3: Storybook Fix** | TypeScript-Fehler in Stories behoben (`default` aus args entfernt) |
+| 2026-02-08 | **Phase 3: attrs/listeners** | OsButton forwarded jetzt attrs + $listeners für Vue 2 (getCurrentInstance) |
+| 2026-02-08 | **Phase 3: Jest Mock erweitert** | Alle Composition API Funktionen (computed, ref, watch, etc.) im Mock |
+| 2026-02-08 | **Phase 3: 15 Buttons migriert** | GroupForm, EmbedComponent, DonationInfo, CommentCard, MapStylesButtons, GroupMember, embeds, notifications, privacy, terms-and-conditions-confirm |
+| 2026-02-08 | **Phase 3: Test-Updates** | privacy.spec.js Selektoren, notifications Snapshot, DonationInfo.spec.js |
 
 ---
 

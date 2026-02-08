@@ -35,9 +35,9 @@
     />
     <template v-else>
       <content-viewer :content="commentContent" class="content" />
-      <base-button v-if="hasLongContent" size="small" ghost @click="isCollapsed = !isCollapsed">
+      <os-button v-if="hasLongContent" size="sm" variant="ghost" @click="isCollapsed = !isCollapsed">
         {{ isCollapsed ? $t('comment.show.more') : $t('comment.show.less') }}
-      </base-button>
+      </os-button>
     </template>
     <div class="actions">
       <shout-button
@@ -62,6 +62,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapGetters } from 'vuex'
 import { COMMENT_MAX_UNTRUNCATED_LENGTH, COMMENT_TRUNCATE_TO_LENGTH } from '~/constants/comment'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
@@ -74,6 +75,7 @@ import scrollToAnchor from '~/mixins/scrollToAnchor.js'
 
 export default {
   components: {
+    OsButton,
     UserTeaser,
     ContentMenu,
     ContentViewer,

@@ -35,7 +35,7 @@ describe('DonationInfo.vue', () => {
     })
 
     it('displays the action button', () => {
-      expect(wrapper.find('.base-button').text()).toBe('donations.donate-now')
+      expect(wrapper.find('button').text()).toBe('donations.donate-now')
     })
 
     describe('mount with data', () => {

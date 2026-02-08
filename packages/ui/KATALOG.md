@@ -10,8 +10,9 @@
 ### Übersicht
 ```
 Phase 0: Analyse    ██████████ 100% (8/8 Schritte)
+Phase 3: Migration  ███████░░░  75% (15/20 Buttons)
 ───────────────────────────────────────────
-Nächste Phase: Phase 2 (Projekt-Setup)
+Aktuelle Phase: Phase 3 (Webapp-Integration)
 ```
 
 ### Statistiken
@@ -23,6 +24,33 @@ Nächste Phase: Phase 2 (Projekt-Setup)
 | Detailiert analysiert | 3 Familien (Button, Modal, Menu) |
 | Duplikate gefunden | 5 direkte + 3 Familien |
 | Zur Migration priorisiert | 15 Kern-Komponenten |
+
+### OsButton Migration (Phase 3)
+| Status | Anzahl | Details |
+|--------|--------|---------|
+| ✅ Migriert | 15 | Buttons ohne icon/circle/loading |
+| ⏳ Ausstehend | 5 | Benötigen icon/circle/loading Props |
+| **Gesamt** | **20** | In 16 Dateien |
+
+**Migrierte Komponenten:**
+- UserTeaserPopover.vue (1 Button)
+- GroupForm.vue (1 Button - Cancel)
+- EmbedComponent.vue (2 Buttons - Cancel, Play Now)
+- DonationInfo.vue (1 Button)
+- CommentCard.vue (1 Button - Show More)
+- MapStylesButtons.vue (1 Button)
+- GroupMember.vue (1 Button)
+- embeds.vue (2 Buttons)
+- notifications.vue (3 Buttons)
+- privacy.vue (1 Button)
+- terms-and-conditions-confirm.vue (2 Buttons)
+
+**Ausstehend (benötigen Props):**
+- GroupForm.vue Submit (icon)
+- CommentCard.vue Reply (icon, circle)
+- EmbedComponent.vue Close (icon, circle)
+- Invitation.vue (icon, circle)
+- data-download.vue (icon, loading)
 
 ---
 
@@ -50,7 +78,7 @@ Nächste Phase: Phase 2 (Projekt-Setup)
 ### Data Input
 | # | Komponente | Status | Webapp-Duplikat | Varianten | Priorität | Notizen |
 |---|------------|--------|-----------------|-----------|-----------|---------|
-| 13 | Button | ⬜ Ausstehend | BaseButton, CustomButton, ActionButton, ... | | | VIELE Varianten! |
+| 13 | Button | ⏳ Migration | BaseButton, CustomButton, ActionButton, ... | | | → OsButton (15/20 migriert) |
 | 14 | CopyField | ⬜ Ausstehend | | | | |
 | 15 | Form | ⬜ Ausstehend | | | | |
 | 16 | FormItem | ⬜ Ausstehend | | | | |
@@ -115,7 +143,7 @@ Nächste Phase: Phase 2 (Projekt-Setup)
 | 7 | BadgeSelection | ⬜ Ausstehend | Input | | |
 | 8 | Badges | ⬜ Ausstehend | Display | | |
 | 9 | BadgesSection | ⬜ Ausstehend | Display | | |
-| 10 | BaseButton | ⬜ Ausstehend | Button | Button | 🔄 Button-Familie |
+| 10 | BaseButton | ⏳ Migration | Button | Button | 🔄 → OsButton (15/20 migriert) |
 | 11 | BaseCard | ⬜ Ausstehend | Layout | Card | 🔗 DUPLIKAT |
 | 12 | BaseIcon | ⬜ Ausstehend | Display | Icon | 🔗 DUPLIKAT |
 
@@ -129,7 +157,7 @@ Nächste Phase: Phase 2 (Projekt-Setup)
 | 17 | Change | ⬜ Ausstehend | Feature | | |
 | 18 | Chat | ⬜ Ausstehend | Feature | | Chat-spezifisch |
 | 19 | ChatNotificationMenu | ⬜ Ausstehend | Feature | | Chat-spezifisch |
-| 20 | CommentCard | ⬜ Ausstehend | Display | Card | |
+| 20 | CommentCard | ⏳ Teilweise | Display | Card | 1/2 Buttons → OsButton |
 | 21 | CommentForm | ⬜ Ausstehend | Input | Form | |
 | 22 | CommentList | ⬜ Ausstehend | Display | List | |
 | 23 | ComponentSlider | ⬜ Ausstehend | Layout | | |
@@ -152,12 +180,12 @@ Nächste Phase: Phase 2 (Projekt-Setup)
 | 36 | DeleteData | ⬜ Ausstehend | Feature | | |
 | 37 | DeleteUserModal | ⬜ Ausstehend | Feedback | Modal | 🔄 Modal-Familie |
 | 38 | DisableModal | ⬜ Ausstehend | Feedback | Modal | 🔄 Modal-Familie |
-| 39 | DonationInfo | ⬜ Ausstehend | Display | | |
+| 39 | DonationInfo | ✅ Migriert | Display | | Button → OsButton |
 | 40 | Dropdown | ⬜ Ausstehend | Input | Select | |
 | 41 | DropdownFilter | ⬜ Ausstehend | Filter | Select | |
 | 42 | Editor | ⬜ Ausstehend | Input | | Rich-Text |
 | 43 | EmailDisplayAndVerify | ⬜ Ausstehend | Feature | | |
-| 44 | EmbedComponent | ⬜ Ausstehend | Display | | |
+| 44 | EmbedComponent | ⏳ Teilweise | Display | | 2/3 Buttons → OsButton |
 | 45 | EmotionButton | ⬜ Ausstehend | Button | Button | |
 | 46 | Emotions | ⬜ Ausstehend | Feature | | |
 | 47 | Empty | ⬜ Ausstehend | Feedback | Placeholder | |
@@ -176,7 +204,7 @@ Nächste Phase: Phase 2 (Projekt-Setup)
 | 56 | FollowList | ⬜ Ausstehend | Display | List | |
 | 57 | GroupButton | ⬜ Ausstehend | Button | Button | |
 | 58 | GroupContentMenu | ⬜ Ausstehend | Navigation | Menu | |
-| 59 | GroupForm | ⬜ Ausstehend | Input | Form | |
+| 59 | GroupForm | ⏳ Teilweise | Input | Form | 1/2 Buttons → OsButton |
 | 60 | GroupLink | ⬜ Ausstehend | Navigation | | |
 | 61 | GroupList | ⬜ Ausstehend | Display | List | |
 | 62 | GroupMember | ⬜ Ausstehend | Display | | |
@@ -308,7 +336,7 @@ Nächste Phase: Phase 2 (Projekt-Setup)
 | EmotionButton | Emotion | Feature-spezifisch |
 | JoinLeaveButton | Beitreten/Verlassen | Feature-spezifisch |
 | MapButton | Karten-Button | Feature-spezifisch |
-| MapStylesButtons | Kartenstile | Feature-spezifisch |
+| MapStylesButtons | Kartenstile | ✅ → OsButton |
 | CtaJoinLeaveGroup | CTA | Feature-spezifisch |
 | CtaUnblockAuthor | CTA | Feature-spezifisch |
 
@@ -374,11 +402,16 @@ Diese sollten zuerst migriert werden:
 | 2026-02-04 | Claude | Priorisierung | 15 Komponenten in 4 Tiers priorisiert |
 | 2026-02-04 | Claude | Konsolidierungsplan | 3 Phasen definiert, Token-Liste erstellt |
 | 2026-02-04 | Claude | **Phase 0 abgeschlossen** | Bereit für Phase 2 (Projekt-Setup) |
+| 2026-02-08 | Claude | OsButton entwickelt | CVA-Varianten, Vue 2/3 kompatibel via vue-demi |
+| 2026-02-08 | Claude | Webapp-Integration | Jest Mock, Docker Build, CI-Kompatibilität |
+| 2026-02-08 | Claude | **15 Buttons migriert** | Alle ohne icon/circle/loading Props |
+| 2026-02-08 | Claude | OsButton erweitert | attrs/listeners Forwarding für Vue 2 ($listeners) |
 
 ---
 
 ## Nächste Schritte
 
+### Phase 0: Analyse ✅
 1. [x] Webapp-Komponenten auflisten
 2. [x] Styleguide-Komponenten auflisten
 3. [x] Offensichtliche Duplikate identifizieren
@@ -388,9 +421,18 @@ Diese sollten zuerst migriert werden:
 7. [x] Priorisierung festlegen
 8. [x] Konsolidierungsplan finalisieren
 
+### Phase 3: OsButton Migration (in Arbeit)
+9. [x] OsButton entwickeln (CVA, vue-demi)
+10. [x] Webapp-Integration (Jest, Docker, CI)
+11. [x] 15 Buttons migrieren (ohne icon/circle/loading)
+12. [ ] icon-Prop zu OsButton hinzufügen
+13. [ ] circle-Variant zu OsButton hinzufügen
+14. [ ] loading-Prop zu OsButton hinzufügen
+15. [ ] Verbleibende 5 Buttons migrieren
+
 ---
 
-**✅ Phase 0 abgeschlossen!** Weiter mit Phase 2 (Projekt-Setup).
+**✅ Phase 0 abgeschlossen!** Phase 3 zu 75% erledigt.
 
 ---
 

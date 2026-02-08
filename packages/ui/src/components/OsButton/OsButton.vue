@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { computed, defineComponent, h, isVue2 } from 'vue-demi'
+  import { computed, defineComponent, getCurrentInstance, h, isVue2 } from 'vue-demi'
 
   import { cn } from '../../utils'
 
@@ -10,6 +10,8 @@
 
   export default defineComponent({
     name: 'OsButton',
+    // In Vue 2, inheritAttrs must be false to manually forward attrs
+    inheritAttrs: false,
     props: {
       variant: {
         type: String as PropType<ButtonVariants['variant']>,
@@ -36,7 +38,7 @@
         default: '',
       },
     },
-    setup(props, { slots }) {
+    setup(props, { slots, attrs }) {
       const classes = computed(() =>
         cn(
           buttonVariants({
@@ -48,11 +50,18 @@
         ),
       )
 
+      // Get component instance for Vue 2 $listeners access
+      const instance = getCurrentInstance()
+
       return () => {
         const children = slots.default?.()
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
         if (isVue2) {
-          // Vue 2: attrs for HTML attributes
+          // Vue 2: separate attrs and on (listeners)
+          // $listeners contains event handlers like @click
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const listeners = (instance?.proxy as any)?.$listeners || {}
+
           return h(
             'button',
             {
@@ -60,19 +69,22 @@
               attrs: {
                 type: props.type,
                 disabled: props.disabled || undefined,
+                ...attrs,
               },
+              on: listeners,
             },
             children,
           )
         }
         /* v8 ignore stop */
-        // Vue 3: flat props
+        // Vue 3: flat props, attrs includes listeners
         return h(
           'button',
           {
             type: props.type,
             disabled: props.disabled,
             class: classes.value,
+            ...attrs,
           },
           children,
         )

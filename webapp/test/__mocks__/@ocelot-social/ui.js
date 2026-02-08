@@ -20,12 +20,49 @@ if (!vueDemi.isVue2) {
   throw new Error('vue-demi is not configured for Vue 2! isVue2=' + vueDemi.isVue2)
 }
 
-// If defineComponent is undefined, get it from Vue.default
+// Patch missing Composition API functions from Vue.default
 // This is needed because Jest loads vue.runtime.common.js which exports under default
-if (!vueDemi.defineComponent) {
-  const Vue = require('vue')
-  if (Vue.default && Vue.default.defineComponent) {
-    vueDemi.defineComponent = Vue.default.defineComponent
+const Vue = require('vue')
+const VueApi = Vue.default || Vue
+
+// List of Composition API functions that vue-demi should export
+const compositionApiFns = [
+  'defineComponent',
+  'computed',
+  'ref',
+  'reactive',
+  'watch',
+  'watchEffect',
+  'onMounted',
+  'onUnmounted',
+  'onBeforeMount',
+  'onBeforeUnmount',
+  'provide',
+  'inject',
+  'toRef',
+  'toRefs',
+  'unref',
+  'isRef',
+  'shallowRef',
+  'triggerRef',
+  'customRef',
+  'shallowReactive',
+  'shallowReadonly',
+  'readonly',
+  'toRaw',
+  'markRaw',
+  'effectScope',
+  'getCurrentScope',
+  'onScopeDispose',
+  'getCurrentInstance',
+  'h',
+  'nextTick',
+]
+
+// Patch any missing functions
+for (const fn of compositionApiFns) {
+  if (!vueDemi[fn] && VueApi[fn]) {
+    vueDemi[fn] = VueApi[fn]
   }
 }
 

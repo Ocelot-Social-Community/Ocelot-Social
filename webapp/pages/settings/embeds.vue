@@ -18,12 +18,12 @@
         {{ $t('settings.embeds.status.change.question') }}
       </ds-text>
       <ds-space margin-top="small" margin-bottom="base">
-        <base-button @click="submit" :filled="!disabled" :disabled="!disabled">
+        <os-button @click="submit" :variant="!disabled ? 'primary' : 'secondary'" :disabled="!disabled">
           {{ $t('settings.embeds.status.change.deny') }}
-        </base-button>
-        <base-button @click="submit" :filled="disabled" :disabled="disabled">
+        </os-button>
+        <os-button @click="submit" :variant="disabled ? 'primary' : 'secondary'" :disabled="disabled">
           {{ $t('settings.embeds.status.change.allow') }}
-        </base-button>
+        </os-button>
       </ds-space>
       <h3>{{ $t('settings.embeds.info-description') }}</h3>
       <ds-space margin="small">
@@ -45,12 +45,14 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import axios from 'axios'
 import { mapGetters, mapMutations } from 'vuex'
 import { updateUserMutation } from '~/graphql/User.js'
 import scrollToContent from './scroll-to-content.js'
 
 export default {
+  components: { OsButton },
   mixins: [scrollToContent],
   head() {
     return {

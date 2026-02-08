@@ -35,17 +35,11 @@ exports[`notifications.vue mount renders 1`] = `
         </label></div>
     </div>
   </div>
-  <div class="ds-space" style="margin-top: 24px; margin-bottom: 8px;"><button type="button" class="base-button">
-      <!---->
-      <!---->
+  <div class="ds-space" style="margin-top: 24px; margin-bottom: 8px;"><button type="button" class="inline-flex items-center justify-center font-semibold tracking-wide rounded shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] transition-colors duration-100 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-[var(--color-secondary)] text-[var(--color-secondary-contrast)] hover:bg-[var(--color-secondary-hover)] focus-visible:ring-[var(--color-secondary)] h-[37.5px] px-4 py-2 text-[15px]">
       settings.notifications.checkAll
-    </button> <button type="button" class="base-button">
-      <!---->
-      <!---->
+    </button> <button type="button" class="inline-flex items-center justify-center font-semibold tracking-wide rounded shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] transition-colors duration-100 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-[var(--color-secondary)] text-[var(--color-secondary-contrast)] hover:bg-[var(--color-secondary-hover)] focus-visible:ring-[var(--color-secondary)] h-[37.5px] px-4 py-2 text-[15px]">
       settings.notifications.uncheckAll
-    </button> <button disabled="disabled" type="button" class="save-button base-button --filled">
-      <!---->
-      <!---->
+    </button> <button type="button" disabled="disabled" class="inline-flex items-center justify-center font-semibold tracking-wide rounded shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] transition-colors duration-100 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-[var(--color-primary)] text-[var(--color-primary-contrast)] hover:bg-[var(--color-primary-hover)] focus-visible:ring-[var(--color-primary)] h-[37.5px] px-4 py-2 text-[15px] save-button">
       actions.save
     </button></div>
   <!---->
