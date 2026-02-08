@@ -26,7 +26,12 @@
       <os-button @click="uncheckAll" :disabled="isUncheckAllDisabled" variant="secondary">
         {{ $t('settings.notifications.uncheckAll') }}
       </os-button>
-      <os-button custom-class="save-button" variant="primary" @click="submit" :disabled="isSubmitDisabled">
+      <os-button
+        custom-class="save-button"
+        variant="primary"
+        @click="submit"
+        :disabled="isSubmitDisabled"
+      >
         {{ $t('actions.save') }}
       </os-button>
     </ds-space>
