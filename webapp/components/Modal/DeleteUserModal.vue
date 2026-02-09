@@ -36,7 +36,7 @@
       </ds-section>
     </div>
 
-    <template slot="footer">
+    <template #footer>
       <os-button variant="primary" appearance="outline" class="cancel" @click="cancel">{{ $t('actions.cancel') }}</os-button>
       <base-button danger filled class="confirm" icon="exclamation-circle" @click="openModal">
         {{ $t('settings.deleteUserAccount.name') }}

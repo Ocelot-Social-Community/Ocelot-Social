@@ -3,7 +3,7 @@
     <!-- eslint-disable-next-line vue/no-v-html -->
     <p v-html="message" />
 
-    <template slot="footer">
+    <template #footer>
       <os-button variant="primary" appearance="outline" class="cancel" @click="cancel">{{ $t('release.cancel') }}</os-button>
       <base-button danger filled class="confirm" icon="exclamation-circle" @click="confirm">
         {{ $t('release.submit') }}

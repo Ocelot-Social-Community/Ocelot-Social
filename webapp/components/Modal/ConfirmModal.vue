@@ -9,7 +9,7 @@
     <!-- eslint-disable-next-line vue/no-v-html -->
     <p v-html="message" />
 
-    <template slot="footer">
+    <template #footer>
       <base-button
         class="cancel"
         :danger="!modalData.buttons.confirm.danger"
