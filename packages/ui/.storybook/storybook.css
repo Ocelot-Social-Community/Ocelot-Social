@@ -1,0 +1,34 @@
+/* Inter font for consistent rendering across platforms */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+/* Greyscale theme for Storybook - demonstrates that colors come from the app */
+/* All colors meet WCAG AA contrast requirements (4.5:1 for normal text) */
+:root {
+  font-family: 'Inter', system-ui, sans-serif;
+
+  --color-primary: #404040;
+  --color-primary-hover: #262626;
+  --color-primary-contrast: #ffffff;
+
+  --color-secondary: #595959;
+  --color-secondary-hover: #404040;
+  --color-secondary-contrast: #ffffff;
+
+  --color-danger: #525252;
+  --color-danger-hover: #404040;
+  --color-danger-contrast: #ffffff;
+
+  --color-warning: #d4d4d4;
+  --color-warning-hover: #a3a3a3;
+  --color-warning-contrast: #000000;
+
+  --color-success: #525252;
+  --color-success-hover: #404040;
+  --color-success-contrast: #ffffff;
+
+  --color-info: #595959;
+  --color-info-hover: #404040;
+  --color-info-contrast: #ffffff;
+}

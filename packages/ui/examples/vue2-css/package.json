@@ -1,0 +1,26 @@
+{
+  "name": "vue2-css",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "lint": "eslint --max-warnings 0 ."
+  },
+  "dependencies": {
+    "@ocelot-social/ui": "file:../..",
+    "vue": "^2.7.16"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue2": "^2.3.3",
+    "@vue/test-utils": "^1.3.6",
+    "eslint": "^9.18.0",
+    "eslint-config-it4c": "^0.8.0",
+    "jsdom": "^28.0.0",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18"
+  }
+}
