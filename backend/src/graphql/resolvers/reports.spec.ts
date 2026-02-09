@@ -626,7 +626,7 @@ describe('file a report on a resource', () => {
         variables: {
           resourceId: 'abusive-post-1',
           reasonCategory: 'other',
-          reasonDescription: 'This comment is bigoted',
+          reasonDescription: 'This post is bigoted',
         },
       })
       await mutate({
@@ -634,7 +634,7 @@ describe('file a report on a resource', () => {
         variables: {
           resourceId: 'abusive-comment-1',
           reasonCategory: 'discrimination_etc',
-          reasonDescription: 'This post is bigoted',
+          reasonDescription: 'This comment is bigoted',
         },
       })
       await mutate({
@@ -706,7 +706,7 @@ describe('file a report on a resource', () => {
                   }),
                   createdAt: expect.any(String),
                   reasonCategory: 'other',
-                  reasonDescription: 'This comment is bigoted',
+                  reasonDescription: 'This post is bigoted',
                 }),
               ]),
             }),
@@ -726,7 +726,7 @@ describe('file a report on a resource', () => {
                   }),
                   createdAt: expect.any(String),
                   reasonCategory: 'discrimination_etc',
-                  reasonDescription: 'This post is bigoted',
+                  reasonDescription: 'This comment is bigoted',
                 }),
               ]),
             }),
