@@ -12,6 +12,9 @@ reviews:
       - master
       - main
 
+  auto_approve:
+    enabled: true
+
   # Review-Einstellungen
   request_changes_workflow: true
   high_level_summary: true
