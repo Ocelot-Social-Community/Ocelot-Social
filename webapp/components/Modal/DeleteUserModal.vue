@@ -126,8 +126,8 @@ export default {
       }, 1000)
     },
     async confirm() {
-      this.$apollo
-        .mutate({
+      try {
+        await this.$apollo.mutate({
           mutation: gql`
             mutation ($id: ID!, $resource: [Deletable]) {
               DeleteUser(id: $id, resource: $resource) {
@@ -137,26 +137,24 @@ export default {
           `,
           variables: { id: this.userdata.id, resource: ['Post', 'Comment'] },
         })
-        .then(({ _data }) => {
-          this.success = true
-          this.$toast.success(this.$t('settings.deleteUserAccount.success'))
-          setTimeout(() => {
-            this.isOpen = false
-            setTimeout(() => {
-              this.success = false
-              this.$emit('close')
-              this.$router.replace('/')
-            }, 500)
-          }, 1500)
-          this.loading = false
-        })
-        .catch((err) => {
-          this.$emit('close')
-          this.success = false
-          this.$toast.error(err.message)
+        this.success = true
+        this.$toast.success(this.$t('settings.deleteUserAccount.success'))
+        setTimeout(() => {
           this.isOpen = false
-          this.loading = false
-        })
+          setTimeout(() => {
+            this.success = false
+            this.$emit('close')
+            this.$router.replace('/')
+          }, 500)
+        }, 1500)
+      } catch (err) {
+        this.$emit('close')
+        this.success = false
+        this.$toast.error(err.message)
+        this.isOpen = false
+      } finally {
+        this.loading = false
+      }
     },
   },
 }
