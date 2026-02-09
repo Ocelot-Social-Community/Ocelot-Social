@@ -1,0 +1,4 @@
+@import 'tailwindcss';
+
+/* Scan UI library dist for utility classes */
+@source '../../../dist/**/*.mjs';

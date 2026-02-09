@@ -1,6 +1,5 @@
-// eslint-disable-next-line import/no-cycle
-import { MiddlewareOrder } from '@middleware/index'
+// import { addMiddleware } from '@middleware/index'
 
-export default (): MiddlewareOrder[] => {
-  return []
+export default () => {
+  // addMiddleware({ name: 'myMW', middleware: myMW, position: { } })
 }

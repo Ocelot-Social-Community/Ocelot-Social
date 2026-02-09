@@ -1,0 +1,81 @@
+name: UI Build
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'packages/ui/**'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'packages/ui/**'
+
+defaults:
+  run:
+    working-directory: packages/ui
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: 'packages/ui/.tool-versions'
+          cache: 'npm'
+          cache-dependency-path: packages/ui/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build library
+        run: npm run build
+
+      - name: Verify build output
+        run: |
+          echo "Checking build output..."
+
+          # Check that dist directory exists
+          if [ ! -d "dist" ]; then
+            echo "::error::dist directory not found"
+            exit 1
+          fi
+
+          # Check required files exist
+          FILES=(
+            "dist/index.mjs"
+            "dist/index.cjs"
+            "dist/index.d.ts"
+            "dist/index.d.cts"
+            "dist/tailwind.preset.mjs"
+            "dist/tailwind.preset.cjs"
+            "dist/tailwind.preset.d.ts"
+            "dist/tailwind.preset.d.cts"
+            "dist/style.css"
+          )
+
+          for file in "${FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "::error::Missing required file: $file"
+              exit 1
+            fi
+            echo "✓ $file"
+          done
+
+          echo ""
+          echo "All build outputs verified!"
+
+      - name: Validate package
+        run: npm run validate
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: packages/ui/dist/
+          retention-days: 7
