@@ -22,7 +22,7 @@
           <user-teaser :user="report.resource" :showAvatar="false" :showPopover="false" />
         </client-only>
         <nuxt-link v-else class="title" :to="linkTarget">
-          {{ linkText | truncate(50) }}
+          {{ $filters.truncate(linkText, 50) }}
         </nuxt-link>
       </td>
 
