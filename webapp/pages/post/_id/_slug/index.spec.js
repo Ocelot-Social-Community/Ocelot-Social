@@ -140,7 +140,7 @@ describe('PostSlug', () => {
           })
 
           it('does go to index (main) page', () => {
-            expect(mocks.$router.push).toHaveBeenCalledTimes(1)
+            expect(mocks.$router.push).toHaveBeenCalledWith('/')
           })
         })
       })
