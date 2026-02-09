@@ -65,9 +65,7 @@ describe('PostSlug', () => {
         },
         // If you are mocking the router, then don't use VueRouter with localVue: https://vue-test-utils.vuejs.org/guides/using-with-vue-router.html
         $router: {
-          history: {
-            push: jest.fn(),
-          },
+          push: jest.fn(),
         },
         $toast: {
           success: jest.fn(),
@@ -142,7 +140,7 @@ describe('PostSlug', () => {
           })
 
           it('does go to index (main) page', () => {
-            expect(mocks.$router.history.push).toHaveBeenCalledTimes(1)
+            expect(mocks.$router.push).toHaveBeenCalledTimes(1)
           })
         })
       })

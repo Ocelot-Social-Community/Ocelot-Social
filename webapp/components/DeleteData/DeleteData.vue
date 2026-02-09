@@ -114,7 +114,7 @@ export default {
         .then(() => {
           this.$toast.success(this.$t('settings.deleteUserAccount.success'))
           this.logout()
-          this.$router.history.push('/')
+          this.$router.push('/')
         })
         .catch((error) => {
           this.$toast.error(error.message)

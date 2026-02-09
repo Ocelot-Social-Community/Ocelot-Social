@@ -36,9 +36,7 @@ describe('DeleteData.vue', () => {
         success: jest.fn(),
       },
       $router: {
-        history: {
-          push: jest.fn(),
-        },
+        push: jest.fn(),
       },
     }
     getters = {
@@ -166,7 +164,7 @@ describe('DeleteData.vue', () => {
 
       it('redirect the user to the homepage', async () => {
         await deleteAccountBtn.trigger('click')
-        expect(mocks.$router.history.push).toHaveBeenCalledWith('/')
+        expect(mocks.$router.push).toHaveBeenCalledWith('/')
       })
     })
 
