@@ -111,9 +111,9 @@ export default {
           `,
           variables: { id: this.currentUser.id, resource: resourceArgs },
         })
-        .then(() => {
+        .then(async () => {
           this.$toast.success(this.$t('settings.deleteUserAccount.success'))
-          this.logout()
+          await this.logout()
           this.$router.push('/')
         })
         .catch((error) => {
