@@ -20,9 +20,9 @@
         <strong>
           {{
             selectedBadgeIndex === null
-              ? this.$t('settings.badges.click-to-select')
+              ? $t('settings.badges.click-to-select')
               : isEmptySlotSelected
-                ? this.$t('settings.badges.click-to-use')
+                ? $t('settings.badges.click-to-use')
                 : ''
           }}
         </strong>
