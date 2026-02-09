@@ -71,12 +71,12 @@
             </ds-flex-item>
           </ds-flex>
           <div v-if="!myProfile" class="action-buttons">
-            <base-button v-if="user.isBlocked" @click="unblockUser(user)">
+            <os-button v-if="user.isBlocked" variant="primary" appearance="outline" full-width @click="unblockUser(user)">
               {{ $t('settings.blocked-users.unblock') }}
-            </base-button>
-            <base-button v-if="user.isMuted" @click="unmuteUser(user)">
+            </os-button>
+            <os-button v-if="user.isMuted" variant="primary" appearance="outline" full-width @click="unmuteUser(user)">
               {{ $t('settings.muted-users.unmute') }}
-            </base-button>
+            </os-button>
             <hc-follow-button
               v-if="!user.isMuted && !user.isBlocked"
               :follow-id="user.id"
@@ -192,6 +192,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import uniqBy from 'lodash/uniqBy'
 import { mapGetters, mapMutations } from 'vuex'
 import postListActions from '~/mixins/postListActions'
@@ -225,6 +226,7 @@ const tabToFilterMapping = ({ tab, id }) => {
 
 export default {
   components: {
+    OsButton,
     SocialMedia,
     PostTeaser,
     HcFollowButton,
@@ -489,10 +491,12 @@ export default {
 .action-buttons {
   margin: $space-small 0;
 
+  > button {
+    margin-bottom: $space-x-small;
+  }
   > .base-button {
     display: block;
     width: 100%;
-    margin-bottom: $space-x-small;
   }
 }
 </style>
