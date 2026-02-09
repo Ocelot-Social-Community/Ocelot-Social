@@ -12,12 +12,11 @@ reviews:
       - master
       - main
 
-  # Auto-Approve wenn keine Probleme gefunden
   auto_approve:
     enabled: true
 
   # Review-Einstellungen
-  request_changes_workflow: false
+  request_changes_workflow: true
   high_level_summary: true
   poem: false
   review_status: true
