@@ -80,11 +80,11 @@
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
-Phase 3: ████████░░  79% (19/24 Aufgaben) - Webapp-Integration (M5 ✅)
+Phase 3: █████████░  83% (20/24 Aufgaben) - Webapp-Integration (M4a ✅, M5 ✅)
 Phase 4: █░░░░░░░░░   6% (1/17 Aufgaben) - OsButton ✅
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ███████░░░  67% (58/86 Aufgaben)
+Gesamt:  ███████░░░  69% (59/86 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -97,8 +97,8 @@ Analyse:    ██████████ 100% (Button, Modal, Menu detailiert)
 ### OsButton Migration (Phase 3)
 ```
 Scope gesamt:     ~90 Buttons in Webapp
-├─ Migriert:       26 Buttons (29%) ✅
-├─ Ohne neue Props:  4 Buttons (Milestone 4a - verbleibend)
+├─ Migriert:       32 Buttons (36%) ✅
+├─ Ohne neue Props:  0 Buttons (Milestone 4a ✅)
 └─ Mit icon/circle/loading: ~60 Buttons (Milestone 4c)
 
 OsButton Features:
@@ -115,9 +115,9 @@ OsButton Features:
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-09 (Session 9)
+**Letzte Aktualisierung:** 2026-02-09 (Session 10)
 
-**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 4a in Arbeit (26 Buttons migriert, 4 verbleibend ohne neue Props)
+**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 4a abgeschlossen ✅ (32 Buttons migriert, nächster: Milestone 4b)
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -184,8 +184,8 @@ OsButton Features:
   - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 
 **Aktuell in Arbeit:**
-- Phase 3, Milestone 4a: 14 weitere Buttons migrieren (ohne neue Props)
-- Phase 3, Milestone 4b: 5 Buttons mit neuen Props (icon, circle, loading)
+- Phase 3, Milestone 4b: icon/circle/loading Props in OsButton implementieren
+- Phase 3, Milestone 4c: ~60 Buttons mit icon/circle/loading migrieren
 
 **Zuletzt abgeschlossen (Milestone 5 + Analyse):**
 - [x] Visuelle Validierung: 16/16 Buttons validiert ✅
@@ -241,12 +241,12 @@ OsButton Features:
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
 3. ~~**Phase 2: Projekt-Setup**~~ ✅ ABGESCHLOSSEN
-4. **Phase 3: Webapp-Integration** - 16/90 Buttons migriert (18%)
+4. **Phase 3: Webapp-Integration** - 32/90 Buttons migriert (36%)
    - [x] yarn link / Webpack-Alias in Webapp
    - [x] CSS-Variablen definieren (ocelot-ui-variables.scss)
    - [x] 16 Buttons migriert & validiert ✅
    - [x] Docker Build + CI-Kompatibilität
-   - [ ] **Milestone 4a:** 14 weitere Buttons (ohne neue Props)
+   - [x] **Milestone 4a:** 14 weitere Buttons (ohne neue Props) ✅
    - [ ] **Milestone 4b:** icon/circle/loading Props implementieren
    - [ ] **Milestone 4c:** ~60 Buttons mit icon/circle/loading migrieren
 
@@ -1452,6 +1452,7 @@ Bei der Migration werden:
 | 2026-02-09 | **§16a hinzugefügt** | Webapp ↔ Maintenance Code-Sharing: Webapp als Source of Truth (Entscheidung #69) |
 | 2026-02-09 | **§16b hinzugefügt** | Daten-Entkopplung: ViewModel/Mapper Pattern für API-agnostische Komponenten (Entscheidung #70) |
 | 2026-02-09 | **NotificationMenu.vue** | 2 Buttons migriert (ghost primary), padding-top Fix für vertical-align Unterschied |
+| 2026-02-09 | **Milestone 4a abgeschlossen** | 6 weitere Buttons migriert: donations.vue (Save), profile/_id/_slug.vue (Unblock, Unmute), badges.vue (Remove), notifications/index.vue (Mark All Read), ReportRow.vue (More Details) |
 
 ---
 

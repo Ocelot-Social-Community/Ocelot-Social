@@ -10,9 +10,9 @@
 ### Übersicht
 ```
 Phase 0: Analyse    ██████████ 100% (8/8 Schritte)
-Phase 3: Migration  ███░░░░░░░  27% (24/90 Buttons)
+Phase 3: Migration  ████░░░░░░  36% (32/90 Buttons)
 ───────────────────────────────────────────
-Aktuelle Phase: Phase 3 - Milestone 4a (8/14 Buttons)
+Aktuelle Phase: Phase 3 - Milestone 4a ✅, nächster: Milestone 4b
 ```
 
 ### Statistiken
@@ -28,12 +28,11 @@ Aktuelle Phase: Phase 3 - Milestone 4a (8/14 Buttons)
 ### OsButton Migration (Phase 3)
 | Status | Anzahl | Details |
 |--------|--------|---------|
-| ✅ Migriert | 24 | Erste Welle + Milestone 4a (8/14) |
-| ⏳ Ausstehend (ohne neue Props) | 6 | Milestone 4a (verbleibend) |
+| ✅ Migriert | 32 | Erste Welle (16) + Milestone 4a (14) + NotificationMenu (2) |
 | ⏳ Ausstehend (mit neuen Props) | ~60 | Milestone 4c (benötigen icon/circle/loading) |
 | **Gesamt** | **~90** | In ~50 Dateien |
 
-**Migrierte Komponenten (24):**
+**Migrierte Komponenten (32):**
 
 *Erste Welle (16):*
 - UserTeaserPopover.vue (1 Button)
@@ -48,28 +47,22 @@ Aktuelle Phase: Phase 3 - Milestone 4a (8/14 Buttons)
 - privacy.vue (1 Button)
 - terms-and-conditions-confirm.vue (2 Buttons)
 
-*Milestone 4a - Session 8 (8):*
-- DisableModal.vue (1 Button - Cancel)
-- DeleteUserModal.vue (1 Button - Cancel)
-- ReleaseModal.vue (1 Button - Cancel)
-- ContributionForm.vue (1 Button - Cancel)
-- EnterNonce.vue (1 Button - Submit)
-- MySomethingList.vue (1 Button - Cancel)
-- ImageUploader.vue (2 Buttons - Crop)
-
-**Milestone 4a - ohne neue Props (8/14 erledigt):**
-- ✅ Modal/DisableModal.vue (1 Button - Cancel)
-- ✅ Modal/DeleteUserModal.vue (1 Button - Cancel)
-- ✅ ReleaseModal/ReleaseModal.vue (1 Button - Cancel)
+*Milestone 4a (14) ✅:*
+- ✅ DisableModal.vue (1 Button - Cancel)
+- ✅ DeleteUserModal.vue (1 Button - Cancel)
+- ✅ ReleaseModal.vue (1 Button - Cancel)
 - ✅ ContributionForm.vue (1 Button - Cancel)
 - ✅ EnterNonce.vue (1 Button - Submit)
 - ✅ MySomethingList.vue (1 Button - Cancel)
 - ✅ ImageUploader.vue (2 Buttons - Crop)
-- ⬜ admin/donations.vue (1 Button - Save)
-- ⬜ profile/_id/_slug.vue (2 Buttons - Unblock, Unmute)
-- ⬜ settings/badges.vue (1 Button - Remove)
-- ⬜ notifications/index.vue (1 Button - Mark All Read)
-- ⬜ ReportRow.vue (1 Button - More Details)
+- ✅ admin/donations.vue (1 Button - Save)
+- ✅ profile/_id/_slug.vue (2 Buttons - Unblock, Unmute)
+- ✅ settings/badges.vue (1 Button - Remove)
+- ✅ notifications/index.vue (1 Button - Mark All Read)
+- ✅ ReportRow.vue (1 Button - More Details)
+
+*Sonstige (2):*
+- ✅ NotificationMenu.vue (2 Buttons - Mark All Read, Notification Page)
 
 **Ausstehend - benötigen neue Props (~60):**
 
