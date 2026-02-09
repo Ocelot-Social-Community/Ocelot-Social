@@ -45,7 +45,8 @@ export default {
     reports: async (_parent, params, context, _resolveInfo) => {
       const { driver } = context
       const session = driver.session()
-      let orderByClause, filterClause
+      let orderByClause
+      const filterClauses: string[] = []
       switch (params.orderBy) {
         case 'createdAt_asc':
           orderByClause = 'ORDER BY report.createdAt ASC'
@@ -59,25 +60,23 @@ export default {
 
       switch (params.reviewed) {
         case true:
-          filterClause = 'AND ((report)<-[:REVIEWED]-(:User))'
+          filterClauses.push('AND ((report)<-[:REVIEWED]-(:User))')
           break
         case false:
-          filterClause = 'AND NOT ((report)<-[:REVIEWED]-(:User))'
+          filterClauses.push('AND NOT ((report)<-[:REVIEWED]-(:User))')
           break
-        default:
-          filterClause = ''
       }
 
       switch (params.closed) {
         case true:
-          filterClause = 'AND report.closed = true'
+          filterClauses.push('AND report.closed = true')
           break
         case false:
-          filterClause = 'AND report.closed = false'
-          break
-        default:
+          filterClauses.push('AND report.closed = false')
           break
       }
+
+      const filterClause = filterClauses.join(' ')
 
       const offset =
         params.offset && typeof params.offset === 'number' ? `SKIP ${params.offset}` : ''

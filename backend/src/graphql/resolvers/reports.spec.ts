@@ -816,6 +816,50 @@ describe('file a report on a resource', () => {
         })
       })
 
+      describe('combined reviewed and closed filter', () => {
+        it('returns only reports matching both filters', async () => {
+          authenticatedUser = await moderator.toJson()
+          // review and close one report
+          await mutate({
+            mutation: review,
+            variables: { resourceId: 'abusive-post-1', disable: false, closed: true },
+          })
+          // review but keep open another report
+          await mutate({
+            mutation: review,
+            variables: { resourceId: 'abusive-user-1', disable: false, closed: false },
+          })
+          const { data } = await query({
+            query: reports,
+            variables: { reviewed: true, closed: true },
+          })
+          expect(data.reports).toHaveLength(1)
+          expect(data.reports[0].resource.id).toBe('abusive-post-1')
+          expect(data.reports[0].closed).toBe(true)
+        })
+
+        it('reviewed: true, closed: false returns reviewed but open reports', async () => {
+          authenticatedUser = await moderator.toJson()
+          // review and close one report
+          await mutate({
+            mutation: review,
+            variables: { resourceId: 'abusive-post-1', disable: false, closed: true },
+          })
+          // review but keep open another report
+          await mutate({
+            mutation: review,
+            variables: { resourceId: 'abusive-user-1', disable: false, closed: false },
+          })
+          const { data } = await query({
+            query: reports,
+            variables: { reviewed: true, closed: false },
+          })
+          expect(data.reports).toHaveLength(1)
+          expect(data.reports[0].resource.id).toBe('abusive-user-1')
+          expect(data.reports[0].closed).toBe(false)
+        })
+      })
+
       describe('pagination', () => {
         it('first: 2 returns only 2 reports', async () => {
           authenticatedUser = await moderator.toJson()
