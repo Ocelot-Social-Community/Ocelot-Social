@@ -4,7 +4,7 @@
     <p v-html="message" />
 
     <template slot="footer">
-      <base-button class="cancel" @click="cancel">{{ $t('disable.cancel') }}</base-button>
+      <os-button variant="primary" appearance="outline" class="cancel" @click="cancel">{{ $t('disable.cancel') }}</os-button>
       <base-button danger filled class="confirm" icon="exclamation-circle" @click="confirm">
         {{ $t('disable.submit') }}
       </base-button>
@@ -13,10 +13,12 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import gql from 'graphql-tag'
 
 export default {
   name: 'DisableModal',
+  components: { OsButton },
   props: {
     name: { type: String, default: '' },
     type: { type: String, required: true },
