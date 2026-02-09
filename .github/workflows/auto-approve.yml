@@ -1,0 +1,17 @@
+name: Auto Approve after CodeRabbit
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  auto-approve:
+    if: >
+      github.event.review.state == 'approved' &&
+      github.event.review.user.login == 'coderabbitai[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/auto-approve-action@v4
