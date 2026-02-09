@@ -20,17 +20,20 @@
     <ds-text>
       {{ $t('components.registration.email-nonce.form.click-next') }}
     </ds-text>
-    <base-button :disabled="disabled" filled name="submit" type="submit">
+    <os-button variant="primary" :disabled="disabled" name="submit" type="submit">
       {{ $t('components.registration.email-nonce.form.next') }}
-    </base-button>
+    </os-button>
     <slot></slot>
   </ds-form>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import registrationConstants from '~/constants/registration'
 
 export default {
+  name: 'EnterNonce',
+  components: { OsButton },
   props: {
     email: { type: String, required: true },
   },
