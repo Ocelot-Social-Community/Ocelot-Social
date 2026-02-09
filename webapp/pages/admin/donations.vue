@@ -33,17 +33,19 @@
         :disabled="!showDonations"
         data-test="donations-progress"
       />
-      <base-button class="donations-info-button" filled type="submit">
+      <os-button class="donations-info-button" variant="primary" type="submit">
         {{ $t('actions.save') }}
-      </base-button>
+      </os-button>
     </ds-form>
   </base-card>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { DonationsQuery, UpdateDonations } from '~/graphql/Donations'
 
 export default {
+  components: { OsButton },
   data() {
     return {
       formData: {
