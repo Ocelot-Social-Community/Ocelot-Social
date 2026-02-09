@@ -365,7 +365,7 @@ export default {
     },
     async unmuteUser(user) {
       try {
-        this.$apollo.mutate({ mutation: unmuteUser(), variables: { id: user.id } })
+        await this.$apollo.mutate({ mutation: unmuteUser(), variables: { id: user.id } })
       } catch (error) {
         this.$toast.error(error.message)
       } finally {
@@ -385,7 +385,7 @@ export default {
     },
     async unblockUser(user) {
       try {
-        this.$apollo.mutate({ mutation: unblockUser(), variables: { id: user.id } })
+        await this.$apollo.mutate({ mutation: unblockUser(), variables: { id: user.id } })
       } catch (error) {
         this.$toast.error(error.message)
       } finally {
