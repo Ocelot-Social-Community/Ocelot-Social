@@ -37,7 +37,7 @@
     </div>
 
     <template slot="footer">
-      <base-button class="cancel" @click="cancel">{{ $t('actions.cancel') }}</base-button>
+      <os-button variant="primary" appearance="outline" class="cancel" @click="cancel">{{ $t('actions.cancel') }}</os-button>
       <base-button danger filled class="confirm" icon="exclamation-circle" @click="openModal">
         {{ $t('settings.deleteUserAccount.name') }}
       </base-button>
@@ -46,6 +46,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import gql from 'graphql-tag'
 import { mapMutations } from 'vuex'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
@@ -55,9 +56,10 @@ import UserTeaser from '~/components/UserTeaser/UserTeaser'
 export default {
   name: 'DeleteUserModal',
   components: {
-    UserTeaser,
-    SweetalertIcon,
     DateTime,
+    OsButton,
+    SweetalertIcon,
+    UserTeaser,
   },
   props: {
     userdata: { type: Object, required: true },
