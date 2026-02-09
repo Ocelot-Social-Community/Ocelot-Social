@@ -51,6 +51,8 @@
 | # | Abschnitt |
 |---|-----------|
 | 16 | [Library vs. Webapp](#16-library-vs-webapp) |
+| 16a | [Webapp ↔ Maintenance Code-Sharing](#16a-webapp--maintenance-code-sharing) |
+| 16b | [Daten-Entkopplung (ViewModel/Mapper)](#16b-daten-entkopplung-viewmodelmapper-pattern) |
 | 17 | [Externe Abhängigkeiten](#17-externe-abhängigkeiten) |
 | 18 | [Kompatibilitätstests (Details)](#18-kompatibilitätstests-details) |
 | 19 | [Komplexitätsanalyse](#19-komplexitätsanalyse) |
@@ -1280,6 +1282,7 @@ Bei der Migration werden:
 | 67 | Variable-Validierung | Runtime-Check in Development | `validateCssVariables()` warnt bei fehlenden Variablen |
 | 68 | Branding-Test (Webapp) | CI-Test in Webapp | Webapp testet, dass Default-Branding alle Library-Variablen definiert |
 | 69 | Webapp ↔ Maintenance Sharing | Webapp als Source of Truth | Kein separates "shared" Package, maintenance importiert aus webapp/ (siehe §16a) |
+| 70 | Daten-Entkopplung | ViewModel/Mapper Pattern | Komponenten kennen nur ViewModels, Mapper transformieren API-Daten (siehe §16b) |
 
 ### Komponenten-API & Konventionen
 
@@ -1447,6 +1450,7 @@ Bei der Migration werden:
 | 2026-02-09 | **Milestone 4a: 8 Buttons** | DisableModal, DeleteUserModal, ReleaseModal, ContributionForm, EnterNonce, MySomethingList, ImageUploader (2x) |
 | 2026-02-09 | **ImageUploader CSS-Fix** | `position: absolute !important` für crop-confirm (überschreibt OsButton `relative`) |
 | 2026-02-09 | **§16a hinzugefügt** | Webapp ↔ Maintenance Code-Sharing: Webapp als Source of Truth (Entscheidung #69) |
+| 2026-02-09 | **§16b hinzugefügt** | Daten-Entkopplung: ViewModel/Mapper Pattern für API-agnostische Komponenten (Entscheidung #70) |
 
 ---
 
@@ -1968,6 +1972,200 @@ Phase 3 (später): @ocelot-social/auth, @ocelot-social/posts, etc.
 | # | Datum | Entscheidung |
 |---|-------|--------------|
 | 68 | 2026-02-09 | Webapp als Source of Truth für geteilte Business-Komponenten |
+
+---
+
+## 16b. Daten-Entkopplung (ViewModel/Mapper Pattern)
+
+### Problemstellung
+
+Komponenten sind oft direkt an API/GraphQL-Strukturen gekoppelt:
+
+```vue
+<!-- ❌ Tight Coupling -->
+<UserCard :user="graphqlResponse.User" />
+
+// Komponente kennt GraphQL-Struktur
+props.user.avatar.url
+props.user._followedByCurrentUserCount  // Underscore?!
+props.user.__typename                   // Leaked!
+```
+
+**Probleme:**
+- Schema-Änderung = alle Komponenten anpassen
+- `__typename`, `_count` etc. leaken in die UI
+- Schwer testbar (braucht echte GraphQL-Struktur)
+- Komponenten nicht wiederverwendbar
+
+### Lösung: ViewModel + Mapper Pattern
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  GraphQL / API Layer                                        │
+│  • Queries & Mutations                                      │
+│  • Generated Types (graphql-codegen)                        │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Mappers (einziger Ort der API-Struktur kennt)              │
+│  • toUserCardViewModel(graphqlUser) → UserCardViewModel     │
+│  • toPostTeaserViewModel(graphqlPost) → PostTeaserViewModel │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  ViewModels (was die UI braucht)                            │
+│  • UserCardViewModel { displayName, avatarUrl, ... }        │
+│  • PostTeaserViewModel { title, excerpt, ... }              │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Presentational Components (kennen nur ViewModels)          │
+│  • <UserCard :user="UserCardViewModel" />                   │
+│  • <PostTeaser :post="PostTeaserViewModel" />               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Implementierung
+
+**1. ViewModels definieren:**
+```typescript
+// types/viewModels.ts
+export interface UserCardViewModel {
+  id: string
+  displayName: string
+  avatarUrl: string | null
+  followerCount: number
+  isFollowedByMe: boolean
+}
+
+export interface PostTeaserViewModel {
+  id: string
+  title: string
+  excerpt: string
+  authorName: string
+  authorAvatarUrl: string | null
+  createdAt: Date
+  commentCount: number
+  canEdit: boolean
+}
+```
+
+**2. Mapper-Funktionen:**
+```typescript
+// mappers/userMapper.ts
+import type { UserCardViewModel } from '~/types/viewModels'
+import type { UserGraphQL } from '~/graphql/types'
+
+export function toUserCardViewModel(
+  user: UserGraphQL,
+  currentUserId?: string
+): UserCardViewModel {
+  return {
+    id: user.id,
+    displayName: user.name || user.slug || 'Anonymous',
+    avatarUrl: user.avatar?.url ?? null,
+    followerCount: user._followedByCurrentUserCount ?? 0,
+    isFollowedByMe: user.followedByCurrentUser ?? false,
+  }
+}
+```
+
+**3. Komponenten nutzen nur ViewModels:**
+```vue
+<!-- components/UserCard.vue -->
+<script setup lang="ts">
+import type { UserCardViewModel } from '~/types/viewModels'
+
+// Komponente kennt NUR das ViewModel, nicht GraphQL
+defineProps<{
+  user: UserCardViewModel
+}>()
+</script>
+```
+
+**4. Composables kapseln Mapping:**
+```typescript
+// composables/useUser.ts
+import { computed } from 'vue'
+import { useQuery } from '@vue/apollo-composable'
+import { GET_USER } from '~/graphql/queries'
+import { toUserCardViewModel } from '~/mappers/userMapper'
+import type { UserCardViewModel } from '~/types/viewModels'
+
+export function useUser(userId: string) {
+  const { result, loading, error } = useQuery(GET_USER, { id: userId })
+
+  const user = computed<UserCardViewModel | null>(() => {
+    if (!result.value?.User) return null
+    return toUserCardViewModel(result.value.User)
+  })
+
+  return { user, loading, error }
+}
+```
+
+### Ordnerstruktur
+
+```
+webapp/
+├── graphql/
+│   ├── queries/
+│   ├── mutations/
+│   └── types/              # Generated by graphql-codegen
+├── types/
+│   └── viewModels.ts       # UI-spezifische Interfaces
+├── mappers/
+│   ├── userMapper.ts
+│   ├── postMapper.ts
+│   └── index.ts
+├── lib/
+│   └── composables/
+│       ├── useAuth.ts
+│       ├── useUser.ts      # Gibt ViewModel zurück
+│       └── usePost.ts
+├── components/             # Presentational (nur ViewModels)
+│   ├── UserCard.vue
+│   └── PostTeaser.vue
+└── pages/                  # Nutzen Composables
+    └── users/[id].vue
+```
+
+### Vorteile
+
+| Aspekt | Ohne Mapper | Mit Mapper |
+|--------|-------------|------------|
+| **API-Änderung** | Alle Komponenten anpassen | Nur Mapper anpassen |
+| **Testing** | Mock GraphQL Response | Einfaches ViewModel-Objekt |
+| **Wiederverwendung** | Komponente an API gebunden | Komponente API-agnostisch |
+| **TypeScript** | Komplexe/generierte Types | Klare, einfache Interfaces |
+| **webapp ↔ maintenance** | Verschiedene Strukturen | Gleiche ViewModels |
+
+### Regeln
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Regel 1: Komponenten definieren was sie BRAUCHEN           │
+│           (ViewModel), nicht was die API LIEFERT            │
+├─────────────────────────────────────────────────────────────┤
+│  Regel 2: Mapper sind der EINZIGE Ort der API kennt         │
+│           API-Änderung = nur Mapper ändern                  │
+├─────────────────────────────────────────────────────────────┤
+│  Regel 3: Composables kapseln Fetching + Mapping            │
+│           useUser() gibt UserCardViewModel zurück           │
+├─────────────────────────────────────────────────────────────┤
+│  Regel 4: Presentational Components sind API-agnostisch     │
+│           Einfach testbar, wiederverwendbar                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Entscheidung
+
+| # | Datum | Entscheidung |
+|---|-------|--------------|
+| 70 | 2026-02-09 | ViewModel/Mapper Pattern für Daten-Entkopplung |
 
 ---
 
