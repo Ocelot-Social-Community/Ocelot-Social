@@ -12,10 +12,6 @@ reviews:
       - master
       - main
 
-  # Auto-Approve wenn keine Probleme gefunden
-  auto_approve:
-    enabled: trupe
-
   # Review-Einstellungen
   request_changes_workflow: true
   high_level_summary: true
