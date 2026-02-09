@@ -86,6 +86,7 @@ export default {
         }, 1500)
       } catch (err) {
         this.isOpen = false
+        this.$emit('close')
       } finally {
         this.loading = false
       }
