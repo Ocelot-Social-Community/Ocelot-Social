@@ -42,6 +42,7 @@ export default {
   components: {
     SweetalertIcon,
   },
+  emits: ['close'],
   props: {
     name: { type: String, default: '' }, // only used for compatibility with the other modals in 'Modal.vue'
     type: { type: String, required: true }, // only used for compatibility with the other modals in 'Modal.vue'
