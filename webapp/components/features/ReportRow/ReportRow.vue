@@ -93,6 +93,7 @@ export default {
     FiledReportsTable,
     UserTeaser,
   },
+  emits: ['confirm-report'],
   props: {
     report: {
       type: Object,
