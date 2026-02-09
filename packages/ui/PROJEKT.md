@@ -97,8 +97,8 @@ Analyse:    ██████████ 100% (Button, Modal, Menu detailiert)
 ### OsButton Migration (Phase 3)
 ```
 Scope gesamt:     ~90 Buttons in Webapp
-├─ Migriert:       24 Buttons (27%) ✅
-├─ Ohne neue Props:  6 Buttons (Milestone 4a - verbleibend)
+├─ Migriert:       26 Buttons (29%) ✅
+├─ Ohne neue Props:  4 Buttons (Milestone 4a - verbleibend)
 └─ Mit icon/circle/loading: ~60 Buttons (Milestone 4c)
 
 OsButton Features:
@@ -115,9 +115,9 @@ OsButton Features:
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-09 (Session 8)
+**Letzte Aktualisierung:** 2026-02-09 (Session 9)
 
-**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 4a in Arbeit (8/14 Buttons)
+**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 4a in Arbeit (26 Buttons migriert, 4 verbleibend ohne neue Props)
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -1451,6 +1451,7 @@ Bei der Migration werden:
 | 2026-02-09 | **ImageUploader CSS-Fix** | `position: absolute !important` für crop-confirm (überschreibt OsButton `relative`) |
 | 2026-02-09 | **§16a hinzugefügt** | Webapp ↔ Maintenance Code-Sharing: Webapp als Source of Truth (Entscheidung #69) |
 | 2026-02-09 | **§16b hinzugefügt** | Daten-Entkopplung: ViewModel/Mapper Pattern für API-agnostische Komponenten (Entscheidung #70) |
+| 2026-02-09 | **NotificationMenu.vue** | 2 Buttons migriert (ghost primary), padding-top Fix für vertical-align Unterschied |
 
 ---
 
