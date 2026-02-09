@@ -4,7 +4,9 @@
     <p v-html="message" />
 
     <template #footer>
-      <os-button variant="primary" appearance="outline" class="cancel" @click="cancel">{{ $t('disable.cancel') }}</os-button>
+      <os-button variant="primary" appearance="outline" class="cancel" @click="cancel">
+        {{ $t('disable.cancel') }}
+      </os-button>
       <base-button danger filled class="confirm" icon="exclamation-circle" @click="confirm">
         {{ $t('disable.submit') }}
       </base-button>

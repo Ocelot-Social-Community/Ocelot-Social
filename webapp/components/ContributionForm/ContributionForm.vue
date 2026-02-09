@@ -173,7 +173,13 @@
             </ds-flex-item>
             <ds-flex-item width="0.15" />
             <ds-flex-item class="action-buttons-group" width="2">
-              <os-button data-test="cancel-button" variant="primary" appearance="outline" :disabled="loading" @click="$router.back()">
+              <os-button
+                data-test="cancel-button"
+                variant="primary"
+                appearance="outline"
+                :disabled="loading"
+                @click="$router.back()"
+              >
                 {{ $t('actions.cancel') }}
               </os-button>
               <base-button type="submit" icon="check" :loading="loading" :disabled="errors" filled>

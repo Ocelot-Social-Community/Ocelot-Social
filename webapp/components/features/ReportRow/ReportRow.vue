@@ -11,7 +11,12 @@
         <span class="user-count">
           {{ $t('moderation.reports.numberOfUsers', { count: report.filed.length }) }}
         </span>
-        <os-button variant="primary" appearance="outline" size="sm" @click="showFiledReports = !showFiledReports">
+        <os-button
+          variant="primary"
+          appearance="outline"
+          size="sm"
+          @click="showFiledReports = !showFiledReports"
+        >
           {{ $t('moderation.reports.moreDetails') }}
         </os-button>
       </td>

@@ -29,7 +29,12 @@
       </div>
 
       <div v-if="selectedBadgeIndex !== null && !isEmptySlotSelected" class="badge-actions">
-        <os-button variant="primary" appearance="outline" class="remove-button" @click="removeBadgeFromSlot">
+        <os-button
+          variant="primary"
+          appearance="outline"
+          class="remove-button"
+          @click="removeBadgeFromSlot"
+        >
           {{ $t('settings.badges.remove') }}
         </os-button>
       </div>

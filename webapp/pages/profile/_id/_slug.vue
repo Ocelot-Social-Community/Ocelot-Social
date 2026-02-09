@@ -71,10 +71,22 @@
             </ds-flex-item>
           </ds-flex>
           <div v-if="!myProfile" class="action-buttons">
-            <os-button v-if="user.isBlocked" variant="primary" appearance="outline" full-width @click="unblockUser(user)">
+            <os-button
+              v-if="user.isBlocked"
+              variant="primary"
+              appearance="outline"
+              full-width
+              @click="unblockUser(user)"
+            >
               {{ $t('settings.blocked-users.unblock') }}
             </os-button>
-            <os-button v-if="user.isMuted" variant="primary" appearance="outline" full-width @click="unmuteUser(user)">
+            <os-button
+              v-if="user.isMuted"
+              variant="primary"
+              appearance="outline"
+              full-width
+              @click="unmuteUser(user)"
+            >
               {{ $t('settings.muted-users.unmute') }}
             </os-button>
             <hc-follow-button
