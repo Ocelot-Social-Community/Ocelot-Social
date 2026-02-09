@@ -1279,6 +1279,7 @@ Bei der Migration werden:
 | 66 | Branding-Hierarchie | Webapp → Spezialisiertes Branding | Default-Branding in Webapp, Overrides pro Instanz |
 | 67 | Variable-Validierung | Runtime-Check in Development | `validateCssVariables()` warnt bei fehlenden Variablen |
 | 68 | Branding-Test (Webapp) | CI-Test in Webapp | Webapp testet, dass Default-Branding alle Library-Variablen definiert |
+| 69 | Webapp ↔ Maintenance Sharing | Webapp als Source of Truth | Kein separates "shared" Package, maintenance importiert aus webapp/ (siehe §16a) |
 
 ### Komponenten-API & Konventionen
 
@@ -1442,6 +1443,10 @@ Bei der Migration werden:
 | 2026-02-09 | **Disabled Border-Fix** | CSS-Regeln in index.css: `border-style: solid` + `border-width: 0.8px` bei :disabled |
 | 2026-02-09 | **Visuelle Validierung abgeschlossen** | 16/16 Buttons validiert (100%) ✅ Milestone 5 erfolgreich |
 | 2026-02-09 | **Button-Analyse erweitert** | 14 weitere Buttons identifiziert (ohne icon/circle/loading) → Scope: 16/35 |
+| 2026-02-09 | **Scope auf ~90 erweitert** | ~60 weitere Buttons mit icon/circle/loading identifiziert |
+| 2026-02-09 | **Milestone 4a: 8 Buttons** | DisableModal, DeleteUserModal, ReleaseModal, ContributionForm, EnterNonce, MySomethingList, ImageUploader (2x) |
+| 2026-02-09 | **ImageUploader CSS-Fix** | `position: absolute !important` für crop-confirm (überschreibt OsButton `relative`) |
+| 2026-02-09 | **§16a hinzugefügt** | Webapp ↔ Maintenance Code-Sharing: Webapp als Source of Truth (Entscheidung #69) |
 
 ---
 
@@ -1862,6 +1867,107 @@ Vor dem Erstellen einer Komponente diese Fragen beantworten:
 [ ] Falls Webapp: Welche Library-Komponenten werden genutzt?
 [ ] Falls Grenzfall: Kann sie aufgeteilt werden?
 ```
+
+---
+
+## 16a. Webapp ↔ Maintenance Code-Sharing
+
+### Problemstellung
+
+Die Webapp und Maintenance-App sind aktuell verschachtelt und sollen getrennt werden.
+Einige Business-Komponenten werden in beiden Apps benötigt, gehören aber nicht in die UI-Library.
+
+**Das DX-Problem:** "shared" hat kein logisches Kriterium außer "wird in beiden gebraucht".
+
+### Analysierte Optionen
+
+| Option | Beschreibung | Bewertung |
+|--------|--------------|-----------|
+| **A: Domain Packages** | `@ocelot-social/auth`, `@ocelot-social/posts`, etc. | Gut bei vielen Komponenten, aber Overhead |
+| **B: Core + Duplikation** | Composables teilen, Komponenten duplizieren | Gut wenn UI unterschiedlich |
+| **C: Webapp als Source** | Maintenance importiert aus Webapp | Einfachste Lösung |
+
+### Empfehlung: Option C (Webapp als Source of Truth)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  @ocelot-social/ui                                          │
+│  ─────────────────                                          │
+│  • OsButton, OsModal, OsCard, OsInput                       │
+│  • Rein präsentational, keine Abhängigkeiten                │
+├─────────────────────────────────────────────────────────────┤
+│  webapp/                                                    │
+│  ───────                                                    │
+│  • Alle Business-Komponenten (Source of Truth)              │
+│  • Composables in webapp/lib/composables/                   │
+│  • GraphQL in webapp/graphql/                               │
+│  • Ist die "Haupt-App"                                      │
+├─────────────────────────────────────────────────────────────┤
+│  maintenance/                                               │
+│  ────────────                                               │
+│  • Importiert aus @ocelot-social/ui                         │
+│  • Importiert aus webapp/ via Alias                         │
+│  • Nur maintenance-spezifische Komponenten lokal            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Umsetzung
+
+**maintenance/nuxt.config.js:**
+```javascript
+export default {
+  alias: {
+    '@webapp': '../webapp',
+    '@ocelot-social/ui': '../packages/ui/dist'
+  }
+}
+```
+
+**Import in Maintenance:**
+```typescript
+// UI-Komponenten aus Library
+import { OsButton, OsModal } from '@ocelot-social/ui'
+
+// Business-Komponenten aus Webapp
+import FollowButton from '@webapp/components/FollowButton.vue'
+import PostTeaser from '@webapp/components/PostTeaser.vue'
+
+// Composables aus Webapp
+import { useAuth } from '@webapp/lib/composables/useAuth'
+import { useFollow } from '@webapp/lib/composables/useFollow'
+```
+
+### Kriterien für Entwickler
+
+| Frage | Antwort |
+|-------|---------|
+| Wo suche ich eine UI-Komponente? | `@ocelot-social/ui` |
+| Wo suche ich eine Business-Komponente? | `webapp/components/` |
+| Wo erstelle ich eine neue geteilte Komponente? | `webapp/components/` |
+| Wo erstelle ich maintenance-spezifische Komponenten? | `maintenance/components/` |
+
+### Vorteile
+
+1. **Klare Regel:** Alles Business-bezogene ist in Webapp
+2. **Kein neues Package:** Weniger Overhead
+3. **Eine Source of Truth:** Keine Sync-Probleme
+4. **Einfache Migration:** Später ggf. Domain-Packages extrahieren
+
+### Spätere Evolution (optional)
+
+Wenn klare Patterns entstehen, können Domain-Packages extrahiert werden:
+
+```
+Phase 1 (jetzt):  Webapp ist Source of Truth
+Phase 2 (später): Patterns identifizieren
+Phase 3 (später): @ocelot-social/auth, @ocelot-social/posts, etc.
+```
+
+### Entscheidung
+
+| # | Datum | Entscheidung |
+|---|-------|--------------|
+| 68 | 2026-02-09 | Webapp als Source of Truth für geteilte Business-Komponenten |
 
 ---
 
