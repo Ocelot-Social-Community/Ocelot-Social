@@ -620,32 +620,31 @@ describe('file a report on a resource', () => {
         ),
       ])
       authenticatedUser = await currentUser.toJson()
-      await Promise.all([
-        mutate({
-          mutation: fileReport,
-          variables: {
-            resourceId: 'abusive-post-1',
-            reasonCategory: 'other',
-            reasonDescription: 'This comment is bigoted',
-          },
-        }),
-        mutate({
-          mutation: fileReport,
-          variables: {
-            resourceId: 'abusive-comment-1',
-            reasonCategory: 'discrimination_etc',
-            reasonDescription: 'This post is bigoted',
-          },
-        }),
-        mutate({
-          mutation: fileReport,
-          variables: {
-            resourceId: 'abusive-user-1',
-            reasonCategory: 'doxing',
-            reasonDescription: 'This user is harassing me with bigoted remarks',
-          },
-        }),
-      ])
+      // Sequential to ensure distinct createdAt values for orderBy tests
+      await mutate({
+        mutation: fileReport,
+        variables: {
+          resourceId: 'abusive-post-1',
+          reasonCategory: 'other',
+          reasonDescription: 'This comment is bigoted',
+        },
+      })
+      await mutate({
+        mutation: fileReport,
+        variables: {
+          resourceId: 'abusive-comment-1',
+          reasonCategory: 'discrimination_etc',
+          reasonDescription: 'This post is bigoted',
+        },
+      })
+      await mutate({
+        mutation: fileReport,
+        variables: {
+          resourceId: 'abusive-user-1',
+          reasonCategory: 'doxing',
+          reasonDescription: 'This user is harassing me with bigoted remarks',
+        },
+      })
       authenticatedUser = null
     })
 
