@@ -29,9 +29,9 @@
       </div>
 
       <div v-if="selectedBadgeIndex !== null && !isEmptySlotSelected" class="badge-actions">
-        <base-button @click="removeBadgeFromSlot" class="remove-button">
+        <os-button variant="primary" appearance="outline" class="remove-button" @click="removeBadgeFromSlot">
           {{ $t('settings.badges.remove') }}
-        </base-button>
+        </os-button>
       </div>
 
       <div
@@ -49,6 +49,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 import { setTrophyBadgeSelected } from '~/graphql/User'
 import scrollToContent from './scroll-to-content.js'
@@ -56,7 +57,7 @@ import Badges from '../../components/Badges.vue'
 import BadgeSelection from '../../components/BadgeSelection.vue'
 
 export default {
-  components: { BadgeSelection, Badges },
+  components: { OsButton, BadgeSelection, Badges },
   mixins: [scrollToContent],
   data() {
     return {
