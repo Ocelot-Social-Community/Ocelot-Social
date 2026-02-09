@@ -10,9 +10,9 @@
 ### Übersicht
 ```
 Phase 0: Analyse    ██████████ 100% (8/8 Schritte)
-Phase 3: Migration  ██░░░░░░░░  18% (16/90 Buttons)
+Phase 3: Migration  ███░░░░░░░  27% (24/90 Buttons)
 ───────────────────────────────────────────
-Aktuelle Phase: Phase 3 (Webapp-Integration)
+Aktuelle Phase: Phase 3 - Milestone 4a (8/14 Buttons)
 ```
 
 ### Statistiken
@@ -28,12 +28,14 @@ Aktuelle Phase: Phase 3 (Webapp-Integration)
 ### OsButton Migration (Phase 3)
 | Status | Anzahl | Details |
 |--------|--------|---------|
-| ✅ Migriert | 16 | Erste Welle (validiert) |
-| ⏳ Ausstehend (ohne neue Props) | 14 | Milestone 4a |
+| ✅ Migriert | 24 | Erste Welle + Milestone 4a (8/14) |
+| ⏳ Ausstehend (ohne neue Props) | 6 | Milestone 4a (verbleibend) |
 | ⏳ Ausstehend (mit neuen Props) | ~60 | Milestone 4c (benötigen icon/circle/loading) |
 | **Gesamt** | **~90** | In ~50 Dateien |
 
-**Migrierte Komponenten (16):**
+**Migrierte Komponenten (24):**
+
+*Erste Welle (16):*
 - UserTeaserPopover.vue (1 Button)
 - GroupForm.vue (1 Button - Cancel)
 - EmbedComponent.vue (2 Buttons - Cancel, Play Now)
@@ -46,19 +48,28 @@ Aktuelle Phase: Phase 3 (Webapp-Integration)
 - privacy.vue (1 Button)
 - terms-and-conditions-confirm.vue (2 Buttons)
 
-**Neu identifiziert - ohne neue Props (14):**
-- Modal/DisableModal.vue (1 Button - Cancel)
-- Modal/DeleteUserModal.vue (1 Button - Cancel)
-- Modal/ReleaseModal.vue (1 Button - Cancel)
+*Milestone 4a - Session 8 (8):*
+- DisableModal.vue (1 Button - Cancel)
+- DeleteUserModal.vue (1 Button - Cancel)
+- ReleaseModal.vue (1 Button - Cancel)
 - ContributionForm.vue (1 Button - Cancel)
 - EnterNonce.vue (1 Button - Submit)
 - MySomethingList.vue (1 Button - Cancel)
 - ImageUploader.vue (2 Buttons - Crop)
-- admin/donations.vue (1 Button - Save)
-- profile/_id/_slug.vue (2 Buttons - Unblock, Unmute)
-- settings/badges.vue (1 Button - Remove)
-- notifications/index.vue (1 Button - Mark All Read)
-- ReportRow.vue (1 Button - More Details)
+
+**Milestone 4a - ohne neue Props (8/14 erledigt):**
+- ✅ Modal/DisableModal.vue (1 Button - Cancel)
+- ✅ Modal/DeleteUserModal.vue (1 Button - Cancel)
+- ✅ ReleaseModal/ReleaseModal.vue (1 Button - Cancel)
+- ✅ ContributionForm.vue (1 Button - Cancel)
+- ✅ EnterNonce.vue (1 Button - Submit)
+- ✅ MySomethingList.vue (1 Button - Cancel)
+- ✅ ImageUploader.vue (2 Buttons - Crop)
+- ⬜ admin/donations.vue (1 Button - Save)
+- ⬜ profile/_id/_slug.vue (2 Buttons - Unblock, Unmute)
+- ⬜ settings/badges.vue (1 Button - Remove)
+- ⬜ notifications/index.vue (1 Button - Mark All Read)
+- ⬜ ReportRow.vue (1 Button - More Details)
 
 **Ausstehend - benötigen neue Props (~60):**
 
@@ -479,6 +490,7 @@ Diese sollten zuerst migriert werden:
 | 2026-02-08 | Claude | **16 Buttons migriert** | Alle ohne icon/circle/loading Props, validiert |
 | 2026-02-08 | Claude | OsButton erweitert | attrs/listeners Forwarding für Vue 2 ($listeners) |
 | 2026-02-09 | Claude | Scope erweitert | ~90 Buttons identifiziert (16 migriert, 14 ohne Props, ~60 mit Props) |
+| 2026-02-09 | Claude | **Milestone 4a: 8 Buttons** | DisableModal, DeleteUserModal, ReleaseModal, ContributionForm, EnterNonce, MySomethingList, ImageUploader (2x) |
 
 ---
 
@@ -520,7 +532,7 @@ Diese sollten zuerst migriert werden:
 
 ---
 
-**✅ Phase 0 abgeschlossen!** Phase 3 zu 18% erledigt (16/90 Buttons migriert, 16/16 validiert ✅).
+**✅ Phase 0 abgeschlossen!** Phase 3 zu 27% erledigt (24/90 Buttons migriert). Milestone 4a: 8/14 Buttons.
 
 ---
 

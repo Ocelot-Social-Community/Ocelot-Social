@@ -95,8 +95,8 @@ Analyse:    ██████████ 100% (Button, Modal, Menu detailiert)
 ### OsButton Migration (Phase 3)
 ```
 Scope gesamt:     ~90 Buttons in Webapp
-├─ Migriert:       16 Buttons (18%) ✅
-├─ Ohne neue Props: 14 Buttons (Milestone 4a)
+├─ Migriert:       24 Buttons (27%) ✅
+├─ Ohne neue Props:  6 Buttons (Milestone 4a - verbleibend)
 └─ Mit icon/circle/loading: ~60 Buttons (Milestone 4c)
 
 OsButton Features:
@@ -113,9 +113,9 @@ OsButton Features:
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-09 (Session 7)
+**Letzte Aktualisierung:** 2026-02-09 (Session 8)
 
-**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 1-3 & 5 abgeschlossen ✅
+**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 4a in Arbeit (8/14 Buttons)
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -435,10 +435,10 @@ OsButton Features:
 
 | Kategorie | Buttons | Status |
 |-----------|---------|--------|
-| ✅ Migriert & Validiert | 16 | Erledigt |
-| ⬜ Ohne neue Props (M4a) | 14 | Ausstehend |
+| ✅ Migriert & Validiert | 24 | Erledigt |
+| ⏳ Ohne neue Props (M4a) | 6 | In Arbeit (8 von 14 erledigt) |
 | ⬜ Mit icon/circle/loading (M4c) | ~60 | Ausstehend |
-| **Gesamt** | **~90** | **18% erledigt** |
+| **Gesamt** | **~90** | **27% erledigt** |
 
 **Details siehe KATALOG.md** (vollständige Tracking-Tabellen)
 
