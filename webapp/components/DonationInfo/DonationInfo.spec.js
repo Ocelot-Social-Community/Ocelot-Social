@@ -4,10 +4,18 @@ import DonationInfo from './DonationInfo.vue'
 
 const localVue = global.localVue
 
-const mockDate = new Date(2019, 11, 6)
-global.Date = jest.fn(() => mockDate)
+const OriginalDate = global.Date
+const mockDate = new OriginalDate(2019, 11, 6)
 
 describe('DonationInfo.vue', () => {
+  beforeAll(() => {
+    global.Date = jest.fn(() => mockDate)
+  })
+
+  afterAll(() => {
+    global.Date = OriginalDate
+  })
+
   let mocks, wrapper, propsData
 
   beforeEach(() => {
