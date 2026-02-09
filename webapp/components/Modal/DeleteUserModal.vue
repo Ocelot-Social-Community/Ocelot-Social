@@ -71,8 +71,6 @@ export default {
       isOpen: true,
       success: false,
       loading: false,
-      // isAdmin: this.$store.getters['auth/isAdmin'],
-      isAdmin: true,
     }
   },
   computed: {
