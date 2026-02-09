@@ -60,7 +60,7 @@ export default {
     return {
       offset: 0,
       notifications: [],
-      nofiticationRead: null,
+      notificationRead: null,
       pageSize,
       first: pageSize,
       hasNext: false,
