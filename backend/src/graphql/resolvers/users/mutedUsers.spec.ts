@@ -309,6 +309,7 @@ describe('muteUser', () => {
                   query: Post,
                   variables: { orderBy: 'createdAt_asc' },
                 })
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 const postIds = result.data?.Post.map((p) => p.id)
                 expect(postIds).not.toContain('p23')
               })
