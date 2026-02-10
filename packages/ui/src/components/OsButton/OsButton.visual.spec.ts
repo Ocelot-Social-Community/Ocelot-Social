@@ -24,38 +24,6 @@ async function checkA11y(page: Page) {
 }
 
 test.describe('OsButton visual regression', () => {
-  test('default variant', async ({ page }) => {
-    await page.goto(`${STORY_URL}--default&viewMode=story`)
-    const root = page.locator(STORY_ROOT)
-    await root.waitFor()
-    await expect(root.locator('button')).toHaveScreenshot('default.png')
-    await checkA11y(page)
-  })
-
-  test('primary variant', async ({ page }) => {
-    await page.goto(`${STORY_URL}--primary&viewMode=story`)
-    const root = page.locator(STORY_ROOT)
-    await root.waitFor()
-    await expect(root.locator('button')).toHaveScreenshot('primary.png')
-    await checkA11y(page)
-  })
-
-  test('secondary variant', async ({ page }) => {
-    await page.goto(`${STORY_URL}--secondary&viewMode=story`)
-    const root = page.locator(STORY_ROOT)
-    await root.waitFor()
-    await expect(root.locator('button')).toHaveScreenshot('secondary.png')
-    await checkA11y(page)
-  })
-
-  test('danger variant', async ({ page }) => {
-    await page.goto(`${STORY_URL}--danger&viewMode=story`)
-    const root = page.locator(STORY_ROOT)
-    await root.waitFor()
-    await expect(root.locator('button')).toHaveScreenshot('danger.png')
-    await checkA11y(page)
-  })
-
   test('all variants', async ({ page }) => {
     await page.goto(`${STORY_URL}--all-variants&viewMode=story`)
     const root = page.locator(STORY_ROOT)

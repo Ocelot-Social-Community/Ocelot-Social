@@ -33,11 +33,11 @@
   --color-danger-active: #9a2e3f;
   --color-danger-contrast: #ffffff;
 
-  /* Warning (Cadmium Yellow / Yellow Ochre) - light base with dark text */
-  --color-warning: #e8b44c;
-  --color-warning-hover: #f0c87a;
-  --color-warning-active: #d09a30;
-  --color-warning-contrast: #3d2e1e;
+  /* Warning (Yellow Ochre / Raw Sienna) - dark amber, works as text on white */
+  --color-warning: #946b1d;
+  --color-warning-hover: #a87c28;
+  --color-warning-active: #7d5a15;
+  --color-warning-contrast: #ffffff;
 
   /* Success (Viridian Green) */
   --color-success: #3d7a5e;
@@ -46,9 +46,9 @@
   --color-success-contrast: #ffffff;
 
   /* Info (Cerulean Blue) */
-  --color-info: #3e7ea8;
-  --color-info-hover: #5594bc;
-  --color-info-active: #31688e;
+  --color-info: #387598;
+  --color-info-hover: #4e8bae;
+  --color-info-active: #2d6080;
   --color-info-contrast: #ffffff;
 
   /* Disabled (Payne's Grey - muted watercolor grey) */

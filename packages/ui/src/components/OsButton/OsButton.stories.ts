@@ -31,58 +31,6 @@ const meta: Meta<typeof OsButton> = {
 export default meta
 type Story = StoryObj<typeof OsButton>
 
-export const Primary: Story = {
-  args: {
-    variant: 'primary',
-  },
-  render: (args) => ({
-    components: { OsButton },
-    setup() {
-      return { args }
-    },
-    template: '<OsButton v-bind="args">Primary Button</OsButton>',
-  }),
-}
-
-export const Secondary: Story = {
-  args: {
-    variant: 'secondary',
-  },
-  render: (args) => ({
-    components: { OsButton },
-    setup() {
-      return { args }
-    },
-    template: '<OsButton v-bind="args">Secondary Button</OsButton>',
-  }),
-}
-
-export const Danger: Story = {
-  args: {
-    variant: 'danger',
-  },
-  render: (args) => ({
-    components: { OsButton },
-    setup() {
-      return { args }
-    },
-    template: '<OsButton v-bind="args">Danger Button</OsButton>',
-  }),
-}
-
-export const Default: Story = {
-  args: {
-    variant: 'default',
-  },
-  render: (args) => ({
-    components: { OsButton },
-    setup() {
-      return { args }
-    },
-    template: '<OsButton v-bind="args">Default Button</OsButton>',
-  }),
-}
-
 export const AllVariants: Story = {
   render: () => ({
     components: { OsButton },
@@ -152,7 +100,11 @@ export const AllAppearances: Story = {
           <div class="flex flex-wrap gap-2">
             <OsButton appearance="filled" variant="default">Default</OsButton>
             <OsButton appearance="filled" variant="primary">Primary</OsButton>
+            <OsButton appearance="filled" variant="secondary">Secondary</OsButton>
             <OsButton appearance="filled" variant="danger">Danger</OsButton>
+            <OsButton appearance="filled" variant="warning">Warning</OsButton>
+            <OsButton appearance="filled" variant="success">Success</OsButton>
+            <OsButton appearance="filled" variant="info">Info</OsButton>
           </div>
         </div>
         <div>
@@ -160,7 +112,11 @@ export const AllAppearances: Story = {
           <div class="flex flex-wrap gap-2">
             <OsButton appearance="outline" variant="default">Default</OsButton>
             <OsButton appearance="outline" variant="primary">Primary</OsButton>
+            <OsButton appearance="outline" variant="secondary">Secondary</OsButton>
             <OsButton appearance="outline" variant="danger">Danger</OsButton>
+            <OsButton appearance="outline" variant="warning">Warning</OsButton>
+            <OsButton appearance="outline" variant="success">Success</OsButton>
+            <OsButton appearance="outline" variant="info">Info</OsButton>
           </div>
         </div>
         <div>
@@ -168,7 +124,11 @@ export const AllAppearances: Story = {
           <div class="flex flex-wrap gap-2">
             <OsButton appearance="ghost" variant="default">Default</OsButton>
             <OsButton appearance="ghost" variant="primary">Primary</OsButton>
+            <OsButton appearance="ghost" variant="secondary">Secondary</OsButton>
             <OsButton appearance="ghost" variant="danger">Danger</OsButton>
+            <OsButton appearance="ghost" variant="warning">Warning</OsButton>
+            <OsButton appearance="ghost" variant="success">Success</OsButton>
+            <OsButton appearance="ghost" variant="info">Info</OsButton>
           </div>
         </div>
       </div>
