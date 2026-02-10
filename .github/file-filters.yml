@@ -18,6 +18,7 @@ webapp: &webapp
   - 'webapp/**/*'
   - 'styleguide/**/*'
   - 'package.json'
+  - *ui
 
 docs-check: &docs-check
   - '.github/workflows/check-documentation.yml'
