@@ -124,17 +124,21 @@ export const AppearanceOutline: Story = {
   }),
 }
 
-export const Ghost: Story = {
-  args: {
-    appearance: 'ghost',
-    variant: 'primary',
-  },
-  render: (args) => ({
+export const AppearanceGhost: Story = {
+  name: 'Appearance: Ghost',
+  render: () => ({
     components: { OsButton },
-    setup() {
-      return { args }
-    },
-    template: '<OsButton v-bind="args">Ghost Button</OsButton>',
+    template: `
+      <div class="flex flex-wrap gap-2">
+        <OsButton appearance="ghost" variant="default">Default</OsButton>
+        <OsButton appearance="ghost" variant="primary">Primary</OsButton>
+        <OsButton appearance="ghost" variant="secondary">Secondary</OsButton>
+        <OsButton appearance="ghost" variant="danger">Danger</OsButton>
+        <OsButton appearance="ghost" variant="warning">Warning</OsButton>
+        <OsButton appearance="ghost" variant="success">Success</OsButton>
+        <OsButton appearance="ghost" variant="info">Info</OsButton>
+      </div>
+    `,
   }),
 }
 
