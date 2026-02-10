@@ -65,12 +65,16 @@
           // Vue 2: separate attrs and on (listeners)
           // $listeners contains event handlers like @click
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const listeners = (instance?.proxy as any)?.$listeners || {}
+          const proxy = instance?.proxy as any
+          const listeners = proxy?.$listeners || {}
+          // In Vue 2, class/style are not in $attrs - access via $vnode
+          const parentClass = proxy?.$vnode?.data?.staticClass || ''
+          const parentDynClass = proxy?.$vnode?.data?.class
 
           return h(
             'button',
             {
-              class: classes.value,
+              class: [classes.value, parentClass, parentDynClass].filter(Boolean),
               attrs: {
                 type: props.type,
                 disabled: props.disabled || undefined,
