@@ -36,10 +36,8 @@ test.describe('OsButton keyboard accessibility', () => {
     for (let i = 0; i < count; i++) {
       const button = buttons.nth(i)
       await button.focus()
-      const outline = await button.evaluate(
-        (el) => getComputedStyle(el).outlineStyle,
-      )
-      const label = await button.textContent()
+      const outline = await button.evaluate((el) => getComputedStyle(el).outlineStyle)
+      const label = (await button.textContent()) ?? ''
       expect(outline, `Button "${label}" must have visible focus outline`).not.toBe('none')
     }
   })
