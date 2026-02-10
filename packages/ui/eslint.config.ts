@@ -21,49 +21,9 @@ export default [
   ...vue3,
   ...vitest,
   {
-    // TODO: Move these Vue-standard rules to eslint-config-it4c
     rules: {
-      // TODO(it4c): Add .css/.scss to vue3 config
-      'n/file-extension-in-import': [
-        'error',
-        'never',
-        {
-          '.vue': 'always',
-          '.json': 'always',
-          '.css': 'always',
-          '.scss': 'always',
-        },
-      ],
-      // TODO(it4c): Add CSS/SCSS exception to vue3 config
-      'import-x/no-unassigned-import': [
-        'error',
-        {
-          allow: ['**/*.css', '**/*.scss'],
-        },
-      ],
-      // TODO(it4c): Disable in vue3 config (alias imports)
+      // TODO: replace with alias
       'import-x/no-relative-parent-imports': 'off',
-      // TODO(it4c): Disable in vue3 config (Prettier handles)
-      'vue/max-attributes-per-line': 'off',
-    },
-  },
-  {
-    // Disable TypeScript rules for JSON files
-    files: ['**/*.json'],
-    rules: {
-      '@typescript-eslint/no-unused-expressions': 'off',
-    },
-  },
-  {
-    // TODO: Move these Vitest rules to eslint-config-it4c vitest config
-    files: ['**/*.spec.ts', '**/*.spec.tsx'],
-    rules: {
-      // TODO(it4c): Add to vitest config (standard pattern)
-      'vitest/consistent-test-filename': ['error', { pattern: '.*\\.spec\\.[tj]sx?$' }],
-      // TODO(it4c): Disable in vitest config
-      'vitest/prefer-expect-assertions': 'off',
-      // TODO(it4c): Disable in vitest config
-      'vitest/no-hooks': 'off',
     },
   },
   {
@@ -81,7 +41,6 @@ export default [
     files: ['**/*.visual.spec.ts'],
     ...playwrightPlugin.configs['flat/recommended'],
     rules: {
-      ...playwrightPlugin.configs['flat/recommended'].rules,
       'n/no-process-env': 'off',
       'vitest/require-hook': 'off',
     },
