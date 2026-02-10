@@ -8,6 +8,8 @@ import { getMutedUsers } from '@graphql/resolvers/users'
 
 export const filterForMutedUsers = async (params, context) => {
   if (!context.user) return params
+  // Skip mute filter for single post lookups (direct navigation by id or slug)
+  if (params.id || params.slug) return params
   const [mutedUsers] = await Promise.all([getMutedUsers(context)])
   const mutedUsersIds = [...mutedUsers.map((user) => user.id)]
   if (!mutedUsersIds.length) return params

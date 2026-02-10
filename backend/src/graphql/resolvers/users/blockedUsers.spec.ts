@@ -245,6 +245,71 @@ describe('blockUser', () => {
               })
             })
           })
+
+          describe('if the current user blocks and mutes the other user', () => {
+            beforeEach(async () => {
+              await currentUser.relateTo(blockedUser, 'blocked')
+              await currentUser.relateTo(blockedUser, 'muted')
+            })
+
+            it('the muted+blocked user post is still accessible by direct id lookup', async () => {
+              await expect(
+                query({ query: Post, variables: { id: 'p23' } }),
+              ).resolves.toMatchObject({
+                data: {
+                  Post: [
+                    expect.objectContaining({
+                      id: 'p23',
+                      title: 'A post written by the blocked user',
+                    }),
+                  ],
+                },
+              })
+            })
+
+            describe('and the blocked+muted user has a pinned post', () => {
+              beforeEach(async () => {
+                const pinnedPost = await database.neode.create('Post', {
+                  id: 'p-pinned',
+                  title: 'A pinned post by the blocked user',
+                  content: 'pinned content',
+                  pinned: true,
+                })
+                await pinnedPost.relateTo(blockedUser, 'author')
+              })
+
+              it('the pinned post is still accessible by id', async () => {
+                await expect(
+                  query({ query: Post, variables: { id: 'p-pinned' } }),
+                ).resolves.toMatchObject({
+                  data: {
+                    Post: [
+                      expect.objectContaining({
+                        id: 'p-pinned',
+                        title: 'A pinned post by the blocked user',
+                        pinned: true,
+                      }),
+                    ],
+                  },
+                })
+              })
+
+              it('the pinned post shows up in the post list', async () => {
+                await expect(
+                  query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+                ).resolves.toMatchObject({
+                  data: {
+                    Post: expect.arrayContaining([
+                      expect.objectContaining({
+                        id: 'p-pinned',
+                        pinned: true,
+                      }),
+                    ]),
+                  },
+                })
+              })
+            })
+          })
         })
 
         describe('from the perspective of the blocked user', () => {
