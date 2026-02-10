@@ -9,7 +9,7 @@
     </span>
     <!-- version -->
     <a
-      href="https://github.com/Ocelot-Social-Community/Ocelot-Social/releases"
+      :href="`https://github.com/Ocelot-Social-Community/Ocelot-Social/releases/tag/${$env.VERSION}`"
       target="_blank"
       data-test="version-link"
     >
