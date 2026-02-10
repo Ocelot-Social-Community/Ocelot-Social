@@ -2,7 +2,7 @@
   <base-card v-if="isUnavailable" class="comment-card">
     <p>
       <base-icon name="ban" />
-      {{ this.$t('comment.content.unavailable-placeholder') }}
+      {{ $t('comment.content.unavailable-placeholder') }}
     </p>
   </base-card>
   <base-card v-else :class="commentClass" :id="anchor">
@@ -55,7 +55,7 @@
         node-type="Comment"
       />
       <base-button
-        :title="this.$t('post.comment.reply')"
+        :title="$t('post.comment.reply')"
         icon="level-down"
         class="reply-button"
         circle
