@@ -6,6 +6,12 @@ const meta: Meta<typeof OsButton> = {
   title: 'Components/OsButton',
   component: OsButton,
   tags: ['autodocs'],
+}
+
+export default meta
+type Story = StoryObj<typeof OsButton>
+
+export const Playground: Story = {
   argTypes: {
     variant: {
       control: 'select',
@@ -26,10 +32,21 @@ const meta: Meta<typeof OsButton> = {
       control: 'boolean',
     },
   },
+  args: {
+    variant: 'primary',
+    appearance: 'filled',
+    size: 'md',
+    fullWidth: false,
+    disabled: false,
+  },
+  render: (args) => ({
+    components: { OsButton },
+    setup() {
+      return { args }
+    },
+    template: '<OsButton v-bind="args">Button</OsButton>',
+  }),
 }
-
-export default meta
-type Story = StoryObj<typeof OsButton>
 
 export const AllVariants: Story = {
   render: () => ({
