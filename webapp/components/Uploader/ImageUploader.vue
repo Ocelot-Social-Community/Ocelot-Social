@@ -26,15 +26,15 @@
       />
     </div>
     <div v-show="!showCropper && imageCanBeCropped" class="crop-overlay">
-      <base-button class="crop-confirm" filled @click="initCropper">
+      <os-button class="crop-confirm" variant="primary" @click="initCropper">
         {{ $t('contribution.teaserImage.cropImage') }}
-      </base-button>
+      </os-button>
     </div>
     <div v-show="showCropper" class="crop-overlay">
       <img id="cropping-image" />
-      <base-button class="crop-confirm" filled @click="cropImage">
+      <os-button class="crop-confirm" variant="primary" @click="cropImage">
         {{ $t('contribution.teaserImage.cropperConfirm') }}
-      </base-button>
+      </os-button>
       <base-button
         class="crop-cancel"
         icon="close"
@@ -49,8 +49,9 @@
 </template>
 
 <script>
-import VueDropzone from 'nuxt-dropzone'
+import { OsButton } from '@ocelot-social/ui'
 import Cropper from 'cropperjs'
+import VueDropzone from 'nuxt-dropzone'
 import LoadingSpinner from '~/components/_new/generic/LoadingSpinner/LoadingSpinner'
 import 'cropperjs/dist/cropper.css'
 
@@ -59,6 +60,7 @@ const minAspectRatio = 0.3
 export default {
   components: {
     LoadingSpinner,
+    OsButton,
     VueDropzone,
   },
   props: {
@@ -197,7 +199,7 @@ export default {
     }
 
     > .crop-confirm {
-      position: absolute;
+      position: absolute !important;
       left: $space-x-small;
       top: $space-x-small;
       z-index: $z-index-surface;

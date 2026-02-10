@@ -52,14 +52,14 @@ describe('privacy.vue', () => {
 
     it('clicking on submit changes shoutsAllowed to false', async () => {
       await wrapper.find('#allow-shouts').setChecked(false)
-      await wrapper.find('.base-button').trigger('click')
+      await wrapper.find('button').trigger('click')
       expect(wrapper.vm.shoutsAllowed).toBe(false)
     })
 
     it('clicking on submit with a server error shows a toast and shoutsAllowed is still true', async () => {
       mocks.$apollo.mutate = jest.fn().mockRejectedValue({ message: 'Ouch!' })
       await wrapper.find('#allow-shouts').setChecked(false)
-      await wrapper.find('.base-button').trigger('click')
+      await wrapper.find('button').trigger('click')
       expect(mocks.$toast.error).toHaveBeenCalledWith('Ouch!')
       expect(wrapper.vm.shoutsAllowed).toBe(true)
     })

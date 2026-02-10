@@ -1,5 +1,37 @@
-@import "tailwindcss";
+/*
+ * Tailwind CSS ohne Preflight (Reset)
+ * Preflight überschreibt globale Styles und kollidiert mit bestehenden Apps.
+ * Stattdessen importieren wir nur Theme und Utilities.
+ *
+ * WICHTIG: Kein globaler button-Reset hier!
+ * Das würde alle Buttons in der Webapp überschreiben (BaseButton, ds-button, etc.)
+ * OsButton verwendet stattdessen Tailwind-Klassen direkt.
+ */
+@import "tailwindcss/theme";
+@import "tailwindcss/utilities";
 
 /* Scan component files for utility classes */
 @source "../components/**/*.vue";
 @source "../**/*.ts";
+
+/*
+ * Disabled state overrides
+ * These rules have higher specificity than :active/:hover to ensure
+ * disabled buttons immediately show disabled styling, even when clicked.
+ */
+
+/* Filled buttons: gray background when disabled, regardless of hover/active */
+button[data-appearance="filled"]:disabled:hover,
+button[data-appearance="filled"]:disabled:active {
+  background-color: var(--color-disabled) !important;
+  border-color: var(--color-disabled) !important;
+  color: var(--color-disabled-contrast) !important;
+}
+
+/* Outline buttons: transparent background when disabled, regardless of hover/active */
+button[data-appearance="outline"]:disabled:hover,
+button[data-appearance="outline"]:disabled:active {
+  background-color: transparent !important;
+  border-color: var(--color-disabled) !important;
+  color: var(--color-disabled) !important;
+}

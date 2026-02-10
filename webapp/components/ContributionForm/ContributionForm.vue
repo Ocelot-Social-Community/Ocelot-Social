@@ -173,9 +173,15 @@
             </ds-flex-item>
             <ds-flex-item width="0.15" />
             <ds-flex-item class="action-buttons-group" width="2">
-              <base-button data-test="cancel-button" :disabled="loading" @click="$router.back()">
+              <os-button
+                data-test="cancel-button"
+                variant="primary"
+                appearance="outline"
+                :disabled="loading"
+                @click="$router.back()"
+              >
                 {{ $t('actions.cancel') }}
-              </base-button>
+              </os-button>
               <base-button type="submit" icon="check" :loading="loading" :disabled="errors" filled>
                 {{ $t('actions.save') }}
               </base-button>
@@ -187,6 +193,7 @@
   </div>
 </template>
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
 import Editor from '~/components/Editor/Editor'
@@ -202,11 +209,12 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 export default {
   mixins: [GetCategories],
   components: {
-    Editor,
-    ImageUploader,
-    PageParamsLink,
     CategoriesSelect,
     DatePicker,
+    Editor,
+    ImageUploader,
+    OsButton,
+    PageParamsLink,
   },
   props: {
     contribution: {
