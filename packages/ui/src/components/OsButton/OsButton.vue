@@ -74,6 +74,7 @@
               attrs: {
                 type: props.type,
                 disabled: props.disabled || undefined,
+                'data-appearance': props.appearance,
                 ...attrs,
               },
               on: listeners,
@@ -88,6 +89,7 @@
           {
             type: props.type,
             disabled: props.disabled,
+            'data-appearance': props.appearance,
             class: classes.value,
             ...attrs,
           },
