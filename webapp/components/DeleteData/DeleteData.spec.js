@@ -97,7 +97,7 @@ describe('DeleteData.vue', () => {
         deleteAccountBtn = wrapper.find('[data-test="delete-button"]')
       })
 
-      it('if deleteEnabled is true and only deletes user ', async () => {
+      it('if deleteEnabled is true and only deletes user', async () => {
         await deleteAccountBtn.trigger('click')
         expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -109,7 +109,7 @@ describe('DeleteData.vue', () => {
         )
       })
 
-      it("deletes user's posts and comments if requested by default ", async () => {
+      it("deletes user's posts and comments if requested by default", async () => {
         enableContributionDeletionCheckbox = wrapper.find(
           '[data-test="contributions-deletion-checkbox"]',
         )
