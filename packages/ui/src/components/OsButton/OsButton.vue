@@ -37,10 +37,6 @@
         type: Boolean,
         default: false,
       },
-      customClass: {
-        type: String,
-        default: '',
-      },
     },
     setup(props, { slots, attrs }) {
       const classes = computed(() =>
@@ -51,7 +47,6 @@
             size: props.size,
             fullWidth: props.fullWidth,
           }),
-          props.customClass,
         ),
       )
 

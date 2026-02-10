@@ -89,7 +89,7 @@ describe('osButton', () => {
 
   it('merges custom classes', () => {
     const wrapper = mount(OsButton, {
-      props: { customClass: 'my-custom-class' },
+      attrs: { class: 'my-custom-class' },
     })
     expect(wrapper.classes()).toContain('my-custom-class')
   })
