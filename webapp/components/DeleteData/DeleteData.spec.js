@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 import DeleteData from './DeleteData.vue'
 import Vue from 'vue'
 import Vuex from 'vuex'
@@ -164,6 +165,7 @@ describe('DeleteData.vue', () => {
 
       it('redirect the user to the homepage', async () => {
         await deleteAccountBtn.trigger('click')
+        await flushPromises()
         expect(mocks.$router.push).toHaveBeenCalledWith('/')
       })
     })
