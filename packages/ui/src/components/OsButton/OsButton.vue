@@ -88,14 +88,16 @@
         }
         /* v8 ignore stop */
         // Vue 3: flat props, attrs includes listeners
+        // Extract class from attrs to merge instead of overwrite
+        const { class: attrClass, ...restAttrs } = attrs as Record<string, unknown>
         return h(
           'button',
           {
             type: props.type,
             disabled: props.disabled,
             'data-appearance': props.appearance,
-            class: classes.value,
-            ...attrs,
+            class: cn(classes.value, (attrClass as string) || ''),
+            ...restAttrs,
           },
           children,
         )
