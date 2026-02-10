@@ -106,42 +106,6 @@ export const AllSizes: Story = {
   }),
 }
 
-export const AppearanceOutline: Story = {
-  name: 'Appearance: Outline',
-  render: () => ({
-    components: { OsButton },
-    template: `
-      <div class="flex flex-wrap gap-2">
-        <OsButton appearance="outline" variant="default">Default</OsButton>
-        <OsButton appearance="outline" variant="primary">Primary</OsButton>
-        <OsButton appearance="outline" variant="secondary">Secondary</OsButton>
-        <OsButton appearance="outline" variant="danger">Danger</OsButton>
-        <OsButton appearance="outline" variant="warning">Warning</OsButton>
-        <OsButton appearance="outline" variant="success">Success</OsButton>
-        <OsButton appearance="outline" variant="info">Info</OsButton>
-      </div>
-    `,
-  }),
-}
-
-export const AppearanceGhost: Story = {
-  name: 'Appearance: Ghost',
-  render: () => ({
-    components: { OsButton },
-    template: `
-      <div class="flex flex-wrap gap-2">
-        <OsButton appearance="ghost" variant="default">Default</OsButton>
-        <OsButton appearance="ghost" variant="primary">Primary</OsButton>
-        <OsButton appearance="ghost" variant="secondary">Secondary</OsButton>
-        <OsButton appearance="ghost" variant="danger">Danger</OsButton>
-        <OsButton appearance="ghost" variant="warning">Warning</OsButton>
-        <OsButton appearance="ghost" variant="success">Success</OsButton>
-        <OsButton appearance="ghost" variant="info">Info</OsButton>
-      </div>
-    `,
-  }),
-}
-
 export const AllAppearances: Story = {
   render: () => ({
     components: { OsButton },
@@ -183,6 +147,42 @@ export const AllAppearances: Story = {
             <OsButton appearance="ghost" variant="info">Info</OsButton>
           </div>
         </div>
+      </div>
+    `,
+  }),
+}
+
+export const AppearanceOutline: Story = {
+  name: 'Appearance: Outline',
+  render: () => ({
+    components: { OsButton },
+    template: `
+      <div class="flex flex-wrap gap-2">
+        <OsButton appearance="outline" variant="default">Default</OsButton>
+        <OsButton appearance="outline" variant="primary">Primary</OsButton>
+        <OsButton appearance="outline" variant="secondary">Secondary</OsButton>
+        <OsButton appearance="outline" variant="danger">Danger</OsButton>
+        <OsButton appearance="outline" variant="warning">Warning</OsButton>
+        <OsButton appearance="outline" variant="success">Success</OsButton>
+        <OsButton appearance="outline" variant="info">Info</OsButton>
+      </div>
+    `,
+  }),
+}
+
+export const AppearanceGhost: Story = {
+  name: 'Appearance: Ghost',
+  render: () => ({
+    components: { OsButton },
+    template: `
+      <div class="flex flex-wrap gap-2">
+        <OsButton appearance="ghost" variant="default">Default</OsButton>
+        <OsButton appearance="ghost" variant="primary">Primary</OsButton>
+        <OsButton appearance="ghost" variant="secondary">Secondary</OsButton>
+        <OsButton appearance="ghost" variant="danger">Danger</OsButton>
+        <OsButton appearance="ghost" variant="warning">Warning</OsButton>
+        <OsButton appearance="ghost" variant="success">Success</OsButton>
+        <OsButton appearance="ghost" variant="info">Info</OsButton>
       </div>
     `,
   }),
