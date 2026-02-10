@@ -57,7 +57,7 @@ jobs:
           retention-days: 1
 
   test-compatibility:
-    name: Test ${{ matrix.example }}
+    name: Test Compatibility
     if: needs.files-changed.outputs.ui == 'true'
     needs: [files-changed, build-library]
     runs-on: ubuntu-latest
