@@ -52,11 +52,55 @@ export const AllSizes: Story = {
   render: () => ({
     components: { OsButton },
     template: `
-      <div class="flex flex-col gap-2 items-start">
-        <OsButton size="sm">Small (26px)</OsButton>
-        <OsButton size="md">Medium (36px)</OsButton>
-        <OsButton size="lg">Large</OsButton>
-        <OsButton size="xl">Extra Large</OsButton>
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-sm font-bold mb-2">Small (26px)</h3>
+          <div class="flex flex-wrap gap-2 items-center">
+            <OsButton size="sm" variant="default">Default</OsButton>
+            <OsButton size="sm" variant="primary">Primary</OsButton>
+            <OsButton size="sm" variant="secondary">Secondary</OsButton>
+            <OsButton size="sm" variant="danger">Danger</OsButton>
+            <OsButton size="sm" variant="warning">Warning</OsButton>
+            <OsButton size="sm" variant="success">Success</OsButton>
+            <OsButton size="sm" variant="info">Info</OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Medium (36px)</h3>
+          <div class="flex flex-wrap gap-2 items-center">
+            <OsButton size="md" variant="default">Default</OsButton>
+            <OsButton size="md" variant="primary">Primary</OsButton>
+            <OsButton size="md" variant="secondary">Secondary</OsButton>
+            <OsButton size="md" variant="danger">Danger</OsButton>
+            <OsButton size="md" variant="warning">Warning</OsButton>
+            <OsButton size="md" variant="success">Success</OsButton>
+            <OsButton size="md" variant="info">Info</OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Large</h3>
+          <div class="flex flex-wrap gap-2 items-center">
+            <OsButton size="lg" variant="default">Default</OsButton>
+            <OsButton size="lg" variant="primary">Primary</OsButton>
+            <OsButton size="lg" variant="secondary">Secondary</OsButton>
+            <OsButton size="lg" variant="danger">Danger</OsButton>
+            <OsButton size="lg" variant="warning">Warning</OsButton>
+            <OsButton size="lg" variant="success">Success</OsButton>
+            <OsButton size="lg" variant="info">Info</OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Extra Large</h3>
+          <div class="flex flex-wrap gap-2 items-center">
+            <OsButton size="xl" variant="default">Default</OsButton>
+            <OsButton size="xl" variant="primary">Primary</OsButton>
+            <OsButton size="xl" variant="secondary">Secondary</OsButton>
+            <OsButton size="xl" variant="danger">Danger</OsButton>
+            <OsButton size="xl" variant="warning">Warning</OsButton>
+            <OsButton size="xl" variant="success">Success</OsButton>
+            <OsButton size="xl" variant="info">Info</OsButton>
+          </div>
+        </div>
       </div>
     `,
   }),

@@ -36,7 +36,7 @@ test.describe('OsButton visual regression', () => {
     await page.goto(`${STORY_URL}--all-sizes&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
-    await expect(root.locator('.flex')).toHaveScreenshot('all-sizes.png')
+    await expect(root.locator('.flex-col').first()).toHaveScreenshot('all-sizes.png')
     await checkA11y(page)
   })
 
