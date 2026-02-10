@@ -105,17 +105,30 @@ jobs:
             /home/runner/work/Ocelot-Social/Ocelot-Social
           key: ${{ github.run_id }}-e2e-cypress
 
-  fullstack_tests:
-    name: Fullstack | tests
-    if: success()
-    needs: [prepare_backend_environment, prepare_webapp_image, prepare_cypress]
+  list_features:
+    name: List Feature Files
     runs-on: ubuntu-latest
-    env:
-      jobs: 8
+    outputs:
+      features: ${{ steps.list.outputs.features }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.2.2
+
+      - name: List feature files
+        id: list
+        run: |
+          FEATURES=$(find cypress/e2e/ -maxdepth 1 -name "*.feature" -printf '%f\n' | sort | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "features=$FEATURES" >> $GITHUB_OUTPUT
+
+  fullstack_tests:
+    name: E2E | ${{ matrix.feature }}
+    if: success()
+    needs: [prepare_backend_environment, prepare_webapp_image, prepare_cypress, list_features]
+    runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        # run copies of the current job in parallel
-        job: [1, 2, 3, 4, 5, 6, 7, 8]
+        feature: ${{ fromJson(needs.list_features.outputs.features) }}
     steps:
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
@@ -171,7 +184,7 @@ jobs:
 
       - name: Full stack tests | run tests
         id: e2e-tests
-        run: yarn run cypress:run --spec $(cypress/parallel-features.sh ${{ matrix.job }} ${{ env.jobs }} )
+        run: yarn run cypress:run --spec "cypress/e2e/${{ matrix.feature }}"
 
       - name: Full stack tests | if tests failed, compile html report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
@@ -184,6 +197,6 @@ jobs:
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
-          name: ocelot-e2e-test-report-pr${{ needs.docker_preparation.outputs.pr-number }}
+          name: e2e-report-${{ matrix.feature }}
           path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
 
