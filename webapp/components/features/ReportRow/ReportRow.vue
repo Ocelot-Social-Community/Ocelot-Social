@@ -11,9 +11,14 @@
         <span class="user-count">
           {{ $t('moderation.reports.numberOfUsers', { count: report.filed.length }) }}
         </span>
-        <base-button size="small" @click="showFiledReports = !showFiledReports">
+        <os-button
+          variant="primary"
+          appearance="outline"
+          size="sm"
+          @click="showFiledReports = !showFiledReports"
+        >
           {{ $t('moderation.reports.moreDetails') }}
-        </base-button>
+        </os-button>
       </td>
 
       <!-- Content Column -->
@@ -22,7 +27,7 @@
           <user-teaser :user="report.resource" :showAvatar="false" :showPopover="false" />
         </client-only>
         <nuxt-link v-else class="title" :to="linkTarget">
-          {{ linkText | truncate(50) }}
+          {{ $filters.truncate(linkText, 50) }}
         </nuxt-link>
       </td>
 
@@ -78,14 +83,17 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import FiledReportsTable from '~/components/features/FiledReportsTable/FiledReportsTable'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 
 export default {
   components: {
+    OsButton,
     FiledReportsTable,
     UserTeaser,
   },
+  emits: ['confirm-report'],
   props: {
     report: {
       type: Object,

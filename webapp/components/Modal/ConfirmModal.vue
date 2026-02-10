@@ -9,7 +9,7 @@
     <!-- eslint-disable-next-line vue/no-v-html -->
     <p v-html="message" />
 
-    <template slot="footer">
+    <template #footer>
       <base-button
         class="cancel"
         :danger="!modalData.buttons.confirm.danger"
@@ -42,6 +42,7 @@ export default {
   components: {
     SweetalertIcon,
   },
+  emits: ['close'],
   props: {
     name: { type: String, default: '' }, // only used for compatibility with the other modals in 'Modal.vue'
     type: { type: String, required: true }, // only used for compatibility with the other modals in 'Modal.vue'
@@ -85,6 +86,7 @@ export default {
         }, 1500)
       } catch (err) {
         this.isOpen = false
+        this.$emit('close')
       } finally {
         this.loading = false
       }

@@ -20,25 +20,37 @@
       </div>
     </ds-space>
     <ds-space margin-top="base" margin-bottom="x-small">
-      <base-button @click="checkAll" :disabled="isCheckAllDisabled">
+      <os-button
+        appearance="outline"
+        variant="primary"
+        @click="checkAll"
+        :disabled="isCheckAllDisabled"
+      >
         {{ $t('settings.notifications.checkAll') }}
-      </base-button>
-      <base-button @click="uncheckAll" :disabled="isUncheckAllDisabled">
+      </os-button>
+      <os-button
+        appearance="outline"
+        variant="primary"
+        @click="uncheckAll"
+        :disabled="isUncheckAllDisabled"
+      >
         {{ $t('settings.notifications.uncheckAll') }}
-      </base-button>
-      <base-button class="save-button" filled @click="submit" :disabled="isSubmitDisabled">
+      </os-button>
+      <os-button class="save-button" variant="primary" @click="submit" :disabled="isSubmitDisabled">
         {{ $t('actions.save') }}
-      </base-button>
+      </os-button>
     </ds-space>
   </base-card>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 import { updateUserMutation } from '~/graphql/User'
 import scrollToContent from './scroll-to-content.js'
 
 export default {
+  components: { OsButton },
   mixins: [scrollToContent],
   data() {
     return {

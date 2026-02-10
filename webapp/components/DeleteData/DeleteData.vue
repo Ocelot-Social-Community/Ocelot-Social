@@ -111,10 +111,14 @@ export default {
           `,
           variables: { id: this.currentUser.id, resource: resourceArgs },
         })
-        .then(() => {
+        .then(async () => {
           this.$toast.success(this.$t('settings.deleteUserAccount.success'))
-          this.logout()
-          this.$router.history.push('/')
+          try {
+            await this.logout()
+          } catch {
+            // Logout-Fehler ignorieren — Account ist bereits gelöscht
+          }
+          this.$router.push('/')
         })
         .catch((error) => {
           this.$toast.error(error.message)

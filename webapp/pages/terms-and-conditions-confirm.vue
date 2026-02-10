@@ -4,28 +4,30 @@
       <base-icon name="balance-scale" />
       <h2 class="title">{{ $t(`termsAndConditions.newTermsAndConditions`) }}</h2>
       <nuxt-link :to="{ name: 'terms-and-conditions' }" target="_blank">
-        <base-button>
+        <os-button appearance="outline" variant="primary">
           {{ $t(`termsAndConditions.termsAndConditionsNewConfirmText`) }}
-        </base-button>
+        </os-button>
       </nuxt-link>
       <label for="checkbox">
         <input id="checkbox" type="checkbox" v-model="checked" :checked="checked" />
         {{ $t('termsAndConditions.termsAndConditionsNewConfirm') }}
       </label>
-      <base-button filled @click="submit" :disabled="!checked">
+      <os-button variant="primary" @click="submit" :disabled="!checked">
         {{ $t(`actions.save`) }}
-      </base-button>
+      </os-button>
     </base-card>
   </ds-container>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import { updateUserMutation } from '~/graphql/User.js'
 
 export default {
   name: 'TermsAndConditionsConfirm',
+  components: { OsButton },
   layout: 'default',
   head() {
     return {

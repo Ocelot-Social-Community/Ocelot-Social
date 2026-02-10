@@ -1,19 +1,21 @@
 <template>
   <div class="donation-info">
     <progress-bar :label="label" :goal="goal" :progress="progress">
-      <base-button size="small" filled @click="redirectToPage(links.DONATE)">
+      <os-button size="sm" variant="primary" @click="redirectToPage(links.DONATE)">
         {{ $t('donations.donate-now') }}
-      </base-button>
+      </os-button>
     </progress-bar>
   </div>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import links from '~/constants/links.js'
 import ProgressBar from '~/components/ProgressBar/ProgressBar.vue'
 
 export default {
   components: {
+    OsButton,
     ProgressBar,
   },
   props: {

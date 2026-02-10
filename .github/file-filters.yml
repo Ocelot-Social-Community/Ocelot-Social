@@ -1,5 +1,9 @@
 # These file filter patterns are used by the action https://github.com/dorny/paths-filter
 
+ui: &ui
+  - '.github/workflows/ui-*.yml'
+  - 'packages/ui/**/*'
+
 backend: &backend
   - '.github/workflows/test-backend.yml'
   - 'backend/**/*'
@@ -14,6 +18,7 @@ webapp: &webapp
   - 'webapp/**/*'
   - 'styleguide/**/*'
   - 'package.json'
+  - *ui
 
 docs-check: &docs-check
   - '.github/workflows/check-documentation.yml'

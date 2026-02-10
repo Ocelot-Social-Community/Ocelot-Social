@@ -53,17 +53,18 @@
         </ds-chip>
       </template>
       <template #edit="scope">
-        <base-button
+        <os-button
           v-if="scope.row.membership.role !== 'owner'"
-          size="small"
-          primary
+          appearance="outline"
+          variant="primary"
+          size="sm"
           @click="
             isOpen = true
             userId = scope.row.user.id
           "
         >
           {{ $t('group.removeMemberButton') }}
-        </base-button>
+        </os-button>
       </template>
     </ds-table>
     <ds-modal
@@ -79,12 +80,14 @@
   </div>
 </template>
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { changeGroupMemberRoleMutation, removeUserFromGroupMutation } from '~/graphql/groups.js'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 
 export default {
   name: 'GroupMember',
   components: {
+    OsButton,
     ProfileAvatar,
   },
   props: {

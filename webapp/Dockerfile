@@ -6,6 +6,14 @@ COPY styleguide .
 RUN yarn install --production=false --frozen-lockfile --non-interactive
 RUN yarn run build:lib
 
+FROM node:25.6.0-alpine AS ui-library
+RUN apk --no-cache add git python3 make g++
+RUN mkdir -p /app
+WORKDIR /app
+COPY packages/ui .
+RUN yarn install --production=false --frozen-lockfile --non-interactive
+RUN yarn run build
+
 FROM node:25.6.0-alpine AS base
 LABEL org.label-schema.name="ocelot.social:webapp"
 LABEL org.label-schema.description="Web Frontend of the Social Network Software ocelot.social"
@@ -22,6 +30,7 @@ RUN apk --no-cache add git python3 make g++ bash jq
 RUN mkdir -p /app
 WORKDIR /app
 COPY --from=styleguide ./app/ /styleguide/
+COPY --from=ui-library ./app/ /packages/ui/
 CMD ["/bin/bash", "-c", "yarn run start"]
 
 FROM base AS development
