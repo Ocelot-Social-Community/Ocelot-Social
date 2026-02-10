@@ -3,14 +3,8 @@ name: UI Compatibility
 on:
   push:
     branches: [master]
-    paths:
-      - 'packages/ui/**'
-      - '.github/workflows/ui-compatibility.yml'
   pull_request:
     branches: [master]
-    paths:
-      - 'packages/ui/**'
-      - '.github/workflows/ui-compatibility.yml'
 
 jobs:
   files-changed:

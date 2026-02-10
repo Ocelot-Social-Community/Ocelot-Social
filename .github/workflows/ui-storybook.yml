@@ -3,14 +3,8 @@ name: UI Storybook
 on:
   push:
     branches: [master]
-    paths:
-      - 'packages/ui/**'
-      - '.github/workflows/ui-storybook.yml'
   pull_request:
     branches: [master]
-    paths:
-      - 'packages/ui/**'
-      - '.github/workflows/ui-storybook.yml'
 
 defaults:
   run:
