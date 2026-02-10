@@ -53,7 +53,7 @@ describe('osButton', () => {
         props: { appearance: 'ghost', variant: 'primary' },
       })
       expect(wrapper.classes()).toContain('bg-transparent')
-      expect(wrapper.classes()).toContain('border-none')
+      expect(wrapper.classes()).toContain('border-transparent')
       expect(wrapper.classes()).toContain('text-[var(--color-primary)]')
     })
   })
@@ -115,9 +115,11 @@ describe('osButton', () => {
   })
 
   describe('focus styles', () => {
-    it('default variant has no focus outline', () => {
+    it('default variant has dashed outline focus style using currentColor', () => {
       const wrapper = mount(OsButton)
-      expect(wrapper.classes()).toContain('focus:outline-none')
+      expect(wrapper.classes()).toContain('focus:outline-dashed')
+      expect(wrapper.classes()).toContain('focus:outline-current')
+      expect(wrapper.classes()).toContain('focus:outline-1')
     })
 
     it('colored variants have dashed outline focus style', () => {

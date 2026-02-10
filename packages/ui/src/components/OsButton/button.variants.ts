@@ -27,7 +27,7 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         // Color variants - actual styling comes from compound variants with appearance
-        default: ['focus:outline-none'], // default variant has no focus outline
+        default: ['focus:outline-dashed focus:outline-current'],
         primary: ['focus:outline-dashed focus:outline-[var(--color-primary)]'],
         secondary: ['focus:outline-dashed focus:outline-[var(--color-secondary)]'],
         danger: ['focus:outline-dashed focus:outline-[var(--color-danger)]'],
