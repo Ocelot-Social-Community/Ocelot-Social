@@ -113,7 +113,11 @@ export default {
         })
         .then(async () => {
           this.$toast.success(this.$t('settings.deleteUserAccount.success'))
-          await this.logout()
+          try {
+            await this.logout()
+          } catch {
+            // Logout-Fehler ignorieren — Account ist bereits gelöscht
+          }
           this.$router.push('/')
         })
         .catch((error) => {
