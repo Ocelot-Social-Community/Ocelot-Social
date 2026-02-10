@@ -241,6 +241,79 @@ describe('muteUser', () => {
                 },
               })
             })
+
+            it("the muted user's post is still accessible by direct id lookup", async () => {
+              const { query } = createTestClient(server)
+              await expect(query({ query: Post, variables: { id: 'p23' } })).resolves.toMatchObject(
+                {
+                  data: {
+                    Post: [
+                      expect.objectContaining({
+                        id: 'p23',
+                        title: 'A post written by the muted user',
+                      }),
+                    ],
+                  },
+                },
+              )
+            })
+
+            describe('but the muted user has a pinned post', () => {
+              beforeEach(async () => {
+                const pinnedPost = await neode.create('Post', {
+                  id: 'p-pinned',
+                  title: 'A pinned post by the muted user',
+                  content: 'pinned content',
+                  pinned: true,
+                })
+                await pinnedPost.relateTo(mutedUser, 'author')
+              })
+
+              it('the pinned post still shows up in the post list', async () => {
+                const { query } = createTestClient(server)
+                await expect(
+                  query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+                ).resolves.toMatchObject({
+                  data: {
+                    Post: expect.arrayContaining([
+                      expect.objectContaining({
+                        id: 'p-pinned',
+                        title: 'A pinned post by the muted user',
+                        pinned: true,
+                      }),
+                    ]),
+                  },
+                })
+              })
+
+              it('the pinned post is accessible by id', async () => {
+                const { query } = createTestClient(server)
+                await expect(
+                  query({ query: Post, variables: { id: 'p-pinned' } }),
+                ).resolves.toMatchObject({
+                  data: {
+                    Post: [
+                      expect.objectContaining({
+                        id: 'p-pinned',
+                        title: 'A pinned post by the muted user',
+                        pinned: true,
+                      }),
+                    ],
+                  },
+                })
+              })
+
+              it('the non-pinned post from the muted user is still hidden in the feed', async () => {
+                const { query } = createTestClient(server)
+                const result = await query({
+                  query: Post,
+                  variables: { orderBy: 'createdAt_asc' },
+                })
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+                const postIds = result.data?.Post.map((p) => p.id)
+                expect(postIds).not.toContain('p23')
+              })
+            })
           })
         })
 
