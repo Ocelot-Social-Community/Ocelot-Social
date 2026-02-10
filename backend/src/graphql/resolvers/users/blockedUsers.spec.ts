@@ -308,6 +308,16 @@ describe('blockUser', () => {
                   },
                 })
               })
+
+              it('the non-pinned post from the muted+blocked user is still hidden in the feed', async () => {
+                const result = await query({
+                  query: Post,
+                  variables: { orderBy: 'createdAt_asc' },
+                })
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+                const postIds = result.data?.Post.map((p) => p.id)
+                expect(postIds).not.toContain('p23')
+              })
             })
           })
         })
