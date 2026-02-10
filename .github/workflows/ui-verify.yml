@@ -3,14 +3,8 @@ name: UI Verify
 on:
   push:
     branches: [master]
-    paths:
-      - 'packages/ui/**'
-      - '.github/workflows/ui-verify.yml'
   pull_request:
     branches: [master]
-    paths:
-      - 'packages/ui/**'
-      - '.github/workflows/ui-verify.yml'
 
 defaults:
   run:

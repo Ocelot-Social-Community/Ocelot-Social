@@ -3,14 +3,8 @@ name: UI Visual
 on:
   push:
     branches: [master]
-    paths:
-      - 'packages/ui/**'
-      - '.github/workflows/ui-visual.yml'
   pull_request:
     branches: [master]
-    paths:
-      - 'packages/ui/**'
-      - '.github/workflows/ui-visual.yml'
 
 defaults:
   run:
