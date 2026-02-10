@@ -29,14 +29,14 @@ ONBUILD COPY ./branding/email/ src/middleware/helpers/email/
 ONBUILD COPY ./branding/middlewares/ src/middleware/branding/
 ONBUILD COPY ./branding/data/ src/db/data
 ONBUILD COPY ./branding/public/ public/
-ONBUILD RUN --mount=type=cache,target=/yarn-cache \
+ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 ONBUILD RUN yarn run build
 ONBUILD RUN mkdir /build
 ONBUILD RUN cp -r ./build /build
 ONBUILD RUN cp -r ./public /build
 ONBUILD RUN cp -r ./package.json yarn.lock /build
-ONBUILD RUN --mount=type=cache,target=/yarn-cache \
+ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 
 FROM build AS test

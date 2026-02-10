@@ -4,7 +4,7 @@ RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
 COPY styleguide .
-RUN --mount=type=cache,target=/yarn-cache \
+RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 RUN yarn run build:lib
 
@@ -13,7 +13,7 @@ RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
 COPY packages/ui .
-RUN --mount=type=cache,target=/yarn-cache \
+RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 RUN yarn run build
 
@@ -45,7 +45,7 @@ COPY webapp/ .
 ONBUILD COPY webap[p]/brandin[g]/ .
 ONBUILD COPY brandin[g]/ .
 ONBUILD RUN tools/merge-locales.sh
-ONBUILD RUN --mount=type=cache,target=/yarn-cache \
+ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 ONBUILD RUN yarn run build
 ONBUILD RUN mkdir /build
@@ -60,14 +60,14 @@ ONBUILD RUN cp -r ./static /build
 ONBUILD RUN cp -r ./locales /build
 ONBUILD RUN cp -r ./package.json ./yarn.lock /build
 ONBUILD RUN cp -r ./scripts /build
-ONBUILD RUN --mount=type=cache,target=/yarn-cache \
+ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 
 FROM base AS test_build
 ENV NODE_ENV=test
 COPY webapp/. .
 RUN tools/merge-locales.sh
-RUN --mount=type=cache,target=/yarn-cache \
+RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 RUN yarn run build
 RUN mkdir /build
@@ -79,7 +79,7 @@ RUN cp -r ./static /build
 RUN cp -r ./locales /build
 RUN cp -r ./package.json ./yarn.lock /build
 RUN cp -r ./scripts /build
-RUN --mount=type=cache,target=/yarn-cache \
+RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 
 FROM test_build AS test
