@@ -76,7 +76,7 @@ test.describe('OsButton visual regression', () => {
     await page.goto(`${STORY_URL}--full-width&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
-    await expect(root.locator('button')).toHaveScreenshot('full-width.png')
+    await expect(root.locator('.flex-col').first()).toHaveScreenshot('full-width.png')
     await checkA11y(page)
   })
 })

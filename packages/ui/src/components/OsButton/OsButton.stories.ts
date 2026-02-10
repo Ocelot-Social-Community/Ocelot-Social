@@ -235,14 +235,18 @@ export const Disabled: Story = {
 }
 
 export const FullWidth: Story = {
-  args: {
-    fullWidth: true,
-  },
-  render: (args) => ({
+  render: () => ({
     components: { OsButton },
-    setup() {
-      return { args }
-    },
-    template: '<OsButton v-bind="args">Full Width Button</OsButton>',
+    template: `
+      <div class="flex flex-col gap-2">
+        <OsButton fullWidth variant="default">Default</OsButton>
+        <OsButton fullWidth variant="primary">Primary</OsButton>
+        <OsButton fullWidth variant="secondary">Secondary</OsButton>
+        <OsButton fullWidth variant="danger">Danger</OsButton>
+        <OsButton fullWidth variant="warning">Warning</OsButton>
+        <OsButton fullWidth variant="success">Success</OsButton>
+        <OsButton fullWidth variant="info">Info</OsButton>
+      </div>
+    `,
   }),
 }
