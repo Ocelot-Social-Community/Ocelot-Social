@@ -51,6 +51,8 @@
 | # | Abschnitt |
 |---|-----------|
 | 16 | [Library vs. Webapp](#16-library-vs-webapp) |
+| 16a | [Webapp ↔ Maintenance Code-Sharing](#16a-webapp--maintenance-code-sharing) |
+| 16b | [Daten-Entkopplung (ViewModel/Mapper)](#16b-daten-entkopplung-viewmodelmapper-pattern) |
 | 17 | [Externe Abhängigkeiten](#17-externe-abhängigkeiten) |
 | 18 | [Kompatibilitätstests (Details)](#18-kompatibilitätstests-details) |
 | 19 | [Komplexitätsanalyse](#19-komplexitätsanalyse) |
@@ -78,12 +80,11 @@
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
-Phase 3: ░░░░░░░░░░   0% (0/7 Aufgaben)
+Phase 3: █████████░  83% (20/24 Aufgaben) - Webapp-Integration (M4a ✅, M5 ✅)
 Phase 4: █░░░░░░░░░   6% (1/17 Aufgaben) - OsButton ✅
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
-Webapp:  ░░░░░░░░░░   0% (0/1 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  █████░░░░░  56% (39/70 Aufgaben)
+Gesamt:  ███████░░░  69% (59/86 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -93,22 +94,30 @@ Styleguide: ██████████ 100% (38 Komponenten erfasst)
 Analyse:    ██████████ 100% (Button, Modal, Menu detailiert)
 ```
 
-### Komponenten-Migration (Priorisiert: 15)
+### OsButton Migration (Phase 3)
 ```
-Analysiert:   3 Familien (Button, Modal, Menu)
-Spezifiziert: 1 (OsButton)
-Entwickelt:   1 (OsButton mit CVA)
-QA bestanden: 1 (OsButton: 100% Coverage, Visual, A11y, Keyboard)
-Integriert:   0
+Scope gesamt:     ~90 Buttons in Webapp
+├─ Migriert:       32 Buttons (36%) ✅
+├─ Ohne neue Props:  0 Buttons (Milestone 4a ✅)
+└─ Mit icon/circle/loading: ~60 Buttons (Milestone 4c)
+
+OsButton Features:
+├─ variant:     ✅ primary, secondary, danger, warning, success, info, default
+├─ appearance:  ✅ filled, outline, ghost
+├─ size:        ✅ xs, sm, md, lg, xl
+├─ disabled:    ✅ mit hover/active-Override
+├─ icon:        ⬜ TODO (Milestone 4b)
+├─ circle:      ⬜ TODO (Milestone 4b)
+└─ loading:     ⬜ TODO (Milestone 4b)
 ```
 
 ---
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-08
+**Letzte Aktualisierung:** 2026-02-10 (Session 12)
 
-**Aktuelle Phase:** Phase 3 (Token-System & Basis) - Bereit zum Start
+**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 4a abgeschlossen ✅ (32 Buttons migriert, nächster: Milestone 4b)
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -166,8 +175,8 @@ Integriert:   0
   - cn() Utility für Tailwind-Klassen-Merge (clsx + tailwind-merge)
   - OsButton Komponente mit CVA-Varianten implementiert
   - ESLint-Konfiguration angepasst (vue/max-attributes-per-line, import-x/no-relative-parent-imports)
-  - Storybook 10 für Dokumentation eingerichtet (Greyscale-Theme)
-  - OsButton.stories.ts mit allen Varianten
+  - Storybook 10 für Dokumentation eingerichtet (Wasserfarben-Theme)
+  - OsButton.stories.ts mit Playground + allen Varianten/Appearances/Sizes
   - Storybook Build-Konfiguration (viteFinal entfernt Library-Plugins)
   - Docker Setup (Dockerfile, docker-compose, ui-docker.yml)
   - Visual Regression Tests (Playwright, colocated) mit integriertem A11y-Check
@@ -175,21 +184,91 @@ Integriert:   0
   - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 
 **Aktuell in Arbeit:**
-- Bereit für Phase 3: Token-System & Basis
+- Phase 3, Milestone 4b: icon/circle/loading Props in OsButton implementieren
+- Phase 3, Milestone 4c: ~60 Buttons mit icon/circle/loading migrieren
+
+**Zuletzt abgeschlossen (Session 12 - CSS-Linting, CI-Optimierung, Code-Review Fixes):**
+- [x] CSS-Linting: `@eslint/css` + `tailwind-csstree` für Tailwind v4 Syntax-Support
+- [x] `excludeCSS()` Helper: JS-Regeln von CSS-Dateien fernhalten (language-Inkompatibilität)
+- [x] CSS-Regeln: `no-empty-blocks`, `no-duplicate-imports`, `no-invalid-at-rules`
+- [x] CI-Workflow-Trigger optimiert: 9 UI-Workflows von `on: push` auf Branch+Path-Filter (`master`, `packages/ui/**`)
+- [x] `custom-class` → `class` Migration: 4 Stellen in 3 Webapp-Dateien (notifications, MapStylesButtons, EmbedComponent)
+- [x] Vue 3 Template-Fix: `this.$t()` → `$t()` in CommentCard.vue (Zeile 5 + 58)
+- [x] Pre-existing Fix: `async` Arrow-Function in OsButton.visual.spec.ts
+
+**Zuvor abgeschlossen (Session 11 - Storybook & Code-Review Fixes):**
+- [x] Wasserfarben-Farbschema für Storybook (Ultramarin, Dioxazin-Violett, Alizarin, Ocker, Viridian, Cöruleum)
+- [x] Stories erweitert: Playground (interaktive Controls), alle Varianten in allen Stories
+- [x] Einzelne Stories (Primary, Secondary, Danger, Default) durch AllVariants ersetzt
+- [x] AllAppearances zeigt alle 7 Varianten × 3 Appearances
+- [x] Einheitlicher Border (0.8px) über alle Appearances (kein Layout-Shift mehr)
+- [x] WCAG 2.4.7 Fix: Default-Variante hat jetzt `focus:outline-dashed focus:outline-current`
+- [x] Keyboard Accessibility Test: prüft Focus-Indikator auf allen Buttons im Browser
+- [x] `data-appearance` Attribut: robuste CSS-Selektoren statt fragile escaped Tailwind-Klassen
+- [x] Code-Review Feedback eingearbeitet (Unit-Tests, Testnamen, CSS-Selektoren)
+
+**Zuvor abgeschlossen (Milestone 5 + Analyse):**
+- [x] Visuelle Validierung: 16/16 Buttons validiert ✅
+- [x] OsButton Features: `appearance` (outline, ghost), `xs` size, focus/active states
+- [x] Disabled-Styles: CSS-Variablen, hover/active-Override, Border-Fix
+- [x] Codebase-Analyse: 14 weitere migrierbare Buttons identifiziert (Scope: 16/35)
+
+**Zuletzt erledigt (Phase 3):**
+- [x] vue-demi zur Webapp hinzugefügt (Vue 2.7 Kompatibilität)
+- [x] Webpack-Alias für vue-demi (nutzt Webapp's Vue 2.7 statt UI-Library's Vue 3)
+- [x] Webpack-Alias für @ocelot-social/ui (dist Pfade mit $ für exakten Match)
+- [x] OsButton mit isVue2 Render-Funktion (Vue 2: attrs-Objekt, Vue 3: flat props)
+- [x] CSS-Reihenfolge angepasst (UI-Library nach Styleguide für korrekte Spezifität)
+- [x] Manueller visueller Vergleich ✅
+- [x] **Jest-Integration für vue-demi** ✅
+  - Custom Mock (`test/__mocks__/@ocelot-social/ui.js`) statt direktem Import
+  - Problem: Jest's moduleNameMapper greift nicht für verschachtelte requires in CJS
+  - Problem: Jest lädt `vue.runtime.common.js` mit exports unter `default`
+  - Lösung: Module._load Patch für vue-demi + defineComponent von Vue.default
+  - Setup-File (`test/vueDemiSetup.js`) für Module._resolveFilename Patch
+  - **979 Tests bestehen ✅**
+- [x] Button-Variants an ds-button angepasst (font-semibold, rounded, box-shadow)
+- [x] UserTeaserPopover.vue migriert (verwendet `<os-button>`)
+- [x] **Docker Build für UI-Library** ✅
+  - ui-library Stage in Dockerfile + Dockerfile.maintenance
+  - COPY --from=ui-library ./app/ /packages/ui/
+- [x] **CI-Kompatibilität** ✅
+  - Relativer Pfad `file:../packages/ui` statt absolut `/packages/ui`
+  - Funktioniert lokal, in CI und in Docker
+- [x] **OsButton attrs/listeners Forwarding** ✅
+  - getCurrentInstance() für $listeners Zugriff in Vue 2
+  - inheritAttrs: false für manuelle Weiterleitung
+  - Jest Mock um alle Composition API Funktionen erweitert
+- [x] **16 Buttons migriert** (ohne icon/circle/loading) ✅
+  - GroupForm.vue, EmbedComponent.vue, DonationInfo.vue, CommentCard.vue
+  - MapStylesButtons.vue, GroupMember.vue, embeds.vue
+  - notifications.vue, privacy.vue, terms-and-conditions-confirm.vue, UserTeaserPopover.vue
+- [x] **Disabled-Styles korrigiert** ✅
+  - CSS-Variablen `--color-disabled` und `--color-disabled-contrast` hinzugefügt
+  - Filled-Buttons: Grauer Hintergrund statt opacity (wie buttonStates Mixin)
+  - Outline/Ghost: Graue Border/Text
+- [x] terms-and-conditions-confirm.vue: Read T&C Button → `appearance="outline" variant="primary"`
+- [x] **Disabled:active/hover Spezifität** ✅
+  - CSS-Regeln in index.css mit höherer Spezifität für disabled:hover und disabled:active
+  - Button zeigt sofort disabled-Farben, auch wenn während :active disabled wird
+- [x] notifications.vue: Check All + Uncheck All → `appearance="outline" variant="primary"`
+- [x] embeds.vue: Allow All → `appearance="outline" variant="primary"`
+- [x] **Disabled Border-Fix** ✅
+  - CSS-Regeln in index.css: `border-style: solid` und `border-width: 0.8px` bei disabled
+  - Verhindert Layout-Sprung wenn Button disabled wird
 
 **Nächste Schritte:**
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
 3. ~~**Phase 2: Projekt-Setup**~~ ✅ ABGESCHLOSSEN
-   - [x] CSS Custom Properties Token-System aufsetzen
-   - [x] Storybook für Dokumentation einrichten
-   - [x] Docker Setup (Dockerfile, docker-compose, ui-docker.yml)
-   - [x] Visual Regression Tests (Playwright + @axe-core/playwright)
-   - [x] Keyboard Accessibility Tests
-   - [x] ESLint Plugins (storybook, playwright, vuejs-accessibility, jsdoc)
-   - [x] Storybook Build Workflow (ui-storybook.yml)
-   - [x] Completeness Check Script (verify: Story, Visual, checkA11y, Keyboard, Varianten)
-4. **Phase 3: Token-System & Basis** - Nächste Phase
+4. **Phase 3: Webapp-Integration** - 32/90 Buttons migriert (36%)
+   - [x] yarn link / Webpack-Alias in Webapp
+   - [x] CSS-Variablen definieren (ocelot-ui-variables.scss)
+   - [x] 16 Buttons migriert & validiert ✅
+   - [x] Docker Build + CI-Kompatibilität
+   - [x] **Milestone 4a:** 14 weitere Buttons (ohne neue Props) ✅
+   - [ ] **Milestone 4b:** icon/circle/loading Props implementieren
+   - [ ] **Milestone 4c:** ~60 Buttons mit icon/circle/loading migrieren
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
 - [ ] `NPM_TOKEN` als GitHub Secret einrichten (für npm publish in ui-release.yml)
@@ -239,7 +318,7 @@ Integriert:   0
 - [x] Visual Regression Tests einrichten (Playwright, colocated mit Komponenten)
 - [x] Accessibility Tests in Visual Tests integriert (@axe-core/playwright)
 - [x] Keyboard Accessibility Tests (describe('keyboard accessibility'))
-- [x] ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
+- [x] ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc, @eslint/css
 - [x] Bundle Size Check einrichten (size-limit, ui-size.yml)
 - [x] Package-Validierung einrichten (publint, arethetypeswrong)
 - [x] Example Apps erstellen (vue3-tailwind, vue3-css, vue2-tailwind, vue2-css)
@@ -252,14 +331,175 @@ Integriert:   0
 - [x] CONTRIBUTING.md
 - [x] Completeness Check Script (Story, Visual+checkA11y, Keyboard, Varianten)
 
-### Phase 3: Token-System & Basis
-- [ ] Base Tokens definieren (Farben, Spacing, Typography)
-- [ ] Semantic Tokens definieren
-- [ ] Component Tokens definieren
-- [ ] Branding-System implementieren (CSS Variables)
-- [ ] Beispiel-Branding erstellen (Standard + Yunite)
-- [ ] Storybook Theme-Farben anpassen (ocelot.social Branding)
-- [ ] Token-Dokumentation in Storybook
+### Phase 3: Webapp-Integration (Validierung)
+
+**Ziel:** OsButton in der Webapp einbinden, ohne visuelle oder funktionale Änderungen.
+
+**Ansatz:** Integration First - Library einbinden, dann schrittweise OsButton ersetzen, beginnend mit einfachsten Stellen.
+
+**Milestone 1: Library-Einbindung** ✅
+- [x] @ocelot-social/ui in Webapp installieren (yarn link + Webpack-Alias)
+- [x] vue-demi zur Webapp hinzugefügt (für Vue 2.7 Kompatibilität)
+- [x] Webpack-Alias für vue-demi (nutzt Webapp's Vue 2.7)
+- [x] Webpack-Alias für @ocelot-social/ui$ und style.css$
+- [x] CSS Custom Properties in Webapp definieren (ocelot-ui-variables.scss)
+- [x] CSS-Reihenfolge angepasst (UI-Library nach Styleguide)
+- [x] Import-Pfade testen
+- [x] Docker Build Stage für UI-Library (Dockerfile + Dockerfile.maintenance)
+- [x] Relativer Pfad für CI-Kompatibilität (file:../packages/ui)
+- [x] Jest Mock für @ocelot-social/ui (test/__mocks__/@ocelot-social/ui.js)
+
+**Milestone 2: Erste Integration (Minimaler Aufwand)** ✅
+- [x] OsButton mit isVue2 Render-Funktion (Vue 2/3 kompatibel)
+- [x] Button-Variants an ds-button angepasst (font-semibold, rounded, box-shadow)
+- [x] OsButton in UserTeaserPopover.vue eingesetzt (`variant="primary"`)
+- [x] Manueller visueller Vergleich ✅
+- [x] Webapp-Tests bestehen ✅ (979 Tests, jest moduleNameMapper für vue-demi)
+
+**Milestone 3: Schrittweise Erweiterung** ✅
+- [x] GroupForm.vue Cancel-Button migriert
+- [x] OsButton attrs/listeners Forwarding (Vue 2 $listeners via getCurrentInstance)
+- [x] 14 weitere Buttons migriert (alle ohne icon/circle/loading)
+
+**Milestone 4a: Weitere Buttons migrieren (14 ohne neue Props)**
+- [ ] Modal Cancel-Buttons (DisableModal, DeleteUserModal, ReleaseModal)
+- [ ] Form Cancel/Submit-Buttons (ContributionForm, EnterNonce, MySomethingList)
+- [ ] ImageUploader.vue (2× Crop-Buttons)
+- [ ] Page-Buttons (donations, badges, notifications/index, profile Unblock/Unmute)
+- [ ] ReportRow.vue More-Details-Button
+
+**Milestone 4b: OsButton Props erweitern**
+- [ ] `icon` Prop implementieren (slot-basiert oder Icon-Komponente)
+- [ ] `circle` Variant zu CVA hinzufügen
+- [ ] `loading` Prop mit Spinner implementieren
+
+**Milestone 4c: Buttons mit icon/circle/loading migrieren (~60 Buttons)**
+
+*Button-Komponenten (Wrapper):*
+- [ ] Button/JoinLeaveButton.vue (icon, loading)
+- [ ] Button/FollowButton.vue (icon, loading)
+- [ ] LoginButton/LoginButton.vue (icon, circle)
+- [ ] InviteButton/InviteButton.vue (icon, circle)
+- [ ] EmotionButton/EmotionButton.vue (circle)
+- [ ] CustomButton/CustomButton.vue (2× circle)
+- [ ] LabeledButton/LabeledButton.vue (icon, circle)
+
+*Navigation & Menus:*
+- [ ] ContentMenu/ContentMenu.vue (icon, circle)
+- [ ] ContentMenu/GroupContentMenu.vue (icon, circle)
+- [ ] ChatNotificationMenu.vue (circle)
+- [ ] NotificationMenu.vue (3× icon, circle)
+- [ ] HeaderMenu/HeaderMenu.vue (icon, circle)
+- [ ] Map/MapButton.vue (circle)
+
+*Editor:*
+- [ ] Editor/MenuBarButton.vue (icon, circle)
+- [ ] Editor/MenuLegend.vue (~10× icon, circle)
+
+*Filter & Input:*
+- [ ] HashtagsFilter.vue (icon, circle)
+- [ ] CategoriesSelect.vue (icon)
+- [ ] SearchableInput.vue (icon, circle)
+- [ ] Select/LocationSelect.vue (icon)
+- [ ] PaginationButtons.vue (2× icon, circle)
+
+*Chat:*
+- [ ] Chat/Chat.vue (2× icon, circle)
+- [ ] Chat/AddChatRoomByUserSearch.vue (icon, circle)
+
+*Forms & Auth:*
+- [ ] LoginForm/LoginForm.vue (icon, loading)
+- [ ] PasswordReset/Request.vue (loading)
+- [ ] PasswordReset/ChangePassword.vue (loading)
+- [ ] Password/Change.vue (loading)
+- [ ] ContributionForm.vue Submit (icon, loading)
+- [ ] GroupForm.vue Submit (icon)
+- [ ] CommentForm/CommentForm.vue (loading)
+
+*Modals:*
+- [ ] Modal/ConfirmModal.vue (2× icon, loading)
+- [ ] Modal/ReportModal.vue (2× icon, loading)
+- [ ] Modal/DisableModal.vue Confirm (icon)
+- [ ] Modal/DeleteUserModal.vue Confirm (icon)
+- [ ] Modal/ReleaseModal.vue Confirm (icon)
+
+*Features:*
+- [ ] ComponentSlider.vue (2× icon, loading)
+- [ ] MySomethingList.vue (3× icon, circle, loading)
+- [ ] CreateInvitation.vue (icon, circle)
+- [ ] Invitation.vue (2× icon, circle)
+- [ ] ProfileList.vue (loading)
+- [ ] ReportRow.vue Confirm (icon)
+- [ ] ImageUploader.vue Delete/Cancel (2× icon, circle)
+- [ ] CommentCard.vue Reply (icon, circle)
+- [ ] EmbedComponent.vue Close (icon, circle)
+- [ ] CtaUnblockAuthor.vue (icon)
+- [ ] data-download.vue (icon, loading)
+
+*Pages:*
+- [ ] pages/groups/_id/_slug.vue (3× icon, circle, loading)
+- [ ] pages/admin/users/index.vue (2× icon, circle, loading)
+- [ ] pages/settings/index.vue (icon, loading)
+- [ ] pages/settings/blocked-users.vue (icon, circle)
+- [ ] pages/settings/muted-users.vue (icon, circle)
+- [ ] pages/settings/my-email-address/*.vue (2× icon)
+- [ ] pages/profile/_id/_slug.vue Chat (icon)
+- [ ] pages/post/_id/_slug/index.vue (icon, circle)
+
+**Milestone 5: Validierung & Dokumentation** ✅
+- [x] Keine visuellen Änderungen bestätigt (16/16 Buttons validiert)
+- [x] Keine funktionalen Änderungen bestätigt
+- [x] Disabled-Styles korrigiert (hover/active-Override, Border-Fix)
+- [ ] Webapp-Tests bestehen weiterhin (TODO: Regressionstest)
+- [ ] Erkenntnisse in KATALOG.md dokumentiert
+
+**Einsatzstellen-Übersicht:**
+
+| Kategorie | Buttons | Status |
+|-----------|---------|--------|
+| ✅ Migriert & Validiert | 24 | Erledigt |
+| ⏳ Ohne neue Props (M4a) | 6 | In Arbeit (8 von 14 erledigt) |
+| ⬜ Mit icon/circle/loading (M4c) | ~60 | Ausstehend |
+| **Gesamt** | **~90** | **27% erledigt** |
+
+**Details siehe KATALOG.md** (vollständige Tracking-Tabellen)
+
+**Erfolgskriterien:**
+| Kriterium | Prüfung |
+|-----------|---------|
+| Visuell identisch | Manueller Screenshot-Vergleich |
+| Funktional identisch | Click, Disabled funktionieren |
+| Keine Regression | Webapp Unit-Tests bestehen |
+
+**Visuelle Validierung (OsButton vs Original):**
+
+Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Active, Disabled.
+
+| Datei | Button | Props | Validiert |
+|-------|--------|-------|-----------|
+| `components/Group/GroupForm.vue` | Cancel | `default` | ✅ |
+| `components/Group/GroupMember.vue` | Remove Member | `appearance="outline" variant="primary" size="sm"` | ✅ |
+| `components/CommentCard/CommentCard.vue` | Show more/less | `appearance="ghost" variant="primary" size="sm"` | ✅ |
+| `components/UserTeaser/UserTeaserPopover.vue` | Open Profile | `variant="primary"` | ✅ |
+| `components/DonationInfo/DonationInfo.vue` | Donate Now | `size="sm" variant="primary"` | ✅ |
+| `components/Map/MapStylesButtons.vue` | Map Styles | `:appearance` dynamisch + custom CSS | ✅ |
+| `components/Embed/EmbedComponent.vue` | Cancel | `appearance="outline" variant="danger"` + custom CSS | ✅ |
+| `components/Embed/EmbedComponent.vue` | Play Now | `variant="primary"` + custom CSS | ✅ |
+| `pages/terms-and-conditions-confirm.vue` | Read T&C | `appearance="outline" variant="primary"` | ✅ |
+| `pages/terms-and-conditions-confirm.vue` | Save | `variant="primary"` + disabled | ✅ |
+| `pages/settings/privacy.vue` | Save | `variant="primary"` + disabled | ✅ |
+| `pages/settings/notifications.vue` | Check All | `appearance="outline" variant="primary"` + disabled | ✅ |
+| `pages/settings/notifications.vue` | Uncheck All | `appearance="outline" variant="primary"` + disabled | ✅ |
+| `pages/settings/notifications.vue` | Save | `variant="primary"` + disabled | ✅ |
+| `pages/settings/embeds.vue` | Allow All | `appearance="outline" variant="primary"` + disabled | ✅ |
+| `pages/settings/embeds.vue` | Deny All | `variant="primary"` + disabled | ✅ |
+
+**Validierung abgeschlossen:** 16/16 (100%) ✅
+
+**Nach Abschluss aller Validierungen:**
+- [ ] Gesamt-Regressionstest durchführen
+- [ ] Alle Unit-Tests bestehen
+- [ ] Dokumentation aktualisieren
 
 ### Phase 4: Komponenten-Migration (15 Komponenten + 2 Infrastruktur)
 
@@ -1061,6 +1301,8 @@ Bei der Migration werden:
 | 66 | Branding-Hierarchie | Webapp → Spezialisiertes Branding | Default-Branding in Webapp, Overrides pro Instanz |
 | 67 | Variable-Validierung | Runtime-Check in Development | `validateCssVariables()` warnt bei fehlenden Variablen |
 | 68 | Branding-Test (Webapp) | CI-Test in Webapp | Webapp testet, dass Default-Branding alle Library-Variablen definiert |
+| 69 | Webapp ↔ Maintenance Sharing | Webapp als Source of Truth | Kein separates "shared" Package, maintenance importiert aus webapp/ (siehe §16a) |
+| 70 | Daten-Entkopplung | ViewModel/Mapper Pattern | Komponenten kennen nur ViewModels, Mapper transformieren API-Daten (siehe §16b) |
 
 ### Komponenten-API & Konventionen
 
@@ -1185,6 +1427,65 @@ Bei der Migration werden:
 | 2026-02-08 | **Projekt-Optimierung** | src/test/setup.ts entfernt, @storybook/vue3 entfernt, README.md fix |
 | 2026-02-08 | **Package Updates** | size-limit 12.0.0, eslint-plugin-jsdoc 62.5.4, vite-tsconfig-paths 6.1.0 |
 | 2026-02-08 | **TODO: eslint-config-it4c** | Muss auf ESLint 10 aktualisiert werden (aktuell inkompatibel) |
+| 2026-02-08 | **Phase 3: vue-demi Integration** | vue-demi zur Webapp hinzugefügt, Webpack-Alias für Vue 2.7 Kompatibilität |
+| 2026-02-08 | **Phase 3: Webpack-Alias** | @ocelot-social/ui$ und style.css$ Aliase für yarn-linked Package |
+| 2026-02-08 | **Phase 3: isVue2 Render** | OsButton mit isVue2 Check: Vue 2 attrs-Objekt, Vue 3 flat props |
+| 2026-02-08 | **Phase 3: CSS-Spezifität** | UI-Library CSS nach Styleguide laden (styleguide.js Plugin) |
+| 2026-02-08 | **Phase 3: Jest vue-demi** | Custom Mock (`__mocks__/@ocelot-social/ui.js`) mit Module._load Patch, defineComponent von Vue.default, vueDemiSetup.js, 979 Tests ✅ |
+| 2026-02-08 | **Phase 3: Button-Styles** | Variants angepasst: font-semibold, rounded, box-shadow, h-[37.5px] |
+| 2026-02-08 | **Phase 3: Erste Integration** | UserTeaserPopover.vue verwendet `<os-button>` |
+| 2026-02-08 | **Phase 3: Visueller Test** | Manueller Vergleich OsButton vs ds-button erfolgreich ✅ |
+| 2026-02-08 | **Phase 3: v8 ignore** | Vue 2 Branch in OsButton mit `/* v8 ignore */` für 100% Coverage in Vitest |
+| 2026-02-08 | **Phase 3: Docker Build** | ui-library Stage in Dockerfile + Dockerfile.maintenance, COPY --from=ui-library |
+| 2026-02-08 | **Phase 3: CI-Fix** | Relativer Pfad `file:../packages/ui` statt absolut für yarn install außerhalb Docker |
+| 2026-02-08 | **Phase 3: Storybook Fix** | TypeScript-Fehler in Stories behoben (`default` aus args entfernt) |
+| 2026-02-08 | **Phase 3: attrs/listeners** | OsButton forwarded jetzt attrs + $listeners für Vue 2 (getCurrentInstance) |
+| 2026-02-08 | **Phase 3: Jest Mock erweitert** | Alle Composition API Funktionen (computed, ref, watch, etc.) im Mock |
+| 2026-02-08 | **Phase 3: 15 Buttons migriert** | GroupForm, EmbedComponent, DonationInfo, CommentCard, MapStylesButtons, GroupMember, embeds, notifications, privacy, terms-and-conditions-confirm |
+| 2026-02-08 | **Phase 3: Test-Updates** | privacy.spec.js Selektoren, notifications Snapshot, DonationInfo.spec.js |
+| 2026-02-08 | **OsButton: appearance Prop** | Neue `appearance` Prop: `filled` (default), `outline`, `ghost` - ermöglicht base-button Stile |
+| 2026-02-08 | **OsButton: xs Size** | Exakte Pixel-Werte für base-button --small: h-26px, px-8px, text-12px, rounded-5px |
+| 2026-02-08 | **OsButton: outline primary** | Grüner Rahmen + grüner Text + hellgrüner Hintergrund-Tint (rgba(25,122,49,0.18)) |
+| 2026-02-08 | **OsButton: ghost primary** | Transparenter Hintergrund, grüner Text, Hover füllt grün, Active dunkler |
+| 2026-02-08 | **OsButton: Focus Style** | `focus:outline-dashed focus:outline-1` statt ring (wie base-button) |
+| 2026-02-08 | **OsButton: Active State** | `active:bg-[var(--color-*-hover)]` für dunkleren Hintergrund beim Drücken |
+| 2026-02-08 | **Visuelle Validierung** | Tracking-Tabelle in PROJEKT.md für manuelle Button-Vergleiche (4/16 validiert) |
+| 2026-02-08 | **Storybook Grayscale Theme** | Vollständige CSS-Variablen: default, active-states, contrast-inverse |
+| 2026-02-08 | **Tailwind Source Filter** | `@import "tailwindcss" source(none)` - verhindert Markdown-Scanning |
+| 2026-02-08 | **Button Variants Konsistenz** | Alle 21 compound variants mit korrekten active-states (`--color-*-active`) |
+| 2026-02-08 | **CSS-Variablen erweitert** | `--color-secondary/warning/success/info-active` in ocelot-ui-variables.scss |
+| 2026-02-08 | **Story Dokumentation** | "Medium (37.5px)" → "Medium (36px)" korrigiert |
+| 2026-02-08 | **Playwright Toleranz** | `maxDiffPixelRatio: 0.03` für Cross-Platform Font-Rendering |
+| 2026-02-09 | **Disabled-Styles korrigiert** | CSS-Variablen `--color-disabled`, filled: grauer Hintergrund statt opacity |
+| 2026-02-09 | **terms-and-conditions-confirm** | Read T&C Button → `appearance="outline" variant="primary"` |
+| 2026-02-09 | **Visuelle Validierung** | 10/16 Buttons validiert (terms-and-conditions-confirm.vue abgeschlossen) |
+| 2026-02-09 | **Disabled:active/hover Fix** | CSS-Regeln in index.css mit höherer Spezifität für sofortige disabled-Darstellung |
+| 2026-02-09 | **notifications.vue** | Check All + Uncheck All → `appearance="outline" variant="primary"` |
+| 2026-02-09 | **Visuelle Validierung** | 14/16 Buttons validiert (notifications.vue abgeschlossen) |
+| 2026-02-09 | **embeds.vue** | Allow All → `appearance="outline" variant="primary"` |
+| 2026-02-09 | **Disabled Border-Fix** | CSS-Regeln in index.css: `border-style: solid` + `border-width: 0.8px` bei :disabled |
+| 2026-02-09 | **Visuelle Validierung abgeschlossen** | 16/16 Buttons validiert (100%) ✅ Milestone 5 erfolgreich |
+| 2026-02-09 | **Button-Analyse erweitert** | 14 weitere Buttons identifiziert (ohne icon/circle/loading) → Scope: 16/35 |
+| 2026-02-09 | **Scope auf ~90 erweitert** | ~60 weitere Buttons mit icon/circle/loading identifiziert |
+| 2026-02-09 | **Milestone 4a: 8 Buttons** | DisableModal, DeleteUserModal, ReleaseModal, ContributionForm, EnterNonce, MySomethingList, ImageUploader (2x) |
+| 2026-02-09 | **ImageUploader CSS-Fix** | `position: absolute !important` für crop-confirm (überschreibt OsButton `relative`) |
+| 2026-02-09 | **§16a hinzugefügt** | Webapp ↔ Maintenance Code-Sharing: Webapp als Source of Truth (Entscheidung #69) |
+| 2026-02-09 | **§16b hinzugefügt** | Daten-Entkopplung: ViewModel/Mapper Pattern für API-agnostische Komponenten (Entscheidung #70) |
+| 2026-02-09 | **NotificationMenu.vue** | 2 Buttons migriert (ghost primary), padding-top Fix für vertical-align Unterschied |
+| 2026-02-09 | **Milestone 4a abgeschlossen** | 6 weitere Buttons migriert: donations.vue (Save), profile/_id/_slug.vue (Unblock, Unmute), badges.vue (Remove), notifications/index.vue (Mark All Read), ReportRow.vue (More Details) |
+| 2026-02-10 | **Wasserfarben-Farbschema** | Greyscale-Theme → Aquarell-Farben (Ultramarin, Dioxazin-Violett, Alizarin, Ocker, Viridian, Cöruleum), WCAG AA konform |
+| 2026-02-10 | **Stories konsolidiert** | Primary/Secondary/Danger/Default entfernt → AllVariants; AllSizes/AllAppearances/Disabled/FullWidth zeigen alle 7 Varianten |
+| 2026-02-10 | **Appearance: Filled/Outline/Ghost** | Einzelne Stories umbenannt und mit allen 7 Varianten erweitert |
+| 2026-02-10 | **Playground-Story** | Interaktive Controls (argTypes nur in Playground, nicht global) |
+| 2026-02-10 | **Einheitlicher Border** | `border-[0.8px] border-solid border-transparent` als Base-Klasse für alle Appearances |
+| 2026-02-10 | **WCAG 2.4.7 Fix** | Default-Variante: `focus:outline-none` → `focus:outline-dashed focus:outline-current` |
+| 2026-02-10 | **Keyboard A11y Test** | Playwright-Test fokussiert alle Buttons und prüft `outlineStyle !== 'none'` |
+| 2026-02-10 | **data-appearance Attribut** | OsButton rendert `data-appearance` auf `<button>`; CSS-Selektoren nutzen `[data-appearance="filled"]` statt escaped Tailwind-Klassen |
+| 2026-02-10 | **Code-Review Fixes** | Unit-Tests: spezifischere Assertions (Compound-Variant-Logik), Trailing Spaces in Testnamen, ESLint restrict-template-expressions Fix |
+| 2026-02-10 | **CSS-Linting** | `@eslint/css` + `tailwind-csstree` für Tailwind v4 Custom Syntax; `excludeCSS()` Helper verhindert JS-Regel-Konflikte; Regeln: no-empty-blocks, no-duplicate-imports, no-invalid-at-rules |
+| 2026-02-10 | **CI-Workflow-Trigger** | 9 UI-Workflows von `on: push` auf `push`+`pull_request` mit Branch-Filter (`master`) und Path-Filter (`packages/ui/**` + Workflow-Datei) umgestellt |
+| 2026-02-10 | **custom-class entfernt** | `custom-class` Prop (entfernt aus OsButton) → `class` Attribut in notifications.vue, MapStylesButtons.vue, EmbedComponent.vue (4 Stellen); Snapshot aktualisiert |
+| 2026-02-10 | **Vue 3 Template-Fix** | `this.$t()` → `$t()` in CommentCard.vue (this im Template in Vue 3 nicht verfügbar) |
 
 ---
 
@@ -1605,6 +1906,301 @@ Vor dem Erstellen einer Komponente diese Fragen beantworten:
 [ ] Falls Webapp: Welche Library-Komponenten werden genutzt?
 [ ] Falls Grenzfall: Kann sie aufgeteilt werden?
 ```
+
+---
+
+## 16a. Webapp ↔ Maintenance Code-Sharing
+
+### Problemstellung
+
+Die Webapp und Maintenance-App sind aktuell verschachtelt und sollen getrennt werden.
+Einige Business-Komponenten werden in beiden Apps benötigt, gehören aber nicht in die UI-Library.
+
+**Das DX-Problem:** "shared" hat kein logisches Kriterium außer "wird in beiden gebraucht".
+
+### Analysierte Optionen
+
+| Option | Beschreibung | Bewertung |
+|--------|--------------|-----------|
+| **A: Domain Packages** | `@ocelot-social/auth`, `@ocelot-social/posts`, etc. | Gut bei vielen Komponenten, aber Overhead |
+| **B: Core + Duplikation** | Composables teilen, Komponenten duplizieren | Gut wenn UI unterschiedlich |
+| **C: Webapp als Source** | Maintenance importiert aus Webapp | Einfachste Lösung |
+
+### Empfehlung: Option C (Webapp als Source of Truth)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  @ocelot-social/ui                                          │
+│  ─────────────────                                          │
+│  • OsButton, OsModal, OsCard, OsInput                       │
+│  • Rein präsentational, keine Abhängigkeiten                │
+├─────────────────────────────────────────────────────────────┤
+│  webapp/                                                    │
+│  ───────                                                    │
+│  • Alle Business-Komponenten (Source of Truth)              │
+│  • Composables in webapp/lib/composables/                   │
+│  • GraphQL in webapp/graphql/                               │
+│  • Ist die "Haupt-App"                                      │
+├─────────────────────────────────────────────────────────────┤
+│  maintenance/                                               │
+│  ────────────                                               │
+│  • Importiert aus @ocelot-social/ui                         │
+│  • Importiert aus webapp/ via Alias                         │
+│  • Nur maintenance-spezifische Komponenten lokal            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Umsetzung
+
+**maintenance/nuxt.config.js:**
+```javascript
+export default {
+  alias: {
+    '@webapp': '../webapp',
+    '@ocelot-social/ui': '../packages/ui/dist'
+  }
+}
+```
+
+**Import in Maintenance:**
+```typescript
+// UI-Komponenten aus Library
+import { OsButton, OsModal } from '@ocelot-social/ui'
+
+// Business-Komponenten aus Webapp
+import FollowButton from '@webapp/components/FollowButton.vue'
+import PostTeaser from '@webapp/components/PostTeaser.vue'
+
+// Composables aus Webapp
+import { useAuth } from '@webapp/lib/composables/useAuth'
+import { useFollow } from '@webapp/lib/composables/useFollow'
+```
+
+### Kriterien für Entwickler
+
+| Frage | Antwort |
+|-------|---------|
+| Wo suche ich eine UI-Komponente? | `@ocelot-social/ui` |
+| Wo suche ich eine Business-Komponente? | `webapp/components/` |
+| Wo erstelle ich eine neue geteilte Komponente? | `webapp/components/` |
+| Wo erstelle ich maintenance-spezifische Komponenten? | `maintenance/components/` |
+
+### Vorteile
+
+1. **Klare Regel:** Alles Business-bezogene ist in Webapp
+2. **Kein neues Package:** Weniger Overhead
+3. **Eine Source of Truth:** Keine Sync-Probleme
+4. **Einfache Migration:** Später ggf. Domain-Packages extrahieren
+
+### Spätere Evolution (optional)
+
+Wenn klare Patterns entstehen, können Domain-Packages extrahiert werden:
+
+```
+Phase 1 (jetzt):  Webapp ist Source of Truth
+Phase 2 (später): Patterns identifizieren
+Phase 3 (später): @ocelot-social/auth, @ocelot-social/posts, etc.
+```
+
+### Entscheidung
+
+| # | Datum | Entscheidung |
+|---|-------|--------------|
+| 68 | 2026-02-09 | Webapp als Source of Truth für geteilte Business-Komponenten |
+
+---
+
+## 16b. Daten-Entkopplung (ViewModel/Mapper Pattern)
+
+### Problemstellung
+
+Komponenten sind oft direkt an API/GraphQL-Strukturen gekoppelt:
+
+```vue
+<!-- ❌ Tight Coupling -->
+<UserCard :user="graphqlResponse.User" />
+
+// Komponente kennt GraphQL-Struktur
+props.user.avatar.url
+props.user._followedByCurrentUserCount  // Underscore?!
+props.user.__typename                   // Leaked!
+```
+
+**Probleme:**
+- Schema-Änderung = alle Komponenten anpassen
+- `__typename`, `_count` etc. leaken in die UI
+- Schwer testbar (braucht echte GraphQL-Struktur)
+- Komponenten nicht wiederverwendbar
+
+### Lösung: ViewModel + Mapper Pattern
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  GraphQL / API Layer                                        │
+│  • Queries & Mutations                                      │
+│  • Generated Types (graphql-codegen)                        │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Mappers (einziger Ort der API-Struktur kennt)              │
+│  • toUserCardViewModel(graphqlUser) → UserCardViewModel     │
+│  • toPostTeaserViewModel(graphqlPost) → PostTeaserViewModel │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  ViewModels (was die UI braucht)                            │
+│  • UserCardViewModel { displayName, avatarUrl, ... }        │
+│  • PostTeaserViewModel { title, excerpt, ... }              │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Presentational Components (kennen nur ViewModels)          │
+│  • <UserCard :user="UserCardViewModel" />                   │
+│  • <PostTeaser :post="PostTeaserViewModel" />               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Implementierung
+
+**1. ViewModels definieren:**
+```typescript
+// types/viewModels.ts
+export interface UserCardViewModel {
+  id: string
+  displayName: string
+  avatarUrl: string | null
+  followerCount: number
+  isFollowedByMe: boolean
+}
+
+export interface PostTeaserViewModel {
+  id: string
+  title: string
+  excerpt: string
+  authorName: string
+  authorAvatarUrl: string | null
+  createdAt: Date
+  commentCount: number
+  canEdit: boolean
+}
+```
+
+**2. Mapper-Funktionen:**
+```typescript
+// mappers/userMapper.ts
+import type { UserCardViewModel } from '~/types/viewModels'
+import type { UserGraphQL } from '~/graphql/types'
+
+export function toUserCardViewModel(
+  user: UserGraphQL,
+  currentUserId?: string
+): UserCardViewModel {
+  return {
+    id: user.id,
+    displayName: user.name || user.slug || 'Anonymous',
+    avatarUrl: user.avatar?.url ?? null,
+    followerCount: user._followedByCurrentUserCount ?? 0,
+    isFollowedByMe: user.followedByCurrentUser ?? false,
+  }
+}
+```
+
+**3. Komponenten nutzen nur ViewModels:**
+```vue
+<!-- components/UserCard.vue -->
+<script setup lang="ts">
+import type { UserCardViewModel } from '~/types/viewModels'
+
+// Komponente kennt NUR das ViewModel, nicht GraphQL
+defineProps<{
+  user: UserCardViewModel
+}>()
+</script>
+```
+
+**4. Composables kapseln Mapping:**
+```typescript
+// composables/useUser.ts
+import { computed } from 'vue'
+import { useQuery } from '@vue/apollo-composable'
+import { GET_USER } from '~/graphql/queries'
+import { toUserCardViewModel } from '~/mappers/userMapper'
+import type { UserCardViewModel } from '~/types/viewModels'
+
+export function useUser(userId: string) {
+  const { result, loading, error } = useQuery(GET_USER, { id: userId })
+
+  const user = computed<UserCardViewModel | null>(() => {
+    if (!result.value?.User) return null
+    return toUserCardViewModel(result.value.User)
+  })
+
+  return { user, loading, error }
+}
+```
+
+### Ordnerstruktur
+
+```
+webapp/
+├── graphql/
+│   ├── queries/
+│   ├── mutations/
+│   └── types/              # Generated by graphql-codegen
+├── types/
+│   └── viewModels.ts       # UI-spezifische Interfaces
+├── mappers/
+│   ├── userMapper.ts
+│   ├── postMapper.ts
+│   └── index.ts
+├── lib/
+│   └── composables/
+│       ├── useAuth.ts
+│       ├── useUser.ts      # Gibt ViewModel zurück
+│       └── usePost.ts
+├── components/             # Presentational (nur ViewModels)
+│   ├── UserCard.vue
+│   └── PostTeaser.vue
+└── pages/                  # Nutzen Composables
+    └── users/[id].vue
+```
+
+### Vorteile
+
+| Aspekt | Ohne Mapper | Mit Mapper |
+|--------|-------------|------------|
+| **API-Änderung** | Alle Komponenten anpassen | Nur Mapper anpassen |
+| **Testing** | Mock GraphQL Response | Einfaches ViewModel-Objekt |
+| **Wiederverwendung** | Komponente an API gebunden | Komponente API-agnostisch |
+| **TypeScript** | Komplexe/generierte Types | Klare, einfache Interfaces |
+| **webapp ↔ maintenance** | Verschiedene Strukturen | Gleiche ViewModels |
+
+### Regeln
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Regel 1: Komponenten definieren was sie BRAUCHEN           │
+│           (ViewModel), nicht was die API LIEFERT            │
+├─────────────────────────────────────────────────────────────┤
+│  Regel 2: Mapper sind der EINZIGE Ort der API kennt         │
+│           API-Änderung = nur Mapper ändern                  │
+├─────────────────────────────────────────────────────────────┤
+│  Regel 3: Composables kapseln Fetching + Mapping            │
+│           useUser() gibt UserCardViewModel zurück           │
+├─────────────────────────────────────────────────────────────┤
+│  Regel 4: Presentational Components sind API-agnostisch     │
+│           Einfach testbar, wiederverwendbar                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Entscheidung
+
+| # | Datum | Entscheidung |
+|---|-------|--------------|
+| 70 | 2026-02-09 | ViewModel/Mapper Pattern für Daten-Entkopplung |
 
 ---
 

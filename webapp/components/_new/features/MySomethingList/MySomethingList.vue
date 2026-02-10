@@ -56,19 +56,27 @@
         >
           {{ isEditing ? $t('actions.save') : texts.addButton }}
         </base-button>
-        <base-button v-if="isEditing" id="cancel" @click="handleCancel()">
+        <os-button
+          v-if="isEditing"
+          id="cancel"
+          variant="primary"
+          appearance="outline"
+          @click="handleCancel()"
+        >
           {{ $t('actions.cancel') }}
-        </base-button>
+        </os-button>
       </ds-space>
     </ds-space>
   </ds-form>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapMutations } from 'vuex'
 
 export default {
   name: 'MySomethingList',
+  components: { OsButton },
   props: {
     useFormData: { type: Object, default: () => ({}) },
     useFormSchema: { type: Object, default: () => ({}) },
@@ -186,7 +194,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .divider {
   opacity: 0.4;
   padding: 0 $space-small;

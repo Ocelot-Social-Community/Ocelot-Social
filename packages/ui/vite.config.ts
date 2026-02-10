@@ -12,6 +12,9 @@ import { defineConfig } from 'vitest/config'
 const execAsync = promisify(exec)
 
 export default defineConfig({
+  optimizeDeps: {
+    exclude: ['vue-demi'],
+  },
   plugins: [
     vue(),
     tailwindcss(),

@@ -51,18 +51,18 @@
       <ds-flex class="notifications-link-container">
         <ds-flex-item>
           <nuxt-link :to="{ name: 'notifications' }">
-            <base-button ghost primary>
+            <os-button appearance="ghost" variant="primary">
               {{ $t('notifications.pageLink') }}
-            </base-button>
+            </os-button>
           </nuxt-link>
-          <base-button
-            ghost
-            primary
+          <os-button
+            appearance="ghost"
+            variant="primary"
             @click="markAllAsRead(closeMenu)"
             data-test="markAllAsRead-button"
           >
             {{ $t('notifications.markAllAsRead') }}
-          </base-button>
+          </os-button>
         </ds-flex-item>
       </ds-flex>
       <div class="notifications-menu-popover">
@@ -79,6 +79,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import unionBy from 'lodash/unionBy'
+import { OsButton } from '@ocelot-social/ui'
 import {
   notificationQuery,
   markAsReadMutation,
@@ -95,6 +96,7 @@ export default {
     NotificationsTable,
     CounterIcon,
     Dropdown,
+    OsButton,
   },
   data() {
     return {
@@ -200,6 +202,7 @@ export default {
   background-color: $background-color-softer-active;
   text-align: right;
   padding: $space-x-small 0;
+  padding-top: $space-x-small;
   flex-direction: row;
 }
 </style>

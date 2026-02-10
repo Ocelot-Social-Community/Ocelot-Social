@@ -24,7 +24,7 @@ export default {
   },
   methods: {
     onNextClick() {
-      this.$router.history.push('/login')
+      this.$router.push('/login')
       return true
     },
   },

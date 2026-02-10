@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 import DeleteData from './DeleteData.vue'
 import Vue from 'vue'
 import Vuex from 'vuex'
@@ -36,9 +37,7 @@ describe('DeleteData.vue', () => {
         success: jest.fn(),
       },
       $router: {
-        history: {
-          push: jest.fn(),
-        },
+        push: jest.fn(),
       },
     }
     getters = {
@@ -86,9 +85,9 @@ describe('DeleteData.vue', () => {
       expect(wrapper.vm.deleteEnabled).toEqual(false)
     })
 
-    it('does not call the delete user mutation if deleteEnabled is false', () => {
+    it('does not call the delete user mutation if deleteEnabled is false', async () => {
       deleteAccountBtn = wrapper.find('[data-test="delete-button"]')
-      deleteAccountBtn.trigger('click')
+      await deleteAccountBtn.trigger('click')
       expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
     })
 
@@ -99,8 +98,8 @@ describe('DeleteData.vue', () => {
         deleteAccountBtn = wrapper.find('[data-test="delete-button"]')
       })
 
-      it('if deleteEnabled is true and only deletes user ', () => {
-        deleteAccountBtn.trigger('click')
+      it('if deleteEnabled is true and only deletes user', async () => {
+        await deleteAccountBtn.trigger('click')
         expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
           expect.objectContaining({
             variables: {
@@ -111,14 +110,14 @@ describe('DeleteData.vue', () => {
         )
       })
 
-      it("deletes user's posts and comments if requested by default ", () => {
+      it("deletes user's posts and comments if requested by default", async () => {
         enableContributionDeletionCheckbox = wrapper.find(
           '[data-test="contributions-deletion-checkbox"]',
         )
         enableContributionDeletionCheckbox.setChecked(true)
         enableCommentDeletionCheckbox = wrapper.find('[data-test="comments-deletion-checkbox"]')
         enableCommentDeletionCheckbox.setChecked(true)
-        deleteAccountBtn.trigger('click')
+        await deleteAccountBtn.trigger('click')
         expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
           expect.objectContaining({
             variables: {
@@ -129,12 +128,12 @@ describe('DeleteData.vue', () => {
         )
       })
 
-      it("deletes a user's posts if requested", () => {
+      it("deletes a user's posts if requested", async () => {
         enableContributionDeletionCheckbox = wrapper.find(
           '[data-test="contributions-deletion-checkbox"]',
         )
         enableContributionDeletionCheckbox.setChecked(true)
-        deleteAccountBtn.trigger('click')
+        await deleteAccountBtn.trigger('click')
         expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
           expect.objectContaining({
             variables: {
@@ -145,10 +144,10 @@ describe('DeleteData.vue', () => {
         )
       })
 
-      it("deletes a user's comments if requested", () => {
+      it("deletes a user's comments if requested", async () => {
         enableCommentDeletionCheckbox = wrapper.find('[data-test="comments-deletion-checkbox"]')
         enableCommentDeletionCheckbox.setChecked(true)
-        deleteAccountBtn.trigger('click')
+        await deleteAccountBtn.trigger('click')
         expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
           expect.objectContaining({
             variables: {
@@ -166,7 +165,8 @@ describe('DeleteData.vue', () => {
 
       it('redirect the user to the homepage', async () => {
         await deleteAccountBtn.trigger('click')
-        expect(mocks.$router.history.push).toHaveBeenCalledWith('/')
+        await flushPromises()
+        expect(mocks.$router.push).toHaveBeenCalledWith('/')
       })
     })
 

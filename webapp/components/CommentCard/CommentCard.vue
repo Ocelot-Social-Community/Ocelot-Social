@@ -2,7 +2,7 @@
   <base-card v-if="isUnavailable" class="comment-card">
     <p>
       <base-icon name="ban" />
-      {{ this.$t('comment.content.unavailable-placeholder') }}
+      {{ $t('comment.content.unavailable-placeholder') }}
     </p>
   </base-card>
   <base-card v-else :class="commentClass" :id="anchor">
@@ -35,9 +35,15 @@
     />
     <template v-else>
       <content-viewer :content="commentContent" class="content" />
-      <base-button v-if="hasLongContent" size="small" ghost @click="isCollapsed = !isCollapsed">
+      <os-button
+        v-if="hasLongContent"
+        size="sm"
+        appearance="ghost"
+        variant="primary"
+        @click="isCollapsed = !isCollapsed"
+      >
         {{ isCollapsed ? $t('comment.show.more') : $t('comment.show.less') }}
-      </base-button>
+      </os-button>
     </template>
     <div class="actions">
       <shout-button
@@ -49,7 +55,7 @@
         node-type="Comment"
       />
       <base-button
-        :title="this.$t('post.comment.reply')"
+        :title="$t('post.comment.reply')"
         icon="level-down"
         class="reply-button"
         circle
@@ -62,6 +68,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapGetters } from 'vuex'
 import { COMMENT_MAX_UNTRUNCATED_LENGTH, COMMENT_TRUNCATE_TO_LENGTH } from '~/constants/comment'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
@@ -74,6 +81,7 @@ import scrollToAnchor from '~/mixins/scrollToAnchor.js'
 
 export default {
   components: {
+    OsButton,
     UserTeaser,
     ContentMenu,
     ContentViewer,
@@ -207,13 +215,6 @@ export default {
     display: flex;
     justify-content: space-between;
     margin-bottom: $space-small;
-  }
-
-  .actions {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
   }
 }
 

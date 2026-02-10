@@ -12,14 +12,15 @@
     </ds-flex>
     <ds-space />
     <ds-flex-item class="notifications-header-button" :width="{ base: 'auto' }" centered>
-      <base-button
-        primary
+      <os-button
+        variant="primary"
+        appearance="outline"
         :disabled="unreadNotificationsCount === 0"
-        @click="markAllAsRead"
         data-test="markAllAsRead-button"
+        @click="markAllAsRead"
       >
         {{ $t('notifications.markAllAsRead') }}
-      </base-button>
+      </os-button>
     </ds-flex-item>
     <ds-space />
     <notifications-table
@@ -41,6 +42,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import NotificationsTable from '~/components/NotificationsTable/NotificationsTable'
 import DropdownFilter from '~/components/DropdownFilter/DropdownFilter'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
@@ -48,6 +50,7 @@ import { notificationQuery, markAsReadMutation, markAllAsReadMutation } from '~/
 
 export default {
   components: {
+    OsButton,
     DropdownFilter,
     NotificationsTable,
     PaginationButtons,
@@ -57,7 +60,7 @@ export default {
     return {
       offset: 0,
       notifications: [],
-      nofiticationRead: null,
+      notificationRead: null,
       pageSize,
       first: pageSize,
       hasNext: false,

@@ -36,8 +36,10 @@
       </ds-section>
     </div>
 
-    <template slot="footer">
-      <base-button class="cancel" @click="cancel">{{ $t('actions.cancel') }}</base-button>
+    <template #footer>
+      <os-button variant="primary" appearance="outline" class="cancel" @click="cancel">
+        {{ $t('actions.cancel') }}
+      </os-button>
       <base-button danger filled class="confirm" icon="exclamation-circle" @click="openModal">
         {{ $t('settings.deleteUserAccount.name') }}
       </base-button>
@@ -46,6 +48,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import gql from 'graphql-tag'
 import { mapMutations } from 'vuex'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
@@ -55,9 +58,10 @@ import UserTeaser from '~/components/UserTeaser/UserTeaser'
 export default {
   name: 'DeleteUserModal',
   components: {
-    UserTeaser,
-    SweetalertIcon,
     DateTime,
+    OsButton,
+    SweetalertIcon,
+    UserTeaser,
   },
   props: {
     userdata: { type: Object, required: true },
@@ -67,8 +71,6 @@ export default {
       isOpen: true,
       success: false,
       loading: false,
-      // isAdmin: this.$store.getters['auth/isAdmin'],
-      isAdmin: true,
     }
   },
   computed: {
@@ -124,8 +126,9 @@ export default {
       }, 1000)
     },
     async confirm() {
-      this.$apollo
-        .mutate({
+      this.loading = true
+      try {
+        await this.$apollo.mutate({
           mutation: gql`
             mutation ($id: ID!, $resource: [Deletable]) {
               DeleteUser(id: $id, resource: $resource) {
@@ -135,26 +138,24 @@ export default {
           `,
           variables: { id: this.userdata.id, resource: ['Post', 'Comment'] },
         })
-        .then(({ _data }) => {
-          this.success = true
-          this.$toast.success(this.$t('settings.deleteUserAccount.success'))
-          setTimeout(() => {
-            this.isOpen = false
-            setTimeout(() => {
-              this.success = false
-              this.$emit('close')
-              this.$router.history.replace('/')
-            }, 500)
-          }, 1500)
-          this.loading = false
-        })
-        .catch((err) => {
-          this.$emit('close')
-          this.success = false
-          this.$toast.error(err.message)
+        this.success = true
+        this.$toast.success(this.$t('settings.deleteUserAccount.success'))
+        setTimeout(() => {
           this.isOpen = false
-          this.loading = false
-        })
+          setTimeout(() => {
+            this.success = false
+            this.$emit('close')
+            this.$router.replace('/')
+          }, 500)
+        }, 1500)
+      } catch (err) {
+        this.success = false
+        this.$toast.error(err.message)
+        this.isOpen = false
+        this.$emit('close')
+      } finally {
+        this.loading = false
+      }
     },
   },
 }

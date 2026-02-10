@@ -24,12 +24,23 @@
       <h3>{{ $t('editor.embed.data_privacy_warning') }}</h3>
       <ds-text>{{ $t('editor.embed.data_privacy_info') }} {{ embedPublisher }}</ds-text>
       <div class="buttons">
-        <base-button @click="closeOverlay()" data-test="cancel-button" danger>
+        <os-button
+          @click="closeOverlay()"
+          data-test="cancel-button"
+          appearance="outline"
+          variant="danger"
+          class="embed-button"
+        >
           {{ $t('actions.cancel') }}
-        </base-button>
-        <base-button @click="allowEmbed()" data-test="play-now-button" filled>
+        </os-button>
+        <os-button
+          @click="allowEmbed()"
+          data-test="play-now-button"
+          variant="primary"
+          class="embed-button"
+        >
           {{ $t('editor.embed.play_now') }}
-        </base-button>
+        </os-button>
       </div>
       <label class="checkbox">
         <input type="checkbox" v-model="checkedAlwaysAllowEmbeds" />
@@ -47,11 +58,15 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 import { updateUserMutation } from '~/graphql/User.js'
 
 export default {
   name: 'embed-component',
+  components: {
+    OsButton,
+  },
   props: {
     dataEmbedUrl: {
       type: String,
@@ -222,9 +237,8 @@ export default {
     background-color: $color-neutral-100;
 
     > .buttons {
-      .base-button {
+      button {
         margin-right: $space-small;
-        white-space: nowrap;
       }
     }
 

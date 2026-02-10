@@ -329,7 +329,7 @@ export default {
       try {
         await this.$apollo.mutate(deletePostMutation(this.post.id))
         this.$toast.success(this.$t('delete.contribution.success'))
-        this.$router.history.push('/') // Redirect to index (main) page
+        this.$router.push('/') // Redirect to index (main) page
       } catch (err) {
         this.$toast.error(err.message)
       }
