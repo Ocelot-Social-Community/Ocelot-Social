@@ -23,6 +23,28 @@ async function checkA11y(page: Page) {
   expect(results.violations).toEqual([])
 }
 
+test.describe('OsButton keyboard accessibility', () => {
+  test('all variants show visible focus indicator', async ({ page }) => {
+    await page.goto(`${STORY_URL}--all-appearances&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+
+    const buttons = root.locator('button:not([disabled])')
+    const count = await buttons.count()
+    expect(count).toBeGreaterThan(0)
+
+    for (let i = 0; i < count; i++) {
+      const button = buttons.nth(i)
+      await button.focus()
+      const outline = await button.evaluate(
+        (el) => getComputedStyle(el).outlineStyle,
+      )
+      const label = await button.textContent()
+      expect(outline, `Button "${label}" must have visible focus outline`).not.toBe('none')
+    }
+  })
+})
+
 test.describe('OsButton visual regression', () => {
   test('all variants', async ({ page }) => {
     await page.goto(`${STORY_URL}--all-variants&viewMode=story`)
