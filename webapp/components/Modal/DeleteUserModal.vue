@@ -126,6 +126,7 @@ export default {
       }, 1000)
     },
     async confirm() {
+      this.loading = true
       try {
         await this.$apollo.mutate({
           mutation: gql`
