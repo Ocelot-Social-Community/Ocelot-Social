@@ -35,16 +35,7 @@ export default {
       'password-reset-enter-nonce',
       'password-reset-change-password',
       'registration',
-      'pages-slug',
-      'organization',
-      'support',
-      'terms-and-conditions',
-      'code-of-conduct',
-      'changelog',
-      'imprint',
-      'data-privacy',
-      'faq',
-      'donate',
+      'static', // _static.vue catch-all for footer pages (organization, imprint, etc.)
     ],
     // pages to keep alive
     keepAlivePages: ['index'],
