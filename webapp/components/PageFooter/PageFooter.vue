@@ -9,7 +9,7 @@
     </span>
     <!-- version -->
     <a
-      :href="`https://github.com/Ocelot-Social-Community/Ocelot-Social/releases/tag/${$env.VERSION}`"
+      :href="`https://github.com/Ocelot-Social-Community/Ocelot-Social/releases/tag/${releaseTag}`"
       target="_blank"
       data-test="version-link"
     >
@@ -33,7 +33,12 @@ export default {
     },
   },
   data() {
-    return { links, version: `v${this.$env.VERSION}` }
+    const version = this.$env.VERSION
+    return {
+      links,
+      version: `v${version}`,
+      releaseTag: version.split('+')[0],
+    }
   },
 }
 </script>

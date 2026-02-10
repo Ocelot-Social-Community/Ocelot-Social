@@ -6,6 +6,19 @@ dotenv.config() // we want to synchronize @nuxt-dotenv and nuxt-env
 // Load Package Details for some default values
 const pkg = require('../package')
 
+// Build version from git describe (e.g. "3.14.0-12-gabcdef" → "3.14.0+12")
+const BUILD_VERSION = (() => {
+  try {
+    const desc = require('child_process')
+      .execSync('git describe --tags --match "[0-9]*"', { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] })
+      .trim()
+    const match = desc.match(/^(.+)-(\d+)-g[0-9a-f]+$/)
+    return match ? `${match[1]}+${match[2]}` : desc
+  } catch {
+    return null
+  }
+})()
+
 const environment = {
   NODE_ENV: process.env.NODE_ENV,
   DEBUG: process.env.NODE_ENV !== 'production' || false,
@@ -25,7 +38,7 @@ const sentry = {
 }
 
 const options = {
-  VERSION: process.env.VERSION || pkg.version,
+  VERSION: process.env.VERSION || BUILD_VERSION || pkg.version,
   DESCRIPTION: process.env.DESCRIPTION || pkg.description,
   MAPBOX_TOKEN: process.env.MAPBOX_TOKEN,
   PUBLIC_REGISTRATION: process.env.PUBLIC_REGISTRATION === 'true' || false,
