@@ -253,18 +253,18 @@ describe('blockUser', () => {
             })
 
             it('the muted+blocked user post is still accessible by direct id lookup', async () => {
-              await expect(
-                query({ query: Post, variables: { id: 'p23' } }),
-              ).resolves.toMatchObject({
-                data: {
-                  Post: [
-                    expect.objectContaining({
-                      id: 'p23',
-                      title: 'A post written by the blocked user',
-                    }),
-                  ],
+              await expect(query({ query: Post, variables: { id: 'p23' } })).resolves.toMatchObject(
+                {
+                  data: {
+                    Post: [
+                      expect.objectContaining({
+                        id: 'p23',
+                        title: 'A post written by the blocked user',
+                      }),
+                    ],
+                  },
                 },
-              })
+              )
             })
 
             describe('and the blocked+muted user has a pinned post', () => {

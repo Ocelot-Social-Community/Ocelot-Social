@@ -244,18 +244,18 @@ describe('muteUser', () => {
 
             it("the muted user's post is still accessible by direct id lookup", async () => {
               const { query } = createTestClient(server)
-              await expect(
-                query({ query: Post, variables: { id: 'p23' } }),
-              ).resolves.toMatchObject({
-                data: {
-                  Post: [
-                    expect.objectContaining({
-                      id: 'p23',
-                      title: 'A post written by the muted user',
-                    }),
-                  ],
+              await expect(query({ query: Post, variables: { id: 'p23' } })).resolves.toMatchObject(
+                {
+                  data: {
+                    Post: [
+                      expect.objectContaining({
+                        id: 'p23',
+                        title: 'A post written by the muted user',
+                      }),
+                    ],
+                  },
                 },
-              })
+              )
             })
 
             describe('but the muted user has a pinned post', () => {
