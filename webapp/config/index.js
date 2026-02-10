@@ -10,7 +10,10 @@ const pkg = require('../package')
 const BUILD_VERSION = (() => {
   try {
     const desc = require('child_process')
-      .execSync('git describe --tags --match "[0-9]*"', { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] })
+      .execSync('git describe --tags --match "[0-9]*"', {
+        encoding: 'utf8',
+        stdio: ['pipe', 'pipe', 'ignore'],
+      })
       .trim()
     const match = desc.match(/^(.+)-(\d+)-g[0-9a-f]+$/)
     return match ? `${match[1]}+${match[2]}` : desc
