@@ -115,7 +115,7 @@ OsButton Features:
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-09 (Session 10)
+**Letzte Aktualisierung:** 2026-02-10 (Session 11)
 
 **Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 4a abgeschlossen ✅ (32 Buttons migriert, nächster: Milestone 4b)
 
@@ -175,8 +175,8 @@ OsButton Features:
   - cn() Utility für Tailwind-Klassen-Merge (clsx + tailwind-merge)
   - OsButton Komponente mit CVA-Varianten implementiert
   - ESLint-Konfiguration angepasst (vue/max-attributes-per-line, import-x/no-relative-parent-imports)
-  - Storybook 10 für Dokumentation eingerichtet (Greyscale-Theme)
-  - OsButton.stories.ts mit allen Varianten
+  - Storybook 10 für Dokumentation eingerichtet (Wasserfarben-Theme)
+  - OsButton.stories.ts mit Playground + allen Varianten/Appearances/Sizes
   - Storybook Build-Konfiguration (viteFinal entfernt Library-Plugins)
   - Docker Setup (Dockerfile, docker-compose, ui-docker.yml)
   - Visual Regression Tests (Playwright, colocated) mit integriertem A11y-Check
@@ -187,7 +187,18 @@ OsButton Features:
 - Phase 3, Milestone 4b: icon/circle/loading Props in OsButton implementieren
 - Phase 3, Milestone 4c: ~60 Buttons mit icon/circle/loading migrieren
 
-**Zuletzt abgeschlossen (Milestone 5 + Analyse):**
+**Zuletzt abgeschlossen (Session 11 - Storybook & Code-Review Fixes):**
+- [x] Wasserfarben-Farbschema für Storybook (Ultramarin, Dioxazin-Violett, Alizarin, Ocker, Viridian, Cöruleum)
+- [x] Stories erweitert: Playground (interaktive Controls), alle Varianten in allen Stories
+- [x] Einzelne Stories (Primary, Secondary, Danger, Default) durch AllVariants ersetzt
+- [x] AllAppearances zeigt alle 7 Varianten × 3 Appearances
+- [x] Einheitlicher Border (0.8px) über alle Appearances (kein Layout-Shift mehr)
+- [x] WCAG 2.4.7 Fix: Default-Variante hat jetzt `focus:outline-dashed focus:outline-current`
+- [x] Keyboard Accessibility Test: prüft Focus-Indikator auf allen Buttons im Browser
+- [x] `data-appearance` Attribut: robuste CSS-Selektoren statt fragile escaped Tailwind-Klassen
+- [x] Code-Review Feedback eingearbeitet (Unit-Tests, Testnamen, CSS-Selektoren)
+
+**Zuvor abgeschlossen (Milestone 5 + Analyse):**
 - [x] Visuelle Validierung: 16/16 Buttons validiert ✅
 - [x] OsButton Features: `appearance` (outline, ghost), `xs` size, focus/active states
 - [x] Disabled-Styles: CSS-Variablen, hover/active-Override, Border-Fix
@@ -1453,6 +1464,15 @@ Bei der Migration werden:
 | 2026-02-09 | **§16b hinzugefügt** | Daten-Entkopplung: ViewModel/Mapper Pattern für API-agnostische Komponenten (Entscheidung #70) |
 | 2026-02-09 | **NotificationMenu.vue** | 2 Buttons migriert (ghost primary), padding-top Fix für vertical-align Unterschied |
 | 2026-02-09 | **Milestone 4a abgeschlossen** | 6 weitere Buttons migriert: donations.vue (Save), profile/_id/_slug.vue (Unblock, Unmute), badges.vue (Remove), notifications/index.vue (Mark All Read), ReportRow.vue (More Details) |
+| 2026-02-10 | **Wasserfarben-Farbschema** | Greyscale-Theme → Aquarell-Farben (Ultramarin, Dioxazin-Violett, Alizarin, Ocker, Viridian, Cöruleum), WCAG AA konform |
+| 2026-02-10 | **Stories konsolidiert** | Primary/Secondary/Danger/Default entfernt → AllVariants; AllSizes/AllAppearances/Disabled/FullWidth zeigen alle 7 Varianten |
+| 2026-02-10 | **Appearance: Filled/Outline/Ghost** | Einzelne Stories umbenannt und mit allen 7 Varianten erweitert |
+| 2026-02-10 | **Playground-Story** | Interaktive Controls (argTypes nur in Playground, nicht global) |
+| 2026-02-10 | **Einheitlicher Border** | `border-[0.8px] border-solid border-transparent` als Base-Klasse für alle Appearances |
+| 2026-02-10 | **WCAG 2.4.7 Fix** | Default-Variante: `focus:outline-none` → `focus:outline-dashed focus:outline-current` |
+| 2026-02-10 | **Keyboard A11y Test** | Playwright-Test fokussiert alle Buttons und prüft `outlineStyle !== 'none'` |
+| 2026-02-10 | **data-appearance Attribut** | OsButton rendert `data-appearance` auf `<button>`; CSS-Selektoren nutzen `[data-appearance="filled"]` statt escaped Tailwind-Klassen |
+| 2026-02-10 | **Code-Review Fixes** | Unit-Tests: spezifischere Assertions (Compound-Variant-Logik), Trailing Spaces in Testnamen, ESLint restrict-template-expressions Fix |
 
 ---
 
