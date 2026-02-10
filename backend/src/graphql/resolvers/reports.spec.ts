@@ -752,9 +752,7 @@ describe('reports', () => {
               query: reports,
               variables: { orderBy: 'createdAt_asc' },
             })
-            const sorted = [...data.reports].sort((a, b) =>
-              a.createdAt > b.createdAt ? 1 : -1,
-            )
+            const sorted = [...data.reports].sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
             expect(data.reports).toEqual(sorted)
           })
 
@@ -763,9 +761,7 @@ describe('reports', () => {
               query: reports,
               variables: { orderBy: 'createdAt_desc' },
             })
-            const sorted = [...data.reports].sort((a, b) =>
-              a.createdAt < b.createdAt ? 1 : -1,
-            )
+            const sorted = [...data.reports].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
             expect(data.reports).toEqual(sorted)
           })
         })
