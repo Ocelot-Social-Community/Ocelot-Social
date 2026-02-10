@@ -106,17 +106,21 @@ export const AllSizes: Story = {
   }),
 }
 
-export const Outline: Story = {
-  args: {
-    appearance: 'outline',
-    variant: 'primary',
-  },
-  render: (args) => ({
+export const AppearanceOutline: Story = {
+  name: 'Appearance: Outline',
+  render: () => ({
     components: { OsButton },
-    setup() {
-      return { args }
-    },
-    template: '<OsButton v-bind="args">Outline Button</OsButton>',
+    template: `
+      <div class="flex flex-wrap gap-2">
+        <OsButton appearance="outline" variant="default">Default</OsButton>
+        <OsButton appearance="outline" variant="primary">Primary</OsButton>
+        <OsButton appearance="outline" variant="secondary">Secondary</OsButton>
+        <OsButton appearance="outline" variant="danger">Danger</OsButton>
+        <OsButton appearance="outline" variant="warning">Warning</OsButton>
+        <OsButton appearance="outline" variant="success">Success</OsButton>
+        <OsButton appearance="outline" variant="info">Info</OsButton>
+      </div>
+    `,
   }),
 }
 

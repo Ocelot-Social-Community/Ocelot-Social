@@ -40,11 +40,11 @@ test.describe('OsButton visual regression', () => {
     await checkA11y(page)
   })
 
-  test('outline appearance', async ({ page }) => {
-    await page.goto(`${STORY_URL}--outline&viewMode=story`)
+  test('appearance outline', async ({ page }) => {
+    await page.goto(`${STORY_URL}--appearance-outline&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
-    await expect(root.locator('button')).toHaveScreenshot('outline.png')
+    await expect(root.locator('.flex')).toHaveScreenshot('appearance-outline.png')
     await checkA11y(page)
   })
 
