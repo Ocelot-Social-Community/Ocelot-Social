@@ -6,7 +6,7 @@
       :appearance="actualStyle === style.url ? 'filled' : 'outline'"
       variant="primary"
       size="sm"
-      custom-class="map-style-button"
+      class="map-style-button"
       @click="setStyle(style.url)"
     >
       {{ style.title }}

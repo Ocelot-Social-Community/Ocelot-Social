@@ -29,7 +29,7 @@
           data-test="cancel-button"
           appearance="outline"
           variant="danger"
-          custom-class="embed-button"
+          class="embed-button"
         >
           {{ $t('actions.cancel') }}
         </os-button>
@@ -37,7 +37,7 @@
           @click="allowEmbed()"
           data-test="play-now-button"
           variant="primary"
-          custom-class="embed-button"
+          class="embed-button"
         >
           {{ $t('editor.embed.play_now') }}
         </os-button>

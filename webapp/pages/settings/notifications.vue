@@ -37,7 +37,7 @@
         {{ $t('settings.notifications.uncheckAll') }}
       </os-button>
       <os-button
-        custom-class="save-button"
+        class="save-button"
         variant="primary"
         @click="submit"
         :disabled="isSubmitDisabled"
