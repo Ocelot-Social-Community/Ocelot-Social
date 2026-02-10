@@ -115,7 +115,7 @@ OsButton Features:
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-10 (Session 11)
+**Letzte Aktualisierung:** 2026-02-10 (Session 12)
 
 **Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 4a abgeschlossen ✅ (32 Buttons migriert, nächster: Milestone 4b)
 
@@ -187,7 +187,16 @@ OsButton Features:
 - Phase 3, Milestone 4b: icon/circle/loading Props in OsButton implementieren
 - Phase 3, Milestone 4c: ~60 Buttons mit icon/circle/loading migrieren
 
-**Zuletzt abgeschlossen (Session 11 - Storybook & Code-Review Fixes):**
+**Zuletzt abgeschlossen (Session 12 - CSS-Linting, CI-Optimierung, Code-Review Fixes):**
+- [x] CSS-Linting: `@eslint/css` + `tailwind-csstree` für Tailwind v4 Syntax-Support
+- [x] `excludeCSS()` Helper: JS-Regeln von CSS-Dateien fernhalten (language-Inkompatibilität)
+- [x] CSS-Regeln: `no-empty-blocks`, `no-duplicate-imports`, `no-invalid-at-rules`
+- [x] CI-Workflow-Trigger optimiert: 9 UI-Workflows von `on: push` auf Branch+Path-Filter (`master`, `packages/ui/**`)
+- [x] `custom-class` → `class` Migration: 4 Stellen in 3 Webapp-Dateien (notifications, MapStylesButtons, EmbedComponent)
+- [x] Vue 3 Template-Fix: `this.$t()` → `$t()` in CommentCard.vue (Zeile 5 + 58)
+- [x] Pre-existing Fix: `async` Arrow-Function in OsButton.visual.spec.ts
+
+**Zuvor abgeschlossen (Session 11 - Storybook & Code-Review Fixes):**
 - [x] Wasserfarben-Farbschema für Storybook (Ultramarin, Dioxazin-Violett, Alizarin, Ocker, Viridian, Cöruleum)
 - [x] Stories erweitert: Playground (interaktive Controls), alle Varianten in allen Stories
 - [x] Einzelne Stories (Primary, Secondary, Danger, Default) durch AllVariants ersetzt
@@ -309,7 +318,7 @@ OsButton Features:
 - [x] Visual Regression Tests einrichten (Playwright, colocated mit Komponenten)
 - [x] Accessibility Tests in Visual Tests integriert (@axe-core/playwright)
 - [x] Keyboard Accessibility Tests (describe('keyboard accessibility'))
-- [x] ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
+- [x] ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc, @eslint/css
 - [x] Bundle Size Check einrichten (size-limit, ui-size.yml)
 - [x] Package-Validierung einrichten (publint, arethetypeswrong)
 - [x] Example Apps erstellen (vue3-tailwind, vue3-css, vue2-tailwind, vue2-css)
@@ -1473,6 +1482,10 @@ Bei der Migration werden:
 | 2026-02-10 | **Keyboard A11y Test** | Playwright-Test fokussiert alle Buttons und prüft `outlineStyle !== 'none'` |
 | 2026-02-10 | **data-appearance Attribut** | OsButton rendert `data-appearance` auf `<button>`; CSS-Selektoren nutzen `[data-appearance="filled"]` statt escaped Tailwind-Klassen |
 | 2026-02-10 | **Code-Review Fixes** | Unit-Tests: spezifischere Assertions (Compound-Variant-Logik), Trailing Spaces in Testnamen, ESLint restrict-template-expressions Fix |
+| 2026-02-10 | **CSS-Linting** | `@eslint/css` + `tailwind-csstree` für Tailwind v4 Custom Syntax; `excludeCSS()` Helper verhindert JS-Regel-Konflikte; Regeln: no-empty-blocks, no-duplicate-imports, no-invalid-at-rules |
+| 2026-02-10 | **CI-Workflow-Trigger** | 9 UI-Workflows von `on: push` auf `push`+`pull_request` mit Branch-Filter (`master`) und Path-Filter (`packages/ui/**` + Workflow-Datei) umgestellt |
+| 2026-02-10 | **custom-class entfernt** | `custom-class` Prop (entfernt aus OsButton) → `class` Attribut in notifications.vue, MapStylesButtons.vue, EmbedComponent.vue (4 Stellen); Snapshot aktualisiert |
+| 2026-02-10 | **Vue 3 Template-Fix** | `this.$t()` → `$t()` in CommentCard.vue (this im Template in Vue 3 nicht verfügbar) |
 
 ---
 
