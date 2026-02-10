@@ -152,6 +152,24 @@ export const AllAppearances: Story = {
   }),
 }
 
+export const AppearanceFilled: Story = {
+  name: 'Appearance: Filled',
+  render: () => ({
+    components: { OsButton },
+    template: `
+      <div class="flex flex-wrap gap-2">
+        <OsButton appearance="filled" variant="default">Default</OsButton>
+        <OsButton appearance="filled" variant="primary">Primary</OsButton>
+        <OsButton appearance="filled" variant="secondary">Secondary</OsButton>
+        <OsButton appearance="filled" variant="danger">Danger</OsButton>
+        <OsButton appearance="filled" variant="warning">Warning</OsButton>
+        <OsButton appearance="filled" variant="success">Success</OsButton>
+        <OsButton appearance="filled" variant="info">Info</OsButton>
+      </div>
+    `,
+  }),
+}
+
 export const AppearanceOutline: Story = {
   name: 'Appearance: Outline',
   render: () => ({
