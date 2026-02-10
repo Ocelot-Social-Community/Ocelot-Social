@@ -1,58 +1,57 @@
 /* Inter font for consistent rendering across platforms */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* Tailwind v4 without automatic content detection */
-@import "tailwindcss" source(none);
+@import "tailwindcss";
 
-/* Explicit source paths - only scan source code, not documentation */
-@source "../src/components/**/*.vue";
-@source "../src/components/**/*.ts";
-
-/* Greyscale theme for Storybook - demonstrates that colors come from the app */
+/* Watercolor theme for Storybook - vibrant colors inspired by aquarelle paints */
 /* All colors meet WCAG AA contrast requirements (4.5:1 for normal text) */
 :root {
   font-family: 'Inter', system-ui, sans-serif;
 
-  /* Default (gray) - neutral button */
-  --color-default: #e5e5e5;
-  --color-default-hover: #a3a3a3;
-  --color-default-active: #737373;
-  --color-default-contrast: #171717;
+  /* Default (Buff / Raw Umber) - neutral button */
+  --color-default: #d8c9b8;
+  --color-default-hover: #c4b19c;
+  --color-default-active: #a89478;
+  --color-default-contrast: #3d2e1e;
   --color-default-contrast-inverse: #ffffff;
 
-  /* Primary */
-  --color-primary: #404040;
-  --color-primary-hover: #525252; /* lighter for filled hover */
-  --color-primary-active: #262626; /* darker for active */
+  /* Primary (Ultramarine Blue) */
+  --color-primary: #4a5a9e;
+  --color-primary-hover: #5e6db2;
+  --color-primary-active: #3b4882;
   --color-primary-contrast: #ffffff;
 
-  /* Secondary */
-  --color-secondary: #595959;
-  --color-secondary-hover: #6b6b6b;
-  --color-secondary-active: #404040;
+  /* Secondary (Dioxazine Violet) */
+  --color-secondary: #7b519a;
+  --color-secondary-hover: #9068ad;
+  --color-secondary-active: #654280;
   --color-secondary-contrast: #ffffff;
 
-  /* Danger */
-  --color-danger: #525252;
-  --color-danger-hover: #636363;
-  --color-danger-active: #404040;
+  /* Danger (Alizarin Crimson) */
+  --color-danger: #b83a4e;
+  --color-danger-hover: #cc5567;
+  --color-danger-active: #9a2e3f;
   --color-danger-contrast: #ffffff;
 
-  /* Warning - lighter base with dark text */
-  --color-warning: #d4d4d4;
-  --color-warning-hover: #e5e5e5;
-  --color-warning-active: #a3a3a3;
-  --color-warning-contrast: #000000;
+  /* Warning (Cadmium Yellow / Yellow Ochre) - light base with dark text */
+  --color-warning: #e8b44c;
+  --color-warning-hover: #f0c87a;
+  --color-warning-active: #d09a30;
+  --color-warning-contrast: #3d2e1e;
 
-  /* Success */
-  --color-success: #525252;
-  --color-success-hover: #636363;
-  --color-success-active: #404040;
+  /* Success (Viridian Green) */
+  --color-success: #3d7a5e;
+  --color-success-hover: #509470;
+  --color-success-active: #30644c;
   --color-success-contrast: #ffffff;
 
-  /* Info */
-  --color-info: #595959;
-  --color-info-hover: #6b6b6b;
-  --color-info-active: #404040;
+  /* Info (Cerulean Blue) */
+  --color-info: #3e7ea8;
+  --color-info-hover: #5594bc;
+  --color-info-active: #31688e;
   --color-info-contrast: #ffffff;
+
+  /* Disabled (Payne's Grey - muted watercolor grey) */
+  --color-disabled: #c4bdb5;
+  --color-disabled-contrast: #8a8078;
 }
