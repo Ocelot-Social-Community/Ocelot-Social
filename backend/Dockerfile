@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM node:25.6.0-alpine AS base
 LABEL org.label-schema.name="ocelot.social:backend"
 LABEL org.label-schema.description="Backend of the Social Network Software ocelot.social"
@@ -28,13 +29,15 @@ ONBUILD COPY ./branding/email/ src/middleware/helpers/email/
 ONBUILD COPY ./branding/middlewares/ src/middleware/branding/
 ONBUILD COPY ./branding/data/ src/db/data
 ONBUILD COPY ./branding/public/ public/
-ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
+ONBUILD RUN --mount=type=cache,target=/yarn-cache \
+    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 ONBUILD RUN yarn run build
 ONBUILD RUN mkdir /build
 ONBUILD RUN cp -r ./build /build
 ONBUILD RUN cp -r ./public /build
 ONBUILD RUN cp -r ./package.json yarn.lock /build
-ONBUILD RUN cd /build && yarn install --production=true --frozen-lockfile --non-interactive
+ONBUILD RUN --mount=type=cache,target=/yarn-cache \
+    cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 
 FROM build AS test
 # required for the migrations
