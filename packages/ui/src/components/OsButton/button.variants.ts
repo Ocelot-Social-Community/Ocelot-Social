@@ -19,6 +19,7 @@ export const buttonVariants = cva(
     'rounded-[4px]',
     'transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]',
     'cursor-pointer select-none',
+    'border-[0.8px] border-solid border-transparent', // consistent border across all appearances
     'focus:outline-1', // outline width, style set per variant
     'disabled:pointer-events-none disabled:cursor-default',
   ],
@@ -43,12 +44,12 @@ export const buttonVariants = cva(
           'disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent]',
         ],
         outline: [
-          'bg-transparent shadow-none border-[0.8px] border-solid',
+          'bg-transparent shadow-none',
           // Disabled: gray border and text
           'disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)]',
         ],
         ghost: [
-          'bg-transparent shadow-none border-none',
+          'bg-transparent shadow-none',
           // Disabled: gray text
           'disabled:text-[var(--color-disabled)]',
         ],

@@ -20,24 +20,12 @@
  * disabled buttons immediately show disabled styling, even when clicked.
  */
 
-/* Filled buttons: ensure border is preserved when disabled */
-button.disabled\:bg-\[var\(--color-disabled\)\]:disabled {
-  border-style: solid !important;
-  border-width: 0.8px !important;
-}
-
 /* Filled buttons: gray background when disabled, regardless of hover/active */
 button.disabled\:bg-\[var\(--color-disabled\)\]:disabled:hover,
 button.disabled\:bg-\[var\(--color-disabled\)\]:disabled:active {
   background-color: var(--color-disabled) !important;
   border-color: var(--color-disabled) !important;
   color: var(--color-disabled-contrast) !important;
-}
-
-/* Outline buttons: ensure border is preserved when disabled */
-button.disabled\:border-\[var\(--color-disabled\)\]:disabled {
-  border-style: solid !important;
-  border-width: 0.8px !important;
 }
 
 /* Outline buttons: transparent background when disabled, regardless of hover/active */
