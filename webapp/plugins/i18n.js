@@ -44,7 +44,9 @@ export default ({ app, req, cookie, store }) => {
     })
     if (!app.$i18n.localeExists(localeInStore)) {
       import(`~/locales/${localeInStore}.json`).then((res) => {
-        app.$i18n.add(localeInStore, res.default)
+        const translation = res.default
+        translation.html = htmlTranslations[localeInStore]
+        app.$i18n.add(localeInStore, translation)
       })
     }
 
