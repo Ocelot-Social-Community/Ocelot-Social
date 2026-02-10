@@ -18,7 +18,7 @@ const STORY_ROOT = '#storybook-root'
  * Wait for all fonts to be loaded before taking screenshots
  */
 async function waitForFonts(page: Page) {
-  await page.evaluate(() => document.fonts.ready)
+  await page.evaluate(async () => document.fonts.ready)
 }
 
 /**

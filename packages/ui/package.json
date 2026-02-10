@@ -72,6 +72,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
     "@axe-core/playwright": "^4.11.1",
+    "@eslint/css": "^0.14.1",
     "@fontsource-variable/inter": "^5.2.8",
     "@playwright/test": "^1.58.2",
     "@size-limit/file": "^12.0.0",
@@ -93,6 +94,7 @@
     "publint": "^0.3.17",
     "size-limit": "^12.0.0",
     "storybook": "^10.2.7",
+    "tailwind-csstree": "^0.1.4",
     "tailwindcss": "^4.1.18",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
