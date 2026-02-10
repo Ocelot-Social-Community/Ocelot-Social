@@ -1,0 +1,99 @@
+# CodeRabbit Configuration
+# https://docs.coderabbit.ai/guides/configure-coderabbit
+
+language: de
+
+reviews:
+  # Automatisches Review für alle PRs
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - master
+      - main
+
+  auto_approve:
+    enabled: true
+
+  # Review-Einstellungen
+  request_changes_workflow: true
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  changed_files_summary: true
+
+  # Pfad-Filter (Dateien die ignoriert werden)
+  path_filters:
+    - "!**/*.lock"
+    - "!**/package-lock.json"
+    - "!**/yarn.lock"
+    - "!**/*.snap"
+    - "!**/coverage/**"
+    - "!**/dist/**"
+    - "!**/node_modules/**"
+    - "!**/*.min.js"
+    - "!**/*.min.css"
+    - "!**/.git/**"
+    - "!**/storybook-static/**"
+
+  # Instruktionen für spezifische Pfade
+  path_instructions:
+    - path: "webapp/**/*.vue"
+      instructions: |
+        Prüfe Vue.js Best Practices:
+        - Composition API Verwendung
+        - Props Validierung
+        - Event-Handling
+        - Reaktivität
+
+    - path: "webapp/**/*.spec.js"
+      instructions: |
+        Prüfe Test-Qualität:
+        - Aussagekräftige Test-Namen
+        - Edge Cases abgedeckt
+        - Mocking korrekt verwendet
+
+    - path: "backend/**/*.js"
+      instructions: |
+        Prüfe Backend Best Practices:
+        - Error Handling
+        - Input Validierung
+        - SQL Injection Prevention
+        - Performance (N+1 Queries)
+
+    - path: "packages/ui/**/*.ts"
+      instructions: |
+        Prüfe UI Library Standards:
+        - TypeScript Typisierung
+        - Vue 2/3 Kompatibilität (vue-demi)
+        - Accessibility (WCAG 2.1)
+        - CVA Varianten-Pattern
+
+    - path: "packages/ui/**/*.vue"
+      instructions: |
+        Prüfe UI Komponenten:
+        - Render-Funktion Pattern für vue-demi
+        - Props mit korrekten Types
+        - Slots dokumentiert
+        - Keine Template-Syntax (nur h() für Vue 2/3 Kompatibilität)
+
+# Chat-Befehle
+chat:
+  auto_reply: true
+
+# Ton und Stil
+tone_instructions: |
+  Sei konstruktiv und freundlich.
+  Erkläre das "Warum" hinter Vorschlägen.
+  Priorisiere Sicherheit > Korrektheit > Performance > Lesbarkeit.
+  Schlage konkrete Code-Änderungen vor wenn möglich.
+
+# Knowledge Base (Repository-spezifisches Wissen)
+knowledge_base:
+  learnings:
+    scope: auto
+  issues:
+    scope: auto
+  pull_requests:
+    scope: auto

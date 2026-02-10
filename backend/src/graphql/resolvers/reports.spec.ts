@@ -14,7 +14,7 @@ import createServer from '@src/server'
 const instance = getNeode()
 const driver = getDriver()
 
-describe('file a report on a resource', () => {
+describe('reports', () => {
   let authenticatedUser, currentUser, mutate, query, moderator, abusiveUser, otherReportingUser
   const categoryIds = ['cat9']
   const variables = {
@@ -620,32 +620,31 @@ describe('file a report on a resource', () => {
         ),
       ])
       authenticatedUser = await currentUser.toJson()
-      await Promise.all([
-        mutate({
-          mutation: fileReport,
-          variables: {
-            resourceId: 'abusive-post-1',
-            reasonCategory: 'other',
-            reasonDescription: 'This comment is bigoted',
-          },
-        }),
-        mutate({
-          mutation: fileReport,
-          variables: {
-            resourceId: 'abusive-comment-1',
-            reasonCategory: 'discrimination_etc',
-            reasonDescription: 'This post is bigoted',
-          },
-        }),
-        mutate({
-          mutation: fileReport,
-          variables: {
-            resourceId: 'abusive-user-1',
-            reasonCategory: 'doxing',
-            reasonDescription: 'This user is harassing me with bigoted remarks',
-          },
-        }),
-      ])
+      // Sequential to ensure distinct createdAt values for orderBy tests
+      await mutate({
+        mutation: fileReport,
+        variables: {
+          resourceId: 'abusive-post-1',
+          reasonCategory: 'other',
+          reasonDescription: 'This post is bigoted',
+        },
+      })
+      await mutate({
+        mutation: fileReport,
+        variables: {
+          resourceId: 'abusive-comment-1',
+          reasonCategory: 'discrimination_etc',
+          reasonDescription: 'This comment is bigoted',
+        },
+      })
+      await mutate({
+        mutation: fileReport,
+        variables: {
+          resourceId: 'abusive-user-1',
+          reasonCategory: 'doxing',
+          reasonDescription: 'This user is harassing me with bigoted remarks',
+        },
+      })
       authenticatedUser = null
     })
 
@@ -660,82 +659,250 @@ describe('file a report on a resource', () => {
     })
 
     describe('authenticated', () => {
-      it('role "user" gets no reports', async () => {
-        authenticatedUser = await currentUser.toJson()
-        await expect(query({ query: reports })).resolves.toMatchObject({
-          data: { reports: null },
-          errors: [{ message: 'Not Authorized!' }],
+      describe('as user', () => {
+        beforeEach(async () => {
+          authenticatedUser = await currentUser.toJson()
+        })
+
+        it('returns no reports', async () => {
+          await expect(query({ query: reports })).resolves.toMatchObject({
+            data: { reports: null },
+            errors: [{ message: 'Not Authorized!' }],
+          })
         })
       })
 
-      it('role "moderator" gets reports', async () => {
-        const expected = {
-          reports: expect.arrayContaining([
-            expect.objectContaining({
-              id: expect.any(String),
-              createdAt: expect.any(String),
-              updatedAt: expect.any(String),
-              closed: false,
-              resource: {
-                __typename: 'User',
-                id: 'abusive-user-1',
-              },
-              filed: expect.arrayContaining([
-                expect.objectContaining({
-                  submitter: expect.objectContaining({
-                    id: 'current-user-id',
+      describe('as moderator', () => {
+        beforeEach(async () => {
+          authenticatedUser = await moderator.toJson()
+        })
+
+        it('gets reports', async () => {
+          const expected = {
+            reports: expect.arrayContaining([
+              expect.objectContaining({
+                id: expect.any(String),
+                createdAt: expect.any(String),
+                updatedAt: expect.any(String),
+                closed: false,
+                resource: {
+                  __typename: 'User',
+                  id: 'abusive-user-1',
+                },
+                filed: expect.arrayContaining([
+                  expect.objectContaining({
+                    submitter: expect.objectContaining({
+                      id: 'current-user-id',
+                    }),
+                    createdAt: expect.any(String),
+                    reasonCategory: 'doxing',
+                    reasonDescription: 'This user is harassing me with bigoted remarks',
                   }),
-                  createdAt: expect.any(String),
-                  reasonCategory: 'doxing',
-                  reasonDescription: 'This user is harassing me with bigoted remarks',
-                }),
-              ]),
-            }),
-            expect.objectContaining({
-              id: expect.any(String),
-              createdAt: expect.any(String),
-              updatedAt: expect.any(String),
-              closed: false,
-              resource: {
-                __typename: 'Post',
-                id: 'abusive-post-1',
-              },
-              filed: expect.arrayContaining([
-                expect.objectContaining({
-                  submitter: expect.objectContaining({
-                    id: 'current-user-id',
+                ]),
+              }),
+              expect.objectContaining({
+                id: expect.any(String),
+                createdAt: expect.any(String),
+                updatedAt: expect.any(String),
+                closed: false,
+                resource: {
+                  __typename: 'Post',
+                  id: 'abusive-post-1',
+                },
+                filed: expect.arrayContaining([
+                  expect.objectContaining({
+                    submitter: expect.objectContaining({
+                      id: 'current-user-id',
+                    }),
+                    createdAt: expect.any(String),
+                    reasonCategory: 'other',
+                    reasonDescription: 'This post is bigoted',
                   }),
-                  createdAt: expect.any(String),
-                  reasonCategory: 'other',
-                  reasonDescription: 'This comment is bigoted',
-                }),
-              ]),
-            }),
-            expect.objectContaining({
-              id: expect.any(String),
-              createdAt: expect.any(String),
-              updatedAt: expect.any(String),
-              closed: false,
-              resource: {
-                __typename: 'Comment',
-                id: 'abusive-comment-1',
-              },
-              filed: expect.arrayContaining([
-                expect.objectContaining({
-                  submitter: expect.objectContaining({
-                    id: 'current-user-id',
+                ]),
+              }),
+              expect.objectContaining({
+                id: expect.any(String),
+                createdAt: expect.any(String),
+                updatedAt: expect.any(String),
+                closed: false,
+                resource: {
+                  __typename: 'Comment',
+                  id: 'abusive-comment-1',
+                },
+                filed: expect.arrayContaining([
+                  expect.objectContaining({
+                    submitter: expect.objectContaining({
+                      id: 'current-user-id',
+                    }),
+                    createdAt: expect.any(String),
+                    reasonCategory: 'discrimination_etc',
+                    reasonDescription: 'This comment is bigoted',
                   }),
-                  createdAt: expect.any(String),
-                  reasonCategory: 'discrimination_etc',
-                  reasonDescription: 'This post is bigoted',
-                }),
-              ]),
-            }),
-          ]),
-        }
-        authenticatedUser = await moderator.toJson()
-        const { data } = await query({ query: reports })
-        expect(data).toEqual(expected)
+                ]),
+              }),
+            ]),
+          }
+          const { data } = await query({ query: reports })
+          expect(data).toEqual(expected)
+        })
+
+        describe('orderBy', () => {
+          it('createdAt_asc returns reports in ascending order', async () => {
+            const { data } = await query({
+              query: reports,
+              variables: { orderBy: 'createdAt_asc' },
+            })
+            const sorted = [...data.reports].sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
+            expect(data.reports).toEqual(sorted)
+          })
+
+          it('createdAt_desc returns reports in descending order', async () => {
+            const { data } = await query({
+              query: reports,
+              variables: { orderBy: 'createdAt_desc' },
+            })
+            const sorted = [...data.reports].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+            expect(data.reports).toEqual(sorted)
+          })
+        })
+
+        describe('reviewed filter', () => {
+          it('reviewed: false returns only unreviewed reports', async () => {
+            const { data } = await query({
+              query: reports,
+              variables: { reviewed: false },
+            })
+            expect(data.reports).toHaveLength(3)
+          })
+
+          it('reviewed: true returns only reviewed reports', async () => {
+            // review one report
+            await mutate({
+              mutation: review,
+              variables: { resourceId: 'abusive-post-1', disable: false, closed: false },
+            })
+            const { data } = await query({
+              query: reports,
+              variables: { reviewed: true },
+            })
+            expect(data.reports).toHaveLength(1)
+            expect(data.reports[0].resource.id).toBe('abusive-post-1')
+          })
+        })
+
+        describe('closed filter', () => {
+          it('closed: false returns only open reports', async () => {
+            const { data } = await query({
+              query: reports,
+              variables: { closed: false },
+            })
+            expect(data.reports).toHaveLength(3)
+            data.reports.forEach((report) => {
+              expect(report.closed).toBe(false)
+            })
+          })
+
+          it('closed: true returns only closed reports', async () => {
+            // close one report via review
+            await mutate({
+              mutation: review,
+              variables: { resourceId: 'abusive-post-1', disable: false, closed: true },
+            })
+            const { data } = await query({
+              query: reports,
+              variables: { closed: true },
+            })
+            expect(data.reports).toHaveLength(1)
+            expect(data.reports[0].resource.id).toBe('abusive-post-1')
+            expect(data.reports[0].closed).toBe(true)
+          })
+        })
+
+        describe('combined reviewed and closed filter', () => {
+          it('returns only reports matching both filters', async () => {
+            // review and close one report
+            await mutate({
+              mutation: review,
+              variables: { resourceId: 'abusive-post-1', disable: false, closed: true },
+            })
+            // review but keep open another report
+            await mutate({
+              mutation: review,
+              variables: { resourceId: 'abusive-user-1', disable: false, closed: false },
+            })
+            const { data } = await query({
+              query: reports,
+              variables: { reviewed: true, closed: true },
+            })
+            expect(data.reports).toHaveLength(1)
+            expect(data.reports[0].resource.id).toBe('abusive-post-1')
+            expect(data.reports[0].closed).toBe(true)
+          })
+
+          it('reviewed: true, closed: false returns reviewed but open reports', async () => {
+            // review and close one report
+            await mutate({
+              mutation: review,
+              variables: { resourceId: 'abusive-post-1', disable: false, closed: true },
+            })
+            // review but keep open another report
+            await mutate({
+              mutation: review,
+              variables: { resourceId: 'abusive-user-1', disable: false, closed: false },
+            })
+            const { data } = await query({
+              query: reports,
+              variables: { reviewed: true, closed: false },
+            })
+            expect(data.reports).toHaveLength(1)
+            expect(data.reports[0].resource.id).toBe('abusive-user-1')
+            expect(data.reports[0].closed).toBe(false)
+          })
+        })
+
+        describe('pagination', () => {
+          it('first: 2 returns only 2 reports', async () => {
+            const { data } = await query({
+              query: reports,
+              variables: { first: 2 },
+            })
+            expect(data.reports).toHaveLength(2)
+          })
+
+          it('first: 1 returns only 1 report', async () => {
+            const { data } = await query({
+              query: reports,
+              variables: { first: 1 },
+            })
+            expect(data.reports).toHaveLength(1)
+          })
+
+          it('offset: 1 skips the first report', async () => {
+            const { data: allData } = await query({
+              query: reports,
+              variables: { orderBy: 'createdAt_asc' },
+            })
+            const { data: offsetData } = await query({
+              query: reports,
+              variables: { orderBy: 'createdAt_asc', offset: 1 },
+            })
+            expect(offsetData.reports).toHaveLength(allData.reports.length - 1)
+            expect(offsetData.reports[0].id).toBe(allData.reports[1].id)
+          })
+
+          it('first and offset combined for paging', async () => {
+            const { data: allData } = await query({
+              query: reports,
+              variables: { orderBy: 'createdAt_asc' },
+            })
+            const { data: pageData } = await query({
+              query: reports,
+              variables: { orderBy: 'createdAt_asc', first: 1, offset: 1 },
+            })
+            expect(pageData.reports).toHaveLength(1)
+            expect(pageData.reports[0].id).toBe(allData.reports[1].id)
+          })
+        })
       })
     })
   })
