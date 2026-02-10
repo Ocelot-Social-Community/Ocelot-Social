@@ -44,8 +44,8 @@ describe('osButton', () => {
         props: { appearance: 'outline', variant: 'primary' },
       })
       expect(wrapper.classes()).toContain('bg-transparent')
-      expect(wrapper.classes()).toContain('border-[0.8px]')
       expect(wrapper.classes()).toContain('border-[var(--color-primary)]')
+      expect(wrapper.classes()).toContain('text-[var(--color-primary)]')
     })
 
     it('applies ghost appearance classes', () => {
@@ -53,8 +53,8 @@ describe('osButton', () => {
         props: { appearance: 'ghost', variant: 'primary' },
       })
       expect(wrapper.classes()).toContain('bg-transparent')
-      expect(wrapper.classes()).toContain('border-transparent')
       expect(wrapper.classes()).toContain('text-[var(--color-primary)]')
+      expect(wrapper.classes()).not.toContain('border-[var(--color-primary)]')
     })
   })
 
