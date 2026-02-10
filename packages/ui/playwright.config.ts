@@ -50,8 +50,8 @@ export default defineConfig({
   /* Snapshot configuration */
   expect: {
     toHaveScreenshot: {
-      /* Allow slight differences due to font rendering across platforms */
-      maxDiffPixelRatio: 0.03,
+      /* Allow slight differences due to font rendering across platforms (self-hosted font) */
+      maxDiffPixelRatio: 0.01,
     },
   },
 

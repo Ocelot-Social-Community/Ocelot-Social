@@ -15,6 +15,13 @@ const STORY_URL = '/iframe.html?id=components-osbutton'
 const STORY_ROOT = '#storybook-root'
 
 /**
+ * Wait for all fonts to be loaded before taking screenshots
+ */
+async function waitForFonts(page: Page) {
+  await page.evaluate(() => document.fonts.ready)
+}
+
+/**
  * Helper to run accessibility check on the current page
  */
 async function checkA11y(page: Page) {
@@ -48,6 +55,7 @@ test.describe('OsButton visual regression', () => {
     await page.goto(`${STORY_URL}--all-variants&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
+    await waitForFonts(page)
     await expect(root.locator('.flex')).toHaveScreenshot('all-variants.png')
     await checkA11y(page)
   })
@@ -56,6 +64,7 @@ test.describe('OsButton visual regression', () => {
     await page.goto(`${STORY_URL}--all-sizes&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
+    await waitForFonts(page)
     await expect(root.locator('.flex-col').first()).toHaveScreenshot('all-sizes.png')
     await checkA11y(page)
   })
@@ -64,6 +73,7 @@ test.describe('OsButton visual regression', () => {
     await page.goto(`${STORY_URL}--appearance-filled&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
+    await waitForFonts(page)
     await expect(root.locator('.flex')).toHaveScreenshot('appearance-filled.png')
     await checkA11y(page)
   })
@@ -72,6 +82,7 @@ test.describe('OsButton visual regression', () => {
     await page.goto(`${STORY_URL}--appearance-outline&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
+    await waitForFonts(page)
     await expect(root.locator('.flex')).toHaveScreenshot('appearance-outline.png')
     await checkA11y(page)
   })
@@ -80,6 +91,7 @@ test.describe('OsButton visual regression', () => {
     await page.goto(`${STORY_URL}--appearance-ghost&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
+    await waitForFonts(page)
     await expect(root.locator('.flex')).toHaveScreenshot('appearance-ghost.png')
     await checkA11y(page)
   })
@@ -88,6 +100,7 @@ test.describe('OsButton visual regression', () => {
     await page.goto(`${STORY_URL}--all-appearances&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
+    await waitForFonts(page)
     await expect(root.locator('.flex-col').first()).toHaveScreenshot('all-appearances.png')
     await checkA11y(page)
   })
@@ -96,6 +109,7 @@ test.describe('OsButton visual regression', () => {
     await page.goto(`${STORY_URL}--disabled&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
+    await waitForFonts(page)
     await expect(root.locator('.flex-col').first()).toHaveScreenshot('disabled.png')
     await checkA11y(page)
   })
@@ -104,6 +118,7 @@ test.describe('OsButton visual regression', () => {
     await page.goto(`${STORY_URL}--full-width&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
+    await waitForFonts(page)
     await expect(root.locator('.flex-col').first()).toHaveScreenshot('full-width.png')
     await checkA11y(page)
   })

@@ -1,12 +1,9 @@
-/* Inter font for consistent rendering across platforms */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
 @import "tailwindcss";
 
 /* Watercolor theme for Storybook - vibrant colors inspired by aquarelle paints */
 /* All colors meet WCAG AA contrast requirements (4.5:1 for normal text) */
 :root {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Inter Variable', system-ui, sans-serif;
 
   /* Default (Buff / Raw Umber) - neutral button */
   --color-default: #d8c9b8;
