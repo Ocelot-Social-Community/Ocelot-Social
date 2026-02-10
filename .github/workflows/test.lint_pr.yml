@@ -29,6 +29,7 @@ jobs:
           # Configure which scopes are allowed (newline delimited).
           scopes: |
             backend
+            package/ui
             webapp
             maintenance
             database
