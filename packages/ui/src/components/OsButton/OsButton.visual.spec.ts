@@ -68,7 +68,7 @@ test.describe('OsButton visual regression', () => {
     await page.goto(`${STORY_URL}--disabled&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
-    await expect(root.locator('button')).toHaveScreenshot('disabled.png')
+    await expect(root.locator('.flex-col').first()).toHaveScreenshot('disabled.png')
     await checkA11y(page)
   })
 

@@ -189,15 +189,48 @@ export const AppearanceGhost: Story = {
 }
 
 export const Disabled: Story = {
-  args: {
-    disabled: true,
-  },
-  render: (args) => ({
+  render: () => ({
     components: { OsButton },
-    setup() {
-      return { args }
-    },
-    template: '<OsButton v-bind="args">Disabled Button</OsButton>',
+    template: `
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-sm font-bold mb-2">Filled</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton disabled appearance="filled" variant="default">Default</OsButton>
+            <OsButton disabled appearance="filled" variant="primary">Primary</OsButton>
+            <OsButton disabled appearance="filled" variant="secondary">Secondary</OsButton>
+            <OsButton disabled appearance="filled" variant="danger">Danger</OsButton>
+            <OsButton disabled appearance="filled" variant="warning">Warning</OsButton>
+            <OsButton disabled appearance="filled" variant="success">Success</OsButton>
+            <OsButton disabled appearance="filled" variant="info">Info</OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Outline</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton disabled appearance="outline" variant="default">Default</OsButton>
+            <OsButton disabled appearance="outline" variant="primary">Primary</OsButton>
+            <OsButton disabled appearance="outline" variant="secondary">Secondary</OsButton>
+            <OsButton disabled appearance="outline" variant="danger">Danger</OsButton>
+            <OsButton disabled appearance="outline" variant="warning">Warning</OsButton>
+            <OsButton disabled appearance="outline" variant="success">Success</OsButton>
+            <OsButton disabled appearance="outline" variant="info">Info</OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Ghost</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton disabled appearance="ghost" variant="default">Default</OsButton>
+            <OsButton disabled appearance="ghost" variant="primary">Primary</OsButton>
+            <OsButton disabled appearance="ghost" variant="secondary">Secondary</OsButton>
+            <OsButton disabled appearance="ghost" variant="danger">Danger</OsButton>
+            <OsButton disabled appearance="ghost" variant="warning">Warning</OsButton>
+            <OsButton disabled appearance="ghost" variant="success">Success</OsButton>
+            <OsButton disabled appearance="ghost" variant="info">Info</OsButton>
+          </div>
+        </div>
+      </div>
+    `,
   }),
 }
 
