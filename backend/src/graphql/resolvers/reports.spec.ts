@@ -14,7 +14,7 @@ import createServer from '@src/server'
 const instance = getNeode()
 const driver = getDriver()
 
-describe('file a report on a resource', () => {
+describe('reports', () => {
   let authenticatedUser, currentUser, mutate, query, moderator, abusiveUser, otherReportingUser
   const categoryIds = ['cat9']
   const variables = {
@@ -658,16 +658,25 @@ describe('file a report on a resource', () => {
       })
     })
 
-    describe('authenticated', () => {
-      it('role "user" gets no reports', async () => {
+    describe('authenticated as user', () => {
+      beforeEach(async () => {
         authenticatedUser = await currentUser.toJson()
+      })
+
+      it('gets no reports', async () => {
         await expect(query({ query: reports })).resolves.toMatchObject({
           data: { reports: null },
           errors: [{ message: 'Not Authorized!' }],
         })
       })
+    })
 
-      it('role "moderator" gets reports', async () => {
+    describe('authenticated as moderator', () => {
+      beforeEach(async () => {
+        authenticatedUser = await moderator.toJson()
+      })
+
+      it('gets reports', async () => {
         const expected = {
           reports: expect.arrayContaining([
             expect.objectContaining({
@@ -732,14 +741,12 @@ describe('file a report on a resource', () => {
             }),
           ]),
         }
-        authenticatedUser = await moderator.toJson()
         const { data } = await query({ query: reports })
         expect(data).toEqual(expected)
       })
 
       describe('orderBy', () => {
         it('createdAt_asc returns reports in ascending order', async () => {
-          authenticatedUser = await moderator.toJson()
           const { data } = await query({
             query: reports,
             variables: { orderBy: 'createdAt_asc' },
@@ -749,7 +756,6 @@ describe('file a report on a resource', () => {
         })
 
         it('createdAt_desc returns reports in descending order', async () => {
-          authenticatedUser = await moderator.toJson()
           const { data } = await query({
             query: reports,
             variables: { orderBy: 'createdAt_desc' },
@@ -761,7 +767,6 @@ describe('file a report on a resource', () => {
 
       describe('reviewed filter', () => {
         it('reviewed: false returns only unreviewed reports', async () => {
-          authenticatedUser = await moderator.toJson()
           const { data } = await query({
             query: reports,
             variables: { reviewed: false },
@@ -770,7 +775,6 @@ describe('file a report on a resource', () => {
         })
 
         it('reviewed: true returns only reviewed reports', async () => {
-          authenticatedUser = await moderator.toJson()
           // review one report
           await mutate({
             mutation: review,
@@ -787,7 +791,6 @@ describe('file a report on a resource', () => {
 
       describe('closed filter', () => {
         it('closed: false returns only open reports', async () => {
-          authenticatedUser = await moderator.toJson()
           const { data } = await query({
             query: reports,
             variables: { closed: false },
@@ -799,7 +802,6 @@ describe('file a report on a resource', () => {
         })
 
         it('closed: true returns only closed reports', async () => {
-          authenticatedUser = await moderator.toJson()
           // close one report via review
           await mutate({
             mutation: review,
@@ -817,7 +819,6 @@ describe('file a report on a resource', () => {
 
       describe('combined reviewed and closed filter', () => {
         it('returns only reports matching both filters', async () => {
-          authenticatedUser = await moderator.toJson()
           // review and close one report
           await mutate({
             mutation: review,
@@ -838,7 +839,6 @@ describe('file a report on a resource', () => {
         })
 
         it('reviewed: true, closed: false returns reviewed but open reports', async () => {
-          authenticatedUser = await moderator.toJson()
           // review and close one report
           await mutate({
             mutation: review,
@@ -861,7 +861,6 @@ describe('file a report on a resource', () => {
 
       describe('pagination', () => {
         it('first: 2 returns only 2 reports', async () => {
-          authenticatedUser = await moderator.toJson()
           const { data } = await query({
             query: reports,
             variables: { first: 2 },
@@ -870,7 +869,6 @@ describe('file a report on a resource', () => {
         })
 
         it('first: 1 returns only 1 report', async () => {
-          authenticatedUser = await moderator.toJson()
           const { data } = await query({
             query: reports,
             variables: { first: 1 },
@@ -879,7 +877,6 @@ describe('file a report on a resource', () => {
         })
 
         it('offset: 1 skips the first report', async () => {
-          authenticatedUser = await moderator.toJson()
           const { data: allData } = await query({
             query: reports,
             variables: { orderBy: 'createdAt_asc' },
@@ -893,7 +890,6 @@ describe('file a report on a resource', () => {
         })
 
         it('first and offset combined for paging', async () => {
-          authenticatedUser = await moderator.toJson()
           const { data: allData } = await query({
             query: reports,
             variables: { orderBy: 'createdAt_asc' },
