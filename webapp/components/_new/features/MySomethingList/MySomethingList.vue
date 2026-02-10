@@ -194,7 +194,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scope>
+<style lang="scss" scoped>
 .divider {
   opacity: 0.4;
   padding: 0 $space-small;
