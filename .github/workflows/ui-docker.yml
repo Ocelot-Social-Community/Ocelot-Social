@@ -1,6 +1,16 @@
 name: UI Docker
 
-on: push
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'packages/ui/**'
+      - '.github/workflows/ui-docker.yml'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'packages/ui/**'
+      - '.github/workflows/ui-docker.yml'
 
 jobs:
   files-changed:

@@ -1,6 +1,16 @@
 name: UI Lint
 
-on: push
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'packages/ui/**'
+      - '.github/workflows/ui-lint.yml'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'packages/ui/**'
+      - '.github/workflows/ui-lint.yml'
 
 defaults:
   run:

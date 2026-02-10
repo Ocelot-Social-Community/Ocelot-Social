@@ -1,6 +1,16 @@
 name: UI Test
 
-on: push
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'packages/ui/**'
+      - '.github/workflows/ui-test.yml'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'packages/ui/**'
+      - '.github/workflows/ui-test.yml'
 
 defaults:
   run:
