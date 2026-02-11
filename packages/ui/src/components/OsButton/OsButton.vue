@@ -95,18 +95,17 @@
       },
     },
     setup(props, { slots, attrs }) {
-      const classes = computed(() =>
-        cn(
-          buttonVariants({
-            variant: props.variant,
-            appearance: props.appearance,
-            size: props.size,
-            fullWidth: props.fullWidth,
-          }),
-        ),
+      const variantClasses = computed(() =>
+        buttonVariants({
+          variant: props.variant,
+          appearance: props.appearance,
+          size: props.size,
+          fullWidth: props.fullWidth,
+        }),
       )
 
-      const instance = getCurrentInstance()
+      /* v8 ignore next -- Vue 2 only */
+      const instance = isVue2 ? getCurrentInstance() : null
 
       return () => {
         const iconContent = slots.icon?.()
@@ -122,7 +121,7 @@
         const size = props.size!
         // eslint-disable-next-line security/detect-object-injection -- size is a validated prop
         const spinnerPx = SPINNER_PX[size]
-        const isSmall = ['xs', 'sm'].includes(size)
+        const isSmall = props.circle || ['xs', 'sm'].includes(size)
         const isLoading = props.loading
         const isDisabled = props.disabled || isLoading
 
@@ -133,7 +132,7 @@
         const innerChildren: ReturnType<typeof h>[] = []
 
         if (hasIcon) {
-          const iconMargin = props.circle ? '' : isSmall ? '' : hasText ? '-ml-1' : '-ml-1 -mr-1'
+          const iconMargin = isSmall ? '' : hasText ? '-ml-1' : '-ml-1 -mr-1'
           const loadingClass = isLoading ? 'relative overflow-visible' : ''
           const iconChildren = isLoading
             ? [
@@ -162,11 +161,7 @@
 
         const children = buttonSpinner ? [contentWrapper, buttonSpinner] : [contentWrapper]
 
-        const buttonClass = cn(
-          classes.value,
-          'relative inline-flex items-center justify-center',
-          circleClass,
-        )
+        const buttonClass = cn(variantClasses.value, circleClass)
 
         const buttonData = {
           type: props.type,
