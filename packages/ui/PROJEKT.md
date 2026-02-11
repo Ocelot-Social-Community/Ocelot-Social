@@ -80,11 +80,11 @@
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
-Phase 3: █████████░  96% (23/24 Aufgaben) - Webapp-Integration (M4a ✅, M4b ✅, M5 ✅)
+Phase 3: ██████████ 100% (24/24 Aufgaben) ✅ - Webapp-Integration komplett
 Phase 4: █░░░░░░░░░   6% (1/17 Aufgaben) - OsButton ✅
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ███████░░░  72% (62/86 Aufgaben)
+Gesamt:  ████████░░  74% (63/86 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -94,12 +94,12 @@ Styleguide: ██████████ 100% (38 Komponenten erfasst)
 Analyse:    ██████████ 100% (Button, Modal, Menu detailiert)
 ```
 
-### OsButton Migration (Phase 3)
+### OsButton Migration (Phase 3) ✅
 ```
-Scope gesamt:     ~90 Buttons in Webapp
-├─ Migriert:       43 Buttons (48%) ✅
-├─ Ohne neue Props:  0 Buttons (Milestone 4a ✅)
-└─ Mit icon/circle/loading: ~47 Buttons (Milestone 4c)
+Scope gesamt:     132 <os-button> Tags in 78 Webapp-Dateien
+├─ Migriert:       132 Buttons (100%) ✅
+├─ <base-button>:    0 verbleibend in Templates
+└─ Cleanup:        Snapshots/Tests müssen aktualisiert werden
 
 OsButton Features:
 ├─ variant:     ✅ primary, secondary, danger, warning, success, info, default
@@ -115,9 +115,9 @@ OsButton Features:
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-11 (Session 14)
+**Letzte Aktualisierung:** 2026-02-11 (Session 15)
 
-**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 4b ✅ (icon, circle, loading), Webapp-Migration (43 Buttons migriert)
+**Aktuelle Phase:** Phase 3 ✅ ABGESCHLOSSEN - Alle 132 Buttons in 78 Dateien migriert, 0 `<base-button>` verbleibend
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -183,10 +183,22 @@ OsButton Features:
   - Completeness Check (verify Script prüft Story, Visual, checkA11y, Keyboard, Varianten)
   - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 
-**Aktuell in Arbeit:**
-- Phase 3, Milestone 4c: ~60 Buttons mit icon/circle/loading migrieren
+**Zuletzt abgeschlossen (Session 15 - Milestone 4c komplett):**
+- [x] **Alle verbleibenden base-button Instanzen migriert** (132 os-button Tags, 0 base-button verbleibend)
+- [x] 59 Buttons in dieser Session migriert (Chat, Filter, Modals, Forms, Pages, etc.)
+- [x] `type="submit"` für alle Form-Buttons (OsButton default ist `type="button"`)
+- [x] `!!errors` Boolean-Cast für disabled-Props (errors ist Objekt, nicht Boolean)
+- [x] CSS-Selektoren `.base-button` → `> button` oder `button` angepasst
+- [x] `!important` für CSS-Positioning (überschreibt Tailwind-Klassen)
+- [x] Disabled outline border-color Fix (`var(--color-disabled-border,#e5e3e8)`)
+- [x] ComponentSlider Selection-Dots: dynamic appearance + 18px custom CSS
+- [x] pages/index.vue FAB: `size="xl"` + position/dimension `!important`
+- [x] pages/groups FAB: `size="xl"` + box-shadow `!important`
+- [x] ReportModal Breite auf 700px beibehalten
+- [x] ContributionForm Submit: `type="submit"` + `!!errors` Fix
+- [x] my-email-address/index.vue: `!!errors` Fix
 
-**Zuletzt abgeschlossen (Session 14 - Loading Prop, Circle Prop, Code-Optimierung):**
+**Zuvor abgeschlossen (Session 14 - Loading Prop, Circle Prop, Code-Optimierung):**
 - [x] `loading` Prop mit animiertem SVG-Spinner implementiert
 - [x] Spinner-Architektur: Beide Animationen (rotate + dash) auf `<circle>` Element (Chrome-Compositing-Bug-Workaround)
 - [x] Spinner zentriert auf Icon (Icon-Buttons) oder Button-Container (Text-Only-Buttons)
@@ -295,14 +307,15 @@ OsButton Features:
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
 3. ~~**Phase 2: Projekt-Setup**~~ ✅ ABGESCHLOSSEN
-4. **Phase 3: Webapp-Integration** - 43/90 Buttons migriert (48%)
+4. ~~**Phase 3: Webapp-Integration**~~ ✅ ABGESCHLOSSEN — 132 Buttons in 78 Dateien
    - [x] yarn link / Webpack-Alias in Webapp
    - [x] CSS-Variablen definieren (ocelot-ui-variables.scss)
    - [x] 16 Buttons migriert & validiert ✅
    - [x] Docker Build + CI-Kompatibilität
    - [x] **Milestone 4a:** 14 weitere Buttons (ohne neue Props) ✅
    - [x] **Milestone 4b:** icon/circle/loading Props implementieren ✅
-   - [ ] **Milestone 4c:** ~60 Buttons mit icon/circle/loading migrieren
+   - [x] **Milestone 4c:** Alle verbleibenden Buttons migriert ✅
+5. **Nächstes:** Snapshots/Tests aktualisieren, BaseButton-Komponente ggf. entfernen
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
 - [ ] `NPM_TOKEN` als GitHub Secret einrichten (für npm publish in ui-release.yml)
@@ -407,94 +420,107 @@ OsButton Features:
 - [x] `circle` Prop implementiert (rounded-full, größenabhängige Breiten) ✅
 - [x] `loading` Prop mit animiertem SVG-Spinner implementiert ✅
 
-**Milestone 4c: Buttons mit icon/circle/loading migrieren (~60 Buttons)**
+**Milestone 4c: Buttons mit icon/circle/loading migrieren** ✅ ABGESCHLOSSEN
 
 *Button-Komponenten (Wrapper):*
-- [ ] Button/JoinLeaveButton.vue (icon, loading)
-- [ ] Button/FollowButton.vue (icon, loading)
-- [ ] LoginButton/LoginButton.vue (icon, circle)
-- [ ] InviteButton/InviteButton.vue (icon, circle)
-- [ ] EmotionButton/EmotionButton.vue (circle)
-- [ ] CustomButton/CustomButton.vue (2× circle)
-- [ ] LabeledButton/LabeledButton.vue (icon, circle)
+- [x] Button/JoinLeaveButton.vue (icon, loading) ✅
+- [x] Button/FollowButton.vue (icon, loading) ✅
+- [x] LoginButton/LoginButton.vue (icon, circle) ✅
+- [x] InviteButton/InviteButton.vue (icon, circle) ✅
+- [x] EmotionButton/EmotionButton.vue (circle) ✅
+- [x] CustomButton/CustomButton.vue (2× circle) ✅
+- [x] LabeledButton/LabeledButton.vue (icon, circle) ✅
 
 *Navigation & Menus:*
-- [ ] ContentMenu/ContentMenu.vue (icon, circle)
-- [ ] ContentMenu/GroupContentMenu.vue (icon, circle)
-- [ ] ChatNotificationMenu.vue (circle)
-- [ ] NotificationMenu.vue (3× icon, circle)
-- [ ] HeaderMenu/HeaderMenu.vue (icon, circle)
-- [ ] Map/MapButton.vue (circle)
+- [x] ContentMenu/ContentMenu.vue (icon, circle) ✅
+- [x] ContentMenu/GroupContentMenu.vue (icon, circle) ✅
+- [x] ChatNotificationMenu.vue (circle) ✅
+- [x] NotificationMenu.vue (3× icon, circle) ✅
+- [x] HeaderMenu/HeaderMenu.vue (icon, circle) ✅
+- [x] Map/MapButton.vue (circle) ✅
 
 *Editor:*
-- [ ] Editor/MenuBarButton.vue (icon, circle)
-- [ ] Editor/MenuLegend.vue (~10× icon, circle)
+- [x] Editor/MenuBar.vue (~11× icon, circle) ✅
+- [x] Editor/MenuLegend.vue (2× icon) ✅
 
 *Filter & Input:*
-- [ ] HashtagsFilter.vue (icon, circle)
+- [x] HashtagsFilter.vue (icon, circle) ✅
 - [x] CategoriesSelect.vue (icon) ✅
-- [ ] SearchableInput.vue (icon, circle)
+- [x] SearchableInput.vue (icon, circle) ✅
 - [x] Select/LocationSelect.vue (icon) ✅
 - [x] PaginationButtons.vue (2× icon, circle) ✅
 
 *Chat:*
-- [ ] Chat/Chat.vue (2× icon, circle)
-- [ ] Chat/AddChatRoomByUserSearch.vue (icon, circle)
+- [x] Chat/Chat.vue (2× icon, circle) ✅
+- [x] Chat/AddChatRoomByUserSearch.vue (icon, circle) ✅
 
 *Forms & Auth:*
-- [ ] LoginForm/LoginForm.vue (icon, loading)
-- [ ] PasswordReset/Request.vue (loading)
-- [ ] PasswordReset/ChangePassword.vue (loading)
-- [ ] Password/Change.vue (loading)
-- [ ] ContributionForm.vue Submit (icon, loading)
-- [ ] GroupForm.vue Submit (icon)
-- [ ] CommentForm/CommentForm.vue (loading)
+- [x] LoginForm/LoginForm.vue (icon, loading) ✅
+- [x] PasswordReset/Request.vue (loading) ✅
+- [x] PasswordReset/ChangePassword.vue (loading) ✅
+- [x] Password/Change.vue (loading) ✅
+- [x] ContributionForm.vue Submit (icon, loading) ✅
+- [x] CommentForm/CommentForm.vue (loading) ✅
 
 *Modals:*
-- [ ] Modal/ConfirmModal.vue (2× icon, loading)
-- [ ] Modal/ReportModal.vue (2× icon, loading)
+- [x] Modal/ConfirmModal.vue (2× icon, loading) ✅
+- [x] Modal/ReportModal.vue (2× icon, loading) ✅
 - [x] Modal/DisableModal.vue Confirm (icon) ✅
 - [x] Modal/DeleteUserModal.vue Confirm (icon) ✅
-- [ ] Modal/ReleaseModal.vue Confirm (icon)
+- [x] Modal/ReleaseModal.vue Confirm (icon) ✅
 
 *Features:*
-- [ ] ComponentSlider.vue (2× icon, loading)
-- [ ] MySomethingList.vue (3× icon, circle, loading)
-- [ ] CreateInvitation.vue (icon, circle)
-- [ ] Invitation.vue (2× icon, circle)
-- [ ] ProfileList.vue (loading)
-- [ ] ReportRow.vue Confirm (icon)
-- [ ] ImageUploader.vue Delete/Cancel (2× icon, circle)
-- [ ] CommentCard.vue Reply (icon, circle)
-- [ ] EmbedComponent.vue Close (icon, circle)
+- [x] ComponentSlider.vue (2× icon) ✅
+- [x] MySomethingList.vue (3× icon, circle) ✅
+- [x] CreateInvitation.vue (icon, circle) ✅
+- [x] Invitation.vue (2× icon, circle) ✅
+- [x] ProfileList.vue (loading) ✅
+- [x] ReportRow.vue Confirm (icon) ✅
+- [x] ImageUploader.vue Delete/Cancel (2× icon, circle) ✅
+- [x] CommentCard.vue Reply (icon, circle) ✅
+- [x] EmbedComponent.vue Close (icon, circle) ✅
 - [x] CtaUnblockAuthor.vue (icon) ✅
-- [ ] data-download.vue (icon, loading)
+- [x] data-download.vue (icon, loading) ✅
+- [x] ActionButton.vue (icon, circle) ✅
+- [x] DeleteData.vue (icon) ✅
+- [x] GroupButton.vue (icon, circle) ✅
+
+*Filter-Menüs:*
+- [x] FilterMenu/FilterMenu.vue (icon) ✅
+- [x] FilterMenu/HeaderButton.vue (2× icon) ✅
+- [x] FilterMenu/CategoriesFilter.vue (2× icon) ✅
+- [x] FilterMenu/OrderByFilter.vue (2×) ✅
+- [x] FilterMenu/EventsByFilter.vue (2×) ✅
+- [x] FilterMenu/FollowingFilter.vue (3×) ✅
 
 *Pages:*
-- [ ] pages/groups/_id/_slug.vue (3× icon, circle, loading)
-- [ ] pages/admin/users/index.vue (2× icon, circle, loading)
-- [ ] pages/settings/index.vue (icon, loading)
-- [ ] pages/settings/blocked-users.vue (icon, circle)
-- [ ] pages/settings/muted-users.vue (icon, circle)
-- [x] pages/settings/my-email-address/index.vue (1× icon) ✅
-- [x] pages/profile/_id/_slug.vue Chat (icon) ✅
-- [ ] pages/post/_id/_slug/index.vue (icon, circle)
+- [x] pages/index.vue (2× icon, circle) ✅
+- [x] pages/groups/index.vue (icon, circle) ✅
+- [x] pages/groups/_id/_slug.vue (3× icon, circle) ✅
+- [x] pages/admin/users/index.vue (2× icon, circle) ✅
+- [x] pages/settings/index.vue (icon) ✅
+- [x] pages/settings/blocked-users.vue (icon, circle) ✅
+- [x] pages/settings/muted-users.vue (icon, circle) ✅
+- [x] pages/settings/data-download.vue (icon) ✅
+- [x] pages/settings/my-email-address/index.vue (icon) ✅
+- [x] pages/settings/my-email-address/enter-nonce.vue (icon) ✅
+- [x] pages/profile/_id/_slug.vue (icon, circle) ✅
+- [x] pages/post/_id/_slug/index.vue (icon, circle) ✅
 
 **Milestone 5: Validierung & Dokumentation** ✅
 - [x] Keine visuellen Änderungen bestätigt (16/16 Buttons validiert)
 - [x] Keine funktionalen Änderungen bestätigt
 - [x] Disabled-Styles korrigiert (hover/active-Override, Border-Fix)
-- [ ] Webapp-Tests bestehen weiterhin (TODO: Regressionstest)
+- [ ] Webapp-Tests bestehen weiterhin (TODO: Snapshots aktualisieren)
 - [ ] Erkenntnisse in KATALOG.md dokumentiert
 
 **Einsatzstellen-Übersicht:**
 
 | Kategorie | Buttons | Status |
 |-----------|---------|--------|
-| ✅ Migriert & Validiert | 32 | Erledigt (M1-M4a) |
-| ✅ Mit icon/circle migriert (M4c) | 9 | 9 Buttons in 8 Dateien |
-| ⬜ Mit icon/circle/loading (M4c) | ~49 | Ausstehend |
-| **Gesamt** | **~90** | **46% erledigt** |
+| ✅ Migriert (gesamt) | 132 | 78 Dateien |
+| ⬜ `<base-button>` verbleibend | 0 | Nur BaseButton.vue Definition + Test-Dateien |
+| **Gesamt** | **132** | **100% erledigt** ✅ |
 
 **Details siehe KATALOG.md** (vollständige Tracking-Tabellen)
 
@@ -1550,6 +1576,12 @@ Bei der Migration werden:
 | 2026-02-11 | **Code-Optimierung** | OsButton ~250→207 Zeilen: buttonData geteilt, SPINNER_PX vereinfacht, redundante cn() entfernt, getCurrentInstance nur Vue 2 |
 | 2026-02-11 | **5 neue Unit-Tests** | default type, data-appearance, min-w, icon-only loading, circle gap-1; gesamt: 76 Tests |
 | 2026-02-11 | **Milestone 4b abgeschlossen** | icon ✅, circle ✅, loading ✅ — alle OsButton-Props implementiert |
+| 2026-02-11 | **Milestone 4c: 59 Buttons** | Chat (2), AddChatRoomByUserSearch (1), CommentCard (1), CommentForm (2), ComponentSlider (2), ContributionForm (1), DeleteData (1), EmbedComponent (1), FilterMenu (1), HeaderButton (2), CategoriesFilter (2), OrderByFilter (2), EventsByFilter (2), FollowingFilter (3), GroupButton (1), ConfirmModal (2), ReportModal (2), Password/Change (1), PasswordReset/Request (1), PasswordReset/ChangePassword (1), Registration/Signup (1), ReleaseModal (1), ImageUploader (2), CreateInvitation (1), Invitation (2), ProfileList (1), ReportRow (1), MySomethingList (3), ActionButton (1), pages/index (2), profile/add-post (1), post/blur-toggle (1), groups/slug (3), settings/index (1), admin/users (2), blocked-users (1), data-download (1), muted-users (1), groups/index (1), enter-nonce (1) |
+| 2026-02-11 | **type="submit" Pattern** | OsButton hat `type="button"` als Default; alle Form-Submit-Buttons brauchen explizit `type="submit"` |
+| 2026-02-11 | **!!errors Pattern** | DsForm `errors` ist ein Objekt, nicht Boolean; OsButton `disabled` Prop erwartet Boolean → `!!errors` nötig |
+| 2026-02-11 | **CSS-Selector Pattern** | `.base-button` → `> button` oder `button`; Position/Dimensions brauchen `!important` für Tailwind-Override |
+| 2026-02-11 | **Disabled border-color** | Outline disabled border von `var(--color-disabled)` auf `var(--color-disabled-border,#e5e3e8)` mit Fallback |
+| 2026-02-11 | **Phase 3 abgeschlossen** | 132 `<os-button>` Tags in 78 Dateien, 0 `<base-button>` in Templates verbleibend |
 
 ---
 
