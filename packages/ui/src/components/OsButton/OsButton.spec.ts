@@ -375,6 +375,66 @@ describe('osButton', () => {
       await wrapper.trigger('click')
       expect(wrapper.emitted('click')).toBeUndefined()
     })
+
+    it('renders spinner inside icon wrapper when icon is present', () => {
+      const wrapper = mount(OsButton, {
+        props: { loading: true },
+        slots: {
+          icon: '<svg data-testid="icon"></svg>',
+          default: 'Save',
+        },
+      })
+      const iconWrapper = wrapper.find('.os-button__icon')
+      expect(iconWrapper.exists()).toBeTruthy()
+      expect(iconWrapper.find('.os-button__spinner').exists()).toBeTruthy()
+    })
+
+    it('hides icon content when loading with icon', () => {
+      const wrapper = mount(OsButton, {
+        props: { loading: true },
+        slots: {
+          icon: '<svg data-testid="icon"></svg>',
+          default: 'Save',
+        },
+      })
+      const iconWrapper = wrapper.find('.os-button__icon')
+      expect(iconWrapper.classes()).toContain('[&>*]:invisible')
+    })
+
+    it('renders spinner as direct button child when no icon', () => {
+      const wrapper = mount(OsButton, {
+        props: { loading: true },
+        slots: { default: 'Save' },
+      })
+      // Spinner is a direct child of button, not inside content wrapper
+      const spinner = wrapper.find('button > .os-button__spinner')
+      expect(spinner.exists()).toBeTruthy()
+    })
+
+    it('does not render button-level spinner when icon is present', () => {
+      const wrapper = mount(OsButton, {
+        props: { loading: true },
+        slots: {
+          icon: '<svg></svg>',
+          default: 'Save',
+        },
+      })
+      // No spinner as direct child of button — it's inside the icon wrapper
+      const buttonSpinner = wrapper.find('button > .os-button__spinner')
+      expect(buttonSpinner.exists()).toBeFalsy()
+    })
+
+    it('works with circle prop', () => {
+      const wrapper = mount(OsButton, {
+        props: { loading: true, circle: true },
+        slots: { icon: '<svg></svg>' },
+        attrs: { 'aria-label': 'Add' },
+      })
+      expect(wrapper.classes()).toContain('rounded-full')
+      expect(wrapper.find('.os-button__spinner').exists()).toBeTruthy()
+      expect(wrapper.attributes('disabled')).toBeDefined()
+      expect(wrapper.attributes('aria-busy')).toBe('true')
+    })
   })
 
   describe('keyboard accessibility', () => {
