@@ -4,16 +4,18 @@
       <base-card>
         <hc-editor ref="editor" :users="users" :value="form.content" @input="updateEditorContent" />
         <div class="buttons">
-          <base-button
+          <os-button
+            variant="primary"
+            appearance="outline"
             :disabled="disabled && !update"
             @click="handleCancel"
             data-test="cancel-button"
           >
             {{ $t('actions.cancel') }}
-          </base-button>
-          <base-button type="submit" :loading="loading" :disabled="disabled || errors" filled>
+          </os-button>
+          <os-button variant="primary" appearance="filled" :loading="loading" :disabled="disabled || errors">
             {{ $t('post.comment.submit') }}
-          </base-button>
+          </os-button>
         </div>
       </base-card>
     </template>
@@ -21,6 +23,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import HcEditor from '~/components/Editor/Editor'
 import { COMMENT_MIN_LENGTH } from '~/constants/comment'
 import { minimisedUserQuery } from '~/graphql/User'
@@ -28,6 +31,7 @@ import CommentMutations from '~/graphql/CommentMutations'
 
 export default {
   components: {
+    OsButton,
     HcEditor,
   },
   props: {
@@ -152,7 +156,7 @@ export default {
     display: flex;
     justify-content: flex-end;
 
-    > .base-button {
+    > button {
       margin-left: $space-x-small;
     }
   }
