@@ -38,7 +38,7 @@ describe('OrderByFilter', () => {
       it('sets "newest-button" attribute `filled`', () => {
         expect(
           wrapper
-            .find('.order-by-filter .filter-list .base-button[data-test="newest-button"]')
+            .find('.order-by-filter .filter-list button[data-test="newest-button"]')
             .classes('--filled'),
         ).toBe(true)
       })
@@ -46,7 +46,7 @@ describe('OrderByFilter', () => {
       it('don\'t sets "oldest-button" attribute `filled`', () => {
         expect(
           wrapper
-            .find('.order-by-filter .filter-list .base-button[data-test="oldest-button"]')
+            .find('.order-by-filter .filter-list button[data-test="oldest-button"]')
             .classes('--filled'),
         ).toBe(false)
       })
@@ -61,7 +61,7 @@ describe('OrderByFilter', () => {
       it('don\'t sets "newest-button" attribute `filled`', () => {
         expect(
           wrapper
-            .find('.order-by-filter .filter-list .base-button[data-test="newest-button"]')
+            .find('.order-by-filter .filter-list button[data-test="newest-button"]')
             .classes('--filled'),
         ).toBe(false)
       })
@@ -69,7 +69,7 @@ describe('OrderByFilter', () => {
       it('sets "oldest-button" attribute `filled`', () => {
         expect(
           wrapper
-            .find('.order-by-filter .filter-list .base-button[data-test="oldest-button"]')
+            .find('.order-by-filter .filter-list button[data-test="oldest-button"]')
             .classes('--filled'),
         ).toBe(true)
       })
@@ -78,7 +78,7 @@ describe('OrderByFilter', () => {
     describe('click "newest-button"', () => {
       it('calls TOGGLE_ORDER with "sortDate_desc"', () => {
         wrapper
-          .find('.order-by-filter .filter-list .base-button[data-test="newest-button"]')
+          .find('.order-by-filter .filter-list button[data-test="newest-button"]')
           .trigger('click')
         expect(mutations['posts/TOGGLE_ORDER']).toHaveBeenCalledWith({}, 'sortDate_desc')
       })
@@ -87,7 +87,7 @@ describe('OrderByFilter', () => {
     describe('click "oldest-button"', () => {
       it('calls TOGGLE_ORDER with "sortDate_asc"', () => {
         wrapper
-          .find('.order-by-filter .filter-list .base-button[data-test="oldest-button"]')
+          .find('.order-by-filter .filter-list button[data-test="oldest-button"]')
           .trigger('click')
         expect(mutations['posts/TOGGLE_ORDER']).toHaveBeenCalledWith({}, 'sortDate_asc')
       })

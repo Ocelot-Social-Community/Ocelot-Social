@@ -95,7 +95,7 @@ describe('my-social-media.vue', () => {
 
         it('switches back to list', async () => {
           await flushPromises()
-          const submitButton = wrapper.find('.base-button[data-test="add-save-button"]')
+          const submitButton = wrapper.find('button[data-test="add-save-button"]')
           expect(submitButton.text()).not.toContain('settings.social-media.submit')
         })
       })
@@ -133,7 +133,7 @@ describe('my-social-media.vue', () => {
 
       describe('editing social media link', () => {
         beforeEach(async () => {
-          const editButton = wrapper.find('.base-button[data-test="edit-button"]')
+          const editButton = wrapper.find('button[data-test="edit-button"]')
           editButton.trigger('click')
           await Vue.nextTick()
           input = wrapper.find('input#editSocialMedia')
@@ -153,7 +153,7 @@ describe('my-social-media.vue', () => {
       // TODO: confirm deletion modal is not present
       describe.skip('deleting social media link', () => {
         beforeEach(async () => {
-          const deleteButton = wrapper.find('.base-button[data-test="delete-button"]')
+          const deleteButton = wrapper.find('button[data-test="delete-button"]')
           deleteButton.trigger('click')
           await Vue.nextTick()
           // wrapper.find('button.cancel').trigger('click')

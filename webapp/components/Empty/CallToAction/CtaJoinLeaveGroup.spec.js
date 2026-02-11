@@ -63,7 +63,7 @@ describe('CtaJoinLeaveGroup.vue', () => {
             },
           },
         })
-        wrapper.find('.base-button').trigger('click')
+        wrapper.find('button').trigger('click')
         await wrapper.vm.$nextTick()
       })
       it('emits update event', async () => {

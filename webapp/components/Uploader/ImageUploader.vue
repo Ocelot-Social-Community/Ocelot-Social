@@ -253,13 +253,6 @@ export default {
       opacity: $opacity-soft;
     }
 
-    > .base-button {
-      position: absolute;
-      top: $space-small;
-      right: $space-small;
-      z-index: $z-index-surface;
-    }
-
     > .supported-formats {
       margin-top: 150px;
       font-weight: bold;

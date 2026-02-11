@@ -49,7 +49,7 @@ describe('LocationSelect', () => {
     })
 
     it('renders the clearLocationName button by default', () => {
-      expect(wrapper.find('.base-button').exists()).toBe(true)
+      expect(wrapper.find('button').exists()).toBe(true)
     })
 
     it('calls apollo with given value', () => {
@@ -64,7 +64,7 @@ describe('LocationSelect', () => {
 
     describe('clearLocationName button click', () => {
       beforeEach(() => {
-        wrapper.find('.base-button').trigger('click')
+        wrapper.find('button').trigger('click')
       })
 
       it('emits an empty string', () => {
@@ -81,7 +81,7 @@ describe('LocationSelect', () => {
       })
 
       it('does not show clear location name button', () => {
-        expect(wrapper.find('.base-button').exists()).toBe(false)
+        expect(wrapper.find('button').exists()).toBe(false)
       })
     })
 

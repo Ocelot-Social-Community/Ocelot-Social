@@ -56,7 +56,7 @@ describe('muted-users.vue', () => {
 
       describe('click unmute', () => {
         beforeEach(() => {
-          wrapper.find('.base-button').trigger('click')
+          wrapper.find('button').trigger('click')
         })
 
         it('calls unmute mutation with given user', () => {

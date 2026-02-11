@@ -60,7 +60,7 @@ describe('CategoriesFilter.vue', () => {
 
   describe('mount', () => {
     it('starts with all categories button active', () => {
-      const allCategoriesButton = wrapper.find('.categories-filter .item-all-topics .base-button')
+      const allCategoriesButton = wrapper.find('.categories-filter .item-all-topics button')
       expect(allCategoriesButton.attributes().class).toContain('--filled')
     })
 
@@ -68,13 +68,13 @@ describe('CategoriesFilter.vue', () => {
     // it('sets category button attribute `filled` when corresponding category is filtered', async () => {
     //   getters['posts/filteredCategoryIds'] = jest.fn(() => ['cat9'])
     //   wrapper = await Wrapper()
-    //   democracyAndPoliticsButton = wrapper.find('.categories-filter .item-save-topics .base-button')
+    //   democracyAndPoliticsButton = wrapper.find('.categories-filter .item-save-topics button')
     //   expect(democracyAndPoliticsButton.attributes().class).toContain('--filled')
     // })
 
     describe('click on an "catetories-buttons" button', () => {
       it('calls TOGGLE_CATEGORY when clicked', () => {
-        environmentAndNatureButton = wrapper.findAll('.category-filter-list .base-button').at(0)
+        environmentAndNatureButton = wrapper.findAll('.category-filter-list button').at(0)
         environmentAndNatureButton.trigger('click')
         expect(mutations['posts/TOGGLE_CATEGORY']).toHaveBeenCalledWith({}, 'cat15')
       })
@@ -84,7 +84,7 @@ describe('CategoriesFilter.vue', () => {
       it('when all button is clicked', async () => {
         getters['posts/filteredCategoryIds'] = jest.fn(() => ['cat9'])
         wrapper = await Wrapper()
-        const allCategoriesButton = wrapper.find('.categories-filter .item-all-topics .base-button')
+        const allCategoriesButton = wrapper.find('.categories-filter .item-all-topics button')
         allCategoriesButton.trigger('click')
         expect(mutations['posts/RESET_CATEGORIES']).toHaveBeenCalledTimes(1)
       })
@@ -94,7 +94,7 @@ describe('CategoriesFilter.vue', () => {
     // describe('save categories', () => {
     //   it('calls the API', async () => {
     //     wrapper = await Wrapper()
-    //     const saveButton = wrapper.find('.categories-filter .item-save-topics .base-button')
+    //     const saveButton = wrapper.find('.categories-filter .item-save-topics button')
     //     saveButton.trigger('click')
     //     expect(apolloMutationMock).toBeCalled()
     //   })

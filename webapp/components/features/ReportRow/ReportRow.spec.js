@@ -39,7 +39,7 @@ describe('ReportRow', () => {
       beforeEach(() => {
         propsData = { ...propsData, report: reports[1] }
         wrapper = Wrapper()
-        confirmButton = wrapper.find('.base-button.--danger')
+        confirmButton = wrapper.find('button.--danger')
       })
 
       it('renders a confirm button', () => {
