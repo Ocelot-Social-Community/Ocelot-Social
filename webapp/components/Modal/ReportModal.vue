@@ -29,26 +29,32 @@
     </small>
     <ds-space />
     <template #footer>
-      <base-button class="cancel" icon="close" @click="cancel">
+      <os-button class="cancel" variant="primary" appearance="outline" @click="cancel">
+        <template #icon>
+          <base-icon name="close" />
+        </template>
         {{ $t('report.cancel') }}
-      </base-button>
+      </os-button>
 
-      <base-button
-        danger
-        filled
+      <os-button
         class="confirm"
-        icon="exclamation-circle"
+        variant="danger"
+        appearance="filled"
         :disabled="!form.reasonCategory"
         :loading="loading"
         @click="confirm"
       >
+        <template #icon>
+          <base-icon name="exclamation-circle" />
+        </template>
         {{ $t('report.submit') }}
-      </base-button>
+      </os-button>
     </template>
   </ds-modal>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import { reportMutation } from '~/graphql/Moderation.js'
 import { valuesReasonCategoryOptions } from '~/constants/modals.js'
@@ -57,6 +63,7 @@ import validReport from '~/components/utils/ReportModal'
 export default {
   name: 'ReportModal',
   components: {
+    OsButton,
     SweetalertIcon,
   },
   props: {
@@ -160,7 +167,8 @@ export default {
 
 <style lang="scss">
 .ds-modal {
-  max-width: 600px !important;
+  width: 700px !important;
+  max-width: 700px !important;
 }
 .ds-radio-option {
   width: 100% !important;
