@@ -43,12 +43,16 @@ describe('FollowingFilter', () => {
       getters['posts/filteredByPostsInMyGroups'] = jest.fn(() => true)
       const wrapper = Wrapper()
       expect(
-        wrapper.find('.following-filter .filter-list .follower-item button').classes('--filled'),
+        wrapper
+          .find('.following-filter .filter-list .follower-item button[data-appearance="filled"]')
+          .exists(),
       ).toBe(true)
       expect(
         wrapper
-          .find('.following-filter .filter-list .posts-in-my-groups-item button')
-          .classes('--filled'),
+          .find(
+            '.following-filter .filter-list .posts-in-my-groups-item button[data-appearance="filled"]',
+          )
+          .exists(),
       ).toBe(true)
     })
 
