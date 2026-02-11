@@ -47,13 +47,18 @@
         <span>{{ $t('editor.embed.always_allow') }}</span>
       </label>
     </aside>
-    <base-button
-      icon="close"
-      size="small"
+    <os-button
+      variant="primary"
+      appearance="outline"
       circle
+      size="sm"
       class="close-button"
       @click.prevent="removeEmbed()"
-    />
+    >
+      <template #icon>
+        <base-icon name="close" />
+      </template>
+    </os-button>
   </ds-container>
 </template>
 
@@ -252,9 +257,9 @@ export default {
   }
 
   > .close-button {
-    position: absolute;
-    top: $space-x-small;
-    right: $space-x-small;
+    position: absolute !important;
+    top: $space-x-small !important;
+    right: $space-x-small !important;
   }
 }
 
