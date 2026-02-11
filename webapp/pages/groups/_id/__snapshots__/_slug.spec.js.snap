@@ -84,18 +84,24 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               trigger="manual"
             >
               <button
-                class="base-button --icon-only --circle --small"
+                class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] text-[12px] leading-[normal] tracking-[0.6px] overflow-hidden whitespace-nowrap align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[26px]"
+                data-appearance="outline"
                 data-test="group-menu-button"
                 type="button"
               >
                 <span
-                  class="base-icon"
+                  class="inline-flex items-center "
                 >
-                  <!---->
+                  <span
+                    class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  >
+                    <span
+                      class="base-icon"
+                    >
+                      <!---->
+                    </span>
+                  </span>
                 </span>
-                 
-                <!---->
-                 
               </button>
                
               <div>
@@ -277,37 +283,51 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             class="action-buttons"
           >
             <button
-              class="base-button --danger"
+              class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-danger)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle border-[var(--color-danger)] text-[var(--color-danger)] hover:bg-[var(--color-danger)] hover:text-[var(--color-danger-contrast)] active:bg-[var(--color-danger-active)] active:border-[var(--color-danger-active)] active:text-[var(--color-danger-contrast)]"
+              data-appearance="outline"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center gap-2"
               >
-                <!---->
-              </span>
-               
-              <!---->
-               
+                <span
+                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
+                
             group.unmute
           
+              </span>
             </button>
              
             <button
-              class="join-leave-button base-button --filled has-tooltip"
+              class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle w-full bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] has-tooltip"
+              data-appearance="filled"
               data-original-title="null"
               disabled="disabled"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center gap-2"
               >
-                <!---->
-              </span>
-               
-              <!---->
-               
+                <span
+                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
+                
   group.joinLeaveButton.iAmMember
 
+              </span>
             </button>
           </div>
            
@@ -886,15 +906,17 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             </div>
              
             <button
-              class="collaps-button base-button --small --ghost"
+              class="collaps-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
+              data-appearance="ghost"
               type="button"
             >
-              <!---->
-               
-              <!---->
-               
+              <span
+                class="inline-flex items-center "
+              >
+                
             comment.show.more
           
+              </span>
             </button>
              
             <!---->
@@ -909,18 +931,24 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             to="[object Object]"
           >
             <button
-              class="profile-post-add-button base-button --icon-only --circle --filled has-tooltip"
+              class="profile-post-add-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
+              data-appearance="filled"
               data-original-title="null"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center "
               >
-                <!---->
+                <span
+                  class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
               </span>
-               
-              <!---->
-               
             </button>
           </nuxt-link-stub>
         </div>
@@ -1127,36 +1155,50 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             class="action-buttons"
           >
             <button
-              class="base-button --danger"
+              class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-danger)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle border-[var(--color-danger)] text-[var(--color-danger)] hover:bg-[var(--color-danger)] hover:text-[var(--color-danger-contrast)] active:bg-[var(--color-danger-active)] active:border-[var(--color-danger-active)] active:text-[var(--color-danger-contrast)]"
+              data-appearance="outline"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center gap-2"
               >
-                <!---->
-              </span>
-               
-              <!---->
-               
+                <span
+                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
+                
             group.unmute
           
+              </span>
             </button>
              
             <button
-              class="join-leave-button base-button has-tooltip"
+              class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle w-full border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] has-tooltip"
+              data-appearance="outline"
               data-original-title="null"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center gap-2"
               >
-                <!---->
-              </span>
-               
-              <!---->
-               
+                <span
+                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
+                
   group.joinLeaveButton.join
 
+              </span>
             </button>
           </div>
            
@@ -1380,15 +1422,17 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             </div>
              
             <button
-              class="collaps-button base-button --small --ghost"
+              class="collaps-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
+              data-appearance="ghost"
               type="button"
             >
-              <!---->
-               
-              <!---->
-               
+              <span
+                class="inline-flex items-center "
+              >
+                
             comment.show.more
           
+              </span>
             </button>
              
             <!---->
@@ -1599,36 +1643,50 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             class="action-buttons"
           >
             <button
-              class="base-button --danger"
+              class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-danger)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle border-[var(--color-danger)] text-[var(--color-danger)] hover:bg-[var(--color-danger)] hover:text-[var(--color-danger-contrast)] active:bg-[var(--color-danger-active)] active:border-[var(--color-danger-active)] active:text-[var(--color-danger-contrast)]"
+              data-appearance="outline"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center gap-2"
               >
-                <!---->
-              </span>
-               
-              <!---->
-               
+                <span
+                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
+                
             group.unmute
           
+              </span>
             </button>
              
             <button
-              class="join-leave-button base-button --filled has-tooltip"
+              class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle w-full bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] has-tooltip"
+              data-appearance="filled"
               data-original-title="null"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center gap-2"
               >
-                <!---->
-              </span>
-               
-              <!---->
-               
+                <span
+                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
+                
   group.joinLeaveButton.pendingMember
 
+              </span>
             </button>
           </div>
            
@@ -1872,15 +1930,17 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             </div>
              
             <button
-              class="collaps-button base-button --small --ghost"
+              class="collaps-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
+              data-appearance="ghost"
               type="button"
             >
-              <!---->
-               
-              <!---->
-               
+              <span
+                class="inline-flex items-center "
+              >
+                
             comment.show.more
           
+              </span>
             </button>
              
             <!---->
@@ -2047,18 +2107,24 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               trigger="manual"
             >
               <button
-                class="base-button --icon-only --circle --small"
+                class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] text-[12px] leading-[normal] tracking-[0.6px] overflow-hidden whitespace-nowrap align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[26px]"
+                data-appearance="outline"
                 data-test="group-menu-button"
                 type="button"
               >
                 <span
-                  class="base-icon"
+                  class="inline-flex items-center "
                 >
-                  <!---->
+                  <span
+                    class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  >
+                    <span
+                      class="base-icon"
+                    >
+                      <!---->
+                    </span>
+                  </span>
                 </span>
-                 
-                <!---->
-                 
               </button>
                
               <div>
@@ -2198,36 +2264,50 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             class="action-buttons"
           >
             <button
-              class="base-button --danger"
+              class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-danger)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle border-[var(--color-danger)] text-[var(--color-danger)] hover:bg-[var(--color-danger)] hover:text-[var(--color-danger-contrast)] active:bg-[var(--color-danger-active)] active:border-[var(--color-danger-active)] active:text-[var(--color-danger-contrast)]"
+              data-appearance="outline"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center gap-2"
               >
-                <!---->
-              </span>
-               
-              <!---->
-               
+                <span
+                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
+                
             group.unmute
           
+              </span>
             </button>
              
             <button
-              class="join-leave-button base-button --filled has-tooltip"
+              class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle w-full bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] has-tooltip"
+              data-appearance="filled"
               data-original-title="null"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center gap-2"
               >
-                <!---->
-              </span>
-               
-              <!---->
-               
+                <span
+                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
+                
   group.joinLeaveButton.iAmMember
 
+              </span>
             </button>
           </div>
            
@@ -2806,15 +2886,17 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             </div>
              
             <button
-              class="collaps-button base-button --small --ghost"
+              class="collaps-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
+              data-appearance="ghost"
               type="button"
             >
-              <!---->
-               
-              <!---->
-               
+              <span
+                class="inline-flex items-center "
+              >
+                
             comment.show.more
           
+              </span>
             </button>
              
             <!---->
@@ -2829,18 +2911,24 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             to="[object Object]"
           >
             <button
-              class="profile-post-add-button base-button --icon-only --circle --filled has-tooltip"
+              class="profile-post-add-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
+              data-appearance="filled"
               data-original-title="null"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center "
               >
-                <!---->
+                <span
+                  class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
               </span>
-               
-              <!---->
-               
             </button>
           </nuxt-link-stub>
         </div>
@@ -3031,18 +3119,24 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               trigger="manual"
             >
               <button
-                class="base-button --icon-only --circle --small"
+                class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] text-[12px] leading-[normal] tracking-[0.6px] overflow-hidden whitespace-nowrap align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[26px]"
+                data-appearance="outline"
                 data-test="group-menu-button"
                 type="button"
               >
                 <span
-                  class="base-icon"
+                  class="inline-flex items-center "
                 >
-                  <!---->
+                  <span
+                    class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  >
+                    <span
+                      class="base-icon"
+                    >
+                      <!---->
+                    </span>
+                  </span>
                 </span>
-                 
-                <!---->
-                 
               </button>
                
               <div>
@@ -3203,21 +3297,28 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             <!---->
              
             <button
-              class="join-leave-button base-button --filled has-tooltip"
+              class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle w-full bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] has-tooltip"
+              data-appearance="filled"
               data-original-title="null"
               disabled="disabled"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center gap-2"
               >
-                <!---->
-              </span>
-               
-              <!---->
-               
+                <span
+                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
+                
   group.joinLeaveButton.iAmMember
 
+              </span>
             </button>
           </div>
            
@@ -3793,15 +3894,17 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             </div>
              
             <button
-              class="collaps-button base-button --small --ghost"
+              class="collaps-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
+              data-appearance="ghost"
               type="button"
             >
-              <!---->
-               
-              <!---->
-               
+              <span
+                class="inline-flex items-center "
+              >
+                
             comment.show.more
           
+              </span>
             </button>
              
             <!---->
@@ -3816,18 +3919,24 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             to="[object Object]"
           >
             <button
-              class="profile-post-add-button base-button --icon-only --circle --filled has-tooltip"
+              class="profile-post-add-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
+              data-appearance="filled"
               data-original-title="null"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center "
               >
-                <!---->
+                <span
+                  class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
               </span>
-               
-              <!---->
-               
             </button>
           </nuxt-link-stub>
         </div>
@@ -4051,20 +4160,27 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             <!---->
              
             <button
-              class="join-leave-button base-button has-tooltip"
+              class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle w-full border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] has-tooltip"
+              data-appearance="outline"
               data-original-title="null"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center gap-2"
               >
-                <!---->
-              </span>
-               
-              <!---->
-               
+                <span
+                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
+                
   group.joinLeaveButton.join
 
+              </span>
             </button>
           </div>
            
@@ -4620,15 +4736,17 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             </div>
              
             <button
-              class="collaps-button base-button --small --ghost"
+              class="collaps-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
+              data-appearance="ghost"
               type="button"
             >
-              <!---->
-               
-              <!---->
-               
+              <span
+                class="inline-flex items-center "
+              >
+                
             comment.show.more
           
+              </span>
             </button>
              
             <!---->
@@ -4856,20 +4974,27 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             <!---->
              
             <button
-              class="join-leave-button base-button --filled has-tooltip"
+              class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle w-full bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] has-tooltip"
+              data-appearance="filled"
               data-original-title="null"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center gap-2"
               >
-                <!---->
-              </span>
-               
-              <!---->
-               
+                <span
+                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
+                
   group.joinLeaveButton.pendingMember
 
+              </span>
             </button>
           </div>
            
@@ -5445,15 +5570,17 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             </div>
              
             <button
-              class="collaps-button base-button --small --ghost"
+              class="collaps-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
+              data-appearance="ghost"
               type="button"
             >
-              <!---->
-               
-              <!---->
-               
+              <span
+                class="inline-flex items-center "
+              >
+                
             comment.show.more
           
+              </span>
             </button>
              
             <!---->
@@ -5620,18 +5747,24 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               trigger="manual"
             >
               <button
-                class="base-button --icon-only --circle --small"
+                class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] text-[12px] leading-[normal] tracking-[0.6px] overflow-hidden whitespace-nowrap align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[26px]"
+                data-appearance="outline"
                 data-test="group-menu-button"
                 type="button"
               >
                 <span
-                  class="base-icon"
+                  class="inline-flex items-center "
                 >
-                  <!---->
+                  <span
+                    class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  >
+                    <span
+                      class="base-icon"
+                    >
+                      <!---->
+                    </span>
+                  </span>
                 </span>
-                 
-                <!---->
-                 
               </button>
                
               <div>
@@ -5750,20 +5883,27 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             <!---->
              
             <button
-              class="join-leave-button base-button --filled has-tooltip"
+              class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle w-full bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] has-tooltip"
+              data-appearance="filled"
               data-original-title="null"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center gap-2"
               >
-                <!---->
-              </span>
-               
-              <!---->
-               
+                <span
+                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
+                
   group.joinLeaveButton.iAmMember
 
+              </span>
             </button>
           </div>
            
@@ -6339,15 +6479,17 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             </div>
              
             <button
-              class="collaps-button base-button --small --ghost"
+              class="collaps-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
+              data-appearance="ghost"
               type="button"
             >
-              <!---->
-               
-              <!---->
-               
+              <span
+                class="inline-flex items-center "
+              >
+                
             comment.show.more
           
+              </span>
             </button>
              
             <!---->
@@ -6362,18 +6504,24 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             to="[object Object]"
           >
             <button
-              class="profile-post-add-button base-button --icon-only --circle --filled has-tooltip"
+              class="profile-post-add-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
+              data-appearance="filled"
               data-original-title="null"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center "
               >
-                <!---->
+                <span
+                  class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
               </span>
-               
-              <!---->
-               
             </button>
           </nuxt-link-stub>
         </div>
@@ -6564,18 +6712,24 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               trigger="manual"
             >
               <button
-                class="base-button --icon-only --circle --small"
+                class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] text-[12px] leading-[normal] tracking-[0.6px] overflow-hidden whitespace-nowrap align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[26px]"
+                data-appearance="outline"
                 data-test="group-menu-button"
                 type="button"
               >
                 <span
-                  class="base-icon"
+                  class="inline-flex items-center "
                 >
-                  <!---->
+                  <span
+                    class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  >
+                    <span
+                      class="base-icon"
+                    >
+                      <!---->
+                    </span>
+                  </span>
                 </span>
-                 
-                <!---->
-                 
               </button>
                
               <div>
@@ -6759,21 +6913,28 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             <!---->
              
             <button
-              class="join-leave-button base-button --filled has-tooltip"
+              class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle w-full bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] has-tooltip"
+              data-appearance="filled"
               data-original-title="null"
               disabled="disabled"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center gap-2"
               >
-                <!---->
-              </span>
-               
-              <!---->
-               
+                <span
+                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
+                
   group.joinLeaveButton.iAmMember
 
+              </span>
             </button>
           </div>
            
@@ -7391,15 +7552,17 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             </div>
              
             <button
-              class="collaps-button base-button --small --ghost"
+              class="collaps-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
+              data-appearance="ghost"
               type="button"
             >
-              <!---->
-               
-              <!---->
-               
+              <span
+                class="inline-flex items-center "
+              >
+                
             comment.show.more
           
+              </span>
             </button>
              
             <!---->
@@ -7414,18 +7577,24 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             to="[object Object]"
           >
             <button
-              class="profile-post-add-button base-button --icon-only --circle --filled has-tooltip"
+              class="profile-post-add-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
+              data-appearance="filled"
               data-original-title="null"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center "
               >
-                <!---->
+                <span
+                  class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
               </span>
-               
-              <!---->
-               
             </button>
           </nuxt-link-stub>
         </div>
@@ -7600,18 +7769,24 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               trigger="manual"
             >
               <button
-                class="base-button --icon-only --circle --small"
+                class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] text-[12px] leading-[normal] tracking-[0.6px] overflow-hidden whitespace-nowrap align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[26px]"
+                data-appearance="outline"
                 data-test="group-menu-button"
                 type="button"
               >
                 <span
-                  class="base-icon"
+                  class="inline-flex items-center "
                 >
-                  <!---->
+                  <span
+                    class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  >
+                    <span
+                      class="base-icon"
+                    >
+                      <!---->
+                    </span>
+                  </span>
                 </span>
-                 
-                <!---->
-                 
               </button>
                
               <div>
@@ -7753,20 +7928,27 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             <!---->
              
             <button
-              class="join-leave-button base-button --filled has-tooltip"
+              class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle w-full bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] has-tooltip"
+              data-appearance="filled"
               data-original-title="null"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center gap-2"
               >
-                <!---->
-              </span>
-               
-              <!---->
-               
+                <span
+                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
+                
   group.joinLeaveButton.iAmMember
 
+              </span>
             </button>
           </div>
            
@@ -8384,15 +8566,17 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             </div>
              
             <button
-              class="collaps-button base-button --small --ghost"
+              class="collaps-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid border-transparent focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] collaps-button"
+              data-appearance="ghost"
               type="button"
             >
-              <!---->
-               
-              <!---->
-               
+              <span
+                class="inline-flex items-center "
+              >
+                
             comment.show.more
           
+              </span>
             </button>
              
             <!---->
@@ -8407,18 +8591,24 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             to="[object Object]"
           >
             <button
-              class="profile-post-add-button base-button --icon-only --circle --filled has-tooltip"
+              class="profile-post-add-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
+              data-appearance="filled"
               data-original-title="null"
               type="button"
             >
               <span
-                class="base-icon"
+                class="inline-flex items-center "
               >
-                <!---->
+                <span
+                  class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                >
+                  <span
+                    class="base-icon"
+                  >
+                    <!---->
+                  </span>
+                </span>
               </span>
-               
-              <!---->
-               
             </button>
           </nuxt-link-stub>
         </div>
