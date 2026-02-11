@@ -38,16 +38,20 @@ describe('OrderByFilter', () => {
       it('sets "newest-button" attribute `filled`', () => {
         expect(
           wrapper
-            .find('.order-by-filter .filter-list button[data-test="newest-button"]')
-            .classes('--filled'),
+            .find(
+              '.order-by-filter .filter-list button[data-test="newest-button"][data-appearance="filled"]',
+            )
+            .exists(),
         ).toBe(true)
       })
 
       it('don\'t sets "oldest-button" attribute `filled`', () => {
         expect(
           wrapper
-            .find('.order-by-filter .filter-list button[data-test="oldest-button"]')
-            .classes('--filled'),
+            .find(
+              '.order-by-filter .filter-list button[data-test="oldest-button"][data-appearance="filled"]',
+            )
+            .exists(),
         ).toBe(false)
       })
     })
@@ -61,16 +65,20 @@ describe('OrderByFilter', () => {
       it('don\'t sets "newest-button" attribute `filled`', () => {
         expect(
           wrapper
-            .find('.order-by-filter .filter-list button[data-test="newest-button"]')
-            .classes('--filled'),
+            .find(
+              '.order-by-filter .filter-list button[data-test="newest-button"][data-appearance="filled"]',
+            )
+            .exists(),
         ).toBe(false)
       })
 
       it('sets "oldest-button" attribute `filled`', () => {
         expect(
           wrapper
-            .find('.order-by-filter .filter-list button[data-test="oldest-button"]')
-            .classes('--filled'),
+            .find(
+              '.order-by-filter .filter-list button[data-test="oldest-button"][data-appearance="filled"]',
+            )
+            .exists(),
         ).toBe(true)
       })
     })
