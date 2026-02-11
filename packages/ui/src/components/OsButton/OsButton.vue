@@ -104,8 +104,9 @@
         }),
       )
 
-      /* v8 ignore next -- Vue 2 only */
+      /* v8 ignore start -- Vue 2 only */
       const instance = isVue2 ? getCurrentInstance() : null
+      /* v8 ignore stop */
 
       return () => {
         const iconContent = slots.icon?.()
@@ -136,6 +137,7 @@
           const loadingClass = isLoading ? 'relative overflow-visible' : ''
           const iconChildren = isLoading
             ? [
+                /* v8 ignore next -- iconContent guaranteed truthy by hasIcon check */
                 ...(iconContent || []),
                 createSpinner(spinnerPx, 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'),
               ]
