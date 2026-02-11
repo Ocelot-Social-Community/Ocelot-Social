@@ -42,11 +42,13 @@
         @input.native="setFilter"
       />
 
-      <base-button
+      <os-button
         v-if="hasMore"
+        variant="primary"
+        appearance="outline"
         :loading="loading"
         class="spacer-x-small"
-        size="small"
+        size="sm"
         @click="$emit('fetchAllProfiles')"
       >
         {{
@@ -54,13 +56,14 @@
             number: allProfilesCount - profiles.length,
           })
         }}
-      </base-button>
+      </os-button>
     </template>
     <p v-else-if="titleNobody" class="nobody-message">{{ titleNobody }}</p>
   </base-card>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { escape } from 'xregexp/xregexp-all.js'
 // @ts-ignore
 import { RecycleScroller } from 'vue-virtual-scroller'
@@ -73,6 +76,7 @@ const VIRTUAL_SCROLL_THRESHOLD = 50
 export default {
   name: 'ProfileList',
   components: {
+    OsButton,
     UserTeaser,
     RecycleScroller,
   },
