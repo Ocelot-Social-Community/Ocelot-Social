@@ -33,12 +33,16 @@
               />
               <aside v-show="post.image && post.image.sensitive" class="blur-toggle">
                 <img v-show="blurred" :src="post.image.url.w320" class="preview" />
-                <base-button
-                  :icon="blurred ? 'eye' : 'eye-slash'"
-                  filled
+                <os-button
+                  variant="primary"
+                  appearance="filled"
                   circle
                   @click="blurred = !blurred"
-                />
+                >
+                  <template #icon>
+                    <base-icon :name="blurred ? 'eye' : 'eye-slash'" />
+                  </template>
+                </os-button>
               </aside>
             </template>
             <section class="menu">
@@ -174,6 +178,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
 import CommentList from '~/components/CommentList/CommentList'
@@ -209,6 +214,7 @@ export default {
     mode: 'out-in',
   },
   components: {
+    OsButton,
     CommentForm,
     CommentList,
     ContentMenu,
