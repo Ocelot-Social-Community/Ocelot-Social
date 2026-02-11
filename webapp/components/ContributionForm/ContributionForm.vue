@@ -182,9 +182,12 @@
               >
                 {{ $t('actions.cancel') }}
               </os-button>
-              <base-button type="submit" icon="check" :loading="loading" :disabled="errors" filled>
+              <os-button variant="primary" appearance="filled" :loading="loading" :disabled="errors">
+                <template #icon>
+                  <base-icon name="check" />
+                </template>
                 {{ $t('actions.save') }}
-              </base-button>
+              </os-button>
             </ds-flex-item>
           </ds-flex>
         </base-card>
