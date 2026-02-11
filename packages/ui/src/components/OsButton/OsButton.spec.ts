@@ -216,6 +216,94 @@ describe('osButton', () => {
     })
   })
 
+  describe('circle prop', () => {
+    it('renders as round button with rounded-full and p-0', () => {
+      const wrapper = mount(OsButton, {
+        props: { circle: true },
+        slots: { icon: '<svg></svg>' },
+        attrs: { 'aria-label': 'Add' },
+      })
+      expect(wrapper.classes()).toContain('rounded-full')
+      expect(wrapper.classes()).toContain('p-0')
+    })
+
+    it('applies w-[36px] width for md size (default)', () => {
+      const wrapper = mount(OsButton, {
+        props: { circle: true },
+        slots: { icon: '<svg></svg>' },
+        attrs: { 'aria-label': 'Add' },
+      })
+      expect(wrapper.classes()).toContain('w-[36px]')
+    })
+
+    it('applies w-[26px] width for sm size', () => {
+      const wrapper = mount(OsButton, {
+        props: { circle: true, size: 'sm' },
+        slots: { icon: '<svg></svg>' },
+        attrs: { 'aria-label': 'Add' },
+      })
+      expect(wrapper.classes()).toContain('w-[26px]')
+    })
+
+    it('applies w-12 width for lg size', () => {
+      const wrapper = mount(OsButton, {
+        props: { circle: true, size: 'lg' },
+        slots: { icon: '<svg></svg>' },
+        attrs: { 'aria-label': 'Add' },
+      })
+      expect(wrapper.classes()).toContain('w-12')
+    })
+
+    it('applies w-14 width for xl size', () => {
+      const wrapper = mount(OsButton, {
+        props: { circle: true, size: 'xl' },
+        slots: { icon: '<svg></svg>' },
+        attrs: { 'aria-label': 'Add' },
+      })
+      expect(wrapper.classes()).toContain('w-14')
+    })
+
+    it('is combinable with primary variant', () => {
+      const wrapper = mount(OsButton, {
+        props: { circle: true, variant: 'primary' },
+        slots: { icon: '<svg></svg>' },
+        attrs: { 'aria-label': 'Add' },
+      })
+      expect(wrapper.classes()).toContain('rounded-full')
+      expect(wrapper.classes()).toContain('bg-[var(--color-primary)]')
+    })
+
+    it('is combinable with ghost appearance', () => {
+      const wrapper = mount(OsButton, {
+        props: { circle: true, appearance: 'ghost', variant: 'primary' },
+        slots: { icon: '<svg></svg>' },
+        attrs: { 'aria-label': 'Add' },
+      })
+      expect(wrapper.classes()).toContain('rounded-full')
+      expect(wrapper.classes()).toContain('bg-transparent')
+    })
+
+    it('icon has no negative margin in circle mode', () => {
+      const wrapper = mount(OsButton, {
+        props: { circle: true },
+        slots: { icon: '<svg></svg>' },
+        attrs: { 'aria-label': 'Add' },
+      })
+      const iconWrapper = wrapper.find('.os-button__icon')
+      expect(iconWrapper.classes()).not.toContain('-ml-1')
+      expect(iconWrapper.classes()).not.toContain('-mr-1')
+    })
+
+    it('does not apply circle classes when circle is false', () => {
+      const wrapper = mount(OsButton, {
+        props: { circle: false },
+        slots: { default: 'Click me' },
+      })
+      expect(wrapper.classes()).not.toContain('rounded-full')
+      expect(wrapper.classes()).not.toContain('p-0')
+    })
+  })
+
   describe('keyboard accessibility', () => {
     it('renders as native button element for keyboard support', () => {
       const wrapper = mount(OsButton)

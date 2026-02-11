@@ -40,6 +40,18 @@ const meta: Meta<typeof OsButton> = {
 export default meta
 type Story = StoryObj<typeof OsButton>
 
+/** Custom args for Playground (icon selector + label are not real component props) */
+interface PlaygroundArgs {
+  variant: string
+  appearance: string
+  size: string
+  fullWidth: boolean
+  circle: boolean
+  disabled: boolean
+  icon: string
+  label: string
+}
+
 const iconMap: Record<string, (() => ReturnType<typeof h>) | null> = {
   none: null,
   check: CheckIcon,
@@ -47,7 +59,7 @@ const iconMap: Record<string, (() => ReturnType<typeof h>) | null> = {
   plus: PlusIcon,
 }
 
-export const Playground: Story = {
+export const Playground: StoryObj<PlaygroundArgs> = {
   argTypes: {
     variant: {
       control: 'select',
@@ -62,6 +74,9 @@ export const Playground: Story = {
       options: ['sm', 'md', 'lg', 'xl'],
     },
     fullWidth: {
+      control: 'boolean',
+    },
+    circle: {
       control: 'boolean',
     },
     disabled: {
@@ -80,6 +95,7 @@ export const Playground: Story = {
     appearance: 'filled',
     size: 'md',
     fullWidth: false,
+    circle: false,
     disabled: false,
     icon: 'none',
     label: 'Button',
@@ -91,8 +107,8 @@ export const Playground: Story = {
         const { icon: _icon, label: _label, ...rest } = args
         return rest
       })
-      const IconComponent = computed(() => iconMap[args.icon as string] ?? null)
-      const label = computed(() => args.label as string)
+      const IconComponent = computed(() => iconMap[args.icon] ?? null)
+      const label = computed(() => args.label)
       return { buttonProps, IconComponent, label }
     },
     template: `
@@ -476,6 +492,164 @@ export const IconAppearances: Story = {
             <OsButton appearance="ghost" variant="success">
               <template #icon><CheckIcon /></template>
               Success
+            </OsButton>
+          </div>
+        </div>
+      </div>
+    `,
+  }),
+}
+
+export const Circle: Story = {
+  render: () => ({
+    components: { OsButton, PlusIcon, CloseIcon, CheckIcon },
+    template: `
+      <div class="flex flex-wrap gap-2 items-center">
+        <OsButton circle variant="default" aria-label="Add">
+          <template #icon><PlusIcon /></template>
+        </OsButton>
+        <OsButton circle variant="primary" aria-label="Add">
+          <template #icon><PlusIcon /></template>
+        </OsButton>
+        <OsButton circle variant="secondary" aria-label="Confirm">
+          <template #icon><CheckIcon /></template>
+        </OsButton>
+        <OsButton circle variant="danger" aria-label="Close">
+          <template #icon><CloseIcon /></template>
+        </OsButton>
+        <OsButton circle variant="warning" aria-label="Close">
+          <template #icon><CloseIcon /></template>
+        </OsButton>
+        <OsButton circle variant="success" aria-label="Confirm">
+          <template #icon><CheckIcon /></template>
+        </OsButton>
+        <OsButton circle variant="info" aria-label="Add">
+          <template #icon><PlusIcon /></template>
+        </OsButton>
+      </div>
+    `,
+  }),
+}
+
+export const CircleSizes: Story = {
+  render: () => ({
+    components: { OsButton, PlusIcon },
+    template: `
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-sm font-bold mb-2">Small (26px)</h3>
+          <div class="flex flex-wrap gap-2 items-center">
+            <OsButton circle size="sm" variant="primary" aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+            <OsButton circle size="sm" variant="danger" aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+            <OsButton circle size="sm" variant="default" aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Medium (36px)</h3>
+          <div class="flex flex-wrap gap-2 items-center">
+            <OsButton circle size="md" variant="primary" aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+            <OsButton circle size="md" variant="danger" aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+            <OsButton circle size="md" variant="default" aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Large (48px)</h3>
+          <div class="flex flex-wrap gap-2 items-center">
+            <OsButton circle size="lg" variant="primary" aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+            <OsButton circle size="lg" variant="danger" aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+            <OsButton circle size="lg" variant="default" aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Extra Large (56px)</h3>
+          <div class="flex flex-wrap gap-2 items-center">
+            <OsButton circle size="xl" variant="primary" aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+            <OsButton circle size="xl" variant="danger" aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+            <OsButton circle size="xl" variant="default" aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+          </div>
+        </div>
+      </div>
+    `,
+  }),
+}
+
+export const CircleAppearances: Story = {
+  render: () => ({
+    components: { OsButton, PlusIcon, CloseIcon, CheckIcon },
+    template: `
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-sm font-bold mb-2">Filled</h3>
+          <div class="flex flex-wrap gap-2 items-center">
+            <OsButton circle appearance="filled" variant="primary" aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+            <OsButton circle appearance="filled" variant="danger" aria-label="Close">
+              <template #icon><CloseIcon /></template>
+            </OsButton>
+            <OsButton circle appearance="filled" variant="success" aria-label="Confirm">
+              <template #icon><CheckIcon /></template>
+            </OsButton>
+            <OsButton circle appearance="filled" variant="default" aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Outline</h3>
+          <div class="flex flex-wrap gap-2 items-center">
+            <OsButton circle appearance="outline" variant="primary" aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+            <OsButton circle appearance="outline" variant="danger" aria-label="Close">
+              <template #icon><CloseIcon /></template>
+            </OsButton>
+            <OsButton circle appearance="outline" variant="success" aria-label="Confirm">
+              <template #icon><CheckIcon /></template>
+            </OsButton>
+            <OsButton circle appearance="outline" variant="default" aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Ghost</h3>
+          <div class="flex flex-wrap gap-2 items-center">
+            <OsButton circle appearance="ghost" variant="primary" aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+            <OsButton circle appearance="ghost" variant="danger" aria-label="Close">
+              <template #icon><CloseIcon /></template>
+            </OsButton>
+            <OsButton circle appearance="ghost" variant="success" aria-label="Confirm">
+              <template #icon><CheckIcon /></template>
+            </OsButton>
+            <OsButton circle appearance="ghost" variant="default" aria-label="Add">
+              <template #icon><PlusIcon /></template>
             </OsButton>
           </div>
         </div>

@@ -158,4 +158,31 @@ test.describe('OsButton visual regression', () => {
     await expect(root.locator('.flex-col').first()).toHaveScreenshot('icon-appearances.png')
     await checkA11y(page)
   })
+
+  test('circle', async ({ page }) => {
+    await page.goto(`${STORY_URL}--circle&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+    await expect(root.locator('.flex')).toHaveScreenshot('circle.png')
+    await checkA11y(page)
+  })
+
+  test('circle sizes', async ({ page }) => {
+    await page.goto(`${STORY_URL}--circle-sizes&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+    await expect(root.locator('.flex-col').first()).toHaveScreenshot('circle-sizes.png')
+    await checkA11y(page)
+  })
+
+  test('circle appearances', async ({ page }) => {
+    await page.goto(`${STORY_URL}--circle-appearances&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+    await expect(root.locator('.flex-col').first()).toHaveScreenshot('circle-appearances.png')
+    await checkA11y(page)
+  })
 })
