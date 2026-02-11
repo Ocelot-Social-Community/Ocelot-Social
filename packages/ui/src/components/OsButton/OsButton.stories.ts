@@ -315,7 +315,7 @@ export const FullWidth: Story = {
   }),
 }
 
-export const WithIcon: Story = {
+export const Icon: Story = {
   render: () => ({
     components: { OsButton, CheckIcon, PlusIcon, CloseIcon },
     template: `
