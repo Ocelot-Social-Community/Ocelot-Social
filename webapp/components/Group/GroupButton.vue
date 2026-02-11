@@ -1,19 +1,27 @@
 <template>
   <div>
     <nuxt-link to="/groups">
-      <base-button
-        icon="users"
+      <os-button
+        variant="primary"
+        appearance="ghost"
         circle
-        ghost
         v-tooltip="{
           content: $t('header.groups.tooltip'),
           placement: 'bottom-start',
         }"
-      />
+      >
+        <template #icon>
+          <base-icon name="users" />
+        </template>
+      </os-button>
     </nuxt-link>
   </div>
 </template>
 
 <script>
-export default {}
+import { OsButton } from '@ocelot-social/ui'
+
+export default {
+  components: { OsButton },
+}
 </script>
