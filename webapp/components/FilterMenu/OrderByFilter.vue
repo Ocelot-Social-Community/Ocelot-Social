@@ -2,36 +2,41 @@
   <filter-menu-section class="order-by-filter" :title="sectionTitle" :divider="false">
     <template #filter-list>
       <li class="item">
-        <base-button
-          icon="sort-amount-asc"
-          :label="buttonLabel('desc')"
-          :filled="orderBy === orderedDesc"
+        <os-button
+          variant="primary"
+          :appearance="orderBy === orderedDesc ? 'filled' : 'outline'"
+          size="sm"
           :title="buttonTitle('desc')"
           @click="toggleOrder(orderedDesc)"
           data-test="newest-button"
-          size="small"
         >
+          <template #icon>
+            <base-icon name="sort-amount-asc" />
+          </template>
           {{ buttonLabel('desc') }}
-        </base-button>
+        </os-button>
       </li>
       <li class="item">
-        <base-button
-          icon="sort-amount-desc"
-          :label="buttonLabel('asc')"
-          :filled="orderBy === orderedAsc"
+        <os-button
+          variant="primary"
+          :appearance="orderBy === orderedAsc ? 'filled' : 'outline'"
+          size="sm"
           :title="buttonTitle('asc')"
           @click="toggleOrder(orderedAsc)"
           data-test="oldest-button"
-          size="small"
         >
+          <template #icon>
+            <base-icon name="sort-amount-desc" />
+          </template>
           {{ buttonLabel('asc') }}
-        </base-button>
+        </os-button>
       </li>
     </template>
   </filter-menu-section>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 
@@ -39,6 +44,7 @@ export default {
   name: 'OrderByFilter',
   components: {
     FilterMenuSection,
+    OsButton,
   },
   computed: {
     ...mapGetters({
