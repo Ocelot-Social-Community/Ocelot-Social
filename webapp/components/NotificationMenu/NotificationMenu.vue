@@ -4,19 +4,24 @@
     class="notifications-menu"
     :to="{ name: 'notifications' }"
   >
-    <base-button
-      icon="bell"
-      ghost
+    <os-button
+      variant="primary"
+      appearance="ghost"
       circle
       v-tooltip="{
         content: $t('header.notifications.tooltip'),
         placement: 'bottom-start',
       }"
-    />
+    >
+      <template #icon>
+        <base-icon name="bell" />
+      </template>
+    </os-button>
   </nuxt-link>
   <nuxt-link v-else-if="noMenu" class="notifications-menu" :to="{ name: 'notifications' }">
-    <base-button
-      ghost
+    <os-button
+      variant="primary"
+      appearance="ghost"
       circle
       v-tooltip="{
         content: $t('header.notifications.tooltip'),
@@ -24,7 +29,7 @@
       }"
     >
       <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
-    </base-button>
+    </os-button>
   </nuxt-link>
   <dropdown
     v-else
@@ -35,8 +40,9 @@
     ref="dropdown"
   >
     <template #default="{ toggleMenu }">
-      <base-button
-        ghost
+      <os-button
+        variant="primary"
+        appearance="ghost"
         circle
         v-tooltip="{
           content: $t('header.notifications.tooltip'),
@@ -45,7 +51,7 @@
         @click="toggleMenu"
       >
         <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
-      </base-button>
+      </os-button>
     </template>
     <template #popover="{ closeMenu }">
       <ds-flex class="notifications-link-container">
