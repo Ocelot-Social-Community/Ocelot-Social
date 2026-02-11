@@ -8,17 +8,21 @@
       <!-- create group -->
       <ds-space centered>
         <nuxt-link :to="{ name: 'groups-create' }">
-          <base-button
+          <os-button
             class="group-add-button"
-            icon="plus"
-            size="large"
+            variant="primary"
+            appearance="filled"
             circle
-            filled
+            size="xl"
             v-tooltip="{
               content: $t('group.createNewGroup.tooltip'),
               placement: 'left',
             }"
-          />
+          >
+            <template #icon>
+              <base-icon name="plus" />
+            </template>
+          </os-button>
         </nuxt-link>
       </ds-space>
       <!-- group list -->
@@ -54,6 +58,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import GroupList from '~/components/Group/GroupList'
 import { groupQuery, groupCountQuery } from '~/graphql/groups.js'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
@@ -69,6 +74,7 @@ const tabToFilterMapping = (tab) => {
 export default {
   name: 'Groups',
   components: {
+    OsButton,
     GroupList,
     TabNavigation,
     PaginationButtons,
@@ -187,6 +193,6 @@ export default {
 
 <style lang="scss">
 .group-add-button {
-  box-shadow: $box-shadow-x-large;
+  box-shadow: $box-shadow-x-large !important;
 }
 </style>
