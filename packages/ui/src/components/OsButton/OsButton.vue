@@ -57,7 +57,18 @@
         const iconContent = slots.icon?.()
         const defaultContent = slots.default?.()
         const hasIcon = iconContent && iconContent.length > 0
-        const hasText = defaultContent && defaultContent.length > 0
+        const hasText =
+          defaultContent &&
+          defaultContent.some((node) => {
+            // Check for non-whitespace text nodes and real elements
+            if (typeof node === 'string') return node.trim().length > 0
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const n = node as any
+            if (n.type === Symbol.for('v-txt') || n.type === Symbol.for('Text') || n.type === 3) {
+              return typeof n.children === 'string' && n.children.trim().length > 0
+            }
+            return true
+          })
 
         // Build children array: [iconSpan?, ...textContent?]
         const children: (string | ReturnType<typeof h>)[] = []

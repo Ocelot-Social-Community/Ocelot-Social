@@ -169,6 +169,17 @@ describe('osButton', () => {
       expect(wrapper.classes()).not.toContain('gap-2')
     })
 
+    it('treats whitespace-only text as icon-only', () => {
+      const wrapper = mount(OsButton, {
+        slots: {
+          icon: '<svg></svg>',
+          default: '   ',
+        },
+      })
+      expect(wrapper.classes()).not.toContain('gap-2')
+      expect(wrapper.find('.os-button__icon').classes()).toContain('-mr-1')
+    })
+
     it('does not add gap-2 without icon', () => {
       const wrapper = mount(OsButton, {
         slots: { default: 'Click me' },

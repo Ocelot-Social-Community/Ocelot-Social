@@ -1,4 +1,4 @@
-import { h } from 'vue'
+import { computed, h } from 'vue'
 
 import OsButton from './OsButton.vue'
 
@@ -40,6 +40,13 @@ const meta: Meta<typeof OsButton> = {
 export default meta
 type Story = StoryObj<typeof OsButton>
 
+const iconMap: Record<string, (() => ReturnType<typeof h>) | null> = {
+  none: null,
+  check: CheckIcon,
+  close: CloseIcon,
+  plus: PlusIcon,
+}
+
 export const Playground: Story = {
   argTypes: {
     variant: {
@@ -60,6 +67,13 @@ export const Playground: Story = {
     disabled: {
       control: 'boolean',
     },
+    icon: {
+      control: 'select',
+      options: Object.keys(iconMap),
+    },
+    label: {
+      control: 'text',
+    },
   },
   args: {
     variant: 'primary',
@@ -67,13 +81,26 @@ export const Playground: Story = {
     size: 'md',
     fullWidth: false,
     disabled: false,
+    icon: 'none',
+    label: 'Button',
   },
   render: (args) => ({
     components: { OsButton },
     setup() {
-      return { args }
+      const buttonProps = computed(() => {
+        const { icon: _icon, label: _label, ...rest } = args
+        return rest
+      })
+      const IconComponent = computed(() => iconMap[args.icon as string] ?? null)
+      const label = computed(() => args.label as string)
+      return { buttonProps, IconComponent, label }
     },
-    template: '<OsButton v-bind="args">Button</OsButton>',
+    template: `
+      <OsButton v-bind="buttonProps">
+        <template v-if="IconComponent" #icon><component :is="IconComponent" /></template>
+        {{ label }}
+      </OsButton>
+    `,
   }),
 }
 
