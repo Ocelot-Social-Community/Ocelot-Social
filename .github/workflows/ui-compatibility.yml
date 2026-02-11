@@ -57,7 +57,7 @@ jobs:
           retention-days: 1
 
   test-compatibility:
-    name: Test ${{ matrix.example }}
+    name: Test Compatibility
     if: needs.files-changed.outputs.ui == 'true'
     needs: [files-changed, build-library]
     runs-on: ubuntu-latest
@@ -101,3 +101,21 @@ jobs:
 
       - name: Build example app
         run: npm run build
+
+  compatibility-result:
+    name: Compatibility Result
+    if: always()
+    needs: [files-changed, test-compatibility]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip if no UI changes
+        if: needs.files-changed.outputs.ui != 'true'
+        run: echo "No UI changes detected, skipping."
+
+      - name: Check matrix results
+        if: needs.files-changed.outputs.ui == 'true'
+        run: |
+          if [ "${{ needs.test-compatibility.result }}" != "success" ]; then
+            echo "Compatibility tests failed"
+            exit 1
+          fi
