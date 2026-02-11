@@ -182,7 +182,7 @@
               >
                 {{ $t('actions.cancel') }}
               </os-button>
-              <os-button variant="primary" appearance="filled" :loading="loading" :disabled="errors">
+              <os-button variant="primary" appearance="filled" type="submit" :loading="loading" :disabled="!!errors">
                 <template #icon>
                   <base-icon name="check" />
                 </template>
