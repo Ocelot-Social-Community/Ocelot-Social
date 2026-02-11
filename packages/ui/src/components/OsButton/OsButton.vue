@@ -53,41 +53,31 @@
       // Get component instance for Vue 2 $listeners access
       const instance = getCurrentInstance()
 
+      const ICON_CLASS =
+        'os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current'
+
       return () => {
         const iconContent = slots.icon?.()
         const defaultContent = slots.default?.()
         const hasIcon = iconContent && iconContent.length > 0
         const hasText =
-          defaultContent &&
-          defaultContent.some((node) => {
-            // Check for non-whitespace text nodes and real elements
+          defaultContent?.some((node) => {
             if (typeof node === 'string') return node.trim().length > 0
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const n = node as any
-            if (n.type === Symbol.for('v-txt') || n.type === Symbol.for('Text') || n.type === 3) {
-              return typeof n.children === 'string' && n.children.trim().length > 0
-            }
-            return true
-          })
+            const children = (node as any).children
+            // Text VNodes have string children; element/component VNodes are always visible
+            return typeof children !== 'string' || children.trim().length > 0
+          }) ?? false
 
-        // Build children array: [iconSpan?, ...textContent?]
         const children: (string | ReturnType<typeof h>)[] = []
         if (hasIcon) {
-          children.push(
-            h(
-              'span',
-              {
-                class: `os-button__icon -ml-1 ${hasText ? '' : '-mr-1 '}inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current`,
-              },
-              iconContent,
-            ),
-          )
+          const iconMargin = hasText ? '-ml-1' : '-ml-1 -mr-1'
+          children.push(h('span', { class: `${iconMargin} ${ICON_CLASS}` }, iconContent))
         }
         if (hasText) {
           children.push(...defaultContent)
         }
 
-        // Add gap between icon and text
         const gapClass = hasIcon && hasText ? 'gap-2' : ''
 
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
