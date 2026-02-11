@@ -96,16 +96,19 @@
               @optimistic="optimisticFollow"
               @update="updateFollow"
             />
-            <base-button
-              icon="chat-bubble"
+            <os-button
+              variant="primary"
+              appearance="outline"
+              full-width
               v-tooltip="{
                 content: $t('chat.userProfileButton.tooltip', { name: userName }),
                 placement: 'bottom-start',
               }"
               @click="showOrChangeChat(user.id)"
             >
+              <template #icon><base-icon name="chat-bubble" /></template>
               {{ $t('chat.userProfileButton.label') }}
-            </base-button>
+            </os-button>
           </div>
           <template v-if="user.about">
             <hr />
