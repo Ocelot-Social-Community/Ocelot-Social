@@ -97,9 +97,9 @@ Analyse:    ██████████ 100% (Button, Modal, Menu detailiert)
 ### OsButton Migration (Phase 3)
 ```
 Scope gesamt:     ~90 Buttons in Webapp
-├─ Migriert:       39 Buttons (43%) ✅
+├─ Migriert:       41 Buttons (46%) ✅
 ├─ Ohne neue Props:  0 Buttons (Milestone 4a ✅)
-└─ Mit icon/circle/loading: ~53 Buttons (Milestone 4c)
+└─ Mit icon/circle/loading: ~51 Buttons (Milestone 4c)
 
 OsButton Features:
 ├─ variant:     ✅ primary, secondary, danger, warning, success, info, default
@@ -107,7 +107,7 @@ OsButton Features:
 ├─ size:        ✅ xs, sm, md, lg, xl
 ├─ disabled:    ✅ mit hover/active-Override
 ├─ icon:        ✅ slot-basiert (icon-system-agnostisch)
-├─ circle:      ⬜ TODO (Milestone 4b)
+├─ circle:      ✅ rounded-full, größenabhängig (p-1.5 bis p-3)
 └─ loading:     ⬜ TODO (Milestone 4b)
 ```
 
@@ -377,16 +377,16 @@ OsButton Features:
 - [x] OsButton attrs/listeners Forwarding (Vue 2 $listeners via getCurrentInstance)
 - [x] 14 weitere Buttons migriert (alle ohne icon/circle/loading)
 
-**Milestone 4a: Weitere Buttons migrieren (14 ohne neue Props)**
-- [ ] Modal Cancel-Buttons (DisableModal, DeleteUserModal, ReleaseModal)
-- [ ] Form Cancel/Submit-Buttons (ContributionForm, EnterNonce, MySomethingList)
-- [ ] ImageUploader.vue (2× Crop-Buttons)
-- [ ] Page-Buttons (donations, badges, notifications/index, profile Unblock/Unmute)
-- [ ] ReportRow.vue More-Details-Button
+**Milestone 4a: Weitere Buttons migrieren (14 ohne neue Props)** ✅
+- [x] Modal Cancel-Buttons (DisableModal, DeleteUserModal, ReleaseModal)
+- [x] Form Cancel/Submit-Buttons (ContributionForm, EnterNonce, MySomethingList)
+- [x] ImageUploader.vue (2× Crop-Buttons)
+- [x] Page-Buttons (donations, badges, notifications/index, profile Unblock/Unmute)
+- [x] ReportRow.vue More-Details-Button
 
 **Milestone 4b: OsButton Props erweitern**
 - [x] `icon` Slot implementiert (slot-basiert, icon-system-agnostisch) ✅
-- [ ] `circle` Variant zu CVA hinzufügen
+- [x] `circle` Variant zu CVA hinzufügen ✅
 - [ ] `loading` Prop mit Spinner implementieren
 
 **Milestone 4c: Buttons mit icon/circle/loading migrieren (~60 Buttons)**
@@ -417,7 +417,7 @@ OsButton Features:
 - [x] CategoriesSelect.vue (icon) ✅
 - [ ] SearchableInput.vue (icon, circle)
 - [x] Select/LocationSelect.vue (icon) ✅
-- [ ] PaginationButtons.vue (2× icon, circle)
+- [x] PaginationButtons.vue (2× icon, circle) ✅
 
 *Chat:*
 - [ ] Chat/Chat.vue (2× icon, circle)
@@ -474,9 +474,9 @@ OsButton Features:
 | Kategorie | Buttons | Status |
 |-----------|---------|--------|
 | ✅ Migriert & Validiert | 32 | Erledigt (M1-M4a) |
-| ✅ Mit icon migriert (M4c) | 7 | 7 Buttons in 7 Dateien |
-| ⬜ Mit icon/circle/loading (M4c) | ~51 | Ausstehend |
-| **Gesamt** | **~90** | **37% erledigt** |
+| ✅ Mit icon/circle migriert (M4c) | 9 | 9 Buttons in 8 Dateien |
+| ⬜ Mit icon/circle/loading (M4c) | ~49 | Ausstehend |
+| **Gesamt** | **~90** | **46% erledigt** |
 
 **Details siehe KATALOG.md** (vollständige Tracking-Tabellen)
 
@@ -1522,6 +1522,7 @@ Bei der Migration werden:
 | 2026-02-11 | **CategoriesSelect.vue** | v-for Buttons migriert: dynamisches `:icon` → `#icon` Slot, `:filled` → `:appearance`, CSS `.base-button` → `button` |
 | 2026-02-11 | **profile/_id/_slug.vue** | Chat-Button migriert: `icon="chat-bubble"` → `variant="primary" appearance="outline" full-width` + `#icon` Slot |
 | 2026-02-11 | **verify.vue korrigiert** | Kein Button vorhanden (Eintrag aus Milestone-Liste entfernt) |
+| 2026-02-11 | **PaginationButtons.vue** | 2 circle icon-only Buttons migriert: `outline primary circle` + `#icon` Slot + aria-label |
 
 ---
 

@@ -10,9 +10,9 @@
 ### Übersicht
 ```
 Phase 0: Analyse    ██████████ 100% (8/8 Schritte)
-Phase 3: Migration  ████░░░░░░  36% (32/90 Buttons)
+Phase 3: Migration  ████▌░░░░░  46% (41/90 Buttons)
 ───────────────────────────────────────────
-Aktuelle Phase: Phase 3 - Milestone 4a ✅, nächster: Milestone 4b
+Aktuelle Phase: Phase 3 - M4a ✅, M4b: icon ✅ circle ✅, nächster: loading + M4c
 ```
 
 ### Statistiken
@@ -28,11 +28,11 @@ Aktuelle Phase: Phase 3 - Milestone 4a ✅, nächster: Milestone 4b
 ### OsButton Migration (Phase 3)
 | Status | Anzahl | Details |
 |--------|--------|---------|
-| ✅ Migriert | 32 | Erste Welle (16) + Milestone 4a (14) + NotificationMenu (2) |
-| ⏳ Ausstehend (mit neuen Props) | ~60 | Milestone 4c (benötigen icon/circle/loading) |
+| ✅ Migriert | 41 | Erste Welle (16) + M4a (14) + NotificationMenu (2) + M4c icon/circle (9) |
+| ⏳ Ausstehend (mit neuen Props) | ~49 | Milestone 4c (benötigen icon/circle/loading) |
 | **Gesamt** | **~90** | In ~50 Dateien |
 
-**Migrierte Komponenten (32):**
+**Migrierte Komponenten (41):**
 
 *Erste Welle (16):*
 - UserTeaserPopover.vue (1 Button)
@@ -64,7 +64,17 @@ Aktuelle Phase: Phase 3 - Milestone 4a ✅, nächster: Milestone 4b
 *Sonstige (2):*
 - ✅ NotificationMenu.vue (2 Buttons - Mark All Read, Notification Page)
 
-**Ausstehend - benötigen neue Props (~60):**
+*Milestone 4c icon/circle (9):*
+- ✅ DisableModal.vue Confirm (1 Button - icon)
+- ✅ DeleteUserModal.vue Confirm (1 Button - icon)
+- ✅ CtaUnblockAuthor.vue (1 Button - icon)
+- ✅ LocationSelect.vue (1 Button - icon)
+- ✅ CategoriesSelect.vue (1 Button - icon)
+- ✅ my-email-address/index.vue (1 Button - icon)
+- ✅ profile/_id/_slug.vue Chat (1 Button - icon)
+- ✅ PaginationButtons.vue (2 Buttons - icon, circle)
+
+**Ausstehend - benötigen neue Props (~49):**
 
 *Button-Komponenten mit icon/circle/loading:*
 - ActionButton.vue: 3 Buttons (icon, circle)
@@ -77,7 +87,6 @@ Aktuelle Phase: Phase 3 - Milestone 4a ✅, nächster: Milestone 4b
 - ObserveButton.vue: 1 Button (icon, loading)
 - InviteButton.vue: 1 Button (icon, loading)
 - MapButton.vue: 1 Button (icon)
-- PaginationButtons.vue: 2 Buttons (icon, circle)
 
 *Navigation mit icon:*
 - LocaleSwitch.vue: 1 Button (icon)
@@ -154,7 +163,7 @@ Aktuelle Phase: Phase 3 - Milestone 4a ✅, nächster: Milestone 4b
 ### Data Input
 | # | Komponente | Status | Webapp-Duplikat | Varianten | Priorität | Notizen |
 |---|------------|--------|-----------------|-----------|-----------|---------|
-| 13 | Button | ⏳ Migration | BaseButton, CustomButton, ActionButton, ... | | | → OsButton (16/90 migriert) |
+| 13 | Button | ⏳ Migration | BaseButton, CustomButton, ActionButton, ... | | | → OsButton (41/90 migriert) |
 | 14 | CopyField | ⬜ Ausstehend | | | | |
 | 15 | Form | ⬜ Ausstehend | | | | |
 | 16 | FormItem | ⬜ Ausstehend | | | | |
@@ -219,7 +228,7 @@ Aktuelle Phase: Phase 3 - Milestone 4a ✅, nächster: Milestone 4b
 | 7 | BadgeSelection | ⬜ Ausstehend | Input | | |
 | 8 | Badges | ⬜ Ausstehend | Display | | |
 | 9 | BadgesSection | ⬜ Ausstehend | Display | | |
-| 10 | BaseButton | ⏳ Migration | Button | Button | 🔄 → OsButton (16/90 migriert) |
+| 10 | BaseButton | ⏳ Migration | Button | Button | 🔄 → OsButton (41/90 migriert) |
 | 11 | BaseCard | ⬜ Ausstehend | Layout | Card | 🔗 DUPLIKAT |
 | 12 | BaseIcon | ⬜ Ausstehend | Display | Icon | 🔗 DUPLIKAT |
 
@@ -228,7 +237,7 @@ Aktuelle Phase: Phase 3 - Milestone 4a ✅, nächster: Milestone 4b
 |---|------------|--------|-----------|-------------------|---------|
 | 13 | CategoriesFilter | ⬜ Ausstehend | Filter | | |
 | 14 | CategoriesMenu | ⬜ Ausstehend | Navigation | Menu | |
-| 15 | CategoriesSelect | ⬜ Ausstehend | Input | Select | |
+| 15 | CategoriesSelect | ⏳ Teilweise | Input | Select | Buttons → OsButton (icon) |
 | 16 | ChangePassword | ⬜ Ausstehend | Feature | | Auth-spezifisch |
 | 17 | Change | ⬜ Ausstehend | Feature | | |
 | 18 | Chat | ⬜ Ausstehend | Feature | | Chat-spezifisch |
@@ -241,12 +250,12 @@ Aktuelle Phase: Phase 3 - Milestone 4a ✅, nächster: Milestone 4b
 | 25 | ContentMenu | ⬜ Ausstehend | Navigation | Menu | |
 | 26 | ContentViewer | ⬜ Ausstehend | Display | | |
 | 27 | ContextMenu | ⬜ Ausstehend | Navigation | Menu | |
-| 28 | ContributionForm | ⬜ Ausstehend | Feature | Form | Post-spezifisch |
+| 28 | ContributionForm | ⏳ Teilweise | Feature | Form | Cancel → OsButton |
 | 29 | CounterIcon | ⬜ Ausstehend | Display | Icon | |
 | 30 | CountTo | ⬜ Ausstehend | Display | Number | Animation |
 | 31 | CreateInvitation | ⬜ Ausstehend | Feature | | |
 | 32 | CtaJoinLeaveGroup | ⬜ Ausstehend | Button | Button | 🔄 Button-Familie |
-| 33 | CtaUnblockAuthor | ⬜ Ausstehend | Button | Button | 🔄 Button-Familie |
+| 33 | CtaUnblockAuthor | ✅ Migriert | Button | Button | Button → OsButton (icon) |
 | 34 | CustomButton | ⬜ Ausstehend | Button | Button | 🔄 Button-Familie |
 
 ### D-E
@@ -254,8 +263,8 @@ Aktuelle Phase: Phase 3 - Milestone 4a ✅, nächster: Milestone 4b
 |---|------------|--------|-----------|-------------------|---------|
 | 35 | DateTimeRange | ⬜ Ausstehend | Input | | |
 | 36 | DeleteData | ⬜ Ausstehend | Feature | | |
-| 37 | DeleteUserModal | ⬜ Ausstehend | Feedback | Modal | 🔄 Modal-Familie |
-| 38 | DisableModal | ⬜ Ausstehend | Feedback | Modal | 🔄 Modal-Familie |
+| 37 | DeleteUserModal | ⏳ Teilweise | Feedback | Modal | 🔄 Modal-Familie, Buttons → OsButton |
+| 38 | DisableModal | ⏳ Teilweise | Feedback | Modal | 🔄 Modal-Familie, Buttons → OsButton |
 | 39 | DonationInfo | ✅ Migriert | Display | | Button → OsButton |
 | 40 | Dropdown | ⬜ Ausstehend | Input | Select | |
 | 41 | DropdownFilter | ⬜ Ausstehend | Filter | Select | |
@@ -265,7 +274,7 @@ Aktuelle Phase: Phase 3 - Milestone 4a ✅, nächster: Milestone 4b
 | 45 | EmotionButton | ⬜ Ausstehend | Button | Button | |
 | 46 | Emotions | ⬜ Ausstehend | Feature | | |
 | 47 | Empty | ⬜ Ausstehend | Feedback | Placeholder | |
-| 48 | EnterNonce | ⬜ Ausstehend | Feature | | Auth |
+| 48 | EnterNonce | ⏳ Teilweise | Feature | | Auth, Submit → OsButton |
 
 ### F-G
 | # | Komponente | Status | Kategorie | Styleguide-Pendant | Notizen |
@@ -293,7 +302,7 @@ Aktuelle Phase: Phase 3 - Milestone 4a ✅, nächster: Milestone 4b
 | 65 | HashtagsFilter | ⬜ Ausstehend | Filter | | |
 | 66 | HeaderButton | ⬜ Ausstehend | Button | Button | 🔄 Button-Familie |
 | 67 | HeaderMenu | ⬜ Ausstehend | Navigation | Menu | |
-| 68 | ImageUploader | ⬜ Ausstehend | Input | | |
+| 68 | ImageUploader | ⏳ Teilweise | Input | | Crop-Buttons → OsButton |
 | 69 | index | ⬜ Ausstehend | ? | | Prüfen |
 | 70 | InternalPage | ⬜ Ausstehend | Layout | Page | |
 | 71 | Invitation | ⬜ Ausstehend | Feature | | |
@@ -305,7 +314,7 @@ Aktuelle Phase: Phase 3 - Milestone 4a ✅, nächster: Milestone 4b
 | 77 | LoadingSpinner | ⬜ Ausstehend | Feedback | Spinner | 🔗 DUPLIKAT |
 | 78 | LocaleSwitch | ⬜ Ausstehend | Navigation | | |
 | 79 | LocationInfo | ⬜ Ausstehend | Display | | |
-| 80 | LocationSelect | ⬜ Ausstehend | Input | Select | |
+| 80 | LocationSelect | ⏳ Teilweise | Input | Select | Close-Button → OsButton (icon) |
 | 81 | LocationTeaser | ⬜ Ausstehend | Display | Card | |
 | 82 | LoginButton | ⬜ Ausstehend | Button | Button | |
 | 83 | LoginForm | ⬜ Ausstehend | Feature | Form | Auth |
@@ -322,8 +331,8 @@ Aktuelle Phase: Phase 3 - Milestone 4a ✅, nächster: Milestone 4b
 | 90 | MenuBarButton | ⬜ Ausstehend | Button | Button | 🔄 Button-Familie |
 | 91 | MenuLegend | ⬜ Ausstehend | Navigation | | |
 | 92 | Modal | ⬜ Ausstehend | Feedback | Modal | 🔗 DUPLIKAT |
-| 93 | MySomethingList | ⬜ Ausstehend | Display | List | |
-| 94 | NotificationMenu | ⬜ Ausstehend | Navigation | Menu | |
+| 93 | MySomethingList | ⏳ Teilweise | Display | List | Cancel → OsButton |
+| 94 | NotificationMenu | ⏳ Teilweise | Navigation | Menu | 2/3 Buttons → OsButton |
 | 95 | NotificationsTable | ⬜ Ausstehend | Display | Table | |
 | 96 | ObserveButton | ⬜ Ausstehend | Button | Button | |
 | 97 | OrderByFilter | ⬜ Ausstehend | Filter | | |
@@ -333,7 +342,7 @@ Aktuelle Phase: Phase 3 - Milestone 4a ✅, nächster: Milestone 4b
 |---|------------|--------|-----------|-------------------|---------|
 | 98 | PageFooter | ⬜ Ausstehend | Layout | | |
 | 99 | PageParamsLink | ⬜ Ausstehend | Navigation | | |
-| 100 | PaginationButtons | ⬜ Ausstehend | Navigation | | |
+| 100 | PaginationButtons | ✅ Migriert | Navigation | | 2 Buttons → OsButton (icon, circle) |
 | 101 | PostTeaser | ⬜ Ausstehend | Display | Card | |
 | 102 | PostTypeFilter | ⬜ Ausstehend | Filter | | |
 | 103 | ProfileAvatar | ⬜ Ausstehend | Display | Avatar | |
@@ -345,10 +354,10 @@ Aktuelle Phase: Phase 3 - Milestone 4a ✅, nächster: Milestone 4b
 | 109 | RegistrationSlideNonce | ⬜ Ausstehend | Feature | | Auth |
 | 110 | RegistrationSlideNoPublic | ⬜ Ausstehend | Feature | | Auth |
 | 111 | RegistrationSlider | ⬜ Ausstehend | Feature | | Auth |
-| 112 | ReleaseModal | ⬜ Ausstehend | Feedback | Modal | 🔄 Modal-Familie |
+| 112 | ReleaseModal | ⏳ Teilweise | Feedback | Modal | 🔄 Modal-Familie, Cancel → OsButton |
 | 113 | ReportList | ⬜ Ausstehend | Display | List | |
 | 114 | ReportModal | ⬜ Ausstehend | Feedback | Modal | 🔄 Modal-Familie |
-| 115 | ReportRow | ⬜ Ausstehend | Display | | |
+| 115 | ReportRow | ⏳ Teilweise | Display | | More Details → OsButton |
 | 116 | ReportsTable | ⬜ Ausstehend | Display | Table | |
 | 117 | Request | ⬜ Ausstehend | Feature | | |
 | 118 | ResponsiveImage | ⬜ Ausstehend | Display | | |
@@ -484,6 +493,9 @@ Diese sollten zuerst migriert werden:
 | 2026-02-08 | Claude | OsButton erweitert | attrs/listeners Forwarding für Vue 2 ($listeners) |
 | 2026-02-09 | Claude | Scope erweitert | ~90 Buttons identifiziert (16 migriert, 14 ohne Props, ~60 mit Props) |
 | 2026-02-09 | Claude | **Milestone 4a: 8 Buttons** | DisableModal, DeleteUserModal, ReleaseModal, ContributionForm, EnterNonce, MySomethingList, ImageUploader (2x) |
+| 2026-02-09 | Claude | **Milestone 4a abgeschlossen** | 6 weitere: donations, profile (2x), badges, notifications/index, ReportRow |
+| 2026-02-11 | Claude | **M4b: icon + circle** | icon-Slot implementiert, circle-Prop mit CVA |
+| 2026-02-11 | Claude | **9 icon-Buttons migriert (M4c)** | DisableModal, DeleteUserModal, CtaUnblockAuthor, LocationSelect, CategoriesSelect, my-email-address, profile Chat, PaginationButtons (2x circle) |
 
 ---
 
@@ -504,18 +516,18 @@ Diese sollten zuerst migriert werden:
 10. [x] Webapp-Integration (Jest, Docker, CI)
 11. [x] 16 Buttons migrieren (validiert ✅)
 
-**Milestone 4a: 14 Buttons ohne neue Props**
-12. [ ] Modal Cancel-Buttons (3)
-13. [ ] Form Cancel/Submit-Buttons (3)
-14. [ ] ImageUploader Crop-Buttons (2)
-15. [ ] Page Buttons (6)
+**Milestone 4a: 14 Buttons ohne neue Props** ✅
+12. [x] Modal Cancel-Buttons (3)
+13. [x] Form Cancel/Submit-Buttons (3)
+14. [x] ImageUploader Crop-Buttons (2)
+15. [x] Page Buttons (6)
 
-**Milestone 4b: Props für ~60 Buttons hinzufügen**
-16. [ ] icon-Prop zu OsButton hinzufügen
-17. [ ] circle-Variant zu OsButton hinzufügen
+**Milestone 4b: Props für ~49 Buttons hinzufügen**
+16. [x] icon-Slot zu OsButton hinzufügen ✅
+17. [x] circle-Variant zu OsButton hinzufügen ✅
 18. [ ] loading-Prop zu OsButton hinzufügen
 
-**Milestone 4c: ~60 Buttons mit neuen Props migrieren**
+**Milestone 4c: ~49 Buttons mit neuen Props migrieren**
 19. [ ] Button-Komponenten (~15)
 20. [ ] Navigation (~8)
 21. [ ] Editor (~15)
@@ -1291,7 +1303,7 @@ $box-shadow-small-inset: inset 0 0 0 1px rgba(0,0,0,.05)
 2. Circle-Variant zu OsButton hinzufügen
 3. Loading-Prop zu OsButton hinzufügen
 
-**Milestone 4c: ~60 Buttons mit neuen Props migrieren**
+**Milestone 4c: ~49 Buttons mit neuen Props migrieren**
 1. Button-Komponenten (~15)
 2. Navigation (~8)
 3. Editor (~15)
