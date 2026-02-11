@@ -87,7 +87,7 @@ describe('osButton', () => {
         xl: 'min-w-14',
       }
       for (const [size, expected] of Object.entries(sizes)) {
-        const wrapper = mount(OsButton, { props: { size } })
+        const wrapper = mount(OsButton, { props: { size: size as 'sm' | 'md' | 'lg' | 'xl' } })
         expect(wrapper.classes()).toContain(expected)
       }
     })
