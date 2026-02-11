@@ -3,14 +3,8 @@ name: UI Size
 on:
   push:
     branches: [master]
-    paths:
-      - 'packages/ui/**'
-      - '.github/workflows/ui-size.yml'
   pull_request:
     branches: [master]
-    paths:
-      - 'packages/ui/**'
-      - '.github/workflows/ui-size.yml'
 
 defaults:
   run:
