@@ -30,7 +30,7 @@
           :key="item.name"
         >
           <div>
-            <os-button size="sm" circle appearance="ghost" class="legend-icon">
+            <os-button size="sm" circle variant="primary" appearance="ghost" class="legend-icon">
               <template v-if="item.iconName" #icon>
                 <base-icon :name="item.iconName" />
               </template>
