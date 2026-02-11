@@ -16,16 +16,20 @@
           icon="question-circle"
           :label="$t('settings.email.labelNonce')"
         />
-        <base-button icon="check" :disabled="errors" type="submit" filled>
+        <os-button variant="primary" appearance="filled" type="submit" :disabled="!!errors">
+          <template #icon><base-icon name="check" /></template>
           {{ $t('actions.save') }}
-        </base-button>
+        </os-button>
       </base-card>
     </template>
   </ds-form>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
+
 export default {
+  components: { OsButton },
   data() {
     return {
       formSchema: {
