@@ -96,6 +96,8 @@ export default {
       resetCategories: 'posts/RESET_CATEGORIES',
     }),
     async onSubmit() {
+      this.$store.commit('auth/SET_PENDING', true)
+      return
       const { email, password } = this.form
       try {
         await this.$store.dispatch('auth/login', { email, password })
