@@ -53,7 +53,9 @@
         </template>
 
         <template #unblockUser="scope">
-          <base-button circle size="small" @click="unblockUser(scope)" icon="user-plus" />
+          <os-button variant="primary" appearance="outline" circle size="sm" @click="unblockUser(scope)">
+            <template #icon><base-icon name="user-plus" /></template>
+          </os-button>
         </template>
       </ds-table>
     </base-card>
@@ -73,6 +75,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { blockedUsers, unblockUser } from '~/graphql/settings/BlockedUsers'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import scrollToContent from './scroll-to-content.js'
@@ -80,6 +83,7 @@ import scrollToContent from './scroll-to-content.js'
 export default {
   mixins: [scrollToContent],
   components: {
+    OsButton,
     ProfileAvatar,
   },
   data() {
