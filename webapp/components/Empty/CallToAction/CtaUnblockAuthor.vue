@@ -29,7 +29,7 @@ export default {
   props: {
     author: {
       type: Object,
-      require: true,
+      required: true,
     },
   },
   computed: {
