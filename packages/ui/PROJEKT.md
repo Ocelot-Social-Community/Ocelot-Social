@@ -105,7 +105,7 @@ Scope gesamt:     133 <os-button> Tags in 79 Webapp-Dateien
 OsButton Features:
 ├─ variant:     ✅ primary, secondary, danger, warning, success, info, default
 ├─ appearance:  ✅ filled, outline, ghost
-├─ size:        ✅ xs, sm, md, lg, xl
+├─ size:        ✅ sm, md, lg, xl
 ├─ disabled:    ✅ mit hover/active-Override
 ├─ icon:        ✅ slot-basiert (icon-system-agnostisch)
 ├─ circle:      ✅ rounded-full, größenabhängig (p-1.5 bis p-3)
@@ -116,7 +116,7 @@ OsButton Features:
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-11 (Session 16)
+**Letzte Aktualisierung:** 2026-02-12 (Session 16, fortgesetzt)
 
 **Aktuelle Phase:** Phase 3 ✅ ABGESCHLOSSEN - Alle 133 Buttons in 79 Dateien migriert, 0 `<base-button>` und 0 `<ds-button>` verbleibend
 
@@ -184,13 +184,26 @@ OsButton Features:
   - Completeness Check (verify Script prüft Story, Visual, checkA11y, Keyboard, Varianten)
   - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 
-**Zuletzt abgeschlossen (Session 16 - Bugfixes & letzte ds-button Migration):**
+**Zuletzt abgeschlossen (Session 16 - Bugfixes, Code-Review, letzte ds-button Migration):**
 - [x] Password/Change.vue: `!!errors` Fix für disabled-Prop
 - [x] CommentForm.vue: `type="submit"` + `!!errors` Fix
 - [x] GroupForm.vue: Letzter `<ds-button>` → `<os-button>` migriert (save/update mit icon)
 - [x] OsButton.spec.ts: TypeScript-Fix für size-Prop Union Type
 - [x] OsButton.vue: v8 ignore Coverage-Fixes (100% Branch Coverage)
 - [x] 0 `<ds-button>` und 0 `<base-button>` in Webapp-Templates verbleibend
+- [x] `data-variant` Attribut auf OsButton (konsistent mit `data-appearance`, CSS-Selektor-Support)
+- [x] notifications.spec.js: `wrapper.find()` → Testing Library `screen.getByText()` (war Vue Test Utils API)
+- [x] FilterMenu.vue: Dynamische `:appearance="filterActive ? 'filled' : 'ghost'"` (Regressionsbug)
+- [x] FilterMenu.spec.js: `data-appearance="filled"` statt CSS-Klasse `--filled`
+- [x] CtaUnblockAuthor.vue: `require` → `required` Typo-Fix
+- [x] LocationSelect.vue: `clearLocationName()` direkt via `this.currentValue` statt `event.target.value`
+- [x] LocationSelect.vue: `@click.native` → `@click` (Vue 3 Kompatibilität)
+- [x] LocationSelect.vue: `aria-label` via `$t('actions.clear')` (i18n)
+- [x] `actions.clear` in allen 9 Sprachdateien angelegt (en, de, fr, es, it, nl, pl, pt, ru)
+- [x] OsButton: JSDoc-Dokumentation für Slots (`@slot default`, `@slot icon`)
+- [x] OsButton: `isSmall` von `['xs', 'sm']` auf `size === 'sm'` vereinfacht (xs existiert nicht)
+- [x] OsButton: Strikte Typisierung `Record<Size, ...>` statt `Record<string, ...>` für Lookup-Maps
+- [x] animations.css: Stylelint-konforme Formatierung (eine Deklaration pro Zeile)
 
 **Zuvor abgeschlossen (Session 15 - Milestone 4c komplett):**
 - [x] **Alle verbleibenden base-button Instanzen migriert** (132 os-button Tags, 0 base-button verbleibend)
@@ -1598,6 +1611,17 @@ Bei der Migration werden:
 | 2026-02-11 | **OsButton.spec.ts TS-Fix** | `size` aus `Object.entries` als Union Type gecastet (`as 'sm' | 'md' | 'lg' | 'xl'`) |
 | 2026-02-11 | **Coverage 100%** | `v8 ignore start/stop` für Vue 2 Branch, `v8 ignore next` für defensive `||` Fallback |
 | 2026-02-11 | **Scope: 133 Buttons** | 133 `<os-button>` Tags in 79 Dateien, 0 `<base-button>` + 0 `<ds-button>` verbleibend |
+| 2026-02-12 | **data-variant Attribut** | OsButton rendert `data-variant` auf `<button>` (konsistent mit `data-appearance`), ermöglicht CSS-Selektoren wie `button[data-variant="danger"]` |
+| 2026-02-12 | **notifications.spec.js** | Test-API korrigiert: `wrapper.find()` (Vue Test Utils) → `screen.getByText()` (Testing Library), `button.disabled` statt `button.attributes('disabled')` |
+| 2026-02-12 | **FilterMenu Regressionsbug** | `appearance="ghost"` war hardcoded statt dynamisch; `filterActive` Computed Property existierte aber war nicht genutzt → `:appearance="filterActive ? 'filled' : 'ghost'"` |
+| 2026-02-12 | **FilterMenu.spec.js** | Test von CSS-Klasse `--filled` auf `data-appearance="filled"` Attribut-Selektor umgestellt |
+| 2026-02-12 | **CtaUnblockAuthor.vue** | Typo `require: true` → `required: true` (Vue ignorierte die Prop-Validierung) |
+| 2026-02-12 | **LocationSelect.vue Fixes** | `event.target.value` → `this.currentValue` (Button hat kein value), `@click.native` → `@click` (Vue 3), `aria-label` via i18n |
+| 2026-02-12 | **i18n: actions.clear** | Neuer Key in allen 9 Sprachdateien: en=Clear, de=Zurücksetzen, fr=Effacer, es=Borrar, it=Cancella, nl=Wissen, pl=Wyczyść, pt=Limpar, ru=Очистить |
+| 2026-02-12 | **OsButton JSDoc** | Slot-Dokumentation (`@slot default`, `@slot icon`) für vue-component-meta/Storybook autodocs |
+| 2026-02-12 | **OsButton xs entfernt** | `isSmall` von `['xs', 'sm'].includes(size)` auf `size === 'sm'` vereinfacht (xs ist kein gültiger Size-Wert) |
+| 2026-02-12 | **Strikte Typisierung** | `type Size = NonNullable<ButtonVariants['size']>`, `Record<Size, ...>` für CIRCLE_WIDTHS + SPINNER_PX; `props.size!` → `(props.size ?? 'md') as Size` |
+| 2026-02-12 | **animations.css** | Stylelint-konforme Formatierung: eine Deklaration pro Zeile, Leerzeilen zwischen Keyframe-Stufen |
 
 ---
 
