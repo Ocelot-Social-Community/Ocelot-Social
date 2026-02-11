@@ -148,17 +148,21 @@
           <ds-grid-item :row-span="2" column-span="fullWidth">
             <ds-space centered>
               <nuxt-link :to="{ name: 'post-create-type' }">
-                <base-button
+                <os-button
                   v-if="myProfile"
                   v-tooltip="{
                     content: $t('contribution.newPost'),
                     placement: 'left',
                   }"
                   class="profile-post-add-button"
-                  icon="plus"
+                  variant="primary"
+                  appearance="filled"
                   circle
-                  filled
-                />
+                >
+                  <template #icon>
+                    <base-icon name="plus" />
+                  </template>
+                </os-button>
               </nuxt-link>
             </ds-space>
           </ds-grid-item>
@@ -501,7 +505,7 @@ export default {
   }
 }
 .profile-post-add-button {
-  box-shadow: $box-shadow-x-large;
+  box-shadow: $box-shadow-x-large !important;
 }
 .action-buttons {
   display: flex;
