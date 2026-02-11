@@ -30,15 +30,15 @@
         model="email"
         name="email"
       />
-      <base-button
+      <os-button
+        variant="primary"
+        appearance="filled"
         :disabled="disabled"
         :loading="$apollo.loading"
-        filled
-        name="submit"
         type="submit"
       >
         {{ $t('components.registration.signup.form.submit') }}
-      </base-button>
+      </os-button>
       <slot></slot>
     </ds-form>
   </ds-space>
@@ -62,6 +62,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import gql from 'graphql-tag'
 import metadata from '~/constants/metadata'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
@@ -77,6 +78,7 @@ export const SignupMutation = gql`
 export default {
   name: 'Signup',
   components: {
+    OsButton,
     SweetalertIcon,
   },
   props: {
