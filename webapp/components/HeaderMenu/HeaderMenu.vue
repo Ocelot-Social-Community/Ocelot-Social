@@ -139,12 +139,17 @@
               </div>
             </client-only>
             <!-- hamburger menu -->
-            <base-button
-              icon="bars"
-              @click="toggleMobileMenuView"
+            <os-button
+              variant="primary"
+              :appearance="toggleMobileMenu ? 'filled' : 'outline'"
               circle
               class="hamburger-button"
-            />
+              @click="toggleMobileMenuView"
+            >
+              <template #icon>
+                <base-icon name="bars" />
+              </template>
+            </os-button>
           </ds-flex-item>
         </ds-flex>
         <!-- search, filter -->
@@ -274,6 +279,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapGetters } from 'vuex'
 import isEmpty from 'lodash/isEmpty'
 import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
@@ -298,6 +304,7 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 export default {
   mixins: [GetCategories],
   components: {
+    OsButton,
     AvatarMenu,
     ChatNotificationMenu,
     CustomButton,
