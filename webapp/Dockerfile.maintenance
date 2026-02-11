@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM nginx:1.29.5-alpine AS base
 LABEL org.label-schema.name="ocelot.social:maintenance"
 LABEL org.label-schema.description="Maintenance page of the Social Network Software ocelot.social"
@@ -13,7 +14,8 @@ RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
 COPY styleguide .
-RUN yarn install --production=false --frozen-lockfile --non-interactive
+RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
+    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 RUN yarn run build:lib
 
 FROM node:25.6.0-alpine AS ui-library
@@ -21,7 +23,8 @@ RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
 COPY packages/ui .
-RUN yarn install --production=false --frozen-lockfile --non-interactive
+RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
+    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 RUN yarn run build
 
 FROM node:25.6.0-alpine AS build
@@ -38,7 +41,8 @@ RUN rm -rf ./pages
 ONBUILD COPY webap[p]/brandin[g]/ .
 ONBUILD COPY brandin[g]/ .
 ONBUILD RUN tools/merge-locales.sh
-ONBUILD RUN yarn install --production=false --frozen-lockfile --non-interactive
+ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
+    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 ONBUILD RUN cp -r maintenance/source/* ./
 ONBUILD RUN yarn run generate
 
