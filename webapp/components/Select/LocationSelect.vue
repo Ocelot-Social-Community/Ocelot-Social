@@ -133,9 +133,9 @@ export default {
         this.loadingGeo = false
       }
     },
-    clearLocationName(event) {
-      event.target.value = ''
-      this.$emit('input', event.target.value)
+    clearLocationName() {
+      this.currentValue = ''
+      this.$emit('input', '')
     },
   },
 }
