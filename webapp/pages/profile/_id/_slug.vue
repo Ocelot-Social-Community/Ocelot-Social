@@ -504,14 +504,9 @@ export default {
   box-shadow: $box-shadow-x-large;
 }
 .action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: $space-x-small;
   margin: $space-small 0;
-
-  > button {
-    margin-bottom: $space-x-small;
-  }
-  > .base-button {
-    display: block;
-    width: 100%;
-  }
 }
 </style>
