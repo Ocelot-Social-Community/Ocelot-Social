@@ -168,8 +168,11 @@
           const iconMargin = props.circle ? '' : isSmall ? '' : hasText ? '-ml-1' : '-ml-1 -mr-1'
           const loadingClass = isLoading ? 'relative overflow-visible [&>*]:invisible' : ''
           const iconChildren = isLoading
-            ? // eslint-disable-next-line security/detect-object-injection -- size is a validated prop
-              [...(iconContent || []), createSpinner(ICON_SPINNER_SIZE[size], SPINNER_CENTER_ICON, true)]
+            ? [
+                ...(iconContent || []),
+                // eslint-disable-next-line security/detect-object-injection -- size is a validated prop
+                createSpinner(ICON_SPINNER_SIZE[size], SPINNER_CENTER_ICON, true),
+              ]
             : iconContent
           innerChildren.push(
             h('span', { class: `${iconMargin} ${ICON_CLASS} ${loadingClass}` }, iconChildren),
@@ -189,8 +192,10 @@
 
         // Spinner for text-only buttons (centered over button)
         const buttonSpinner =
-          // eslint-disable-next-line security/detect-object-injection -- size is a validated prop
-          isLoading && !hasIcon ? createSpinner(SPINNER_SIZE[size], SPINNER_CENTER_BUTTON, false) : null
+          isLoading && !hasIcon
+            ? // eslint-disable-next-line security/detect-object-injection -- size is a validated prop
+              createSpinner(SPINNER_SIZE[size], SPINNER_CENTER_BUTTON, false)
+            : null
 
         const children = buttonSpinner ? [contentWrapper, buttonSpinner] : [contentWrapper]
 
