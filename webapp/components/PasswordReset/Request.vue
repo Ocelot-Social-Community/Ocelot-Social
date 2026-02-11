@@ -20,16 +20,15 @@
     <ds-space margin-botton="large">
       <ds-text align="left">{{ $t('components.password-reset.request.form.description') }}</ds-text>
     </ds-space>
-    <base-button
+    <os-button
+      variant="primary"
+      appearance="filled"
       :disabled="disabled"
       :loading="$apollo.loading"
-      filled
-      padding
-      name="submit"
       type="submit"
     >
       {{ $t('components.password-reset.request.form.submit') }}
-    </base-button>
+    </os-button>
     <slot></slot>
   </ds-form>
   <div v-else>
@@ -43,11 +42,13 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import gql from 'graphql-tag'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 
 export default {
   components: {
+    OsButton,
     SweetalertIcon,
   },
   data() {
