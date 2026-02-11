@@ -50,7 +50,9 @@
         </template>
 
         <template #unmuteUser="scope">
-          <base-button circle size="small" @click="unmuteUser(scope)" icon="user-plus" />
+          <os-button variant="primary" appearance="outline" circle size="sm" @click="unmuteUser(scope)">
+            <template #icon><base-icon name="user-plus" /></template>
+          </os-button>
         </template>
       </ds-table>
     </base-card>
@@ -70,6 +72,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mutedUsers, unmuteUser } from '~/graphql/settings/MutedUsers'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import scrollToContent from './scroll-to-content.js'
@@ -77,6 +80,7 @@ import scrollToContent from './scroll-to-content.js'
 export default {
   mixins: [scrollToContent],
   components: {
+    OsButton,
     ProfileAvatar,
   },
   data() {
