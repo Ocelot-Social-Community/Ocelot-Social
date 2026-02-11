@@ -20,15 +20,12 @@
 
   const SPINNER_PX: Record<string, number> = { sm: 24, md: 32, lg: 40, xl: 46 }
 
-  const SPINNER_CENTER_ICON = 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
-  const SPINNER_CENTER_BUTTON = 'inset-0 m-auto'
-
   const SVG_ATTRS = {
     viewBox: '0 0 50 50',
     xmlns: 'http://www.w3.org/2000/svg',
     'aria-hidden': 'true',
   }
-  const SVG_STYLE = 'width:100%;height:100%;overflow:hidden'
+
   const CIRCLE_ATTRS = {
     cx: '25',
     cy: '25',
@@ -38,22 +35,26 @@
     'stroke-width': '4',
     'stroke-linecap': 'round',
   }
+
   const CIRCLE_STYLE =
     'transform-origin:25px 25px;animation:os-spinner-rotate 16s linear infinite,os-spinner-dash 1.5s ease-in-out infinite'
 
-  function createSpinner(px: number, center: string, forceVisible: boolean) {
+  function createSpinner(px: number, center: string) {
     /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
     const svg = isVue2
-      ? h('svg', { attrs: SVG_ATTRS, style: SVG_STYLE }, [
+      ? h('svg', { attrs: SVG_ATTRS, style: 'width:100%;height:100%;overflow:hidden' }, [
           h('circle', { attrs: CIRCLE_ATTRS, style: CIRCLE_STYLE }),
         ])
       : /* v8 ignore stop */
-        h('svg', { ...SVG_ATTRS, style: SVG_STYLE }, [
+        h('svg', { ...SVG_ATTRS, style: 'width:100%;height:100%;overflow:hidden' }, [
           h('circle', { ...CIRCLE_ATTRS, style: CIRCLE_STYLE }),
         ])
 
-    const style = `width:${px}px;height:${px}px${forceVisible ? ';visibility:visible' : ''}`
-    return h('span', { class: `os-button__spinner absolute ${center}`, style }, [svg])
+    return h(
+      'span',
+      { class: `os-button__spinner absolute ${center}`, style: `width:${px}px;height:${px}px` },
+      [svg],
+    )
   }
 
   export default defineComponent({
@@ -135,7 +136,10 @@
           const iconMargin = props.circle ? '' : isSmall ? '' : hasText ? '-ml-1' : '-ml-1 -mr-1'
           const loadingClass = isLoading ? 'relative overflow-visible' : ''
           const iconChildren = isLoading
-            ? [...(iconContent || []), createSpinner(spinnerPx, SPINNER_CENTER_ICON, true)]
+            ? [
+                ...(iconContent || []),
+                createSpinner(spinnerPx, 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'),
+              ]
             : iconContent
           innerChildren.push(
             h('span', { class: `${iconMargin} ${ICON_CLASS} ${loadingClass}` }, iconChildren),
@@ -154,7 +158,7 @@
         )
 
         const buttonSpinner =
-          isLoading && !hasIcon ? createSpinner(spinnerPx, SPINNER_CENTER_BUTTON, false) : null
+          isLoading && !hasIcon ? createSpinner(spinnerPx, 'inset-0 m-auto') : null
 
         const children = buttonSpinner ? [contentWrapper, buttonSpinner] : [contentWrapper]
 
@@ -163,6 +167,13 @@
           'relative inline-flex items-center justify-center',
           circleClass,
         )
+
+        const buttonData = {
+          type: props.type,
+          disabled: isDisabled || undefined,
+          'data-appearance': props.appearance,
+          'aria-busy': isLoading || undefined,
+        }
 
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
         if (isVue2) {
@@ -176,13 +187,7 @@
             'button',
             {
               class: [buttonClass, parentClass, parentDynClass].filter(Boolean),
-              attrs: {
-                type: props.type,
-                disabled: isDisabled || undefined,
-                'data-appearance': props.appearance,
-                'aria-busy': isLoading || undefined,
-                ...attrs,
-              },
+              attrs: { ...buttonData, ...attrs },
               on: listeners,
             },
             children,
@@ -194,10 +199,7 @@
         return h(
           'button',
           {
-            type: props.type,
-            disabled: isDisabled || undefined,
-            'data-appearance': props.appearance,
-            'aria-busy': isLoading || undefined,
+            ...buttonData,
             class: cn(buttonClass, (attrClass as string) || ''),
             ...restAttrs,
           },
