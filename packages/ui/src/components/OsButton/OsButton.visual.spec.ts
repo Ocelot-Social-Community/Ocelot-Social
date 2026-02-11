@@ -185,4 +185,22 @@ test.describe('OsButton visual regression', () => {
     await expect(root.locator('.flex-col').first()).toHaveScreenshot('circle-appearances.png')
     await checkA11y(page)
   })
+
+  test('loading', async ({ page }) => {
+    await page.goto(`${STORY_URL}--loading&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+    // Pause animations for deterministic screenshots
+    await page.evaluate(() => {
+      document.querySelectorAll('.os-button__spinner').forEach((el) => {
+        ;(el as HTMLElement).style.animationPlayState = 'paused'
+      })
+      document.querySelectorAll('.os-button__spinner circle').forEach((el) => {
+        ;(el as HTMLElement).style.animationPlayState = 'paused'
+      })
+    })
+    await expect(root.locator('.flex-col').first()).toHaveScreenshot('loading.png')
+    await checkA11y(page)
+  })
 })

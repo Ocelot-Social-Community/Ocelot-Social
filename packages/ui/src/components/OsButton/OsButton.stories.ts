@@ -48,6 +48,7 @@ interface PlaygroundArgs {
   fullWidth: boolean
   circle: boolean
   disabled: boolean
+  loading: boolean
   icon: string
   label: string
 }
@@ -82,6 +83,9 @@ export const Playground: StoryObj<PlaygroundArgs> = {
     disabled: {
       control: 'boolean',
     },
+    loading: {
+      control: 'boolean',
+    },
     icon: {
       control: 'select',
       options: Object.keys(iconMap),
@@ -97,6 +101,7 @@ export const Playground: StoryObj<PlaygroundArgs> = {
     fullWidth: false,
     circle: false,
     disabled: false,
+    loading: false,
     icon: 'none',
     label: 'Button',
   },
@@ -650,6 +655,47 @@ export const CircleAppearances: Story = {
             </OsButton>
             <OsButton circle appearance="ghost" variant="default" aria-label="Add">
               <template #icon><PlusIcon /></template>
+            </OsButton>
+          </div>
+        </div>
+      </div>
+    `,
+  }),
+}
+
+export const Loading: Story = {
+  render: () => ({
+    components: { OsButton, CheckIcon },
+    template: `
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-sm font-bold mb-2">Filled</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton loading appearance="filled" variant="default">Default</OsButton>
+            <OsButton loading appearance="filled" variant="primary">Primary</OsButton>
+            <OsButton loading appearance="filled" variant="danger">Danger</OsButton>
+            <OsButton loading appearance="filled" variant="success">Success</OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Outline</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton loading appearance="outline" variant="default">Default</OsButton>
+            <OsButton loading appearance="outline" variant="primary">Primary</OsButton>
+            <OsButton loading appearance="outline" variant="danger">Danger</OsButton>
+            <OsButton loading appearance="outline" variant="success">Success</OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">With Icon</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton loading variant="primary">
+              <template #icon><CheckIcon /></template>
+              Save
+            </OsButton>
+            <OsButton loading variant="danger">Delete</OsButton>
+            <OsButton loading circle variant="primary" aria-label="Loading">
+              <template #icon><CheckIcon /></template>
             </OsButton>
           </div>
         </div>

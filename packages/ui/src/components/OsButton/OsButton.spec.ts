@@ -159,7 +159,8 @@ describe('osButton', () => {
           default: 'Save',
         },
       })
-      expect(wrapper.classes()).toContain('gap-2')
+      const contentSpan = wrapper.find('button > span')
+      expect(contentSpan.classes()).toContain('gap-2')
     })
 
     it('adds gap-1 class for small sizes with icon and text', () => {
@@ -170,15 +171,17 @@ describe('osButton', () => {
           default: 'Save',
         },
       })
-      expect(wrapper.classes()).toContain('gap-1')
-      expect(wrapper.classes()).not.toContain('gap-2')
+      const contentSpan = wrapper.find('button > span')
+      expect(contentSpan.classes()).toContain('gap-1')
+      expect(contentSpan.classes()).not.toContain('gap-2')
     })
 
     it('does not add gap-2 for icon-only button', () => {
       const wrapper = mount(OsButton, {
         slots: { icon: '<svg></svg>' },
       })
-      expect(wrapper.classes()).not.toContain('gap-2')
+      const contentSpan = wrapper.find('button > span')
+      expect(contentSpan.classes()).not.toContain('gap-2')
     })
 
     it('treats whitespace-only text as icon-only', () => {
@@ -188,7 +191,8 @@ describe('osButton', () => {
           default: '   ',
         },
       })
-      expect(wrapper.classes()).not.toContain('gap-2')
+      const contentSpan = wrapper.find('button > span')
+      expect(contentSpan.classes()).not.toContain('gap-2')
       expect(wrapper.find('.os-button__icon').classes()).toContain('-mr-1')
     })
 
@@ -196,7 +200,8 @@ describe('osButton', () => {
       const wrapper = mount(OsButton, {
         slots: { default: 'Click me' },
       })
-      expect(wrapper.classes()).not.toContain('gap-2')
+      const contentSpan = wrapper.find('button > span')
+      expect(contentSpan.classes()).not.toContain('gap-2')
     })
 
     it('renders without icon slot (backward compat)', () => {
@@ -301,6 +306,73 @@ describe('osButton', () => {
       })
       expect(wrapper.classes()).not.toContain('rounded-full')
       expect(wrapper.classes()).not.toContain('p-0')
+    })
+  })
+
+  describe('loading prop', () => {
+    it('renders spinner SVG when loading=true', () => {
+      const wrapper = mount(OsButton, {
+        props: { loading: true },
+        slots: { default: 'Save' },
+      })
+      expect(wrapper.find('.os-button__spinner').exists()).toBeTruthy()
+      expect(wrapper.find('svg').exists()).toBeTruthy()
+    })
+
+    it('disables button when loading=true', () => {
+      const wrapper = mount(OsButton, {
+        props: { loading: true },
+        slots: { default: 'Save' },
+      })
+      expect(wrapper.attributes('disabled')).toBeDefined()
+    })
+
+    it('sets aria-busy="true" when loading', () => {
+      const wrapper = mount(OsButton, {
+        props: { loading: true },
+        slots: { default: 'Save' },
+      })
+      expect(wrapper.attributes('aria-busy')).toBe('true')
+    })
+
+    it('hides content with opacity-0 when loading', () => {
+      const wrapper = mount(OsButton, {
+        props: { loading: true },
+        slots: { default: 'Save' },
+      })
+      const contentSpan = wrapper.find('span')
+      expect(contentSpan.classes()).toContain('opacity-0')
+    })
+
+    it('does not render spinner when loading=false (default)', () => {
+      const wrapper = mount(OsButton, {
+        slots: { default: 'Save' },
+      })
+      expect(wrapper.find('.os-button__spinner').exists()).toBeFalsy()
+    })
+
+    it('does not set aria-busy when not loading', () => {
+      const wrapper = mount(OsButton, {
+        slots: { default: 'Save' },
+      })
+      expect(wrapper.attributes('aria-busy')).toBeUndefined()
+    })
+
+    it('loading + disabled: button remains disabled', () => {
+      const wrapper = mount(OsButton, {
+        props: { loading: true, disabled: true },
+        slots: { default: 'Save' },
+      })
+      expect(wrapper.attributes('disabled')).toBeDefined()
+    })
+
+    it('does not emit click when loading', async () => {
+      const wrapper = mount(OsButton, {
+        props: { loading: true },
+        slots: { default: 'Save' },
+      })
+      await wrapper.trigger('click')
+      expect(wrapper.emitted('click')).toBeUndefined()
     })
   })
 

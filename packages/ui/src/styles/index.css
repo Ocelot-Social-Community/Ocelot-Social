@@ -20,6 +20,18 @@
  * disabled buttons immediately show disabled styling, even when clicked.
  */
 
+/*
+ * Spinner animations for loading state
+ */
+@keyframes os-spinner-dash {
+  0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; }
+  100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
+}
+@keyframes os-spinner-rotate {
+  100% { transform: rotate(2160deg); }
+}
+
 /* Filled buttons: gray background when disabled, regardless of hover/active */
 button[data-appearance="filled"]:disabled:hover,
 button[data-appearance="filled"]:disabled:active {

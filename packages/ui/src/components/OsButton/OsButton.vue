@@ -41,6 +41,10 @@
         type: Boolean,
         default: false,
       },
+      loading: {
+        type: Boolean,
+        default: false,
+      },
     },
     setup(props, { slots, attrs }) {
       const classes = computed(() =>
@@ -67,6 +71,8 @@
       const ICON_CLASS =
         'os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current'
 
+      const SPINNER_SIZE = 'w-[1.2em] h-[1.2em]'
+
       return () => {
         const iconContent = slots.icon?.()
         const defaultContent = slots.default?.()
@@ -80,21 +86,54 @@
 
         const size = props.size!
         const isSmall = ['xs', 'sm'].includes(size)
+        const isLoading = props.loading
 
-        const circleClass = props.circle
-          ? `rounded-full p-0 ${CIRCLE_WIDTHS[size]}`
-          : ''
+        const circleClass = props.circle ? `rounded-full p-0 ${CIRCLE_WIDTHS[size]}` : ''
 
-        const children: (string | ReturnType<typeof h>)[] = []
+        const innerChildren: (string | ReturnType<typeof h>)[] = []
         if (hasIcon) {
           const iconMargin = props.circle ? '' : isSmall ? '' : hasText ? '-ml-1' : '-ml-1 -mr-1'
-          children.push(h('span', { class: `${iconMargin} ${ICON_CLASS}` }, iconContent))
+          innerChildren.push(h('span', { class: `${iconMargin} ${ICON_CLASS}` }, iconContent))
         }
         if (defaultContent && hasText) {
-          children.push(...defaultContent)
+          innerChildren.push(...defaultContent)
         }
 
         const gapClass = hasIcon && hasText ? (isSmall ? 'gap-1' : 'gap-2') : ''
+
+        // Wrap content in a span; when loading, make it invisible but keep layout
+        const contentClass = `inline-flex items-center ${gapClass} ${isLoading ? 'opacity-0' : ''}`
+        const contentWrapper = h('span', { class: contentClass }, innerChildren)
+
+        // Spinner SVG (absolutely positioned over content)
+        const spinner = isLoading
+          ? h(
+              'svg',
+              {
+                class: `os-button__spinner absolute ${SPINNER_SIZE}`,
+                viewBox: '0 0 50 50',
+                xmlns: 'http://www.w3.org/2000/svg',
+                'aria-hidden': 'true',
+                style: 'animation: os-spinner-rotate 2s linear infinite',
+              },
+              [
+                h('circle', {
+                  cx: '25',
+                  cy: '25',
+                  r: '20',
+                  fill: 'none',
+                  stroke: 'currentColor',
+                  'stroke-width': '4',
+                  'stroke-linecap': 'round',
+                  style: 'animation: os-spinner-dash 1.5s ease-in-out infinite',
+                }),
+              ],
+            )
+          : null
+
+        const children = spinner ? [contentWrapper, spinner] : [contentWrapper]
+
+        const isDisabled = props.disabled || isLoading
 
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
         if (isVue2) {
@@ -110,11 +149,18 @@
           return h(
             'button',
             {
-              class: [classes.value, gapClass, circleClass, parentClass, parentDynClass].filter(Boolean),
+              class: [
+                classes.value,
+                'relative inline-flex items-center justify-center',
+                circleClass,
+                parentClass,
+                parentDynClass,
+              ].filter(Boolean),
               attrs: {
                 type: props.type,
-                disabled: props.disabled || undefined,
+                disabled: isDisabled || undefined,
                 'data-appearance': props.appearance,
+                'aria-busy': isLoading || undefined,
                 ...attrs,
               },
               on: listeners,
@@ -130,9 +176,15 @@
           'button',
           {
             type: props.type,
-            disabled: props.disabled,
+            disabled: isDisabled || undefined,
             'data-appearance': props.appearance,
-            class: cn(classes.value, gapClass, circleClass, (attrClass as string) || ''),
+            'aria-busy': isLoading || undefined,
+            class: cn(
+              classes.value,
+              'relative inline-flex items-center justify-center',
+              circleClass,
+              (attrClass as string) || '',
+            ),
             ...restAttrs,
           },
           children,
