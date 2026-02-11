@@ -248,14 +248,16 @@ export default {
       this.editor.commands.mention({ id: message.id, label: message.slug })
     },
     toggleLinkInput(attrs, element) {
-      if (!this.isLinkInputActive && attrs && element) {
-        this.$refs.linkInput.linkUrl = attrs.href
-        this.isLinkInputActive = true
-        this.$refs.contextMenu.displayContextMenu(element, this.$refs.linkInput.$el, 'link')
-      } else {
+      if (this.$refs.contextMenu.menu) {
         this.$refs.contextMenu.hideContextMenu()
         this.isLinkInputActive = false
         this.editor.focus()
+      } else if (attrs && element) {
+        this.$refs.linkInput.linkUrl = attrs.href
+        this.isLinkInputActive = true
+        this.$nextTick(() => {
+          this.$refs.contextMenu.displayContextMenu(element, this.$refs.linkInput.$el, 'link')
+        })
       }
     },
     setLinkUrl(url) {
