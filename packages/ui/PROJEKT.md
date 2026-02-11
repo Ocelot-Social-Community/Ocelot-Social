@@ -97,9 +97,9 @@ Analyse:    ██████████ 100% (Button, Modal, Menu detailiert)
 ### OsButton Migration (Phase 3)
 ```
 Scope gesamt:     ~90 Buttons in Webapp
-├─ Migriert:       33 Buttons (37%) ✅
+├─ Migriert:       39 Buttons (43%) ✅
 ├─ Ohne neue Props:  0 Buttons (Milestone 4a ✅)
-└─ Mit icon/circle/loading: ~59 Buttons (Milestone 4c)
+└─ Mit icon/circle/loading: ~53 Buttons (Milestone 4c)
 
 OsButton Features:
 ├─ variant:     ✅ primary, secondary, danger, warning, success, info, default
@@ -185,7 +185,7 @@ OsButton Features:
 
 **Aktuell in Arbeit:**
 - Phase 3, Milestone 4b: circle/loading Props in OsButton implementieren
-- Phase 3, Milestone 4c: ~59 Buttons mit icon/circle/loading migrieren
+- Phase 3, Milestone 4c: ~53 Buttons mit icon/circle/loading migrieren
 
 **Zuletzt abgeschlossen (Session 13 - Icon-Slot, Storybook Playground, Webapp-Migration):**
 - [x] Icon-Slot für OsButton implementiert (slot-basiert, icon-system-agnostisch)
@@ -198,6 +198,10 @@ OsButton Features:
 - [x] Unit Tests: 8 neue Tests (icon slot, keyboard a11y mit aria-label)
 - [x] Erste Webapp-Migration mit Icon: `my-email-address/index.vue` (Save-Button mit check-Icon)
 - [x] Code-Optimierung: ICON_CLASS Konstante, iconMargin Variable, vereinfachte hasText-Logik
+- [x] Größenabhängiger Gap: `gap-1` für xs/sm, `gap-2` für md/lg/xl
+- [x] Größenabhängiger Icon-Margin: kein negativer Margin bei xs/sm (mehr Abstand zur Button-Grenze)
+- [x] 6 weitere Buttons mit Icon migriert: DisableModal, DeleteUserModal, CtaUnblockAuthor, LocationSelect, CategoriesSelect, profile Chat
+- [x] verify.vue hat keinen Button (Eintrag korrigiert)
 
 **Zuvor abgeschlossen (Session 12 - CSS-Linting, CI-Optimierung, Code-Review Fixes):**
 - [x] CSS-Linting: `@eslint/css` + `tailwind-csstree` für Tailwind v4 Syntax-Support
@@ -273,7 +277,7 @@ OsButton Features:
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
 3. ~~**Phase 2: Projekt-Setup**~~ ✅ ABGESCHLOSSEN
-4. **Phase 3: Webapp-Integration** - 33/90 Buttons migriert (37%)
+4. **Phase 3: Webapp-Integration** - 39/90 Buttons migriert (43%)
    - [x] yarn link / Webpack-Alias in Webapp
    - [x] CSS-Variablen definieren (ocelot-ui-variables.scss)
    - [x] 16 Buttons migriert & validiert ✅
@@ -410,9 +414,9 @@ OsButton Features:
 
 *Filter & Input:*
 - [ ] HashtagsFilter.vue (icon, circle)
-- [ ] CategoriesSelect.vue (icon)
+- [x] CategoriesSelect.vue (icon) ✅
 - [ ] SearchableInput.vue (icon, circle)
-- [ ] Select/LocationSelect.vue (icon)
+- [x] Select/LocationSelect.vue (icon) ✅
 - [ ] PaginationButtons.vue (2× icon, circle)
 
 *Chat:*
@@ -431,8 +435,8 @@ OsButton Features:
 *Modals:*
 - [ ] Modal/ConfirmModal.vue (2× icon, loading)
 - [ ] Modal/ReportModal.vue (2× icon, loading)
-- [ ] Modal/DisableModal.vue Confirm (icon)
-- [ ] Modal/DeleteUserModal.vue Confirm (icon)
+- [x] Modal/DisableModal.vue Confirm (icon) ✅
+- [x] Modal/DeleteUserModal.vue Confirm (icon) ✅
 - [ ] Modal/ReleaseModal.vue Confirm (icon)
 
 *Features:*
@@ -445,7 +449,7 @@ OsButton Features:
 - [ ] ImageUploader.vue Delete/Cancel (2× icon, circle)
 - [ ] CommentCard.vue Reply (icon, circle)
 - [ ] EmbedComponent.vue Close (icon, circle)
-- [ ] CtaUnblockAuthor.vue (icon)
+- [x] CtaUnblockAuthor.vue (icon) ✅
 - [ ] data-download.vue (icon, loading)
 
 *Pages:*
@@ -455,8 +459,7 @@ OsButton Features:
 - [ ] pages/settings/blocked-users.vue (icon, circle)
 - [ ] pages/settings/muted-users.vue (icon, circle)
 - [x] pages/settings/my-email-address/index.vue (1× icon) ✅
-- [ ] pages/settings/my-email-address/verify.vue (1× icon)
-- [ ] pages/profile/_id/_slug.vue Chat (icon)
+- [x] pages/profile/_id/_slug.vue Chat (icon) ✅
 - [ ] pages/post/_id/_slug/index.vue (icon, circle)
 
 **Milestone 5: Validierung & Dokumentation** ✅
@@ -471,8 +474,8 @@ OsButton Features:
 | Kategorie | Buttons | Status |
 |-----------|---------|--------|
 | ✅ Migriert & Validiert | 32 | Erledigt (M1-M4a) |
-| ✅ Mit icon migriert (M4c) | 1 | my-email-address/index.vue |
-| ⬜ Mit icon/circle/loading (M4c) | ~57 | Ausstehend |
+| ✅ Mit icon migriert (M4c) | 7 | 7 Buttons in 7 Dateien |
+| ⬜ Mit icon/circle/loading (M4c) | ~51 | Ausstehend |
 | **Gesamt** | **~90** | **37% erledigt** |
 
 **Details siehe KATALOG.md** (vollständige Tracking-Tabellen)
@@ -1510,6 +1513,15 @@ Bei der Migration werden:
 | 2026-02-11 | **SVG-Targeting** | `[&>svg]` statt `[&>*]` für Icon-Sizing (BaseIcon rendert `<span><svg>`, Wrapper-Span darf nicht beeinflusst werden) |
 | 2026-02-11 | **my-email-address migriert** | Save-Button: `<os-button variant="primary">` mit `<template #icon><base-icon name="check" /></template>` |
 | 2026-02-11 | **Code-Optimierung** | `ICON_CLASS` Konstante extrahiert, `iconMargin` Variable, vereinfachte `hasText`-Logik (kein Symbol.for) |
+| 2026-02-11 | **Größenabhängiger Gap** | `gap-1` (4px) für xs/sm, `gap-2` (8px) für md/lg/xl bei Icon+Text |
+| 2026-02-11 | **Größenabhängiger Margin** | Kein negativer Icon-Margin bei xs/sm (voller Padding-Abstand zur Button-Grenze) |
+| 2026-02-11 | **DisableModal.vue** | Confirm-Button migriert: `danger filled icon="exclamation-circle"` → `variant="danger"` + `#icon` Slot |
+| 2026-02-11 | **DeleteUserModal.vue** | Confirm-Button migriert: identisches Pattern wie DisableModal |
+| 2026-02-11 | **CtaUnblockAuthor.vue** | Button migriert: `filled icon="arrow-right"` → `variant="primary"` + `#icon` Slot, OsButton importiert |
+| 2026-02-11 | **LocationSelect.vue** | Icon-only Close-Button migriert: `ghost size="small" icon="close"` → `variant="primary" appearance="ghost" size="sm"` + aria-label |
+| 2026-02-11 | **CategoriesSelect.vue** | v-for Buttons migriert: dynamisches `:icon` → `#icon` Slot, `:filled` → `:appearance`, CSS `.base-button` → `button` |
+| 2026-02-11 | **profile/_id/_slug.vue** | Chat-Button migriert: `icon="chat-bubble"` → `variant="primary" appearance="outline" full-width` + `#icon` Slot |
+| 2026-02-11 | **verify.vue korrigiert** | Kein Button vorhanden (Eintrag aus Milestone-Liste entfernt) |
 
 ---
 
