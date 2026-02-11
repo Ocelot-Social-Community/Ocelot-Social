@@ -7,9 +7,12 @@
       <os-button variant="primary" appearance="outline" class="cancel" @click="cancel">
         {{ $t('release.cancel') }}
       </os-button>
-      <base-button danger filled class="confirm" icon="exclamation-circle" @click="confirm">
+      <os-button variant="danger" appearance="filled" class="confirm" @click="confirm">
+        <template #icon>
+          <base-icon name="exclamation-circle" />
+        </template>
         {{ $t('release.submit') }}
-      </base-button>
+      </os-button>
     </template>
   </ds-modal>
 </template>
