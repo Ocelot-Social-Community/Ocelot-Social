@@ -34,7 +34,10 @@
     xl: 'width:30px;height:30px',
   }
 
-  const SPINNER_CENTER = 'inset-0 m-auto'
+  /** Center spinner over icon wrapper (may overflow — wrapper has overflow-visible) */
+  const SPINNER_CENTER_ICON = 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
+  /** Center spinner in button container (spinner fits inside) */
+  const SPINNER_CENTER_BUTTON = 'inset-0 m-auto'
 
   const CIRCLE_ATTRS = {
     cx: '25',
@@ -166,7 +169,7 @@
           const loadingClass = isLoading ? 'relative overflow-visible [&>*]:invisible' : ''
           const iconChildren = isLoading
             ? // eslint-disable-next-line security/detect-object-injection -- size is a validated prop
-              [...(iconContent || []), createSpinner(ICON_SPINNER_SIZE[size], SPINNER_CENTER, true)]
+              [...(iconContent || []), createSpinner(ICON_SPINNER_SIZE[size], SPINNER_CENTER_ICON, true)]
             : iconContent
           innerChildren.push(
             h('span', { class: `${iconMargin} ${ICON_CLASS} ${loadingClass}` }, iconChildren),
@@ -187,7 +190,7 @@
         // Spinner for text-only buttons (centered over button)
         const buttonSpinner =
           // eslint-disable-next-line security/detect-object-injection -- size is a validated prop
-          isLoading && !hasIcon ? createSpinner(SPINNER_SIZE[size], SPINNER_CENTER, false) : null
+          isLoading && !hasIcon ? createSpinner(SPINNER_SIZE[size], SPINNER_CENTER_BUTTON, false) : null
 
         const children = buttonSpinner ? [contentWrapper, buttonSpinner] : [contentWrapper]
 
