@@ -1,64 +1,134 @@
 <template>
   <editor-menu-bar :editor="editor" v-slot="{ commands, isActive, getMarkAttrs }">
     <div>
-      <menu-bar-button :isActive="isActive.bold()" :onClick="commands.bold" icon="bold" />
+      <os-button
+        size="sm"
+        circle
+        variant="primary"
+        :appearance="isActive.bold() ? 'outline' : 'ghost'"
+        @click="commands.bold"
+      >
+        <template #icon>
+          <base-icon name="bold" />
+        </template>
+      </os-button>
 
-      <menu-bar-button :isActive="isActive.italic()" :onClick="commands.italic" icon="italic" />
+      <os-button
+        size="sm"
+        circle
+        variant="primary"
+        :appearance="isActive.italic() ? 'outline' : 'ghost'"
+        @click="commands.italic"
+      >
+        <template #icon>
+          <base-icon name="italic" />
+        </template>
+      </os-button>
 
-      <menu-bar-button
-        :isActive="isActive.underline()"
-        :onClick="commands.underline"
-        icon="underline"
-      />
+      <os-button
+        size="sm"
+        circle
+        variant="primary"
+        :appearance="isActive.underline() ? 'outline' : 'ghost'"
+        @click="commands.underline"
+      >
+        <template #icon>
+          <base-icon name="underline" />
+        </template>
+      </os-button>
 
-      <menu-bar-button
+      <os-button
         ref="linkButton"
-        :isActive="isActive.link()"
-        :onClick="(event) => toggleLinkInput(getMarkAttrs('link'), event.currentTarget)"
-        icon="link"
-      />
+        size="sm"
+        circle
+        variant="primary"
+        :appearance="isActive.link() ? 'outline' : 'ghost'"
+        @click="(event) => toggleLinkInput(getMarkAttrs('link'), event.currentTarget)"
+      >
+        <template #icon>
+          <base-icon name="link" />
+        </template>
+      </os-button>
 
-      <menu-bar-button
-        :isActive="isActive.paragraph()"
-        :onClick="commands.paragraph"
-        icon="paragraph"
-      />
+      <os-button
+        size="sm"
+        circle
+        variant="primary"
+        :appearance="isActive.paragraph() ? 'outline' : 'ghost'"
+        @click="commands.paragraph"
+      >
+        <template #icon>
+          <base-icon name="paragraph" />
+        </template>
+      </os-button>
 
-      <menu-bar-button
-        :isActive="isActive.heading({ level: 3 })"
-        :onClick="() => commands.heading({ level: 3 })"
-        label="H3"
-      />
+      <os-button
+        size="sm"
+        circle
+        variant="primary"
+        :appearance="isActive.heading({ level: 3 }) ? 'outline' : 'ghost'"
+        @click="() => commands.heading({ level: 3 })"
+      >
+        H3
+      </os-button>
 
-      <menu-bar-button
-        :isActive="isActive.heading({ level: 4 })"
-        :onClick="() => commands.heading({ level: 4 })"
-        label="H4"
-      />
+      <os-button
+        size="sm"
+        circle
+        variant="primary"
+        :appearance="isActive.heading({ level: 4 }) ? 'outline' : 'ghost'"
+        @click="() => commands.heading({ level: 4 })"
+      >
+        H4
+      </os-button>
 
-      <menu-bar-button
-        :isActive="isActive.bullet_list()"
-        :onClick="commands.bullet_list"
-        icon="list-ul"
-      />
+      <os-button
+        size="sm"
+        circle
+        variant="primary"
+        :appearance="isActive.bullet_list() ? 'outline' : 'ghost'"
+        @click="commands.bullet_list"
+      >
+        <template #icon>
+          <base-icon name="list-ul" />
+        </template>
+      </os-button>
 
-      <menu-bar-button
-        :isActive="isActive.ordered_list()"
-        :onClick="commands.ordered_list"
-        icon="list-ol"
-      />
+      <os-button
+        size="sm"
+        circle
+        variant="primary"
+        :appearance="isActive.ordered_list() ? 'outline' : 'ghost'"
+        @click="commands.ordered_list"
+      >
+        <template #icon>
+          <base-icon name="list-ol" />
+        </template>
+      </os-button>
 
-      <menu-bar-button
-        :isActive="isActive.blockquote()"
-        :onClick="commands.blockquote"
-        icon="quote-right"
-      />
+      <os-button
+        size="sm"
+        circle
+        variant="primary"
+        :appearance="isActive.blockquote() ? 'outline' : 'ghost'"
+        @click="commands.blockquote"
+      >
+        <template #icon>
+          <base-icon name="quote-right" />
+        </template>
+      </os-button>
 
-      <menu-bar-button
-        :isActive="isActive.horizontal_rule()"
-        :onClick="commands.horizontal_rule"
-        icon="minus"
-      />
+      <os-button
+        size="sm"
+        circle
+        variant="primary"
+        :appearance="isActive.horizontal_rule() ? 'outline' : 'ghost'"
+        @click="commands.horizontal_rule"
+      >
+        <template #icon>
+          <base-icon name="minus" />
+        </template>
+      </os-button>
 
       <menu-legend class="legend-button" />
     </div>
@@ -66,14 +136,14 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { EditorMenuBar } from 'tiptap'
-import MenuBarButton from './MenuBarButton'
 import MenuLegend from './MenuLegend.vue'
 
 export default {
   components: {
+    OsButton,
     EditorMenuBar,
-    MenuBarButton,
     MenuLegend,
   },
   props: {
