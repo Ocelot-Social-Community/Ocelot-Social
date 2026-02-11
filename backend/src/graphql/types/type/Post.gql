@@ -1,6 +1,7 @@
 input _CategoryFilter {
   AND: [_CategoryFilter!]
   OR: [_CategoryFilter!]
+  id_in: [ID!]
 }
 input _PostFilter {
   AND: [_PostFilter!]
