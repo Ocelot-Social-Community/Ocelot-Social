@@ -13,24 +13,29 @@
       :loading="loadingGeo"
       @input.native="handleCityInput"
     />
-    <base-button
+    <os-button
       v-if="locationName !== '' && canBeCleared"
-      icon="close"
-      ghost
-      size="small"
-      style="position: relative; display: inline-block; right: -94%; top: -48px; width: 29px"
+      variant="primary"
+      appearance="ghost"
+      size="sm"
+      aria-label="Clear location"
+      style="right: -94%; top: -48px"
       @click.native="clearLocationName"
-    ></base-button>
+    >
+      <template #icon><base-icon name="close" /></template>
+    </os-button>
   </div>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { queryLocations } from '~/graphql/location'
 
 let timeout
 
 export default {
   name: 'LocationSelect',
+  components: { OsButton },
   props: {
     value: {
       required: true,
