@@ -64,9 +64,10 @@
             </ds-flex-item>
           </ds-flex>
           <div class="action-buttons">
-            <base-button danger v-if="group.isMutedByMe" @click="unmuteGroup" icon="volume-up">
+            <os-button variant="danger" appearance="outline" v-if="group.isMutedByMe" @click="unmuteGroup">
+              <template #icon><base-icon name="volume-up" /></template>
               {{ $t('group.unmute') }}
-            </base-button>
+            </os-button>
             <!-- Group join / leave -->
             <join-leave-button
               :group="group"
@@ -200,14 +201,15 @@
               v-html="groupDescriptionExcerpt"
             />
             <content-viewer v-else class="content hyphenate-text" :content="group.description" />
-            <base-button
+            <os-button
               class="collaps-button"
-              size="small"
-              ghost
+              variant="primary"
+              appearance="ghost"
+              size="sm"
               @click="isDescriptionCollapsed = !isDescriptionCollapsed"
             >
               {{ isDescriptionCollapsed ? $t('comment.show.more') : $t('comment.show.less') }}
-            </base-button>
+            </os-button>
           </base-card>
         </ds-space>
         <ds-space v-if="isGroupMemberNonePending" centered>
@@ -217,16 +219,20 @@
               query: { groupId: group.id },
             }"
           >
-            <base-button
+            <os-button
               class="profile-post-add-button"
-              icon="plus"
+              variant="primary"
+              appearance="filled"
               circle
-              filled
               v-tooltip="{
                 content: $t('contribution.newPost'),
                 placement: 'left',
               }"
-            />
+            >
+              <template #icon>
+                <base-icon name="plus" />
+              </template>
+            </os-button>
           </nuxt-link>
         </ds-space>
         <masonry-grid>
@@ -279,6 +285,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
@@ -314,6 +321,7 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   components: {
+    OsButton,
     AvatarUploader,
     Category,
     ContentViewer,
@@ -642,13 +650,10 @@ export default {
   box-shadow: $box-shadow-x-large;
 }
 .action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: $space-x-small;
   margin: $space-small 0;
-
-  > .base-button {
-    display: block;
-    width: 100%;
-    margin-bottom: $space-x-small;
-  }
 }
 .centered-text {
   text-align: center;
