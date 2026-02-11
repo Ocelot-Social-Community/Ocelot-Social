@@ -62,7 +62,16 @@
         // Build children array: [iconSpan?, ...textContent?]
         const children: unknown[] = []
         if (hasIcon) {
-          children.push(h('span', { class: 'os-button__icon' }, iconContent))
+          children.push(
+            h(
+              'span',
+              {
+                class:
+                  'os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>*]:h-full [&>*]:w-auto [&_svg]:fill-current',
+              },
+              iconContent,
+            ),
+          )
         }
         if (hasText) {
           children.push(...defaultContent)
