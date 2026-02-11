@@ -18,27 +18,23 @@
   const ICON_CLASS =
     'os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current'
 
-  /** Spinner dimensions (inline style) — full-size for text-only buttons */
-  const SPINNER_SIZE: Record<string, string> = {
-    sm: 'width:24px;height:24px',
-    md: 'width:32px;height:32px',
-    lg: 'width:40px;height:40px',
-    xl: 'width:46px;height:46px',
+  /** Spinner px: [button-level, icon-level] per size */
+  const SPINNER_PX: Record<string, [number, number]> = {
+    sm: [24, 16],
+    md: [32, 22],
+    lg: [40, 26],
+    xl: [46, 30],
   }
 
-  /** Smaller spinner when overlaying an icon */
-  const ICON_SPINNER_SIZE: Record<string, string> = {
-    sm: 'width:16px;height:16px',
-    md: 'width:22px;height:22px',
-    lg: 'width:26px;height:26px',
-    xl: 'width:30px;height:30px',
-  }
-
-  /** Center spinner over icon wrapper (may overflow — wrapper has overflow-visible) */
   const SPINNER_CENTER_ICON = 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
-  /** Center spinner in button container (spinner fits inside) */
   const SPINNER_CENTER_BUTTON = 'inset-0 m-auto'
 
+  const SVG_ATTRS = {
+    viewBox: '0 0 50 50',
+    xmlns: 'http://www.w3.org/2000/svg',
+    'aria-hidden': 'true',
+  }
+  const SVG_STYLE = 'width:100%;height:100%;overflow:hidden'
   const CIRCLE_ATTRS = {
     cx: '25',
     cy: '25',
@@ -48,47 +44,22 @@
     'stroke-width': '4',
     'stroke-linecap': 'round',
   }
-
-  /** Both animations on the circle — SVG stays static to avoid wobble */
   const CIRCLE_STYLE =
     'transform-origin:25px 25px;animation:os-spinner-rotate 16s linear infinite,os-spinner-dash 1.5s ease-in-out infinite'
 
-  /** SVG style: fills wrapper, no animation (purely a container) */
-  const SVG_STYLE = 'width:100%;height:100%;overflow:hidden'
-
-  function createSpinner(sizeStyle: string, extraClass: string, forceVisible: boolean) {
+  function createSpinner(px: number, center: string, forceVisible: boolean) {
     /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
     const svg = isVue2
-      ? h(
-          'svg',
-          {
-            attrs: {
-              viewBox: '0 0 50 50',
-              xmlns: 'http://www.w3.org/2000/svg',
-              'aria-hidden': 'true',
-            },
-            style: SVG_STYLE,
-          },
-          [h('circle', { attrs: CIRCLE_ATTRS, style: CIRCLE_STYLE })],
-        )
+      ? h('svg', { attrs: SVG_ATTRS, style: SVG_STYLE }, [
+          h('circle', { attrs: CIRCLE_ATTRS, style: CIRCLE_STYLE }),
+        ])
       : /* v8 ignore stop */
-        h(
-          'svg',
-          {
-            viewBox: '0 0 50 50',
-            xmlns: 'http://www.w3.org/2000/svg',
-            'aria-hidden': 'true',
-            style: SVG_STYLE,
-          },
-          [h('circle', { ...CIRCLE_ATTRS, style: CIRCLE_STYLE })],
-        )
+        h('svg', { ...SVG_ATTRS, style: SVG_STYLE }, [
+          h('circle', { ...CIRCLE_ATTRS, style: CIRCLE_STYLE }),
+        ])
 
-    // Wrapper carries positioning + size; SVG inside only rotates.
-    // Separating position from transform avoids sub-pixel wobble.
-    const wrapperStyle = `${sizeStyle}${forceVisible ? ';visibility:visible' : ''}`
-    return h('span', { class: `os-button__spinner absolute ${extraClass}`, style: wrapperStyle }, [
-      svg,
-    ])
+    const style = `width:${px}px;height:${px}px${forceVisible ? ';visibility:visible' : ''}`
+    return h('span', { class: `os-button__spinner absolute ${center}`, style }, [svg])
   }
 
   export default defineComponent({
@@ -154,6 +125,8 @@
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const size = props.size!
+        // eslint-disable-next-line security/detect-object-injection -- size is a validated prop
+        const spinnerPx = SPINNER_PX[size]
         const isSmall = ['xs', 'sm'].includes(size)
         const isLoading = props.loading
         const isDisabled = props.disabled || isLoading
@@ -168,11 +141,7 @@
           const iconMargin = props.circle ? '' : isSmall ? '' : hasText ? '-ml-1' : '-ml-1 -mr-1'
           const loadingClass = isLoading ? 'relative overflow-visible [&>*]:invisible' : ''
           const iconChildren = isLoading
-            ? [
-                ...(iconContent || []),
-                // eslint-disable-next-line security/detect-object-injection -- size is a validated prop
-                createSpinner(ICON_SPINNER_SIZE[size], SPINNER_CENTER_ICON, true),
-              ]
+            ? [...(iconContent || []), createSpinner(spinnerPx[1], SPINNER_CENTER_ICON, true)]
             : iconContent
           innerChildren.push(
             h('span', { class: `${iconMargin} ${ICON_CLASS} ${loadingClass}` }, iconChildren),
@@ -190,12 +159,8 @@
           innerChildren,
         )
 
-        // Spinner for text-only buttons (centered over button)
         const buttonSpinner =
-          isLoading && !hasIcon
-            ? // eslint-disable-next-line security/detect-object-injection -- size is a validated prop
-              createSpinner(SPINNER_SIZE[size], SPINNER_CENTER_BUTTON, false)
-            : null
+          isLoading && !hasIcon ? createSpinner(spinnerPx[0], SPINNER_CENTER_BUTTON, false) : null
 
         const children = buttonSpinner ? [contentWrapper, buttonSpinner] : [contentWrapper]
 
@@ -205,7 +170,6 @@
           circleClass,
         )
 
-        // --- Render button ---
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
         if (isVue2) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
