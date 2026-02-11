@@ -78,6 +78,19 @@ describe('osButton', () => {
       })
       expect(wrapper.classes()).toContain('h-12')
     })
+
+    it('has min-width matching height for each size', () => {
+      const sizes: Record<string, string> = {
+        sm: 'min-w-[26px]',
+        md: 'min-w-[36px]',
+        lg: 'min-w-12',
+        xl: 'min-w-14',
+      }
+      for (const [size, expected] of Object.entries(sizes)) {
+        const wrapper = mount(OsButton, { props: { size } })
+        expect(wrapper.classes()).toContain(expected)
+      }
+    })
   })
 
   it('applies fullWidth class', () => {
@@ -101,11 +114,23 @@ describe('osButton', () => {
     expect(wrapper.attributes('disabled')).toBeDefined()
   })
 
+  it('defaults to type="button"', () => {
+    const wrapper = mount(OsButton)
+    expect(wrapper.attributes('type')).toBe('button')
+  })
+
   it('sets button type', () => {
     const wrapper = mount(OsButton, {
       props: { type: 'submit' },
     })
     expect(wrapper.attributes('type')).toBe('submit')
+  })
+
+  it('sets data-appearance attribute', () => {
+    const wrapper = mount(OsButton, {
+      props: { appearance: 'outline' },
+    })
+    expect(wrapper.attributes('data-appearance')).toBe('outline')
   })
 
   it('emits click event', async () => {
@@ -299,6 +324,19 @@ describe('osButton', () => {
       expect(iconWrapper.classes()).not.toContain('-mr-1')
     })
 
+    it('uses gap-1 for circle with icon and text', () => {
+      const wrapper = mount(OsButton, {
+        props: { circle: true },
+        slots: {
+          icon: '<svg></svg>',
+          default: 'Add',
+        },
+      })
+      const contentSpan = wrapper.find('button > span')
+      expect(contentSpan.classes()).toContain('gap-1')
+      expect(contentSpan.classes()).not.toContain('gap-2')
+    })
+
     it('does not apply circle classes when circle is false', () => {
       const wrapper = mount(OsButton, {
         props: { circle: false },
@@ -422,6 +460,18 @@ describe('osButton', () => {
       // No spinner as direct child of button — it's inside the icon wrapper
       const buttonSpinner = wrapper.find('button > .os-button__spinner')
       expect(buttonSpinner.exists()).toBeFalsy()
+    })
+
+    it('keeps icon visible and shows spinner for icon-only loading', () => {
+      const wrapper = mount(OsButton, {
+        props: { loading: true },
+        slots: { icon: '<svg data-testid="icon"></svg>' },
+      })
+      const iconWrapper = wrapper.find('.os-button__icon')
+      expect(iconWrapper.exists()).toBeTruthy()
+      expect(iconWrapper.find('[data-testid="icon"]').exists()).toBeTruthy()
+      expect(iconWrapper.find('.os-button__spinner').exists()).toBeTruthy()
+      expect(iconWrapper.classes()).not.toContain('[&>*]:invisible')
     })
 
     it('works with circle prop', () => {
