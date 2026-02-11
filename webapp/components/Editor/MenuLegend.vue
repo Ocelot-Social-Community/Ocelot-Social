@@ -74,7 +74,7 @@ export default {
 
 <style lang="scss">
 .legend-question-button {
-  color: #70677e;
+  color: #70677e !important;
   font-size: 1.2rem !important;
 }
 .legend-question-button:hover {
