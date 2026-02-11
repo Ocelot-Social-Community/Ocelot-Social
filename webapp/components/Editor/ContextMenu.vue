@@ -10,7 +10,6 @@ export default {
     displayContextMenu(target, content, type) {
       const placement = type === 'link' ? 'right' : 'top-start'
       const trigger = type === 'link' ? 'click' : 'mouseenter'
-      const showOnInit = type !== 'link'
 
       if (this.menu) {
         return
@@ -24,7 +23,6 @@ export default {
         inertia: true,
         interactive: true,
         placement,
-        showOnInit,
         theme: 'ocelot-social',
         trigger,
         onMount(instance) {
@@ -35,6 +33,7 @@ export default {
           }
         },
       })
+      this.menu.show()
 
       // we have to update tippy whenever the DOM is updated
       if (MutationObserver) {

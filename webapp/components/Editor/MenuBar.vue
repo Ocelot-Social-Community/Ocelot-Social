@@ -43,7 +43,7 @@
         circle
         variant="primary"
         :appearance="isActive.link() ? 'outline' : 'ghost'"
-        @click="(event) => toggleLinkInput(getMarkAttrs('link'), event.currentTarget)"
+        @click="(event) => toggleLinkInput(getMarkAttrs('link'), event.target.closest('button'))"
       >
         <template #icon>
           <base-icon name="link" />
