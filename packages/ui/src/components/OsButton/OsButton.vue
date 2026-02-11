@@ -77,6 +77,13 @@
         lg: 'width:40px;height:40px',
         xl: 'width:46px;height:46px',
       }
+      // Smaller spinner when replacing an icon (slightly larger than icon's 1.2em)
+      const ICON_SPINNER_INLINE: Record<string, string> = {
+        sm: 'width:16px;height:16px',
+        md: 'width:22px;height:22px',
+        lg: 'width:26px;height:26px',
+        xl: 'width:30px;height:30px',
+      }
 
       return () => {
         const iconContent = slots.icon?.()
@@ -96,9 +103,10 @@
         const circleClass = props.circle ? `rounded-full p-0 ${CIRCLE_WIDTHS[size]}` : ''
 
         // Build spinner VNode with inline size (immune to parent [&>svg] rules)
-        const spinnerStyle = `${SPINNER_INLINE[size]};animation:os-spinner-rotate 16s linear infinite`
-        const createSpinner = (extraClass: string) => {
-          const style = spinnerStyle
+        const createSpinner = (extraClass: string, opts: { forceVisible?: boolean; iconSize?: boolean } = {}) => {
+          const sizeStyle = opts.iconSize ? ICON_SPINNER_INLINE[size] : SPINNER_INLINE[size]
+          let style = `${sizeStyle};animation:os-spinner-rotate 16s linear infinite`
+          if (opts.forceVisible) style += ';visibility:visible'
           const svgProps = isVue2
             ? /* v8 ignore next */ {
                 class: `os-button__spinner absolute ${extraClass}`,
@@ -148,11 +156,16 @@
           innerChildren.push(
             h(
               'span',
-              { class: `${iconMargin} ${ICON_CLASS} ${isLoading ? 'relative overflow-visible' : ''}` },
+              {
+                class: `${iconMargin} ${ICON_CLASS} ${isLoading ? 'relative overflow-visible [&>*]:invisible' : ''}`,
+              },
               isLoading
                 ? [
                     ...(iconContent || []),
-                    createSpinner('top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'),
+                    createSpinner('top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2', {
+                      forceVisible: true,
+                      iconSize: true,
+                    }),
                   ]
                 : iconContent,
             ),
