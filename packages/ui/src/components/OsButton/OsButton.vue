@@ -8,6 +8,12 @@
   import type { ButtonVariants } from './button.variants'
   import type { PropType } from 'vue-demi'
 
+  /**
+   * Flexible button component with optional icon slot.
+   * @slot default - Button content (text or HTML)
+   * @slot icon - Optional icon (rendered left of text). Use aria-label for icon-only buttons.
+   */
+
   const CIRCLE_WIDTHS: Record<string, string> = {
     sm: 'w-[26px]',
     md: 'w-[36px]',
