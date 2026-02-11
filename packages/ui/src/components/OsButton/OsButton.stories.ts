@@ -317,10 +317,7 @@ export const FullWidth: Story = {
 
 export const WithIcon: Story = {
   render: () => ({
-    components: { OsButton },
-    setup() {
-      return { CheckIcon, PlusIcon, CloseIcon }
-    },
+    components: { OsButton, CheckIcon, PlusIcon, CloseIcon },
     template: `
       <div class="flex flex-wrap gap-2">
         <OsButton variant="primary">
@@ -350,10 +347,7 @@ export const WithIcon: Story = {
 
 export const IconOnly: Story = {
   render: () => ({
-    components: { OsButton },
-    setup() {
-      return { CloseIcon, PlusIcon, CheckIcon }
-    },
+    components: { OsButton, CloseIcon, PlusIcon, CheckIcon },
     template: `
       <div class="flex flex-wrap gap-2">
         <OsButton variant="danger" aria-label="Close">
@@ -378,10 +372,7 @@ export const IconOnly: Story = {
 
 export const IconSizes: Story = {
   render: () => ({
-    components: { OsButton },
-    setup() {
-      return { CheckIcon }
-    },
+    components: { OsButton, CheckIcon },
     template: `
       <div class="flex flex-wrap gap-2 items-center">
         <OsButton size="sm" variant="primary">
@@ -407,10 +398,7 @@ export const IconSizes: Story = {
 
 export const IconAppearances: Story = {
   render: () => ({
-    components: { OsButton },
-    setup() {
-      return { CheckIcon }
-    },
+    components: { OsButton, CheckIcon },
     template: `
       <div class="flex flex-col gap-4">
         <div>
