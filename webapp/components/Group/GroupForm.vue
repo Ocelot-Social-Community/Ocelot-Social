@@ -135,9 +135,15 @@
           <nuxt-link to="/groups">
             <os-button>{{ $t('actions.cancel') }}</os-button>
           </nuxt-link>
-          <ds-button type="submit" icon="save" primary :disabled="checkFormError(errors)" fill>
+          <os-button
+            variant="primary"
+            appearance="filled"
+            type="submit"
+            :disabled="checkFormError(errors)"
+          >
+            <template #icon><base-icon name="save" /></template>
             {{ update ? $t('group.update') : $t('group.save') }}
-          </ds-button>
+          </os-button>
         </ds-space>
       </template>
     </ds-form>
