@@ -152,28 +152,28 @@ describe('osButton', () => {
       expect(wrapper.text()).toContain('Save')
     })
 
-    it('adds gap-1 class when icon and text are present', () => {
+    it('adds gap-2 class when icon and text are present', () => {
       const wrapper = mount(OsButton, {
         slots: {
           icon: '<svg></svg>',
           default: 'Save',
         },
       })
-      expect(wrapper.classes()).toContain('gap-1')
+      expect(wrapper.classes()).toContain('gap-2')
     })
 
-    it('does not add gap-1 for icon-only button', () => {
+    it('does not add gap-2 for icon-only button', () => {
       const wrapper = mount(OsButton, {
         slots: { icon: '<svg></svg>' },
       })
-      expect(wrapper.classes()).not.toContain('gap-1')
+      expect(wrapper.classes()).not.toContain('gap-2')
     })
 
-    it('does not add gap-1 without icon', () => {
+    it('does not add gap-2 without icon', () => {
       const wrapper = mount(OsButton, {
         slots: { default: 'Click me' },
       })
-      expect(wrapper.classes()).not.toContain('gap-1')
+      expect(wrapper.classes()).not.toContain('gap-2')
     })
 
     it('renders without icon slot (backward compat)', () => {

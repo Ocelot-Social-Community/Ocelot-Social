@@ -60,14 +60,13 @@
         const hasText = defaultContent && defaultContent.length > 0
 
         // Build children array: [iconSpan?, ...textContent?]
-        const children: unknown[] = []
+        const children: (string | ReturnType<typeof h>)[] = []
         if (hasIcon) {
           children.push(
             h(
               'span',
               {
-                class:
-                  'os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>*]:h-full [&>*]:w-auto [&_svg]:fill-current',
+                class: `os-button__icon -ml-1 ${hasText ? '' : '-mr-1 '}inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current`,
               },
               iconContent,
             ),
@@ -78,7 +77,7 @@
         }
 
         // Add gap between icon and text
-        const gapClass = hasIcon && hasText ? 'gap-1' : ''
+        const gapClass = hasIcon && hasText ? 'gap-2' : ''
 
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
         if (isVue2) {
