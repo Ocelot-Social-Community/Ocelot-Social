@@ -101,35 +101,52 @@
 
         const gapClass = hasIcon && hasText ? (isSmall ? 'gap-1' : 'gap-2') : ''
 
-        // Wrap content in a span; when loading, make it invisible but keep layout
-        const contentClass = `inline-flex items-center ${gapClass} ${isLoading ? 'opacity-0' : ''}`
+        // Wrap content in a span; content stays visible during loading
+        const contentClass = `inline-flex items-center ${gapClass}`
         const contentWrapper = h('span', { class: contentClass }, innerChildren)
 
         // Spinner SVG (absolutely positioned over content)
-        const spinner = isLoading
-          ? h(
-              'svg',
-              {
-                class: `os-button__spinner absolute ${SPINNER_SIZE}`,
+        const spinnerSvgProps = isVue2
+          ? /* v8 ignore next */ {
+              class: `os-button__spinner absolute ${SPINNER_SIZE}`,
+              attrs: {
                 viewBox: '0 0 50 50',
                 xmlns: 'http://www.w3.org/2000/svg',
                 'aria-hidden': 'true',
-                style: 'animation: os-spinner-rotate 2s linear infinite',
               },
-              [
-                h('circle', {
-                  cx: '25',
-                  cy: '25',
-                  r: '20',
-                  fill: 'none',
-                  stroke: 'currentColor',
-                  'stroke-width': '4',
-                  'stroke-linecap': 'round',
-                  style: 'animation: os-spinner-dash 1.5s ease-in-out infinite',
-                }),
-              ],
-            )
-          : null
+              style: 'animation: os-spinner-rotate 16s linear infinite',
+            }
+          : {
+              class: `os-button__spinner absolute ${SPINNER_SIZE}`,
+              viewBox: '0 0 50 50',
+              xmlns: 'http://www.w3.org/2000/svg',
+              'aria-hidden': 'true',
+              style: 'animation: os-spinner-rotate 16s linear infinite',
+            }
+        const spinnerCircleProps = isVue2
+          ? /* v8 ignore next */ {
+              attrs: {
+                cx: '25',
+                cy: '25',
+                r: '20',
+                fill: 'none',
+                stroke: 'currentColor',
+                'stroke-width': '4',
+                'stroke-linecap': 'round',
+              },
+              style: 'animation: os-spinner-dash 1.5s ease-in-out infinite',
+            }
+          : {
+              cx: '25',
+              cy: '25',
+              r: '20',
+              fill: 'none',
+              stroke: 'currentColor',
+              'stroke-width': '4',
+              'stroke-linecap': 'round',
+              style: 'animation: os-spinner-dash 1.5s ease-in-out infinite',
+            }
+        const spinner = isLoading ? h('svg', spinnerSvgProps, [h('circle', spinnerCircleProps)]) : null
 
         const children = spinner ? [contentWrapper, spinner] : [contentWrapper]
 

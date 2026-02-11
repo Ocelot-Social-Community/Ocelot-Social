@@ -143,13 +143,6 @@ export default {
     margin-top: $space-large;
     margin-bottom: $space-small;
   }
-
-  .base-button {
-    display: block;
-    width: 100%;
-    margin-top: $space-large;
-    margin-bottom: $space-small;
-  }
 }
 
 .password-wrapper {

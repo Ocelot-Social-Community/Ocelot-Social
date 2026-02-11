@@ -335,13 +335,14 @@ describe('osButton', () => {
       expect(wrapper.attributes('aria-busy')).toBe('true')
     })
 
-    it('hides content with opacity-0 when loading', () => {
+    it('keeps content visible when loading', () => {
       const wrapper = mount(OsButton, {
         props: { loading: true },
         slots: { default: 'Save' },
       })
       const contentSpan = wrapper.find('span')
-      expect(contentSpan.classes()).toContain('opacity-0')
+      expect(contentSpan.classes()).not.toContain('opacity-0')
+      expect(wrapper.text()).toContain('Save')
     })
 
     it('does not render spinner when loading=false (default)', () => {
