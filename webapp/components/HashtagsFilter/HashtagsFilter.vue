@@ -1,17 +1,25 @@
 <template>
   <base-card class="hashtags-filter">
     <h2>{{ $t('hashtags-filter.hashtag-search', { hashtag }) }}</h2>
-    <base-button
-      icon="close"
+    <os-button
+      variant="primary"
+      appearance="ghost"
       circle
       :title="this.$t('hashtags-filter.clearSearch')"
       @click="clearSearch"
-    />
+    >
+      <template #icon>
+        <base-icon name="close" />
+      </template>
+    </os-button>
   </base-card>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
+
 export default {
+  components: { OsButton },
   props: {
     hashtag: {
       type: String,
