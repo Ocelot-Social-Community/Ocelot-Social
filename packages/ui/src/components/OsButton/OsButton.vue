@@ -122,7 +122,7 @@
         const size = props.size!
         // eslint-disable-next-line security/detect-object-injection -- size is a validated prop
         const spinnerPx = SPINNER_PX[size]
-        const isSmall = props.circle || ['xs', 'sm'].includes(size)
+        const isSmall = props.circle || size === 'sm'
         const isLoading = props.loading
         const isDisabled = props.disabled || isLoading
 
