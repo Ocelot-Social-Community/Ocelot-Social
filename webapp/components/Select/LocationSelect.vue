@@ -135,7 +135,6 @@ export default {
     },
     clearLocationName() {
       this.currentValue = ''
-      this.$emit('input', '')
     },
   },
 }
