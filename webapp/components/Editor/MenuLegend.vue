@@ -1,18 +1,13 @@
 <template>
   <dropdown :placement="placement" offset="5">
-    <template #default="{ openMenu, closeMenu }">
+    <template #default="{ toggleMenu }">
       <slot name="button">
         <os-button
           class="legend-question-button"
           appearance="ghost"
           circle
           size="sm"
-          @click="
-            () => {
-              isDropdownOpen ? closeMenu() : openMenu()
-              isDropdownOpen = !isDropdownOpen
-            }
-          "
+          @click="toggleMenu"
         >
           <template #icon>
             <base-icon name="question-circle" />
@@ -72,7 +67,6 @@ export default {
         { iconName: 'quote-right', name: `editor.legend.quote`, shortcut: '> + space' },
         { iconName: 'minus', name: `editor.legend.ruler`, shortcut: '---' },
       ],
-      isDropdownOpen: false,
     }
   },
 }
