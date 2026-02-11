@@ -1,15 +1,18 @@
 <template>
   <div class="emotion-button">
-    <base-button :id="emotion" circle ghost @click="$emit('toggleEmotion', emotion)">
+    <os-button :id="emotion" appearance="ghost" circle @click="$emit('toggleEmotion', emotion)">
       <img class="image" :src="emojiPath" />
-    </base-button>
+    </os-button>
     <label class="label" :for="emotion">{{ $t(`contribution.emotions-label.${emotion}`) }}</label>
     <p v-if="emotionCount !== null" class="count">{{ emotionCount }}x</p>
   </div>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
+
 export default {
+  components: { OsButton },
   name: 'EmotionButton',
   props: {
     emojiPath: {
@@ -35,7 +38,7 @@ export default {
   flex-direction: column;
   align-items: center;
 
-  > .base-button {
+  > button {
     padding: 0;
 
     &:hover {
