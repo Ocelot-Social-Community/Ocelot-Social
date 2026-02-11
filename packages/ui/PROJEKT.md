@@ -80,11 +80,11 @@
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
-Phase 3: █████████░  88% (21/24 Aufgaben) - Webapp-Integration (M4a ✅, M4b: icon ✅, M5 ✅)
+Phase 3: █████████░  96% (23/24 Aufgaben) - Webapp-Integration (M4a ✅, M4b ✅, M5 ✅)
 Phase 4: █░░░░░░░░░   6% (1/17 Aufgaben) - OsButton ✅
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ███████░░░  69% (59/86 Aufgaben)
+Gesamt:  ███████░░░  72% (62/86 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -97,9 +97,9 @@ Analyse:    ██████████ 100% (Button, Modal, Menu detailiert)
 ### OsButton Migration (Phase 3)
 ```
 Scope gesamt:     ~90 Buttons in Webapp
-├─ Migriert:       41 Buttons (46%) ✅
+├─ Migriert:       43 Buttons (48%) ✅
 ├─ Ohne neue Props:  0 Buttons (Milestone 4a ✅)
-└─ Mit icon/circle/loading: ~51 Buttons (Milestone 4c)
+└─ Mit icon/circle/loading: ~47 Buttons (Milestone 4c)
 
 OsButton Features:
 ├─ variant:     ✅ primary, secondary, danger, warning, success, info, default
@@ -108,16 +108,16 @@ OsButton Features:
 ├─ disabled:    ✅ mit hover/active-Override
 ├─ icon:        ✅ slot-basiert (icon-system-agnostisch)
 ├─ circle:      ✅ rounded-full, größenabhängig (p-1.5 bis p-3)
-└─ loading:     ⬜ TODO (Milestone 4b)
+└─ loading:     ✅ animated SVG spinner, aria-busy (Milestone 4b)
 ```
 
 ---
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-11 (Session 13)
+**Letzte Aktualisierung:** 2026-02-11 (Session 14)
 
-**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 4b: icon ✅, erste Webapp-Migration ✅ (33 Buttons migriert)
+**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 4b ✅ (icon, circle, loading), Webapp-Migration (43 Buttons migriert)
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -184,10 +184,28 @@ OsButton Features:
   - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 
 **Aktuell in Arbeit:**
-- Phase 3, Milestone 4b: circle/loading Props in OsButton implementieren
-- Phase 3, Milestone 4c: ~53 Buttons mit icon/circle/loading migrieren
+- Phase 3, Milestone 4c: ~60 Buttons mit icon/circle/loading migrieren
 
-**Zuletzt abgeschlossen (Session 13 - Icon-Slot, Storybook Playground, Webapp-Migration):**
+**Zuletzt abgeschlossen (Session 14 - Loading Prop, Circle Prop, Code-Optimierung):**
+- [x] `loading` Prop mit animiertem SVG-Spinner implementiert
+- [x] Spinner-Architektur: Beide Animationen (rotate + dash) auf `<circle>` Element (Chrome-Compositing-Bug-Workaround)
+- [x] Spinner zentriert auf Icon (Icon-Buttons) oder Button-Container (Text-Only-Buttons)
+- [x] Icon bleibt bei loading sichtbar, Spinner überlagert Icon-Bereich
+- [x] `aria-busy="true"` für Screenreader bei loading
+- [x] `circle` Prop implementiert (rounded-full, größenabhängige Breiten)
+- [x] `min-width` pro Größe hinzugefügt (verhindert zu kleine leere Buttons)
+- [x] Animations-Keyframes in `animations.css` ausgelagert (wiederverwendbar)
+- [x] Code-Optimierung: OsButton von ~250 auf 207 Zeilen vereinfacht
+  - `buttonData` Objekt für Vue 2/3 geteilt
+  - `SPINNER_PX` vereinfacht (Tuple → einfache Zahlen)
+  - Redundante `cn()` Wrapping entfernt
+  - `getCurrentInstance()` nur bei Vue 2 aufgerufen
+- [x] 76 Unit-Tests (5 neue: default type, data-appearance, min-w, icon-only loading, circle gap)
+- [x] Loading-Stories in Storybook (alle Varianten × Appearances)
+- [x] Visual Tests mit `animationPlayState = 'paused'` für stabile Screenshots
+- [x] PaginationButtons.vue migriert (2 circle icon-only Buttons)
+
+**Zuvor abgeschlossen (Session 13 - Icon-Slot, Storybook Playground, Webapp-Migration):**
 - [x] Icon-Slot für OsButton implementiert (slot-basiert, icon-system-agnostisch)
 - [x] Render-Funktion: `slots.icon?.()` → `<span class="os-button__icon">` Wrapper
 - [x] Tailwind-Klassen direkt auf Icon-Wrapper (kein custom CSS in index.css nötig)
@@ -277,13 +295,13 @@ OsButton Features:
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
 3. ~~**Phase 2: Projekt-Setup**~~ ✅ ABGESCHLOSSEN
-4. **Phase 3: Webapp-Integration** - 39/90 Buttons migriert (43%)
+4. **Phase 3: Webapp-Integration** - 43/90 Buttons migriert (48%)
    - [x] yarn link / Webpack-Alias in Webapp
    - [x] CSS-Variablen definieren (ocelot-ui-variables.scss)
    - [x] 16 Buttons migriert & validiert ✅
    - [x] Docker Build + CI-Kompatibilität
    - [x] **Milestone 4a:** 14 weitere Buttons (ohne neue Props) ✅
-   - [ ] **Milestone 4b:** icon/circle/loading Props implementieren
+   - [x] **Milestone 4b:** icon/circle/loading Props implementieren ✅
    - [ ] **Milestone 4c:** ~60 Buttons mit icon/circle/loading migrieren
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
@@ -384,10 +402,10 @@ OsButton Features:
 - [x] Page-Buttons (donations, badges, notifications/index, profile Unblock/Unmute)
 - [x] ReportRow.vue More-Details-Button
 
-**Milestone 4b: OsButton Props erweitern**
+**Milestone 4b: OsButton Props erweitern** ✅
 - [x] `icon` Slot implementiert (slot-basiert, icon-system-agnostisch) ✅
-- [x] `circle` Variant zu CVA hinzufügen ✅
-- [ ] `loading` Prop mit Spinner implementieren
+- [x] `circle` Prop implementiert (rounded-full, größenabhängige Breiten) ✅
+- [x] `loading` Prop mit animiertem SVG-Spinner implementiert ✅
 
 **Milestone 4c: Buttons mit icon/circle/loading migrieren (~60 Buttons)**
 
@@ -1523,6 +1541,15 @@ Bei der Migration werden:
 | 2026-02-11 | **profile/_id/_slug.vue** | Chat-Button migriert: `icon="chat-bubble"` → `variant="primary" appearance="outline" full-width` + `#icon` Slot |
 | 2026-02-11 | **verify.vue korrigiert** | Kein Button vorhanden (Eintrag aus Milestone-Liste entfernt) |
 | 2026-02-11 | **PaginationButtons.vue** | 2 circle icon-only Buttons migriert: `outline primary circle` + `#icon` Slot + aria-label |
+| 2026-02-11 | **OsButton: circle Prop** | `circle` Prop: `rounded-full p-0` + größenabhängige Breiten (CIRCLE_WIDTHS Map) |
+| 2026-02-11 | **OsButton: loading Prop** | Animierter SVG-Spinner mit `aria-busy="true"`, Button auto-disabled bei loading |
+| 2026-02-11 | **Spinner-Architektur** | Beide Animationen (rotate + dash) auf `<circle>` Element; SVG ist statischer Container; Chrome-Compositing-Bug-Workaround |
+| 2026-02-11 | **Spinner-Zentrierung** | Icon-Buttons: Spinner über Icon (translate-basiert, overflow:visible); Text-Buttons: Spinner im Button-Container (inset-0 m-auto) |
+| 2026-02-11 | **animations.css** | Keyframes `os-spinner-dash` + `os-spinner-rotate` in separate CSS-Datei ausgelagert |
+| 2026-02-11 | **min-width pro Größe** | `min-w-[26px]`/`min-w-[36px]`/`min-w-12`/`min-w-14` in button.variants.ts (verhindert zu kleine leere Buttons) |
+| 2026-02-11 | **Code-Optimierung** | OsButton ~250→207 Zeilen: buttonData geteilt, SPINNER_PX vereinfacht, redundante cn() entfernt, getCurrentInstance nur Vue 2 |
+| 2026-02-11 | **5 neue Unit-Tests** | default type, data-appearance, min-w, icon-only loading, circle gap-1; gesamt: 76 Tests |
+| 2026-02-11 | **Milestone 4b abgeschlossen** | icon ✅, circle ✅, loading ✅ — alle OsButton-Props implementiert |
 
 ---
 
