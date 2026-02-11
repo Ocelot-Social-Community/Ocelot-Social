@@ -35,18 +35,27 @@
       <ds-flex v-if="singleRoom">
         <ds-flex-item centered class="single-chat-bubble">
           <nuxt-link :to="{ name: 'chat' }">
-            <base-button icon="expand" size="small" circle />
+            <os-button variant="primary" appearance="ghost" circle size="sm">
+              <template #icon>
+                <base-icon name="expand" />
+              </template>
+            </os-button>
           </nuxt-link>
         </ds-flex-item>
         <ds-flex-item centered>
           <div class="vac-svg-button vac-room-options">
             <slot name="menu-icon">
-              <base-button
-                icon="close"
-                size="small"
+              <os-button
+                variant="primary"
+                appearance="ghost"
                 circle
+                size="sm"
                 @click="$emit('close-single-room', true)"
-              />
+              >
+                <template #icon>
+                  <base-icon name="close" />
+                </template>
+              </os-button>
             </slot>
           </div>
         </ds-flex-item>
@@ -89,6 +98,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { roomQuery, createRoom, unreadRoomsQuery } from '~/graphql/Rooms'
 import {
   messageQuery,
@@ -101,6 +111,7 @@ import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'Chat',
+  components: { OsButton },
   props: {
     theme: {
       type: String,
