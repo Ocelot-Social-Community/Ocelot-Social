@@ -1,16 +1,20 @@
 <template>
   <dropdown class="invite-button" offset="8" :placement="placement" noMouseLeaveClosing>
     <template #default="{ toggleMenu }">
-      <base-button
-        icon="user-plus"
+      <os-button
+        variant="primary"
+        appearance="ghost"
         circle
-        ghost
         v-tooltip="{
           content: $t('invite-codes.button.tooltip'),
           placement: 'bottom-start',
         }"
         @click.prevent="toggleMenu"
-      />
+      >
+        <template #icon>
+          <base-icon name="user-plus" />
+        </template>
+      </os-button>
     </template>
     <template #popover>
       <div class="invite-list">
@@ -31,6 +35,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import Dropdown from '~/components/Dropdown'
 import { mapGetters, mapMutations } from 'vuex'
 import InvitationList from '~/components/_new/features/Invitations/InvitationList.vue'
@@ -38,6 +43,7 @@ import { generatePersonalInviteCode, invalidateInviteCode } from '~/graphql/Invi
 
 export default {
   components: {
+    OsButton,
     Dropdown,
     InvitationList,
   },
