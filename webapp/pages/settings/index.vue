@@ -29,7 +29,13 @@
           :label="$t('settings.data.labelBio')"
           :placeholder="$t('settings.data.labelBio')"
         />
-        <os-button variant="primary" appearance="filled" type="submit" :disabled="!!errors" :loading="loadingData">
+        <os-button
+          variant="primary"
+          appearance="filled"
+          type="submit"
+          :disabled="!!errors"
+          :loading="loadingData"
+        >
           <template #icon><base-icon name="check" /></template>
           {{ $t('actions.save') }}
         </os-button>

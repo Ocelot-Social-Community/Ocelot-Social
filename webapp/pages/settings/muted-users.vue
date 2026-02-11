@@ -50,7 +50,13 @@
         </template>
 
         <template #unmuteUser="scope">
-          <os-button variant="primary" appearance="outline" circle size="sm" @click="unmuteUser(scope)">
+          <os-button
+            variant="primary"
+            appearance="outline"
+            circle
+            size="sm"
+            @click="unmuteUser(scope)"
+          >
             <template #icon><base-icon name="user-plus" /></template>
           </os-button>
         </template>

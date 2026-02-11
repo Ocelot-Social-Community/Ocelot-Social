@@ -24,7 +24,13 @@
         />
         <password-strength :password="formData.password" />
         <ds-space margin-top="base" margin-bottom="xxx-small">
-          <os-button variant="primary" appearance="filled" :loading="$apollo.loading" :disabled="errors" type="submit">
+          <os-button
+            variant="primary"
+            appearance="filled"
+            :loading="$apollo.loading"
+            :disabled="errors"
+            type="submit"
+          >
             {{ $t('settings.security.change-password.button') }}
           </os-button>
         </ds-space>

@@ -1,7 +1,7 @@
 <template>
   <os-button
     :variant="isMember && hovered ? 'danger' : 'primary'"
-    :appearance="(filled || (isMember && !hovered)) ? 'filled' : 'outline'"
+    :appearance="filled || (isMember && !hovered) ? 'filled' : 'outline'"
     :disabled="disabled"
     :loading="localLoading"
     full-width
@@ -150,4 +150,3 @@ export default {
   },
 }
 </script>
-

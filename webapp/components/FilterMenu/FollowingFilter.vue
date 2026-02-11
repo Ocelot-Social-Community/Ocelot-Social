@@ -8,7 +8,9 @@
       <div class="item item-all-follower">
         <os-button
           variant="primary"
-          :appearance="!filteredByUsersFollowed && !filteredByPostsInMyGroups ? 'filled' : 'outline'"
+          :appearance="
+            !filteredByUsersFollowed && !filteredByPostsInMyGroups ? 'filled' : 'outline'
+          "
           size="sm"
           @click="setResetFollowers"
         >

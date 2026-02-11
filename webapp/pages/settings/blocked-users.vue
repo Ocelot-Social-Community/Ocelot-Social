@@ -53,7 +53,13 @@
         </template>
 
         <template #unblockUser="scope">
-          <os-button variant="primary" appearance="outline" circle size="sm" @click="unblockUser(scope)">
+          <os-button
+            variant="primary"
+            appearance="outline"
+            circle
+            size="sm"
+            @click="unblockUser(scope)"
+          >
             <template #icon><base-icon name="user-plus" /></template>
           </os-button>
         </template>

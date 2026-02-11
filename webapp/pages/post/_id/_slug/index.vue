@@ -33,12 +33,7 @@
               />
               <aside v-show="post.image && post.image.sensitive" class="blur-toggle">
                 <img v-show="blurred" :src="post.image.url.w320" class="preview" />
-                <os-button
-                  variant="primary"
-                  appearance="filled"
-                  circle
-                  @click="blurred = !blurred"
-                >
+                <os-button variant="primary" appearance="filled" circle @click="blurred = !blurred">
                   <template #icon>
                     <base-icon :name="blurred ? 'eye' : 'eye-slash'" />
                   </template>

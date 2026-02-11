@@ -1,7 +1,7 @@
 <template>
   <os-button
     :variant="isFollowed && hovered ? 'danger' : 'primary'"
-    :appearance="(isFollowed && !hovered) ? 'filled' : 'outline'"
+    :appearance="isFollowed && !hovered ? 'filled' : 'outline'"
     :disabled="disabled || !followId"
     :loading="loading"
     full-width
@@ -86,4 +86,3 @@ export default {
   },
 }
 </script>
-

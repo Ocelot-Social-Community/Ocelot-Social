@@ -1,11 +1,6 @@
 <template>
   <span class="header-button-wrapper">
-    <os-button
-      class="my-filter-button"
-      variant="primary"
-      appearance="filled"
-      @click="clickButton"
-    >
+    <os-button class="my-filter-button" variant="primary" appearance="filled" @click="clickButton">
       {{ title }}
     </os-button>
     <os-button

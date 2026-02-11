@@ -2,7 +2,14 @@
   <div class="add-chat-room-by-user-search">
     <ds-flex class="headline">
       <h2 class="title">{{ $t('chat.addRoomHeadline') }}</h2>
-      <os-button class="close-button" variant="primary" appearance="ghost" circle size="sm" @click="closeUserSearch">
+      <os-button
+        class="close-button"
+        variant="primary"
+        appearance="ghost"
+        circle
+        size="sm"
+        @click="closeUserSearch"
+      >
         <template #icon>
           <base-icon name="close" />
         </template>

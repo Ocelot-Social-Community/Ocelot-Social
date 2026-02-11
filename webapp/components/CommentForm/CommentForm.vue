@@ -13,7 +13,12 @@
           >
             {{ $t('actions.cancel') }}
           </os-button>
-          <os-button variant="primary" appearance="filled" :loading="loading" :disabled="disabled || errors">
+          <os-button
+            variant="primary"
+            appearance="filled"
+            :loading="loading"
+            :disabled="disabled || errors"
+          >
             {{ $t('post.comment.submit') }}
           </os-button>
         </div>

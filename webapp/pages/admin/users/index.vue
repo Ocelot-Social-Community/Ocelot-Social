@@ -12,7 +12,13 @@
             />
           </ds-flex-item>
           <ds-flex-item width="30px">
-            <os-button variant="primary" appearance="filled" circle type="submit" :loading="$apollo.loading">
+            <os-button
+              variant="primary"
+              appearance="filled"
+              circle
+              type="submit"
+              :loading="$apollo.loading"
+            >
               <template #icon><base-icon name="search" /></template>
             </os-button>
           </ds-flex-item>

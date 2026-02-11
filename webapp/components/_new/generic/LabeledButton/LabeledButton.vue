@@ -1,6 +1,11 @@
 <template>
   <div class="labeled-button">
-    <os-button variant="primary" circle :appearance="filled ? 'filled' : 'outline'" @click="(event) => $emit('click', event)">
+    <os-button
+      variant="primary"
+      circle
+      :appearance="filled ? 'filled' : 'outline'"
+      @click="(event) => $emit('click', event)"
+    >
       <template #icon>
         <base-icon :name="icon" />
       </template>

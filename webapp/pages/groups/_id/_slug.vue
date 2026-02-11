@@ -64,7 +64,12 @@
             </ds-flex-item>
           </ds-flex>
           <div class="action-buttons">
-            <os-button variant="danger" appearance="outline" v-if="group.isMutedByMe" @click="unmuteGroup">
+            <os-button
+              variant="danger"
+              appearance="outline"
+              v-if="group.isMutedByMe"
+              @click="unmuteGroup"
+            >
               <template #icon><base-icon name="volume-up" /></template>
               {{ $t('group.unmute') }}
             </os-button>
