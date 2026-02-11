@@ -2,18 +2,22 @@
   <dropdown :placement="placement" offset="5">
     <template #default="{ openMenu, closeMenu }">
       <slot name="button">
-        <menu-bar-button
+        <os-button
           class="legend-question-button"
-          icon="question-circle"
+          appearance="ghost"
           circle
-          ghost
-          :onClick="
+          size="sm"
+          @click="
             () => {
               isDropdownOpen ? closeMenu() : openMenu()
               isDropdownOpen = !isDropdownOpen
             }
           "
-        />
+        >
+          <template #icon>
+            <base-icon name="question-circle" />
+          </template>
+        </os-button>
       </slot>
     </template>
     <!-- eslint-disable-next-line vue/no-useless-template-attributes -->
@@ -26,9 +30,12 @@
           :key="item.name"
         >
           <div>
-            <base-button size="small" circle ghost :icon="item.iconName" class="legend-icon">
+            <os-button size="sm" circle appearance="ghost" class="legend-icon">
+              <template v-if="item.iconName" #icon>
+                <base-icon :name="item.iconName" />
+              </template>
               <span v-if="item.label">{{ item.label }}</span>
-            </base-button>
+            </os-button>
             <span>{{ $t(item.name) }}</span>
           </div>
           <span class="tool-shortcut">{{ item.shortcut }}</span>
@@ -39,13 +46,13 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import Dropdown from '~/components/Dropdown'
-import MenuBarButton from './MenuBarButton'
 
 export default {
   components: {
     Dropdown,
-    MenuBarButton,
+    OsButton,
   },
   props: {
     placement: { type: String, default: 'bottom-start' },
@@ -73,12 +80,12 @@ export default {
 
 <style lang="scss">
 .legend-question-button {
-  color: $color-neutral-40;
+  color: #70677e;
   font-size: 1.2rem !important;
 }
 .legend-question-button:hover {
   background: none !important;
-  color: $color-neutral-40 !important;
+  color: #70677e !important;
 }
 .legend-question-button:focus {
   outline: none !important;
