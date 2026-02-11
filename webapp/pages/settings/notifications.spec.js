@@ -83,7 +83,6 @@ describe('notifications.vue', () => {
   })
 
   describe('Notifications', () => {
-
     it('check all button works', async () => {
       const button = screen.getByText('settings.notifications.checkAll')
       await fireEvent.click(button)
