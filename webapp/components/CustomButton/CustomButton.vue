@@ -1,10 +1,10 @@
 <template>
   <div>
     <a v-if="settings.url" :href="settings.url" :target="settings.target">
-      <base-button
+      <os-button
         class="custom-button"
+        appearance="ghost"
         circle
-        ghost
         v-tooltip="{
           content: $t(settings.toolTipIdent),
           placement: 'bottom-start',
@@ -16,13 +16,13 @@
           :alt="settings.iconAltText"
           :style="logoWidthStyle"
         />
-      </base-button>
+      </os-button>
     </a>
     <nuxt-link v-else :to="settings.path">
-      <base-button
+      <os-button
         class="custom-button"
+        appearance="ghost"
         circle
-        ghost
         v-tooltip="{
           content: $t(settings.toolTipIdent),
           placement: 'bottom-start',
@@ -34,15 +34,17 @@
           :alt="settings.iconAltText"
           :style="logoWidthStyle"
         />
-      </base-button>
+      </os-button>
     </nuxt-link>
   </div>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import isEmpty from 'lodash/isEmpty'
 
 export default {
+  components: { OsButton },
   name: 'CustomButton',
   props: {
     settings: { type: Object, required: true },
