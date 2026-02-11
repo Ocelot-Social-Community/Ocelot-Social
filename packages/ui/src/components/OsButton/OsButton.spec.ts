@@ -126,6 +126,13 @@ describe('osButton', () => {
     expect(wrapper.attributes('type')).toBe('submit')
   })
 
+  it('sets data-variant attribute', () => {
+    const wrapper = mount(OsButton, {
+      props: { variant: 'danger' },
+    })
+    expect(wrapper.attributes('data-variant')).toBe('danger')
+  })
+
   it('sets data-appearance attribute', () => {
     const wrapper = mount(OsButton, {
       props: { appearance: 'outline' },

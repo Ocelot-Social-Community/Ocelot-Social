@@ -168,6 +168,7 @@
         const buttonData = {
           type: props.type,
           disabled: isDisabled || undefined,
+          'data-variant': props.variant,
           'data-appearance': props.appearance,
           'aria-busy': isLoading || undefined,
         }
