@@ -10,9 +10,9 @@ exports[`CtaUnblockAuthor.vue shallowMount renders 1`] = `
     contribution.comment.commenting-disabled.blocked-author.call-to-action
   </ds-text-stub>
   <nuxt-link-stub to="[object Object]">
-    <base-button-stub filled="true" icon="arrow-right" size="regular" type="button">
+    <os-button-stub variant="primary" appearance="filled" size="md" type="button">
       contribution.comment.commenting-disabled.blocked-author.button-label
-    </base-button-stub>
+    </os-button-stub>
   </nuxt-link-stub>
 </ds-space-stub>
 `;
