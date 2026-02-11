@@ -69,16 +69,18 @@
             return typeof children !== 'string' || children.trim().length > 0
           }) ?? false
 
+        const isSmall = ['xs', 'sm'].includes(props.size)
+
         const children: (string | ReturnType<typeof h>)[] = []
         if (hasIcon) {
-          const iconMargin = hasText ? '-ml-1' : '-ml-1 -mr-1'
+          const iconMargin = isSmall ? '' : hasText ? '-ml-1' : '-ml-1 -mr-1'
           children.push(h('span', { class: `${iconMargin} ${ICON_CLASS}` }, iconContent))
         }
         if (hasText) {
           children.push(...defaultContent)
         }
 
-        const gapClass = hasIcon && hasText ? 'gap-2' : ''
+        const gapClass = hasIcon && hasText ? (isSmall ? 'gap-1' : 'gap-2') : ''
 
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
         if (isVue2) {

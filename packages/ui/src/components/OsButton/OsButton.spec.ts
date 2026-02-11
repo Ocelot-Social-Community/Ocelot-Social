@@ -162,6 +162,18 @@ describe('osButton', () => {
       expect(wrapper.classes()).toContain('gap-2')
     })
 
+    it('adds gap-1 class for small sizes with icon and text', () => {
+      const wrapper = mount(OsButton, {
+        props: { size: 'sm' },
+        slots: {
+          icon: '<svg></svg>',
+          default: 'Save',
+        },
+      })
+      expect(wrapper.classes()).toContain('gap-1')
+      expect(wrapper.classes()).not.toContain('gap-2')
+    })
+
     it('does not add gap-2 for icon-only button', () => {
       const wrapper = mount(OsButton, {
         slots: { icon: '<svg></svg>' },
