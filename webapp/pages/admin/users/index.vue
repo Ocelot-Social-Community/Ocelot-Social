@@ -12,7 +12,9 @@
             />
           </ds-flex-item>
           <ds-flex-item width="30px">
-            <base-button filled circle type="submit" icon="search" :loading="$apollo.loading" />
+            <os-button variant="primary" appearance="filled" circle type="submit" :loading="$apollo.loading">
+              <template #icon><base-icon name="search" /></template>
+            </os-button>
           </ds-flex-item>
         </ds-flex>
       </ds-form>
@@ -70,7 +72,9 @@
               params: { id: scope.row.id },
             }"
           >
-            <base-button icon="pencil" filled circle />
+            <os-button variant="primary" appearance="filled" circle>
+              <template #icon><base-icon name="pencil" /></template>
+            </os-button>
           </nuxt-link>
         </template>
       </ds-table>
@@ -83,6 +87,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapGetters } from 'vuex'
 import { isEmail } from 'validator'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
@@ -91,6 +96,7 @@ import { FetchAllRoles, updateUserRole } from '~/graphql/admin/Roles'
 
 export default {
   components: {
+    OsButton,
     PaginationButtons,
   },
   data() {
