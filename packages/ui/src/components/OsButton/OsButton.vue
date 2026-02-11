@@ -14,7 +14,9 @@
    * @slot icon - Optional icon (rendered left of text). Use aria-label for icon-only buttons.
    */
 
-  const CIRCLE_WIDTHS: Record<string, string> = {
+  type Size = NonNullable<ButtonVariants['size']>
+
+  const CIRCLE_WIDTHS: Record<Size, string> = {
     sm: 'w-[26px]',
     md: 'w-[36px]',
     lg: 'w-12',
@@ -24,7 +26,7 @@
   const ICON_CLASS =
     'os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current'
 
-  const SPINNER_PX: Record<string, number> = { sm: 24, md: 32, lg: 40, xl: 46 }
+  const SPINNER_PX: Record<Size, number> = { sm: 24, md: 32, lg: 40, xl: 46 }
 
   const SVG_ATTRS = {
     viewBox: '0 0 50 50',
@@ -124,16 +126,13 @@
             return typeof children !== 'string' || children.trim().length > 0
           }) ?? false
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const size = props.size!
-        // eslint-disable-next-line security/detect-object-injection -- size is a validated prop
-        const spinnerPx = SPINNER_PX[size]
+        const size = (props.size ?? 'md') as Size
+        const spinnerPx = SPINNER_PX[size] // eslint-disable-line security/detect-object-injection
         const isSmall = props.circle || size === 'sm'
         const isLoading = props.loading
         const isDisabled = props.disabled || isLoading
 
-        // eslint-disable-next-line security/detect-object-injection -- size is a validated prop
-        const circleClass = props.circle ? `rounded-full p-0 ${CIRCLE_WIDTHS[size]}` : ''
+        const circleClass = props.circle ? `rounded-full p-0 ${CIRCLE_WIDTHS[size]}` : '' // eslint-disable-line security/detect-object-injection
 
         // --- Build inner children (icon + text) ---
         const innerChildren: ReturnType<typeof h>[] = []
