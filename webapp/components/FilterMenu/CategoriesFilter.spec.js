@@ -60,8 +60,11 @@ describe('CategoriesFilter.vue', () => {
 
   describe('mount', () => {
     it('starts with all categories button active', () => {
-      const allCategoriesButton = wrapper.find('.categories-filter .item-all-topics button')
-      expect(allCategoriesButton.attributes().class).toContain('--filled')
+      expect(
+        wrapper
+          .find('.categories-filter .item-all-topics button[data-appearance="filled"]')
+          .exists(),
+      ).toBe(true)
     })
 
     // TODO move to FilterMenuComponent.spec.js?
