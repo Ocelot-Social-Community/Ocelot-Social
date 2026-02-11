@@ -1,7 +1,8 @@
 <template>
   <nuxt-link class="chat-notification-menu" :to="{ name: 'chat' }">
-    <base-button
-      ghost
+    <os-button
+      variant="primary"
+      appearance="ghost"
       circle
       v-tooltip="{
         content: $t('header.chats.tooltip'),
@@ -9,11 +10,12 @@
       }"
     >
       <counter-icon icon="chat-bubble" :count="unreadRoomCount" danger />
-    </base-button>
+    </os-button>
   </nuxt-link>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import { unreadRoomsQuery, roomCountUpdated } from '~/graphql/Rooms'
@@ -21,6 +23,7 @@ import { unreadRoomsQuery, roomCountUpdated } from '~/graphql/Rooms'
 export default {
   name: 'ChatNotificationMenu',
   components: {
+    OsButton,
     CounterIcon,
   },
   computed: {
