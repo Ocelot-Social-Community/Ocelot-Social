@@ -3,7 +3,7 @@
     <os-button
       slot="default"
       variant="primary"
-      appearance="ghost"
+      :appearance="filterActive ? 'filled' : 'ghost'"
       slot-scope="{ toggleMenu }"
       @click.prevent="toggleMenu()"
     >

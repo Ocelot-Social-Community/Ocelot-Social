@@ -39,15 +39,13 @@ describe('FilterMenu.vue', () => {
 
   describe('mount', () => {
     it('starts with dropdown button inactive', () => {
-      const dropdownButton = wrapper.find('.filter-menu button')
-      expect(dropdownButton.attributes().class).toContain('--ghost')
+      expect(wrapper.find('.filter-menu button[data-appearance="ghost"]').exists()).toBe(true)
     })
 
     it('sets dropdwon button attribute `filled` when a filter is applied', () => {
       getters['posts/isActive'] = jest.fn(() => true)
       wrapper = Wrapper()
-      const dropdownButton = wrapper.find('.filter-menu button')
-      expect(dropdownButton.attributes().class).toContain('--filled')
+      expect(wrapper.find('.filter-menu button[data-appearance="filled"]').exists()).toBe(true)
     })
   })
 })
