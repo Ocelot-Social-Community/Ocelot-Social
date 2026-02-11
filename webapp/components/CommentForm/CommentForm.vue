@@ -16,8 +16,9 @@
           <os-button
             variant="primary"
             appearance="filled"
+            type="submit"
             :loading="loading"
-            :disabled="disabled || errors"
+            :disabled="disabled || !!errors"
           >
             {{ $t('post.comment.submit') }}
           </os-button>
