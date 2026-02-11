@@ -34,7 +34,7 @@
     xl: 'width:30px;height:30px',
   }
 
-  const SPINNER_CENTER = 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
+  const SPINNER_CENTER = 'inset-0 m-auto'
 
   const CIRCLE_ATTRS = {
     cx: '25',
@@ -46,40 +46,46 @@
     'stroke-linecap': 'round',
   }
 
-  const CIRCLE_STYLE = 'animation:os-spinner-dash 1.5s ease-in-out infinite'
+  /** Both animations on the circle — SVG stays static to avoid wobble */
+  const CIRCLE_STYLE =
+    'transform-origin:25px 25px;animation:os-spinner-rotate 16s linear infinite,os-spinner-dash 1.5s ease-in-out infinite'
+
+  /** SVG style: fills wrapper, no animation (purely a container) */
+  const SVG_STYLE = 'width:100%;height:100%;overflow:hidden'
 
   function createSpinner(sizeStyle: string, extraClass: string, forceVisible: boolean) {
-    const style = `${sizeStyle};animation:os-spinner-rotate 16s linear infinite${forceVisible ? ';visibility:visible' : ''}`
-
     /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
-    if (isVue2) {
-      return h(
-        'svg',
-        {
-          class: `os-button__spinner absolute ${extraClass}`,
-          attrs: {
+    const svg = isVue2
+      ? h(
+          'svg',
+          {
+            attrs: {
+              viewBox: '0 0 50 50',
+              xmlns: 'http://www.w3.org/2000/svg',
+              'aria-hidden': 'true',
+            },
+            style: SVG_STYLE,
+          },
+          [h('circle', { attrs: CIRCLE_ATTRS, style: CIRCLE_STYLE })],
+        )
+      : /* v8 ignore stop */
+        h(
+          'svg',
+          {
             viewBox: '0 0 50 50',
             xmlns: 'http://www.w3.org/2000/svg',
             'aria-hidden': 'true',
+            style: SVG_STYLE,
           },
-          style,
-        },
-        [h('circle', { attrs: CIRCLE_ATTRS, style: CIRCLE_STYLE })],
-      )
-    }
-    /* v8 ignore stop */
+          [h('circle', { ...CIRCLE_ATTRS, style: CIRCLE_STYLE })],
+        )
 
-    return h(
-      'svg',
-      {
-        class: `os-button__spinner absolute ${extraClass}`,
-        viewBox: '0 0 50 50',
-        xmlns: 'http://www.w3.org/2000/svg',
-        'aria-hidden': 'true',
-        style,
-      },
-      [h('circle', { ...CIRCLE_ATTRS, style: CIRCLE_STYLE })],
-    )
+    // Wrapper carries positioning + size; SVG inside only rotates.
+    // Separating position from transform avoids sub-pixel wobble.
+    const wrapperStyle = `${sizeStyle}${forceVisible ? ';visibility:visible' : ''}`
+    return h('span', { class: `os-button__spinner absolute ${extraClass}`, style: wrapperStyle }, [
+      svg,
+    ])
   }
 
   export default defineComponent({
