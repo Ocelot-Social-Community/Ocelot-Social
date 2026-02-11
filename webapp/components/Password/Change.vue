@@ -24,15 +24,16 @@
       />
       <password-strength :password="formData.password" />
       <ds-space margin-top="base">
-        <base-button :loading="loading" :disabled="errors" filled type="submit">
+        <os-button variant="primary" appearance="filled" :loading="loading" :disabled="errors" type="submit">
           {{ $t('settings.security.change-password.button') }}
-        </base-button>
+        </os-button>
       </ds-space>
     </template>
   </ds-form>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import gql from 'graphql-tag'
 import PasswordStrength from './Strength'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
@@ -40,6 +41,7 @@ import PasswordForm from '~/components/utils/PasswordFormHelper'
 export default {
   name: 'ChangePassword',
   components: {
+    OsButton,
     PasswordStrength,
   },
   data() {
