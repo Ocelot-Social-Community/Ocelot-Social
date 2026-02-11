@@ -71,7 +71,12 @@
       const ICON_CLASS =
         'os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current'
 
-      const SPINNER_SIZE = 'w-[1.2em] h-[1.2em]'
+      const SPINNER_SIZES: Record<string, string> = {
+        sm: 'w-[20px] h-[20px]',
+        md: 'w-[28px] h-[28px]',
+        lg: 'w-[36px] h-[36px]',
+        xl: 'w-[42px] h-[42px]',
+      }
 
       return () => {
         const iconContent = slots.icon?.()
@@ -108,7 +113,7 @@
         // Spinner SVG (absolutely positioned over content)
         const spinnerSvgProps = isVue2
           ? /* v8 ignore next */ {
-              class: `os-button__spinner absolute ${SPINNER_SIZE}`,
+              class: `os-button__spinner absolute ${SPINNER_SIZES[size]}`,
               attrs: {
                 viewBox: '0 0 50 50',
                 xmlns: 'http://www.w3.org/2000/svg',
@@ -117,7 +122,7 @@
               style: 'animation: os-spinner-rotate 16s linear infinite',
             }
           : {
-              class: `os-button__spinner absolute ${SPINNER_SIZE}`,
+              class: `os-button__spinner absolute ${SPINNER_SIZES[size]}`,
               viewBox: '0 0 50 50',
               xmlns: 'http://www.w3.org/2000/svg',
               'aria-hidden': 'true',
