@@ -80,7 +80,7 @@
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
-Phase 3: █████████░  83% (20/24 Aufgaben) - Webapp-Integration (M4a ✅, M5 ✅)
+Phase 3: █████████░  88% (21/24 Aufgaben) - Webapp-Integration (M4a ✅, M4b: icon ✅, M5 ✅)
 Phase 4: █░░░░░░░░░   6% (1/17 Aufgaben) - OsButton ✅
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
@@ -97,16 +97,16 @@ Analyse:    ██████████ 100% (Button, Modal, Menu detailiert)
 ### OsButton Migration (Phase 3)
 ```
 Scope gesamt:     ~90 Buttons in Webapp
-├─ Migriert:       32 Buttons (36%) ✅
+├─ Migriert:       33 Buttons (37%) ✅
 ├─ Ohne neue Props:  0 Buttons (Milestone 4a ✅)
-└─ Mit icon/circle/loading: ~60 Buttons (Milestone 4c)
+└─ Mit icon/circle/loading: ~59 Buttons (Milestone 4c)
 
 OsButton Features:
 ├─ variant:     ✅ primary, secondary, danger, warning, success, info, default
 ├─ appearance:  ✅ filled, outline, ghost
 ├─ size:        ✅ xs, sm, md, lg, xl
 ├─ disabled:    ✅ mit hover/active-Override
-├─ icon:        ⬜ TODO (Milestone 4b)
+├─ icon:        ✅ slot-basiert (icon-system-agnostisch)
 ├─ circle:      ⬜ TODO (Milestone 4b)
 └─ loading:     ⬜ TODO (Milestone 4b)
 ```
@@ -115,9 +115,9 @@ OsButton Features:
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-10 (Session 12)
+**Letzte Aktualisierung:** 2026-02-11 (Session 13)
 
-**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 4a abgeschlossen ✅ (32 Buttons migriert, nächster: Milestone 4b)
+**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 4b: icon ✅, erste Webapp-Migration ✅ (33 Buttons migriert)
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -184,10 +184,22 @@ OsButton Features:
   - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 
 **Aktuell in Arbeit:**
-- Phase 3, Milestone 4b: icon/circle/loading Props in OsButton implementieren
-- Phase 3, Milestone 4c: ~60 Buttons mit icon/circle/loading migrieren
+- Phase 3, Milestone 4b: circle/loading Props in OsButton implementieren
+- Phase 3, Milestone 4c: ~59 Buttons mit icon/circle/loading migrieren
 
-**Zuletzt abgeschlossen (Session 12 - CSS-Linting, CI-Optimierung, Code-Review Fixes):**
+**Zuletzt abgeschlossen (Session 13 - Icon-Slot, Storybook Playground, Webapp-Migration):**
+- [x] Icon-Slot für OsButton implementiert (slot-basiert, icon-system-agnostisch)
+- [x] Render-Funktion: `slots.icon?.()` → `<span class="os-button__icon">` Wrapper
+- [x] Tailwind-Klassen direkt auf Icon-Wrapper (kein custom CSS in index.css nötig)
+- [x] VNode-basierte Text-Erkennung: Whitespace-only = icon-only (gap/margin-Logik)
+- [x] Storybook: 4 neue Stories (Icon, IconOnly, IconSizes, IconAppearances)
+- [x] Playground: Reaktiver Icon-Selektor (none/check/close/plus) + Label-Text-Control
+- [x] Visual Tests: 4 neue Tests mit Screenshots + a11y-Checks
+- [x] Unit Tests: 8 neue Tests (icon slot, keyboard a11y mit aria-label)
+- [x] Erste Webapp-Migration mit Icon: `my-email-address/index.vue` (Save-Button mit check-Icon)
+- [x] Code-Optimierung: ICON_CLASS Konstante, iconMargin Variable, vereinfachte hasText-Logik
+
+**Zuvor abgeschlossen (Session 12 - CSS-Linting, CI-Optimierung, Code-Review Fixes):**
 - [x] CSS-Linting: `@eslint/css` + `tailwind-csstree` für Tailwind v4 Syntax-Support
 - [x] `excludeCSS()` Helper: JS-Regeln von CSS-Dateien fernhalten (language-Inkompatibilität)
 - [x] CSS-Regeln: `no-empty-blocks`, `no-duplicate-imports`, `no-invalid-at-rules`
@@ -261,7 +273,7 @@ OsButton Features:
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
 3. ~~**Phase 2: Projekt-Setup**~~ ✅ ABGESCHLOSSEN
-4. **Phase 3: Webapp-Integration** - 32/90 Buttons migriert (36%)
+4. **Phase 3: Webapp-Integration** - 33/90 Buttons migriert (37%)
    - [x] yarn link / Webpack-Alias in Webapp
    - [x] CSS-Variablen definieren (ocelot-ui-variables.scss)
    - [x] 16 Buttons migriert & validiert ✅
@@ -369,7 +381,7 @@ OsButton Features:
 - [ ] ReportRow.vue More-Details-Button
 
 **Milestone 4b: OsButton Props erweitern**
-- [ ] `icon` Prop implementieren (slot-basiert oder Icon-Komponente)
+- [x] `icon` Slot implementiert (slot-basiert, icon-system-agnostisch) ✅
 - [ ] `circle` Variant zu CVA hinzufügen
 - [ ] `loading` Prop mit Spinner implementieren
 
@@ -442,7 +454,8 @@ OsButton Features:
 - [ ] pages/settings/index.vue (icon, loading)
 - [ ] pages/settings/blocked-users.vue (icon, circle)
 - [ ] pages/settings/muted-users.vue (icon, circle)
-- [ ] pages/settings/my-email-address/*.vue (2× icon)
+- [x] pages/settings/my-email-address/index.vue (1× icon) ✅
+- [ ] pages/settings/my-email-address/verify.vue (1× icon)
 - [ ] pages/profile/_id/_slug.vue Chat (icon)
 - [ ] pages/post/_id/_slug/index.vue (icon, circle)
 
@@ -457,10 +470,10 @@ OsButton Features:
 
 | Kategorie | Buttons | Status |
 |-----------|---------|--------|
-| ✅ Migriert & Validiert | 24 | Erledigt |
-| ⏳ Ohne neue Props (M4a) | 6 | In Arbeit (8 von 14 erledigt) |
-| ⬜ Mit icon/circle/loading (M4c) | ~60 | Ausstehend |
-| **Gesamt** | **~90** | **27% erledigt** |
+| ✅ Migriert & Validiert | 32 | Erledigt (M1-M4a) |
+| ✅ Mit icon migriert (M4c) | 1 | my-email-address/index.vue |
+| ⬜ Mit icon/circle/loading (M4c) | ~57 | Ausstehend |
+| **Gesamt** | **~90** | **37% erledigt** |
 
 **Details siehe KATALOG.md** (vollständige Tracking-Tabellen)
 
@@ -1486,6 +1499,17 @@ Bei der Migration werden:
 | 2026-02-10 | **CI-Workflow-Trigger** | 9 UI-Workflows von `on: push` auf `push`+`pull_request` mit Branch-Filter (`master`) und Path-Filter (`packages/ui/**` + Workflow-Datei) umgestellt |
 | 2026-02-10 | **custom-class entfernt** | `custom-class` Prop (entfernt aus OsButton) → `class` Attribut in notifications.vue, MapStylesButtons.vue, EmbedComponent.vue (4 Stellen); Snapshot aktualisiert |
 | 2026-02-10 | **Vue 3 Template-Fix** | `this.$t()` → `$t()` in CommentCard.vue (this im Template in Vue 3 nicht verfügbar) |
+| 2026-02-11 | **Icon-Slot implementiert** | Benannter `#icon` Slot für OsButton, slot-basiert statt Icon-Prop (icon-system-agnostisch) |
+| 2026-02-11 | **Icon-Wrapper Klassen** | Tailwind-Utility-Klassen direkt auf `<span>`: `inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current` |
+| 2026-02-11 | **VNode Text-Erkennung** | `hasText` prüft VNode-Children auf sichtbaren Inhalt; whitespace-only → icon-only Verhalten |
+| 2026-02-11 | **Gap & Margin Logik** | `gap-2` bei Icon+Text, `-ml-1` bei Icon, `-ml-1 -mr-1` bei Icon-Only (optischer Ausgleich) |
+| 2026-02-11 | **4 neue Stories** | Icon, IconOnly, IconSizes, IconAppearances mit Inline-SVG Komponenten (CheckIcon, CloseIcon, PlusIcon) |
+| 2026-02-11 | **Playground erweitert** | Reaktiver Icon-Selektor (none/check/close/plus) + Label-Text-Control via `computed()` |
+| 2026-02-11 | **Storybook: components Option** | Funktionale Komponenten müssen in `components` registriert werden, nicht in `setup()` return |
+| 2026-02-11 | **Storybook: CSS nicht in index.css** | Storybook lädt eigene `storybook.css`, nicht `src/styles/index.css` → Utility-Klassen direkt verwenden |
+| 2026-02-11 | **SVG-Targeting** | `[&>svg]` statt `[&>*]` für Icon-Sizing (BaseIcon rendert `<span><svg>`, Wrapper-Span darf nicht beeinflusst werden) |
+| 2026-02-11 | **my-email-address migriert** | Save-Button: `<os-button variant="primary">` mit `<template #icon><base-icon name="check" /></template>` |
+| 2026-02-11 | **Code-Optimierung** | `ICON_CLASS` Konstante extrahiert, `iconMargin` Variable, vereinfachte `hasText`-Logik (kein Symbol.for) |
 
 ---
 
