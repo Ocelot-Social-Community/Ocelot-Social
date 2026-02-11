@@ -18,13 +18,7 @@
   const ICON_CLASS =
     'os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current'
 
-  /** Spinner px: [button-level, icon-level] per size */
-  const SPINNER_PX: Record<string, [number, number]> = {
-    sm: [24, 16],
-    md: [32, 22],
-    lg: [40, 26],
-    xl: [46, 30],
-  }
+  const SPINNER_PX: Record<string, number> = { sm: 24, md: 32, lg: 40, xl: 46 }
 
   const SPINNER_CENTER_ICON = 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
   const SPINNER_CENTER_BUTTON = 'inset-0 m-auto'
@@ -139,12 +133,9 @@
 
         if (hasIcon) {
           const iconMargin = props.circle ? '' : isSmall ? '' : hasText ? '-ml-1' : '-ml-1 -mr-1'
-          const loadingClass = isLoading ? 'relative overflow-visible [&>*]:invisible' : ''
+          const loadingClass = isLoading ? 'relative overflow-visible' : ''
           const iconChildren = isLoading
-            ? [
-                ...(iconContent || []),
-                createSpinner(hasText ? spinnerPx[1] : spinnerPx[0], SPINNER_CENTER_ICON, true),
-              ]
+            ? [...(iconContent || []), createSpinner(spinnerPx, SPINNER_CENTER_ICON, true)]
             : iconContent
           innerChildren.push(
             h('span', { class: `${iconMargin} ${ICON_CLASS} ${loadingClass}` }, iconChildren),
@@ -163,7 +154,7 @@
         )
 
         const buttonSpinner =
-          isLoading && !hasIcon ? createSpinner(spinnerPx[0], SPINNER_CENTER_BUTTON, false) : null
+          isLoading && !hasIcon ? createSpinner(spinnerPx, SPINNER_CENTER_BUTTON, false) : null
 
         const children = buttonSpinner ? [contentWrapper, buttonSpinner] : [contentWrapper]
 

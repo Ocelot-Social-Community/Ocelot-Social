@@ -389,7 +389,7 @@ describe('osButton', () => {
       expect(iconWrapper.find('.os-button__spinner').exists()).toBeTruthy()
     })
 
-    it('hides icon content when loading with icon', () => {
+    it('keeps icon visible when loading with icon', () => {
       const wrapper = mount(OsButton, {
         props: { loading: true },
         slots: {
@@ -398,7 +398,7 @@ describe('osButton', () => {
         },
       })
       const iconWrapper = wrapper.find('.os-button__icon')
-      expect(iconWrapper.classes()).toContain('[&>*]:invisible')
+      expect(iconWrapper.classes()).not.toContain('[&>*]:invisible')
     })
 
     it('renders spinner as direct button child when no icon', () => {
