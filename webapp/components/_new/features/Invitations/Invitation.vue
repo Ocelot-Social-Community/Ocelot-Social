@@ -16,33 +16,43 @@
       </div>
     </div>
     <div class="actions">
-      <base-button
+      <os-button
+        variant="primary"
+        appearance="outline"
         circle
         class="copy-button"
-        icon="copy"
         @click="copyInviteCode(inviteCode.copy)"
         :disabled="!canCopy"
         :aria-label="$t('invite-codes.copy-code')"
-      />
-      <base-button
+      >
+        <template #icon>
+          <base-icon name="copy" />
+        </template>
+      </os-button>
+      <os-button
+        variant="primary"
+        appearance="outline"
         circle
         class="invalidate-button"
-        icon="trash"
         @click="openDeleteModal"
         :aria-label="$t('invite-codes.invalidate')"
-      />
+      >
+        <template #icon>
+          <base-icon name="trash" />
+        </template>
+      </os-button>
     </div>
   </li>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapMutations } from 'vuex'
-import BaseButton from '~/components/_new/generic/BaseButton/BaseButton.vue'
 
 export default {
   name: 'Invitation',
   components: {
-    BaseButton,
+    OsButton,
   },
   props: {
     inviteCode: {
