@@ -10,36 +10,44 @@
     <p v-html="message" />
 
     <template #footer>
-      <base-button
+      <os-button
         class="cancel"
-        :danger="!modalData.buttons.confirm.danger"
-        :icon="modalData.buttons.cancel.icon"
+        :variant="!modalData.buttons.confirm.danger ? 'danger' : 'primary'"
+        appearance="outline"
         @click="cancel"
         data-test="cancel-button"
       >
+        <template v-if="modalData.buttons.cancel.icon" #icon>
+          <base-icon :name="modalData.buttons.cancel.icon" />
+        </template>
         {{ $t(modalData.buttons.cancel.textIdent) }}
-      </base-button>
+      </os-button>
 
-      <base-button
-        :danger="modalData.buttons.confirm.danger"
+      <os-button
         class="confirm"
-        :icon="modalData.buttons.confirm.icon"
+        :variant="modalData.buttons.confirm.danger ? 'danger' : 'primary'"
+        appearance="filled"
         :loading="loading"
         @click="confirm"
         data-test="confirm-button"
       >
+        <template v-if="modalData.buttons.confirm.icon" #icon>
+          <base-icon :name="modalData.buttons.confirm.icon" />
+        </template>
         {{ $t(modalData.buttons.confirm.textIdent) }}
-      </base-button>
+      </os-button>
     </template>
   </ds-modal>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 
 export default {
   name: 'ConfirmModal',
   components: {
+    OsButton,
     SweetalertIcon,
   },
   emits: ['close'],
