@@ -2,13 +2,18 @@
   <dropdown class="content-menu" :placement="placement" offset="5">
     <template #default="{ toggleMenu }">
       <slot name="button" :toggleMenu="toggleMenu">
-        <base-button
+        <os-button
           data-test="content-menu-button"
-          icon="ellipsis-v"
-          size="small"
+          variant="primary"
+          appearance="outline"
+          size="sm"
           circle
           @click.prevent="toggleMenu()"
-        />
+        >
+          <template #icon>
+            <base-icon name="ellipsis-v" />
+          </template>
+        </os-button>
       </slot>
     </template>
     <template #popover="{ toggleMenu }">
@@ -31,12 +36,14 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import Dropdown from '~/components/Dropdown'
 import PinnedPostsMixin from '~/mixins/pinnedPosts'
 
 export default {
   name: 'ContentMenu',
   components: {
+    OsButton,
     Dropdown,
   },
   mixins: [PinnedPostsMixin],
