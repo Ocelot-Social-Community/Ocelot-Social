@@ -35,26 +35,23 @@
           :key="slider.name"
           :class="['Sliders__slider-selection', index === sliderIndex && '--unconfirmed']"
         >
-          <base-button
+          <os-button
             :class="['selection-dot']"
             style="float: left"
-            :bullet="true"
-            size="tiny"
-            type="submit"
-            filled
-            :loading="false"
+            variant="primary"
+            :appearance="index <= sliderIndex ? 'filled' : 'outline'"
+            circle
+            size="sm"
             :disabled="index > sliderIndex"
             @click="sliderData.sliderSelectorCallback(index)"
           />
         </div>
       </ds-flex-item>
       <ds-flex-item>
-        <base-button
+        <os-button
           :style="multipleSliders && 'float: right'"
-          :icon="sliderData.sliders[sliderIndex].button.icon"
-          type="submit"
-          filled
-          padding
+          variant="primary"
+          appearance="filled"
           :loading="
             sliderData.sliders[sliderIndex].button.loading !== undefined
               ? sliderData.sliders[sliderIndex].button.loading
@@ -64,8 +61,11 @@
           @click="onNextClick"
           data-test="next-button"
         >
+          <template v-if="sliderData.sliders[sliderIndex].button.icon" #icon>
+            <base-icon :name="sliderData.sliders[sliderIndex].button.icon" />
+          </template>
           {{ $t(sliderData.sliders[sliderIndex].button.titleIdent) }}
-        </base-button>
+        </os-button>
       </ds-flex-item>
     </ds-flex>
 
@@ -74,7 +74,10 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
+
 export default {
+  components: { OsButton },
   name: 'ComponentSlider',
   props: {
     sliderData: { type: Object, required: true },
@@ -107,6 +110,10 @@ export default {
   &__slider-selection {
     .selection-dot {
       margin-right: 2px;
+      height: 18px !important;
+      width: 18px !important;
+      min-height: 18px !important;
+      min-width: 18px !important;
     }
     &.--unconfirmed {
       opacity: $opacity-disabled;
