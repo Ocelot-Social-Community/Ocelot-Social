@@ -73,17 +73,16 @@
         const hasIcon = iconContent && iconContent.length > 0
         const hasText =
           defaultContent?.some((node: unknown) => {
-            if (typeof node === 'string') return node.trim().length > 0
             const children = (node as Record<string, unknown>).children
             // Text VNodes have string children; element/component VNodes are always visible
             return typeof children !== 'string' || children.trim().length > 0
           }) ?? false
 
-        const size = props.size ?? 'md'
+        const size = props.size!
         const isSmall = ['xs', 'sm'].includes(size)
 
         const circleClass = props.circle
-          ? `rounded-full p-0 ${CIRCLE_WIDTHS[size] || CIRCLE_WIDTHS.md}`
+          ? `rounded-full p-0 ${CIRCLE_WIDTHS[size]}`
           : ''
 
         const children: (string | ReturnType<typeof h>)[] = []
