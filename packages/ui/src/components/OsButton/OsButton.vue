@@ -141,7 +141,10 @@
           const iconMargin = props.circle ? '' : isSmall ? '' : hasText ? '-ml-1' : '-ml-1 -mr-1'
           const loadingClass = isLoading ? 'relative overflow-visible [&>*]:invisible' : ''
           const iconChildren = isLoading
-            ? [...(iconContent || []), createSpinner(spinnerPx[1], SPINNER_CENTER_ICON, true)]
+            ? [
+                ...(iconContent || []),
+                createSpinner(hasText ? spinnerPx[1] : spinnerPx[0], SPINNER_CENTER_ICON, true),
+              ]
             : iconContent
           innerChildren.push(
             h('span', { class: `${iconMargin} ${ICON_CLASS} ${loadingClass}` }, iconChildren),
