@@ -18,9 +18,9 @@
       variant="primary"
       appearance="ghost"
       size="sm"
-      aria-label="Clear location"
+      :aria-label="$t('actions.clear')"
       style="right: -94%; top: -48px"
-      @click.native="clearLocationName"
+      @click="clearLocationName"
     >
       <template #icon><base-icon name="close" /></template>
     </os-button>

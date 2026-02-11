@@ -1,6 +1,7 @@
 {
   "actions": {
     "cancel": "Annuleren",
+    "clear": "Wissen",
     "create": null,
     "delete": null,
     "edit": null,
