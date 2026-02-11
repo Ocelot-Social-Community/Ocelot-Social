@@ -40,9 +40,10 @@
       <os-button variant="primary" appearance="outline" class="cancel" @click="cancel">
         {{ $t('actions.cancel') }}
       </os-button>
-      <base-button danger filled class="confirm" icon="exclamation-circle" @click="openModal">
+      <os-button variant="danger" class="confirm" @click="openModal">
+        <template #icon><base-icon name="exclamation-circle" /></template>
         {{ $t('settings.deleteUserAccount.name') }}
-      </base-button>
+      </os-button>
     </template>
   </ds-modal>
 </template>
