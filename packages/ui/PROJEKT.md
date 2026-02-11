@@ -96,9 +96,10 @@ Analyse:    ██████████ 100% (Button, Modal, Menu detailiert)
 
 ### OsButton Migration (Phase 3) ✅
 ```
-Scope gesamt:     132 <os-button> Tags in 78 Webapp-Dateien
-├─ Migriert:       132 Buttons (100%) ✅
+Scope gesamt:     133 <os-button> Tags in 79 Webapp-Dateien
+├─ Migriert:       133 Buttons (100%) ✅
 ├─ <base-button>:    0 verbleibend in Templates
+├─ <ds-button>:      0 verbleibend in Templates
 └─ Cleanup:        Snapshots/Tests müssen aktualisiert werden
 
 OsButton Features:
@@ -115,9 +116,9 @@ OsButton Features:
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-11 (Session 15)
+**Letzte Aktualisierung:** 2026-02-11 (Session 16)
 
-**Aktuelle Phase:** Phase 3 ✅ ABGESCHLOSSEN - Alle 132 Buttons in 78 Dateien migriert, 0 `<base-button>` verbleibend
+**Aktuelle Phase:** Phase 3 ✅ ABGESCHLOSSEN - Alle 133 Buttons in 79 Dateien migriert, 0 `<base-button>` und 0 `<ds-button>` verbleibend
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -183,7 +184,15 @@ OsButton Features:
   - Completeness Check (verify Script prüft Story, Visual, checkA11y, Keyboard, Varianten)
   - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 
-**Zuletzt abgeschlossen (Session 15 - Milestone 4c komplett):**
+**Zuletzt abgeschlossen (Session 16 - Bugfixes & letzte ds-button Migration):**
+- [x] Password/Change.vue: `!!errors` Fix für disabled-Prop
+- [x] CommentForm.vue: `type="submit"` + `!!errors` Fix
+- [x] GroupForm.vue: Letzter `<ds-button>` → `<os-button>` migriert (save/update mit icon)
+- [x] OsButton.spec.ts: TypeScript-Fix für size-Prop Union Type
+- [x] OsButton.vue: v8 ignore Coverage-Fixes (100% Branch Coverage)
+- [x] 0 `<ds-button>` und 0 `<base-button>` in Webapp-Templates verbleibend
+
+**Zuvor abgeschlossen (Session 15 - Milestone 4c komplett):**
 - [x] **Alle verbleibenden base-button Instanzen migriert** (132 os-button Tags, 0 base-button verbleibend)
 - [x] 59 Buttons in dieser Session migriert (Chat, Filter, Modals, Forms, Pages, etc.)
 - [x] `type="submit"` für alle Form-Buttons (OsButton default ist `type="button"`)
@@ -518,9 +527,10 @@ OsButton Features:
 
 | Kategorie | Buttons | Status |
 |-----------|---------|--------|
-| ✅ Migriert (gesamt) | 132 | 78 Dateien |
+| ✅ Migriert (gesamt) | 133 | 79 Dateien |
 | ⬜ `<base-button>` verbleibend | 0 | Nur BaseButton.vue Definition + Test-Dateien |
-| **Gesamt** | **132** | **100% erledigt** ✅ |
+| ⬜ `<ds-button>` verbleibend | 0 | Alle ersetzt |
+| **Gesamt** | **133** | **100% erledigt** ✅ |
 
 **Details siehe KATALOG.md** (vollständige Tracking-Tabellen)
 
@@ -1582,6 +1592,12 @@ Bei der Migration werden:
 | 2026-02-11 | **CSS-Selector Pattern** | `.base-button` → `> button` oder `button`; Position/Dimensions brauchen `!important` für Tailwind-Override |
 | 2026-02-11 | **Disabled border-color** | Outline disabled border von `var(--color-disabled)` auf `var(--color-disabled-border,#e5e3e8)` mit Fallback |
 | 2026-02-11 | **Phase 3 abgeschlossen** | 132 `<os-button>` Tags in 78 Dateien, 0 `<base-button>` in Templates verbleibend |
+| 2026-02-11 | **Password/Change.vue Fix** | `!!errors` für disabled-Prop (DsForm errors ist Objekt) |
+| 2026-02-11 | **CommentForm.vue Fix** | `type="submit"` fehlte + `!!errors` für disabled-Prop |
+| 2026-02-11 | **GroupForm.vue ds-button** | Letzter `<ds-button>` in Webapp → `<os-button>` mit `#icon` Slot migriert |
+| 2026-02-11 | **OsButton.spec.ts TS-Fix** | `size` aus `Object.entries` als Union Type gecastet (`as 'sm' | 'md' | 'lg' | 'xl'`) |
+| 2026-02-11 | **Coverage 100%** | `v8 ignore start/stop` für Vue 2 Branch, `v8 ignore next` für defensive `||` Fallback |
+| 2026-02-11 | **Scope: 133 Buttons** | 133 `<os-button>` Tags in 79 Dateien, 0 `<base-button>` + 0 `<ds-button>` verbleibend |
 
 ---
 
