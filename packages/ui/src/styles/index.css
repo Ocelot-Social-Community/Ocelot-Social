@@ -35,3 +35,22 @@ button[data-appearance="outline"]:disabled:active {
   border-color: var(--color-disabled) !important;
   color: var(--color-disabled) !important;
 }
+
+/*
+ * Icon wrapper for OsButton
+ * Provides consistent icon sizing and alignment inside buttons.
+ * Icons inherit the button's text color via currentColor.
+ */
+.os-button__icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  height: 1.2em;
+}
+
+.os-button__icon svg,
+.os-button__icon > * {
+  height: 100%;
+  width: auto;
+  fill: currentColor;
+}

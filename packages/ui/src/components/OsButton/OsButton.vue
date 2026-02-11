@@ -54,7 +54,23 @@
       const instance = getCurrentInstance()
 
       return () => {
-        const children = slots.default?.()
+        const iconContent = slots.icon?.()
+        const defaultContent = slots.default?.()
+        const hasIcon = iconContent && iconContent.length > 0
+        const hasText = defaultContent && defaultContent.length > 0
+
+        // Build children array: [iconSpan?, ...textContent?]
+        const children: unknown[] = []
+        if (hasIcon) {
+          children.push(h('span', { class: 'os-button__icon' }, iconContent))
+        }
+        if (hasText) {
+          children.push(...defaultContent)
+        }
+
+        // Add gap between icon and text
+        const gapClass = hasIcon && hasText ? 'gap-1' : ''
+
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
         if (isVue2) {
           // Vue 2: separate attrs and on (listeners)
@@ -69,7 +85,7 @@
           return h(
             'button',
             {
-              class: [classes.value, parentClass, parentDynClass].filter(Boolean),
+              class: [classes.value, gapClass, parentClass, parentDynClass].filter(Boolean),
               attrs: {
                 type: props.type,
                 disabled: props.disabled || undefined,
@@ -91,7 +107,7 @@
             type: props.type,
             disabled: props.disabled,
             'data-appearance': props.appearance,
-            class: cn(classes.value, (attrClass as string) || ''),
+            class: cn(classes.value, gapClass, (attrClass as string) || ''),
             ...restAttrs,
           },
           children,

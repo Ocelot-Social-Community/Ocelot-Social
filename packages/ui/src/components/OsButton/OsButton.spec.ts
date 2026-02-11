@@ -131,6 +131,68 @@ describe('osButton', () => {
     })
   })
 
+  describe('icon slot', () => {
+    it('renders icon slot content in .os-button__icon wrapper', () => {
+      const wrapper = mount(OsButton, {
+        slots: { icon: '<svg data-testid="icon"></svg>' },
+      })
+      const iconWrapper = wrapper.find('.os-button__icon')
+      expect(iconWrapper.exists()).toBeTruthy()
+      expect(iconWrapper.find('[data-testid="icon"]').exists()).toBeTruthy()
+    })
+
+    it('renders both icon and text', () => {
+      const wrapper = mount(OsButton, {
+        slots: {
+          icon: '<svg data-testid="icon"></svg>',
+          default: 'Save',
+        },
+      })
+      expect(wrapper.find('.os-button__icon').exists()).toBeTruthy()
+      expect(wrapper.text()).toContain('Save')
+    })
+
+    it('adds gap-1 class when icon and text are present', () => {
+      const wrapper = mount(OsButton, {
+        slots: {
+          icon: '<svg></svg>',
+          default: 'Save',
+        },
+      })
+      expect(wrapper.classes()).toContain('gap-1')
+    })
+
+    it('does not add gap-1 for icon-only button', () => {
+      const wrapper = mount(OsButton, {
+        slots: { icon: '<svg></svg>' },
+      })
+      expect(wrapper.classes()).not.toContain('gap-1')
+    })
+
+    it('does not add gap-1 without icon', () => {
+      const wrapper = mount(OsButton, {
+        slots: { default: 'Click me' },
+      })
+      expect(wrapper.classes()).not.toContain('gap-1')
+    })
+
+    it('renders without icon slot (backward compat)', () => {
+      const wrapper = mount(OsButton, {
+        slots: { default: 'Click me' },
+      })
+      expect(wrapper.find('.os-button__icon').exists()).toBeFalsy()
+      expect(wrapper.text()).toBe('Click me')
+    })
+
+    it('renders icon-only button without text', () => {
+      const wrapper = mount(OsButton, {
+        slots: { icon: '<svg></svg>' },
+      })
+      expect(wrapper.find('.os-button__icon').exists()).toBeTruthy()
+      expect(wrapper.text()).toBe('')
+    })
+  })
+
   describe('keyboard accessibility', () => {
     it('renders as native button element for keyboard support', () => {
       const wrapper = mount(OsButton)
@@ -150,6 +212,15 @@ describe('osButton', () => {
       })
       // Disabled buttons have disabled attribute which browsers handle correctly
       expect(wrapper.attributes('disabled')).toBeDefined()
+    })
+
+    it('icon-only button is focusable with aria-label', () => {
+      const wrapper = mount(OsButton, {
+        slots: { icon: '<svg></svg>' },
+        attrs: { 'aria-label': 'Close' },
+      })
+      expect(wrapper.attributes('aria-label')).toBe('Close')
+      expect(wrapper.attributes('tabindex')).toBeUndefined()
     })
 
     it('can receive focus programmatically', () => {

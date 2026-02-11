@@ -122,4 +122,40 @@ test.describe('OsButton visual regression', () => {
     await expect(root.locator('.flex-col').first()).toHaveScreenshot('full-width.png')
     await checkA11y(page)
   })
+
+  test('with icon', async ({ page }) => {
+    await page.goto(`${STORY_URL}--with-icon&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+    await expect(root.locator('.flex')).toHaveScreenshot('with-icon.png')
+    await checkA11y(page)
+  })
+
+  test('icon only', async ({ page }) => {
+    await page.goto(`${STORY_URL}--icon-only&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+    await expect(root.locator('.flex')).toHaveScreenshot('icon-only.png')
+    await checkA11y(page)
+  })
+
+  test('icon sizes', async ({ page }) => {
+    await page.goto(`${STORY_URL}--icon-sizes&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+    await expect(root.locator('.flex')).toHaveScreenshot('icon-sizes.png')
+    await checkA11y(page)
+  })
+
+  test('icon appearances', async ({ page }) => {
+    await page.goto(`${STORY_URL}--icon-appearances&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+    await expect(root.locator('.flex-col').first()).toHaveScreenshot('icon-appearances.png')
+    await checkA11y(page)
+  })
 })
