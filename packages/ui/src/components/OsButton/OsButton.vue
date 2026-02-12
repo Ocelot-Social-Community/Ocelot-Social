@@ -126,7 +126,7 @@
             return typeof children !== 'string' || children.trim().length > 0
           }) ?? false
 
-        const size = (props.size ?? 'md') as Size
+        const size = props.size as Size
         const spinnerPx = SPINNER_PX[size] // eslint-disable-line security/detect-object-injection
         const isSmall = props.circle || size === 'sm'
         const isLoading = props.loading
