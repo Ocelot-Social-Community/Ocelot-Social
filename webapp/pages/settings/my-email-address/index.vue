@@ -18,7 +18,7 @@
         <ds-space class="backendErrors" v-if="backendErrors">
           <ds-text align="center" bold color="danger">{{ backendErrors.message }}</ds-text>
         </ds-space>
-        <os-button :disabled="!!errors" type="submit" variant="primary" appearance="filled">
+        <os-button :disabled="!!errors" :loading="loadingData" type="submit" variant="primary" appearance="filled">
           <template #icon><base-icon name="check" /></template>
           {{ $t('actions.save') }}
         </os-button>
@@ -44,6 +44,7 @@ export default {
     return {
       backendErrors: null,
       data: null,
+      loadingData: false,
     }
   },
   computed: {
@@ -84,6 +85,7 @@ export default {
   },
   methods: {
     async submit() {
+      this.loadingData = true
       const { email } = this.formData
       try {
         const response = await this.$apollo.mutate({
@@ -111,6 +113,8 @@ export default {
           return
         }
         this.$toast.error(err.message)
+      } finally {
+        this.loadingData = false
       }
     },
   },
