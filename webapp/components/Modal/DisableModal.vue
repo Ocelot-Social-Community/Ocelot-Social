@@ -81,6 +81,8 @@ export default {
       } catch (err) {
         this.$toast.error(err.message)
         this.isOpen = false
+      } finally {
+        this.loading = false
       }
     },
   },
