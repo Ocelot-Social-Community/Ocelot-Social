@@ -51,6 +51,7 @@
 
         <template #unmuteUser="scope">
           <os-button
+            data-test="unmute-btn"
             variant="primary"
             appearance="outline"
             circle
