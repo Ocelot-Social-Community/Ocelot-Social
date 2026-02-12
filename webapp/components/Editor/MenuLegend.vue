@@ -72,7 +72,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .legend-question-button {
   color: #70677e !important;
   font-size: 1.2rem !important;
