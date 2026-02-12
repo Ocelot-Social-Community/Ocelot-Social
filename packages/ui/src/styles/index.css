@@ -9,6 +9,7 @@
  */
 @import "tailwindcss/theme";
 @import "tailwindcss/utilities";
+@import "./animations.css";
 
 /* Scan component files for utility classes */
 @source "../components/**/*.vue";
@@ -19,8 +20,6 @@
  * These rules have higher specificity than :active/:hover to ensure
  * disabled buttons immediately show disabled styling, even when clicked.
  */
-
-@import "./animations.css";
 
 /* Filled buttons: gray background when disabled, regardless of hover/active */
 button[data-appearance="filled"]:disabled:hover,
