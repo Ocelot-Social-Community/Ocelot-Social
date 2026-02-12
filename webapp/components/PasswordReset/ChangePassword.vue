@@ -28,7 +28,7 @@
             variant="primary"
             appearance="filled"
             :loading="$apollo.loading"
-            :disabled="errors"
+            :disabled="!!errors"
             type="submit"
           >
             {{ $t('settings.security.change-password.button') }}
