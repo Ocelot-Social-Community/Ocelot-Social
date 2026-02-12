@@ -6,7 +6,7 @@
       variant="primary"
       appearance="ghost"
       circle
-      :title="this.$t('hashtags-filter.clearSearch')"
+      :title="$t('hashtags-filter.clearSearch')"
       @click="clearSearch"
     >
       <template #icon>
