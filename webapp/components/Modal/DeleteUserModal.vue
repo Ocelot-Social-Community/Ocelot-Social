@@ -40,7 +40,13 @@
       <os-button variant="primary" appearance="outline" class="cancel" @click="cancel">
         {{ $t('actions.cancel') }}
       </os-button>
-      <os-button variant="danger" appearance="filled" class="confirm" :loading="loading" @click="openModal">
+      <os-button
+        variant="danger"
+        appearance="filled"
+        class="confirm"
+        :loading="loading"
+        @click="openModal"
+      >
         <template #icon><base-icon name="exclamation-circle" /></template>
         {{ $t('settings.deleteUserAccount.name') }}
       </os-button>
