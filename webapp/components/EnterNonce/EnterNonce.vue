@@ -20,7 +20,13 @@
     <ds-text>
       {{ $t('components.registration.email-nonce.form.click-next') }}
     </ds-text>
-    <os-button variant="primary" appearance="filled" :disabled="disabled" name="submit" type="submit">
+    <os-button
+      variant="primary"
+      appearance="filled"
+      :disabled="disabled"
+      name="submit"
+      type="submit"
+    >
       {{ $t('components.registration.email-nonce.form.next') }}
     </os-button>
     <slot></slot>
