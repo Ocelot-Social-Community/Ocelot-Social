@@ -3,9 +3,9 @@ import { render, fireEvent, screen } from '@testing-library/vue'
 import Notifications from './notifications.vue'
 
 const localVue = global.localVue
-let wrapper
 
 describe('notifications.vue', () => {
+  let wrapper
   let mocks
   let store
 
@@ -66,14 +66,7 @@ describe('notifications.vue', () => {
         },
       },
     })
-  })
-
-  const Wrapper = () => {
-    return render(Notifications, { mocks, localVue, store })
-  }
-
-  beforeEach(() => {
-    wrapper = Wrapper()
+    wrapper = render(Notifications, { mocks, localVue, store })
   })
 
   describe('mount', () => {
