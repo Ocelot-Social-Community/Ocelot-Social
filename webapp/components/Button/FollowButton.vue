@@ -1,5 +1,6 @@
 <template>
   <os-button
+    data-test="follow-btn"
     :variant="isFollowed && hovered ? 'danger' : 'primary'"
     :appearance="isFollowed && !hovered ? 'filled' : 'outline'"
     :disabled="disabled || !followId"

@@ -29,18 +29,18 @@ describe('FollowButton.vue', () => {
 
     it('renders button and text', () => {
       expect(mocks.$t).toHaveBeenCalledWith('followButton.follow')
-      expect(wrapper.findAll('button')).toHaveLength(1)
+      expect(wrapper.findAll('[data-test="follow-btn"]')).toHaveLength(1)
     })
 
     it('renders button and text when followed', () => {
       propsData.isFollowed = true
       wrapper = Wrapper()
       expect(mocks.$t).toHaveBeenCalledWith('followButton.following')
-      expect(wrapper.findAll('button')).toHaveLength(1)
+      expect(wrapper.findAll('[data-test="follow-btn"]')).toHaveLength(1)
     })
 
     it.skip('toggle the button', async () => {
-      wrapper.find('button').trigger('click') // This does not work since @click.prevent is used
+      wrapper.find('[data-test="follow-btn"]').trigger('click') // This does not work since @click.prevent is used
       expect(wrapper.vm.isFollowed).toBe(true)
     })
   })
