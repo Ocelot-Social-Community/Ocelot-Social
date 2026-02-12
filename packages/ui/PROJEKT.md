@@ -116,9 +116,9 @@ OsButton Features:
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-12 (Session 16, fortgesetzt)
+**Letzte Aktualisierung:** 2026-02-12 (Session 17)
 
-**Aktuelle Phase:** Phase 3 ✅ ABGESCHLOSSEN - Alle 133 Buttons in 79 Dateien migriert, 0 `<base-button>` und 0 `<ds-button>` verbleibend
+**Aktuelle Phase:** Phase 3 ✅ ABGESCHLOSSEN + Code-Review-Feedback eingearbeitet
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -184,7 +184,31 @@ OsButton Features:
   - Completeness Check (verify Script prüft Story, Visual, checkA11y, Keyboard, Varianten)
   - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 
-**Zuletzt abgeschlossen (Session 16 - Bugfixes, Code-Review, letzte ds-button Migration):**
+**Zuletzt abgeschlossen (Session 17 - Code-Review Feedback, OsButton Refactoring, Accessibility):**
+- [x] OsButton.vue vereinfacht: `vueAttrs()` Helper, Einmal-Variablen durch `cn()` ersetzt, `children` Array inline (217→227 Zeilen, aber lesbarer)
+- [x] OsButton: `@import "./animations.css"` vor `@source`-Direktiven verschoben (CSS-Spec-Konformität)
+- [x] CustomButton.vue: `isEmpty` aus `data()` entfernt → direkter Import im Computed
+- [x] notifications.spec.js: Doppelten `beforeEach` konsolidiert, `wrapper` in `describe`-Block verschoben
+- [x] MenuLegend.vue: `<style scoped>` hinzugefügt (verhindert Style-Leaking generischer Klassennamen)
+- [x] LocationSelect: `data-test="clear-location-button"` + spezifischerer Selektor im Spec
+- [x] HashtagsFilter: `data-test="clear-search-button"` + spezifischerer Selektor im Spec
+- [x] FollowButton.vue: `.native` Modifier von `@mouseenter`/`@mouseleave` entfernt (Vue 3 Kompatibilität)
+- [x] MapButton.vue: Icon in `<template #icon>` verschoben + redundantes Inline-Style entfernt
+- [x] MySomethingList.vue: Unbenutzte `.icon-button` CSS-Klasse entfernt
+- [x] PaginationButtons.vue: Hardcoded `aria-label` → `$t('pagination.previous/next')` (i18n)
+- [x] `pagination.previous/next` in allen 9 Sprachdateien angelegt
+- [x] GroupContentMenu.vue: `aria-label` via `$t('group.contentMenu.menuButton')` für icon-only Button
+- [x] `group.contentMenu.menuButton` in allen 9 Sprachdateien angelegt
+- [x] FilterMenu.vue: Veraltete `slot="default"` + `slot-scope` → `<template #default="{ toggleMenu }">` (Vue 3)
+- [x] HashtagsFilter.vue: `this.$t()` → `$t()` im Template (Vue 3 Kompatibilität)
+- [x] DisableModal.vue: `appearance="filled"` + `:loading="loading"` auf Danger-Button
+- [x] DeleteUserModal.vue: `appearance="filled"` + `:loading="loading"` auf Danger-Button
+- [x] my-email-address/index.vue: `loadingData` State + `:loading` auf Submit-Button + `finally` Block
+- [x] ReportModal.vue: `class="report-modal"` + CSS-Selektoren mit Prefix (verhindert globales Style-Leaking)
+- [x] DeleteUserModal.vue: CSS-Selektoren mit `.delete-user-modal` Prefix (verhindert globales Style-Leaking)
+- [x] Button-Wrapper-Analyse: GroupButton + MapButton als Kandidaten zum Inlining identifiziert (nur 1 Nutzungsort, keine Logik)
+
+**Zuvor abgeschlossen (Session 16 - Bugfixes, Code-Review, letzte ds-button Migration):**
 - [x] Password/Change.vue: `!!errors` Fix für disabled-Prop
 - [x] CommentForm.vue: `type="submit"` + `!!errors` Fix
 - [x] GroupForm.vue: Letzter `<ds-button>` → `<os-button>` migriert (save/update mit icon)
@@ -329,7 +353,7 @@ OsButton Features:
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
 3. ~~**Phase 2: Projekt-Setup**~~ ✅ ABGESCHLOSSEN
-4. ~~**Phase 3: Webapp-Integration**~~ ✅ ABGESCHLOSSEN — 132 Buttons in 78 Dateien
+4. ~~**Phase 3: Webapp-Integration**~~ ✅ ABGESCHLOSSEN — 133 Buttons in 79 Dateien
    - [x] yarn link / Webpack-Alias in Webapp
    - [x] CSS-Variablen definieren (ocelot-ui-variables.scss)
    - [x] 16 Buttons migriert & validiert ✅
@@ -337,7 +361,12 @@ OsButton Features:
    - [x] **Milestone 4a:** 14 weitere Buttons (ohne neue Props) ✅
    - [x] **Milestone 4b:** icon/circle/loading Props implementieren ✅
    - [x] **Milestone 4c:** Alle verbleibenden Buttons migriert ✅
-5. **Nächstes:** Snapshots/Tests aktualisieren, BaseButton-Komponente ggf. entfernen
+   - [x] **Code-Review Feedback:** Refactoring, A11y, Vue 3 Compat, CSS-Scoping ✅
+5. **Nächstes:**
+   - [ ] GroupButton + MapButton in HeaderMenu inlinen (keine eigene Komponente nötig)
+   - [ ] `compat/` Verzeichnis in packages/ui anlegen (temporäre Migrations-Wrapper)
+   - [ ] BaseIcon nach `compat/` verschieben (131 Nutzungen, Voraussetzung für weitere Migrationen)
+   - [ ] Snapshots/Tests aktualisieren, BaseButton-Komponente ggf. entfernen
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
 - [ ] `NPM_TOKEN` als GitHub Secret einrichten (für npm publish in ui-release.yml)
@@ -1622,6 +1651,21 @@ Bei der Migration werden:
 | 2026-02-12 | **OsButton xs entfernt** | `isSmall` von `['xs', 'sm'].includes(size)` auf `size === 'sm'` vereinfacht (xs ist kein gültiger Size-Wert) |
 | 2026-02-12 | **Strikte Typisierung** | `type Size = NonNullable<ButtonVariants['size']>`, `Record<Size, ...>` für CIRCLE_WIDTHS + SPINNER_PX; `props.size!` → `(props.size ?? 'md') as Size` |
 | 2026-02-12 | **animations.css** | Stylelint-konforme Formatierung: eine Deklaration pro Zeile, Leerzeilen zwischen Keyframe-Stufen |
+| 2026-02-12 | **OsButton Refactoring** | `vueAttrs()` Helper für Vue 2/3 Attribut-Handling, Einmal-Variablen durch `cn()` ersetzt, `children` inline; 77 Tests, 100% Coverage |
+| 2026-02-12 | **CSS @import Reihenfolge** | `@import "./animations.css"` vor `@source`-Direktiven verschoben (CSS-Spec: @import vor anderen At-Rules) |
+| 2026-02-12 | **CustomButton Cleanup** | `isEmpty` aus `data()` entfernt — reine Utility-Funktion braucht keine Vue-Reaktivität |
+| 2026-02-12 | **notifications.spec.js** | Doppelten `beforeEach` konsolidiert; `wrapper` von Modulebene in `describe`-Block verschoben |
+| 2026-02-12 | **Style-Scoping** | MenuLegend.vue: `<style scoped>` hinzugefügt; ReportModal + DeleteUserModal: CSS-Selektoren mit Komponenten-Prefix |
+| 2026-02-12 | **data-test Selektoren** | LocationSelect (`clear-location-button`) + HashtagsFilter (`clear-search-button`): spezifischere Test-Selektoren |
+| 2026-02-12 | **Vue 3 Compat Fixes** | FollowButton: `.native` entfernt; FilterMenu: `slot`/`slot-scope` → `<template #default>`; HashtagsFilter: `this.$t()` → `$t()` |
+| 2026-02-12 | **A11y: aria-label** | GroupContentMenu icon-only Button: `$t('group.contentMenu.menuButton')`; PaginationButtons: `$t('pagination.previous/next')` |
+| 2026-02-12 | **i18n Keys** | `pagination.previous/next` + `group.contentMenu.menuButton` in allen 9 Sprachdateien angelegt |
+| 2026-02-12 | **Modal Konsistenz** | DisableModal + DeleteUserModal: `appearance="filled"` + `:loading="loading"` auf Danger-Buttons |
+| 2026-02-12 | **Loading State** | my-email-address/index.vue: `loadingData` hinzugefügt + `finally` Block für Reset |
+| 2026-02-12 | **MapButton #icon Slot** | Icon von Default-Slot in `<template #icon>` verschoben (konsistent mit allen anderen Buttons) |
+| 2026-02-12 | **Dead Code entfernt** | MySomethingList.vue: `.icon-button` CSS-Klasse (nach Migration nicht mehr verwendet) |
+| 2026-02-12 | **Button-Wrapper-Analyse** | 15 OsButton-Wrapper klassifiziert: 4 Smart (Apollo/Vuex), 4 Presentational, 7 Borderline; GroupButton + MapButton als Inline-Kandidaten identifiziert |
+| 2026-02-12 | **compat/ Konzept** | Separates Verzeichnis für temporäre Migrations-Wrapper (nicht von check-completeness.ts erfasst); BaseIcon als erster Kandidat (131 Nutzungen) |
 
 ---
 
