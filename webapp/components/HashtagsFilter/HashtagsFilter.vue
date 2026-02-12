@@ -2,6 +2,7 @@
   <base-card class="hashtags-filter">
     <h2>{{ $t('hashtags-filter.hashtag-search', { hashtag }) }}</h2>
     <os-button
+      data-test="clear-search-button"
       variant="primary"
       appearance="ghost"
       circle
