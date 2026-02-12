@@ -7,7 +7,7 @@
       <os-button variant="primary" appearance="outline" class="cancel" @click="cancel">
         {{ $t('disable.cancel') }}
       </os-button>
-      <os-button variant="danger" class="confirm" :loading="loading" @click="confirm">
+      <os-button variant="danger" appearance="filled" class="confirm" :loading="loading" @click="confirm">
         <template #icon><base-icon name="exclamation-circle" /></template>
         {{ $t('disable.submit') }}
       </os-button>
