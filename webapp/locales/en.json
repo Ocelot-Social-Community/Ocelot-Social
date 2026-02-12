@@ -8,7 +8,8 @@
     "loading": "loading",
     "loadMore": "load more",
     "save": "Save",
-    "saveCategories": "Save topics"
+    "saveCategories": "Save topics",
+    "search": "Search"
   },
   "admin": {
     "badges": {

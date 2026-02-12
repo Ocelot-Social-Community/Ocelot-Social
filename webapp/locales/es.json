@@ -8,7 +8,8 @@
     "loading": "cargamento",
     "loadMore": "cargar más",
     "save": "Guardar",
-    "saveCategories": null
+    "saveCategories": null,
+    "search": "Buscar"
   },
   "admin": {
     "badges": {

@@ -18,6 +18,7 @@
               circle
               type="submit"
               :loading="$apollo.loading"
+              :aria-label="$t('actions.search')"
             >
               <template #icon><base-icon name="search" /></template>
             </os-button>

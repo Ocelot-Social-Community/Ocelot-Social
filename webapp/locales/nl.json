@@ -8,7 +8,8 @@
     "loading": null,
     "loadMore": null,
     "save": null,
-    "saveCategories": null
+    "saveCategories": null,
+    "search": "Zoeken"
   },
   "admin": {
     "badges": {

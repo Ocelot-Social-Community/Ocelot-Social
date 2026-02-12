@@ -8,7 +8,8 @@
     "loading": "загрузка",
     "loadMore": "Загрузить ещё",
     "save": "Сохранить",
-    "saveCategories": null
+    "saveCategories": null,
+    "search": "Поиск"
   },
   "admin": {
     "badges": {
