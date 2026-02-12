@@ -54,6 +54,7 @@
 
         <template #unblockUser="scope">
           <os-button
+            data-test="unblock-btn"
             variant="primary"
             appearance="outline"
             circle
