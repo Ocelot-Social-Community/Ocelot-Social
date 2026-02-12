@@ -44,6 +44,7 @@
 
       <os-button
         v-if="hasMore"
+        data-test="load-all-connections-btn"
         variant="primary"
         appearance="outline"
         :loading="loading"

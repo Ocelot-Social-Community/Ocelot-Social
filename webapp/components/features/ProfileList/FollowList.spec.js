@@ -70,7 +70,7 @@ describe('FollowList.vue', () => {
       describe('of `following`', () => {
         it('uses the `following` data on :user', () => {
           const wrapper = Wrapper({ user, type: 'following' })
-          wrapper.find('button').trigger('click')
+          wrapper.find('[data-test="load-all-connections-btn"]').trigger('click')
 
           expect(wrapper.vm.allConnectionsCount).toBe(user.followingCount)
           expect(wrapper.findAll('.user-teaser')).toHaveLength(user.following.length)
@@ -83,7 +83,7 @@ describe('FollowList.vue', () => {
       describe('of `followedBy`', () => {
         it('uses the `followedBy` data on :user', () => {
           const wrapper = Wrapper({ type: 'followedBy' })
-          wrapper.find('button').trigger('click')
+          wrapper.find('[data-test="load-all-connections-btn"]').trigger('click')
 
           expect(wrapper.vm.allConnectionsCount).toBe(user.followedByCount)
           expect(wrapper.findAll('.user-teaser')).toHaveLength(user.followedBy.length)
@@ -129,7 +129,7 @@ describe('FollowList.vue', () => {
         })
 
         it(`has a button to load all remaining connections`, async () => {
-          wrapper.find('button').trigger('click')
+          wrapper.find('[data-test="load-all-connections-btn"]').trigger('click')
           expect(wrapper.emitted('fetchAllConnections')).toBeTruthy()
         })
       })
