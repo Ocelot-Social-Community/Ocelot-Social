@@ -11,7 +11,9 @@
           placement: 'bottom-start',
         }"
       >
-        <base-icon name="globe-detailed" size="large" style="margin-left: 0 !important" />
+        <template #icon>
+          <base-icon name="globe-detailed" size="large" />
+        </template>
       </os-button>
     </nuxt-link>
   </div>
@@ -28,8 +30,8 @@ export default {
 
 <style lang="scss">
 .map-button {
-  margin-left: 4px;
-  margin-right: 4px;
+  margin-left: 3px;
+  margin-right: 3px;
 
   .base-icon > .svg.--large {
     margin-left: 0;
