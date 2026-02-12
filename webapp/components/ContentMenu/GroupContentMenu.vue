@@ -7,8 +7,9 @@
           appearance="outline"
           size="sm"
           circle
-          @click.prevent="toggleMenu()"
+          :aria-label="$t('group.contentMenu.menuButton')"
           data-test="group-menu-button"
+          @click.prevent="toggleMenu()"
         >
           <template #icon>
             <base-icon name="ellipsis-v" />

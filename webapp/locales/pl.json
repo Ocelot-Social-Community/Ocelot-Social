@@ -540,6 +540,7 @@
     "changeMemberRole": null,
     "contentMenu": {
       "inviteLinks": null,
+      "menuButton": "Menu grupy",
       "muteGroup": null,
       "unmuteGroup": null,
       "visitGroupPage": null

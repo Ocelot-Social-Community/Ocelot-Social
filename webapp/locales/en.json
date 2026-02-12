@@ -540,6 +540,7 @@
     "changeMemberRole": "The role has been changed to “{role}”!",
     "contentMenu": {
       "inviteLinks": "Invite links",
+      "menuButton": "Group menu",
       "muteGroup": "Mute group",
       "unmuteGroup": "Unmute group",
       "visitGroupPage": "Show group"
