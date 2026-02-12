@@ -47,17 +47,16 @@
   const CIRCLE_STYLE =
     'transform-origin:25px 25px;animation:os-spinner-rotate 16s linear infinite,os-spinner-dash 1.5s ease-in-out infinite'
 
-  function createSpinner(px: number, center: string) {
+  function vueAttrs(attrs: Record<string, string>, style?: string) {
     /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
-    const svg = isVue2
-      ? h('svg', { attrs: SVG_ATTRS, style: 'width:100%;height:100%;overflow:hidden' }, [
-          h('circle', { attrs: CIRCLE_ATTRS, style: CIRCLE_STYLE }),
-        ])
-      : /* v8 ignore stop */
-        h('svg', { ...SVG_ATTRS, style: 'width:100%;height:100%;overflow:hidden' }, [
-          h('circle', { ...CIRCLE_ATTRS, style: CIRCLE_STYLE }),
-        ])
+    return isVue2 ? { attrs, ...(style && { style }) } : { ...attrs, ...(style && { style }) }
+    /* v8 ignore stop */
+  }
 
+  function createSpinner(px: number, center: string) {
+    const svg = h('svg', vueAttrs(SVG_ATTRS, 'width:100%;height:100%;overflow:hidden'), [
+      h('circle', vueAttrs(CIRCLE_ATTRS, CIRCLE_STYLE)),
+    ])
     return h(
       'span',
       { class: `os-button__spinner absolute ${center}`, style: `width:${px}px;height:${px}px` },
@@ -132,14 +131,10 @@
         const isLoading = props.loading
         const isDisabled = props.disabled || isLoading
 
-        const circleClass = props.circle ? `rounded-full p-0 ${CIRCLE_WIDTHS[size]}` : '' // eslint-disable-line security/detect-object-injection
-
         // --- Build inner children (icon + text) ---
         const innerChildren: ReturnType<typeof h>[] = []
 
         if (hasIcon) {
-          const iconMargin = isSmall ? '' : hasText ? '-ml-1' : '-ml-1 -mr-1'
-          const loadingClass = isLoading ? 'relative overflow-visible' : ''
           const iconChildren = isLoading
             ? [
                 /* v8 ignore next -- iconContent guaranteed truthy by hasIcon check */
@@ -148,7 +143,17 @@
               ]
             : iconContent
           innerChildren.push(
-            h('span', { class: `${iconMargin} ${ICON_CLASS} ${loadingClass}` }, iconChildren),
+            h(
+              'span',
+              {
+                class: cn(
+                  ICON_CLASS,
+                  !isSmall && (hasText ? '-ml-1' : '-ml-1 -mr-1'),
+                  isLoading && 'relative overflow-visible',
+                ),
+              },
+              iconChildren,
+            ),
           )
         }
 
@@ -156,19 +161,27 @@
           innerChildren.push(...(defaultContent as ReturnType<typeof h>[]))
         }
 
-        const gapClass = hasIcon && hasText ? (isSmall ? 'gap-1' : 'gap-2') : ''
         const contentWrapper = h(
           'span',
-          { class: `inline-flex items-center ${gapClass}` },
+          {
+            class: cn(
+              'inline-flex items-center',
+              hasIcon && hasText && (isSmall ? 'gap-1' : 'gap-2'),
+            ),
+          },
           innerChildren,
         )
 
-        const buttonSpinner =
-          isLoading && !hasIcon ? createSpinner(spinnerPx, 'inset-0 m-auto') : null
+        const children =
+          isLoading && !hasIcon
+            ? [contentWrapper, createSpinner(spinnerPx, 'inset-0 m-auto')]
+            : [contentWrapper]
 
-        const children = buttonSpinner ? [contentWrapper, buttonSpinner] : [contentWrapper]
-
-        const buttonClass = cn(variantClasses.value, circleClass)
+        const buttonClass = cn(
+          variantClasses.value,
+          props.circle && 'rounded-full p-0',
+          props.circle && CIRCLE_WIDTHS[size], // eslint-disable-line security/detect-object-injection
+        )
 
         const buttonData = {
           type: props.type,
