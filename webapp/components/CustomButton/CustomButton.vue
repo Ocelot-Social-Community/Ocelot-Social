@@ -49,14 +49,9 @@ export default {
   props: {
     settings: { type: Object, required: true },
   },
-  data() {
-    return {
-      isEmpty,
-    }
-  },
   computed: {
     logoWidthStyle() {
-      const width = this.isEmpty(this.settings.iconWidth) ? '26px' : this.settings.iconWidth
+      const width = isEmpty(this.settings.iconWidth) ? '26px' : this.settings.iconWidth
       return `width: ${width};`
     },
   },
