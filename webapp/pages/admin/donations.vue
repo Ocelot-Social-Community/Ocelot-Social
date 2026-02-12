@@ -33,7 +33,7 @@
         :disabled="!showDonations"
         data-test="donations-progress"
       />
-      <os-button class="donations-info-button" variant="primary" type="submit">
+      <os-button class="donations-info-button" variant="primary" appearance="filled" type="submit">
         {{ $t('actions.save') }}
       </os-button>
     </ds-form>
