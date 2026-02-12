@@ -109,10 +109,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.invite-button {
-  color: $color-secondary;
-}
-
 .invite-list {
   max-width: min(400px, 90vw);
   padding: $space-small;
