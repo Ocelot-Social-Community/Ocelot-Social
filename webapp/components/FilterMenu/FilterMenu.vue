@@ -1,17 +1,17 @@
 <template>
   <dropdown ref="menu" placement="top-start" :offset="8" class="filter-menu">
-    <os-button
-      slot="default"
-      variant="primary"
-      :appearance="filterActive ? 'filled' : 'ghost'"
-      slot-scope="{ toggleMenu }"
-      @click.prevent="toggleMenu()"
-    >
-      <template #icon>
-        <base-icon name="filter" />
-      </template>
-      <base-icon class="dropdown-arrow" name="angle-down" />
-    </os-button>
+    <template #default="{ toggleMenu }">
+      <os-button
+        variant="primary"
+        :appearance="filterActive ? 'filled' : 'ghost'"
+        @click.prevent="toggleMenu()"
+      >
+        <template #icon>
+          <base-icon name="filter" />
+        </template>
+        <base-icon class="dropdown-arrow" name="angle-down" />
+      </os-button>
+    </template>
     <template #popover>
       <filter-menu-component />
     </template>
