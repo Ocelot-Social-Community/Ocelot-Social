@@ -15,6 +15,7 @@
     />
     <os-button
       v-if="locationName !== '' && canBeCleared"
+      data-test="clear-location-button"
       variant="primary"
       appearance="ghost"
       size="sm"
