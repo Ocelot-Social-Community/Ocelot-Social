@@ -84,6 +84,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               trigger="manual"
             >
               <button
+                aria-label="group.contentMenu.menuButton"
                 class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] text-[12px] leading-[normal] tracking-[0.6px] overflow-hidden whitespace-nowrap align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[26px]"
                 data-appearance="outline"
                 data-test="group-menu-button"
@@ -91,10 +92,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 type="button"
               >
                 <span
-                  class="inline-flex items-center "
+                  class="inline-flex items-center"
                 >
                   <span
-                    class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                    class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
                     <span
                       class="base-icon"
@@ -293,7 +294,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -319,7 +320,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -915,7 +916,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               type="button"
             >
               <span
-                class="inline-flex items-center "
+                class="inline-flex items-center"
               >
                 
             comment.show.more
@@ -942,10 +943,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               type="button"
             >
               <span
-                class="inline-flex items-center "
+                class="inline-flex items-center"
               >
                 <span
-                  class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
                   <span
                     class="base-icon"
@@ -1169,7 +1170,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -1194,7 +1195,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -1435,7 +1436,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               type="button"
             >
               <span
-                class="inline-flex items-center "
+                class="inline-flex items-center"
               >
                 
             comment.show.more
@@ -1660,7 +1661,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -1685,7 +1686,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -1946,7 +1947,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               type="button"
             >
               <span
-                class="inline-flex items-center "
+                class="inline-flex items-center"
               >
                 
             comment.show.more
@@ -2118,6 +2119,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               trigger="manual"
             >
               <button
+                aria-label="group.contentMenu.menuButton"
                 class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] text-[12px] leading-[normal] tracking-[0.6px] overflow-hidden whitespace-nowrap align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[26px]"
                 data-appearance="outline"
                 data-test="group-menu-button"
@@ -2125,10 +2127,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 type="button"
               >
                 <span
-                  class="inline-flex items-center "
+                  class="inline-flex items-center"
                 >
                   <span
-                    class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                    class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
                     <span
                       class="base-icon"
@@ -2285,7 +2287,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -2310,7 +2312,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -2906,7 +2908,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               type="button"
             >
               <span
-                class="inline-flex items-center "
+                class="inline-flex items-center"
               >
                 
             comment.show.more
@@ -2933,10 +2935,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               type="button"
             >
               <span
-                class="inline-flex items-center "
+                class="inline-flex items-center"
               >
                 <span
-                  class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
                   <span
                     class="base-icon"
@@ -3135,6 +3137,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               trigger="manual"
             >
               <button
+                aria-label="group.contentMenu.menuButton"
                 class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] text-[12px] leading-[normal] tracking-[0.6px] overflow-hidden whitespace-nowrap align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[26px]"
                 data-appearance="outline"
                 data-test="group-menu-button"
@@ -3142,10 +3145,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 type="button"
               >
                 <span
-                  class="inline-flex items-center "
+                  class="inline-flex items-center"
                 >
                   <span
-                    class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                    class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
                     <span
                       class="base-icon"
@@ -3325,7 +3328,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -3918,7 +3921,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               type="button"
             >
               <span
-                class="inline-flex items-center "
+                class="inline-flex items-center"
               >
                 
             comment.show.more
@@ -3945,10 +3948,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               type="button"
             >
               <span
-                class="inline-flex items-center "
+                class="inline-flex items-center"
               >
                 <span
-                  class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
                   <span
                     class="base-icon"
@@ -4190,7 +4193,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -4763,7 +4766,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               type="button"
             >
               <span
-                class="inline-flex items-center "
+                class="inline-flex items-center"
               >
                 
             comment.show.more
@@ -5006,7 +5009,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -5599,7 +5602,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               type="button"
             >
               <span
-                class="inline-flex items-center "
+                class="inline-flex items-center"
               >
                 
             comment.show.more
@@ -5771,6 +5774,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               trigger="manual"
             >
               <button
+                aria-label="group.contentMenu.menuButton"
                 class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] text-[12px] leading-[normal] tracking-[0.6px] overflow-hidden whitespace-nowrap align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[26px]"
                 data-appearance="outline"
                 data-test="group-menu-button"
@@ -5778,10 +5782,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 type="button"
               >
                 <span
-                  class="inline-flex items-center "
+                  class="inline-flex items-center"
                 >
                   <span
-                    class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                    class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
                     <span
                       class="base-icon"
@@ -5918,7 +5922,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -6511,7 +6515,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               type="button"
             >
               <span
-                class="inline-flex items-center "
+                class="inline-flex items-center"
               >
                 
             comment.show.more
@@ -6538,10 +6542,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               type="button"
             >
               <span
-                class="inline-flex items-center "
+                class="inline-flex items-center"
               >
                 <span
-                  class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
                   <span
                     class="base-icon"
@@ -6740,6 +6744,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               trigger="manual"
             >
               <button
+                aria-label="group.contentMenu.menuButton"
                 class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] text-[12px] leading-[normal] tracking-[0.6px] overflow-hidden whitespace-nowrap align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[26px]"
                 data-appearance="outline"
                 data-test="group-menu-button"
@@ -6747,10 +6752,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 type="button"
               >
                 <span
-                  class="inline-flex items-center "
+                  class="inline-flex items-center"
                 >
                   <span
-                    class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                    class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
                     <span
                       class="base-icon"
@@ -6953,7 +6958,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -7588,7 +7593,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               type="button"
             >
               <span
-                class="inline-flex items-center "
+                class="inline-flex items-center"
               >
                 
             comment.show.more
@@ -7615,10 +7620,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               type="button"
             >
               <span
-                class="inline-flex items-center "
+                class="inline-flex items-center"
               >
                 <span
-                  class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
                   <span
                     class="base-icon"
@@ -7801,6 +7806,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               trigger="manual"
             >
               <button
+                aria-label="group.contentMenu.menuButton"
                 class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] text-[12px] leading-[normal] tracking-[0.6px] overflow-hidden whitespace-nowrap align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[26px]"
                 data-appearance="outline"
                 data-test="group-menu-button"
@@ -7808,10 +7814,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 type="button"
               >
                 <span
-                  class="inline-flex items-center "
+                  class="inline-flex items-center"
                 >
                   <span
-                    class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                    class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
                     <span
                       class="base-icon"
@@ -7971,7 +7977,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -8606,7 +8612,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               type="button"
             >
               <span
-                class="inline-flex items-center "
+                class="inline-flex items-center"
               >
                 
             comment.show.more
@@ -8633,10 +8639,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               type="button"
             >
               <span
-                class="inline-flex items-center "
+                class="inline-flex items-center"
               >
                 <span
-                  class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
                   <span
                     class="base-icon"

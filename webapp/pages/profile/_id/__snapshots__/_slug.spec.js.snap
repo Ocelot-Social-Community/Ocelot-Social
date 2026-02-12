@@ -61,10 +61,10 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                 type="button"
               >
                 <span
-                  class="inline-flex items-center "
+                  class="inline-flex items-center"
                 >
                   <span
-                    class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                    class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
                     <span
                       class="base-icon"
@@ -317,7 +317,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -342,7 +342,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -728,10 +728,10 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                 type="button"
               >
                 <span
-                  class="inline-flex items-center "
+                  class="inline-flex items-center"
                 >
                   <span
-                    class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                    class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
                     <span
                       class="base-icon"
@@ -1021,7 +1021,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -1046,7 +1046,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                 class="inline-flex items-center gap-2"
               >
                 <span
-                  class="-ml-1 os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
                     class="base-icon"
@@ -1460,10 +1460,10 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                 type="button"
               >
                 <span
-                  class="inline-flex items-center "
+                  class="inline-flex items-center"
                 >
                   <span
-                    class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                    class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
                     <span
                       class="base-icon"
@@ -1854,10 +1854,10 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                   type="button"
                 >
                   <span
-                    class="inline-flex items-center "
+                    class="inline-flex items-center"
                   >
                     <span
-                      class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                      class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                     >
                       <span
                         class="base-icon"
@@ -2056,10 +2056,10 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                 type="button"
               >
                 <span
-                  class="inline-flex items-center "
+                  class="inline-flex items-center"
                 >
                   <span
-                    class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                    class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
                     <span
                       class="base-icon"
@@ -2492,10 +2492,10 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                   type="button"
                 >
                   <span
-                    class="inline-flex items-center "
+                    class="inline-flex items-center"
                   >
                     <span
-                      class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                      class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                     >
                       <span
                         class="base-icon"

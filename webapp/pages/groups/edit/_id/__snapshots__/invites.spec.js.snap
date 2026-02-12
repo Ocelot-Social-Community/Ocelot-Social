@@ -68,10 +68,10 @@ exports[`invites.vue renders 1`] = `
                   type="button"
                 >
                   <span
-                    class="inline-flex items-center "
+                    class="inline-flex items-center"
                   >
                     <span
-                      class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                      class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                     >
                       <span
                         class="base-icon"
@@ -90,10 +90,10 @@ exports[`invites.vue renders 1`] = `
                   type="button"
                 >
                   <span
-                    class="inline-flex items-center "
+                    class="inline-flex items-center"
                   >
                     <span
-                      class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                      class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                     >
                       <span
                         class="base-icon"
@@ -164,10 +164,10 @@ exports[`invites.vue renders 1`] = `
               type="submit"
             >
               <span
-                class="inline-flex items-center "
+                class="inline-flex items-center"
               >
                 <span
-                  class=" os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current "
+                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
                   <span
                     class="base-icon"

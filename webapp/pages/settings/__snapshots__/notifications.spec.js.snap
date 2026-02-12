@@ -167,7 +167,7 @@ exports[`notifications.vue mount renders 1`] = `
         type="button"
       >
         <span
-          class="inline-flex items-center "
+          class="inline-flex items-center"
         >
           
       settings.notifications.checkAll
@@ -182,7 +182,7 @@ exports[`notifications.vue mount renders 1`] = `
         type="button"
       >
         <span
-          class="inline-flex items-center "
+          class="inline-flex items-center"
         >
           
       settings.notifications.uncheckAll
@@ -198,7 +198,7 @@ exports[`notifications.vue mount renders 1`] = `
         type="button"
       >
         <span
-          class="inline-flex items-center "
+          class="inline-flex items-center"
         >
           
       actions.save
