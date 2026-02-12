@@ -209,10 +209,6 @@ export default {
   padding: 0 $space-small;
 }
 
-.icon-button {
-  cursor: pointer;
-}
-
 .list-item--high {
   .ds-list-item-prefix {
     align-self: center;
