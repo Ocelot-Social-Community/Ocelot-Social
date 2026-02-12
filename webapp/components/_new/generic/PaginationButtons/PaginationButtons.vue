@@ -7,7 +7,7 @@
       variant="primary"
       circle
       data-test="previous-button"
-      aria-label="Previous"
+      :aria-label="$t('pagination.previous')"
       @click="$emit('back')"
     >
       <template #icon><base-icon name="arrow-left" /></template>
@@ -25,7 +25,7 @@
       variant="primary"
       circle
       data-test="next-button"
-      aria-label="Next"
+      :aria-label="$t('pagination.next')"
       @click="$emit('next')"
     >
       <template #icon><base-icon name="arrow-right" /></template>

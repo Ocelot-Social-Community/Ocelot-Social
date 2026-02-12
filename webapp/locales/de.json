@@ -836,6 +836,10 @@
   "observeButton": {
     "observed": "beobachtet"
   },
+  "pagination": {
+    "next": "Weiter",
+    "previous": "Zurück"
+  },
   "post": {
     "comment": {
       "joinGroup": "Gruppe „<b>{name}</b>“ beigetreten",

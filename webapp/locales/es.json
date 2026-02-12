@@ -836,6 +836,10 @@
   "observeButton": {
     "observed": null
   },
+  "pagination": {
+    "next": "Siguiente",
+    "previous": "Anterior"
+  },
   "post": {
     "comment": {
       "joinGroup": null,
