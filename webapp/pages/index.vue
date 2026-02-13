@@ -41,7 +41,7 @@
             >
               {{ $t('contribution.filterMasonryGrid.noFilter') }}
               &nbsp;
-              <base-icon class="my-filter-button" :name="filterButtonIcon"></base-icon>
+              <base-icon :name="filterButtonIcon"></base-icon>
             </os-button>
 
             <header-button
