@@ -54,6 +54,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
               trigger="manual"
             >
               <button
+                aria-label="actions.menu"
                 class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] text-[12px] leading-[normal] tracking-[0.6px] overflow-hidden whitespace-nowrap align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[26px]"
                 data-appearance="outline"
                 data-test="content-menu-button"
@@ -722,6 +723,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
               trigger="manual"
             >
               <button
+                aria-label="actions.menu"
                 class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] text-[12px] leading-[normal] tracking-[0.6px] overflow-hidden whitespace-nowrap align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[26px]"
                 data-appearance="outline"
                 data-test="content-menu-button"
@@ -1455,6 +1457,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
               trigger="manual"
             >
               <button
+                aria-label="actions.menu"
                 class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] text-[12px] leading-[normal] tracking-[0.6px] overflow-hidden whitespace-nowrap align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[26px]"
                 data-appearance="outline"
                 data-test="content-menu-button"
@@ -2052,6 +2055,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
               trigger="manual"
             >
               <button
+                aria-label="actions.menu"
                 class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)] h-[26px] min-w-[26px] text-[12px] leading-[normal] tracking-[0.6px] overflow-hidden whitespace-nowrap align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[26px]"
                 data-appearance="outline"
                 data-test="content-menu-button"
