@@ -54,7 +54,7 @@ import scrollToContent from './scroll-to-content.js'
 
 export default {
   mixins: [scrollToContent],
-  name: 'NewsFeed',
+  name: 'Settings',
   components: {
     OsButton,
     LocationSelect,
