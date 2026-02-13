@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
+import { defineComponent, h } from 'vue-demi'
 
 import OsButton from './OsButton.vue'
 
@@ -491,6 +492,58 @@ describe('osButton', () => {
       expect(wrapper.find('.os-button__spinner').exists()).toBeTruthy()
       expect(wrapper.attributes('disabled')).toBeDefined()
       expect(wrapper.attributes('aria-busy')).toBe('true')
+    })
+  })
+
+  describe('as prop', () => {
+    it('renders as <button> by default', () => {
+      const wrapper = mount(OsButton)
+      expect(wrapper.element.tagName).toBe('BUTTON')
+      expect(wrapper.attributes('type')).toBe('button')
+    })
+
+    it('renders as <a> when as="a"', () => {
+      const wrapper = mount(OsButton, {
+        props: { as: 'a' },
+        attrs: { href: '/test' },
+        slots: { default: 'Link' },
+      })
+      expect(wrapper.element.tagName).toBe('A')
+      expect(wrapper.attributes('href')).toBe('/test')
+      expect(wrapper.attributes('type')).toBeUndefined()
+    })
+
+    it('renders a component passed as as', () => {
+      const FakeLink = defineComponent({
+        props: { to: String },
+        setup(props, { slots }) {
+          return () => h('a', { href: props.to }, slots.default?.())
+        },
+      })
+      const wrapper = mount(OsButton, {
+        props: { as: FakeLink },
+        attrs: { to: '/groups' },
+        slots: { default: 'Groups' },
+      })
+      expect(wrapper.element.tagName).toBe('A')
+      expect(wrapper.text()).toBe('Groups')
+    })
+
+    it('does not set disabled attr on non-button tags', () => {
+      const wrapper = mount(OsButton, {
+        props: { as: 'a', disabled: true },
+      })
+      expect(wrapper.attributes('disabled')).toBeUndefined()
+      expect(wrapper.attributes('aria-disabled')).toBe('true')
+      expect(wrapper.attributes('tabindex')).toBe('-1')
+    })
+
+    it('applies variant classes regardless of as', () => {
+      const wrapper = mount(OsButton, {
+        props: { as: 'a', variant: 'primary', appearance: 'filled' },
+      })
+      expect(wrapper.classes()).toContain('os-button')
+      expect(wrapper.classes()).toContain('bg-[var(--color-primary)]')
     })
   })
 

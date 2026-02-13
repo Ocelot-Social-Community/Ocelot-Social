@@ -6,10 +6,19 @@
   import { buttonVariants } from './button.variants'
 
   import type { ButtonVariants } from './button.variants'
-  import type { PropType } from 'vue-demi'
+  import type { Component, PropType } from 'vue-demi'
 
   /**
    * Flexible button component with optional icon slot.
+   *
+   * Use the `as` prop to render as a different element or component (e.g. nuxt-link)
+   * without creating a dependency on any router library:
+   *
+   * ```vue
+   * <os-button :as="NuxtLink" to="/groups">Groups</os-button>
+   * <os-button as="a" href="/external">External</os-button>
+   * ```
+   *
    * @slot default - Button content (text or HTML)
    * @slot icon - Optional icon (rendered left of text). Use aria-label for icon-only buttons.
    */
@@ -68,6 +77,11 @@
     name: 'OsButton',
     inheritAttrs: false,
     props: {
+      /** Element or component to render as (e.g. 'a', NuxtLink, RouterLink). */
+      as: {
+        type: [String, Object, Function] as PropType<string | Component>,
+        default: 'button',
+      },
       variant: {
         type: String as PropType<ButtonVariants['variant']>,
         default: 'default',
@@ -184,12 +198,21 @@
           props.circle && CIRCLE_WIDTHS[size], // eslint-disable-line security/detect-object-injection
         )
 
-        const buttonData = {
-          type: props.type,
-          disabled: isDisabled || undefined,
+        const tag = props.as
+        const isNativeButton = tag === 'button'
+
+        const buttonData: Record<string, unknown> = {
           'data-variant': props.variant,
           'data-appearance': props.appearance,
           'aria-busy': isLoading || undefined,
+        }
+
+        if (isNativeButton) {
+          buttonData.type = props.type
+          buttonData.disabled = isDisabled || undefined
+        } else if (isDisabled) {
+          buttonData['aria-disabled'] = 'true'
+          buttonData.tabindex = '-1'
         }
 
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
@@ -201,7 +224,7 @@
           const parentDynClass = proxy?.$vnode?.data?.class
 
           return h(
-            'button',
+            tag,
             {
               class: [buttonClass, parentClass, parentDynClass].filter(Boolean),
               attrs: { ...buttonData, ...attrs },
@@ -214,7 +237,7 @@
 
         const { class: attrClass, ...restAttrs } = attrs as Record<string, unknown>
         return h(
-          'button',
+          tag,
           {
             ...buttonData,
             class: cn(buttonClass, attrClass || ''),

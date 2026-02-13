@@ -186,6 +186,15 @@ test.describe('OsButton visual regression', () => {
     await checkA11y(page)
   })
 
+  test('as link', async ({ page }) => {
+    await page.goto(`${STORY_URL}--as-link&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+    await expect(root.locator('.flex-col').first()).toHaveScreenshot('as-link.png')
+    await checkA11y(page)
+  })
+
   test('loading', async ({ page }) => {
     await page.goto(`${STORY_URL}--loading&viewMode=story`)
     const root = page.locator(STORY_ROOT)

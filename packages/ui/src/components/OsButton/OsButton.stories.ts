@@ -42,6 +42,7 @@ type Story = StoryObj<typeof OsButton>
 
 /** Custom args for Playground (icon selector + label are not real component props) */
 interface PlaygroundArgs {
+  as: string
   variant: string
   appearance: string
   size: string
@@ -62,6 +63,10 @@ const iconMap: Record<string, (() => ReturnType<typeof h>) | null> = {
 
 export const Playground: StoryObj<PlaygroundArgs> = {
   argTypes: {
+    as: {
+      control: 'select',
+      options: ['button', 'a'],
+    },
     variant: {
       control: 'select',
       options: ['default', 'primary', 'secondary', 'danger', 'warning', 'success', 'info'],
@@ -95,6 +100,7 @@ export const Playground: StoryObj<PlaygroundArgs> = {
     },
   },
   args: {
+    as: 'button',
     variant: 'primary',
     appearance: 'filled',
     size: 'md',
@@ -117,7 +123,7 @@ export const Playground: StoryObj<PlaygroundArgs> = {
       return { buttonProps, IconComponent, label }
     },
     template: `
-      <OsButton v-bind="buttonProps">
+      <OsButton v-bind="buttonProps" :href="buttonProps.as === 'a' ? '#' : undefined">
         <template v-if="IconComponent" #icon><component :is="IconComponent" /></template>
         {{ label }}
       </OsButton>
@@ -656,6 +662,52 @@ export const CircleAppearances: Story = {
             <OsButton circle appearance="ghost" variant="default" aria-label="Add">
               <template #icon><PlusIcon /></template>
             </OsButton>
+          </div>
+        </div>
+      </div>
+    `,
+  }),
+}
+
+export const AsLink: Story = {
+  name: 'As Link',
+  render: () => ({
+    components: { OsButton, CheckIcon, PlusIcon },
+    template: `
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-sm font-bold mb-2">as="a" (anchor element)</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton as="a" href="#" variant="primary">Primary Link</OsButton>
+            <OsButton as="a" href="#" variant="primary" appearance="outline">Outline Link</OsButton>
+            <OsButton as="a" href="#" variant="primary" appearance="ghost">Ghost Link</OsButton>
+            <OsButton as="a" href="#" variant="danger">Danger Link</OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">as="a" with icon</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton as="a" href="#" variant="primary">
+              <template #icon><CheckIcon /></template>
+              Save
+            </OsButton>
+            <OsButton as="a" href="#" variant="success" circle aria-label="Add">
+              <template #icon><PlusIcon /></template>
+            </OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">as="a" disabled</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton as="a" href="#" variant="primary" disabled>Disabled Link</OsButton>
+            <OsButton as="a" href="#" variant="primary" appearance="outline" disabled>Disabled Outline</OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">as="button" (default)</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton variant="primary">Button (default)</OsButton>
+            <OsButton as="button" variant="primary">Button (explicit)</OsButton>
           </div>
         </div>
       </div>
