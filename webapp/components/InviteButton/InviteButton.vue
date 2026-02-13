@@ -5,6 +5,7 @@
         variant="primary"
         appearance="ghost"
         circle
+        :aria-label="$t('invite-codes.button.tooltip')"
         v-tooltip="{
           content: $t('invite-codes.button.tooltip'),
           placement: 'bottom-start',
