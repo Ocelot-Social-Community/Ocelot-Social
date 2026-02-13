@@ -236,6 +236,10 @@ OsButton Features:
 - [x] NotificationMenu.vue: `counter-icon` von Default-Slot in `#icon`-Slot verschoben (2 Stellen, Rendering-Bug)
 - [x] ChatNotificationMenu.vue: `counter-icon` von Default-Slot in `#icon`-Slot verschoben (Rendering-Bug)
 - [x] InviteButton.vue: `this.currentUser` → `this.user` (Bug: Getter hieß `user`, `currentUser` war undefined)
+- [x] pages/index.vue: `beforeDestroy()` aus `methods` in Lifecycle-Hook verschoben (Memory-Leak: Event-Listener wurden nie entfernt)
+- [x] Editor.vue: Fehlender `else`-Branch in `toggleLinkInput()` — `isLinkInputActive` wird jetzt auch bei no-args-Aufrufen (blur/esc) zurückgesetzt
+- [x] admin/users/index.vue: Veraltete Slot-Syntax `slot="role" slot-scope="scope"` → `#role="scope"` (Vue 3)
+- [x] settings/index.vue: Irreführender Komponentenname `NewsFeed` → `Settings`
 
 **Zuvor abgeschlossen (Session 18 - Code-Review Feedback, OsButton Refactoring, Accessibility):**
 - [x] OsButton.vue vereinfacht: `vueAttrs()` Helper, Einmal-Variablen durch `cn()` ersetzt, `children` Array inline (217→227 Zeilen, aber lesbarer)
