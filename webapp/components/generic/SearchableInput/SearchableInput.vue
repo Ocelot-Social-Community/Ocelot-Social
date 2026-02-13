@@ -49,7 +49,7 @@
         </p>
       </template>
     </ds-select>
-    <os-button v-if="isActive" variant="primary" appearance="ghost" circle size="sm" @click="clear">
+    <os-button v-if="isActive" variant="primary" appearance="ghost" circle size="sm" :aria-label="$t('actions.clear')" @click="clear">
       <template #icon>
         <base-icon name="close" />
       </template>
