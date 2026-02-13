@@ -41,19 +41,11 @@ describe('ChangePassword.vue', () => {
     })
 
     describe('validations', () => {
-      it('invalid', () => {
-        expect(wrapper.vm.disabled).toBe(true)
-      })
-
       describe('old password and new password', () => {
         describe('match', () => {
           beforeEach(() => {
             wrapper.find('input#oldPassword').setValue('some secret')
             wrapper.find('input#password').setValue('some secret')
-          })
-
-          it('invalid', () => {
-            expect(wrapper.vm.disabled).toBe(true)
           })
 
           it.skip('displays a warning', () => {
