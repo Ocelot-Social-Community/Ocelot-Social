@@ -7,7 +7,6 @@
           id="showDonations"
           type="checkbox"
           v-model="showDonations"
-          :checked="showDonations"
         />
         <label for="showDonations">
           {{ $t('admin.donations.showDonationsCheckboxLabel') }}
