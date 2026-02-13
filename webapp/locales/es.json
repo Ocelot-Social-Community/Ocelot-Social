@@ -121,7 +121,9 @@
   "chat": {
     "addRoomHeadline": null,
     "cancelSelectMessage": null,
+    "closeChat": "Cerrar chat",
     "conversationStarted": null,
+    "expandChat": "Expandir chat",
     "isOnline": null,
     "isTyping": null,
     "lastSeen": null,

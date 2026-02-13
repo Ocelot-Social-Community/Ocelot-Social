@@ -121,7 +121,9 @@
   "chat": {
     "addRoomHeadline": null,
     "cancelSelectMessage": null,
+    "closeChat": "Chiudi chat",
     "conversationStarted": null,
+    "expandChat": "Espandi chat",
     "isOnline": null,
     "isTyping": null,
     "lastSeen": null,

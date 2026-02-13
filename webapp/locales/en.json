@@ -121,7 +121,9 @@
   "chat": {
     "addRoomHeadline": "Search User for new Chat",
     "cancelSelectMessage": "Cancel",
+    "closeChat": "Close chat",
     "conversationStarted": "Conversation started on:",
+    "expandChat": "Expand chat",
     "isOnline": "is online",
     "isTyping": "is writing...",
     "lastSeen": "last seen ",
