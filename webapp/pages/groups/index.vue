@@ -14,6 +14,7 @@
             appearance="filled"
             circle
             size="xl"
+            :aria-label="$t('group.createNewGroup.tooltip')"
             v-tooltip="{
               content: $t('group.createNewGroup.tooltip'),
               placement: 'left',
