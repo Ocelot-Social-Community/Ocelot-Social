@@ -79,7 +79,12 @@
               params: { id: scope.row.id },
             }"
           >
-            <os-button variant="primary" appearance="filled" circle :aria-label="$t('actions.edit')">
+            <os-button
+              variant="primary"
+              appearance="filled"
+              circle
+              :aria-label="$t('actions.edit')"
+            >
               <template #icon><base-icon name="pencil" /></template>
             </os-button>
           </nuxt-link>

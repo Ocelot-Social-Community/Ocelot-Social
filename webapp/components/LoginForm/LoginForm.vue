@@ -144,7 +144,7 @@ export default {
   max-width: 620px;
   margin: auto;
 
-  button[type="submit"] {
+  button[type='submit'] {
     margin-top: $space-large;
     margin-bottom: $space-small;
   }
