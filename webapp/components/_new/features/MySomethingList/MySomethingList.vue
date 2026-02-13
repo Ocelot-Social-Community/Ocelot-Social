@@ -29,6 +29,7 @@
                 circle
                 @click="handleEditItem(item)"
                 :title="$t('actions.edit')"
+                :aria-label="$t('actions.edit')"
                 data-test="edit-button"
               >
                 <template #icon>
@@ -40,6 +41,7 @@
                 appearance="ghost"
                 circle
                 :title="$t('actions.delete')"
+                :aria-label="$t('actions.delete')"
                 @click="handleDeleteItem(item)"
                 data-test="delete-button"
               >
