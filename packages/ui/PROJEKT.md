@@ -116,7 +116,7 @@ OsButton Features:
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-13 (Session 18)
+**Letzte Aktualisierung:** 2026-02-13 (Session 19)
 
 **Aktuelle Phase:** Phase 3 ✅ ABGESCHLOSSEN + Code-Review-Feedback eingearbeitet
 
@@ -184,7 +184,7 @@ OsButton Features:
   - Completeness Check (verify Script prüft Story, Visual, checkA11y, Keyboard, Varianten)
   - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 
-**Zuletzt abgeschlossen (Session 18 - CodeRabbit Review Feedback: data-test Selektoren, Accessibility, Bugfixes):**
+**Zuvor abgeschlossen (Session 18 - CodeRabbit Review Feedback: data-test Selektoren, Accessibility, Bugfixes):**
 - [x] Cypress-Selektoren: `.user-content-menu button` → `[data-test="content-menu-button"]` (2 Step-Definitions)
 - [x] Cypress-Selektoren: `.content-menu button` → `[data-test="content-menu-button"]` (Admin.PinPost + ReportContent)
 - [x] muted-users.vue: `data-test="unmute-btn"` + `aria-label` auf Unmute-Button
@@ -213,7 +213,21 @@ OsButton Features:
 - [x] i18n: `post.sensitiveContent.show/hide` in allen 9 Sprachdateien
 - [x] i18n: `component-slider.step` in allen 9 Sprachdateien
 
-**Zuvor abgeschlossen (Session 17 - Code-Review Feedback, OsButton Refactoring, Accessibility):**
+**Zuletzt abgeschlossen (Session 19 - CodeRabbit Review Feedback: Cleanup, Accessibility, Bugfixes):**
+- [x] donations.vue: Redundantes `:checked="showDonations"` entfernt (v-model setzt checked bereits)
+- [x] MySomethingList.vue: Disabled-Logik vereinfacht `!(!isEditing || (isEditing && !disabled))` → `isEditing && disabled`
+- [x] button.variants.ts: Hardcoded Fallback `#e5e3e8` entfernt → `var(--color-disabled)` (konsistent mit filled/index.css)
+- [x] CommentCard.vue: `aria-label` auf icon-only Reply-Button
+- [x] HashtagsFilter.vue: `aria-label` auf icon-only Clear-Button
+- [x] ReleaseModal.vue: `$emit('close')` im catch-Block ergänzt (fehlte im Fehlerfall)
+- [x] Chat.vue: `aria-label` auf Expand- und Close-Buttons
+- [x] i18n: `chat.expandChat` + `chat.closeChat` in allen 9 Sprachdateien (vollständig übersetzt)
+- [x] ChatNotificationMenu.vue: `aria-label` auf icon-only Chat-Button
+- [x] SearchableInput.vue: `aria-label` auf icon-only Close-Button
+- [x] GroupButton.vue: `aria-label` auf icon-only Groups-Button
+- [x] MapButton.vue: `aria-label` auf icon-only Map-Button
+
+**Zuvor abgeschlossen (Session 18 - Code-Review Feedback, OsButton Refactoring, Accessibility):**
 - [x] OsButton.vue vereinfacht: `vueAttrs()` Helper, Einmal-Variablen durch `cn()` ersetzt, `children` Array inline (217→227 Zeilen, aber lesbarer)
 - [x] OsButton: `@import "./animations.css"` vor `@source`-Direktiven verschoben (CSS-Spec-Konformität)
 - [x] CustomButton.vue: `isEmpty` aus `data()` entfernt → direkter Import im Computed
