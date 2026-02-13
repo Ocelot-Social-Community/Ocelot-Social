@@ -7,6 +7,7 @@
       appearance="ghost"
       circle
       :title="$t('hashtags-filter.clearSearch')"
+      :aria-label="$t('hashtags-filter.clearSearch')"
       @click="clearSearch"
     >
       <template #icon>
