@@ -8,6 +8,7 @@
       variant="primary"
       appearance="ghost"
       circle
+      :aria-label="$t('header.notifications.tooltip')"
       v-tooltip="{
         content: $t('header.notifications.tooltip'),
         placement: 'bottom-start',
@@ -23,6 +24,7 @@
       variant="primary"
       appearance="ghost"
       circle
+      :aria-label="$t('header.notifications.tooltip')"
       v-tooltip="{
         content: $t('header.notifications.tooltip'),
         placement: 'bottom-start',
@@ -44,6 +46,7 @@
         variant="primary"
         appearance="ghost"
         circle
+        :aria-label="$t('header.notifications.tooltip')"
         v-tooltip="{
           content: $t('header.notifications.tooltip'),
           placement: 'bottom-start',
