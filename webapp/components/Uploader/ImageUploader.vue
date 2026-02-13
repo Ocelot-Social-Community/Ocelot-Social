@@ -44,6 +44,7 @@
         appearance="filled"
         circle
         size="sm"
+        :aria-label="$t('actions.cancel')"
         @click="closeCropper"
       >
         <template #icon>
