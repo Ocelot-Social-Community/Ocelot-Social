@@ -231,6 +231,11 @@ OsButton Features:
 - [x] i18n: `actions.clear` disambiguiert — es: "Borrar" → "Limpiar", it: "Cancella" → "Svuota" (Verwechslung mit `actions.delete`)
 - [x] OsButton.vue: `as string` Cast bei `attrClass` entfernt (cn/clsx verarbeitet Arrays/Objekte korrekt)
 - [x] CommentForm.vue: `handleSubmit` auf async/await + try/catch/finally umgestellt (Loading-Bug im Fehlerfall behoben)
+- [x] MenuBar.vue: `aria-label` auf alle 11 Editor-Toolbar-Buttons (nutzt bestehende `editor.legend.*` Keys)
+- [x] NotificationMenu.vue: `aria-label` auf alle 3 Bell-Buttons
+- [x] NotificationMenu.vue: `counter-icon` von Default-Slot in `#icon`-Slot verschoben (2 Stellen, Rendering-Bug)
+- [x] ChatNotificationMenu.vue: `counter-icon` von Default-Slot in `#icon`-Slot verschoben (Rendering-Bug)
+- [x] InviteButton.vue: `this.currentUser` → `this.user` (Bug: Getter hieß `user`, `currentUser` war undefined)
 
 **Zuvor abgeschlossen (Session 18 - Code-Review Feedback, OsButton Refactoring, Accessibility):**
 - [x] OsButton.vue vereinfacht: `vueAttrs()` Helper, Einmal-Variablen durch `cn()` ersetzt, `children` Array inline (217→227 Zeilen, aber lesbarer)
