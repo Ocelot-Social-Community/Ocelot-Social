@@ -45,6 +45,7 @@
         appearance="filled"
         circle
         size="sm"
+        :title="$t('actions.cancel')"
         :aria-label="$t('actions.cancel')"
         @click="closeCropper"
       >
