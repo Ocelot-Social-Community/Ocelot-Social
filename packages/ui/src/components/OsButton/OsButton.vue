@@ -216,7 +216,7 @@
           'button',
           {
             ...buttonData,
-            class: cn(buttonClass, (attrClass as string) || ''),
+            class: cn(buttonClass, attrClass || ''),
             ...restAttrs,
           },
           children,
