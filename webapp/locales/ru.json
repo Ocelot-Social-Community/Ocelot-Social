@@ -1,13 +1,17 @@
 {
   "actions": {
     "cancel": "Отменить",
+    "clear": "Очистить",
+    "close": "Закрыть",
     "create": "Создать",
     "delete": "Удалить",
     "edit": "Редактировать",
     "loading": "загрузка",
     "loadMore": "Загрузить ещё",
+    "menu": "Открыть меню",
     "save": "Сохранить",
-    "saveCategories": null
+    "saveCategories": null,
+    "search": "Поиск"
   },
   "admin": {
     "badges": {
@@ -117,7 +121,9 @@
   "chat": {
     "addRoomHeadline": null,
     "cancelSelectMessage": null,
+    "closeChat": "Закрыть чат",
     "conversationStarted": null,
+    "expandChat": "Развернуть чат",
     "isOnline": null,
     "isTyping": null,
     "lastSeen": null,
@@ -183,6 +189,9 @@
       "url": "должен быть корректный URL"
     },
     "versus": "Против"
+  },
+  "component-slider": {
+    "step": "Шаг {current} из {total}"
   },
   "components": {
     "dateTimeRange": {
@@ -539,6 +548,7 @@
     "changeMemberRole": null,
     "contentMenu": {
       "inviteLinks": null,
+      "menuButton": "Меню группы",
       "muteGroup": null,
       "unmuteGroup": null,
       "visitGroupPage": null
@@ -835,6 +845,10 @@
   "observeButton": {
     "observed": null
   },
+  "pagination": {
+    "next": "Вперёд",
+    "previous": "Назад"
+  },
   "post": {
     "comment": {
       "joinGroup": null,
@@ -880,6 +894,10 @@
     },
     "name": "Пост",
     "pinned": "Объявление",
+    "sensitiveContent": {
+      "hide": "Скрыть деликатный контент",
+      "show": "Показать деликатный контент"
+    },
     "takeAction": {
       "name": "Действовать"
     },
@@ -1225,6 +1243,7 @@
     "germany": "Германия",
     "imprint": "Импрессум",
     "made": "Сделано с ❤️",
+    "navigation": "Навигация",
     "register": "Регистрационный номер",
     "support": null,
     "termsAndConditions": "Условия и положения",

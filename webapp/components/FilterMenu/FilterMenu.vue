@@ -1,15 +1,18 @@
 <template>
   <dropdown ref="menu" placement="top-start" :offset="8" class="filter-menu">
-    <base-button
-      slot="default"
-      icon="filter"
-      :filled="filterActive"
-      :ghost="!filterActive"
-      slot-scope="{ toggleMenu }"
-      @click.prevent="toggleMenu()"
-    >
-      <base-icon class="dropdown-arrow" name="angle-down" />
-    </base-button>
+    <template #default="{ toggleMenu }">
+      <os-button
+        variant="primary"
+        :appearance="filterActive ? 'filled' : 'ghost'"
+        :aria-label="$t('common.filter')"
+        @click.prevent="toggleMenu()"
+      >
+        <template #icon>
+          <base-icon name="filter" />
+        </template>
+        <base-icon class="dropdown-arrow" name="angle-down" />
+      </os-button>
+    </template>
     <template #popover>
       <filter-menu-component />
     </template>
@@ -17,6 +20,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import Dropdown from '~/components/Dropdown'
 import { mapGetters } from 'vuex'
 import FilterMenuComponent from './FilterMenuComponent'
@@ -25,6 +29,7 @@ export default {
   components: {
     Dropdown,
     FilterMenuComponent,
+    OsButton,
   },
   props: {
     placement: { type: String },

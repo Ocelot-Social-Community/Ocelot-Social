@@ -1,19 +1,19 @@
 <template>
   <dropdown :placement="placement" offset="5">
-    <template #default="{ openMenu, closeMenu }">
+    <template #default="{ toggleMenu }">
       <slot name="button">
-        <menu-bar-button
+        <os-button
           class="legend-question-button"
-          icon="question-circle"
+          variant="primary"
+          appearance="ghost"
           circle
-          ghost
-          :onClick="
-            () => {
-              isDropdownOpen ? closeMenu() : openMenu()
-              isDropdownOpen = !isDropdownOpen
-            }
-          "
-        />
+          size="sm"
+          @click="toggleMenu"
+        >
+          <template #icon>
+            <base-icon name="question-circle" />
+          </template>
+        </os-button>
       </slot>
     </template>
     <!-- eslint-disable-next-line vue/no-useless-template-attributes -->
@@ -26,9 +26,12 @@
           :key="item.name"
         >
           <div>
-            <base-button size="small" circle ghost :icon="item.iconName" class="legend-icon">
+            <os-button size="sm" circle variant="primary" appearance="ghost" class="legend-icon">
+              <template v-if="item.iconName" #icon>
+                <base-icon :name="item.iconName" />
+              </template>
               <span v-if="item.label">{{ item.label }}</span>
-            </base-button>
+            </os-button>
             <span>{{ $t(item.name) }}</span>
           </div>
           <span class="tool-shortcut">{{ item.shortcut }}</span>
@@ -39,13 +42,13 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import Dropdown from '~/components/Dropdown'
-import MenuBarButton from './MenuBarButton'
 
 export default {
   components: {
     Dropdown,
-    MenuBarButton,
+    OsButton,
   },
   props: {
     placement: { type: String, default: 'bottom-start' },
@@ -65,20 +68,19 @@ export default {
         { iconName: 'quote-right', name: `editor.legend.quote`, shortcut: '> + space' },
         { iconName: 'minus', name: `editor.legend.ruler`, shortcut: '---' },
       ],
-      isDropdownOpen: false,
     }
   },
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .legend-question-button {
-  color: $color-neutral-40;
+  color: #70677e !important;
   font-size: 1.2rem !important;
 }
 .legend-question-button:hover {
   background: none !important;
-  color: $color-neutral-40 !important;
+  color: #70677e !important;
 }
 .legend-question-button:focus {
   outline: none !important;

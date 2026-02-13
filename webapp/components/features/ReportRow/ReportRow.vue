@@ -60,17 +60,19 @@
         <span v-if="report.closed" class="title">
           {{ $t('moderation.reports.decided') }}
         </span>
-        <base-button
+        <os-button
           v-else
-          danger
-          filled
+          variant="danger"
+          appearance="filled"
           data-test="confirm"
-          size="small"
-          :icon="statusIconName"
+          size="sm"
           @click="$emit('confirm-report')"
         >
+          <template #icon>
+            <base-icon :name="statusIconName" />
+          </template>
           {{ $t('moderation.reports.decideButton') }}
-        </base-button>
+        </os-button>
       </td>
     </tr>
 

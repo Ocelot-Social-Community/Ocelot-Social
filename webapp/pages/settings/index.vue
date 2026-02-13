@@ -29,15 +29,23 @@
           :label="$t('settings.data.labelBio')"
           :placeholder="$t('settings.data.labelBio')"
         />
-        <base-button icon="check" :disabled="errors" type="submit" :loading="loadingData" filled>
+        <os-button
+          variant="primary"
+          appearance="filled"
+          type="submit"
+          :disabled="!!errors"
+          :loading="loadingData"
+        >
+          <template #icon><base-icon name="check" /></template>
           {{ $t('actions.save') }}
-        </base-button>
+        </os-button>
       </base-card>
     </template>
   </ds-form>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 import UniqueSlugForm from '~/components/utils/UniqueSlugForm'
 import LocationSelect from '~/components/Select/LocationSelect'
@@ -46,8 +54,9 @@ import scrollToContent from './scroll-to-content.js'
 
 export default {
   mixins: [scrollToContent],
-  name: 'NewsFeed',
+  name: 'Settings',
   components: {
+    OsButton,
     LocationSelect,
   },
   data() {

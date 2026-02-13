@@ -2,36 +2,41 @@
   <filter-menu-section class="order-by-filter" :title="sectionTitle" :divider="false">
     <template #filter-list>
       <li class="item">
-        <base-button
-          icon="check"
-          :label="$t('filter-menu.ended.all.label')"
-          :filled="!eventsEnded"
+        <os-button
+          variant="primary"
+          :appearance="!eventsEnded ? 'filled' : 'outline'"
+          size="sm"
           :title="$t('filter-menu.ended.all.hint')"
           @click="toggleEventsEnded"
           data-test="all-button"
-          size="small"
         >
+          <template #icon>
+            <base-icon name="check" />
+          </template>
           {{ $t('filter-menu.ended.all.label') }}
-        </base-button>
+        </os-button>
       </li>
       <li class="item">
-        <base-button
-          icon="calendar"
-          :label="$t('filter-menu.ended.onlyEnded.label')"
-          :filled="eventsEnded"
+        <os-button
+          variant="primary"
+          :appearance="eventsEnded ? 'filled' : 'outline'"
+          size="sm"
           :title="$t('filter-menu.ended.onlyEnded.hint')"
           @click="toggleEventsEnded"
           data-test="not-ended-button"
-          size="small"
         >
+          <template #icon>
+            <base-icon name="calendar" />
+          </template>
           {{ $t('filter-menu.ended.onlyEnded.label') }}
-        </base-button>
+        </os-button>
       </li>
     </template>
   </filter-menu-section>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 
@@ -39,6 +44,7 @@ export default {
   name: 'EventsByFilter',
   components: {
     FilterMenuSection,
+    OsButton,
   },
   computed: {
     ...mapGetters({

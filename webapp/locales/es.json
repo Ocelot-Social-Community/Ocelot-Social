@@ -1,13 +1,17 @@
 {
   "actions": {
     "cancel": "Cancelar",
+    "clear": "Limpiar",
+    "close": "Cerrar",
     "create": "Crear",
     "delete": "Borrar",
     "edit": "Edite",
     "loading": "cargamento",
     "loadMore": "cargar más",
+    "menu": "Abrir menú",
     "save": "Guardar",
-    "saveCategories": null
+    "saveCategories": null,
+    "search": "Buscar"
   },
   "admin": {
     "badges": {
@@ -117,7 +121,9 @@
   "chat": {
     "addRoomHeadline": null,
     "cancelSelectMessage": null,
+    "closeChat": "Cerrar chat",
     "conversationStarted": null,
+    "expandChat": "Expandir chat",
     "isOnline": null,
     "isTyping": null,
     "lastSeen": null,
@@ -183,6 +189,9 @@
       "url": "debe ser una URL válida"
     },
     "versus": "Versus"
+  },
+  "component-slider": {
+    "step": "Paso {current} de {total}"
   },
   "components": {
     "dateTimeRange": {
@@ -539,6 +548,7 @@
     "changeMemberRole": null,
     "contentMenu": {
       "inviteLinks": null,
+      "menuButton": "Menú del grupo",
       "muteGroup": "Silenciar grupo",
       "unmuteGroup": "Desactivar silencio del grupo",
       "visitGroupPage": null
@@ -835,6 +845,10 @@
   "observeButton": {
     "observed": null
   },
+  "pagination": {
+    "next": "Siguiente",
+    "previous": "Anterior"
+  },
   "post": {
     "comment": {
       "joinGroup": null,
@@ -880,6 +894,10 @@
     },
     "name": "Contribución",
     "pinned": "Anuncio",
+    "sensitiveContent": {
+      "hide": "Ocultar contenido sensible",
+      "show": "Mostrar contenido sensible"
+    },
     "takeAction": {
       "name": "Tomar acción"
     },
@@ -1225,6 +1243,7 @@
     "germany": "Alemania",
     "imprint": "Pie de imprenta",
     "made": "Hecho con ❤️",
+    "navigation": "Navegación",
     "register": "Número de registro",
     "support": null,
     "termsAndConditions": "Términos y condiciones",

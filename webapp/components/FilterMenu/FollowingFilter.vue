@@ -6,40 +6,48 @@
   >
     <template #filter-follower>
       <div class="item item-all-follower">
-        <base-button
-          :filled="!filteredByUsersFollowed && !filteredByPostsInMyGroups"
-          :label="$t('filter-menu.all')"
-          icon="check"
+        <os-button
+          variant="primary"
+          :appearance="
+            !filteredByUsersFollowed && !filteredByPostsInMyGroups ? 'filled' : 'outline'
+          "
+          size="sm"
           @click="setResetFollowers"
-          size="small"
         >
+          <template #icon>
+            <base-icon name="check" />
+          </template>
           {{ $t('filter-menu.all') }}
-        </base-button>
+        </os-button>
       </div>
       <div class="follower-filter-list">
         <li class="item follower-item">
-          <base-button
-            icon="user-plus"
-            :label="$t('filter-menu.following')"
-            :filled="filteredByUsersFollowed"
+          <os-button
+            variant="primary"
+            :appearance="filteredByUsersFollowed ? 'filled' : 'outline'"
+            size="sm"
             :title="$t('filter-menu.following')"
             @click="toggleFilteredByFollowed(currentUser.id)"
-            size="small"
           >
+            <template #icon>
+              <base-icon name="user-plus" />
+            </template>
             {{ $t('filter-menu.following') }}
-          </base-button>
+          </os-button>
         </li>
         <li class="item posts-in-my-groups-item">
-          <base-button
-            icon="users"
-            :label="$t('filter-menu.my-groups')"
-            :filled="filteredByPostsInMyGroups"
+          <os-button
+            variant="primary"
+            :appearance="filteredByPostsInMyGroups ? 'filled' : 'outline'"
+            size="sm"
             :title="$t('contribution.filterMyGroups')"
             @click="toggleFilteredByMyGroups()"
-            size="small"
           >
+            <template #icon>
+              <base-icon name="users" />
+            </template>
             {{ $t('contribution.filterMyGroups') }}
-          </base-button>
+          </os-button>
         </li>
       </div>
     </template>
@@ -47,6 +55,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 
@@ -54,6 +63,7 @@ export default {
   name: 'FollowingFilter',
   components: {
     FilterMenuSection,
+    OsButton,
   },
   computed: {
     ...mapGetters({
@@ -81,7 +91,7 @@ export default {
   display: flex;
   margin-left: $space-xx-small;
 
-  & .base-button {
+  & button {
     margin-right: $space-xx-small;
     margin-bottom: $space-xx-small;
   }

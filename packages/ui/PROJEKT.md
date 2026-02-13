@@ -80,11 +80,11 @@
 Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
-Phase 3: █████████░  83% (20/24 Aufgaben) - Webapp-Integration (M4a ✅, M5 ✅)
+Phase 3: ██████████ 100% (24/24 Aufgaben) ✅ - Webapp-Integration komplett
 Phase 4: █░░░░░░░░░   6% (1/17 Aufgaben) - OsButton ✅
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ███████░░░  69% (59/86 Aufgaben)
+Gesamt:  ████████░░  74% (63/86 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -94,30 +94,31 @@ Styleguide: ██████████ 100% (38 Komponenten erfasst)
 Analyse:    ██████████ 100% (Button, Modal, Menu detailiert)
 ```
 
-### OsButton Migration (Phase 3)
+### OsButton Migration (Phase 3) ✅
 ```
-Scope gesamt:     ~90 Buttons in Webapp
-├─ Migriert:       32 Buttons (36%) ✅
-├─ Ohne neue Props:  0 Buttons (Milestone 4a ✅)
-└─ Mit icon/circle/loading: ~60 Buttons (Milestone 4c)
+Scope gesamt:     133 <os-button> Tags in 79 Webapp-Dateien
+├─ Migriert:       133 Buttons (100%) ✅
+├─ <base-button>:    0 verbleibend in Templates
+├─ <ds-button>:      0 verbleibend in Templates
+└─ Cleanup:        Snapshots/Tests müssen aktualisiert werden
 
 OsButton Features:
 ├─ variant:     ✅ primary, secondary, danger, warning, success, info, default
 ├─ appearance:  ✅ filled, outline, ghost
-├─ size:        ✅ xs, sm, md, lg, xl
+├─ size:        ✅ sm, md, lg, xl
 ├─ disabled:    ✅ mit hover/active-Override
-├─ icon:        ⬜ TODO (Milestone 4b)
-├─ circle:      ⬜ TODO (Milestone 4b)
-└─ loading:     ⬜ TODO (Milestone 4b)
+├─ icon:        ✅ slot-basiert (icon-system-agnostisch)
+├─ circle:      ✅ rounded-full, größenabhängig (p-1.5 bis p-3)
+└─ loading:     ✅ animated SVG spinner, aria-busy (Milestone 4b)
 ```
 
 ---
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-10 (Session 12)
+**Letzte Aktualisierung:** 2026-02-13 (Session 19)
 
-**Aktuelle Phase:** Phase 3 (Webapp-Integration) - Milestone 4a abgeschlossen ✅ (32 Buttons migriert, nächster: Milestone 4b)
+**Aktuelle Phase:** Phase 3 ✅ ABGESCHLOSSEN + Code-Review-Feedback eingearbeitet
 
 **Zuletzt abgeschlossen:**
 - [x] Projektordner erstellt
@@ -183,11 +184,171 @@ OsButton Features:
   - Completeness Check (verify Script prüft Story, Visual, checkA11y, Keyboard, Varianten)
   - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 
-**Aktuell in Arbeit:**
-- Phase 3, Milestone 4b: icon/circle/loading Props in OsButton implementieren
-- Phase 3, Milestone 4c: ~60 Buttons mit icon/circle/loading migrieren
+**Zuvor abgeschlossen (Session 18 - CodeRabbit Review Feedback: data-test Selektoren, Accessibility, Bugfixes):**
+- [x] Cypress-Selektoren: `.user-content-menu button` → `[data-test="content-menu-button"]` (2 Step-Definitions)
+- [x] Cypress-Selektoren: `.content-menu button` → `[data-test="content-menu-button"]` (Admin.PinPost + ReportContent)
+- [x] muted-users.vue: `data-test="unmute-btn"` + `aria-label` auf Unmute-Button
+- [x] blocked-users.vue: `data-test="unblock-btn"` + `aria-label` auf Unblock-Button
+- [x] ProfileList.vue: `data-test="load-all-connections-btn"` + FollowList.spec.js Selektoren aktualisiert
+- [x] FollowButton.vue: `data-test="follow-btn"` + Spec-Selektoren aktualisiert
+- [x] JoinLeaveButton.vue: `data-test="join-leave-btn"` + `.native` von `@mouseenter`/`@mouseleave` entfernt
+- [x] LoginButton.vue: `data-test="login-btn"` + `aria-label="$t('login.login')"` + Spec-Selektoren aktualisiert
+- [x] ReportRow.spec.js: `button[data-variant="danger"]` → `[data-test="confirm"]`
+- [x] CtaJoinLeaveGroup.spec.js: Selektor auf `[data-test="join-leave-btn"]` aktualisiert
+- [x] DisableModal.vue: `finally { this.loading = false }` für Loading-State-Reset
+- [x] ReleaseModal.vue: `:loading="loading"` + `this.loading = true` + `finally { this.loading = false }`
+- [x] ChangePassword.vue: `:disabled="errors"` → `:disabled="!!errors"` (Boolean-Cast)
+- [x] Password/Change.vue: Unbenutzte `disabled: true` aus data() entfernt + 2 tote Tests entfernt
+- [x] MenuBar.vue: Unbenutztes `ref="linkButton"` entfernt
+- [x] GroupForm.vue: Cancel-Button `variant="default" appearance="filled"` (per User-Anweisung)
+- [x] `appearance="filled"` ergänzt: donations.vue, LoginForm.vue, EnterNonce.vue
+- [x] LoginForm.vue: CSS `.login-form button` → `.login-form button[type='submit']`
+- [x] pages/index.vue: Redundantes `class="my-filter-button"` von `<base-icon>` entfernt
+- [x] MySomethingList.vue: `:title` + `:aria-label` auf Edit/Delete-Buttons (Tooltip beibehalten)
+- [x] A11y aria-label auf icon-only Buttons: admin/users (search + edit), AddChatRoomByUserSearch (close), EmbedComponent (close), groups/index (create), profile/_id/_slug (new post), groups/_id/_slug (new post), CustomButton (2x tooltip), HeaderMenu (hamburger), ImageUploader (crop-cancel), ContentMenu (menu), HeaderButton (filter-remove), InviteButton (invite)
+- [x] post/_id/_slug/index.vue: Zustandsabhängiges `aria-label` (`post.sensitiveContent.show/hide`)
+- [x] ComponentSlider.vue: `aria-label` mit Interpolation (`component-slider.step`)
+- [x] i18n: `actions.search`, `actions.close`, `actions.menu` in allen 9 Sprachdateien
+- [x] i18n: `site.navigation` in allen 9 Sprachdateien
+- [x] i18n: `post.sensitiveContent.show/hide` in allen 9 Sprachdateien
+- [x] i18n: `component-slider.step` in allen 9 Sprachdateien
 
-**Zuletzt abgeschlossen (Session 12 - CSS-Linting, CI-Optimierung, Code-Review Fixes):**
+**Zuletzt abgeschlossen (Session 19 - CodeRabbit Review Feedback: Cleanup, Accessibility, Bugfixes):**
+- [x] donations.vue: Redundantes `:checked="showDonations"` entfernt (v-model setzt checked bereits)
+- [x] MySomethingList.vue: Disabled-Logik vereinfacht `!(!isEditing || (isEditing && !disabled))` → `isEditing && disabled`
+- [x] button.variants.ts: Hardcoded Fallback `#e5e3e8` entfernt → `var(--color-disabled)` (konsistent mit filled/index.css)
+- [x] CommentCard.vue: `aria-label` auf icon-only Reply-Button
+- [x] HashtagsFilter.vue: `aria-label` auf icon-only Clear-Button
+- [x] ReleaseModal.vue: `$emit('close')` im catch-Block ergänzt (fehlte im Fehlerfall)
+- [x] Chat.vue: `aria-label` auf Expand- und Close-Buttons
+- [x] i18n: `chat.expandChat` + `chat.closeChat` in allen 9 Sprachdateien (vollständig übersetzt)
+- [x] ChatNotificationMenu.vue: `aria-label` auf icon-only Chat-Button
+- [x] SearchableInput.vue: `aria-label` auf icon-only Close-Button
+- [x] GroupButton.vue: `aria-label` auf icon-only Groups-Button
+- [x] MapButton.vue: `aria-label` auf icon-only Map-Button
+- [x] EmotionButton.vue: `aria-label` auf icon-only Emoji-Button (`<label for>` wirkt nicht auf `<button>`)
+- [x] ImageUploader.vue: `aria-label` auf icon-only Delete-Button
+- [x] i18n: `actions.clear` disambiguiert — es: "Borrar" → "Limpiar", it: "Cancella" → "Svuota" (Verwechslung mit `actions.delete`)
+- [x] OsButton.vue: `as string` Cast bei `attrClass` entfernt (cn/clsx verarbeitet Arrays/Objekte korrekt)
+- [x] CommentForm.vue: `handleSubmit` auf async/await + try/catch/finally umgestellt (Loading-Bug im Fehlerfall behoben)
+- [x] MenuBar.vue: `aria-label` auf alle 11 Editor-Toolbar-Buttons (nutzt bestehende `editor.legend.*` Keys)
+- [x] NotificationMenu.vue: `aria-label` auf alle 3 Bell-Buttons
+- [x] NotificationMenu.vue: `counter-icon` von Default-Slot in `#icon`-Slot verschoben (2 Stellen, Rendering-Bug)
+- [x] ChatNotificationMenu.vue: `counter-icon` von Default-Slot in `#icon`-Slot verschoben (Rendering-Bug)
+- [x] InviteButton.vue: `this.currentUser` → `this.user` (Bug: Getter hieß `user`, `currentUser` war undefined)
+- [x] pages/index.vue: `beforeDestroy()` aus `methods` in Lifecycle-Hook verschoben (Memory-Leak: Event-Listener wurden nie entfernt)
+- [x] Editor.vue: Fehlender `else`-Branch in `toggleLinkInput()` — `isLinkInputActive` wird jetzt auch bei no-args-Aufrufen (blur/esc) zurückgesetzt
+- [x] admin/users/index.vue: Veraltete Slot-Syntax `slot="role" slot-scope="scope"` → `#role="scope"` (Vue 3)
+- [x] settings/index.vue: Irreführender Komponentenname `NewsFeed` → `Settings`
+- [x] FilterMenu.spec.js: Typo `dropdwon` → `dropdown` im Testnamen
+- [x] ImageUploader.vue: `:title` auf Crop-Cancel-Button ergänzt (konsistent mit Delete-Button)
+- [x] OsButton.spec.ts: `as const` auf `sizes`-Objekt statt Type-Cast bei jedem `mount`-Aufruf
+- [x] CommentForm.vue: `disabled = false` aus `finally` in `catch` verschoben (verhindert Überschreiben nach `clear()`)
+- [x] FilterMenu.vue: `aria-label` auf icon-only Filter-Button
+- [x] ContextMenu.vue: `this.menu.show()` nur bei `type !== 'link'` (Link-Menüs öffneten sich sofort statt auf Klick zu warten)
+- [x] ContextMenu.vue: `this.menu = null` vor `destroy()` (Race-Condition: ESC + blur feuerten doppelt → removeChild-Error)
+- [x] CustomButton.vue: `variant="primary"` auf beide `os-button`-Instanzen (Konsistenz mit restlicher Codebase)
+- [x] Invitation.vue: Ungenutztes Argument `inviteCode.copy` bei `copyInviteCode()` entfernt
+- [x] CtaUnblockAuthor.vue: `appearance="filled"` explizit gesetzt (fehlte als einziger primärer CTA)
+- [x] HeaderMenu.vue: `beforeDestroy`-Hook ergänzt — Scroll-Listener wird jetzt entfernt (Memory-Leak)
+- [x] MenuLegend.vue: `variant="primary"` auf Trigger-Button (konsistent mit Toolbar-Buttons in MenuBar.vue)
+
+**Zuvor abgeschlossen (Session 18 - Code-Review Feedback, OsButton Refactoring, Accessibility):**
+- [x] OsButton.vue vereinfacht: `vueAttrs()` Helper, Einmal-Variablen durch `cn()` ersetzt, `children` Array inline (217→227 Zeilen, aber lesbarer)
+- [x] OsButton: `@import "./animations.css"` vor `@source`-Direktiven verschoben (CSS-Spec-Konformität)
+- [x] CustomButton.vue: `isEmpty` aus `data()` entfernt → direkter Import im Computed
+- [x] notifications.spec.js: Doppelten `beforeEach` konsolidiert, `wrapper` in `describe`-Block verschoben
+- [x] MenuLegend.vue: `<style scoped>` hinzugefügt (verhindert Style-Leaking generischer Klassennamen)
+- [x] LocationSelect: `data-test="clear-location-button"` + spezifischerer Selektor im Spec
+- [x] HashtagsFilter: `data-test="clear-search-button"` + spezifischerer Selektor im Spec
+- [x] FollowButton.vue: `.native` Modifier von `@mouseenter`/`@mouseleave` entfernt (Vue 3 Kompatibilität)
+- [x] MapButton.vue: Icon in `<template #icon>` verschoben + redundantes Inline-Style entfernt
+- [x] MySomethingList.vue: Unbenutzte `.icon-button` CSS-Klasse entfernt
+- [x] PaginationButtons.vue: Hardcoded `aria-label` → `$t('pagination.previous/next')` (i18n)
+- [x] `pagination.previous/next` in allen 9 Sprachdateien angelegt
+- [x] GroupContentMenu.vue: `aria-label` via `$t('group.contentMenu.menuButton')` für icon-only Button
+- [x] `group.contentMenu.menuButton` in allen 9 Sprachdateien angelegt
+- [x] FilterMenu.vue: Veraltete `slot="default"` + `slot-scope` → `<template #default="{ toggleMenu }">` (Vue 3)
+- [x] HashtagsFilter.vue: `this.$t()` → `$t()` im Template (Vue 3 Kompatibilität)
+- [x] DisableModal.vue: `appearance="filled"` + `:loading="loading"` auf Danger-Button
+- [x] DeleteUserModal.vue: `appearance="filled"` + `:loading="loading"` auf Danger-Button
+- [x] my-email-address/index.vue: `loadingData` State + `:loading` auf Submit-Button + `finally` Block
+- [x] ReportModal.vue: `class="report-modal"` + CSS-Selektoren mit Prefix (verhindert globales Style-Leaking)
+- [x] DeleteUserModal.vue: CSS-Selektoren mit `.delete-user-modal` Prefix (verhindert globales Style-Leaking)
+- [x] Button-Wrapper-Analyse: GroupButton + MapButton als Kandidaten zum Inlining identifiziert (nur 1 Nutzungsort, keine Logik)
+
+**Zuvor abgeschlossen (Session 16 - Bugfixes, Code-Review, letzte ds-button Migration):**
+- [x] Password/Change.vue: `!!errors` Fix für disabled-Prop
+- [x] CommentForm.vue: `type="submit"` + `!!errors` Fix
+- [x] GroupForm.vue: Letzter `<ds-button>` → `<os-button>` migriert (save/update mit icon)
+- [x] OsButton.spec.ts: TypeScript-Fix für size-Prop Union Type
+- [x] OsButton.vue: v8 ignore Coverage-Fixes (100% Branch Coverage)
+- [x] 0 `<ds-button>` und 0 `<base-button>` in Webapp-Templates verbleibend
+- [x] `data-variant` Attribut auf OsButton (konsistent mit `data-appearance`, CSS-Selektor-Support)
+- [x] notifications.spec.js: `wrapper.find()` → Testing Library `screen.getByText()` (war Vue Test Utils API)
+- [x] FilterMenu.vue: Dynamische `:appearance="filterActive ? 'filled' : 'ghost'"` (Regressionsbug)
+- [x] FilterMenu.spec.js: `data-appearance="filled"` statt CSS-Klasse `--filled`
+- [x] CtaUnblockAuthor.vue: `require` → `required` Typo-Fix
+- [x] LocationSelect.vue: `clearLocationName()` direkt via `this.currentValue` statt `event.target.value`
+- [x] LocationSelect.vue: `@click.native` → `@click` (Vue 3 Kompatibilität)
+- [x] LocationSelect.vue: `aria-label` via `$t('actions.clear')` (i18n)
+- [x] `actions.clear` in allen 9 Sprachdateien angelegt (en, de, fr, es, it, nl, pl, pt, ru)
+- [x] OsButton: JSDoc-Dokumentation für Slots (`@slot default`, `@slot icon`)
+- [x] OsButton: `isSmall` von `['xs', 'sm']` auf `size === 'sm'` vereinfacht (xs existiert nicht)
+- [x] OsButton: Strikte Typisierung `Record<Size, ...>` statt `Record<string, ...>` für Lookup-Maps
+- [x] animations.css: Stylelint-konforme Formatierung (eine Deklaration pro Zeile)
+
+**Zuvor abgeschlossen (Session 15 - Milestone 4c komplett):**
+- [x] **Alle verbleibenden base-button Instanzen migriert** (132 os-button Tags, 0 base-button verbleibend)
+- [x] 59 Buttons in dieser Session migriert (Chat, Filter, Modals, Forms, Pages, etc.)
+- [x] `type="submit"` für alle Form-Buttons (OsButton default ist `type="button"`)
+- [x] `!!errors` Boolean-Cast für disabled-Props (errors ist Objekt, nicht Boolean)
+- [x] CSS-Selektoren `.base-button` → `> button` oder `button` angepasst
+- [x] `!important` für CSS-Positioning (überschreibt Tailwind-Klassen)
+- [x] Disabled outline border-color Fix (`var(--color-disabled-border,#e5e3e8)`)
+- [x] ComponentSlider Selection-Dots: dynamic appearance + 18px custom CSS
+- [x] pages/index.vue FAB: `size="xl"` + position/dimension `!important`
+- [x] pages/groups FAB: `size="xl"` + box-shadow `!important`
+- [x] ReportModal Breite auf 700px beibehalten
+- [x] ContributionForm Submit: `type="submit"` + `!!errors` Fix
+- [x] my-email-address/index.vue: `!!errors` Fix
+
+**Zuvor abgeschlossen (Session 14 - Loading Prop, Circle Prop, Code-Optimierung):**
+- [x] `loading` Prop mit animiertem SVG-Spinner implementiert
+- [x] Spinner-Architektur: Beide Animationen (rotate + dash) auf `<circle>` Element (Chrome-Compositing-Bug-Workaround)
+- [x] Spinner zentriert auf Icon (Icon-Buttons) oder Button-Container (Text-Only-Buttons)
+- [x] Icon bleibt bei loading sichtbar, Spinner überlagert Icon-Bereich
+- [x] `aria-busy="true"` für Screenreader bei loading
+- [x] `circle` Prop implementiert (rounded-full, größenabhängige Breiten)
+- [x] `min-width` pro Größe hinzugefügt (verhindert zu kleine leere Buttons)
+- [x] Animations-Keyframes in `animations.css` ausgelagert (wiederverwendbar)
+- [x] Code-Optimierung: OsButton von ~250 auf 207 Zeilen vereinfacht
+  - `buttonData` Objekt für Vue 2/3 geteilt
+  - `SPINNER_PX` vereinfacht (Tuple → einfache Zahlen)
+  - Redundante `cn()` Wrapping entfernt
+  - `getCurrentInstance()` nur bei Vue 2 aufgerufen
+- [x] 76 Unit-Tests (5 neue: default type, data-appearance, min-w, icon-only loading, circle gap)
+- [x] Loading-Stories in Storybook (alle Varianten × Appearances)
+- [x] Visual Tests mit `animationPlayState = 'paused'` für stabile Screenshots
+- [x] PaginationButtons.vue migriert (2 circle icon-only Buttons)
+
+**Zuvor abgeschlossen (Session 13 - Icon-Slot, Storybook Playground, Webapp-Migration):**
+- [x] Icon-Slot für OsButton implementiert (slot-basiert, icon-system-agnostisch)
+- [x] Render-Funktion: `slots.icon?.()` → `<span class="os-button__icon">` Wrapper
+- [x] Tailwind-Klassen direkt auf Icon-Wrapper (kein custom CSS in index.css nötig)
+- [x] VNode-basierte Text-Erkennung: Whitespace-only = icon-only (gap/margin-Logik)
+- [x] Storybook: 4 neue Stories (Icon, IconOnly, IconSizes, IconAppearances)
+- [x] Playground: Reaktiver Icon-Selektor (none/check/close/plus) + Label-Text-Control
+- [x] Visual Tests: 4 neue Tests mit Screenshots + a11y-Checks
+- [x] Unit Tests: 8 neue Tests (icon slot, keyboard a11y mit aria-label)
+- [x] Erste Webapp-Migration mit Icon: `my-email-address/index.vue` (Save-Button mit check-Icon)
+- [x] Code-Optimierung: ICON_CLASS Konstante, iconMargin Variable, vereinfachte hasText-Logik
+- [x] Größenabhängiger Gap: `gap-1` für xs/sm, `gap-2` für md/lg/xl
+- [x] Größenabhängiger Icon-Margin: kein negativer Margin bei xs/sm (mehr Abstand zur Button-Grenze)
+- [x] 6 weitere Buttons mit Icon migriert: DisableModal, DeleteUserModal, CtaUnblockAuthor, LocationSelect, CategoriesSelect, profile Chat
+- [x] verify.vue hat keinen Button (Eintrag korrigiert)
+
+**Zuvor abgeschlossen (Session 12 - CSS-Linting, CI-Optimierung, Code-Review Fixes):**
 - [x] CSS-Linting: `@eslint/css` + `tailwind-csstree` für Tailwind v4 Syntax-Support
 - [x] `excludeCSS()` Helper: JS-Regeln von CSS-Dateien fernhalten (language-Inkompatibilität)
 - [x] CSS-Regeln: `no-empty-blocks`, `no-duplicate-imports`, `no-invalid-at-rules`
@@ -261,14 +422,20 @@ OsButton Features:
 1. ~~Phase 0: Komponenten-Analyse~~ ✅
 2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
 3. ~~**Phase 2: Projekt-Setup**~~ ✅ ABGESCHLOSSEN
-4. **Phase 3: Webapp-Integration** - 32/90 Buttons migriert (36%)
+4. ~~**Phase 3: Webapp-Integration**~~ ✅ ABGESCHLOSSEN — 133 Buttons in 79 Dateien
    - [x] yarn link / Webpack-Alias in Webapp
    - [x] CSS-Variablen definieren (ocelot-ui-variables.scss)
    - [x] 16 Buttons migriert & validiert ✅
    - [x] Docker Build + CI-Kompatibilität
    - [x] **Milestone 4a:** 14 weitere Buttons (ohne neue Props) ✅
-   - [ ] **Milestone 4b:** icon/circle/loading Props implementieren
-   - [ ] **Milestone 4c:** ~60 Buttons mit icon/circle/loading migrieren
+   - [x] **Milestone 4b:** icon/circle/loading Props implementieren ✅
+   - [x] **Milestone 4c:** Alle verbleibenden Buttons migriert ✅
+   - [x] **Code-Review Feedback:** Refactoring, A11y, Vue 3 Compat, CSS-Scoping ✅
+5. **Nächstes:**
+   - [ ] GroupButton + MapButton in HeaderMenu inlinen (keine eigene Komponente nötig)
+   - [ ] `compat/` Verzeichnis in packages/ui anlegen (temporäre Migrations-Wrapper)
+   - [ ] BaseIcon nach `compat/` verschieben (131 Nutzungen, Voraussetzung für weitere Migrationen)
+   - [ ] Snapshots/Tests aktualisieren, BaseButton-Komponente ggf. entfernen
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
 - [ ] `NPM_TOKEN` als GitHub Secret einrichten (für npm publish in ui-release.yml)
@@ -361,106 +528,120 @@ OsButton Features:
 - [x] OsButton attrs/listeners Forwarding (Vue 2 $listeners via getCurrentInstance)
 - [x] 14 weitere Buttons migriert (alle ohne icon/circle/loading)
 
-**Milestone 4a: Weitere Buttons migrieren (14 ohne neue Props)**
-- [ ] Modal Cancel-Buttons (DisableModal, DeleteUserModal, ReleaseModal)
-- [ ] Form Cancel/Submit-Buttons (ContributionForm, EnterNonce, MySomethingList)
-- [ ] ImageUploader.vue (2× Crop-Buttons)
-- [ ] Page-Buttons (donations, badges, notifications/index, profile Unblock/Unmute)
-- [ ] ReportRow.vue More-Details-Button
+**Milestone 4a: Weitere Buttons migrieren (14 ohne neue Props)** ✅
+- [x] Modal Cancel-Buttons (DisableModal, DeleteUserModal, ReleaseModal)
+- [x] Form Cancel/Submit-Buttons (ContributionForm, EnterNonce, MySomethingList)
+- [x] ImageUploader.vue (2× Crop-Buttons)
+- [x] Page-Buttons (donations, badges, notifications/index, profile Unblock/Unmute)
+- [x] ReportRow.vue More-Details-Button
 
-**Milestone 4b: OsButton Props erweitern**
-- [ ] `icon` Prop implementieren (slot-basiert oder Icon-Komponente)
-- [ ] `circle` Variant zu CVA hinzufügen
-- [ ] `loading` Prop mit Spinner implementieren
+**Milestone 4b: OsButton Props erweitern** ✅
+- [x] `icon` Slot implementiert (slot-basiert, icon-system-agnostisch) ✅
+- [x] `circle` Prop implementiert (rounded-full, größenabhängige Breiten) ✅
+- [x] `loading` Prop mit animiertem SVG-Spinner implementiert ✅
 
-**Milestone 4c: Buttons mit icon/circle/loading migrieren (~60 Buttons)**
+**Milestone 4c: Buttons mit icon/circle/loading migrieren** ✅ ABGESCHLOSSEN
 
 *Button-Komponenten (Wrapper):*
-- [ ] Button/JoinLeaveButton.vue (icon, loading)
-- [ ] Button/FollowButton.vue (icon, loading)
-- [ ] LoginButton/LoginButton.vue (icon, circle)
-- [ ] InviteButton/InviteButton.vue (icon, circle)
-- [ ] EmotionButton/EmotionButton.vue (circle)
-- [ ] CustomButton/CustomButton.vue (2× circle)
-- [ ] LabeledButton/LabeledButton.vue (icon, circle)
+- [x] Button/JoinLeaveButton.vue (icon, loading) ✅
+- [x] Button/FollowButton.vue (icon, loading) ✅
+- [x] LoginButton/LoginButton.vue (icon, circle) ✅
+- [x] InviteButton/InviteButton.vue (icon, circle) ✅
+- [x] EmotionButton/EmotionButton.vue (circle) ✅
+- [x] CustomButton/CustomButton.vue (2× circle) ✅
+- [x] LabeledButton/LabeledButton.vue (icon, circle) ✅
 
 *Navigation & Menus:*
-- [ ] ContentMenu/ContentMenu.vue (icon, circle)
-- [ ] ContentMenu/GroupContentMenu.vue (icon, circle)
-- [ ] ChatNotificationMenu.vue (circle)
-- [ ] NotificationMenu.vue (3× icon, circle)
-- [ ] HeaderMenu/HeaderMenu.vue (icon, circle)
-- [ ] Map/MapButton.vue (circle)
+- [x] ContentMenu/ContentMenu.vue (icon, circle) ✅
+- [x] ContentMenu/GroupContentMenu.vue (icon, circle) ✅
+- [x] ChatNotificationMenu.vue (circle) ✅
+- [x] NotificationMenu.vue (3× icon, circle) ✅
+- [x] HeaderMenu/HeaderMenu.vue (icon, circle) ✅
+- [x] Map/MapButton.vue (circle) ✅
 
 *Editor:*
-- [ ] Editor/MenuBarButton.vue (icon, circle)
-- [ ] Editor/MenuLegend.vue (~10× icon, circle)
+- [x] Editor/MenuBar.vue (~11× icon, circle) ✅
+- [x] Editor/MenuLegend.vue (2× icon) ✅
 
 *Filter & Input:*
-- [ ] HashtagsFilter.vue (icon, circle)
-- [ ] CategoriesSelect.vue (icon)
-- [ ] SearchableInput.vue (icon, circle)
-- [ ] Select/LocationSelect.vue (icon)
-- [ ] PaginationButtons.vue (2× icon, circle)
+- [x] HashtagsFilter.vue (icon, circle) ✅
+- [x] CategoriesSelect.vue (icon) ✅
+- [x] SearchableInput.vue (icon, circle) ✅
+- [x] Select/LocationSelect.vue (icon) ✅
+- [x] PaginationButtons.vue (2× icon, circle) ✅
 
 *Chat:*
-- [ ] Chat/Chat.vue (2× icon, circle)
-- [ ] Chat/AddChatRoomByUserSearch.vue (icon, circle)
+- [x] Chat/Chat.vue (2× icon, circle) ✅
+- [x] Chat/AddChatRoomByUserSearch.vue (icon, circle) ✅
 
 *Forms & Auth:*
-- [ ] LoginForm/LoginForm.vue (icon, loading)
-- [ ] PasswordReset/Request.vue (loading)
-- [ ] PasswordReset/ChangePassword.vue (loading)
-- [ ] Password/Change.vue (loading)
-- [ ] ContributionForm.vue Submit (icon, loading)
-- [ ] GroupForm.vue Submit (icon)
-- [ ] CommentForm/CommentForm.vue (loading)
+- [x] LoginForm/LoginForm.vue (icon, loading) ✅
+- [x] PasswordReset/Request.vue (loading) ✅
+- [x] PasswordReset/ChangePassword.vue (loading) ✅
+- [x] Password/Change.vue (loading) ✅
+- [x] ContributionForm.vue Submit (icon, loading) ✅
+- [x] CommentForm/CommentForm.vue (loading) ✅
 
 *Modals:*
-- [ ] Modal/ConfirmModal.vue (2× icon, loading)
-- [ ] Modal/ReportModal.vue (2× icon, loading)
-- [ ] Modal/DisableModal.vue Confirm (icon)
-- [ ] Modal/DeleteUserModal.vue Confirm (icon)
-- [ ] Modal/ReleaseModal.vue Confirm (icon)
+- [x] Modal/ConfirmModal.vue (2× icon, loading) ✅
+- [x] Modal/ReportModal.vue (2× icon, loading) ✅
+- [x] Modal/DisableModal.vue Confirm (icon) ✅
+- [x] Modal/DeleteUserModal.vue Confirm (icon) ✅
+- [x] Modal/ReleaseModal.vue Confirm (icon) ✅
 
 *Features:*
-- [ ] ComponentSlider.vue (2× icon, loading)
-- [ ] MySomethingList.vue (3× icon, circle, loading)
-- [ ] CreateInvitation.vue (icon, circle)
-- [ ] Invitation.vue (2× icon, circle)
-- [ ] ProfileList.vue (loading)
-- [ ] ReportRow.vue Confirm (icon)
-- [ ] ImageUploader.vue Delete/Cancel (2× icon, circle)
-- [ ] CommentCard.vue Reply (icon, circle)
-- [ ] EmbedComponent.vue Close (icon, circle)
-- [ ] CtaUnblockAuthor.vue (icon)
-- [ ] data-download.vue (icon, loading)
+- [x] ComponentSlider.vue (2× icon) ✅
+- [x] MySomethingList.vue (3× icon, circle) ✅
+- [x] CreateInvitation.vue (icon, circle) ✅
+- [x] Invitation.vue (2× icon, circle) ✅
+- [x] ProfileList.vue (loading) ✅
+- [x] ReportRow.vue Confirm (icon) ✅
+- [x] ImageUploader.vue Delete/Cancel (2× icon, circle) ✅
+- [x] CommentCard.vue Reply (icon, circle) ✅
+- [x] EmbedComponent.vue Close (icon, circle) ✅
+- [x] CtaUnblockAuthor.vue (icon) ✅
+- [x] data-download.vue (icon, loading) ✅
+- [x] ActionButton.vue (icon, circle) ✅
+- [x] DeleteData.vue (icon) ✅
+- [x] GroupButton.vue (icon, circle) ✅
+
+*Filter-Menüs:*
+- [x] FilterMenu/FilterMenu.vue (icon) ✅
+- [x] FilterMenu/HeaderButton.vue (2× icon) ✅
+- [x] FilterMenu/CategoriesFilter.vue (2× icon) ✅
+- [x] FilterMenu/OrderByFilter.vue (2×) ✅
+- [x] FilterMenu/EventsByFilter.vue (2×) ✅
+- [x] FilterMenu/FollowingFilter.vue (3×) ✅
 
 *Pages:*
-- [ ] pages/groups/_id/_slug.vue (3× icon, circle, loading)
-- [ ] pages/admin/users/index.vue (2× icon, circle, loading)
-- [ ] pages/settings/index.vue (icon, loading)
-- [ ] pages/settings/blocked-users.vue (icon, circle)
-- [ ] pages/settings/muted-users.vue (icon, circle)
-- [ ] pages/settings/my-email-address/*.vue (2× icon)
-- [ ] pages/profile/_id/_slug.vue Chat (icon)
-- [ ] pages/post/_id/_slug/index.vue (icon, circle)
+- [x] pages/index.vue (2× icon, circle) ✅
+- [x] pages/groups/index.vue (icon, circle) ✅
+- [x] pages/groups/_id/_slug.vue (3× icon, circle) ✅
+- [x] pages/admin/users/index.vue (2× icon, circle) ✅
+- [x] pages/settings/index.vue (icon) ✅
+- [x] pages/settings/blocked-users.vue (icon, circle) ✅
+- [x] pages/settings/muted-users.vue (icon, circle) ✅
+- [x] pages/settings/data-download.vue (icon) ✅
+- [x] pages/settings/my-email-address/index.vue (icon) ✅
+- [x] pages/settings/my-email-address/enter-nonce.vue (icon) ✅
+- [x] pages/profile/_id/_slug.vue (icon, circle) ✅
+- [x] pages/post/_id/_slug/index.vue (icon, circle) ✅
 
 **Milestone 5: Validierung & Dokumentation** ✅
 - [x] Keine visuellen Änderungen bestätigt (16/16 Buttons validiert)
 - [x] Keine funktionalen Änderungen bestätigt
 - [x] Disabled-Styles korrigiert (hover/active-Override, Border-Fix)
-- [ ] Webapp-Tests bestehen weiterhin (TODO: Regressionstest)
+- [ ] Webapp-Tests bestehen weiterhin (TODO: Snapshots aktualisieren)
 - [ ] Erkenntnisse in KATALOG.md dokumentiert
 
 **Einsatzstellen-Übersicht:**
 
 | Kategorie | Buttons | Status |
 |-----------|---------|--------|
-| ✅ Migriert & Validiert | 24 | Erledigt |
-| ⏳ Ohne neue Props (M4a) | 6 | In Arbeit (8 von 14 erledigt) |
-| ⬜ Mit icon/circle/loading (M4c) | ~60 | Ausstehend |
-| **Gesamt** | **~90** | **27% erledigt** |
+| ✅ Migriert (gesamt) | 133 | 79 Dateien |
+| ⬜ `<base-button>` verbleibend | 0 | Nur BaseButton.vue Definition + Test-Dateien |
+| ⬜ `<ds-button>` verbleibend | 0 | Alle ersetzt |
+| **Gesamt** | **133** | **100% erledigt** ✅ |
 
 **Details siehe KATALOG.md** (vollständige Tracking-Tabellen)
 
@@ -1486,6 +1667,87 @@ Bei der Migration werden:
 | 2026-02-10 | **CI-Workflow-Trigger** | 9 UI-Workflows von `on: push` auf `push`+`pull_request` mit Branch-Filter (`master`) und Path-Filter (`packages/ui/**` + Workflow-Datei) umgestellt |
 | 2026-02-10 | **custom-class entfernt** | `custom-class` Prop (entfernt aus OsButton) → `class` Attribut in notifications.vue, MapStylesButtons.vue, EmbedComponent.vue (4 Stellen); Snapshot aktualisiert |
 | 2026-02-10 | **Vue 3 Template-Fix** | `this.$t()` → `$t()` in CommentCard.vue (this im Template in Vue 3 nicht verfügbar) |
+| 2026-02-11 | **Icon-Slot implementiert** | Benannter `#icon` Slot für OsButton, slot-basiert statt Icon-Prop (icon-system-agnostisch) |
+| 2026-02-11 | **Icon-Wrapper Klassen** | Tailwind-Utility-Klassen direkt auf `<span>`: `inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current` |
+| 2026-02-11 | **VNode Text-Erkennung** | `hasText` prüft VNode-Children auf sichtbaren Inhalt; whitespace-only → icon-only Verhalten |
+| 2026-02-11 | **Gap & Margin Logik** | `gap-2` bei Icon+Text, `-ml-1` bei Icon, `-ml-1 -mr-1` bei Icon-Only (optischer Ausgleich) |
+| 2026-02-11 | **4 neue Stories** | Icon, IconOnly, IconSizes, IconAppearances mit Inline-SVG Komponenten (CheckIcon, CloseIcon, PlusIcon) |
+| 2026-02-11 | **Playground erweitert** | Reaktiver Icon-Selektor (none/check/close/plus) + Label-Text-Control via `computed()` |
+| 2026-02-11 | **Storybook: components Option** | Funktionale Komponenten müssen in `components` registriert werden, nicht in `setup()` return |
+| 2026-02-11 | **Storybook: CSS nicht in index.css** | Storybook lädt eigene `storybook.css`, nicht `src/styles/index.css` → Utility-Klassen direkt verwenden |
+| 2026-02-11 | **SVG-Targeting** | `[&>svg]` statt `[&>*]` für Icon-Sizing (BaseIcon rendert `<span><svg>`, Wrapper-Span darf nicht beeinflusst werden) |
+| 2026-02-11 | **my-email-address migriert** | Save-Button: `<os-button variant="primary">` mit `<template #icon><base-icon name="check" /></template>` |
+| 2026-02-11 | **Code-Optimierung** | `ICON_CLASS` Konstante extrahiert, `iconMargin` Variable, vereinfachte `hasText`-Logik (kein Symbol.for) |
+| 2026-02-11 | **Größenabhängiger Gap** | `gap-1` (4px) für xs/sm, `gap-2` (8px) für md/lg/xl bei Icon+Text |
+| 2026-02-11 | **Größenabhängiger Margin** | Kein negativer Icon-Margin bei xs/sm (voller Padding-Abstand zur Button-Grenze) |
+| 2026-02-11 | **DisableModal.vue** | Confirm-Button migriert: `danger filled icon="exclamation-circle"` → `variant="danger"` + `#icon` Slot |
+| 2026-02-11 | **DeleteUserModal.vue** | Confirm-Button migriert: identisches Pattern wie DisableModal |
+| 2026-02-11 | **CtaUnblockAuthor.vue** | Button migriert: `filled icon="arrow-right"` → `variant="primary"` + `#icon` Slot, OsButton importiert |
+| 2026-02-11 | **LocationSelect.vue** | Icon-only Close-Button migriert: `ghost size="small" icon="close"` → `variant="primary" appearance="ghost" size="sm"` + aria-label |
+| 2026-02-11 | **CategoriesSelect.vue** | v-for Buttons migriert: dynamisches `:icon` → `#icon` Slot, `:filled` → `:appearance`, CSS `.base-button` → `button` |
+| 2026-02-11 | **profile/_id/_slug.vue** | Chat-Button migriert: `icon="chat-bubble"` → `variant="primary" appearance="outline" full-width` + `#icon` Slot |
+| 2026-02-11 | **verify.vue korrigiert** | Kein Button vorhanden (Eintrag aus Milestone-Liste entfernt) |
+| 2026-02-11 | **PaginationButtons.vue** | 2 circle icon-only Buttons migriert: `outline primary circle` + `#icon` Slot + aria-label |
+| 2026-02-11 | **OsButton: circle Prop** | `circle` Prop: `rounded-full p-0` + größenabhängige Breiten (CIRCLE_WIDTHS Map) |
+| 2026-02-11 | **OsButton: loading Prop** | Animierter SVG-Spinner mit `aria-busy="true"`, Button auto-disabled bei loading |
+| 2026-02-11 | **Spinner-Architektur** | Beide Animationen (rotate + dash) auf `<circle>` Element; SVG ist statischer Container; Chrome-Compositing-Bug-Workaround |
+| 2026-02-11 | **Spinner-Zentrierung** | Icon-Buttons: Spinner über Icon (translate-basiert, overflow:visible); Text-Buttons: Spinner im Button-Container (inset-0 m-auto) |
+| 2026-02-11 | **animations.css** | Keyframes `os-spinner-dash` + `os-spinner-rotate` in separate CSS-Datei ausgelagert |
+| 2026-02-11 | **min-width pro Größe** | `min-w-[26px]`/`min-w-[36px]`/`min-w-12`/`min-w-14` in button.variants.ts (verhindert zu kleine leere Buttons) |
+| 2026-02-11 | **Code-Optimierung** | OsButton ~250→207 Zeilen: buttonData geteilt, SPINNER_PX vereinfacht, redundante cn() entfernt, getCurrentInstance nur Vue 2 |
+| 2026-02-11 | **5 neue Unit-Tests** | default type, data-appearance, min-w, icon-only loading, circle gap-1; gesamt: 76 Tests |
+| 2026-02-11 | **Milestone 4b abgeschlossen** | icon ✅, circle ✅, loading ✅ — alle OsButton-Props implementiert |
+| 2026-02-11 | **Milestone 4c: 59 Buttons** | Chat (2), AddChatRoomByUserSearch (1), CommentCard (1), CommentForm (2), ComponentSlider (2), ContributionForm (1), DeleteData (1), EmbedComponent (1), FilterMenu (1), HeaderButton (2), CategoriesFilter (2), OrderByFilter (2), EventsByFilter (2), FollowingFilter (3), GroupButton (1), ConfirmModal (2), ReportModal (2), Password/Change (1), PasswordReset/Request (1), PasswordReset/ChangePassword (1), Registration/Signup (1), ReleaseModal (1), ImageUploader (2), CreateInvitation (1), Invitation (2), ProfileList (1), ReportRow (1), MySomethingList (3), ActionButton (1), pages/index (2), profile/add-post (1), post/blur-toggle (1), groups/slug (3), settings/index (1), admin/users (2), blocked-users (1), data-download (1), muted-users (1), groups/index (1), enter-nonce (1) |
+| 2026-02-11 | **type="submit" Pattern** | OsButton hat `type="button"` als Default; alle Form-Submit-Buttons brauchen explizit `type="submit"` |
+| 2026-02-11 | **!!errors Pattern** | DsForm `errors` ist ein Objekt, nicht Boolean; OsButton `disabled` Prop erwartet Boolean → `!!errors` nötig |
+| 2026-02-11 | **CSS-Selector Pattern** | `.base-button` → `> button` oder `button`; Position/Dimensions brauchen `!important` für Tailwind-Override |
+| 2026-02-11 | **Disabled border-color** | Outline disabled border von `var(--color-disabled)` auf `var(--color-disabled-border,#e5e3e8)` mit Fallback |
+| 2026-02-11 | **Phase 3 abgeschlossen** | 132 `<os-button>` Tags in 78 Dateien, 0 `<base-button>` in Templates verbleibend |
+| 2026-02-11 | **Password/Change.vue Fix** | `!!errors` für disabled-Prop (DsForm errors ist Objekt) |
+| 2026-02-11 | **CommentForm.vue Fix** | `type="submit"` fehlte + `!!errors` für disabled-Prop |
+| 2026-02-11 | **GroupForm.vue ds-button** | Letzter `<ds-button>` in Webapp → `<os-button>` mit `#icon` Slot migriert |
+| 2026-02-11 | **OsButton.spec.ts TS-Fix** | `size` aus `Object.entries` als Union Type gecastet (`as 'sm' | 'md' | 'lg' | 'xl'`) |
+| 2026-02-11 | **Coverage 100%** | `v8 ignore start/stop` für Vue 2 Branch, `v8 ignore next` für defensive `||` Fallback |
+| 2026-02-11 | **Scope: 133 Buttons** | 133 `<os-button>` Tags in 79 Dateien, 0 `<base-button>` + 0 `<ds-button>` verbleibend |
+| 2026-02-12 | **data-variant Attribut** | OsButton rendert `data-variant` auf `<button>` (konsistent mit `data-appearance`), ermöglicht CSS-Selektoren wie `button[data-variant="danger"]` |
+| 2026-02-12 | **notifications.spec.js** | Test-API korrigiert: `wrapper.find()` (Vue Test Utils) → `screen.getByText()` (Testing Library), `button.disabled` statt `button.attributes('disabled')` |
+| 2026-02-12 | **FilterMenu Regressionsbug** | `appearance="ghost"` war hardcoded statt dynamisch; `filterActive` Computed Property existierte aber war nicht genutzt → `:appearance="filterActive ? 'filled' : 'ghost'"` |
+| 2026-02-12 | **FilterMenu.spec.js** | Test von CSS-Klasse `--filled` auf `data-appearance="filled"` Attribut-Selektor umgestellt |
+| 2026-02-12 | **CtaUnblockAuthor.vue** | Typo `require: true` → `required: true` (Vue ignorierte die Prop-Validierung) |
+| 2026-02-12 | **LocationSelect.vue Fixes** | `event.target.value` → `this.currentValue` (Button hat kein value), `@click.native` → `@click` (Vue 3), `aria-label` via i18n |
+| 2026-02-12 | **i18n: actions.clear** | Neuer Key in allen 9 Sprachdateien: en=Clear, de=Zurücksetzen, fr=Effacer, es=Borrar, it=Cancella, nl=Wissen, pl=Wyczyść, pt=Limpar, ru=Очистить |
+| 2026-02-12 | **OsButton JSDoc** | Slot-Dokumentation (`@slot default`, `@slot icon`) für vue-component-meta/Storybook autodocs |
+| 2026-02-12 | **OsButton xs entfernt** | `isSmall` von `['xs', 'sm'].includes(size)` auf `size === 'sm'` vereinfacht (xs ist kein gültiger Size-Wert) |
+| 2026-02-12 | **Strikte Typisierung** | `type Size = NonNullable<ButtonVariants['size']>`, `Record<Size, ...>` für CIRCLE_WIDTHS + SPINNER_PX; `props.size!` → `(props.size ?? 'md') as Size` |
+| 2026-02-12 | **animations.css** | Stylelint-konforme Formatierung: eine Deklaration pro Zeile, Leerzeilen zwischen Keyframe-Stufen |
+| 2026-02-12 | **OsButton Refactoring** | `vueAttrs()` Helper für Vue 2/3 Attribut-Handling, Einmal-Variablen durch `cn()` ersetzt, `children` inline; 77 Tests, 100% Coverage |
+| 2026-02-12 | **CSS @import Reihenfolge** | `@import "./animations.css"` vor `@source`-Direktiven verschoben (CSS-Spec: @import vor anderen At-Rules) |
+| 2026-02-12 | **CustomButton Cleanup** | `isEmpty` aus `data()` entfernt — reine Utility-Funktion braucht keine Vue-Reaktivität |
+| 2026-02-12 | **notifications.spec.js** | Doppelten `beforeEach` konsolidiert; `wrapper` von Modulebene in `describe`-Block verschoben |
+| 2026-02-12 | **Style-Scoping** | MenuLegend.vue: `<style scoped>` hinzugefügt; ReportModal + DeleteUserModal: CSS-Selektoren mit Komponenten-Prefix |
+| 2026-02-12 | **data-test Selektoren** | LocationSelect (`clear-location-button`) + HashtagsFilter (`clear-search-button`): spezifischere Test-Selektoren |
+| 2026-02-12 | **Vue 3 Compat Fixes** | FollowButton: `.native` entfernt; FilterMenu: `slot`/`slot-scope` → `<template #default>`; HashtagsFilter: `this.$t()` → `$t()` |
+| 2026-02-12 | **A11y: aria-label** | GroupContentMenu icon-only Button: `$t('group.contentMenu.menuButton')`; PaginationButtons: `$t('pagination.previous/next')` |
+| 2026-02-12 | **i18n Keys** | `pagination.previous/next` + `group.contentMenu.menuButton` in allen 9 Sprachdateien angelegt |
+| 2026-02-12 | **Modal Konsistenz** | DisableModal + DeleteUserModal: `appearance="filled"` + `:loading="loading"` auf Danger-Buttons |
+| 2026-02-12 | **Loading State** | my-email-address/index.vue: `loadingData` hinzugefügt + `finally` Block für Reset |
+| 2026-02-12 | **MapButton #icon Slot** | Icon von Default-Slot in `<template #icon>` verschoben (konsistent mit allen anderen Buttons) |
+| 2026-02-12 | **Dead Code entfernt** | MySomethingList.vue: `.icon-button` CSS-Klasse (nach Migration nicht mehr verwendet) |
+| 2026-02-12 | **Button-Wrapper-Analyse** | 15 OsButton-Wrapper klassifiziert: 4 Smart (Apollo/Vuex), 4 Presentational, 7 Borderline; GroupButton + MapButton als Inline-Kandidaten identifiziert |
+| 2026-02-12 | **compat/ Konzept** | Separates Verzeichnis für temporäre Migrations-Wrapper (nicht von check-completeness.ts erfasst); BaseIcon als erster Kandidat (131 Nutzungen) |
+| 2026-02-13 | **data-test Selektoren** | ~10 Komponenten: `data-test` Attribute für robuste Test-Selektoren (unmute-btn, unblock-btn, follow-btn, join-leave-btn, login-btn, load-all-connections-btn, content-menu-button) |
+| 2026-02-13 | **Cypress Selektoren** | 4 Step-Definitions: `.user-content-menu button` / `.content-menu button` → `[data-test="content-menu-button"]` |
+| 2026-02-13 | **Spec-Selektoren** | FollowList, FollowButton, LoginButton, CtaJoinLeaveGroup, ReportRow, muted-users, blocked-users: generische `button` → `[data-test="..."]` |
+| 2026-02-13 | **A11y: aria-label** | ~15 icon-only Buttons: aria-label hinzugefügt (admin/users, AddChatRoom, EmbedComponent, groups, profile, CustomButton, HeaderMenu, ImageUploader, ContentMenu, HeaderButton, InviteButton, LoginButton, blocked/muted-users) |
+| 2026-02-13 | **Zustandsabhängiges aria-label** | post/_id/_slug: `$t(blurred ? 'post.sensitiveContent.show' : 'post.sensitiveContent.hide')` |
+| 2026-02-13 | **ComponentSlider aria-label** | Interpoliertes Label: `$t('component-slider.step', { current: index + 1, total: ... })` |
+| 2026-02-13 | **i18n Keys (6 neue)** | `actions.search`, `actions.close`, `actions.menu`, `site.navigation`, `post.sensitiveContent.show/hide`, `component-slider.step` in allen 9 Sprachdateien |
+| 2026-02-13 | **Loading-State Fixes** | DisableModal + ReleaseModal: `finally { this.loading = false }` für Reset |
+| 2026-02-13 | **Bugfixes** | ChangePassword: `!!errors`; Password/Change: `disabled` aus data() entfernt + 2 tote Tests; MenuBar: unbenutztes `ref` entfernt |
+| 2026-02-13 | **Button-Props** | GroupForm cancel: `variant="default" appearance="filled"`; donations/LoginForm/EnterNonce: `appearance="filled"` ergänzt |
+| 2026-02-13 | **CSS-Selektoren** | LoginForm: `.login-form button` → `.login-form button[type='submit']`; pages/index: redundante Klasse auf BaseIcon entfernt |
+| 2026-02-13 | **JoinLeaveButton** | `.native` von `@mouseenter`/`@mouseleave` entfernt (Vue 3 Kompatibilität) |
+| 2026-02-13 | **MySomethingList** | `:title` + `:aria-label` auf Edit/Delete-Buttons (Tooltip beibehalten neben Accessibility) |
 
 ---
 

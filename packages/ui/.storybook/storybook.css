@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../src/styles/animations.css";
 
 /* Watercolor theme for Storybook - vibrant colors inspired by aquarelle paints */
 /* All colors meet WCAG AA contrast requirements (4.5:1 for normal text) */

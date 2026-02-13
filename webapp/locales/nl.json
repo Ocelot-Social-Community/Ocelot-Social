@@ -1,13 +1,17 @@
 {
   "actions": {
     "cancel": "Annuleren",
+    "clear": "Wissen",
+    "close": "Sluiten",
     "create": null,
     "delete": null,
     "edit": null,
     "loading": null,
     "loadMore": null,
+    "menu": "Menu openen",
     "save": null,
-    "saveCategories": null
+    "saveCategories": null,
+    "search": "Zoeken"
   },
   "admin": {
     "badges": {
@@ -117,7 +121,9 @@
   "chat": {
     "addRoomHeadline": null,
     "cancelSelectMessage": null,
+    "closeChat": "Chat sluiten",
     "conversationStarted": null,
+    "expandChat": "Chat uitvouwen",
     "isOnline": null,
     "isTyping": null,
     "lastSeen": null,
@@ -183,6 +189,9 @@
       "url": null
     },
     "versus": "Versus"
+  },
+  "component-slider": {
+    "step": "Stap {current} van {total}"
   },
   "components": {
     "dateTimeRange": {
@@ -539,6 +548,7 @@
     "changeMemberRole": null,
     "contentMenu": {
       "inviteLinks": null,
+      "menuButton": "Groepsmenu",
       "muteGroup": null,
       "unmuteGroup": null,
       "visitGroupPage": null
@@ -835,6 +845,10 @@
   "observeButton": {
     "observed": null
   },
+  "pagination": {
+    "next": "Volgende",
+    "previous": "Vorige"
+  },
   "post": {
     "comment": {
       "joinGroup": null,
@@ -880,6 +894,10 @@
     },
     "name": "Post",
     "pinned": null,
+    "sensitiveContent": {
+      "hide": "Gevoelige inhoud verbergen",
+      "show": "Gevoelige inhoud tonen"
+    },
     "takeAction": {
       "name": "Onderneem actie"
     },
@@ -1225,6 +1243,7 @@
     "germany": "Duitsland",
     "imprint": "Afdruk",
     "made": "Met ❤️ gemaakt",
+    "navigation": "Navigatie",
     "register": "inschrijfnummer",
     "support": null,
     "termsAndConditions": null,

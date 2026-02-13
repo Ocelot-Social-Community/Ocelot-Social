@@ -1,5 +1,5 @@
 <template>
-  <ds-modal :title="title" :is-open="isOpen" @cancel="cancel">
+  <ds-modal class="report-modal" :title="title" :is-open="isOpen" @cancel="cancel">
     <transition name="ds-transition-fade">
       <ds-flex v-if="success" class="hc-modal-success" centered>
         <sweetalert-icon icon="success" />
@@ -29,26 +29,32 @@
     </small>
     <ds-space />
     <template #footer>
-      <base-button class="cancel" icon="close" @click="cancel">
+      <os-button class="cancel" variant="primary" appearance="outline" @click="cancel">
+        <template #icon>
+          <base-icon name="close" />
+        </template>
         {{ $t('report.cancel') }}
-      </base-button>
+      </os-button>
 
-      <base-button
-        danger
-        filled
+      <os-button
         class="confirm"
-        icon="exclamation-circle"
+        variant="danger"
+        appearance="filled"
         :disabled="!form.reasonCategory"
         :loading="loading"
         @click="confirm"
       >
+        <template #icon>
+          <base-icon name="exclamation-circle" />
+        </template>
         {{ $t('report.submit') }}
-      </base-button>
+      </os-button>
     </template>
   </ds-modal>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import { reportMutation } from '~/graphql/Moderation.js'
 import { valuesReasonCategoryOptions } from '~/constants/modals.js'
@@ -57,6 +63,7 @@ import validReport from '~/components/utils/ReportModal'
 export default {
   name: 'ReportModal',
   components: {
+    OsButton,
     SweetalertIcon,
   },
   props: {
@@ -159,26 +166,27 @@ export default {
 </script>
 
 <style lang="scss">
-.ds-modal {
-  max-width: 600px !important;
+.report-modal.ds-modal {
+  width: 700px !important;
+  max-width: 700px !important;
 }
-.ds-radio-option {
+.report-modal .ds-radio-option {
   width: 100% !important;
 }
-.ds-radio-option-label {
+.report-modal .ds-radio-option-label {
   margin: 5px 20px 5px 5px !important;
   width: 100% !important;
 }
-.reason-description {
+.report-modal .reason-description {
   margin-top: $space-x-small !important;
   margin-bottom: $space-xx-small !important;
 }
-.smallTag {
+.report-modal .smallTag {
   width: 100%;
   position: relative;
   left: 90%;
 }
-.hc-modal-success {
+.report-modal .hc-modal-success {
   pointer-events: none;
   position: absolute;
   width: 100%;

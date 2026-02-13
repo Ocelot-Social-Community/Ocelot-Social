@@ -42,26 +42,30 @@
     <section class="warning">
       <p>{{ $t('settings.deleteUserAccount.accountWarning') }}</p>
     </section>
-    <base-button
-      icon="trash"
-      danger
-      filled
+    <os-button
+      variant="danger"
+      appearance="filled"
       :disabled="!deleteEnabled"
       data-test="delete-button"
       @click="handleSubmit"
     >
+      <template #icon>
+        <base-icon name="trash" />
+      </template>
       {{ $t('settings.deleteUserAccount.name') }}
-    </base-button>
+    </os-button>
   </base-card>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapActions, mapGetters } from 'vuex'
 import gql from 'graphql-tag'
 import { currentUserCountQuery } from '~/graphql/User'
 
 export default {
   name: 'DeleteData',
+  components: { OsButton },
   data() {
     return {
       deleteContributions: false,
@@ -166,7 +170,7 @@ export default {
     border-left: 4px solid $color-danger;
   }
 
-  > .base-button {
+  > button {
     align-self: flex-start;
   }
 }

@@ -52,17 +52,24 @@ exports[`CreateInvitation.vue renders 1`] = `
        
       <button
         aria-label="invite-codes.generate-code"
-        class="generate-invite-code base-button --icon-only --circle"
+        class="generate-invite-code inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] generate-invite-code"
+        data-appearance="outline"
+        data-variant="primary"
         type="submit"
       >
         <span
-          class="base-icon"
+          class="inline-flex items-center"
         >
-          <!---->
+          <span
+            class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+          >
+            <span
+              class="base-icon"
+            >
+              <!---->
+            </span>
+          </span>
         </span>
-         
-        <!---->
-         
       </button>
     </form>
   </div>
@@ -122,17 +129,24 @@ exports[`CreateInvitation.vue renders with disabled button 1`] = `
        
       <button
         aria-label="invite-codes.generate-code"
-        class="generate-invite-code base-button --icon-only --circle"
+        class="generate-invite-code inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] generate-invite-code"
+        data-appearance="outline"
+        data-variant="primary"
         type="submit"
       >
         <span
-          class="base-icon"
+          class="inline-flex items-center"
         >
-          <!---->
+          <span
+            class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+          >
+            <span
+              class="base-icon"
+            >
+              <!---->
+            </span>
+          </span>
         </span>
-         
-        <!---->
-         
       </button>
     </form>
   </div>

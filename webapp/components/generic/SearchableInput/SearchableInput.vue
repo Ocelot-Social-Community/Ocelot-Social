@@ -49,11 +49,24 @@
         </p>
       </template>
     </ds-select>
-    <base-button v-if="isActive" icon="close" circle ghost size="small" @click="clear" />
+    <os-button
+      v-if="isActive"
+      variant="primary"
+      appearance="ghost"
+      circle
+      size="sm"
+      :aria-label="$t('actions.clear')"
+      @click="clear"
+    >
+      <template #icon>
+        <base-icon name="close" />
+      </template>
+    </os-button>
   </div>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { isEmpty } from 'lodash'
 import SearchHeading from '~/components/generic/SearchHeading/SearchHeading.vue'
 import SearchPost from '~/components/generic/SearchPost/SearchPost.vue'
@@ -64,6 +77,7 @@ import UserTeaser from '~/components/UserTeaser/UserTeaser.vue'
 export default {
   name: 'SearchableInput',
   components: {
+    OsButton,
     SearchHeading,
     SearchGroup,
     SearchPost,
@@ -194,9 +208,9 @@ export default {
     padding-top: $space-xx-small;
   }
 
-  .base-button {
-    position: absolute;
-    right: $space-xx-small;
+  > button {
+    position: absolute !important;
+    right: $space-xx-small !important;
   }
 }
 </style>

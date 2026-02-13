@@ -14,16 +14,20 @@
       </div>
     </vue-dropzone>
     <div v-show="!showCropper && hasImage">
-      <base-button
+      <os-button
         class="delete-image-button"
-        icon="trash"
+        variant="danger"
+        appearance="filled"
         circle
-        danger
-        filled
         data-test="delete-button"
         :title="$t('actions.delete')"
+        :aria-label="$t('actions.delete')"
         @click.stop="deleteImage"
-      />
+      >
+        <template #icon>
+          <base-icon name="trash" />
+        </template>
+      </os-button>
     </div>
     <div v-show="!showCropper && imageCanBeCropped" class="crop-overlay">
       <os-button class="crop-confirm" variant="primary" @click="initCropper">
@@ -35,15 +39,20 @@
       <os-button class="crop-confirm" variant="primary" @click="cropImage">
         {{ $t('contribution.teaserImage.cropperConfirm') }}
       </os-button>
-      <base-button
+      <os-button
         class="crop-cancel"
-        icon="close"
-        size="small"
+        variant="danger"
+        appearance="filled"
         circle
-        danger
-        filled
+        size="sm"
+        :title="$t('actions.cancel')"
+        :aria-label="$t('actions.cancel')"
         @click="closeCropper"
-      />
+      >
+        <template #icon>
+          <base-icon name="close" />
+        </template>
+      </os-button>
     </div>
   </div>
 </template>
@@ -206,17 +215,17 @@ export default {
     }
 
     > .crop-cancel {
-      position: absolute;
-      right: $space-x-small;
-      top: $space-x-small;
+      position: absolute !important;
+      right: $space-x-small !important;
+      top: $space-x-small !important;
       z-index: $z-index-surface;
     }
   }
 
   .delete-image-button {
-    position: absolute;
-    top: $space-small;
-    right: $space-small;
+    position: absolute !important;
+    top: $space-small !important;
+    right: $space-small !important;
     z-index: $z-index-surface;
     cursor: pointer;
   }
@@ -245,13 +254,6 @@ export default {
       background-color: $color-neutral-95;
       font-size: $size-icon-large;
       opacity: $opacity-soft;
-    }
-
-    > .base-button {
-      position: absolute;
-      top: $space-small;
-      right: $space-small;
-      z-index: $z-index-surface;
     }
 
     > .supported-formats {

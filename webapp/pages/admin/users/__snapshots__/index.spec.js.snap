@@ -87,17 +87,25 @@ exports[`Users given badges are disabled renders 1`] = `
           style="flex-basis: 30px; width: 30px; padding-left: 8px; padding-right: 8px; margin-bottom: 16px;"
         >
           <button
-            class="base-button --icon-only --circle --filled"
+            aria-label="actions.search"
+            class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px]"
+            data-appearance="filled"
+            data-variant="primary"
             type="submit"
           >
             <span
-              class="base-icon"
+              class="inline-flex items-center"
             >
-              <!---->
+              <span
+                class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+              >
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+              </span>
             </span>
-             
-            <!---->
-             
           </button>
         </div>
       </div>
@@ -368,37 +376,53 @@ exports[`Users given badges are disabled renders 1`] = `
       class="pagination-buttons"
     >
       <button
-        class="previous-button base-button --icon-only --circle"
+        aria-label="pagination.previous"
+        class="previous-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] previous-button"
+        data-appearance="outline"
         data-test="previous-button"
+        data-variant="primary"
         disabled="disabled"
         type="button"
       >
         <span
-          class="base-icon"
+          class="inline-flex items-center"
         >
-          <!---->
+          <span
+            class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+          >
+            <span
+              class="base-icon"
+            >
+              <!---->
+            </span>
+          </span>
         </span>
-         
-        <!---->
-         
       </button>
        
       <!---->
        
       <button
-        class="next-button base-button --icon-only --circle"
+        aria-label="pagination.next"
+        class="next-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] next-button"
+        data-appearance="outline"
         data-test="next-button"
+        data-variant="primary"
         disabled="disabled"
         type="button"
       >
         <span
-          class="base-icon"
+          class="inline-flex items-center"
         >
-          <!---->
+          <span
+            class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+          >
+            <span
+              class="base-icon"
+            >
+              <!---->
+            </span>
+          </span>
         </span>
-         
-        <!---->
-         
       </button>
     </div>
      
@@ -494,17 +518,25 @@ exports[`Users given badges are enabled renders 1`] = `
           style="flex-basis: 30px; width: 30px; padding-left: 8px; padding-right: 8px; margin-bottom: 16px;"
         >
           <button
-            class="base-button --icon-only --circle --filled"
+            aria-label="actions.search"
+            class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px]"
+            data-appearance="filled"
+            data-variant="primary"
             type="submit"
           >
             <span
-              class="base-icon"
+              class="inline-flex items-center"
             >
-              <!---->
+              <span
+                class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+              >
+                <span
+                  class="base-icon"
+                >
+                  <!---->
+                </span>
+              </span>
             </span>
-             
-            <!---->
-             
           </button>
         </div>
       </div>
@@ -710,17 +742,25 @@ exports[`Users given badges are enabled renders 1`] = `
                 to="[object Object]"
               >
                 <button
-                  class="base-button --icon-only --circle --filled"
+                  aria-label="actions.edit"
+                  class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px]"
+                  data-appearance="filled"
+                  data-variant="primary"
                   type="button"
                 >
                   <span
-                    class="base-icon"
+                    class="inline-flex items-center"
                   >
-                    <!---->
+                    <span
+                      class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                    >
+                      <span
+                        class="base-icon"
+                      >
+                        <!---->
+                      </span>
+                    </span>
                   </span>
-                   
-                  <!---->
-                   
                 </button>
               </nuxt-link-stub>
             </td>
@@ -804,17 +844,25 @@ exports[`Users given badges are enabled renders 1`] = `
                 to="[object Object]"
               >
                 <button
-                  class="base-button --icon-only --circle --filled"
+                  aria-label="actions.edit"
+                  class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px]"
+                  data-appearance="filled"
+                  data-variant="primary"
                   type="button"
                 >
                   <span
-                    class="base-icon"
+                    class="inline-flex items-center"
                   >
-                    <!---->
+                    <span
+                      class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                    >
+                      <span
+                        class="base-icon"
+                      >
+                        <!---->
+                      </span>
+                    </span>
                   </span>
-                   
-                  <!---->
-                   
                 </button>
               </nuxt-link-stub>
             </td>
@@ -827,37 +875,53 @@ exports[`Users given badges are enabled renders 1`] = `
       class="pagination-buttons"
     >
       <button
-        class="previous-button base-button --icon-only --circle"
+        aria-label="pagination.previous"
+        class="previous-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] previous-button"
+        data-appearance="outline"
         data-test="previous-button"
+        data-variant="primary"
         disabled="disabled"
         type="button"
       >
         <span
-          class="base-icon"
+          class="inline-flex items-center"
         >
-          <!---->
+          <span
+            class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+          >
+            <span
+              class="base-icon"
+            >
+              <!---->
+            </span>
+          </span>
         </span>
-         
-        <!---->
-         
       </button>
        
       <!---->
        
       <button
-        class="next-button base-button --icon-only --circle"
+        aria-label="pagination.next"
+        class="next-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] next-button"
+        data-appearance="outline"
         data-test="next-button"
+        data-variant="primary"
         disabled="disabled"
         type="button"
       >
         <span
-          class="base-icon"
+          class="inline-flex items-center"
         >
-          <!---->
+          <span
+            class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+          >
+            <span
+              class="base-icon"
+            >
+              <!---->
+            </span>
+          </span>
         </span>
-         
-        <!---->
-         
       </button>
     </div>
      

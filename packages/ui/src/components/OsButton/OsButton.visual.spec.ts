@@ -122,4 +122,85 @@ test.describe('OsButton visual regression', () => {
     await expect(root.locator('.flex-col').first()).toHaveScreenshot('full-width.png')
     await checkA11y(page)
   })
+
+  test('icon', async ({ page }) => {
+    await page.goto(`${STORY_URL}--icon&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+    await expect(root.locator('.flex')).toHaveScreenshot('icon.png')
+    await checkA11y(page)
+  })
+
+  test('icon only', async ({ page }) => {
+    await page.goto(`${STORY_URL}--icon-only&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+    await expect(root.locator('.flex')).toHaveScreenshot('icon-only.png')
+    await checkA11y(page)
+  })
+
+  test('icon sizes', async ({ page }) => {
+    await page.goto(`${STORY_URL}--icon-sizes&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+    await expect(root.locator('.flex')).toHaveScreenshot('icon-sizes.png')
+    await checkA11y(page)
+  })
+
+  test('icon appearances', async ({ page }) => {
+    await page.goto(`${STORY_URL}--icon-appearances&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+    await expect(root.locator('.flex-col').first()).toHaveScreenshot('icon-appearances.png')
+    await checkA11y(page)
+  })
+
+  test('circle', async ({ page }) => {
+    await page.goto(`${STORY_URL}--circle&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+    await expect(root.locator('.flex')).toHaveScreenshot('circle.png')
+    await checkA11y(page)
+  })
+
+  test('circle sizes', async ({ page }) => {
+    await page.goto(`${STORY_URL}--circle-sizes&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+    await expect(root.locator('.flex-col').first()).toHaveScreenshot('circle-sizes.png')
+    await checkA11y(page)
+  })
+
+  test('circle appearances', async ({ page }) => {
+    await page.goto(`${STORY_URL}--circle-appearances&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+    await expect(root.locator('.flex-col').first()).toHaveScreenshot('circle-appearances.png')
+    await checkA11y(page)
+  })
+
+  test('loading', async ({ page }) => {
+    await page.goto(`${STORY_URL}--loading&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+    // Pause animations for deterministic screenshots
+    await page.evaluate(() => {
+      document.querySelectorAll('.os-button__spinner').forEach((el) => {
+        ;(el as HTMLElement).style.animationPlayState = 'paused'
+      })
+      document.querySelectorAll('.os-button__spinner circle').forEach((el) => {
+        ;(el as HTMLElement).style.animationPlayState = 'paused'
+      })
+    })
+    await expect(root.locator('.flex-col').first()).toHaveScreenshot('loading.png')
+    await checkA11y(page)
+  })
 })

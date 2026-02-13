@@ -1,16 +1,21 @@
 <template>
   <dropdown class="invite-button" offset="8" :placement="placement" noMouseLeaveClosing>
     <template #default="{ toggleMenu }">
-      <base-button
-        icon="user-plus"
+      <os-button
+        variant="primary"
+        appearance="ghost"
         circle
-        ghost
+        :aria-label="$t('invite-codes.button.tooltip')"
         v-tooltip="{
           content: $t('invite-codes.button.tooltip'),
           placement: 'bottom-start',
         }"
         @click.prevent="toggleMenu"
-      />
+      >
+        <template #icon>
+          <base-icon name="user-plus" />
+        </template>
+      </os-button>
     </template>
     <template #popover>
       <div class="invite-list">
@@ -31,6 +36,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import Dropdown from '~/components/Dropdown'
 import { mapGetters, mapMutations } from 'vuex'
 import InvitationList from '~/components/_new/features/Invitations/InvitationList.vue'
@@ -38,6 +44,7 @@ import { generatePersonalInviteCode, invalidateInviteCode } from '~/graphql/Invi
 
 export default {
   components: {
+    OsButton,
     Dropdown,
     InvitationList,
   },
@@ -66,7 +73,7 @@ export default {
           },
           update: (_, { data: { generatePersonalInviteCode } }) => {
             this.setCurrentUser({
-              ...this.currentUser,
+              ...this.user,
               inviteCodes: [...this.user.inviteCodes, generatePersonalInviteCode],
             })
           },
@@ -85,7 +92,7 @@ export default {
           },
           update: (_, { data: { _invalidateInviteCode } }) => {
             this.setCurrentUser({
-              ...this.currentUser,
+              ...this.user,
               inviteCodes: this.user.inviteCodes.map((inviteCode) => ({
                 ...inviteCode,
                 isValid: inviteCode.code === code ? false : inviteCode.isValid,
@@ -103,10 +110,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.invite-button {
-  color: $color-secondary;
-}
-
 .invite-list {
   max-width: min(400px, 90vw);
   padding: $space-small;

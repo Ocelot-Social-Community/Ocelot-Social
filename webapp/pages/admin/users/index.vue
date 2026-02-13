@@ -12,7 +12,16 @@
             />
           </ds-flex-item>
           <ds-flex-item width="30px">
-            <base-button filled circle type="submit" icon="search" :loading="$apollo.loading" />
+            <os-button
+              variant="primary"
+              appearance="filled"
+              circle
+              type="submit"
+              :loading="$apollo.loading"
+              :aria-label="$t('actions.search')"
+            >
+              <template #icon><base-icon name="search" /></template>
+            </os-button>
           </ds-flex-item>
         </ds-flex>
       </ds-form>
@@ -49,7 +58,7 @@
           {{ scope.row.createdAt | dateTime }}
         </template>
 
-        <template slot="role" slot-scope="scope">
+        <template #role="scope">
           <template v-if="userRoles">
             <select
               v-if="scope.row.id !== currentUser.id"
@@ -70,7 +79,14 @@
               params: { id: scope.row.id },
             }"
           >
-            <base-button icon="pencil" filled circle />
+            <os-button
+              variant="primary"
+              appearance="filled"
+              circle
+              :aria-label="$t('actions.edit')"
+            >
+              <template #icon><base-icon name="pencil" /></template>
+            </os-button>
           </nuxt-link>
         </template>
       </ds-table>
@@ -83,6 +99,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapGetters } from 'vuex'
 import { isEmail } from 'validator'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
@@ -91,6 +108,7 @@ import { FetchAllRoles, updateUserRole } from '~/graphql/admin/Roles'
 
 export default {
   components: {
+    OsButton,
     PaginationButtons,
   },
   data() {

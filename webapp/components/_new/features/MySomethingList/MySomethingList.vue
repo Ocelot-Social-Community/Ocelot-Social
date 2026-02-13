@@ -23,22 +23,32 @@
             <template>
               <slot name="list-item" :item="item" />
               <span class="divider">|</span>
-              <base-button
-                icon="edit"
+              <os-button
+                variant="primary"
+                appearance="ghost"
                 circle
-                ghost
                 @click="handleEditItem(item)"
                 :title="$t('actions.edit')"
+                :aria-label="$t('actions.edit')"
                 data-test="edit-button"
-              />
-              <base-button
-                :title="$t('actions.delete')"
-                icon="trash"
+              >
+                <template #icon>
+                  <base-icon name="edit" />
+                </template>
+              </os-button>
+              <os-button
+                variant="primary"
+                appearance="ghost"
                 circle
-                ghost
+                :title="$t('actions.delete')"
+                :aria-label="$t('actions.delete')"
                 @click="handleDeleteItem(item)"
                 data-test="delete-button"
-              />
+              >
+                <template #icon>
+                  <base-icon name="trash" />
+                </template>
+              </os-button>
             </template>
           </ds-list-item>
         </ds-list>
@@ -47,15 +57,16 @@
 
     <ds-space margin-top="base">
       <ds-space margin-top="base">
-        <base-button
-          filled
-          :disabled="loading || !(!isEditing || (isEditing && !disabled))"
+        <os-button
+          variant="primary"
+          appearance="filled"
+          :disabled="loading || (isEditing && disabled)"
           :loading="loading"
           type="submit"
           data-test="add-save-button"
         >
           {{ isEditing ? $t('actions.save') : texts.addButton }}
-        </base-button>
+        </os-button>
         <os-button
           v-if="isEditing"
           id="cancel"
@@ -198,10 +209,6 @@ export default {
 .divider {
   opacity: 0.4;
   padding: 0 $space-small;
-}
-
-.icon-button {
-  cursor: pointer;
 }
 
 .list-item--high {

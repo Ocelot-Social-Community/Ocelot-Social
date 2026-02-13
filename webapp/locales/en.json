@@ -1,13 +1,17 @@
 {
   "actions": {
     "cancel": "Cancel",
+    "clear": "Clear",
+    "close": "Close",
     "create": "Create",
     "delete": "Delete",
     "edit": "Edit",
     "loading": "loading",
     "loadMore": "load more",
+    "menu": "Open menu",
     "save": "Save",
-    "saveCategories": "Save topics"
+    "saveCategories": "Save topics",
+    "search": "Search"
   },
   "admin": {
     "badges": {
@@ -117,7 +121,9 @@
   "chat": {
     "addRoomHeadline": "Search User for new Chat",
     "cancelSelectMessage": "Cancel",
+    "closeChat": "Close chat",
     "conversationStarted": "Conversation started on:",
+    "expandChat": "Expand chat",
     "isOnline": "is online",
     "isTyping": "is writing...",
     "lastSeen": "last seen ",
@@ -183,6 +189,9 @@
       "url": "must be a valid URL"
     },
     "versus": "Versus"
+  },
+  "component-slider": {
+    "step": "Step {current} of {total}"
   },
   "components": {
     "dateTimeRange": {
@@ -539,6 +548,7 @@
     "changeMemberRole": "The role has been changed to “{role}”!",
     "contentMenu": {
       "inviteLinks": "Invite links",
+      "menuButton": "Group menu",
       "muteGroup": "Mute group",
       "unmuteGroup": "Unmute group",
       "visitGroupPage": "Show group"
@@ -835,6 +845,10 @@
   "observeButton": {
     "observed": "observed"
   },
+  "pagination": {
+    "next": "Next",
+    "previous": "Previous"
+  },
   "post": {
     "comment": {
       "joinGroup": "Joined group „<b>{name}</b>“",
@@ -880,6 +894,10 @@
     },
     "name": "Article",
     "pinned": "Announcement",
+    "sensitiveContent": {
+      "hide": "Hide sensitive content",
+      "show": "Show sensitive content"
+    },
     "takeAction": {
       "name": "Take action"
     },
@@ -1225,6 +1243,7 @@
     "germany": "Germany",
     "imprint": "Imprint",
     "made": "Made with ❤️",
+    "navigation": "Navigation",
     "register": "Registry number",
     "support": "Support",
     "termsAndConditions": "Terms and Conditions",

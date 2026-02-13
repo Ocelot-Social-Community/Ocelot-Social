@@ -4,27 +4,36 @@
     class="notifications-menu"
     :to="{ name: 'notifications' }"
   >
-    <base-button
-      icon="bell"
-      ghost
+    <os-button
+      variant="primary"
+      appearance="ghost"
       circle
-      v-tooltip="{
-        content: $t('header.notifications.tooltip'),
-        placement: 'bottom-start',
-      }"
-    />
-  </nuxt-link>
-  <nuxt-link v-else-if="noMenu" class="notifications-menu" :to="{ name: 'notifications' }">
-    <base-button
-      ghost
-      circle
+      :aria-label="$t('header.notifications.tooltip')"
       v-tooltip="{
         content: $t('header.notifications.tooltip'),
         placement: 'bottom-start',
       }"
     >
-      <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
-    </base-button>
+      <template #icon>
+        <base-icon name="bell" />
+      </template>
+    </os-button>
+  </nuxt-link>
+  <nuxt-link v-else-if="noMenu" class="notifications-menu" :to="{ name: 'notifications' }">
+    <os-button
+      variant="primary"
+      appearance="ghost"
+      circle
+      :aria-label="$t('header.notifications.tooltip')"
+      v-tooltip="{
+        content: $t('header.notifications.tooltip'),
+        placement: 'bottom-start',
+      }"
+    >
+      <template #icon>
+        <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
+      </template>
+    </os-button>
   </nuxt-link>
   <dropdown
     v-else
@@ -35,17 +44,21 @@
     ref="dropdown"
   >
     <template #default="{ toggleMenu }">
-      <base-button
-        ghost
+      <os-button
+        variant="primary"
+        appearance="ghost"
         circle
+        :aria-label="$t('header.notifications.tooltip')"
         v-tooltip="{
           content: $t('header.notifications.tooltip'),
           placement: 'bottom-start',
         }"
         @click="toggleMenu"
       >
-        <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
-      </base-button>
+        <template #icon>
+          <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
+        </template>
+      </os-button>
     </template>
     <template #popover="{ closeMenu }">
       <ds-flex class="notifications-link-container">

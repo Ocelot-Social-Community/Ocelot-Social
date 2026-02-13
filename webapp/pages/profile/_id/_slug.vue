@@ -96,16 +96,19 @@
               @optimistic="optimisticFollow"
               @update="updateFollow"
             />
-            <base-button
-              icon="chat-bubble"
+            <os-button
+              variant="primary"
+              appearance="outline"
+              full-width
               v-tooltip="{
                 content: $t('chat.userProfileButton.tooltip', { name: userName }),
                 placement: 'bottom-start',
               }"
               @click="showOrChangeChat(user.id)"
             >
+              <template #icon><base-icon name="chat-bubble" /></template>
               {{ $t('chat.userProfileButton.label') }}
-            </base-button>
+            </os-button>
           </div>
           <template v-if="user.about">
             <hr />
@@ -145,17 +148,22 @@
           <ds-grid-item :row-span="2" column-span="fullWidth">
             <ds-space centered>
               <nuxt-link :to="{ name: 'post-create-type' }">
-                <base-button
+                <os-button
                   v-if="myProfile"
                   v-tooltip="{
                     content: $t('contribution.newPost'),
                     placement: 'left',
                   }"
                   class="profile-post-add-button"
-                  icon="plus"
+                  variant="primary"
+                  appearance="filled"
                   circle
-                  filled
-                />
+                  :aria-label="$t('contribution.newPost')"
+                >
+                  <template #icon>
+                    <base-icon name="plus" />
+                  </template>
+                </os-button>
               </nuxt-link>
             </ds-space>
           </ds-grid-item>
@@ -498,17 +506,12 @@ export default {
   }
 }
 .profile-post-add-button {
-  box-shadow: $box-shadow-x-large;
+  box-shadow: $box-shadow-x-large !important;
 }
 .action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: $space-x-small;
   margin: $space-small 0;
-
-  > button {
-    margin-bottom: $space-x-small;
-  }
-  > .base-button {
-    display: block;
-    width: 100%;
-  }
 }
 </style>

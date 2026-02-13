@@ -1,20 +1,27 @@
 <template>
   <div class="action-button">
-    <base-button
+    <os-button
+      variant="primary"
+      :appearance="filled ? 'filled' : 'outline'"
       :loading="loading"
       :disabled="disabled"
-      :icon="icon"
       :aria-label="text"
-      :filled="filled"
       circle
       @click="click"
-    />
+    >
+      <template #icon>
+        <base-icon :name="icon" />
+      </template>
+    </os-button>
     <div class="count">{{ count }}</div>
   </div>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
+
 export default {
+  components: { OsButton },
   props: {
     count: { type: Number, required: true },
     text: { type: String, required: true },

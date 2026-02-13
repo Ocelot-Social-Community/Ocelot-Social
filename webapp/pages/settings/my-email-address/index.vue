@@ -18,9 +18,16 @@
         <ds-space class="backendErrors" v-if="backendErrors">
           <ds-text align="center" bold color="danger">{{ backendErrors.message }}</ds-text>
         </ds-space>
-        <base-button icon="check" :disabled="errors" type="submit" filled>
+        <os-button
+          :disabled="!!errors"
+          :loading="loadingData"
+          type="submit"
+          variant="primary"
+          appearance="filled"
+        >
+          <template #icon><base-icon name="check" /></template>
           {{ $t('actions.save') }}
-        </base-button>
+        </os-button>
       </base-card>
     </template>
   </ds-form>
@@ -28,6 +35,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { OsButton } from '@ocelot-social/ui'
 import { AddEmailAddressMutation } from '~/graphql/EmailAddress.js'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import scrollToContent from '../scroll-to-content.js'
@@ -35,12 +43,14 @@ import scrollToContent from '../scroll-to-content.js'
 export default {
   mixins: [scrollToContent],
   components: {
+    OsButton,
     SweetalertIcon,
   },
   data() {
     return {
       backendErrors: null,
       data: null,
+      loadingData: false,
     }
   },
   computed: {
@@ -81,6 +91,7 @@ export default {
   },
   methods: {
     async submit() {
+      this.loadingData = true
       const { email } = this.formData
       try {
         const response = await this.$apollo.mutate({
@@ -108,6 +119,8 @@ export default {
           return
         }
         this.$toast.error(err.message)
+      } finally {
+        this.loadingData = false
       }
     },
   },

@@ -56,7 +56,7 @@ describe('ComponentSlider.vue', () => {
     })
 
     it('click on next Button', async () => {
-      await wrapper.find('.base-button[data-test="next-button"]').trigger('click')
+      await wrapper.find('button[data-test="next-button"]').trigger('click')
       await wrapper.vm.$nextTick()
       expect(propsData.sliderData.sliderSelectorCallback).toHaveBeenCalled()
     })

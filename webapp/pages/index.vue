@@ -4,17 +4,22 @@
     <div :class="POST_ADD_BUTTON_POSITION_TOP ? 'box-add-button-top' : ''">
       <client-only>
         <nuxt-link :to="{ name: 'post-create-type' }" :class="{ 'hide-filter': hideByScroll }">
-          <base-button
+          <os-button
             v-tooltip="{
               content: $t('contribution.newPost'),
               placement: 'left',
             }"
             class="post-add-button"
             :class="POST_ADD_BUTTON_POSITION_TOP ? 'post-add-button-top' : 'post-add-button-bottom'"
-            icon="plus"
-            filled
+            variant="primary"
+            appearance="filled"
             circle
-          />
+            size="xl"
+          >
+            <template #icon>
+              <base-icon name="plus" />
+            </template>
+          </os-button>
         </nuxt-link>
       </client-only>
     </div>
@@ -22,7 +27,7 @@
       <div v-if="SHOW_CONTENT_FILTER_MASONRY_GRID" class="top-filter-menu">
         <div class="filterButtonBox">
           <div class="filterButtonMenu" :class="{ 'hide-filter': hideByScroll }">
-            <base-button
+            <os-button
               class="my-filter-button"
               v-if="
                 !postsFilter['postType_in'] &&
@@ -30,14 +35,14 @@
                 !postsFilter['author'] &&
                 !postsFilter['postsInMyGroups']
               "
-              right
+              variant="primary"
+              appearance="filled"
               @click="showFilter = !showFilter"
-              filled
             >
               {{ $t('contribution.filterMasonryGrid.noFilter') }}
               &nbsp;
-              <base-icon class="my-filter-button" :name="filterButtonIcon"></base-icon>
-            </base-button>
+              <base-icon :name="filterButtonIcon"></base-icon>
+            </os-button>
 
             <header-button
               v-if="filteredPostTypes.includes('Article')"
@@ -143,6 +148,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import postListActions from '~/mixins/postListActions'
 import mobile from '~/mixins/mobile'
 import DonationInfo from '~/components/DonationInfo/DonationInfo.vue'
@@ -165,6 +171,7 @@ export default {
   components: {
     DonationInfo,
     HashtagsFilter,
+    OsButton,
     PostTeaser,
     HcEmpty,
     MasonryGrid,
@@ -233,6 +240,10 @@ export default {
     document.addEventListener('click', this.showFilterMenu)
     window.addEventListener('scroll', this.handleScroll)
   },
+  beforeDestroy() {
+    document.removeEventListener('click', this.showFilterMenu)
+    window.removeEventListener('scroll', this.handleScroll)
+  },
   methods: {
     ...mapMutations({
       resetPostType: 'posts/RESET_POST_TYPE',
@@ -266,10 +277,6 @@ export default {
         }
       }
       this.prevScrollpos = currentScrollPos
-    },
-    beforeDestroy() {
-      document.removeEventListener('click', this.showFilterMenu)
-      window.removeEventListener('scroll', this.handleScroll)
     },
     clearSearch() {
       this.$router.push({ path: '/' })
@@ -349,26 +356,30 @@ export default {
   float: right;
 }
 
-.base-button.--circle.post-add-button-bottom {
-  height: 54px;
-  width: 54px;
-  font-size: 26px;
-  z-index: $z-index-sticky-float;
-  position: fixed;
-  bottom: -5px;
-  left: 98vw;
-  transform: translate(-120%, -120%);
-  box-shadow: $box-shadow-x-large;
+button.post-add-button-bottom {
+  height: 54px !important;
+  width: 54px !important;
+  min-height: 54px !important;
+  min-width: 54px !important;
+  font-size: 26px !important;
+  z-index: $z-index-sticky-float !important;
+  position: fixed !important;
+  bottom: -5px !important;
+  left: 98vw !important;
+  transform: translate(-120%, -120%) !important;
+  box-shadow: $box-shadow-x-large !important;
 }
 
-.base-button.--circle.post-add-button-top {
-  height: 54px;
-  width: 54px;
-  font-size: 26px;
-  z-index: $z-index-sticky-float;
-  position: fixed;
-  top: 80px;
-  box-shadow: $box-shadow-x-large;
+button.post-add-button-top {
+  height: 54px !important;
+  width: 54px !important;
+  min-height: 54px !important;
+  min-width: 54px !important;
+  font-size: 26px !important;
+  z-index: $z-index-sticky-float !important;
+  position: fixed !important;
+  top: 80px !important;
+  box-shadow: $box-shadow-x-large !important;
 }
 
 .top-filter-menu {
@@ -456,9 +467,11 @@ export default {
   .box-add-button-top {
     padding-right: 40px;
   }
-  .base-button.--circle.post-add-button-top {
-    height: 44px;
-    width: 44px;
+  button.post-add-button-top {
+    height: 44px !important;
+    width: 44px !important;
+    min-height: 44px !important;
+    min-width: 44px !important;
     font-size: 23px;
   }
 }

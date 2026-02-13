@@ -1,13 +1,17 @@
 {
   "actions": {
     "cancel": null,
+    "clear": "Svuota",
+    "close": "Chiudi",
     "create": "Crea",
     "delete": "Cancella",
     "edit": "Modifica",
     "loading": "Caricamento in corso",
     "loadMore": "Carica di più",
+    "menu": "Apri menu",
     "save": "Salva",
-    "saveCategories": null
+    "saveCategories": null,
+    "search": "Cerca"
   },
   "admin": {
     "badges": {
@@ -117,7 +121,9 @@
   "chat": {
     "addRoomHeadline": null,
     "cancelSelectMessage": null,
+    "closeChat": "Chiudi chat",
     "conversationStarted": null,
+    "expandChat": "Espandi chat",
     "isOnline": null,
     "isTyping": null,
     "lastSeen": null,
@@ -183,6 +189,9 @@
       "url": null
     },
     "versus": "Verso"
+  },
+  "component-slider": {
+    "step": "Passo {current} di {total}"
   },
   "components": {
     "dateTimeRange": {
@@ -539,6 +548,7 @@
     "changeMemberRole": null,
     "contentMenu": {
       "inviteLinks": null,
+      "menuButton": "Menu del gruppo",
       "muteGroup": null,
       "unmuteGroup": null,
       "visitGroupPage": null
@@ -835,6 +845,10 @@
   "observeButton": {
     "observed": null
   },
+  "pagination": {
+    "next": "Successivo",
+    "previous": "Precedente"
+  },
   "post": {
     "comment": {
       "joinGroup": null,
@@ -880,6 +894,10 @@
     },
     "name": "Messaggio",
     "pinned": null,
+    "sensitiveContent": {
+      "hide": "Nascondi contenuto sensibile",
+      "show": "Mostra contenuto sensibile"
+    },
     "takeAction": {
       "name": "Agire"
     },
@@ -1225,6 +1243,7 @@
     "germany": "Germania",
     "imprint": "Impressum",
     "made": "Con ❤️ fatto",
+    "navigation": "Navigazione",
     "register": "numero di registro",
     "support": null,
     "termsAndConditions": null,

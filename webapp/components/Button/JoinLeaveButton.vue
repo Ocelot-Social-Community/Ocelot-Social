@@ -1,26 +1,31 @@
 <template>
-  <base-button
-    class="join-leave-button"
+  <os-button
+    data-test="join-leave-btn"
+    :variant="isMember && hovered ? 'danger' : 'primary'"
+    :appearance="filled || (isMember && !hovered) ? 'filled' : 'outline'"
     :disabled="disabled"
     :loading="localLoading"
-    :icon="icon"
-    :filled="filled || (isMember && !hovered)"
-    :danger="isMember && hovered"
+    full-width
     v-tooltip="tooltip"
-    @mouseenter.native="onHover"
-    @mouseleave.native="hovered = false"
+    @mouseenter="onHover"
+    @mouseleave="hovered = false"
     @click.prevent="toggle"
   >
+    <template #icon>
+      <base-icon :name="icon" />
+    </template>
     {{ label }}
-  </base-button>
+  </os-button>
 </template>
 
 <script>
 import { mapMutations } from 'vuex'
+import { OsButton } from '@ocelot-social/ui'
 import { joinGroupMutation, leaveGroupMutation } from '~/graphql/groups'
 
 export default {
   name: 'JoinLeaveButton',
+  components: { OsButton },
   props: {
     group: { type: Object, required: true },
     userId: { type: String, required: true },
@@ -146,10 +151,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss">
-.join-leave-button {
-  display: block;
-  width: 100%;
-}
-</style>

@@ -1,27 +1,30 @@
 <template>
-  <span>
-    <base-button
-      class="my-filter-button my-filter-button-selected"
-      right
-      @click="clickButton"
-      filled
-    >
+  <span class="header-button-wrapper">
+    <os-button class="my-filter-button" variant="primary" appearance="filled" @click="clickButton">
       {{ title }}
-    </base-button>
-    <base-button
+    </os-button>
+    <os-button
       class="filter-remove"
-      @click="clickRemove"
-      icon="close"
-      :title="titleRemove"
-      size="small"
+      variant="primary"
+      appearance="filled"
       circle
-      filled
-    />
+      size="sm"
+      :title="titleRemove"
+      :aria-label="titleRemove"
+      @click.stop="clickRemove"
+    >
+      <template #icon>
+        <base-icon name="close" />
+      </template>
+    </os-button>
   </span>
 </template>
 <script>
+import { OsButton } from '@ocelot-social/ui'
+
 export default {
   name: 'HeaderButton',
+  components: { OsButton },
   props: {
     title: {
       type: String,
@@ -43,14 +46,21 @@ export default {
 }
 </script>
 <style lang="scss">
-.my-filter-button-selected {
-  padding-right: 36px;
-}
-
-.base-button.filter-remove {
+.header-button-wrapper {
+  display: inline-flex;
+  align-items: center;
   position: relative;
-  margin-left: -37px;
-  top: -5px;
   margin-right: 8px;
+
+  > .my-filter-button {
+    padding-right: 36px !important;
+  }
+
+  > .filter-remove {
+    position: absolute !important;
+    right: 4px !important;
+    top: 50% !important;
+    transform: translateY(-50%);
+  }
 }
 </style>

@@ -8,21 +8,29 @@
         v-model="comment"
         :schema="{ type: 'string', max: 30 }"
       />
-      <base-button
+      <os-button
+        variant="primary"
+        appearance="outline"
         circle
         class="generate-invite-code"
         :aria-label="$t('invite-codes.generate-code')"
-        icon="plus"
         type="submit"
         :disabled="disabled"
-      />
+      >
+        <template #icon>
+          <base-icon name="plus" />
+        </template>
+      </os-button>
     </form>
   </div>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
+
 export default {
   name: 'CreateInvitation',
+  components: { OsButton },
   props: {
     disabled: {
       type: Boolean,

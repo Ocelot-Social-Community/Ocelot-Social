@@ -54,15 +54,21 @@
         class="shout-button"
         node-type="Comment"
       />
-      <base-button
+      <os-button
         :title="$t('post.comment.reply')"
-        icon="level-down"
+        :aria-label="$t('post.comment.reply')"
         class="reply-button"
+        variant="primary"
+        appearance="outline"
         circle
-        size="small"
+        size="sm"
         v-scroll-to="'.editor'"
         @click="reply"
-      />
+      >
+        <template #icon>
+          <base-icon name="level-down" />
+        </template>
+      </os-button>
     </div>
   </base-card>
 </template>

@@ -1,24 +1,29 @@
 <template>
-  <base-button
-    class="track-button"
+  <os-button
+    data-test="follow-btn"
+    :variant="isFollowed && hovered ? 'danger' : 'primary'"
+    :appearance="isFollowed && !hovered ? 'filled' : 'outline'"
     :disabled="disabled || !followId"
     :loading="loading"
-    :icon="icon"
-    :filled="isFollowed && !hovered"
-    :danger="isFollowed && hovered"
-    @mouseenter.native="onHover"
-    @mouseleave.native="hovered = false"
+    full-width
+    @mouseenter="onHover"
+    @mouseleave="hovered = false"
     @click.prevent="toggle"
   >
+    <template #icon>
+      <base-icon :name="icon" />
+    </template>
     {{ label }}
-  </base-button>
+  </os-button>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { followUserMutation, unfollowUserMutation } from '~/graphql/User'
 
 export default {
   name: 'HcFollowButton',
+  components: { OsButton },
   props: {
     followId: { type: String, default: null },
     isFollowed: { type: Boolean, default: false },
@@ -82,10 +87,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss">
-.track-button {
-  display: block;
-  width: 100%;
-}
-</style>

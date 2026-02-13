@@ -1,13 +1,17 @@
 {
   "actions": {
     "cancel": "Cancelar",
+    "clear": "Limpar",
+    "close": "Fechar",
     "create": "Criar",
     "delete": "Apagar",
     "edit": "Editar",
     "loading": "Carregando",
     "loadMore": "Carregar mais",
+    "menu": "Abrir menu",
     "save": "Salvar",
-    "saveCategories": null
+    "saveCategories": null,
+    "search": "Pesquisar"
   },
   "admin": {
     "badges": {
@@ -117,7 +121,9 @@
   "chat": {
     "addRoomHeadline": null,
     "cancelSelectMessage": null,
+    "closeChat": "Fechar chat",
     "conversationStarted": null,
+    "expandChat": "Expandir chat",
     "isOnline": null,
     "isTyping": null,
     "lastSeen": null,
@@ -183,6 +189,9 @@
       "url": "deve ser uma URL válida"
     },
     "versus": "Contra"
+  },
+  "component-slider": {
+    "step": "Passo {current} de {total}"
   },
   "components": {
     "dateTimeRange": {
@@ -539,6 +548,7 @@
     "changeMemberRole": null,
     "contentMenu": {
       "inviteLinks": null,
+      "menuButton": "Menu do grupo",
       "muteGroup": null,
       "unmuteGroup": null,
       "visitGroupPage": null
@@ -835,6 +845,10 @@
   "observeButton": {
     "observed": null
   },
+  "pagination": {
+    "next": "Seguinte",
+    "previous": "Anterior"
+  },
   "post": {
     "comment": {
       "joinGroup": null,
@@ -880,6 +894,10 @@
     },
     "name": "Postar",
     "pinned": "Anúncio",
+    "sensitiveContent": {
+      "hide": "Ocultar conteúdo sensível",
+      "show": "Mostrar conteúdo sensível"
+    },
     "takeAction": {
       "name": "Tomar uma ação"
     },
@@ -1225,6 +1243,7 @@
     "germany": "Alemanha",
     "imprint": "Impressão",
     "made": "Feito com ❤️",
+    "navigation": "Navegação",
     "register": "número de registo",
     "support": null,
     "termsAndConditions": "Termos e Condições",

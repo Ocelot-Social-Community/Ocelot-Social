@@ -4,16 +4,24 @@
       <base-card>
         <hc-editor ref="editor" :users="users" :value="form.content" @input="updateEditorContent" />
         <div class="buttons">
-          <base-button
+          <os-button
+            variant="primary"
+            appearance="outline"
             :disabled="disabled && !update"
             @click="handleCancel"
             data-test="cancel-button"
           >
             {{ $t('actions.cancel') }}
-          </base-button>
-          <base-button type="submit" :loading="loading" :disabled="disabled || errors" filled>
+          </os-button>
+          <os-button
+            variant="primary"
+            appearance="filled"
+            type="submit"
+            :loading="loading"
+            :disabled="disabled || !!errors"
+          >
             {{ $t('post.comment.submit') }}
-          </base-button>
+          </os-button>
         </div>
       </base-card>
     </template>
@@ -21,6 +29,7 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import HcEditor from '~/components/Editor/Editor'
 import { COMMENT_MIN_LENGTH } from '~/constants/comment'
 import { minimisedUserQuery } from '~/graphql/User'
@@ -28,6 +37,7 @@ import CommentMutations from '~/graphql/CommentMutations'
 
 export default {
   components: {
+    OsButton,
     HcEditor,
   },
   props: {
@@ -79,54 +89,49 @@ export default {
         this.closeEditWindow()
       }
     },
-    handleSubmit() {
-      let mutateParams
-      if (!this.update) {
-        mutateParams = {
-          mutation: CommentMutations(this.$i18n).CreateComment,
-          variables: {
-            postId: this.post.id,
-            content: this.form.content,
-          },
-        }
-      } else {
-        mutateParams = {
-          mutation: CommentMutations(this.$i18n).UpdateComment,
-          variables: {
-            id: this.comment.id,
-            content: this.form.content,
-          },
-        }
-      }
+    async handleSubmit() {
+      const mutateParams = !this.update
+        ? {
+            mutation: CommentMutations(this.$i18n).CreateComment,
+            variables: {
+              postId: this.post.id,
+              content: this.form.content,
+            },
+          }
+        : {
+            mutation: CommentMutations(this.$i18n).UpdateComment,
+            variables: {
+              id: this.comment.id,
+              content: this.form.content,
+            },
+          }
 
       this.loading = true
       this.disabled = true
-      this.$apollo
-        .mutate(mutateParams)
-        .then((res) => {
-          this.loading = false
-          if (!this.update) {
-            const {
-              data: { CreateComment },
-            } = res
-            this.$emit('createComment', CreateComment)
-            this.clear()
-            this.$toast.success(this.$t('post.comment.submitted'))
-            this.disabled = false
-          } else {
-            const {
-              data: { UpdateComment },
-            } = res
-            this.$emit('updateComment', UpdateComment)
-            this.$emit('collapse')
-            this.$toast.success(this.$t('post.comment.updated'))
-            this.disabled = false
-            this.closeEditWindow()
-          }
-        })
-        .catch((err) => {
-          this.$toast.error(err.message)
-        })
+      try {
+        const res = await this.$apollo.mutate(mutateParams)
+        if (!this.update) {
+          const {
+            data: { CreateComment },
+          } = res
+          this.$emit('createComment', CreateComment)
+          this.clear()
+          this.$toast.success(this.$t('post.comment.submitted'))
+        } else {
+          const {
+            data: { UpdateComment },
+          } = res
+          this.$emit('updateComment', UpdateComment)
+          this.$emit('collapse')
+          this.$toast.success(this.$t('post.comment.updated'))
+          this.closeEditWindow()
+        }
+      } catch (err) {
+        this.$toast.error(err.message)
+        this.disabled = false
+      } finally {
+        this.loading = false
+      }
     },
   },
   apollo: {
@@ -152,7 +157,7 @@ export default {
     display: flex;
     justify-content: flex-end;
 
-    > .base-button {
+    > button {
       margin-left: $space-x-small;
     }
   }

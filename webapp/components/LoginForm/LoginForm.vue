@@ -36,9 +36,17 @@
         <nuxt-link to="/password-reset/request">
           {{ $t('login.forgotPassword') }}
         </nuxt-link>
-        <base-button :loading="pending" filled name="submit" type="submit" icon="sign-in">
+        <os-button
+          :loading="pending"
+          variant="primary"
+          appearance="filled"
+          full-width
+          name="submit"
+          type="submit"
+        >
+          <template #icon><base-icon name="sign-in" /></template>
           {{ $t('login.login') }}
-        </base-button>
+        </os-button>
         <p>
           {{ $t('login.no-account') }}
           <nuxt-link to="/registration">{{ $t('login.register') }}</nuxt-link>
@@ -58,12 +66,14 @@ import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParams
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
 import ShowPassword from '../ShowPassword/ShowPassword.vue'
+import { OsButton } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   components: {
     LocaleSwitch,
     Logo,
+    OsButton,
     PageParamsLink,
     ShowPassword,
   },
@@ -134,9 +144,7 @@ export default {
   max-width: 620px;
   margin: auto;
 
-  .base-button {
-    display: block;
-    width: 100%;
+  button[type='submit'] {
     margin-top: $space-large;
     margin-bottom: $space-small;
   }

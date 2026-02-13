@@ -5,6 +5,7 @@ import Notifications from './notifications.vue'
 const localVue = global.localVue
 
 describe('notifications.vue', () => {
+  let wrapper
   let mocks
   let store
 
@@ -65,29 +66,16 @@ describe('notifications.vue', () => {
         },
       },
     })
+    wrapper = render(Notifications, { mocks, localVue, store })
   })
 
   describe('mount', () => {
     it('renders', () => {
-      expect(
-        render(Notifications, {
-          store,
-          mocks,
-          localVue,
-        }),
-      ).toMatchSnapshot()
+      expect(wrapper.container).toMatchSnapshot()
     })
   })
 
   describe('Notifications', () => {
-    beforeEach(() => {
-      render(Notifications, {
-        store,
-        mocks,
-        localVue,
-      })
-    })
-
     it('check all button works', async () => {
       const button = screen.getByText('settings.notifications.checkAll')
       await fireEvent.click(button)
@@ -98,7 +86,7 @@ describe('notifications.vue', () => {
       }
 
       // Check that the button is disabled
-      expect(button.disabled).toBe(true)
+      expect(button.closest('button').disabled).toBe(true)
     })
 
     it('uncheck all button works', async () => {
@@ -111,7 +99,7 @@ describe('notifications.vue', () => {
       }
 
       // Check that the button is disabled
-      expect(button.disabled).toBe(true)
+      expect(button.closest('button').disabled).toBe(true)
     })
 
     it('clicking on submit keeps set values and shows success message', async () => {

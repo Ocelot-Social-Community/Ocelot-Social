@@ -1,30 +1,41 @@
 <template>
   <div>
     <nuxt-link to="/map">
-      <base-button
+      <os-button
         class="map-button"
+        variant="primary"
+        appearance="ghost"
         circle
-        ghost
+        :aria-label="$t('header.map.tooltip')"
         v-tooltip="{
           content: $t('header.map.tooltip'),
           placement: 'bottom-start',
         }"
       >
-        <base-icon name="globe-detailed" size="large" />
-      </base-button>
+        <template #icon>
+          <base-icon name="globe-detailed" size="large" />
+        </template>
+      </os-button>
     </nuxt-link>
   </div>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
+
 export default {
   name: 'MapButton',
+  components: { OsButton },
 }
 </script>
 
 <style lang="scss">
 .map-button {
-  margin-left: 4px;
-  margin-right: 4px;
+  margin-left: 3px;
+  margin-right: 3px;
+
+  .base-icon > .svg.--large {
+    margin-left: 0;
+  }
 }
 </style>

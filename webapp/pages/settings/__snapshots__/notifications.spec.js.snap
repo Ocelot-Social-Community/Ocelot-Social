@@ -1,47 +1,213 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`notifications.vue mount renders 1`] = `
-<article class="base-card">
-  <h2 class="title">settings.notifications.name</h2>
-  <div class="ds-space" style="margin-top: 16px; margin-bottom: 16px;">
-    <div class="ds-space" style="margin-bottom: 8px;">
-      <h4>settings.notifications.post</h4>
-    </div>
-    <div class="notifcation-settings-section">
-      <div class="ds-space" style="margin-bottom: 8px;"><input id="commentOnObservedPost" type="checkbox"> <label for="commentOnObservedPost" class="label">
+<div>
+  <article
+    class="base-card"
+  >
+    <h2
+      class="title"
+    >
+      settings.notifications.name
+    </h2>
+     
+    <div
+      class="ds-space"
+      style="margin-top: 16px; margin-bottom: 16px;"
+    >
+      <div
+        class="ds-space"
+        style="margin-bottom: 8px;"
+      >
+        <h4>
+          settings.notifications.post
+        </h4>
+      </div>
+       
+      <div
+        class="notifcation-settings-section"
+      >
+        <div
+          class="ds-space"
+          style="margin-bottom: 8px;"
+        >
+          <input
+            id="commentOnObservedPost"
+            type="checkbox"
+          />
+           
+          <label
+            class="label"
+            for="commentOnObservedPost"
+          >
+            
           settings.notifications.commentOnObservedPost
-        </label></div>
-      <div class="ds-space" style="margin-bottom: 8px;"><input id="mention" type="checkbox"> <label for="mention" class="label">
+        
+          </label>
+        </div>
+        <div
+          class="ds-space"
+          style="margin-bottom: 8px;"
+        >
+          <input
+            id="mention"
+            type="checkbox"
+          />
+           
+          <label
+            class="label"
+            for="mention"
+          >
+            
           settings.notifications.mention
-        </label></div>
+        
+          </label>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="ds-space" style="margin-top: 16px; margin-bottom: 16px;">
-    <div class="ds-space" style="margin-bottom: 8px;">
-      <h4>settings.notifications.group</h4>
-    </div>
-    <div class="notifcation-settings-section">
-      <div class="ds-space" style="margin-bottom: 8px;"><input id="groupMemberJoined" type="checkbox"> <label for="groupMemberJoined" class="label">
+    <div
+      class="ds-space"
+      style="margin-top: 16px; margin-bottom: 16px;"
+    >
+      <div
+        class="ds-space"
+        style="margin-bottom: 8px;"
+      >
+        <h4>
+          settings.notifications.group
+        </h4>
+      </div>
+       
+      <div
+        class="notifcation-settings-section"
+      >
+        <div
+          class="ds-space"
+          style="margin-bottom: 8px;"
+        >
+          <input
+            id="groupMemberJoined"
+            type="checkbox"
+          />
+           
+          <label
+            class="label"
+            for="groupMemberJoined"
+          >
+            
           settings.notifications.groupMemberJoined
-        </label></div>
-      <div class="ds-space" style="margin-bottom: 8px;"><input id="groupMemberLeft" type="checkbox"> <label for="groupMemberLeft" class="label">
+        
+          </label>
+        </div>
+        <div
+          class="ds-space"
+          style="margin-bottom: 8px;"
+        >
+          <input
+            id="groupMemberLeft"
+            type="checkbox"
+          />
+           
+          <label
+            class="label"
+            for="groupMemberLeft"
+          >
+            
           settings.notifications.groupMemberLeft
-        </label></div>
-      <div class="ds-space" style="margin-bottom: 8px;"><input id="groupMemberRemoved" type="checkbox"> <label for="groupMemberRemoved" class="label">
+        
+          </label>
+        </div>
+        <div
+          class="ds-space"
+          style="margin-bottom: 8px;"
+        >
+          <input
+            id="groupMemberRemoved"
+            type="checkbox"
+          />
+           
+          <label
+            class="label"
+            for="groupMemberRemoved"
+          >
+            
           settings.notifications.groupMemberRemoved
-        </label></div>
-      <div class="ds-space" style="margin-bottom: 8px;"><input id="groupMemberRoleChanged" type="checkbox"> <label for="groupMemberRoleChanged" class="label">
+        
+          </label>
+        </div>
+        <div
+          class="ds-space"
+          style="margin-bottom: 8px;"
+        >
+          <input
+            id="groupMemberRoleChanged"
+            type="checkbox"
+          />
+           
+          <label
+            class="label"
+            for="groupMemberRoleChanged"
+          >
+            
           settings.notifications.groupMemberRoleChanged
-        </label></div>
+        
+          </label>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="ds-space" style="margin-top: 24px; margin-bottom: 8px;"><button type="button" data-appearance="outline" class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)] h-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)]">
+     
+    <div
+      class="ds-space"
+      style="margin-top: 24px; margin-bottom: 8px;"
+    >
+      <button
+        class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)] h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)]"
+        data-appearance="outline"
+        data-variant="primary"
+        type="button"
+      >
+        <span
+          class="inline-flex items-center"
+        >
+          
       settings.notifications.checkAll
-    </button> <button type="button" data-appearance="outline" class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)] h-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)]">
+    
+        </span>
+      </button>
+       
+      <button
+        class="inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] bg-transparent shadow-none disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)] h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)]"
+        data-appearance="outline"
+        data-variant="primary"
+        type="button"
+      >
+        <span
+          class="inline-flex items-center"
+        >
+          
       settings.notifications.uncheckAll
-    </button> <button type="button" disabled="disabled" data-appearance="filled" class="save-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] save-button">
+    
+        </span>
+      </button>
+       
+      <button
+        class="save-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] save-button"
+        data-appearance="filled"
+        data-variant="primary"
+        disabled="disabled"
+        type="button"
+      >
+        <span
+          class="inline-flex items-center"
+        >
+          
       actions.save
-    </button></div>
-  <!---->
-</article>
+    
+        </span>
+      </button>
+    </div>
+     
+    <!---->
+  </article>
+</div>
 `;

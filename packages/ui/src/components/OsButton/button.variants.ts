@@ -45,7 +45,7 @@ export const buttonVariants = cva(
         ],
         outline: [
           'bg-transparent shadow-none',
-          // Disabled: gray border and text
+          // Disabled: light gray border and gray text
           'disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)]',
         ],
         ghost: [
@@ -55,10 +55,10 @@ export const buttonVariants = cva(
         ],
       },
       size: {
-        sm: 'h-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle', // base-button --small
-        md: 'h-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle',
-        lg: 'h-12 px-6 py-3 text-lg',
-        xl: 'h-14 px-8 py-4 text-xl',
+        sm: 'h-[26px] min-w-[26px] px-[8px] py-0 text-[12px] leading-[normal] tracking-[0.6px] rounded-[5px] overflow-hidden whitespace-nowrap align-middle',
+        md: 'h-[36px] min-w-[36px] px-[16px] py-0 text-[15px] leading-[normal] rounded-[5px] align-middle',
+        lg: 'h-12 min-w-12 px-6 py-3 text-lg',
+        xl: 'h-14 min-w-14 px-8 py-4 text-xl',
       },
       fullWidth: {
         true: 'w-full',

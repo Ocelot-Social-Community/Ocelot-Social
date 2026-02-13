@@ -1,25 +1,27 @@
 <template>
   <section class="categories-select">
-    <base-button
+    <os-button
       v-for="category in sortCategories(categories)"
       :key="category.id"
       :data-test="categoryButtonsId(category.id)"
       @click="toggleCategory(category.id)"
-      :filled="isActive(category.id)"
+      variant="primary"
+      :appearance="isActive(category.id) ? 'filled' : 'outline'"
       :disabled="isDisabled(category.id)"
-      :icon="category.icon"
-      size="small"
+      size="sm"
       v-tooltip="{
         content: $t(`contribution.category.description.${category.slug}`),
         placement: 'bottom-start',
       }"
     >
+      <template #icon><base-icon :name="category.icon" /></template>
       {{ $t(`contribution.category.name.${category.slug}`) }}
-    </base-button>
+    </os-button>
   </section>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { CATEGORIES_MAX } from '~/constants/categories.js'
 import xor from 'lodash/xor'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
@@ -31,6 +33,7 @@ export default {
       default: null,
     },
   },
+  components: { OsButton },
   mixins: [SortCategories, GetCategories],
   props: {
     existingCategoryIds: { type: Array, default: () => [] },
@@ -83,7 +86,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
 
-  > .base-button {
+  > button {
     margin-right: $space-xx-small;
     margin-bottom: $space-xx-small;
   }

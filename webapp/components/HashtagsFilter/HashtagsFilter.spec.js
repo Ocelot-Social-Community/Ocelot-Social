@@ -34,7 +34,7 @@ describe('HashtagsFilter.vue', () => {
 
       describe('click clear search button', () => {
         it('emits clearSearch', () => {
-          wrapper.find('.base-button').trigger('click')
+          wrapper.find('button[data-test="clear-search-button"]').trigger('click')
           expect(wrapper.emitted().clearSearch).toHaveLength(1)
         })
       })

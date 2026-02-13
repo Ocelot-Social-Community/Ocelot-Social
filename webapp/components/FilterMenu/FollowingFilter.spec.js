@@ -44,19 +44,21 @@ describe('FollowingFilter', () => {
       const wrapper = Wrapper()
       expect(
         wrapper
-          .find('.following-filter .filter-list .follower-item .base-button')
-          .classes('--filled'),
+          .find('.following-filter .filter-list .follower-item button[data-appearance="filled"]')
+          .exists(),
       ).toBe(true)
       expect(
         wrapper
-          .find('.following-filter .filter-list .posts-in-my-groups-item .base-button')
-          .classes('--filled'),
+          .find(
+            '.following-filter .filter-list .posts-in-my-groups-item button[data-appearance="filled"]',
+          )
+          .exists(),
       ).toBe(true)
     })
 
     describe('click "filter-by-followed" button', () => {
       it('calls TOGGLE_FILTER_BY_FOLLOWED', () => {
-        wrapper.find('.following-filter .filter-list .follower-item .base-button').trigger('click')
+        wrapper.find('.following-filter .filter-list .follower-item button').trigger('click')
         expect(mutations['posts/TOGGLE_FILTER_BY_FOLLOWED']).toHaveBeenCalledWith({}, 'u34')
       })
     })
@@ -64,7 +66,7 @@ describe('FollowingFilter', () => {
     describe('click "filter-by-my-groups" button', () => {
       it('calls TOGGLE_FILTER_BY_MY_GROUPS', () => {
         wrapper
-          .find('.following-filter .filter-list .posts-in-my-groups-item .base-button')
+          .find('.following-filter .filter-list .posts-in-my-groups-item button')
           .trigger('click')
         expect(mutations['posts/TOGGLE_FILTER_BY_MY_GROUPS']).toHaveBeenCalled()
       })
@@ -72,9 +74,7 @@ describe('FollowingFilter', () => {
     describe('clears follower filter', () => {
       it('when all button is clicked', async () => {
         wrapper = await Wrapper()
-        const clearFollowerButton = wrapper.find(
-          '.following-filter .item-all-follower .base-button',
-        )
+        const clearFollowerButton = wrapper.find('.following-filter .item-all-follower button')
         clearFollowerButton.trigger('click')
         expect(mutations['posts/RESET_FOLLOWERS_FILTER']).toHaveBeenCalledTimes(1)
       })

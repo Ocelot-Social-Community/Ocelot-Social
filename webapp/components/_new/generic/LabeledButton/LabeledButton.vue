@@ -1,12 +1,24 @@
 <template>
   <div class="labeled-button">
-    <base-button circle :icon="icon" :filled="filled" @click="(event) => $emit('click', event)" />
+    <os-button
+      variant="primary"
+      circle
+      :appearance="filled ? 'filled' : 'outline'"
+      @click="(event) => $emit('click', event)"
+    >
+      <template #icon>
+        <base-icon :name="icon" />
+      </template>
+    </os-button>
     <label class="label">{{ label }}</label>
   </div>
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
+
 export default {
+  components: { OsButton },
   props: {
     filled: {
       type: Boolean,

@@ -56,7 +56,7 @@ describe('blocked-users.vue', () => {
 
       describe('click unblock', () => {
         beforeEach(() => {
-          wrapper.find('.base-button').trigger('click')
+          wrapper.find('[data-test="unblock-btn"]').trigger('click')
         })
 
         it('calls unblock mutation with given user', () => {

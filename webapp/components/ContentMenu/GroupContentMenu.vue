@@ -2,13 +2,19 @@
   <dropdown class="group-content-menu" :placement="placement" offset="5">
     <template #default="{ toggleMenu }">
       <slot name="button" :toggleMenu="toggleMenu">
-        <base-button
-          icon="ellipsis-v"
-          size="small"
+        <os-button
+          variant="primary"
+          appearance="outline"
+          size="sm"
           circle
-          @click.prevent="toggleMenu()"
+          :aria-label="$t('group.contentMenu.menuButton')"
           data-test="group-menu-button"
-        />
+          @click.prevent="toggleMenu()"
+        >
+          <template #icon>
+            <base-icon name="ellipsis-v" />
+          </template>
+        </os-button>
       </slot>
     </template>
     <template #popover="{ toggleMenu }">
@@ -32,11 +38,13 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import Dropdown from '~/components/Dropdown'
 
 export default {
   name: 'GroupContentMenu',
   components: {
+    OsButton,
     Dropdown,
   },
   props: {

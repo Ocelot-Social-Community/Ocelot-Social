@@ -78,23 +78,23 @@ describe('MySomethingList.vue', () => {
         })
 
         it('displays the edit button', () => {
-          expect(wrapper.find('.base-button[data-test="edit-button"]').exists()).toBe(true)
+          expect(wrapper.find('button[data-test="edit-button"]').exists()).toBe(true)
         })
 
         it('displays the delete button', () => {
-          expect(wrapper.find('.base-button[data-test="delete-button"]').exists()).toBe(true)
+          expect(wrapper.find('button[data-test="delete-button"]').exists()).toBe(true)
         })
       })
 
       describe('editing item', () => {
         beforeEach(async () => {
-          const editButton = wrapper.find('.base-button[data-test="edit-button"]')
+          const editButton = wrapper.find('button[data-test="edit-button"]')
           editButton.trigger('click')
           await Vue.nextTick()
         })
 
         it('disables adding items while editing', () => {
-          const submitButton = wrapper.find('.base-button[data-test="add-save-button"]')
+          const submitButton = wrapper.find('button[data-test="add-save-button"]')
           expect(submitButton.text()).not.toContain('settings.social-media.submit')
         })
 
@@ -109,7 +109,7 @@ describe('MySomethingList.vue', () => {
 
       describe('calls callback functions', () => {
         it('calls edit', async () => {
-          const editButton = wrapper.find('.base-button[data-test="edit-button"]')
+          const editButton = wrapper.find('button[data-test="edit-button"]')
           editButton.trigger('click')
           await Vue.nextTick()
           const expectedItem = expect.objectContaining({ id: 'id', dummy: 'dummy' })
@@ -134,7 +134,7 @@ describe('MySomethingList.vue', () => {
         })
 
         it('calls delete by committing "modal/SET_OPEN"', async () => {
-          const deleteButton = wrapper.find('.base-button[data-test="delete-button"]')
+          const deleteButton = wrapper.find('button[data-test="delete-button"]')
           deleteButton.trigger('click')
           await Vue.nextTick()
           const expectedModalData = expect.objectContaining({

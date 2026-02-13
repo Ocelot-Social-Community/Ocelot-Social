@@ -1,16 +1,16 @@
 <template>
   <base-card>
     <h2 class="title">{{ $t('settings.download.name') }}</h2>
-    <base-button
-      @click="onClick(jsonData)"
-      icon="download"
-      secondary
-      filled
+    <os-button
+      variant="primary"
+      appearance="filled"
       :disabled="loading"
       :loading="loading"
+      @click="onClick(jsonData)"
     >
+      <template #icon><base-icon name="download" /></template>
       {{ $t('settings.download.json') }}
-    </base-button>
+    </os-button>
     <ds-space margin="large" />
     <ds-text>{{ $t('settings.download.description') }}</ds-text>
     <ds-space margin="large" />
@@ -22,16 +22,16 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import { mapGetters } from 'vuex'
 import { userDataQuery } from '~/graphql/User'
-import BaseButton from '~/components/_new/generic/BaseButton/BaseButton.vue'
 import isEmpty from 'lodash/isEmpty'
 import scrollToContent from './scroll-to-content.js'
 
 export default {
   mixins: [scrollToContent],
   components: {
-    BaseButton,
+    OsButton,
   },
   data() {
     return {

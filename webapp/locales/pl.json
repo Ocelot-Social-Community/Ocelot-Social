@@ -1,13 +1,17 @@
 {
   "actions": {
     "cancel": "Odwołaj",
+    "clear": "Wyczyść",
+    "close": "Zamknij",
     "create": "Tworzenie",
     "delete": "Usuń",
     "edit": "Edycja",
     "loading": "załadunek",
     "loadMore": "Obciążenie więcej",
+    "menu": "Otwórz menu",
     "save": "Oszczędzaj",
-    "saveCategories": null
+    "saveCategories": null,
+    "search": "Szukaj"
   },
   "admin": {
     "badges": {
@@ -117,7 +121,9 @@
   "chat": {
     "addRoomHeadline": null,
     "cancelSelectMessage": null,
+    "closeChat": "Zamknij czat",
     "conversationStarted": null,
+    "expandChat": "Rozwiń czat",
     "isOnline": null,
     "isTyping": null,
     "lastSeen": null,
@@ -183,6 +189,9 @@
       "url": null
     },
     "versus": "werset"
+  },
+  "component-slider": {
+    "step": "Krok {current} z {total}"
   },
   "components": {
     "dateTimeRange": {
@@ -539,6 +548,7 @@
     "changeMemberRole": null,
     "contentMenu": {
       "inviteLinks": null,
+      "menuButton": "Menu grupy",
       "muteGroup": null,
       "unmuteGroup": null,
       "visitGroupPage": null
@@ -835,6 +845,10 @@
   "observeButton": {
     "observed": null
   },
+  "pagination": {
+    "next": "Następna",
+    "previous": "Poprzednia"
+  },
   "post": {
     "comment": {
       "joinGroup": null,
@@ -880,6 +894,10 @@
     },
     "name": "Poczta",
     "pinned": null,
+    "sensitiveContent": {
+      "hide": "Ukryj wrażliwą treść",
+      "show": "Pokaż wrażliwą treść"
+    },
     "takeAction": {
       "name": "Podejmij działanie"
     },
@@ -1225,6 +1243,7 @@
     "germany": "Niemcy",
     "imprint": "Nadruk",
     "made": "Z ❤️ zrobiony",
+    "navigation": "Nawigacja",
     "register": "numer rejestracyjny",
     "support": null,
     "termsAndConditions": null,

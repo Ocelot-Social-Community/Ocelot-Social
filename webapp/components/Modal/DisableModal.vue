@@ -7,9 +7,16 @@
       <os-button variant="primary" appearance="outline" class="cancel" @click="cancel">
         {{ $t('disable.cancel') }}
       </os-button>
-      <base-button danger filled class="confirm" icon="exclamation-circle" @click="confirm">
+      <os-button
+        variant="danger"
+        appearance="filled"
+        class="confirm"
+        :loading="loading"
+        @click="confirm"
+      >
+        <template #icon><base-icon name="exclamation-circle" /></template>
         {{ $t('disable.submit') }}
-      </base-button>
+      </os-button>
     </template>
   </ds-modal>
 </template>
@@ -52,6 +59,7 @@ export default {
       }, 1000)
     },
     async confirm() {
+      this.loading = true
       try {
         // TODO: Use the "modalData" structure introduced in "ConfirmModal" and refactor this here. Be aware that all the Jest tests have to be refactored as well !!!
         // await this.modalData.buttons.confirm.callback()
@@ -73,6 +81,8 @@ export default {
       } catch (err) {
         this.$toast.error(err.message)
         this.isOpen = false
+      } finally {
+        this.loading = false
       }
     },
   },

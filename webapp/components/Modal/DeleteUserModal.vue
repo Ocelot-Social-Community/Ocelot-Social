@@ -40,9 +40,16 @@
       <os-button variant="primary" appearance="outline" class="cancel" @click="cancel">
         {{ $t('actions.cancel') }}
       </os-button>
-      <base-button danger filled class="confirm" icon="exclamation-circle" @click="openModal">
+      <os-button
+        variant="danger"
+        appearance="filled"
+        class="confirm"
+        :loading="loading"
+        @click="openModal"
+      >
+        <template #icon><base-icon name="exclamation-circle" /></template>
         {{ $t('settings.deleteUserAccount.name') }}
-      </base-button>
+      </os-button>
     </template>
   </ds-modal>
 </template>
@@ -162,10 +169,10 @@ export default {
 </script>
 
 <style lang="scss">
-.ds-modal {
+.delete-user-modal.ds-modal {
   max-width: 700px !important;
 }
-.hc-modal-success {
+.delete-user-modal .hc-modal-success {
   pointer-events: none;
   position: absolute;
   width: 100%;
@@ -177,7 +184,7 @@ export default {
   z-index: $z-index-modal;
   border-radius: $border-radius-x-large;
 }
-.bold {
+.delete-user-modal .bold {
   font-weight: 700;
 }
 </style>

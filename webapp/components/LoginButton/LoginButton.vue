@@ -1,7 +1,18 @@
 <template>
   <dropdown class="login-button" offset="8" :placement="placement">
     <template #default="{ toggleMenu }">
-      <base-button icon="sign-in" circle ghost @click.prevent="toggleMenu" />
+      <os-button
+        data-test="login-btn"
+        variant="primary"
+        appearance="ghost"
+        circle
+        :aria-label="$t('login.login')"
+        @click.prevent="toggleMenu"
+      >
+        <template #icon>
+          <base-icon name="sign-in" />
+        </template>
+      </os-button>
     </template>
     <template #popover>
       <div class="login-button-menu-popover">
@@ -15,10 +26,12 @@
 </template>
 
 <script>
+import { OsButton } from '@ocelot-social/ui'
 import Dropdown from '~/components/Dropdown'
 
 export default {
   components: {
+    OsButton,
     Dropdown,
   },
   props: {
