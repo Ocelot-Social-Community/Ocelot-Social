@@ -83,6 +83,9 @@ export default {
       } catch (err) {
         this.$toast.error(err.message)
         this.isOpen = false
+        setTimeout(() => {
+          this.$emit('close')
+        }, 1000)
       } finally {
         this.loading = false
       }
