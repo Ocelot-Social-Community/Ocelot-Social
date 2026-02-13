@@ -4,6 +4,7 @@
       <slot name="button">
         <os-button
           class="legend-question-button"
+          variant="primary"
           appearance="ghost"
           circle
           size="sm"
