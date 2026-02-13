@@ -21,7 +21,7 @@
         appearance="outline"
         circle
         class="copy-button"
-        @click="copyInviteCode(inviteCode.copy)"
+        @click="copyInviteCode"
         :disabled="!canCopy"
         :aria-label="$t('invite-codes.copy-code')"
       >
