@@ -56,6 +56,7 @@
             appearance="outline"
             circle
             size="sm"
+            :aria-label="$t('settings.muted-users.columns.unmute')"
             @click="unmuteUser(scope)"
           >
             <template #icon><base-icon name="user-plus" /></template>

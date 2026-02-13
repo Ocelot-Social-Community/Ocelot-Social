@@ -59,6 +59,7 @@
             appearance="outline"
             circle
             size="sm"
+            :aria-label="$t('settings.blocked-users.columns.unblock')"
             @click="unblockUser(scope)"
           >
             <template #icon><base-icon name="user-plus" /></template>
