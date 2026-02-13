@@ -229,6 +229,7 @@
               variant="primary"
               appearance="filled"
               circle
+              :aria-label="$t('contribution.newPost')"
               v-tooltip="{
                 content: $t('contribution.newPost'),
                 placement: 'left',
