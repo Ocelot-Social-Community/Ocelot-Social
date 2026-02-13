@@ -240,6 +240,9 @@ OsButton Features:
 - [x] Editor.vue: Fehlender `else`-Branch in `toggleLinkInput()` — `isLinkInputActive` wird jetzt auch bei no-args-Aufrufen (blur/esc) zurückgesetzt
 - [x] admin/users/index.vue: Veraltete Slot-Syntax `slot="role" slot-scope="scope"` → `#role="scope"` (Vue 3)
 - [x] settings/index.vue: Irreführender Komponentenname `NewsFeed` → `Settings`
+- [x] FilterMenu.spec.js: Typo `dropdwon` → `dropdown` im Testnamen
+- [x] ImageUploader.vue: `:title` auf Crop-Cancel-Button ergänzt (konsistent mit Delete-Button)
+- [x] OsButton.spec.ts: `as const` auf `sizes`-Objekt statt Type-Cast bei jedem `mount`-Aufruf
 
 **Zuvor abgeschlossen (Session 18 - Code-Review Feedback, OsButton Refactoring, Accessibility):**
 - [x] OsButton.vue vereinfacht: `vueAttrs()` Helper, Einmal-Variablen durch `cn()` ersetzt, `children` Array inline (217→227 Zeilen, aber lesbarer)
