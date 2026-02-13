@@ -158,6 +158,7 @@
                   variant="primary"
                   appearance="filled"
                   circle
+                  :aria-label="$t('contribution.newPost')"
                 >
                   <template #icon>
                     <base-icon name="plus" />
