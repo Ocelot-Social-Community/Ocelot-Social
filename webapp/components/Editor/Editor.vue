@@ -258,6 +258,9 @@ export default {
         this.$nextTick(() => {
           this.$refs.contextMenu.displayContextMenu(element, this.$refs.linkInput.$el, 'link')
         })
+      } else {
+        this.isLinkInputActive = false
+        this.editor.focus()
       }
     },
     setLinkUrl(url) {
