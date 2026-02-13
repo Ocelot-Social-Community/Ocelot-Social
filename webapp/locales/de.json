@@ -858,10 +858,6 @@
       "title": "Erstelle eine Veranstaltung"
     },
     "edited": "bearbeitet",
-    "sensitiveContent": {
-      "show": "Sensiblen Inhalt anzeigen",
-      "hide": "Sensiblen Inhalt verbergen"
-    },
     "editPost": {
       "event": "Bearbeite deine Veranstaltung",
       "forGroup": {
@@ -892,6 +888,10 @@
     },
     "name": "Beitrag",
     "pinned": "Meldung",
+    "sensitiveContent": {
+      "hide": "Sensiblen Inhalt verbergen",
+      "show": "Sensiblen Inhalt anzeigen"
+    },
     "takeAction": {
       "name": "Aktiv werden"
     },

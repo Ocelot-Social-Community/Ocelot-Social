@@ -858,10 +858,6 @@
       "title": "Create an Event"
     },
     "edited": "edited",
-    "sensitiveContent": {
-      "show": "Show sensitive content",
-      "hide": "Hide sensitive content"
-    },
     "editPost": {
       "event": "Edit Your Event",
       "forGroup": {
@@ -892,6 +888,10 @@
     },
     "name": "Article",
     "pinned": "Announcement",
+    "sensitiveContent": {
+      "hide": "Hide sensitive content",
+      "show": "Show sensitive content"
+    },
     "takeAction": {
       "name": "Take action"
     },

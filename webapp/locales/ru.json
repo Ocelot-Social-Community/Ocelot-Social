@@ -858,10 +858,6 @@
       "title": null
     },
     "edited": "Изменен",
-    "sensitiveContent": {
-      "show": "Показать деликатный контент",
-      "hide": "Скрыть деликатный контент"
-    },
     "editPost": {
       "event": null,
       "forGroup": {
@@ -892,6 +888,10 @@
     },
     "name": "Пост",
     "pinned": "Объявление",
+    "sensitiveContent": {
+      "hide": "Скрыть деликатный контент",
+      "show": "Показать деликатный контент"
+    },
     "takeAction": {
       "name": "Действовать"
     },

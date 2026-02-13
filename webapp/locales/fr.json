@@ -858,10 +858,6 @@
       "title": null
     },
     "edited": "édité",
-    "sensitiveContent": {
-      "show": "Afficher le contenu sensible",
-      "hide": "Masquer le contenu sensible"
-    },
     "editPost": {
       "event": null,
       "forGroup": {
@@ -892,6 +888,10 @@
     },
     "name": "Post",
     "pinned": "Annonce",
+    "sensitiveContent": {
+      "hide": "Masquer le contenu sensible",
+      "show": "Afficher le contenu sensible"
+    },
     "takeAction": {
       "name": "Passez à l'action"
     },
