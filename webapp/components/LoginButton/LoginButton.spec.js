@@ -37,7 +37,7 @@ describe('LoginButton.vue', () => {
     })
 
     it('open popup', () => {
-      wrapper.find('button').trigger('click')
+      wrapper.find('[data-test="login-btn"]').trigger('click')
       expect(wrapper.find('.login-button').exists()).toBe(true)
     })
   })
