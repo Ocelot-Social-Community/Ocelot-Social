@@ -1,7 +1,14 @@
 <template>
   <dropdown class="login-button" offset="8" :placement="placement">
     <template #default="{ toggleMenu }">
-      <os-button data-test="login-btn" variant="primary" appearance="ghost" circle :aria-label="$t('login.login')" @click.prevent="toggleMenu">
+      <os-button
+        data-test="login-btn"
+        variant="primary"
+        appearance="ghost"
+        circle
+        :aria-label="$t('login.login')"
+        @click.prevent="toggleMenu"
+      >
         <template #icon>
           <base-icon name="sign-in" />
         </template>
