@@ -116,7 +116,7 @@ OsButton Features:
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-12 (Session 17)
+**Letzte Aktualisierung:** 2026-02-13 (Session 18)
 
 **Aktuelle Phase:** Phase 3 ✅ ABGESCHLOSSEN + Code-Review-Feedback eingearbeitet
 
@@ -184,7 +184,36 @@ OsButton Features:
   - Completeness Check (verify Script prüft Story, Visual, checkA11y, Keyboard, Varianten)
   - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 
-**Zuletzt abgeschlossen (Session 17 - Code-Review Feedback, OsButton Refactoring, Accessibility):**
+**Zuletzt abgeschlossen (Session 18 - CodeRabbit Review Feedback: data-test Selektoren, Accessibility, Bugfixes):**
+- [x] Cypress-Selektoren: `.user-content-menu button` → `[data-test="content-menu-button"]` (2 Step-Definitions)
+- [x] Cypress-Selektoren: `.content-menu button` → `[data-test="content-menu-button"]` (Admin.PinPost + ReportContent)
+- [x] muted-users.vue: `data-test="unmute-btn"` + `aria-label` auf Unmute-Button
+- [x] blocked-users.vue: `data-test="unblock-btn"` + `aria-label` auf Unblock-Button
+- [x] ProfileList.vue: `data-test="load-all-connections-btn"` + FollowList.spec.js Selektoren aktualisiert
+- [x] FollowButton.vue: `data-test="follow-btn"` + Spec-Selektoren aktualisiert
+- [x] JoinLeaveButton.vue: `data-test="join-leave-btn"` + `.native` von `@mouseenter`/`@mouseleave` entfernt
+- [x] LoginButton.vue: `data-test="login-btn"` + `aria-label="$t('login.login')"` + Spec-Selektoren aktualisiert
+- [x] ReportRow.spec.js: `button[data-variant="danger"]` → `[data-test="confirm"]`
+- [x] CtaJoinLeaveGroup.spec.js: Selektor auf `[data-test="join-leave-btn"]` aktualisiert
+- [x] DisableModal.vue: `finally { this.loading = false }` für Loading-State-Reset
+- [x] ReleaseModal.vue: `:loading="loading"` + `this.loading = true` + `finally { this.loading = false }`
+- [x] ChangePassword.vue: `:disabled="errors"` → `:disabled="!!errors"` (Boolean-Cast)
+- [x] Password/Change.vue: Unbenutzte `disabled: true` aus data() entfernt + 2 tote Tests entfernt
+- [x] MenuBar.vue: Unbenutztes `ref="linkButton"` entfernt
+- [x] GroupForm.vue: Cancel-Button `variant="default" appearance="filled"` (per User-Anweisung)
+- [x] `appearance="filled"` ergänzt: donations.vue, LoginForm.vue, EnterNonce.vue
+- [x] LoginForm.vue: CSS `.login-form button` → `.login-form button[type='submit']`
+- [x] pages/index.vue: Redundantes `class="my-filter-button"` von `<base-icon>` entfernt
+- [x] MySomethingList.vue: `:title` + `:aria-label` auf Edit/Delete-Buttons (Tooltip beibehalten)
+- [x] A11y aria-label auf icon-only Buttons: admin/users (search + edit), AddChatRoomByUserSearch (close), EmbedComponent (close), groups/index (create), profile/_id/_slug (new post), groups/_id/_slug (new post), CustomButton (2x tooltip), HeaderMenu (hamburger), ImageUploader (crop-cancel), ContentMenu (menu), HeaderButton (filter-remove), InviteButton (invite)
+- [x] post/_id/_slug/index.vue: Zustandsabhängiges `aria-label` (`post.sensitiveContent.show/hide`)
+- [x] ComponentSlider.vue: `aria-label` mit Interpolation (`component-slider.step`)
+- [x] i18n: `actions.search`, `actions.close`, `actions.menu` in allen 9 Sprachdateien
+- [x] i18n: `site.navigation` in allen 9 Sprachdateien
+- [x] i18n: `post.sensitiveContent.show/hide` in allen 9 Sprachdateien
+- [x] i18n: `component-slider.step` in allen 9 Sprachdateien
+
+**Zuvor abgeschlossen (Session 17 - Code-Review Feedback, OsButton Refactoring, Accessibility):**
 - [x] OsButton.vue vereinfacht: `vueAttrs()` Helper, Einmal-Variablen durch `cn()` ersetzt, `children` Array inline (217→227 Zeilen, aber lesbarer)
 - [x] OsButton: `@import "./animations.css"` vor `@source`-Direktiven verschoben (CSS-Spec-Konformität)
 - [x] CustomButton.vue: `isEmpty` aus `data()` entfernt → direkter Import im Computed
@@ -1666,6 +1695,19 @@ Bei der Migration werden:
 | 2026-02-12 | **Dead Code entfernt** | MySomethingList.vue: `.icon-button` CSS-Klasse (nach Migration nicht mehr verwendet) |
 | 2026-02-12 | **Button-Wrapper-Analyse** | 15 OsButton-Wrapper klassifiziert: 4 Smart (Apollo/Vuex), 4 Presentational, 7 Borderline; GroupButton + MapButton als Inline-Kandidaten identifiziert |
 | 2026-02-12 | **compat/ Konzept** | Separates Verzeichnis für temporäre Migrations-Wrapper (nicht von check-completeness.ts erfasst); BaseIcon als erster Kandidat (131 Nutzungen) |
+| 2026-02-13 | **data-test Selektoren** | ~10 Komponenten: `data-test` Attribute für robuste Test-Selektoren (unmute-btn, unblock-btn, follow-btn, join-leave-btn, login-btn, load-all-connections-btn, content-menu-button) |
+| 2026-02-13 | **Cypress Selektoren** | 4 Step-Definitions: `.user-content-menu button` / `.content-menu button` → `[data-test="content-menu-button"]` |
+| 2026-02-13 | **Spec-Selektoren** | FollowList, FollowButton, LoginButton, CtaJoinLeaveGroup, ReportRow, muted-users, blocked-users: generische `button` → `[data-test="..."]` |
+| 2026-02-13 | **A11y: aria-label** | ~15 icon-only Buttons: aria-label hinzugefügt (admin/users, AddChatRoom, EmbedComponent, groups, profile, CustomButton, HeaderMenu, ImageUploader, ContentMenu, HeaderButton, InviteButton, LoginButton, blocked/muted-users) |
+| 2026-02-13 | **Zustandsabhängiges aria-label** | post/_id/_slug: `$t(blurred ? 'post.sensitiveContent.show' : 'post.sensitiveContent.hide')` |
+| 2026-02-13 | **ComponentSlider aria-label** | Interpoliertes Label: `$t('component-slider.step', { current: index + 1, total: ... })` |
+| 2026-02-13 | **i18n Keys (6 neue)** | `actions.search`, `actions.close`, `actions.menu`, `site.navigation`, `post.sensitiveContent.show/hide`, `component-slider.step` in allen 9 Sprachdateien |
+| 2026-02-13 | **Loading-State Fixes** | DisableModal + ReleaseModal: `finally { this.loading = false }` für Reset |
+| 2026-02-13 | **Bugfixes** | ChangePassword: `!!errors`; Password/Change: `disabled` aus data() entfernt + 2 tote Tests; MenuBar: unbenutztes `ref` entfernt |
+| 2026-02-13 | **Button-Props** | GroupForm cancel: `variant="default" appearance="filled"`; donations/LoginForm/EnterNonce: `appearance="filled"` ergänzt |
+| 2026-02-13 | **CSS-Selektoren** | LoginForm: `.login-form button` → `.login-form button[type='submit']`; pages/index: redundante Klasse auf BaseIcon entfernt |
+| 2026-02-13 | **JoinLeaveButton** | `.native` von `@mouseenter`/`@mouseleave` entfernt (Vue 3 Kompatibilität) |
+| 2026-02-13 | **MySomethingList** | `:title` + `:aria-label` auf Edit/Delete-Buttons (Tooltip beibehalten neben Accessibility) |
 
 ---
 
