@@ -60,7 +60,7 @@
         <os-button
           variant="primary"
           appearance="filled"
-          :disabled="loading || !(!isEditing || (isEditing && !disabled))"
+          :disabled="loading || (isEditing && disabled)"
           :loading="loading"
           type="submit"
           data-test="add-save-button"
