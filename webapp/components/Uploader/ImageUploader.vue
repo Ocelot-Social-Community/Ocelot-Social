@@ -21,6 +21,7 @@
         circle
         data-test="delete-button"
         :title="$t('actions.delete')"
+        :aria-label="$t('actions.delete')"
         @click.stop="deleteImage"
       >
         <template #icon>
