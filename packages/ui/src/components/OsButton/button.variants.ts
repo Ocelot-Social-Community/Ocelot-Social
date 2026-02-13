@@ -46,7 +46,7 @@ export const buttonVariants = cva(
         outline: [
           'bg-transparent shadow-none',
           // Disabled: light gray border and gray text
-          'disabled:border-[var(--color-disabled-border,#e5e3e8)] disabled:text-[var(--color-disabled)]',
+          'disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)]',
         ],
         ghost: [
           'bg-transparent shadow-none',
