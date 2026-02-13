@@ -128,9 +128,9 @@ export default {
         }
       } catch (err) {
         this.$toast.error(err.message)
+        this.disabled = false
       } finally {
         this.loading = false
-        this.disabled = false
       }
     },
   },
