@@ -6,8 +6,8 @@
     :loading="localLoading"
     full-width
     v-tooltip="tooltip"
-    @mouseenter.native="onHover"
-    @mouseleave.native="hovered = false"
+    @mouseenter="onHover"
+    @mouseleave="hovered = false"
     @click.prevent="toggle"
   >
     <template #icon>
