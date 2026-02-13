@@ -3,6 +3,7 @@
     <a v-if="settings.url" :href="settings.url" :target="settings.target">
       <os-button
         class="custom-button"
+        variant="primary"
         appearance="ghost"
         circle
         :aria-label="$t(settings.toolTipIdent)"
@@ -22,6 +23,7 @@
     <nuxt-link v-else :to="settings.path">
       <os-button
         class="custom-button"
+        variant="primary"
         appearance="ghost"
         circle
         :aria-label="$t(settings.toolTipIdent)"
