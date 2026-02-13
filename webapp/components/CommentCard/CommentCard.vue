@@ -56,6 +56,7 @@
       />
       <os-button
         :title="$t('post.comment.reply')"
+        :aria-label="$t('post.comment.reply')"
         class="reply-button"
         variant="primary"
         appearance="outline"
