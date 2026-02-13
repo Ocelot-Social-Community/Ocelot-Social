@@ -66,7 +66,6 @@ export default {
         ...passwordForm.formSchema,
       },
       loading: false,
-      disabled: true,
     }
   },
   methods: {
