@@ -4,6 +4,7 @@
       <os-button
         variant="primary"
         :appearance="filterActive ? 'filled' : 'ghost'"
+        :aria-label="$t('common.filter')"
         @click.prevent="toggleMenu()"
       >
         <template #icon>
