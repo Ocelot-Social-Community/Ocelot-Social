@@ -1,5 +1,6 @@
 <template>
   <os-button
+    data-test="join-leave-btn"
     :variant="isMember && hovered ? 'danger' : 'primary'"
     :appearance="filled || (isMember && !hovered) ? 'filled' : 'outline'"
     :disabled="disabled"
