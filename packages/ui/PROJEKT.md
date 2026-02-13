@@ -226,6 +226,11 @@ OsButton Features:
 - [x] SearchableInput.vue: `aria-label` auf icon-only Close-Button
 - [x] GroupButton.vue: `aria-label` auf icon-only Groups-Button
 - [x] MapButton.vue: `aria-label` auf icon-only Map-Button
+- [x] EmotionButton.vue: `aria-label` auf icon-only Emoji-Button (`<label for>` wirkt nicht auf `<button>`)
+- [x] ImageUploader.vue: `aria-label` auf icon-only Delete-Button
+- [x] i18n: `actions.clear` disambiguiert — es: "Borrar" → "Limpiar", it: "Cancella" → "Svuota" (Verwechslung mit `actions.delete`)
+- [x] OsButton.vue: `as string` Cast bei `attrClass` entfernt (cn/clsx verarbeitet Arrays/Objekte korrekt)
+- [x] CommentForm.vue: `handleSubmit` auf async/await + try/catch/finally umgestellt (Loading-Bug im Fehlerfall behoben)
 
 **Zuvor abgeschlossen (Session 18 - Code-Review Feedback, OsButton Refactoring, Accessibility):**
 - [x] OsButton.vue vereinfacht: `vueAttrs()` Helper, Einmal-Variablen durch `cn()` ersetzt, `children` Array inline (217→227 Zeilen, aber lesbarer)
