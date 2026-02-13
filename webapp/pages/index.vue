@@ -240,6 +240,10 @@ export default {
     document.addEventListener('click', this.showFilterMenu)
     window.addEventListener('scroll', this.handleScroll)
   },
+  beforeDestroy() {
+    document.removeEventListener('click', this.showFilterMenu)
+    window.removeEventListener('scroll', this.handleScroll)
+  },
   methods: {
     ...mapMutations({
       resetPostType: 'posts/RESET_POST_TYPE',
@@ -273,10 +277,6 @@ export default {
         }
       }
       this.prevScrollpos = currentScrollPos
-    },
-    beforeDestroy() {
-      document.removeEventListener('click', this.showFilterMenu)
-      window.removeEventListener('scroll', this.handleScroll)
     },
     clearSearch() {
       this.$router.push({ path: '/' })
