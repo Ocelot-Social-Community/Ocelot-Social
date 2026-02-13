@@ -1,6 +1,6 @@
 <template>
   <div class="emotion-button">
-    <os-button :id="emotion" appearance="ghost" circle @click="$emit('toggleEmotion', emotion)">
+    <os-button :id="emotion" appearance="ghost" circle :aria-label="$t(`contribution.emotions-label.${emotion}`)" @click="$emit('toggleEmotion', emotion)">
       <img class="image" :src="emojiPath" />
     </os-button>
     <label class="label" :for="emotion">{{ $t(`contribution.emotions-label.${emotion}`) }}</label>
