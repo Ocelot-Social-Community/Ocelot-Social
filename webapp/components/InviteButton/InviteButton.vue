@@ -73,7 +73,7 @@ export default {
           },
           update: (_, { data: { generatePersonalInviteCode } }) => {
             this.setCurrentUser({
-              ...this.currentUser,
+              ...this.user,
               inviteCodes: [...this.user.inviteCodes, generatePersonalInviteCode],
             })
           },
@@ -92,7 +92,7 @@ export default {
           },
           update: (_, { data: { _invalidateInviteCode } }) => {
             this.setCurrentUser({
-              ...this.currentUser,
+              ...this.user,
               inviteCodes: this.user.inviteCodes.map((inviteCode) => ({
                 ...inviteCode,
                 isValid: inviteCode.code === code ? false : inviteCode.isValid,
