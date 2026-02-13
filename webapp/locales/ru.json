@@ -187,6 +187,9 @@
     },
     "versus": "Против"
   },
+  "component-slider": {
+    "step": "Шаг {current} из {total}"
+  },
   "components": {
     "dateTimeRange": {
       "hourMinute": null,

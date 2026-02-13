@@ -187,6 +187,9 @@
     },
     "versus": "Contra"
   },
+  "component-slider": {
+    "step": "Passo {current} de {total}"
+  },
   "components": {
     "dateTimeRange": {
       "hourMinute": null,

@@ -187,6 +187,9 @@
     },
     "versus": "Versus"
   },
+  "component-slider": {
+    "step": "Step {current} of {total}"
+  },
   "components": {
     "dateTimeRange": {
       "hourMinute": "HH:mm",

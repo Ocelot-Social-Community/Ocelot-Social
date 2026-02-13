@@ -43,6 +43,7 @@
             circle
             size="sm"
             :disabled="index > sliderIndex"
+            :aria-label="$t('component-slider.step', { current: index + 1, total: sliderData.sliders.length })"
             @click="sliderData.sliderSelectorCallback(index)"
           />
         </div>

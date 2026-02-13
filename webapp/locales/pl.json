@@ -187,6 +187,9 @@
     },
     "versus": "werset"
   },
+  "component-slider": {
+    "step": "Krok {current} z {total}"
+  },
   "components": {
     "dateTimeRange": {
       "hourMinute": null,
