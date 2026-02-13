@@ -5,6 +5,7 @@
         class="custom-button"
         appearance="ghost"
         circle
+        :aria-label="$t(settings.toolTipIdent)"
         v-tooltip="{
           content: $t(settings.toolTipIdent),
           placement: 'bottom-start',
@@ -23,6 +24,7 @@
         class="custom-button"
         appearance="ghost"
         circle
+        :aria-label="$t(settings.toolTipIdent)"
         v-tooltip="{
           content: $t(settings.toolTipIdent),
           placement: 'bottom-start',
