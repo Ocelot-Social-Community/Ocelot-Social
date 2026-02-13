@@ -30,7 +30,9 @@
         placement: 'bottom-start',
       }"
     >
-      <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
+      <template #icon>
+        <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
+      </template>
     </os-button>
   </nuxt-link>
   <dropdown
@@ -53,7 +55,9 @@
         }"
         @click="toggleMenu"
       >
-        <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
+        <template #icon>
+          <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
+        </template>
       </os-button>
     </template>
     <template #popover="{ closeMenu }">

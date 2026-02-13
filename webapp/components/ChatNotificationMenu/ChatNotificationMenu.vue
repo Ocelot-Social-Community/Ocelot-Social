@@ -10,7 +10,9 @@
         placement: 'bottom-start',
       }"
     >
-      <counter-icon icon="chat-bubble" :count="unreadRoomCount" danger />
+      <template #icon>
+        <counter-icon icon="chat-bubble" :count="unreadRoomCount" danger />
+      </template>
     </os-button>
   </nuxt-link>
 </template>
