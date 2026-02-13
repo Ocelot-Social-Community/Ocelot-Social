@@ -243,6 +243,9 @@ OsButton Features:
 - [x] FilterMenu.spec.js: Typo `dropdwon` → `dropdown` im Testnamen
 - [x] ImageUploader.vue: `:title` auf Crop-Cancel-Button ergänzt (konsistent mit Delete-Button)
 - [x] OsButton.spec.ts: `as const` auf `sizes`-Objekt statt Type-Cast bei jedem `mount`-Aufruf
+- [x] CommentForm.vue: `disabled = false` aus `finally` in `catch` verschoben (verhindert Überschreiben nach `clear()`)
+- [x] FilterMenu.vue: `aria-label` auf icon-only Filter-Button
+- [x] ContextMenu.vue: `this.menu.show()` nur bei `type !== 'link'` (Link-Menüs öffneten sich sofort statt auf Klick zu warten)
 
 **Zuvor abgeschlossen (Session 18 - Code-Review Feedback, OsButton Refactoring, Accessibility):**
 - [x] OsButton.vue vereinfacht: `vueAttrs()` Helper, Einmal-Variablen durch `cn()` ersetzt, `children` Array inline (217→227 Zeilen, aber lesbarer)
