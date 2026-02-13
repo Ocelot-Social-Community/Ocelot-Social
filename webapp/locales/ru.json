@@ -858,6 +858,10 @@
       "title": null
     },
     "edited": "Изменен",
+    "sensitiveContent": {
+      "show": "Показать деликатный контент",
+      "hide": "Скрыть деликатный контент"
+    },
     "editPost": {
       "event": null,
       "forGroup": {

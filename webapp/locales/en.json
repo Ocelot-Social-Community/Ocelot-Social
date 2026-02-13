@@ -858,6 +858,10 @@
       "title": "Create an Event"
     },
     "edited": "edited",
+    "sensitiveContent": {
+      "show": "Show sensitive content",
+      "hide": "Hide sensitive content"
+    },
     "editPost": {
       "event": "Edit Your Event",
       "forGroup": {

@@ -858,6 +858,10 @@
       "title": null
     },
     "edited": null,
+    "sensitiveContent": {
+      "show": "Pokaż wrażliwą treść",
+      "hide": "Ukryj wrażliwą treść"
+    },
     "editPost": {
       "event": null,
       "forGroup": {
