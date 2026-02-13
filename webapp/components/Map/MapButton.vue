@@ -6,6 +6,7 @@
         variant="primary"
         appearance="ghost"
         circle
+        :aria-label="$t('header.map.tooltip')"
         v-tooltip="{
           content: $t('header.map.tooltip'),
           placement: 'bottom-start',
