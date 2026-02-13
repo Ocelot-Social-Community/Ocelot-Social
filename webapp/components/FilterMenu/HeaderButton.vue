@@ -10,6 +10,7 @@
       circle
       size="sm"
       :title="titleRemove"
+      :aria-label="titleRemove"
       @click.stop="clickRemove"
     >
       <template #icon>
