@@ -8,6 +8,7 @@
         appearance="ghost"
         circle
         size="sm"
+        :aria-label="$t('actions.close')"
         @click="closeUserSearch"
       >
         <template #icon>

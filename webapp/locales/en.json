@@ -2,6 +2,7 @@
   "actions": {
     "cancel": "Cancel",
     "clear": "Clear",
+    "close": "Close",
     "create": "Create",
     "delete": "Delete",
     "edit": "Edit",
