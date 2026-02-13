@@ -3,11 +3,7 @@
     <h2 class="title">{{ $t('admin.donations.name') }}</h2>
     <ds-form v-model="formData" @submit="submit">
       <ds-text class="show-donations-checkbox">
-        <input
-          id="showDonations"
-          type="checkbox"
-          v-model="showDonations"
-        />
+        <input id="showDonations" type="checkbox" v-model="showDonations" />
         <label for="showDonations">
           {{ $t('admin.donations.showDonationsCheckboxLabel') }}
         </label>

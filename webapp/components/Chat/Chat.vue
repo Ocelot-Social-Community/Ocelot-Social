@@ -35,7 +35,13 @@
       <ds-flex v-if="singleRoom">
         <ds-flex-item centered class="single-chat-bubble">
           <nuxt-link :to="{ name: 'chat' }">
-            <os-button variant="primary" appearance="ghost" circle size="sm" :aria-label="$t('chat.expandChat')">
+            <os-button
+              variant="primary"
+              appearance="ghost"
+              circle
+              size="sm"
+              :aria-label="$t('chat.expandChat')"
+            >
               <template #icon>
                 <base-icon name="expand" />
               </template>
