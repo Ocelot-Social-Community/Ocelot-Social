@@ -8,6 +8,7 @@
           appearance="outline"
           size="sm"
           circle
+          :aria-label="$t('actions.menu')"
           @click.prevent="toggleMenu()"
         >
           <template #icon>
