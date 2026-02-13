@@ -53,6 +53,7 @@
       circle
       size="sm"
       class="close-button"
+      :aria-label="$t('actions.close')"
       @click.prevent="removeEmbed()"
     >
       <template #icon>
