@@ -4,6 +4,7 @@
       variant="primary"
       appearance="ghost"
       circle
+      :aria-label="$t('header.chats.tooltip')"
       v-tooltip="{
         content: $t('header.chats.tooltip'),
         placement: 'bottom-start',
