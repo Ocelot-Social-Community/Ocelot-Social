@@ -80,14 +80,14 @@ describe('osButton', () => {
     })
 
     it('has min-width matching height for each size', () => {
-      const sizes: Record<string, string> = {
+      const sizes = {
         sm: 'min-w-[26px]',
         md: 'min-w-[36px]',
         lg: 'min-w-12',
         xl: 'min-w-14',
-      }
+      } as const
       for (const [size, expected] of Object.entries(sizes)) {
-        const wrapper = mount(OsButton, { props: { size: size as 'sm' | 'md' | 'lg' | 'xl' } })
+        const wrapper = mount(OsButton, { props: { size: size as keyof typeof sizes } })
         expect(wrapper.classes()).toContain(expected)
       }
     })
