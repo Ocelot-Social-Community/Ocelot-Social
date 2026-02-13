@@ -246,6 +246,12 @@ OsButton Features:
 - [x] CommentForm.vue: `disabled = false` aus `finally` in `catch` verschoben (verhindert Überschreiben nach `clear()`)
 - [x] FilterMenu.vue: `aria-label` auf icon-only Filter-Button
 - [x] ContextMenu.vue: `this.menu.show()` nur bei `type !== 'link'` (Link-Menüs öffneten sich sofort statt auf Klick zu warten)
+- [x] ContextMenu.vue: `this.menu = null` vor `destroy()` (Race-Condition: ESC + blur feuerten doppelt → removeChild-Error)
+- [x] CustomButton.vue: `variant="primary"` auf beide `os-button`-Instanzen (Konsistenz mit restlicher Codebase)
+- [x] Invitation.vue: Ungenutztes Argument `inviteCode.copy` bei `copyInviteCode()` entfernt
+- [x] CtaUnblockAuthor.vue: `appearance="filled"` explizit gesetzt (fehlte als einziger primärer CTA)
+- [x] HeaderMenu.vue: `beforeDestroy`-Hook ergänzt — Scroll-Listener wird jetzt entfernt (Memory-Leak)
+- [x] MenuLegend.vue: `variant="primary"` auf Trigger-Button (konsistent mit Toolbar-Buttons in MenuBar.vue)
 
 **Zuvor abgeschlossen (Session 18 - Code-Review Feedback, OsButton Refactoring, Accessibility):**
 - [x] OsButton.vue vereinfacht: `vueAttrs()` Helper, Einmal-Variablen durch `cn()` ersetzt, `children` Array inline (217→227 Zeilen, aber lesbarer)
