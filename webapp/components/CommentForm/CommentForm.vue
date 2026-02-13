@@ -89,54 +89,49 @@ export default {
         this.closeEditWindow()
       }
     },
-    handleSubmit() {
-      let mutateParams
-      if (!this.update) {
-        mutateParams = {
-          mutation: CommentMutations(this.$i18n).CreateComment,
-          variables: {
-            postId: this.post.id,
-            content: this.form.content,
-          },
-        }
-      } else {
-        mutateParams = {
-          mutation: CommentMutations(this.$i18n).UpdateComment,
-          variables: {
-            id: this.comment.id,
-            content: this.form.content,
-          },
-        }
-      }
+    async handleSubmit() {
+      const mutateParams = !this.update
+        ? {
+            mutation: CommentMutations(this.$i18n).CreateComment,
+            variables: {
+              postId: this.post.id,
+              content: this.form.content,
+            },
+          }
+        : {
+            mutation: CommentMutations(this.$i18n).UpdateComment,
+            variables: {
+              id: this.comment.id,
+              content: this.form.content,
+            },
+          }
 
       this.loading = true
       this.disabled = true
-      this.$apollo
-        .mutate(mutateParams)
-        .then((res) => {
-          this.loading = false
-          if (!this.update) {
-            const {
-              data: { CreateComment },
-            } = res
-            this.$emit('createComment', CreateComment)
-            this.clear()
-            this.$toast.success(this.$t('post.comment.submitted'))
-            this.disabled = false
-          } else {
-            const {
-              data: { UpdateComment },
-            } = res
-            this.$emit('updateComment', UpdateComment)
-            this.$emit('collapse')
-            this.$toast.success(this.$t('post.comment.updated'))
-            this.disabled = false
-            this.closeEditWindow()
-          }
-        })
-        .catch((err) => {
-          this.$toast.error(err.message)
-        })
+      try {
+        const res = await this.$apollo.mutate(mutateParams)
+        if (!this.update) {
+          const {
+            data: { CreateComment },
+          } = res
+          this.$emit('createComment', CreateComment)
+          this.clear()
+          this.$toast.success(this.$t('post.comment.submitted'))
+        } else {
+          const {
+            data: { UpdateComment },
+          } = res
+          this.$emit('updateComment', UpdateComment)
+          this.$emit('collapse')
+          this.$toast.success(this.$t('post.comment.updated'))
+          this.closeEditWindow()
+        }
+      } catch (err) {
+        this.$toast.error(err.message)
+      } finally {
+        this.loading = false
+        this.disabled = false
+      }
     },
   },
   apollo: {
