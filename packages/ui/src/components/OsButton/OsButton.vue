@@ -178,6 +178,7 @@
             : [contentWrapper]
 
         const buttonClass = cn(
+          'os-button',
           variantClasses.value,
           props.circle && 'rounded-full p-0',
           props.circle && CIRCLE_WIDTHS[size], // eslint-disable-line security/detect-object-injection
