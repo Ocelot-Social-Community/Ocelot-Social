@@ -49,8 +49,9 @@ export default {
     },
     hideContextMenu() {
       if (this.menu) {
-        this.menu.destroy()
+        const menu = this.menu
         this.menu = null
+        menu.destroy()
       }
       if (this.observer) {
         this.observer.disconnect()
