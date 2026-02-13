@@ -144,6 +144,7 @@
               :appearance="toggleMobileMenu ? 'filled' : 'outline'"
               circle
               class="hamburger-button"
+              :aria-label="$t('site.navigation')"
               @click="toggleMobileMenuView"
             >
               <template #icon>
