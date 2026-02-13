@@ -529,13 +529,14 @@ describe('osButton', () => {
       expect(wrapper.text()).toBe('Groups')
     })
 
-    it('does not set disabled attr on non-button tags', () => {
+    it('ignores disabled prop on non-button tags', () => {
       const wrapper = mount(OsButton, {
         props: { as: 'a', disabled: true },
+        attrs: { href: '/test' },
       })
       expect(wrapper.attributes('disabled')).toBeUndefined()
-      expect(wrapper.attributes('aria-disabled')).toBe('true')
-      expect(wrapper.attributes('tabindex')).toBe('-1')
+      expect(wrapper.attributes('aria-disabled')).toBeUndefined()
+      expect(wrapper.attributes('tabindex')).toBeUndefined()
     })
 
     it('applies variant classes regardless of as', () => {

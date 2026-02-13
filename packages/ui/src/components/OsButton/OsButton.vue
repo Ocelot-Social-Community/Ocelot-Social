@@ -77,7 +77,10 @@
     name: 'OsButton',
     inheritAttrs: false,
     props: {
-      /** Element or component to render as (e.g. 'a', NuxtLink, RouterLink). */
+      /**
+       * Element or component to render as (e.g. 'a', NuxtLink, RouterLink).
+       * Note: `disabled`, `type`, and `loading` only apply when as="button" (default).
+       */
       as: {
         type: [String, Object, Function] as PropType<string | Component>,
         default: 'button',
@@ -210,9 +213,6 @@
         if (isNativeButton) {
           buttonData.type = props.type
           buttonData.disabled = isDisabled || undefined
-        } else if (isDisabled) {
-          buttonData['aria-disabled'] = 'true'
-          buttonData.tabindex = '-1'
         }
 
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */

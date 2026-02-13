@@ -697,13 +697,6 @@ export const AsLink: Story = {
           </div>
         </div>
         <div>
-          <h3 class="text-sm font-bold mb-2">as="a" disabled</h3>
-          <div class="flex flex-wrap gap-2">
-            <OsButton as="a" href="#" variant="primary" disabled>Disabled Link</OsButton>
-            <OsButton as="a" href="#" variant="primary" appearance="outline" disabled>Disabled Outline</OsButton>
-          </div>
-        </div>
-        <div>
           <h3 class="text-sm font-bold mb-2">as="button" (default)</h3>
           <div class="flex flex-wrap gap-2">
             <OsButton variant="primary">Button (default)</OsButton>
