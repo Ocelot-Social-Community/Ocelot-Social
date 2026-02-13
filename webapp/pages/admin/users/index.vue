@@ -58,7 +58,7 @@
           {{ scope.row.createdAt | dateTime }}
         </template>
 
-        <template slot="role" slot-scope="scope">
+        <template #role="scope">
           <template v-if="userRoles">
             <select
               v-if="scope.row.id !== currentUser.id"
