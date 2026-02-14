@@ -21,7 +21,7 @@ export default [
   ...vue3,
   ...vitest,
   {
-    // TODO: fix in eslint-config-it4c — these rules conflict with each other
+    // TODO: fix in eslint-config-it4c
     files: ['**/*.spec.ts', '**/*.test.ts'],
     rules: {
       'vitest/valid-title': 'off', // conflicts with vitest/prefer-describe-function-title
