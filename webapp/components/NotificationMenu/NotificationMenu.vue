@@ -45,7 +45,12 @@
     <template #popover="{ closeMenu }">
       <ds-flex class="notifications-link-container">
         <ds-flex-item>
-          <os-button as="nuxt-link" :to="{ name: 'notifications' }" appearance="ghost" variant="primary">
+          <os-button
+            as="nuxt-link"
+            :to="{ name: 'notifications' }"
+            appearance="ghost"
+            variant="primary"
+          >
             {{ $t('notifications.pageLink') }}
           </os-button>
           <os-button
