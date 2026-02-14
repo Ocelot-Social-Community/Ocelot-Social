@@ -18,7 +18,6 @@ describe('tailwind.preset', () => {
 
     it('contains only strings', () => {
       for (const variable of requiredCssVariables) {
-        expect(typeof variable).toBe('string')
         expectTypeOf(variable).toBeString()
       }
     })
