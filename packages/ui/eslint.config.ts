@@ -1,9 +1,14 @@
-import config, { css, vue3, vitest } from 'eslint-config-it4c'
+import config, { css, vue3, vitest as vitests } from 'eslint-config-it4c'
 import jsdocPlugin from 'eslint-plugin-jsdoc'
 import playwrightPlugin from 'eslint-plugin-playwright'
 import storybookPlugin from 'eslint-plugin-storybook'
 import vuejsAccessibilityPlugin from 'eslint-plugin-vuejs-accessibility'
 import { tailwind4 } from 'tailwind-csstree'
+
+/** Turn off all vitest rules (for use in Playwright test overrides) */
+const vitestRulesOff = Object.fromEntries(
+  Object.keys(vitests[0]?.rules ?? {}).map((rule) => [rule, 'off']),
+)
 
 export default [
   {
@@ -19,7 +24,7 @@ export default [
   },
   ...config,
   ...vue3,
-  ...vitest,
+  ...vitests,
   {
     rules: {
       // TODO: replace with alias
@@ -37,12 +42,12 @@ export default [
     },
   },
   {
-    // Playwright visual tests
+    // Playwright visual tests (not vitest — disable all vitest rules)
     files: ['**/*.visual.spec.ts'],
     ...playwrightPlugin.configs['flat/recommended'],
     rules: {
       'n/no-process-env': 'off',
-      'vitest/require-hook': 'off',
+      ...vitestRulesOff,
     },
   },
   {
