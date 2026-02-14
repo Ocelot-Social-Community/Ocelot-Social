@@ -28,7 +28,7 @@ export default [
     },
   },
   {
-    // Playwright visual tests (not vitest — disable all vitest rules)
+    // Playwright visual tests
     files: ['**/*.visual.spec.ts'],
     ...playwrightPlugin.configs['flat/recommended'],
   },
