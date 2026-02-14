@@ -13,7 +13,7 @@
  * Note: JSDoc comments on props are checked via ESLint (jsdoc/require-jsdoc)
  */
 
-import { access, readFile } from 'node:fs/promises'
+import { readFile } from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
 
 import { glob } from 'glob'
@@ -25,12 +25,13 @@ function toKebabCase(str: string): string {
   return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
 }
 
-async function fileExists(path: string): Promise<boolean> {
+/** Read file contents, returning null if the file does not exist */
+async function tryReadFile(path: string): Promise<string | null> {
   try {
-    await access(path)
-    return true
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path from glob, not user input
+    return await readFile(path, 'utf-8')
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return false
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null
     throw error
   }
 }
@@ -64,29 +65,29 @@ for (const componentPath of components) {
     warnings: [],
   }
 
+  // Read all files once (null = file does not exist)
+  const storyContent = await tryReadFile(storyPath)
+  const visualTestContent = await tryReadFile(visualTestPath)
+  const unitTestContent = await tryReadFile(unitTestPath)
+  const variantsContent = await tryReadFile(variantsPath)
+
   // Check 1: Story file exists
-  if (!(await fileExists(storyPath))) {
+  if (storyContent === null) {
     result.errors.push(`Missing story file: ${storyPath}`)
   }
 
   // Check 2: Visual regression test file exists
-  if (!(await fileExists(visualTestPath))) {
+  if (visualTestContent === null) {
     result.errors.push(`Missing visual test file: ${visualTestPath}`)
   }
 
   // Check 3: Visual tests include accessibility checks
-  if (await fileExists(visualTestPath)) {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path from glob, not user input
-    const visualTestContent = await readFile(visualTestPath, 'utf-8')
-    if (!visualTestContent.includes('checkA11y(')) {
-      result.errors.push(`Missing checkA11y() calls in visual tests: ${visualTestPath}`)
-    }
+  if (visualTestContent !== null && !visualTestContent.includes('checkA11y(')) {
+    result.errors.push(`Missing checkA11y() calls in visual tests: ${visualTestPath}`)
   }
 
   // Check 4: Keyboard accessibility tests exist
-  if (await fileExists(unitTestPath)) {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path from glob, not user input
-    const unitTestContent = await readFile(unitTestPath, 'utf-8')
+  if (unitTestContent !== null) {
     if (!unitTestContent.includes("describe('keyboard accessibility'")) {
       result.errors.push(`Missing keyboard accessibility tests in: ${unitTestPath}`)
     }
@@ -95,20 +96,13 @@ for (const componentPath of components) {
   }
 
   // Check 5 & 6: Story and visual test coverage
-  if ((await fileExists(storyPath)) && (await fileExists(visualTestPath))) {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path from glob, not user input
-    const storyContent = await readFile(storyPath, 'utf-8')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path from glob, not user input
-    const visualTestContent = await readFile(visualTestPath, 'utf-8')
-
-    // Extract exported story names (e.g., "export const Primary: Story")
+  if (storyContent !== null && visualTestContent !== null) {
     const storyExports = storyContent.matchAll(/export\s+const\s+(\w+):\s*Story/g)
 
     for (const match of storyExports) {
       const storyName = match[1]
       const kebabName = toKebabCase(storyName)
 
-      // Check if this story is tested in visual tests (URL pattern: --story-name)
       if (!visualTestContent.includes(`--${kebabName}`)) {
         result.warnings.push(`Story "${storyName}" missing visual test (--${kebabName})`)
       }
@@ -116,31 +110,20 @@ for (const componentPath of components) {
   }
 
   // Check 5: Variant values are demonstrated in stories
-  if ((await fileExists(storyPath)) && (await fileExists(variantsPath))) {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path from glob, not user input
-    const variantsContent = await readFile(variantsPath, 'utf-8')
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path from glob, not user input
-    const storyContent = await readFile(storyPath, 'utf-8')
-
-    // Extract variants block
+  if (storyContent !== null && variantsContent !== null) {
     const variantsBlockMatch = /variants:\s*\{([\s\S]*?)\n\s{4}\},/m.exec(variantsContent)
 
     if (variantsBlockMatch) {
       const variantsBlock = variantsBlockMatch[1]
-
-      // Extract each variant type (variant, size, etc.)
       const variantTypeMatches = variantsBlock.matchAll(/^\s{6}(\w+):\s*\{([\s\S]*?)\n\s{6}\}/gm)
 
       for (const match of variantTypeMatches) {
         const variantName = match[1]
         const variantValues = match[2]
-
-        // Extract individual values
         const valueMatches = variantValues.matchAll(/^\s+(\w+):\s*\[/gm)
 
         for (const valueMatch of valueMatches) {
           const value = valueMatch[1]
-          // Check if this value appears in stories (multiple patterns)
           const patterns = [
             `${variantName}="${value}"`,
             `${variantName}='${value}'`,
@@ -148,8 +131,7 @@ for (const componentPath of components) {
             `${variantName}: "${value}"`,
           ]
 
-          const found = patterns.some((p) => storyContent.includes(p))
-          if (!found) {
+          if (!patterns.some((p) => storyContent.includes(p))) {
             result.warnings.push(`Variant "${variantName}=${value}" not demonstrated in story`)
           }
         }
