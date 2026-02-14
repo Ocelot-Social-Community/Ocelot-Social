@@ -12,7 +12,7 @@
  * Note: JSDoc comments on props are checked via ESLint (jsdoc/require-jsdoc)
  */
 
-import { existsSync, readFileSync } from 'node:fs'
+import { access, readFile } from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
 
 import { glob } from 'glob'
@@ -22,6 +22,16 @@ import { glob } from 'glob'
  */
 function toKebabCase(str: string): string {
   return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+}
+
+async function fileExists(path: string): Promise<boolean> {
+  try {
+    await access(path)
+    return true
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return false
+    throw error
+  }
 }
 
 interface CheckResult {
@@ -34,7 +44,7 @@ const results: CheckResult[] = []
 let hasErrors = false
 
 // Find all Vue components (excluding index files)
-const components = glob.sync('src/components/**/Os*.vue')
+const components = await glob('src/components/**/Os*.vue')
 
 for (const componentPath of components) {
   const componentName = basename(componentPath, '.vue')
@@ -54,26 +64,26 @@ for (const componentPath of components) {
   }
 
   // Check 1: Story file exists
-  if (!existsSync(storyPath)) {
+  if (!(await fileExists(storyPath))) {
     result.errors.push(`Missing story file: ${storyPath}`)
   }
 
   // Check 2: Visual regression test file exists
-  if (!existsSync(visualTestPath)) {
+  if (!(await fileExists(visualTestPath))) {
     result.errors.push(`Missing visual test file: ${visualTestPath}`)
   }
 
   // Check 3: Visual tests include accessibility checks
-  if (existsSync(visualTestPath)) {
-    const visualTestContent = readFileSync(visualTestPath, 'utf-8')
+  if (await fileExists(visualTestPath)) {
+    const visualTestContent = await readFile(visualTestPath, 'utf-8')
     if (!visualTestContent.includes('checkA11y(')) {
       result.errors.push(`Missing checkA11y() calls in visual tests: ${visualTestPath}`)
     }
   }
 
   // Check 4: Keyboard accessibility tests exist
-  if (existsSync(unitTestPath)) {
-    const unitTestContent = readFileSync(unitTestPath, 'utf-8')
+  if (await fileExists(unitTestPath)) {
+    const unitTestContent = await readFile(unitTestPath, 'utf-8')
     if (!unitTestContent.includes("describe('keyboard accessibility'")) {
       result.errors.push(`Missing keyboard accessibility tests in: ${unitTestPath}`)
     }
@@ -82,9 +92,9 @@ for (const componentPath of components) {
   }
 
   // Check 5 & 6: Story and visual test coverage
-  if (existsSync(storyPath) && existsSync(visualTestPath)) {
-    const storyContent = readFileSync(storyPath, 'utf-8')
-    const visualTestContent = readFileSync(visualTestPath, 'utf-8')
+  if ((await fileExists(storyPath)) && (await fileExists(visualTestPath))) {
+    const storyContent = await readFile(storyPath, 'utf-8')
+    const visualTestContent = await readFile(visualTestPath, 'utf-8')
 
     // Extract exported story names (e.g., "export const Primary: Story")
     const storyExports = storyContent.matchAll(/export\s+const\s+(\w+):\s*Story/g)
@@ -101,9 +111,9 @@ for (const componentPath of components) {
   }
 
   // Check 5: Variant values are demonstrated in stories
-  if (existsSync(storyPath) && existsSync(variantsPath)) {
-    const variantsContent = readFileSync(variantsPath, 'utf-8')
-    const storyContent = readFileSync(storyPath, 'utf-8')
+  if ((await fileExists(storyPath)) && (await fileExists(variantsPath))) {
+    const variantsContent = await readFile(variantsPath, 'utf-8')
+    const storyContent = await readFile(storyPath, 'utf-8')
 
     // Extract variants block
     const variantsBlockMatch = /variants:\s*\{([\s\S]*?)\n\s{4}\},/m.exec(variantsContent)
