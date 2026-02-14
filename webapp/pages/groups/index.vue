@@ -7,24 +7,24 @@
     <ds-space>
       <!-- create group -->
       <ds-space centered>
-        <nuxt-link :to="{ name: 'groups-create' }">
-          <os-button
-            class="group-add-button"
-            variant="primary"
-            appearance="filled"
-            circle
-            size="xl"
-            :aria-label="$t('group.createNewGroup.tooltip')"
-            v-tooltip="{
-              content: $t('group.createNewGroup.tooltip'),
-              placement: 'left',
-            }"
-          >
-            <template #icon>
-              <base-icon name="plus" />
-            </template>
-          </os-button>
-        </nuxt-link>
+        <os-button
+          as="nuxt-link"
+          :to="{ name: 'groups-create' }"
+          class="group-add-button"
+          variant="primary"
+          appearance="filled"
+          circle
+          size="xl"
+          :aria-label="$t('group.createNewGroup.tooltip')"
+          v-tooltip="{
+            content: $t('group.createNewGroup.tooltip'),
+            placement: 'left',
+          }"
+        >
+          <template #icon>
+            <base-icon name="plus" />
+          </template>
+        </os-button>
       </ds-space>
       <!-- group list -->
       <ds-space centered v-if="showPagination">
