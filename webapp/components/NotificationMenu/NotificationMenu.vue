@@ -1,24 +1,6 @@
 <template>
   <os-button
-    v-if="!unreadNotificationsCount"
-    as="nuxt-link"
-    :to="{ name: 'notifications' }"
-    class="notifications-menu"
-    variant="primary"
-    appearance="ghost"
-    circle
-    :aria-label="$t('header.notifications.tooltip')"
-    v-tooltip="{
-      content: $t('header.notifications.tooltip'),
-      placement: 'bottom-start',
-    }"
-  >
-    <template #icon>
-      <base-icon name="bell" />
-    </template>
-  </os-button>
-  <os-button
-    v-else-if="noMenu"
+    v-if="!unreadNotificationsCount || noMenu"
     as="nuxt-link"
     :to="{ name: 'notifications' }"
     class="notifications-menu"
