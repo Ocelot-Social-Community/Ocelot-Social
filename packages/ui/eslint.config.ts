@@ -34,14 +34,6 @@ export default [
     },
   },
   {
-    // CLI scripts - allow sync methods and console
-    files: ['scripts/**/*.ts'],
-    rules: {
-      //'no-console': 'off',
-      //'security/detect-non-literal-fs-filename': 'off',
-    },
-  },
-  {
     // Playwright visual tests (not vitest — disable all vitest rules)
     files: ['**/*.visual.spec.ts'],
     ...playwrightPlugin.configs['flat/recommended'],

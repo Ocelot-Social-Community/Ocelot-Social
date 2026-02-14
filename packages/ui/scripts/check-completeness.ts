@@ -76,6 +76,7 @@ for (const componentPath of components) {
 
   // Check 3: Visual tests include accessibility checks
   if (await fileExists(visualTestPath)) {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path from glob, not user input
     const visualTestContent = await readFile(visualTestPath, 'utf-8')
     if (!visualTestContent.includes('checkA11y(')) {
       result.errors.push(`Missing checkA11y() calls in visual tests: ${visualTestPath}`)
@@ -84,6 +85,7 @@ for (const componentPath of components) {
 
   // Check 4: Keyboard accessibility tests exist
   if (await fileExists(unitTestPath)) {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path from glob, not user input
     const unitTestContent = await readFile(unitTestPath, 'utf-8')
     if (!unitTestContent.includes("describe('keyboard accessibility'")) {
       result.errors.push(`Missing keyboard accessibility tests in: ${unitTestPath}`)
@@ -94,7 +96,9 @@ for (const componentPath of components) {
 
   // Check 5 & 6: Story and visual test coverage
   if ((await fileExists(storyPath)) && (await fileExists(visualTestPath))) {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path from glob, not user input
     const storyContent = await readFile(storyPath, 'utf-8')
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path from glob, not user input
     const visualTestContent = await readFile(visualTestPath, 'utf-8')
 
     // Extract exported story names (e.g., "export const Primary: Story")
@@ -113,7 +117,9 @@ for (const componentPath of components) {
 
   // Check 5: Variant values are demonstrated in stories
   if ((await fileExists(storyPath)) && (await fileExists(variantsPath))) {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path from glob, not user input
     const variantsContent = await readFile(variantsPath, 'utf-8')
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path from glob, not user input
     const storyContent = await readFile(storyPath, 'utf-8')
 
     // Extract variants block
