@@ -1,22 +1,22 @@
 <template>
   <div>
-    <nuxt-link to="/map">
-      <os-button
-        class="map-button"
-        variant="primary"
-        appearance="ghost"
-        circle
-        :aria-label="$t('header.map.tooltip')"
-        v-tooltip="{
-          content: $t('header.map.tooltip'),
-          placement: 'bottom-start',
-        }"
-      >
-        <template #icon>
-          <base-icon name="globe-detailed" size="large" />
-        </template>
-      </os-button>
-    </nuxt-link>
+    <os-button
+      as="nuxt-link"
+      to="/map"
+      class="map-button"
+      variant="primary"
+      appearance="ghost"
+      circle
+      :aria-label="$t('header.map.tooltip')"
+      v-tooltip="{
+        content: $t('header.map.tooltip'),
+        placement: 'bottom-start',
+      }"
+    >
+      <template #icon>
+        <base-icon name="globe-detailed" size="large" />
+      </template>
+    </os-button>
   </div>
 </template>
 
