@@ -79,7 +79,7 @@
     "@storybook/vue3-vite": "^10.2.7",
     "@tailwindcss/cli": "^4.1.18",
     "@tailwindcss/vite": "^4.1.18",
-    "@types/node": "^25.2.2",
+    "@types/node": "^25.2.3",
     "@vitejs/plugin-vue": "^6.0.4",
     "@vitest/coverage-v8": "^4.0.18",
     "@vue/test-utils": "^2.4.6",
