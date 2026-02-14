@@ -132,9 +132,7 @@
         </div>
         <!-- submit -->
         <ds-space margin-top="large">
-          <nuxt-link to="/groups">
-            <os-button variant="default" appearance="filled">{{ $t('actions.cancel') }}</os-button>
-          </nuxt-link>
+          <os-button as="nuxt-link" to="/groups" variant="default" appearance="filled">{{ $t('actions.cancel') }}</os-button>
           <os-button
             variant="primary"
             appearance="filled"
