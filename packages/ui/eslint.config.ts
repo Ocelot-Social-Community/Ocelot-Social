@@ -37,8 +37,7 @@ export default [
     // CLI scripts - allow sync methods and console
     files: ['scripts/**/*.ts'],
     rules: {
-      'n/shebang': 'off',
-      'n/no-sync': 'off',
+      //'n/no-sync': 'off',
       'no-console': 'off',
       'security/detect-non-literal-fs-filename': 'off',
     },

@@ -1,4 +1,3 @@
-#!/usr/bin/env npx tsx
 /**
  * Completeness checker for @ocelot-social/ui components
  *
