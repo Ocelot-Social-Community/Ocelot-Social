@@ -66,10 +66,12 @@ for (const componentPath of components) {
   }
 
   // Read all files once (null = file does not exist)
-  const storyContent = await tryReadFile(storyPath)
-  const visualTestContent = await tryReadFile(visualTestPath)
-  const unitTestContent = await tryReadFile(unitTestPath)
-  const variantsContent = await tryReadFile(variantsPath)
+  const [storyContent, visualTestContent, unitTestContent, variantsContent] = await Promise.all([
+    tryReadFile(storyPath),
+    tryReadFile(visualTestPath),
+    tryReadFile(unitTestPath),
+    tryReadFile(variantsPath),
+  ])
 
   // Check 1: Story file exists
   if (storyContent === null) {
