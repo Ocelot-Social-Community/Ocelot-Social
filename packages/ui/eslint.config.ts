@@ -41,13 +41,6 @@ export default [
       ...vitestRulesOff,
     },
   },
-  {
-    // Playwright config
-    files: ['playwright.config.ts'],
-    rules: {
-      // 'n/no-process-env': 'off',
-    },
-  },
   // Storybook files
   // eslint-disable-next-line import-x/no-named-as-default-member -- flat config access pattern
   ...storybookPlugin.configs['flat/recommended'],
