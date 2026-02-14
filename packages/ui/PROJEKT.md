@@ -133,8 +133,8 @@ as-Prop Migration:  15 <nuxt-link>/<a>-Wrapper in 15 Webapp-Dateien → as="nuxt
 - [x] OsButton: `as` Prop implementiert (polymorphe Komponente: `button`, `a`, `nuxt-link`, `router-link`, Custom-Komponenten)
 - [x] Naming-Konvention: `tag` → `as` (moderner Standard: Headless UI, Radix Vue, Chakra UI, PrimeVue)
 - [x] `disabled`/`type`/`loading` nur bei `as="button"` (Links haben kein natives `disabled`-Attribut)
-- [x] Stories: `AsLink` Story + Playground `as`-Selektor (button/a)
-- [x] Visual Test: `as link` Screenshot + a11y-Check
+- [x] Stories: `Polymorphic` Story + Playground `as`-Selektor (button/a)
+- [x] Visual Test: `polymorphic` Screenshot + a11y-Check
 - [x] 15 `<nuxt-link>`/`<a>`-Wrapper in 15 Webapp-Dateien → `as="nuxt-link"` / `as="a"` migriert:
   - GroupButton.vue, CtaUnblockAuthor.vue, terms-and-conditions-confirm.vue
   - CustomButton.vue (v-if/v-else → computed `linkTag`/`linkProps` konsolidiert)
@@ -1699,7 +1699,7 @@ Bei der Migration werden:
 | 2026-02-14 | **`as` Prop** | Polymorphe OsButton-Komponente: `as` Prop für dynamischen Tag/Komponente (`button`, `a`, `nuxt-link`, `router-link`); moderner Standard (Headless UI, Radix Vue) |
 | 2026-02-14 | **Naming: tag → as** | `tag` → `as` umbenannt nach Recherche moderner UI-Libraries (Headless UI, Radix Vue, Chakra UI, PrimeVue nutzen `as`) |
 | 2026-02-14 | **Disabled nur für button** | `disabled`/`type`/`loading` nur bei `as="button"` (Links haben kein natives `disabled`); `aria-disabled`/`tabindex` Logik entfernt |
-| 2026-02-14 | **AsLink Story** | Neue Story `AsLink` mit Varianten, Icons, disabled-Vergleich; Playground mit `as`-Selektor (button/a) |
+| 2026-02-14 | **Polymorphic Story** | Neue Story `Polymorphic` mit Varianten, Icons, disabled-Vergleich; Playground mit `as`-Selektor (button/a) |
 | 2026-02-14 | **nuxt-link Migration** | 15 `<nuxt-link>`/`<a>`-Wrapper → `as="nuxt-link"`/`as="a"` in 15 Webapp-Dateien; invalides HTML (`<button>` in `<a>`) eliminiert |
 | 2026-02-14 | **CustomButton konsolidiert** | v-if/v-else für `<a>`/`<nuxt-link>` Wrapper → einzelner `<os-button :as="linkTag" v-bind="linkProps">` mit Computed Properties |
 | 2026-02-14 | **NotificationMenu konsolidiert** | 2 separate Buttons (kein Badge / mit Badge) zu einem zusammengeführt — counter-icon zeigt bei `count=0` kein Badge |
