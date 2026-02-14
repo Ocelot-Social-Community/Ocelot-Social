@@ -46,6 +46,6 @@ describe('ocelotUI Plugin', () => {
 
     expect(() => {
       OcelotUI.install?.(mockApp as never)
-    }).not.toThrow()
+    }).not.toThrowError()
   })
 })
