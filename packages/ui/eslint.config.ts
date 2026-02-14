@@ -32,6 +32,14 @@ export default [
     },
   },
   {
+    // TODO: fix in eslint-config-it4c — these rules conflict with each other
+    files: ['**/*.spec.ts', '**/*.test.ts'],
+    rules: {
+      'vitest/valid-title': 'off', // conflicts with vitest/prefer-describe-function-title
+      'vitest/expect-expect': ['warn', { assertFunctionNames: ['expect', 'expectTypeOf'] }],
+    },
+  },
+  {
     // CLI scripts - allow sync methods and console
     files: ['scripts/**/*.ts'],
     rules: {

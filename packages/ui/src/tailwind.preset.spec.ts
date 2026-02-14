@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach, expectTypeOf } from 'vitest'
 
 import { ocelotPreset, requiredCssVariables, validateCssVariables } from './tailwind.preset'
 
 describe('tailwind.preset', () => {
-  describe('ocelotPreset', () => {
+  describe(ocelotPreset, () => {
     it('exports a valid Tailwind preset with theme.extend structure', () => {
       expect(ocelotPreset).toBeDefined()
       expect(ocelotPreset).toHaveProperty('theme')
@@ -11,14 +11,14 @@ describe('tailwind.preset', () => {
     })
   })
 
-  describe('requiredCssVariables', () => {
+  describe(requiredCssVariables, () => {
     it('exports an array', () => {
       expect(Array.isArray(requiredCssVariables)).toBe(true)
     })
 
     it('contains only strings', () => {
       for (const variable of requiredCssVariables) {
-        expect(typeof variable).toBe('string')
+        expectTypeOf(variable).toBeString()
       }
     })
 
@@ -33,7 +33,7 @@ describe('tailwind.preset', () => {
     })
   })
 
-  describe('validateCssVariables', () => {
+  describe(validateCssVariables, () => {
     afterEach(() => {
       vi.unstubAllGlobals()
       vi.restoreAllMocks()
