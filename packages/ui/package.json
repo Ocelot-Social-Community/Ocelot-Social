@@ -72,7 +72,6 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
     "@axe-core/playwright": "^4.11.1",
-    "@eslint/css": "^0.14.1",
     "@fontsource-variable/inter": "^5.2.8",
     "@playwright/test": "^1.58.2",
     "@size-limit/file": "^12.0.0",

@@ -1,22 +1,9 @@
-// TODO: Update eslint-config-it4c to support ESLint 10 (currently incompatible)
-import css from '@eslint/css'
-import config, { vue3, vitest } from 'eslint-config-it4c'
+import config, { css, vue3, vitest } from 'eslint-config-it4c'
 import jsdocPlugin from 'eslint-plugin-jsdoc'
 import playwrightPlugin from 'eslint-plugin-playwright'
 import storybookPlugin from 'eslint-plugin-storybook'
 import vuejsAccessibilityPlugin from 'eslint-plugin-vuejs-accessibility'
 import { tailwind4 } from 'tailwind-csstree'
-
-import type { Linter } from 'eslint'
-
-/** Exclude CSS files from JS-focused config blocks (JS rules crash on CSS language) */
-function excludeCSS(configs: Linter.Config[]): Linter.Config[] {
-  return configs.map((c) => {
-    // Don't touch global-ignores-only blocks
-    if (Object.keys(c).length === 1 && 'ignores' in c) return c
-    return { ...c, ignores: [...(c.ignores ?? []), '**/*.css'] }
-  })
-}
 
 export default [
   {
@@ -30,11 +17,10 @@ export default [
       'playwright-report/',
     ],
   },
-  ...excludeCSS(config),
-  ...excludeCSS(vue3),
-  ...excludeCSS(vitest),
+  ...config,
+  ...vue3,
+  ...vitest,
   {
-    ignores: ['**/*.css'],
     rules: {
       // TODO: replace with alias
       'import-x/no-relative-parent-imports': 'off',
@@ -96,18 +82,12 @@ export default [
       ...vuejsAccessibilityPlugin.configs.recommended.rules,
     },
   },
+  ...css,
   {
-    // CSS files with Tailwind v4 syntax support
+    // Extend CSS config with Tailwind v4 syntax support
     files: ['**/*.css'],
-    plugins: { css },
-    language: 'css/css',
     languageOptions: {
       customSyntax: tailwind4,
-    },
-    rules: {
-      'css/no-empty-blocks': 'error',
-      'css/no-duplicate-imports': 'error',
-      'css/no-invalid-at-rules': 'error',
     },
   },
 ]
