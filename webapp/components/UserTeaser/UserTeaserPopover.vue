@@ -27,9 +27,15 @@
         />
       </li>
     </ul>
-    <nuxt-link v-if="isTouchDevice && userLink" :to="userLink" class="link">
-      <os-button variant="primary">{{ $t('user-teaser.popover.open-profile') }}</os-button>
-    </nuxt-link>
+    <os-button
+      v-if="isTouchDevice && userLink"
+      as="nuxt-link"
+      :to="userLink"
+      class="link"
+      variant="primary"
+    >
+      {{ $t('user-teaser.popover.open-profile') }}
+    </os-button>
   </div>
 </template>
 
