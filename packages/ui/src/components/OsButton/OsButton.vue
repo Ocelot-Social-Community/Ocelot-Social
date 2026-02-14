@@ -79,7 +79,8 @@
     props: {
       /**
        * Element or component to render as (e.g. 'a', NuxtLink, RouterLink).
-       * Note: `disabled`, `type`, and `loading` only apply when as="button" (default).
+       * Note: `disabled` and `type` apply only when as="button" (default).
+       * `loading` shows the spinner for any tag, but only disables native buttons.
        */
       as: {
         type: [String, Object, Function] as PropType<string | Component>,
