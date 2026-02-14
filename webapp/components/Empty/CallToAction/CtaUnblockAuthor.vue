@@ -7,16 +7,14 @@
     <ds-text>
       {{ $t('contribution.comment.commenting-disabled.blocked-author.call-to-action') }}
     </ds-text>
-    <nuxt-link :to="authorLink">
-      <os-button variant="primary" appearance="filled">
-        <template #icon><base-icon name="arrow-right" /></template>
-        {{
-          $t('contribution.comment.commenting-disabled.blocked-author.button-label', {
-            name: author.name,
-          })
-        }}
-      </os-button>
-    </nuxt-link>
+    <os-button as="nuxt-link" :to="authorLink" variant="primary" appearance="filled">
+      <template #icon><base-icon name="arrow-right" /></template>
+      {{
+        $t('contribution.comment.commenting-disabled.blocked-author.button-label', {
+          name: author.name,
+        })
+      }}
+    </os-button>
   </ds-space>
 </template>
 
