@@ -6,9 +6,9 @@ import vuejsAccessibilityPlugin from 'eslint-plugin-vuejs-accessibility'
 import { tailwind4 } from 'tailwind-csstree'
 
 /** Turn off all vitest rules (for use in Playwright test overrides) */
-const vitestRulesOff = Object.fromEntries(
+/* const vitestRulesOff = Object.fromEntries(
   Object.keys(vitests[0]?.rules ?? {}).map((rule) => [rule, 'off']),
-)
+) */
 
 export default [
   {
@@ -30,16 +30,15 @@ export default [
     files: ['**/*.spec.ts', '**/*.test.ts'],
     rules: {
       'vitest/valid-title': 'off', // conflicts with vitest/prefer-describe-function-title
-      'vitest/expect-expect': ['warn', { assertFunctionNames: ['expect', 'expectTypeOf'] }],
     },
   },
   {
     // Playwright visual tests (not vitest — disable all vitest rules)
     files: ['**/*.visual.spec.ts'],
     ...playwrightPlugin.configs['flat/recommended'],
-    rules: {
+    /*rules: {
       ...vitestRulesOff,
-    },
+    },*/
   },
   // Storybook files
   // eslint-disable-next-line import-x/no-named-as-default-member -- flat config access pattern
