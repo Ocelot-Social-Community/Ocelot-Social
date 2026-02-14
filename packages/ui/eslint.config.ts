@@ -38,7 +38,6 @@ export default [
     files: ['**/*.visual.spec.ts'],
     ...playwrightPlugin.configs['flat/recommended'],
     rules: {
-      'n/no-process-env': 'off',
       ...vitestRulesOff,
     },
   },
@@ -46,7 +45,7 @@ export default [
     // Playwright config
     files: ['playwright.config.ts'],
     rules: {
-      'n/no-process-env': 'off',
+      // 'n/no-process-env': 'off',
     },
   },
   // Storybook files
