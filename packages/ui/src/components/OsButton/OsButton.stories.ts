@@ -670,7 +670,6 @@ export const CircleAppearances: Story = {
 }
 
 export const AsLink: Story = {
-  name: 'As Link',
   render: () => ({
     components: { OsButton, CheckIcon, PlusIcon },
     template: `

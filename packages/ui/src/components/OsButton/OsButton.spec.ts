@@ -498,7 +498,7 @@ describe('osButton', () => {
   describe('as prop', () => {
     it('renders as <button> by default', () => {
       const wrapper = mount(OsButton)
-      expect(wrapper.element.tagName).toBe('BUTTON')
+      expect((wrapper.element as HTMLElement).tagName).toBe('BUTTON')
       expect(wrapper.attributes('type')).toBe('button')
     })
 
@@ -508,14 +508,14 @@ describe('osButton', () => {
         attrs: { href: '/test' },
         slots: { default: 'Link' },
       })
-      expect(wrapper.element.tagName).toBe('A')
+      expect((wrapper.element as HTMLElement).tagName).toBe('A')
       expect(wrapper.attributes('href')).toBe('/test')
       expect(wrapper.attributes('type')).toBeUndefined()
     })
 
     it('renders a component passed as as', () => {
       const FakeLink = defineComponent({
-        props: { to: String },
+        props: { to: { type: String, default: undefined } },
         setup(props, { slots }) {
           return () => h('a', { href: props.to }, slots.default?.())
         },
@@ -525,7 +525,7 @@ describe('osButton', () => {
         attrs: { to: '/groups' },
         slots: { default: 'Groups' },
       })
-      expect(wrapper.element.tagName).toBe('A')
+      expect((wrapper.element as HTMLElement).tagName).toBe('A')
       expect(wrapper.text()).toBe('Groups')
     })
 
