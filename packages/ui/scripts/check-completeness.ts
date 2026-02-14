@@ -1,4 +1,4 @@
-#!/usr/bin/env npx tsx
+/* eslint-disable no-console */
 /**
  * Completeness checker for @ocelot-social/ui components
  *
@@ -13,7 +13,7 @@
  * Note: JSDoc comments on props are checked via ESLint (jsdoc/require-jsdoc)
  */
 
-import { existsSync, readFileSync } from 'node:fs'
+import { readFile } from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
 
 import { glob } from 'glob'
@@ -23,6 +23,17 @@ import { glob } from 'glob'
  */
 function toKebabCase(str: string): string {
   return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+}
+
+/** Read file contents, returning null if the file does not exist */
+async function tryReadFile(path: string): Promise<string | null> {
+  try {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- path from glob, not user input
+    return await readFile(path, 'utf-8')
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null
+    throw error
+  }
 }
 
 interface CheckResult {
@@ -35,7 +46,7 @@ const results: CheckResult[] = []
 let hasErrors = false
 
 // Find all Vue components (excluding index files)
-const components = glob.sync('src/components/**/Os*.vue')
+const components = await glob('src/components/**/Os*.vue')
 
 for (const componentPath of components) {
   const componentName = basename(componentPath, '.vue')
@@ -54,28 +65,32 @@ for (const componentPath of components) {
     warnings: [],
   }
 
+  // Read all files once (null = file does not exist)
+  const [storyContent, visualTestContent, unitTestContent, variantsContent] = await Promise.all([
+    tryReadFile(storyPath),
+    tryReadFile(visualTestPath),
+    tryReadFile(unitTestPath),
+    tryReadFile(variantsPath),
+  ])
+
   // Check 1: Story file exists
-  if (!existsSync(storyPath)) {
+  if (storyContent === null) {
     result.errors.push(`Missing story file: ${storyPath}`)
   }
 
   // Check 2: Visual regression test file exists
-  if (!existsSync(visualTestPath)) {
+  if (visualTestContent === null) {
     result.errors.push(`Missing visual test file: ${visualTestPath}`)
   }
 
   // Check 3: Visual tests include accessibility checks
-  if (existsSync(visualTestPath)) {
-    const visualTestContent = readFileSync(visualTestPath, 'utf-8')
-    if (!visualTestContent.includes('checkA11y(')) {
-      result.errors.push(`Missing checkA11y() calls in visual tests: ${visualTestPath}`)
-    }
+  if (visualTestContent !== null && !visualTestContent.includes('checkA11y(')) {
+    result.errors.push(`Missing checkA11y() calls in visual tests: ${visualTestPath}`)
   }
 
   // Check 4: Keyboard accessibility tests exist
-  if (existsSync(unitTestPath)) {
-    const unitTestContent = readFileSync(unitTestPath, 'utf-8')
-    if (!unitTestContent.includes("describe('keyboard accessibility'")) {
+  if (unitTestContent !== null) {
+    if (!/describe\(\s*['"]keyboard accessibility['"]/.test(unitTestContent)) {
       result.errors.push(`Missing keyboard accessibility tests in: ${unitTestPath}`)
     }
   } else {
@@ -83,18 +98,14 @@ for (const componentPath of components) {
   }
 
   // Check 5 & 6: Story and visual test coverage
-  if (existsSync(storyPath) && existsSync(visualTestPath)) {
-    const storyContent = readFileSync(storyPath, 'utf-8')
-    const visualTestContent = readFileSync(visualTestPath, 'utf-8')
-
-    // Extract exported story names (e.g., "export const Primary: Story")
+  if (storyContent !== null && visualTestContent !== null) {
     const storyExports = storyContent.matchAll(/export\s+const\s+(\w+):\s*Story/g)
 
     for (const match of storyExports) {
       const storyName = match[1]
+      if (storyName === 'Playground') continue
       const kebabName = toKebabCase(storyName)
 
-      // Check if this story is tested in visual tests (URL pattern: --story-name)
       if (!visualTestContent.includes(`--${kebabName}`)) {
         result.warnings.push(`Story "${storyName}" missing visual test (--${kebabName})`)
       }
@@ -102,29 +113,20 @@ for (const componentPath of components) {
   }
 
   // Check 5: Variant values are demonstrated in stories
-  if (existsSync(storyPath) && existsSync(variantsPath)) {
-    const variantsContent = readFileSync(variantsPath, 'utf-8')
-    const storyContent = readFileSync(storyPath, 'utf-8')
-
-    // Extract variants block
+  if (storyContent !== null && variantsContent !== null) {
     const variantsBlockMatch = /variants:\s*\{([\s\S]*?)\n\s{4}\},/m.exec(variantsContent)
 
     if (variantsBlockMatch) {
       const variantsBlock = variantsBlockMatch[1]
-
-      // Extract each variant type (variant, size, etc.)
       const variantTypeMatches = variantsBlock.matchAll(/^\s{6}(\w+):\s*\{([\s\S]*?)\n\s{6}\}/gm)
 
       for (const match of variantTypeMatches) {
         const variantName = match[1]
         const variantValues = match[2]
-
-        // Extract individual values
         const valueMatches = variantValues.matchAll(/^\s+(\w+):\s*\[/gm)
 
         for (const valueMatch of valueMatches) {
           const value = valueMatch[1]
-          // Check if this value appears in stories (multiple patterns)
           const patterns = [
             `${variantName}="${value}"`,
             `${variantName}='${value}'`,
@@ -132,8 +134,7 @@ for (const componentPath of components) {
             `${variantName}: "${value}"`,
           ]
 
-          const found = patterns.some((p) => storyContent.includes(p))
-          if (!found) {
+          if (!patterns.some((p) => storyContent.includes(p))) {
             result.warnings.push(`Variant "${variantName}=${value}" not demonstrated in story`)
           }
         }

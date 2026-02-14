@@ -1,7 +1,7 @@
 <script lang="ts">
   import { computed, defineComponent, getCurrentInstance, h, isVue2 } from 'vue-demi'
 
-  import { cn } from '../../utils'
+  import { cn } from '#src/utils'
 
   import { buttonVariants } from './button.variants'
 

@@ -11,7 +11,7 @@ describe('ocelotUI Plugin', () => {
 
   it('registers only Os-prefixed components', () => {
     const mockApp = {
-      component: vi.fn(),
+      component: vi.fn<(name: string, component: unknown) => void>(),
     }
 
     OcelotUI.install?.(mockApp as never)
@@ -28,23 +28,24 @@ describe('ocelotUI Plugin', () => {
 
   it('does not register non-component exports', () => {
     const mockApp = {
-      component: vi.fn(),
+      component: vi.fn<(name: string, component: unknown) => void>(),
     }
 
     OcelotUI.install?.(mockApp as never)
 
     // buttonVariants should NOT be registered
-    const callArgs = mockApp.component.mock.calls.map((call: unknown[]) => call[0])
+    const callArgs = mockApp.component.mock.calls.map((call) => call[0])
+
     expect(callArgs).not.toContain('buttonVariants')
   })
 
   it('works without throwing', () => {
     const mockApp = {
-      component: vi.fn(),
+      component: vi.fn<(name: string, component: unknown) => void>(),
     }
 
     expect(() => {
       OcelotUI.install?.(mockApp as never)
-    }).not.toThrow()
+    }).not.toThrowError()
   })
 })

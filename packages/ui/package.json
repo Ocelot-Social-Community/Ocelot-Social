@@ -4,6 +4,9 @@
   "description": "Vue component library for ocelot.social - works with Vue 2.7+ and Vue 3",
   "license": "Apache-2.0",
   "type": "module",
+  "imports": {
+    "#src/*": "./src/*"
+  },
   "exports": {
     ".": {
       "import": {
@@ -72,7 +75,6 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
     "@axe-core/playwright": "^4.11.1",
-    "@eslint/css": "^0.14.1",
     "@fontsource-variable/inter": "^5.2.8",
     "@playwright/test": "^1.58.2",
     "@size-limit/file": "^12.0.0",
@@ -84,7 +86,7 @@
     "@vitest/coverage-v8": "^4.0.18",
     "@vue/test-utils": "^2.4.6",
     "eslint": "^9.39.2",
-    "eslint-config-it4c": "^0.9.0",
+    "eslint-config-it4c": "^0.11.2",
     "eslint-plugin-jsdoc": "^62.5.3",
     "eslint-plugin-playwright": "^2.5.1",
     "eslint-plugin-storybook": "^10.2.8",
