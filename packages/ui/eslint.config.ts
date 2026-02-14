@@ -21,13 +21,6 @@ export default [
   ...vue3,
   ...vitest,
   {
-    // TODO: fix in eslint-config-it4c
-    files: ['**/*.spec.ts', '**/*.test.ts'],
-    rules: {
-      'vitest/valid-title': 'off', // conflicts with vitest/prefer-describe-function-title
-    },
-  },
-  {
     // Playwright visual tests
     files: ['**/*.visual.spec.ts'],
     ...playwrightPlugin.configs['flat/recommended'],

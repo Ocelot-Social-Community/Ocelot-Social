@@ -3,7 +3,7 @@ import { describe, it, expect, vi, afterEach, expectTypeOf } from 'vitest'
 import { ocelotPreset, requiredCssVariables, validateCssVariables } from './tailwind.preset'
 
 describe('tailwind.preset', () => {
-  describe(ocelotPreset, () => {
+  describe('ocelotPreset', () => {
     it('exports a valid Tailwind preset with theme.extend structure', () => {
       expect(ocelotPreset).toBeDefined()
       expect(ocelotPreset).toHaveProperty('theme')
@@ -11,7 +11,7 @@ describe('tailwind.preset', () => {
     })
   })
 
-  describe(requiredCssVariables, () => {
+  describe('requiredCssVariables', () => {
     it('exports an array', () => {
       expect(Array.isArray(requiredCssVariables)).toBe(true)
     })
