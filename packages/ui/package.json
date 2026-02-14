@@ -86,7 +86,7 @@
     "@vitest/coverage-v8": "^4.0.18",
     "@vue/test-utils": "^2.4.6",
     "eslint": "^9.39.2",
-    "eslint-config-it4c": "^0.11.1",
+    "eslint-config-it4c": "^0.11.2",
     "eslint-plugin-jsdoc": "^62.5.3",
     "eslint-plugin-playwright": "^2.5.1",
     "eslint-plugin-storybook": "^10.2.7",
