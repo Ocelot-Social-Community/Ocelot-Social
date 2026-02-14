@@ -106,114 +106,47 @@ OsButton Features:
 ├─ variant:     ✅ primary, secondary, danger, warning, success, info, default
 ├─ appearance:  ✅ filled, outline, ghost
 ├─ size:        ✅ sm, md, lg, xl
-├─ disabled:    ✅ mit hover/active-Override
+├─ disabled:    ✅ mit hover/active-Override (nur as="button")
 ├─ icon:        ✅ slot-basiert (icon-system-agnostisch)
 ├─ circle:      ✅ rounded-full, größenabhängig (p-1.5 bis p-3)
-└─ loading:     ✅ animated SVG spinner, aria-busy (Milestone 4b)
+├─ loading:     ✅ animated SVG spinner, aria-busy (Milestone 4b)
+└─ as:          ✅ polymorphes Rendering (button/a/NuxtLink/RouterLink)
+
+as-Prop Migration:  15 <nuxt-link>/<a>-Wrapper in 15 Webapp-Dateien → as="nuxt-link"/as="a"
 ```
 
 ---
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-13 (Session 19)
+**Letzte Aktualisierung:** 2026-02-14 (Session 20)
 
-**Aktuelle Phase:** Phase 3 ✅ ABGESCHLOSSEN + Code-Review-Feedback eingearbeitet
+**Aktuelle Phase:** Phase 3 ✅ ABGESCHLOSSEN + Code-Review-Feedback + `as`-Prop-Migration
 
-**Zuletzt abgeschlossen:**
-- [x] Projektordner erstellt
-- [x] Planungsdokument erstellt
-- [x] Tech-Stack entschieden
-- [x] Branding-Architektur definiert
-- [x] Migrationsstrategie definiert
-- [x] **Phase 0: Komponenten-Analyse** (177 Komponenten katalogisiert)
-- [x] Button-Familie detailiert analysiert (Props, Styles, Konsolidierung)
-- [x] Modal-Familie detailiert analysiert (Architektur erkannt)
-- [x] Menu-Familie detailiert analysiert (3 Patterns identifiziert)
-- [x] Priorisierung erstellt (15 Komponenten in 4 Tiers)
-- [x] Konsolidierungsplan finalisiert
-- [x] **Phase 1: Vue 2.7 Upgrade** ✅
-  - Vue 2.6.14 → 2.7.16
-  - vue-template-compiler entfernt
-  - @vue/composition-api entfernt
-  - @nuxtjs/composition-api entfernt
-  - Webpack-Alias für @vue/composition-api → vue
-  - Webpack-Regel für ESM .mjs Module
-  - **Unit-Tests: 157 Suites, 979 passed, 87 Snapshots** ✅
-  - **Integrationstests: bestanden** ✅
-- [x] **Phase 2: Projekt-Setup** ✅
-  - Vite + Vue 3 Projekt initialisiert
-  - vue-demi für Vue 2/3 Kompatibilität
-  - Vitest konfiguriert (integriert in vite.config.ts)
-  - npm Package-Struktur mit korrekten exports
-  - README.md Grundgerüst
-  - LICENSE (Apache 2.0)
-  - Plugin-Tests geschrieben
-  - Tailwind CSS v4 mit @tailwindcss/vite
-  - Dual-Build (style.css + tailwind.preset)
-  - Dark Mode Grundstruktur (via Tailwind dark: Prefix)
-  - Prop-Types definiert (Size, Rounded, Shadow, Variant)
-  - Branding-Architektur (keine Defaults, validateCssVariables)
-  - eslint-config-it4c eingerichtet (v0.8.0)
-  - ESLint Flat Config mit Vue 3 + Vitest Modulen
-  - Prettier-Integration via eslint-plugin-prettier
-  - GitHub Workflows (ui-lint.yml, ui-test.yml, ui-build.yml)
-  - 100% Test-Coverage Requirement
-  - .tool-versions (Node 25.5.0, konsistent mit Dockerfiles)
-  - Example Apps für Kompatibilitätstests (4er-Matrix)
-  - GitHub Workflow ui-compatibility.yml für Vue 2/3 Tests (inkl. Lint)
-  - Eigene ESLint + Prettier Configs für Example Apps
-  - Type Assertions für CI-Kompatibilität (`as unknown as Plugin`)
-  - Bundle Size Check (size-limit) mit ui-size.yml Workflow
-  - Package-Validierung (publint, arethetypeswrong) mit CJS/ESM Types
-  - Kompatibilitätstest-Workflow mit 4 Example Apps (Vue 2/3 × Tailwind/CSS)
-  - release-please Manifest-Konfiguration (Monorepo-Setup)
-  - npm Publish Workflow (ui-release.yml)
-  - CONTRIBUTING.md (Entwickler-Leitfaden)
-  - Dependabot für UI-Package und Example Apps konfiguriert
-  - CSS-Build separat via Tailwind CLI (closeBundle Hook)
-  - CVA (class-variance-authority) für typsichere Varianten
-  - cn() Utility für Tailwind-Klassen-Merge (clsx + tailwind-merge)
-  - OsButton Komponente mit CVA-Varianten implementiert
-  - ESLint-Konfiguration angepasst (vue/max-attributes-per-line, import-x/no-relative-parent-imports)
-  - Storybook 10 für Dokumentation eingerichtet (Wasserfarben-Theme)
-  - OsButton.stories.ts mit Playground + allen Varianten/Appearances/Sizes
-  - Storybook Build-Konfiguration (viteFinal entfernt Library-Plugins)
-  - Docker Setup (Dockerfile, docker-compose, ui-docker.yml)
-  - Visual Regression Tests (Playwright, colocated) mit integriertem A11y-Check
-  - Completeness Check (verify Script prüft Story, Visual, checkA11y, Keyboard, Varianten)
-  - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
+**Abgeschlossene Phasen:**
+- [x] Phase 0: Analyse (177 Komponenten katalogisiert)
+- [x] Phase 1: Vue 2.7 Upgrade (2.6.14 → 2.7.16, 979 Tests ✅)
+- [x] Phase 2: Projekt-Setup (Vite, vue-demi, Tailwind v4, CVA, Storybook 10, CI/CD, 100% Coverage)
+- [x] Phase 3: Webapp-Integration — 133 os-button in 79 Dateien, 0 base-button/ds-button verbleibend
 
-**Zuvor abgeschlossen (Session 18 - CodeRabbit Review Feedback: data-test Selektoren, Accessibility, Bugfixes):**
-- [x] Cypress-Selektoren: `.user-content-menu button` → `[data-test="content-menu-button"]` (2 Step-Definitions)
-- [x] Cypress-Selektoren: `.content-menu button` → `[data-test="content-menu-button"]` (Admin.PinPost + ReportContent)
-- [x] muted-users.vue: `data-test="unmute-btn"` + `aria-label` auf Unmute-Button
-- [x] blocked-users.vue: `data-test="unblock-btn"` + `aria-label` auf Unblock-Button
-- [x] ProfileList.vue: `data-test="load-all-connections-btn"` + FollowList.spec.js Selektoren aktualisiert
-- [x] FollowButton.vue: `data-test="follow-btn"` + Spec-Selektoren aktualisiert
-- [x] JoinLeaveButton.vue: `data-test="join-leave-btn"` + `.native` von `@mouseenter`/`@mouseleave` entfernt
-- [x] LoginButton.vue: `data-test="login-btn"` + `aria-label="$t('login.login')"` + Spec-Selektoren aktualisiert
-- [x] ReportRow.spec.js: `button[data-variant="danger"]` → `[data-test="confirm"]`
-- [x] CtaJoinLeaveGroup.spec.js: Selektor auf `[data-test="join-leave-btn"]` aktualisiert
-- [x] DisableModal.vue: `finally { this.loading = false }` für Loading-State-Reset
-- [x] ReleaseModal.vue: `:loading="loading"` + `this.loading = true` + `finally { this.loading = false }`
-- [x] ChangePassword.vue: `:disabled="errors"` → `:disabled="!!errors"` (Boolean-Cast)
-- [x] Password/Change.vue: Unbenutzte `disabled: true` aus data() entfernt + 2 tote Tests entfernt
-- [x] MenuBar.vue: Unbenutztes `ref="linkButton"` entfernt
-- [x] GroupForm.vue: Cancel-Button `variant="default" appearance="filled"` (per User-Anweisung)
-- [x] `appearance="filled"` ergänzt: donations.vue, LoginForm.vue, EnterNonce.vue
-- [x] LoginForm.vue: CSS `.login-form button` → `.login-form button[type='submit']`
-- [x] pages/index.vue: Redundantes `class="my-filter-button"` von `<base-icon>` entfernt
-- [x] MySomethingList.vue: `:title` + `:aria-label` auf Edit/Delete-Buttons (Tooltip beibehalten)
-- [x] A11y aria-label auf icon-only Buttons: admin/users (search + edit), AddChatRoomByUserSearch (close), EmbedComponent (close), groups/index (create), profile/_id/_slug (new post), groups/_id/_slug (new post), CustomButton (2x tooltip), HeaderMenu (hamburger), ImageUploader (crop-cancel), ContentMenu (menu), HeaderButton (filter-remove), InviteButton (invite)
-- [x] post/_id/_slug/index.vue: Zustandsabhängiges `aria-label` (`post.sensitiveContent.show/hide`)
-- [x] ComponentSlider.vue: `aria-label` mit Interpolation (`component-slider.step`)
-- [x] i18n: `actions.search`, `actions.close`, `actions.menu` in allen 9 Sprachdateien
-- [x] i18n: `site.navigation` in allen 9 Sprachdateien
-- [x] i18n: `post.sensitiveContent.show/hide` in allen 9 Sprachdateien
-- [x] i18n: `component-slider.step` in allen 9 Sprachdateien
+**Zuletzt abgeschlossen (Session 20 - `as`-Prop + nuxt-link Migration):**
+- [x] OsButton: `as` Prop implementiert (polymorphe Komponente: `button`, `a`, `nuxt-link`, `router-link`, Custom-Komponenten)
+- [x] Naming-Konvention: `tag` → `as` (moderner Standard: Headless UI, Radix Vue, Chakra UI, PrimeVue)
+- [x] `disabled`/`type`/`loading` nur bei `as="button"` (Links haben kein natives `disabled`-Attribut)
+- [x] Stories: `AsLink` Story + Playground `as`-Selektor (button/a)
+- [x] Visual Test: `as link` Screenshot + a11y-Check
+- [x] 15 `<nuxt-link>`/`<a>`-Wrapper in 15 Webapp-Dateien → `as="nuxt-link"` / `as="a"` migriert:
+  - GroupButton.vue, CtaUnblockAuthor.vue, terms-and-conditions-confirm.vue
+  - CustomButton.vue (v-if/v-else → computed `linkTag`/`linkProps` konsolidiert)
+  - groups/index.vue, GroupForm.vue, admin/users/index.vue
+  - pages/index.vue (CSS `button.post-add-button-*` → `.post-add-button-*`)
+  - profile/_id/_slug.vue (v-if auf ds-grid-item, symmetrisches Padding `$space-x-small`)
+  - groups/_id/_slug.vue, MapButton.vue
+  - ChatNotificationMenu.vue, Chat.vue, UserTeaserPopover.vue
+  - NotificationMenu.vue (3 Instanzen, 2 zu einem Button konsolidiert via counter-icon)
+- [x] Verifiziert: 0 verbleibende `<nuxt-link>`/`<a>`-Wrapper um `<os-button>` in Webapp
 
-**Zuletzt abgeschlossen (Session 19 - CodeRabbit Review Feedback: Cleanup, Accessibility, Bugfixes):**
+**Zuvor abgeschlossen (Session 19 - CodeRabbit Review Feedback: Cleanup, Accessibility, Bugfixes):**
 - [x] donations.vue: Redundantes `:checked="showDonations"` entfernt (v-model setzt checked bereits)
 - [x] MySomethingList.vue: Disabled-Logik vereinfacht `!(!isEditing || (isEditing && !disabled))` → `isEditing && disabled`
 - [x] button.variants.ts: Hardcoded Fallback `#e5e3e8` entfernt → `var(--color-disabled)` (konsistent mit filled/index.css)
@@ -253,7 +186,36 @@ OsButton Features:
 - [x] HeaderMenu.vue: `beforeDestroy`-Hook ergänzt — Scroll-Listener wird jetzt entfernt (Memory-Leak)
 - [x] MenuLegend.vue: `variant="primary"` auf Trigger-Button (konsistent mit Toolbar-Buttons in MenuBar.vue)
 
-**Zuvor abgeschlossen (Session 18 - Code-Review Feedback, OsButton Refactoring, Accessibility):**
+**Zuvor abgeschlossen (Session 18 - CodeRabbit Review Feedback: data-test Selektoren, Accessibility, Bugfixes):**
+- [x] Cypress-Selektoren: `.user-content-menu button` → `[data-test="content-menu-button"]` (2 Step-Definitions)
+- [x] Cypress-Selektoren: `.content-menu button` → `[data-test="content-menu-button"]` (Admin.PinPost + ReportContent)
+- [x] muted-users.vue: `data-test="unmute-btn"` + `aria-label` auf Unmute-Button
+- [x] blocked-users.vue: `data-test="unblock-btn"` + `aria-label` auf Unblock-Button
+- [x] ProfileList.vue: `data-test="load-all-connections-btn"` + FollowList.spec.js Selektoren aktualisiert
+- [x] FollowButton.vue: `data-test="follow-btn"` + Spec-Selektoren aktualisiert
+- [x] JoinLeaveButton.vue: `data-test="join-leave-btn"` + `.native` von `@mouseenter`/`@mouseleave` entfernt
+- [x] LoginButton.vue: `data-test="login-btn"` + `aria-label="$t('login.login')"` + Spec-Selektoren aktualisiert
+- [x] ReportRow.spec.js: `button[data-variant="danger"]` → `[data-test="confirm"]`
+- [x] CtaJoinLeaveGroup.spec.js: Selektor auf `[data-test="join-leave-btn"]` aktualisiert
+- [x] DisableModal.vue: `finally { this.loading = false }` für Loading-State-Reset
+- [x] ReleaseModal.vue: `:loading="loading"` + `this.loading = true` + `finally { this.loading = false }`
+- [x] ChangePassword.vue: `:disabled="errors"` → `:disabled="!!errors"` (Boolean-Cast)
+- [x] Password/Change.vue: Unbenutzte `disabled: true` aus data() entfernt + 2 tote Tests entfernt
+- [x] MenuBar.vue: Unbenutztes `ref="linkButton"` entfernt
+- [x] GroupForm.vue: Cancel-Button `variant="default" appearance="filled"` (per User-Anweisung)
+- [x] `appearance="filled"` ergänzt: donations.vue, LoginForm.vue, EnterNonce.vue
+- [x] LoginForm.vue: CSS `.login-form button` → `.login-form button[type='submit']`
+- [x] pages/index.vue: Redundantes `class="my-filter-button"` von `<base-icon>` entfernt
+- [x] MySomethingList.vue: `:title` + `:aria-label` auf Edit/Delete-Buttons (Tooltip beibehalten)
+- [x] A11y aria-label auf icon-only Buttons: admin/users (search + edit), AddChatRoomByUserSearch (close), EmbedComponent (close), groups/index (create), profile/_id/_slug (new post), groups/_id/_slug (new post), CustomButton (2x tooltip), HeaderMenu (hamburger), ImageUploader (crop-cancel), ContentMenu (menu), HeaderButton (filter-remove), InviteButton (invite)
+- [x] post/_id/_slug/index.vue: Zustandsabhängiges `aria-label` (`post.sensitiveContent.show/hide`)
+- [x] ComponentSlider.vue: `aria-label` mit Interpolation (`component-slider.step`)
+- [x] i18n: `actions.search`, `actions.close`, `actions.menu` in allen 9 Sprachdateien
+- [x] i18n: `site.navigation` in allen 9 Sprachdateien
+- [x] i18n: `post.sensitiveContent.show/hide` in allen 9 Sprachdateien
+- [x] i18n: `component-slider.step` in allen 9 Sprachdateien
+
+**Zuvor abgeschlossen (Session 17 - Code-Review Feedback, OsButton Refactoring, Accessibility):**
 - [x] OsButton.vue vereinfacht: `vueAttrs()` Helper, Einmal-Variablen durch `cn()` ersetzt, `children` Array inline (217→227 Zeilen, aber lesbarer)
 - [x] OsButton: `@import "./animations.css"` vor `@source`-Direktiven verschoben (CSS-Spec-Konformität)
 - [x] CustomButton.vue: `isEmpty` aus `data()` entfernt → direkter Import im Computed
@@ -368,13 +330,13 @@ OsButton Features:
 - [x] `data-appearance` Attribut: robuste CSS-Selektoren statt fragile escaped Tailwind-Klassen
 - [x] Code-Review Feedback eingearbeitet (Unit-Tests, Testnamen, CSS-Selektoren)
 
-**Zuvor abgeschlossen (Milestone 5 + Analyse):**
+**Zuvor abgeschlossen (Sessions 9-10 - Milestone 5, Analyse, Disabled-Styles):**
 - [x] Visuelle Validierung: 16/16 Buttons validiert ✅
 - [x] OsButton Features: `appearance` (outline, ghost), `xs` size, focus/active states
 - [x] Disabled-Styles: CSS-Variablen, hover/active-Override, Border-Fix
 - [x] Codebase-Analyse: 14 weitere migrierbare Buttons identifiziert (Scope: 16/35)
 
-**Zuletzt erledigt (Phase 3):**
+**Zuvor abgeschlossen (Sessions 1-8 - Phase 3 Webapp-Integration):**
 - [x] vue-demi zur Webapp hinzugefügt (Vue 2.7 Kompatibilität)
 - [x] Webpack-Alias für vue-demi (nutzt Webapp's Vue 2.7 statt UI-Library's Vue 3)
 - [x] Webpack-Alias für @ocelot-social/ui (dist Pfade mit $ für exakten Match)
@@ -419,23 +381,11 @@ OsButton Features:
   - Verhindert Layout-Sprung wenn Button disabled wird
 
 **Nächste Schritte:**
-1. ~~Phase 0: Komponenten-Analyse~~ ✅
-2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
-3. ~~**Phase 2: Projekt-Setup**~~ ✅ ABGESCHLOSSEN
-4. ~~**Phase 3: Webapp-Integration**~~ ✅ ABGESCHLOSSEN — 133 Buttons in 79 Dateien
-   - [x] yarn link / Webpack-Alias in Webapp
-   - [x] CSS-Variablen definieren (ocelot-ui-variables.scss)
-   - [x] 16 Buttons migriert & validiert ✅
-   - [x] Docker Build + CI-Kompatibilität
-   - [x] **Milestone 4a:** 14 weitere Buttons (ohne neue Props) ✅
-   - [x] **Milestone 4b:** icon/circle/loading Props implementieren ✅
-   - [x] **Milestone 4c:** Alle verbleibenden Buttons migriert ✅
-   - [x] **Code-Review Feedback:** Refactoring, A11y, Vue 3 Compat, CSS-Scoping ✅
-5. **Nächstes:**
-   - [ ] GroupButton + MapButton in HeaderMenu inlinen (keine eigene Komponente nötig)
-   - [ ] `compat/` Verzeichnis in packages/ui anlegen (temporäre Migrations-Wrapper)
-   - [ ] BaseIcon nach `compat/` verschieben (131 Nutzungen, Voraussetzung für weitere Migrationen)
-   - [ ] Snapshots/Tests aktualisieren, BaseButton-Komponente ggf. entfernen
+- [ ] Snapshots/Tests aktualisieren (nach `as`-Prop-Migration)
+- [ ] GroupButton + MapButton in HeaderMenu inlinen (keine eigene Komponente nötig)
+- [ ] `compat/` Verzeichnis in packages/ui anlegen (temporäre Migrations-Wrapper)
+- [ ] BaseIcon nach `compat/` verschieben (131 Nutzungen, Voraussetzung für weitere Migrationen)
+- [ ] BaseButton-Komponente ggf. entfernen
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
 - [ ] `NPM_TOKEN` als GitHub Secret einrichten (für npm publish in ui-release.yml)
@@ -722,8 +672,6 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 
 ---
 
----
-
 # VISION
 
 ## 1. Projektziel & Vision
@@ -782,7 +730,7 @@ Migration vorbereiten - schrittweise neue Komponenten in Vue 3 entwickeln, die d
 | Dateinamen | **PascalCase** | OsButton.vue, OsCard.vue |
 | i18n | **Nur Props** | Keine Default-Texte in Komponenten |
 | Breakpoints | **Tailwind Standard** | sm:640, md:768, lg:1024, xl:1280, 2xl:1536 |
-| Size Props | **Tailwind-Skala (vollständig)** | xs, sm, md, lg, xl, 2xl |
+| Size Props | **Tailwind-Skala** | sm, md, lg, xl (komponentenspezifisch) |
 | Rounded Props | **Tailwind-Skala (vollständig)** | none, sm, md, lg, xl, 2xl, 3xl, full |
 | Shadow Props | **Tailwind-Skala (vollständig)** | none, sm, md, lg, xl, 2xl |
 | Variant Props | **Semantisch (vollständig)** | primary, secondary, danger, warning, success, info |
@@ -1217,8 +1165,8 @@ Alle grün → Merge erlaubt
 **Storybook Deploy (Webhook):**
 1. GitHub sendet Webhook bei Release-Event
 2. Server empfängt Webhook
-3. Server führt `scripts/deploy-histoire.sh` aus (Teil des Repos)
-4. Script: git pull → npm ci → histoire build → copy to webroot
+3. Server führt `scripts/deploy-storybook.sh` aus (Teil des Repos)
+4. Script: git pull → npm ci → storybook build → copy to webroot
 
 ### GitHub Workflows (vollständige Liste)
 
@@ -1230,7 +1178,7 @@ Alle grün → Merge erlaubt
 | **test-a11y** | Push/PR | axe-core | Accessibility-Tests |
 | **test-visual** | Push/PR | Playwright | Visual Regression Screenshots |
 | **build** | Push/PR | Vite | Build verifizieren |
-| **build-histoire** | Push/PR | Storybook | Dokumentation bauen |
+| **build-storybook** | Push/PR | Storybook | Dokumentation bauen |
 | **size-check** | Push/PR | size-limit | Bundle-Größe prüfen |
 | **release** | Push main | release-please | Release-PR erstellen |
 | **publish** | Release | npm | Auf npm veröffentlichen |
@@ -1288,7 +1236,7 @@ Die Komponenten werden über Storybook dokumentiert und auf einer öffentlichen 
 
 **Hosting:**
 - Eigener Server (öffentlich zugänglich)
-- Static Build via `histoire build`
+- Static Build via `storybook build`
 - Deployment bei jedem Release
 
 **Workflow:**
@@ -1403,7 +1351,7 @@ Bei der Migration werden:
 
 ## 11. Entscheidungen
 
-> 70 Entscheidungen in 9 Kategorien
+> 73 Entscheidungen in 9 Kategorien
 
 ### Vision & Ziele
 
@@ -1472,7 +1420,7 @@ Bei der Migration werden:
 | 29 | Dark Mode | Ja, von Anfang an | Alle Komponenten mit Light/Dark |
 | 30 | Icons | Hybrid-Architektur | System-Icons in Library, Feature-Icons in App |
 | 51 | Icon-Architektur | Hybrid | ~10 System-Icons in Library, Rest in App (siehe §4) |
-| 59 | Size Props | Tailwind-Skala (xs, sm, md, lg, xl, 2xl) | Konsistenz mit Tailwind, intuitive Benennung |
+| 59 | Size Props | Tailwind-Skala (sm, md, lg, xl) | Komponentenspezifisch, OsButton nutzt sm-xl |
 | 60 | Rounded Props | Tailwind-Skala (none, sm, md, lg, xl, 2xl, 3xl, full) | Konsistenz mit Tailwind border-radius |
 | 61 | Shadow Props | Tailwind-Skala (none, sm, md, lg, xl, 2xl) | Konsistenz mit Tailwind box-shadow |
 | 62 | Variant Props | Semantisch (primary, secondary, danger, warning, success, info) | Übliche UI-Farbvarianten |
@@ -1482,8 +1430,8 @@ Bei der Migration werden:
 | 66 | Branding-Hierarchie | Webapp → Spezialisiertes Branding | Default-Branding in Webapp, Overrides pro Instanz |
 | 67 | Variable-Validierung | Runtime-Check in Development | `validateCssVariables()` warnt bei fehlenden Variablen |
 | 68 | Branding-Test (Webapp) | CI-Test in Webapp | Webapp testet, dass Default-Branding alle Library-Variablen definiert |
-| 69 | Webapp ↔ Maintenance Sharing | Webapp als Source of Truth | Kein separates "shared" Package, maintenance importiert aus webapp/ (siehe §16a) |
-| 70 | Daten-Entkopplung | ViewModel/Mapper Pattern | Komponenten kennen nur ViewModels, Mapper transformieren API-Daten (siehe §16b) |
+| 72 | Webapp ↔ Maintenance Sharing | Webapp als Source of Truth | Kein separates "shared" Package, maintenance importiert aus webapp/ (siehe §16a) |
+| 73 | Daten-Entkopplung | ViewModel/Mapper Pattern | Komponenten kennen nur ViewModels, Mapper transformieren API-Daten (siehe §16b) |
 
 ### Komponenten-API & Konventionen
 
@@ -1748,6 +1696,15 @@ Bei der Migration werden:
 | 2026-02-13 | **CSS-Selektoren** | LoginForm: `.login-form button` → `.login-form button[type='submit']`; pages/index: redundante Klasse auf BaseIcon entfernt |
 | 2026-02-13 | **JoinLeaveButton** | `.native` von `@mouseenter`/`@mouseleave` entfernt (Vue 3 Kompatibilität) |
 | 2026-02-13 | **MySomethingList** | `:title` + `:aria-label` auf Edit/Delete-Buttons (Tooltip beibehalten neben Accessibility) |
+| 2026-02-14 | **`as` Prop** | Polymorphe OsButton-Komponente: `as` Prop für dynamischen Tag/Komponente (`button`, `a`, `nuxt-link`, `router-link`); moderner Standard (Headless UI, Radix Vue) |
+| 2026-02-14 | **Naming: tag → as** | `tag` → `as` umbenannt nach Recherche moderner UI-Libraries (Headless UI, Radix Vue, Chakra UI, PrimeVue nutzen `as`) |
+| 2026-02-14 | **Disabled nur für button** | `disabled`/`type`/`loading` nur bei `as="button"` (Links haben kein natives `disabled`); `aria-disabled`/`tabindex` Logik entfernt |
+| 2026-02-14 | **AsLink Story** | Neue Story `AsLink` mit Varianten, Icons, disabled-Vergleich; Playground mit `as`-Selektor (button/a) |
+| 2026-02-14 | **nuxt-link Migration** | 15 `<nuxt-link>`/`<a>`-Wrapper → `as="nuxt-link"`/`as="a"` in 15 Webapp-Dateien; invalides HTML (`<button>` in `<a>`) eliminiert |
+| 2026-02-14 | **CustomButton konsolidiert** | v-if/v-else für `<a>`/`<nuxt-link>` Wrapper → einzelner `<os-button :as="linkTag" v-bind="linkProps">` mit Computed Properties |
+| 2026-02-14 | **NotificationMenu konsolidiert** | 2 separate Buttons (kein Badge / mit Badge) zu einem zusammengeführt — counter-icon zeigt bei `count=0` kein Badge |
+| 2026-02-14 | **CSS-Selektor Fix** | pages/index.vue: `button.post-add-button-top/bottom` → `.post-add-button-top/bottom` (nuxt-link rendert `<a>`, nicht `<button>`) |
+| 2026-02-14 | **Profil-Spacing** | profile/_id/_slug.vue: `v-if` auf ds-grid-item (kein leerer Abstand), symmetrisches Padding `$space-x-small` |
 
 ---
 
@@ -2268,7 +2225,7 @@ Phase 3 (später): @ocelot-social/auth, @ocelot-social/posts, etc.
 
 | # | Datum | Entscheidung |
 |---|-------|--------------|
-| 68 | 2026-02-09 | Webapp als Source of Truth für geteilte Business-Komponenten |
+| 72 | 2026-02-09 | Webapp als Source of Truth für geteilte Business-Komponenten |
 
 ---
 
@@ -2462,7 +2419,7 @@ webapp/
 
 | # | Datum | Entscheidung |
 |---|-------|--------------|
-| 70 | 2026-02-09 | ViewModel/Mapper Pattern für Daten-Entkopplung |
+| 73 | 2026-02-09 | ViewModel/Mapper Pattern für Daten-Entkopplung |
 
 ---
 
