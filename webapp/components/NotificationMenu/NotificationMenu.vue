@@ -1,40 +1,40 @@
 <template>
-  <nuxt-link
+  <os-button
     v-if="!unreadNotificationsCount"
-    class="notifications-menu"
+    as="nuxt-link"
     :to="{ name: 'notifications' }"
+    class="notifications-menu"
+    variant="primary"
+    appearance="ghost"
+    circle
+    :aria-label="$t('header.notifications.tooltip')"
+    v-tooltip="{
+      content: $t('header.notifications.tooltip'),
+      placement: 'bottom-start',
+    }"
   >
-    <os-button
-      variant="primary"
-      appearance="ghost"
-      circle
-      :aria-label="$t('header.notifications.tooltip')"
-      v-tooltip="{
-        content: $t('header.notifications.tooltip'),
-        placement: 'bottom-start',
-      }"
-    >
-      <template #icon>
-        <base-icon name="bell" />
-      </template>
-    </os-button>
-  </nuxt-link>
-  <nuxt-link v-else-if="noMenu" class="notifications-menu" :to="{ name: 'notifications' }">
-    <os-button
-      variant="primary"
-      appearance="ghost"
-      circle
-      :aria-label="$t('header.notifications.tooltip')"
-      v-tooltip="{
-        content: $t('header.notifications.tooltip'),
-        placement: 'bottom-start',
-      }"
-    >
-      <template #icon>
-        <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
-      </template>
-    </os-button>
-  </nuxt-link>
+    <template #icon>
+      <base-icon name="bell" />
+    </template>
+  </os-button>
+  <os-button
+    v-else-if="noMenu"
+    as="nuxt-link"
+    :to="{ name: 'notifications' }"
+    class="notifications-menu"
+    variant="primary"
+    appearance="ghost"
+    circle
+    :aria-label="$t('header.notifications.tooltip')"
+    v-tooltip="{
+      content: $t('header.notifications.tooltip'),
+      placement: 'bottom-start',
+    }"
+  >
+    <template #icon>
+      <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
+    </template>
+  </os-button>
   <dropdown
     v-else
     class="notifications-menu"
@@ -63,11 +63,9 @@
     <template #popover="{ closeMenu }">
       <ds-flex class="notifications-link-container">
         <ds-flex-item>
-          <nuxt-link :to="{ name: 'notifications' }">
-            <os-button appearance="ghost" variant="primary">
-              {{ $t('notifications.pageLink') }}
-            </os-button>
-          </nuxt-link>
+          <os-button as="nuxt-link" :to="{ name: 'notifications' }" appearance="ghost" variant="primary">
+            {{ $t('notifications.pageLink') }}
+          </os-button>
           <os-button
             appearance="ghost"
             variant="primary"
