@@ -1,0 +1,10 @@
+import { h } from 'vue-demi'
+
+import type { VNode } from 'vue-demi'
+
+export const IconSearch = (): VNode =>
+  h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 32 32', fill: 'currentColor' }, [
+    h('path', {
+      d: 'M19 3c5.511 0 10 4.489 10 10s-4.489 10-10 10c-2.395 0-4.588-0.839-6.313-2.25l-7.969 7.969-1.438-1.438 7.969-7.969c-1.411-1.724-2.25-3.917-2.25-6.313 0-5.511 4.489-10 10-10zM19 5c-4.43 0-8 3.57-8 8s3.57 8 8 8 8-3.57 8-8-3.57-8-8-8z',
+    }),
+  ])
