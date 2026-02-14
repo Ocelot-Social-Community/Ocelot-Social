@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Completeness checker for @ocelot-social/ui components
  *

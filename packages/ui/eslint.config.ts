@@ -38,7 +38,7 @@ export default [
     files: ['scripts/**/*.ts'],
     rules: {
       //'no-console': 'off',
-      'security/detect-non-literal-fs-filename': 'off',
+      //'security/detect-non-literal-fs-filename': 'off',
     },
   },
   {
