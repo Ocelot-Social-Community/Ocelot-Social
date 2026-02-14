@@ -145,27 +145,26 @@
           <tab-navigation :tabs="tabOptions" :activeTab="tabActive" @switch-tab="handleTab" />
 
           <!-- feed -->
-          <ds-grid-item :row-span="2" column-span="fullWidth">
-            <ds-space centered>
-              <nuxt-link :to="{ name: 'post-create-type' }">
-                <os-button
-                  v-if="myProfile"
-                  v-tooltip="{
-                    content: $t('contribution.newPost'),
-                    placement: 'left',
-                  }"
-                  class="profile-post-add-button"
-                  variant="primary"
-                  appearance="filled"
-                  circle
-                  :aria-label="$t('contribution.newPost')"
-                >
-                  <template #icon>
-                    <base-icon name="plus" />
-                  </template>
-                </os-button>
-              </nuxt-link>
-            </ds-space>
+          <ds-grid-item v-if="myProfile" :row-span="2" column-span="fullWidth">
+            <div class="profile-post-add-button-container">
+              <os-button
+                as="nuxt-link"
+                :to="{ name: 'post-create-type' }"
+                v-tooltip="{
+                  content: $t('contribution.newPost'),
+                  placement: 'left',
+                }"
+                class="profile-post-add-button"
+                variant="primary"
+                appearance="filled"
+                circle
+                :aria-label="$t('contribution.newPost')"
+              >
+                <template #icon>
+                  <base-icon name="plus" />
+                </template>
+              </os-button>
+            </div>
           </ds-grid-item>
 
           <template v-if="posts.length">
@@ -504,6 +503,11 @@ export default {
     top: $space-x-small;
     right: $space-x-small;
   }
+}
+.profile-post-add-button-container {
+  display: flex;
+  justify-content: center;
+  padding: $space-x-small 0;
 }
 .profile-post-add-button {
   box-shadow: $box-shadow-x-large !important;
