@@ -1,45 +1,48 @@
 <template>
   <div>
-    <a v-if="settings.url" :href="settings.url" :target="settings.target">
-      <os-button
-        class="custom-button"
-        variant="primary"
-        appearance="ghost"
-        circle
-        :aria-label="$t(settings.toolTipIdent)"
-        v-tooltip="{
-          content: $t(settings.toolTipIdent),
-          placement: 'bottom-start',
-        }"
-      >
-        <img
-          class="logo-svg"
-          :src="settings.iconPath"
-          :alt="settings.iconAltText"
-          :style="logoWidthStyle"
-        />
-      </os-button>
-    </a>
-    <nuxt-link v-else :to="settings.path">
-      <os-button
-        class="custom-button"
-        variant="primary"
-        appearance="ghost"
-        circle
-        :aria-label="$t(settings.toolTipIdent)"
-        v-tooltip="{
-          content: $t(settings.toolTipIdent),
-          placement: 'bottom-start',
-        }"
-      >
-        <img
-          class="logo-svg"
-          :src="settings.iconPath"
-          :alt="settings.iconAltText"
-          :style="logoWidthStyle"
-        />
-      </os-button>
-    </nuxt-link>
+    <os-button
+      v-if="settings.url"
+      as="a"
+      :href="settings.url"
+      :target="settings.target"
+      class="custom-button"
+      variant="primary"
+      appearance="ghost"
+      circle
+      :aria-label="$t(settings.toolTipIdent)"
+      v-tooltip="{
+        content: $t(settings.toolTipIdent),
+        placement: 'bottom-start',
+      }"
+    >
+      <img
+        class="logo-svg"
+        :src="settings.iconPath"
+        :alt="settings.iconAltText"
+        :style="logoWidthStyle"
+      />
+    </os-button>
+    <os-button
+      v-else
+      as="nuxt-link"
+      :to="settings.path"
+      class="custom-button"
+      variant="primary"
+      appearance="ghost"
+      circle
+      :aria-label="$t(settings.toolTipIdent)"
+      v-tooltip="{
+        content: $t(settings.toolTipIdent),
+        placement: 'bottom-start',
+      }"
+    >
+      <img
+        class="logo-svg"
+        :src="settings.iconPath"
+        :alt="settings.iconAltText"
+        :style="logoWidthStyle"
+      />
+    </os-button>
   </div>
 </template>
 
