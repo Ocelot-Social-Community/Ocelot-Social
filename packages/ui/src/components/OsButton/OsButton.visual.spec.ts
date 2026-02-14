@@ -186,12 +186,12 @@ test.describe('OsButton visual regression', () => {
     await checkA11y(page)
   })
 
-  test('as link', async ({ page }) => {
-    await page.goto(`${STORY_URL}--as-link&viewMode=story`)
+  test('polymorphic', async ({ page }) => {
+    await page.goto(`${STORY_URL}--polymorphic&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
     await waitForFonts(page)
-    await expect(root.locator('.flex-col').first()).toHaveScreenshot('as-link.png')
+    await expect(root.locator('.flex-col').first()).toHaveScreenshot('polymorphic.png')
     await checkA11y(page)
   })
 

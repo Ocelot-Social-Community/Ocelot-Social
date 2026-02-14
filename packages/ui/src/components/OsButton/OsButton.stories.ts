@@ -669,7 +669,7 @@ export const CircleAppearances: Story = {
   }),
 }
 
-export const AsLink: Story = {
+export const Polymorphic: Story = {
   render: () => ({
     components: { OsButton, CheckIcon, PlusIcon },
     template: `
