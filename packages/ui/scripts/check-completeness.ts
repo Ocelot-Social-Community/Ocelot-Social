@@ -101,6 +101,7 @@ for (const componentPath of components) {
 
     for (const match of storyExports) {
       const storyName = match[1]
+      if (storyName === 'Playground') continue
       const kebabName = toKebabCase(storyName)
 
       if (!visualTestContent.includes(`--${kebabName}`)) {
