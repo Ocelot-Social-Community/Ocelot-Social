@@ -1,14 +1,9 @@
-import config, { css, vue3, vitest as vitests } from 'eslint-config-it4c'
+import config, { css, vue3, vitest } from 'eslint-config-it4c'
 import jsdocPlugin from 'eslint-plugin-jsdoc'
 import playwrightPlugin from 'eslint-plugin-playwright'
 import storybookPlugin from 'eslint-plugin-storybook'
 import vuejsAccessibilityPlugin from 'eslint-plugin-vuejs-accessibility'
 import { tailwind4 } from 'tailwind-csstree'
-
-/** Turn off all vitest rules (for use in Playwright test overrides) */
-/* const vitestRulesOff = Object.fromEntries(
-  Object.keys(vitests[0]?.rules ?? {}).map((rule) => [rule, 'off']),
-) */
 
 export default [
   {
@@ -24,7 +19,7 @@ export default [
   },
   ...config,
   ...vue3,
-  ...vitests,
+  ...vitest,
   {
     // TODO: fix in eslint-config-it4c — these rules conflict with each other
     files: ['**/*.spec.ts', '**/*.test.ts'],
@@ -36,9 +31,6 @@ export default [
     // Playwright visual tests (not vitest — disable all vitest rules)
     files: ['**/*.visual.spec.ts'],
     ...playwrightPlugin.configs['flat/recommended'],
-    /*rules: {
-      ...vitestRulesOff,
-    },*/
   },
   // Storybook files
   // eslint-disable-next-line import-x/no-named-as-default-member -- flat config access pattern
