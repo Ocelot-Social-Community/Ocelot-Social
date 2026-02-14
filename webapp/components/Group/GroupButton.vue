@@ -1,21 +1,21 @@
 <template>
   <div>
-    <nuxt-link to="/groups">
-      <os-button
-        variant="primary"
-        appearance="ghost"
-        circle
-        :aria-label="$t('header.groups.tooltip')"
-        v-tooltip="{
-          content: $t('header.groups.tooltip'),
-          placement: 'bottom-start',
-        }"
-      >
-        <template #icon>
-          <base-icon name="users" />
-        </template>
-      </os-button>
-    </nuxt-link>
+    <os-button
+      as="nuxt-link"
+      to="/groups"
+      variant="primary"
+      appearance="ghost"
+      circle
+      :aria-label="$t('header.groups.tooltip')"
+      v-tooltip="{
+        content: $t('header.groups.tooltip'),
+        placement: 'bottom-start',
+      }"
+    >
+      <template #icon>
+        <base-icon name="users" />
+      </template>
+    </os-button>
   </div>
 </template>
 
