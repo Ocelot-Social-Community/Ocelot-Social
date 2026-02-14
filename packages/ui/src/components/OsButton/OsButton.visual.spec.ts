@@ -1,6 +1,5 @@
 import { AxeBuilder } from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
-import { expect, test } from 'vitest'
 
 import type { Page } from '@playwright/test'
 

@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, afterEach, expectTypeOf } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 
 import { ocelotPreset, requiredCssVariables, validateCssVariables } from './tailwind.preset'
 
 describe('tailwind.preset', () => {
-  describe(ocelotPreset, () => {
+  describe('ocelotPreset', () => {
     it('exports a valid Tailwind preset with theme.extend structure', () => {
       expect(ocelotPreset).toBeDefined()
       expect(ocelotPreset).toHaveProperty('theme')
@@ -11,14 +11,14 @@ describe('tailwind.preset', () => {
     })
   })
 
-  describe(requiredCssVariables, () => {
+  describe('requiredCssVariables', () => {
     it('exports an array', () => {
       expect(Array.isArray(requiredCssVariables)).toBe(true)
     })
 
     it('contains only strings', () => {
       for (const variable of requiredCssVariables) {
-        expectTypeOf(variable).toBeString()
+        expect(typeof variable).toBe('string')
       }
     })
 
@@ -33,7 +33,7 @@ describe('tailwind.preset', () => {
     })
   })
 
-  describe(validateCssVariables, () => {
+  describe('validateCssVariables', () => {
     afterEach(() => {
       vi.unstubAllGlobals()
       vi.restoreAllMocks()
@@ -49,7 +49,7 @@ describe('tailwind.preset', () => {
 
     it('does not warn when all variables are defined', () => {
       const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
-      const mockGetPropertyValue = vi.fn().mockReturnValue('some-value')
+      const mockGetPropertyValue = vi.fn<(prop: string) => string>().mockReturnValue('some-value')
 
       vi.stubGlobal('window', {})
       vi.stubGlobal('document', {
@@ -66,7 +66,7 @@ describe('tailwind.preset', () => {
 
     it('warns when variables are missing', () => {
       const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
-      const mockGetPropertyValue = vi.fn().mockReturnValue('')
+      const mockGetPropertyValue = vi.fn<(prop: string) => string>().mockReturnValue('')
 
       vi.stubGlobal('window', {})
       vi.stubGlobal('document', {

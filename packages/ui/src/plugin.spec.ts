@@ -11,7 +11,7 @@ describe('ocelotUI Plugin', () => {
 
   it('registers only Os-prefixed components', () => {
     const mockApp = {
-      component: vi.fn(),
+      component: vi.fn<(name: string, component: unknown) => void>(),
     }
 
     OcelotUI.install?.(mockApp as never)
@@ -28,7 +28,7 @@ describe('ocelotUI Plugin', () => {
 
   it('does not register non-component exports', () => {
     const mockApp = {
-      component: vi.fn(),
+      component: vi.fn<(name: string, component: unknown) => void>(),
     }
 
     OcelotUI.install?.(mockApp as never)
@@ -41,7 +41,7 @@ describe('ocelotUI Plugin', () => {
 
   it('works without throwing', () => {
     const mockApp = {
-      component: vi.fn(),
+      component: vi.fn<(name: string, component: unknown) => void>(),
     }
 
     expect(() => {
