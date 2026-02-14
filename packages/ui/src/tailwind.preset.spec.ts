@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach, expectTypeOf } from 'vitest'
 
 import { ocelotPreset, requiredCssVariables, validateCssVariables } from './tailwind.preset'
 
 describe('tailwind.preset', () => {
-  describe('ocelotPreset', () => {
+  describe(ocelotPreset, () => {
     it('exports a valid Tailwind preset with theme.extend structure', () => {
       expect(ocelotPreset).toBeDefined()
       expect(ocelotPreset).toHaveProperty('theme')
@@ -11,28 +11,29 @@ describe('tailwind.preset', () => {
     })
   })
 
-  describe('requiredCssVariables', () => {
+  describe(requiredCssVariables, () => {
     it('exports an array', () => {
-      expect(Array.isArray(requiredCssVariables)).toBeTruthy()
+      expect(Array.isArray(requiredCssVariables)).toBe(true)
     })
 
     it('contains only strings', () => {
       for (const variable of requiredCssVariables) {
-        expect(typeof variable).toBe('string')
+        expectTypeOf(variable).toBeString()
       }
     })
 
     it('all variables start with --', () => {
       // This test validates the format constraint.
       for (const variable of requiredCssVariables) {
-        expect(variable.startsWith('--')).toBeTruthy()
+        expect(variable.startsWith('--')).toBe(true)
       }
+
       // Ensure test runs even with empty array
-      expect(requiredCssVariables.every((v) => v.startsWith('--'))).toBeTruthy()
+      expect(requiredCssVariables.every((v) => v.startsWith('--'))).toBe(true)
     })
   })
 
-  describe('validateCssVariables', () => {
+  describe(validateCssVariables, () => {
     afterEach(() => {
       vi.unstubAllGlobals()
       vi.restoreAllMocks()
@@ -43,7 +44,7 @@ describe('tailwind.preset', () => {
 
       expect(() => {
         validateCssVariables()
-      }).not.toThrow()
+      }).not.toThrowError()
     })
 
     it('does not warn when all variables are defined', () => {

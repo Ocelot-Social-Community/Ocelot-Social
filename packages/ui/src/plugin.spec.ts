@@ -35,6 +35,7 @@ describe('ocelotUI Plugin', () => {
 
     // buttonVariants should NOT be registered
     const callArgs = mockApp.component.mock.calls.map((call: unknown[]) => call[0])
+
     expect(callArgs).not.toContain('buttonVariants')
   })
 
@@ -45,6 +46,6 @@ describe('ocelotUI Plugin', () => {
 
     expect(() => {
       OcelotUI.install?.(mockApp as never)
-    }).not.toThrow()
+    }).not.toThrowError()
   })
 })
