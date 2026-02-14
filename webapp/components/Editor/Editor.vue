@@ -11,12 +11,17 @@
       :query="query"
       :select-item="selectItem"
     />
-    <link-input
-      v-show="isLinkInputActive"
-      ref="linkInput"
-      :toggle-link-input="toggleLinkInput"
-      :set-link-url="setLinkUrl"
-    />
+    <div v-show="isLinkInputActive" ref="linkInput">
+      <ds-input
+        id="linkInputId"
+        v-model="linkUrl"
+        class="editor-menu-link-input"
+        placeholder="https://"
+        @blur.native.capture="toggleLinkInput()"
+        @keydown.native.esc.prevent="toggleLinkInput()"
+        @keydown.native.enter.prevent="enterLink()"
+      />
+    </div>
   </div>
 </template>
 
@@ -35,7 +40,6 @@ import Mention from './nodes/Mention'
 import MenuBar from './MenuBar'
 import ContextMenu from './ContextMenu'
 import SuggestionList from './SuggestionList'
-import LinkInput from './LinkInput'
 
 let throttleInputEvent
 
@@ -43,7 +47,6 @@ export default {
   components: {
     ContextMenu,
     EditorContent,
-    LinkInput,
     MenuBar,
     SuggestionList,
   },
@@ -58,6 +61,7 @@ export default {
       lastValueHash: null,
       editor: null,
       isLinkInputActive: false,
+      linkUrl: null,
       suggestionType: '',
       query: null,
       suggestionRange: null,
@@ -247,16 +251,20 @@ export default {
     insertReply(message) {
       this.editor.commands.mention({ id: message.id, label: message.slug })
     },
+    enterLink() {
+      this.setLinkUrl(this.linkUrl)
+      this.linkUrl = null
+    },
     toggleLinkInput(attrs, element) {
       if (this.$refs.contextMenu.menu) {
         this.$refs.contextMenu.hideContextMenu()
         this.isLinkInputActive = false
         this.editor.focus()
       } else if (attrs && element) {
-        this.$refs.linkInput.linkUrl = attrs.href
+        this.linkUrl = attrs.href
         this.isLinkInputActive = true
         this.$nextTick(() => {
-          this.$refs.contextMenu.displayContextMenu(element, this.$refs.linkInput.$el, 'link')
+          this.$refs.contextMenu.displayContextMenu(element, this.$refs.linkInput, 'link')
         })
       } else {
         this.isLinkInputActive = false
