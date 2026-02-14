@@ -4,6 +4,9 @@
   "description": "Vue component library for ocelot.social - works with Vue 2.7+ and Vue 3",
   "license": "Apache-2.0",
   "type": "module",
+  "imports": {
+    "#src/*": "./src/*"
+  },
   "exports": {
     ".": {
       "import": {

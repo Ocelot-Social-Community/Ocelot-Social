@@ -26,12 +26,6 @@ export default [
   ...vue3,
   ...vitests,
   {
-    rules: {
-      // TODO: replace with alias
-      'import-x/no-relative-parent-imports': 'off',
-    },
-  },
-  {
     // TODO: fix in eslint-config-it4c — these rules conflict with each other
     files: ['**/*.spec.ts', '**/*.test.ts'],
     rules: {
