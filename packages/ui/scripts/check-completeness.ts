@@ -88,7 +88,7 @@ for (const componentPath of components) {
 
   // Check 4: Keyboard accessibility tests exist
   if (unitTestContent !== null) {
-    if (!unitTestContent.includes("describe('keyboard accessibility'")) {
+    if (!/describe\(\s*['"]keyboard accessibility['"]/.test(unitTestContent)) {
       result.errors.push(`Missing keyboard accessibility tests in: ${unitTestPath}`)
     }
   } else {
