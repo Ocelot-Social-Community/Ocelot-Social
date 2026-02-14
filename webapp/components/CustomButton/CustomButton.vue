@@ -1,31 +1,8 @@
 <template>
   <div>
     <os-button
-      v-if="settings.url"
-      as="a"
-      :href="settings.url"
-      :target="settings.target"
-      class="custom-button"
-      variant="primary"
-      appearance="ghost"
-      circle
-      :aria-label="$t(settings.toolTipIdent)"
-      v-tooltip="{
-        content: $t(settings.toolTipIdent),
-        placement: 'bottom-start',
-      }"
-    >
-      <img
-        class="logo-svg"
-        :src="settings.iconPath"
-        :alt="settings.iconAltText"
-        :style="logoWidthStyle"
-      />
-    </os-button>
-    <os-button
-      v-else
-      as="nuxt-link"
-      :to="settings.path"
+      :as="linkTag"
+      v-bind="linkProps"
       class="custom-button"
       variant="primary"
       appearance="ghost"
@@ -57,6 +34,14 @@ export default {
     settings: { type: Object, required: true },
   },
   computed: {
+    linkTag() {
+      return this.settings.url ? 'a' : 'nuxt-link'
+    },
+    linkProps() {
+      return this.settings.url
+        ? { href: this.settings.url, target: this.settings.target }
+        : { to: this.settings.path }
+    },
     logoWidthStyle() {
       const width = isEmpty(this.settings.iconWidth) ? '26px' : this.settings.iconWidth
       return `width: ${width};`
