@@ -75,7 +75,7 @@
             {
               class: [
                 cn(
-                  'os-icon inline-flex items-center shrink-0',
+                  'os-icon inline-flex items-center align-bottom shrink-0',
                   sizeClass,
                   '[&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current',
                 ),
@@ -103,7 +103,7 @@
           'span',
           {
             class: cn(
-              'os-icon inline-flex items-center shrink-0',
+              'os-icon inline-flex items-center align-bottom shrink-0',
               sizeClass,
               '[&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current',
               attrClass as ClassValue,

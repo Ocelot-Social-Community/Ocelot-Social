@@ -19,7 +19,7 @@
         />
         <ds-chip size="base" :color="errors && errors.name ? 'danger' : 'medium'">
           {{ `${formData.name.length} / ${formSchema.name.min}–${formSchema.name.max}` }}
-          <base-icon v-if="errors && errors.name" name="warning" />
+          <os-icon v-if="errors && errors.name" :icon="IconWarning" />
         </ds-chip>
 
         <!-- group Slug -->
@@ -85,7 +85,7 @@
         />
         <ds-chip size="base" :color="errors && errors.description ? 'danger' : 'medium'">
           {{ `${descriptionLength} / ${formSchema.description.min}` }}
-          <base-icon v-if="errors && errors.description" name="warning" />
+          <os-icon v-if="errors && errors.description" :icon="IconWarning" />
         </ds-chip>
 
         <!-- actionRadius -->
@@ -127,7 +127,7 @@
           />
           <ds-chip size="base" :color="errors && errors.categoryIds ? 'danger' : 'medium'">
             {{ formData.categoryIds.length }} / 3
-            <base-icon v-if="errors && errors.categoryIds" name="warning" />
+            <os-icon v-if="errors && errors.categoryIds" :icon="IconWarning" />
           </ds-chip>
         </div>
         <!-- submit -->
@@ -151,7 +151,8 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
 import {
@@ -173,6 +174,7 @@ export default {
     ActionRadiusSelect,
     LocationSelect,
     OsButton,
+    OsIcon,
   },
   props: {
     update: {
@@ -185,6 +187,9 @@ export default {
       required: false,
       default: () => ({}),
     },
+  },
+  created() {
+    this.IconWarning = ocelotIcons.IconWarning
   },
   data() {
     const { name, slug, groupType, about, description, actionRadius, locationName, categories } =
