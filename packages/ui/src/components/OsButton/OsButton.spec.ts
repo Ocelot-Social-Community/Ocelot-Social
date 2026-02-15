@@ -552,6 +552,7 @@ describe('osButton', () => {
   describe('as prop', () => {
     it('renders as <button> by default', () => {
       const wrapper = mount(OsButton)
+
       expect((wrapper.element as HTMLElement).tagName).toBe('BUTTON')
       expect(wrapper.attributes('type')).toBe('button')
     })
@@ -562,6 +563,7 @@ describe('osButton', () => {
         attrs: { href: '/test' },
         slots: { default: 'Link' },
       })
+
       expect((wrapper.element as HTMLElement).tagName).toBe('A')
       expect(wrapper.attributes('href')).toBe('/test')
       expect(wrapper.attributes('type')).toBeUndefined()
@@ -579,6 +581,7 @@ describe('osButton', () => {
         attrs: { to: '/groups' },
         slots: { default: 'Groups' },
       })
+
       expect((wrapper.element as HTMLElement).tagName).toBe('A')
       expect(wrapper.text()).toBe('Groups')
     })
@@ -588,6 +591,7 @@ describe('osButton', () => {
         props: { as: 'a', disabled: true },
         attrs: { href: '/test' },
       })
+
       expect(wrapper.attributes('disabled')).toBeUndefined()
       expect(wrapper.attributes('aria-disabled')).toBeUndefined()
       expect(wrapper.attributes('tabindex')).toBeUndefined()
@@ -597,6 +601,7 @@ describe('osButton', () => {
       const wrapper = mount(OsButton, {
         props: { as: 'a', variant: 'primary', appearance: 'filled' },
       })
+
       expect(wrapper.classes()).toContain('os-button')
       expect(wrapper.classes()).toContain('bg-[var(--color-primary)]')
     })
