@@ -5,6 +5,11 @@ import type { Plugin } from 'vite'
 
 const SUFFIX = '?icon'
 
+/** Escape a string for safe embedding in a single-quoted JS literal */
+function escapeJS(str: string): string {
+  return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'")
+}
+
 export default function svgIcon(): Plugin {
   return {
     name: 'svg-icon',
@@ -40,11 +45,16 @@ export default function svgIcon(): Plugin {
       }
 
       const pathElements = paths
-        .map((d) => `h('path', isVue2 ? { attrs: { d: '${d}' } } : { d: '${d}' })`)
+        .map((d) => {
+          const escaped = escapeJS(d)
+          return `h('path', isVue2 ? { attrs: { d: '${escaped}' } } : { d: '${escaped}' })`
+        })
         .join(', ')
 
+      const safeViewBox = escapeJS(viewBox)
+
       return `import { h, isVue2 } from 'vue-demi'
-const svgAttrs = { xmlns: 'http://www.w3.org/2000/svg', viewBox: '${viewBox}', fill: 'currentColor' }
+const svgAttrs = { xmlns: 'http://www.w3.org/2000/svg', viewBox: '${safeViewBox}', fill: 'currentColor' }
 export default () => h('svg', isVue2 ? { attrs: svgAttrs } : svgAttrs, [${pathElements}])
 `
     },
