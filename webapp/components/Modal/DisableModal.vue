@@ -14,7 +14,7 @@
         :loading="loading"
         @click="confirm"
       >
-        <template #icon><base-icon name="exclamation-circle" /></template>
+        <template #icon><os-icon :icon="IconExclamationCircle" /></template>
         {{ $t('disable.submit') }}
       </os-button>
     </template>
@@ -22,16 +22,20 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import gql from 'graphql-tag'
 
 export default {
   name: 'DisableModal',
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   props: {
     name: { type: String, default: '' },
     type: { type: String, required: true },
     id: { type: String, required: true },
+  },
+  created() {
+    this.IconExclamationCircle = ocelotIcons.IconExclamationCircle
   },
   data() {
     return {

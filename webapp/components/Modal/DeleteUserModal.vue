@@ -47,7 +47,7 @@
         :loading="loading"
         @click="openModal"
       >
-        <template #icon><base-icon name="exclamation-circle" /></template>
+        <template #icon><os-icon :icon="IconExclamationCircle" /></template>
         {{ $t('settings.deleteUserAccount.name') }}
       </os-button>
     </template>
@@ -55,7 +55,8 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import gql from 'graphql-tag'
 import { mapMutations } from 'vuex'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
@@ -67,11 +68,15 @@ export default {
   components: {
     DateTime,
     OsButton,
+    OsIcon,
     SweetalertIcon,
     UserTeaser,
   },
   props: {
     userdata: { type: Object, required: true },
+  },
+  created() {
+    this.IconExclamationCircle = ocelotIcons.IconExclamationCircle
   },
   data() {
     return {

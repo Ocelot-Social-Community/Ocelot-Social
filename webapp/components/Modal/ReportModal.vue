@@ -45,7 +45,7 @@
         @click="confirm"
       >
         <template #icon>
-          <base-icon name="exclamation-circle" />
+          <os-icon :icon="IconExclamationCircle" />
         </template>
         {{ $t('report.submit') }}
       </os-button>
@@ -55,6 +55,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import { reportMutation } from '~/graphql/Moderation.js'
 import { valuesReasonCategoryOptions } from '~/constants/modals.js'
@@ -85,6 +86,7 @@ export default {
     }
   },
   created() {
+    this.IconExclamationCircle = ocelotIcons.IconExclamationCircle
     this.form.reasonCategoryOptions = valuesReasonCategoryOptions.map((reasonCategory) => {
       return {
         label: this.$t('report.reason.category.options.' + reasonCategory),
