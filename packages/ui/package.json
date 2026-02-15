@@ -18,14 +18,14 @@
         "default": "./dist/index.cjs"
       }
     },
-    "./webapp": {
+    "./ocelot": {
       "import": {
-        "types": "./dist/webapp.d.ts",
-        "default": "./dist/webapp.mjs"
+        "types": "./dist/ocelot.d.ts",
+        "default": "./dist/ocelot.mjs"
       },
       "require": {
-        "types": "./dist/webapp.d.cts",
-        "default": "./dist/webapp.cjs"
+        "types": "./dist/ocelot.d.cts",
+        "default": "./dist/ocelot.cjs"
       }
     },
     "./style.css": "./dist/style.css",
@@ -152,7 +152,7 @@
       "limit": "2 kB"
     },
     {
-      "path": "dist/webapp.mjs",
+      "path": "dist/ocelot.mjs",
       "limit": "5 kB",
       "brotli": true
     },

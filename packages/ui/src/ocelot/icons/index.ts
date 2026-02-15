@@ -18,6 +18,6 @@ function toName(path: string): string {
   )
 }
 
-export const webappIcons: Record<string, () => VNode> = Object.fromEntries(
+export const ocelotIcons: Record<string, () => VNode> = Object.fromEntries(
   Object.entries(modules).map(([path, icon]) => [toName(path), icon]),
 )

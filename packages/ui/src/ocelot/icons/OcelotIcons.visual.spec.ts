@@ -4,14 +4,14 @@ import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
 /**
- * Visual regression tests for Webapp Icons
+ * Visual regression tests for Ocelot Icons
  *
  * These tests capture screenshots of Storybook stories and compare them
  * against baseline images to detect unintended visual changes.
  * Each test also runs accessibility checks using axe-core.
  */
 
-const STORY_URL = '/iframe.html?id=webapp-icons'
+const STORY_URL = '/iframe.html?id=ocelot-icons'
 const STORY_ROOT = '#storybook-root'
 
 /**
@@ -30,7 +30,7 @@ async function checkA11y(page: Page) {
   expect(results.violations).toEqual([])
 }
 
-test.describe('WebappIcons keyboard accessibility', () => {
+test.describe('OcelotIcons keyboard accessibility', () => {
   test('all icons are decorative (not focusable)', async ({ page }) => {
     await page.goto(`${STORY_URL}--all-icons&viewMode=story`)
     const root = page.locator(STORY_ROOT)
@@ -49,7 +49,7 @@ test.describe('WebappIcons keyboard accessibility', () => {
   })
 })
 
-test.describe('WebappIcons visual regression', () => {
+test.describe('OcelotIcons visual regression', () => {
   test('all icons', async ({ page }) => {
     await page.goto(`${STORY_URL}--all-icons&viewMode=story`)
     const root = page.locator(STORY_ROOT)

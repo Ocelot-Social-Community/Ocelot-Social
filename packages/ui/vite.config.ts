@@ -31,7 +31,7 @@ export default defineConfig({
         // Generate .d.cts files for CJS compatibility
         await copyFile('dist/index.d.ts', 'dist/index.d.cts')
         await copyFile('dist/tailwind.preset.d.ts', 'dist/tailwind.preset.d.cts')
-        await copyFile('dist/webapp.d.ts', 'dist/webapp.d.cts')
+        await copyFile('dist/ocelot.d.ts', 'dist/ocelot.d.cts')
       },
     }),
     // Build CSS separately using Tailwind CLI
@@ -47,7 +47,7 @@ export default defineConfig({
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
         'tailwind.preset': resolve(__dirname, 'src/tailwind.preset.ts'),
-        webapp: resolve(__dirname, 'src/webapp/index.ts'),
+        ocelot: resolve(__dirname, 'src/ocelot/index.ts'),
       },
       formats: ['es', 'cjs'],
       fileName: (format, entryName) => `${entryName}.${format === 'es' ? 'mjs' : 'cjs'}`,

@@ -4,20 +4,20 @@ import { h } from 'vue'
 
 import OsIcon from '#src/components/OsIcon/OsIcon.vue'
 
-import { webappIcons } from './index'
+import { ocelotIcons } from './index'
 
-describe('webapp icons', () => {
-  const IconAngleDown = webappIcons.IconAngleDown
+describe('ocelot icons', () => {
+  const IconAngleDown = ocelotIcons.IconAngleDown
 
   describe('exports', () => {
-    it('exports webappIcons as a record of functions', () => {
-      expectTypeOf(webappIcons).toBeObject()
+    it('exports ocelotIcons as a record of functions', () => {
+      expectTypeOf(ocelotIcons).toBeObject()
 
-      expect(Object.keys(webappIcons).length).toBeGreaterThan(0)
+      expect(Object.keys(ocelotIcons).length).toBeGreaterThan(0)
     })
 
     it('auto-discovers all SVGs in svgs/ directory', () => {
-      expect(webappIcons).toHaveProperty('IconAngleDown')
+      expect(ocelotIcons).toHaveProperty('IconAngleDown')
 
       expectTypeOf(IconAngleDown).toBeFunction()
     })

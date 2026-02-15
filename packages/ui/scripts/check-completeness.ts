@@ -48,7 +48,7 @@ let hasErrors = false
 // Find all Vue components (excluding index files)
 const components = [
   ...(await glob('src/components/**/Os*.vue')),
-  ...(await glob('src/webapp/components/**/*.vue')),
+  ...(await glob('src/ocelot/components/**/*.vue')),
 ]
 
 for (const componentPath of components) {
@@ -154,10 +154,10 @@ for (const componentPath of components) {
   }
 }
 
-// --- Webapp stories (no .vue files, story-driven checks) ---
-const webappStories = await glob('src/webapp/**/*.stories.ts')
+// --- Ocelot stories (no .vue files, story-driven checks) ---
+const ocelotStories = await glob('src/ocelot/**/*.stories.ts')
 
-for (const storyPath of webappStories) {
+for (const storyPath of ocelotStories) {
   const storyName = basename(storyPath, '.stories.ts')
   const storyDir = dirname(storyPath)
   const visualTestPath = join(storyDir, `${storyName}.visual.spec.ts`)
