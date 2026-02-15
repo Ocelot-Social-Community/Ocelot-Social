@@ -646,7 +646,7 @@ export const CircleAppearances: Story = {
 
 export const Polymorphic: Story = {
   render: () => ({
-    components: { OsButton, CheckIcon, PlusIcon },
+    components: { OsButton, IconCheck, IconPlus },
     template: `
       <div class="flex flex-col gap-4">
         <div>
@@ -662,11 +662,11 @@ export const Polymorphic: Story = {
           <h3 class="text-sm font-bold mb-2">as="a" with icon</h3>
           <div class="flex flex-wrap gap-2">
             <OsButton as="a" href="#" variant="primary">
-              <template #icon><CheckIcon /></template>
+              <template #icon><IconCheck /></template>
               Save
             </OsButton>
             <OsButton as="a" href="#" variant="success" circle aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
           </div>
         </div>
