@@ -8,10 +8,10 @@ export const IconCheck = _IconCheck
 export const IconClose = _IconClose
 export const IconPlus = _IconPlus
 
-export const SYSTEM_ICONS: Record<string, Component> = {
+export const SYSTEM_ICONS = {
   check: IconCheck,
   close: IconClose,
   plus: IconPlus,
-}
+} as const satisfies Record<string, Component>
 
 export type SystemIconName = keyof typeof SYSTEM_ICONS
