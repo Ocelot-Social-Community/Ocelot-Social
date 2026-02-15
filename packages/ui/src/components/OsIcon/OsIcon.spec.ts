@@ -170,8 +170,8 @@ describe('osIcon', () => {
   describe('system icons', () => {
     const iconEntries = Object.entries(SYSTEM_ICONS)
 
-    it('has 10 system icons registered', () => {
-      expect(iconEntries).toHaveLength(10)
+    it('has 4 system icons registered', () => {
+      expect(iconEntries).toHaveLength(4)
     })
 
     it.each(iconEntries)('renders "%s" without errors', (name) => {
@@ -183,19 +183,24 @@ describe('osIcon', () => {
       expect(wrapper.find('path').exists()).toBe(true)
     })
 
-    it('exports all icon components individually', () => {
-      const icons = [IconBars, IconCheck, IconChevronDown, IconChevronUp, IconClose]
+    it('exports all icon components individually and renders them', () => {
+      const icons = [
+        IconBars,
+        IconCheck,
+        IconChevronDown,
+        IconChevronUp,
+        IconClose,
+        IconCopy,
+        IconEye,
+        IconEyeSlash,
+        IconSearch,
+        IconSpinner,
+      ]
 
       for (const icon of icons) {
-        expect(icon).toBeDefined()
-      }
-    })
+        const wrapper = mount(OsIcon, { props: { icon } })
 
-    it('exports remaining icon components individually', () => {
-      const icons = [IconCopy, IconEye, IconEyeSlash, IconSearch, IconSpinner]
-
-      for (const icon of icons) {
-        expect(icon).toBeDefined()
+        expect(wrapper.find('svg').exists()).toBe(true)
       }
     })
 

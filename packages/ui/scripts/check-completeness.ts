@@ -46,7 +46,10 @@ const results: CheckResult[] = []
 let hasErrors = false
 
 // Find all Vue components (excluding index files)
-const components = await glob('src/components/**/Os*.vue')
+const components = [
+  ...(await glob('src/components/**/Os*.vue')),
+  ...(await glob('src/webapp/components/**/*.vue')),
+]
 
 for (const componentPath of components) {
   const componentName = basename(componentPath, '.vue')

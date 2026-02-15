@@ -2,7 +2,7 @@ import { computed, h } from 'vue'
 
 import { OsButton } from '#src/components/OsButton'
 
-import { SYSTEM_ICONS } from './icons'
+import { IconEye, SYSTEM_ICONS } from './icons'
 import OsIcon from './OsIcon.vue'
 
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
@@ -137,11 +137,14 @@ export const CustomComponent: Story = {
 export const WithAriaLabel: Story = {
   render: () => ({
     components: { OsIcon },
+    setup() {
+      return { IconEye }
+    },
     template: `
       <div class="flex items-center gap-4">
         <OsIcon name="close" aria-label="Close dialog" />
         <OsIcon name="search" aria-label="Search" />
-        <OsIcon name="eye" aria-label="Show password" />
+        <OsIcon :icon="IconEye" aria-label="Show password" />
       </div>
     `,
   }),
@@ -150,13 +153,16 @@ export const WithAriaLabel: Story = {
 export const InheritColor: Story = {
   render: () => ({
     components: { OsIcon },
+    setup() {
+      return { IconEye }
+    },
     template: `
       <div class="flex items-center gap-4 text-lg">
         <span class="text-red-500"><OsIcon name="close" /></span>
         <span class="text-green-500"><OsIcon name="check" /></span>
         <span class="text-blue-500"><OsIcon name="search" /></span>
         <span class="text-yellow-500"><OsIcon name="spinner" /></span>
-        <span class="text-purple-500"><OsIcon name="eye" /></span>
+        <span class="text-purple-500"><OsIcon :icon="IconEye" /></span>
       </div>
     `,
   }),

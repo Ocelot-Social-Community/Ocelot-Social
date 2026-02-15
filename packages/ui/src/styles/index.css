@@ -13,6 +13,7 @@
 
 /* Scan component files for utility classes */
 @source "../components/**/*.vue";
+@source "../webapp/**/*.vue";
 @source "../**/*.ts";
 
 /*

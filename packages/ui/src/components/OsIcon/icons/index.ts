@@ -1,11 +1,5 @@
-import { IconBars } from './bars'
 import { IconCheck } from './check'
-import { IconChevronDown } from './chevron-down'
-import { IconChevronUp } from './chevron-up'
 import { IconClose } from './close'
-import { IconCopy } from './copy'
-import { IconEye } from './eye'
-import { IconEyeSlash } from './eye-slash'
 import { IconSearch } from './search'
 import { IconSpinner } from './spinner'
 
@@ -23,14 +17,8 @@ export { IconSearch } from './search'
 export { IconSpinner } from './spinner'
 
 export const SYSTEM_ICONS: Record<string, Component> = {
-  bars: IconBars,
   check: IconCheck,
-  'chevron-down': IconChevronDown,
-  'chevron-up': IconChevronUp,
   close: IconClose,
-  copy: IconCopy,
-  eye: IconEye,
-  'eye-slash': IconEyeSlash,
   search: IconSearch,
   spinner: IconSpinner,
 }
