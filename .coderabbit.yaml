@@ -4,6 +4,10 @@
 language: de
 
 reviews:
+  tools:
+    docstring_coverage:
+      enabled: false
+
   # Automatisches Review für alle PRs
   auto_review:
     enabled: true
