@@ -8,7 +8,7 @@
       @vdropzone-file-added="fileAdded"
     >
       <loading-spinner v-if="isLoadingImage" />
-      <base-icon v-else-if="!hasImage" name="image" />
+      <os-icon v-else-if="!hasImage" :icon="icons.image" />
       <div v-if="!hasImage" class="supported-formats">
         {{ $t('contribution.teaserImage.supportedFormats') }}
       </div>
@@ -246,12 +246,12 @@ export default {
     cursor: pointer;
 
     &:hover {
-      > .base-icon {
+      > .os-icon {
         opacity: $opacity-base;
       }
     }
 
-    > .base-icon {
+    > .os-icon {
       position: absolute;
       padding: $space-small;
       border-radius: 100%;

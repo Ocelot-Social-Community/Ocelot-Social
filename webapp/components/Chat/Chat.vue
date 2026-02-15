@@ -44,7 +44,7 @@
             :aria-label="$t('chat.expandChat')"
           >
             <template #icon>
-              <base-icon name="expand" />
+              <os-icon :icon="icons.expand" />
             </template>
           </os-button>
         </ds-flex-item>
@@ -106,6 +106,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { roomQuery, createRoom, unreadRoomsQuery } from '~/graphql/Rooms'
 import {
   messageQuery,
@@ -119,6 +120,9 @@ import { mapGetters, mapMutations } from 'vuex'
 export default {
   name: 'Chat',
   components: { OsButton, OsIcon },
+  created() {
+    this.icons = ocelotIcons
+  },
   props: {
     theme: {
       type: String,

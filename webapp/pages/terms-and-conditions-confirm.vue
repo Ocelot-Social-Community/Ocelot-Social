@@ -1,7 +1,7 @@
 <template>
   <ds-container width="medium" class="terms-and-conditions-confirm">
     <base-card>
-      <base-icon name="balance-scale" />
+      <os-icon :icon="icons.balanceScale" />
       <h2 class="title">{{ $t(`termsAndConditions.newTermsAndConditions`) }}</h2>
       <os-button
         as="nuxt-link"
@@ -24,14 +24,18 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters, mapMutations } from 'vuex'
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import { updateUserMutation } from '~/graphql/User.js'
 
 export default {
   name: 'TermsAndConditionsConfirm',
-  components: { OsButton },
+  components: { OsButton, OsIcon },
+  created() {
+    this.icons = ocelotIcons
+  },
   layout: 'default',
   head() {
     return {
@@ -91,7 +95,7 @@ export default {
   align-items: center;
   justify-content: space-between;
 
-  > .base-icon {
+  > .os-icon {
     font-size: $font-size-xxx-large;
   }
 }

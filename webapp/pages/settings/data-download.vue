@@ -8,7 +8,7 @@
       :loading="loading"
       @click="onClick(jsonData)"
     >
-      <template #icon><base-icon name="download" /></template>
+      <template #icon><os-icon :icon="icons.download" /></template>
       {{ $t('settings.download.json') }}
     </os-button>
     <ds-space margin="large" />
@@ -22,7 +22,8 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters } from 'vuex'
 import { userDataQuery } from '~/graphql/User'
 import isEmpty from 'lodash/isEmpty'
@@ -32,6 +33,10 @@ export default {
   mixins: [scrollToContent],
   components: {
     OsButton,
+    OsIcon,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   data() {
     return {

@@ -141,7 +141,7 @@
             type="submit"
             :disabled="checkFormError(errors)"
           >
-            <template #icon><base-icon name="save" /></template>
+            <template #icon><os-icon :icon="icons.save" /></template>
             {{ update ? $t('group.update') : $t('group.save') }}
           </os-button>
         </ds-space>

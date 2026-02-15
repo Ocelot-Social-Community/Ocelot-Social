@@ -50,7 +50,7 @@
         </ds-menu>
         <hr />
         <nuxt-link class="logout-link" :to="{ name: 'logout' }">
-          <base-icon name="sign-out" />
+          <os-icon :icon="icons.signOut" />
           {{ $t('login.logout') }}
         </nuxt-link>
       </div>

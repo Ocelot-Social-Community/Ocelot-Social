@@ -179,7 +179,7 @@
               @click="toggleMobileMenuView"
             >
               <template #icon>
-                <base-icon name="bars" />
+                <os-icon :icon="icons.bars" />
               </template>
             </os-button>
           </ds-flex-item>

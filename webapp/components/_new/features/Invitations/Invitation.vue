@@ -26,7 +26,7 @@
         :aria-label="$t('invite-codes.copy-code')"
       >
         <template #icon>
-          <base-icon name="copy" />
+          <os-icon :icon="icons.copy" />
         </template>
       </os-button>
       <os-button

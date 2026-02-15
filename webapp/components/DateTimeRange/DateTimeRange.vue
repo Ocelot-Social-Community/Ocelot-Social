@@ -14,7 +14,7 @@
       </div>
     </div>
     <template v-if="!isSameDayLocal">
-      <base-icon name="arrow-down" />
+      <os-icon :icon="icons.arrowDown" />
       <div class="ds-flex date-time-row">
         <div>
           <os-icon :icon="icons.calendar" data-test="calendar" />

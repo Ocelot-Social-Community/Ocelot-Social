@@ -70,7 +70,7 @@
               v-if="group.isMutedByMe"
               @click="unmuteGroup"
             >
-              <template #icon><base-icon name="volume-up" /></template>
+              <template #icon><os-icon :icon="icons.volumeUp" /></template>
               {{ $t('group.unmute') }}
             </os-button>
             <!-- Group join / leave -->
@@ -290,6 +290,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
@@ -342,6 +343,9 @@ export default {
     MasonryGridItem,
     // SocialMedia,
     // TabNavigation,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   mixins: [postListActions, SortCategories, GetCategories],
   transition: {

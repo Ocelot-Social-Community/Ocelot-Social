@@ -20,7 +20,7 @@
               :loading="$apollo.loading"
               :aria-label="$t('actions.search')"
             >
-              <template #icon><base-icon name="search" /></template>
+              <template #icon><os-icon :icon="icons.search" /></template>
             </os-button>
           </ds-flex-item>
         </ds-flex>
@@ -84,7 +84,7 @@
             circle
             :aria-label="$t('actions.edit')"
           >
-            <template #icon><base-icon name="pencil" /></template>
+            <template #icon><os-icon :icon="icons.pencil" /></template>
           </os-button>
         </template>
       </ds-table>
@@ -97,7 +97,8 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters } from 'vuex'
 import { isEmail } from 'validator'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
@@ -107,7 +108,11 @@ import { FetchAllRoles, updateUserRole } from '~/graphql/admin/Roles'
 export default {
   components: {
     OsButton,
+    OsIcon,
     PaginationButtons,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   data() {
     const pageSize = 15

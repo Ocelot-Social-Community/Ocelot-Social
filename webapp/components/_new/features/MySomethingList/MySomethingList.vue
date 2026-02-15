@@ -33,7 +33,7 @@
                 data-test="edit-button"
               >
                 <template #icon>
-                  <base-icon name="edit" />
+                  <os-icon :icon="icons.edit" />
                 </template>
               </os-button>
               <os-button
