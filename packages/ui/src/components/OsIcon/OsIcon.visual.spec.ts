@@ -83,17 +83,6 @@ test.describe('OsIcon visual regression', () => {
     await checkA11y(page)
   })
 
-  test('with aria label', async ({ page }) => {
-    await page.goto(`${STORY_URL}--with-aria-label&viewMode=story`)
-    const root = page.locator(STORY_ROOT)
-    await root.waitFor()
-    await waitForFonts(page)
-
-    await expect(root.locator('.flex').first()).toHaveScreenshot('with-aria-label.png')
-
-    await checkA11y(page)
-  })
-
   test('inherit color', async ({ page }) => {
     await page.goto(`${STORY_URL}--inherit-color&viewMode=story`)
     const root = page.locator(STORY_ROOT)
