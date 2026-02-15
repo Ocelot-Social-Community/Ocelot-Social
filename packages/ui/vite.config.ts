@@ -9,6 +9,8 @@ import dts from 'vite-plugin-dts'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
 
+import svgIcon from './src/plugins/vite-svg-icon'
+
 const execAsync = promisify(exec)
 
 export default defineConfig({
@@ -16,6 +18,7 @@ export default defineConfig({
     exclude: ['vue-demi'],
   },
   plugins: [
+    svgIcon(),
     vue(),
     tailwindcss(),
     tsconfigPaths(),
@@ -76,7 +79,7 @@ export default defineConfig({
         'src/**/*.{test,spec}.ts',
         'src/**/*.stories.ts',
         'src/**/index.ts',
-        'src/webapp/icons/!(index).ts',
+        'src/plugins/**',
       ],
       thresholds: {
         100: true,

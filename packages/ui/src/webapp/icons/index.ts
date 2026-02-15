@@ -1,2 +1,4 @@
 // Auto-generated — do not edit
-export { IconAngleDown } from './angle-down'
+import _IconAngleDown from './svgs/angle-down.svg?icon'
+
+export const IconAngleDown = _IconAngleDown
