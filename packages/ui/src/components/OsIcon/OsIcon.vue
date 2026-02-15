@@ -49,12 +49,17 @@
         const sizeClass = ICON_SIZES[props.size]
 
         // Vue 2's h() cannot handle plain arrow functions as components (only
-        // constructor functions or option objects). SYSTEM_ICONS entries are
-        // arrow functions that return VNodes, so call them directly.
+        // constructor functions or option objects). Icon render functions are
+        // arrow functions that accept optional (h, isVue2) and return VNodes.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isRenderFn = typeof iconComponent === 'function' && !(iconComponent as any).cid
+        // In Vue 2, pass $createElement (bound to this instance) so icons avoid
+        // the globally-imported h() which requires currentInstance in Vue 2.7.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const createElement = isVue2 ? (instance?.proxy as any)?.$createElement : h
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const iconVNode = isRenderFn
-          ? (iconComponent as () => ReturnType<typeof h>)()
+          ? (iconComponent as (...args: any[]) => ReturnType<typeof h>)(createElement, isVue2)
           : h(iconComponent)
 
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */

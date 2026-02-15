@@ -49,15 +49,20 @@ export default function svgIcon(): Plugin {
       const pathElements = paths
         .map((d) => {
           const escaped = escapeJS(d)
-          return `h('path', isVue2 ? { attrs: { d: '${escaped}' } } : { d: '${escaped}' })`
+          return `_h('path', _v2 ? { attrs: { d: '${escaped}' } } : { d: '${escaped}' })`
         })
         .join(', ')
 
       const safeViewBox = escapeJS(viewBox)
 
-      return `import { h, isVue2 } from 'vue-demi'
+      // Icon functions accept optional (h, v2) from OsIcon. When OsIcon passes
+      // Vue 2's $createElement, we use it directly — avoiding the globally-imported
+      // h() which requires currentInstance in Vue 2.7.
+      // When used as a standalone Vue 3 component (e.g. in Storybook), h/v2 are not
+      // functions/booleans, so we fall back to the imported _hImport / _v2Import.
+      return `import { h as _hImport, isVue2 as _v2Import } from 'vue-demi'
 const svgAttrs = { xmlns: 'http://www.w3.org/2000/svg', viewBox: '${safeViewBox}', fill: 'currentColor' }
-export default () => h('svg', isVue2 ? { attrs: svgAttrs } : svgAttrs, [${pathElements}])
+export default (h, v2) => { const _h = typeof h === 'function' ? h : _hImport; const _v2 = typeof v2 === 'boolean' ? v2 : _v2Import; return _h('svg', _v2 ? { attrs: svgAttrs } : svgAttrs, [${pathElements}]) }
 `
     },
   }
