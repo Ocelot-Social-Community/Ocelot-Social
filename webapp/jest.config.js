@@ -47,6 +47,7 @@ module.exports = {
     '^vue-demi$': path.resolve(__dirname, 'node_modules/vue-demi/lib/index.cjs'),
     // UI library - use mock that loads dist with correct vue-demi
     '^@ocelot-social/ui$': '<rootDir>/test/__mocks__/@ocelot-social/ui.js',
+    '^@ocelot-social/ui/ocelot$': '<rootDir>/test/__mocks__/@ocelot-social/ui/ocelot.js',
     '^@ocelot-social/ui/style.css$': 'identity-obj-proxy',
     // Other mappings
     '\\.(svg)$': '<rootDir>/test/fileMock.js',

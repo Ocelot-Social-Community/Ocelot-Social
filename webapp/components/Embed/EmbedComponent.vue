@@ -57,14 +57,14 @@
       @click.prevent="removeEmbed()"
     >
       <template #icon>
-        <base-icon name="close" />
+        <os-icon name="close" />
       </template>
     </os-button>
   </ds-container>
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 import { updateUserMutation } from '~/graphql/User.js'
 
@@ -72,6 +72,7 @@ export default {
   name: 'embed-component',
   components: {
     OsButton,
+    OsIcon,
   },
   props: {
     dataEmbedUrl: {

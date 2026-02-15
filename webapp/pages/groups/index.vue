@@ -22,7 +22,7 @@
           }"
         >
           <template #icon>
-            <base-icon name="plus" />
+            <os-icon name="plus" />
           </template>
         </os-button>
       </ds-space>
@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import GroupList from '~/components/Group/GroupList'
 import { groupQuery, groupCountQuery } from '~/graphql/groups.js'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
@@ -76,6 +76,7 @@ export default {
   name: 'Groups',
   components: {
     OsButton,
+    OsIcon,
     GroupList,
     TabNavigation,
     PaginationButtons,

@@ -20,7 +20,7 @@
             placement: 'bottom-start',
           }"
         />
-        <base-icon class="dropdown-arrow" name="angle-down" />
+        <os-icon class="dropdown-arrow" :icon="ocelotIcons.IconAngleDown" />
       </a>
     </template>
     <template #popover="{ closeMenu }">
@@ -59,6 +59,8 @@
 </template>
 
 <script>
+import { OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters } from 'vuex'
 import Dropdown from '~/components/Dropdown'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
@@ -66,10 +68,14 @@ import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar
 export default {
   components: {
     Dropdown,
+    OsIcon,
     ProfileAvatar,
   },
   props: {
     placement: { type: String, default: 'top-end' },
+  },
+  setup() {
+    return { ocelotIcons }
   },
   computed: {
     ...mapGetters({

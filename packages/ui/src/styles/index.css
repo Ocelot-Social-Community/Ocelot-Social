@@ -13,6 +13,7 @@
 
 /* Scan component files for utility classes */
 @source "../components/**/*.vue";
+@source "../ocelot/**/*.vue";
 @source "../**/*.ts";
 
 /*
