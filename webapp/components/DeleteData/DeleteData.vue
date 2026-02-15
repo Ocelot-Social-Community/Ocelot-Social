@@ -1,7 +1,7 @@
 <template>
   <base-card class="delete-data">
     <h2 class="title">
-      <os-icon :icon="IconWarning" />
+      <os-icon :icon="icons.warning" />
       {{ $t('settings.deleteUserAccount.name') }}
     </h2>
     <label>
@@ -50,7 +50,7 @@
       @click="handleSubmit"
     >
       <template #icon>
-        <os-icon :icon="IconTrash" />
+        <os-icon :icon="icons.trash" />
       </template>
       {{ $t('settings.deleteUserAccount.name') }}
     </os-button>
@@ -68,8 +68,7 @@ export default {
   name: 'DeleteData',
   components: { OsButton, OsIcon },
   created() {
-    this.IconWarning = ocelotIcons.IconWarning
-    this.IconTrash = ocelotIcons.IconTrash
+    this.icons = ocelotIcons
   },
   data() {
     return {

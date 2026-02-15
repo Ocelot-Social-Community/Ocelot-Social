@@ -1,7 +1,7 @@
 <template>
   <div :class="`location-info size-${size}`">
     <div class="location">
-      <os-icon :icon="IconMapMarker" />
+      <os-icon :icon="icons.mapMarker" />
       {{ locationData.name }}
     </div>
     <div v-if="locationData.distanceToMe !== null && !isOwner" class="distance">
@@ -18,7 +18,7 @@ export default {
   name: 'LocationInfo',
   components: { OsIcon },
   created() {
-    this.IconMapMarker = ocelotIcons.IconMapMarker
+    this.icons = ocelotIcons
   },
   props: {
     locationData: { type: Object, default: null },

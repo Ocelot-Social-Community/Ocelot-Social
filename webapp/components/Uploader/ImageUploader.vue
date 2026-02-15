@@ -25,7 +25,7 @@
         @click.stop="deleteImage"
       >
         <template #icon>
-          <os-icon :icon="IconTrash" />
+          <os-icon :icon="icons.trash" />
         </template>
       </os-button>
     </div>
@@ -81,7 +81,7 @@ export default {
     },
   },
   created() {
-    this.IconTrash = ocelotIcons.IconTrash
+    this.icons = ocelotIcons
   },
   data() {
     return {

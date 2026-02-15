@@ -97,7 +97,7 @@
                   }"
                 >
                   <template #icon>
-                    <os-icon :icon="IconUsers" />
+                    <os-icon :icon="icons.users" />
                   </template>
                 </os-button>
               </client-only>
@@ -246,7 +246,7 @@
                   }"
                 >
                   <template #icon>
-                    <os-icon :icon="IconUsers" />
+                    <os-icon :icon="icons.users" />
                   </template>
                 </os-button>
               </div>
@@ -383,7 +383,7 @@ export default {
     showMobileMenu: { type: Boolean, default: false },
   },
   created() {
-    this.IconUsers = ocelotIcons.IconUsers
+    this.icons = ocelotIcons
   },
   data() {
     return {

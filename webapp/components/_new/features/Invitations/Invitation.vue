@@ -38,7 +38,7 @@
         :aria-label="$t('invite-codes.invalidate')"
       >
         <template #icon>
-          <os-icon :icon="IconTrash" />
+          <os-icon :icon="icons.trash" />
         </template>
       </os-button>
     </div>
@@ -80,7 +80,7 @@ export default {
     }
   },
   created() {
-    this.IconTrash = ocelotIcons.IconTrash
+    this.icons = ocelotIcons
     this.canCopy = !!navigator.clipboard
   },
   methods: {

@@ -10,7 +10,7 @@
       >
         <base-icon name="filter" />
         <label class="label" for="dropdown">{{ selected }}</label>
-        <os-icon class="dropdown-arrow" :icon="ocelotIcons.IconAngleDown" />
+        <os-icon class="dropdown-arrow" :icon="icons.angleDown" />
       </a>
     </template>
     <template #popover="{ toggleMenu }">
@@ -40,7 +40,7 @@ export default {
     OsIcon,
   },
   setup() {
-    return { ocelotIcons }
+    return { icons: ocelotIcons }
   },
   props: {
     selected: { type: String, default: '' },

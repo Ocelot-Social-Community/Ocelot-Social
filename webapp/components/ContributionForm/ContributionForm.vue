@@ -41,7 +41,7 @@
           />
           <ds-chip size="base" :color="errors && errors.title && 'danger'">
             {{ formData.title.length }}/{{ formSchema.title.max }}
-            <os-icon v-if="errors && errors.title" :icon="IconWarning" />
+            <os-icon v-if="errors && errors.title" :icon="icons.warning" />
           </ds-chip>
           <editor
             :users="users"
@@ -51,7 +51,7 @@
           />
           <ds-chip size="base" :color="errors && errors.content && 'danger'">
             {{ contentLength }}
-            <os-icon v-if="errors && errors.content" :icon="IconWarning" />
+            <os-icon v-if="errors && errors.content" :icon="icons.warning" />
           </ds-chip>
 
           <!-- Eventdata -->
@@ -82,7 +82,7 @@
                   class="chipbox event-grid-item-margin-helper"
                 >
                   <ds-chip size="base" :color="errors && errors.eventStart && 'danger'">
-                    <os-icon :icon="IconWarning" />
+                    <os-icon :icon="icons.warning" />
                   </ds-chip>
                 </div>
               </ds-grid-item>
@@ -116,7 +116,7 @@
                 <div class="chipbox">
                   <ds-chip size="base" :color="errors && errors.eventVenue && 'danger'">
                     {{ formData.eventVenue.length }}/{{ formSchema.eventVenue.max }}
-                    <os-icon v-if="errors && errors.eventVenue" :icon="IconWarning" />
+                    <os-icon v-if="errors && errors.eventVenue" :icon="icons.warning" />
                   </ds-chip>
                 </div>
               </ds-grid-item>
@@ -129,7 +129,7 @@
                 <div class="chipbox">
                   <ds-chip size="base" :color="errors && errors.eventLocationName && 'danger'">
                     {{ formData.eventLocationName.length }}/{{ formSchema.eventLocationName.max }}
-                    <os-icon v-if="errors && errors.eventLocationName" :icon="IconWarning" />
+                    <os-icon v-if="errors && errors.eventLocationName" :icon="icons.warning" />
                   </ds-chip>
                 </div>
               </ds-grid-item>
@@ -159,7 +159,7 @@
             :color="errors && errors.categoryIds && 'danger'"
           >
             {{ formData.categoryIds.length }} / 3
-            <os-icon v-if="errors && errors.categoryIds" :icon="IconWarning" />
+            <os-icon v-if="errors && errors.categoryIds" :icon="icons.warning" />
           </ds-chip>
           <ds-flex class="buttons-footer" gutter="xxx-small">
             <ds-flex-item width="3.5" class="buttons-footer-helper">
@@ -243,7 +243,7 @@ export default {
   },
 
   created() {
-    this.IconWarning = ocelotIcons.IconWarning
+    this.icons = ocelotIcons
   },
   data() {
     const {

@@ -10,7 +10,7 @@
         <template #icon>
           <base-icon name="filter" />
         </template>
-        <os-icon class="dropdown-arrow" :icon="ocelotIcons.IconAngleDown" />
+        <os-icon class="dropdown-arrow" :icon="icons.angleDown" />
       </os-button>
     </template>
     <template #popover>
@@ -34,7 +34,7 @@ export default {
     OsIcon,
   },
   setup() {
-    return { ocelotIcons }
+    return { icons: ocelotIcons }
   },
   props: {
     placement: { type: String },

@@ -30,7 +30,7 @@
             @click="toggleFilteredByFollowed(currentUser.id)"
           >
             <template #icon>
-              <os-icon :icon="IconUserPlus" />
+              <os-icon :icon="icons.userPlus" />
             </template>
             {{ $t('filter-menu.following') }}
           </os-button>
@@ -44,7 +44,7 @@
             @click="toggleFilteredByMyGroups()"
           >
             <template #icon>
-              <os-icon :icon="IconUsers" />
+              <os-icon :icon="icons.users" />
             </template>
             {{ $t('contribution.filterMyGroups') }}
           </os-button>
@@ -68,8 +68,7 @@ export default {
     OsIcon,
   },
   created() {
-    this.IconUserPlus = ocelotIcons.IconUserPlus
-    this.IconUsers = ocelotIcons.IconUsers
+    this.icons = ocelotIcons
   },
   computed: {
     ...mapGetters({

@@ -13,7 +13,7 @@
         @click.prevent="toggleMenu"
       >
         <template #icon>
-          <os-icon :icon="IconUserPlus" />
+          <os-icon :icon="icons.userPlus" />
         </template>
       </os-button>
     </template>
@@ -54,7 +54,7 @@ export default {
     placement: { type: String, default: 'top-end' },
   },
   created() {
-    this.IconUserPlus = ocelotIcons.IconUserPlus
+    this.icons = ocelotIcons
   },
   computed: {
     ...mapGetters({

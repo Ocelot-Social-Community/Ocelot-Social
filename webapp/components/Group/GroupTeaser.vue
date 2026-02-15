@@ -20,7 +20,7 @@
         <!-- group location -->
         <div class="location-item">
           <ds-text v-if="group && group.location" color="soft">
-            <os-icon :icon="IconMapMarker" />
+            <os-icon :icon="icons.mapMarker" />
             {{ group && group.location ? group.location.name : '' }}
           </ds-text>
         </div>
@@ -95,7 +95,7 @@ export default {
     OsIcon,
   },
   created() {
-    this.IconMapMarker = ocelotIcons.IconMapMarker
+    this.icons = ocelotIcons
   },
   props: {
     group: {

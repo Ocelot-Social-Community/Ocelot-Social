@@ -13,7 +13,7 @@
         >
           <!-- <base-icon name="globe" /> -->
           <span class="label">{{ current.code.toUpperCase() }}</span>
-          <os-icon class="dropdown-arrow" :icon="ocelotIcons.IconAngleDown" />
+          <os-icon class="dropdown-arrow" :icon="icons.angleDown" />
         </a>
       </template>
       <template #popover="{ toggleMenu }">
@@ -50,7 +50,7 @@ export default {
     OsIcon,
   },
   setup() {
-    return { ocelotIcons }
+    return { icons: ocelotIcons }
   },
   props: {
     placement: { type: String, default: 'bottom-start' },

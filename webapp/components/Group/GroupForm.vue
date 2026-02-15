@@ -19,7 +19,7 @@
         />
         <ds-chip size="base" :color="errors && errors.name ? 'danger' : 'medium'">
           {{ `${formData.name.length} / ${formSchema.name.min}–${formSchema.name.max}` }}
-          <os-icon v-if="errors && errors.name" :icon="IconWarning" />
+          <os-icon v-if="errors && errors.name" :icon="icons.warning" />
         </ds-chip>
 
         <!-- group Slug -->
@@ -85,7 +85,7 @@
         />
         <ds-chip size="base" :color="errors && errors.description ? 'danger' : 'medium'">
           {{ `${descriptionLength} / ${formSchema.description.min}` }}
-          <os-icon v-if="errors && errors.description" :icon="IconWarning" />
+          <os-icon v-if="errors && errors.description" :icon="icons.warning" />
         </ds-chip>
 
         <!-- actionRadius -->
@@ -127,7 +127,7 @@
           />
           <ds-chip size="base" :color="errors && errors.categoryIds ? 'danger' : 'medium'">
             {{ formData.categoryIds.length }} / 3
-            <os-icon v-if="errors && errors.categoryIds" :icon="IconWarning" />
+            <os-icon v-if="errors && errors.categoryIds" :icon="icons.warning" />
           </ds-chip>
         </div>
         <!-- submit -->
@@ -189,7 +189,7 @@ export default {
     },
   },
   created() {
-    this.IconWarning = ocelotIcons.IconWarning
+    this.icons = ocelotIcons
   },
   data() {
     const { name, slug, groupType, about, description, actionRadius, locationName, categories } =

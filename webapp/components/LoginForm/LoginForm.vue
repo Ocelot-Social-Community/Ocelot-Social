@@ -44,7 +44,7 @@
           name="submit"
           type="submit"
         >
-          <template #icon><os-icon :icon="IconSignIn" /></template>
+          <template #icon><os-icon :icon="icons.signIn" /></template>
           {{ $t('login.login') }}
         </os-button>
         <p>
@@ -80,7 +80,7 @@ export default {
     ShowPassword,
   },
   created() {
-    this.IconSignIn = ocelotIcons.IconSignIn
+    this.icons = ocelotIcons
   },
   data() {
     return {

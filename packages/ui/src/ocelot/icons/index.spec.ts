@@ -7,7 +7,7 @@ import OsIcon from '#src/components/OsIcon/OsIcon.vue'
 import { ocelotIcons } from './index'
 
 describe('ocelot icons', () => {
-  const IconAngleDown = ocelotIcons.IconAngleDown
+  const angleDown = ocelotIcons.angleDown
 
   describe('exports', () => {
     it('exports ocelotIcons as a record of functions', () => {
@@ -17,20 +17,20 @@ describe('ocelot icons', () => {
     })
 
     it('auto-discovers all SVGs in svgs/ directory', () => {
-      expect(ocelotIcons).toHaveProperty('IconAngleDown')
+      expect(ocelotIcons).toHaveProperty('angleDown')
 
-      expectTypeOf(IconAngleDown).toBeFunction()
+      expectTypeOf(angleDown).toBeFunction()
     })
   })
 
-  describe('iconAngleDown', () => {
+  describe('angleDown', () => {
     it('renders an SVG with correct viewBox', () => {
-      const vnode = IconAngleDown()
+      const vnode = angleDown()
 
       expect(vnode).toBeDefined()
 
       const wrapper = mount({
-        render: () => h('div', [IconAngleDown()]),
+        render: () => h('div', [angleDown()]),
       })
       const svg = wrapper.find('svg')
 
@@ -40,7 +40,7 @@ describe('ocelot icons', () => {
 
     it('works with OsIcon :icon prop', () => {
       const wrapper = mount(OsIcon, {
-        props: { icon: IconAngleDown },
+        props: { icon: angleDown },
       })
 
       expect(wrapper.find('.os-icon').exists()).toBe(true)
@@ -52,7 +52,7 @@ describe('ocelot icons', () => {
   describe('keyboard accessibility', () => {
     it('icon via :icon prop is not focusable (decorative element)', () => {
       const wrapper = mount(OsIcon, {
-        props: { icon: IconAngleDown },
+        props: { icon: angleDown },
       })
 
       expect(wrapper.attributes('tabindex')).toBeUndefined()

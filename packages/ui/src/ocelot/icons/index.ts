@@ -7,16 +7,8 @@ const modules = import.meta.glob<() => VNode>('./svgs/*.svg', {
 })
 
 function toName(path: string): string {
-  return (
-    'Icon' +
-    path
-      .replace('./svgs/', '')
-      .replace('.svg', '')
-      .split('-')
-      .filter(Boolean)
-      .map((s) => s[0].toUpperCase() + s.slice(1))
-      .join('')
-  )
+  const parts = path.replace('./svgs/', '').replace('.svg', '').split('-').filter(Boolean)
+  return parts.map((s, i) => (i === 0 ? s : s[0].toUpperCase() + s.slice(1))).join('')
 }
 
 export const ocelotIcons: Record<string, () => VNode> = Object.fromEntries(

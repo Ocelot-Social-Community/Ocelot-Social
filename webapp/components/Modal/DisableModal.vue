@@ -14,7 +14,7 @@
         :loading="loading"
         @click="confirm"
       >
-        <template #icon><os-icon :icon="IconExclamationCircle" /></template>
+        <template #icon><os-icon :icon="icons.exclamationCircle" /></template>
         {{ $t('disable.submit') }}
       </os-button>
     </template>
@@ -35,7 +35,7 @@ export default {
     id: { type: String, required: true },
   },
   created() {
-    this.IconExclamationCircle = ocelotIcons.IconExclamationCircle
+    this.icons = ocelotIcons
   },
   data() {
     return {

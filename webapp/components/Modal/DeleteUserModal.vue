@@ -47,7 +47,7 @@
         :loading="loading"
         @click="openModal"
       >
-        <template #icon><os-icon :icon="IconExclamationCircle" /></template>
+        <template #icon><os-icon :icon="icons.exclamationCircle" /></template>
         {{ $t('settings.deleteUserAccount.name') }}
       </os-button>
     </template>
@@ -76,7 +76,7 @@ export default {
     userdata: { type: Object, required: true },
   },
   created() {
-    this.IconExclamationCircle = ocelotIcons.IconExclamationCircle
+    this.icons = ocelotIcons
   },
   data() {
     return {

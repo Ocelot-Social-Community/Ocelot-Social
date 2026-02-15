@@ -59,7 +59,7 @@
             :aria-label="$t('settings.muted-users.columns.unmute')"
             @click="unmuteUser(scope)"
           >
-            <template #icon><os-icon :icon="IconUserPlus" /></template>
+            <template #icon><os-icon :icon="icons.userPlus" /></template>
           </os-button>
         </template>
       </ds-table>
@@ -94,7 +94,7 @@ export default {
     ProfileAvatar,
   },
   created() {
-    this.IconUserPlus = ocelotIcons.IconUserPlus
+    this.icons = ocelotIcons
   },
   data() {
     return {

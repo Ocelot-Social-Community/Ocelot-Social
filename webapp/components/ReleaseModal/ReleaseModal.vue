@@ -15,7 +15,7 @@
         @click="confirm"
       >
         <template #icon>
-          <os-icon :icon="IconExclamationCircle" />
+          <os-icon :icon="icons.exclamationCircle" />
         </template>
         {{ $t('release.submit') }}
       </os-button>
@@ -37,7 +37,7 @@ export default {
     id: { type: String, required: true },
   },
   created() {
-    this.IconExclamationCircle = ocelotIcons.IconExclamationCircle
+    this.icons = ocelotIcons
   },
   data() {
     return {

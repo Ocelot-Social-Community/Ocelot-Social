@@ -45,7 +45,7 @@
         @click="confirm"
       >
         <template #icon>
-          <os-icon :icon="IconExclamationCircle" />
+          <os-icon :icon="icons.exclamationCircle" />
         </template>
         {{ $t('report.submit') }}
       </os-button>
@@ -86,7 +86,7 @@ export default {
     }
   },
   created() {
-    this.IconExclamationCircle = ocelotIcons.IconExclamationCircle
+    this.icons = ocelotIcons
     this.form.reasonCategoryOptions = valuesReasonCategoryOptions.map((reasonCategory) => {
       return {
         label: this.$t('report.reason.category.options.' + reasonCategory),

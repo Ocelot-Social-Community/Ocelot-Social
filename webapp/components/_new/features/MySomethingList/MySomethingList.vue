@@ -46,7 +46,7 @@
                 data-test="delete-button"
               >
                 <template #icon>
-                  <os-icon :icon="IconTrash" />
+                  <os-icon :icon="icons.trash" />
                 </template>
               </os-button>
             </template>
@@ -111,7 +111,7 @@ export default {
     },
   },
   created() {
-    this.IconTrash = ocelotIcons.IconTrash
+    this.icons = ocelotIcons
   },
   data() {
     return {

@@ -10,14 +10,14 @@
         @click.prevent="toggleMenu"
       >
         <template #icon>
-          <os-icon :icon="IconSignIn" />
+          <os-icon :icon="icons.signIn" />
         </template>
       </os-button>
     </template>
     <template #popover>
       <div class="login-button-menu-popover">
         <nuxt-link class="login-link" :to="{ name: 'login' }">
-          <os-icon :icon="IconSignIn" />
+          <os-icon :icon="icons.signIn" />
           {{ $t('login.login') }}
         </nuxt-link>
       </div>
@@ -40,7 +40,7 @@ export default {
     placement: { type: String, default: 'top-end' },
   },
   created() {
-    this.IconSignIn = ocelotIcons.IconSignIn
+    this.icons = ocelotIcons
   },
 }
 </script>

@@ -20,7 +20,7 @@
             placement: 'bottom-start',
           }"
         />
-        <os-icon class="dropdown-arrow" :icon="ocelotIcons.IconAngleDown" />
+        <os-icon class="dropdown-arrow" :icon="icons.angleDown" />
       </a>
     </template>
     <template #popover="{ closeMenu }">
@@ -75,7 +75,7 @@ export default {
     placement: { type: String, default: 'top-end' },
   },
   setup() {
-    return { ocelotIcons }
+    return { icons: ocelotIcons }
   },
   computed: {
     ...mapGetters({
