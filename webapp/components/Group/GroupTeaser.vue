@@ -20,7 +20,7 @@
         <!-- group location -->
         <div class="location-item">
           <ds-text v-if="group && group.location" color="soft">
-            <base-icon name="map-marker" />
+            <os-icon :icon="IconMapMarker" />
             {{ group && group.location ? group.location.name : '' }}
           </ds-text>
         </div>
@@ -80,6 +80,8 @@
 </template>
 
 <script>
+import { OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import Category from '~/components/Category'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
@@ -90,6 +92,10 @@ export default {
   components: {
     Category,
     GroupContentMenu,
+    OsIcon,
+  },
+  created() {
+    this.IconMapMarker = ocelotIcons.IconMapMarker
   },
   props: {
     group: {
