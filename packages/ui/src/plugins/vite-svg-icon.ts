@@ -34,10 +34,13 @@ export default function svgIcon(): Plugin {
         paths.push(match[1])
       }
 
-      const pathElements = paths.map((d) => `h('path', { d: '${d}' })`).join(', ')
+      const pathElements = paths
+        .map((d) => `h('path', isVue2 ? { attrs: { d: '${d}' } } : { d: '${d}' })`)
+        .join(', ')
 
-      return `import { h } from 'vue-demi'
-export default () => h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '${viewBox}', fill: 'currentColor' }, [${pathElements}])
+      return `import { h, isVue2 } from 'vue-demi'
+const svgAttrs = { xmlns: 'http://www.w3.org/2000/svg', viewBox: '${viewBox}', fill: 'currentColor' }
+export default () => h('svg', isVue2 ? { attrs: svgAttrs } : svgAttrs, [${pathElements}])
 `
     },
   }
