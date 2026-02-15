@@ -81,10 +81,10 @@ Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
 Phase 3: ██████████ 100% (24/24 Aufgaben) ✅ - Webapp-Integration komplett
-Phase 4: █░░░░░░░░░   6% (1/17 Aufgaben) - OsButton ✅
+Phase 4: ██░░░░░░░░  18% (3/17 Aufgaben) - OsButton ✅, OsIcon ✅, System-Icons ✅
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████████░░  74% (63/86 Aufgaben)
+Gesamt:  ████████░░  76% (65/86 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -112,15 +112,55 @@ OsButton Features:
 └─ loading:     ✅ animated SVG spinner, aria-busy (Milestone 4b)
 ```
 
+### OsIcon (Phase 4)
+```
+OsIcon Features:
+├─ name:       ✅ System-Icon per Name (check, close, plus)
+├─ icon:       ✅ Custom Vue-Komponente (hat Vorrang vor name)
+├─ size:       ✅ xs, sm, md, lg, xl, 2xl (em-basiert)
+├─ a11y:       ✅ decorative (default) / semantic (mit aria-label)
+├─ color:      ✅ fill-current (erbt von Parent)
+└─ svg-plugin: ✅ vite-svg-icon (SVG → Vue Component via ?icon)
+
+System-Icons:
+├─ check.svg   (Checkmark)
+├─ close.svg   (Close/X)
+└─ plus.svg    (Plus/Add)
+
+Ocelot-Icons (separates Entry-Point):
+└─ angle-down.svg (Dropdown-Pfeil)
+```
+
 ---
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-13 (Session 19)
+**Letzte Aktualisierung:** 2026-02-15 (Session 20)
 
-**Aktuelle Phase:** Phase 3 ✅ ABGESCHLOSSEN + Code-Review-Feedback eingearbeitet
+**Aktuelle Phase:** Phase 4 - OsIcon ✅ implementiert, System-Icons eingerichtet
 
-**Zuletzt abgeschlossen:**
+**Zuletzt abgeschlossen (Session 20 - OsIcon Komponente, System-Icons, Ocelot-Umbenennung):**
+- [x] OsIcon Komponente implementiert (name, icon, size Props; Vue 2/3 via vue-demi h())
+- [x] System-Icons: check, close, plus (SVG, viewBox 0 0 32 32, stroke-basiert)
+- [x] Custom vite-svg-icon Plugin: SVG → Vue Render-Function via `?icon` Query
+- [x] Icon-Größen: xs(0.75em), sm(0.875em), md(1.2em), lg(1.5em), xl(2em), 2xl(2.5em)
+- [x] A11y: decorative (aria-hidden, default) / semantic (role="img" + aria-label)
+- [x] fill-current für Farbvererbung vom Parent
+- [x] OsButton nutzt OsIcon statt inline SVG für Icon-Rendering
+- [x] Ocelot-Icons: separates Entry-Point (ocelot.mjs) mit dynamischem Loading via import.meta.glob
+- [x] `src/webapp/` → `src/ocelot/` umbenannt (konsistentes Naming)
+- [x] check-completeness erweitert: unterstützt ocelot/ Verzeichnis
+- [x] OsIcon: 211 Zeilen Unit-Tests, Visual Tests mit checkA11y(), Keyboard A11y
+- [x] 100% Test-Coverage für OsIcon
+- [x] OsButton Stories bereinigt (OsIcon statt Inline-SVGs)
+
+**Zuvor erledigt (auf master gemergt):**
+- [x] `os-button` CSS-Klasse auf Button-Element für Branding-Kompatibilität (#9211)
+- [x] eslint-config-it4c v0.11.2 Update: Flat Config, path alias #src, CSS-Linting (#9233)
+- [x] Release @ocelot-social/ui v0.0.2
+- [x] Release v3.14.1
+
+**Zuvor abgeschlossen:**
 - [x] Projektordner erstellt
 - [x] Planungsdokument erstellt
 - [x] Tech-Stack entschieden
@@ -133,50 +173,8 @@ OsButton Features:
 - [x] Priorisierung erstellt (15 Komponenten in 4 Tiers)
 - [x] Konsolidierungsplan finalisiert
 - [x] **Phase 1: Vue 2.7 Upgrade** ✅
-  - Vue 2.6.14 → 2.7.16
-  - vue-template-compiler entfernt
-  - @vue/composition-api entfernt
-  - @nuxtjs/composition-api entfernt
-  - Webpack-Alias für @vue/composition-api → vue
-  - Webpack-Regel für ESM .mjs Module
-  - **Unit-Tests: 157 Suites, 979 passed, 87 Snapshots** ✅
-  - **Integrationstests: bestanden** ✅
 - [x] **Phase 2: Projekt-Setup** ✅
-  - Vite + Vue 3 Projekt initialisiert
-  - vue-demi für Vue 2/3 Kompatibilität
-  - Vitest konfiguriert (integriert in vite.config.ts)
-  - npm Package-Struktur mit korrekten exports
-  - README.md Grundgerüst
-  - LICENSE (Apache 2.0)
-  - Plugin-Tests geschrieben
-  - Tailwind CSS v4 mit @tailwindcss/vite
-  - Dual-Build (style.css + tailwind.preset)
-  - Dark Mode Grundstruktur (via Tailwind dark: Prefix)
-  - Prop-Types definiert (Size, Rounded, Shadow, Variant)
-  - Branding-Architektur (keine Defaults, validateCssVariables)
-  - eslint-config-it4c eingerichtet (v0.8.0)
-  - ESLint Flat Config mit Vue 3 + Vitest Modulen
-  - Prettier-Integration via eslint-plugin-prettier
-  - GitHub Workflows (ui-lint.yml, ui-test.yml, ui-build.yml)
-  - 100% Test-Coverage Requirement
-  - .tool-versions (Node 25.5.0, konsistent mit Dockerfiles)
-  - Example Apps für Kompatibilitätstests (4er-Matrix)
-  - GitHub Workflow ui-compatibility.yml für Vue 2/3 Tests (inkl. Lint)
-  - Eigene ESLint + Prettier Configs für Example Apps
-  - Type Assertions für CI-Kompatibilität (`as unknown as Plugin`)
-  - Bundle Size Check (size-limit) mit ui-size.yml Workflow
-  - Package-Validierung (publint, arethetypeswrong) mit CJS/ESM Types
-  - Kompatibilitätstest-Workflow mit 4 Example Apps (Vue 2/3 × Tailwind/CSS)
-  - release-please Manifest-Konfiguration (Monorepo-Setup)
-  - npm Publish Workflow (ui-release.yml)
-  - CONTRIBUTING.md (Entwickler-Leitfaden)
-  - Dependabot für UI-Package und Example Apps konfiguriert
-  - CSS-Build separat via Tailwind CLI (closeBundle Hook)
-  - CVA (class-variance-authority) für typsichere Varianten
-  - cn() Utility für Tailwind-Klassen-Merge (clsx + tailwind-merge)
-  - OsButton Komponente mit CVA-Varianten implementiert
-  - ESLint-Konfiguration angepasst (vue/max-attributes-per-line, import-x/no-relative-parent-imports)
-  - Storybook 10 für Dokumentation eingerichtet (Wasserfarben-Theme)
+- [x] **Phase 3: Webapp-Integration** ✅ (133 Buttons migriert, 79 Dateien)
   - OsButton.stories.ts mit Playground + allen Varianten/Appearances/Sizes
   - Storybook Build-Konfiguration (viteFinal entfernt Library-Plugins)
   - Docker Setup (Dockerfile, docker-compose, ui-docker.yml)
@@ -184,258 +182,22 @@ OsButton Features:
   - Completeness Check (verify Script prüft Story, Visual, checkA11y, Keyboard, Varianten)
   - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
 
-**Zuvor abgeschlossen (Session 18 - CodeRabbit Review Feedback: data-test Selektoren, Accessibility, Bugfixes):**
-- [x] Cypress-Selektoren: `.user-content-menu button` → `[data-test="content-menu-button"]` (2 Step-Definitions)
-- [x] Cypress-Selektoren: `.content-menu button` → `[data-test="content-menu-button"]` (Admin.PinPost + ReportContent)
-- [x] muted-users.vue: `data-test="unmute-btn"` + `aria-label` auf Unmute-Button
-- [x] blocked-users.vue: `data-test="unblock-btn"` + `aria-label` auf Unblock-Button
-- [x] ProfileList.vue: `data-test="load-all-connections-btn"` + FollowList.spec.js Selektoren aktualisiert
-- [x] FollowButton.vue: `data-test="follow-btn"` + Spec-Selektoren aktualisiert
-- [x] JoinLeaveButton.vue: `data-test="join-leave-btn"` + `.native` von `@mouseenter`/`@mouseleave` entfernt
-- [x] LoginButton.vue: `data-test="login-btn"` + `aria-label="$t('login.login')"` + Spec-Selektoren aktualisiert
-- [x] ReportRow.spec.js: `button[data-variant="danger"]` → `[data-test="confirm"]`
-- [x] CtaJoinLeaveGroup.spec.js: Selektor auf `[data-test="join-leave-btn"]` aktualisiert
-- [x] DisableModal.vue: `finally { this.loading = false }` für Loading-State-Reset
-- [x] ReleaseModal.vue: `:loading="loading"` + `this.loading = true` + `finally { this.loading = false }`
-- [x] ChangePassword.vue: `:disabled="errors"` → `:disabled="!!errors"` (Boolean-Cast)
-- [x] Password/Change.vue: Unbenutzte `disabled: true` aus data() entfernt + 2 tote Tests entfernt
-- [x] MenuBar.vue: Unbenutztes `ref="linkButton"` entfernt
-- [x] GroupForm.vue: Cancel-Button `variant="default" appearance="filled"` (per User-Anweisung)
-- [x] `appearance="filled"` ergänzt: donations.vue, LoginForm.vue, EnterNonce.vue
-- [x] LoginForm.vue: CSS `.login-form button` → `.login-form button[type='submit']`
-- [x] pages/index.vue: Redundantes `class="my-filter-button"` von `<base-icon>` entfernt
-- [x] MySomethingList.vue: `:title` + `:aria-label` auf Edit/Delete-Buttons (Tooltip beibehalten)
-- [x] A11y aria-label auf icon-only Buttons: admin/users (search + edit), AddChatRoomByUserSearch (close), EmbedComponent (close), groups/index (create), profile/_id/_slug (new post), groups/_id/_slug (new post), CustomButton (2x tooltip), HeaderMenu (hamburger), ImageUploader (crop-cancel), ContentMenu (menu), HeaderButton (filter-remove), InviteButton (invite)
-- [x] post/_id/_slug/index.vue: Zustandsabhängiges `aria-label` (`post.sensitiveContent.show/hide`)
-- [x] ComponentSlider.vue: `aria-label` mit Interpolation (`component-slider.step`)
-- [x] i18n: `actions.search`, `actions.close`, `actions.menu` in allen 9 Sprachdateien
-- [x] i18n: `site.navigation` in allen 9 Sprachdateien
-- [x] i18n: `post.sensitiveContent.show/hide` in allen 9 Sprachdateien
-- [x] i18n: `component-slider.step` in allen 9 Sprachdateien
-
-**Zuletzt abgeschlossen (Session 19 - CodeRabbit Review Feedback: Cleanup, Accessibility, Bugfixes):**
-- [x] donations.vue: Redundantes `:checked="showDonations"` entfernt (v-model setzt checked bereits)
-- [x] MySomethingList.vue: Disabled-Logik vereinfacht `!(!isEditing || (isEditing && !disabled))` → `isEditing && disabled`
-- [x] button.variants.ts: Hardcoded Fallback `#e5e3e8` entfernt → `var(--color-disabled)` (konsistent mit filled/index.css)
-- [x] CommentCard.vue: `aria-label` auf icon-only Reply-Button
-- [x] HashtagsFilter.vue: `aria-label` auf icon-only Clear-Button
-- [x] ReleaseModal.vue: `$emit('close')` im catch-Block ergänzt (fehlte im Fehlerfall)
-- [x] Chat.vue: `aria-label` auf Expand- und Close-Buttons
-- [x] i18n: `chat.expandChat` + `chat.closeChat` in allen 9 Sprachdateien (vollständig übersetzt)
-- [x] ChatNotificationMenu.vue: `aria-label` auf icon-only Chat-Button
-- [x] SearchableInput.vue: `aria-label` auf icon-only Close-Button
-- [x] GroupButton.vue: `aria-label` auf icon-only Groups-Button
-- [x] MapButton.vue: `aria-label` auf icon-only Map-Button
-- [x] EmotionButton.vue: `aria-label` auf icon-only Emoji-Button (`<label for>` wirkt nicht auf `<button>`)
-- [x] ImageUploader.vue: `aria-label` auf icon-only Delete-Button
-- [x] i18n: `actions.clear` disambiguiert — es: "Borrar" → "Limpiar", it: "Cancella" → "Svuota" (Verwechslung mit `actions.delete`)
-- [x] OsButton.vue: `as string` Cast bei `attrClass` entfernt (cn/clsx verarbeitet Arrays/Objekte korrekt)
-- [x] CommentForm.vue: `handleSubmit` auf async/await + try/catch/finally umgestellt (Loading-Bug im Fehlerfall behoben)
-- [x] MenuBar.vue: `aria-label` auf alle 11 Editor-Toolbar-Buttons (nutzt bestehende `editor.legend.*` Keys)
-- [x] NotificationMenu.vue: `aria-label` auf alle 3 Bell-Buttons
-- [x] NotificationMenu.vue: `counter-icon` von Default-Slot in `#icon`-Slot verschoben (2 Stellen, Rendering-Bug)
-- [x] ChatNotificationMenu.vue: `counter-icon` von Default-Slot in `#icon`-Slot verschoben (Rendering-Bug)
-- [x] InviteButton.vue: `this.currentUser` → `this.user` (Bug: Getter hieß `user`, `currentUser` war undefined)
-- [x] pages/index.vue: `beforeDestroy()` aus `methods` in Lifecycle-Hook verschoben (Memory-Leak: Event-Listener wurden nie entfernt)
-- [x] Editor.vue: Fehlender `else`-Branch in `toggleLinkInput()` — `isLinkInputActive` wird jetzt auch bei no-args-Aufrufen (blur/esc) zurückgesetzt
-- [x] admin/users/index.vue: Veraltete Slot-Syntax `slot="role" slot-scope="scope"` → `#role="scope"` (Vue 3)
-- [x] settings/index.vue: Irreführender Komponentenname `NewsFeed` → `Settings`
-- [x] FilterMenu.spec.js: Typo `dropdwon` → `dropdown` im Testnamen
-- [x] ImageUploader.vue: `:title` auf Crop-Cancel-Button ergänzt (konsistent mit Delete-Button)
-- [x] OsButton.spec.ts: `as const` auf `sizes`-Objekt statt Type-Cast bei jedem `mount`-Aufruf
-- [x] CommentForm.vue: `disabled = false` aus `finally` in `catch` verschoben (verhindert Überschreiben nach `clear()`)
-- [x] FilterMenu.vue: `aria-label` auf icon-only Filter-Button
-- [x] ContextMenu.vue: `this.menu.show()` nur bei `type !== 'link'` (Link-Menüs öffneten sich sofort statt auf Klick zu warten)
-- [x] ContextMenu.vue: `this.menu = null` vor `destroy()` (Race-Condition: ESC + blur feuerten doppelt → removeChild-Error)
-- [x] CustomButton.vue: `variant="primary"` auf beide `os-button`-Instanzen (Konsistenz mit restlicher Codebase)
-- [x] Invitation.vue: Ungenutztes Argument `inviteCode.copy` bei `copyInviteCode()` entfernt
-- [x] CtaUnblockAuthor.vue: `appearance="filled"` explizit gesetzt (fehlte als einziger primärer CTA)
-- [x] HeaderMenu.vue: `beforeDestroy`-Hook ergänzt — Scroll-Listener wird jetzt entfernt (Memory-Leak)
-- [x] MenuLegend.vue: `variant="primary"` auf Trigger-Button (konsistent mit Toolbar-Buttons in MenuBar.vue)
-
-**Zuvor abgeschlossen (Session 18 - Code-Review Feedback, OsButton Refactoring, Accessibility):**
-- [x] OsButton.vue vereinfacht: `vueAttrs()` Helper, Einmal-Variablen durch `cn()` ersetzt, `children` Array inline (217→227 Zeilen, aber lesbarer)
-- [x] OsButton: `@import "./animations.css"` vor `@source`-Direktiven verschoben (CSS-Spec-Konformität)
-- [x] CustomButton.vue: `isEmpty` aus `data()` entfernt → direkter Import im Computed
-- [x] notifications.spec.js: Doppelten `beforeEach` konsolidiert, `wrapper` in `describe`-Block verschoben
-- [x] MenuLegend.vue: `<style scoped>` hinzugefügt (verhindert Style-Leaking generischer Klassennamen)
-- [x] LocationSelect: `data-test="clear-location-button"` + spezifischerer Selektor im Spec
-- [x] HashtagsFilter: `data-test="clear-search-button"` + spezifischerer Selektor im Spec
-- [x] FollowButton.vue: `.native` Modifier von `@mouseenter`/`@mouseleave` entfernt (Vue 3 Kompatibilität)
-- [x] MapButton.vue: Icon in `<template #icon>` verschoben + redundantes Inline-Style entfernt
-- [x] MySomethingList.vue: Unbenutzte `.icon-button` CSS-Klasse entfernt
-- [x] PaginationButtons.vue: Hardcoded `aria-label` → `$t('pagination.previous/next')` (i18n)
-- [x] `pagination.previous/next` in allen 9 Sprachdateien angelegt
-- [x] GroupContentMenu.vue: `aria-label` via `$t('group.contentMenu.menuButton')` für icon-only Button
-- [x] `group.contentMenu.menuButton` in allen 9 Sprachdateien angelegt
-- [x] FilterMenu.vue: Veraltete `slot="default"` + `slot-scope` → `<template #default="{ toggleMenu }">` (Vue 3)
-- [x] HashtagsFilter.vue: `this.$t()` → `$t()` im Template (Vue 3 Kompatibilität)
-- [x] DisableModal.vue: `appearance="filled"` + `:loading="loading"` auf Danger-Button
-- [x] DeleteUserModal.vue: `appearance="filled"` + `:loading="loading"` auf Danger-Button
-- [x] my-email-address/index.vue: `loadingData` State + `:loading` auf Submit-Button + `finally` Block
-- [x] ReportModal.vue: `class="report-modal"` + CSS-Selektoren mit Prefix (verhindert globales Style-Leaking)
-- [x] DeleteUserModal.vue: CSS-Selektoren mit `.delete-user-modal` Prefix (verhindert globales Style-Leaking)
-- [x] Button-Wrapper-Analyse: GroupButton + MapButton als Kandidaten zum Inlining identifiziert (nur 1 Nutzungsort, keine Logik)
-
-**Zuvor abgeschlossen (Session 16 - Bugfixes, Code-Review, letzte ds-button Migration):**
-- [x] Password/Change.vue: `!!errors` Fix für disabled-Prop
-- [x] CommentForm.vue: `type="submit"` + `!!errors` Fix
-- [x] GroupForm.vue: Letzter `<ds-button>` → `<os-button>` migriert (save/update mit icon)
-- [x] OsButton.spec.ts: TypeScript-Fix für size-Prop Union Type
-- [x] OsButton.vue: v8 ignore Coverage-Fixes (100% Branch Coverage)
-- [x] 0 `<ds-button>` und 0 `<base-button>` in Webapp-Templates verbleibend
-- [x] `data-variant` Attribut auf OsButton (konsistent mit `data-appearance`, CSS-Selektor-Support)
-- [x] notifications.spec.js: `wrapper.find()` → Testing Library `screen.getByText()` (war Vue Test Utils API)
-- [x] FilterMenu.vue: Dynamische `:appearance="filterActive ? 'filled' : 'ghost'"` (Regressionsbug)
-- [x] FilterMenu.spec.js: `data-appearance="filled"` statt CSS-Klasse `--filled`
-- [x] CtaUnblockAuthor.vue: `require` → `required` Typo-Fix
-- [x] LocationSelect.vue: `clearLocationName()` direkt via `this.currentValue` statt `event.target.value`
-- [x] LocationSelect.vue: `@click.native` → `@click` (Vue 3 Kompatibilität)
-- [x] LocationSelect.vue: `aria-label` via `$t('actions.clear')` (i18n)
-- [x] `actions.clear` in allen 9 Sprachdateien angelegt (en, de, fr, es, it, nl, pl, pt, ru)
-- [x] OsButton: JSDoc-Dokumentation für Slots (`@slot default`, `@slot icon`)
-- [x] OsButton: `isSmall` von `['xs', 'sm']` auf `size === 'sm'` vereinfacht (xs existiert nicht)
-- [x] OsButton: Strikte Typisierung `Record<Size, ...>` statt `Record<string, ...>` für Lookup-Maps
-- [x] animations.css: Stylelint-konforme Formatierung (eine Deklaration pro Zeile)
-
-**Zuvor abgeschlossen (Session 15 - Milestone 4c komplett):**
-- [x] **Alle verbleibenden base-button Instanzen migriert** (132 os-button Tags, 0 base-button verbleibend)
-- [x] 59 Buttons in dieser Session migriert (Chat, Filter, Modals, Forms, Pages, etc.)
-- [x] `type="submit"` für alle Form-Buttons (OsButton default ist `type="button"`)
-- [x] `!!errors` Boolean-Cast für disabled-Props (errors ist Objekt, nicht Boolean)
-- [x] CSS-Selektoren `.base-button` → `> button` oder `button` angepasst
-- [x] `!important` für CSS-Positioning (überschreibt Tailwind-Klassen)
-- [x] Disabled outline border-color Fix (`var(--color-disabled-border,#e5e3e8)`)
-- [x] ComponentSlider Selection-Dots: dynamic appearance + 18px custom CSS
-- [x] pages/index.vue FAB: `size="xl"` + position/dimension `!important`
-- [x] pages/groups FAB: `size="xl"` + box-shadow `!important`
-- [x] ReportModal Breite auf 700px beibehalten
-- [x] ContributionForm Submit: `type="submit"` + `!!errors` Fix
-- [x] my-email-address/index.vue: `!!errors` Fix
-
-**Zuvor abgeschlossen (Session 14 - Loading Prop, Circle Prop, Code-Optimierung):**
-- [x] `loading` Prop mit animiertem SVG-Spinner implementiert
-- [x] Spinner-Architektur: Beide Animationen (rotate + dash) auf `<circle>` Element (Chrome-Compositing-Bug-Workaround)
-- [x] Spinner zentriert auf Icon (Icon-Buttons) oder Button-Container (Text-Only-Buttons)
-- [x] Icon bleibt bei loading sichtbar, Spinner überlagert Icon-Bereich
-- [x] `aria-busy="true"` für Screenreader bei loading
-- [x] `circle` Prop implementiert (rounded-full, größenabhängige Breiten)
-- [x] `min-width` pro Größe hinzugefügt (verhindert zu kleine leere Buttons)
-- [x] Animations-Keyframes in `animations.css` ausgelagert (wiederverwendbar)
-- [x] Code-Optimierung: OsButton von ~250 auf 207 Zeilen vereinfacht
-  - `buttonData` Objekt für Vue 2/3 geteilt
-  - `SPINNER_PX` vereinfacht (Tuple → einfache Zahlen)
-  - Redundante `cn()` Wrapping entfernt
-  - `getCurrentInstance()` nur bei Vue 2 aufgerufen
-- [x] 76 Unit-Tests (5 neue: default type, data-appearance, min-w, icon-only loading, circle gap)
-- [x] Loading-Stories in Storybook (alle Varianten × Appearances)
-- [x] Visual Tests mit `animationPlayState = 'paused'` für stabile Screenshots
-- [x] PaginationButtons.vue migriert (2 circle icon-only Buttons)
-
-**Zuvor abgeschlossen (Session 13 - Icon-Slot, Storybook Playground, Webapp-Migration):**
-- [x] Icon-Slot für OsButton implementiert (slot-basiert, icon-system-agnostisch)
-- [x] Render-Funktion: `slots.icon?.()` → `<span class="os-button__icon">` Wrapper
-- [x] Tailwind-Klassen direkt auf Icon-Wrapper (kein custom CSS in index.css nötig)
-- [x] VNode-basierte Text-Erkennung: Whitespace-only = icon-only (gap/margin-Logik)
-- [x] Storybook: 4 neue Stories (Icon, IconOnly, IconSizes, IconAppearances)
-- [x] Playground: Reaktiver Icon-Selektor (none/check/close/plus) + Label-Text-Control
-- [x] Visual Tests: 4 neue Tests mit Screenshots + a11y-Checks
-- [x] Unit Tests: 8 neue Tests (icon slot, keyboard a11y mit aria-label)
-- [x] Erste Webapp-Migration mit Icon: `my-email-address/index.vue` (Save-Button mit check-Icon)
-- [x] Code-Optimierung: ICON_CLASS Konstante, iconMargin Variable, vereinfachte hasText-Logik
-- [x] Größenabhängiger Gap: `gap-1` für xs/sm, `gap-2` für md/lg/xl
-- [x] Größenabhängiger Icon-Margin: kein negativer Margin bei xs/sm (mehr Abstand zur Button-Grenze)
-- [x] 6 weitere Buttons mit Icon migriert: DisableModal, DeleteUserModal, CtaUnblockAuthor, LocationSelect, CategoriesSelect, profile Chat
-- [x] verify.vue hat keinen Button (Eintrag korrigiert)
-
-**Zuvor abgeschlossen (Session 12 - CSS-Linting, CI-Optimierung, Code-Review Fixes):**
-- [x] CSS-Linting: `@eslint/css` + `tailwind-csstree` für Tailwind v4 Syntax-Support
-- [x] `excludeCSS()` Helper: JS-Regeln von CSS-Dateien fernhalten (language-Inkompatibilität)
-- [x] CSS-Regeln: `no-empty-blocks`, `no-duplicate-imports`, `no-invalid-at-rules`
-- [x] CI-Workflow-Trigger optimiert: 9 UI-Workflows von `on: push` auf Branch+Path-Filter (`master`, `packages/ui/**`)
-- [x] `custom-class` → `class` Migration: 4 Stellen in 3 Webapp-Dateien (notifications, MapStylesButtons, EmbedComponent)
-- [x] Vue 3 Template-Fix: `this.$t()` → `$t()` in CommentCard.vue (Zeile 5 + 58)
-- [x] Pre-existing Fix: `async` Arrow-Function in OsButton.visual.spec.ts
-
-**Zuvor abgeschlossen (Session 11 - Storybook & Code-Review Fixes):**
-- [x] Wasserfarben-Farbschema für Storybook (Ultramarin, Dioxazin-Violett, Alizarin, Ocker, Viridian, Cöruleum)
-- [x] Stories erweitert: Playground (interaktive Controls), alle Varianten in allen Stories
-- [x] Einzelne Stories (Primary, Secondary, Danger, Default) durch AllVariants ersetzt
-- [x] AllAppearances zeigt alle 7 Varianten × 3 Appearances
-- [x] Einheitlicher Border (0.8px) über alle Appearances (kein Layout-Shift mehr)
-- [x] WCAG 2.4.7 Fix: Default-Variante hat jetzt `focus:outline-dashed focus:outline-current`
-- [x] Keyboard Accessibility Test: prüft Focus-Indikator auf allen Buttons im Browser
-- [x] `data-appearance` Attribut: robuste CSS-Selektoren statt fragile escaped Tailwind-Klassen
-- [x] Code-Review Feedback eingearbeitet (Unit-Tests, Testnamen, CSS-Selektoren)
-
-**Zuvor abgeschlossen (Milestone 5 + Analyse):**
-- [x] Visuelle Validierung: 16/16 Buttons validiert ✅
-- [x] OsButton Features: `appearance` (outline, ghost), `xs` size, focus/active states
-- [x] Disabled-Styles: CSS-Variablen, hover/active-Override, Border-Fix
-- [x] Codebase-Analyse: 14 weitere migrierbare Buttons identifiziert (Scope: 16/35)
-
-**Zuletzt erledigt (Phase 3):**
-- [x] vue-demi zur Webapp hinzugefügt (Vue 2.7 Kompatibilität)
-- [x] Webpack-Alias für vue-demi (nutzt Webapp's Vue 2.7 statt UI-Library's Vue 3)
-- [x] Webpack-Alias für @ocelot-social/ui (dist Pfade mit $ für exakten Match)
-- [x] OsButton mit isVue2 Render-Funktion (Vue 2: attrs-Objekt, Vue 3: flat props)
-- [x] CSS-Reihenfolge angepasst (UI-Library nach Styleguide für korrekte Spezifität)
-- [x] Manueller visueller Vergleich ✅
-- [x] **Jest-Integration für vue-demi** ✅
-  - Custom Mock (`test/__mocks__/@ocelot-social/ui.js`) statt direktem Import
-  - Problem: Jest's moduleNameMapper greift nicht für verschachtelte requires in CJS
-  - Problem: Jest lädt `vue.runtime.common.js` mit exports unter `default`
-  - Lösung: Module._load Patch für vue-demi + defineComponent von Vue.default
-  - Setup-File (`test/vueDemiSetup.js`) für Module._resolveFilename Patch
-  - **979 Tests bestehen ✅**
-- [x] Button-Variants an ds-button angepasst (font-semibold, rounded, box-shadow)
-- [x] UserTeaserPopover.vue migriert (verwendet `<os-button>`)
-- [x] **Docker Build für UI-Library** ✅
-  - ui-library Stage in Dockerfile + Dockerfile.maintenance
-  - COPY --from=ui-library ./app/ /packages/ui/
-- [x] **CI-Kompatibilität** ✅
-  - Relativer Pfad `file:../packages/ui` statt absolut `/packages/ui`
-  - Funktioniert lokal, in CI und in Docker
-- [x] **OsButton attrs/listeners Forwarding** ✅
-  - getCurrentInstance() für $listeners Zugriff in Vue 2
-  - inheritAttrs: false für manuelle Weiterleitung
-  - Jest Mock um alle Composition API Funktionen erweitert
-- [x] **16 Buttons migriert** (ohne icon/circle/loading) ✅
-  - GroupForm.vue, EmbedComponent.vue, DonationInfo.vue, CommentCard.vue
-  - MapStylesButtons.vue, GroupMember.vue, embeds.vue
-  - notifications.vue, privacy.vue, terms-and-conditions-confirm.vue, UserTeaserPopover.vue
-- [x] **Disabled-Styles korrigiert** ✅
-  - CSS-Variablen `--color-disabled` und `--color-disabled-contrast` hinzugefügt
-  - Filled-Buttons: Grauer Hintergrund statt opacity (wie buttonStates Mixin)
-  - Outline/Ghost: Graue Border/Text
-- [x] terms-and-conditions-confirm.vue: Read T&C Button → `appearance="outline" variant="primary"`
-- [x] **Disabled:active/hover Spezifität** ✅
-  - CSS-Regeln in index.css mit höherer Spezifität für disabled:hover und disabled:active
-  - Button zeigt sofort disabled-Farben, auch wenn während :active disabled wird
-- [x] notifications.vue: Check All + Uncheck All → `appearance="outline" variant="primary"`
-- [x] embeds.vue: Allow All → `appearance="outline" variant="primary"`
-- [x] **Disabled Border-Fix** ✅
-  - CSS-Regeln in index.css: `border-style: solid` und `border-width: 0.8px` bei disabled
-  - Verhindert Layout-Sprung wenn Button disabled wird
+**Zuvor abgeschlossen (Sessions 11-19 — Details im Arbeitsprotokoll §12):**
+- [x] Session 19: CodeRabbit Review Cleanup, ~30 Bugfixes + A11y-Verbesserungen
+- [x] Session 18: CodeRabbit Review data-test Selektoren, ~25 A11y aria-labels, OsButton Refactoring
+- [x] Session 16: Letzte ds-button Migration, Bugfixes, data-variant Attribut
+- [x] Session 15: Milestone 4c — 59 Buttons migriert, 0 base-button verbleibend
+- [x] Session 14: Loading Prop, Circle Prop, Spinner-Architektur, Code-Optimierung
+- [x] Session 13: Icon-Slot, Storybook Playground, 6 Icon-Buttons migriert
+- [x] Session 12: CSS-Linting, CI-Optimierung, Code-Review Fixes
+- [x] Session 11: Wasserfarben-Farbschema, Stories konsolidiert, Keyboard A11y
 
 **Nächste Schritte:**
-1. ~~Phase 0: Komponenten-Analyse~~ ✅
-2. ~~Phase 1: Vue 2.7 Upgrade~~ ✅
-3. ~~**Phase 2: Projekt-Setup**~~ ✅ ABGESCHLOSSEN
-4. ~~**Phase 3: Webapp-Integration**~~ ✅ ABGESCHLOSSEN — 133 Buttons in 79 Dateien
-   - [x] yarn link / Webpack-Alias in Webapp
-   - [x] CSS-Variablen definieren (ocelot-ui-variables.scss)
-   - [x] 16 Buttons migriert & validiert ✅
-   - [x] Docker Build + CI-Kompatibilität
-   - [x] **Milestone 4a:** 14 weitere Buttons (ohne neue Props) ✅
-   - [x] **Milestone 4b:** icon/circle/loading Props implementieren ✅
-   - [x] **Milestone 4c:** Alle verbleibenden Buttons migriert ✅
-   - [x] **Code-Review Feedback:** Refactoring, A11y, Vue 3 Compat, CSS-Scoping ✅
-5. **Nächstes:**
-   - [ ] GroupButton + MapButton in HeaderMenu inlinen (keine eigene Komponente nötig)
-   - [ ] `compat/` Verzeichnis in packages/ui anlegen (temporäre Migrations-Wrapper)
-   - [ ] BaseIcon nach `compat/` verschieben (131 Nutzungen, Voraussetzung für weitere Migrationen)
-   - [ ] Snapshots/Tests aktualisieren, BaseButton-Komponente ggf. entfernen
+- [ ] OsSpinner Komponente (vereint DsSpinner + LoadingSpinner)
+- [ ] OsCard Komponente (vereint DsCard + BaseCard)
+- [ ] Weitere Tier 1 Komponenten
+- [ ] BaseIcon → OsIcon Webapp-Migration (131 Nutzungen)
+- [ ] Snapshots/Tests aktualisieren
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
 - [ ] `NPM_TOKEN` als GitHub Secret einrichten (für npm publish in ui-release.yml)
@@ -685,7 +447,7 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 ### Phase 4: Komponenten-Migration (15 Komponenten + 2 Infrastruktur)
 
 **Tier 1: Kern-Komponenten**
-- [ ] OsIcon (vereint DsIcon + BaseIcon)
+- [x] OsIcon (vereint DsIcon + BaseIcon) ✅ System-Icons + vite-svg-icon Plugin
 - [ ] OsSpinner (vereint DsSpinner + LoadingSpinner)
 - [x] OsButton (vereint DsButton + BaseButton) ✅ Entwickelt in Phase 2
 - [ ] OsCard (vereint DsCard + BaseCard)
@@ -708,7 +470,7 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 - [ ] OsTag
 
 **Infrastruktur**
-- [ ] System-Icons einrichten
+- [x] System-Icons einrichten ✅ vite-svg-icon Plugin, 3 System-Icons, Ocelot-Icons Entry-Point
 - [ ] CI docs-check Workflow (JSDoc-Coverage, README-Aktualität)
 
 ### Phase 5: Finalisierung
@@ -910,17 +672,15 @@ Die Library verwendet eine **Hybrid-Architektur** für Icons:
 ┌─────────────────────────────────────────────────────────────┐
 │  @ocelot-social/ui (Library)                                │
 ├─────────────────────────────────────────────────────────────┤
-│  icons/system/           # ~10 System-Icons                 │
+│  src/components/OsIcon/icons/svgs/  # System-Icons          │
+│  ├── check.svg           # Bestätigung, Checkboxen          │
 │  ├── close.svg           # Modal, Chip, Dialoge             │
-│  ├── check.svg           # Modal confirm, Checkboxen        │
-│  ├── chevron-down.svg    # Select, Dropdown                 │
-│  ├── chevron-up.svg      # Select, Accordion                │
-│  ├── spinner.svg         # Loading-States                   │
-│  ├── bars.svg            # Hamburger-Menu                   │
-│  ├── copy.svg            # CopyField                        │
-│  ├── eye.svg             # Password-Toggle                  │
-│  ├── eye-slash.svg       # Password-Toggle, Anonym          │
-│  └── search.svg          # Search-Input                     │
+│  └── plus.svg            # Hinzufügen, Erstellen            │
+│                                                             │
+│  src/ocelot/icons/svgs/             # Ocelot-Icons          │
+│  └── angle-down.svg      # Dropdown-Pfeil                   │
+│                                                             │
+│  (Weitere System-Icons werden bei Bedarf ergänzt)           │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
@@ -942,54 +702,61 @@ Die Library verwendet eine **Hybrid-Architektur** für Icons:
 3. **Feature-Icons gehören zur App** - Icons wie `user`, `bell`, `heart` sind Business-Logik
 4. **Branding-Flexibilität** - Verschiedene Ocelot-Instanzen können unterschiedliche Icon-Sets verwenden
 
-### System-Icons (in Library enthalten)
+### System-Icons (in Library enthalten) ✅
+
+| Icon | Verwendung | Status |
+|------|------------|--------|
+| `check` | Bestätigung, Checkboxen | ✅ implementiert |
+| `close` | Modal, Chip, Dialoge | ✅ implementiert |
+| `plus` | Hinzufügen, Erstellen | ✅ implementiert |
+
+**Geplant (bei Bedarf ergänzen):**
 
 | Icon | Verwendung in Komponenten |
 |------|---------------------------|
-| `close` | OsModal, OsChip, OsDialog, OsAlert |
-| `check` | OsModal (confirm), OsCheckbox |
 | `chevron-down` | OsSelect, OsDropdown, OsAccordion |
 | `chevron-up` | OsSelect, OsAccordion |
-| `spinner` | OsButton (loading), OsSpinner |
 | `bars` | OsPage (mobile menu) |
-| `copy` | OsCopyField |
-| `eye` | OsInput (password toggle) |
-| `eye-slash` | OsInput (password toggle), OsAvatar (anonym) |
 | `search` | OsInput (search variant) |
 
-### API-Design
+### API-Design (implementiert)
 
 ```typescript
-// OsIcon akzeptiert verschiedene Formate:
-
-// 1. System-Icon (String) - aus Library
+// OsIcon — System-Icon per Name
 <OsIcon name="close" />
+<OsIcon name="check" size="lg" />
 
-// 2. Vue-Komponente - für App-Icons
+// OsIcon — Custom Vue-Komponente (hat Vorrang vor name)
 <OsIcon :icon="UserIcon" />
 
-// 3. In Komponenten mit icon-Prop
-<OsButton icon="close" />           // System-Icon
-<OsButton :icon="CustomIcon" />     // Komponente
+// OsIcon — Semantic (mit aria-label)
+<OsIcon name="close" aria-label="Schließen" />
+
+// OsButton — Icon über #icon Slot (icon-system-agnostisch)
+<OsButton variant="primary">
+  <template #icon><OsIcon name="check" /></template>
+  Speichern
+</OsButton>
 ```
 
-### Webapp-Integration
+### SVG-Loading (vite-svg-icon Plugin)
 
 ```typescript
-// webapp/plugins/icons.ts
-import { provideIcons } from '@ocelot-social/ui'
-import * as appIcons from '~/assets/icons'
+// SVGs werden via ?icon Query als Vue-Komponenten geladen
+import CheckIcon from './check.svg?icon'
 
-export default defineNuxtPlugin((nuxtApp) => {
-  // App-Icons global registrieren
-  provideIcons(appIcons)
-})
+// Plugin extrahiert viewBox + <path> und transformiert zu:
+// h('svg', { viewBox, ... }, [h('path', { d })])
 ```
 
-```vue
-<!-- Dann in der Webapp nutzbar -->
-<OsButton :icon="icons.user" />
-<OsIcon :icon="icons.bell" />
+### Ocelot-Icons (separates Entry-Point)
+
+```typescript
+// Dynamisches Loading via import.meta.glob
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+
+// Filename → PascalCase: angle-down.svg → IconAngleDown
+// Returns Record<string, () => VNode>
 ```
 
 ### Aktuelle Icon-Statistik
@@ -998,7 +765,8 @@ export default defineNuxtPlugin((nuxtApp) => {
 |--------|--------|--------|
 | Styleguide (_all) | 616 | Nicht übernehmen (FontAwesome 4 komplett) |
 | Webapp (svgs) | 238 | Feature-Icons, bleiben in Webapp |
-| **Library (system)** | **~10** | Nur essenzielle System-Icons |
+| **Library (system)** | **3** | ✅ check, close, plus |
+| **Ocelot-Icons** | **1** | ✅ angle-down (separates Entry-Point) |
 
 ---
 
@@ -1748,6 +1516,22 @@ Bei der Migration werden:
 | 2026-02-13 | **CSS-Selektoren** | LoginForm: `.login-form button` → `.login-form button[type='submit']`; pages/index: redundante Klasse auf BaseIcon entfernt |
 | 2026-02-13 | **JoinLeaveButton** | `.native` von `@mouseenter`/`@mouseleave` entfernt (Vue 3 Kompatibilität) |
 | 2026-02-13 | **MySomethingList** | `:title` + `:aria-label` auf Edit/Delete-Buttons (Tooltip beibehalten neben Accessibility) |
+| 2026-02-13 | **OsButton Klasse** | `os-button` CSS-Klasse auf Button-Element für Branding-Kompatibilität (#9211) |
+| 2026-02-14 | **ESLint Config Update** | eslint-config-it4c v0.11.2: Flat Config, path alias `#src`, CSS-Linting, security/detect-non-literal-fs-filename, n/no-sync, n/shebang (#9233) |
+| 2026-02-14 | **check-completeness** | Parallelisiertes File-Reading, breitere Regex für Keyboard-Tests, Playground-Tests ignoriert |
+| 2026-02-14 | **Release v0.0.2** | @ocelot-social/ui v0.0.2 veröffentlicht |
+| 2026-02-15 | **OsIcon Komponente** | Neue Komponente: `name` (System-Icon), `icon` (Custom Component), `size` (xs-2xl); Vue 2/3 via vue-demi h() |
+| 2026-02-15 | **vite-svg-icon Plugin** | Custom Vite Plugin: extrahiert viewBox + `<path>` aus SVG, transformiert zu Vue h()-Aufruf via `?icon` Query |
+| 2026-02-15 | **System-Icons** | 3 SVG-Icons in Library: check, close, plus (viewBox 0 0 32 32, stroke-basiert); SYSTEM_ICONS Registry + SystemIconName Type |
+| 2026-02-15 | **Icon-Größen** | CVA-Varianten: xs(0.75em), sm(0.875em), md(1.2em default), lg(1.5em), xl(2em), 2xl(2.5em) — em-basiert für Kontext-Skalierung |
+| 2026-02-15 | **Icon A11y** | Decorative: `aria-hidden="true"` (default); Semantic: `role="img"` + `aria-label` wenn Label-Prop vorhanden |
+| 2026-02-15 | **OsIcon in OsButton** | OsButton nutzt OsIcon statt inline SVG-Elemente für Icon-Slot-Rendering |
+| 2026-02-15 | **Ocelot-Icons** | Separates Entry-Point (`ocelot.mjs`): dynamisches Icon-Loading via `import.meta.glob('**/*.svg', { query: '?icon' })` |
+| 2026-02-15 | **webapp → ocelot** | `src/webapp/` → `src/ocelot/` umbenannt; Stories, Tests, Exports angepasst; konsistentes Naming |
+| 2026-02-15 | **OsIcon Tests** | 211 Zeilen Unit-Tests (Rendering, Sizes, A11y, CSS, System-Icons); Visual Tests mit checkA11y(); Keyboard A11y; 100% Coverage |
+| 2026-02-15 | **OsButton Stories** | Bereinigt: Inline-SVG-Komponenten durch OsIcon ersetzt; WithAriaLabel-Story entfernt; InheritColor-Story vereinfacht |
+| 2026-02-15 | **check-completeness** | Erweitert für ocelot/ Verzeichnis; unterstützt OsIcon-Patterns |
+| 2026-02-15 | **svg-icon.d.ts** | TypeScript-Deklaration für `?icon` Import-Query (Component-Typ) |
 
 ---
 

@@ -10,7 +10,7 @@
         <template #icon>
           <base-icon name="filter" />
         </template>
-        <base-icon class="dropdown-arrow" name="angle-down" />
+        <os-icon class="dropdown-arrow" :icon="ocelotIcons.IconAngleDown" />
       </os-button>
     </template>
     <template #popover>
@@ -20,7 +20,8 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import Dropdown from '~/components/Dropdown'
 import { mapGetters } from 'vuex'
 import FilterMenuComponent from './FilterMenuComponent'
@@ -30,6 +31,10 @@ export default {
     Dropdown,
     FilterMenuComponent,
     OsButton,
+    OsIcon,
+  },
+  setup() {
+    return { ocelotIcons }
   },
   props: {
     placement: { type: String },

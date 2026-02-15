@@ -14,17 +14,17 @@
       @click.stop="clickRemove"
     >
       <template #icon>
-        <base-icon name="close" />
+        <os-icon name="close" />
       </template>
     </os-button>
   </span>
 </template>
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 
 export default {
   name: 'HeaderButton',
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   props: {
     title: {
       type: String,

@@ -55,6 +55,13 @@ export default [
       ...vuejsAccessibilityPlugin.configs.recommended.rules,
     },
   },
+  {
+    // Allow .svg?icon imports (custom Vite plugin)
+    files: ['src/**/icons/index.ts'],
+    rules: {
+      'n/file-extension-in-import': 'off',
+    },
+  },
   ...css,
   {
     // Extend CSS config with Tailwind v4 syntax support

@@ -23,20 +23,20 @@
       style="right: -94%; top: -48px"
       @click="clearLocationName"
     >
-      <template #icon><base-icon name="close" /></template>
+      <template #icon><os-icon name="close" /></template>
     </os-button>
   </div>
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { queryLocations } from '~/graphql/location'
 
 let timeout
 
 export default {
   name: 'LocationSelect',
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   props: {
     value: {
       required: true,

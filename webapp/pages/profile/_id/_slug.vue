@@ -161,7 +161,7 @@
                   :aria-label="$t('contribution.newPost')"
                 >
                   <template #icon>
-                    <base-icon name="plus" />
+                    <os-icon name="plus" />
                   </template>
                 </os-button>
               </nuxt-link>
@@ -212,7 +212,7 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import uniqBy from 'lodash/uniqBy'
 import { mapGetters, mapMutations } from 'vuex'
 import postListActions from '~/mixins/postListActions'
@@ -247,6 +247,7 @@ const tabToFilterMapping = ({ tab, id }) => {
 export default {
   components: {
     OsButton,
+    OsIcon,
     SocialMedia,
     PostTeaser,
     HcFollowButton,

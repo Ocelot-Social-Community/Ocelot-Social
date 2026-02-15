@@ -31,7 +31,7 @@
     <template #footer>
       <os-button class="cancel" variant="primary" appearance="outline" @click="cancel">
         <template #icon>
-          <base-icon name="close" />
+          <os-icon name="close" />
         </template>
         {{ $t('report.cancel') }}
       </os-button>
@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import { reportMutation } from '~/graphql/Moderation.js'
 import { valuesReasonCategoryOptions } from '~/constants/modals.js'
@@ -64,6 +64,7 @@ export default {
   name: 'ReportModal',
   components: {
     OsButton,
+    OsIcon,
     SweetalertIcon,
   },
   props: {

@@ -18,7 +18,7 @@
         :disabled="disabled"
       >
         <template #icon>
-          <base-icon name="plus" />
+          <os-icon name="plus" />
         </template>
       </os-button>
     </form>
@@ -26,11 +26,11 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 
 export default {
   name: 'CreateInvitation',
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   props: {
     disabled: {
       type: Boolean,

@@ -287,6 +287,7 @@ export default {
         ? '/packages/ui/dist'
         : path.resolve(__dirname, '../packages/ui/dist')
       config.resolve.alias['@ocelot-social/ui$'] = path.join(uiLibraryPath, 'index.mjs')
+      config.resolve.alias['@ocelot-social/ui/ocelot$'] = path.join(uiLibraryPath, 'ocelot.mjs')
       config.resolve.alias['@ocelot-social/ui/style.css$'] = path.join(uiLibraryPath, 'style.css')
       config.module.rules.push({
         resourceQuery: /blockType=docs/,

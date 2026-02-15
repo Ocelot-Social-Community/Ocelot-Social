@@ -9,6 +9,8 @@ import dts from 'vite-plugin-dts'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
 
+import svgIcon from './src/plugins/vite-svg-icon'
+
 const execAsync = promisify(exec)
 
 export default defineConfig({
@@ -16,6 +18,7 @@ export default defineConfig({
     exclude: ['vue-demi'],
   },
   plugins: [
+    svgIcon(),
     vue(),
     tailwindcss(),
     tsconfigPaths(),
@@ -28,6 +31,7 @@ export default defineConfig({
         // Generate .d.cts files for CJS compatibility
         await copyFile('dist/index.d.ts', 'dist/index.d.cts')
         await copyFile('dist/tailwind.preset.d.ts', 'dist/tailwind.preset.d.cts')
+        await copyFile('dist/ocelot.d.ts', 'dist/ocelot.d.cts')
       },
     }),
     // Build CSS separately using Tailwind CLI
@@ -43,6 +47,7 @@ export default defineConfig({
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
         'tailwind.preset': resolve(__dirname, 'src/tailwind.preset.ts'),
+        ocelot: resolve(__dirname, 'src/ocelot/index.ts'),
       },
       formats: ['es', 'cjs'],
       fileName: (format, entryName) => `${entryName}.${format === 'es' ? 'mjs' : 'cjs'}`,
@@ -64,7 +69,7 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     include: ['src/**/*.{test,spec}.{js,ts}'],
-    exclude: ['src/**/*.visual.spec.ts'],
+    exclude: ['src/**/*.visual.spec.ts', 'src/plugins/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'json-summary', 'html'],
@@ -74,6 +79,7 @@ export default defineConfig({
         'src/**/*.{test,spec}.ts',
         'src/**/*.stories.ts',
         'src/**/index.ts',
+        'src/plugins/**',
       ],
       thresholds: {
         100: true,

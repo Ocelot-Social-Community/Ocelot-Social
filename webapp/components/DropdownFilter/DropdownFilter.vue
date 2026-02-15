@@ -10,7 +10,7 @@
       >
         <base-icon name="filter" />
         <label class="label" for="dropdown">{{ selected }}</label>
-        <base-icon class="dropdown-arrow" name="angle-down" />
+        <os-icon class="dropdown-arrow" :icon="ocelotIcons.IconAngleDown" />
       </a>
     </template>
     <template #popover="{ toggleMenu }">
@@ -30,11 +30,17 @@
   </dropdown>
 </template>
 <script>
+import { OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import Dropdown from '~/components/Dropdown'
 
 export default {
   components: {
     Dropdown,
+    OsIcon,
+  },
+  setup() {
+    return { ocelotIcons }
   },
   props: {
     selected: { type: String, default: '' },

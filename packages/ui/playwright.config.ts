@@ -8,7 +8,7 @@ import { defineConfig, devices } from '@playwright/test'
  * Baseline images are stored in e2e/__screenshots__ and committed to git.
  */
 export default defineConfig({
-  testDir: './src/components',
+  testDir: './src',
   testMatch: '**/*.visual.spec.ts',
 
   /* Run tests in parallel */

@@ -13,7 +13,7 @@
         >
           <!-- <base-icon name="globe" /> -->
           <span class="label">{{ current.code.toUpperCase() }}</span>
-          <base-icon class="dropdown-arrow" name="angle-down" />
+          <os-icon class="dropdown-arrow" :icon="ocelotIcons.IconAngleDown" />
         </a>
       </template>
       <template #popover="{ toggleMenu }">
@@ -35,6 +35,8 @@
 </template>
 
 <script>
+import { OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import gql from 'graphql-tag'
 import Dropdown from '~/components/Dropdown'
 import find from 'lodash/find'
@@ -45,6 +47,10 @@ import { mapGetters, mapMutations } from 'vuex'
 export default {
   components: {
     Dropdown,
+    OsIcon,
+  },
+  setup() {
+    return { ocelotIcons }
   },
   props: {
     placement: { type: String, default: 'bottom-start' },

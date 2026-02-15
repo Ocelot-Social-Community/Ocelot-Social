@@ -60,7 +60,7 @@
                 @click="$emit('close-single-room', true)"
               >
                 <template #icon>
-                  <base-icon name="close" />
+                  <os-icon name="close" />
                 </template>
               </os-button>
             </slot>
@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { roomQuery, createRoom, unreadRoomsQuery } from '~/graphql/Rooms'
 import {
   messageQuery,
@@ -118,7 +118,7 @@ import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'Chat',
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   props: {
     theme: {
       type: String,

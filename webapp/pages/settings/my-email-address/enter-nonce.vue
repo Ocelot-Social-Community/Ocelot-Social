@@ -17,7 +17,7 @@
           :label="$t('settings.email.labelNonce')"
         />
         <os-button variant="primary" appearance="filled" type="submit" :disabled="!!errors">
-          <template #icon><base-icon name="check" /></template>
+          <template #icon><os-icon name="check" /></template>
           {{ $t('actions.save') }}
         </os-button>
       </base-card>
@@ -26,10 +26,10 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 
 export default {
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   data() {
     return {
       formSchema: {

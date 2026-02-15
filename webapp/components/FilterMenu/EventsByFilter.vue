@@ -11,7 +11,7 @@
           data-test="all-button"
         >
           <template #icon>
-            <base-icon name="check" />
+            <os-icon name="check" />
           </template>
           {{ $t('filter-menu.ended.all.label') }}
         </os-button>
@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 
@@ -45,6 +45,7 @@ export default {
   components: {
     FilterMenuSection,
     OsButton,
+    OsIcon,
   },
   computed: {
     ...mapGetters({

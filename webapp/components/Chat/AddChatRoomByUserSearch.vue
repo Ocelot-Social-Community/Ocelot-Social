@@ -12,7 +12,7 @@
         @click="closeUserSearch"
       >
         <template #icon>
-          <base-icon name="close" />
+          <os-icon name="close" />
         </template>
       </os-button>
     </ds-flex>
@@ -24,13 +24,14 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import SelectUserSearch from '~/components/generic/SelectUserSearch/SelectUserSearch'
 
 export default {
   name: 'AddChatRoomByUserSearch',
   components: {
     OsButton,
+    OsIcon,
     SelectUserSearch,
   },
   props: {
