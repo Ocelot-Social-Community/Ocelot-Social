@@ -67,7 +67,7 @@ test.describe('OsIcon visual regression', () => {
     await root.waitFor()
     await waitForFonts(page)
 
-    await expect(root.locator('.flex').first()).toHaveScreenshot('all-sizes.png')
+    await expect(root.locator('[data-testid="all-sizes"]')).toHaveScreenshot('all-sizes.png')
 
     await checkA11y(page)
   })
@@ -78,7 +78,7 @@ test.describe('OsIcon visual regression', () => {
     await root.waitFor()
     await waitForFonts(page)
 
-    await expect(root.locator('.flex').first()).toHaveScreenshot('custom-component.png')
+    await expect(root.locator('[data-testid="custom-component"]')).toHaveScreenshot('custom-component.png')
 
     await checkA11y(page)
   })
@@ -89,7 +89,7 @@ test.describe('OsIcon visual regression', () => {
     await root.waitFor()
     await waitForFonts(page)
 
-    await expect(root.locator('.flex').first()).toHaveScreenshot('inherit-color.png')
+    await expect(root.locator('[data-testid="inherit-color"]')).toHaveScreenshot('inherit-color.png')
 
     await checkA11y(page)
   })

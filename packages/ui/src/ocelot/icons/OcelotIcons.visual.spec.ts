@@ -66,7 +66,7 @@ test.describe('OcelotIcons visual regression', () => {
     await root.waitFor()
     await waitForFonts(page)
 
-    await expect(root.locator('.flex').first()).toHaveScreenshot('all-icons.png')
+    await expect(root.locator('[data-testid="icon-gallery"]')).toHaveScreenshot('all-icons.png')
 
     await checkA11y(page)
   })

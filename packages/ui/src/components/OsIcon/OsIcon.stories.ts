@@ -83,7 +83,7 @@ export const AllSizes: Story = {
   render: () => ({
     components: { OsIcon },
     template: `
-      <div class="flex items-end gap-4">
+      <div data-testid="all-sizes" class="flex items-end gap-4">
         <div class="flex flex-col items-center gap-1">
           <OsIcon name="check" size="xs" />
           <span class="text-xs text-gray-500">xs</span>
@@ -120,7 +120,7 @@ export const CustomComponent: Story = {
       return { HeartIcon }
     },
     template: `
-      <div class="flex items-center gap-4">
+      <div data-testid="custom-component" class="flex items-center gap-4">
         <OsIcon :icon="HeartIcon" size="md" />
         <OsIcon :icon="HeartIcon" size="lg" />
         <OsIcon :icon="HeartIcon" size="xl" />
@@ -133,7 +133,7 @@ export const InheritColor: Story = {
   render: () => ({
     components: { OsIcon },
     template: `
-      <div class="flex items-center gap-4 text-lg">
+      <div data-testid="inherit-color" class="flex items-center gap-4 text-lg">
         <span class="text-red-500"><OsIcon name="close" /></span>
         <span class="text-green-500"><OsIcon name="check" /></span>
         <span class="text-blue-500"><OsIcon name="plus" /></span>

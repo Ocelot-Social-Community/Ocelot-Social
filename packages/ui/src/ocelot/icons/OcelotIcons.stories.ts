@@ -21,7 +21,7 @@ export const AllIcons: StoryObj = {
       return { systemEntries, ocelotEntries }
     },
     template: `
-      <div class="flex flex-col gap-6">
+      <div data-testid="icon-gallery" class="flex flex-col gap-6">
         <div>
           <h3 class="text-sm font-bold mb-2">Library Icons</h3>
           <div class="grid grid-cols-5 gap-4">
