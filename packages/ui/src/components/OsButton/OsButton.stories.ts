@@ -5,6 +5,7 @@ import { IconCheck, IconClose, IconPlus } from '#src/components/OsIcon'
 import OsButton from './OsButton.vue'
 
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import type { Component } from 'vue'
 
 const meta: Meta<typeof OsButton> = {
   title: 'Components/OsButton',
@@ -29,7 +30,7 @@ interface PlaygroundArgs {
   label: string
 }
 
-const iconMap: Record<string, (() => unknown) | null> = {
+const iconMap: Record<string, Component | null> = {
   none: null,
   check: IconCheck,
   close: IconClose,
