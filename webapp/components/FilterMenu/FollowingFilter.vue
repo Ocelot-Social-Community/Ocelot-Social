@@ -30,7 +30,7 @@
             @click="toggleFilteredByFollowed(currentUser.id)"
           >
             <template #icon>
-              <base-icon name="user-plus" />
+              <os-icon :icon="IconUserPlus" />
             </template>
             {{ $t('filter-menu.following') }}
           </os-button>
@@ -56,6 +56,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 
@@ -65,6 +66,9 @@ export default {
     FilterMenuSection,
     OsButton,
     OsIcon,
+  },
+  created() {
+    this.IconUserPlus = ocelotIcons.IconUserPlus
   },
   computed: {
     ...mapGetters({
