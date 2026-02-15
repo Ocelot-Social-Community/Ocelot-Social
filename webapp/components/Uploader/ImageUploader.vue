@@ -50,7 +50,7 @@
         @click="closeCropper"
       >
         <template #icon>
-          <base-icon name="close" />
+          <os-icon name="close" />
         </template>
       </os-button>
     </div>
@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import Cropper from 'cropperjs'
 import VueDropzone from 'nuxt-dropzone'
 import LoadingSpinner from '~/components/_new/generic/LoadingSpinner/LoadingSpinner'
@@ -70,6 +70,7 @@ export default {
   components: {
     LoadingSpinner,
     OsButton,
+    OsIcon,
     VueDropzone,
   },
   props: {

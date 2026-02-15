@@ -59,14 +59,14 @@
       @click="clear"
     >
       <template #icon>
-        <base-icon name="close" />
+        <os-icon name="close" />
       </template>
     </os-button>
   </div>
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { isEmpty } from 'lodash'
 import SearchHeading from '~/components/generic/SearchHeading/SearchHeading.vue'
 import SearchPost from '~/components/generic/SearchPost/SearchPost.vue'
@@ -78,6 +78,7 @@ export default {
   name: 'SearchableInput',
   components: {
     OsButton,
+    OsIcon,
     SearchHeading,
     SearchGroup,
     SearchPost,

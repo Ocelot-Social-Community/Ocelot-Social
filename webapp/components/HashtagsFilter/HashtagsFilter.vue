@@ -11,17 +11,17 @@
       @click="clearSearch"
     >
       <template #icon>
-        <base-icon name="close" />
+        <os-icon name="close" />
       </template>
     </os-button>
   </base-card>
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 
 export default {
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   props: {
     hashtag: {
       type: String,
