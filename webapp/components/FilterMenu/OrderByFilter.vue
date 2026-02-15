@@ -11,7 +11,7 @@
           data-test="newest-button"
         >
           <template #icon>
-            <base-icon name="sort-amount-asc" />
+            <os-icon :icon="icons.sortAmountAsc" />
           </template>
           {{ buttonLabel('desc') }}
         </os-button>
@@ -26,7 +26,7 @@
           data-test="oldest-button"
         >
           <template #icon>
-            <base-icon name="sort-amount-desc" />
+            <os-icon :icon="icons.sortAmountDesc" />
           </template>
           {{ buttonLabel('asc') }}
         </os-button>
@@ -36,7 +36,8 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 
@@ -45,6 +46,10 @@ export default {
   components: {
     FilterMenuSection,
     OsButton,
+    OsIcon,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   computed: {
     ...mapGetters({
