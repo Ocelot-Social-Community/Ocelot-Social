@@ -103,7 +103,7 @@
               'os-icon inline-flex items-center shrink-0',
               sizeClass,
               '[&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current',
-              (attrClass as string) || '',
+              attrClass,
             ),
             ...a11yAttrs,
             ...restAttrs,
