@@ -44,7 +44,7 @@
           name="submit"
           type="submit"
         >
-          <template #icon><base-icon name="sign-in" /></template>
+          <template #icon><os-icon :icon="IconSignIn" /></template>
           {{ $t('login.login') }}
         </os-button>
         <p>
@@ -66,7 +66,8 @@ import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParams
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
 import ShowPassword from '../ShowPassword/ShowPassword.vue'
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters, mapMutations } from 'vuex'
 
 export default {
@@ -74,8 +75,12 @@ export default {
     LocaleSwitch,
     Logo,
     OsButton,
+    OsIcon,
     PageParamsLink,
     ShowPassword,
+  },
+  created() {
+    this.IconSignIn = ocelotIcons.IconSignIn
   },
   data() {
     return {
