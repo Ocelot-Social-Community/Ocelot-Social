@@ -50,7 +50,7 @@
       @click="handleSubmit"
     >
       <template #icon>
-        <base-icon name="trash" />
+        <os-icon :icon="IconTrash" />
       </template>
       {{ $t('settings.deleteUserAccount.name') }}
     </os-button>
@@ -69,6 +69,7 @@ export default {
   components: { OsButton, OsIcon },
   created() {
     this.IconWarning = ocelotIcons.IconWarning
+    this.IconTrash = ocelotIcons.IconTrash
   },
   data() {
     return {

@@ -46,7 +46,7 @@
                 data-test="delete-button"
               >
                 <template #icon>
-                  <base-icon name="trash" />
+                  <os-icon :icon="IconTrash" />
                 </template>
               </os-button>
             </template>
@@ -82,12 +82,13 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapMutations } from 'vuex'
 
 export default {
   name: 'MySomethingList',
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   props: {
     useFormData: { type: Object, default: () => ({}) },
     useFormSchema: { type: Object, default: () => ({}) },
@@ -108,6 +109,9 @@ export default {
         delete: () => {},
       }),
     },
+  },
+  created() {
+    this.IconTrash = ocelotIcons.IconTrash
   },
   data() {
     return {
