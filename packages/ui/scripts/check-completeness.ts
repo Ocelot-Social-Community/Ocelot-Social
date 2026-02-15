@@ -103,7 +103,7 @@ for (const componentPath of components) {
   const unitTestPath = join(componentDir, `${componentName}.spec.ts`)
   const variantsPath = join(
     componentDir,
-    `${componentName.toLowerCase().replace('os', '')}.variants.ts`,
+    `${componentName.replace(/^Os/, '').toLowerCase()}.variants.ts`,
   )
 
   const result: CheckResult = {
