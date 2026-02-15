@@ -1,7 +1,6 @@
 import { IconCheck } from './check'
 import { IconClose } from './close'
-import { IconSearch } from './search'
-import { IconSpinner } from './spinner'
+import { IconPlus } from './plus'
 
 import type { Component } from 'vue-demi'
 
@@ -13,14 +12,14 @@ export { IconClose } from './close'
 export { IconCopy } from './copy'
 export { IconEye } from './eye'
 export { IconEyeSlash } from './eye-slash'
+export { IconPlus } from './plus'
 export { IconSearch } from './search'
 export { IconSpinner } from './spinner'
 
 export const SYSTEM_ICONS: Record<string, Component> = {
   check: IconCheck,
   close: IconClose,
-  search: IconSearch,
-  spinner: IconSpinner,
+  plus: IconPlus,
 }
 
 export type SystemIconName = keyof typeof SYSTEM_ICONS

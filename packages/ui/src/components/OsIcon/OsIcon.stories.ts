@@ -2,7 +2,7 @@ import { computed, h } from 'vue'
 
 import { OsButton } from '#src/components/OsButton'
 
-import { IconEye, SYSTEM_ICONS } from './icons'
+import { IconEye, IconSearch, IconSpinner, SYSTEM_ICONS } from './icons'
 import OsIcon from './OsIcon.vue'
 
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
@@ -138,12 +138,12 @@ export const WithAriaLabel: Story = {
   render: () => ({
     components: { OsIcon },
     setup() {
-      return { IconEye }
+      return { IconEye, IconSearch }
     },
     template: `
       <div class="flex items-center gap-4">
         <OsIcon name="close" aria-label="Close dialog" />
-        <OsIcon name="search" aria-label="Search" />
+        <OsIcon :icon="IconSearch" aria-label="Search" />
         <OsIcon :icon="IconEye" aria-label="Show password" />
       </div>
     `,
@@ -154,14 +154,14 @@ export const InheritColor: Story = {
   render: () => ({
     components: { OsIcon },
     setup() {
-      return { IconEye }
+      return { IconEye, IconSearch, IconSpinner }
     },
     template: `
       <div class="flex items-center gap-4 text-lg">
         <span class="text-red-500"><OsIcon name="close" /></span>
         <span class="text-green-500"><OsIcon name="check" /></span>
-        <span class="text-blue-500"><OsIcon name="search" /></span>
-        <span class="text-yellow-500"><OsIcon name="spinner" /></span>
+        <span class="text-blue-500"><OsIcon :icon="IconSearch" /></span>
+        <span class="text-yellow-500"><OsIcon :icon="IconSpinner" /></span>
         <span class="text-purple-500"><OsIcon :icon="IconEye" /></span>
       </div>
     `,
@@ -182,8 +182,8 @@ export const InButton: Story = {
           Delete
         </OsButton>
         <OsButton variant="default">
-          <template #icon><OsIcon name="search" /></template>
-          Search
+          <template #icon><OsIcon name="plus" /></template>
+          Add
         </OsButton>
         <OsButton variant="success" circle aria-label="Confirm">
           <template #icon><OsIcon name="check" /></template>

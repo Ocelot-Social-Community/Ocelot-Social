@@ -9,6 +9,7 @@ export {
   IconCopy,
   IconEye,
   IconEyeSlash,
+  IconPlus,
   IconSearch,
   IconSpinner,
   SYSTEM_ICONS,

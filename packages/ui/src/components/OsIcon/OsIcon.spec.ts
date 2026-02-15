@@ -12,6 +12,7 @@ import {
   IconCopy,
   IconEye,
   IconEyeSlash,
+  IconPlus,
   IconSearch,
   IconSpinner,
   SYSTEM_ICONS,
@@ -170,8 +171,8 @@ describe('osIcon', () => {
   describe('system icons', () => {
     const iconEntries = Object.entries(SYSTEM_ICONS)
 
-    it('has 4 system icons registered', () => {
-      expect(iconEntries).toHaveLength(4)
+    it('has 3 system icons registered', () => {
+      expect(iconEntries).toHaveLength(3)
     })
 
     it.each(iconEntries)('renders "%s" without errors', (name) => {
@@ -193,6 +194,7 @@ describe('osIcon', () => {
         IconCopy,
         IconEye,
         IconEyeSlash,
+        IconPlus,
         IconSearch,
         IconSpinner,
       ]
