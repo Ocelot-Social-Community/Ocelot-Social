@@ -7,6 +7,8 @@
   import { SYSTEM_ICONS } from './icons'
 
   import type { Size } from '#src/types'
+  import type { SystemIconName } from './icons'
+  import type { ClassValue } from 'clsx'
   import type { Component, PropType } from 'vue-demi'
 
   /**
@@ -39,7 +41,8 @@
 
       return () => {
         // icon prop takes precedence over name
-        const iconComponent = props.icon || (props.name ? SYSTEM_ICONS[props.name] : undefined)
+        const iconComponent =
+          props.icon || (props.name ? SYSTEM_ICONS[props.name as SystemIconName] : undefined)
 
         if (!iconComponent) return null
 
@@ -103,7 +106,7 @@
               'os-icon inline-flex items-center shrink-0',
               sizeClass,
               '[&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current',
-              attrClass,
+              attrClass as ClassValue,
             ),
             ...a11yAttrs,
             ...restAttrs,
