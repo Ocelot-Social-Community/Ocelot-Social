@@ -1,4 +1,5 @@
 import type { VNode } from 'vue-demi'
+import { SYSTEM_ICONS } from '../../components/OsIcon/icons'
 
 const modules = import.meta.glob<() => VNode>('./svgs/*.svg', {
   query: '?icon',
@@ -11,6 +12,9 @@ function toName(path: string): string {
   return parts.map((s, i) => (i === 0 ? s : s[0].toUpperCase() + s.slice(1))).join('')
 }
 
-export const ocelotIcons: Record<string, () => VNode> = Object.fromEntries(
-  Object.entries(modules).map(([path, icon]) => [toName(path), icon]),
-)
+export const ocelotIcons: Record<string, () => VNode> = {
+  ...SYSTEM_ICONS,
+  ...Object.fromEntries(
+    Object.entries(modules).map(([path, icon]) => [toName(path), icon]),
+  ),
+}

@@ -62,7 +62,7 @@ export const Playground: StoryObj<PlaygroundArgs> = {
   }),
 }
 
-export const AllSystemIcons: Story = {
+export const AllIcons: Story = {
   render: () => ({
     components: { OsIcon },
     setup() {

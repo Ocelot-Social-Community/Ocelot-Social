@@ -32,7 +32,7 @@ async function checkA11y(page: Page) {
 
 test.describe('OsIcon keyboard accessibility', () => {
   test('decorative icons are not focusable', async ({ page }) => {
-    await page.goto(`${STORY_URL}--all-system-icons&viewMode=story`)
+    await page.goto(`${STORY_URL}--all-icons&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
 
@@ -51,12 +51,12 @@ test.describe('OsIcon keyboard accessibility', () => {
 
 test.describe('OsIcon visual regression', () => {
   test('all system icons', async ({ page }) => {
-    await page.goto(`${STORY_URL}--all-system-icons&viewMode=story`)
+    await page.goto(`${STORY_URL}--all-icons&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
     await waitForFonts(page)
 
-    await expect(root.locator('.grid')).toHaveScreenshot('all-system-icons.png')
+    await expect(root.locator('.grid')).toHaveScreenshot('all-icons.png')
 
     await checkA11y(page)
   })

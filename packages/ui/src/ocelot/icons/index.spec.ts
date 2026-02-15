@@ -21,6 +21,12 @@ describe('ocelot icons', () => {
 
       expectTypeOf(angleDown).toBeFunction()
     })
+
+    it('includes system icons (check, close, plus)', () => {
+      expect(ocelotIcons).toHaveProperty('check')
+      expect(ocelotIcons).toHaveProperty('close')
+      expect(ocelotIcons).toHaveProperty('plus')
+    })
   })
 
   describe('angleDown', () => {
