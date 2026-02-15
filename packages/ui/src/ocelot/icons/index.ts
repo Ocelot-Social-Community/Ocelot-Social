@@ -13,6 +13,7 @@ function toName(path: string): string {
       .replace('./svgs/', '')
       .replace('.svg', '')
       .split('-')
+      .filter(Boolean)
       .map((s) => s[0].toUpperCase() + s.slice(1))
       .join('')
   )
