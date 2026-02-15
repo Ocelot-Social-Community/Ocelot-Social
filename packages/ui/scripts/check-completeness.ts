@@ -154,6 +154,70 @@ for (const componentPath of components) {
   }
 }
 
+// --- Webapp stories (no .vue files, story-driven checks) ---
+const webappStories = await glob('src/webapp/**/*.stories.ts')
+
+for (const storyPath of webappStories) {
+  const storyName = basename(storyPath, '.stories.ts')
+  const storyDir = dirname(storyPath)
+  const visualTestPath = join(storyDir, `${storyName}.visual.spec.ts`)
+  const unitTestPath = join(storyDir, 'index.spec.ts')
+
+  const result: CheckResult = {
+    component: storyName,
+    errors: [],
+    warnings: [],
+  }
+
+  const [storyContent, visualTestContent, unitTestContent] = await Promise.all([
+    tryReadFile(storyPath),
+    tryReadFile(visualTestPath),
+    tryReadFile(unitTestPath),
+  ])
+
+  // Check: Visual regression test file exists
+  if (visualTestContent === null) {
+    result.errors.push(`Missing visual test file: ${visualTestPath}`)
+  }
+
+  // Check: Visual tests include accessibility checks
+  if (visualTestContent !== null && !visualTestContent.includes('checkA11y(')) {
+    result.errors.push(`Missing checkA11y() calls in visual tests: ${visualTestPath}`)
+  }
+
+  // Check: Keyboard accessibility tests exist
+  if (unitTestContent !== null) {
+    if (!/describe\(\s*['"]keyboard accessibility['"]/.test(unitTestContent)) {
+      result.errors.push(`Missing keyboard accessibility tests in: ${unitTestPath}`)
+    }
+  } else {
+    result.errors.push(`Missing unit test file: ${unitTestPath}`)
+  }
+
+  // Check: Story-to-visual-test coverage
+  if (storyContent !== null && visualTestContent !== null) {
+    const storyExports = storyContent.matchAll(/export\s+const\s+(\w+):\s*Story/g)
+
+    for (const match of storyExports) {
+      const exportName = match[1]
+      if (exportName === 'Playground') continue
+      const kebabName = toKebabCase(exportName)
+
+      if (!visualTestContent.includes(`--${kebabName}`)) {
+        result.warnings.push(`Story "${exportName}" missing visual test (--${kebabName})`)
+      }
+    }
+  }
+
+  if (result.errors.length > 0 || result.warnings.length > 0) {
+    results.push(result)
+  }
+
+  if (result.errors.length > 0) {
+    hasErrors = true
+  }
+}
+
 // Output results
 if (results.length === 0) {
   console.log('✓ All completeness checks passed!')
