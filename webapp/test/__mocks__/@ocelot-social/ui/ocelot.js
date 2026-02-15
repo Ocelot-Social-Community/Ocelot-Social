@@ -72,7 +72,10 @@ Module._load = function (request, parent, isMain) {
 }
 
 // Load the UI library ocelot dist
-const ocelotDistPath = path.resolve(__dirname, '../../../../node_modules/@ocelot-social/ui/dist/ocelot.cjs')
+const ocelotDistPath = path.resolve(
+  __dirname,
+  '../../../../node_modules/@ocelot-social/ui/dist/ocelot.cjs',
+)
 const ocelot = require(ocelotDistPath)
 
 // Export everything from the ocelot dist

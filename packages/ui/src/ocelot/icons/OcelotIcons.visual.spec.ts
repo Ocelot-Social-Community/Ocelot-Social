@@ -46,7 +46,7 @@ test.describe('OcelotIcons keyboard accessibility', () => {
 
       await expect(icon).toHaveAttribute('aria-hidden', 'true')
       const tabindex = await icon.getAttribute('tabindex')
-      expect(tabindex, `icon ${i} should not have tabindex`).toBeNull()
+      expect(tabindex, `icon ${String(i)} should not have tabindex`).toBeNull()
     }
 
     // Verify no icon receives focus when tabbing through

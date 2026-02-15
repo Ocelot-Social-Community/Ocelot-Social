@@ -34,7 +34,9 @@ export default function svgIcon(): Plugin {
 
       const unsupported = svg.match(/<(?:circle|rect|polygon|polyline|ellipse|line)\s/g)
       if (unsupported) {
-        this.warn(`${filePath}: unsupported SVG elements will be ignored: ${[...new Set(unsupported.map((s) => s.trim()))].join(', ')}`)
+        this.warn(
+          `${filePath}: unsupported SVG elements will be ignored: ${[...new Set(unsupported.map((s) => s.trim()))].join(', ')}`,
+        )
       }
 
       const paths: string[] = []
