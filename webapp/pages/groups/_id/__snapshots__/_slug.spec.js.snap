@@ -934,39 +934,35 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           style="margin-bottom: 32px;"
         >
           <nuxt-link-stub
+            aria-label="contribution.newPost"
+            class="profile-post-add-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
+            data-appearance="filled"
+            data-original-title="null"
+            data-variant="primary"
             to="[object Object]"
           >
-            <button
-              aria-label="contribution.newPost"
-              class="profile-post-add-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
-              data-appearance="filled"
-              data-original-title="null"
-              data-variant="primary"
-              type="button"
+            <span
+              class="inline-flex items-center"
             >
               <span
-                class="inline-flex items-center"
+                class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
               >
                 <span
-                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  aria-hidden="true"
+                  class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
-                  <span
-                    aria-hidden="true"
-                    class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  <svg
+                    fill="currentColor"
+                    viewBox="0 0 32 32"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    <svg
-                      fill="currentColor"
-                      viewBox="0 0 32 32"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M15 5h2v10h10v2h-10v10h-2v-10h-10v-2h10v-10z"
-                      />
-                    </svg>
-                  </span>
+                    <path
+                      d="M15 5h2v10h10v2h-10v10h-2v-10h-10v-2h10v-10z"
+                    />
+                  </svg>
                 </span>
               </span>
-            </button>
+            </span>
           </nuxt-link-stub>
         </div>
          
@@ -2939,39 +2935,35 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           style="margin-bottom: 32px;"
         >
           <nuxt-link-stub
+            aria-label="contribution.newPost"
+            class="profile-post-add-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
+            data-appearance="filled"
+            data-original-title="null"
+            data-variant="primary"
             to="[object Object]"
           >
-            <button
-              aria-label="contribution.newPost"
-              class="profile-post-add-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
-              data-appearance="filled"
-              data-original-title="null"
-              data-variant="primary"
-              type="button"
+            <span
+              class="inline-flex items-center"
             >
               <span
-                class="inline-flex items-center"
+                class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
               >
                 <span
-                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  aria-hidden="true"
+                  class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
-                  <span
-                    aria-hidden="true"
-                    class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  <svg
+                    fill="currentColor"
+                    viewBox="0 0 32 32"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    <svg
-                      fill="currentColor"
-                      viewBox="0 0 32 32"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M15 5h2v10h10v2h-10v10h-2v-10h-10v-2h10v-10z"
-                      />
-                    </svg>
-                  </span>
+                    <path
+                      d="M15 5h2v10h10v2h-10v10h-2v-10h-10v-2h10v-10z"
+                    />
+                  </svg>
                 </span>
               </span>
-            </button>
+            </span>
           </nuxt-link-stub>
         </div>
          
@@ -3963,39 +3955,35 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           style="margin-bottom: 32px;"
         >
           <nuxt-link-stub
+            aria-label="contribution.newPost"
+            class="profile-post-add-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
+            data-appearance="filled"
+            data-original-title="null"
+            data-variant="primary"
             to="[object Object]"
           >
-            <button
-              aria-label="contribution.newPost"
-              class="profile-post-add-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
-              data-appearance="filled"
-              data-original-title="null"
-              data-variant="primary"
-              type="button"
+            <span
+              class="inline-flex items-center"
             >
               <span
-                class="inline-flex items-center"
+                class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
               >
                 <span
-                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  aria-hidden="true"
+                  class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
-                  <span
-                    aria-hidden="true"
-                    class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  <svg
+                    fill="currentColor"
+                    viewBox="0 0 32 32"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    <svg
-                      fill="currentColor"
-                      viewBox="0 0 32 32"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M15 5h2v10h10v2h-10v10h-2v-10h-10v-2h10v-10z"
-                      />
-                    </svg>
-                  </span>
+                    <path
+                      d="M15 5h2v10h10v2h-10v10h-2v-10h-10v-2h10v-10z"
+                    />
+                  </svg>
                 </span>
               </span>
-            </button>
+            </span>
           </nuxt-link-stub>
         </div>
          
@@ -6570,39 +6558,35 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           style="margin-bottom: 32px;"
         >
           <nuxt-link-stub
+            aria-label="contribution.newPost"
+            class="profile-post-add-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
+            data-appearance="filled"
+            data-original-title="null"
+            data-variant="primary"
             to="[object Object]"
           >
-            <button
-              aria-label="contribution.newPost"
-              class="profile-post-add-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
-              data-appearance="filled"
-              data-original-title="null"
-              data-variant="primary"
-              type="button"
+            <span
+              class="inline-flex items-center"
             >
               <span
-                class="inline-flex items-center"
+                class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
               >
                 <span
-                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  aria-hidden="true"
+                  class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
-                  <span
-                    aria-hidden="true"
-                    class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  <svg
+                    fill="currentColor"
+                    viewBox="0 0 32 32"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    <svg
-                      fill="currentColor"
-                      viewBox="0 0 32 32"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M15 5h2v10h10v2h-10v10h-2v-10h-10v-2h10v-10z"
-                      />
-                    </svg>
-                  </span>
+                    <path
+                      d="M15 5h2v10h10v2h-10v10h-2v-10h-10v-2h10v-10z"
+                    />
+                  </svg>
                 </span>
               </span>
-            </button>
+            </span>
           </nuxt-link-stub>
         </div>
          
@@ -7659,39 +7643,35 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           style="margin-bottom: 32px;"
         >
           <nuxt-link-stub
+            aria-label="contribution.newPost"
+            class="profile-post-add-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
+            data-appearance="filled"
+            data-original-title="null"
+            data-variant="primary"
             to="[object Object]"
           >
-            <button
-              aria-label="contribution.newPost"
-              class="profile-post-add-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
-              data-appearance="filled"
-              data-original-title="null"
-              data-variant="primary"
-              type="button"
+            <span
+              class="inline-flex items-center"
             >
               <span
-                class="inline-flex items-center"
+                class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
               >
                 <span
-                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  aria-hidden="true"
+                  class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
-                  <span
-                    aria-hidden="true"
-                    class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  <svg
+                    fill="currentColor"
+                    viewBox="0 0 32 32"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    <svg
-                      fill="currentColor"
-                      viewBox="0 0 32 32"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M15 5h2v10h10v2h-10v10h-2v-10h-10v-2h10v-10z"
-                      />
-                    </svg>
-                  </span>
+                    <path
+                      d="M15 5h2v10h10v2h-10v10h-2v-10h-10v-2h10v-10z"
+                    />
+                  </svg>
                 </span>
               </span>
-            </button>
+            </span>
           </nuxt-link-stub>
         </div>
          
@@ -8689,39 +8669,35 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           style="margin-bottom: 32px;"
         >
           <nuxt-link-stub
+            aria-label="contribution.newPost"
+            class="profile-post-add-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
+            data-appearance="filled"
+            data-original-title="null"
+            data-variant="primary"
             to="[object Object]"
           >
-            <button
-              aria-label="contribution.newPost"
-              class="profile-post-add-button os-button inline-flex items-center justify-center [white-space-collapse:collapse] relative appearance-none font-semibold tracking-[0.05em] transition-[color,background-color] duration-[80ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] cursor-pointer select-none border-[0.8px] border-solid focus:outline-1 disabled:pointer-events-none disabled:cursor-default focus:outline-dashed focus:outline-[var(--color-primary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)] disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent] h-[36px] min-w-[36px] text-[15px] leading-[normal] align-middle bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)] active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)] rounded-full p-0 w-[36px] profile-post-add-button has-tooltip"
-              data-appearance="filled"
-              data-original-title="null"
-              data-variant="primary"
-              type="button"
+            <span
+              class="inline-flex items-center"
             >
               <span
-                class="inline-flex items-center"
+                class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
               >
                 <span
-                  class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  aria-hidden="true"
+                  class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
-                  <span
-                    aria-hidden="true"
-                    class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  <svg
+                    fill="currentColor"
+                    viewBox="0 0 32 32"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    <svg
-                      fill="currentColor"
-                      viewBox="0 0 32 32"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M15 5h2v10h10v2h-10v10h-2v-10h-10v-2h10v-10z"
-                      />
-                    </svg>
-                  </span>
+                    <path
+                      d="M15 5h2v10h10v2h-10v10h-2v-10h-10v-2h10v-10z"
+                    />
+                  </svg>
                 </span>
               </span>
-            </button>
+            </span>
           </nuxt-link-stub>
         </div>
          

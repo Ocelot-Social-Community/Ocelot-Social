@@ -3,11 +3,15 @@
     <base-card>
       <base-icon name="balance-scale" />
       <h2 class="title">{{ $t(`termsAndConditions.newTermsAndConditions`) }}</h2>
-      <nuxt-link :to="{ name: 'terms-and-conditions' }" target="_blank">
-        <os-button appearance="outline" variant="primary">
-          {{ $t(`termsAndConditions.termsAndConditionsNewConfirmText`) }}
-        </os-button>
-      </nuxt-link>
+      <os-button
+        as="nuxt-link"
+        :to="{ name: 'terms-and-conditions' }"
+        target="_blank"
+        appearance="outline"
+        variant="primary"
+      >
+        {{ $t(`termsAndConditions.termsAndConditionsNewConfirmText`) }}
+      </os-button>
       <label for="checkbox">
         <input id="checkbox" type="checkbox" v-model="checked" :checked="checked" />
         {{ $t('termsAndConditions.termsAndConditionsNewConfirm') }}

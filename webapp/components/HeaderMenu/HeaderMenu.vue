@@ -84,11 +84,42 @@
               </div>
               <!-- group button -->
               <client-only v-if="SHOW_GROUP_BUTTON_IN_HEADER">
-                <group-button />
+                <os-button
+                  as="nuxt-link"
+                  to="/groups"
+                  variant="primary"
+                  appearance="ghost"
+                  circle
+                  :aria-label="$t('header.groups.tooltip')"
+                  v-tooltip="{
+                    content: $t('header.groups.tooltip'),
+                    placement: 'bottom-start',
+                  }"
+                >
+                  <template #icon>
+                    <base-icon name="users" />
+                  </template>
+                </os-button>
               </client-only>
               <!-- map button -->
               <client-only v-if="!isEmpty(this.$env.MAPBOX_TOKEN)">
-                <map-button />
+                <os-button
+                  as="nuxt-link"
+                  to="/map"
+                  class="map-button"
+                  variant="primary"
+                  appearance="ghost"
+                  circle
+                  :aria-label="$t('header.map.tooltip')"
+                  v-tooltip="{
+                    content: $t('header.map.tooltip'),
+                    placement: 'bottom-start',
+                  }"
+                >
+                  <template #icon>
+                    <base-icon name="globe-detailed" size="large" />
+                  </template>
+                </os-button>
               </client-only>
               <!-- custom button -->
               <client-only v-if="!isEmpty(customButton)">
@@ -202,7 +233,22 @@
           >
             <client-only>
               <div @click="toggleMobileMenuView">
-                <group-button />
+                <os-button
+                  as="nuxt-link"
+                  to="/groups"
+                  variant="primary"
+                  appearance="ghost"
+                  circle
+                  :aria-label="$t('header.groups.tooltip')"
+                  v-tooltip="{
+                    content: $t('header.groups.tooltip'),
+                    placement: 'bottom-start',
+                  }"
+                >
+                  <template #icon>
+                    <base-icon name="users" />
+                  </template>
+                </os-button>
               </div>
             </client-only>
           </ds-flex-item>
@@ -214,7 +260,23 @@
           >
             <client-only>
               <div @click="toggleMobileMenuView">
-                <map-button />
+                <os-button
+                  as="nuxt-link"
+                  to="/map"
+                  class="map-button"
+                  variant="primary"
+                  appearance="ghost"
+                  circle
+                  :aria-label="$t('header.map.tooltip')"
+                  v-tooltip="{
+                    content: $t('header.map.tooltip'),
+                    placement: 'bottom-start',
+                  }"
+                >
+                  <template #icon>
+                    <base-icon name="globe-detailed" size="large" />
+                  </template>
+                </os-button>
               </div>
             </client-only>
           </ds-flex-item>
@@ -290,12 +352,10 @@ import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
 import ChatNotificationMenu from '~/components/ChatNotificationMenu/ChatNotificationMenu'
 import CustomButton from '~/components/CustomButton/CustomButton'
 import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
-import GroupButton from '~/components/Group/GroupButton'
 import headerMenuBranded from '~/constants/headerMenuBranded.js'
 import InviteButton from '~/components/InviteButton/InviteButton'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
-import MapButton from '~/components/Map/MapButton'
 import SearchField from '~/components/features/SearchField/SearchField.vue'
 import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
 import links from '~/constants/links.js'
@@ -310,11 +370,9 @@ export default {
     ChatNotificationMenu,
     CustomButton,
     FilterMenu,
-    GroupButton,
     InviteButton,
     LocaleSwitch,
     Logo,
-    MapButton,
     NotificationMenu,
     PageParamsLink,
     SearchField,
@@ -472,5 +530,13 @@ export default {
 }
 .hide-mobile-menu {
   display: none;
+}
+.map-button {
+  margin-left: 3px;
+  margin-right: 3px;
+
+  .base-icon > .svg.--large {
+    margin-left: 0;
+  }
 }
 </style>

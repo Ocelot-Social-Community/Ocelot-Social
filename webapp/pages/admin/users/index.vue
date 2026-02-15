@@ -73,21 +73,19 @@
           </template>
         </template>
         <template #badges="scope">
-          <nuxt-link
+          <os-button
+            as="nuxt-link"
             :to="{
               name: 'admin-users-id',
               params: { id: scope.row.id },
             }"
+            variant="primary"
+            appearance="filled"
+            circle
+            :aria-label="$t('actions.edit')"
           >
-            <os-button
-              variant="primary"
-              appearance="filled"
-              circle
-              :aria-label="$t('actions.edit')"
-            >
-              <template #icon><base-icon name="pencil" /></template>
-            </os-button>
-          </nuxt-link>
+            <template #icon><base-icon name="pencil" /></template>
+          </os-button>
         </template>
       </ds-table>
       <pagination-buttons :hasNext="hasNext" :hasPrevious="hasPrevious" @next="next" @back="back" />

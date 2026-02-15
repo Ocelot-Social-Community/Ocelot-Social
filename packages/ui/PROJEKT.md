@@ -106,10 +106,13 @@ OsButton Features:
 ├─ variant:     ✅ primary, secondary, danger, warning, success, info, default
 ├─ appearance:  ✅ filled, outline, ghost
 ├─ size:        ✅ sm, md, lg, xl
-├─ disabled:    ✅ mit hover/active-Override
+├─ disabled:    ✅ mit hover/active-Override (nur as="button")
 ├─ icon:        ✅ slot-basiert (icon-system-agnostisch)
 ├─ circle:      ✅ rounded-full, größenabhängig (p-1.5 bis p-3)
-└─ loading:     ✅ animated SVG spinner, aria-busy (Milestone 4b)
+├─ loading:     ✅ animated SVG spinner, aria-busy (Milestone 4b)
+└─ as:          ✅ polymorphes Rendering (button/a/NuxtLink/RouterLink)
+
+as-Prop Migration:  15 <nuxt-link>/<a>-Wrapper in 15 Webapp-Dateien → as="nuxt-link"/as="a"
 ```
 
 ### OsIcon (Phase 4)
@@ -135,11 +138,11 @@ Ocelot-Icons (separates Entry-Point):
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-15 (Session 20)
+**Letzte Aktualisierung:** 2026-02-15 (Session 21)
 
 **Aktuelle Phase:** Phase 4 - OsIcon ✅ implementiert, System-Icons eingerichtet
 
-**Zuletzt abgeschlossen (Session 20 - OsIcon Komponente, System-Icons, Ocelot-Umbenennung):**
+**Zuletzt abgeschlossen (Session 21 - OsIcon Komponente, System-Icons, Ocelot-Umbenennung):**
 - [x] OsIcon Komponente implementiert (name, icon, size Props; Vue 2/3 via vue-demi h())
 - [x] System-Icons: check, close, plus (SVG, viewBox 0 0 32 32, stroke-basiert)
 - [x] Custom vite-svg-icon Plugin: SVG → Vue Render-Function via `?icon` Query
@@ -154,33 +157,34 @@ Ocelot-Icons (separates Entry-Point):
 - [x] 100% Test-Coverage für OsIcon
 - [x] OsButton Stories bereinigt (OsIcon statt Inline-SVGs)
 
+**Zuvor abgeschlossen (Session 20 - `as`-Prop + nuxt-link Migration):**
+- [x] OsButton: `as` Prop implementiert (polymorphe Komponente: `button`, `a`, `nuxt-link`, `router-link`, Custom-Komponenten)
+- [x] Naming-Konvention: `tag` → `as` (moderner Standard: Headless UI, Radix Vue, Chakra UI, PrimeVue)
+- [x] `disabled`/`type`/`loading` nur bei `as="button"` (Links haben kein natives `disabled`-Attribut)
+- [x] Stories: `Polymorphic` Story + Playground `as`-Selektor (button/a)
+- [x] Visual Test: `polymorphic` Screenshot + a11y-Check
+- [x] 15 `<nuxt-link>`/`<a>`-Wrapper in 15 Webapp-Dateien → `as="nuxt-link"` / `as="a"` migriert:
+  - GroupButton.vue, CtaUnblockAuthor.vue, terms-and-conditions-confirm.vue
+  - CustomButton.vue (v-if/v-else → computed `linkTag`/`linkProps` konsolidiert)
+  - groups/index.vue, GroupForm.vue, admin/users/index.vue
+  - pages/index.vue (CSS `button.post-add-button-*` → `.post-add-button-*`)
+  - profile/_id/_slug.vue (v-if auf ds-grid-item, symmetrisches Padding `$space-x-small`)
+  - groups/_id/_slug.vue, MapButton.vue
+  - ChatNotificationMenu.vue, Chat.vue, UserTeaserPopover.vue
+  - NotificationMenu.vue (3 Instanzen, 2 zu einem Button konsolidiert via counter-icon)
+- [x] Verifiziert: 0 verbleibende `<nuxt-link>`/`<a>`-Wrapper um `<os-button>` in Webapp
+
 **Zuvor erledigt (auf master gemergt):**
 - [x] `os-button` CSS-Klasse auf Button-Element für Branding-Kompatibilität (#9211)
 - [x] eslint-config-it4c v0.11.2 Update: Flat Config, path alias #src, CSS-Linting (#9233)
 - [x] Release @ocelot-social/ui v0.0.2
 - [x] Release v3.14.1
 
-**Zuvor abgeschlossen:**
-- [x] Projektordner erstellt
-- [x] Planungsdokument erstellt
-- [x] Tech-Stack entschieden
-- [x] Branding-Architektur definiert
-- [x] Migrationsstrategie definiert
-- [x] **Phase 0: Komponenten-Analyse** (177 Komponenten katalogisiert)
-- [x] Button-Familie detailiert analysiert (Props, Styles, Konsolidierung)
-- [x] Modal-Familie detailiert analysiert (Architektur erkannt)
-- [x] Menu-Familie detailiert analysiert (3 Patterns identifiziert)
-- [x] Priorisierung erstellt (15 Komponenten in 4 Tiers)
-- [x] Konsolidierungsplan finalisiert
-- [x] **Phase 1: Vue 2.7 Upgrade** ✅
-- [x] **Phase 2: Projekt-Setup** ✅
-- [x] **Phase 3: Webapp-Integration** ✅ (133 Buttons migriert, 79 Dateien)
-  - OsButton.stories.ts mit Playground + allen Varianten/Appearances/Sizes
-  - Storybook Build-Konfiguration (viteFinal entfernt Library-Plugins)
-  - Docker Setup (Dockerfile, docker-compose, ui-docker.yml)
-  - Visual Regression Tests (Playwright, colocated) mit integriertem A11y-Check
-  - Completeness Check (verify Script prüft Story, Visual, checkA11y, Keyboard, Varianten)
-  - ESLint Plugins: vuejs-accessibility, playwright, storybook, jsdoc
+**Abgeschlossene Phasen:**
+- [x] Phase 0: Analyse (177 Komponenten katalogisiert)
+- [x] Phase 1: Vue 2.7 Upgrade (2.6.14 → 2.7.16, 979 Tests ✅)
+- [x] Phase 2: Projekt-Setup (Vite, vue-demi, Tailwind v4, CVA, Storybook 10, CI/CD, 100% Coverage)
+- [x] Phase 3: Webapp-Integration — 133 os-button in 79 Dateien, 0 base-button/ds-button verbleibend
 
 **Zuvor abgeschlossen (Sessions 11-19 — Details im Arbeitsprotokoll §12):**
 - [x] Session 19: CodeRabbit Review Cleanup, ~30 Bugfixes + A11y-Verbesserungen
@@ -484,8 +488,6 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 
 ---
 
----
-
 # VISION
 
 ## 1. Projektziel & Vision
@@ -544,7 +546,7 @@ Migration vorbereiten - schrittweise neue Komponenten in Vue 3 entwickeln, die d
 | Dateinamen | **PascalCase** | OsButton.vue, OsCard.vue |
 | i18n | **Nur Props** | Keine Default-Texte in Komponenten |
 | Breakpoints | **Tailwind Standard** | sm:640, md:768, lg:1024, xl:1280, 2xl:1536 |
-| Size Props | **Tailwind-Skala (vollständig)** | xs, sm, md, lg, xl, 2xl |
+| Size Props | **Tailwind-Skala** | sm, md, lg, xl (komponentenspezifisch) |
 | Rounded Props | **Tailwind-Skala (vollständig)** | none, sm, md, lg, xl, 2xl, 3xl, full |
 | Shadow Props | **Tailwind-Skala (vollständig)** | none, sm, md, lg, xl, 2xl |
 | Variant Props | **Semantisch (vollständig)** | primary, secondary, danger, warning, success, info |
@@ -985,8 +987,8 @@ Alle grün → Merge erlaubt
 **Storybook Deploy (Webhook):**
 1. GitHub sendet Webhook bei Release-Event
 2. Server empfängt Webhook
-3. Server führt `scripts/deploy-histoire.sh` aus (Teil des Repos)
-4. Script: git pull → npm ci → histoire build → copy to webroot
+3. Server führt `scripts/deploy-storybook.sh` aus (Teil des Repos)
+4. Script: git pull → npm ci → storybook build → copy to webroot
 
 ### GitHub Workflows (vollständige Liste)
 
@@ -998,7 +1000,7 @@ Alle grün → Merge erlaubt
 | **test-a11y** | Push/PR | axe-core | Accessibility-Tests |
 | **test-visual** | Push/PR | Playwright | Visual Regression Screenshots |
 | **build** | Push/PR | Vite | Build verifizieren |
-| **build-histoire** | Push/PR | Storybook | Dokumentation bauen |
+| **build-storybook** | Push/PR | Storybook | Dokumentation bauen |
 | **size-check** | Push/PR | size-limit | Bundle-Größe prüfen |
 | **release** | Push main | release-please | Release-PR erstellen |
 | **publish** | Release | npm | Auf npm veröffentlichen |
@@ -1056,7 +1058,7 @@ Die Komponenten werden über Storybook dokumentiert und auf einer öffentlichen 
 
 **Hosting:**
 - Eigener Server (öffentlich zugänglich)
-- Static Build via `histoire build`
+- Static Build via `storybook build`
 - Deployment bei jedem Release
 
 **Workflow:**
@@ -1171,7 +1173,7 @@ Bei der Migration werden:
 
 ## 11. Entscheidungen
 
-> 70 Entscheidungen in 9 Kategorien
+> 73 Entscheidungen in 9 Kategorien
 
 ### Vision & Ziele
 
@@ -1240,7 +1242,7 @@ Bei der Migration werden:
 | 29 | Dark Mode | Ja, von Anfang an | Alle Komponenten mit Light/Dark |
 | 30 | Icons | Hybrid-Architektur | System-Icons in Library, Feature-Icons in App |
 | 51 | Icon-Architektur | Hybrid | ~10 System-Icons in Library, Rest in App (siehe §4) |
-| 59 | Size Props | Tailwind-Skala (xs, sm, md, lg, xl, 2xl) | Konsistenz mit Tailwind, intuitive Benennung |
+| 59 | Size Props | Tailwind-Skala (sm, md, lg, xl) | Komponentenspezifisch, OsButton nutzt sm-xl |
 | 60 | Rounded Props | Tailwind-Skala (none, sm, md, lg, xl, 2xl, 3xl, full) | Konsistenz mit Tailwind border-radius |
 | 61 | Shadow Props | Tailwind-Skala (none, sm, md, lg, xl, 2xl) | Konsistenz mit Tailwind box-shadow |
 | 62 | Variant Props | Semantisch (primary, secondary, danger, warning, success, info) | Übliche UI-Farbvarianten |
@@ -1250,8 +1252,8 @@ Bei der Migration werden:
 | 66 | Branding-Hierarchie | Webapp → Spezialisiertes Branding | Default-Branding in Webapp, Overrides pro Instanz |
 | 67 | Variable-Validierung | Runtime-Check in Development | `validateCssVariables()` warnt bei fehlenden Variablen |
 | 68 | Branding-Test (Webapp) | CI-Test in Webapp | Webapp testet, dass Default-Branding alle Library-Variablen definiert |
-| 69 | Webapp ↔ Maintenance Sharing | Webapp als Source of Truth | Kein separates "shared" Package, maintenance importiert aus webapp/ (siehe §16a) |
-| 70 | Daten-Entkopplung | ViewModel/Mapper Pattern | Komponenten kennen nur ViewModels, Mapper transformieren API-Daten (siehe §16b) |
+| 72 | Webapp ↔ Maintenance Sharing | Webapp als Source of Truth | Kein separates "shared" Package, maintenance importiert aus webapp/ (siehe §16a) |
+| 73 | Daten-Entkopplung | ViewModel/Mapper Pattern | Komponenten kennen nur ViewModels, Mapper transformieren API-Daten (siehe §16b) |
 
 ### Komponenten-API & Konventionen
 
@@ -1520,6 +1522,15 @@ Bei der Migration werden:
 | 2026-02-14 | **ESLint Config Update** | eslint-config-it4c v0.11.2: Flat Config, path alias `#src`, CSS-Linting, security/detect-non-literal-fs-filename, n/no-sync, n/shebang (#9233) |
 | 2026-02-14 | **check-completeness** | Parallelisiertes File-Reading, breitere Regex für Keyboard-Tests, Playground-Tests ignoriert |
 | 2026-02-14 | **Release v0.0.2** | @ocelot-social/ui v0.0.2 veröffentlicht |
+| 2026-02-14 | **`as` Prop** | Polymorphe OsButton-Komponente: `as` Prop für dynamischen Tag/Komponente (`button`, `a`, `nuxt-link`, `router-link`); moderner Standard (Headless UI, Radix Vue) |
+| 2026-02-14 | **Naming: tag → as** | `tag` → `as` umbenannt nach Recherche moderner UI-Libraries (Headless UI, Radix Vue, Chakra UI, PrimeVue nutzen `as`) |
+| 2026-02-14 | **Disabled nur für button** | `disabled`/`type`/`loading` nur bei `as="button"` (Links haben kein natives `disabled`); `aria-disabled`/`tabindex` Logik entfernt |
+| 2026-02-14 | **Polymorphic Story** | Neue Story `Polymorphic` mit Varianten, Icons, disabled-Vergleich; Playground mit `as`-Selektor (button/a) |
+| 2026-02-14 | **nuxt-link Migration** | 15 `<nuxt-link>`/`<a>`-Wrapper → `as="nuxt-link"`/`as="a"` in 15 Webapp-Dateien; invalides HTML (`<button>` in `<a>`) eliminiert |
+| 2026-02-14 | **CustomButton konsolidiert** | v-if/v-else für `<a>`/`<nuxt-link>` Wrapper → einzelner `<os-button :as="linkTag" v-bind="linkProps">` mit Computed Properties |
+| 2026-02-14 | **NotificationMenu konsolidiert** | 2 separate Buttons (kein Badge / mit Badge) zu einem zusammengeführt — counter-icon zeigt bei `count=0` kein Badge |
+| 2026-02-14 | **CSS-Selektor Fix** | pages/index.vue: `button.post-add-button-top/bottom` → `.post-add-button-top/bottom` (nuxt-link rendert `<a>`, nicht `<button>`) |
+| 2026-02-14 | **Profil-Spacing** | profile/_id/_slug.vue: `v-if` auf ds-grid-item (kein leerer Abstand), symmetrisches Padding `$space-x-small` |
 | 2026-02-15 | **OsIcon Komponente** | Neue Komponente: `name` (System-Icon), `icon` (Custom Component), `size` (xs-2xl); Vue 2/3 via vue-demi h() |
 | 2026-02-15 | **vite-svg-icon Plugin** | Custom Vite Plugin: extrahiert viewBox + `<path>` aus SVG, transformiert zu Vue h()-Aufruf via `?icon` Query |
 | 2026-02-15 | **System-Icons** | 3 SVG-Icons in Library: check, close, plus (viewBox 0 0 32 32, stroke-basiert); SYSTEM_ICONS Registry + SystemIconName Type |
@@ -2052,7 +2063,7 @@ Phase 3 (später): @ocelot-social/auth, @ocelot-social/posts, etc.
 
 | # | Datum | Entscheidung |
 |---|-------|--------------|
-| 68 | 2026-02-09 | Webapp als Source of Truth für geteilte Business-Komponenten |
+| 72 | 2026-02-09 | Webapp als Source of Truth für geteilte Business-Komponenten |
 
 ---
 
@@ -2246,7 +2257,7 @@ webapp/
 
 | # | Datum | Entscheidung |
 |---|-------|--------------|
-| 70 | 2026-02-09 | ViewModel/Mapper Pattern für Daten-Entkopplung |
+| 73 | 2026-02-09 | ViewModel/Mapper Pattern für Daten-Entkopplung |
 
 ---
 
