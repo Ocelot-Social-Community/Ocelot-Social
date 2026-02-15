@@ -8,3 +8,12 @@
  */
 
 export { OsButton, buttonVariants, type ButtonVariants } from './OsButton'
+export {
+  OsIcon,
+  ICON_SIZES,
+  IconCheck,
+  IconClose,
+  IconPlus,
+  SYSTEM_ICONS,
+  type SystemIconName,
+} from './OsIcon'

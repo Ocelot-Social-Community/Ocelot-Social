@@ -21,7 +21,7 @@
           size="xl"
         >
           <template #icon>
-            <base-icon name="plus" />
+            <os-icon name="plus" />
           </template>
         </os-button>
       </client-only>
@@ -151,7 +151,7 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import postListActions from '~/mixins/postListActions'
 import mobile from '~/mixins/mobile'
 import DonationInfo from '~/components/DonationInfo/DonationInfo.vue'
@@ -175,6 +175,7 @@ export default {
     DonationInfo,
     HashtagsFilter,
     OsButton,
+    OsIcon,
     PostTeaser,
     HcEmpty,
     MasonryGrid,

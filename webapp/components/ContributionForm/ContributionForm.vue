@@ -190,7 +190,7 @@
                 :disabled="!!errors"
               >
                 <template #icon>
-                  <base-icon name="check" />
+                  <os-icon name="check" />
                 </template>
                 {{ $t('actions.save') }}
               </os-button>
@@ -202,7 +202,7 @@
   </div>
 </template>
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
 import Editor from '~/components/Editor/Editor'
@@ -223,6 +223,7 @@ export default {
     Editor,
     ImageUploader,
     OsButton,
+    OsIcon,
     PageParamsLink,
   },
   props: {

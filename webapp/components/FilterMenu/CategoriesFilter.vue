@@ -9,7 +9,7 @@
           @click="setResetCategories"
         >
           <template #icon>
-            <base-icon name="check" />
+            <os-icon name="check" />
           </template>
           {{ $t('filter-menu.all') }}
         </os-button>
@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
@@ -49,6 +49,7 @@ export default {
   components: {
     FilterMenuSection,
     OsButton,
+    OsIcon,
   },
   mixins: [SortCategories, GetCategories],
   computed: {

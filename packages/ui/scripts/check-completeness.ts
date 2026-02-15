@@ -42,11 +42,58 @@ interface CheckResult {
   warnings: string[]
 }
 
+function checkVisualTests(
+  visualTestContent: string | null,
+  visualTestPath: string,
+  errors: string[],
+): void {
+  if (visualTestContent === null) {
+    errors.push(`Missing visual test file: ${visualTestPath}`)
+  } else if (!visualTestContent.includes('checkA11y(')) {
+    errors.push(`Missing checkA11y() calls in visual tests: ${visualTestPath}`)
+  }
+}
+
+function checkKeyboardA11y(
+  unitTestContent: string | null,
+  unitTestPath: string,
+  errors: string[],
+): void {
+  if (unitTestContent !== null) {
+    if (!/describe\(\s*['"]keyboard accessibility['"]/.test(unitTestContent)) {
+      errors.push(`Missing keyboard accessibility tests in: ${unitTestPath}`)
+    }
+  } else {
+    errors.push(`Missing unit test file: ${unitTestPath}`)
+  }
+}
+
+function checkStoryCoverage(
+  storyContent: string,
+  visualTestContent: string,
+  warnings: string[],
+): void {
+  const storyExports = storyContent.matchAll(/export\s+const\s+(\w+):\s*Story/g)
+
+  for (const match of storyExports) {
+    const storyName = match[1]
+    if (storyName === 'Playground') continue
+    const kebabName = toKebabCase(storyName)
+
+    if (!visualTestContent.includes(`--${kebabName}`)) {
+      warnings.push(`Story "${storyName}" missing visual test (--${kebabName})`)
+    }
+  }
+}
+
 const results: CheckResult[] = []
 let hasErrors = false
 
 // Find all Vue components (excluding index files)
-const components = await glob('src/components/**/Os*.vue')
+const components = [
+  ...(await glob('src/components/**/Os*.vue')),
+  ...(await glob('src/ocelot/components/**/*.vue')),
+]
 
 for (const componentPath of components) {
   const componentName = basename(componentPath, '.vue')
@@ -56,7 +103,7 @@ for (const componentPath of components) {
   const unitTestPath = join(componentDir, `${componentName}.spec.ts`)
   const variantsPath = join(
     componentDir,
-    `${componentName.toLowerCase().replace('os', '')}.variants.ts`,
+    `${componentName.replace(/^Os/, '').toLowerCase()}.variants.ts`,
   )
 
   const result: CheckResult = {
@@ -78,38 +125,15 @@ for (const componentPath of components) {
     result.errors.push(`Missing story file: ${storyPath}`)
   }
 
-  // Check 2: Visual regression test file exists
-  if (visualTestContent === null) {
-    result.errors.push(`Missing visual test file: ${visualTestPath}`)
-  }
-
-  // Check 3: Visual tests include accessibility checks
-  if (visualTestContent !== null && !visualTestContent.includes('checkA11y(')) {
-    result.errors.push(`Missing checkA11y() calls in visual tests: ${visualTestPath}`)
-  }
+  // Check 2 & 3: Visual regression tests with a11y checks
+  checkVisualTests(visualTestContent, visualTestPath, result.errors)
 
   // Check 4: Keyboard accessibility tests exist
-  if (unitTestContent !== null) {
-    if (!/describe\(\s*['"]keyboard accessibility['"]/.test(unitTestContent)) {
-      result.errors.push(`Missing keyboard accessibility tests in: ${unitTestPath}`)
-    }
-  } else {
-    result.errors.push(`Missing unit test file: ${unitTestPath}`)
-  }
+  checkKeyboardA11y(unitTestContent, unitTestPath, result.errors)
 
   // Check 5 & 6: Story and visual test coverage
   if (storyContent !== null && visualTestContent !== null) {
-    const storyExports = storyContent.matchAll(/export\s+const\s+(\w+):\s*Story/g)
-
-    for (const match of storyExports) {
-      const storyName = match[1]
-      if (storyName === 'Playground') continue
-      const kebabName = toKebabCase(storyName)
-
-      if (!visualTestContent.includes(`--${kebabName}`)) {
-        result.warnings.push(`Story "${storyName}" missing visual test (--${kebabName})`)
-      }
-    }
+    checkStoryCoverage(storyContent, visualTestContent, result.warnings)
   }
 
   // Check 5: Variant values are demonstrated in stories
@@ -140,6 +164,47 @@ for (const componentPath of components) {
         }
       }
     }
+  }
+
+  if (result.errors.length > 0 || result.warnings.length > 0) {
+    results.push(result)
+  }
+
+  if (result.errors.length > 0) {
+    hasErrors = true
+  }
+}
+
+// --- Ocelot stories (no .vue files, story-driven checks) ---
+const ocelotStories = await glob('src/ocelot/**/*.stories.ts')
+
+for (const storyPath of ocelotStories) {
+  const storyName = basename(storyPath, '.stories.ts')
+  const storyDir = dirname(storyPath)
+  const visualTestPath = join(storyDir, `${storyName}.visual.spec.ts`)
+  const unitTestPath = join(storyDir, 'index.spec.ts')
+
+  const result: CheckResult = {
+    component: storyName,
+    errors: [],
+    warnings: [],
+  }
+
+  const [storyContent, visualTestContent, unitTestContent] = await Promise.all([
+    tryReadFile(storyPath),
+    tryReadFile(visualTestPath),
+    tryReadFile(unitTestPath),
+  ])
+
+  // Check: Visual regression tests with a11y checks
+  checkVisualTests(visualTestContent, visualTestPath, result.errors)
+
+  // Check: Keyboard accessibility tests exist
+  checkKeyboardA11y(unitTestContent, unitTestPath, result.errors)
+
+  // Check: Story-to-visual-test coverage
+  if (storyContent !== null && visualTestContent !== null) {
+    checkStoryCoverage(storyContent, visualTestContent, result.warnings)
   }
 
   if (result.errors.length > 0 || result.warnings.length > 0) {

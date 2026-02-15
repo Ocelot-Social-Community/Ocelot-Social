@@ -18,6 +18,16 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./ocelot": {
+      "import": {
+        "types": "./dist/ocelot.d.ts",
+        "default": "./dist/ocelot.mjs"
+      },
+      "require": {
+        "types": "./dist/ocelot.d.cts",
+        "default": "./dist/ocelot.cjs"
+      }
+    },
     "./style.css": "./dist/style.css",
     "./tailwind.preset": {
       "style": "./dist/tailwind.preset.mjs",
@@ -134,12 +144,17 @@
   "size-limit": [
     {
       "path": "dist/index.mjs",
-      "limit": "15 kB",
+      "limit": "16 kB",
       "brotli": true
     },
     {
       "path": "dist/tailwind.preset.mjs",
       "limit": "2 kB"
+    },
+    {
+      "path": "dist/ocelot.mjs",
+      "limit": "5 kB",
+      "brotli": true
     },
     {
       "path": "dist/style.css",

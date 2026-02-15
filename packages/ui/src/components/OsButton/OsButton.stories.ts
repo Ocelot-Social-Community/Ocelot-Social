@@ -1,35 +1,11 @@
-import { computed, h } from 'vue'
+import { computed } from 'vue'
+
+import { IconCheck, IconClose, IconPlus } from '#src/components/OsIcon'
 
 import OsButton from './OsButton.vue'
 
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-
-/**
- * Inline SVG icons for demo purposes (from Heroicons).
- * In real usage, the webapp passes its own BaseIcon component.
- */
-const CheckIcon = () =>
-  h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 20 20', fill: 'currentColor' }, [
-    h('path', {
-      'fill-rule': 'evenodd',
-      d: 'M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z',
-      'clip-rule': 'evenodd',
-    }),
-  ])
-
-const CloseIcon = () =>
-  h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 20 20', fill: 'currentColor' }, [
-    h('path', {
-      d: 'M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z',
-    }),
-  ])
-
-const PlusIcon = () =>
-  h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 20 20', fill: 'currentColor' }, [
-    h('path', {
-      d: 'M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z',
-    }),
-  ])
+import type { Component } from 'vue'
 
 const meta: Meta<typeof OsButton> = {
   title: 'Components/OsButton',
@@ -54,11 +30,11 @@ interface PlaygroundArgs {
   label: string
 }
 
-const iconMap: Record<string, (() => ReturnType<typeof h>) | null> = {
+const iconMap: Record<string, Component | null> = {
   none: null,
-  check: CheckIcon,
-  close: CloseIcon,
-  plus: PlusIcon,
+  check: IconCheck,
+  close: IconClose,
+  plus: IconPlus,
 }
 
 export const Playground: StoryObj<PlaygroundArgs> = {
@@ -371,27 +347,27 @@ export const FullWidth: Story = {
 
 export const Icon: Story = {
   render: () => ({
-    components: { OsButton, CheckIcon, PlusIcon, CloseIcon },
+    components: { OsButton, IconCheck, IconPlus, IconClose },
     template: `
       <div class="flex flex-wrap gap-2">
         <OsButton variant="primary">
-          <template #icon><CheckIcon /></template>
+          <template #icon><IconCheck /></template>
           Save
         </OsButton>
         <OsButton variant="success">
-          <template #icon><CheckIcon /></template>
+          <template #icon><IconCheck /></template>
           Confirm
         </OsButton>
         <OsButton variant="default">
-          <template #icon><PlusIcon /></template>
+          <template #icon><IconPlus /></template>
           Add
         </OsButton>
         <OsButton variant="danger">
-          <template #icon><CloseIcon /></template>
+          <template #icon><IconClose /></template>
           Delete
         </OsButton>
         <OsButton variant="info">
-          <template #icon><PlusIcon /></template>
+          <template #icon><IconPlus /></template>
           Create
         </OsButton>
       </div>
@@ -401,23 +377,23 @@ export const Icon: Story = {
 
 export const IconOnly: Story = {
   render: () => ({
-    components: { OsButton, CloseIcon, PlusIcon, CheckIcon },
+    components: { OsButton, IconClose, IconPlus, IconCheck },
     template: `
       <div class="flex flex-wrap gap-2">
         <OsButton variant="danger" aria-label="Close">
-          <template #icon><CloseIcon /></template>
+          <template #icon><IconClose /></template>
         </OsButton>
         <OsButton variant="primary" aria-label="Add">
-          <template #icon><PlusIcon /></template>
+          <template #icon><IconPlus /></template>
         </OsButton>
         <OsButton variant="success" aria-label="Confirm">
-          <template #icon><CheckIcon /></template>
+          <template #icon><IconCheck /></template>
         </OsButton>
         <OsButton variant="default" aria-label="Close" appearance="outline">
-          <template #icon><CloseIcon /></template>
+          <template #icon><IconClose /></template>
         </OsButton>
         <OsButton variant="primary" aria-label="Add" appearance="ghost">
-          <template #icon><PlusIcon /></template>
+          <template #icon><IconPlus /></template>
         </OsButton>
       </div>
     `,
@@ -426,23 +402,23 @@ export const IconOnly: Story = {
 
 export const IconSizes: Story = {
   render: () => ({
-    components: { OsButton, CheckIcon },
+    components: { OsButton, IconCheck },
     template: `
       <div class="flex flex-wrap gap-2 items-center">
         <OsButton size="sm" variant="primary">
-          <template #icon><CheckIcon /></template>
+          <template #icon><IconCheck /></template>
           Small
         </OsButton>
         <OsButton size="md" variant="primary">
-          <template #icon><CheckIcon /></template>
+          <template #icon><IconCheck /></template>
           Medium
         </OsButton>
         <OsButton size="lg" variant="primary">
-          <template #icon><CheckIcon /></template>
+          <template #icon><IconCheck /></template>
           Large
         </OsButton>
         <OsButton size="xl" variant="primary">
-          <template #icon><CheckIcon /></template>
+          <template #icon><IconCheck /></template>
           Extra Large
         </OsButton>
       </div>
@@ -452,22 +428,22 @@ export const IconSizes: Story = {
 
 export const IconAppearances: Story = {
   render: () => ({
-    components: { OsButton, CheckIcon },
+    components: { OsButton, IconCheck },
     template: `
       <div class="flex flex-col gap-4">
         <div>
           <h3 class="text-sm font-bold mb-2">Filled</h3>
           <div class="flex flex-wrap gap-2">
             <OsButton appearance="filled" variant="primary">
-              <template #icon><CheckIcon /></template>
+              <template #icon><IconCheck /></template>
               Primary
             </OsButton>
             <OsButton appearance="filled" variant="danger">
-              <template #icon><CheckIcon /></template>
+              <template #icon><IconCheck /></template>
               Danger
             </OsButton>
             <OsButton appearance="filled" variant="success">
-              <template #icon><CheckIcon /></template>
+              <template #icon><IconCheck /></template>
               Success
             </OsButton>
           </div>
@@ -476,15 +452,15 @@ export const IconAppearances: Story = {
           <h3 class="text-sm font-bold mb-2">Outline</h3>
           <div class="flex flex-wrap gap-2">
             <OsButton appearance="outline" variant="primary">
-              <template #icon><CheckIcon /></template>
+              <template #icon><IconCheck /></template>
               Primary
             </OsButton>
             <OsButton appearance="outline" variant="danger">
-              <template #icon><CheckIcon /></template>
+              <template #icon><IconCheck /></template>
               Danger
             </OsButton>
             <OsButton appearance="outline" variant="success">
-              <template #icon><CheckIcon /></template>
+              <template #icon><IconCheck /></template>
               Success
             </OsButton>
           </div>
@@ -493,15 +469,15 @@ export const IconAppearances: Story = {
           <h3 class="text-sm font-bold mb-2">Ghost</h3>
           <div class="flex flex-wrap gap-2">
             <OsButton appearance="ghost" variant="primary">
-              <template #icon><CheckIcon /></template>
+              <template #icon><IconCheck /></template>
               Primary
             </OsButton>
             <OsButton appearance="ghost" variant="danger">
-              <template #icon><CheckIcon /></template>
+              <template #icon><IconCheck /></template>
               Danger
             </OsButton>
             <OsButton appearance="ghost" variant="success">
-              <template #icon><CheckIcon /></template>
+              <template #icon><IconCheck /></template>
               Success
             </OsButton>
           </div>
@@ -513,29 +489,29 @@ export const IconAppearances: Story = {
 
 export const Circle: Story = {
   render: () => ({
-    components: { OsButton, PlusIcon, CloseIcon, CheckIcon },
+    components: { OsButton, IconPlus, IconClose, IconCheck },
     template: `
       <div class="flex flex-wrap gap-2 items-center">
         <OsButton circle variant="default" aria-label="Add">
-          <template #icon><PlusIcon /></template>
+          <template #icon><IconPlus /></template>
         </OsButton>
         <OsButton circle variant="primary" aria-label="Add">
-          <template #icon><PlusIcon /></template>
+          <template #icon><IconPlus /></template>
         </OsButton>
         <OsButton circle variant="secondary" aria-label="Confirm">
-          <template #icon><CheckIcon /></template>
+          <template #icon><IconCheck /></template>
         </OsButton>
         <OsButton circle variant="danger" aria-label="Close">
-          <template #icon><CloseIcon /></template>
+          <template #icon><IconClose /></template>
         </OsButton>
         <OsButton circle variant="warning" aria-label="Close">
-          <template #icon><CloseIcon /></template>
+          <template #icon><IconClose /></template>
         </OsButton>
         <OsButton circle variant="success" aria-label="Confirm">
-          <template #icon><CheckIcon /></template>
+          <template #icon><IconCheck /></template>
         </OsButton>
         <OsButton circle variant="info" aria-label="Add">
-          <template #icon><PlusIcon /></template>
+          <template #icon><IconPlus /></template>
         </OsButton>
       </div>
     `,
@@ -544,20 +520,20 @@ export const Circle: Story = {
 
 export const CircleSizes: Story = {
   render: () => ({
-    components: { OsButton, PlusIcon },
+    components: { OsButton, IconPlus },
     template: `
       <div class="flex flex-col gap-4">
         <div>
           <h3 class="text-sm font-bold mb-2">Small (26px)</h3>
           <div class="flex flex-wrap gap-2 items-center">
             <OsButton circle size="sm" variant="primary" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
             <OsButton circle size="sm" variant="danger" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
             <OsButton circle size="sm" variant="default" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
           </div>
         </div>
@@ -565,13 +541,13 @@ export const CircleSizes: Story = {
           <h3 class="text-sm font-bold mb-2">Medium (36px)</h3>
           <div class="flex flex-wrap gap-2 items-center">
             <OsButton circle size="md" variant="primary" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
             <OsButton circle size="md" variant="danger" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
             <OsButton circle size="md" variant="default" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
           </div>
         </div>
@@ -579,13 +555,13 @@ export const CircleSizes: Story = {
           <h3 class="text-sm font-bold mb-2">Large (48px)</h3>
           <div class="flex flex-wrap gap-2 items-center">
             <OsButton circle size="lg" variant="primary" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
             <OsButton circle size="lg" variant="danger" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
             <OsButton circle size="lg" variant="default" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
           </div>
         </div>
@@ -593,13 +569,13 @@ export const CircleSizes: Story = {
           <h3 class="text-sm font-bold mb-2">Extra Large (56px)</h3>
           <div class="flex flex-wrap gap-2 items-center">
             <OsButton circle size="xl" variant="primary" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
             <OsButton circle size="xl" variant="danger" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
             <OsButton circle size="xl" variant="default" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
           </div>
         </div>
@@ -610,23 +586,23 @@ export const CircleSizes: Story = {
 
 export const CircleAppearances: Story = {
   render: () => ({
-    components: { OsButton, PlusIcon, CloseIcon, CheckIcon },
+    components: { OsButton, IconPlus, IconClose, IconCheck },
     template: `
       <div class="flex flex-col gap-4">
         <div>
           <h3 class="text-sm font-bold mb-2">Filled</h3>
           <div class="flex flex-wrap gap-2 items-center">
             <OsButton circle appearance="filled" variant="primary" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
             <OsButton circle appearance="filled" variant="danger" aria-label="Close">
-              <template #icon><CloseIcon /></template>
+              <template #icon><IconClose /></template>
             </OsButton>
             <OsButton circle appearance="filled" variant="success" aria-label="Confirm">
-              <template #icon><CheckIcon /></template>
+              <template #icon><IconCheck /></template>
             </OsButton>
             <OsButton circle appearance="filled" variant="default" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
           </div>
         </div>
@@ -634,16 +610,16 @@ export const CircleAppearances: Story = {
           <h3 class="text-sm font-bold mb-2">Outline</h3>
           <div class="flex flex-wrap gap-2 items-center">
             <OsButton circle appearance="outline" variant="primary" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
             <OsButton circle appearance="outline" variant="danger" aria-label="Close">
-              <template #icon><CloseIcon /></template>
+              <template #icon><IconClose /></template>
             </OsButton>
             <OsButton circle appearance="outline" variant="success" aria-label="Confirm">
-              <template #icon><CheckIcon /></template>
+              <template #icon><IconCheck /></template>
             </OsButton>
             <OsButton circle appearance="outline" variant="default" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
           </div>
         </div>
@@ -651,16 +627,16 @@ export const CircleAppearances: Story = {
           <h3 class="text-sm font-bold mb-2">Ghost</h3>
           <div class="flex flex-wrap gap-2 items-center">
             <OsButton circle appearance="ghost" variant="primary" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
             <OsButton circle appearance="ghost" variant="danger" aria-label="Close">
-              <template #icon><CloseIcon /></template>
+              <template #icon><IconClose /></template>
             </OsButton>
             <OsButton circle appearance="ghost" variant="success" aria-label="Confirm">
-              <template #icon><CheckIcon /></template>
+              <template #icon><IconCheck /></template>
             </OsButton>
             <OsButton circle appearance="ghost" variant="default" aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
           </div>
         </div>
@@ -671,7 +647,7 @@ export const CircleAppearances: Story = {
 
 export const Polymorphic: Story = {
   render: () => ({
-    components: { OsButton, CheckIcon, PlusIcon },
+    components: { OsButton, IconCheck, IconPlus },
     template: `
       <div class="flex flex-col gap-4">
         <div>
@@ -687,11 +663,11 @@ export const Polymorphic: Story = {
           <h3 class="text-sm font-bold mb-2">as="a" with icon</h3>
           <div class="flex flex-wrap gap-2">
             <OsButton as="a" href="#" variant="primary">
-              <template #icon><CheckIcon /></template>
+              <template #icon><IconCheck /></template>
               Save
             </OsButton>
             <OsButton as="a" href="#" variant="success" circle aria-label="Add">
-              <template #icon><PlusIcon /></template>
+              <template #icon><IconPlus /></template>
             </OsButton>
           </div>
         </div>
@@ -709,7 +685,7 @@ export const Polymorphic: Story = {
 
 export const Loading: Story = {
   render: () => ({
-    components: { OsButton, CheckIcon },
+    components: { OsButton, IconCheck },
     template: `
       <div class="flex flex-col gap-4">
         <div>
@@ -734,12 +710,12 @@ export const Loading: Story = {
           <h3 class="text-sm font-bold mb-2">With Icon</h3>
           <div class="flex flex-wrap gap-2">
             <OsButton loading variant="primary">
-              <template #icon><CheckIcon /></template>
+              <template #icon><IconCheck /></template>
               Save
             </OsButton>
             <OsButton loading variant="danger">Delete</OsButton>
             <OsButton loading circle variant="primary" aria-label="Loading">
-              <template #icon><CheckIcon /></template>
+              <template #icon><IconCheck /></template>
             </OsButton>
           </div>
         </div>

@@ -235,7 +235,7 @@
             }"
           >
             <template #icon>
-              <base-icon name="plus" />
+              <os-icon name="plus" />
             </template>
           </os-button>
         </ds-space>
@@ -289,7 +289,7 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
@@ -326,6 +326,7 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 export default {
   components: {
     OsButton,
+    OsIcon,
     AvatarUploader,
     Category,
     ContentViewer,
