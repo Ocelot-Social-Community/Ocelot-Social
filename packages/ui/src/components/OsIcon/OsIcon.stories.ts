@@ -1,7 +1,5 @@
 import { computed, h } from 'vue'
 
-import { OsButton } from '#src/components/OsButton'
-
 import { SYSTEM_ICONS } from './icons'
 import OsIcon from './OsIcon.vue'
 
@@ -139,34 +137,6 @@ export const InheritColor: Story = {
         <span class="text-red-500"><OsIcon name="close" /></span>
         <span class="text-green-500"><OsIcon name="check" /></span>
         <span class="text-blue-500"><OsIcon name="plus" /></span>
-      </div>
-    `,
-  }),
-}
-
-export const InButton: Story = {
-  render: () => ({
-    components: { OsButton, OsIcon },
-    template: `
-      <div class="flex flex-wrap gap-2">
-        <OsButton variant="primary">
-          <template #icon><OsIcon name="check" /></template>
-          Confirm
-        </OsButton>
-        <OsButton variant="danger">
-          <template #icon><OsIcon name="close" /></template>
-          Delete
-        </OsButton>
-        <OsButton variant="default">
-          <template #icon><OsIcon name="plus" /></template>
-          Add
-        </OsButton>
-        <OsButton variant="success" circle aria-label="Confirm">
-          <template #icon><OsIcon name="check" /></template>
-        </OsButton>
-        <OsButton variant="danger" circle aria-label="Close">
-          <template #icon><OsIcon name="close" /></template>
-        </OsButton>
       </div>
     `,
   }),

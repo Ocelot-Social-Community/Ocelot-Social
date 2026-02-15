@@ -93,15 +93,4 @@ test.describe('OsIcon visual regression', () => {
 
     await checkA11y(page)
   })
-
-  test('in button', async ({ page }) => {
-    await page.goto(`${STORY_URL}--in-button&viewMode=story`)
-    const root = page.locator(STORY_ROOT)
-    await root.waitFor()
-    await waitForFonts(page)
-
-    await expect(root.locator('.flex').first()).toHaveScreenshot('in-button.png')
-
-    await checkA11y(page)
-  })
 })
