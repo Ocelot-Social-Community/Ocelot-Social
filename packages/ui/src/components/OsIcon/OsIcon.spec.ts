@@ -3,20 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { h } from 'vue'
 
 import { ICON_SIZES } from './icon.variants'
-import {
-  IconBars,
-  IconCheck,
-  IconChevronDown,
-  IconChevronUp,
-  IconClose,
-  IconCopy,
-  IconEye,
-  IconEyeSlash,
-  IconPlus,
-  IconSearch,
-  IconSpinner,
-  SYSTEM_ICONS,
-} from './icons'
+import { IconCheck, IconClose, IconPlus, SYSTEM_ICONS } from './icons'
 import OsIcon from './OsIcon.vue'
 
 import type { Size } from '#src/types'
@@ -185,19 +172,7 @@ describe('osIcon', () => {
     })
 
     it('exports all icon components individually and renders them', () => {
-      const icons = [
-        IconBars,
-        IconCheck,
-        IconChevronDown,
-        IconChevronUp,
-        IconClose,
-        IconCopy,
-        IconEye,
-        IconEyeSlash,
-        IconPlus,
-        IconSearch,
-        IconSpinner,
-      ]
+      const icons = [IconCheck, IconClose, IconPlus]
 
       for (const icon of icons) {
         const wrapper = mount(OsIcon, { props: { icon } })

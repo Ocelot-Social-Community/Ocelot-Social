@@ -2,7 +2,7 @@ import { computed, h } from 'vue'
 
 import { OsButton } from '#src/components/OsButton'
 
-import { IconEye, IconSearch, IconSpinner, SYSTEM_ICONS } from './icons'
+import { SYSTEM_ICONS } from './icons'
 import OsIcon from './OsIcon.vue'
 
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
@@ -17,6 +17,20 @@ export default meta
 type Story = StoryObj<typeof OsIcon>
 
 const iconNames = Object.keys(SYSTEM_ICONS)
+
+const HeartIcon = () =>
+  h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 20 20', fill: 'currentColor' }, [
+    h('path', {
+      d: 'M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.837-2.194C3.614 12.186 2 10.114 2 7.5A4.5 4.5 0 016.5 3c1.279 0 2.374.612 3.149 1.469C10.376 3.612 11.471 3 12.75 3A4.5 4.5 0 0117.25 7.5c0 2.614-1.614 4.686-3.63 6.526a22.045 22.045 0 01-2.837 2.194 20.759 20.759 0 01-1.162.682l-.019.01-.005.003h-.002L9.653 16.915z',
+    }),
+  ])
+
+const StarIcon = () =>
+  h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 20 20', fill: 'currentColor' }, [
+    h('path', {
+      d: 'M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z',
+    }),
+  ])
 
 interface PlaygroundArgs {
   name: string
@@ -112,16 +126,6 @@ export const CustomComponent: Story = {
   render: () => ({
     components: { OsIcon },
     setup() {
-      const HeartIcon = () =>
-        h(
-          'svg',
-          { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 20 20', fill: 'currentColor' },
-          [
-            h('path', {
-              d: 'M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.837-2.194C3.614 12.186 2 10.114 2 7.5A4.5 4.5 0 016.5 3c1.279 0 2.374.612 3.149 1.469C10.376 3.612 11.471 3 12.75 3A4.5 4.5 0 0117.25 7.5c0 2.614-1.614 4.686-3.63 6.526a22.045 22.045 0 01-2.837 2.194 20.759 20.759 0 01-1.162.682l-.019.01-.005.003h-.002L9.653 16.915z',
-            }),
-          ],
-        )
       return { HeartIcon }
     },
     template: `
@@ -138,13 +142,13 @@ export const WithAriaLabel: Story = {
   render: () => ({
     components: { OsIcon },
     setup() {
-      return { IconEye, IconSearch }
+      return { HeartIcon, StarIcon }
     },
     template: `
       <div class="flex items-center gap-4">
         <OsIcon name="close" aria-label="Close dialog" />
-        <OsIcon :icon="IconSearch" aria-label="Search" />
-        <OsIcon :icon="IconEye" aria-label="Show password" />
+        <OsIcon :icon="HeartIcon" aria-label="Favorite" />
+        <OsIcon :icon="StarIcon" aria-label="Rating" />
       </div>
     `,
   }),
@@ -154,15 +158,15 @@ export const InheritColor: Story = {
   render: () => ({
     components: { OsIcon },
     setup() {
-      return { IconEye, IconSearch, IconSpinner }
+      return { HeartIcon, StarIcon }
     },
     template: `
       <div class="flex items-center gap-4 text-lg">
         <span class="text-red-500"><OsIcon name="close" /></span>
         <span class="text-green-500"><OsIcon name="check" /></span>
-        <span class="text-blue-500"><OsIcon :icon="IconSearch" /></span>
-        <span class="text-yellow-500"><OsIcon :icon="IconSpinner" /></span>
-        <span class="text-purple-500"><OsIcon :icon="IconEye" /></span>
+        <span class="text-blue-500"><OsIcon name="plus" /></span>
+        <span class="text-yellow-500"><OsIcon :icon="StarIcon" /></span>
+        <span class="text-purple-500"><OsIcon :icon="HeartIcon" /></span>
       </div>
     `,
   }),

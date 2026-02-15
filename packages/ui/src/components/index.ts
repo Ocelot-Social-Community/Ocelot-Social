@@ -11,16 +11,9 @@ export { OsButton, buttonVariants, type ButtonVariants } from './OsButton'
 export {
   OsIcon,
   ICON_SIZES,
-  IconBars,
   IconCheck,
-  IconChevronDown,
-  IconChevronUp,
   IconClose,
-  IconCopy,
-  IconEye,
-  IconEyeSlash,
-  IconSearch,
-  IconSpinner,
+  IconPlus,
   SYSTEM_ICONS,
   type SystemIconName,
 } from './OsIcon'
