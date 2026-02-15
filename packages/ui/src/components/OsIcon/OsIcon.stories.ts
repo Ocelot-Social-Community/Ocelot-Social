@@ -134,15 +134,11 @@ export const CustomComponent: Story = {
 export const InheritColor: Story = {
   render: () => ({
     components: { OsIcon },
-    setup() {
-      return { HeartIcon }
-    },
     template: `
       <div class="flex items-center gap-4 text-lg">
         <span class="text-red-500"><OsIcon name="close" /></span>
         <span class="text-green-500"><OsIcon name="check" /></span>
         <span class="text-blue-500"><OsIcon name="plus" /></span>
-        <span class="text-purple-500"><OsIcon :icon="HeartIcon" /></span>
       </div>
     `,
   }),
