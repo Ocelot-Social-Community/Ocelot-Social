@@ -45,6 +45,16 @@ test.describe('OcelotIcons keyboard accessibility', () => {
       const icon = icons.nth(i)
 
       await expect(icon).toHaveAttribute('aria-hidden', 'true')
+      const tabindex = await icon.getAttribute('tabindex')
+      expect(tabindex, `icon ${i} should not have tabindex`).toBeNull()
+    }
+
+    // Verify no icon receives focus when tabbing through
+    await page.keyboard.press('Tab')
+    for (let i = 0; i < count; i++) {
+      const icon = icons.nth(i)
+
+      await expect(icon).not.toBeFocused()
     }
   })
 })
