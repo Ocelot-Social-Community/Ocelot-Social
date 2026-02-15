@@ -44,7 +44,7 @@
             @click="toggleFilteredByMyGroups()"
           >
             <template #icon>
-              <base-icon name="users" />
+              <os-icon :icon="IconUsers" />
             </template>
             {{ $t('contribution.filterMyGroups') }}
           </os-button>
@@ -69,6 +69,7 @@ export default {
   },
   created() {
     this.IconUserPlus = ocelotIcons.IconUserPlus
+    this.IconUsers = ocelotIcons.IconUsers
   },
   computed: {
     ...mapGetters({

@@ -97,7 +97,7 @@
                   }"
                 >
                   <template #icon>
-                    <base-icon name="users" />
+                    <os-icon :icon="IconUsers" />
                   </template>
                 </os-button>
               </client-only>
@@ -246,7 +246,7 @@
                   }"
                 >
                   <template #icon>
-                    <base-icon name="users" />
+                    <os-icon :icon="IconUsers" />
                   </template>
                 </os-button>
               </div>
@@ -342,7 +342,8 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters } from 'vuex'
 import isEmpty from 'lodash/isEmpty'
 import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
@@ -366,6 +367,7 @@ export default {
   mixins: [GetCategories],
   components: {
     OsButton,
+    OsIcon,
     AvatarMenu,
     ChatNotificationMenu,
     CustomButton,
@@ -379,6 +381,9 @@ export default {
   },
   props: {
     showMobileMenu: { type: Boolean, default: false },
+  },
+  created() {
+    this.IconUsers = ocelotIcons.IconUsers
   },
   data() {
     return {
