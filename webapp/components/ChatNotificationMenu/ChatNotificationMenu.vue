@@ -1,20 +1,21 @@
 <template>
-  <nuxt-link class="chat-notification-menu" :to="{ name: 'chat' }">
-    <os-button
-      variant="primary"
-      appearance="ghost"
-      circle
-      :aria-label="$t('header.chats.tooltip')"
-      v-tooltip="{
-        content: $t('header.chats.tooltip'),
-        placement: 'bottom-start',
-      }"
-    >
-      <template #icon>
-        <counter-icon icon="chat-bubble" :count="unreadRoomCount" danger />
-      </template>
-    </os-button>
-  </nuxt-link>
+  <os-button
+    as="nuxt-link"
+    :to="{ name: 'chat' }"
+    class="chat-notification-menu"
+    variant="primary"
+    appearance="ghost"
+    circle
+    :aria-label="$t('header.chats.tooltip')"
+    v-tooltip="{
+      content: $t('header.chats.tooltip'),
+      placement: 'bottom-start',
+    }"
+  >
+    <template #icon>
+      <counter-icon icon="chat-bubble" :count="unreadRoomCount" danger />
+    </template>
+  </os-button>
 </template>
 
 <script>

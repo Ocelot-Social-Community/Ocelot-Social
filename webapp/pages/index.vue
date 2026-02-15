@@ -3,24 +3,27 @@
     <!-- create post -->
     <div :class="POST_ADD_BUTTON_POSITION_TOP ? 'box-add-button-top' : ''">
       <client-only>
-        <nuxt-link :to="{ name: 'post-create-type' }" :class="{ 'hide-filter': hideByScroll }">
-          <os-button
-            v-tooltip="{
-              content: $t('contribution.newPost'),
-              placement: 'left',
-            }"
-            class="post-add-button"
-            :class="POST_ADD_BUTTON_POSITION_TOP ? 'post-add-button-top' : 'post-add-button-bottom'"
-            variant="primary"
-            appearance="filled"
-            circle
-            size="xl"
-          >
-            <template #icon>
-              <base-icon name="plus" />
-            </template>
-          </os-button>
-        </nuxt-link>
+        <os-button
+          as="nuxt-link"
+          :to="{ name: 'post-create-type' }"
+          v-tooltip="{
+            content: $t('contribution.newPost'),
+            placement: 'left',
+          }"
+          class="post-add-button"
+          :class="[
+            POST_ADD_BUTTON_POSITION_TOP ? 'post-add-button-top' : 'post-add-button-bottom',
+            { 'hide-filter': hideByScroll },
+          ]"
+          variant="primary"
+          appearance="filled"
+          circle
+          size="xl"
+        >
+          <template #icon>
+            <base-icon name="plus" />
+          </template>
+        </os-button>
       </client-only>
     </div>
     <div>
@@ -356,7 +359,7 @@ export default {
   float: right;
 }
 
-button.post-add-button-bottom {
+.post-add-button-bottom {
   height: 54px !important;
   width: 54px !important;
   min-height: 54px !important;
@@ -370,7 +373,7 @@ button.post-add-button-bottom {
   box-shadow: $box-shadow-x-large !important;
 }
 
-button.post-add-button-top {
+.post-add-button-top {
   height: 54px !important;
   width: 54px !important;
   min-height: 54px !important;
@@ -467,7 +470,7 @@ button.post-add-button-top {
   .box-add-button-top {
     padding-right: 40px;
   }
-  button.post-add-button-top {
+  .post-add-button-top {
     height: 44px !important;
     width: 44px !important;
     min-height: 44px !important;

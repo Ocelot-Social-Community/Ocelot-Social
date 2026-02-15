@@ -34,19 +34,19 @@
     <div v-if="selectedRoom && selectedRoom.roomId" slot="room-options" class="chat-room-options">
       <ds-flex v-if="singleRoom">
         <ds-flex-item centered class="single-chat-bubble">
-          <nuxt-link :to="{ name: 'chat' }">
-            <os-button
-              variant="primary"
-              appearance="ghost"
-              circle
-              size="sm"
-              :aria-label="$t('chat.expandChat')"
-            >
-              <template #icon>
-                <base-icon name="expand" />
-              </template>
-            </os-button>
-          </nuxt-link>
+          <os-button
+            as="nuxt-link"
+            :to="{ name: 'chat' }"
+            variant="primary"
+            appearance="ghost"
+            circle
+            size="sm"
+            :aria-label="$t('chat.expandChat')"
+          >
+            <template #icon>
+              <base-icon name="expand" />
+            </template>
+          </os-button>
         </ds-flex-item>
         <ds-flex-item centered>
           <div class="vac-svg-button vac-room-options">
