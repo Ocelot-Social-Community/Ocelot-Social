@@ -58,9 +58,18 @@ exports[`InvitationList.vue renders 1`] = `
                   class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
                   <span
-                    class="base-icon"
+                    aria-hidden="true"
+                    class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
-                    <!---->
+                    <svg
+                      fill="currentColor"
+                      viewBox="0 0 32 32"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M4 4h16v3h-2v-1h-12v16h5v2h-7v-20zM12 8h16v20h-16v-20zM14 10v16h12v-16h-12z"
+                      />
+                    </svg>
                   </span>
                 </span>
               </span>
@@ -80,9 +89,18 @@ exports[`InvitationList.vue renders 1`] = `
                   class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
                   <span
-                    class="base-icon"
+                    aria-hidden="true"
+                    class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
-                    <!---->
+                    <svg
+                      fill="currentColor"
+                      viewBox="0 0 32 32"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M14.25 4h4c0.522 0 1.061 0.186 1.438 0.563s0.563 0.915 0.563 1.438v1h6v2h-1v16c0 1.645-1.355 3-3 3h-12c-1.645 0-3-1.355-3-3v-16h-1v-2h6v-1c0-0.522 0.185-1.061 0.563-1.438s0.915-0.563 1.438-0.563zM14.25 6v1h4v-1h-4zM9.25 9v16c0 0.555 0.445 1 1 1h12c0.555 0 1-0.445 1-1v-16h-14zM11.25 12h2v11h-2v-11zM15.25 12h2v11h-2v-11zM19.25 12h2v11h-2v-11z"
+                      />
+                    </svg>
                   </span>
                 </span>
               </span>
@@ -140,9 +158,18 @@ exports[`InvitationList.vue renders 1`] = `
                   class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
                   <span
-                    class="base-icon"
+                    aria-hidden="true"
+                    class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
-                    <!---->
+                    <svg
+                      fill="currentColor"
+                      viewBox="0 0 32 32"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M4 4h16v3h-2v-1h-12v16h5v2h-7v-20zM12 8h16v20h-16v-20zM14 10v16h12v-16h-12z"
+                      />
+                    </svg>
                   </span>
                 </span>
               </span>
@@ -162,9 +189,18 @@ exports[`InvitationList.vue renders 1`] = `
                   class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
                   <span
-                    class="base-icon"
+                    aria-hidden="true"
+                    class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
-                    <!---->
+                    <svg
+                      fill="currentColor"
+                      viewBox="0 0 32 32"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M14.25 4h4c0.522 0 1.061 0.186 1.438 0.563s0.563 0.915 0.563 1.438v1h6v2h-1v16c0 1.645-1.355 3-3 3h-12c-1.645 0-3-1.355-3-3v-16h-1v-2h6v-1c0-0.522 0.185-1.061 0.563-1.438s0.915-0.563 1.438-0.563zM14.25 6v1h4v-1h-4zM9.25 9v16c0 0.555 0.445 1 1 1h12c0.555 0 1-0.445 1-1v-16h-14zM11.25 12h2v11h-2v-11zM15.25 12h2v11h-2v-11zM19.25 12h2v11h-2v-11z"
+                      />
+                    </svg>
                   </span>
                 </span>
               </span>
@@ -237,7 +273,7 @@ exports[`InvitationList.vue renders 1`] = `
             >
               <span
                 aria-hidden="true"
-                class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
               >
                 <svg
                   fill="currentColor"
@@ -334,7 +370,7 @@ exports[`InvitationList.vue renders empty state 1`] = `
             >
               <span
                 aria-hidden="true"
-                class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
               >
                 <svg
                   fill="currentColor"

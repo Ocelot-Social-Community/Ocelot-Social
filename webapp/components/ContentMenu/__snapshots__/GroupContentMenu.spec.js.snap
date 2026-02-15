@@ -35,9 +35,18 @@ exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
           class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
         >
           <span
-            class="base-icon"
+            aria-hidden="true"
+            class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
           >
-            <!---->
+            <svg
+              fill="currentColor"
+              viewBox="0 0 32 32"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M16 6c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 14c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 22c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z"
+              />
+            </svg>
           </span>
         </span>
       </span>
@@ -160,9 +169,18 @@ exports[`GroupContentMenu renders as groupProfile, muted 1`] = `
           class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
         >
           <span
-            class="base-icon"
+            aria-hidden="true"
+            class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
           >
-            <!---->
+            <svg
+              fill="currentColor"
+              viewBox="0 0 32 32"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M16 6c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 14c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 22c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z"
+              />
+            </svg>
           </span>
         </span>
       </span>
@@ -243,9 +261,18 @@ exports[`GroupContentMenu renders as groupProfile, not muted 1`] = `
           class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
         >
           <span
-            class="base-icon"
+            aria-hidden="true"
+            class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
           >
-            <!---->
+            <svg
+              fill="currentColor"
+              viewBox="0 0 32 32"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M16 6c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 14c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 22c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z"
+              />
+            </svg>
           </span>
         </span>
       </span>
@@ -326,9 +353,18 @@ exports[`GroupContentMenu renders as groupTeaser 1`] = `
           class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
         >
           <span
-            class="base-icon"
+            aria-hidden="true"
+            class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
           >
-            <!---->
+            <svg
+              fill="currentColor"
+              viewBox="0 0 32 32"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M16 6c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 14c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 22c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z"
+              />
+            </svg>
           </span>
         </span>
       </span>

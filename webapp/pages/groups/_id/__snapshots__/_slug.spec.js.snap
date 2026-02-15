@@ -98,9 +98,18 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                     class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
                     <span
-                      class="base-icon"
+                      aria-hidden="true"
+                      class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                     >
-                      <!---->
+                      <svg
+                        fill="currentColor"
+                        viewBox="0 0 32 32"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M16 6c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 14c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 22c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z"
+                        />
+                      </svg>
                     </span>
                   </span>
                 </span>
@@ -214,9 +223,18 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="location"
               >
                 <span
-                  class="base-icon"
+                  aria-hidden="true"
+                  class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
-                  <!---->
+                  <svg
+                    fill="currentColor"
+                    viewBox="0 0 32 32"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M16 3c4.959 0 9 4.042 9 9 0 1.406-0.57 3.020-1.344 4.781s-1.77 3.631-2.781 5.375c-2.023 3.488-4.063 6.406-4.063 6.406l-0.813 1.188-0.813-1.188s-2.039-2.918-4.063-6.406c-1.012-1.744-2.007-3.613-2.781-5.375s-1.344-3.375-1.344-4.781c0-4.958 4.041-9 9-9zM16 5c-3.877 0-7 3.123-7 7 0 0.803 0.43 2.316 1.156 3.969s1.73 3.484 2.719 5.188c1.572 2.71 2.546 4.144 3.125 5 0.579-0.856 1.553-2.29 3.125-5 0.988-1.704 1.993-3.535 2.719-5.188s1.156-3.166 1.156-3.969c0-3.877-3.122-7-7-7zM16 10c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z"
+                    />
+                  </svg>
                 </span>
                 
     Paris
@@ -297,9 +315,18 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                   class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
-                    class="base-icon"
+                    aria-hidden="true"
+                    class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
-                    <!---->
+                    <svg
+                      fill="currentColor"
+                      viewBox="0 0 32 32"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M15 4.594v22.813l-1.719-1.688-4.719-4.719h-4.563v-10h4.563l4.719-4.719zM24.125 6.375c2.385 2.511 3.875 5.896 3.875 9.625s-1.49 7.113-3.875 9.625l-1.406-1.406c2.024-2.149 3.281-5.041 3.281-8.219s-1.257-6.071-3.281-8.219zM21.313 9.188c1.661 1.786 2.688 4.187 2.688 6.813s-1.026 5.026-2.688 6.813l-1.406-1.438c1.3-1.424 2.094-3.3 2.094-5.375s-0.794-3.952-2.094-5.375zM13 9.438l-3.281 3.281-0.313 0.281h-3.406v6h3.406l0.313 0.281 3.281 3.281v-13.125zM18.5 12.031c0.939 1.059 1.5 2.446 1.5 3.969s-0.561 2.91-1.5 3.969l-1.438-1.438c0.578-0.694 0.938-1.559 0.938-2.531s-0.36-1.837-0.938-2.531z"
+                      />
+                    </svg>
                   </span>
                 </span>
                 
@@ -949,7 +976,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               >
                 <span
                   aria-hidden="true"
-                  class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
                   <svg
                     fill="currentColor"
@@ -1135,9 +1162,18 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="location"
               >
                 <span
-                  class="base-icon"
+                  aria-hidden="true"
+                  class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
-                  <!---->
+                  <svg
+                    fill="currentColor"
+                    viewBox="0 0 32 32"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M16 3c4.959 0 9 4.042 9 9 0 1.406-0.57 3.020-1.344 4.781s-1.77 3.631-2.781 5.375c-2.023 3.488-4.063 6.406-4.063 6.406l-0.813 1.188-0.813-1.188s-2.039-2.918-4.063-6.406c-1.012-1.744-2.007-3.613-2.781-5.375s-1.344-3.375-1.344-4.781c0-4.958 4.041-9 9-9zM16 5c-3.877 0-7 3.123-7 7 0 0.803 0.43 2.316 1.156 3.969s1.73 3.484 2.719 5.188c1.572 2.71 2.546 4.144 3.125 5 0.579-0.856 1.553-2.29 3.125-5 0.988-1.704 1.993-3.535 2.719-5.188s1.156-3.166 1.156-3.969c0-3.877-3.122-7-7-7zM16 10c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z"
+                    />
+                  </svg>
                 </span>
                 
     Paris
@@ -1180,9 +1216,18 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                   class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
-                    class="base-icon"
+                    aria-hidden="true"
+                    class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
-                    <!---->
+                    <svg
+                      fill="currentColor"
+                      viewBox="0 0 32 32"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M15 4.594v22.813l-1.719-1.688-4.719-4.719h-4.563v-10h4.563l4.719-4.719zM24.125 6.375c2.385 2.511 3.875 5.896 3.875 9.625s-1.49 7.113-3.875 9.625l-1.406-1.406c2.024-2.149 3.281-5.041 3.281-8.219s-1.257-6.071-3.281-8.219zM21.313 9.188c1.661 1.786 2.688 4.187 2.688 6.813s-1.026 5.026-2.688 6.813l-1.406-1.438c1.3-1.424 2.094-3.3 2.094-5.375s-0.794-3.952-2.094-5.375zM13 9.438l-3.281 3.281-0.313 0.281h-3.406v6h3.406l0.313 0.281 3.281 3.281v-13.125zM18.5 12.031c0.939 1.059 1.5 2.446 1.5 3.969s-0.561 2.91-1.5 3.969l-1.438-1.438c0.578-0.694 0.938-1.559 0.938-2.531s-0.36-1.837-0.938-2.531z"
+                      />
+                    </svg>
                   </span>
                 </span>
                 
@@ -1627,9 +1672,18 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="location"
               >
                 <span
-                  class="base-icon"
+                  aria-hidden="true"
+                  class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
-                  <!---->
+                  <svg
+                    fill="currentColor"
+                    viewBox="0 0 32 32"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M16 3c4.959 0 9 4.042 9 9 0 1.406-0.57 3.020-1.344 4.781s-1.77 3.631-2.781 5.375c-2.023 3.488-4.063 6.406-4.063 6.406l-0.813 1.188-0.813-1.188s-2.039-2.918-4.063-6.406c-1.012-1.744-2.007-3.613-2.781-5.375s-1.344-3.375-1.344-4.781c0-4.958 4.041-9 9-9zM16 5c-3.877 0-7 3.123-7 7 0 0.803 0.43 2.316 1.156 3.969s1.73 3.484 2.719 5.188c1.572 2.71 2.546 4.144 3.125 5 0.579-0.856 1.553-2.29 3.125-5 0.988-1.704 1.993-3.535 2.719-5.188s1.156-3.166 1.156-3.969c0-3.877-3.122-7-7-7zM16 10c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z"
+                    />
+                  </svg>
                 </span>
                 
     Paris
@@ -1672,9 +1726,18 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                   class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
-                    class="base-icon"
+                    aria-hidden="true"
+                    class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
-                    <!---->
+                    <svg
+                      fill="currentColor"
+                      viewBox="0 0 32 32"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M15 4.594v22.813l-1.719-1.688-4.719-4.719h-4.563v-10h4.563l4.719-4.719zM24.125 6.375c2.385 2.511 3.875 5.896 3.875 9.625s-1.49 7.113-3.875 9.625l-1.406-1.406c2.024-2.149 3.281-5.041 3.281-8.219s-1.257-6.071-3.281-8.219zM21.313 9.188c1.661 1.786 2.688 4.187 2.688 6.813s-1.026 5.026-2.688 6.813l-1.406-1.438c1.3-1.424 2.094-3.3 2.094-5.375s-0.794-3.952-2.094-5.375zM13 9.438l-3.281 3.281-0.313 0.281h-3.406v6h3.406l0.313 0.281 3.281 3.281v-13.125zM18.5 12.031c0.939 1.059 1.5 2.446 1.5 3.969s-0.561 2.91-1.5 3.969l-1.438-1.438c0.578-0.694 0.938-1.559 0.938-2.531s-0.36-1.837-0.938-2.531z"
+                      />
+                    </svg>
                   </span>
                 </span>
                 
@@ -2142,9 +2205,18 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                     class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
                     <span
-                      class="base-icon"
+                      aria-hidden="true"
+                      class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                     >
-                      <!---->
+                      <svg
+                        fill="currentColor"
+                        viewBox="0 0 32 32"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M16 6c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 14c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 22c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z"
+                        />
+                      </svg>
                     </span>
                   </span>
                 </span>
@@ -2216,9 +2288,18 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                 class="location"
               >
                 <span
-                  class="base-icon"
+                  aria-hidden="true"
+                  class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
-                  <!---->
+                  <svg
+                    fill="currentColor"
+                    viewBox="0 0 32 32"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M16 3c4.959 0 9 4.042 9 9 0 1.406-0.57 3.020-1.344 4.781s-1.77 3.631-2.781 5.375c-2.023 3.488-4.063 6.406-4.063 6.406l-0.813 1.188-0.813-1.188s-2.039-2.918-4.063-6.406c-1.012-1.744-2.007-3.613-2.781-5.375s-1.344-3.375-1.344-4.781c0-4.958 4.041-9 9-9zM16 5c-3.877 0-7 3.123-7 7 0 0.803 0.43 2.316 1.156 3.969s1.73 3.484 2.719 5.188c1.572 2.71 2.546 4.144 3.125 5 0.579-0.856 1.553-2.29 3.125-5 0.988-1.704 1.993-3.535 2.719-5.188s1.156-3.166 1.156-3.969c0-3.877-3.122-7-7-7zM16 10c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z"
+                    />
+                  </svg>
                 </span>
                 
     Paris
@@ -2299,9 +2380,18 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                   class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current -ml-1"
                 >
                   <span
-                    class="base-icon"
+                    aria-hidden="true"
+                    class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
-                    <!---->
+                    <svg
+                      fill="currentColor"
+                      viewBox="0 0 32 32"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M15 4.594v22.813l-1.719-1.688-4.719-4.719h-4.563v-10h4.563l4.719-4.719zM24.125 6.375c2.385 2.511 3.875 5.896 3.875 9.625s-1.49 7.113-3.875 9.625l-1.406-1.406c2.024-2.149 3.281-5.041 3.281-8.219s-1.257-6.071-3.281-8.219zM21.313 9.188c1.661 1.786 2.688 4.187 2.688 6.813s-1.026 5.026-2.688 6.813l-1.406-1.438c1.3-1.424 2.094-3.3 2.094-5.375s-0.794-3.952-2.094-5.375zM13 9.438l-3.281 3.281-0.313 0.281h-3.406v6h3.406l0.313 0.281 3.281 3.281v-13.125zM18.5 12.031c0.939 1.059 1.5 2.446 1.5 3.969s-0.561 2.91-1.5 3.969l-1.438-1.438c0.578-0.694 0.938-1.559 0.938-2.531s-0.36-1.837-0.938-2.531z"
+                      />
+                    </svg>
                   </span>
                 </span>
                 
@@ -2950,7 +3040,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               >
                 <span
                   aria-hidden="true"
-                  class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
                   <svg
                     fill="currentColor"
@@ -3167,9 +3257,18 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
                     <span
-                      class="base-icon"
+                      aria-hidden="true"
+                      class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                     >
-                      <!---->
+                      <svg
+                        fill="currentColor"
+                        viewBox="0 0 32 32"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M16 6c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 14c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 22c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z"
+                        />
+                      </svg>
                     </span>
                   </span>
                 </span>
@@ -3970,7 +4069,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               >
                 <span
                   aria-hidden="true"
-                  class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
                   <svg
                     fill="currentColor"
@@ -5813,9 +5912,18 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
                     <span
-                      class="base-icon"
+                      aria-hidden="true"
+                      class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                     >
-                      <!---->
+                      <svg
+                        fill="currentColor"
+                        viewBox="0 0 32 32"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M16 6c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 14c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 22c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z"
+                        />
+                      </svg>
                     </span>
                   </span>
                 </span>
@@ -6573,7 +6681,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               >
                 <span
                   aria-hidden="true"
-                  class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
                   <svg
                     fill="currentColor"
@@ -6790,9 +6898,18 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                     class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
                     <span
-                      class="base-icon"
+                      aria-hidden="true"
+                      class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                     >
-                      <!---->
+                      <svg
+                        fill="currentColor"
+                        viewBox="0 0 32 32"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M16 6c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 14c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 22c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z"
+                        />
+                      </svg>
                     </span>
                   </span>
                 </span>
@@ -6906,9 +7023,18 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class="location"
               >
                 <span
-                  class="base-icon"
+                  aria-hidden="true"
+                  class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
-                  <!---->
+                  <svg
+                    fill="currentColor"
+                    viewBox="0 0 32 32"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M16 3c4.959 0 9 4.042 9 9 0 1.406-0.57 3.020-1.344 4.781s-1.77 3.631-2.781 5.375c-2.023 3.488-4.063 6.406-4.063 6.406l-0.813 1.188-0.813-1.188s-2.039-2.918-4.063-6.406c-1.012-1.744-2.007-3.613-2.781-5.375s-1.344-3.375-1.344-4.781c0-4.958 4.041-9 9-9zM16 5c-3.877 0-7 3.123-7 7 0 0.803 0.43 2.316 1.156 3.969s1.73 3.484 2.719 5.188c1.572 2.71 2.546 4.144 3.125 5 0.579-0.856 1.553-2.29 3.125-5 0.988-1.704 1.993-3.535 2.719-5.188s1.156-3.166 1.156-3.969c0-3.877-3.122-7-7-7zM16 10c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z"
+                    />
+                  </svg>
                 </span>
                 
     Hamburg
@@ -7658,7 +7784,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               >
                 <span
                   aria-hidden="true"
-                  class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
                   <svg
                     fill="currentColor"
@@ -7859,9 +7985,18 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                     class="os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                   >
                     <span
-                      class="base-icon"
+                      aria-hidden="true"
+                      class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                     >
-                      <!---->
+                      <svg
+                        fill="currentColor"
+                        viewBox="0 0 32 32"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M16 6c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 14c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2zM16 22c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z"
+                        />
+                      </svg>
                     </span>
                   </span>
                 </span>
@@ -7933,9 +8068,18 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 class="location"
               >
                 <span
-                  class="base-icon"
+                  aria-hidden="true"
+                  class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
-                  <!---->
+                  <svg
+                    fill="currentColor"
+                    viewBox="0 0 32 32"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M16 3c4.959 0 9 4.042 9 9 0 1.406-0.57 3.020-1.344 4.781s-1.77 3.631-2.781 5.375c-2.023 3.488-4.063 6.406-4.063 6.406l-0.813 1.188-0.813-1.188s-2.039-2.918-4.063-6.406c-1.012-1.744-2.007-3.613-2.781-5.375s-1.344-3.375-1.344-4.781c0-4.958 4.041-9 9-9zM16 5c-3.877 0-7 3.123-7 7 0 0.803 0.43 2.316 1.156 3.969s1.73 3.484 2.719 5.188c1.572 2.71 2.546 4.144 3.125 5 0.579-0.856 1.553-2.29 3.125-5 0.988-1.704 1.993-3.535 2.719-5.188s1.156-3.166 1.156-3.969c0-3.877-3.122-7-7-7zM16 10c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z"
+                    />
+                  </svg>
                 </span>
                 
     Hamburg
@@ -8684,7 +8828,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               >
                 <span
                   aria-hidden="true"
-                  class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+                  class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
                 >
                   <svg
                     fill="currentColor"
