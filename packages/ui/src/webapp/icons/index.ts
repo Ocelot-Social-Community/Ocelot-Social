@@ -1,4 +1,23 @@
-// Auto-generated — do not edit
-import _IconAngleDown from './svgs/angle-down.svg?icon'
+import type { VNode } from 'vue-demi'
 
-export const IconAngleDown = _IconAngleDown
+const modules = import.meta.glob<() => VNode>('./svgs/*.svg', {
+  query: '?icon',
+  eager: true,
+  import: 'default',
+})
+
+function toName(path: string): string {
+  return (
+    'Icon' +
+    path
+      .replace('./svgs/', '')
+      .replace('.svg', '')
+      .split('-')
+      .map((s) => s[0].toUpperCase() + s.slice(1))
+      .join('')
+  )
+}
+
+export const webappIcons: Record<string, () => VNode> = Object.fromEntries(
+  Object.entries(modules).map(([path, icon]) => [toName(path), icon]),
+)

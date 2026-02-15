@@ -65,7 +65,6 @@
     "size": "size-limit",
     "size:check": "size-limit --json",
     "validate": "publint && attw --pack . --profile node16 --exclude-entrypoints ./style.css",
-    "generate:webapp-icons": "tsx scripts/generate-webapp-icons.ts",
     "prepublishOnly": "npm run build && npm run validate"
   },
   "peerDependencies": {

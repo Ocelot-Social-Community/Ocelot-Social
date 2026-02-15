@@ -4,11 +4,21 @@ import { h } from 'vue'
 
 import OsIcon from '#src/components/OsIcon/OsIcon.vue'
 
-import { IconAngleDown } from './index'
+import { webappIcons } from './index'
 
 describe('webapp icons', () => {
+  const IconAngleDown = webappIcons.IconAngleDown
+
   describe('exports', () => {
-    it('exports IconAngleDown as a function', () => {
+    it('exports webappIcons as a record of functions', () => {
+      expectTypeOf(webappIcons).toBeObject()
+
+      expect(Object.keys(webappIcons).length).toBeGreaterThan(0)
+    })
+
+    it('auto-discovers all SVGs in svgs/ directory', () => {
+      expect(webappIcons).toHaveProperty('IconAngleDown')
+
       expectTypeOf(IconAngleDown).toBeFunction()
     })
   })
