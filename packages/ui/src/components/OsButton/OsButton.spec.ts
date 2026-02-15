@@ -9,12 +9,14 @@ describe('osButton', () => {
     const wrapper = mount(OsButton, {
       slots: { default: 'Click me' },
     })
+
     expect(wrapper.text()).toBe('Click me')
   })
 
   describe('variant prop', () => {
     it('applies default variant classes by default', () => {
       const wrapper = mount(OsButton)
+
       // Default variant with filled appearance
       expect(wrapper.classes()).toContain('bg-[var(--color-default)]')
     })
@@ -23,6 +25,7 @@ describe('osButton', () => {
       const wrapper = mount(OsButton, {
         props: { variant: 'primary' },
       })
+
       expect(wrapper.classes()).toContain('bg-[var(--color-primary)]')
     })
 
@@ -30,6 +33,7 @@ describe('osButton', () => {
       const wrapper = mount(OsButton, {
         props: { variant: 'danger' },
       })
+
       expect(wrapper.classes()).toContain('bg-[var(--color-danger)]')
     })
   })
@@ -37,6 +41,7 @@ describe('osButton', () => {
   describe('appearance prop', () => {
     it('applies filled appearance by default', () => {
       const wrapper = mount(OsButton)
+
       expect(wrapper.classes()).toContain('shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]')
     })
 
@@ -44,6 +49,7 @@ describe('osButton', () => {
       const wrapper = mount(OsButton, {
         props: { appearance: 'outline', variant: 'primary' },
       })
+
       expect(wrapper.classes()).toContain('bg-transparent')
       expect(wrapper.classes()).toContain('border-[var(--color-primary)]')
       expect(wrapper.classes()).toContain('text-[var(--color-primary)]')
@@ -53,6 +59,7 @@ describe('osButton', () => {
       const wrapper = mount(OsButton, {
         props: { appearance: 'ghost', variant: 'primary' },
       })
+
       expect(wrapper.classes()).toContain('bg-transparent')
       expect(wrapper.classes()).toContain('text-[var(--color-primary)]')
       expect(wrapper.classes()).not.toContain('border-[var(--color-primary)]')
@@ -62,6 +69,7 @@ describe('osButton', () => {
   describe('size prop', () => {
     it('applies md size by default', () => {
       const wrapper = mount(OsButton)
+
       expect(wrapper.classes()).toContain('h-[36px]')
     })
 
@@ -69,6 +77,7 @@ describe('osButton', () => {
       const wrapper = mount(OsButton, {
         props: { size: 'sm' },
       })
+
       expect(wrapper.classes()).toContain('h-[26px]')
       expect(wrapper.classes()).toContain('text-[12px]')
     })
@@ -77,6 +86,7 @@ describe('osButton', () => {
       const wrapper = mount(OsButton, {
         props: { size: 'lg' },
       })
+
       expect(wrapper.classes()).toContain('h-12')
     })
 
@@ -89,6 +99,7 @@ describe('osButton', () => {
       } as const
       for (const [size, expected] of Object.entries(sizes)) {
         const wrapper = mount(OsButton, { props: { size: size as keyof typeof sizes } })
+
         expect(wrapper.classes()).toContain(expected)
       }
     })
@@ -98,6 +109,7 @@ describe('osButton', () => {
     const wrapper = mount(OsButton, {
       props: { fullWidth: true },
     })
+
     expect(wrapper.classes()).toContain('w-full')
   })
 
@@ -105,6 +117,7 @@ describe('osButton', () => {
     const wrapper = mount(OsButton, {
       attrs: { class: 'my-custom-class' },
     })
+
     expect(wrapper.classes()).toContain('my-custom-class')
   })
 
@@ -112,11 +125,13 @@ describe('osButton', () => {
     const wrapper = mount(OsButton, {
       props: { disabled: true },
     })
+
     expect(wrapper.attributes('disabled')).toBeDefined()
   })
 
   it('defaults to type="button"', () => {
     const wrapper = mount(OsButton)
+
     expect(wrapper.attributes('type')).toBe('button')
   })
 
@@ -124,6 +139,7 @@ describe('osButton', () => {
     const wrapper = mount(OsButton, {
       props: { type: 'submit' },
     })
+
     expect(wrapper.attributes('type')).toBe('submit')
   })
 
@@ -131,6 +147,7 @@ describe('osButton', () => {
     const wrapper = mount(OsButton, {
       props: { variant: 'danger' },
     })
+
     expect(wrapper.attributes('data-variant')).toBe('danger')
   })
 
@@ -138,18 +155,21 @@ describe('osButton', () => {
     const wrapper = mount(OsButton, {
       props: { appearance: 'outline' },
     })
+
     expect(wrapper.attributes('data-appearance')).toBe('outline')
   })
 
   it('emits click event', async () => {
     const wrapper = mount(OsButton)
     await wrapper.trigger('click')
+
     expect(wrapper.emitted('click')).toHaveLength(1)
   })
 
   describe('focus styles', () => {
     it('default variant has dashed outline focus style using currentColor', () => {
       const wrapper = mount(OsButton)
+
       expect(wrapper.classes()).toContain('focus:outline-dashed')
       expect(wrapper.classes()).toContain('focus:outline-current')
       expect(wrapper.classes()).toContain('focus:outline-1')
@@ -159,6 +179,7 @@ describe('osButton', () => {
       const wrapper = mount(OsButton, {
         props: { variant: 'primary' },
       })
+
       expect(wrapper.classes()).toContain('focus:outline-dashed')
       expect(wrapper.classes()).toContain('focus:outline-1')
     })
@@ -170,8 +191,9 @@ describe('osButton', () => {
         slots: { icon: '<svg data-testid="icon"></svg>' },
       })
       const iconWrapper = wrapper.find('.os-button__icon')
-      expect(iconWrapper.exists()).toBeTruthy()
-      expect(iconWrapper.find('[data-testid="icon"]').exists()).toBeTruthy()
+
+      expect(iconWrapper.exists()).toBe(true)
+      expect(iconWrapper.find('[data-testid="icon"]').exists()).toBe(true)
     })
 
     it('renders both icon and text', () => {
@@ -181,7 +203,8 @@ describe('osButton', () => {
           default: 'Save',
         },
       })
-      expect(wrapper.find('.os-button__icon').exists()).toBeTruthy()
+
+      expect(wrapper.find('.os-button__icon').exists()).toBe(true)
       expect(wrapper.text()).toContain('Save')
     })
 
@@ -193,6 +216,7 @@ describe('osButton', () => {
         },
       })
       const contentSpan = wrapper.find('button > span')
+
       expect(contentSpan.classes()).toContain('gap-2')
     })
 
@@ -205,6 +229,7 @@ describe('osButton', () => {
         },
       })
       const contentSpan = wrapper.find('button > span')
+
       expect(contentSpan.classes()).toContain('gap-1')
       expect(contentSpan.classes()).not.toContain('gap-2')
     })
@@ -214,6 +239,7 @@ describe('osButton', () => {
         slots: { icon: '<svg></svg>' },
       })
       const contentSpan = wrapper.find('button > span')
+
       expect(contentSpan.classes()).not.toContain('gap-2')
     })
 
@@ -225,6 +251,7 @@ describe('osButton', () => {
         },
       })
       const contentSpan = wrapper.find('button > span')
+
       expect(contentSpan.classes()).not.toContain('gap-2')
       expect(wrapper.find('.os-button__icon').classes()).toContain('-mr-1')
     })
@@ -234,6 +261,7 @@ describe('osButton', () => {
         slots: { default: 'Click me' },
       })
       const contentSpan = wrapper.find('button > span')
+
       expect(contentSpan.classes()).not.toContain('gap-2')
     })
 
@@ -241,7 +269,8 @@ describe('osButton', () => {
       const wrapper = mount(OsButton, {
         slots: { default: 'Click me' },
       })
-      expect(wrapper.find('.os-button__icon').exists()).toBeFalsy()
+
+      expect(wrapper.find('.os-button__icon').exists()).toBe(false)
       expect(wrapper.text()).toBe('Click me')
     })
 
@@ -249,7 +278,8 @@ describe('osButton', () => {
       const wrapper = mount(OsButton, {
         slots: { icon: '<svg></svg>' },
       })
-      expect(wrapper.find('.os-button__icon').exists()).toBeTruthy()
+
+      expect(wrapper.find('.os-button__icon').exists()).toBe(true)
       expect(wrapper.text()).toBe('')
     })
   })
@@ -261,6 +291,7 @@ describe('osButton', () => {
         slots: { icon: '<svg></svg>' },
         attrs: { 'aria-label': 'Add' },
       })
+
       expect(wrapper.classes()).toContain('rounded-full')
       expect(wrapper.classes()).toContain('p-0')
     })
@@ -271,6 +302,7 @@ describe('osButton', () => {
         slots: { icon: '<svg></svg>' },
         attrs: { 'aria-label': 'Add' },
       })
+
       expect(wrapper.classes()).toContain('w-[36px]')
     })
 
@@ -280,6 +312,7 @@ describe('osButton', () => {
         slots: { icon: '<svg></svg>' },
         attrs: { 'aria-label': 'Add' },
       })
+
       expect(wrapper.classes()).toContain('w-[26px]')
     })
 
@@ -289,6 +322,7 @@ describe('osButton', () => {
         slots: { icon: '<svg></svg>' },
         attrs: { 'aria-label': 'Add' },
       })
+
       expect(wrapper.classes()).toContain('w-12')
     })
 
@@ -298,6 +332,7 @@ describe('osButton', () => {
         slots: { icon: '<svg></svg>' },
         attrs: { 'aria-label': 'Add' },
       })
+
       expect(wrapper.classes()).toContain('w-14')
     })
 
@@ -307,6 +342,7 @@ describe('osButton', () => {
         slots: { icon: '<svg></svg>' },
         attrs: { 'aria-label': 'Add' },
       })
+
       expect(wrapper.classes()).toContain('rounded-full')
       expect(wrapper.classes()).toContain('bg-[var(--color-primary)]')
     })
@@ -317,6 +353,7 @@ describe('osButton', () => {
         slots: { icon: '<svg></svg>' },
         attrs: { 'aria-label': 'Add' },
       })
+
       expect(wrapper.classes()).toContain('rounded-full')
       expect(wrapper.classes()).toContain('bg-transparent')
     })
@@ -328,6 +365,7 @@ describe('osButton', () => {
         attrs: { 'aria-label': 'Add' },
       })
       const iconWrapper = wrapper.find('.os-button__icon')
+
       expect(iconWrapper.classes()).not.toContain('-ml-1')
       expect(iconWrapper.classes()).not.toContain('-mr-1')
     })
@@ -341,6 +379,7 @@ describe('osButton', () => {
         },
       })
       const contentSpan = wrapper.find('button > span')
+
       expect(contentSpan.classes()).toContain('gap-1')
       expect(contentSpan.classes()).not.toContain('gap-2')
     })
@@ -350,6 +389,7 @@ describe('osButton', () => {
         props: { circle: false },
         slots: { default: 'Click me' },
       })
+
       expect(wrapper.classes()).not.toContain('rounded-full')
       expect(wrapper.classes()).not.toContain('p-0')
     })
@@ -361,8 +401,9 @@ describe('osButton', () => {
         props: { loading: true },
         slots: { default: 'Save' },
       })
-      expect(wrapper.find('.os-button__spinner').exists()).toBeTruthy()
-      expect(wrapper.find('svg').exists()).toBeTruthy()
+
+      expect(wrapper.find('.os-button__spinner').exists()).toBe(true)
+      expect(wrapper.find('svg').exists()).toBe(true)
     })
 
     it('disables button when loading=true', () => {
@@ -370,6 +411,7 @@ describe('osButton', () => {
         props: { loading: true },
         slots: { default: 'Save' },
       })
+
       expect(wrapper.attributes('disabled')).toBeDefined()
     })
 
@@ -378,6 +420,7 @@ describe('osButton', () => {
         props: { loading: true },
         slots: { default: 'Save' },
       })
+
       expect(wrapper.attributes('aria-busy')).toBe('true')
     })
 
@@ -387,6 +430,7 @@ describe('osButton', () => {
         slots: { default: 'Save' },
       })
       const contentSpan = wrapper.find('span')
+
       expect(contentSpan.classes()).not.toContain('opacity-0')
       expect(wrapper.text()).toContain('Save')
     })
@@ -395,13 +439,15 @@ describe('osButton', () => {
       const wrapper = mount(OsButton, {
         slots: { default: 'Save' },
       })
-      expect(wrapper.find('.os-button__spinner').exists()).toBeFalsy()
+
+      expect(wrapper.find('.os-button__spinner').exists()).toBe(false)
     })
 
     it('does not set aria-busy when not loading', () => {
       const wrapper = mount(OsButton, {
         slots: { default: 'Save' },
       })
+
       expect(wrapper.attributes('aria-busy')).toBeUndefined()
     })
 
@@ -410,6 +456,7 @@ describe('osButton', () => {
         props: { loading: true, disabled: true },
         slots: { default: 'Save' },
       })
+
       expect(wrapper.attributes('disabled')).toBeDefined()
     })
 
@@ -419,6 +466,7 @@ describe('osButton', () => {
         slots: { default: 'Save' },
       })
       await wrapper.trigger('click')
+
       expect(wrapper.emitted('click')).toBeUndefined()
     })
 
@@ -431,8 +479,9 @@ describe('osButton', () => {
         },
       })
       const iconWrapper = wrapper.find('.os-button__icon')
-      expect(iconWrapper.exists()).toBeTruthy()
-      expect(iconWrapper.find('.os-button__spinner').exists()).toBeTruthy()
+
+      expect(iconWrapper.exists()).toBe(true)
+      expect(iconWrapper.find('.os-button__spinner').exists()).toBe(true)
     })
 
     it('keeps icon visible when loading with icon', () => {
@@ -444,6 +493,7 @@ describe('osButton', () => {
         },
       })
       const iconWrapper = wrapper.find('.os-button__icon')
+
       expect(iconWrapper.classes()).not.toContain('[&>*]:invisible')
     })
 
@@ -454,7 +504,8 @@ describe('osButton', () => {
       })
       // Spinner is a direct child of button, not inside content wrapper
       const spinner = wrapper.find('button > .os-button__spinner')
-      expect(spinner.exists()).toBeTruthy()
+
+      expect(spinner.exists()).toBe(true)
     })
 
     it('does not render button-level spinner when icon is present', () => {
@@ -467,7 +518,8 @@ describe('osButton', () => {
       })
       // No spinner as direct child of button — it's inside the icon wrapper
       const buttonSpinner = wrapper.find('button > .os-button__spinner')
-      expect(buttonSpinner.exists()).toBeFalsy()
+
+      expect(buttonSpinner.exists()).toBe(false)
     })
 
     it('keeps icon visible and shows spinner for icon-only loading', () => {
@@ -476,9 +528,10 @@ describe('osButton', () => {
         slots: { icon: '<svg data-testid="icon"></svg>' },
       })
       const iconWrapper = wrapper.find('.os-button__icon')
-      expect(iconWrapper.exists()).toBeTruthy()
-      expect(iconWrapper.find('[data-testid="icon"]').exists()).toBeTruthy()
-      expect(iconWrapper.find('.os-button__spinner').exists()).toBeTruthy()
+
+      expect(iconWrapper.exists()).toBe(true)
+      expect(iconWrapper.find('[data-testid="icon"]').exists()).toBe(true)
+      expect(iconWrapper.find('.os-button__spinner').exists()).toBe(true)
       expect(iconWrapper.classes()).not.toContain('[&>*]:invisible')
     })
 
@@ -488,8 +541,9 @@ describe('osButton', () => {
         slots: { icon: '<svg></svg>' },
         attrs: { 'aria-label': 'Add' },
       })
+
       expect(wrapper.classes()).toContain('rounded-full')
-      expect(wrapper.find('.os-button__spinner').exists()).toBeTruthy()
+      expect(wrapper.find('.os-button__spinner').exists()).toBe(true)
       expect(wrapper.attributes('disabled')).toBeDefined()
       expect(wrapper.attributes('aria-busy')).toBe('true')
     })
@@ -551,12 +605,14 @@ describe('osButton', () => {
   describe('keyboard accessibility', () => {
     it('renders as native button element for keyboard support', () => {
       const wrapper = mount(OsButton)
+
       // Native button elements have built-in Enter/Space key support
       expect((wrapper.element as HTMLElement).tagName).toBe('BUTTON')
     })
 
     it('is focusable by default', () => {
       const wrapper = mount(OsButton)
+
       // No tabindex=-1 means button is in natural tab order
       expect(wrapper.attributes('tabindex')).toBeUndefined()
     })
@@ -565,6 +621,7 @@ describe('osButton', () => {
       const wrapper = mount(OsButton, {
         props: { disabled: true },
       })
+
       // Disabled buttons have disabled attribute which browsers handle correctly
       expect(wrapper.attributes('disabled')).toBeDefined()
     })
@@ -574,6 +631,7 @@ describe('osButton', () => {
         slots: { icon: '<svg></svg>' },
         attrs: { 'aria-label': 'Close' },
       })
+
       expect(wrapper.attributes('aria-label')).toBe('Close')
       expect(wrapper.attributes('tabindex')).toBeUndefined()
     })
@@ -582,7 +640,9 @@ describe('osButton', () => {
       const wrapper = mount(OsButton, { attachTo: document.body })
       const button = wrapper.element as HTMLButtonElement
       button.focus()
+
       expect(document.activeElement).toBe(button)
+
       wrapper.unmount()
     })
   })

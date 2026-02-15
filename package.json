@@ -1,6 +1,6 @@
 {
   "name": "ocelot-social",
-  "version": "3.14.0",
+  "version": "3.14.1",
   "description": "Free and open source software program code available to run social networks.",
   "author": "ocelot.social Community",
   "license": "MIT",
@@ -46,13 +46,13 @@
     "cypress": "^15.10.0",
     "cypress-network-idle": "^1.15.0",
     "date-fns": "^3.6.0",
-    "dotenv": "^17.2.4",
+    "dotenv": "^17.3.1",
     "graphql-request": "^2.0.0",
     "mock-socket": "^9.0.3",
     "multiple-cucumber-html-reporter": "^3.9.3",
     "node-polyfill-webpack-plugin": "^4.1.0",
     "sass-embedded": "^1.97.3",
-    "webpack": "^5.105.0"
+    "webpack": "^5.105.2"
   },
   "optionalDependencies": {
     "@vuepress/bundler-vite": "^2.0.0-rc.18",

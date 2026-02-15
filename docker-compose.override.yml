@@ -27,7 +27,7 @@ services:
       - SMTP_HOST=mailserver
       - AWS_ACCESS_KEY_ID=minio
       - AWS_SECRET_ACCESS_KEY=12341234
-      - AWS_ENDPOINT=http:/localhost:9000
+      - AWS_ENDPOINT=http://localhost:9000
       - AWS_REGION=local
       - AWS_BUCKET=ocelot
       - IMAGOR_PUBLIC_URL=http://localhost:8000
@@ -84,7 +84,7 @@ services:
       # IMAGOR_UNSAFE: 1 # unsafe URL for testing
       AWS_ACCESS_KEY_ID: minio
       AWS_SECRET_ACCESS_KEY: 12341234
-      AWS_ENDPOINT: http:/minio:9000
+      AWS_ENDPOINT: http://minio:9000
       S3_FORCE_PATH_STYLE: 1
       S3_LOADER_BUCKET: ocelot # enable S3 loader by specifying bucket
       S3_STORAGE_BUCKET: ocelot # enable S3 storage by specifying bucket
