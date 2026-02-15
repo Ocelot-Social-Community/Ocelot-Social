@@ -218,28 +218,26 @@
           </base-card>
         </ds-space>
         <ds-space v-if="isGroupMemberNonePending" centered>
-          <nuxt-link
+          <os-button
+            as="nuxt-link"
             :to="{
               name: 'post-create-type',
               query: { groupId: group.id },
             }"
+            class="profile-post-add-button"
+            variant="primary"
+            appearance="filled"
+            circle
+            :aria-label="$t('contribution.newPost')"
+            v-tooltip="{
+              content: $t('contribution.newPost'),
+              placement: 'left',
+            }"
           >
-            <os-button
-              class="profile-post-add-button"
-              variant="primary"
-              appearance="filled"
-              circle
-              :aria-label="$t('contribution.newPost')"
-              v-tooltip="{
-                content: $t('contribution.newPost'),
-                placement: 'left',
-              }"
-            >
-              <template #icon>
-                <base-icon name="plus" />
-              </template>
-            </os-button>
-          </nuxt-link>
+            <template #icon>
+              <base-icon name="plus" />
+            </template>
+          </os-button>
         </ds-space>
         <masonry-grid>
           <!-- TapNavigation -->
