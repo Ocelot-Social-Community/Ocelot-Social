@@ -4,9 +4,9 @@
 language: de
 
 reviews:
-  tools:
-    docstring_coverage:
-      enabled: false
+  pre_merge_checks:
+    docstrings:
+      mode: "off"
 
   # Automatisches Review für alle PRs
   auto_review:
