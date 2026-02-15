@@ -12,7 +12,7 @@
         <slot></slot>
         <div class="avatar-attachments-upload-area">
           <div class="avatar-drag-marker">
-            <base-icon v-if="hover" name="image" />
+            <os-icon v-if="hover" :icon="icons.image" />
           </div>
         </div>
       </div>
@@ -20,12 +20,18 @@
   </div>
 </template>
 <script>
+import { OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import vueDropzone from 'nuxt-dropzone'
 
 export default {
   name: 'AvatarUploader',
   components: {
+    OsIcon,
     vueDropzone,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   props: {
     profile: { type: Object, required: true },

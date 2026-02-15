@@ -1,14 +1,17 @@
 <template>
   <span class="counter-icon">
-    <base-icon :name="icon" />
+    <os-icon :icon="icon" />
     <span v-if="count > 0" :class="counterClass">{{ cappedCount }}</span>
   </span>
 </template>
 
 <script>
+import { OsIcon } from '@ocelot-social/ui'
+
 export default {
+  components: { OsIcon },
   props: {
-    icon: { type: String, required: true },
+    icon: { type: [Object, Function], required: true },
     count: { type: Number, required: true },
     danger: { type: Boolean, default: false },
     soft: { type: Boolean, default: false },

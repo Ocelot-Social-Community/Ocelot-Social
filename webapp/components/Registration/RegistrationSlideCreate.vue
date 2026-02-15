@@ -165,6 +165,7 @@ import PasswordStrength from '~/components/Password/Strength'
 import EmailDisplayAndVerify from './EmailDisplayAndVerify'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import ShowPassword from '../ShowPassword/ShowPassword.vue'
 import LocationSelect from '~/components/Select/LocationSelect'
 
@@ -179,6 +180,9 @@ export default {
     ShowPassword,
     SweetalertIcon,
     LocationSelect,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   props: {
     sliderData: { type: Object, required: true },
@@ -277,10 +281,10 @@ export default {
       )
     },
     iconNamePassword() {
-      return this.showPassword ? 'eye-slash' : 'eye'
+      return this.showPassword ? this.icons.eyeSlash : this.icons.eye
     },
     iconNamePasswordConfirm() {
-      return this.showPasswordConfirm ? 'eye-slash' : 'eye'
+      return this.showPasswordConfirm ? this.icons.eyeSlash : this.icons.eye
     },
   },
   watch: {

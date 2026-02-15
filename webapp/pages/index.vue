@@ -44,7 +44,7 @@
             >
               {{ $t('contribution.filterMasonryGrid.noFilter') }}
               &nbsp;
-              <base-icon :name="filterButtonIcon"></base-icon>
+              <os-icon :icon="filterButtonIcon" />
             </os-button>
 
             <header-button
@@ -152,6 +152,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import postListActions from '~/mixins/postListActions'
 import mobile from '~/mixins/mobile'
 import DonationInfo from '~/components/DonationInfo/DonationInfo.vue'
@@ -184,6 +185,9 @@ export default {
     HeaderButton,
   },
   mixins: [postListActions, mobile(), GetCategories],
+  created() {
+    this.icons = ocelotIcons
+  },
   data() {
     const { hashtag = null } = this.$route.query
     return {
@@ -211,7 +215,7 @@ export default {
       orderBy: 'posts/orderBy',
     }),
     filterButtonIcon() {
-      return this.showFilter ? 'angle-up' : 'angle-down'
+      return this.showFilter ? this.icons.angleUp : this.icons.angleDown
     },
     finalFilters() {
       let filter = this.postsFilter

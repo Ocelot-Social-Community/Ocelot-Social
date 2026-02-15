@@ -73,7 +73,7 @@
         </div>
         <div v-else class="categories-placeholder"></div>
         <counter-icon
-          icon="heart-o"
+          :icon="icons.heartO"
           :count="post.shoutedCount"
           v-tooltip="{
             content: $t('contribution.amount-shouts', { amount: post.shoutedCount }),
@@ -81,7 +81,7 @@
           }"
         />
         <counter-icon
-          icon="comments"
+          :icon="icons.comments"
           :count="post.commentsCount"
           v-tooltip="{
             content: $t('contribution.amount-comments', { amount: post.commentsCount }),
@@ -89,7 +89,7 @@
           }"
         />
         <counter-icon
-          icon="hand-pointer"
+          :icon="icons.handPointer"
           :count="post.clickedCount"
           v-tooltip="{
             content: $t('contribution.amount-clicks', { amount: post.clickedCount }),
@@ -97,7 +97,7 @@
           }"
         />
         <counter-icon
-          icon="eye"
+          :icon="icons.eye"
           :count="post.viewedTeaserCount"
           v-tooltip="{
             content: $t('contribution.amount-views', { amount: post.viewedTeaserCount }),
@@ -133,6 +133,7 @@
 </template>
 
 <script>
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import Category from '~/components/Category'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
@@ -150,6 +151,9 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 export default {
   name: 'PostTeaser',
   mixins: [GetCategories],
+  created() {
+    this.icons = ocelotIcons
+  },
   components: {
     Category,
     ContentMenu,

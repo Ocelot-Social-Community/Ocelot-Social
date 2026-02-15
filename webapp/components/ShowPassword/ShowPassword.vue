@@ -1,13 +1,16 @@
 <template>
   <span class="click-wrapper" @click="togglePassword">
     <span class="icon-wrapper" :data-test="iconName">
-      <base-icon class="toggle-icon" :name="iconName" />
+      <os-icon class="toggle-icon" :icon="iconName" />
     </span>
   </span>
 </template>
 
 <script>
+import { OsIcon } from '@ocelot-social/ui'
+
 export default {
+  components: { OsIcon },
   props: ['iconName'],
   emits: ['toggle-password'],
   methods: {

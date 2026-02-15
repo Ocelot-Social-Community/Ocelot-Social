@@ -9,7 +9,7 @@
           @click="setResetCategories"
         >
           <template #icon>
-            <os-icon name="check" />
+            <os-icon :icon="icons.check" />
           </template>
           {{ $t('filter-menu.all') }}
         </os-button>
@@ -29,7 +29,7 @@
           }"
         >
           <template #icon>
-            <base-icon :name="category.icon" />
+            <os-icon :icon="resolveIcon(category.icon)" />
           </template>
           {{ $t(`contribution.category.name.${category.slug}`) }}
         </os-button>
@@ -40,6 +40,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
@@ -50,6 +51,9 @@ export default {
     FilterMenuSection,
     OsButton,
     OsIcon,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   mixins: [SortCategories, GetCategories],
   computed: {
@@ -69,6 +73,13 @@ export default {
     saveCategories(categoryId) {
       this.toggleCategory(categoryId)
       this.$emit('updateCategories', categoryId)
+    },
+    resolveIcon(iconName) {
+      const camel = iconName
+        .split('-')
+        .map((s, i) => (i === 0 ? s : s[0].toUpperCase() + s.slice(1)))
+        .join('')
+      return ocelotIcons[camel]
     },
   },
 }

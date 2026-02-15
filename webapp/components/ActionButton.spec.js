@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/vue'
 import '@testing-library/jest-dom'
 import ActionButton from './ActionButton.vue'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 
 const localVue = global.localVue
 
@@ -19,7 +20,7 @@ describe('ActionButton.vue', () => {
       mocks,
       localVue,
       propsData: {
-        icon: 'heart',
+        icon: ocelotIcons.heartO,
         text: 'Click me',
         count: 7,
         disabled: isDisabled,

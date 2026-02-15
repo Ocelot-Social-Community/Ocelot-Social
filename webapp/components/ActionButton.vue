@@ -10,7 +10,7 @@
       @click="click"
     >
       <template #icon>
-        <base-icon :name="icon" />
+        <os-icon :icon="icon" />
       </template>
     </os-button>
     <div class="count">{{ count }}</div>
@@ -18,14 +18,14 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 
 export default {
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   props: {
     count: { type: Number, required: true },
     text: { type: String, required: true },
-    icon: { type: String, required: true },
+    icon: { type: [Object, Function], required: true },
     filled: { type: Boolean, default: false },
     disabled: { type: Boolean },
     loading: { type: Boolean },

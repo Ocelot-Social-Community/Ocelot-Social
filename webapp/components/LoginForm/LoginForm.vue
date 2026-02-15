@@ -98,7 +98,7 @@ export default {
       return this.$store.getters['auth/pending']
     },
     iconName() {
-      return this.showPassword ? 'eye-slash' : 'eye'
+      return this.showPassword ? this.icons.eyeSlash : this.icons.eye
     },
     ...mapGetters({
       currentUser: 'auth/user',

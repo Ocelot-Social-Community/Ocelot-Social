@@ -5,19 +5,23 @@
     :count="shoutedCount"
     :text="$t('shoutButton.shouted')"
     :filled="shouted"
-    icon="heart-o"
+    :icon="icons.heartO"
     @click="toggle"
   />
 </template>
 
 <script>
 import gql from 'graphql-tag'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 
 import ActionButton from '~/components/ActionButton.vue'
 
 export default {
   components: {
     ActionButton,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   props: {
     count: { type: Number, default: 0 },

@@ -28,7 +28,7 @@
           <div>
             <os-button size="sm" circle variant="primary" appearance="ghost" class="legend-icon">
               <template v-if="item.iconName" #icon>
-                <base-icon :name="item.iconName" />
+                <os-icon :icon="item.iconName" />
               </template>
               <span v-if="item.label">{{ item.label }}</span>
             </os-button>
@@ -58,22 +58,22 @@ export default {
   props: {
     placement: { type: String, default: 'bottom-start' },
   },
-  data() {
-    return {
-      legendItems: [
-        { iconName: 'bold', name: `editor.legend.bold`, shortcut: 'ctrl + b' },
-        { iconName: 'italic', name: `editor.legend.italic`, shortcut: 'ctrl + i' },
-        { iconName: 'underline', name: `editor.legend.underline`, shortcut: 'ctrl + u' },
-        { iconName: 'link', name: `editor.legend.link`, shortcut: '' },
-        { iconName: 'paragraph', name: `editor.legend.paragraph`, shortcut: '' },
+  computed: {
+    legendItems() {
+      return [
+        { iconName: this.icons.bold, name: `editor.legend.bold`, shortcut: 'ctrl + b' },
+        { iconName: this.icons.italic, name: `editor.legend.italic`, shortcut: 'ctrl + i' },
+        { iconName: this.icons.underline, name: `editor.legend.underline`, shortcut: 'ctrl + u' },
+        { iconName: this.icons.link, name: `editor.legend.link`, shortcut: '' },
+        { iconName: this.icons.paragraph, name: `editor.legend.paragraph`, shortcut: '' },
         { label: 'H3', name: `editor.legend.heading3`, shortcut: '### + space' },
         { label: 'H4', name: `editor.legend.heading4`, shortcut: '#### + space' },
-        { iconName: 'list-ul', name: `editor.legend.unorderedList`, shortcut: '* + space' },
-        { iconName: 'list-ol', name: `editor.legend.orderedList`, shortcut: '1. + space' },
-        { iconName: 'quote-right', name: `editor.legend.quote`, shortcut: '> + space' },
-        { iconName: 'minus', name: `editor.legend.ruler`, shortcut: '---' },
-      ],
-    }
+        { iconName: this.icons.listUl, name: `editor.legend.unorderedList`, shortcut: '* + space' },
+        { iconName: this.icons.listOl, name: `editor.legend.orderedList`, shortcut: '1. + space' },
+        { iconName: this.icons.quoteRight, name: `editor.legend.quote`, shortcut: '> + space' },
+        { iconName: this.icons.minus, name: `editor.legend.ruler`, shortcut: '---' },
+      ]
+    },
   },
 }
 </script>

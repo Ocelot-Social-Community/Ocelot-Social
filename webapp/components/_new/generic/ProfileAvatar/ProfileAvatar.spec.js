@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import ProfileAvatar from './ProfileAvatar'
-import BaseIcon from '~/components/_new/generic/BaseIcon/BaseIcon'
+import { OsIcon } from '@ocelot-social/ui'
 
 const localVue = global.localVue
 
@@ -20,7 +20,7 @@ describe('ProfileAvatar', () => {
   })
 
   it('renders an icon', () => {
-    expect(wrapper.findComponent(BaseIcon).exists()).toBe(true)
+    expect(wrapper.findComponent(OsIcon).exists()).toBe(true)
   })
 
   describe('given a profile', () => {
@@ -38,7 +38,7 @@ describe('ProfileAvatar', () => {
         it('renders an icon', () => {
           propsData = { profile: { name: null } }
           wrapper = Wrapper()
-          expect(wrapper.findComponent(BaseIcon).exists()).toBe(true)
+          expect(wrapper.findComponent(OsIcon).exists()).toBe(true)
         })
       })
 
@@ -46,7 +46,7 @@ describe('ProfileAvatar', () => {
         it('renders an icon', () => {
           propsData = { profile: { name: 'Anonymous' } }
           wrapper = Wrapper()
-          expect(wrapper.findComponent(BaseIcon).exists()).toBe(true)
+          expect(wrapper.findComponent(OsIcon).exists()).toBe(true)
         })
       })
 

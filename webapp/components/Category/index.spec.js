@@ -20,7 +20,7 @@ describe('Category', () => {
 
   describe('given Strings for Icon and Name', () => {
     beforeEach(() => {
-      icon = 'mouse-pointer'
+      icon = 'home'
       name = 'Peter'
     })
 
@@ -28,8 +28,8 @@ describe('Category', () => {
       expect(Wrapper().text()).toContain('Peter')
     })
 
-    it('shows base icon', () => {
-      expect(Wrapper().find('.base-icon').exists()).toBe(true)
+    it('shows icon', () => {
+      expect(Wrapper().find('.os-icon').exists()).toBe(true)
     })
   })
 })

@@ -117,7 +117,7 @@
                   }"
                 >
                   <template #icon>
-                    <os-icon :icon="icons.globeDetailed" />
+                    <os-icon :icon="icons.globeDetailed" size="xl" />
                   </template>
                 </os-button>
               </client-only>
@@ -274,7 +274,7 @@
                   }"
                 >
                   <template #icon>
-                    <os-icon :icon="icons.globeDetailed" />
+                    <os-icon :icon="icons.globeDetailed" size="xl" />
                   </template>
                 </os-button>
               </div>
@@ -540,8 +540,8 @@ export default {
   margin-left: 3px;
   margin-right: 3px;
 
-  .base-icon > .svg.--large {
-    margin-left: 0;
+  .os-icon {
+    margin: -4px;
   }
 }
 </style>

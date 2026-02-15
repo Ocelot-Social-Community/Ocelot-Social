@@ -4,18 +4,22 @@
     :count="count"
     :text="$t('observeButton.observed')"
     :filled="isObserved"
-    icon="bell"
+    :icon="icons.bell"
     circle
     @click="toggle"
   />
 </template>
 
 <script>
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import ActionButton from '~/components/ActionButton.vue'
 
 export default {
   components: {
     ActionButton,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   props: {
     count: { type: Number, default: 0 },

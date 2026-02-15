@@ -26,7 +26,7 @@
               :parents="item.parents"
               @click.stop.prevent="openItem(item.route, toggleMenu)"
             >
-              <base-icon :name="item.route.icon" />
+              <os-icon :icon="item.route.icon" />
               {{ item.route.label }}
             </ds-menu-item>
           </template>
@@ -84,14 +84,14 @@ export default {
             params: {
               id: this.resource.id,
             },
-            icon: 'edit',
+            icon: this.icons.edit,
           })
           routes.push({
             label: this.$t(`post.menu.delete`),
             callback: () => {
               this.openModal('confirm', 'delete')
             },
-            icon: 'trash',
+            icon: this.icons.trash,
           })
         }
 
@@ -102,7 +102,7 @@ export default {
               callback: () => {
                 this.$emit('pinPost', this.resource)
               },
-              icon: 'link',
+              icon: this.icons.link,
             })
           } else {
             if (this.resource.pinnedBy) {
@@ -111,7 +111,7 @@ export default {
                 callback: () => {
                   this.$emit('unpinPost', this.resource)
                 },
-                icon: 'unlink',
+                icon: this.icons.unlink,
               })
             }
           }
@@ -123,7 +123,7 @@ export default {
             callback: () => {
               this.$emit('pushPost', this.resource)
             },
-            icon: 'link',
+            icon: this.icons.link,
           })
         }
 
@@ -133,7 +133,7 @@ export default {
             callback: () => {
               this.$emit('unpushPost', this.resource)
             },
-            icon: 'link',
+            icon: this.icons.link,
           })
         }
 
@@ -143,7 +143,7 @@ export default {
             callback: () => {
               this.$emit('toggleObservePost', this.resource.id, false)
             },
-            icon: 'bell-slashed',
+            icon: this.icons.bellSlashed,
           })
         } else {
           routes.push({
@@ -151,7 +151,7 @@ export default {
             callback: () => {
               this.$emit('toggleObservePost', this.resource.id, true)
             },
-            icon: 'bell',
+            icon: this.icons.bell,
           })
         }
       }
@@ -162,14 +162,14 @@ export default {
           callback: () => {
             this.$emit('editComment')
           },
-          icon: 'edit',
+          icon: this.icons.edit,
         })
         routes.push({
           label: this.$t(`comment.menu.delete`),
           callback: () => {
             this.openModal('confirm', 'delete')
           },
-          icon: 'trash',
+          icon: this.icons.trash,
         })
       }
 
@@ -179,7 +179,7 @@ export default {
           callback: () => {
             this.openModal('report')
           },
-          icon: 'flag',
+          icon: this.icons.flag,
         })
       }
 
@@ -190,7 +190,7 @@ export default {
             callback: () => {
               this.openModal('disable')
             },
-            icon: 'eye-slash',
+            icon: this.icons.eyeSlash,
           })
         } else {
           routes.push({
@@ -198,7 +198,7 @@ export default {
             callback: () => {
               this.openModal('release')
             },
-            icon: 'eye',
+            icon: this.icons.eye,
           })
         }
       }
@@ -208,7 +208,7 @@ export default {
           routes.push({
             label: this.$t(`settings.name`),
             path: '/settings',
-            icon: 'edit',
+            icon: this.icons.edit,
           })
         } else {
           if (this.resource.isMuted) {
@@ -217,7 +217,7 @@ export default {
               callback: () => {
                 this.$emit('unmute', this.resource)
               },
-              icon: 'microphone',
+              icon: this.icons.microphone,
             })
           } else {
             routes.push({
@@ -225,7 +225,7 @@ export default {
               callback: () => {
                 this.$emit('mute', this.resource)
               },
-              icon: 'microphone-slash',
+              icon: this.icons.microphoneSlash,
             })
           }
           if (this.resource.isBlocked) {
@@ -234,7 +234,7 @@ export default {
               callback: () => {
                 this.$emit('unblock', this.resource)
               },
-              icon: 'user-plus',
+              icon: this.icons.userPlus,
             })
           } else {
             routes.push({
@@ -242,7 +242,7 @@ export default {
               callback: () => {
                 this.$emit('block', this.resource)
               },
-              icon: 'user-times',
+              icon: this.icons.userTimes,
             })
           }
           if (this.isAdmin === true) {
@@ -251,7 +251,7 @@ export default {
               callback: () => {
                 this.$emit('delete', this.resource)
               },
-              icon: 'trash',
+              icon: this.icons.trash,
             })
           }
         }
@@ -270,7 +270,7 @@ export default {
           callback: () => {
             this.$emit(this.resource.groupPinned ? 'unpinGroupPost' : 'pinGroupPost', this.resource)
           },
-          icon: this.resource.groupPinned ? 'unlink' : 'link',
+          icon: this.resource.groupPinned ? this.icons.unlink : this.icons.link,
         })
       }
 

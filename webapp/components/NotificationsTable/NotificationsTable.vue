@@ -42,14 +42,14 @@
               <div class="notification-container">
                 <!-- Icon with responsive sizing -->
                 <div class="notification-icon">
-                  <base-icon
+                  <os-icon
                     v-if="notification.from.post"
-                    name="comment"
+                    :icon="icons.comment"
                     v-tooltip="{ content: $t('notifications.comment'), placement: 'right' }"
                   />
-                  <base-icon
+                  <os-icon
                     v-else
-                    name="bookmark"
+                    :icon="icons.bookmark"
                     v-tooltip="{ content: $t('notifications.post'), placement: 'right' }"
                   />
                 </div>
@@ -94,6 +94,8 @@
   <hc-empty v-else icon="alert" :message="$t('notifications.empty')" />
 </template>
 <script>
+import { OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import HcEmpty from '~/components/Empty/Empty'
 import BaseCard from '../_new/generic/BaseCard/BaseCard.vue'
@@ -103,9 +105,13 @@ const maxMobileWidth = 768 // at this point the table breaks down
 
 export default {
   components: {
+    OsIcon,
     UserTeaser,
     HcEmpty,
     BaseCard,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   mixins: [mobile(maxMobileWidth)],
   props: {

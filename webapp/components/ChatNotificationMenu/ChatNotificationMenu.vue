@@ -13,13 +13,14 @@
     }"
   >
     <template #icon>
-      <counter-icon icon="chat-bubble" :count="unreadRoomCount" danger />
+      <counter-icon :icon="icons.chatBubble" :count="unreadRoomCount" danger />
     </template>
   </os-button>
 </template>
 
 <script>
 import { OsButton } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters, mapMutations } from 'vuex'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import { unreadRoomsQuery, roomCountUpdated } from '~/graphql/Rooms'
@@ -29,6 +30,9 @@ export default {
   components: {
     OsButton,
     CounterIcon,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   computed: {
     ...mapGetters({

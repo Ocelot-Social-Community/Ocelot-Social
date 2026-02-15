@@ -44,7 +44,7 @@
               $emit('toggle-Mobile-Menu-view')
             "
           >
-            <base-icon :name="item.route.icon" />
+            <os-icon :icon="item.route.icon" />
             {{ item.route.name }}
           </ds-menu-item>
         </ds-menu>
@@ -91,46 +91,46 @@ export default {
         {
           name: this.$t('header.avatarMenu.myProfile'),
           path: `/profile/${this.user.id}/${this.user.slug}`,
-          icon: 'user',
+          icon: this.icons.user,
         },
         {
           name: this.$t('header.avatarMenu.groups'),
           path: '/groups',
-          icon: 'users',
+          icon: this.icons.users,
         },
         {
           name: this.$t('header.avatarMenu.map'),
           path: `/map`,
-          icon: 'globe',
+          icon: this.icons.globe,
         },
         {
           name: this.$t('header.avatarMenu.chats'),
           path: `/chat`,
-          icon: 'chat-bubble',
+          icon: this.icons.chatBubble,
         },
         {
           name: this.$t('header.avatarMenu.notifications'),
           path: '/notifications',
-          icon: 'bell',
+          icon: this.icons.bell,
         },
         {
           name: this.$t('settings.name'),
           path: `/settings`,
-          icon: 'cogs',
+          icon: this.icons.cogs,
         },
       ]
       if (this.isModerator) {
         routes.push({
           name: this.$t('moderation.name'),
           path: `/moderation`,
-          icon: 'balance-scale',
+          icon: this.icons.balanceScale,
         })
       }
       if (this.isAdmin) {
         routes.push({
           name: this.$t('admin.name'),
           path: `/admin`,
-          icon: 'shield',
+          icon: this.icons.shield,
         })
       }
       return routes

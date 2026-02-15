@@ -54,9 +54,9 @@
           :color="errors && errors.groupType && formData.groupType === '' ? 'danger' : 'medium'"
         >
           {{ `${formData.groupType === '' ? 0 : 1} / 1` }}
-          <base-icon
+          <os-icon
             v-if="errors && errors.groupType && formData.groupType === ''"
-            name="warning"
+            :icon="icons.warning"
           />
         </ds-chip>
 
@@ -103,9 +103,9 @@
           "
         >
           {{ `${formData.actionRadius === '' ? 0 : 1} / 1` }}
-          <base-icon
+          <os-icon
             v-if="errors && errors.actionRadius && formData.actionRadius === ''"
-            name="warning"
+            :icon="icons.warning"
           />
         </ds-chip>
 

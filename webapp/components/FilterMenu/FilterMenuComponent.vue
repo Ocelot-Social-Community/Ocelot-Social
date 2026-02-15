@@ -7,7 +7,7 @@
           <labeled-button
             filled
             :label="$t('actions.saveCategories')"
-            icon="save"
+            :icon="icons.save"
             @click="saveCategories"
           />
         </div>
@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters } from 'vuex'
 import EventsByFilter from './EventsByFilter'
 import PostTypeFilter from './PostTypeFilter'
@@ -40,6 +41,9 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   mixins: [GetCategories],
+  created() {
+    this.icons = ocelotIcons
+  },
   components: {
     EventsByFilter,
     FollowingFilter,

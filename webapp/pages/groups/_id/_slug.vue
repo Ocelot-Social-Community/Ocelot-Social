@@ -235,7 +235,7 @@
             }"
           >
             <template #icon>
-              <os-icon name="plus" />
+              <os-icon :icon="icons.plus" />
             </template>
           </os-button>
         </ds-space>

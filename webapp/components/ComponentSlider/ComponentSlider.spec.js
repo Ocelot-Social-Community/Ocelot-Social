@@ -20,7 +20,7 @@ describe('ComponentSlider.vue', () => {
           {
             validated: true,
             button: {
-              icon: 'smile',
+              icon: null,
               callback: jest.fn().mockResolvedValue(true),
               sliderCallback: jest.fn().mockResolvedValue(true),
             },
@@ -28,7 +28,7 @@ describe('ComponentSlider.vue', () => {
           {
             validated: true,
             button: {
-              icon: 'smile',
+              icon: null,
               callback: jest.fn().mockResolvedValue(true),
               sliderCallback: jest.fn().mockResolvedValue(true),
             },

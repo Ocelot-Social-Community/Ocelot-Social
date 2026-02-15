@@ -3,10 +3,10 @@
     <p class="label">{{ option.title | truncate(70) }}</p>
     <div class="metadata">
       <span class="counts">
-        <counter-icon icon="comments" :count="option.commentsCount" soft />
-        <counter-icon icon="heart-o" :count="option.shoutedCount" soft />
-        <counter-icon icon="hand-pointer" :count="option.clickedCount" soft />
-        <counter-icon icon="eye" :count="option.viewedTeaserCount" soft />
+        <counter-icon :icon="icons.comments" :count="option.commentsCount" soft />
+        <counter-icon :icon="icons.heartO" :count="option.shoutedCount" soft />
+        <counter-icon :icon="icons.handPointer" :count="option.clickedCount" soft />
+        <counter-icon :icon="icons.eye" :count="option.viewedTeaserCount" soft />
       </span>
       {{ option.author.name | truncate(32) }} - {{ option.createdAt | dateTime('dd.MM.yyyy') }}
     </div>
@@ -14,11 +14,15 @@
 </template>
 
 <script>
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 
 export default {
   components: {
     CounterIcon,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   name: 'SearchPost',
   props: {
