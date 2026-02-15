@@ -884,6 +884,7 @@
       "pin": "Anclar contribución",
       "pinnedSuccessfully": "¡Contribución anclado con éxito!",
       "push": null,
+      "pushed": null,
       "pushedSuccessfully": null,
       "unobserve": "Dejar de observar contribución",
       "unobservedSuccessfully": null,

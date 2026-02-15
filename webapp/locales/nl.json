@@ -884,6 +884,7 @@
       "pin": null,
       "pinnedSuccessfully": null,
       "push": null,
+      "pushed": null,
       "pushedSuccessfully": null,
       "unobserve": null,
       "unobservedSuccessfully": null,

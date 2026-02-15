@@ -123,6 +123,15 @@
       <client-only>
         <div class="date-row" v-if="post.createdAt">
           <span class="text">
+            <base-icon
+              v-if="post.sortDate !== post.createdAt"
+              name="arrow-up"
+              v-tooltip="{
+                content: $t('post.pushed'),
+                placement: 'bottom-end',
+              }"
+              class="pushed-icon"
+            />
             <date-time :date-time="post.createdAt" />
             <slot name="dateTime"></slot>
           </span>
@@ -361,6 +370,10 @@ export default {
       text-overflow: ellipsis;
       color: $text-color-soft;
       font-size: $font-size-small;
+
+      > .pushed-icon {
+        margin-right: $space-xx-small;
+      }
 
       > .ds-text {
         display: inline;
