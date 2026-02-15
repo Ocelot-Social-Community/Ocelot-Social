@@ -27,8 +27,13 @@ export default function svgIcon(): Plugin {
       const viewBoxMatch = viewBoxRegex.exec(svg)
       const viewBox = viewBoxMatch ? viewBoxMatch[1] : '0 0 32 32'
 
+      const unsupported = svg.match(/<(?:circle|rect|polygon|polyline|ellipse|line)\s/g)
+      if (unsupported) {
+        this.warn(`${filePath}: unsupported SVG elements will be ignored: ${[...new Set(unsupported.map((s) => s.trim()))].join(', ')}`)
+      }
+
       const paths: string[] = []
-      const pathRegex = /<path\s+d="([^"]+)"/g
+      const pathRegex = /<path\s[^>]*?\bd="([^"]+)"/g
       let match: RegExpExecArray | null
       while ((match = pathRegex.exec(svg)) !== null) {
         paths.push(match[1])
