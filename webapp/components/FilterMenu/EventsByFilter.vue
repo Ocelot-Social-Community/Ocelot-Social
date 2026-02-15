@@ -26,7 +26,7 @@
           data-test="not-ended-button"
         >
           <template #icon>
-            <base-icon name="calendar" />
+            <os-icon :icon="icons.calendar" />
           </template>
           {{ $t('filter-menu.ended.onlyEnded.label') }}
         </os-button>
@@ -37,6 +37,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 
@@ -46,6 +47,9 @@ export default {
     FilterMenuSection,
     OsButton,
     OsIcon,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   computed: {
     ...mapGetters({
