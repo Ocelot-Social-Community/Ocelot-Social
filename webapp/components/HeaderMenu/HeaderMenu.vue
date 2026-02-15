@@ -117,7 +117,7 @@
                   }"
                 >
                   <template #icon>
-                    <base-icon name="globe-detailed" size="large" />
+                    <os-icon :icon="icons.globeDetailed" />
                   </template>
                 </os-button>
               </client-only>
@@ -274,7 +274,7 @@
                   }"
                 >
                   <template #icon>
-                    <base-icon name="globe-detailed" size="large" />
+                    <os-icon :icon="icons.globeDetailed" />
                   </template>
                 </os-button>
               </div>

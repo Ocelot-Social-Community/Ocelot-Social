@@ -8,7 +8,7 @@
         @click.prevent="toggleMenu()"
       >
         <template #icon>
-          <base-icon name="filter" />
+          <os-icon :icon="icons.filter" />
         </template>
         <os-icon class="dropdown-arrow" :icon="icons.angleDown" />
       </os-button>

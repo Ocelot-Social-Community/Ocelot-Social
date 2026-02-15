@@ -11,7 +11,7 @@
           @click="toggleMenu"
         >
           <template #icon>
-            <base-icon name="question-circle" />
+            <os-icon :icon="icons.questionCircle" />
           </template>
         </os-button>
       </slot>
@@ -42,13 +42,18 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import Dropdown from '~/components/Dropdown'
 
 export default {
   components: {
     Dropdown,
     OsButton,
+    OsIcon,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   props: {
     placement: { type: String, default: 'bottom-start' },

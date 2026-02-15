@@ -12,7 +12,7 @@
           @click.prevent="toggleMenu()"
         >
           <template #icon>
-            <base-icon name="ellipsis-v" />
+            <os-icon :icon="icons.ellipsisV" />
           </template>
         </os-button>
       </slot>
@@ -37,15 +37,20 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import Dropdown from '~/components/Dropdown'
 import PinnedPostsMixin from '~/mixins/pinnedPosts'
 
 export default {
   name: 'ContentMenu',
   components: {
-    OsButton,
     Dropdown,
+    OsButton,
+    OsIcon,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   mixins: [PinnedPostsMixin],
   props: {

@@ -8,7 +8,7 @@
         href="#"
         @click.prevent="toggleMenu()"
       >
-        <base-icon name="filter" />
+        <os-icon :icon="icons.filter" />
         <label class="label" for="dropdown">{{ selected }}</label>
         <os-icon class="dropdown-arrow" :icon="icons.angleDown" />
       </a>

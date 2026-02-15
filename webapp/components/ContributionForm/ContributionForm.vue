@@ -28,7 +28,7 @@
             <input type="checkbox" id="blur-img" v-model="formData.imageBlurred" />
             <page-params-link class="link" :pageParams="links.FAQ">
               {{ $t('contribution.inappropriatePicture') }}
-              <base-icon name="question-circle" />
+              <os-icon :icon="icons.questionCircle" />
             </page-params-link>
           </div>
           <ds-space margin-top="base" />
