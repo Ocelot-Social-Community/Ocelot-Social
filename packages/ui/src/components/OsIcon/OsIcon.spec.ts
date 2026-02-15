@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import { h } from 'vue'
+import { defineComponent, h, markRaw } from 'vue'
 
 import { ICON_SIZES } from './icon.variants'
 import { IconCheck, IconClose, IconPlus, SYSTEM_ICONS } from './icons'
@@ -19,7 +19,7 @@ describe('osIcon', () => {
       expect(wrapper.find('svg').exists()).toBe(true)
     })
 
-    it('renders a custom component via icon prop', () => {
+    it('renders a custom render function via icon prop', () => {
       const CustomIcon = () => h('svg', { 'data-testid': 'custom' })
       const wrapper = mount(OsIcon, {
         props: { icon: CustomIcon },
@@ -27,6 +27,20 @@ describe('osIcon', () => {
 
       expect(wrapper.find('.os-icon').exists()).toBe(true)
       expect(wrapper.find('[data-testid="custom"]').exists()).toBe(true)
+    })
+
+    it('renders a custom component object via icon prop', () => {
+      const CustomIcon = markRaw(
+        defineComponent({
+          render: () => h('svg', { 'data-testid': 'component' }),
+        }),
+      )
+      const wrapper = mount(OsIcon, {
+        props: { icon: CustomIcon },
+      })
+
+      expect(wrapper.find('.os-icon').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="component"]').exists()).toBe(true)
     })
 
     it('renders nothing when neither name nor icon is provided', () => {
