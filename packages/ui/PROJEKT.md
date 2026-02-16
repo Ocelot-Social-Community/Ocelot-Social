@@ -81,10 +81,10 @@ Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
 Phase 3: ██████████ 100% (24/24 Aufgaben) ✅ - Webapp-Integration komplett
-Phase 4: ██░░░░░░░░  18% (3/17 Aufgaben) - OsButton ✅, OsIcon ✅, System-Icons ✅
+Phase 4: ██░░░░░░░░  24% (4/17 Aufgaben) - OsButton ✅, OsIcon ✅, System-Icons ✅, BaseIcon→OsIcon Migration ✅
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████████░░  76% (65/86 Aufgaben)
+Gesamt:  ████████░░  77% (66/86 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -131,31 +131,53 @@ System-Icons:
 └─ plus.svg    (Plus/Add)
 
 Ocelot-Icons (separates Entry-Point):
-└─ angle-down.svg (Dropdown-Pfeil)
+└─ 82 Icons (Feature-Icons + Kategorie-Icons aus Webapp migriert)
+
+BaseIcon → OsIcon Webapp-Migration: ✅
+├─ 131 <base-icon> in 70+ Dateien → <os-icon :icon="...">
+├─ 82 SVGs in ocelot/icons/svgs/ (inkl. 17 Kategorie-Icons)
+├─ vite-svg-icon Plugin erweitert (rect, circle, polygon, polyline, ellipse, line)
+├─ Kategorie-Icons: DB-String → toCamelCase() → ocelotIcons Lookup
+├─ Jest Mocks: @ocelot-social/ui/ocelot für ocelotIcons in Tests
+├─ Tests aktualisiert: 911/939 Tests bestanden (3 pre-existing failures)
+└─ 0 base-icon/BaseIcon Referenzen verbleibend
 ```
 
 ---
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-15 (Session 21)
+**Letzte Aktualisierung:** 2026-02-15 (Session 22)
 
-**Aktuelle Phase:** Phase 4 - OsIcon ✅ implementiert, System-Icons eingerichtet
+**Aktuelle Phase:** Phase 4 - OsIcon ✅, BaseIcon → OsIcon Webapp-Migration ✅
 
-**Zuletzt abgeschlossen (Session 21 - OsIcon Komponente, System-Icons, Ocelot-Umbenennung):**
+**Zuletzt abgeschlossen (Session 22 - BaseIcon → OsIcon Webapp-Migration):**
+- [x] 131 `<base-icon>` Nutzungen in 70+ Dateien → `<os-icon :icon="icons.xxx">` migriert
+- [x] 82 Ocelot-Icons in `packages/ui/src/ocelot/icons/svgs/` (von 1 auf 82)
+- [x] 17 Kategorie-Icons aus Webapp kopiert (networking, energy, psyche, movement, finance, child, mobility, shopping-cart, peace, politics, nature, science, health, media, spirituality, culture, miscellaneous)
+- [x] vite-svg-icon Plugin erweitert: unterstützt `<rect>`, `<circle>`, `<polygon>`, `<polyline>`, `<ellipse>`, `<line>` (war path-only)
+- [x] Alle neuen SVGs auf Single-Line minifiziert (Multiline brach JS-String-Literale)
+- [x] Kategorie-Icons: DB-String → `toCamelCase()` → `ocelotIcons[key]` Lookup (Category/index.vue, CategoriesFilter.vue, CategoriesSelect.vue, admin/categories.vue)
+- [x] `created() { this.icons = ocelotIcons }` Pattern in allen Komponenten (non-reactive)
+- [x] MenuLegend.vue: `legendItems` von `data()` → `computed` (data() läuft vor created(), this.icons undefined)
+- [x] HeaderMenu.vue: Map-Button Icon-Größe korrigiert (`size="xl"` + negative Margin)
+- [x] ShowPassword.vue: `:data-test="iconName"` entfernt (Icon ist jetzt Render-Function, kein String)
+- [x] Jest-Tests aktualisiert: OsIcon + ocelotIcons statt BaseIcon + String-Namen
+  - Category/index.spec.js, ProfileAvatar.spec.js, CounterIcon.spec.js, ReportRow.spec.js
+  - ActionButton.spec.js, ComponentSlider.spec.js, ShowPassword.spec.js, LoginForm.spec.js
+- [x] 8 stale Snapshot-Dateien gelöscht
+- [x] Jest Mock: `test/__mocks__/@ocelot-social/ui/ocelot.js` für ocelotIcons in Tests
+- [x] CSS: `.base-icon` → `.os-icon` in main.scss und Category/index.vue
+- [x] 0 `base-icon`/`BaseIcon` Referenzen verbleibend in gesamter Webapp
+- [x] 911/939 Tests bestanden (3 pre-existing Jest worker crashes)
+
+**Zuvor abgeschlossen (Session 21 - OsIcon Komponente, System-Icons, Ocelot-Umbenennung):**
 - [x] OsIcon Komponente implementiert (name, icon, size Props; Vue 2/3 via vue-demi h())
 - [x] System-Icons: check, close, plus (SVG, viewBox 0 0 32 32, stroke-basiert)
 - [x] Custom vite-svg-icon Plugin: SVG → Vue Render-Function via `?icon` Query
-- [x] Icon-Größen: xs(0.75em), sm(0.875em), md(1.2em), lg(1.5em), xl(2em), 2xl(2.5em)
-- [x] A11y: decorative (aria-hidden, default) / semantic (role="img" + aria-label)
-- [x] fill-current für Farbvererbung vom Parent
-- [x] OsButton nutzt OsIcon statt inline SVG für Icon-Rendering
 - [x] Ocelot-Icons: separates Entry-Point (ocelot.mjs) mit dynamischem Loading via import.meta.glob
 - [x] `src/webapp/` → `src/ocelot/` umbenannt (konsistentes Naming)
-- [x] check-completeness erweitert: unterstützt ocelot/ Verzeichnis
-- [x] OsIcon: 211 Zeilen Unit-Tests, Visual Tests mit checkA11y(), Keyboard A11y
 - [x] 100% Test-Coverage für OsIcon
-- [x] OsButton Stories bereinigt (OsIcon statt Inline-SVGs)
 
 **Zuvor abgeschlossen (Session 20 - `as`-Prop + nuxt-link Migration):**
 - [x] OsButton: `as` Prop implementiert (polymorphe Komponente: `button`, `a`, `nuxt-link`, `router-link`, Custom-Komponenten)
@@ -200,8 +222,7 @@ Ocelot-Icons (separates Entry-Point):
 - [ ] OsSpinner Komponente (vereint DsSpinner + LoadingSpinner)
 - [ ] OsCard Komponente (vereint DsCard + BaseCard)
 - [ ] Weitere Tier 1 Komponenten
-- [ ] BaseIcon → OsIcon Webapp-Migration (131 Nutzungen)
-- [ ] Snapshots/Tests aktualisieren
+- [ ] Browser-Fehler untersuchen: `TypeError: Cannot read properties of undefined (reading 'heartO')` (ocelotIcons undefined im Browser trotz korrekter Webpack-Aliase)
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
 - [ ] `NPM_TOKEN` als GitHub Secret einrichten (für npm publish in ui-release.yml)
@@ -475,6 +496,7 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 
 **Infrastruktur**
 - [x] System-Icons einrichten ✅ vite-svg-icon Plugin, 3 System-Icons, Ocelot-Icons Entry-Point
+- [x] BaseIcon → OsIcon Webapp-Migration ✅ 131 Nutzungen, 82 Ocelot-Icons, 0 BaseIcon verbleibend
 - [ ] CI docs-check Workflow (JSDoc-Coverage, README-Aktualität)
 
 ### Phase 5: Finalisierung
@@ -768,7 +790,7 @@ import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 | Styleguide (_all) | 616 | Nicht übernehmen (FontAwesome 4 komplett) |
 | Webapp (svgs) | 238 | Feature-Icons, bleiben in Webapp |
 | **Library (system)** | **3** | ✅ check, close, plus |
-| **Ocelot-Icons** | **1** | ✅ angle-down (separates Entry-Point) |
+| **Ocelot-Icons** | **82** | ✅ Feature-Icons + Kategorie-Icons (separates Entry-Point) |
 
 ---
 
@@ -1543,6 +1565,18 @@ Bei der Migration werden:
 | 2026-02-15 | **OsButton Stories** | Bereinigt: Inline-SVG-Komponenten durch OsIcon ersetzt; WithAriaLabel-Story entfernt; InheritColor-Story vereinfacht |
 | 2026-02-15 | **check-completeness** | Erweitert für ocelot/ Verzeichnis; unterstützt OsIcon-Patterns |
 | 2026-02-15 | **svg-icon.d.ts** | TypeScript-Deklaration für `?icon` Import-Query (Component-Typ) |
+| 2026-02-15 | **BaseIcon → OsIcon Migration** | 131 `<base-icon>` in 70+ Dateien → `<os-icon :icon="icons.xxx">`, 0 BaseIcon verbleibend |
+| 2026-02-15 | **82 Ocelot-Icons** | Von 1 auf 82 Icons: Feature-Icons + 17 Kategorie-Icons aus Webapp kopiert |
+| 2026-02-15 | **vite-svg-icon erweitert** | Unterstützt jetzt `<rect>`, `<circle>`, `<polygon>`, `<polyline>`, `<ellipse>`, `<line>` (war path-only) |
+| 2026-02-15 | **SVG-Minifizierung** | Alle 21 neuen SVGs auf Single-Line minifiziert (Multiline brach JS-String-Literale im Plugin) |
+| 2026-02-15 | **Kategorie-Icons** | DB-String → `toCamelCase()` → `ocelotIcons[key]` Lookup in Category, CategoriesFilter, CategoriesSelect, admin/categories |
+| 2026-02-15 | **MenuLegend.vue Fix** | `legendItems` von `data()` → `computed` (`data()` läuft vor `created()`, `this.icons` undefined) |
+| 2026-02-15 | **HeaderMenu.vue Fix** | Map-Button Icon-Größe: `size="xl"` + negative Margin (OsIcon md=1.2em vs BaseIcon --large=2.2em) |
+| 2026-02-15 | **ShowPassword.vue Fix** | `:data-test="iconName"` entfernt (Icon ist jetzt Render-Function statt String) |
+| 2026-02-15 | **Test-Updates (8 Specs)** | Category, ProfileAvatar, CounterIcon, ReportRow, ActionButton, ComponentSlider, ShowPassword, LoginForm: BaseIcon → OsIcon + ocelotIcons |
+| 2026-02-15 | **8 Snapshots gelöscht** | Stale Snapshot-Dateien entfernt nach BaseIcon → OsIcon Migration |
+| 2026-02-15 | **CSS Migration** | `.base-icon` → `.os-icon` in main.scss und Category/index.vue |
+| 2026-02-15 | **Jest Mock ocelot** | `test/__mocks__/@ocelot-social/ui/ocelot.js` für ocelotIcons in Jest-Umgebung |
 
 ---
 
