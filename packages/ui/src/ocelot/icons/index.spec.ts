@@ -1,6 +1,5 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, expectTypeOf, it } from 'vitest'
-import { h } from 'vue'
 
 import OsIcon from '#src/components/OsIcon/OsIcon.vue'
 
@@ -31,12 +30,8 @@ describe('ocelot icons', () => {
 
   describe('angleDown', () => {
     it('renders an SVG with correct viewBox', () => {
-      const vnode = angleDown()
-
-      expect(vnode).toBeDefined()
-
-      const wrapper = mount({
-        render: () => h('div', [angleDown()]),
+      const wrapper = mount(OsIcon, {
+        props: { icon: angleDown },
       })
       const svg = wrapper.find('svg')
 

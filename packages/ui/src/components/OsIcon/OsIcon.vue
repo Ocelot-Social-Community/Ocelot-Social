@@ -59,7 +59,7 @@
         const createElement = isVue2 ? (instance?.proxy as any)?.$createElement : h
 
         const iconVNode = isRenderFn
-          ? (iconComponent as (...args: any[]) => ReturnType<typeof h>)(createElement, isVue2)
+          ? (iconComponent as (...args: unknown[]) => ReturnType<typeof h>)(createElement, isVue2)
           : h(iconComponent)
 
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */

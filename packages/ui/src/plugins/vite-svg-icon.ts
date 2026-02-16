@@ -11,6 +11,13 @@ function escapeJS(str: string): string {
 }
 
 const SUPPORTED_ELEMENTS = ['path', 'circle', 'rect', 'polygon', 'polyline', 'ellipse', 'line']
+const ELEM_PATTERN = SUPPORTED_ELEMENTS.join('|')
+// Built from constant array above — safe to use in RegExp
+// eslint-disable-next-line security/detect-non-literal-regexp
+const ELEM_REGEX = new RegExp(
+  `<(${ELEM_PATTERN})\\s([^>]*?)\\/>|<(${ELEM_PATTERN})\\s([^>]*?)>`,
+  'g',
+)
 
 export default function svgIcon(): Plugin {
   return {
@@ -44,12 +51,9 @@ export default function svgIcon(): Plugin {
       }
 
       const children: string[] = []
-      const elemRegex = new RegExp(
-        `<(${SUPPORTED_ELEMENTS.join('|')})\\s([^>]*?)\\/>|<(${SUPPORTED_ELEMENTS.join('|')})\\s([^>]*?)>`,
-        'g',
-      )
+      ELEM_REGEX.lastIndex = 0
       let match: RegExpExecArray | null
-      while ((match = elemRegex.exec(svg)) !== null) {
+      while ((match = ELEM_REGEX.exec(svg)) !== null) {
         const tag = match[1] || match[3]
         const attrString = match[2] || match[4]
         const attrs: Record<string, string> = {}

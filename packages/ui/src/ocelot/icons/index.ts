@@ -1,4 +1,4 @@
-import { SYSTEM_ICONS } from '../../components/OsIcon/icons'
+import { SYSTEM_ICONS } from '#src/components/OsIcon/icons'
 
 import type { Component } from 'vue-demi'
 
