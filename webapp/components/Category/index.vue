@@ -7,14 +7,7 @@
 
 <script>
 import { OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
-
-function toCamelCase(str) {
-  return str
-    .split('-')
-    .map((s, i) => (i === 0 ? s : s[0].toUpperCase() + s.slice(1)))
-    .join('')
-}
+import { iconRegistry, toCamelCase } from '~/utils/iconRegistry'
 
 export default {
   name: 'HcCategory',
@@ -26,7 +19,7 @@ export default {
   },
   computed: {
     resolvedIcon() {
-      return ocelotIcons[toCamelCase(this.icon)]
+      return iconRegistry[toCamelCase(this.icon)]
     },
   },
 }

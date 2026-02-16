@@ -40,7 +40,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry, toCamelCase } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
@@ -53,7 +53,7 @@ export default {
     OsIcon,
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   mixins: [SortCategories, GetCategories],
   computed: {
@@ -75,11 +75,7 @@ export default {
       this.$emit('updateCategories', categoryId)
     },
     resolveIcon(iconName) {
-      const camel = iconName
-        .split('-')
-        .map((s, i) => (i === 0 ? s : s[0].toUpperCase() + s.slice(1)))
-        .join('')
-      return ocelotIcons[camel]
+      return iconRegistry[toCamelCase(iconName)]
     },
   },
 }

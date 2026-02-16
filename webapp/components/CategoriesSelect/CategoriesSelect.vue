@@ -22,7 +22,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry, toCamelCase } from '~/utils/iconRegistry'
 import { CATEGORIES_MAX } from '~/constants/categories.js'
 import xor from 'lodash/xor'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
@@ -79,11 +79,7 @@ export default {
       return `category-buttons-${categoryId}`
     },
     resolveIcon(iconName) {
-      const camel = iconName
-        .split('-')
-        .map((s, i) => (i === 0 ? s : s[0].toUpperCase() + s.slice(1)))
-        .join('')
-      return ocelotIcons[camel]
+      return iconRegistry[toCamelCase(iconName)]
     },
   },
 }
