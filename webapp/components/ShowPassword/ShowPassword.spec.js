@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import { mount } from '@vue/test-utils'
+import { OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 
 import ShowPassword from './ShowPassword.vue'
 
@@ -7,12 +9,12 @@ describe('ShowPassword', () => {
   describe('State of show password icon', () => {
     const wrapper = mount(ShowPassword, {
       propsData: {
-        iconName: 'eye',
+        iconName: ocelotIcons.eye,
       },
     })
 
     it('Shows eye icon by default', () => {
-      expect(wrapper.find('.icon-wrapper').attributes('data-test')).toEqual('eye')
+      expect(wrapper.findComponent(OsIcon).props().icon).toBe(ocelotIcons.eye)
     })
 
     describe('After click', () => {
@@ -24,9 +26,9 @@ describe('ShowPassword', () => {
 
       it('Shows the slash-eye icon after click', async () => {
         wrapper.find('.click-wrapper').trigger('click')
-        wrapper.setProps({ iconName: 'eye-slash' })
+        wrapper.setProps({ iconName: ocelotIcons.eyeSlash })
         await Vue.nextTick()
-        expect(wrapper.find('.icon-wrapper').attributes('data-test')).toEqual('eye-slash')
+        expect(wrapper.findComponent(OsIcon).props().icon).toBe(ocelotIcons.eyeSlash)
       })
     })
   })

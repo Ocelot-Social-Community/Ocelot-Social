@@ -1,6 +1,6 @@
 <template>
   <span class="click-wrapper" @click="togglePassword">
-    <span class="icon-wrapper" :data-test="iconName">
+    <span class="icon-wrapper">
       <os-icon class="toggle-icon" :icon="iconName" />
     </span>
   </span>
