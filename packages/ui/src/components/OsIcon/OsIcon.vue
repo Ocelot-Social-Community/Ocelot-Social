@@ -55,8 +55,10 @@
         const isRenderFn = typeof iconComponent === 'function' && !(iconComponent as any).cid
         // In Vue 2, pass $createElement (bound to this instance) so icons avoid
         // the globally-imported h() which requires currentInstance in Vue 2.7.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const createElement = isVue2 ? (instance?.proxy as any)?.$createElement : h
+        const createElement = /* v8 ignore next -- Vue 2 only */ isVue2
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (instance?.proxy as any)?.$createElement
+          : h
 
         const iconVNode = isRenderFn
           ? (iconComponent as (...args: unknown[]) => ReturnType<typeof h>)(createElement, isVue2)
