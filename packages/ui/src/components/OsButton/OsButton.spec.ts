@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import { defineComponent, h } from 'vue-demi'
+import { defineComponent, h, markRaw } from 'vue-demi'
 
 import OsButton from './OsButton.vue'
 
@@ -570,16 +570,18 @@ describe('osButton', () => {
     })
 
     it('renders a component passed as as', () => {
-      const FakeLink = defineComponent({
-        props: { to: { type: String, default: undefined } },
-        setup(props, { slots }) {
-          return () => h('a', { href: props.to }, slots.default?.())
-        },
-      })
+      const FakeLink = markRaw(
+        defineComponent({
+          props: { to: { type: String, default: undefined } },
+          setup(props, { slots }) {
+            return () => h('a', { href: props.to }, slots.default?.())
+          },
+        }),
+      )
       const wrapper = mount(OsButton, {
         props: { as: FakeLink },
         attrs: { to: '/groups' },
-        slots: { default: 'Groups' },
+        slots: { default: () => 'Groups' },
       })
 
       expect((wrapper.element as HTMLElement).tagName).toBe('A')

@@ -237,15 +237,15 @@
         /* v8 ignore stop */
 
         const { class: attrClass, ...restAttrs } = attrs as Record<string, unknown>
-        return h(
-          tag,
-          {
-            ...buttonData,
-            class: cn(buttonClass, attrClass || ''),
-            ...restAttrs,
-          },
-          children,
-        )
+        const nodeProps = {
+          ...buttonData,
+          class: cn(buttonClass, attrClass || ''),
+          ...restAttrs,
+        }
+        // Components expect slot functions; HTML elements accept VNode arrays
+        return typeof tag === 'string'
+          ? h(tag, nodeProps, children)
+          : h(tag, nodeProps, { default: () => children })
       }
     },
   })
