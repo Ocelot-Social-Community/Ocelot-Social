@@ -17,8 +17,7 @@ describe('ocelot icons', () => {
 
     it('auto-discovers all SVGs in svgs/ directory', () => {
       expect(ocelotIcons).toHaveProperty('angleDown')
-
-      expectTypeOf(angleDown).toBeFunction()
+      expect(typeof angleDown).toBe('function')
     })
 
     it('includes system icons (check, close, plus)', () => {
