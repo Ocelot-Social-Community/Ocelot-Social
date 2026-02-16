@@ -34,7 +34,6 @@
             </ds-heading>
             <!-- group slug -->
             <ds-text align="center" color="soft">
-              <!-- <base-icon name="at" data-test="ampersand" /> -->
               {{ `&${groupSlug}` }}
             </ds-text>
             <!-- group location -->

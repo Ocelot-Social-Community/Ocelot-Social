@@ -11,7 +11,6 @@
           }"
           @click.prevent="toggleMenu()"
         >
-          <!-- <base-icon name="globe" /> -->
           <span class="label">{{ current.code.toUpperCase() }}</span>
           <os-icon class="dropdown-arrow" :icon="icons.angleDown" />
         </a>

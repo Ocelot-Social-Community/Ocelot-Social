@@ -13,7 +13,6 @@
         <!-- group slug -->
         <div>
           <ds-text color="soft">
-            <!-- <base-icon name="at" data-test="ampersand" /> -->
             {{ `&${group.slug}` }}
           </ds-text>
         </div>
