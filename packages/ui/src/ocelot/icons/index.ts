@@ -1,5 +1,6 @@
-import type { Component } from 'vue-demi'
 import { SYSTEM_ICONS } from '../../components/OsIcon/icons'
+
+import type { Component } from 'vue-demi'
 
 const modules = import.meta.glob<Component>('./svgs/*.svg', {
   query: '?icon',
@@ -14,7 +15,5 @@ function toName(path: string): string {
 
 export const ocelotIcons: Record<string, Component> = {
   ...SYSTEM_ICONS,
-  ...Object.fromEntries(
-    Object.entries(modules).map(([path, icon]) => [toName(path), icon]),
-  ),
+  ...Object.fromEntries(Object.entries(modules).map(([path, icon]) => [toName(path), icon])),
 }

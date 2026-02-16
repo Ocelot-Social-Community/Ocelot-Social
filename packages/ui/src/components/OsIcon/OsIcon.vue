@@ -57,7 +57,7 @@
         // the globally-imported h() which requires currentInstance in Vue 2.7.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const createElement = isVue2 ? (instance?.proxy as any)?.$createElement : h
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
         const iconVNode = isRenderFn
           ? (iconComponent as (...args: any[]) => ReturnType<typeof h>)(createElement, isVue2)
           : h(iconComponent)

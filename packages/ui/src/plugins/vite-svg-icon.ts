@@ -34,7 +34,9 @@ export default function svgIcon(): Plugin {
       const viewBoxMatch = viewBoxRegex.exec(svg)
       const viewBox = viewBoxMatch ? viewBoxMatch[1] : '0 0 32 32'
 
-      const unsupported = svg.match(/<(?!\/|svg|path|circle|rect|polygon|polyline|ellipse|line|g\s|g>)(\w+)\s/g)
+      const unsupported = svg.match(
+        /<(?!\/|svg|path|circle|rect|polygon|polyline|ellipse|line|g\s|g>)(\w+)\s/g,
+      )
       if (unsupported) {
         this.warn(
           `${filePath}: unsupported SVG elements will be ignored: ${[...new Set(unsupported.map((s) => s.trim()))].join(', ')}`,
@@ -59,9 +61,7 @@ export default function svgIcon(): Plugin {
         const attrEntries = Object.entries(attrs)
           .map(([k, v]) => `'${escapeJS(k)}': '${escapeJS(v)}'`)
           .join(', ')
-        children.push(
-          `_h('${tag}', _v2 ? { attrs: { ${attrEntries} } } : { ${attrEntries} })`,
-        )
+        children.push(`_h('${tag}', _v2 ? { attrs: { ${attrEntries} } } : { ${attrEntries} })`)
       }
 
       const pathElements = children.join(', ')
