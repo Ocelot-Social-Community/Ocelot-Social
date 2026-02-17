@@ -21,7 +21,7 @@ const IGNORED_ELEMENTS = ['g']
 const KNOWN_ELEMENTS = ['svg', ...SUPPORTED_ELEMENTS, ...IGNORED_ELEMENTS]
 // Built from constant arrays above — safe to use in RegExp
 // eslint-disable-next-line security/detect-non-literal-regexp
-const UNSUPPORTED_REGEX = new RegExp(`<(?!\\/|${KNOWN_ELEMENTS.join('|')})(\\w+)[\\s>]`, 'g')
+const UNSUPPORTED_REGEX = new RegExp(`<(?!\\/|(?:${KNOWN_ELEMENTS.join('|')})\\b)(\\w+)[\\s>]`, 'g')
 
 export default function svgIcon(): Plugin {
   return {
