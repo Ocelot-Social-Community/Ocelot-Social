@@ -316,40 +316,39 @@ export default {
       } = context
 
       const session = context.driver.session()
-      await session.writeTransaction((transaction) => {
-        return transaction.run(
-          `
-          MATCH (user:User { id: $id })-[previousCategories:NOT_INTERESTED_IN]->(category:Category)
-          DELETE previousCategories
-          RETURN user, category
-        `,
-          { id },
-        )
-      })
-
-      // frontend gives [] when all categories are selected (default)
-      if (activeCategories.length === 0) return true
-
-      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const saveCategorySettingsResponse = await transaction.run(
-          `
-            MATCH (category:Category) WHERE NOT category.id IN $activeCategories
-            MATCH (user:User { id: $id })
-            MERGE (user)-[r:NOT_INTERESTED_IN]->(category)
-            RETURN user, r, category
-          `,
-          { id, activeCategories },
-        )
-        const [user] = await saveCategorySettingsResponse.records.map((record) =>
-          record.get('user'),
-        )
-        return user
-      })
       try {
-        await writeTxResultPromise
+        await session.writeTransaction((transaction) => {
+          return transaction.run(
+            `
+            MATCH (user:User { id: $id })-[previousCategories:NOT_INTERESTED_IN]->(category:Category)
+            DELETE previousCategories
+            RETURN user, category
+          `,
+            { id },
+          )
+        })
+
+        // frontend gives [] when all categories are selected (default)
+        if (activeCategories.length === 0) return true
+
+        await session.writeTransaction(async (transaction) => {
+          const saveCategorySettingsResponse = await transaction.run(
+            `
+              MATCH (category:Category) WHERE NOT category.id IN $activeCategories
+              MATCH (user:User { id: $id })
+              MERGE (user)-[r:NOT_INTERESTED_IN]->(category)
+              RETURN user, r, category
+            `,
+            { id, activeCategories },
+          )
+          const [user] = await saveCategorySettingsResponse.records.map((record) =>
+            record.get('user'),
+          )
+          return user
+        })
         return true
       } finally {
-        session.close()
+        await session.close()
       }
     },
     updateOnlineStatus: async (_object, args, context: Context, _resolveInfo) => {
