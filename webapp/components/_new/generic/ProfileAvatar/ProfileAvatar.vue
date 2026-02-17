@@ -1,5 +1,5 @@
 <template>
-  <div :class="['profile-avatar', size && `--${this.size}`, !isAvatar && '--no-image']">
+  <div :class="['profile-avatar', size && `--${size}`, !isAvatar && '--no-image']">
     <!-- '--no-image' is neccessary, because otherwise we still have a little unwanted boarder araund the image for images with white backgrounds -->
     <span class="initials">{{ profileInitials }}</span>
     <os-icon v-if="isAnonymous" :icon="icons.eyeSlash" />
