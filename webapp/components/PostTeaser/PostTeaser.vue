@@ -376,7 +376,7 @@ export default {
 
       > .pushed-icon {
         margin-right: $space-xx-small;
-        vertical-align: middle !important;
+        vertical-align: middle !important; // Override OsIcon's Tailwind align-bottom
       }
 
       > .ds-text {
