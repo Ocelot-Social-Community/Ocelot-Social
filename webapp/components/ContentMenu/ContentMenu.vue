@@ -270,7 +270,7 @@ export default {
           callback: () => {
             this.$emit(this.resource.groupPinned ? 'unpinGroupPost' : 'pinGroupPost', this.resource)
           },
-          icon: this.resource.groupPinned ? this.icons.unlink : this.icons.link,
+          icon: this.resource.groupPinned ? this.icons.unlink : this.icons.mapPin,
         })
       }
 
