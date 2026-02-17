@@ -19,3 +19,11 @@ svgContext.keys().forEach((fileName) => {
 
 // Branding icons override/extend ocelotIcons
 export const iconRegistry = { ...ocelotIcons, ...brandingIcons }
+
+export function resolveIcon(iconName) {
+  if (!iconName) return undefined
+  const icon = iconRegistry[toCamelCase(iconName)]
+  // eslint-disable-next-line no-console
+  if (!icon) console.warn(`Unknown icon: "${iconName}"`)
+  return icon
+}

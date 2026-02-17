@@ -6,6 +6,6 @@
  * SVGs are not available in the test environment.
  */
 const { ocelotIcons } = require('@ocelot-social/ui/ocelot')
-const { toCamelCase } = require('../../utils/iconRegistry')
+const { toCamelCase, resolveIcon } = require('../../utils/iconRegistry')
 
-module.exports = { iconRegistry: ocelotIcons, toCamelCase }
+module.exports = { iconRegistry: ocelotIcons, toCamelCase, resolveIcon }

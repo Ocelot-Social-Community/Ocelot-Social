@@ -40,7 +40,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { iconRegistry, toCamelCase } from '~/utils/iconRegistry'
+import { iconRegistry, resolveIcon } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
@@ -75,11 +75,7 @@ export default {
       this.$emit('updateCategories', categoryId)
     },
     resolveIcon(iconName) {
-      if (!iconName) return undefined
-      const icon = iconRegistry[toCamelCase(iconName)]
-      // eslint-disable-next-line no-console
-      if (!icon) console.warn(`[CategoriesFilter] Unknown icon: "${iconName}"`)
-      return icon
+      return resolveIcon(iconName)
     },
   },
 }

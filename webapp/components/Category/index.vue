@@ -7,7 +7,7 @@
 
 <script>
 import { OsIcon } from '@ocelot-social/ui'
-import { iconRegistry, toCamelCase } from '~/utils/iconRegistry'
+import { resolveIcon } from '~/utils/iconRegistry'
 
 export default {
   name: 'HcCategory',
@@ -19,10 +19,7 @@ export default {
   },
   computed: {
     resolvedIcon() {
-      const icon = iconRegistry[toCamelCase(this.icon)]
-      // eslint-disable-next-line no-console
-      if (!icon) console.warn(`[HcCategory] Unknown icon: "${this.icon}"`)
-      return icon
+      return resolveIcon(this.icon)
     },
   },
 }

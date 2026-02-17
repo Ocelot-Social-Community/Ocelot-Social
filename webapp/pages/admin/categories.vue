@@ -11,7 +11,7 @@
 
 <script>
 import { OsIcon } from '@ocelot-social/ui'
-import { iconRegistry, toCamelCase } from '~/utils/iconRegistry'
+import { resolveIcon } from '~/utils/iconRegistry'
 import gql from 'graphql-tag'
 
 export default {
@@ -35,11 +35,7 @@ export default {
   },
   methods: {
     resolveIcon(iconName) {
-      if (!iconName) return undefined
-      const icon = iconRegistry[toCamelCase(iconName)]
-      // eslint-disable-next-line no-console
-      if (!icon) console.warn(`[AdminCategories] Unknown icon: "${iconName}"`)
-      return icon
+      return resolveIcon(iconName)
     },
   },
   apollo: {
