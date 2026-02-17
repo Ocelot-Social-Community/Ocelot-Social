@@ -50,7 +50,7 @@ test.describe('OsIcon keyboard accessibility', () => {
 })
 
 test.describe('OsIcon visual regression', () => {
-  test('all system icons', async ({ page }) => {
+  test('all icons', async ({ page }) => {
     await page.goto(`${STORY_URL}--all-icons&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
