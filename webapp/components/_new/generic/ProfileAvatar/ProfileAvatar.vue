@@ -43,9 +43,6 @@ export default {
       default: true,
     },
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   computed: {
     isAnonymous() {
       return !this.profile || !this.profile.name || this.profile.name.toLowerCase() === 'anonymous'
@@ -59,6 +56,9 @@ export default {
 
       return this.profile.name.match(/\b\w/g).join('').substring(0, 3).toUpperCase()
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>

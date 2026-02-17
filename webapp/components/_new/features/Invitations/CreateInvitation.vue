@@ -38,13 +38,13 @@ export default {
       default: false,
     },
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   data() {
     return {
       comment: '',
     }
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     async generateInviteCode() {

@@ -31,9 +31,6 @@ import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 
 export default {
   components: { OsButton, OsIcon },
-  created() {
-    this.icons = ocelotIcons
-  },
   data() {
     return {
       formSchema: {
@@ -51,6 +48,9 @@ export default {
         this.formData = formData
       },
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     async submit() {

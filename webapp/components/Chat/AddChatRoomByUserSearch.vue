@@ -41,14 +41,14 @@ export default {
     //   default: [],
     // },
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   data() {
     return {
       id: 'search-user-to-add-to-group',
       user: {},
     }
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     selectUser(user) {
