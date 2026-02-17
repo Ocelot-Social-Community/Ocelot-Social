@@ -227,6 +227,39 @@ test.describe('OsButton visual regression', () => {
     await checkA11y(page)
   })
 
+  test('with suffix', async ({ page }) => {
+    await page.goto(`${STORY_URL}--with-suffix&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+
+    await expect(root.locator('.flex')).toHaveScreenshot('with-suffix.png')
+
+    await checkA11y(page)
+  })
+
+  test('icon and suffix', async ({ page }) => {
+    await page.goto(`${STORY_URL}--icon-and-suffix&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+
+    await expect(root.locator('.flex')).toHaveScreenshot('icon-and-suffix.png')
+
+    await checkA11y(page)
+  })
+
+  test('suffix only', async ({ page }) => {
+    await page.goto(`${STORY_URL}--suffix-only&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+
+    await expect(root.locator('.flex')).toHaveScreenshot('suffix-only.png')
+
+    await checkA11y(page)
+  })
+
   test('loading', async ({ page }) => {
     await page.goto(`${STORY_URL}--loading&viewMode=story`)
     const root = page.locator(STORY_ROOT)

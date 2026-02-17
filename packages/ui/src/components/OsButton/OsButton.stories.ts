@@ -683,6 +683,72 @@ export const Polymorphic: Story = {
   }),
 }
 
+export const WithSuffix: Story = {
+  render: () => ({
+    components: { OsButton, IconCheck, IconClose, IconPlus },
+    template: `
+      <div class="flex flex-wrap gap-2">
+        <OsButton variant="primary">
+          <template #suffix><IconCheck /></template>
+          Confirm
+        </OsButton>
+        <OsButton variant="default">
+          <template #suffix><IconPlus /></template>
+          Add
+        </OsButton>
+        <OsButton variant="danger">
+          <template #suffix><IconClose /></template>
+          Remove
+        </OsButton>
+      </div>
+    `,
+  }),
+}
+
+export const IconAndSuffix: Story = {
+  render: () => ({
+    components: { OsButton, IconCheck, IconClose, IconPlus },
+    template: `
+      <div class="flex flex-wrap gap-2">
+        <OsButton variant="primary">
+          <template #icon><IconCheck /></template>
+          <template #suffix><IconPlus /></template>
+          Action
+        </OsButton>
+        <OsButton variant="danger">
+          <template #icon><IconClose /></template>
+          <template #suffix><IconCheck /></template>
+          Delete
+        </OsButton>
+        <OsButton variant="success">
+          <template #icon><IconPlus /></template>
+          <template #suffix><IconCheck /></template>
+          Create
+        </OsButton>
+      </div>
+    `,
+  }),
+}
+
+export const SuffixOnly: Story = {
+  render: () => ({
+    components: { OsButton, IconCheck, IconClose, IconPlus },
+    template: `
+      <div class="flex flex-wrap gap-2">
+        <OsButton variant="primary" aria-label="Confirm">
+          <template #suffix><IconCheck /></template>
+        </OsButton>
+        <OsButton variant="danger" aria-label="Close">
+          <template #suffix><IconClose /></template>
+        </OsButton>
+        <OsButton variant="default" aria-label="Add">
+          <template #suffix><IconPlus /></template>
+        </OsButton>
+      </div>
+    `,
+  }),
+}
+
 export const Loading: Story = {
   render: () => ({
     components: { OsButton, IconCheck },

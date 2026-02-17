@@ -21,6 +21,7 @@
    *
    * @slot default - Button content (text or HTML)
    * @slot icon - Optional icon (rendered left of text). Use aria-label for icon-only buttons.
+   * @slot suffix - Optional trailing content (rendered right of text). Icons, badges, chevrons etc.
    */
 
   type Size = NonNullable<ButtonVariants['size']>
@@ -34,6 +35,9 @@
 
   const ICON_CLASS =
     'os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current'
+
+  const SUFFIX_CLASS =
+    'os-button__suffix inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current'
 
   const SPINNER_PX: Record<Size, number> = { sm: 24, md: 32, lg: 40, xl: 46 }
 
@@ -136,7 +140,9 @@
       return () => {
         const iconContent = slots.icon?.()
         const defaultContent = slots.default?.()
+        const suffixContent = slots.suffix?.()
         const hasIcon = iconContent && iconContent.length > 0
+        const hasSuffix = suffixContent && suffixContent.length > 0
         const hasText =
           defaultContent?.some((node: unknown) => {
             const children = (node as Record<string, unknown>).children
@@ -179,12 +185,28 @@
           innerChildren.push(...(defaultContent as ReturnType<typeof h>[]))
         }
 
+        if (hasSuffix) {
+          innerChildren.push(
+            h(
+              'span',
+              {
+                class: cn(
+                  SUFFIX_CLASS,
+                  !isSmall && (hasText ? '-mr-1' : '-ml-1 -mr-1'),
+                  isLoading && 'relative overflow-visible',
+                ),
+              },
+              suffixContent,
+            ),
+          )
+        }
+
         const contentWrapper = h(
           'span',
           {
             class: cn(
               'inline-flex items-center',
-              hasIcon && hasText && (isSmall ? 'gap-1' : 'gap-2'),
+              (hasIcon || hasSuffix) && hasText && (isSmall ? 'gap-1' : 'gap-2'),
             ),
           },
           innerChildren,
