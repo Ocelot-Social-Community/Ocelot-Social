@@ -31,7 +31,7 @@ export default {
       type: String,
       required: false,
       validator: (value) => {
-        return value.match(/(small|large)/)
+        return /^(small|large)$/.test(value)
       },
     },
     profile: {
