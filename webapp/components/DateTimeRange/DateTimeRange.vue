@@ -6,7 +6,7 @@
         {{ getStartDateString }}
       </div>
       <div>
-        <os-icon :icon="icons.clock" data-test="calendar" />
+        <os-icon :icon="icons.clock" data-test="clock" />
         {{
           getStartTimeString +
           (this.endDateAsDate && isSameDayLocal ? '&mdash;' + getEndTimeString : '')
@@ -21,7 +21,7 @@
           {{ getEndDateString }}
         </div>
         <div>
-          <os-icon :icon="icons.clock" data-test="calendar" />
+          <os-icon :icon="icons.clock" data-test="clock" />
           {{ getEndTimeString }}
         </div>
       </div>
