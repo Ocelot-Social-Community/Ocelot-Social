@@ -11,7 +11,7 @@
           data-test="newest-button"
         >
           <template #icon>
-            <os-icon :icon="icons.sortAmountAsc" />
+            <os-icon :icon="icons.sortAmountDesc" />
           </template>
           {{ buttonLabel('desc') }}
         </os-button>
@@ -26,7 +26,7 @@
           data-test="oldest-button"
         >
           <template #icon>
-            <os-icon :icon="icons.sortAmountDesc" />
+            <os-icon :icon="icons.sortAmountAsc" />
           </template>
           {{ buttonLabel('asc') }}
         </os-button>
