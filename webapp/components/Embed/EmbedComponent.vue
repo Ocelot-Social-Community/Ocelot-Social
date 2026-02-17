@@ -57,7 +57,7 @@
       @click.prevent="removeEmbed()"
     >
       <template #icon>
-        <os-icon name="close" />
+        <os-icon :icon="icons.close" />
       </template>
     </os-button>
   </ds-container>
@@ -65,6 +65,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters, mapMutations } from 'vuex'
 import { updateUserMutation } from '~/graphql/User.js'
 
@@ -95,6 +96,7 @@ export default {
     }
   },
   created() {
+    this.icons = ocelotIcons
     if (this.currentUser.allowEmbedIframes) {
       this.showEmbed = this.currentUser.allowEmbedIframes
       this.checkedAlwaysAllowEmbeds = this.currentUser.allowEmbedIframes

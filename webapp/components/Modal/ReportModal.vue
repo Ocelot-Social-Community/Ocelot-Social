@@ -31,7 +31,7 @@
     <template #footer>
       <os-button class="cancel" variant="primary" appearance="outline" @click="cancel">
         <template #icon>
-          <os-icon name="close" />
+          <os-icon :icon="icons.close" />
         </template>
         {{ $t('report.cancel') }}
       </os-button>

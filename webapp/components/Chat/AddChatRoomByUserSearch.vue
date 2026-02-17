@@ -12,7 +12,7 @@
         @click="closeUserSearch"
       >
         <template #icon>
-          <os-icon name="close" />
+          <os-icon :icon="icons.close" />
         </template>
       </os-button>
     </ds-flex>
@@ -25,6 +25,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import SelectUserSearch from '~/components/generic/SelectUserSearch/SelectUserSearch'
 
 export default {
@@ -39,6 +40,9 @@ export default {
     //   type: Array,
     //   default: [],
     // },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   data() {
     return {

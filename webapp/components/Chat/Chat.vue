@@ -60,7 +60,7 @@
                 @click="$emit('close-single-room', true)"
               >
                 <template #icon>
-                  <os-icon name="close" />
+                  <os-icon :icon="icons.close" />
                 </template>
               </os-button>
             </slot>

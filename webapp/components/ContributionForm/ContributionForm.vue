@@ -190,7 +190,7 @@
                 :disabled="!!errors"
               >
                 <template #icon>
-                  <os-icon name="check" />
+                  <os-icon :icon="icons.check" />
                 </template>
                 {{ $t('actions.save') }}
               </os-button>

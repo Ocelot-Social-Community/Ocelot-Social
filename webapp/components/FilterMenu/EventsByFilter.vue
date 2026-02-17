@@ -11,7 +11,7 @@
           data-test="all-button"
         >
           <template #icon>
-            <os-icon name="check" />
+            <os-icon :icon="icons.check" />
           </template>
           {{ $t('filter-menu.ended.all.label') }}
         </os-button>

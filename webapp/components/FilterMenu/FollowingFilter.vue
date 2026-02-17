@@ -15,7 +15,7 @@
           @click="setResetFollowers"
         >
           <template #icon>
-            <os-icon name="check" />
+            <os-icon :icon="icons.check" />
           </template>
           {{ $t('filter-menu.all') }}
         </os-button>

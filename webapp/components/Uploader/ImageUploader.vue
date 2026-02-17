@@ -50,7 +50,7 @@
         @click="closeCropper"
       >
         <template #icon>
-          <os-icon name="close" />
+          <os-icon :icon="icons.close" />
         </template>
       </os-button>
     </div>

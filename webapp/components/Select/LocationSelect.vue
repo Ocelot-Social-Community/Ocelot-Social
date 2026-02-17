@@ -23,13 +23,14 @@
       style="right: -94%; top: -48px"
       @click="clearLocationName"
     >
-      <template #icon><os-icon name="close" /></template>
+      <template #icon><os-icon :icon="icons.close" /></template>
     </os-button>
   </div>
 </template>
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { queryLocations } from '~/graphql/location'
 
 let timeout
@@ -53,6 +54,7 @@ export default {
     },
   },
   async created() {
+    this.icons = ocelotIcons
     const result = await this.requestGeoData(this.locationName)
     this.$nextTick(() => {
       this.currentValue = result || this.locationName

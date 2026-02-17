@@ -59,7 +59,7 @@
       @click="clear"
     >
       <template #icon>
-        <os-icon name="close" />
+        <os-icon :icon="icons.close" />
       </template>
     </os-button>
   </div>
@@ -67,6 +67,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { isEmpty } from 'lodash'
 import SearchHeading from '~/components/generic/SearchHeading/SearchHeading.vue'
 import SearchPost from '~/components/generic/SearchPost/SearchPost.vue'
@@ -96,6 +97,9 @@ export default {
       searchProcess: null,
       delay: 300,
     }
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   computed: {
     emptyText() {

@@ -21,7 +21,7 @@
           size="xl"
         >
           <template #icon>
-            <os-icon name="plus" />
+            <os-icon :icon="icons.plus" />
           </template>
         </os-button>
       </client-only>
@@ -185,9 +185,6 @@ export default {
     HeaderButton,
   },
   mixins: [postListActions, mobile(), GetCategories],
-  created() {
-    this.icons = ocelotIcons
-  },
   data() {
     const { hashtag = null } = this.$route.query
     return {
@@ -239,6 +236,9 @@ export default {
     postsFilter() {
       this.resetPostList()
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   mounted() {
     if (this.categoryId) {

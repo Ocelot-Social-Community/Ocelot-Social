@@ -25,7 +25,7 @@
           variant="primary"
           appearance="filled"
         >
-          <template #icon><os-icon name="check" /></template>
+          <template #icon><os-icon :icon="icons.check" /></template>
           {{ $t('actions.save') }}
         </os-button>
       </base-card>
@@ -36,6 +36,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { AddEmailAddressMutation } from '~/graphql/EmailAddress.js'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import scrollToContent from '../scroll-to-content.js'
@@ -46,6 +47,9 @@ export default {
     OsButton,
     OsIcon,
     SweetalertIcon,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   data() {
     return {

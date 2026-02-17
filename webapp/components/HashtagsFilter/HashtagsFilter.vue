@@ -11,7 +11,7 @@
       @click="clearSearch"
     >
       <template #icon>
-        <os-icon name="close" />
+        <os-icon :icon="icons.close" />
       </template>
     </os-button>
   </base-card>
@@ -19,6 +19,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 
 export default {
   components: { OsButton, OsIcon },
@@ -27,6 +28,9 @@ export default {
       type: String,
       required: true,
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     clearSearch() {

@@ -14,13 +14,14 @@
       @click.stop="clickRemove"
     >
       <template #icon>
-        <os-icon name="close" />
+        <os-icon :icon="icons.close" />
       </template>
     </os-button>
   </span>
 </template>
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 
 export default {
   name: 'HeaderButton',
@@ -42,6 +43,9 @@ export default {
       type: Function,
       required: true,
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>
