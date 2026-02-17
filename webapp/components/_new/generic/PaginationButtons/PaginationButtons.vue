@@ -53,6 +53,7 @@ export default {
     },
     hasPrevious: {
       type: Boolean,
+      default: false,
     },
     activePage: {
       type: Number,
