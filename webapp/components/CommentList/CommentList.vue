@@ -4,7 +4,7 @@
       <counter-icon :icon="icons.comments" :count="commentsCount" />
       {{ $t('common.comment', null, 0) }}
     </h3>
-    <div v-if="post.comments" id="comments" class="comments">
+    <div v-if="post.comments" class="comments">
       <comment-card
         v-for="comment in post.comments"
         :key="comment.id"
