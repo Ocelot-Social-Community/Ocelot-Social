@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, cleanup } from '@testing-library/vue'
+import { render, screen, fireEvent } from '@testing-library/vue'
 import '@testing-library/jest-dom'
 import ActionButton from './ActionButton.vue'
 import { ocelotIcons } from '@ocelot-social/ui/ocelot'
@@ -28,13 +28,12 @@ describe('ActionButton.vue', () => {
     })
   }
 
-  beforeEach(() => {
-    wrapper = Wrapper()
-  })
-
   describe('when not disabled', () => {
+    beforeEach(() => {
+      wrapper = Wrapper()
+    })
+
     it('renders', () => {
-      const wrapper = Wrapper()
       expect(wrapper.container).toMatchSnapshot()
     })
 
@@ -51,15 +50,15 @@ describe('ActionButton.vue', () => {
   })
 
   describe('when disabled', () => {
+    beforeEach(() => {
+      wrapper = Wrapper({ isDisabled: true })
+    })
+
     it('renders', () => {
-      cleanup()
-      const wrapper = Wrapper({ isDisabled: true })
       expect(wrapper.container).toMatchSnapshot()
     })
 
     it('button is disabled', () => {
-      cleanup()
-      Wrapper({ isDisabled: true })
       const button = screen.getByRole('button')
       expect(button).toBeDisabled()
     })
