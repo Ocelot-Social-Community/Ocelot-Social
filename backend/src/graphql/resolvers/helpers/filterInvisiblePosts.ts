@@ -6,29 +6,29 @@ import { mergeWith, isArray } from 'lodash'
 
 const getInvisiblePosts = async (context) => {
   const session = context.driver.session()
-  const readTxResultPromise = await session.readTransaction(async (transaction) => {
-    let cypher = ''
-    const { user } = context
-    if (user?.id) {
-      cypher = `
-        MATCH (post:Post)<-[:CANNOT_SEE]-(user:User { id: $userId })
-        RETURN collect(post.id) AS invisiblePostIds`
-    } else {
-      cypher = `
-        MATCH (post:Post)-[:IN]->(group:Group)
-        WHERE NOT group.groupType = 'public'
-        RETURN collect(post.id) AS invisiblePostIds`
-    }
-    const invisiblePostIdsResponse = await transaction.run(cypher, {
-      userId: user ? user.id : null,
-    })
-    return invisiblePostIdsResponse.records.map((record) => record.get('invisiblePostIds'))
-  })
   try {
-    const [invisiblePostIds] = readTxResultPromise
+    const readTxResult = await session.readTransaction(async (transaction) => {
+      let cypher = ''
+      const { user } = context
+      if (user?.id) {
+        cypher = `
+          MATCH (post:Post)<-[:CANNOT_SEE]-(user:User { id: $userId })
+          RETURN collect(post.id) AS invisiblePostIds`
+      } else {
+        cypher = `
+          MATCH (post:Post)-[:IN]->(group:Group)
+          WHERE NOT group.groupType = 'public'
+          RETURN collect(post.id) AS invisiblePostIds`
+      }
+      const invisiblePostIdsResponse = await transaction.run(cypher, {
+        userId: user ? user.id : null,
+      })
+      return invisiblePostIdsResponse.records.map((record) => record.get('invisiblePostIds'))
+    })
+    const [invisiblePostIds] = readTxResult
     return invisiblePostIds
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
