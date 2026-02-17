@@ -16,6 +16,16 @@ const ELEM_PATTERN = SUPPORTED_ELEMENTS.join('|')
 // eslint-disable-next-line security/detect-non-literal-regexp
 const ELEM_REGEX = new RegExp(`<(${ELEM_PATTERN})(?:\\s([^>]*?))?\\/?>`, 'g')
 
+// Elements silently ignored (container without visual effect)
+const IGNORED_ELEMENTS = ['g']
+const KNOWN_ELEMENTS = ['svg', ...SUPPORTED_ELEMENTS, ...IGNORED_ELEMENTS]
+// Built from constant arrays above — safe to use in RegExp
+// eslint-disable-next-line security/detect-non-literal-regexp
+const UNSUPPORTED_REGEX = new RegExp(
+  `<(?!\\/|${KNOWN_ELEMENTS.join('|')})(\\w+)[\\s>]`,
+  'g',
+)
+
 export default function svgIcon(): Plugin {
   return {
     name: 'svg-icon',
@@ -38,9 +48,8 @@ export default function svgIcon(): Plugin {
       const viewBoxMatch = viewBoxRegex.exec(svg)
       const viewBox = viewBoxMatch ? viewBoxMatch[1] : '0 0 32 32'
 
-      const unsupported = svg.match(
-        /<(?!\/|svg|path|circle|rect|polygon|polyline|ellipse|line|g\s|g>)(\w+)\s/g,
-      )
+      UNSUPPORTED_REGEX.lastIndex = 0
+      const unsupported = svg.match(UNSUPPORTED_REGEX)
       if (unsupported) {
         this.warn(
           `${filePath}: unsupported SVG elements will be ignored: ${[...new Set(unsupported.map((s) => s.trim()))].join(', ')}`,
