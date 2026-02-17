@@ -126,6 +126,7 @@
             <os-icon
               v-if="post.sortDate !== post.createdAt"
               :icon="icons.arrowUp"
+              size="sm"
               v-tooltip="{
                 content: $t('post.menu.pushed'),
                 placement: 'bottom-end',
@@ -375,6 +376,7 @@ export default {
 
       > .pushed-icon {
         margin-right: $space-xx-small;
+        vertical-align: middle !important;
       }
 
       > .ds-text {
