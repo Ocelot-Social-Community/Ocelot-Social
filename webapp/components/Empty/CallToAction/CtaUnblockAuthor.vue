@@ -25,9 +25,6 @@ import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 export default {
   name: 'CtaUnblockAuthor',
   components: { OsButton, OsIcon },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     author: {
       type: Object,
@@ -39,6 +36,9 @@ export default {
       const { id, slug } = this.author
       return { name: 'profile-id-slug', params: { slug, id } }
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>
