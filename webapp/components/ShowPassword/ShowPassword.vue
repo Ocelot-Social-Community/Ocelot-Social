@@ -11,7 +11,9 @@ import { OsIcon } from '@ocelot-social/ui'
 
 export default {
   components: { OsIcon },
-  props: ['icon'],
+  props: {
+    icon: { type: [Object, Function], required: true },
+  },
   emits: ['show-password'],
   methods: {
     togglePassword(event) {
