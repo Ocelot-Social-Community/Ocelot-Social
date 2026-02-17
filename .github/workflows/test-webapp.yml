@@ -49,16 +49,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.1.7
 
+      - name: Restore webapp cache
+        id: webapp-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/webapp.tar
+          key: webapp-test-${{ github.sha }}
+
       - name: Webapp | Build 'test' image
+        if: steps.webapp-cache.outputs.cache-hit != 'true'
         run: |
           docker build --target test -f webapp/Dockerfile -t "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" .
           docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" > /tmp/webapp.tar
 
-      - name: Cache docker image
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v4.0.2
+      - name: Save webapp cache
+        if: steps.webapp-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
         with:
           path: /tmp/webapp.tar
-          key: ${{ github.run_id }}-webapp-cache
+          key: webapp-test-${{ github.sha }}
 
   lint_webapp:
     name: Lint Webapp
@@ -89,10 +98,10 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.1.7
 
       - name: Restore webapp cache
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v4.0.2
+        uses: actions/cache/restore@v4
         with:
           path: /tmp/webapp.tar
-          key: ${{ github.run_id }}-webapp-cache
+          key: webapp-test-${{ github.sha }}
 
       - name: Load Docker Image
         run: docker load < /tmp/webapp.tar
