@@ -19,10 +19,7 @@ function toCamelCase(str) {
 
 function resolveIcon(iconName) {
   if (!iconName) return undefined
-  const icon = iconRegistry[toCamelCase(iconName)]
-  // eslint-disable-next-line no-console
-  if (!icon) console.warn(`Unknown icon: "${iconName}"`)
-  return icon
+  return iconRegistry[toCamelCase(iconName)]
 }
 
 module.exports = { iconRegistry, toCamelCase, resolveIcon }
