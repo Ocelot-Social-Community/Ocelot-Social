@@ -21,7 +21,7 @@
 </template>
 <script>
 import { OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import vueDropzone from 'nuxt-dropzone'
 
 export default {
@@ -60,7 +60,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     template() {

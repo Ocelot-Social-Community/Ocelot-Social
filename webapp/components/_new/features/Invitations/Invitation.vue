@@ -47,7 +47,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { mapMutations } from 'vuex'
 
 export default {
@@ -80,7 +80,7 @@ export default {
     }
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
     this.canCopy = !!navigator.clipboard
   },
   methods: {

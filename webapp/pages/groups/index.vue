@@ -60,7 +60,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import GroupList from '~/components/Group/GroupList'
 import { groupQuery, groupCountQuery } from '~/graphql/groups.js'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
@@ -83,7 +83,7 @@ export default {
     PaginationButtons,
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   data() {
     return {

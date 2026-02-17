@@ -60,7 +60,7 @@
 
 <script>
 import { OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import Dropdown from '~/components/Dropdown'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
@@ -138,7 +138,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     matcher(url, route) {

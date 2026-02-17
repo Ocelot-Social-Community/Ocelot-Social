@@ -12,7 +12,7 @@
 
 <script>
 import gql from 'graphql-tag'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 
 import ActionButton from '~/components/ActionButton.vue'
 
@@ -43,7 +43,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     toggle() {

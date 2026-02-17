@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import EventsByFilter from './EventsByFilter'
 import PostTypeFilter from './PostTypeFilter'
@@ -59,7 +59,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     saveCategories() {

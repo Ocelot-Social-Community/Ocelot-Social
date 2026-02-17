@@ -80,7 +80,7 @@
 
 <script>
 import { OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import Category from '~/components/Category'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
@@ -104,7 +104,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   computed: {
     descriptionExcerpt() {

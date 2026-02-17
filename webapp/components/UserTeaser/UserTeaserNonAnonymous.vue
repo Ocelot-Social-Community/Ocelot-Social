@@ -60,7 +60,7 @@
 
 <script>
 import { OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 
 import { userTeaserQuery } from '~/graphql/User.js'
@@ -132,7 +132,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     async loadPopover(openMenu) {

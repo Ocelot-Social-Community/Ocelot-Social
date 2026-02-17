@@ -65,7 +65,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
 import { updateUserMutation } from '~/graphql/User.js'
 
@@ -96,7 +96,7 @@ export default {
     }
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
     if (this.currentUser.allowEmbedIframes) {
       this.showEmbed = this.currentUser.allowEmbedIframes
       this.checkedAlwaysAllowEmbeds = this.currentUser.allowEmbedIframes

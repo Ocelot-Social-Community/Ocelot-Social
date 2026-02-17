@@ -165,7 +165,7 @@ import PasswordStrength from '~/components/Password/Strength'
 import EmailDisplayAndVerify from './EmailDisplayAndVerify'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import ShowPassword from '../ShowPassword/ShowPassword.vue'
 import LocationSelect from '~/components/Select/LocationSelect'
 
@@ -296,7 +296,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     buildName(data) {

@@ -343,7 +343,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import isEmpty from 'lodash/isEmpty'
 import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
@@ -409,7 +409,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     handleScroll() {

@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { mapMutations } from 'vuex'
 import DropdownFilter from '~/components/DropdownFilter/DropdownFilter'
 import ReportsTable from '~/components/features/ReportsTable/ReportsTable'
@@ -112,7 +112,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     ...mapMutations({

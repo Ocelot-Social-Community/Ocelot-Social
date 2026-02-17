@@ -31,7 +31,7 @@
 </template>
 <script>
 import { OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import Dropdown from '~/components/Dropdown'
 
 export default {
@@ -40,7 +40,7 @@ export default {
     OsIcon,
   },
   setup() {
-    return { icons: ocelotIcons }
+    return { icons: iconRegistry }
   },
   props: {
     selected: { type: String, default: '' },

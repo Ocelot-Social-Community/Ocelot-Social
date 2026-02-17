@@ -1,5 +1,5 @@
 import { storiesOf } from '@storybook/vue'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import helpers from '~/storybook/helpers'
 import LabeledButton from './LabeledButton.vue'
 
@@ -11,7 +11,7 @@ storiesOf('Generic/LabeledButton', module)
     components: { LabeledButton },
     data: () => ({
       filled: false,
-      icons: ocelotIcons,
+      icons: iconRegistry,
     }),
     template: `
       <labeled-button

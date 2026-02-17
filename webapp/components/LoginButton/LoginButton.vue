@@ -27,7 +27,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import Dropdown from '~/components/Dropdown'
 
 export default {
@@ -40,7 +40,7 @@ export default {
     placement: { type: String, default: 'top-end' },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
 }
 </script>

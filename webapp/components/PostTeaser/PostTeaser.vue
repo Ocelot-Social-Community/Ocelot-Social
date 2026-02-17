@@ -123,9 +123,9 @@
       <client-only>
         <div class="date-row" v-if="post.createdAt">
           <span class="text">
-            <base-icon
+            <os-icon
               v-if="post.sortDate !== post.createdAt"
-              name="arrow-up"
+              :icon="icons.arrowUp"
               v-tooltip="{
                 content: $t('post.menu.pushed'),
                 placement: 'bottom-end',
@@ -142,7 +142,8 @@
 </template>
 
 <script>
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { OsIcon } from '@ocelot-social/ui'
+import { iconRegistry } from '~/utils/iconRegistry'
 import Category from '~/components/Category'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
@@ -163,6 +164,7 @@ export default {
   components: {
     Category,
     ContentMenu,
+    OsIcon,
     CounterIcon,
     DateTimeRange,
     HcRibbon,
@@ -229,7 +231,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     async deletePostCallback() {

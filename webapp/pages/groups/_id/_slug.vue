@@ -289,7 +289,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
@@ -432,7 +432,7 @@ export default {
     // },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   watch: {
     isAllowedSeeingGroupMembers(to, _from) {
