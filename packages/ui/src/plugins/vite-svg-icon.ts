@@ -23,7 +23,7 @@ const ELEM_PATTERN = SUPPORTED_ELEMENTS.join('|')
 const ELEM_REGEX = new RegExp(`<(${ELEM_PATTERN})(?:\\s([^>]*?))?\\/?>`, 'g')
 
 // Elements silently ignored (container without visual effect)
-const IGNORED_ELEMENTS = ['g']
+const IGNORED_ELEMENTS = ['g', 'title']
 const KNOWN_ELEMENTS = ['svg', ...SUPPORTED_ELEMENTS, ...IGNORED_ELEMENTS]
 // Built from constant arrays above — safe to use in RegExp
 // eslint-disable-next-line security/detect-non-literal-regexp
