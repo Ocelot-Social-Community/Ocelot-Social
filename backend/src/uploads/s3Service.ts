@@ -5,18 +5,26 @@ import type { S3Config } from '@config/index'
 
 import { FileUploadCallback, FileDeleteCallback } from './types'
 
+let cachedClient: S3Client | null = null
+
+const getS3Client = (config: S3Config): S3Client => {
+  if (!cachedClient) {
+    const { AWS_ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = config
+    cachedClient = new S3Client({
+      credentials: {
+        accessKeyId: AWS_ACCESS_KEY_ID,
+        secretAccessKey: AWS_SECRET_ACCESS_KEY,
+      },
+      endpoint: AWS_ENDPOINT,
+      forcePathStyle: true,
+    })
+  }
+  return cachedClient
+}
+
 export const s3Service = (config: S3Config, prefix: string) => {
   const { AWS_BUCKET: Bucket } = config
-
-  const { AWS_ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = config
-  const s3 = new S3Client({
-    credentials: {
-      accessKeyId: AWS_ACCESS_KEY_ID,
-      secretAccessKey: AWS_SECRET_ACCESS_KEY,
-    },
-    endpoint: AWS_ENDPOINT,
-    forcePathStyle: true,
-  })
+  const s3 = getS3Client(config)
 
   const uploadFile: FileUploadCallback = async ({ createReadStream, uniqueFilename, mimetype }) => {
     const s3Location = prefix.length > 0 ? `${prefix}/${uniqueFilename}` : uniqueFilename
