@@ -52,6 +52,7 @@ describe('ActionButton.vue', () => {
 
   describe('when disabled', () => {
     it('renders', () => {
+      cleanup()
       const wrapper = Wrapper({ isDisabled: true })
       expect(wrapper.container).toMatchSnapshot()
     })
