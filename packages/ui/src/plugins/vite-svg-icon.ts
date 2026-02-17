@@ -7,8 +7,27 @@ const SUFFIX = '?icon'
 
 /** Escape a string for safe embedding in a single-quoted JS literal */
 function escapeJS(str: string): string {
-  return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'")
+  return str
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029')
 }
+
+const SUPPORTED_ELEMENTS = ['path', 'circle', 'rect', 'polygon', 'polyline', 'ellipse', 'line']
+const ELEM_PATTERN = SUPPORTED_ELEMENTS.join('|')
+// Built from constant array above — safe to use in RegExp
+// eslint-disable-next-line security/detect-non-literal-regexp
+const ELEM_REGEX = new RegExp(`<(${ELEM_PATTERN})(?:\\s([^>]*?))?\\/?>`, 'g')
+
+// Elements silently ignored (container without visual effect)
+const IGNORED_ELEMENTS = ['g', 'title']
+const KNOWN_ELEMENTS = ['svg', ...SUPPORTED_ELEMENTS, ...IGNORED_ELEMENTS]
+// Built from constant arrays above — safe to use in RegExp
+// eslint-disable-next-line security/detect-non-literal-regexp
+const UNSUPPORTED_REGEX = new RegExp(`<(?!\\/|(?:${KNOWN_ELEMENTS.join('|')})\\b)(\\w+)[\\s>]`, 'g')
 
 export default function svgIcon(): Plugin {
   return {
@@ -32,32 +51,43 @@ export default function svgIcon(): Plugin {
       const viewBoxMatch = viewBoxRegex.exec(svg)
       const viewBox = viewBoxMatch ? viewBoxMatch[1] : '0 0 32 32'
 
-      const unsupported = svg.match(/<(?:circle|rect|polygon|polyline|ellipse|line)\s/g)
+      const unsupported = svg.match(UNSUPPORTED_REGEX)
       if (unsupported) {
         this.warn(
           `${filePath}: unsupported SVG elements will be ignored: ${[...new Set(unsupported.map((s) => s.trim()))].join(', ')}`,
         )
       }
 
-      const paths: string[] = []
-      const pathRegex = /<path\s[^>]*?\bd="([^"]+)"/g
+      const children: string[] = []
+      ELEM_REGEX.lastIndex = 0
       let match: RegExpExecArray | null
-      while ((match = pathRegex.exec(svg)) !== null) {
-        paths.push(match[1])
+      while ((match = ELEM_REGEX.exec(svg)) !== null) {
+        const tag = match[1]
+        const attrString = match[2] || ''
+        const attrs: Record<string, string> = {}
+        const attrRegex = /(\w[\w-]*)=(["'])([^"']*)\2/g
+        let attrMatch: RegExpExecArray | null
+        while ((attrMatch = attrRegex.exec(attrString)) !== null) {
+          attrs[attrMatch[1]] = attrMatch[3]
+        }
+        const attrEntries = Object.entries(attrs)
+          .map(([k, v]) => `'${escapeJS(k)}': '${escapeJS(v)}'`)
+          .join(', ')
+        children.push(`_h('${tag}', _v2 ? { attrs: { ${attrEntries} } } : { ${attrEntries} })`)
       }
 
-      const pathElements = paths
-        .map((d) => {
-          const escaped = escapeJS(d)
-          return `h('path', isVue2 ? { attrs: { d: '${escaped}' } } : { d: '${escaped}' })`
-        })
-        .join(', ')
+      const pathElements = children.join(', ')
 
       const safeViewBox = escapeJS(viewBox)
 
-      return `import { h, isVue2 } from 'vue-demi'
+      // Icon functions accept optional (h, v2) from OsIcon. When OsIcon passes
+      // Vue 2's $createElement, we use it directly — avoiding the globally-imported
+      // h() which requires currentInstance in Vue 2.7.
+      // When used as a standalone Vue 3 component (e.g. in Storybook), h/v2 are not
+      // functions/booleans, so we fall back to the imported _hImport / _v2Import.
+      return `import { h as _hImport, isVue2 as _v2Import } from 'vue-demi'
 const svgAttrs = { xmlns: 'http://www.w3.org/2000/svg', viewBox: '${safeViewBox}', fill: 'currentColor' }
-export default () => h('svg', isVue2 ? { attrs: svgAttrs } : svgAttrs, [${pathElements}])
+export default (h, v2) => { const _h = typeof h === 'function' ? h : _hImport; const _v2 = typeof v2 === 'boolean' ? v2 : _v2Import; return _h('svg', _v2 ? { attrs: svgAttrs } : svgAttrs, [${pathElements}]) }
 `
     },
   }

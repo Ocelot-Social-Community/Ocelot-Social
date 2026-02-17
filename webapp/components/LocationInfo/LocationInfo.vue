@@ -1,7 +1,7 @@
 <template>
   <div :class="`location-info size-${size}`">
     <div class="location">
-      <base-icon name="map-marker" />
+      <os-icon :icon="icons.mapMarker" />
       {{ locationData.name }}
     </div>
     <div v-if="locationData.distanceToMe !== null && !isOwner" class="distance">
@@ -11,8 +11,12 @@
 </template>
 
 <script>
+import { OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+
 export default {
   name: 'LocationInfo',
+  components: { OsIcon },
   props: {
     locationData: { type: Object, default: null },
     size: {
@@ -26,6 +30,9 @@ export default {
       type: Boolean,
       required: true,
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>

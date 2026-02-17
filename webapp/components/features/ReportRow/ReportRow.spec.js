@@ -1,7 +1,8 @@
 import { mount, RouterLinkStub } from '@vue/test-utils'
 import Vuex from 'vuex'
 import ReportRow from './ReportRow.vue'
-import BaseIcon from '~/components/_new/generic/BaseIcon/BaseIcon'
+import { OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { reports } from '~/components/features/ReportList/ReportList.story.js'
 
 const localVue = global.localVue
@@ -84,8 +85,8 @@ describe('ReportRow', () => {
           wrapper = Wrapper()
         })
         it('renders the disabled icon', () => {
-          expect(wrapper.find('.status-line').findComponent(BaseIcon).props().name).toEqual(
-            'eye-slash',
+          expect(wrapper.find('.status-line').findComponent(OsIcon).props().icon).toBe(
+            ocelotIcons.eyeSlash,
           )
         })
 
@@ -100,7 +101,9 @@ describe('ReportRow', () => {
           wrapper = Wrapper()
         })
         it('renders the enabled icon', () => {
-          expect(wrapper.find('.status-line').findComponent(BaseIcon).props().name).toEqual('eye')
+          expect(wrapper.find('.status-line').findComponent(OsIcon).props().icon).toBe(
+            ocelotIcons.eye,
+          )
         })
 
         it('renders its current status', () => {
@@ -121,8 +124,8 @@ describe('ReportRow', () => {
       })
 
       it('renders a comments icon', () => {
-        const commentsIcon = wrapper.findComponent(BaseIcon).props().name
-        expect(commentsIcon).toEqual('comments')
+        const icon = wrapper.findComponent(OsIcon).props().icon
+        expect(icon).toBe(ocelotIcons.comments)
       })
 
       it('renders a link to the post, with the comment contentExcerpt', () => {
@@ -143,8 +146,8 @@ describe('ReportRow', () => {
       })
 
       it('renders a bookmark icon', () => {
-        const postIcon = wrapper.findComponent(BaseIcon).props().name
-        expect(postIcon).toEqual('bookmark')
+        const icon = wrapper.findComponent(OsIcon).props().icon
+        expect(icon).toBe(ocelotIcons.bookmark)
       })
 
       it('renders a link to the post', () => {
@@ -165,8 +168,8 @@ describe('ReportRow', () => {
       })
 
       it('renders a user icon', () => {
-        const userIcon = wrapper.findComponent(BaseIcon).props().name
-        expect(userIcon).toEqual('user')
+        const icon = wrapper.findComponent(OsIcon).props().icon
+        expect(icon).toBe(ocelotIcons.user)
       })
 
       it('renders a link to the user profile', () => {

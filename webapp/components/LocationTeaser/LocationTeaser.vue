@@ -1,6 +1,6 @@
 <template>
   <ds-text class="location-teaser" align="left" color="soft" :size="size">
-    <base-icon name="map-marker" data-test="map-marker" />
+    <os-icon :icon="icons.mapMarker" data-test="map-marker" />
     <span v-if="venue">{{ venue }}</span>
     <span v-if="venue">&nbsp;&mdash;&nbsp;</span>
     <span v-if="!isOnline">
@@ -13,8 +13,12 @@
 </template>
 
 <script>
+import { OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+
 export default {
   name: 'LocationTeaser',
+  components: { OsIcon },
   props: {
     /**
      * The size used for the text.
@@ -39,6 +43,9 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>

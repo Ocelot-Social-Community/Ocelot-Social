@@ -21,7 +21,7 @@
           size="xl"
         >
           <template #icon>
-            <os-icon name="plus" />
+            <os-icon :icon="icons.plus" />
           </template>
         </os-button>
       </client-only>
@@ -44,7 +44,7 @@
             >
               {{ $t('contribution.filterMasonryGrid.noFilter') }}
               &nbsp;
-              <base-icon :name="filterButtonIcon"></base-icon>
+              <os-icon :icon="filterButtonIcon" />
             </os-button>
 
             <header-button
@@ -152,6 +152,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import postListActions from '~/mixins/postListActions'
 import mobile from '~/mixins/mobile'
 import DonationInfo from '~/components/DonationInfo/DonationInfo.vue'
@@ -211,7 +212,7 @@ export default {
       orderBy: 'posts/orderBy',
     }),
     filterButtonIcon() {
-      return this.showFilter ? 'angle-up' : 'angle-down'
+      return this.showFilter ? this.icons.angleUp : this.icons.angleDown
     },
     finalFilters() {
       let filter = this.postsFilter
@@ -235,6 +236,9 @@ export default {
     postsFilter() {
       this.resetPostList()
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   mounted() {
     if (this.categoryId) {

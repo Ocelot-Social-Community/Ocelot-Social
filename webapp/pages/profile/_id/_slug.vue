@@ -31,7 +31,6 @@
               {{ userName }}
             </ds-heading>
             <ds-text align="center" color="soft">
-              <!-- <base-icon name="at" data-test="at" /> -->
               {{ `@${userSlug}` }}
             </ds-text>
             <location-info
@@ -106,7 +105,7 @@
               }"
               @click="showOrChangeChat(user.id)"
             >
-              <template #icon><base-icon name="chat-bubble" /></template>
+              <template #icon><os-icon :icon="icons.chatBubble" /></template>
               {{ $t('chat.userProfileButton.label') }}
             </os-button>
           </div>
@@ -161,7 +160,7 @@
                 :aria-label="$t('contribution.newPost')"
               >
                 <template #icon>
-                  <os-icon name="plus" />
+                  <os-icon :icon="icons.plus" />
                 </template>
               </os-button>
             </div>
@@ -212,6 +211,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import uniqBy from 'lodash/uniqBy'
 import { mapGetters, mapMutations } from 'vuex'
 import postListActions from '~/mixins/postListActions'
@@ -261,6 +261,9 @@ export default {
     FollowList,
     TabNavigation,
     LocationInfo,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   mixins: [postListActions],
   transition: {

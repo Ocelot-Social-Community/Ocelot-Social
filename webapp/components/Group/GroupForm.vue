@@ -19,7 +19,7 @@
         />
         <ds-chip size="base" :color="errors && errors.name ? 'danger' : 'medium'">
           {{ `${formData.name.length} / ${formSchema.name.min}–${formSchema.name.max}` }}
-          <base-icon v-if="errors && errors.name" name="warning" />
+          <os-icon v-if="errors && errors.name" :icon="icons.warning" />
         </ds-chip>
 
         <!-- group Slug -->
@@ -54,9 +54,9 @@
           :color="errors && errors.groupType && formData.groupType === '' ? 'danger' : 'medium'"
         >
           {{ `${formData.groupType === '' ? 0 : 1} / 1` }}
-          <base-icon
+          <os-icon
             v-if="errors && errors.groupType && formData.groupType === ''"
-            name="warning"
+            :icon="icons.warning"
           />
         </ds-chip>
 
@@ -85,7 +85,7 @@
         />
         <ds-chip size="base" :color="errors && errors.description ? 'danger' : 'medium'">
           {{ `${descriptionLength} / ${formSchema.description.min}` }}
-          <base-icon v-if="errors && errors.description" name="warning" />
+          <os-icon v-if="errors && errors.description" :icon="icons.warning" />
         </ds-chip>
 
         <!-- actionRadius -->
@@ -103,9 +103,9 @@
           "
         >
           {{ `${formData.actionRadius === '' ? 0 : 1} / 1` }}
-          <base-icon
+          <os-icon
             v-if="errors && errors.actionRadius && formData.actionRadius === ''"
-            name="warning"
+            :icon="icons.warning"
           />
         </ds-chip>
 
@@ -127,7 +127,7 @@
           />
           <ds-chip size="base" :color="errors && errors.categoryIds ? 'danger' : 'medium'">
             {{ formData.categoryIds.length }} / 3
-            <base-icon v-if="errors && errors.categoryIds" name="warning" />
+            <os-icon v-if="errors && errors.categoryIds" :icon="icons.warning" />
           </ds-chip>
         </div>
         <!-- submit -->
@@ -141,7 +141,7 @@
             type="submit"
             :disabled="checkFormError(errors)"
           >
-            <template #icon><base-icon name="save" /></template>
+            <template #icon><os-icon :icon="icons.save" /></template>
             {{ update ? $t('group.update') : $t('group.save') }}
           </os-button>
         </ds-space>
@@ -151,7 +151,8 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
 import {
@@ -173,6 +174,7 @@ export default {
     ActionRadiusSelect,
     LocationSelect,
     OsButton,
+    OsIcon,
   },
   props: {
     update: {
@@ -280,6 +282,9 @@ export default {
         this.sameCategories
       )
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     checkFormError(error) {

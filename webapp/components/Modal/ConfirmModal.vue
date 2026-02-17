@@ -18,7 +18,7 @@
         data-test="cancel-button"
       >
         <template v-if="modalData.buttons.cancel.icon" #icon>
-          <base-icon :name="modalData.buttons.cancel.icon" />
+          <os-icon :icon="modalData.buttons.cancel.icon" />
         </template>
         {{ $t(modalData.buttons.cancel.textIdent) }}
       </os-button>
@@ -32,7 +32,7 @@
         data-test="confirm-button"
       >
         <template v-if="modalData.buttons.confirm.icon" #icon>
-          <base-icon :name="modalData.buttons.confirm.icon" />
+          <os-icon :icon="modalData.buttons.confirm.icon" />
         </template>
         {{ $t(modalData.buttons.confirm.textIdent) }}
       </os-button>
@@ -41,13 +41,14 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 
 export default {
   name: 'ConfirmModal',
   components: {
     OsButton,
+    OsIcon,
     SweetalertIcon,
   },
   emits: ['close'],

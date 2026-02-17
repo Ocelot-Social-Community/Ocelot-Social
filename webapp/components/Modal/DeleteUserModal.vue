@@ -47,7 +47,7 @@
         :loading="loading"
         @click="openModal"
       >
-        <template #icon><base-icon name="exclamation-circle" /></template>
+        <template #icon><os-icon :icon="icons.exclamationCircle" /></template>
         {{ $t('settings.deleteUserAccount.name') }}
       </os-button>
     </template>
@@ -55,7 +55,8 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import gql from 'graphql-tag'
 import { mapMutations } from 'vuex'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
@@ -67,6 +68,7 @@ export default {
   components: {
     DateTime,
     OsButton,
+    OsIcon,
     SweetalertIcon,
     UserTeaser,
   },
@@ -80,13 +82,16 @@ export default {
       loading: false,
     }
   },
+  created() {
+    this.icons = ocelotIcons
+  },
   computed: {
     title() {
       return this.$t('settings.deleteUserAccount.name')
     },
 
-    modalData(userdata) {
-      return function (userdata) {
+    modalData() {
+      return (userdata) => {
         return {
           name: 'confirm',
           data: {
@@ -99,14 +104,14 @@ export default {
               buttons: {
                 confirm: {
                   danger: true,
-                  icon: 'trash',
+                  icon: this.icons.trash,
                   textIdent: this.$t('settings.deleteUserAccount.confirmDeleting'),
                   callback: () => {
                     this.confirm(userdata)
                   },
                 },
                 cancel: {
-                  icon: 'close',
+                  icon: this.icons.close,
                   textIdent: this.$t('actions.cancel'),
                   callback: () => {},
                 },

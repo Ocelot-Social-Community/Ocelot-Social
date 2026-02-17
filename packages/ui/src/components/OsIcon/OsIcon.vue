@@ -49,12 +49,19 @@
         const sizeClass = ICON_SIZES[props.size]
 
         // Vue 2's h() cannot handle plain arrow functions as components (only
-        // constructor functions or option objects). SYSTEM_ICONS entries are
-        // arrow functions that return VNodes, so call them directly.
+        // constructor functions or option objects). Icon render functions are
+        // arrow functions that accept optional (h, isVue2) and return VNodes.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const isRenderFn = typeof iconComponent === 'function' && !(iconComponent as any).cid
+        // In Vue 2, pass $createElement (bound to this instance) so icons avoid
+        // the globally-imported h() which requires currentInstance in Vue 2.7.
+        const createElement = /* v8 ignore next -- Vue 2 only */ isVue2
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (instance?.proxy as any)?.$createElement
+          : h
+
         const iconVNode = isRenderFn
-          ? (iconComponent as () => ReturnType<typeof h>)()
+          ? (iconComponent as (...args: unknown[]) => ReturnType<typeof h>)(createElement, isVue2)
           : h(iconComponent)
 
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
@@ -75,7 +82,7 @@
             {
               class: [
                 cn(
-                  'os-icon inline-flex items-center shrink-0',
+                  'os-icon inline-flex items-center align-bottom shrink-0',
                   sizeClass,
                   '[&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current',
                 ),
@@ -103,7 +110,7 @@
           'span',
           {
             class: cn(
-              'os-icon inline-flex items-center shrink-0',
+              'os-icon inline-flex items-center align-bottom shrink-0',
               sizeClass,
               '[&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current',
               attrClass as ClassValue,

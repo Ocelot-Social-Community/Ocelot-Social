@@ -8,7 +8,7 @@
       {{ $t('contribution.comment.commenting-disabled.blocked-author.call-to-action') }}
     </ds-text>
     <os-button as="nuxt-link" :to="authorLink" variant="primary" appearance="filled">
-      <template #icon><base-icon name="arrow-right" /></template>
+      <template #icon><os-icon :icon="icons.arrowRight" /></template>
       {{
         $t('contribution.comment.commenting-disabled.blocked-author.button-label', {
           name: author.name,
@@ -19,15 +19,17 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 
 export default {
   name: 'CtaUnblockAuthor',
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   props: {
     author: {
       type: Object,
       required: true,
+      validator: (value) => 'id' in value && 'slug' in value && 'name' in value,
     },
   },
   computed: {
@@ -35,6 +37,9 @@ export default {
       const { id, slug } = this.author
       return { name: 'profile-id-slug', params: { slug, id } }
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>

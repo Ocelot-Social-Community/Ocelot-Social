@@ -1,7 +1,7 @@
 <template>
   <base-card class="delete-data">
     <h2 class="title">
-      <base-icon name="warning" />
+      <os-icon :icon="icons.warning" />
       {{ $t('settings.deleteUserAccount.name') }}
     </h2>
     <label>
@@ -50,7 +50,7 @@
       @click="handleSubmit"
     >
       <template #icon>
-        <base-icon name="trash" />
+        <os-icon :icon="icons.trash" />
       </template>
       {{ $t('settings.deleteUserAccount.name') }}
     </os-button>
@@ -58,14 +58,15 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapActions, mapGetters } from 'vuex'
 import gql from 'graphql-tag'
 import { currentUserCountQuery } from '~/graphql/User'
 
 export default {
   name: 'DeleteData',
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   data() {
     return {
       deleteContributions: false,
@@ -83,6 +84,9 @@ export default {
         this.currentUserCounts = currentUser.currentUser
       },
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   computed: {
     ...mapGetters({
@@ -137,7 +141,7 @@ export default {
   display: flex;
   flex-direction: column;
 
-  > .title > .base-icon {
+  > .title > .os-icon {
     color: $color-danger;
   }
 

@@ -65,7 +65,7 @@ exports[`CreateInvitation.vue renders 1`] = `
           >
             <span
               aria-hidden="true"
-              class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+              class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
             >
               <svg
                 fill="currentColor"
@@ -151,7 +151,7 @@ exports[`CreateInvitation.vue renders with disabled button 1`] = `
           >
             <span
               aria-hidden="true"
-              class="os-icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
+              class="os-icon inline-flex items-center align-bottom shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current"
             >
               <svg
                 fill="currentColor"

@@ -11,19 +11,20 @@
     @click.prevent="toggle"
   >
     <template #icon>
-      <base-icon :name="icon" />
+      <os-icon :icon="icon" />
     </template>
     {{ label }}
   </os-button>
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { followUserMutation, unfollowUserMutation } from '~/graphql/User'
 
 export default {
   name: 'HcFollowButton',
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   props: {
     followId: { type: String, default: null },
     isFollowed: { type: Boolean, default: false },
@@ -38,9 +39,9 @@ export default {
   computed: {
     icon() {
       if (this.isFollowed && this.hovered) {
-        return 'close'
+        return this.icons.close
       } else {
-        return this.isFollowed ? 'check' : 'plus'
+        return this.isFollowed ? this.icons.check : this.icons.plus
       }
     },
     label() {
@@ -56,6 +57,9 @@ export default {
       this.loading = false
       this.hovered = false
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     onHover() {

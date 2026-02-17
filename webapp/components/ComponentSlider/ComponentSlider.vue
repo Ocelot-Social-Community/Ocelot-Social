@@ -65,7 +65,7 @@
           data-test="next-button"
         >
           <template v-if="sliderData.sliders[sliderIndex].button.icon" #icon>
-            <base-icon :name="sliderData.sliders[sliderIndex].button.icon" />
+            <os-icon :icon="sliderData.sliders[sliderIndex].button.icon" />
           </template>
           {{ $t(sliderData.sliders[sliderIndex].button.titleIdent) }}
         </os-button>
@@ -77,10 +77,10 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 
 export default {
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   name: 'ComponentSlider',
   props: {
     sliderData: { type: Object, required: true },

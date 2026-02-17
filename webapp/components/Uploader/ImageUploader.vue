@@ -8,7 +8,7 @@
       @vdropzone-file-added="fileAdded"
     >
       <loading-spinner v-if="isLoadingImage" />
-      <base-icon v-else-if="!hasImage" name="image" />
+      <os-icon v-else-if="!hasImage" :icon="icons.image" />
       <div v-if="!hasImage" class="supported-formats">
         {{ $t('contribution.teaserImage.supportedFormats') }}
       </div>
@@ -25,7 +25,7 @@
         @click.stop="deleteImage"
       >
         <template #icon>
-          <base-icon name="trash" />
+          <os-icon :icon="icons.trash" />
         </template>
       </os-button>
     </div>
@@ -50,7 +50,7 @@
         @click="closeCropper"
       >
         <template #icon>
-          <os-icon name="close" />
+          <os-icon :icon="icons.close" />
         </template>
       </os-button>
     </div>
@@ -59,6 +59,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import Cropper from 'cropperjs'
 import VueDropzone from 'nuxt-dropzone'
 import LoadingSpinner from '~/components/_new/generic/LoadingSpinner/LoadingSpinner'
@@ -93,6 +94,9 @@ export default {
       imageCanBeCropped: false,
       isLoadingImage: false,
     }
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     onUnSupportedFormat(message) {
@@ -242,12 +246,12 @@ export default {
     cursor: pointer;
 
     &:hover {
-      > .base-icon {
+      > .os-icon {
         opacity: $opacity-base;
       }
     }
 
-    > .base-icon {
+    > .os-icon {
       position: absolute;
       padding: $space-small;
       border-radius: 100%;

@@ -31,7 +31,7 @@
             ref="password"
             :type="showPassword ? 'text' : 'password'"
           />
-          <show-password @show-password="toggleShowPassword" :iconName="iconName" />
+          <show-password @show-password="toggleShowPassword" :icon="passwordIcon" />
         </div>
         <nuxt-link to="/password-reset/request">
           {{ $t('login.forgotPassword') }}
@@ -44,7 +44,7 @@
           name="submit"
           type="submit"
         >
-          <template #icon><base-icon name="sign-in" /></template>
+          <template #icon><os-icon :icon="icons.signIn" /></template>
           {{ $t('login.login') }}
         </os-button>
         <p>
@@ -66,7 +66,8 @@ import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParams
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
 import ShowPassword from '../ShowPassword/ShowPassword.vue'
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters, mapMutations } from 'vuex'
 
 export default {
@@ -74,6 +75,7 @@ export default {
     LocaleSwitch,
     Logo,
     OsButton,
+    OsIcon,
     PageParamsLink,
     ShowPassword,
   },
@@ -92,13 +94,16 @@ export default {
     pending() {
       return this.$store.getters['auth/pending']
     },
-    iconName() {
-      return this.showPassword ? 'eye-slash' : 'eye'
+    passwordIcon() {
+      return this.showPassword ? this.icons.eyeSlash : this.icons.eye
     },
     ...mapGetters({
       currentUser: 'auth/user',
       categories: 'categories/categories',
     }),
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     ...mapMutations({

@@ -1,8 +1,10 @@
 import Vue from 'vue'
 import LoginForm from './LoginForm.vue'
+import ShowPassword from '../ShowPassword/ShowPassword.vue'
 import Styleguide from '@@/'
 import Vuex from 'vuex'
 import { mount, createLocalVue } from '@vue/test-utils'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
@@ -131,13 +133,13 @@ describe('LoginForm', () => {
     describe('Click on show password icon, icon change', () => {
       const wrapper = Wrapper()
       it('shows eye icon by default', () => {
-        expect(wrapper.find('span.icon-wrapper').attributes('data-test')).toEqual('eye')
+        expect(wrapper.findComponent(ShowPassword).props().icon).toBe(ocelotIcons.eye)
       })
 
       it('shows the slash-eye icon after click', async () => {
         wrapper.find('span.click-wrapper').trigger('click')
         await Vue.nextTick()
-        await expect(wrapper.find('span.icon-wrapper').attributes('data-test')).toEqual('eye-slash')
+        expect(wrapper.findComponent(ShowPassword).props().icon).toBe(ocelotIcons.eyeSlash)
       })
     })
 

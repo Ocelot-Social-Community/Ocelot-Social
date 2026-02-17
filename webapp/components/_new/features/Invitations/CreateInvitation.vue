@@ -18,7 +18,7 @@
         :disabled="disabled"
       >
         <template #icon>
-          <os-icon name="plus" />
+          <os-icon :icon="icons.plus" />
         </template>
       </os-button>
     </form>
@@ -27,6 +27,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 
 export default {
   name: 'CreateInvitation',
@@ -42,8 +43,11 @@ export default {
       comment: '',
     }
   },
+  created() {
+    this.icons = ocelotIcons
+  },
   methods: {
-    async generateInviteCode() {
+    generateInviteCode() {
       this.$emit('generate-invite-code', this.comment)
       this.comment = ''
     },

@@ -11,9 +11,8 @@
           }"
           @click.prevent="toggleMenu()"
         >
-          <!-- <base-icon name="globe" /> -->
           <span class="label">{{ current.code.toUpperCase() }}</span>
-          <os-icon class="dropdown-arrow" :icon="ocelotIcons.IconAngleDown" />
+          <os-icon class="dropdown-arrow" :icon="icons.angleDown" />
         </a>
       </template>
       <template #popover="{ toggleMenu }">
@@ -49,9 +48,6 @@ export default {
     Dropdown,
     OsIcon,
   },
-  setup() {
-    return { ocelotIcons }
-  },
   props: {
     placement: { type: String, default: 'bottom-start' },
     offset: { type: [String, Number], default: '16' },
@@ -77,6 +73,9 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     changeLanguage(locale, toggleMenu) {

@@ -7,7 +7,7 @@
       @click="(event) => $emit('click', event)"
     >
       <template #icon>
-        <base-icon :name="icon" />
+        <os-icon :icon="icon" />
       </template>
     </os-button>
     <label class="label">{{ label }}</label>
@@ -15,17 +15,17 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 
 export default {
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   props: {
     filled: {
       type: Boolean,
       default: false,
     },
     icon: {
-      type: String,
+      type: [Object, Function],
       required: true,
     },
     label: {

@@ -10,7 +10,7 @@
         @click="commands.bold"
       >
         <template #icon>
-          <base-icon name="bold" />
+          <os-icon :icon="icons.bold" />
         </template>
       </os-button>
 
@@ -23,7 +23,7 @@
         @click="commands.italic"
       >
         <template #icon>
-          <base-icon name="italic" />
+          <os-icon :icon="icons.italic" />
         </template>
       </os-button>
 
@@ -36,7 +36,7 @@
         @click="commands.underline"
       >
         <template #icon>
-          <base-icon name="underline" />
+          <os-icon :icon="icons.underline" />
         </template>
       </os-button>
 
@@ -49,7 +49,7 @@
         @click="(event) => toggleLinkInput(getMarkAttrs('link'), event.target.closest('button'))"
       >
         <template #icon>
-          <base-icon name="link" />
+          <os-icon :icon="icons.link" />
         </template>
       </os-button>
 
@@ -62,7 +62,7 @@
         @click="commands.paragraph"
       >
         <template #icon>
-          <base-icon name="paragraph" />
+          <os-icon :icon="icons.paragraph" />
         </template>
       </os-button>
 
@@ -97,7 +97,7 @@
         @click="commands.bullet_list"
       >
         <template #icon>
-          <base-icon name="list-ul" />
+          <os-icon :icon="icons.listUl" />
         </template>
       </os-button>
 
@@ -110,7 +110,7 @@
         @click="commands.ordered_list"
       >
         <template #icon>
-          <base-icon name="list-ol" />
+          <os-icon :icon="icons.listOl" />
         </template>
       </os-button>
 
@@ -123,7 +123,7 @@
         @click="commands.blockquote"
       >
         <template #icon>
-          <base-icon name="quote-right" />
+          <os-icon :icon="icons.quoteRight" />
         </template>
       </os-button>
 
@@ -136,7 +136,7 @@
         @click="commands.horizontal_rule"
       >
         <template #icon>
-          <base-icon name="minus" />
+          <os-icon :icon="icons.minus" />
         </template>
       </os-button>
 
@@ -146,19 +146,24 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { EditorMenuBar } from 'tiptap'
 import MenuLegend from './MenuLegend.vue'
 
 export default {
   components: {
-    OsButton,
     EditorMenuBar,
     MenuLegend,
+    OsButton,
+    OsIcon,
   },
   props: {
-    editor: Object,
-    toggleLinkInput: Function,
+    editor: { type: Object, default: null },
+    toggleLinkInput: { type: Function, required: true },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>

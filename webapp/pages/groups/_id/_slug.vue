@@ -34,7 +34,6 @@
             </ds-heading>
             <!-- group slug -->
             <ds-text align="center" color="soft">
-              <!-- <base-icon name="at" data-test="ampersand" /> -->
               {{ `&${groupSlug}` }}
             </ds-text>
             <!-- group location -->
@@ -70,7 +69,7 @@
               v-if="group.isMutedByMe"
               @click="unmuteGroup"
             >
-              <template #icon><base-icon name="volume-up" /></template>
+              <template #icon><os-icon :icon="icons.volumeUp" /></template>
               {{ $t('group.unmute') }}
             </os-button>
             <!-- Group join / leave -->
@@ -235,7 +234,7 @@
             }"
           >
             <template #icon>
-              <os-icon name="plus" />
+              <os-icon :icon="icons.plus" />
             </template>
           </os-button>
         </ds-space>
@@ -290,6 +289,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
 import { updateGroupMutation, groupQuery, groupMembersQuery } from '~/graphql/groups'
@@ -430,6 +430,9 @@ export default {
     //     },
     //   ]
     // },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   watch: {
     isAllowedSeeingGroupMembers(to, _from) {

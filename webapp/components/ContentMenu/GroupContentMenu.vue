@@ -12,7 +12,7 @@
           @click.prevent="toggleMenu()"
         >
           <template #icon>
-            <base-icon name="ellipsis-v" />
+            <os-icon :icon="icons.ellipsisV" />
           </template>
         </os-button>
       </slot>
@@ -27,7 +27,7 @@
               :parents="item.parents"
               @click.stop.prevent="openItem(item.route, toggleMenu)"
             >
-              <base-icon :name="item.route.icon" />
+              <os-icon :icon="item.route.icon" />
               {{ item.route.label }}
             </ds-menu-item>
           </template>
@@ -38,14 +38,16 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import Dropdown from '~/components/Dropdown'
 
 export default {
   name: 'GroupContentMenu',
   components: {
-    OsButton,
     Dropdown,
+    OsButton,
+    OsIcon,
   },
   props: {
     usage: {
@@ -65,7 +67,7 @@ export default {
       if (this.usage !== 'groupProfile') {
         routes.push({
           label: this.$t('group.contentMenu.visitGroupPage'),
-          icon: 'home',
+          icon: this.icons.home,
           path: `/groups/${this.group.id}`,
           params: { id: this.group.id, slug: this.group.slug },
         })
@@ -75,7 +77,7 @@ export default {
         if (this.group.isMutedByMe) {
           routes.push({
             label: this.$t('group.contentMenu.unmuteGroup'),
-            icon: 'volume-up',
+            icon: this.icons.volumeUp,
             callback: () => {
               this.$emit('unmute', this.group.id)
             },
@@ -83,7 +85,7 @@ export default {
         } else {
           routes.push({
             label: this.$t('group.contentMenu.muteGroup'),
-            icon: 'volume-off',
+            icon: this.icons.volumeOff,
             callback: () => {
               this.$emit('mute', this.group.id)
             },
@@ -95,17 +97,20 @@ export default {
         routes.push({
           label: this.$t('admin.settings.name'),
           path: `/groups/edit/${this.group.id}`,
-          icon: 'edit',
+          icon: this.icons.edit,
         })
         routes.push({
           label: this.$t('group.contentMenu.inviteLinks'),
           path: `/groups/edit/${this.group.id}/invites`,
-          icon: 'link',
+          icon: this.icons.link,
         })
       }
 
       return routes
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     openItem(route, toggleMenu) {

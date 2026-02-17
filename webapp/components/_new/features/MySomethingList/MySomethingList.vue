@@ -33,7 +33,7 @@
                 data-test="edit-button"
               >
                 <template #icon>
-                  <base-icon name="edit" />
+                  <os-icon :icon="icons.edit" />
                 </template>
               </os-button>
               <os-button
@@ -46,7 +46,7 @@
                 data-test="delete-button"
               >
                 <template #icon>
-                  <base-icon name="trash" />
+                  <os-icon :icon="icons.trash" />
                 </template>
               </os-button>
             </template>
@@ -82,12 +82,13 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapMutations } from 'vuex'
 
 export default {
   name: 'MySomethingList',
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   props: {
     useFormData: { type: Object, default: () => ({}) },
     useFormSchema: { type: Object, default: () => ({}) },
@@ -132,6 +133,9 @@ export default {
     useItems(newItems) {
       this.items = newItems
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     ...mapMutations({
@@ -192,7 +196,7 @@ export default {
                 },
               },
               cancel: {
-                icon: 'close',
+                icon: this.icons.close,
                 textIdent: 'actions.cancel',
                 callback: () => {},
               },

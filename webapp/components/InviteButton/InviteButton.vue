@@ -13,7 +13,7 @@
         @click.prevent="toggleMenu"
       >
         <template #icon>
-          <base-icon name="user-plus" />
+          <os-icon :icon="icons.userPlus" />
         </template>
       </os-button>
     </template>
@@ -36,7 +36,8 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import Dropdown from '~/components/Dropdown'
 import { mapGetters, mapMutations } from 'vuex'
 import InvitationList from '~/components/_new/features/Invitations/InvitationList.vue'
@@ -45,13 +46,13 @@ import { generatePersonalInviteCode, invalidateInviteCode } from '~/graphql/Invi
 export default {
   components: {
     OsButton,
+    OsIcon,
     Dropdown,
     InvitationList,
   },
   props: {
     placement: { type: String, default: 'top-end' },
   },
-
   computed: {
     ...mapGetters({
       user: 'auth/user',
@@ -59,6 +60,9 @@ export default {
     inviteCode() {
       return this.user.inviteCodes[0] || null
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     ...mapMutations({

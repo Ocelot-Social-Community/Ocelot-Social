@@ -62,7 +62,7 @@
             :aria-label="$t('settings.blocked-users.columns.unblock')"
             @click="unblockUser(scope)"
           >
-            <template #icon><base-icon name="user-plus" /></template>
+            <template #icon><os-icon :icon="icons.userPlus" /></template>
           </os-button>
         </template>
       </ds-table>
@@ -83,7 +83,8 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { blockedUsers, unblockUser } from '~/graphql/settings/BlockedUsers'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import scrollToContent from './scroll-to-content.js'
@@ -92,7 +93,11 @@ export default {
   mixins: [scrollToContent],
   components: {
     OsButton,
+    OsIcon,
     ProfileAvatar,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   data() {
     return {

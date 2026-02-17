@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/vue'
 import '@testing-library/jest-dom'
 import ActionButton from './ActionButton.vue'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 
 const localVue = global.localVue
 
@@ -19,7 +20,7 @@ describe('ActionButton.vue', () => {
       mocks,
       localVue,
       propsData: {
-        icon: 'heart',
+        icon: ocelotIcons.heartO,
         text: 'Click me',
         count: 7,
         disabled: isDisabled,
@@ -27,13 +28,12 @@ describe('ActionButton.vue', () => {
     })
   }
 
-  beforeEach(() => {
-    wrapper = Wrapper()
-  })
-
   describe('when not disabled', () => {
+    beforeEach(() => {
+      wrapper = Wrapper()
+    })
+
     it('renders', () => {
-      const wrapper = Wrapper()
       expect(wrapper.container).toMatchSnapshot()
     })
 
@@ -50,15 +50,17 @@ describe('ActionButton.vue', () => {
   })
 
   describe('when disabled', () => {
+    beforeEach(() => {
+      wrapper = Wrapper({ isDisabled: true })
+    })
+
     it('renders', () => {
-      const wrapper = Wrapper({ isDisabled: true })
       expect(wrapper.container).toMatchSnapshot()
     })
 
-    it('button does not emit click event', async () => {
+    it('button is disabled', () => {
       const button = screen.getByRole('button')
-      await fireEvent.click(button)
-      expect(wrapper.emitted().click).toEqual([[]])
+      expect(button).toBeDisabled()
     })
   })
 })

@@ -28,7 +28,7 @@
             <input type="checkbox" id="blur-img" v-model="formData.imageBlurred" />
             <page-params-link class="link" :pageParams="links.FAQ">
               {{ $t('contribution.inappropriatePicture') }}
-              <base-icon name="question-circle" />
+              <os-icon :icon="icons.questionCircle" />
             </page-params-link>
           </div>
           <ds-space margin-top="base" />
@@ -41,7 +41,7 @@
           />
           <ds-chip size="base" :color="errors && errors.title && 'danger'">
             {{ formData.title.length }}/{{ formSchema.title.max }}
-            <base-icon v-if="errors && errors.title" name="warning" />
+            <os-icon v-if="errors && errors.title" :icon="icons.warning" />
           </ds-chip>
           <editor
             :users="users"
@@ -51,7 +51,7 @@
           />
           <ds-chip size="base" :color="errors && errors.content && 'danger'">
             {{ contentLength }}
-            <base-icon v-if="errors && errors.content" name="warning" />
+            <os-icon v-if="errors && errors.content" :icon="icons.warning" />
           </ds-chip>
 
           <!-- Eventdata -->
@@ -82,7 +82,7 @@
                   class="chipbox event-grid-item-margin-helper"
                 >
                   <ds-chip size="base" :color="errors && errors.eventStart && 'danger'">
-                    <base-icon name="warning" />
+                    <os-icon :icon="icons.warning" />
                   </ds-chip>
                 </div>
               </ds-grid-item>
@@ -116,7 +116,7 @@
                 <div class="chipbox">
                   <ds-chip size="base" :color="errors && errors.eventVenue && 'danger'">
                     {{ formData.eventVenue.length }}/{{ formSchema.eventVenue.max }}
-                    <base-icon v-if="errors && errors.eventVenue" name="warning" />
+                    <os-icon v-if="errors && errors.eventVenue" :icon="icons.warning" />
                   </ds-chip>
                 </div>
               </ds-grid-item>
@@ -129,7 +129,7 @@
                 <div class="chipbox">
                   <ds-chip size="base" :color="errors && errors.eventLocationName && 'danger'">
                     {{ formData.eventLocationName.length }}/{{ formSchema.eventLocationName.max }}
-                    <base-icon v-if="errors && errors.eventLocationName" name="warning" />
+                    <os-icon v-if="errors && errors.eventLocationName" :icon="icons.warning" />
                   </ds-chip>
                 </div>
               </ds-grid-item>
@@ -159,7 +159,7 @@
             :color="errors && errors.categoryIds && 'danger'"
           >
             {{ formData.categoryIds.length }} / 3
-            <base-icon v-if="errors && errors.categoryIds" name="warning" />
+            <os-icon v-if="errors && errors.categoryIds" :icon="icons.warning" />
           </ds-chip>
           <ds-flex class="buttons-footer" gutter="xxx-small">
             <ds-flex-item width="3.5" class="buttons-footer-helper">
@@ -190,7 +190,7 @@
                 :disabled="!!errors"
               >
                 <template #icon>
-                  <os-icon name="check" />
+                  <os-icon :icon="icons.check" />
                 </template>
                 {{ $t('actions.save') }}
               </os-button>
@@ -203,6 +203,7 @@
 </template>
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
 import Editor from '~/components/Editor/Editor'
@@ -380,6 +381,9 @@ export default {
       if (!this.formData.categoryIds.length && this.groupCategories)
         this.formData.categoryIds = this.groupCategories.map((cat) => cat.id)
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     notBeforeToday(date) {

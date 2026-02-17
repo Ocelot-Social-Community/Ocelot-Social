@@ -14,7 +14,7 @@
     }"
   >
     <template #icon>
-      <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
+      <counter-icon :icon="icons.bell" :count="unreadNotificationsCount" danger />
     </template>
   </os-button>
   <dropdown
@@ -38,7 +38,7 @@
         @click="toggleMenu"
       >
         <template #icon>
-          <counter-icon icon="bell" :count="unreadNotificationsCount" danger />
+          <counter-icon :icon="icons.bell" :count="unreadNotificationsCount" danger />
         </template>
       </os-button>
     </template>
@@ -78,6 +78,7 @@
 import { mapGetters } from 'vuex'
 import unionBy from 'lodash/unionBy'
 import { OsButton } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import {
   notificationQuery,
   markAsReadMutation,
@@ -104,6 +105,9 @@ export default {
   props: {
     placement: { type: String },
     noMenu: { type: Boolean, default: false },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   mounted() {
     window.addEventListener('resize', this.handleResize)

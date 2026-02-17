@@ -36,7 +36,7 @@
           :disabled="!!errors"
           :loading="loadingData"
         >
-          <template #icon><os-icon name="check" /></template>
+          <template #icon><os-icon :icon="icons.check" /></template>
           {{ $t('actions.save') }}
         </os-button>
       </base-card>
@@ -46,6 +46,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters, mapMutations } from 'vuex'
 import UniqueSlugForm from '~/components/utils/UniqueSlugForm'
 import LocationSelect from '~/components/Select/LocationSelect'
@@ -72,6 +73,9 @@ export default {
         locationName: '',
       },
     }
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   mounted() {
     this.formData.name = this.currentUser.name

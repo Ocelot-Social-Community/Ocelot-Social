@@ -15,7 +15,7 @@
           @click="setResetFollowers"
         >
           <template #icon>
-            <os-icon name="check" />
+            <os-icon :icon="icons.check" />
           </template>
           {{ $t('filter-menu.all') }}
         </os-button>
@@ -30,7 +30,7 @@
             @click="toggleFilteredByFollowed(currentUser.id)"
           >
             <template #icon>
-              <base-icon name="user-plus" />
+              <os-icon :icon="icons.userPlus" />
             </template>
             {{ $t('filter-menu.following') }}
           </os-button>
@@ -44,7 +44,7 @@
             @click="toggleFilteredByMyGroups()"
           >
             <template #icon>
-              <base-icon name="users" />
+              <os-icon :icon="icons.users" />
             </template>
             {{ $t('contribution.filterMyGroups') }}
           </os-button>
@@ -56,6 +56,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 
@@ -72,6 +73,9 @@ export default {
       filteredByPostsInMyGroups: 'posts/filteredByPostsInMyGroups',
       currentUser: 'auth/user',
     }),
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     ...mapMutations({

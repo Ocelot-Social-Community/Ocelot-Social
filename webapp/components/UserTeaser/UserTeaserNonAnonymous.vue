@@ -42,7 +42,7 @@
           <span>{{ injectedText }}<span v-if="injectedText && injectedDate && !userOnly && dateTime"> {{$t('notifications.reason.on_date')}} <date-time :date-time="dateTime" /></span></span>
         </div>
         <span v-if="!userOnly && !injectedDate && dateTime" class="text">
-          <base-icon name="clock" />
+          <os-icon :icon="icons.clock" />
           <date-time :date-time="dateTime" />
           <slot name="dateTime"></slot>
         </span>
@@ -59,6 +59,8 @@
 </template>
 
 <script>
+import { OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters } from 'vuex'
 
 import { userTeaserQuery } from '~/graphql/User.js'
@@ -71,11 +73,12 @@ import UserTeaserHelper from './UserTeaserHelper.vue'
 export default {
   name: 'UserTeaserNonAnonymous',
   components: {
-    ProfileAvatar,
-    UserTeaserPopover,
-    UserTeaserHelper,
-    Dropdown,
     DateTime,
+    Dropdown,
+    OsIcon,
+    ProfileAvatar,
+    UserTeaserHelper,
+    UserTeaserPopover,
   },
   props: {
     linkToProfile: { type: Boolean, default: true },
@@ -127,6 +130,9 @@ export default {
       const { name } = this.group || {}
       return name || this.$t('profile.userAnonym')
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     async loadPopover(openMenu) {

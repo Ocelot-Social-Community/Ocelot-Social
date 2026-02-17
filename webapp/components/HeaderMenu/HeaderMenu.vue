@@ -97,7 +97,7 @@
                   }"
                 >
                   <template #icon>
-                    <base-icon name="users" />
+                    <os-icon :icon="icons.users" />
                   </template>
                 </os-button>
               </client-only>
@@ -117,7 +117,7 @@
                   }"
                 >
                   <template #icon>
-                    <base-icon name="globe-detailed" size="large" />
+                    <os-icon :icon="icons.globeDetailed" size="xl" />
                   </template>
                 </os-button>
               </client-only>
@@ -179,7 +179,7 @@
               @click="toggleMobileMenuView"
             >
               <template #icon>
-                <base-icon name="bars" />
+                <os-icon :icon="icons.bars" />
               </template>
             </os-button>
           </ds-flex-item>
@@ -246,7 +246,7 @@
                   }"
                 >
                   <template #icon>
-                    <base-icon name="users" />
+                    <os-icon :icon="icons.users" />
                   </template>
                 </os-button>
               </div>
@@ -274,7 +274,7 @@
                   }"
                 >
                   <template #icon>
-                    <base-icon name="globe-detailed" size="large" />
+                    <os-icon :icon="icons.globeDetailed" size="xl" />
                   </template>
                 </os-button>
               </div>
@@ -342,7 +342,8 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters } from 'vuex'
 import isEmpty from 'lodash/isEmpty'
 import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
@@ -366,6 +367,7 @@ export default {
   mixins: [GetCategories],
   components: {
     OsButton,
+    OsIcon,
     AvatarMenu,
     ChatNotificationMenu,
     CustomButton,
@@ -405,6 +407,9 @@ export default {
       const [firstRoute] = this.$route.matched
       return firstRoute && firstRoute.name === 'index'
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     handleScroll() {
@@ -507,13 +512,13 @@ export default {
 
       button {
         overflow: visible;
-        .svg {
+        .os-icon {
           height: 1.8em;
         }
       }
     }
   }
-  .hamburger-button .svg {
+  .hamburger-button .os-icon {
     height: 1.5em;
   }
 }
@@ -535,8 +540,8 @@ export default {
   margin-left: 3px;
   margin-right: 3px;
 
-  .base-icon > .svg.--large {
-    margin-left: 0;
+  .os-icon {
+    margin: -4px;
   }
 }
 </style>

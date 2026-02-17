@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { mount } from '@vue/test-utils'
 import MySomethingList from './MySomethingList.vue'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 
 const localVue = global.localVue
 
@@ -23,7 +24,7 @@ describe('MySomethingList.vue', () => {
         deleteModal: {
           titleIdent: 'delete-modal.title',
           messageIdent: 'delete-modal.message',
-          confirm: { icon: 'trash', buttonTextIdent: 'delete-modal.confirm-button' },
+          confirm: { icon: ocelotIcons.trash, buttonTextIdent: 'delete-modal.confirm-button' },
         },
         edit: 'edit-something',
       },
@@ -151,12 +152,12 @@ describe('MySomethingList.vue', () => {
                 buttons: {
                   confirm: {
                     danger: true,
-                    icon: 'trash',
+                    icon: ocelotIcons.trash,
                     textIdent: 'delete-modal.confirm-button',
                     callback: expect.any(Function),
                   },
                   cancel: {
-                    icon: 'close',
+                    icon: ocelotIcons.close,
                     textIdent: 'actions.cancel',
                     callback: expect.any(Function),
                   },

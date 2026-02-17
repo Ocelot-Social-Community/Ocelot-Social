@@ -10,14 +10,14 @@
         @click.prevent="toggleMenu"
       >
         <template #icon>
-          <base-icon name="sign-in" />
+          <os-icon :icon="icons.signIn" />
         </template>
       </os-button>
     </template>
     <template #popover>
       <div class="login-button-menu-popover">
         <nuxt-link class="login-link" :to="{ name: 'login' }">
-          <base-icon name="sign-in" />
+          <os-icon :icon="icons.signIn" />
           {{ $t('login.login') }}
         </nuxt-link>
       </div>
@@ -26,16 +26,21 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import Dropdown from '~/components/Dropdown'
 
 export default {
   components: {
     OsButton,
+    OsIcon,
     Dropdown,
   },
   props: {
     placement: { type: String, default: 'top-end' },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>

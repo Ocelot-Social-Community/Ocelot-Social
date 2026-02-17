@@ -43,7 +43,7 @@
                   @click="blurred = !blurred"
                 >
                   <template #icon>
-                    <base-icon :name="blurred ? 'eye' : 'eye-slash'" />
+                    <os-icon :icon="blurred ? icons.eye : icons.eyeSlash" />
                   </template>
                 </os-button>
               </aside>
@@ -181,7 +181,8 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
 import CommentList from '~/components/CommentList/CommentList'
@@ -218,6 +219,7 @@ export default {
   },
   components: {
     OsButton,
+    OsIcon,
     CommentForm,
     CommentList,
     ContentMenu,
@@ -235,6 +237,9 @@ export default {
     UserTeaser,
   },
   mixins: [GetCategories, postListActions, SortCategories],
+  created() {
+    this.icons = ocelotIcons
+  },
   head() {
     return {
       title: this.title,

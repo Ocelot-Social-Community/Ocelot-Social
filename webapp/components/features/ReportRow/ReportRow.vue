@@ -3,7 +3,7 @@
     <tr>
       <!-- Icon Column -->
       <td class="ds-table-col">
-        <base-icon :name="iconName" :title="iconLabel" />
+        <os-icon :icon="iconName" :aria-label="iconLabel" />
       </td>
 
       <!-- Number of Filed Reports Column -->
@@ -42,7 +42,7 @@
       <!-- Status Column -->
       <td class="ds-table-col" data-test="report-reviewer">
         <span class="status-line">
-          <base-icon :name="statusIconName" :class="isDisabled ? '--disabled' : '--enabled'" />
+          <os-icon :icon="statusIconName" :class="isDisabled ? '--disabled' : '--enabled'" />
           {{ statusText }}
         </span>
         <client-only v-if="isReviewed">
@@ -69,7 +69,7 @@
           @click="$emit('confirm-report')"
         >
           <template #icon>
-            <base-icon :name="statusIconName" />
+            <os-icon :icon="statusIconName" />
           </template>
           {{ $t('moderation.reports.decideButton') }}
         </os-button>
@@ -85,13 +85,15 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import FiledReportsTable from '~/components/features/FiledReportsTable/FiledReportsTable'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 
 export default {
   components: {
     OsButton,
+    OsIcon,
     FiledReportsTable,
     UserTeaser,
   },
@@ -106,6 +108,9 @@ export default {
     return {
       showFiledReports: false,
     }
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   computed: {
     isPost() {
@@ -125,9 +130,9 @@ export default {
       return reviewed && reviewed.length
     },
     iconName() {
-      if (this.isPost) return 'bookmark'
-      else if (this.isComment) return 'comments'
-      else if (this.isUser) return 'user'
+      if (this.isPost) return this.icons.bookmark
+      else if (this.isComment) return this.icons.comments
+      else if (this.isUser) return this.icons.user
       else return null
     },
     iconLabel() {
@@ -150,7 +155,7 @@ export default {
       )
     },
     statusIconName() {
-      return this.isDisabled ? 'eye-slash' : 'eye'
+      return this.isDisabled ? this.icons.eyeSlash : this.icons.eye
     },
     statusText() {
       if (!this.isReviewed) return this.$t('moderation.reports.enabled')
@@ -178,7 +183,7 @@ export default {
   .status-line {
     display: inline-flex;
 
-    > .base-icon {
+    > .os-icon {
       margin-right: $space-xx-small;
     }
   }

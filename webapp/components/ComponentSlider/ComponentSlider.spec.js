@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import ComponentSlider from './ComponentSlider.vue'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 
 const localVue = global.localVue
 
@@ -20,7 +21,7 @@ describe('ComponentSlider.vue', () => {
           {
             validated: true,
             button: {
-              icon: 'smile',
+              icon: ocelotIcons.arrowRight,
               callback: jest.fn().mockResolvedValue(true),
               sliderCallback: jest.fn().mockResolvedValue(true),
             },
@@ -28,7 +29,7 @@ describe('ComponentSlider.vue', () => {
           {
             validated: true,
             button: {
-              icon: 'smile',
+              icon: ocelotIcons.check,
               callback: jest.fn().mockResolvedValue(true),
               sliderCallback: jest.fn().mockResolvedValue(true),
             },

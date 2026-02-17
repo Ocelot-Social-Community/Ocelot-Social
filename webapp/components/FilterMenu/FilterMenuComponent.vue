@@ -7,7 +7,7 @@
           <labeled-button
             filled
             :label="$t('actions.saveCategories')"
-            icon="save"
+            :icon="icons.save"
             @click="saveCategories"
           />
         </div>
@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters } from 'vuex'
 import EventsByFilter from './EventsByFilter'
 import PostTypeFilter from './PostTypeFilter'
@@ -56,6 +57,9 @@ export default {
     eventSetInPostTypeFilter() {
       return this.filteredPostTypes ? this.filteredPostTypes.includes('Event') : null
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     saveCategories() {

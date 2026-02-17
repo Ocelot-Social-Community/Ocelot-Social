@@ -3,16 +3,19 @@
     <h2 class="title">{{ $t('admin.categories.name') }}</h2>
     <ds-table :data="Category" :fields="fields" condensed>
       <template #icon="scope">
-        <base-icon :name="scope.row.icon" />
+        <os-icon :icon="resolveIcon(scope.row.icon)" />
       </template>
     </ds-table>
   </base-card>
 </template>
 
 <script>
+import { OsIcon } from '@ocelot-social/ui'
+import { resolveIcon } from '~/utils/iconRegistry'
 import gql from 'graphql-tag'
 
 export default {
+  components: { OsIcon },
   data() {
     return {
       Category: [],
@@ -28,6 +31,11 @@ export default {
           align: 'right',
         },
       }
+    },
+  },
+  methods: {
+    resolveIcon(iconName) {
+      return resolveIcon(iconName)
     },
   },
   apollo: {

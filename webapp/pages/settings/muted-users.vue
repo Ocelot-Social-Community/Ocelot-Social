@@ -59,7 +59,7 @@
             :aria-label="$t('settings.muted-users.columns.unmute')"
             @click="unmuteUser(scope)"
           >
-            <template #icon><base-icon name="user-plus" /></template>
+            <template #icon><os-icon :icon="icons.userPlus" /></template>
           </os-button>
         </template>
       </ds-table>
@@ -80,7 +80,8 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mutedUsers, unmuteUser } from '~/graphql/settings/MutedUsers'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import scrollToContent from './scroll-to-content.js'
@@ -89,7 +90,11 @@ export default {
   mixins: [scrollToContent],
   components: {
     OsButton,
+    OsIcon,
     ProfileAvatar,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   data() {
     return {

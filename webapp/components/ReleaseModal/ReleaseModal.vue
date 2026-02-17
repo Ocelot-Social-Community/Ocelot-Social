@@ -15,7 +15,7 @@
         @click="confirm"
       >
         <template #icon>
-          <base-icon name="exclamation-circle" />
+          <os-icon :icon="icons.exclamationCircle" />
         </template>
         {{ $t('release.submit') }}
       </os-button>
@@ -24,12 +24,13 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import gql from 'graphql-tag'
 
 export default {
   name: 'ReleaseModal',
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   props: {
     name: { type: String, default: '' },
     type: { type: String, required: true },
@@ -50,6 +51,9 @@ export default {
       const name = this.$filters.truncate(this.name, 30)
       return this.$t(`release.${this.type}.message`, { name })
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     cancel() {

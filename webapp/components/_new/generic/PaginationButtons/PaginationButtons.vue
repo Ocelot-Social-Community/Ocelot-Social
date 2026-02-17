@@ -10,7 +10,7 @@
       :aria-label="$t('pagination.previous')"
       @click="$emit('back')"
     >
-      <template #icon><base-icon name="arrow-left" /></template>
+      <template #icon><os-icon :icon="icons.arrowLeft" /></template>
     </os-button>
 
     <span v-if="showPageCounter" class="pagination-pageCount" data-test="pagination-pageCount">
@@ -28,17 +28,19 @@
       :aria-label="$t('pagination.next')"
       @click="$emit('next')"
     >
-      <template #icon><base-icon name="arrow-right" /></template>
+      <template #icon><os-icon :icon="icons.arrowRight" /></template>
     </os-button>
   </div>
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 
 export default {
   components: {
     OsButton,
+    OsIcon,
   },
   props: {
     pageSize: {
@@ -51,6 +53,7 @@ export default {
     },
     hasPrevious: {
       type: Boolean,
+      default: false,
     },
     activePage: {
       type: Number,
@@ -68,6 +71,9 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>

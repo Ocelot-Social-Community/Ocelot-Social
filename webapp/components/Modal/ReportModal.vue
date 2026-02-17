@@ -31,7 +31,7 @@
     <template #footer>
       <os-button class="cancel" variant="primary" appearance="outline" @click="cancel">
         <template #icon>
-          <os-icon name="close" />
+          <os-icon :icon="icons.close" />
         </template>
         {{ $t('report.cancel') }}
       </os-button>
@@ -45,7 +45,7 @@
         @click="confirm"
       >
         <template #icon>
-          <base-icon name="exclamation-circle" />
+          <os-icon :icon="icons.exclamationCircle" />
         </template>
         {{ $t('report.submit') }}
       </os-button>
@@ -55,6 +55,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import { reportMutation } from '~/graphql/Moderation.js'
 import { valuesReasonCategoryOptions } from '~/constants/modals.js'
@@ -84,14 +85,6 @@ export default {
       },
     }
   },
-  created() {
-    this.form.reasonCategoryOptions = valuesReasonCategoryOptions.map((reasonCategory) => {
-      return {
-        label: this.$t('report.reason.category.options.' + reasonCategory),
-        value: reasonCategory,
-      }
-    })
-  },
   computed: {
     title() {
       return this.$t(`report.${this.type}.title`)
@@ -106,6 +99,15 @@ export default {
         ...validReportSchema.formSchema,
       }
     },
+  },
+  created() {
+    this.icons = ocelotIcons
+    this.form.reasonCategoryOptions = valuesReasonCategoryOptions.map((reasonCategory) => {
+      return {
+        label: this.$t('report.reason.category.options.' + reasonCategory),
+        value: reasonCategory,
+      }
+    })
   },
   methods: {
     async cancel() {

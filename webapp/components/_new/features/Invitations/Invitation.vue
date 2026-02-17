@@ -26,7 +26,7 @@
         :aria-label="$t('invite-codes.copy-code')"
       >
         <template #icon>
-          <base-icon name="copy" />
+          <os-icon :icon="icons.copy" />
         </template>
       </os-button>
       <os-button
@@ -38,7 +38,7 @@
         :aria-label="$t('invite-codes.invalidate')"
       >
         <template #icon>
-          <base-icon name="trash" />
+          <os-icon :icon="icons.trash" />
         </template>
       </os-button>
     </div>
@@ -46,13 +46,15 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapMutations } from 'vuex'
 
 export default {
   name: 'Invitation',
   components: {
     OsButton,
+    OsIcon,
   },
   props: {
     inviteCode: {
@@ -78,6 +80,7 @@ export default {
     }
   },
   created() {
+    this.icons = ocelotIcons
     this.canCopy = !!navigator.clipboard
   },
   methods: {
@@ -100,14 +103,14 @@ export default {
             buttons: {
               confirm: {
                 danger: true,
-                icon: 'trash',
+                icon: this.icons.trash,
                 textIdent: 'actions.delete',
                 callback: () => {
                   this.$emit('invalidate-invite-code', this.inviteCode.code)
                 },
               },
               cancel: {
-                icon: 'close',
+                icon: this.icons.close,
                 textIdent: 'actions.cancel',
                 callback: () => {},
               },

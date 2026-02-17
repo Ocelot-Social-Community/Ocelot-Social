@@ -44,7 +44,7 @@
             :aria-label="$t('chat.expandChat')"
           >
             <template #icon>
-              <base-icon name="expand" />
+              <os-icon :icon="icons.expand" />
             </template>
           </os-button>
         </ds-flex-item>
@@ -60,7 +60,7 @@
                 @click="$emit('close-single-room', true)"
               >
                 <template #icon>
-                  <os-icon name="close" />
+                  <os-icon :icon="icons.close" />
                 </template>
               </os-button>
             </slot>
@@ -106,6 +106,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { roomQuery, createRoom, unreadRoomsQuery } from '~/graphql/Rooms'
 import {
   messageQuery,
@@ -198,6 +199,9 @@ export default {
       messagePageSize: 20,
       messages: [],
     }
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   mounted() {
     if (this.singleRoom) {

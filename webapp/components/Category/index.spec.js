@@ -1,4 +1,6 @@
 import { mount } from '@vue/test-utils'
+import { OsIcon } from '@ocelot-social/ui'
+import { resolveIcon } from '~/utils/iconRegistry'
 
 import Category from './index'
 
@@ -20,7 +22,7 @@ describe('Category', () => {
 
   describe('given Strings for Icon and Name', () => {
     beforeEach(() => {
-      icon = 'mouse-pointer'
+      icon = 'home'
       name = 'Peter'
     })
 
@@ -28,8 +30,10 @@ describe('Category', () => {
       expect(Wrapper().text()).toContain('Peter')
     })
 
-    it('shows base icon', () => {
-      expect(Wrapper().find('.base-icon').exists()).toBe(true)
+    it('shows icon', () => {
+      const wrapper = Wrapper()
+      expect(wrapper.findComponent(OsIcon).exists()).toBe(true)
+      expect(wrapper.findComponent(OsIcon).props().icon).toBe(resolveIcon('home'))
     })
   })
 })

@@ -8,9 +8,9 @@
         @click.prevent="toggleMenu()"
       >
         <template #icon>
-          <base-icon name="filter" />
+          <os-icon :icon="icons.filter" />
         </template>
-        <os-icon class="dropdown-arrow" :icon="ocelotIcons.IconAngleDown" />
+        <os-icon class="dropdown-arrow" :icon="icons.angleDown" />
       </os-button>
     </template>
     <template #popover>
@@ -33,9 +33,6 @@ export default {
     OsButton,
     OsIcon,
   },
-  setup() {
-    return { ocelotIcons }
-  },
   props: {
     placement: { type: String },
     offset: { type: [String, Number] },
@@ -44,6 +41,9 @@ export default {
     ...mapGetters({
       filterActive: 'posts/isActive',
     }),
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>

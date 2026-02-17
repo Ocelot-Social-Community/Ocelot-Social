@@ -7,7 +7,7 @@
     <template #filter-follower>
       <li class="item all-item">
         <labeled-button
-          icon="check"
+          :icon="icons.check"
           :label="$t('filter-menu.all')"
           :filled="filteredPostTypes.length === 0"
           :title="$t('filter-menu.all')"
@@ -18,7 +18,7 @@
       </li>
       <li class="item article-item">
         <labeled-button
-          icon="book"
+          :icon="icons.book"
           :label="$t('filter-menu.article')"
           :filled="filteredPostTypes.includes('Article')"
           :title="$t('filter-menu.article')"
@@ -27,7 +27,7 @@
       </li>
       <li class="item event-item">
         <labeled-button
-          icon="calendar"
+          :icon="icons.calendar"
           :label="$t('filter-menu.event')"
           :filled="filteredPostTypes.includes('Event')"
           :title="$t('filter-menu.event')"
@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
@@ -53,6 +54,9 @@ export default {
     ...mapGetters({
       filteredPostTypes: 'posts/filteredPostTypes',
     }),
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     ...mapMutations({

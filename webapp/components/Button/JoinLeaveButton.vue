@@ -12,7 +12,7 @@
     @click.prevent="toggle"
   >
     <template #icon>
-      <base-icon :name="icon" />
+      <os-icon :icon="icon" />
     </template>
     {{ label }}
   </os-button>
@@ -20,12 +20,13 @@
 
 <script>
 import { mapMutations } from 'vuex'
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { joinGroupMutation, leaveGroupMutation } from '~/graphql/groups'
 
 export default {
   name: 'JoinLeaveButton',
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   props: {
     group: { type: Object, required: true },
     userId: { type: String, required: true },
@@ -45,12 +46,12 @@ export default {
     icon() {
       if (this.isMember) {
         if (this.isNonePendingMember) {
-          return this.hovered ? 'close' : 'check'
+          return this.hovered ? this.icons.close : this.icons.check
         } else {
-          return this.hovered ? 'close' : 'question-circle'
+          return this.hovered ? this.icons.close : this.icons.questionCircle
         }
       }
-      return 'plus'
+      return this.icons.plus
     },
     label() {
       if (this.isMember) {
@@ -81,6 +82,9 @@ export default {
     loading() {
       this.localLoading = this.loading
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     ...mapMutations({
@@ -116,12 +120,12 @@ export default {
             buttons: {
               confirm: {
                 danger: true,
-                icon: 'sign-out',
+                icon: this.icons.signOut,
                 textIdent: 'group.leaveModal.confirmButton',
                 callback: this.joinLeave,
               },
               cancel: {
-                icon: 'close',
+                icon: this.icons.close,
                 textIdent: 'actions.cancel',
                 callback: () => {},
               },

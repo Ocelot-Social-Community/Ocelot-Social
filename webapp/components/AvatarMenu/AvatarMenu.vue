@@ -20,7 +20,7 @@
             placement: 'bottom-start',
           }"
         />
-        <os-icon class="dropdown-arrow" :icon="ocelotIcons.IconAngleDown" />
+        <os-icon class="dropdown-arrow" :icon="icons.angleDown" />
       </a>
     </template>
     <template #popover="{ closeMenu }">
@@ -44,13 +44,13 @@
               $emit('toggle-Mobile-Menu-view')
             "
           >
-            <base-icon :name="item.route.icon" />
+            <os-icon :icon="item.route.icon" />
             {{ item.route.name }}
           </ds-menu-item>
         </ds-menu>
         <hr />
         <nuxt-link class="logout-link" :to="{ name: 'logout' }">
-          <base-icon name="sign-out" />
+          <os-icon :icon="icons.signOut" />
           {{ $t('login.logout') }}
         </nuxt-link>
       </div>
@@ -74,9 +74,6 @@ export default {
   props: {
     placement: { type: String, default: 'top-end' },
   },
-  setup() {
-    return { ocelotIcons }
-  },
   computed: {
     ...mapGetters({
       user: 'auth/user',
@@ -91,46 +88,46 @@ export default {
         {
           name: this.$t('header.avatarMenu.myProfile'),
           path: `/profile/${this.user.id}/${this.user.slug}`,
-          icon: 'user',
+          icon: this.icons.user,
         },
         {
           name: this.$t('header.avatarMenu.groups'),
           path: '/groups',
-          icon: 'users',
+          icon: this.icons.users,
         },
         {
           name: this.$t('header.avatarMenu.map'),
           path: `/map`,
-          icon: 'globe',
+          icon: this.icons.globe,
         },
         {
           name: this.$t('header.avatarMenu.chats'),
           path: `/chat`,
-          icon: 'chat-bubble',
+          icon: this.icons.chatBubble,
         },
         {
           name: this.$t('header.avatarMenu.notifications'),
           path: '/notifications',
-          icon: 'bell',
+          icon: this.icons.bell,
         },
         {
           name: this.$t('settings.name'),
           path: `/settings`,
-          icon: 'cogs',
+          icon: this.icons.cogs,
         },
       ]
       if (this.isModerator) {
         routes.push({
           name: this.$t('moderation.name'),
           path: `/moderation`,
-          icon: 'balance-scale',
+          icon: this.icons.balanceScale,
         })
       }
       if (this.isAdmin) {
         routes.push({
           name: this.$t('admin.name'),
           path: `/admin`,
-          icon: 'shield',
+          icon: this.icons.shield,
         })
       }
       return routes
@@ -139,6 +136,9 @@ export default {
       const { name } = this.user || {}
       return name || this.$t('profile.userAnonym')
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     matcher(url, route) {

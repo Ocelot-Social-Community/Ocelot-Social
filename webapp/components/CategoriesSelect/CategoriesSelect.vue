@@ -14,14 +14,15 @@
         placement: 'bottom-start',
       }"
     >
-      <template #icon><base-icon :name="category.icon" /></template>
+      <template #icon><os-icon :icon="resolveIcon(category.icon)" /></template>
       {{ $t(`contribution.category.name.${category.slug}`) }}
     </os-button>
   </section>
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { resolveIcon } from '~/utils/iconRegistry'
 import { CATEGORIES_MAX } from '~/constants/categories.js'
 import xor from 'lodash/xor'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
@@ -33,7 +34,7 @@ export default {
       default: null,
     },
   },
-  components: { OsButton },
+  components: { OsButton, OsIcon },
   mixins: [SortCategories, GetCategories],
   props: {
     existingCategoryIds: { type: Array, default: () => [] },
@@ -76,6 +77,9 @@ export default {
     },
     categoryButtonsId(categoryId) {
       return `category-buttons-${categoryId}`
+    },
+    resolveIcon(iconName) {
+      return resolveIcon(iconName)
     },
   },
 }

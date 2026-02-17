@@ -49,6 +49,8 @@ module.exports = {
     '^@ocelot-social/ui$': '<rootDir>/test/__mocks__/@ocelot-social/ui.js',
     '^@ocelot-social/ui/ocelot$': '<rootDir>/test/__mocks__/@ocelot-social/ui/ocelot.js',
     '^@ocelot-social/ui/style.css$': 'identity-obj-proxy',
+    // Icon registry - mock to avoid require.context in Jest
+    '^~/utils/iconRegistry$': '<rootDir>/test/__mocks__/iconRegistry.js',
     // Other mappings
     '\\.(svg)$': '<rootDir>/test/fileMock.js',
     '\\.(scss|css|less)$': 'identity-obj-proxy',

@@ -1,7 +1,7 @@
 <template>
   <base-card v-if="isUnavailable" class="comment-card">
     <p>
-      <base-icon name="ban" />
+      <os-icon :icon="icons.ban" />
       {{ $t('comment.content.unavailable-placeholder') }}
     </p>
   </base-card>
@@ -66,7 +66,7 @@
         @click="reply"
       >
         <template #icon>
-          <base-icon name="level-down" />
+          <os-icon :icon="icons.levelDown" />
         </template>
       </os-button>
     </div>
@@ -74,7 +74,8 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapGetters } from 'vuex'
 import { COMMENT_MAX_UNTRUNCATED_LENGTH, COMMENT_TRUNCATE_TO_LENGTH } from '~/constants/comment'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
@@ -88,6 +89,7 @@ import scrollToAnchor from '~/mixins/scrollToAnchor.js'
 export default {
   components: {
     OsButton,
+    OsIcon,
     UserTeaser,
     ContentMenu,
     ContentViewer,
@@ -161,12 +163,12 @@ export default {
           buttons: {
             confirm: {
               danger: true,
-              icon: 'trash',
+              icon: this.icons.trash,
               textIdent: 'delete.submit',
               callback: this.deleteCommentCallback,
             },
             cancel: {
-              icon: 'close',
+              icon: this.icons.close,
               textIdent: 'delete.cancel',
               callback: () => {},
             },
@@ -174,6 +176,9 @@ export default {
         },
       }
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     checkAnchor(anchor) {

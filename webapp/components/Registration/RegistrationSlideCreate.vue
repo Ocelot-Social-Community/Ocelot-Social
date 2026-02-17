@@ -72,7 +72,7 @@
           <show-password
             class="show-password-toggle with-label"
             @show-password="toggleShowPassword('password')"
-            :iconName="iconNamePassword"
+            :icon="passwordIcon"
           />
         </div>
         <div class="password-wrapper">
@@ -88,7 +88,7 @@
           <show-password
             class="show-password-toggle with-label"
             @show-password="toggleShowPassword('confirmPassword')"
-            :iconName="iconNamePasswordConfirm"
+            :icon="passwordConfirmIcon"
           />
         </div>
         <password-strength
@@ -165,6 +165,7 @@ import PasswordStrength from '~/components/Password/Strength'
 import EmailDisplayAndVerify from './EmailDisplayAndVerify'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import ShowPassword from '../ShowPassword/ShowPassword.vue'
 import LocationSelect from '~/components/Select/LocationSelect'
 
@@ -276,11 +277,11 @@ export default {
         (this.locationRequired ? this.formLocationName : true)
       )
     },
-    iconNamePassword() {
-      return this.showPassword ? 'eye-slash' : 'eye'
+    passwordIcon() {
+      return this.showPassword ? this.icons.eyeSlash : this.icons.eye
     },
-    iconNamePasswordConfirm() {
-      return this.showPasswordConfirm ? 'eye-slash' : 'eye'
+    passwordConfirmIcon() {
+      return this.showPasswordConfirm ? this.icons.eyeSlash : this.icons.eye
     },
   },
   watch: {
@@ -293,6 +294,9 @@ export default {
     locationName() {
       this.sendValidation()
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     buildName(data) {

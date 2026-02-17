@@ -2,26 +2,25 @@
   <ds-text class="date-time-range" align="left" color="soft" :size="size">
     <div class="date-time-row">
       <div>
-        <base-icon name="calendar" data-test="calendar" />
+        <os-icon :icon="icons.calendar" data-test="calendar" />
         {{ getStartDateString }}
       </div>
       <div>
-        <base-icon name="clock" data-test="calendar" />
+        <os-icon :icon="icons.clock" data-test="clock" />
         {{
-          getStartTimeString +
-          (this.endDateAsDate && isSameDayLocal ? '&mdash;' + getEndTimeString : '')
+          getStartTimeString + (endDateAsDate && isSameDayLocal ? '&mdash;' + getEndTimeString : '')
         }}
       </div>
     </div>
     <template v-if="!isSameDayLocal">
-      <base-icon name="arrow-down" />
+      <os-icon :icon="icons.arrowDown" />
       <div class="ds-flex date-time-row">
         <div>
-          <base-icon name="calendar" data-test="calendar" />
+          <os-icon :icon="icons.calendar" data-test="calendar" />
           {{ getEndDateString }}
         </div>
         <div>
-          <base-icon name="clock" data-test="calendar" />
+          <os-icon :icon="icons.clock" data-test="clock" />
           {{ getEndTimeString }}
         </div>
       </div>
@@ -30,10 +29,13 @@
 </template>
 
 <script>
+import { OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { format, isSameDay, isSameYear } from 'date-fns'
 
 export default {
   name: 'DateTimeRange',
+  components: { OsIcon },
   props: {
     /**
      * The size used for the text.
@@ -48,7 +50,7 @@ export default {
     },
     startDate: {
       type: String,
-      require: true,
+      required: true,
     },
     endDate: {
       type: String,
@@ -84,6 +86,9 @@ export default {
         ? format(new Date(this.endDate), this.$t('components.dateTimeRange.hourMinute'))
         : ''
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>

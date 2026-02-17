@@ -1,8 +1,8 @@
 <template>
-  <div :class="['profile-avatar', size && `--${this.size}`, !isAvatar && '--no-image']">
+  <div :class="['profile-avatar', size && `--${size}`, !isAvatar && '--no-image']">
     <!-- '--no-image' is neccessary, because otherwise we still have a little unwanted boarder araund the image for images with white backgrounds -->
     <span class="initials">{{ profileInitials }}</span>
-    <base-icon v-if="isAnonymous" name="eye-slash" />
+    <os-icon v-if="isAnonymous" :icon="icons.eyeSlash" />
     <responsive-image
       v-if="isAvatar"
       :image="profile.avatar"
@@ -16,11 +16,14 @@
 </template>
 
 <script>
+import { OsIcon } from '@ocelot-social/ui'
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 
 export default {
   name: 'ProfileAvatar',
   components: {
+    OsIcon,
     ResponsiveImage,
   },
   props: {
@@ -28,7 +31,7 @@ export default {
       type: String,
       required: false,
       validator: (value) => {
-        return value.match(/(small|large)/)
+        return /^(small|large)$/.test(value)
       },
     },
     profile: {
@@ -53,6 +56,9 @@ export default {
 
       return this.profile.name.match(/\b\w/g).join('').substring(0, 3).toUpperCase()
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>
@@ -83,7 +89,7 @@ export default {
   }
 
   > .initials,
-  > .base-icon {
+  > .os-icon {
     position: absolute;
     top: 50%;
     left: 50%;
