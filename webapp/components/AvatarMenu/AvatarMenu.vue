@@ -74,9 +74,6 @@ export default {
   props: {
     placement: { type: String, default: 'top-end' },
   },
-  setup() {
-    return { icons: ocelotIcons }
-  },
   computed: {
     ...mapGetters({
       user: 'auth/user',
@@ -139,6 +136,9 @@ export default {
       const { name } = this.user || {}
       return name || this.$t('profile.userAnonym')
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     matcher(url, route) {
