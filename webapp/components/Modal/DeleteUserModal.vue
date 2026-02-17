@@ -90,8 +90,8 @@ export default {
       return this.$t('settings.deleteUserAccount.name')
     },
 
-    modalData(userdata) {
-      return function (userdata) {
+    modalData() {
+      return (userdata) => {
         return {
           name: 'confirm',
           data: {
