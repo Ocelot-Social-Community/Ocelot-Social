@@ -47,7 +47,7 @@ export default {
     this.icons = ocelotIcons
   },
   methods: {
-    async generateInviteCode() {
+    generateInviteCode() {
       this.$emit('generate-invite-code', this.comment)
       this.comment = ''
     },
