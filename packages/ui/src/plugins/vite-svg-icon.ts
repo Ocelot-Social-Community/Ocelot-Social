@@ -68,7 +68,7 @@ export default function svgIcon(): Plugin {
         const attrRegex = /(\w[\w-]*)=(?:"([^"]*)"|'([^']*)')/g
         let attrMatch: RegExpExecArray | null
         while ((attrMatch = attrRegex.exec(attrString)) !== null) {
-          attrs[attrMatch[1]] = attrMatch[2] ?? attrMatch[3]
+          attrs[attrMatch[1]] = attrMatch[3] === undefined ? attrMatch[2] : attrMatch[3]
         }
         const attrEntries = Object.entries(attrs)
           .map(([k, v]) => `'${escapeJS(k)}': '${escapeJS(v)}'`)
