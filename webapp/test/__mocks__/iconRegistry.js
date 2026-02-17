@@ -6,6 +6,23 @@
  * SVGs are not available in the test environment.
  */
 const { ocelotIcons } = require('@ocelot-social/ui/ocelot')
-const { toCamelCase, resolveIcon } = require('../../utils/iconRegistry')
 
-module.exports = { iconRegistry: ocelotIcons, toCamelCase, resolveIcon }
+const iconRegistry = ocelotIcons
+
+function toCamelCase(str) {
+  return str
+    .split('-')
+    .filter(Boolean)
+    .map((s, i) => (i === 0 ? s : s[0].toUpperCase() + s.slice(1)))
+    .join('')
+}
+
+function resolveIcon(iconName) {
+  if (!iconName) return undefined
+  const icon = iconRegistry[toCamelCase(iconName)]
+  // eslint-disable-next-line no-console
+  if (!icon) console.warn(`Unknown icon: "${iconName}"`)
+  return icon
+}
+
+module.exports = { iconRegistry, toCamelCase, resolveIcon }
