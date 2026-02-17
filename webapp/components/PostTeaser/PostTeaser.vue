@@ -127,7 +127,7 @@
               v-if="post.sortDate !== post.createdAt"
               name="arrow-up"
               v-tooltip="{
-                content: $t('post.pushed'),
+                content: $t('post.menu.pushed'),
                 placement: 'bottom-end',
               }"
               class="pushed-icon"
