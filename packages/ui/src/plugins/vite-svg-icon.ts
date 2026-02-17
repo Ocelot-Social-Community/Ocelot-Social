@@ -45,7 +45,6 @@ export default function svgIcon(): Plugin {
       const viewBoxMatch = viewBoxRegex.exec(svg)
       const viewBox = viewBoxMatch ? viewBoxMatch[1] : '0 0 32 32'
 
-      UNSUPPORTED_REGEX.lastIndex = 0
       const unsupported = svg.match(UNSUPPORTED_REGEX)
       if (unsupported) {
         this.warn(
