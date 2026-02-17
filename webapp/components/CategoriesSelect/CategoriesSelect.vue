@@ -79,6 +79,7 @@ export default {
       return `category-buttons-${categoryId}`
     },
     resolveIcon(iconName) {
+      if (!iconName) return undefined
       const icon = iconRegistry[toCamelCase(iconName)]
       // eslint-disable-next-line no-console
       if (!icon) console.warn(`[CategoriesSelect] Unknown icon: "${iconName}"`)

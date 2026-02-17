@@ -21,14 +21,6 @@ export default {
       Category: [],
     }
   },
-  methods: {
-    resolveIcon(iconName) {
-      const icon = iconRegistry[toCamelCase(iconName)]
-      // eslint-disable-next-line no-console
-      if (!icon) console.warn(`[AdminCategories] Unknown icon: "${iconName}"`)
-      return icon
-    },
-  },
   computed: {
     fields() {
       return {
@@ -39,6 +31,15 @@ export default {
           align: 'right',
         },
       }
+    },
+  },
+  methods: {
+    resolveIcon(iconName) {
+      if (!iconName) return undefined
+      const icon = iconRegistry[toCamelCase(iconName)]
+      // eslint-disable-next-line no-console
+      if (!icon) console.warn(`[AdminCategories] Unknown icon: "${iconName}"`)
+      return icon
     },
   },
   apollo: {
