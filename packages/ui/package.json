@@ -149,7 +149,8 @@
     },
     {
       "path": "dist/tailwind.preset.mjs",
-      "limit": "1 kB"
+      "limit": "1 kB",
+      "brotli": true
     },
     {
       "path": "dist/ocelot.mjs",
