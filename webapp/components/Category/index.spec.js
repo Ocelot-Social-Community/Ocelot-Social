@@ -1,4 +1,6 @@
 import { mount } from '@vue/test-utils'
+import { OsIcon } from '@ocelot-social/ui'
+import { resolveIcon } from '~/utils/iconRegistry'
 
 import Category from './index'
 
@@ -29,7 +31,9 @@ describe('Category', () => {
     })
 
     it('shows icon', () => {
-      expect(Wrapper().find('.os-icon').exists()).toBe(true)
+      const wrapper = Wrapper()
+      expect(wrapper.findComponent(OsIcon).exists()).toBe(true)
+      expect(wrapper.findComponent(OsIcon).props().icon).toBe(resolveIcon('home'))
     })
   })
 })
