@@ -6,12 +6,6 @@
  * SVGs are not available in the test environment.
  */
 const { ocelotIcons } = require('@ocelot-social/ui/ocelot')
-
-function toCamelCase(str) {
-  return str
-    .split('-')
-    .map((s, i) => (i === 0 ? s : s[0].toUpperCase() + s.slice(1)))
-    .join('')
-}
+const { toCamelCase } = require('../../utils/iconRegistry')
 
 module.exports = { iconRegistry: ocelotIcons, toCamelCase }
