@@ -52,14 +52,14 @@ export default {
     OsButton,
     OsIcon,
   },
-  created() {
-    this.icons = iconRegistry
-  },
   mixins: [SortCategories, GetCategories],
   computed: {
     ...mapGetters({
       filteredCategoryIds: 'posts/filteredCategoryIds',
     }),
+  },
+  created() {
+    this.icons = iconRegistry
   },
   methods: {
     ...mapMutations({
@@ -75,7 +75,9 @@ export default {
       this.$emit('updateCategories', categoryId)
     },
     resolveIcon(iconName) {
-      return iconRegistry[toCamelCase(iconName)]
+      const icon = iconRegistry[toCamelCase(iconName)]
+      if (!icon) console.warn(`[CategoriesFilter] Unknown icon: "${iconName}"`)
+      return icon
     },
   },
 }

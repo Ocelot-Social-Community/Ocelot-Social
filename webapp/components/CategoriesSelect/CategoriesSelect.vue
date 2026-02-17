@@ -79,7 +79,9 @@ export default {
       return `category-buttons-${categoryId}`
     },
     resolveIcon(iconName) {
-      return iconRegistry[toCamelCase(iconName)]
+      const icon = iconRegistry[toCamelCase(iconName)]
+      if (!icon) console.warn(`[CategoriesSelect] Unknown icon: "${iconName}"`)
+      return icon
     },
   },
 }

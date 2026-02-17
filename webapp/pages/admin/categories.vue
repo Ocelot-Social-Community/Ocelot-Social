@@ -23,7 +23,9 @@ export default {
   },
   methods: {
     resolveIcon(iconName) {
-      return iconRegistry[toCamelCase(iconName)]
+      const icon = iconRegistry[toCamelCase(iconName)]
+      if (!icon) console.warn(`[AdminCategories] Unknown icon: "${iconName}"`)
+      return icon
     },
   },
   computed: {
