@@ -19,7 +19,10 @@ export default {
   },
   computed: {
     resolvedIcon() {
-      return iconRegistry[toCamelCase(this.icon)]
+      const icon = iconRegistry[toCamelCase(this.icon)]
+      // eslint-disable-next-line no-console
+      if (!icon) console.warn(`[HcCategory] Unknown icon: "${this.icon}"`)
+      return icon
     },
   },
 }
