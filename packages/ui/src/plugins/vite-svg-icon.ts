@@ -14,10 +14,7 @@ const SUPPORTED_ELEMENTS = ['path', 'circle', 'rect', 'polygon', 'polyline', 'el
 const ELEM_PATTERN = SUPPORTED_ELEMENTS.join('|')
 // Built from constant array above — safe to use in RegExp
 // eslint-disable-next-line security/detect-non-literal-regexp
-const ELEM_REGEX = new RegExp(
-  `<(${ELEM_PATTERN})(?:\\s([^>]*?))?\\/?>`,
-  'g',
-)
+const ELEM_REGEX = new RegExp(`<(${ELEM_PATTERN})(?:\\s([^>]*?))?\\/?>`, 'g')
 
 export default function svgIcon(): Plugin {
   return {
