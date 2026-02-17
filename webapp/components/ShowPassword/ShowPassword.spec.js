@@ -21,7 +21,7 @@ describe('ShowPassword', () => {
       it('Password wrapper emits show-password event', async () => {
         wrapper.find('.click-wrapper').trigger('click')
         await Vue.nextTick()
-        expect(wrapper.emitted()).toBeTruthy()
+        expect(wrapper.emitted('show-password')).toBeTruthy()
       })
 
       it('Shows the slash-eye icon after click', async () => {
