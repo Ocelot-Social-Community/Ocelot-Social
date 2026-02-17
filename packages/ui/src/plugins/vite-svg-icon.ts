@@ -7,7 +7,7 @@ const SUFFIX = '?icon'
 
 /** Escape a string for safe embedding in a single-quoted JS literal */
 function escapeJS(str: string): string {
-  return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'")
+  return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '\\r')
 }
 
 const SUPPORTED_ELEMENTS = ['path', 'circle', 'rect', 'polygon', 'polyline', 'ellipse', 'line']
