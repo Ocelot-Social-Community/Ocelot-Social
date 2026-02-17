@@ -48,9 +48,6 @@ export default {
     Dropdown,
     OsIcon,
   },
-  setup() {
-    return { icons: ocelotIcons }
-  },
   props: {
     placement: { type: String, default: 'bottom-start' },
     offset: { type: [String, Number], default: '16' },
@@ -76,6 +73,9 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     changeLanguage(locale, toggleMenu) {
