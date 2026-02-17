@@ -13,7 +13,7 @@ const svgContext = require.context('~/assets/_new/icons/svgs', false, /\.svg$/)
 const brandingIcons = {}
 svgContext.keys().forEach((fileName) => {
   const component = svgContext(fileName).default || svgContext(fileName)
-  const kebabName = fileName.replace('./', '').replace('.svg', '')
+  const kebabName = fileName.replace('./', '').replace(/\.svg$/, '')
   brandingIcons[toCamelCase(kebabName)] = component
 })
 
