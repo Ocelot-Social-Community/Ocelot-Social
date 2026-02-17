@@ -61,15 +61,6 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
-    currentSocialMediaLinks() {
-      const domainRegex = /^(?:https?:\/\/)?(?:[^@\n])?(?:www\.)?([^:/\n?]+)/g
-      const { socialMedia = [] } = this.currentUser
-      return socialMedia.map(({ id, url }) => {
-        const [domain] = url.match(domainRegex) || []
-        const favicon = domain ? `${domain}/favicon.ico` : null
-        return { id, url, favicon }
-      })
-    },
     socialMediaLinks() {
       const domainRegex = /^(?:https?:\/\/)?(?:[^@\n])?(?:www\.)?([^:/\n?]+)/g
       const { socialMedia = [] } = this.currentUser
