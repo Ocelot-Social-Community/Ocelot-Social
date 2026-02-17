@@ -144,21 +144,21 @@
   "size-limit": [
     {
       "path": "dist/index.mjs",
-      "limit": "16 kB",
+      "limit": "15 kB",
       "brotli": true
     },
     {
       "path": "dist/tailwind.preset.mjs",
-      "limit": "2 kB"
+      "limit": "1 kB"
     },
     {
       "path": "dist/ocelot.mjs",
-      "limit": "55 kB",
+      "limit": "45 kB",
       "brotli": true
     },
     {
       "path": "dist/style.css",
-      "limit": "10 kB"
+      "limit": "5 kB"
     }
   ]
 }
