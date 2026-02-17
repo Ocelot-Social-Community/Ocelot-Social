@@ -76,6 +76,7 @@ export default {
     },
     resolveIcon(iconName) {
       const icon = iconRegistry[toCamelCase(iconName)]
+      // eslint-disable-next-line no-console
       if (!icon) console.warn(`[CategoriesFilter] Unknown icon: "${iconName}"`)
       return icon
     },

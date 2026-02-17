@@ -24,6 +24,7 @@ export default {
   methods: {
     resolveIcon(iconName) {
       const icon = iconRegistry[toCamelCase(iconName)]
+      // eslint-disable-next-line no-console
       if (!icon) console.warn(`[AdminCategories] Unknown icon: "${iconName}"`)
       return icon
     },
