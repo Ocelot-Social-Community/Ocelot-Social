@@ -139,7 +139,7 @@ describe('LoginForm', () => {
       it('shows the slash-eye icon after click', async () => {
         wrapper.find('span.click-wrapper').trigger('click')
         await Vue.nextTick()
-        await expect(wrapper.findComponent(ShowPassword).props().icon).toBe(ocelotIcons.eyeSlash)
+        expect(wrapper.findComponent(ShowPassword).props().icon).toBe(ocelotIcons.eyeSlash)
       })
     })
 
