@@ -102,7 +102,7 @@ export default {
               callback: () => {
                 this.$emit('pinPost', this.resource)
               },
-              icon: this.icons.link,
+              icon: this.icons.mapPin,
             })
           } else {
             if (this.resource.pinnedBy) {
@@ -123,7 +123,7 @@ export default {
             callback: () => {
               this.$emit('pushPost', this.resource)
             },
-            icon: this.icons.link,
+            icon: this.icons.arrowUp,
           })
         }
 
