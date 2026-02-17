@@ -104,14 +104,14 @@ export default {
               buttons: {
                 confirm: {
                   danger: true,
-                  icon: ocelotIcons.trash,
+                  icon: this.icons.trash,
                   textIdent: this.$t('settings.deleteUserAccount.confirmDeleting'),
                   callback: () => {
                     this.confirm(userdata)
                   },
                 },
                 cancel: {
-                  icon: ocelotIcons.close,
+                  icon: this.icons.close,
                   textIdent: this.$t('actions.cancel'),
                   callback: () => {},
                 },
