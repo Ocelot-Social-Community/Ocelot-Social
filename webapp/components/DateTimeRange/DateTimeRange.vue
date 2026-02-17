@@ -8,8 +8,7 @@
       <div>
         <os-icon :icon="icons.clock" data-test="clock" />
         {{
-          getStartTimeString +
-          (endDateAsDate && isSameDayLocal ? '&mdash;' + getEndTimeString : '')
+          getStartTimeString + (endDateAsDate && isSameDayLocal ? '&mdash;' + getEndTimeString : '')
         }}
       </div>
     </div>
