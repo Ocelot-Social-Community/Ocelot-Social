@@ -26,8 +26,7 @@ describe('ShowPassword', () => {
 
       it('Shows the slash-eye icon after click', async () => {
         wrapper.find('.click-wrapper').trigger('click')
-        wrapper.setProps({ icon: ocelotIcons.eyeSlash })
-        await Vue.nextTick()
+        await wrapper.setProps({ icon: ocelotIcons.eyeSlash })
         expect(wrapper.findComponent(OsIcon).props().icon).toBe(ocelotIcons.eyeSlash)
       })
     })
