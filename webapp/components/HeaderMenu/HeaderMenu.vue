@@ -512,13 +512,13 @@ export default {
 
       button {
         overflow: visible;
-        .svg {
+        .os-icon {
           height: 1.8em;
         }
       }
     }
   }
-  .hamburger-button .svg {
+  .hamburger-button .os-icon {
     height: 1.5em;
   }
 }
