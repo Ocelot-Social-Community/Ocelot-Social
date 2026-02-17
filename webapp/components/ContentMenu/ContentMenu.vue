@@ -133,7 +133,7 @@ export default {
             callback: () => {
               this.$emit('unpushPost', this.resource)
             },
-            icon: this.icons.link,
+            icon: this.icons.unlink,
           })
         }
 
