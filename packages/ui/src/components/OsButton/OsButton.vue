@@ -172,7 +172,7 @@
               {
                 class: cn(
                   ICON_CLASS,
-                  !isSmall && (hasText ? '-ml-1' : '-ml-1 -mr-1'),
+                  !isSmall && (hasText || hasSuffix ? '-ml-1' : '-ml-1 -mr-1'),
                   isLoading && 'relative overflow-visible',
                 ),
               },
@@ -192,7 +192,7 @@
               {
                 class: cn(
                   SUFFIX_CLASS,
-                  !isSmall && (hasText ? '-mr-1' : '-ml-1 -mr-1'),
+                  !isSmall && (hasText || hasIcon ? '-mr-1' : '-ml-1 -mr-1'),
                   isLoading && 'relative overflow-visible',
                 ),
               },
@@ -206,7 +206,8 @@
           {
             class: cn(
               'inline-flex items-center',
-              (hasIcon || hasSuffix) && hasText && (isSmall ? 'gap-1' : 'gap-2'),
+              (((hasIcon || hasSuffix) && hasText) || (hasIcon && hasSuffix)) &&
+                (isSmall ? 'gap-1' : 'gap-2'),
             ),
           },
           innerChildren,

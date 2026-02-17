@@ -382,6 +382,58 @@ describe('osButton', () => {
       expect(suffixWrapper.classes()).toContain('-ml-1')
       expect(suffixWrapper.classes()).toContain('-mr-1')
     })
+
+    it('icon + suffix without text: icon has -ml-1 but no -mr-1', () => {
+      const wrapper = mount(OsButton, {
+        slots: {
+          icon: '<svg></svg>',
+          suffix: '<svg></svg>',
+        },
+      })
+      const iconWrapper = wrapper.find('.os-button__icon')
+
+      expect(iconWrapper.classes()).toContain('-ml-1')
+      expect(iconWrapper.classes()).not.toContain('-mr-1')
+    })
+
+    it('icon + suffix without text: suffix has -mr-1 but no -ml-1', () => {
+      const wrapper = mount(OsButton, {
+        slots: {
+          icon: '<svg></svg>',
+          suffix: '<svg></svg>',
+        },
+      })
+      const suffixWrapper = wrapper.find('.os-button__suffix')
+
+      expect(suffixWrapper.classes()).toContain('-mr-1')
+      expect(suffixWrapper.classes()).not.toContain('-ml-1')
+    })
+
+    it('icon + suffix without text has gap-2', () => {
+      const wrapper = mount(OsButton, {
+        slots: {
+          icon: '<svg></svg>',
+          suffix: '<svg></svg>',
+        },
+      })
+      const contentSpan = wrapper.find('button > span')
+
+      expect(contentSpan.classes()).toContain('gap-2')
+    })
+
+    it('icon + suffix without text has gap-1 for small size', () => {
+      const wrapper = mount(OsButton, {
+        props: { size: 'sm' },
+        slots: {
+          icon: '<svg></svg>',
+          suffix: '<svg></svg>',
+        },
+      })
+      const contentSpan = wrapper.find('button > span')
+
+      expect(contentSpan.classes()).toContain('gap-1')
+      expect(contentSpan.classes()).not.toContain('gap-2')
+    })
   })
 
   describe('circle prop', () => {
