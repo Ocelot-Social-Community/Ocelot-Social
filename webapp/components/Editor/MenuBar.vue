@@ -159,7 +159,7 @@ export default {
     OsIcon,
   },
   props: {
-    editor: { type: Object, required: true },
+    editor: { type: Object, default: null },
     toggleLinkInput: { type: Function, required: true },
   },
   created() {
