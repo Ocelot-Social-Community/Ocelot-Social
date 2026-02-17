@@ -133,13 +133,13 @@ describe('LoginForm', () => {
     describe('Click on show password icon, icon change', () => {
       const wrapper = Wrapper()
       it('shows eye icon by default', () => {
-        expect(wrapper.findComponent(ShowPassword).props().iconName).toBe(ocelotIcons.eye)
+        expect(wrapper.findComponent(ShowPassword).props().icon).toBe(ocelotIcons.eye)
       })
 
       it('shows the slash-eye icon after click', async () => {
         wrapper.find('span.click-wrapper').trigger('click')
         await Vue.nextTick()
-        await expect(wrapper.findComponent(ShowPassword).props().iconName).toBe(
+        await expect(wrapper.findComponent(ShowPassword).props().icon).toBe(
           ocelotIcons.eyeSlash,
         )
       })

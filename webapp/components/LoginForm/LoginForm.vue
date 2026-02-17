@@ -31,7 +31,7 @@
             ref="password"
             :type="showPassword ? 'text' : 'password'"
           />
-          <show-password @show-password="toggleShowPassword" :iconName="iconName" />
+          <show-password @show-password="toggleShowPassword" :icon="passwordIcon" />
         </div>
         <nuxt-link to="/password-reset/request">
           {{ $t('login.forgotPassword') }}
@@ -94,7 +94,7 @@ export default {
     pending() {
       return this.$store.getters['auth/pending']
     },
-    iconName() {
+    passwordIcon() {
       return this.showPassword ? this.icons.eyeSlash : this.icons.eye
     },
     ...mapGetters({

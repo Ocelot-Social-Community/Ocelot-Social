@@ -72,7 +72,7 @@
           <show-password
             class="show-password-toggle with-label"
             @show-password="toggleShowPassword('password')"
-            :iconName="iconNamePassword"
+            :icon="passwordIcon"
           />
         </div>
         <div class="password-wrapper">
@@ -88,7 +88,7 @@
           <show-password
             class="show-password-toggle with-label"
             @show-password="toggleShowPassword('confirmPassword')"
-            :iconName="iconNamePasswordConfirm"
+            :icon="passwordConfirmIcon"
           />
         </div>
         <password-strength
@@ -277,10 +277,10 @@ export default {
         (this.locationRequired ? this.formLocationName : true)
       )
     },
-    iconNamePassword() {
+    passwordIcon() {
       return this.showPassword ? this.icons.eyeSlash : this.icons.eye
     },
-    iconNamePasswordConfirm() {
+    passwordConfirmIcon() {
       return this.showPasswordConfirm ? this.icons.eyeSlash : this.icons.eye
     },
   },
