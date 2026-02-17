@@ -196,7 +196,7 @@ export default {
                 },
               },
               cancel: {
-                icon: 'close',
+                icon: this.icons.close,
                 textIdent: 'actions.cancel',
                 callback: () => {},
               },

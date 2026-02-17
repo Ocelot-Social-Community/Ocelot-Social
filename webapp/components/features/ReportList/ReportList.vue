@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import { mapMutations } from 'vuex'
 import DropdownFilter from '~/components/DropdownFilter/DropdownFilter'
 import ReportsTable from '~/components/features/ReportsTable/ReportsTable'
@@ -89,14 +90,14 @@ export default {
               buttons: {
                 confirm: {
                   danger: true,
-                  icon: report.resource.disabled ? 'eye-slash' : 'eye',
+                  icon: report.resource.disabled ? this.icons.eyeSlash : this.icons.eye,
                   textIdent: 'moderation.reports.decideModal.submit',
                   callback: () => {
                     this.confirmCallback(report.resource)
                   },
                 },
                 cancel: {
-                  icon: 'close',
+                  icon: this.icons.close,
                   textIdent: 'moderation.reports.decideModal.cancel',
                   callback: () => {},
                 },
@@ -109,6 +110,9 @@ export default {
     hasPrevious() {
       return this.offset > 0
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     ...mapMutations({

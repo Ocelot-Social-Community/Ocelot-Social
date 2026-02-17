@@ -103,14 +103,14 @@ export default {
             buttons: {
               confirm: {
                 danger: true,
-                icon: 'trash',
+                icon: this.icons.trash,
                 textIdent: 'actions.delete',
                 callback: () => {
                   this.$emit('invalidate-invite-code', this.inviteCode.code)
                 },
               },
               cancel: {
-                icon: 'close',
+                icon: this.icons.close,
                 textIdent: 'actions.cancel',
                 callback: () => {},
               },

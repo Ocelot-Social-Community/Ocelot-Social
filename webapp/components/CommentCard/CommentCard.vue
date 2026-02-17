@@ -163,12 +163,12 @@ export default {
           buttons: {
             confirm: {
               danger: true,
-              icon: 'trash',
+              icon: this.icons.trash,
               textIdent: 'delete.submit',
               callback: this.deleteCommentCallback,
             },
             cancel: {
-              icon: 'close',
+              icon: this.icons.close,
               textIdent: 'delete.cancel',
               callback: () => {},
             },
