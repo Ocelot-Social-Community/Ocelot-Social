@@ -124,7 +124,7 @@
         <div class="date-row" v-if="post.createdAt">
           <span class="text">
             <os-icon
-              v-if="post.sortDate !== post.createdAt"
+              v-if="post.sortDate && post.sortDate !== post.createdAt"
               :icon="icons.arrowUp"
               size="sm"
               v-tooltip="{
