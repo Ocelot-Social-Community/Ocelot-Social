@@ -50,7 +50,7 @@ export default {
     },
     startDate: {
       type: String,
-      require: true,
+      required: true,
     },
     endDate: {
       type: String,
