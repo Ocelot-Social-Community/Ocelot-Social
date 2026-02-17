@@ -3,7 +3,7 @@
     <tr>
       <!-- Icon Column -->
       <td class="ds-table-col">
-        <os-icon :icon="iconName" :title="iconLabel" />
+        <os-icon :icon="iconName" :aria-label="iconLabel" />
       </td>
 
       <!-- Number of Filed Reports Column -->
