@@ -3,6 +3,7 @@ import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 export function toCamelCase(str) {
   return str
     .split('-')
+    .filter(Boolean)
     .map((s, i) => (i === 0 ? s : s[0].toUpperCase() + s.slice(1)))
     .join('')
 }
