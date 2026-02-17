@@ -159,8 +159,8 @@ export default {
     OsIcon,
   },
   props: {
-    editor: Object,
-    toggleLinkInput: Function,
+    editor: { type: Object, required: true },
+    toggleLinkInput: { type: Function, required: true },
   },
   created() {
     this.icons = ocelotIcons
