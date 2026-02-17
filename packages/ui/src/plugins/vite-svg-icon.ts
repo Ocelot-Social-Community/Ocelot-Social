@@ -15,7 +15,7 @@ const ELEM_PATTERN = SUPPORTED_ELEMENTS.join('|')
 // Built from constant array above — safe to use in RegExp
 // eslint-disable-next-line security/detect-non-literal-regexp
 const ELEM_REGEX = new RegExp(
-  `<(${ELEM_PATTERN})\\s([^>]*?)\\/>|<(${ELEM_PATTERN})\\s([^>]*?)>`,
+  `<(${ELEM_PATTERN})(?:\\s([^>]*?))?\\/?>`,
   'g',
 )
 
@@ -54,10 +54,10 @@ export default function svgIcon(): Plugin {
       ELEM_REGEX.lastIndex = 0
       let match: RegExpExecArray | null
       while ((match = ELEM_REGEX.exec(svg)) !== null) {
-        const tag = match[1] || match[3]
-        const attrString = match[2] || match[4]
+        const tag = match[1]
+        const attrString = match[2] || ''
         const attrs: Record<string, string> = {}
-        const attrRegex = /(\w[\w-]*)="([^"]+)"/g
+        const attrRegex = /(\w[\w-]*)="([^"]*)"/g
         let attrMatch: RegExpExecArray | null
         while ((attrMatch = attrRegex.exec(attrString)) !== null) {
           attrs[attrMatch[1]] = attrMatch[2]
