@@ -33,9 +33,6 @@ export default {
     OsButton,
     OsIcon,
   },
-  setup() {
-    return { icons: ocelotIcons }
-  },
   props: {
     placement: { type: String },
     offset: { type: [String, Number] },
@@ -44,6 +41,9 @@ export default {
     ...mapGetters({
       filterActive: 'posts/isActive',
     }),
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>
