@@ -343,9 +343,6 @@ export default {
     // SocialMedia,
     // TabNavigation,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   mixins: [postListActions, SortCategories, GetCategories],
   transition: {
     name: 'slide-up',
@@ -433,6 +430,9 @@ export default {
     //     },
     //   ]
     // },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   watch: {
     isAllowedSeeingGroupMembers(to, _from) {
