@@ -12,7 +12,7 @@ import { OsIcon } from '@ocelot-social/ui'
 export default {
   components: { OsIcon },
   props: ['iconName'],
-  emits: ['toggle-password'],
+  emits: ['show-password'],
   methods: {
     togglePassword(event) {
       event.preventDefault()
