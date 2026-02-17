@@ -26,9 +26,6 @@ import scrollToAnchor from '~/mixins/scrollToAnchor'
 
 export default {
   mixins: [scrollToAnchor],
-  created() {
-    this.icons = ocelotIcons
-  },
   components: {
     CounterIcon,
     CommentCard,
@@ -48,6 +45,9 @@ export default {
         0
       )
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     reply(message) {

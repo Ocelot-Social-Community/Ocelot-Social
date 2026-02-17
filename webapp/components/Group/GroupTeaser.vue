@@ -93,9 +93,6 @@ export default {
     GroupContentMenu,
     OsIcon,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     group: {
       type: Object,
@@ -105,6 +102,9 @@ export default {
       type: Object,
       default: () => {},
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   computed: {
     descriptionExcerpt() {

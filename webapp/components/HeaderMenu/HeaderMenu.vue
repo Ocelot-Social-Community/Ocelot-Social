@@ -382,9 +382,6 @@ export default {
   props: {
     showMobileMenu: { type: Boolean, default: false },
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   data() {
     return {
       hideNavbar: false,
@@ -410,6 +407,9 @@ export default {
       const [firstRoute] = this.$route.matched
       return firstRoute && firstRoute.name === 'index'
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     handleScroll() {

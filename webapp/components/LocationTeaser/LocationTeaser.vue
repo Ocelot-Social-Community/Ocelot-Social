@@ -19,9 +19,6 @@ import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 export default {
   name: 'LocationTeaser',
   components: { OsIcon },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     /**
      * The size used for the text.
@@ -46,6 +43,9 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>

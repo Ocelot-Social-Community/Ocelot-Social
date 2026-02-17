@@ -36,9 +36,6 @@ export default {
     type: { type: String, required: true },
     id: { type: String, required: true },
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   data() {
     return {
       isOpen: true,
@@ -54,6 +51,9 @@ export default {
       const name = this.$filters.truncate(this.name, 30)
       return this.$t(`release.${this.type}.message`, { name })
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     cancel() {

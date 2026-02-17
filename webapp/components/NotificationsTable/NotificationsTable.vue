@@ -104,16 +104,13 @@ import mobile from '~/mixins/mobile'
 const maxMobileWidth = 768 // at this point the table breaks down
 
 export default {
+  mixins: [mobile(maxMobileWidth)],
   components: {
     OsIcon,
     UserTeaser,
     HcEmpty,
     BaseCard,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
-  mixins: [mobile(maxMobileWidth)],
   props: {
     notifications: { type: Array, default: () => [] },
     showPopover: { type: Boolean, default: true },
@@ -131,6 +128,9 @@ export default {
         },
       }
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     isComment(notificationSource) {

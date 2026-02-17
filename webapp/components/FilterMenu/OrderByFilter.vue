@@ -48,9 +48,6 @@ export default {
     OsButton,
     OsIcon,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   computed: {
     ...mapGetters({
       filteredPostTypes: 'posts/filteredPostTypes',
@@ -70,6 +67,9 @@ export default {
         ? this.$t('filter-menu.creationDate')
         : this.$t('filter-menu.startDate')
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     ...mapMutations({

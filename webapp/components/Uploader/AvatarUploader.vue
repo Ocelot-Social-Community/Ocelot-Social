@@ -30,9 +30,6 @@ export default {
     OsIcon,
     vueDropzone,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     profile: { type: Object, required: true },
     updateMutation: { type: Function, required: true },
@@ -61,6 +58,9 @@ export default {
         that.error = false
       }, 2000)
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     template() {

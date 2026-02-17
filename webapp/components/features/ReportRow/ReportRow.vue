@@ -97,9 +97,6 @@ export default {
     FiledReportsTable,
     UserTeaser,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   emits: ['confirm-report'],
   props: {
     report: {
@@ -111,6 +108,9 @@ export default {
     return {
       showFiledReports: false,
     }
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   computed: {
     isPost() {

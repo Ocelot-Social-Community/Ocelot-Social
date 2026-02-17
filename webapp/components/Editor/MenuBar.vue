@@ -158,12 +158,12 @@ export default {
     OsButton,
     OsIcon,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     editor: Object,
     toggleLinkInput: Function,
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>

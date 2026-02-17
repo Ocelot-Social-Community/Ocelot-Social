@@ -79,9 +79,6 @@ export default {
     PageParamsLink,
     ShowPassword,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   data() {
     return {
       metadata,
@@ -104,6 +101,9 @@ export default {
       currentUser: 'auth/user',
       categories: 'categories/categories',
     }),
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     ...mapMutations({

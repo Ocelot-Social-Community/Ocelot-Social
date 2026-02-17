@@ -188,9 +188,6 @@ export default {
       default: () => ({}),
     },
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   data() {
     const { name, slug, groupType, about, description, actionRadius, locationName, categories } =
       this.group
@@ -285,6 +282,9 @@ export default {
         this.sameCategories
       )
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     checkFormError(error) {

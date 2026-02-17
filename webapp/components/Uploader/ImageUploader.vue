@@ -80,9 +80,6 @@ export default {
       default: false,
     },
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   data() {
     return {
       dropzoneOptions: {
@@ -97,6 +94,9 @@ export default {
       imageCanBeCropped: false,
       isLoadingImage: false,
     }
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     onUnSupportedFormat(message) {

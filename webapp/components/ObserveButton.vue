@@ -18,13 +18,13 @@ export default {
   components: {
     ActionButton,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     count: { type: Number, default: 0 },
     postId: { type: String, default: null },
     isObserved: { type: Boolean, default: false },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     toggle() {

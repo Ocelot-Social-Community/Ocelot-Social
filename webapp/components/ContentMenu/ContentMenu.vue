@@ -49,9 +49,6 @@ export default {
     OsButton,
     OsIcon,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   mixins: [PinnedPostsMixin],
   props: {
     placement: { type: String, default: 'top-end' },
@@ -71,6 +68,9 @@ export default {
         return {}
       },
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   computed: {
     routes() {

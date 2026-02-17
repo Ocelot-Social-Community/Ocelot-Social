@@ -181,9 +181,6 @@ export default {
     SweetalertIcon,
     LocationSelect,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     sliderData: { type: Object, required: true },
   },
@@ -297,6 +294,9 @@ export default {
     locationName() {
       this.sendValidation()
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     buildName(data) {

@@ -42,9 +42,6 @@ export default {
     OsButton,
     OsIcon,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     pageSize: {
       type: Number,
@@ -73,6 +70,9 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>

@@ -120,9 +120,6 @@ import { mapGetters, mapMutations } from 'vuex'
 export default {
   name: 'Chat',
   components: { OsButton, OsIcon },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     theme: {
       type: String,
@@ -202,6 +199,9 @@ export default {
       messagePageSize: 20,
       messages: [],
     }
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   mounted() {
     if (this.singleRoom) {

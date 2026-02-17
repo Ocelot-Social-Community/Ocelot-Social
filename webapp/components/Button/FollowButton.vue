@@ -25,9 +25,6 @@ import { followUserMutation, unfollowUserMutation } from '~/graphql/User'
 export default {
   name: 'HcFollowButton',
   components: { OsButton, OsIcon },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     followId: { type: String, default: null },
     isFollowed: { type: Boolean, default: false },
@@ -60,6 +57,9 @@ export default {
       this.loading = false
       this.hovered = false
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     onHover() {

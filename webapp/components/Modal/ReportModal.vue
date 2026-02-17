@@ -85,15 +85,6 @@ export default {
       },
     }
   },
-  created() {
-    this.icons = ocelotIcons
-    this.form.reasonCategoryOptions = valuesReasonCategoryOptions.map((reasonCategory) => {
-      return {
-        label: this.$t('report.reason.category.options.' + reasonCategory),
-        value: reasonCategory,
-      }
-    })
-  },
   computed: {
     title() {
       return this.$t(`report.${this.type}.title`)
@@ -108,6 +99,15 @@ export default {
         ...validReportSchema.formSchema,
       }
     },
+  },
+  created() {
+    this.icons = ocelotIcons
+    this.form.reasonCategoryOptions = valuesReasonCategoryOptions.map((reasonCategory) => {
+      return {
+        label: this.$t('report.reason.category.options.' + reasonCategory),
+        value: reasonCategory,
+      }
+    })
   },
   methods: {
     async cancel() {

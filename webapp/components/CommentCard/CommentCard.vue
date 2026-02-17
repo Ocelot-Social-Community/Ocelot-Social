@@ -96,9 +96,6 @@ export default {
     CommentForm,
     ShoutButton,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   mixins: [scrollToAnchor],
   data() {
     const anchor = `commentId-${this.comment.id}`
@@ -179,6 +176,9 @@ export default {
         },
       }
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     checkAnchor(anchor) {

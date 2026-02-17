@@ -242,9 +242,6 @@ export default {
     },
   },
 
-  created() {
-    this.icons = ocelotIcons
-  },
   data() {
     const {
       title,
@@ -384,6 +381,9 @@ export default {
       if (!this.formData.categoryIds.length && this.groupCategories)
         this.formData.categoryIds = this.groupCategories.map((cat) => cat.id)
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     notBeforeToday(date) {

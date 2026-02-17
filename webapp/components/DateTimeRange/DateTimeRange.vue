@@ -37,9 +37,6 @@ import { format, isSameDay, isSameYear } from 'date-fns'
 export default {
   name: 'DateTimeRange',
   components: { OsIcon },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     /**
      * The size used for the text.
@@ -90,6 +87,9 @@ export default {
         ? format(new Date(this.endDate), this.$t('components.dateTimeRange.hourMinute'))
         : ''
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>

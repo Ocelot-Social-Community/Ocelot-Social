@@ -18,15 +18,15 @@ import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 
 export default {
+  name: 'SearchPost',
   components: {
     CounterIcon,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
-  name: 'SearchPost',
   props: {
     option: { type: Object, required: true },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>

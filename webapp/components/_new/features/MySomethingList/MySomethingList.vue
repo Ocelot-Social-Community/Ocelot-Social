@@ -110,9 +110,6 @@ export default {
       }),
     },
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   data() {
     return {
       formData: this.useFormData,
@@ -136,6 +133,9 @@ export default {
     useItems(newItems) {
       this.items = newItems
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     ...mapMutations({

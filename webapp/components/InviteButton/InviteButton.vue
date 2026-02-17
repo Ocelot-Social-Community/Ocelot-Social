@@ -53,9 +53,6 @@ export default {
   props: {
     placement: { type: String, default: 'top-end' },
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   computed: {
     ...mapGetters({
       user: 'auth/user',
@@ -63,6 +60,9 @@ export default {
     inviteCode() {
       return this.user.inviteCodes[0] || null
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     ...mapMutations({

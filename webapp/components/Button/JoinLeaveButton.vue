@@ -27,9 +27,6 @@ import { joinGroupMutation, leaveGroupMutation } from '~/graphql/groups'
 export default {
   name: 'JoinLeaveButton',
   components: { OsButton, OsIcon },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     group: { type: Object, required: true },
     userId: { type: String, required: true },
@@ -85,6 +82,9 @@ export default {
     loading() {
       this.localLoading = this.loading
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     ...mapMutations({

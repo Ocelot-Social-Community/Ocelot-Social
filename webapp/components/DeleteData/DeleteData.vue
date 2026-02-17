@@ -67,9 +67,6 @@ import { currentUserCountQuery } from '~/graphql/User'
 export default {
   name: 'DeleteData',
   components: { OsButton, OsIcon },
-  created() {
-    this.icons = ocelotIcons
-  },
   data() {
     return {
       deleteContributions: false,
@@ -87,6 +84,9 @@ export default {
         this.currentUserCounts = currentUser.currentUser
       },
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   computed: {
     ...mapGetters({

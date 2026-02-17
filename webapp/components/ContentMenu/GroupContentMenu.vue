@@ -49,9 +49,6 @@ export default {
     OsButton,
     OsIcon,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     usage: {
       type: String,
@@ -111,6 +108,9 @@ export default {
 
       return routes
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     openItem(route, toggleMenu) {

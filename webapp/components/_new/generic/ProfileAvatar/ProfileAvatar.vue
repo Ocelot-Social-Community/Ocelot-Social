@@ -26,9 +26,6 @@ export default {
     OsIcon,
     ResponsiveImage,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     size: {
       type: String,
@@ -45,6 +42,9 @@ export default {
       type: Boolean,
       default: true,
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   computed: {
     isAnonymous() {

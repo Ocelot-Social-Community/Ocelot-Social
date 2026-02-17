@@ -46,9 +46,6 @@ import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton
 
 export default {
   name: 'PostTypeFilter',
-  created() {
-    this.icons = ocelotIcons
-  },
   components: {
     FilterMenuSection,
     LabeledButton,
@@ -57,6 +54,9 @@ export default {
     ...mapGetters({
       filteredPostTypes: 'posts/filteredPostTypes',
     }),
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     ...mapMutations({

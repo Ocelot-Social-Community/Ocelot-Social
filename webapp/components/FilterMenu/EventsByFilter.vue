@@ -48,9 +48,6 @@ export default {
     OsButton,
     OsIcon,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   computed: {
     ...mapGetters({
       postFilter: 'posts/filter',
@@ -62,6 +59,9 @@ export default {
     eventsEnded() {
       return !!this.postFilter.eventStart_gte
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     ...mapMutations({

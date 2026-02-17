@@ -151,9 +151,6 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 export default {
   name: 'PostTeaser',
   mixins: [GetCategories],
-  created() {
-    this.icons = ocelotIcons
-  },
   components: {
     Category,
     ContentMenu,
@@ -221,6 +218,9 @@ export default {
       if (this.post.postType[0] === 'Event') return this.$t('post.event')
       return this.$t('post.name')
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     async deletePostCallback() {

@@ -20,9 +20,6 @@ export default {
   components: {
     ActionButton,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     count: { type: Number, default: 0 },
     nodeType: { type: String },
@@ -44,6 +41,9 @@ export default {
         this.shouted = shouted
       },
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     toggle() {

@@ -80,9 +80,6 @@ export default {
     UserTeaserHelper,
     UserTeaserPopover,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     linkToProfile: { type: Boolean, default: true },
     user: { type: Object, default: null },
@@ -133,6 +130,9 @@ export default {
       const { name } = this.group || {}
       return name || this.$t('profile.userAnonym')
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     async loadPopover(openMenu) {

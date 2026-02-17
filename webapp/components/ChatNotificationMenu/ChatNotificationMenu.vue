@@ -31,14 +31,14 @@ export default {
     OsButton,
     CounterIcon,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   computed: {
     ...mapGetters({
       user: 'auth/user',
       unreadRoomCount: 'chat/unreadRoomCount',
     }),
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     ...mapMutations({

@@ -97,9 +97,6 @@ export default {
     Dropdown,
     OsButton,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   data() {
     return {
       notifications: [],
@@ -108,6 +105,9 @@ export default {
   props: {
     placement: { type: String },
     noMenu: { type: Boolean, default: false },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   mounted() {
     window.addEventListener('resize', this.handleResize)

@@ -17,9 +17,6 @@ import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 export default {
   name: 'LocationInfo',
   components: { OsIcon },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     locationData: { type: Object, default: null },
     size: {
@@ -33,6 +30,9 @@ export default {
       type: Boolean,
       required: true,
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>

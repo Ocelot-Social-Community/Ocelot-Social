@@ -75,15 +75,15 @@ export default {
   props: {
     userdata: { type: Object, required: true },
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   data() {
     return {
       isOpen: true,
       success: false,
       loading: false,
     }
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   computed: {
     title() {

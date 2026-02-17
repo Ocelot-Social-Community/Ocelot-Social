@@ -41,9 +41,6 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   mixins: [GetCategories],
-  created() {
-    this.icons = ocelotIcons
-  },
   components: {
     EventsByFilter,
     FollowingFilter,
@@ -60,6 +57,9 @@ export default {
     eventSetInPostTypeFilter() {
       return this.filteredPostTypes ? this.filteredPostTypes.includes('Event') : null
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     saveCategories() {

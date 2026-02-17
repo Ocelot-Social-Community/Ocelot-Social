@@ -52,9 +52,6 @@ export default {
     OsButton,
     OsIcon,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   props: {
     placement: { type: String, default: 'bottom-start' },
   },
@@ -74,6 +71,9 @@ export default {
         { iconName: this.icons.minus, name: `editor.legend.ruler`, shortcut: '---' },
       ]
     },
+  },
+  created() {
+    this.icons = ocelotIcons
   },
 }
 </script>

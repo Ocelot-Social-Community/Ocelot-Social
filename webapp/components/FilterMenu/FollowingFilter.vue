@@ -67,15 +67,15 @@ export default {
     OsButton,
     OsIcon,
   },
-  created() {
-    this.icons = ocelotIcons
-  },
   computed: {
     ...mapGetters({
       filteredByUsersFollowed: 'posts/filteredByUsersFollowed',
       filteredByPostsInMyGroups: 'posts/filteredByPostsInMyGroups',
       currentUser: 'auth/user',
     }),
+  },
+  created() {
+    this.icons = ocelotIcons
   },
   methods: {
     ...mapMutations({
