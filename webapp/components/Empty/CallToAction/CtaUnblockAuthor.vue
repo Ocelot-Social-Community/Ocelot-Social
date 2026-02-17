@@ -29,6 +29,7 @@ export default {
     author: {
       type: Object,
       required: true,
+      validator: (value) => 'id' in value && 'slug' in value && 'name' in value,
     },
   },
   computed: {
