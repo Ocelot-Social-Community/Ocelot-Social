@@ -53,7 +53,7 @@ export default {
         userData.posts.forEach((post) => post.comments.sort(byCreationDate))
         return userData
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

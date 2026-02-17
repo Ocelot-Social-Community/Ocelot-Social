@@ -63,7 +63,7 @@ export default {
           })
           return readTxResult.records.map((r) => r.get('user'))
         } finally {
-          session.close()
+          await session.close()
         }
       }
       return neo4jgraphql(object, args, context, resolveInfo)
@@ -126,7 +126,7 @@ export default {
         }
         return blockedUser
       } finally {
-        session.close()
+        await session.close()
       }
     },
     unblockUser: async (_object, args, context, _resolveInfo) => {
@@ -306,7 +306,7 @@ export default {
         const user = await writeTxResultPromise
         return user
       } finally {
-        session.close()
+        await session.close()
       }
     },
     saveCategorySettings: async (_object, args, context, _resolveInfo) => {
@@ -424,7 +424,7 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     resetTrophyBadgesSelected: async (_object, _args, context, _resolveInfo) => {
@@ -451,7 +451,7 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
@@ -562,7 +562,7 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     badgeTrophiesUnused: async (parent, _params, context, _resolveInfo) => {
@@ -584,7 +584,7 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     badgeTrophiesUnusedCount: async (parent, _params, context, _resolveInfo) => {
@@ -606,7 +606,7 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     badgeVerification: async (parent, _params, context, _resolveInfo) => {
@@ -628,7 +628,7 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     ...Resolver('User', {

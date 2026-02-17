@@ -53,7 +53,7 @@ export default {
         const count = await getUnreadRoomsCount(currentUserId, session)
         return count
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
@@ -103,7 +103,7 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

@@ -65,7 +65,7 @@ export default {
             await setMessagesAsDistributed(undistributedMessagesIds, session)
           }
         } finally {
-          session.close()
+          await session.close()
         }
         // send subscription to author to updated the messages
       }
@@ -147,7 +147,7 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     MarkMessagesAsSeen: async (_parent, params, context, _resolveInfo) => {
@@ -173,7 +173,7 @@ export default {
         // send subscription to author to updated the messages
         return true
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

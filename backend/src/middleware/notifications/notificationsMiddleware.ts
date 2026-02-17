@@ -159,7 +159,7 @@ const postAuthorOfComment = async (commentId, { context }) => {
     })
     return postAuthorId.records.map((record) => record.get('authorId'))
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -200,7 +200,7 @@ const notifyFollowingUsers = async (postId, groupId, context) => {
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -246,7 +246,7 @@ const notifyGroupMembersOfNewPost = async (postId, groupId, context) => {
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -280,7 +280,7 @@ const notifyOwnersOfGroup = async (groupId, userId, reason, context) => {
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -318,7 +318,7 @@ const notifyMemberOfGroup = async (groupId, userId, reason, context) => {
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -389,7 +389,7 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -495,7 +495,7 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
   } catch (error) {
     throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 

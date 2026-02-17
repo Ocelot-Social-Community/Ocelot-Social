@@ -31,7 +31,7 @@ export default {
         const txResult = await readTxResultPromise
         return txResult.records[0].get('result')
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
@@ -77,7 +77,7 @@ export default {
         const txResult = await writeTxResultPromise
         response = txResult[0]
       } finally {
-        session.close()
+        await session.close()
       }
       return response
     },
@@ -115,7 +115,7 @@ export default {
           throw new UserInputError('A user account with this email already exists.')
         throw new Error(e)
       } finally {
-        session.close()
+        await session.close()
       }
       if (!response) throw new UserInputError('Invalid nonce or no email address found.')
       return response
