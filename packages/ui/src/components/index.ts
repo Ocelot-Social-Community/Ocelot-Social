@@ -17,3 +17,4 @@ export {
   SYSTEM_ICONS,
   type SystemIconName,
 } from './OsIcon'
+export { OsSpinner, SPINNER_SIZES } from './OsSpinner'

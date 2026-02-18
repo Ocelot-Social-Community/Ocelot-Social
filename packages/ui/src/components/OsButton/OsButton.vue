@@ -1,6 +1,7 @@
 <script lang="ts">
   import { computed, defineComponent, getCurrentInstance, h, isVue2 } from 'vue-demi'
 
+  import { createSpinnerSvg } from '#src/components/OsSpinner/createSpinnerSvg'
   import { cn } from '#src/utils'
 
   import { buttonVariants } from './button.variants'
@@ -40,39 +41,16 @@
 
   const SPINNER_PX: Record<Size, number> = { sm: 24, md: 32, lg: 40, xl: 46 }
 
-  const SVG_ATTRS = {
-    viewBox: '0 0 50 50',
-    xmlns: 'http://www.w3.org/2000/svg',
-    'aria-hidden': 'true',
-  }
-
-  const CIRCLE_ATTRS = {
-    cx: '25',
-    cy: '25',
-    r: '20',
-    fill: 'none',
-    stroke: 'currentColor',
-    'stroke-width': '4',
-    'stroke-linecap': 'round',
-  }
-
-  const CIRCLE_STYLE =
-    'transform-origin:25px 25px;animation:os-spinner-rotate 16s linear infinite,os-spinner-dash 1.5s ease-in-out infinite'
-
-  function vueAttrs(attrs: Record<string, string>, style?: string) {
-    /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
-    return isVue2 ? { attrs, ...(style && { style }) } : { ...attrs, ...(style && { style }) }
-    /* v8 ignore stop */
-  }
-
   function createSpinner(px: number, center: string) {
-    const svg = h('svg', vueAttrs(SVG_ATTRS, 'width:100%;height:100%;overflow:hidden'), [
-      h('circle', vueAttrs(CIRCLE_ATTRS, CIRCLE_STYLE)),
-    ])
     return h(
       'span',
-      { class: `os-button__spinner absolute ${center}`, style: `width:${px}px;height:${px}px` },
-      [svg],
+      {
+        class: `os-button__spinner absolute ${center}`,
+        style: `width:${px}px;height:${px}px`,
+        /* v8 ignore next -- Vue 2 only */
+        ...(isVue2 ? { attrs: { 'aria-hidden': 'true' } } : { 'aria-hidden': 'true' }),
+      },
+      [createSpinnerSvg()],
     )
   }
 
