@@ -67,7 +67,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { isEmpty } from 'lodash'
 import SearchHeading from '~/components/generic/SearchHeading/SearchHeading.vue'
 import SearchPost from '~/components/generic/SearchPost/SearchPost.vue'
@@ -99,7 +99,7 @@ export default {
     }
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   computed: {
     emptyText() {

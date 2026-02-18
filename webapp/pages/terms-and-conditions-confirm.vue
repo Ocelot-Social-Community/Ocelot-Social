@@ -25,7 +25,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
 import { updateUserMutation } from '~/graphql/User.js'
@@ -34,7 +34,7 @@ export default {
   name: 'TermsAndConditionsConfirm',
   components: { OsButton, OsIcon },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   layout: 'default',
   head() {

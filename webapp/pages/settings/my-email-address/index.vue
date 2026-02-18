@@ -36,7 +36,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { AddEmailAddressMutation } from '~/graphql/EmailAddress.js'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import scrollToContent from '../scroll-to-content.js'
@@ -49,7 +49,7 @@ export default {
     SweetalertIcon,
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   data() {
     return {

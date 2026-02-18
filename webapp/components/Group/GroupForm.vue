@@ -152,7 +152,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
 import {
@@ -284,7 +284,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     checkFormError(error) {

@@ -81,7 +81,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { mutedUsers, unmuteUser } from '~/graphql/settings/MutedUsers'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import scrollToContent from './scroll-to-content.js'
@@ -94,7 +94,7 @@ export default {
     ProfileAvatar,
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   data() {
     return {

@@ -30,7 +30,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { queryLocations } from '~/graphql/location'
 
 let timeout
@@ -54,7 +54,7 @@ export default {
     },
   },
   async created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
     const result = await this.requestGeoData(this.locationName)
     this.$nextTick(() => {
       this.currentValue = result || this.locationName

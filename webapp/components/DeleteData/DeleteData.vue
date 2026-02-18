@@ -59,7 +59,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { mapActions, mapGetters } from 'vuex'
 import gql from 'graphql-tag'
 import { currentUserCountQuery } from '~/graphql/User'
@@ -86,7 +86,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   computed: {
     ...mapGetters({

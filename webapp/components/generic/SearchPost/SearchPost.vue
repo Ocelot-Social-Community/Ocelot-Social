@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 
 export default {
@@ -26,7 +26,7 @@ export default {
     option: { type: Object, required: true },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
 }
 </script>

@@ -27,7 +27,7 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import unionBy from 'lodash/unionBy'
 import {
   createSocialMediaMutation,
@@ -96,7 +96,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     ...mapMutations({

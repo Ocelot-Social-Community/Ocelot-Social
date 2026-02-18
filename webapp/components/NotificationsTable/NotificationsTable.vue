@@ -95,7 +95,7 @@
 </template>
 <script>
 import { OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import HcEmpty from '~/components/Empty/Empty'
 import BaseCard from '../_new/generic/BaseCard/BaseCard.vue'
@@ -130,7 +130,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     isComment(notificationSource) {

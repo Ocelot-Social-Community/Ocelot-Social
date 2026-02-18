@@ -1,4 +1,4 @@
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import PostMutations from '~/graphql/PostMutations.js'
 
 export function postMenuModalsData(truncatedPostName, confirmCallback, cancelCallback = () => {}) {
@@ -12,12 +12,12 @@ export function postMenuModalsData(truncatedPostName, confirmCallback, cancelCal
       buttons: {
         confirm: {
           danger: true,
-          icon: ocelotIcons.trash,
+          icon: iconRegistry.trash,
           textIdent: 'delete.submit',
           callback: confirmCallback,
         },
         cancel: {
-          icon: ocelotIcons.close,
+          icon: iconRegistry.close,
           textIdent: 'delete.cancel',
           callback: cancelCallback,
         },

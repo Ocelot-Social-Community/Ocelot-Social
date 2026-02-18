@@ -98,7 +98,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import { isEmail } from 'validator'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
@@ -112,7 +112,7 @@ export default {
     PaginationButtons,
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   data() {
     const pageSize = 15

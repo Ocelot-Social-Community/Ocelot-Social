@@ -38,7 +38,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import Dropdown from '~/components/Dropdown'
 import PinnedPostsMixin from '~/mixins/pinnedPosts'
 
@@ -70,7 +70,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   computed: {
     routes() {
@@ -102,7 +102,7 @@ export default {
               callback: () => {
                 this.$emit('pinPost', this.resource)
               },
-              icon: this.icons.link,
+              icon: this.icons.mapPin,
             })
           } else {
             if (this.resource.pinnedBy) {
@@ -123,7 +123,7 @@ export default {
             callback: () => {
               this.$emit('pushPost', this.resource)
             },
-            icon: this.icons.link,
+            icon: this.icons.arrowUp,
           })
         }
 
@@ -270,7 +270,7 @@ export default {
           callback: () => {
             this.$emit(this.resource.groupPinned ? 'unpinGroupPost' : 'pinGroupPost', this.resource)
           },
-          icon: this.resource.groupPinned ? this.icons.unlink : this.icons.link,
+          icon: this.resource.groupPinned ? this.icons.unlink : this.icons.mapPin,
         })
       }
 

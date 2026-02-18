@@ -182,7 +182,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
 import CommentList from '~/components/CommentList/CommentList'
@@ -238,7 +238,7 @@ export default {
   },
   mixins: [GetCategories, postListActions, SortCategories],
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   head() {
     return {

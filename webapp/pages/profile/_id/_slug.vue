@@ -211,7 +211,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import uniqBy from 'lodash/uniqBy'
 import { mapGetters, mapMutations } from 'vuex'
 import postListActions from '~/mixins/postListActions'
@@ -263,7 +263,7 @@ export default {
     LocationInfo,
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   mixins: [postListActions],
   transition: {

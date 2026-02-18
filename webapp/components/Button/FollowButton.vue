@@ -19,7 +19,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { followUserMutation, unfollowUserMutation } from '~/graphql/User'
 
 export default {
@@ -59,7 +59,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     onHover() {

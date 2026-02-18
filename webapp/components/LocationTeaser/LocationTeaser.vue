@@ -14,7 +14,7 @@
 
 <script>
 import { OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 
 export default {
   name: 'LocationTeaser',
@@ -45,7 +45,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
 }
 </script>

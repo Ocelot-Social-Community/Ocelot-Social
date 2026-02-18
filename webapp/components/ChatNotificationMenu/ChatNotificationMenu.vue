@@ -20,7 +20,7 @@
 
 <script>
 import { OsButton } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import { unreadRoomsQuery, roomCountUpdated } from '~/graphql/Rooms'
@@ -38,7 +38,7 @@ export default {
     }),
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     ...mapMutations({

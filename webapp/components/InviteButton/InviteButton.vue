@@ -37,7 +37,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import Dropdown from '~/components/Dropdown'
 import { mapGetters, mapMutations } from 'vuex'
 import InvitationList from '~/components/_new/features/Invitations/InvitationList.vue'
@@ -62,7 +62,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     ...mapMutations({

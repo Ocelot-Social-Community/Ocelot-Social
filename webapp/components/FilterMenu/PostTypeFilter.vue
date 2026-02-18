@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
 import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
@@ -56,7 +56,7 @@ export default {
     }),
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     ...mapMutations({

@@ -75,7 +75,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import { COMMENT_MAX_UNTRUNCATED_LENGTH, COMMENT_TRUNCATE_TO_LENGTH } from '~/constants/comment'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
@@ -178,7 +178,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     checkAnchor(anchor) {

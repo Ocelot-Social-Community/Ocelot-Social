@@ -19,7 +19,7 @@
   </div>
 </template>
 <script>
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import CommentCard from '~/components/CommentCard/CommentCard'
 import scrollToAnchor from '~/mixins/scrollToAnchor'
@@ -47,7 +47,7 @@ export default {
     },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     reply(message) {

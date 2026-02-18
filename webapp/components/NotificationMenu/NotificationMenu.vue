@@ -78,7 +78,7 @@
 import { mapGetters } from 'vuex'
 import unionBy from 'lodash/unionBy'
 import { OsButton } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import {
   notificationQuery,
   markAsReadMutation,
@@ -107,7 +107,7 @@ export default {
     noMenu: { type: Boolean, default: false },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   mounted() {
     window.addEventListener('resize', this.handleResize)

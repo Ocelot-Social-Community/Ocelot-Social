@@ -59,7 +59,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import Cropper from 'cropperjs'
 import VueDropzone from 'nuxt-dropzone'
 import LoadingSpinner from '~/components/_new/generic/LoadingSpinner/LoadingSpinner'
@@ -96,7 +96,7 @@ export default {
     }
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     onUnSupportedFormat(message) {

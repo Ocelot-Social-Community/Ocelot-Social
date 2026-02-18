@@ -46,7 +46,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
 import UniqueSlugForm from '~/components/utils/UniqueSlugForm'
 import LocationSelect from '~/components/Select/LocationSelect'
@@ -75,7 +75,7 @@ export default {
     }
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   mounted() {
     this.formData.name = this.currentUser.name

@@ -80,15 +80,13 @@
           return h(
             'span',
             {
-              class: [
-                cn(
-                  'os-icon inline-flex items-center align-bottom shrink-0',
-                  sizeClass,
-                  '[&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current',
-                ),
+              class: cn(
+                'os-icon inline-flex items-center align-bottom shrink-0',
+                sizeClass,
+                '[&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current',
                 parentClass,
                 parentDynClass,
-              ].filter(Boolean),
+              ),
               attrs: { ...a11yAttrs, ...parentAttrs, ...attrs },
             },
             [iconVNode],

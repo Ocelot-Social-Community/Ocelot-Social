@@ -147,7 +147,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { EditorMenuBar } from 'tiptap'
 import MenuLegend from './MenuLegend.vue'
 
@@ -163,7 +163,7 @@ export default {
     toggleLinkInput: { type: Function, required: true },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
 }
 </script>

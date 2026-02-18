@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { ocelotIcons } from '@ocelot-social/ui/ocelot'
+import { iconRegistry } from '~/utils/iconRegistry'
 import ActionButton from '~/components/ActionButton.vue'
 
 export default {
@@ -24,7 +24,7 @@ export default {
     isObserved: { type: Boolean, default: false },
   },
   created() {
-    this.icons = ocelotIcons
+    this.icons = iconRegistry
   },
   methods: {
     toggle() {
