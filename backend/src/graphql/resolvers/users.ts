@@ -400,7 +400,7 @@ export default {
           return result.records.map((record) => record.get('user'))[0]
         })
         if (!user) {
-          throw new Error('You cannot set badges not rewarded to you.')
+          throw new UserInputError('You cannot set badges not rewarded to you.')
         }
         return user
       } finally {
