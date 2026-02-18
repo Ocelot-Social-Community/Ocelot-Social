@@ -70,7 +70,9 @@ export default {
             ...record.get('email').properties,
           }))
         })
-        return txResult[0]
+        const response = txResult[0]
+        if (!response) throw new UserInputError('User not found.')
+        return response
       } finally {
         await session.close()
       }
