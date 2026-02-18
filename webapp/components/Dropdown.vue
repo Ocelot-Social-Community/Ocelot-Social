@@ -6,6 +6,7 @@
     :disabled="disabled"
     trigger="manual"
     :offset="offset"
+    @auto-hide="isPopoverOpen = false"
   >
     <slot :toggleMenu="toggleMenu" :openMenu="openMenu" :closeMenu="closeMenu" :isOpen="isOpen" />
     <div slot="popover" @mouseover="popoverMouseEnter" @mouseleave="popoverMouseLeave">
@@ -55,6 +56,10 @@ export default {
   beforeDestroy() {
     clearTimeout(mouseEnterTimer)
     clearTimeout(mouseLeaveTimer)
+    if (this.isPopoverOpen) {
+      this.isPopoverOpen = false
+      document.body.classList.remove('dropdown-open')
+    }
   },
   methods: {
     toggleMenu() {
