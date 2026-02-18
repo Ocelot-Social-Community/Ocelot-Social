@@ -101,9 +101,9 @@ export default {
                       RETURN toString(count(group)) AS count`
           }
           const transactionResponse = await txc.run(cypher, { userId })
-          return transactionResponse.records.map((record) => record.get('count'))
+          return transactionResponse.records.map((record) => record.get('count'))[0]
         })
-        return parseInt(result)
+        return parseInt(result, 10) || 0
       } finally {
         await session.close()
       }
