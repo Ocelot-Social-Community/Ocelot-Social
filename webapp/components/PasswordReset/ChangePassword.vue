@@ -31,6 +31,9 @@
             :disabled="!!errors"
             type="submit"
           >
+            <template #icon>
+              <os-icon :icon="icons.lock" />
+            </template>
             {{ $t('settings.security.change-password.button') }}
           </os-button>
         </ds-space>
@@ -67,7 +70,8 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { iconRegistry } from '~/utils/iconRegistry'
 import emails from '../../constants/emails.js'
 import PasswordStrength from '../Password/Strength'
 import gql from 'graphql-tag'
@@ -77,12 +81,16 @@ import PasswordForm from '~/components/utils/PasswordFormHelper'
 export default {
   components: {
     OsButton,
+    OsIcon,
     SweetalertIcon,
     PasswordStrength,
   },
   props: {
     email: { type: String, required: true },
     nonce: { type: String, required: true },
+  },
+  created() {
+    this.icons = iconRegistry
   },
   data() {
     const passwordForm = PasswordForm({ translate: this.$t })
