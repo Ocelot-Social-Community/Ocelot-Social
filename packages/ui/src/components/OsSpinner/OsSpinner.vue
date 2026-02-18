@@ -3,12 +3,40 @@
 
   import { cn } from '#src/utils'
 
-  import { createSpinnerSvg } from './createSpinnerSvg'
   import { SPINNER_SIZES } from './spinner.variants'
 
   import type { Size } from '#src/types'
   import type { ClassValue } from 'clsx'
   import type { PropType } from 'vue-demi'
+
+  const SVG_ATTRS = {
+    viewBox: '0 0 50 50',
+    xmlns: 'http://www.w3.org/2000/svg',
+  }
+
+  const CIRCLE_ATTRS = {
+    cx: '25',
+    cy: '25',
+    r: '20',
+    fill: 'none',
+    stroke: 'currentColor',
+    'stroke-width': '4',
+    'stroke-linecap': 'round',
+  }
+
+  const CIRCLE_STYLE =
+    'transform-origin:25px 25px;animation:os-spinner-rotate 16s linear infinite,os-spinner-dash 1.5s ease-in-out infinite'
+
+  function vueAttrs(attrs: Record<string, string>, style: string): Record<string, unknown> {
+    /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
+    return isVue2 ? { attrs, style } : { ...attrs, style }
+    /* v8 ignore stop */
+  }
+
+  function createSvg() {
+    const circle = h('circle', vueAttrs(CIRCLE_ATTRS, CIRCLE_STYLE))
+    return h('svg', vueAttrs(SVG_ATTRS, 'width:100%;height:100%;overflow:hidden'), [circle])
+  }
 
   /**
    * Animated loading spinner with configurable size.
@@ -35,7 +63,7 @@
 
       return () => {
         const sizeClass = SPINNER_SIZES[props.size]
-        const svg = createSpinnerSvg()
+        const svg = createSvg()
 
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
         if (isVue2) {
