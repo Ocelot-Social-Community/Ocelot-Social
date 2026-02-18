@@ -1,7 +1,7 @@
 <script lang="ts">
   import { computed, defineComponent, getCurrentInstance, h, isVue2 } from 'vue-demi'
 
-  import { createSpinnerSvg } from '#src/components/OsSpinner/createSpinnerSvg'
+  import OsSpinner from '#src/components/OsSpinner/OsSpinner.vue'
   import { cn } from '#src/utils'
 
   import { buttonVariants } from './button.variants'
@@ -42,16 +42,11 @@
   const SPINNER_PX: Record<Size, number> = { sm: 24, md: 32, lg: 40, xl: 46 }
 
   function createSpinner(px: number, center: string) {
-    return h(
-      'span',
-      {
-        class: `os-button__spinner absolute ${center}`,
-        style: `width:${px}px;height:${px}px`,
-        /* v8 ignore next -- Vue 2 only */
-        ...(isVue2 ? { attrs: { 'aria-hidden': 'true' } } : { 'aria-hidden': 'true' }),
-      },
-      [createSpinnerSvg()],
-    )
+    return h(OsSpinner, {
+      class: `os-button__spinner absolute ${center}`,
+      style: `width:${px}px;height:${px}px`,
+      'aria-hidden': 'true',
+    })
   }
 
   export default defineComponent({

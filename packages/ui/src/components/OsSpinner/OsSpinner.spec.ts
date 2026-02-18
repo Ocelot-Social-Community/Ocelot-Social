@@ -90,6 +90,23 @@ describe('osSpinner', () => {
 
       expect(wrapper.attributes('aria-label')).toBe('Saving changes')
     })
+
+    it('is decorative when aria-hidden="true"', () => {
+      const wrapper = mount(OsSpinner, {
+        attrs: { 'aria-hidden': 'true' },
+      })
+
+      expect(wrapper.attributes('aria-hidden')).toBe('true')
+      expect(wrapper.attributes('role')).toBeUndefined()
+      expect(wrapper.attributes('aria-label')).toBeUndefined()
+    })
+
+    it('is semantic by default (no aria-hidden)', () => {
+      const wrapper = mount(OsSpinner)
+
+      expect(wrapper.attributes('aria-hidden')).toBeUndefined()
+      expect(wrapper.attributes('role')).toBe('status')
+    })
   })
 
   describe('css', () => {

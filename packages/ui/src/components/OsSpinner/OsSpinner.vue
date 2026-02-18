@@ -13,6 +13,10 @@
   /**
    * Animated loading spinner with configurable size.
    * Inherits color from parent via `currentColor`.
+   *
+   * Semantic by default (`role="status"`, `aria-label="Loading"`).
+   * Pass `aria-hidden="true"` to make it decorative (suppresses role/aria-label).
+   *
    * @prop size - Spinner size (xs/sm/md/lg/xl/2xl)
    */
   export default defineComponent({
@@ -41,16 +45,20 @@
           const parentDynClass = proxy?.$vnode?.data?.class
           const parentAttrs = proxy?.$vnode?.data?.attrs || {}
 
+          const isDecorative =
+            parentAttrs['aria-hidden'] === 'true' || attrs['aria-hidden'] === 'true'
+          const a11yAttrs = isDecorative
+            ? { 'aria-hidden': 'true' }
+            : {
+                role: 'status',
+                'aria-label': parentAttrs['aria-label'] || attrs['aria-label'] || 'Loading',
+              }
+
           return h(
             'span',
             {
               class: cn('os-spinner inline-flex shrink-0', sizeClass, parentClass, parentDynClass),
-              attrs: {
-                role: 'status',
-                'aria-label': parentAttrs['aria-label'] || attrs['aria-label'] || 'Loading',
-                ...parentAttrs,
-                ...attrs,
-              },
+              attrs: { ...a11yAttrs, ...parentAttrs, ...attrs, ...a11yAttrs },
             },
             [svg],
           )
@@ -60,15 +68,20 @@
         const {
           class: attrClass,
           'aria-label': ariaLabel,
+          'aria-hidden': ariaHidden,
           ...restAttrs
         } = attrs as Record<string, unknown>
+
+        const isDecorative = ariaHidden === 'true'
+        const a11yAttrs = isDecorative
+          ? { 'aria-hidden': 'true' as const }
+          : { role: 'status' as const, 'aria-label': (ariaLabel as string) || 'Loading' }
 
         return h(
           'span',
           {
             class: cn('os-spinner inline-flex shrink-0', sizeClass, attrClass as ClassValue),
-            role: 'status',
-            'aria-label': ariaLabel || 'Loading',
+            ...a11yAttrs,
             ...restAttrs,
           },
           [svg],
