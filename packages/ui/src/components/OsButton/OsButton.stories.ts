@@ -27,6 +27,7 @@ interface PlaygroundArgs {
   disabled: boolean
   loading: boolean
   icon: string
+  suffix: string
   label: string
 }
 
@@ -71,6 +72,10 @@ export const Playground: StoryObj<PlaygroundArgs> = {
       control: 'select',
       options: Object.keys(iconMap),
     },
+    suffix: {
+      control: 'select',
+      options: Object.keys(iconMap),
+    },
     label: {
       control: 'text',
     },
@@ -85,23 +90,26 @@ export const Playground: StoryObj<PlaygroundArgs> = {
     disabled: false,
     loading: false,
     icon: 'none',
+    suffix: 'none',
     label: 'Button',
   },
   render: (args) => ({
     components: { OsButton },
     setup() {
       const buttonProps = computed(() => {
-        const { icon: _icon, label: _label, ...rest } = args
+        const { icon: _icon, suffix: _suffix, label: _label, ...rest } = args
         return rest
       })
       const IconComponent = computed(() => iconMap[args.icon] ?? null)
+      const SuffixComponent = computed(() => iconMap[args.suffix] ?? null)
       const label = computed(() => args.label)
-      return { buttonProps, IconComponent, label }
+      return { buttonProps, IconComponent, SuffixComponent, label }
     },
     template: `
       <OsButton v-bind="buttonProps" :href="buttonProps.as === 'a' ? '#' : undefined">
         <template v-if="IconComponent" #icon><component :is="IconComponent" /></template>
         {{ label }}
+        <template v-if="SuffixComponent" #suffix><component :is="SuffixComponent" /></template>
       </OsButton>
     `,
   }),
