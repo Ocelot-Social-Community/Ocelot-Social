@@ -59,7 +59,6 @@
           <os-button
             appearance="ghost"
             variant="primary"
-            :loading="markingAllAsRead"
             @click="markAllAsRead()"
             data-test="markAllAsRead-button"
           >
@@ -108,7 +107,6 @@ export default {
   data() {
     return {
       notifications: [],
-      markingAllAsRead: false,
     }
   },
   props: {
@@ -146,15 +144,12 @@ export default {
         return
       }
 
-      this.markingAllAsRead = true
       try {
         await this.$apollo.mutate({
           mutation: markAllAsReadMutation(this.$i18n),
         })
       } catch (error) {
         this.$toast.error(error.message)
-      } finally {
-        this.markingAllAsRead = false
       }
     },
   },
