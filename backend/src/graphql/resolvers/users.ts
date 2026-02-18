@@ -600,22 +600,18 @@ export default {
     },
     badgeVerification: async (parent, _params, context, _resolveInfo) => {
       const session = context.driver.session()
-
-      const query = session.writeTransaction(async (transaction) => {
-        const result = await transaction.run(
-          `
-            MATCH (user:User {id: $parent.id})<-[:VERIFIES]-(verification:Badge)
-            RETURN verification {.*}
-          `,
-          { parent },
-        )
-        return result.records.map((record) => record.get('verification'))[0]
-      })
       try {
-        const result = await query
+        const result = await session.readTransaction(async (transaction) => {
+          const response = await transaction.run(
+            `
+              MATCH (user:User {id: $parent.id})<-[:VERIFIES]-(verification:Badge)
+              RETURN verification {.*}
+            `,
+            { parent },
+          )
+          return response.records.map((record) => record.get('verification'))[0]
+        })
         return result ?? defaultVerificationBadge
-      } catch (error) {
-        throw new Error(error)
       } finally {
         await session.close()
       }
