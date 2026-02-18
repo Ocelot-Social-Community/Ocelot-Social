@@ -284,6 +284,158 @@ describe('osButton', () => {
     })
   })
 
+  describe('suffix slot', () => {
+    it('renders suffix slot content in .os-button__suffix wrapper', () => {
+      const wrapper = mount(OsButton, {
+        slots: { suffix: '<svg data-testid="suffix"></svg>' },
+      })
+      const suffixWrapper = wrapper.find('.os-button__suffix')
+
+      expect(suffixWrapper.exists()).toBe(true)
+      expect(suffixWrapper.find('[data-testid="suffix"]').exists()).toBe(true)
+    })
+
+    it('renders both suffix and text', () => {
+      const wrapper = mount(OsButton, {
+        slots: {
+          suffix: '<svg data-testid="suffix"></svg>',
+          default: 'Next',
+        },
+      })
+
+      expect(wrapper.find('.os-button__suffix').exists()).toBe(true)
+      expect(wrapper.text()).toContain('Next')
+    })
+
+    it('adds gap-2 class when suffix and text are present', () => {
+      const wrapper = mount(OsButton, {
+        slots: {
+          suffix: '<svg></svg>',
+          default: 'Next',
+        },
+      })
+      const contentSpan = wrapper.find('button > span')
+
+      expect(contentSpan.classes()).toContain('gap-2')
+    })
+
+    it('adds gap-1 class for small sizes with suffix and text', () => {
+      const wrapper = mount(OsButton, {
+        props: { size: 'sm' },
+        slots: {
+          suffix: '<svg></svg>',
+          default: 'Next',
+        },
+      })
+      const contentSpan = wrapper.find('button > span')
+
+      expect(contentSpan.classes()).toContain('gap-1')
+      expect(contentSpan.classes()).not.toContain('gap-2')
+    })
+
+    it('renders icon + text + suffix together', () => {
+      const wrapper = mount(OsButton, {
+        slots: {
+          icon: '<svg data-testid="icon"></svg>',
+          default: 'Save',
+          suffix: '<svg data-testid="suffix"></svg>',
+        },
+      })
+
+      expect(wrapper.find('.os-button__icon').exists()).toBe(true)
+      expect(wrapper.find('.os-button__suffix').exists()).toBe(true)
+      expect(wrapper.text()).toContain('Save')
+    })
+
+    it('suffix has -mr-1 margin (mirrored from icon -ml-1)', () => {
+      const wrapper = mount(OsButton, {
+        slots: {
+          suffix: '<svg></svg>',
+          default: 'Next',
+        },
+      })
+      const suffixWrapper = wrapper.find('.os-button__suffix')
+
+      expect(suffixWrapper.classes()).toContain('-mr-1')
+    })
+
+    it('adds relative overflow-visible when loading with suffix', () => {
+      const wrapper = mount(OsButton, {
+        props: { loading: true },
+        slots: {
+          suffix: '<svg></svg>',
+          default: 'Save',
+        },
+      })
+      const suffixWrapper = wrapper.find('.os-button__suffix')
+
+      expect(suffixWrapper.classes()).toContain('relative')
+      expect(suffixWrapper.classes()).toContain('overflow-visible')
+    })
+
+    it('suffix-only button (no icon, no text) has -ml-1 -mr-1', () => {
+      const wrapper = mount(OsButton, {
+        slots: { suffix: '<svg></svg>' },
+      })
+      const suffixWrapper = wrapper.find('.os-button__suffix')
+
+      expect(suffixWrapper.classes()).toContain('-ml-1')
+      expect(suffixWrapper.classes()).toContain('-mr-1')
+    })
+
+    it('icon + suffix without text: icon has -ml-1 but no -mr-1', () => {
+      const wrapper = mount(OsButton, {
+        slots: {
+          icon: '<svg></svg>',
+          suffix: '<svg></svg>',
+        },
+      })
+      const iconWrapper = wrapper.find('.os-button__icon')
+
+      expect(iconWrapper.classes()).toContain('-ml-1')
+      expect(iconWrapper.classes()).not.toContain('-mr-1')
+    })
+
+    it('icon + suffix without text: suffix has -mr-1 but no -ml-1', () => {
+      const wrapper = mount(OsButton, {
+        slots: {
+          icon: '<svg></svg>',
+          suffix: '<svg></svg>',
+        },
+      })
+      const suffixWrapper = wrapper.find('.os-button__suffix')
+
+      expect(suffixWrapper.classes()).toContain('-mr-1')
+      expect(suffixWrapper.classes()).not.toContain('-ml-1')
+    })
+
+    it('icon + suffix without text has gap-2', () => {
+      const wrapper = mount(OsButton, {
+        slots: {
+          icon: '<svg></svg>',
+          suffix: '<svg></svg>',
+        },
+      })
+      const contentSpan = wrapper.find('button > span')
+
+      expect(contentSpan.classes()).toContain('gap-2')
+    })
+
+    it('icon + suffix without text has gap-1 for small size', () => {
+      const wrapper = mount(OsButton, {
+        props: { size: 'sm' },
+        slots: {
+          icon: '<svg></svg>',
+          suffix: '<svg></svg>',
+        },
+      })
+      const contentSpan = wrapper.find('button > span')
+
+      expect(contentSpan.classes()).toContain('gap-1')
+      expect(contentSpan.classes()).not.toContain('gap-2')
+    })
+  })
+
   describe('circle prop', () => {
     it('renders as round button with rounded-full and p-0', () => {
       const wrapper = mount(OsButton, {

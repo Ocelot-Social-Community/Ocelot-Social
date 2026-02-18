@@ -42,9 +42,10 @@
               appearance="filled"
               @click="showFilter = !showFilter"
             >
+              <template #suffix>
+                <os-icon :icon="filterButtonIcon" />
+              </template>
               {{ $t('contribution.filterMasonryGrid.noFilter') }}
-              &nbsp;
-              <os-icon :icon="filterButtonIcon" />
             </os-button>
 
             <header-button
