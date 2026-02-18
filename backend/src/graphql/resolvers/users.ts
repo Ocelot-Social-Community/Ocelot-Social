@@ -111,7 +111,7 @@ export default {
               MATCH (currentUser:User {id: $currentUser.id})
               OPTIONAL MATCH (currentUser)-[r:FOLLOWS]->(blockedUser)
               DELETE r
-              CREATE (currentUser)-[:BLOCKED]->(blockedUser)
+              MERGE (currentUser)-[:BLOCKED]->(blockedUser)
               RETURN blockedUser {.*}
             `,
             { currentUser, args },
