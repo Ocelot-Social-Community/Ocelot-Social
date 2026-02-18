@@ -511,7 +511,7 @@ const removeUserFromGroupWriteTxResultPromise = async (session, groupId, userId)
       groupId,
       userId,
     })
-    const [user] = await transactionResponse.records.map((record) => {
+    const [user] = transactionResponse.records.map((record) => {
       return { user: record.get('user'), membership: record.get('membership') }
     })
     return user
