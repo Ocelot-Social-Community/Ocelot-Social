@@ -105,7 +105,7 @@ export default {
       const session = context.driver.session()
       try {
         const blockedUser = await session.writeTransaction(async (transaction) => {
-          const unBlockUserTransactionResponse = await transaction.run(
+          const blockUserResponse = await transaction.run(
             `
               MATCH (blockedUser:User {id: $args.id})
               MATCH (currentUser:User {id: $currentUser.id})
@@ -116,7 +116,7 @@ export default {
             `,
             { currentUser, args },
           )
-          return unBlockUserTransactionResponse.records.map((record) =>
+          return blockUserResponse.records.map((record) =>
             record.get('blockedUser'),
           )[0]
         })
@@ -135,7 +135,7 @@ export default {
       const session = context.driver.session()
       try {
         const unblockedUser = await session.writeTransaction(async (transaction) => {
-          const unBlockUserTransactionResponse = await transaction.run(
+          const unblockUserResponse = await transaction.run(
             `
               MATCH(u:User {id: $currentUser.id})-[r:BLOCKED]->(blockedUser:User {id: $args.id})
               DELETE r
@@ -143,7 +143,7 @@ export default {
             `,
             { currentUser, args },
           )
-          return unBlockUserTransactionResponse.records.map((record) =>
+          return unblockUserResponse.records.map((record) =>
             record.get('blockedUser'),
           )[0]
         })
