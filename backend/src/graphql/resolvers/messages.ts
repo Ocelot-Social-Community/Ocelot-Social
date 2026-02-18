@@ -144,8 +144,6 @@ export default {
         })
 
         return await writeTxResultPromise
-      } catch (error) {
-        throw new Error(error)
       } finally {
         await session.close()
       }
@@ -154,22 +152,20 @@ export default {
       const { messageIds } = params
       const currentUserId = context.user.id
       const session = context.driver.session()
-      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const setSeenCypher = `
-          MATCH (m:Message)<-[:CREATED]-(user:User)
-          WHERE m.id IN $messageIds AND NOT user.id = $currentUserId
-          SET m.seen = true
-          RETURN m { .* }
-        `
-        const setSeenTxResponse = await transaction.run(setSeenCypher, {
-          messageIds,
-          currentUserId,
-        })
-        const messages = await setSeenTxResponse.records.map((record) => record.get('m'))
-        return messages
-      })
       try {
-        await writeTxResultPromise
+        await session.writeTransaction(async (transaction) => {
+          const setSeenCypher = `
+            MATCH (m:Message)<-[:CREATED]-(user:User)
+            WHERE m.id IN $messageIds AND NOT user.id = $currentUserId
+            SET m.seen = true
+            RETURN m { .* }
+          `
+          const setSeenTxResponse = await transaction.run(setSeenCypher, {
+            messageIds,
+            currentUserId,
+          })
+          return setSeenTxResponse.records.map((record) => record.get('m'))
+        })
         // send subscription to author to updated the messages
         return true
       } finally {
