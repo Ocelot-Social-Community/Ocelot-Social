@@ -209,12 +209,16 @@ export default {
     },
     DeleteUser: async (_object, params, context: Context, _resolveInfo) => {
       const { resource, id: userId } = params
+      const allowedLabels = ['Post', 'Comment']
       const session = context.driver.session()
       try {
         return await session.writeTransaction(async (transaction) => {
           if (resource?.length) {
             await Promise.all(
               resource.map(async (node) => {
+                if (!allowedLabels.includes(node)) {
+                  throw new UserInputError(`Invalid resource type: ${node}`)
+                }
                 const txResult = await transaction.run(
                   `
                   MATCH (resource:${node})<-[:WROTE]-(author:User {id: $userId})
