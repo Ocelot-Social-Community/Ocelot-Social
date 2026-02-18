@@ -149,7 +149,8 @@ DsSpinner/LoadingSpinner → OsSpinner Webapp-Migration: ✅
 ├─ pages/admin: ds-spinner → os-spinner (size="xl") + ApolloQuery→apollo Option
 ├─ LoadingSpinner Komponente gelöscht
 ├─ ds-space centered → div+padding (Bugfix in 3 Seiten)
-└─ Admin: ApolloQuery→$apollo.loading (Spinner war wg. SSR-Prefetch unsichtbar)
+├─ Admin: ApolloQuery→$apollo.loading (Spinner war wg. SSR-Prefetch unsichtbar)
+└─ infinite-loading: OsSpinner im spinner-Slot (index, profile, groups)
 
 BaseIcon → OsIcon Webapp-Migration: ✅
 ├─ 131 <base-icon> in 70+ Dateien → <os-icon :icon="...">
@@ -179,6 +180,8 @@ BaseIcon → OsIcon Webapp-Migration: ✅
 - [x] `<ds-space centered>` → `<div style="...">` Bugfix in 3 Seiten
 - [x] Admin-Seite: `<ApolloQuery>` → `apollo`-Option + `$apollo.loading` (Spinner war wg. SSR-Prefetch unsichtbar)
 - [x] `filterStatistics()` mutiert nicht mehr Originalobjekt (Destructuring statt `delete`)
+- [x] `infinite-loading` Spinner-Slot: OsSpinner in allen 3 Nutzungen (index, profile, groups)
+- [x] Einheitliches Spinner-Design: vue-infinite-loading Default-Spinner → OsSpinner
 
 **Zuvor abgeschlossen (Session 23 - OsSpinner Komponente):**
 - [x] OsSpinner Komponente implementiert (size prop, currentColor, role="status", aria-label)
@@ -1625,6 +1628,7 @@ Bei der Migration werden:
 | 2026-02-18 | **ds-space centered Bugfix** | `<ds-space centered>` → `<div style="text-align:center;padding:48px 0">` in 3 Seiten (Styleguide-Bug) |
 | 2026-02-18 | **Admin Spinner Fix** | `<ApolloQuery>` → `apollo`-Option + `$apollo.loading`; SSR-Prefetch verhinderte Loading-State im Client |
 | 2026-02-18 | **filterStatistics Fix** | `delete data.__typename` → Destructuring `{ __typename, ...rest }` (keine Mutation des Originalobjekts) |
+| 2026-02-18 | **infinite-loading Spinner-Slot** | OsSpinner im `spinner`-Slot von vue-infinite-loading in 3 Seiten (index, profile, groups); einheitliches Spinner-Design |
 
 ---
 
