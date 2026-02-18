@@ -81,10 +81,10 @@ Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
 Phase 3: ██████████ 100% (24/24 Aufgaben) ✅ - Webapp-Integration komplett
-Phase 4: ██░░░░░░░░  24% (4/17 Aufgaben) - OsButton ✅, OsIcon ✅, System-Icons ✅, BaseIcon→OsIcon Migration ✅
+Phase 4: ███░░░░░░░  29% (5/17 Aufgaben) - OsButton ✅, OsIcon ✅, System-Icons ✅, BaseIcon→OsIcon Migration ✅, OsSpinner ✅
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████████░░  77% (66/86 Aufgaben)
+Gesamt:  ████████░░  78% (67/86 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -133,6 +133,13 @@ System-Icons:
 Ocelot-Icons (separates Entry-Point):
 └─ 82 Icons (Feature-Icons + Kategorie-Icons aus Webapp migriert)
 
+OsSpinner:
+├─ size:       ✅ xs, sm, md, lg, xl, 2xl (em-basiert)
+├─ color:      ✅ currentColor (erbt von Parent)
+├─ a11y:       ✅ role="status", aria-label="Loading" (customizable)
+├─ shared:     ✅ createSpinnerSvg() Utility (OsSpinner + OsButton)
+└─ vue-compat: ✅ h() Render-Function mit isVue2
+
 BaseIcon → OsIcon Webapp-Migration: ✅
 ├─ 131 <base-icon> in 70+ Dateien → <os-icon :icon="...">
 ├─ 82 SVGs in ocelot/icons/svgs/ (inkl. 17 Kategorie-Icons)
@@ -147,11 +154,24 @@ BaseIcon → OsIcon Webapp-Migration: ✅
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-15 (Session 22)
+**Letzte Aktualisierung:** 2026-02-18 (Session 23)
 
-**Aktuelle Phase:** Phase 4 - OsIcon ✅, BaseIcon → OsIcon Webapp-Migration ✅
+**Aktuelle Phase:** Phase 4 - OsIcon ✅, BaseIcon → OsIcon Migration ✅, OsSpinner ✅
 
-**Zuletzt abgeschlossen (Session 22 - BaseIcon → OsIcon Webapp-Migration):**
+**Zuletzt abgeschlossen (Session 23 - OsSpinner Komponente):**
+- [x] OsSpinner Komponente implementiert (size prop, currentColor, role="status", aria-label)
+- [x] Vue 2/3 kompatibel via `h()` Render-Function mit `isVue2`
+- [x] Shared `createSpinnerSvg()` Utility: OsSpinner + OsButton nutzen gleichen SVG-Code
+- [x] OsButton refactored: Inline SVG-Konstanten entfernt, nutzt `createSpinnerSvg()`
+- [x] Storybook Stories: Playground, AllSizes, InheritColor, InlineWithText
+- [x] Unit Tests: 21 Tests (rendering, size, accessibility, css, keyboard)
+- [x] Visual Tests: 4 Tests (all-sizes, inherit-color, inline-text, keyboard a11y)
+- [x] Accessibility: `role="status"`, `aria-label="Loading"` (customizable), axe-core checks
+- [x] 100% Test-Coverage (Statements, Branches, Functions, Lines)
+- [x] Completeness Check bestanden
+- [x] OsButton Visual Tests: 19/19 bestanden (kein Regression durch Refactoring)
+
+**Zuvor abgeschlossen (Session 22 - BaseIcon → OsIcon Webapp-Migration):**
 - [x] 131 `<base-icon>` Nutzungen in 70+ Dateien → `<os-icon :icon="icons.xxx">` migriert
 - [x] 82 Ocelot-Icons in `packages/ui/src/ocelot/icons/svgs/` (von 1 auf 82)
 - [x] 17 Kategorie-Icons aus Webapp kopiert (networking, energy, psyche, movement, finance, child, mobility, shopping-cart, peace, politics, nature, science, health, media, spirituality, culture, miscellaneous)
@@ -219,7 +239,7 @@ BaseIcon → OsIcon Webapp-Migration: ✅
 - [x] Session 11: Wasserfarben-Farbschema, Stories konsolidiert, Keyboard A11y
 
 **Nächste Schritte:**
-- [ ] OsSpinner Komponente (vereint DsSpinner + LoadingSpinner)
+- [ ] OsSpinner Webapp-Migration (DsSpinner + LoadingSpinner → OsSpinner)
 - [ ] OsCard Komponente (vereint DsCard + BaseCard)
 - [ ] Weitere Tier 1 Komponenten
 - [ ] Browser-Fehler untersuchen: `TypeError: Cannot read properties of undefined (reading 'heartO')` (ocelotIcons undefined im Browser trotz korrekter Webpack-Aliase)
@@ -473,7 +493,7 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 
 **Tier 1: Kern-Komponenten**
 - [x] OsIcon (vereint DsIcon + BaseIcon) ✅ System-Icons + vite-svg-icon Plugin
-- [ ] OsSpinner (vereint DsSpinner + LoadingSpinner)
+- [x] OsSpinner (vereint DsSpinner + LoadingSpinner) ✅ Shared createSpinnerSvg + OsButton Refactoring
 - [x] OsButton (vereint DsButton + BaseButton) ✅ Entwickelt in Phase 2
 - [ ] OsCard (vereint DsCard + BaseCard)
 
