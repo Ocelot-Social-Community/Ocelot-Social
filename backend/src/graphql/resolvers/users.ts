@@ -528,9 +528,8 @@ export default {
           return result.records
         })
         const result = Array(TROPHY_BADGES_SELECTED_MAX).fill(defaultTrophyBadge)
-        badgesSelected.map((record) => {
+        badgesSelected.forEach((record) => {
           result[record.get('slot')] = record.get('badge')
-          return true
         })
         return result
       } finally {
