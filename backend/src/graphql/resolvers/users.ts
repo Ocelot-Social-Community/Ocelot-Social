@@ -116,9 +116,7 @@ export default {
             `,
             { currentUser, args },
           )
-          return blockUserResponse.records.map((record) =>
-            record.get('blockedUser'),
-          )[0]
+          return blockUserResponse.records.map((record) => record.get('blockedUser'))[0]
         })
         if (!blockedUser) {
           throw new UserInputError('Could not find User')
@@ -143,9 +141,7 @@ export default {
             `,
             { currentUser, args },
           )
-          return unblockUserResponse.records.map((record) =>
-            record.get('blockedUser'),
-          )[0]
+          return unblockUserResponse.records.map((record) => record.get('blockedUser'))[0]
         })
         if (!unblockedUser) {
           throw new UserInputError('Could not find blocked User')
