@@ -33,7 +33,8 @@
     xl: 'w-14',
   }
 
-  const SLOT_BASE = 'inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current'
+  const SLOT_BASE =
+    'inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current'
   const ICON_CLASS = `os-button__icon ${SLOT_BASE}`
   const SUFFIX_CLASS = `os-button__suffix ${SLOT_BASE}`
 
