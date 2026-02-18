@@ -6,19 +6,29 @@ import type { S3Config } from '@config/index'
 import { FileUploadCallback, FileDeleteCallback } from './types'
 
 let cachedClient: S3Client | null = null
+let cachedConfig: S3Config | null = null
 
 const getS3Client = (config: S3Config): S3Client => {
-  if (!cachedClient) {
-    const { AWS_ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = config
-    cachedClient = new S3Client({
-      credentials: {
-        accessKeyId: AWS_ACCESS_KEY_ID,
-        secretAccessKey: AWS_SECRET_ACCESS_KEY,
-      },
-      endpoint: AWS_ENDPOINT,
-      forcePathStyle: true,
-    })
+  if (cachedClient) {
+    if (
+      cachedConfig!.AWS_ENDPOINT !== config.AWS_ENDPOINT ||
+      cachedConfig!.AWS_ACCESS_KEY_ID !== config.AWS_ACCESS_KEY_ID ||
+      cachedConfig!.AWS_SECRET_ACCESS_KEY !== config.AWS_SECRET_ACCESS_KEY
+    ) {
+      throw new Error('S3Client singleton was created with different credentials')
+    }
+    return cachedClient
   }
+  const { AWS_ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = config
+  cachedClient = new S3Client({
+    credentials: {
+      accessKeyId: AWS_ACCESS_KEY_ID,
+      secretAccessKey: AWS_SECRET_ACCESS_KEY,
+    },
+    endpoint: AWS_ENDPOINT,
+    forcePathStyle: true,
+  })
+  cachedConfig = config
   return cachedClient
 }
 
