@@ -39,15 +39,10 @@ export default {
           })
         } AS result`
       const session = context.driver.session()
-      const resultPromise = session.readTransaction(async (transaction) => {
-        const transactionResponse = transaction.run(cypher, {
-          id,
-        })
-        return transactionResponse
-      })
-
       try {
-        const result = await resultPromise
+        const result = await session.readTransaction(async (transaction) => {
+          return await transaction.run(cypher, { id })
+        })
         const userData = result.records[0].get('result')
         userData.posts.sort(byCreationDate)
         userData.posts.forEach((post) => post.comments.sort(byCreationDate))
