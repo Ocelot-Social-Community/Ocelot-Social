@@ -172,14 +172,13 @@ describe('DeleteData.vue', () => {
 
     describe('error handling', () => {
       it('shows an error toaster when the mutation rejects', async () => {
+        mocks.$apollo.mutate = jest.fn().mockRejectedValue({ message: 'Not Authorized!' })
         enableDeletionInput = wrapper.find('.ds-input')
         enableDeletionInput.setValue(deleteAccountName)
         await Vue.nextTick()
         deleteAccountBtn = wrapper.find('[data-test="delete-button"]')
         await deleteAccountBtn.trigger('click')
-        // second submission causes mutation to reject
-        await deleteAccountBtn.trigger('click')
-        await mocks.$apollo.mutate
+        await flushPromises()
         expect(mocks.$toast.error).toHaveBeenCalledWith('Not Authorized!')
       })
     })

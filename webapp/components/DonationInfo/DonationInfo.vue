@@ -3,25 +3,33 @@
     <progress-bar :label="label" :goal="goal" :progress="progress">
       <os-button size="sm" variant="primary" @click="redirectToPage(links.DONATE)">
         {{ $t('donations.donate-now') }}
+        <template #suffix>
+          <os-icon :icon="icons.heartO" />
+        </template>
       </os-button>
     </progress-bar>
   </div>
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { iconRegistry } from '~/utils/iconRegistry'
 import links from '~/constants/links.js'
 import ProgressBar from '~/components/ProgressBar/ProgressBar.vue'
 
 export default {
   components: {
     OsButton,
+    OsIcon,
     ProgressBar,
   },
   props: {
     title: { type: String, required: false, default: () => null },
     goal: { type: Number, required: true },
     progress: { type: Number, required: true },
+  },
+  created() {
+    this.icons = iconRegistry
   },
   data() {
     return {

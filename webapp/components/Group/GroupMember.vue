@@ -63,6 +63,9 @@
             userId = scope.row.user.id
           "
         >
+          <template #icon>
+            <os-icon :icon="icons.userTimes" />
+          </template>
           {{ $t('group.removeMemberButton') }}
         </os-button>
       </template>
@@ -80,7 +83,8 @@
   </div>
 </template>
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { changeGroupMemberRoleMutation, removeUserFromGroupMutation } from '~/graphql/groups.js'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 
@@ -88,6 +92,7 @@ export default {
   name: 'GroupMember',
   components: {
     OsButton,
+    OsIcon,
     ProfileAvatar,
   },
   props: {
@@ -99,6 +104,9 @@ export default {
       type: Array,
       required: false,
     },
+  },
+  created() {
+    this.icons = iconRegistry
   },
   data() {
     return {

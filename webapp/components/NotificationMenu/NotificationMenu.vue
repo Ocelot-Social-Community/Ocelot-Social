@@ -51,14 +51,20 @@
             appearance="ghost"
             variant="primary"
           >
+            <template #icon>
+              <os-icon :icon="icons.bell" />
+            </template>
             {{ $t('notifications.pageLink') }}
           </os-button>
           <os-button
             appearance="ghost"
             variant="primary"
-            @click="markAllAsRead(closeMenu)"
+            @click="markAllAsRead()"
             data-test="markAllAsRead-button"
           >
+            <template #icon>
+              <os-icon :icon="icons.check" />
+            </template>
             {{ $t('notifications.markAllAsRead') }}
           </os-button>
         </ds-flex-item>
@@ -77,7 +83,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import unionBy from 'lodash/unionBy'
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import {
   notificationQuery,
@@ -96,6 +102,7 @@ export default {
     CounterIcon,
     Dropdown,
     OsButton,
+    OsIcon,
   },
   data() {
     return {
@@ -132,12 +139,11 @@ export default {
         this.$toast.error(error.message)
       }
     },
-    async markAllAsRead(closeMenu) {
+    async markAllAsRead() {
       if (!this.hasNotifications) {
         return
       }
 
-      closeMenu?.()
       try {
         await this.$apollo.mutate({
           mutation: markAllAsReadMutation(this.$i18n),

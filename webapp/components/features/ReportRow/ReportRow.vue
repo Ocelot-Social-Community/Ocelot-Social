@@ -18,6 +18,9 @@
           @click="showFiledReports = !showFiledReports"
         >
           {{ $t('moderation.reports.moreDetails') }}
+          <template #suffix>
+            <os-icon :icon="showFiledReports ? icons.angleUp : icons.angleDown" />
+          </template>
         </os-button>
       </td>
 

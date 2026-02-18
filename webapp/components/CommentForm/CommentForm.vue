@@ -20,6 +20,9 @@
             :loading="loading"
             :disabled="disabled || !!errors"
           >
+            <template #icon>
+              <os-icon :icon="icons.comment" />
+            </template>
             {{ $t('post.comment.submit') }}
           </os-button>
         </div>
@@ -29,7 +32,8 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { iconRegistry } from '~/utils/iconRegistry'
 import HcEditor from '~/components/Editor/Editor'
 import { COMMENT_MIN_LENGTH } from '~/constants/comment'
 import { minimisedUserQuery } from '~/graphql/User'
@@ -38,6 +42,7 @@ import CommentMutations from '~/graphql/CommentMutations'
 export default {
   components: {
     OsButton,
+    OsIcon,
     HcEditor,
   },
   props: {
@@ -47,6 +52,9 @@ export default {
       type: Object,
       default: () => {},
     },
+  },
+  created() {
+    this.icons = iconRegistry
   },
   data() {
     return {
