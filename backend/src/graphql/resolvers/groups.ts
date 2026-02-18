@@ -12,10 +12,7 @@ import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '@constants/groups'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 import type { Context } from '@src/context'
 
-import Resolver, {
-  removeUndefinedNullValuesFromObject,
-  convertObjectToCypherMapLiteral,
-} from './helpers/Resolver'
+import Resolver from './helpers/Resolver'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
 
@@ -23,17 +20,21 @@ export default {
   Query: {
     Group: async (_object, params, context: Context, _resolveInfo) => {
       const { isMember, id, slug, first, offset } = params
-      const matchParams = { id, slug }
-      removeUndefinedNullValuesFromObject(matchParams)
       const session = context.driver.session()
       try {
         return await session.readTransaction(async (txc) => {
           if (!context.user) {
             throw new Error('Missing authenticated user.')
           }
+          const matchFilters: string[] = []
+          if (id !== undefined) matchFilters.push('group.id = $id')
+          if (slug !== undefined) matchFilters.push('group.slug = $slug')
+          const matchWhere = matchFilters.length ? `WHERE ${matchFilters.join(' AND ')}` : ''
+
           const transactionResponse = await txc.run(
             `
-            MATCH (group:Group${convertObjectToCypherMapLiteral(matchParams, true)})
+            MATCH (group:Group)
+            ${matchWhere}
             OPTIONAL MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group)
             WITH group, membership
             ${(isMember === true && "WHERE membership IS NOT NULL AND (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])") || ''}
@@ -45,6 +46,8 @@ export default {
           `,
             {
               userId: context.user.id,
+              id,
+              slug,
               first,
               offset,
             },
