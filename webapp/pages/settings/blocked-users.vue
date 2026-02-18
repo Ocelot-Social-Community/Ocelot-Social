@@ -59,6 +59,7 @@
             appearance="outline"
             circle
             size="sm"
+            :loading="unblockingUserId === scope.row.id"
             :aria-label="$t('settings.blocked-users.columns.unblock')"
             @click="unblockUser(scope)"
           >
@@ -102,6 +103,7 @@ export default {
   data() {
     return {
       blockedUsers: [],
+      unblockingUserId: null,
     }
   },
   computed: {
@@ -119,13 +121,20 @@ export default {
   },
   methods: {
     async unblockUser(user) {
-      await this.$apollo.mutate({
-        mutation: unblockUser(),
-        variables: { id: user.row.id },
-      })
-      this.$apollo.queries.blockedUsers.refetch()
-      const { name } = user.row
-      this.$toast.success(this.$t('settings.blocked-users.unblocked', { name }))
+      this.unblockingUserId = user.row.id
+      try {
+        await this.$apollo.mutate({
+          mutation: unblockUser(),
+          variables: { id: user.row.id },
+        })
+        this.$apollo.queries.blockedUsers.refetch()
+        const { name } = user.row
+        this.$toast.success(this.$t('settings.blocked-users.unblocked', { name }))
+      } catch (error) {
+        this.$toast.error(error.message)
+      } finally {
+        this.unblockingUserId = null
+      }
     },
   },
 }

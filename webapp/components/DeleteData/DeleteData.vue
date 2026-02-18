@@ -46,6 +46,7 @@
       variant="danger"
       appearance="filled"
       :disabled="!deleteEnabled"
+      :loading="loading"
       data-test="delete-button"
       @click="handleSubmit"
     >
@@ -73,6 +74,7 @@ export default {
       deleteComments: false,
       enableDeletionValue: null,
       currentUserCounts: {},
+      loading: false,
     }
   },
   apollo: {
@@ -101,6 +103,7 @@ export default {
       logout: 'auth/logout',
     }),
     handleSubmit() {
+      this.loading = true
       const resourceArgs = []
       if (this.deleteContributions) {
         resourceArgs.push('Post')
@@ -130,6 +133,7 @@ export default {
         })
         .catch((error) => {
           this.$toast.error(error.message)
+          this.loading = false
         })
     },
   },

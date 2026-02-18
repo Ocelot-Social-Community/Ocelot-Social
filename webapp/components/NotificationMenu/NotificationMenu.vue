@@ -59,7 +59,8 @@
           <os-button
             appearance="ghost"
             variant="primary"
-            @click="markAllAsRead(closeMenu)"
+            :loading="markingAllAsRead"
+            @click="markAllAsRead()"
             data-test="markAllAsRead-button"
           >
             <template #icon>
@@ -107,6 +108,7 @@ export default {
   data() {
     return {
       notifications: [],
+      markingAllAsRead: false,
     }
   },
   props: {
@@ -139,18 +141,20 @@ export default {
         this.$toast.error(error.message)
       }
     },
-    async markAllAsRead(closeMenu) {
+    async markAllAsRead() {
       if (!this.hasNotifications) {
         return
       }
 
-      closeMenu?.()
+      this.markingAllAsRead = true
       try {
         await this.$apollo.mutate({
           mutation: markAllAsReadMutation(this.$i18n),
         })
       } catch (error) {
         this.$toast.error(error.message)
+      } finally {
+        this.markingAllAsRead = false
       }
     },
   },
