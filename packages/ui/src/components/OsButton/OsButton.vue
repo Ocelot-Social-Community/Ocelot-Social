@@ -6,7 +6,7 @@
 
   import { buttonVariants } from './button.variants'
 
-  import type { ButtonVariants } from './button.variants'
+  import type { ButtonSize, ButtonVariants } from './button.variants'
   import type { Component, PropType } from 'vue-demi'
 
   /**
@@ -25,9 +25,7 @@
    * @slot suffix - Optional trailing content (rendered right of text). Icons, badges, chevrons etc.
    */
 
-  type Size = NonNullable<ButtonVariants['size']>
-
-  const CIRCLE_WIDTHS: Record<Size, string> = {
+  const CIRCLE_WIDTHS: Record<ButtonSize, string> = {
     sm: 'w-[26px]',
     md: 'w-[36px]',
     lg: 'w-12',
@@ -39,7 +37,7 @@
   const ICON_CLASS = `os-button__icon ${SLOT_BASE}`
   const SUFFIX_CLASS = `os-button__suffix ${SLOT_BASE}`
 
-  const SPINNER_PX: Record<Size, number> = { sm: 24, md: 32, lg: 40, xl: 46 }
+  const SPINNER_PX: Record<ButtonSize, number> = { sm: 24, md: 32, lg: 40, xl: 46 }
 
   function createSpinner(px: number, center: string) {
     return h(OsSpinner, {
@@ -121,7 +119,7 @@
             return typeof children !== 'string' || children.trim().length > 0
           }) ?? false
 
-        const size = props.size as Size
+        const size = props.size as ButtonSize
         const spinnerPx = SPINNER_PX[size] // eslint-disable-line security/detect-object-injection
         const isSmall = props.circle || size === 'sm'
         const isLoading = props.loading

@@ -7,7 +7,7 @@
  * - Registered globally when using the plugin: app.use(OcelotUI)
  */
 
-export { OsButton, buttonVariants, type ButtonVariants } from './OsButton'
+export { OsButton, buttonVariants, type ButtonSize, type ButtonVariants } from './OsButton'
 export {
   OsIcon,
   ICON_SIZES,

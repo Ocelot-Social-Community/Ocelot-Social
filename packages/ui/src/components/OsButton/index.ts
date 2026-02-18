@@ -1,2 +1,2 @@
 export { default as OsButton } from './OsButton.vue'
-export { buttonVariants, type ButtonVariants } from './button.variants'
+export { buttonVariants, type ButtonSize, type ButtonVariants } from './button.variants'
