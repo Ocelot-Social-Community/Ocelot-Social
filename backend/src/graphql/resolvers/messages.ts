@@ -116,9 +116,7 @@ export default {
             content,
           })
 
-          const [message] = createMessageTxResponse.records.map((record) =>
-            record.get('message'),
-          )
+          const [message] = createMessageTxResponse.records.map((record) => record.get('message'))
 
           // this is the case if the room doesn't exist - requires refactoring for implicit rooms
           if (!message) {
