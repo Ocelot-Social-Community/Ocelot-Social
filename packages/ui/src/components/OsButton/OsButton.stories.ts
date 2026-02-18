@@ -27,6 +27,7 @@ interface PlaygroundArgs {
   disabled: boolean
   loading: boolean
   icon: string
+  suffix: string
   label: string
 }
 
@@ -71,6 +72,10 @@ export const Playground: StoryObj<PlaygroundArgs> = {
       control: 'select',
       options: Object.keys(iconMap),
     },
+    suffix: {
+      control: 'select',
+      options: Object.keys(iconMap),
+    },
     label: {
       control: 'text',
     },
@@ -85,23 +90,26 @@ export const Playground: StoryObj<PlaygroundArgs> = {
     disabled: false,
     loading: false,
     icon: 'none',
+    suffix: 'none',
     label: 'Button',
   },
   render: (args) => ({
     components: { OsButton },
     setup() {
       const buttonProps = computed(() => {
-        const { icon: _icon, label: _label, ...rest } = args
+        const { icon: _icon, suffix: _suffix, label: _label, ...rest } = args
         return rest
       })
       const IconComponent = computed(() => iconMap[args.icon] ?? null)
+      const SuffixComponent = computed(() => iconMap[args.suffix] ?? null)
       const label = computed(() => args.label)
-      return { buttonProps, IconComponent, label }
+      return { buttonProps, IconComponent, SuffixComponent, label }
     },
     template: `
       <OsButton v-bind="buttonProps" :href="buttonProps.as === 'a' ? '#' : undefined">
         <template v-if="IconComponent" #icon><component :is="IconComponent" /></template>
         {{ label }}
+        <template v-if="SuffixComponent" #suffix><component :is="SuffixComponent" /></template>
       </OsButton>
     `,
   }),
@@ -676,6 +684,117 @@ export const Polymorphic: Story = {
           <div class="flex flex-wrap gap-2">
             <OsButton variant="primary">Button (default)</OsButton>
             <OsButton as="button" variant="primary">Button (explicit)</OsButton>
+          </div>
+        </div>
+      </div>
+    `,
+  }),
+}
+
+export const Suffix: Story = {
+  render: () => ({
+    components: { OsButton, IconCheck, IconClose, IconPlus },
+    template: `
+      <div class="flex flex-col gap-4">
+        <div>
+          <h3 class="text-sm font-bold mb-2">Text + Suffix</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton variant="primary">
+              <template #suffix><IconCheck /></template>
+              Confirm
+            </OsButton>
+            <OsButton variant="default">
+              <template #suffix><IconPlus /></template>
+              Add
+            </OsButton>
+            <OsButton variant="danger">
+              <template #suffix><IconClose /></template>
+              Remove
+            </OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Text + Suffix + Loading</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton loading variant="primary">
+              <template #suffix><IconCheck /></template>
+              Confirm
+            </OsButton>
+            <OsButton loading variant="default">
+              <template #suffix><IconPlus /></template>
+              Add
+            </OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Icon + Text + Suffix</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton variant="primary">
+              <template #icon><IconCheck /></template>
+              <template #suffix><IconPlus /></template>
+              Action
+            </OsButton>
+            <OsButton variant="danger">
+              <template #icon><IconClose /></template>
+              <template #suffix><IconCheck /></template>
+              Delete
+            </OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Icon + Text + Suffix + Loading</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton loading variant="primary">
+              <template #icon><IconCheck /></template>
+              <template #suffix><IconPlus /></template>
+              Action
+            </OsButton>
+            <OsButton loading variant="danger">
+              <template #icon><IconClose /></template>
+              <template #suffix><IconCheck /></template>
+              Delete
+            </OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Icon + Suffix + Loading (no text)</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton loading variant="primary" aria-label="Action">
+              <template #icon><IconCheck /></template>
+              <template #suffix><IconPlus /></template>
+            </OsButton>
+            <OsButton loading variant="danger" aria-label="Delete">
+              <template #icon><IconClose /></template>
+              <template #suffix><IconCheck /></template>
+            </OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Suffix Only</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton variant="primary" aria-label="Confirm">
+              <template #suffix><IconCheck /></template>
+            </OsButton>
+            <OsButton variant="danger" aria-label="Close">
+              <template #suffix><IconClose /></template>
+            </OsButton>
+            <OsButton variant="default" aria-label="Add">
+              <template #suffix><IconPlus /></template>
+            </OsButton>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold mb-2">Suffix Only + Loading + Circle</h3>
+          <div class="flex flex-wrap gap-2">
+            <OsButton loading circle variant="primary" aria-label="Confirm">
+              <template #suffix><IconCheck /></template>
+            </OsButton>
+            <OsButton loading circle variant="danger" aria-label="Close">
+              <template #suffix><IconClose /></template>
+            </OsButton>
+            <OsButton loading circle variant="default" aria-label="Add">
+              <template #suffix><IconPlus /></template>
+            </OsButton>
           </div>
         </div>
       </div>
