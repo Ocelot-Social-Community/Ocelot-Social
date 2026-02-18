@@ -33,11 +33,9 @@
     xl: 'w-14',
   }
 
-  const ICON_CLASS =
-    'os-button__icon inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current'
-
-  const SUFFIX_CLASS =
-    'os-button__suffix inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current'
+  const SLOT_BASE = 'inline-flex items-center shrink-0 h-[1.2em] [&>svg]:h-full [&>svg]:w-auto [&>svg]:fill-current'
+  const ICON_CLASS = `os-button__icon ${SLOT_BASE}`
+  const SUFFIX_CLASS = `os-button__suffix ${SLOT_BASE}`
 
   const SPINNER_PX: Record<Size, number> = { sm: 24, md: 32, lg: 40, xl: 46 }
 
