@@ -202,7 +202,7 @@
           </template>
         </masonry-grid>
         <client-only>
-          <infinite-loading v-if="hasMore && !$apollo.loading" @infinite="showMoreContributions">
+          <infinite-loading v-if="hasMore" @infinite="showMoreContributions">
             <os-spinner slot="spinner" size="lg" />
           </infinite-loading>
         </client-only>
