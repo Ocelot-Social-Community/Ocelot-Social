@@ -82,6 +82,7 @@ export default {
       args.email = normalizeEmail(args.email)
       const { nonce, email } = args
       const session = context.driver.session()
+      let response
       try {
         const txResult = await session.writeTransaction(async (txc) => {
           const result = await txc.run(
@@ -101,9 +102,7 @@ export default {
           )
           return result.records.map((record) => record.get('email').properties)
         })
-        const response = txResult[0]
-        if (!response) throw new UserInputError('Invalid nonce or no email address found.')
-        return response
+        response = txResult[0]
       } catch (e) {
         if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed')
           throw new UserInputError('A user account with this email already exists.')
@@ -111,6 +110,8 @@ export default {
       } finally {
         await session.close()
       }
+      if (!response) throw new UserInputError('Invalid nonce or no email address found.')
+      return response
     },
   },
   EmailAddress: {
