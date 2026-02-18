@@ -3,9 +3,9 @@
     <ApolloQuery :query="Statistics">
       <template v-slot="{ result: { loading, error, data } }">
         <template v-if="loading">
-          <ds-space centered>
-            <ds-spinner size="large"></ds-spinner>
-          </ds-space>
+          <div style="text-align: center; padding: 48px 0">
+            <os-spinner size="xl" />
+          </div>
         </template>
         <template v-else-if="error">
           <ds-space centered>
@@ -47,11 +47,13 @@
 </template>
 
 <script>
+import { OsSpinner } from '@ocelot-social/ui'
 import HcCountTo from '~/components/CountTo.vue'
 import { Statistics } from '~/graphql/admin/Statistics'
 
 export default {
   components: {
+    OsSpinner,
     HcCountTo,
   },
   data() {

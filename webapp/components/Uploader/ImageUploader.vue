@@ -7,7 +7,7 @@
       :use-custom-slot="true"
       @vdropzone-file-added="fileAdded"
     >
-      <loading-spinner v-if="isLoadingImage" />
+      <os-spinner v-if="isLoadingImage" size="lg" />
       <os-icon v-else-if="!hasImage" :icon="icons.image" />
       <div v-if="!hasImage" class="supported-formats">
         {{ $t('contribution.teaserImage.supportedFormats') }}
@@ -58,20 +58,19 @@
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsSpinner } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Cropper from 'cropperjs'
 import VueDropzone from 'nuxt-dropzone'
-import LoadingSpinner from '~/components/_new/generic/LoadingSpinner/LoadingSpinner'
 import 'cropperjs/dist/cropper.css'
 
 const minAspectRatio = 0.3
 
 export default {
   components: {
-    LoadingSpinner,
     OsButton,
     OsIcon,
+    OsSpinner,
     VueDropzone,
   },
   props: {
