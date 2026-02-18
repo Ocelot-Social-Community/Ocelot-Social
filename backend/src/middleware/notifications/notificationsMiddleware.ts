@@ -186,19 +186,16 @@ const notifyFollowingUsers = async (postId, groupId, context) => {
     }
   `
   const session = context.driver.session()
-  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-    const notificationTransactionResponse = await transaction.run(cypher, {
-      postId,
-      reason,
-      groupId: groupId || null,
-      userId: context.user.id,
-    })
-    return notificationTransactionResponse.records.map((record) => record.get('notification'))
-  })
   try {
-    return await writeTxResultPromise
-  } catch (error) {
-    throw new Error(error)
+    return await session.writeTransaction(async (transaction) => {
+      const notificationTransactionResponse = await transaction.run(cypher, {
+        postId,
+        reason,
+        groupId: groupId || null,
+        userId: context.user.id,
+      })
+      return notificationTransactionResponse.records.map((record) => record.get('notification'))
+    })
   } finally {
     await session.close()
   }
@@ -232,19 +229,16 @@ const notifyGroupMembersOfNewPost = async (postId, groupId, context) => {
     }
   `
   const session = context.driver.session()
-  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-    const notificationTransactionResponse = await transaction.run(cypher, {
-      postId,
-      reason,
-      groupId,
-      userId: context.user.id,
-    })
-    return notificationTransactionResponse.records.map((record) => record.get('notification'))
-  })
   try {
-    return await writeTxResultPromise
-  } catch (error) {
-    throw new Error(error)
+    return await session.writeTransaction(async (transaction) => {
+      const notificationTransactionResponse = await transaction.run(cypher, {
+        postId,
+        reason,
+        groupId,
+        userId: context.user.id,
+      })
+      return notificationTransactionResponse.records.map((record) => record.get('notification'))
+    })
   } finally {
     await session.close()
   }
@@ -267,18 +261,15 @@ const notifyOwnersOfGroup = async (groupId, userId, reason, context) => {
     RETURN notification {.*, from: finalGroup, to: properties(owner), email: email, relatedUser: properties(user) }
   `
   const session = context.driver.session()
-  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-    const notificationTransactionResponse = await transaction.run(cypher, {
-      groupId,
-      reason,
-      userId,
-    })
-    return notificationTransactionResponse.records.map((record) => record.get('notification'))
-  })
   try {
-    return await writeTxResultPromise
-  } catch (error) {
-    throw new Error(error)
+    return await session.writeTransaction(async (transaction) => {
+      const notificationTransactionResponse = await transaction.run(cypher, {
+        groupId,
+        reason,
+        userId,
+      })
+      return notificationTransactionResponse.records.map((record) => record.get('notification'))
+    })
   } finally {
     await session.close()
   }
@@ -304,19 +295,16 @@ const notifyMemberOfGroup = async (groupId, userId, reason, context) => {
     RETURN notification {.*, from: finalGroup, to: properties(user), email: email, relatedUser: properties(owner) }
   `
   const session = context.driver.session()
-  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-    const notificationTransactionResponse = await transaction.run(cypher, {
-      groupId,
-      reason,
-      userId,
-      ownerId: owner.id,
-    })
-    return notificationTransactionResponse.records.map((record) => record.get('notification'))
-  })
   try {
-    return await writeTxResultPromise
-  } catch (error) {
-    throw new Error(error)
+    return await session.writeTransaction(async (transaction) => {
+      const notificationTransactionResponse = await transaction.run(cypher, {
+        groupId,
+        reason,
+        userId,
+        ownerId: owner.id,
+      })
+      return notificationTransactionResponse.records.map((record) => record.get('notification'))
+    })
   } finally {
     await session.close()
   }
@@ -376,18 +364,15 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
     RETURN notification {.*, from: finalResource, to: properties(user), email: email, relatedUser: properties(user) }
   `
   const session = context.driver.session()
-  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-    const notificationTransactionResponse = await transaction.run(mentionedCypher, {
-      id,
-      idsOfUsers,
-      reason,
-    })
-    return notificationTransactionResponse.records.map((record) => record.get('notification'))
-  })
   try {
-    return await writeTxResultPromise
-  } catch (error) {
-    throw new Error(error)
+    return await session.writeTransaction(async (transaction) => {
+      const notificationTransactionResponse = await transaction.run(mentionedCypher, {
+        id,
+        idsOfUsers,
+        reason,
+      })
+      return notificationTransactionResponse.records.map((record) => record.get('notification'))
+    })
   } finally {
     await session.close()
   }
