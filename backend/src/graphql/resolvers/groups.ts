@@ -42,10 +42,12 @@ export default {
             ${(isMember === undefined && "WHERE (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])") || ''}
             RETURN group {.*, myRole: membership.role}
             ORDER BY group.createdAt DESC
-            ${first !== undefined && offset !== undefined ? `SKIP ${offset} LIMIT ${first}` : ''}
+            ${first !== undefined && offset !== undefined ? 'SKIP toInteger($offset) LIMIT toInteger($first)' : ''}
           `,
             {
               userId: context.user.id,
+              first,
+              offset,
             },
           )
           return transactionResponse.records.map((record) => record.get('group'))
