@@ -286,6 +286,9 @@ export default {
             return { user: record.get('user'), membership: record.get('membership') }
           })
         })
+        if (!result[0]) {
+          throw new UserInputError('Could not find User or Group')
+        }
         return result[0]
       } finally {
         await session.close()
