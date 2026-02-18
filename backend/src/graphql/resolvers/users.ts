@@ -317,34 +317,25 @@ export default {
 
       const session = context.driver.session()
       try {
-        await session.writeTransaction((transaction) => {
-          return transaction.run(
+        await session.writeTransaction(async (transaction) => {
+          await transaction.run(
             `
-            MATCH (user:User { id: $id })-[previousCategories:NOT_INTERESTED_IN]->(category:Category)
-            DELETE previousCategories
-            RETURN user, category
-          `,
+              MATCH (user:User { id: $id })-[previousCategories:NOT_INTERESTED_IN]->(:Category)
+              DELETE previousCategories
+            `,
             { id },
           )
-        })
-
-        // frontend gives [] when all categories are selected (default)
-        if (activeCategories.length === 0) return true
-
-        await session.writeTransaction(async (transaction) => {
-          const saveCategorySettingsResponse = await transaction.run(
-            `
-              MATCH (category:Category) WHERE NOT category.id IN $activeCategories
-              MATCH (user:User { id: $id })
-              MERGE (user)-[r:NOT_INTERESTED_IN]->(category)
-              RETURN user, r, category
-            `,
-            { id, activeCategories },
-          )
-          const [user] = await saveCategorySettingsResponse.records.map((record) =>
-            record.get('user'),
-          )
-          return user
+          // frontend gives [] when all categories are selected (default)
+          if (activeCategories.length > 0) {
+            await transaction.run(
+              `
+                MATCH (category:Category) WHERE NOT category.id IN $activeCategories
+                MATCH (user:User { id: $id })
+                MERGE (user)-[:NOT_INTERESTED_IN]->(category)
+              `,
+              { id, activeCategories },
+            )
+          }
         })
         return true
       } finally {
