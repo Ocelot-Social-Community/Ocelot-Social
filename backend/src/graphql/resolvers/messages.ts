@@ -82,41 +82,41 @@ export default {
       const session = context.driver.session()
 
       try {
-        const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        return await session.writeTransaction(async (transaction) => {
           const createMessageCypher = `
-          MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
-          OPTIONAL MATCH (currentUser)-[:AVATAR_IMAGE]->(image:Image)
-          OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
-          OPTIONAL MATCH (room)<-[:CHATS_IN]-(recipientUser:User)
-            WHERE NOT recipientUser.id = $currentUserId
-          WITH MAX(m.indexId) as maxIndex, room, currentUser, image, recipientUser
-          CREATE (currentUser)-[:CREATED]->(message:Message {
-            createdAt: toString(datetime()),
-            id: apoc.create.uuid(),
-            indexId: CASE WHEN maxIndex IS NOT NULL THEN maxIndex + 1 ELSE 0 END,
-            content: LEFT($content,2000),
-            saved: true,
-            distributed: false,
-            seen: false
-          })-[:INSIDE]->(room)
-          SET room.lastMessageAt = toString(datetime())
-          RETURN message {
-            .*,
-            indexId: toString(message.indexId),
-            recipientId: recipientUser.id,
-            senderId: currentUser.id,
-            username: currentUser.name,
-            avatar: image.url,
-            date: message.createdAt
-          }
-        `
+            MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+            OPTIONAL MATCH (currentUser)-[:AVATAR_IMAGE]->(image:Image)
+            OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
+            OPTIONAL MATCH (room)<-[:CHATS_IN]-(recipientUser:User)
+              WHERE NOT recipientUser.id = $currentUserId
+            WITH MAX(m.indexId) as maxIndex, room, currentUser, image, recipientUser
+            CREATE (currentUser)-[:CREATED]->(message:Message {
+              createdAt: toString(datetime()),
+              id: apoc.create.uuid(),
+              indexId: CASE WHEN maxIndex IS NOT NULL THEN maxIndex + 1 ELSE 0 END,
+              content: LEFT($content,2000),
+              saved: true,
+              distributed: false,
+              seen: false
+            })-[:INSIDE]->(room)
+            SET room.lastMessageAt = toString(datetime())
+            RETURN message {
+              .*,
+              indexId: toString(message.indexId),
+              recipientId: recipientUser.id,
+              senderId: currentUser.id,
+              username: currentUser.name,
+              avatar: image.url,
+              date: message.createdAt
+            }
+          `
           const createMessageTxResponse = await transaction.run(createMessageCypher, {
             currentUserId,
             roomId,
             content,
           })
 
-          const [message] = await createMessageTxResponse.records.map((record) =>
+          const [message] = createMessageTxResponse.records.map((record) =>
             record.get('message'),
           )
 
@@ -142,8 +142,6 @@ export default {
 
           return { ...message, files: atns }
         })
-
-        return await writeTxResultPromise
       } finally {
         await session.close()
       }
