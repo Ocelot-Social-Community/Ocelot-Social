@@ -431,30 +431,29 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
 
   // Find Recipient
   const session = context.driver.session()
-  const messageRecipient = session.readTransaction(async (transaction) => {
-    const messageRecipientCypher = `
-      MATCH (senderUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
-      MATCH (room)<-[:CHATS_IN]-(recipientUser:User)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
-        WHERE NOT recipientUser.id = $currentUserId
-        AND NOT (recipientUser)-[:BLOCKED]-(senderUser)
-        AND NOT (recipientUser)-[:MUTED]->(senderUser)
-      RETURN senderUser {.*}, recipientUser {.*}, emailAddress {.email}
-    `
-    const txResponse = await transaction.run(messageRecipientCypher, {
-      currentUserId,
-      roomId,
-    })
-
-    return {
-      senderUser: await txResponse.records.map((record) => record.get('senderUser'))[0],
-      recipientUser: await txResponse.records.map((record) => record.get('recipientUser'))[0],
-      email: await txResponse.records.map((record) => record.get('emailAddress'))[0]?.email,
-    }
-  })
-
   try {
-    // Execute Query
-    const { senderUser, recipientUser, email } = await messageRecipient
+    const { senderUser, recipientUser, email } = await session.readTransaction(
+      async (transaction) => {
+        const messageRecipientCypher = `
+          MATCH (senderUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+          MATCH (room)<-[:CHATS_IN]-(recipientUser:User)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
+            WHERE NOT recipientUser.id = $currentUserId
+            AND NOT (recipientUser)-[:BLOCKED]-(senderUser)
+            AND NOT (recipientUser)-[:MUTED]->(senderUser)
+          RETURN senderUser {.*}, recipientUser {.*}, emailAddress {.email}
+        `
+        const txResponse = await transaction.run(messageRecipientCypher, {
+          currentUserId,
+          roomId,
+        })
+
+        return {
+          senderUser: txResponse.records.map((record) => record.get('senderUser'))[0],
+          recipientUser: txResponse.records.map((record) => record.get('recipientUser'))[0],
+          email: txResponse.records.map((record) => record.get('emailAddress'))[0]?.email,
+        }
+      },
+    )
 
     if (recipientUser) {
       // send subscriptions
@@ -477,8 +476,6 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
 
     // Return resolver result to client
     return message
-  } catch (error) {
-    throw new Error(error)
   } finally {
     await session.close()
   }
