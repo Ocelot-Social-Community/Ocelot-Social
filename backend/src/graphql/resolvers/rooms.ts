@@ -87,11 +87,11 @@ export default {
               unreadCount: toString(COUNT(DISTINCT message))
             }
           `
-          const createRommTxResponse = await transaction.run(createRoomCypher, {
+          const createRoomTxResponse = await transaction.run(createRoomCypher, {
             userId,
             currentUserId,
           })
-          const [room] = createRommTxResponse.records.map((record) => record.get('room'))
+          const [room] = createRoomTxResponse.records.map((record) => record.get('room'))
           return room
         })
         if (room) {
