@@ -1,48 +1,44 @@
 <template>
   <base-card>
-    <ApolloQuery :query="Statistics">
-      <template v-slot="{ result: { loading, error, data } }">
-        <template v-if="loading">
-          <div style="text-align: center; padding: 48px 0">
-            <os-spinner size="xl" />
-          </div>
-        </template>
-        <template v-else-if="error">
-          <ds-space centered>
-            <ds-space>
-              <img :src="errorIconPath" width="40" />
-            </ds-space>
-            <ds-text>
-              {{ $t('site.error-occurred') }}
-            </ds-text>
-          </ds-space>
-        </template>
-        <template v-else-if="data">
-          <ds-space margin="large">
-            <ds-flex>
-              <ds-flex-item
-                v-for="(value, name, index) in filterStatistics(data.statistics)"
-                :key="index"
-                :width="{ base: '100%', sm: '50%', md: '33%' }"
+    <template v-if="$apollo.loading">
+      <div style="text-align: center; padding: 48px 0">
+        <os-spinner size="xl" />
+      </div>
+    </template>
+    <template v-else-if="statistics">
+      <ds-space margin="large">
+        <ds-flex>
+          <ds-flex-item
+            v-for="(value, name, index) in filterStatistics(statistics)"
+            :key="index"
+            :width="{ base: '100%', sm: '50%', md: '33%' }"
+          >
+            <ds-space margin="small">
+              <ds-number
+                :count="0"
+                :label="$t('admin.dashboard.' + name)"
+                size="x-large"
+                uppercase
               >
-                <ds-space margin="small">
-                  <ds-number
-                    :count="0"
-                    :label="$t('admin.dashboard.' + name)"
-                    size="x-large"
-                    uppercase
-                  >
-                    <client-only slot="count">
-                      <hc-count-to :end-val="value" />
-                    </client-only>
-                  </ds-number>
-                </ds-space>
-              </ds-flex-item>
-            </ds-flex>
-          </ds-space>
-        </template>
-      </template>
-    </ApolloQuery>
+                <client-only slot="count">
+                  <hc-count-to :end-val="value" />
+                </client-only>
+              </ds-number>
+            </ds-space>
+          </ds-flex-item>
+        </ds-flex>
+      </ds-space>
+    </template>
+    <template v-else>
+      <ds-space centered>
+        <ds-space>
+          <img :src="errorIconPath" width="40" />
+        </ds-space>
+        <ds-text>
+          {{ $t('site.error-occurred') }}
+        </ds-text>
+      </ds-space>
+    </template>
   </base-card>
 </template>
 
@@ -59,13 +55,21 @@ export default {
   data() {
     return {
       errorIconPath: '/img/svg/emoji/cry.svg',
-      Statistics,
+      statistics: null,
     }
+  },
+  apollo: {
+    statistics: {
+      query: Statistics,
+      update(data) {
+        return data.statistics
+      },
+    },
   },
   methods: {
     filterStatistics(data) {
-      delete data.__typename
-      return data
+      const { __typename, ...rest } = data
+      return rest
     },
   },
 }
