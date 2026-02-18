@@ -515,9 +515,12 @@ const removeUserFromGroupWriteTxResultPromise = async (session, groupId, userId)
       groupId,
       userId,
     })
-    const [user] = transactionResponse.records.map((record) => {
+    const [result] = transactionResponse.records.map((record) => {
       return { user: record.get('user'), membership: record.get('membership') }
     })
-    return user
+    if (!result) {
+      throw new UserInputError('User is not a member of this group')
+    }
+    return result
   })
 }
