@@ -281,7 +281,7 @@ export default {
       if (context.user.id === id) throw new Error('you-cannot-change-your-own-role')
       const session = context.driver.session()
       try {
-        return await session.writeTransaction(async (transaction) => {
+        const user = await session.writeTransaction(async (transaction) => {
           const switchUserRoleResponse = await transaction.run(
             `
               MATCH (user:User {id: $id})
@@ -294,6 +294,10 @@ export default {
           )
           return switchUserRoleResponse.records.map((record) => record.get('user'))[0]
         })
+        if (!user) {
+          throw new UserInputError('Could not find User')
+        }
+        return user
       } finally {
         await session.close()
       }
