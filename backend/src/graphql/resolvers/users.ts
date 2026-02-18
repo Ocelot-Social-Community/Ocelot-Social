@@ -203,8 +203,6 @@ export default {
         // TODO: put in a middleware, see "CreateGroup", "UpdateGroup"
         await createOrUpdateLocations('User', params.id, params.locationName, session, context)
         return user
-      } catch (error) {
-        throw new UserInputError(error.message)
       } finally {
         await session.close()
       }
