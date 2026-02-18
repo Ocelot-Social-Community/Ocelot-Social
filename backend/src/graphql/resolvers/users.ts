@@ -49,17 +49,15 @@ export default {
     User: async (object, args, context, resolveInfo) => {
       if (args.email) {
         args.email = normalizeEmail(args.email)
-        let session
+        const session = context.driver.session()
         try {
-          session = context.driver.session()
           const readTxResult = await session.readTransaction((txc) => {
-            const result = txc.run(
+            return txc.run(
               `
-            MATCH (user:User)-[:PRIMARY_EMAIL]->(e:EmailAddress {email: $args.email})
-            RETURN user {.*, email: e.email}`,
+              MATCH (user:User)-[:PRIMARY_EMAIL]->(e:EmailAddress {email: $args.email})
+              RETURN user {.*, email: e.email}`,
               { args },
             )
-            return result
           })
           return readTxResult.records.map((r) => r.get('user'))
         } finally {
