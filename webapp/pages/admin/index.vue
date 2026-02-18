@@ -14,12 +14,7 @@
             :width="{ base: '100%', sm: '50%', md: '33%' }"
           >
             <ds-space margin="small">
-              <ds-number
-                :count="0"
-                :label="$t('admin.dashboard.' + name)"
-                size="x-large"
-                uppercase
-              >
+              <ds-number :count="0" :label="$t('admin.dashboard.' + name)" size="x-large" uppercase>
                 <client-only slot="count">
                   <hc-count-to :end-val="value" />
                 </client-only>
