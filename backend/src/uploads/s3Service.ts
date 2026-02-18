@@ -11,9 +11,9 @@ let cachedConfig: S3Config | null = null
 const getS3Client = (config: S3Config): S3Client => {
   if (cachedClient) {
     if (
-      cachedConfig!.AWS_ENDPOINT !== config.AWS_ENDPOINT ||
-      cachedConfig!.AWS_ACCESS_KEY_ID !== config.AWS_ACCESS_KEY_ID ||
-      cachedConfig!.AWS_SECRET_ACCESS_KEY !== config.AWS_SECRET_ACCESS_KEY
+      cachedConfig?.AWS_ENDPOINT !== config.AWS_ENDPOINT ||
+      cachedConfig?.AWS_ACCESS_KEY_ID !== config.AWS_ACCESS_KEY_ID ||
+      cachedConfig?.AWS_SECRET_ACCESS_KEY !== config.AWS_SECRET_ACCESS_KEY
     ) {
       throw new Error('S3Client singleton was created with different credentials')
     }
