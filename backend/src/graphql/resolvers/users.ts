@@ -116,7 +116,9 @@ export default {
             `,
             { currentUser, args },
           )
-          return unBlockUserTransactionResponse.records.map((record) => record.get('blockedUser'))[0]
+          return unBlockUserTransactionResponse.records.map((record) =>
+            record.get('blockedUser'),
+          )[0]
         })
         if (!blockedUser) {
           throw new UserInputError('Could not find User')
@@ -141,7 +143,9 @@ export default {
             `,
             { currentUser, args },
           )
-          return unBlockUserTransactionResponse.records.map((record) => record.get('blockedUser'))[0]
+          return unBlockUserTransactionResponse.records.map((record) =>
+            record.get('blockedUser'),
+          )[0]
         })
         if (!unblockedUser) {
           throw new UserInputError('Could not find blocked User')
