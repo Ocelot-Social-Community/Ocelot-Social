@@ -7,6 +7,6 @@ defineStep('the {string} post was saved successfully without a teaser image', co
     .should("contain", condition === 'updated' ? 'successfully updated' : 'new post content')
     .get('.post-page')
     .should('exist')
-    .get('.hero-image > .image')
+    .get('.os-card__hero-image > .image')
     .should('not.exist')
 })
