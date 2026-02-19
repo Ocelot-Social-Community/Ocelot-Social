@@ -62,8 +62,7 @@ import Badges from '../../components/Badges.vue'
 import BadgeSelection from '../../components/BadgeSelection.vue'
 
 export default {
-  components: { OsButton,
-    OsCard, BadgeSelection, Badges },
+  components: { OsButton, OsCard, BadgeSelection, Badges },
   mixins: [scrollToContent],
   data() {
     return {

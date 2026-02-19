@@ -30,8 +30,7 @@ import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 
 export default {
-  components: { OsButton,
-    OsCard, OsIcon },
+  components: { OsButton, OsCard, OsIcon },
   data() {
     return {
       formSchema: {

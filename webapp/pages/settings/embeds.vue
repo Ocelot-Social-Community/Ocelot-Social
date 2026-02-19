@@ -62,8 +62,7 @@ import { updateUserMutation } from '~/graphql/User.js'
 import scrollToContent from './scroll-to-content.js'
 
 export default {
-  components: { OsButton,
-    OsCard },
+  components: { OsButton, OsCard },
   mixins: [scrollToContent],
   head() {
     return {
