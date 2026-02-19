@@ -5,7 +5,7 @@
       <b>- {{ $t('quotes.african.author') }}</b>
     </blockquote>
     <os-card class="--columns">
-      <aside class="image-column">
+      <aside class="image-column" :aria-label="$t('login.moreInfo', metadata)">
         <page-params-link :pageParams="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)">
           <logo logoType="welcome" />
         </page-params-link>
@@ -54,7 +54,7 @@
           </p>
         </form>
       </section>
-      <aside class="top-menu">
+      <aside class="top-menu" :aria-label="$t('localeSwitch.tooltip')">
         <locale-switch offset="5" />
       </aside>
     </os-card>
