@@ -18,20 +18,18 @@
           <ds-grid-item>
             <ds-flex class="user-section">
               <ds-flex-item>
-                <client-only>
-                  <user-teaser
-                    :user="
-                      isGroup(notification.from)
-                        ? notification.relatedUser
-                        : notification.from.author
-                    "
-                    :class="{ 'notification-status': notification.read }"
-                    :date-time="notification.from.createdAt"
-                    :injected-text="$t(`notifications.reason.${notification.reason}`)"
-                    :injected-date="true"
-                    :show-popover="showPopover"
-                  />
-                </client-only>
+                <user-teaser
+                  :user="
+                    isGroup(notification.from)
+                      ? notification.relatedUser
+                      : notification.from.author
+                  "
+                  :class="{ 'notification-status': notification.read }"
+                  :date-time="notification.from.createdAt"
+                  :injected-text="$t(`notifications.reason.${notification.reason}`)"
+                  :injected-date="true"
+                  :show-popover="showPopover"
+                />
               </ds-flex-item>
             </ds-flex>
           </ds-grid-item>
