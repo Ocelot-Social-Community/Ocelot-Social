@@ -109,8 +109,8 @@
           'span',
           {
             class: cn('os-spinner inline-flex shrink-0', sizeClass, attrClass as ClassValue),
-            ...a11yAttrs,
             ...restAttrs,
+            ...a11yAttrs,
           },
           [svg],
         )
