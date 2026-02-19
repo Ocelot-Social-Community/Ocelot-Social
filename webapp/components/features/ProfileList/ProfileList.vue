@@ -1,5 +1,5 @@
 <template>
-  <base-card class="profile-list">
+  <os-card class="profile-list">
     <template v-if="profiles.length">
       <h5 class="title spacer-x-small">
         {{ title }}
@@ -60,11 +60,11 @@
       </os-button>
     </template>
     <p v-else-if="titleNobody" class="nobody-message">{{ titleNobody }}</p>
-  </base-card>
+  </os-card>
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsCard } from '@ocelot-social/ui'
 import { escape } from 'xregexp/xregexp-all.js'
 // @ts-ignore
 import { RecycleScroller } from 'vue-virtual-scroller'
@@ -78,6 +78,7 @@ export default {
   name: 'ProfileList',
   components: {
     OsButton,
+    OsCard,
     UserTeaser,
     RecycleScroller,
   },
