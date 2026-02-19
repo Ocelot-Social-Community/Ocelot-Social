@@ -46,7 +46,7 @@ describe('Empty.vue', () => {
       it('sets margin to that margin', () => {
         propsData.margin = 'xxx-small'
         wrapper = Wrapper()
-        expect(wrapper.find('.hc-empty').attributes().margin).toEqual(propsData.margin)
+        expect(wrapper.find('.hc-empty').classes()).toContain('ds-my-xxx-small')
       })
     })
   })
