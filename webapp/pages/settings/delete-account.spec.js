@@ -36,7 +36,7 @@ describe('delete-account.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.classes('base-card')).toBe(true)
+      expect(wrapper.classes('os-card')).toBe(true)
     })
   })
 })
