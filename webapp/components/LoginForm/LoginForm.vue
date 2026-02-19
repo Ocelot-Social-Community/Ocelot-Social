@@ -4,58 +4,60 @@
       <p>{{ $t('quotes.african.quote') }}</p>
       <b>- {{ $t('quotes.african.author') }}</b>
     </blockquote>
-    <base-card>
-      <template #imageColumn>
+    <os-card class="--columns">
+      <aside class="image-column">
         <page-params-link :pageParams="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)">
           <logo logoType="welcome" />
         </page-params-link>
-      </template>
-      <h2 class="title">{{ $t('login.login') }}</h2>
-      <form :disabled="pending" @submit.prevent="onSubmit">
-        <ds-input
-          v-model="form.email"
-          :disabled="pending"
-          :placeholder="$t('login.email')"
-          type="email"
-          name="email"
-          icon="envelope"
-        />
-        <div class="password-wrapper">
+      </aside>
+      <section class="content-column">
+        <h2 class="title">{{ $t('login.login') }}</h2>
+        <form :disabled="pending" @submit.prevent="onSubmit">
           <ds-input
-            v-model="form.password"
+            v-model="form.email"
             :disabled="pending"
-            :placeholder="$t('login.password')"
-            icon="lock"
-            name="password"
-            class="password-field"
-            ref="password"
-            :type="showPassword ? 'text' : 'password'"
+            :placeholder="$t('login.email')"
+            type="email"
+            name="email"
+            icon="envelope"
           />
-          <show-password @show-password="toggleShowPassword" :icon="passwordIcon" />
-        </div>
-        <nuxt-link to="/password-reset/request">
-          {{ $t('login.forgotPassword') }}
-        </nuxt-link>
-        <os-button
-          :loading="pending"
-          variant="primary"
-          appearance="filled"
-          full-width
-          name="submit"
-          type="submit"
-        >
-          <template #icon><os-icon :icon="icons.signIn" /></template>
-          {{ $t('login.login') }}
-        </os-button>
-        <p>
-          {{ $t('login.no-account') }}
-          <nuxt-link to="/registration">{{ $t('login.register') }}</nuxt-link>
-        </p>
-      </form>
-      <template #topMenu>
+          <div class="password-wrapper">
+            <ds-input
+              v-model="form.password"
+              :disabled="pending"
+              :placeholder="$t('login.password')"
+              icon="lock"
+              name="password"
+              class="password-field"
+              ref="password"
+              :type="showPassword ? 'text' : 'password'"
+            />
+            <show-password @show-password="toggleShowPassword" :icon="passwordIcon" />
+          </div>
+          <nuxt-link to="/password-reset/request">
+            {{ $t('login.forgotPassword') }}
+          </nuxt-link>
+          <os-button
+            :loading="pending"
+            variant="primary"
+            appearance="filled"
+            full-width
+            name="submit"
+            type="submit"
+          >
+            <template #icon><os-icon :icon="icons.signIn" /></template>
+            {{ $t('login.login') }}
+          </os-button>
+          <p>
+            {{ $t('login.no-account') }}
+            <nuxt-link to="/registration">{{ $t('login.register') }}</nuxt-link>
+          </p>
+        </form>
+      </section>
+      <aside class="top-menu">
         <locale-switch offset="5" />
-      </template>
-    </base-card>
+      </aside>
+    </os-card>
   </section>
 </template>
 
@@ -66,7 +68,7 @@ import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParams
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
 import ShowPassword from '../ShowPassword/ShowPassword.vue'
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
 
@@ -75,6 +77,7 @@ export default {
     LocaleSwitch,
     Logo,
     OsButton,
+    OsCard,
     OsIcon,
     PageParamsLink,
     ShowPassword,
