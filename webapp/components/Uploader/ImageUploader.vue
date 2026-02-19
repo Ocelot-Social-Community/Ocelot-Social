@@ -8,7 +8,7 @@
       @vdropzone-file-added="fileAdded"
     >
       <os-spinner v-if="isLoadingImage" size="lg" />
-      <os-icon v-else-if="!hasImage" :icon="icons.image" />
+      <os-icon v-else-if="!hasImage" size="lg" :icon="icons.image" />
       <div v-if="!hasImage" class="supported-formats">
         {{ $t('contribution.teaserImage.supportedFormats') }}
       </div>
