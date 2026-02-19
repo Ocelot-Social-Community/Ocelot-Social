@@ -20,9 +20,7 @@
               <ds-flex-item>
                 <user-teaser
                   :user="
-                    isGroup(notification.from)
-                      ? notification.relatedUser
-                      : notification.from.author
+                    isGroup(notification.from) ? notification.relatedUser : notification.from.author
                   "
                   :class="{ 'notification-status': notification.read }"
                   :date-time="notification.from.createdAt"
