@@ -132,9 +132,7 @@ export default {
 .ds-heading {
   margin-top: 0;
 }
-</style>
 
-<style lang="scss">
 .post-create-layout__sidebar,
 .post-create-layout__main {
   flex: 0 0 100%;
