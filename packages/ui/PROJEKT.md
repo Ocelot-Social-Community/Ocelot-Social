@@ -183,11 +183,16 @@ BaseIcon → OsIcon Webapp-Migration: ✅
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-19 (Session 25)
+**Letzte Aktualisierung:** 2026-02-19 (Session 26)
 
 **Aktuelle Phase:** Phase 4 - OsIcon ✅, BaseIcon → OsIcon Migration ✅, OsSpinner ✅, Spinner Webapp-Migration ✅, OsCard ✅, BaseCard → OsCard Migration ✅
 
-**Zuletzt abgeschlossen (Session 25 - BaseCard → OsCard Webapp-Migration):**
+**Zuletzt abgeschlossen (Session 26 - CodeRabbit Review Fixes):**
+- [x] Cypress: `.os-card .title` → `.os-card > .title` (Kind-Kombinator statt Nachfahren)
+- [x] OsCard.spec.ts: `compareDocumentPosition()` Bitmask-Assertion `!== 0` statt `.toBe(true)`
+- [x] Maintenance-App: `@ocelot-social/ui` Abhängigkeit + `./nuxt.config.js` Import als pre-existing (kein Scope) bewertet
+
+**Zuvor abgeschlossen (Session 25 - BaseCard → OsCard Webapp-Migration):**
 - [x] ~30 Webapp-Dateien: `<base-card>` → `<os-card>` mit lokalen Imports
 - [x] 3 Template-Dateien mit #imageColumn/#topMenu Slots → inline Layout (LoginForm, RegistrationSlider, password-reset)
 - [x] CSS: `.os-card.--columns` Layout in main.scss (flex, image-column, content-column, top-menu, responsive)
@@ -1671,6 +1676,7 @@ Bei der Migration werden:
 | 2026-02-19 | **BaseCard gelöscht** | BaseCard.vue Komponente + base-components.js Plugin entfernt; nuxt.config, maintenance config, testSetup bereinigt |
 | 2026-02-19 | **CSS-Fixes** | ContributionForm Media-Query Selektoren, ProfileList Spezifität, InternalPage $space-small, OsCard highlight outline-1 Tests |
 | 2026-02-19 | **Code-Quality** | SocialMedia Props typisiert, LoginForm querySelector, redundante client-only entfernt, NotificationsTable optional chaining, HashtagsFilter doppeltes Mounting |
+| 2026-02-19 | **Review Fixes (Session 26)** | Cypress Kind-Kombinator `.os-card > .title`, OsCard.spec.ts Bitmask-Assertion fix, Maintenance-App Abhängigkeiten als pre-existing bewertet |
 
 ---
 
