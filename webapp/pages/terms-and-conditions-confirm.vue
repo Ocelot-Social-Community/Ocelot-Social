@@ -1,6 +1,6 @@
 <template>
   <ds-container width="medium" class="terms-and-conditions-confirm">
-    <base-card>
+    <os-card>
       <os-icon :icon="icons.balanceScale" />
       <h2 class="title">{{ $t(`termsAndConditions.newTermsAndConditions`) }}</h2>
       <os-button
@@ -19,12 +19,12 @@
       <os-button variant="primary" @click="submit" :disabled="!checked">
         {{ $t(`actions.save`) }}
       </os-button>
-    </base-card>
+    </os-card>
   </ds-container>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
 import { VERSION } from '~/constants/terms-and-conditions-version.js'
@@ -32,7 +32,7 @@ import { updateUserMutation } from '~/graphql/User.js'
 
 export default {
   name: 'TermsAndConditionsConfirm',
-  components: { OsButton, OsIcon },
+  components: { OsButton, OsCard, OsIcon },
   created() {
     this.icons = iconRegistry
   },
@@ -88,7 +88,7 @@ export default {
 </script>
 
 <style lang="scss">
-.terms-and-conditions-confirm > .base-card {
+.terms-and-conditions-confirm > .os-card {
   height: 280px;
   display: flex;
   flex-direction: column;
