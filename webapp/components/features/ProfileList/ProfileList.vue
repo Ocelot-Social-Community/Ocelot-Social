@@ -173,7 +173,7 @@ export default {
 </script>
 
 <style lang="scss">
-.profile-list {
+.profile-list.os-card {
   display: flex;
   flex-direction: column;
   position: relative;
