@@ -19,7 +19,7 @@
                 :title="$t('login.moreInfo', metadata)"
                 target="_blank"
               > -->
-              <img class="image" alt="Under maintenance" src="/img/custom/logo-squared.svg" />
+              <img class="image" :alt="$t('maintenance.title', metadata)" src="/img/custom/logo-squared.svg" />
               <!-- </a> -->
             </div>
           </div>
