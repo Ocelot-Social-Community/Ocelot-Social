@@ -1,5 +1,5 @@
 <template>
-  <base-card>
+  <os-card>
     <transition name="ds-transition-fade">
       <client-only>
         <sweetalert-icon :icon="sweetAlertIcon" />
@@ -34,16 +34,18 @@
         </client-only>
       </ds-space>
     </template>
-  </base-card>
+  </os-card>
 </template>
 
 <script>
+import { OsCard } from '@ocelot-social/ui'
 import emails from '~/constants/emails.js'
 import { VerifyEmailAddressMutation } from '~/graphql/EmailAddress.js'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 
 export default {
   components: {
+    OsCard,
     SweetalertIcon,
   },
   computed: {

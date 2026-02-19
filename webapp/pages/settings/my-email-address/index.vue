@@ -1,13 +1,13 @@
 <template>
-  <base-card v-if="data">
+  <os-card v-if="data">
     <transition name="ds-transition-fade">
       <sweetalert-icon icon="info" />
     </transition>
     <ds-text v-html="submitMessage" />
-  </base-card>
+  </os-card>
   <ds-form v-else v-model="form" :schema="formSchema" @submit="submit">
     <template #default="{ errors }">
-      <base-card>
+      <os-card>
         <h2 class="title">{{ $t('settings.email.name') }}</h2>
         <ds-input
           id="email"
@@ -28,14 +28,14 @@
           <template #icon><os-icon :icon="icons.check" /></template>
           {{ $t('actions.save') }}
         </os-button>
-      </base-card>
+      </os-card>
     </template>
   </ds-form>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { AddEmailAddressMutation } from '~/graphql/EmailAddress.js'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
@@ -45,6 +45,7 @@ export default {
   mixins: [scrollToContent],
   components: {
     OsButton,
+    OsCard,
     OsIcon,
     SweetalertIcon,
   },
