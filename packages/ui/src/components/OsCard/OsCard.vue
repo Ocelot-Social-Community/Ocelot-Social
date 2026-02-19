@@ -6,15 +6,23 @@
   import type { ClassValue } from 'clsx'
 
   const CARD_BASE =
-    'os-card relative p-6 rounded-[5px] overflow-hidden break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)]'
+    'os-card relative rounded-[5px] overflow-hidden break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)]'
 
   const HIGHLIGHT_CLASS = 'border border-[var(--color-warning)]'
+
+  const HERO_IMAGE_CLASS = 'os-card__hero-image'
+  const CONTENT_CLASS = 'os-card__content p-6'
 
   /**
    * Content card container with rounded corners, background, and shadow.
    * Renders as `<article>` by default.
    *
+   * When `heroImage` slot is provided, the card uses a two-section layout:
+   * the hero image spans full width (no padding), followed by padded content.
+   * Without `heroImage`, the card applies padding directly.
+   *
    * @slot default - Card content
+   * @slot heroImage - Full-width image at the top of the card
    */
   export default defineComponent({
     name: 'OsCard',
@@ -35,8 +43,18 @@
       /* v8 ignore stop */
 
       return () => {
-        const children = slots.default?.()
-        const cardClass = cn(CARD_BASE, props.highlight && HIGHLIGHT_CLASS)
+        const defaultContent = slots.default?.()
+        const heroImageContent = slots.heroImage?.()
+        const hasHeroImage = heroImageContent && heroImageContent.length > 0
+
+        const cardClass = cn(CARD_BASE, !hasHeroImage && 'p-6', props.highlight && HIGHLIGHT_CLASS)
+
+        const children = hasHeroImage
+          ? [
+              h('div', { class: HERO_IMAGE_CLASS }, heroImageContent),
+              h('div', { class: CONTENT_CLASS }, defaultContent),
+            ]
+          : defaultContent
 
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
         if (isVue2) {

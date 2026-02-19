@@ -73,3 +73,28 @@ export const Highlight: Story = {
     `,
   }),
 }
+
+export const HeroImage: Story = {
+  render: () => ({
+    components: { OsCard },
+    template: `
+      <div data-testid="hero-image" class="flex flex-col gap-4" style="max-width: 400px">
+        <OsCard>
+          <template #heroImage>
+            <img
+              src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200'%3E%3Crect fill='%234a5a9e' width='400' height='200'/%3E%3Ctext x='200' y='105' text-anchor='middle' fill='white' font-size='20' font-family='sans-serif'%3EHero Image%3C/text%3E%3C/svg%3E"
+              alt="Hero placeholder"
+              style="display: block; width: 100%; height: auto"
+            />
+          </template>
+          <h3 style="margin: 0 0 8px; font-weight: 600">Post with Hero Image</h3>
+          <p style="margin: 0; color: #666">The image spans the full card width. Content below has its own padding.</p>
+        </OsCard>
+        <OsCard>
+          <h3 style="margin: 0 0 8px; font-weight: 600">Card without Image</h3>
+          <p style="margin: 0; color: #666">A regular card for comparison.</p>
+        </OsCard>
+      </div>
+    `,
+  }),
+}
