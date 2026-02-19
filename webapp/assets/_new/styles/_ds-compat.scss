@@ -36,10 +36,12 @@
 
 // ds-space centered
 .ds-space-centered {
-  text-align: center;
+  display: flex;
   flex: 1;
-  align-content: center;
+  text-align: center;
+  align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 // ds-list-item bullet icon (replaces DsListItem Vue component's angle-right prefix)
