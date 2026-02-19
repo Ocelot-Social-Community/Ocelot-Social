@@ -1,6 +1,6 @@
 <template>
   <ds-grid-item class="tab-navigation" :row-span="tabs.length" column-span="fullWidth">
-    <base-card class="ds-tab-nav">
+    <os-card class="ds-tab-nav">
       <ul class="Tabs">
         <li
           v-for="tab in tabs"
@@ -24,15 +24,17 @@
           </a>
         </li>
       </ul>
-    </base-card>
+    </os-card>
   </ds-grid-item>
 </template>
 
 <script>
+import { OsCard } from '@ocelot-social/ui'
 import HcCountTo from '~/components/CountTo.vue'
 
 export default {
   components: {
+    OsCard,
     HcCountTo,
   },
   props: {
@@ -93,8 +95,8 @@ export default {
   top: 53px;
   z-index: 2;
 }
-.ds-tab-nav.base-card {
-  padding: 0;
+.ds-tab-nav.os-card {
+  padding: 0 !important;
 
   .ds-tab-nav-item {
     &.ds-tab-nav-item-active {
