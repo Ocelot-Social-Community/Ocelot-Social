@@ -706,6 +706,7 @@
     "hello": "Cześć",
     "login": "Logowanie",
     "logout": "Wyloguj się",
+    "loggingOut": "Wylogowywanie …",
     "moreInfo": "Co to jest {APPLICATION_NAME}?",
     "moreInfoHint": "idź po więcej szczegółów",
     "no-account": null,

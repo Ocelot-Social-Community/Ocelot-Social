@@ -706,6 +706,7 @@
     "hello": "Ciao",
     "login": "Accesso",
     "logout": "Logout",
+    "loggingOut": "Disconnessione in corso …",
     "moreInfo": "Che cosa è {APPLICATION_NAME}?",
     "moreInfoHint": null,
     "no-account": null,

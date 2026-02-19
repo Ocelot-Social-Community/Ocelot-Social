@@ -706,6 +706,7 @@
     "hello": "Здравствуйте",
     "login": "Вход",
     "logout": "Выйти",
+    "loggingOut": "Выход из системы …",
     "moreInfo": "Что такое {APPLICATION_NAME}?",
     "moreInfoHint": "на страницу проекта",
     "no-account": "У вас нет аккаунта?",

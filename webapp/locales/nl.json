@@ -706,6 +706,7 @@
     "hello": "Hallo",
     "login": "Inloggen",
     "logout": "Uitloggen",
+    "loggingOut": "Uitloggen …",
     "moreInfo": "Wat is {APPLICATION_NAME}?",
     "moreInfoHint": null,
     "no-account": null,

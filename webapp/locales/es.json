@@ -706,6 +706,7 @@
     "hello": "Hola",
     "login": "Iniciar sesión",
     "logout": "Cierre de sesión",
+    "loggingOut": "Cerrando sesión …",
     "moreInfo": "¿Qué es {APPLICATION_NAME}?",
     "moreInfoHint": "a la página de presentación",
     "no-account": "¿No tiene una cuenta?",

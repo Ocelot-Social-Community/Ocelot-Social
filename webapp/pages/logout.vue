@@ -6,7 +6,7 @@
           <logo logoType="logout" />
         </div>
         <div style="text-align: center" class="ds-mt-small ds-mb-xxx-small ds-space-centered">
-          <h3 class="ds-heading ds-heading-h3 ds-heading-soft">Logging out...</h3>
+          <h3 class="ds-heading ds-heading-h3 ds-heading-soft">{{ $t('login.loggingOut') }}</h3>
         </div>
       </div>
     </div>

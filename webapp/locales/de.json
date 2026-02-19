@@ -706,6 +706,7 @@
     "hello": "Hallo",
     "login": "Anmelden",
     "logout": "Abmelden",
+    "loggingOut": "Abmeldung läuft …",
     "moreInfo": "Was ist {APPLICATION_NAME}?",
     "moreInfoHint": "zur Präsentationsseite",
     "no-account": "Du hast noch kein Nutzerkonto?",
