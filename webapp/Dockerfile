@@ -8,16 +8,13 @@ RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 RUN yarn run build:lib
 
-# Node 22 LTS: @microsoft/api-extractor (dep of vite-plugin-dts) is CJS-only
-# and fails ESM resolution on Node 25 Alpine (ERR_MODULE_NOT_FOUND lib-esm/)
-FROM node:22-alpine AS ui-library
+FROM node:25.6.1-alpine AS ui-library
 RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
 COPY packages/ui .
-RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
-    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
-RUN yarn run build
+RUN npm ci
+RUN npm run build
 
 FROM node:25.6.1-alpine AS base
 LABEL org.label-schema.name="ocelot.social:webapp"
