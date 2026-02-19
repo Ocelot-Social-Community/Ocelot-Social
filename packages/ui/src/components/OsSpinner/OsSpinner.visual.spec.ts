@@ -38,7 +38,7 @@ async function checkA11y(page: Page) {
 }
 
 test.describe('OsSpinner keyboard accessibility', () => {
-  test('spinner is not focusable', async ({ page }) => {
+  test('spinner is not focusable and has status role', async ({ page }) => {
     await page.goto(`${STORY_URL}--all-sizes&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
@@ -52,6 +52,13 @@ test.describe('OsSpinner keyboard accessibility', () => {
       const spinner = spinners.nth(i)
 
       await expect(spinner).toHaveAttribute('role', 'status')
+      await expect(spinner).not.toHaveAttribute('tabindex')
+    }
+
+    // Verify no spinner receives focus via Tab navigation
+    await page.keyboard.press('Tab')
+    for (let i = 0; i < count; i++) {
+      await expect(spinners.nth(i)).not.toBeFocused()
     }
   })
 })
