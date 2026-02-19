@@ -1,6 +1,7 @@
 import { storiesOf } from '@storybook/vue'
 import { withA11y } from '@storybook/addon-a11y'
 import { action } from '@storybook/addon-actions'
+import { OsCard } from '@ocelot-social/ui'
 import { post } from '~/components/PostTeaser/PostTeaser.story.js'
 import { user } from '~/components/UserTeaser/UserTeaser.story.js'
 import helpers from '~/storybook/helpers'
@@ -172,7 +173,7 @@ storiesOf('ReportList', module)
   .addDecorator(withA11y)
   .addDecorator(helpers.layout)
   .add('with reports', () => ({
-    components: { ReportList, DropdownFilter, ReportsTable },
+    components: { ReportList, DropdownFilter, ReportsTable, OsCard },
     store: helpers.store,
     data: () => ({
       filterOptions,
@@ -183,11 +184,11 @@ storiesOf('ReportList', module)
       openModal: action('openModal'),
       filter: action('filter'),
     },
-    template: `<base-card>
+    template: `<os-card>
                 <div class="reports-header">
                   <h3 class="title">Reports</h3>
                   <dropdown-filter @filter="filter" :filterOptions="filterOptions" :selected="selected" />
                 </div>
                 <reports-table :reports="reports" @confirm="openModal" />
-              </base-card>`,
+              </os-card>`,
   }))

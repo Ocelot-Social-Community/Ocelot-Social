@@ -1,6 +1,7 @@
 import { storiesOf } from '@storybook/vue'
 import { withA11y } from '@storybook/addon-a11y'
 import HcEditor from '~/components/Editor/Editor.vue'
+import { OsCard } from '@ocelot-social/ui'
 import helpers from '~/storybook/helpers'
 import Vue from 'vue'
 
@@ -37,11 +38,11 @@ storiesOf('Editor', module)
   .addDecorator((storyFn) => {
     const ctx = storyFn()
     return {
-      components: { ctx },
+      components: { ctx, OsCard },
       template: `
-        <base-card style="width: 50%; min-width: 500px; margin: 0 auto;">
+        <os-card style="width: 50%; min-width: 500px; margin: 0 auto;">
           <ctx />
-        </base-card>
+        </os-card>
       `,
     }
   })
