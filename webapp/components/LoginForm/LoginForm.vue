@@ -138,7 +138,7 @@ export default {
     toggleShowPassword() {
       this.showPassword = !this.showPassword
       this.$nextTick(() => {
-        this.$refs.password.$el.children[1].children[1].focus()
+        this.$refs.password.$el.querySelector('input').focus()
         this.$emit('focus')
       })
     },
