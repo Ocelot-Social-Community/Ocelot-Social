@@ -190,9 +190,9 @@
           </template>
           <template v-else-if="$apollo.loading">
             <ds-grid-item column-span="fullWidth">
-              <ds-space centered>
-                <ds-spinner size="base"></ds-spinner>
-              </ds-space>
+              <div style="text-align: center; padding: 48px 0">
+                <os-spinner size="lg" />
+              </div>
             </ds-grid-item>
           </template>
           <template v-else>
@@ -202,7 +202,9 @@
           </template>
         </masonry-grid>
         <client-only>
-          <infinite-loading v-if="hasMore" @infinite="showMoreContributions" />
+          <infinite-loading v-if="hasMore" @infinite="showMoreContributions">
+            <os-spinner slot="spinner" size="lg" />
+          </infinite-loading>
         </client-only>
       </ds-flex-item>
     </ds-flex>
@@ -210,7 +212,7 @@
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsSpinner } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import uniqBy from 'lodash/uniqBy'
 import { mapGetters, mapMutations } from 'vuex'
@@ -247,6 +249,7 @@ export default {
   components: {
     OsButton,
     OsIcon,
+    OsSpinner,
     SocialMedia,
     PostTeaser,
     HcFollowButton,

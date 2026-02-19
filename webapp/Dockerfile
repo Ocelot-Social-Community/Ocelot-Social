@@ -13,9 +13,8 @@ RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
 COPY packages/ui .
-RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
-    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
-RUN yarn run build
+RUN npm ci
+RUN npm run build
 
 FROM node:25.6.1-alpine AS base
 LABEL org.label-schema.name="ocelot.social:webapp"

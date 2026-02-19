@@ -1071,13 +1071,31 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             <div
               class="infinite-status-prompt"
               data-v-644ea9c9=""
-              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+              style="display: none;"
             >
-              <i
-                class="loading-default"
-                data-v-46b20d22=""
+              <span
+                aria-label="Loading"
+                class="os-spinner inline-flex shrink-0 h-[2em] w-[2em]"
                 data-v-644ea9c9=""
-              />
+                role="status"
+              >
+                <svg
+                  style="width: 100%; height: 100%; overflow: hidden;"
+                  viewBox="0 0 50 50"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="25"
+                    cy="25"
+                    fill="none"
+                    r="20"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-width="4"
+                    style="transform-origin: 25px 25px; animation: os-spinner-rotate 16s linear infinite,os-spinner-dash 1.5s ease-in-out infinite;"
+                  />
+                </svg>
+              </span>
             </div>
              
             <div
@@ -1582,13 +1600,31 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             <div
               class="infinite-status-prompt"
               data-v-644ea9c9=""
-              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+              style="display: none;"
             >
-              <i
-                class="loading-default"
-                data-v-46b20d22=""
+              <span
+                aria-label="Loading"
+                class="os-spinner inline-flex shrink-0 h-[2em] w-[2em]"
                 data-v-644ea9c9=""
-              />
+                role="status"
+              >
+                <svg
+                  style="width: 100%; height: 100%; overflow: hidden;"
+                  viewBox="0 0 50 50"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="25"
+                    cy="25"
+                    fill="none"
+                    r="20"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-width="4"
+                    style="transform-origin: 25px 25px; animation: os-spinner-rotate 16s linear infinite,os-spinner-dash 1.5s ease-in-out infinite;"
+                  />
+                </svg>
+              </span>
             </div>
              
             <div
@@ -2113,13 +2149,31 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             <div
               class="infinite-status-prompt"
               data-v-644ea9c9=""
-              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+              style="display: none;"
             >
-              <i
-                class="loading-default"
-                data-v-46b20d22=""
+              <span
+                aria-label="Loading"
+                class="os-spinner inline-flex shrink-0 h-[2em] w-[2em]"
                 data-v-644ea9c9=""
-              />
+                role="status"
+              >
+                <svg
+                  style="width: 100%; height: 100%; overflow: hidden;"
+                  viewBox="0 0 50 50"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="25"
+                    cy="25"
+                    fill="none"
+                    r="20"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-width="4"
+                    style="transform-origin: 25px 25px; animation: os-spinner-rotate 16s linear infinite,os-spinner-dash 1.5s ease-in-out infinite;"
+                  />
+                </svg>
+              </span>
             </div>
              
             <div
@@ -3147,13 +3201,31 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             <div
               class="infinite-status-prompt"
               data-v-644ea9c9=""
-              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+              style="display: none;"
             >
-              <i
-                class="loading-default"
-                data-v-46b20d22=""
+              <span
+                aria-label="Loading"
+                class="os-spinner inline-flex shrink-0 h-[2em] w-[2em]"
                 data-v-644ea9c9=""
-              />
+                role="status"
+              >
+                <svg
+                  style="width: 100%; height: 100%; overflow: hidden;"
+                  viewBox="0 0 50 50"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="25"
+                    cy="25"
+                    fill="none"
+                    r="20"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-width="4"
+                    style="transform-origin: 25px 25px; animation: os-spinner-rotate 16s linear infinite,os-spinner-dash 1.5s ease-in-out infinite;"
+                  />
+                </svg>
+              </span>
             </div>
              
             <div
@@ -4200,13 +4272,31 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             <div
               class="infinite-status-prompt"
               data-v-644ea9c9=""
-              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+              style="display: none;"
             >
-              <i
-                class="loading-default"
-                data-v-46b20d22=""
+              <span
+                aria-label="Loading"
+                class="os-spinner inline-flex shrink-0 h-[2em] w-[2em]"
                 data-v-644ea9c9=""
-              />
+                role="status"
+              >
+                <svg
+                  style="width: 100%; height: 100%; overflow: hidden;"
+                  viewBox="0 0 50 50"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="25"
+                    cy="25"
+                    fill="none"
+                    r="20"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-width="4"
+                    style="transform-origin: 25px 25px; animation: os-spinner-rotate 16s linear infinite,os-spinner-dash 1.5s ease-in-out infinite;"
+                  />
+                </svg>
+              </span>
             </div>
              
             <div
@@ -5014,13 +5104,31 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             <div
               class="infinite-status-prompt"
               data-v-644ea9c9=""
-              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+              style="display: none;"
             >
-              <i
-                class="loading-default"
-                data-v-46b20d22=""
+              <span
+                aria-label="Loading"
+                class="os-spinner inline-flex shrink-0 h-[2em] w-[2em]"
                 data-v-644ea9c9=""
-              />
+                role="status"
+              >
+                <svg
+                  style="width: 100%; height: 100%; overflow: hidden;"
+                  viewBox="0 0 50 50"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="25"
+                    cy="25"
+                    fill="none"
+                    r="20"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-width="4"
+                    style="transform-origin: 25px 25px; animation: os-spinner-rotate 16s linear infinite,os-spinner-dash 1.5s ease-in-out infinite;"
+                  />
+                </svg>
+              </span>
             </div>
              
             <div
@@ -5848,13 +5956,31 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             <div
               class="infinite-status-prompt"
               data-v-644ea9c9=""
-              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+              style="display: none;"
             >
-              <i
-                class="loading-default"
-                data-v-46b20d22=""
+              <span
+                aria-label="Loading"
+                class="os-spinner inline-flex shrink-0 h-[2em] w-[2em]"
                 data-v-644ea9c9=""
-              />
+                role="status"
+              >
+                <svg
+                  style="width: 100%; height: 100%; overflow: hidden;"
+                  viewBox="0 0 50 50"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="25"
+                    cy="25"
+                    fill="none"
+                    r="20"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-width="4"
+                    style="transform-origin: 25px 25px; animation: os-spinner-rotate 16s linear infinite,os-spinner-dash 1.5s ease-in-out infinite;"
+                  />
+                </svg>
+              </span>
             </div>
              
             <div
@@ -6812,13 +6938,31 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             <div
               class="infinite-status-prompt"
               data-v-644ea9c9=""
-              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+              style="display: none;"
             >
-              <i
-                class="loading-default"
-                data-v-46b20d22=""
+              <span
+                aria-label="Loading"
+                class="os-spinner inline-flex shrink-0 h-[2em] w-[2em]"
                 data-v-644ea9c9=""
-              />
+                role="status"
+              >
+                <svg
+                  style="width: 100%; height: 100%; overflow: hidden;"
+                  viewBox="0 0 50 50"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="25"
+                    cy="25"
+                    fill="none"
+                    r="20"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-width="4"
+                    style="transform-origin: 25px 25px; animation: os-spinner-rotate 16s linear infinite,os-spinner-dash 1.5s ease-in-out infinite;"
+                  />
+                </svg>
+              </span>
             </div>
              
             <div
@@ -7952,13 +8096,31 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             <div
               class="infinite-status-prompt"
               data-v-644ea9c9=""
-              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+              style="display: none;"
             >
-              <i
-                class="loading-default"
-                data-v-46b20d22=""
+              <span
+                aria-label="Loading"
+                class="os-spinner inline-flex shrink-0 h-[2em] w-[2em]"
                 data-v-644ea9c9=""
-              />
+                role="status"
+              >
+                <svg
+                  style="width: 100%; height: 100%; overflow: hidden;"
+                  viewBox="0 0 50 50"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="25"
+                    cy="25"
+                    fill="none"
+                    r="20"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-width="4"
+                    style="transform-origin: 25px 25px; animation: os-spinner-rotate 16s linear infinite,os-spinner-dash 1.5s ease-in-out infinite;"
+                  />
+                </svg>
+              </span>
             </div>
              
             <div
@@ -9015,13 +9177,31 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             <div
               class="infinite-status-prompt"
               data-v-644ea9c9=""
-              style="color: rgb(102, 102, 102); font-size: 14px; padding: 10px 0px; display: none;"
+              style="display: none;"
             >
-              <i
-                class="loading-default"
-                data-v-46b20d22=""
+              <span
+                aria-label="Loading"
+                class="os-spinner inline-flex shrink-0 h-[2em] w-[2em]"
                 data-v-644ea9c9=""
-              />
+                role="status"
+              >
+                <svg
+                  style="width: 100%; height: 100%; overflow: hidden;"
+                  viewBox="0 0 50 50"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="25"
+                    cy="25"
+                    fill="none"
+                    r="20"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-width="4"
+                    style="transform-origin: 25px 25px; animation: os-spinner-rotate 16s linear infinite,os-spinner-dash 1.5s ease-in-out infinite;"
+                  />
+                </svg>
+              </span>
             </div>
              
             <div

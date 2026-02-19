@@ -269,3 +269,6 @@ export const buttonVariants = cva(
 )
 
 export type ButtonVariants = VariantProps<typeof buttonVariants>
+
+/** Button-specific size subset: sm | md | lg | xl */
+export type ButtonSize = NonNullable<ButtonVariants['size']>

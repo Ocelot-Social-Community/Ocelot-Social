@@ -81,10 +81,10 @@ Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
 Phase 3: ██████████ 100% (24/24 Aufgaben) ✅ - Webapp-Integration komplett
-Phase 4: ██░░░░░░░░  24% (4/17 Aufgaben) - OsButton ✅, OsIcon ✅, System-Icons ✅, BaseIcon→OsIcon Migration ✅
+Phase 4: ████░░░░░░  35% (6/17 Aufgaben) - OsButton ✅, OsIcon ✅, System-Icons ✅, BaseIcon→OsIcon Migration ✅, OsSpinner ✅, Spinner Webapp-Migration ✅
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████████░░  77% (66/86 Aufgaben)
+Gesamt:  ████████░░  79% (68/86 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -133,6 +133,25 @@ System-Icons:
 Ocelot-Icons (separates Entry-Point):
 └─ 82 Icons (Feature-Icons + Kategorie-Icons aus Webapp migriert)
 
+OsSpinner:
+├─ size:       ✅ xs, sm, md, lg, xl, 2xl (em-basiert)
+├─ color:      ✅ currentColor (erbt von Parent)
+├─ a11y:       ✅ role="status", aria-label="Loading" (customizable)
+├─ decorative: ✅ aria-hidden="true" suppresses role/aria-label
+├─ os-button:  ✅ OsButton nutzt OsSpinner als Komponente (decorative)
+├─ vue-compat: ✅ h() Render-Function mit isVue2
+└─ webapp:     ✅ 4 Spinner migriert (DsSpinner + LoadingSpinner → OsSpinner)
+
+DsSpinner/LoadingSpinner → OsSpinner Webapp-Migration: ✅
+├─ ImageUploader.vue: LoadingSpinner → OsSpinner (size="lg")
+├─ pages/profile: ds-spinner → os-spinner (size="lg")
+├─ pages/groups: ds-spinner → os-spinner (size="lg")
+├─ pages/admin: ds-spinner → os-spinner (size="xl") + ApolloQuery→apollo Option
+├─ LoadingSpinner Komponente gelöscht
+├─ ds-space centered → div+padding (Bugfix in 3 Seiten)
+├─ Admin: ApolloQuery→$apollo.loading (Spinner war wg. SSR-Prefetch unsichtbar)
+└─ infinite-loading: OsSpinner im spinner-Slot (index, profile, groups)
+
 BaseIcon → OsIcon Webapp-Migration: ✅
 ├─ 131 <base-icon> in 70+ Dateien → <os-icon :icon="...">
 ├─ 82 SVGs in ocelot/icons/svgs/ (inkl. 17 Kategorie-Icons)
@@ -147,11 +166,35 @@ BaseIcon → OsIcon Webapp-Migration: ✅
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-15 (Session 22)
+**Letzte Aktualisierung:** 2026-02-18 (Session 24)
 
-**Aktuelle Phase:** Phase 4 - OsIcon ✅, BaseIcon → OsIcon Webapp-Migration ✅
+**Aktuelle Phase:** Phase 4 - OsIcon ✅, BaseIcon → OsIcon Migration ✅, OsSpinner ✅, Spinner Webapp-Migration ✅
 
-**Zuletzt abgeschlossen (Session 22 - BaseIcon → OsIcon Webapp-Migration):**
+**Zuletzt abgeschlossen (Session 24 - OsSpinner Webapp-Migration + Refactoring):**
+- [x] OsButton refactored: nutzt `h(OsSpinner, { 'aria-hidden': 'true' })` statt Inline-SVG
+- [x] OsSpinner: Decorative-Modus (`aria-hidden="true"` unterdrückt role/aria-label)
+- [x] `ButtonSize` Type exportiert (sm/md/lg/xl), `types.d.ts` Kommentar aktualisiert
+- [x] `createSpinnerSvg.ts` wieder in OsSpinner.vue inlined (nur noch 1 Nutzer)
+- [x] Webapp-Migration: 4 Spinner ersetzt (ImageUploader, profile, groups, admin)
+- [x] LoadingSpinner Komponente gelöscht (ersetzt durch OsSpinner)
+- [x] `<ds-space centered>` → `<div style="...">` Bugfix in 3 Seiten
+- [x] Admin-Seite: `<ApolloQuery>` → `apollo`-Option + `$apollo.loading` (Spinner war wg. SSR-Prefetch unsichtbar)
+- [x] `filterStatistics()` mutiert nicht mehr Originalobjekt (Destructuring statt `delete`)
+- [x] `infinite-loading` Spinner-Slot: OsSpinner in allen 3 Nutzungen (index, profile, groups)
+- [x] Einheitliches Spinner-Design: vue-infinite-loading Default-Spinner → OsSpinner
+
+**Zuvor abgeschlossen (Session 23 - OsSpinner Komponente):**
+- [x] OsSpinner Komponente implementiert (size prop, currentColor, role="status", aria-label)
+- [x] Vue 2/3 kompatibel via `h()` Render-Function mit `isVue2`
+- [x] Storybook Stories: Playground, AllSizes, InheritColor, InlineWithText
+- [x] Unit Tests: 23 Tests (rendering, size, accessibility, decorative mode, css, keyboard)
+- [x] Visual Tests: 4 Tests (all-sizes, inherit-color, inline-text, keyboard a11y)
+- [x] Accessibility: `role="status"`, `aria-label="Loading"` (customizable), axe-core checks
+- [x] 100% Test-Coverage (Statements, Branches, Functions, Lines)
+- [x] Completeness Check bestanden
+- [x] OsButton Visual Tests: 19/19 bestanden (kein Regression durch Refactoring)
+
+**Zuvor abgeschlossen (Session 22 - BaseIcon → OsIcon Webapp-Migration):**
 - [x] 131 `<base-icon>` Nutzungen in 70+ Dateien → `<os-icon :icon="icons.xxx">` migriert
 - [x] 82 Ocelot-Icons in `packages/ui/src/ocelot/icons/svgs/` (von 1 auf 82)
 - [x] 17 Kategorie-Icons aus Webapp kopiert (networking, energy, psyche, movement, finance, child, mobility, shopping-cart, peace, politics, nature, science, health, media, spirituality, culture, miscellaneous)
@@ -219,7 +262,7 @@ BaseIcon → OsIcon Webapp-Migration: ✅
 - [x] Session 11: Wasserfarben-Farbschema, Stories konsolidiert, Keyboard A11y
 
 **Nächste Schritte:**
-- [ ] OsSpinner Komponente (vereint DsSpinner + LoadingSpinner)
+- [x] OsSpinner Webapp-Migration (DsSpinner + LoadingSpinner → OsSpinner) ✅
 - [ ] OsCard Komponente (vereint DsCard + BaseCard)
 - [ ] Weitere Tier 1 Komponenten
 - [ ] Browser-Fehler untersuchen: `TypeError: Cannot read properties of undefined (reading 'heartO')` (ocelotIcons undefined im Browser trotz korrekter Webpack-Aliase)
@@ -473,7 +516,8 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 
 **Tier 1: Kern-Komponenten**
 - [x] OsIcon (vereint DsIcon + BaseIcon) ✅ System-Icons + vite-svg-icon Plugin
-- [ ] OsSpinner (vereint DsSpinner + LoadingSpinner)
+- [x] OsSpinner (vereint DsSpinner + LoadingSpinner) ✅ OsButton nutzt OsSpinner als Komponente
+- [x] OsSpinner Webapp-Migration ✅ 4 Spinner migriert, LoadingSpinner gelöscht, Admin ApolloQuery→$apollo.loading
 - [x] OsButton (vereint DsButton + BaseButton) ✅ Entwickelt in Phase 2
 - [ ] OsCard (vereint DsCard + BaseCard)
 
@@ -1577,6 +1621,14 @@ Bei der Migration werden:
 | 2026-02-15 | **8 Snapshots gelöscht** | Stale Snapshot-Dateien entfernt nach BaseIcon → OsIcon Migration |
 | 2026-02-15 | **CSS Migration** | `.base-icon` → `.os-icon` in main.scss und Category/index.vue |
 | 2026-02-15 | **Jest Mock ocelot** | `test/__mocks__/@ocelot-social/ui/ocelot.js` für ocelotIcons in Jest-Umgebung |
+| 2026-02-18 | **OsSpinner Komponente** | Neue Komponente: size (xs-2xl, em-basiert), currentColor, role="status", aria-label; Vue 2/3 via h() + isVue2 |
+| 2026-02-18 | **OsSpinner Decorative** | `aria-hidden="true"` unterdrückt role/aria-label; OsButton nutzt OsSpinner als Komponente (decorative) |
+| 2026-02-18 | **ButtonSize Type** | `ButtonSize` (sm/md/lg/xl) exportiert aus button.variants.ts; types.d.ts Kommentar: Size ist Vokabular, nicht Pflicht |
+| 2026-02-18 | **OsSpinner Webapp-Migration** | 4 Stellen migriert: ImageUploader, profile, groups, admin; LoadingSpinner gelöscht |
+| 2026-02-18 | **ds-space centered Bugfix** | `<ds-space centered>` → `<div style="text-align:center;padding:48px 0">` in 3 Seiten (Styleguide-Bug) |
+| 2026-02-18 | **Admin Spinner Fix** | `<ApolloQuery>` → `apollo`-Option + `$apollo.loading`; SSR-Prefetch verhinderte Loading-State im Client |
+| 2026-02-18 | **filterStatistics Fix** | `delete data.__typename` → Destructuring `{ __typename, ...rest }` (keine Mutation des Originalobjekts) |
+| 2026-02-18 | **infinite-loading Spinner-Slot** | OsSpinner im `spinner`-Slot von vue-infinite-loading in 3 Seiten (index, profile, groups); einheitliches Spinner-Design |
 
 ---
 

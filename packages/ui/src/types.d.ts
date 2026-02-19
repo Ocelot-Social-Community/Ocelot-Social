@@ -1,13 +1,15 @@
 /**
- * Component prop types based on Tailwind CSS scales
+ * Shared vocabulary types for component props.
  *
- * These types ensure consistency across all components.
- * When a component supports a prop, it must support all values of that scale.
+ * These types define a common naming convention across components.
+ * Components pick the subset that makes sense for them:
+ * - OsIcon/OsSpinner: all 6 sizes (inline elements, em-based)
+ * - OsButton: sm–xl (interactive element, pixel-based touch targets)
  */
 
 /**
- * Size scale for components (buttons, inputs, avatars, etc.)
- * Maps to Tailwind's text/spacing scale
+ * Size vocabulary shared across components.
+ * Each component supports the subset that makes sense for its context.
  */
 export type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 

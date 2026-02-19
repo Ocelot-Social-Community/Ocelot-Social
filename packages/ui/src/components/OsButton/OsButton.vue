@@ -1,11 +1,12 @@
 <script lang="ts">
   import { computed, defineComponent, getCurrentInstance, h, isVue2 } from 'vue-demi'
 
+  import OsSpinner from '#src/components/OsSpinner/OsSpinner.vue'
   import { cn } from '#src/utils'
 
   import { buttonVariants } from './button.variants'
 
-  import type { ButtonVariants } from './button.variants'
+  import type { ButtonSize, ButtonVariants } from './button.variants'
   import type { Component, PropType } from 'vue-demi'
 
   /**
@@ -24,9 +25,7 @@
    * @slot suffix - Optional trailing content (rendered right of text). Icons, badges, chevrons etc.
    */
 
-  type Size = NonNullable<ButtonVariants['size']>
-
-  const CIRCLE_WIDTHS: Record<Size, string> = {
+  const CIRCLE_WIDTHS: Record<ButtonSize, string> = {
     sm: 'w-[26px]',
     md: 'w-[36px]',
     lg: 'w-12',
@@ -38,42 +37,14 @@
   const ICON_CLASS = `os-button__icon ${SLOT_BASE}`
   const SUFFIX_CLASS = `os-button__suffix ${SLOT_BASE}`
 
-  const SPINNER_PX: Record<Size, number> = { sm: 24, md: 32, lg: 40, xl: 46 }
-
-  const SVG_ATTRS = {
-    viewBox: '0 0 50 50',
-    xmlns: 'http://www.w3.org/2000/svg',
-    'aria-hidden': 'true',
-  }
-
-  const CIRCLE_ATTRS = {
-    cx: '25',
-    cy: '25',
-    r: '20',
-    fill: 'none',
-    stroke: 'currentColor',
-    'stroke-width': '4',
-    'stroke-linecap': 'round',
-  }
-
-  const CIRCLE_STYLE =
-    'transform-origin:25px 25px;animation:os-spinner-rotate 16s linear infinite,os-spinner-dash 1.5s ease-in-out infinite'
-
-  function vueAttrs(attrs: Record<string, string>, style?: string) {
-    /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
-    return isVue2 ? { attrs, ...(style && { style }) } : { ...attrs, ...(style && { style }) }
-    /* v8 ignore stop */
-  }
+  const SPINNER_PX: Record<ButtonSize, number> = { sm: 24, md: 32, lg: 40, xl: 46 }
 
   function createSpinner(px: number, center: string) {
-    const svg = h('svg', vueAttrs(SVG_ATTRS, 'width:100%;height:100%;overflow:hidden'), [
-      h('circle', vueAttrs(CIRCLE_ATTRS, CIRCLE_STYLE)),
-    ])
-    return h(
-      'span',
-      { class: `os-button__spinner absolute ${center}`, style: `width:${px}px;height:${px}px` },
-      [svg],
-    )
+    return h(OsSpinner, {
+      class: `os-button__spinner absolute ${center}`,
+      style: `width:${px}px;height:${px}px`,
+      'aria-hidden': 'true',
+    })
   }
 
   export default defineComponent({
@@ -148,7 +119,7 @@
             return typeof children !== 'string' || children.trim().length > 0
           }) ?? false
 
-        const size = props.size as Size
+        const size = props.size as ButtonSize
         const spinnerPx = SPINNER_PX[size] // eslint-disable-line security/detect-object-injection
         const isSmall = props.circle || size === 'sm'
         const isLoading = props.loading

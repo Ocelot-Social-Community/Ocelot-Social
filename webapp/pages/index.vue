@@ -146,13 +146,15 @@
 
     <!-- infinite loading -->
     <client-only>
-      <infinite-loading v-if="hasMore" @infinite="showMoreContributions" />
+      <infinite-loading v-if="hasMore" @infinite="showMoreContributions">
+        <os-spinner slot="spinner" size="lg" />
+      </infinite-loading>
     </client-only>
   </div>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsSpinner } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import postListActions from '~/mixins/postListActions'
 import mobile from '~/mixins/mobile'
@@ -178,6 +180,7 @@ export default {
     HashtagsFilter,
     OsButton,
     OsIcon,
+    OsSpinner,
     PostTeaser,
     HcEmpty,
     MasonryGrid,
