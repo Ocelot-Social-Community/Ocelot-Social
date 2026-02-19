@@ -2,7 +2,7 @@
   <div class="Sliders">
     <slot :name="'header'" />
 
-    <h1
+    <h3
       v-if="
         sliderData.sliders[sliderIndex].titleIdent &&
         ((typeof sliderData.sliders[sliderIndex].titleIdent === 'string' &&
@@ -24,7 +24,7 @@
             sliderData.sliders[sliderIndex].titleIdent.data,
           ))
       }}
-    </h1>
+    </h3>
 
     <slot :name="sliderData.sliders[sliderIndex].name" />
 
