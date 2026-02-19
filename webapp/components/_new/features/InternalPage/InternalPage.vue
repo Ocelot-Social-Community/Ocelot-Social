@@ -10,24 +10,26 @@
         <br />
         <div v-html="$t(pageParams.internalPage.htmlIdent)" />
       </div>
-      <base-card v-else>
+      <os-card v-else>
         <div v-html="$t(pageParams.internalPage.htmlIdent)" />
-      </base-card>
+      </os-card>
     </ds-container>
     <div v-else-if="!pageParams.internalPage.hasBaseCard">
       <br />
       <div v-html="$t(pageParams.internalPage.htmlIdent)" />
     </div>
-    <base-card v-else>
+    <os-card v-else>
       <div v-html="$t(pageParams.internalPage.htmlIdent)" />
-    </base-card>
+    </os-card>
   </div>
 </template>
 
 <script>
+import { OsCard } from '@ocelot-social/ui'
 import { PageParams } from '~/components/utils/PageParams.js'
 
 export default {
+  components: { OsCard },
   name: 'InternalPage',
   props: {
     pageParams: { type: Object, required: true },
@@ -49,7 +51,7 @@ export default {
     padding-left: 0 !important;
     padding-right: 0 !important;
 
-    .base-card {
+    .os-card {
       padding: 16px !important;
     }
   }
