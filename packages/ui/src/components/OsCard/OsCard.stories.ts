@@ -55,3 +55,21 @@ export const CustomClass: Story = {
     `,
   }),
 }
+
+export const Highlight: Story = {
+  render: () => ({
+    components: { OsCard },
+    template: `
+      <div data-testid="highlight" class="flex flex-col gap-4" style="max-width: 400px">
+        <OsCard :highlight="true">
+          <h3 style="margin: 0 0 8px; font-weight: 600">Pinned Post</h3>
+          <p style="margin: 0; color: #666">This card is highlighted with a colored border, used for pinned or featured content.</p>
+        </OsCard>
+        <OsCard>
+          <h3 style="margin: 0 0 8px; font-weight: 600">Normal Post</h3>
+          <p style="margin: 0; color: #666">This card has no highlight for comparison.</p>
+        </OsCard>
+      </div>
+    `,
+  }),
+}

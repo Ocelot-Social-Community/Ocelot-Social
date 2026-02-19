@@ -63,4 +63,15 @@ test.describe('OsCard visual regression', () => {
 
     await checkA11y(page)
   })
+
+  test('highlight', async ({ page }) => {
+    await page.goto(`${STORY_URL}--highlight&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForReady(page)
+
+    await expect(root.locator('[data-testid="highlight"]')).toHaveScreenshot('highlight.png')
+
+    await checkA11y(page)
+  })
 })

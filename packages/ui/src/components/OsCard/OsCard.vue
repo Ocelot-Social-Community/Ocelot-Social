@@ -5,8 +5,10 @@
 
   import type { ClassValue } from 'clsx'
 
-  const CARD_CLASS =
+  const CARD_BASE =
     'os-card relative p-6 rounded-[5px] overflow-hidden break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)]'
+
+  const HIGHLIGHT_CLASS = 'border border-[var(--color-warning)]'
 
   /**
    * Content card container with rounded corners, background, and shadow.
@@ -17,13 +19,24 @@
   export default defineComponent({
     name: 'OsCard',
     inheritAttrs: false,
-    setup(_, { slots, attrs }) {
+    props: {
+      /**
+       * Adds a colored border to highlight the card (e.g. for pinned posts).
+       * Uses `--color-warning` CSS variable for border color.
+       */
+      highlight: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    setup(props, { slots, attrs }) {
       /* v8 ignore start -- Vue 2 only */
       const instance = isVue2 ? getCurrentInstance() : null
       /* v8 ignore stop */
 
       return () => {
         const children = slots.default?.()
+        const cardClass = cn(CARD_BASE, props.highlight && HIGHLIGHT_CLASS)
 
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
         if (isVue2) {
@@ -36,7 +49,7 @@
           return h(
             'article',
             {
-              class: cn(CARD_CLASS, parentClass, parentDynClass),
+              class: cn(cardClass, parentClass, parentDynClass),
               attrs: { ...parentAttrs, ...attrs },
             },
             children,
@@ -49,7 +62,7 @@
         return h(
           'article',
           {
-            class: cn(CARD_CLASS, attrClass as ClassValue),
+            class: cn(cardClass, attrClass as ClassValue),
             ...restAttrs,
           },
           children,

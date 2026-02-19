@@ -52,6 +52,30 @@ describe('osCard', () => {
     })
   })
 
+  describe('highlight', () => {
+    it('does not have border class by default', () => {
+      const wrapper = mount(OsCard)
+
+      expect(wrapper.classes()).not.toContain('border')
+    })
+
+    it('adds border class when highlight is true', () => {
+      const wrapper = mount(OsCard, {
+        props: { highlight: true },
+      })
+
+      expect(wrapper.classes()).toContain('border')
+    })
+
+    it('does not add border class when highlight is false', () => {
+      const wrapper = mount(OsCard, {
+        props: { highlight: false },
+      })
+
+      expect(wrapper.classes()).not.toContain('border')
+    })
+  })
+
   describe('keyboard accessibility', () => {
     it('is not focusable (non-interactive element)', () => {
       const wrapper = mount(OsCard)
