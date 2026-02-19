@@ -8,7 +8,7 @@
       @submit="submit"
     >
       <template #default="{ errors }">
-        <base-card>
+        <os-card>
           <template #heroImage>
             <img
               v-if="formData.image"
@@ -196,13 +196,13 @@
               </os-button>
             </ds-flex-item>
           </ds-flex>
-        </base-card>
+        </os-card>
       </template>
     </ds-form>
   </div>
 </template>
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
@@ -224,6 +224,7 @@ export default {
     Editor,
     ImageUploader,
     OsButton,
+    OsCard,
     OsIcon,
     PageParamsLink,
   },
@@ -540,15 +541,18 @@ export default {
   }
 }
 
-.contribution-form > .base-card {
+.contribution-form > .os-card {
   display: flex;
   flex-direction: column;
 
-  > .hero-image {
+  > .os-card__hero-image {
     position: relative;
+    max-height: $size-image-max-height;
+    overflow: hidden;
 
     > .image {
-      max-height: $size-image-max-height;
+      width: 100%;
+      object-fit: contain;
     }
   }
 
@@ -556,41 +560,46 @@ export default {
     filter: blur($blur-radius);
   }
 
-  > .ds-form-item {
-    margin: 0;
-  }
+  > .os-card__content {
+    display: flex;
+    flex-direction: column;
 
-  > .ds-chip {
-    align-self: flex-end;
-    margin: $space-xx-small 0 $space-base;
-    cursor: default;
-  }
-
-  > .select-field {
-    align-self: flex-end;
-  }
-
-  > .buttons-footer {
-    justify-content: flex-end;
-    align-self: flex-end;
-    width: 100%;
-    margin-top: $space-base;
-
-    > .action-buttons-group {
-      margin-left: auto;
-      display: flex;
-      justify-content: flex-end;
-
-      > button {
-        margin-left: 1em;
-        min-width: fit-content;
-      }
+    > .ds-form-item {
+      margin: 0;
     }
 
-    > .buttons-footer-helper {
-      margin-right: 16px;
-      // important needed because of component inline style
-      margin-bottom: 6px !important;
+    > .ds-chip {
+      align-self: flex-end;
+      margin: $space-xx-small 0 $space-base;
+      cursor: default;
+    }
+
+    > .select-field {
+      align-self: flex-end;
+    }
+
+    > .buttons-footer {
+      justify-content: flex-end;
+      align-self: flex-end;
+      width: 100%;
+      margin-top: $space-base;
+
+      > .action-buttons-group {
+        margin-left: auto;
+        display: flex;
+        justify-content: flex-end;
+
+        > button {
+          margin-left: 1em;
+          min-width: fit-content;
+        }
+      }
+
+      > .buttons-footer-helper {
+        margin-right: 16px;
+        // important needed because of component inline style
+        margin-bottom: 6px !important;
+      }
     }
   }
 
