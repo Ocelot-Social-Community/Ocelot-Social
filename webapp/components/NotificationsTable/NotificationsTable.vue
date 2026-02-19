@@ -18,74 +18,70 @@
           <ds-grid-item>
             <ds-flex class="user-section">
               <ds-flex-item>
-                <base-card :wide-content="true">
-                  <client-only>
-                    <user-teaser
-                      :user="
-                        isGroup(notification.from)
-                          ? notification.relatedUser
-                          : notification.from.author
-                      "
-                      :class="{ 'notification-status': notification.read }"
-                      :date-time="notification.from.createdAt"
-                      :injected-text="$t(`notifications.reason.${notification.reason}`)"
-                      :injected-date="true"
-                      :show-popover="showPopover"
-                    />
-                  </client-only>
-                </base-card>
+                <client-only>
+                  <user-teaser
+                    :user="
+                      isGroup(notification.from)
+                        ? notification.relatedUser
+                        : notification.from.author
+                    "
+                    :class="{ 'notification-status': notification.read }"
+                    :date-time="notification.from.createdAt"
+                    :injected-text="$t(`notifications.reason.${notification.reason}`)"
+                    :injected-date="true"
+                    :show-popover="showPopover"
+                  />
+                </client-only>
               </ds-flex-item>
             </ds-flex>
           </ds-grid-item>
           <ds-grid-item>
-            <base-card :wide-content="true">
-              <div class="notification-container">
-                <!-- Icon with responsive sizing -->
-                <div class="notification-icon">
-                  <os-icon
-                    v-if="notification.from.post"
-                    :icon="icons.comment"
-                    v-tooltip="{ content: $t('notifications.comment'), placement: 'right' }"
-                  />
-                  <os-icon
-                    v-else
-                    :icon="icons.bookmark"
-                    v-tooltip="{ content: $t('notifications.post'), placement: 'right' }"
-                  />
-                </div>
-
-                <!-- Content section with title and description -->
-                <div class="notification-content">
-                  <nuxt-link
-                    class="notification-mention-post"
-                    :class="{ 'notification-status': notification.read }"
-                    :to="{
-                      name: isGroup(notification.from) ? 'groups-id-slug' : 'post-id-slug',
-                      params: params(notification.from),
-                      hash: hashParam(notification.from),
-                    }"
-                    @click.native.prevent="handleNotificationClick(notification)"
-                  >
-                    <b>
-                      {{
-                        notification.from.title ||
-                        notification.from.groupName ||
-                        notification.from.post.title | truncate(50)
-                      }}
-                    </b>
-                  </nuxt-link>
-                  <p
-                    class="notification-description"
-                    :class="{ 'notification-status': notification.read }"
-                  >
-                    {{
-                      notification.from.contentExcerpt ||
-                      notification.from.descriptionExcerpt | removeHtml
-                    }}
-                  </p>
-                </div>
+            <div class="notification-container">
+              <!-- Icon with responsive sizing -->
+              <div class="notification-icon">
+                <os-icon
+                  v-if="notification.from.post"
+                  :icon="icons.comment"
+                  v-tooltip="{ content: $t('notifications.comment'), placement: 'right' }"
+                />
+                <os-icon
+                  v-else
+                  :icon="icons.bookmark"
+                  v-tooltip="{ content: $t('notifications.post'), placement: 'right' }"
+                />
               </div>
-            </base-card>
+
+              <!-- Content section with title and description -->
+              <div class="notification-content">
+                <nuxt-link
+                  class="notification-mention-post"
+                  :class="{ 'notification-status': notification.read }"
+                  :to="{
+                    name: isGroup(notification.from) ? 'groups-id-slug' : 'post-id-slug',
+                    params: params(notification.from),
+                    hash: hashParam(notification.from),
+                  }"
+                  @click.native.prevent="handleNotificationClick(notification)"
+                >
+                  <b>
+                    {{
+                      notification.from.title ||
+                      notification.from.groupName ||
+                      notification.from.post.title | truncate(50)
+                    }}
+                  </b>
+                </nuxt-link>
+                <p
+                  class="notification-description"
+                  :class="{ 'notification-status': notification.read }"
+                >
+                  {{
+                    notification.from.contentExcerpt ||
+                    notification.from.descriptionExcerpt | removeHtml
+                  }}
+                </p>
+              </div>
+            </div>
           </ds-grid-item>
         </ds-grid>
       </ds-grid-item>
@@ -98,7 +94,6 @@ import { OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import HcEmpty from '~/components/Empty/Empty'
-import BaseCard from '../_new/generic/BaseCard/BaseCard.vue'
 import mobile from '~/mixins/mobile'
 
 const maxMobileWidth = 768 // at this point the table breaks down
@@ -109,7 +104,6 @@ export default {
     OsIcon,
     UserTeaser,
     HcEmpty,
-    BaseCard,
   },
   props: {
     notifications: { type: Array, default: () => [] },
@@ -181,11 +175,6 @@ export default {
 .notification-grid .content-section {
   flex-wrap: nowrap;
 }
-.notification-grid .base-card {
-  border-radius: 0;
-  box-shadow: none;
-  padding: 16px 4px;
-}
 /* dirty fix to override broken styleguide inline-styles */
 .notification-grid .ds-grid {
   grid-template-columns: 5fr 6fr !important;
@@ -201,9 +190,9 @@ export default {
   &:nth-child(odd) {
     background-color: $color-neutral-90;
   }
-  .base-card {
+
+  > .ds-grid > div {
     padding: 8px 0;
-    background-color: unset !important;
   }
 }
 @media screen and (max-width: 768px) {
