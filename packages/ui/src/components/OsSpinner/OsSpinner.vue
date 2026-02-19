@@ -86,7 +86,7 @@
             'span',
             {
               class: cn('os-spinner inline-flex shrink-0', sizeClass, parentClass, parentDynClass),
-              attrs: { ...a11yAttrs, ...parentAttrs, ...attrs, ...a11yAttrs },
+              attrs: { ...parentAttrs, ...attrs, ...a11yAttrs },
             },
             [svg],
           )
