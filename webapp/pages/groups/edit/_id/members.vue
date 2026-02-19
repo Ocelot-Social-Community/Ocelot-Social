@@ -6,23 +6,25 @@
       @loadGroupMembers="loadGroupMembers"
     />
     <ds-space margin-bottom="small" />
-    <base-card>
+    <os-card>
       <group-member
         :groupId="group.id"
         :groupMembers="groupMembers"
         @loadGroupMembers="loadGroupMembers"
       />
-    </base-card>
+    </os-card>
   </div>
 </template>
 
 <script>
+import { OsCard } from '@ocelot-social/ui'
 import GroupMember from '~/components/Group/GroupMember'
 import AddGroupMember from '~/components/Group/AddGroupMember'
 import { groupMembersQuery } from '~/graphql/groups.js'
 
 export default {
   components: {
+    OsCard,
     GroupMember,
     AddGroupMember,
   },

@@ -1,19 +1,21 @@
 <template>
   <div>
-    <base-card>
+    <os-card>
       <ds-heading tag="h3">{{ $t('group.general') }}</ds-heading>
       <ds-space margin="large" />
       <group-form :group="group" :update="true" @updateGroup="updateGroup" />
-    </base-card>
+    </os-card>
   </div>
 </template>
 
 <script>
+import { OsCard } from '@ocelot-social/ui'
 import GroupForm from '~/components/Group/GroupForm'
 import { updateGroupMutation } from '~/graphql/groups.js'
 
 export default {
   components: {
+    OsCard,
     GroupForm,
   },
   props: {
