@@ -1,5 +1,5 @@
 <template>
-  <base-card>
+  <os-card>
     <div class="reports-header">
       <h3 class="title">{{ $t('moderation.reports.name') }}</h3>
       <client-only>
@@ -8,10 +8,11 @@
     </div>
     <reports-table :reports="reports" @confirm="openModal" />
     <pagination-buttons :hasNext="hasNext" :hasPrevious="hasPrevious" @back="back" @next="next" />
-  </base-card>
+  </os-card>
 </template>
 
 <script>
+import { OsCard } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapMutations } from 'vuex'
 import DropdownFilter from '~/components/DropdownFilter/DropdownFilter'
@@ -21,6 +22,7 @@ import PaginationButtons from '~/components/_new/generic/PaginationButtons/Pagin
 
 export default {
   components: {
+    OsCard,
     DropdownFilter,
     ReportsTable,
     PaginationButtons,
