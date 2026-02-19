@@ -1,5 +1,5 @@
 <template>
-  <base-card class="hashtags-filter">
+  <os-card class="hashtags-filter">
     <h2>{{ $t('hashtags-filter.hashtag-search', { hashtag }) }}</h2>
     <os-button
       data-test="clear-search-button"
@@ -14,15 +14,15 @@
         <os-icon :icon="icons.close" />
       </template>
     </os-button>
-  </base-card>
+  </os-card>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 
 export default {
-  components: { OsButton, OsIcon },
+  components: { OsButton, OsCard, OsIcon },
   props: {
     hashtag: {
       type: String,
@@ -41,10 +41,10 @@ export default {
 </script>
 
 <style lang="scss">
-.hashtags-filter.base-card {
+.hashtags-filter.os-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: $space-x-small $space-base;
+  padding: $space-x-small $space-base !important;
 }
 </style>
