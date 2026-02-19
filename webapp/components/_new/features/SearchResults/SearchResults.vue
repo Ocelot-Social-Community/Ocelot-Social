@@ -3,14 +3,14 @@
     <div class="search-results__content">
       <masonry-grid>
         <!-- search text -->
-        <ds-grid-item class="grid-total-search-results" :row-span="1" column-span="fullWidth">
+        <div class="grid-total-search-results" style="grid-row-end: span 1; grid-column: 1 / -1">
           <div class="ds-mb-xxx-small ds-mt-xxx-small ds-space-centered">
             <p class="ds-text total-search-results">
               {{ $t('search.for') }}
               <strong>{{ '"' + (search || '') + '"' }}</strong>
             </p>
           </div>
-        </ds-grid-item>
+        </div>
 
         <!-- tabs -->
         <tab-navigation :tabs="tabOptions" :activeTab="activeTab" @switch-tab="switchTab" />
@@ -19,7 +19,10 @@
 
         <template v-if="!(!activeResourceCount || searchCount === 0)">
           <!-- pagination buttons -->
-          <ds-grid-item v-if="activeResourceCount > pageSize" :row-span="2" column-span="fullWidth">
+          <div
+            v-if="activeResourceCount > pageSize"
+            style="grid-row-end: span 2; grid-column: 1 / -1"
+          >
             <div class="ds-mb-large ds-space-centered">
               <pagination-buttons
                 :hasNext="hasNext"
@@ -33,7 +36,7 @@
                 @next="nextResults"
               />
             </div>
-          </ds-grid-item>
+          </div>
 
           <!-- posts -->
           <template v-if="activeTab === 'Post'">
@@ -61,31 +64,34 @@
           </template>
           <!-- users -->
           <template v-if="activeTab === 'User'">
-            <ds-grid-item v-for="user in activeResources" :key="user.id" :row-span="2">
+            <div v-for="user in activeResources" :key="user.id" style="grid-row-end: span 2">
               <os-card>
                 <user-teaser :user="user" />
               </os-card>
-            </ds-grid-item>
+            </div>
           </template>
           <!-- groups -->
           <template v-if="activeTab === 'Group'">
-            <ds-grid-item v-for="group in activeResources" :key="group.id" :row-span="2">
+            <div v-for="group in activeResources" :key="group.id" style="grid-row-end: span 2">
               <os-card class="group-teaser-card-wrapper">
                 <group-teaser :group="{ ...group, name: group.groupName }" />
               </os-card>
-            </ds-grid-item>
+            </div>
           </template>
           <!-- hashtags -->
           <template v-if="activeTab === 'Hashtag'">
-            <ds-grid-item v-for="hashtag in activeResources" :key="hashtag.id" :row-span="2">
+            <div v-for="hashtag in activeResources" :key="hashtag.id" style="grid-row-end: span 2">
               <os-card>
                 <hc-hashtag :id="hashtag.id" />
               </os-card>
-            </ds-grid-item>
+            </div>
           </template>
 
           <!-- pagination buttons -->
-          <ds-grid-item v-if="activeResourceCount > pageSize" :row-span="2" column-span="fullWidth">
+          <div
+            v-if="activeResourceCount > pageSize"
+            style="grid-row-end: span 2; grid-column: 1 / -1"
+          >
             <div class="ds-mb-large ds-space-centered">
               <pagination-buttons
                 :hasNext="hasNext"
@@ -100,15 +106,15 @@
                 @next="nextResults"
               />
             </div>
-          </ds-grid-item>
+          </div>
         </template>
 
         <!-- no results -->
-        <ds-grid-item v-else :row-span="7" column-span="fullWidth">
+        <div v-else style="grid-row-end: span 7; grid-column: 1 / -1">
           <div class="ds-mb-large ds-space-centered">
             <hc-empty icon="tasks" :message="$t('search.no-results', { search })" />
           </div>
-        </ds-grid-item>
+        </div>
       </masonry-grid>
     </div>
   </div>

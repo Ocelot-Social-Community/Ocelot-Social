@@ -1,7 +1,7 @@
 <template>
-  <ds-grid-item :rowSpan="rowSpan">
+  <div :style="{ gridRowEnd: 'span ' + rowSpan }">
     <slot></slot>
-  </ds-grid-item>
+  </div>
 </template>
 
 <script>

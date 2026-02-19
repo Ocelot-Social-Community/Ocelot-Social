@@ -136,11 +136,11 @@
         </masonry-grid-item>
       </template>
       <template v-else>
-        <ds-grid-item :row-span="2" column-span="fullWidth">
+        <div style="grid-row-end: span 2; grid-column: 1 / -1">
           <hc-empty icon="docs" />
           <p class="ds-text ds-text-center">{{ $t('index.no-results') }}</p>
           <p class="ds-text ds-text-center">{{ $t('index.change-filter-settings') }}</p>
-        </ds-grid-item>
+        </div>
       </template>
     </masonry-grid>
 

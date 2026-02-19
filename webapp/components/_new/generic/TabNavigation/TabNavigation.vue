@@ -1,5 +1,5 @@
 <template>
-  <ds-grid-item class="tab-navigation" :row-span="tabs.length" column-span="fullWidth">
+  <div class="tab-navigation" :style="{ gridRowEnd: 'span ' + tabs.length, gridColumn: '1 / -1' }">
     <os-card class="ds-tab-nav">
       <ul class="Tabs">
         <li
@@ -25,7 +25,7 @@
         </li>
       </ul>
     </os-card>
-  </ds-grid-item>
+  </div>
 </template>
 
 <script>

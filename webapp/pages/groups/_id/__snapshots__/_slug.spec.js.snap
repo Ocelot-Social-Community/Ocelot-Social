@@ -1001,10 +1001,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
          
         <div
           class="ds-grid"
-          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
         >
           <div
-            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 4; grid-column: 1 / -1;"
           >
             <div
               data-test="icon-empty"
@@ -1509,10 +1509,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
          
         <div
           class="ds-grid"
-          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
         >
           <div
-            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 4; grid-column: 1 / -1;"
           >
             <div
               data-test="icon-empty"
@@ -2037,10 +2037,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
          
         <div
           class="ds-grid"
-          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
         >
           <div
-            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 4; grid-column: 1 / -1;"
           >
             <div
               data-test="icon-empty"
@@ -3066,10 +3066,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
          
         <div
           class="ds-grid"
-          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
         >
           <div
-            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 4; grid-column: 1 / -1;"
           >
             <div
               data-test="icon-empty"
@@ -4115,10 +4115,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
          
         <div
           class="ds-grid"
-          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
         >
           <div
-            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 4; grid-column: 1 / -1;"
           >
             <div
               data-test="icon-empty"
@@ -4926,10 +4926,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
          
         <div
           class="ds-grid"
-          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
         >
           <div
-            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 4; grid-column: 1 / -1;"
           >
             <div
               data-test="icon-empty"
@@ -5757,10 +5757,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
          
         <div
           class="ds-grid"
-          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
         >
           <div
-            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 4; grid-column: 1 / -1;"
           >
             <div
               data-test="icon-empty"
@@ -6717,10 +6717,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
          
         <div
           class="ds-grid"
-          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
         >
           <div
-            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 4; grid-column: 1 / -1;"
           >
             <div
               data-test="icon-empty"
@@ -7851,10 +7851,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
          
         <div
           class="ds-grid"
-          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
         >
           <div
-            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 4; grid-column: 1 / -1;"
           >
             <div
               data-test="icon-empty"
@@ -8908,10 +8908,10 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
          
         <div
           class="ds-grid"
-          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
         >
           <div
-            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 4; grid-column: 1 / -1;"
           >
             <div
               data-test="icon-empty"

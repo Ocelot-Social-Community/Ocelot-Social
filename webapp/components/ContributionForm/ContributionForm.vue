@@ -58,8 +58,8 @@
           <div v-if="createEvent" class="eventDatas">
             <hr />
             <div class="ds-mt-x-small ds-mb-large"></div>
-            <ds-grid>
-              <ds-grid-item class="event-grid-item">
+            <div class="ds-grid event-date-grid">
+              <div class="event-grid-item">
                 <!-- <label>Beginn</label> -->
                 <div class="event-grid-item-z-helper">
                   <date-picker
@@ -85,8 +85,8 @@
                     <os-icon :icon="icons.warning" />
                   </ds-chip>
                 </div>
-              </ds-grid-item>
-              <ds-grid-item class="event-grid-item">
+              </div>
+              <div class="event-grid-item">
                 <!-- <label>Ende (optional)</label> -->
 
                 <date-picker
@@ -104,10 +104,10 @@
                   :show-second="false"
                   @change="changeEventEnd($event)"
                 ></date-picker>
-              </ds-grid-item>
-            </ds-grid>
-            <ds-grid class="event-location-grid">
-              <ds-grid-item class="event-grid-item">
+              </div>
+            </div>
+            <div class="ds-grid event-location-grid">
+              <div class="event-grid-item">
                 <ds-input
                   model="eventVenue"
                   name="eventVenue"
@@ -119,8 +119,8 @@
                     <os-icon v-if="errors && errors.eventVenue" :icon="icons.warning" />
                   </ds-chip>
                 </div>
-              </ds-grid-item>
-              <ds-grid-item v-if="showEventLocationName" class="event-grid-item">
+              </div>
+              <div v-if="showEventLocationName" class="event-grid-item">
                 <ds-input
                   model="eventLocationName"
                   name="eventLocationName"
@@ -132,8 +132,8 @@
                     <os-icon v-if="errors && errors.eventLocationName" :icon="icons.warning" />
                   </ds-chip>
                 </div>
-              </ds-grid-item>
-            </ds-grid>
+              </div>
+            </div>
 
             <div>
               <input
@@ -520,14 +520,15 @@ export default {
       margin-top: -10px;
     }
   }
-  // style override to handle dynamic inputs
+  .event-date-grid,
   .event-location-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: auto;
+    gap: $space-small;
   }
 
   .event-grid-item {
-    // important needed because of component inline style
-    grid-row-end: span 3 !important;
+    grid-row-end: span 3;
   }
   .event-grid-item-z-helper {
     z-index: 20;
