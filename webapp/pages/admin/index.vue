@@ -9,8 +9,8 @@
       <ds-space margin="large">
         <ds-flex>
           <ds-flex-item
-            v-for="(value, name, index) in filterStatistics(statistics)"
-            :key="index"
+            v-for="(value, name) in filterStatistics(statistics)"
+            :key="name"
             :width="{ base: '100%', sm: '50%', md: '33%' }"
           >
             <ds-space margin="small">
