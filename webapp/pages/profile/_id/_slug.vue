@@ -144,7 +144,7 @@
           <tab-navigation :tabs="tabOptions" :activeTab="tabActive" @switch-tab="handleTab" />
 
           <!-- feed -->
-          <div v-if="myProfile" style="grid-row-end: span 2; grid-column: 1 / -1;">
+          <div v-if="myProfile" style="grid-row-end: span 2; grid-column: 1 / -1">
             <div class="profile-post-add-button-container">
               <os-button
                 as="nuxt-link"
@@ -189,14 +189,14 @@
             </masonry-grid-item>
           </template>
           <template v-else-if="$apollo.loading">
-            <div style="grid-row-end: span 4; grid-column: 1 / -1;">
+            <div style="grid-row-end: span 4; grid-column: 1 / -1">
               <div style="text-align: center; padding: 48px 0">
                 <os-spinner size="lg" />
               </div>
             </div>
           </template>
           <template v-else>
-            <div style="grid-row-end: span 4; grid-column: 1 / -1;">
+            <div style="grid-row-end: span 4; grid-column: 1 / -1">
               <hc-empty margin="xx-large" icon="file" />
             </div>
           </template>

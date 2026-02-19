@@ -3,7 +3,7 @@
     <div class="search-results__content">
       <masonry-grid>
         <!-- search text -->
-        <div class="grid-total-search-results" style="grid-row-end: span 1; grid-column: 1 / -1;">
+        <div class="grid-total-search-results" style="grid-row-end: span 1; grid-column: 1 / -1">
           <div class="ds-mb-xxx-small ds-mt-xxx-small ds-space-centered">
             <p class="ds-text total-search-results">
               {{ $t('search.for') }}
@@ -19,7 +19,10 @@
 
         <template v-if="!(!activeResourceCount || searchCount === 0)">
           <!-- pagination buttons -->
-          <div v-if="activeResourceCount > pageSize" style="grid-row-end: span 2; grid-column: 1 / -1;">
+          <div
+            v-if="activeResourceCount > pageSize"
+            style="grid-row-end: span 2; grid-column: 1 / -1"
+          >
             <div class="ds-mb-large ds-space-centered">
               <pagination-buttons
                 :hasNext="hasNext"
@@ -61,7 +64,7 @@
           </template>
           <!-- users -->
           <template v-if="activeTab === 'User'">
-            <div v-for="user in activeResources" :key="user.id" style="grid-row-end: span 2;">
+            <div v-for="user in activeResources" :key="user.id" style="grid-row-end: span 2">
               <os-card>
                 <user-teaser :user="user" />
               </os-card>
@@ -69,7 +72,7 @@
           </template>
           <!-- groups -->
           <template v-if="activeTab === 'Group'">
-            <div v-for="group in activeResources" :key="group.id" style="grid-row-end: span 2;">
+            <div v-for="group in activeResources" :key="group.id" style="grid-row-end: span 2">
               <os-card class="group-teaser-card-wrapper">
                 <group-teaser :group="{ ...group, name: group.groupName }" />
               </os-card>
@@ -77,7 +80,7 @@
           </template>
           <!-- hashtags -->
           <template v-if="activeTab === 'Hashtag'">
-            <div v-for="hashtag in activeResources" :key="hashtag.id" style="grid-row-end: span 2;">
+            <div v-for="hashtag in activeResources" :key="hashtag.id" style="grid-row-end: span 2">
               <os-card>
                 <hc-hashtag :id="hashtag.id" />
               </os-card>
@@ -85,7 +88,10 @@
           </template>
 
           <!-- pagination buttons -->
-          <div v-if="activeResourceCount > pageSize" style="grid-row-end: span 2; grid-column: 1 / -1;">
+          <div
+            v-if="activeResourceCount > pageSize"
+            style="grid-row-end: span 2; grid-column: 1 / -1"
+          >
             <div class="ds-mb-large ds-space-centered">
               <pagination-buttons
                 :hasNext="hasNext"
@@ -104,7 +110,7 @@
         </template>
 
         <!-- no results -->
-        <div v-else style="grid-row-end: span 7; grid-column: 1 / -1;">
+        <div v-else style="grid-row-end: span 7; grid-column: 1 / -1">
           <div class="ds-mb-large ds-space-centered">
             <hc-empty icon="tasks" :message="$t('search.no-results', { search })" />
           </div>

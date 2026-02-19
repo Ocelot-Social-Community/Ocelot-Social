@@ -1,7 +1,7 @@
 <template>
   <div class="notification-grid" v-if="notifications && notifications.length">
     <div class="ds-grid">
-      <div v-if="!isMobile" style="grid-column: 1 / -1;">
+      <div v-if="!isMobile" style="grid-column: 1 / -1">
         <div class="ds-grid header-grid">
           <div v-for="field in fields" :key="field.label" class="ds-table-head-col">
             {{ field.label }}
@@ -11,7 +11,7 @@
       <div
         v-for="notification in notifications"
         :key="notification.id"
-        style="grid-column: 1 / -1;"
+        style="grid-column: 1 / -1"
         class="notification-grid-row"
       >
         <div class="ds-grid">

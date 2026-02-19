@@ -270,14 +270,14 @@
             </masonry-grid-item>
           </template>
           <template v-else-if="$apollo.loading">
-            <div style="grid-row-end: span 4; grid-column: 1 / -1;">
+            <div style="grid-row-end: span 4; grid-column: 1 / -1">
               <div style="text-align: center; padding: 48px 0">
                 <os-spinner size="lg" />
               </div>
             </div>
           </template>
           <template v-else>
-            <div style="grid-row-end: span 4; grid-column: 1 / -1;">
+            <div style="grid-row-end: span 4; grid-column: 1 / -1">
               <empty margin="xx-large" icon="file" data-test="icon-empty" />
             </div>
           </template>
