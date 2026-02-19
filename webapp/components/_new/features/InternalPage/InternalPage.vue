@@ -52,7 +52,7 @@ export default {
     padding-right: 0 !important;
 
     .os-card {
-      padding: 16px !important;
+      padding: $space-small !important;
     }
   }
 }
