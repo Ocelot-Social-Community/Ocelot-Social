@@ -42,7 +42,7 @@
       <slot></slot>
     </ds-form>
   </div>
-  <div v-else margin="large">
+  <div v-else class="ds-my-large">
     <template v-if="!error">
       <transition name="ds-transition-fade">
         <sweetalert-icon icon="info" />
