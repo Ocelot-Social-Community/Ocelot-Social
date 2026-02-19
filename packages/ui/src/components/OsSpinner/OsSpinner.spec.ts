@@ -139,10 +139,11 @@ describe('osSpinner', () => {
       expect(wrapper.attributes('tabindex')).toBeUndefined()
     })
 
-    it('renders as span element (not interactive)', () => {
+    it('has no interactive role', () => {
       const wrapper = mount(OsSpinner)
 
-      expect((wrapper.element as HTMLElement).tagName).toBe('SPAN')
+      expect(wrapper.attributes('role')).not.toBe('button')
+      expect(wrapper.attributes('role')).not.toBe('link')
     })
   })
 })
