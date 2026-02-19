@@ -109,25 +109,20 @@ describe('osCard', () => {
   })
 
   describe('heroImage slot', () => {
+    const heroSlots = {
+      heroImage: '<img src="/test.jpg" alt="Hero" />',
+      default: '<p>Content</p>',
+    }
+
     it('renders heroImage slot content', () => {
-      const wrapper = mount(OsCard, {
-        slots: {
-          heroImage: '<img src="/test.jpg" alt="Hero" />',
-          default: '<p>Content</p>',
-        },
-      })
+      const wrapper = mount(OsCard, { slots: heroSlots })
 
       expect(wrapper.find('img').exists()).toBe(true)
       expect(wrapper.find('img').attributes('alt')).toBe('Hero')
     })
 
     it('wraps heroImage in os-card__hero-image div', () => {
-      const wrapper = mount(OsCard, {
-        slots: {
-          heroImage: '<img src="/test.jpg" alt="Hero" />',
-          default: '<p>Content</p>',
-        },
-      })
+      const wrapper = mount(OsCard, { slots: heroSlots })
 
       const heroDiv = wrapper.find('.os-card__hero-image')
 
@@ -136,12 +131,7 @@ describe('osCard', () => {
     })
 
     it('wraps default content in os-card__content div', () => {
-      const wrapper = mount(OsCard, {
-        slots: {
-          heroImage: '<img src="/test.jpg" alt="Hero" />',
-          default: '<p>Content</p>',
-        },
-      })
+      const wrapper = mount(OsCard, { slots: heroSlots })
 
       const contentDiv = wrapper.find('.os-card__content')
 
@@ -150,23 +140,13 @@ describe('osCard', () => {
     })
 
     it('does not have padding on card when heroImage is present', () => {
-      const wrapper = mount(OsCard, {
-        slots: {
-          heroImage: '<img src="/test.jpg" alt="Hero" />',
-          default: '<p>Content</p>',
-        },
-      })
+      const wrapper = mount(OsCard, { slots: heroSlots })
 
       expect(wrapper.classes()).not.toContain('p-6')
     })
 
     it('content wrapper has padding when heroImage is present', () => {
-      const wrapper = mount(OsCard, {
-        slots: {
-          heroImage: '<img src="/test.jpg" alt="Hero" />',
-          default: '<p>Content</p>',
-        },
-      })
+      const wrapper = mount(OsCard, { slots: heroSlots })
 
       expect(wrapper.find('.os-card__content').classes()).toContain('p-6')
     })
@@ -181,18 +161,14 @@ describe('osCard', () => {
     })
 
     it('renders heroImage before content', () => {
-      const wrapper = mount(OsCard, {
-        slots: {
-          heroImage: '<img src="/test.jpg" alt="Hero" />',
-          default: '<p>Content</p>',
-        },
-      })
+      const wrapper = mount(OsCard, { slots: heroSlots })
 
-      const divs = wrapper.findAll('.os-card > div')
+      const heroImage = wrapper.find('.os-card__hero-image')
+      const content = wrapper.find('.os-card__content')
 
-      expect(divs).toHaveLength(2)
-      expect(divs[0].classes()).toContain('os-card__hero-image')
-      expect(divs[1].classes()).toContain('os-card__content')
+      expect(heroImage.exists()).toBe(true)
+      expect(content.exists()).toBe(true)
+      expect(heroImage.element.compareDocumentPosition(content.element) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     })
   })
 
