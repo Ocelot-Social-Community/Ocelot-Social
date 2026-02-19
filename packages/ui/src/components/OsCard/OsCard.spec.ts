@@ -85,13 +85,13 @@ describe('osCard', () => {
   })
 
   describe('highlight', () => {
-    it('does not have border class by default', () => {
+    it('does not have outline class by default', () => {
       const wrapper = mount(OsCard)
 
       expect(wrapper.classes()).not.toContain('outline-1')
     })
 
-    it('adds border class when highlight is true', () => {
+    it('adds outline class when highlight is true', () => {
       const wrapper = mount(OsCard, {
         props: { highlight: true },
       })
@@ -99,7 +99,7 @@ describe('osCard', () => {
       expect(wrapper.classes()).toContain('outline-1')
     })
 
-    it('does not add border class when highlight is false', () => {
+    it('does not add outline class when highlight is false', () => {
       const wrapper = mount(OsCard, {
         props: { highlight: false },
       })
