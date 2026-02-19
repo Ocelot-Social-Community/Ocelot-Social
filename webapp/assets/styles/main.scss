@@ -166,6 +166,11 @@ body.dropdown-open {
     font-size: $font-size-large;
     margin-bottom: $space-x-small;
   }
+
+  > .os-card__hero-image > .image {
+    width: 100%;
+    object-fit: contain;
+  }
 }
 
 [class$='menu-popover'] {

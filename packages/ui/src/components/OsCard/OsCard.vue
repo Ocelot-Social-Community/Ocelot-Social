@@ -11,7 +11,7 @@
 
   const HIGHLIGHT_CLASS = 'border border-[var(--color-warning)]'
 
-  const HERO_IMAGE_CLASS = 'os-card__hero-image'
+  const HERO_IMAGE_CLASS = 'os-card__hero-image overflow-hidden'
   const CONTENT_CLASS = 'os-card__content p-6'
 
   /**
