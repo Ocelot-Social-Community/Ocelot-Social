@@ -1,15 +1,15 @@
 <template>
   <div class="layout-blank">
     <div class="main-navigation">
-      <ds-container width="x-large" class="main-navigation-container" style="padding: 10px 10px">
-        <ds-flex class="main-navigation-flex" centered>
-          <ds-flex-item width="5.5%" />
-          <ds-flex-item style="flex-grow: 1" width="20%">
+      <div class="ds-container ds-container-x-large main-navigation-container" style="padding: 10px 10px">
+        <div class="ds-flex ds-flex-centered main-navigation-flex">
+          <div style="flex: 0 0 5.5%; width: 5.5%"></div>
+          <div style="flex: 0 0 20%; width: 20%; flex-grow: 1">
             <a @click="redirectToRoot">
               <logo logoType="header" />
             </a>
-          </ds-flex-item>
-          <ds-flex-item width="20%" style="flex-grow: 0">
+          </div>
+          <div style="flex: 0 0 20%; width: 20%; flex-grow: 0">
             <div class="main-navigation-right" style="flex-basis: auto">
               <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
               <template v-if="!isLoggedIn">
@@ -18,15 +18,15 @@
                 </client-only>
               </template>
             </div>
-          </ds-flex-item>
-        </ds-flex>
-      </ds-container>
+          </div>
+        </div>
+      </div>
     </div>
-    <ds-container>
+    <div class="ds-container ds-container-x-large">
       <div class="content">
         <nuxt />
       </div>
-    </ds-container>
+    </div>
     <page-footer></page-footer>
     <div id="overlay" />
   </div>

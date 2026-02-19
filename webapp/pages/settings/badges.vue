@@ -2,7 +2,7 @@
   <os-card>
     <h2 class="title">{{ $t('settings.badges.name') }}</h2>
     <p>{{ $t('settings.badges.description') }}</p>
-    <ds-space centered margin-bottom="small" margin-top="base">
+    <div class="ds-mb-small ds-mt-base ds-space-centered">
       <div class="presenterContainer">
         <badges
           :badges="[currentUser.badgeVerification, ...selectedBadges]"
@@ -49,7 +49,7 @@
           ref="badgeSelection"
         />
       </div>
-    </ds-space>
+    </div>
   </os-card>
 </template>
 

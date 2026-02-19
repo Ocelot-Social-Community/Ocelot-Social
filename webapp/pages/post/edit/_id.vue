@@ -1,14 +1,14 @@
 <template>
   <div>
-    <ds-space margin="small">
-      <ds-heading tag="h1">
+    <div class="ds-my-small">
+      <h1 class="ds-heading ds-heading-h1">
         {{ heading }}
-      </ds-heading>
-      <ds-heading
+      </h1>
+      <h2
         v-if="
           contribution && contribution.group && contribution.group.id && contribution.group.slug
         "
-        tag="h2"
+        class="ds-heading ds-heading-h2"
       >
         {{ $t('post.editPost.forGroup.title') }}
         <nuxt-link
@@ -19,19 +19,19 @@
         >
           {{ contribution.group.name }}
         </nuxt-link>
-      </ds-heading>
-    </ds-space>
-    <ds-space margin="large" />
-    <ds-flex :width="{ base: '100%' }" gutter="base">
-      <ds-flex-item :width="{ base: '100%', md: 3 }">
+      </h2>
+    </div>
+    <div class="ds-my-large"></div>
+    <div class="ds-flex ds-flex-gap-base post-edit-layout">
+      <div class="post-edit-layout__main">
         <contribution-form
           :contribution="contribution"
           :group="contribution && contribution.group ? contribution.group : null"
           :createEvent="contribution && contribution.postType[0] === 'Event'"
         />
-      </ds-flex-item>
-      <ds-flex-item :width="{ base: '100%', md: 1 }">&nbsp;</ds-flex-item>
-    </ds-flex>
+      </div>
+      <div class="post-edit-layout__aside">&nbsp;</div>
+    </div>
   </div>
 </template>
 
@@ -88,5 +88,21 @@ export default {
 <style lang="scss" scoped>
 .ds-heading {
   margin-top: 0;
+}
+</style>
+
+<style lang="scss">
+.post-edit-layout__main,
+.post-edit-layout__aside {
+  flex: 0 0 100%;
+  width: 100%;
+}
+@media #{$media-query-medium} {
+  .post-edit-layout__main {
+    flex: 3 0 0;
+  }
+  .post-edit-layout__aside {
+    flex: 1 0 0;
+  }
 }
 </style>

@@ -1,9 +1,9 @@
 <template>
-  <ds-space centered>
+  <div class="ds-mb-large ds-space-centered">
     <hc-empty icon="events" :message="$t('components.registration.signup.unavailable')" />
     <slot></slot>
-    <ds-space margin="xxx-small" />
-  </ds-space>
+    <div class="ds-my-xxx-small"></div>
+  </div>
 </template>
 
 <script>

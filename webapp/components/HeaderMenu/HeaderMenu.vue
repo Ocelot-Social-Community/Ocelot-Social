@@ -1,14 +1,14 @@
 <template>
-  <ds-container
-    class="main-navigation-container"
+  <div
+    class="ds-container ds-container-x-large main-navigation-container"
     :class="{ 'hide-navbar': hideNavbar }"
     id="navbar"
   >
     <div>
       <!-- header menu -->
-      <ds-flex v-if="!showMobileMenu" class="main-navigation-flex">
+      <div v-if="!showMobileMenu" class="ds-flex main-navigation-flex">
         <!-- logo -->
-        <ds-flex-item class="logo-wrapper" :width="{ base: 'auto' }">
+        <div class="ds-flex-item logo-wrapper" style="flex: 0 0 auto">
           <a
             v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
             :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
@@ -23,47 +23,47 @@
           >
             <logo logoType="header" />
           </nuxt-link>
-        </ds-flex-item>
+        </div>
         <!-- dynamic brand menus -->
-        <ds-flex-item
+        <div
           v-for="item in menu"
           :key="item.name"
-          class="branding-menu"
-          :width="{ base: 'auto' }"
-          style="margin-right: 20px"
+          class="ds-flex-item branding-menu"
+          style="flex: 0 0 auto; margin-right: 20px"
         >
           <a v-if="item.url" :href="item.url" :target="item.target">
-            <ds-text size="large" bold>
+            <p class="ds-text ds-text-size-large ds-text-bold">
               {{ $t(item.nameIdent) }}
-            </ds-text>
+            </p>
           </a>
           <nuxt-link v-else :to="item.path">
-            <ds-text size="large" bold>
+            <p class="ds-text ds-text-size-large ds-text-bold">
               {{ $t(item.nameIdent) }}
-            </ds-text>
+            </p>
           </nuxt-link>
-        </ds-flex-item>
+        </div>
         <!-- search field -->
-        <ds-flex-item
+        <div
           v-if="isLoggedIn"
           id="nav-search-box"
-          class="header-search"
-          :width="{ base: 'auto' }"
+          class="ds-flex-item header-search"
+          style="flex: 0 0 auto"
         >
           <search-field />
-        </ds-flex-item>
+        </div>
         <!-- filter menu -->
         <!-- TODO: Filter is only visible on index -->
-        <ds-flex-item
+        <div
           v-if="isLoggedIn && SHOW_CONTENT_FILTER_HEADER_MENU"
+          class="ds-flex-item"
           style="flex-grow: 0; flex-basis: auto"
         >
           <client-only>
             <filter-menu v-show="showFilterMenuDropdown" />
           </client-only>
-        </ds-flex-item>
+        </div>
         <!-- right symbols -->
-        <ds-flex-item style="flex: none">
+        <div class="ds-flex-item" style="flex: none">
           <div class="main-navigation-right" style="flex-basis: auto">
             <!-- locale switch -->
             <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
@@ -131,14 +131,14 @@
               </client-only>
             </template>
           </div>
-        </ds-flex-item>
-      </ds-flex>
+        </div>
+      </div>
 
       <!-- mobile header menu -->
       <div v-else class="mobil-header-box">
         <!-- logo, hamburger-->
-        <ds-flex style="align-items: center">
-          <ds-flex-item :width="{ base: LOGOS.LOGO_HEADER_WIDTH }" class="logo-container">
+        <div class="ds-flex" style="align-items: center">
+          <div class="ds-flex-item logo-container" :style="{ flex: '0 0 ' + LOGOS.LOGO_HEADER_WIDTH, width: LOGOS.LOGO_HEADER_WIDTH }">
             <div @click="toggleMobileMenu ? toggleMobileMenuView() : ''">
               <a
                 v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
@@ -155,10 +155,10 @@
                 <logo logoType="header" />
               </nuxt-link>
             </div>
-          </ds-flex-item>
+          </div>
 
           <!-- mobile hamburger menu -->
-          <ds-flex-item class="mobile-hamburger-menu">
+          <div class="ds-flex-item mobile-hamburger-menu">
             <client-only>
               <!-- chat menu -->
               <div>
@@ -182,52 +182,56 @@
                 <os-icon :icon="icons.bars" />
               </template>
             </os-button>
-          </ds-flex-item>
-        </ds-flex>
+          </div>
+        </div>
         <!-- search, filter -->
-        <ds-flex class="mobile-menu">
+        <div class="ds-flex mobile-menu">
           <!-- search field mobile -->
-          <ds-flex-item
+          <div
             v-if="isLoggedIn"
+            class="ds-flex-item"
             :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
             style="padding: 20px"
           >
             <search-field />
-          </ds-flex-item>
+          </div>
           <!-- filter menu mobile -->
-          <ds-flex-item
+          <div
             v-if="isLoggedIn"
+            class="ds-flex-item"
             :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
             style="flex-grow: 0; flex-basis: auto; padding: 20px 0"
           >
             <client-only>
               <filter-menu v-if="showFilterMenuDropdown && SHOW_CONTENT_FILTER_HEADER_MENU" />
             </client-only>
-          </ds-flex-item>
-        </ds-flex>
+          </div>
+        </div>
         <!-- right symbols -->
-        <ds-flex style="margin: 0 20px">
+        <div class="ds-flex" style="margin: 0 20px">
           <!-- locale switch mobile -->
-          <ds-flex-item :class="{ 'hide-mobile-menu': !toggleMobileMenu }">
+          <div class="ds-flex-item" :class="{ 'hide-mobile-menu': !toggleMobileMenu }">
             <locale-switch
               class="topbar-locale-switch topbar-locale-switch-mobile"
               placement="top"
               offset="8"
             />
-          </ds-flex-item>
+          </div>
           <!-- invite button mobile -->
-          <ds-flex-item
+          <div
             v-if="inviteRegistration"
+            class="ds-flex-item"
             :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
             style="text-align: center"
           >
             <client-only>
               <invite-button placement="top" />
             </client-only>
-          </ds-flex-item>
+          </div>
           <!-- group button -->
-          <ds-flex-item
+          <div
             v-if="SHOW_GROUP_BUTTON_IN_HEADER"
+            class="ds-flex-item"
             :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
             style="text-align: center"
           >
@@ -251,10 +255,11 @@
                 </os-button>
               </div>
             </client-only>
-          </ds-flex-item>
+          </div>
           <!-- map button -->
-          <ds-flex-item
+          <div
             v-if="!isEmpty(this.$env.MAPBOX_TOKEN)"
+            class="ds-flex-item"
             :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
             style="text-align: center"
           >
@@ -279,10 +284,11 @@
                 </os-button>
               </div>
             </client-only>
-          </ds-flex-item>
+          </div>
           <!-- custom button -->
-          <ds-flex-item
+          <div
             v-if="!isEmpty(customButton)"
+            class="ds-flex-item"
             :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
             style="text-align: center"
           >
@@ -291,14 +297,14 @@
                 <custom-button :settings="customButton" />
               </div>
             </client-only>
-          </ds-flex-item>
+          </div>
           <!-- avatar menu mobile -->
-          <ds-flex-item :class="{ 'hide-mobile-menu': !toggleMobileMenu }" style="text-align: end">
+          <div class="ds-flex-item" :class="{ 'hide-mobile-menu': !toggleMobileMenu }" style="text-align: end">
             <client-only>
               <avatar-menu placement="top" @toggle-Mobile-Menu-view="toggleMobileMenuView" />
             </client-only>
-          </ds-flex-item>
-        </ds-flex>
+          </div>
+        </div>
         <div :class="{ 'hide-mobile-menu': !toggleMobileMenu }" class="mobile-menu footer-mobile">
           <!-- dynamic branding menus -->
           <ul v-if="isHeaderMenu" class="dynamic-branding-mobil">
@@ -309,15 +315,15 @@
                 :target="item.target"
                 @click="toggleMobileMenuView"
               >
-                <ds-text size="large" bold>
+                <p class="ds-text ds-text-size-large ds-text-bold">
                   {{ $t(item.nameIdent) }}
-                </ds-text>
+                </p>
               </a>
               <nuxt-link v-else :to="item.path">
                 <div @click="toggleMobileMenuView">
-                  <ds-text size="large" bold>
+                  <p class="ds-text ds-text-size-large ds-text-bold">
                     {{ $t(item.nameIdent) }}
-                  </ds-text>
+                  </p>
                 </div>
               </nuxt-link>
             </li>
@@ -338,7 +344,7 @@
         </div>
       </div>
     </div>
-  </ds-container>
+  </div>
 </template>
 
 <script>

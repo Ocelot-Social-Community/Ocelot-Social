@@ -1,7 +1,7 @@
 <template>
-  <ds-space centered margin="xxx-small">
-    <ds-space margin-bottom="small" />
-    <ds-heading tag="h4">
+  <div class="ds-my-xxx-small ds-space-centered">
+    <div class="ds-mb-small"></div>
+    <h4 class="ds-heading ds-heading-h4">
       {{ $t('contribution.comment.commenting-disabled.no-group-member.reason') }}
       <nuxt-link
         :to="{
@@ -11,10 +11,10 @@
       >
         {{ group.name }}
       </nuxt-link>
-    </ds-heading>
-    <ds-text>
+    </h4>
+    <p class="ds-text">
       {{ $t('contribution.comment.commenting-disabled.no-group-member.call-to-action') }}
-    </ds-text>
+    </p>
     <join-leave-button
       :group="group"
       :userId="$store.getters['auth/user'].id"
@@ -23,7 +23,7 @@
       :filled="true"
       @update="updateJoinLeave"
     />
-  </ds-space>
+  </div>
 </template>
 
 <script>

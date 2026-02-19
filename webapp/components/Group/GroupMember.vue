@@ -1,7 +1,7 @@
 <template>
   <div class="group-member">
     <h2 class="title">{{ $t('group.membersListTitle') }}</h2>
-    <ds-space margin-bottom="small" />
+    <div class="ds-mb-small"></div>
     <ds-table :fields="tableFields" :data="groupMembers" condensed>
       <template #avatar="scope">
         <nuxt-link
@@ -20,9 +20,9 @@
             params: { id: scope.row.user.id, slug: scope.row.user.slug },
           }"
         >
-          <ds-text>
+          <p class="ds-text">
             <b>{{ scope.row.user.name | truncate(20) }}</b>
-          </ds-text>
+          </p>
         </nuxt-link>
       </template>
       <template #slug="scope">
@@ -32,9 +32,9 @@
             params: { id: scope.row.user.id, slug: scope.row.user.slug },
           }"
         >
-          <ds-text>
+          <p class="ds-text">
             <b>{{ `@${scope.row.user.slug}` | truncate(20) }}</b>
-          </ds-text>
+          </p>
         </nuxt-link>
       </template>
       <template #roleInGroup="scope">

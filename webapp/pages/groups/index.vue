@@ -1,12 +1,12 @@
 <template>
   <div>
-    <ds-space margin="small">
+    <div class="ds-my-small">
       <tab-navigation :tabs="tabOptions" :activeTab="tabActive" @switch-tab="handleTab" />
-    </ds-space>
-    <ds-space margin="large" />
-    <ds-space>
+    </div>
+    <div class="ds-my-large"></div>
+    <div class="ds-mb-large">
       <!-- create group -->
-      <ds-space centered>
+      <div class="ds-mb-large ds-space-centered">
         <os-button
           as="nuxt-link"
           :to="{ name: 'groups-create' }"
@@ -25,9 +25,9 @@
             <os-icon :icon="icons.plus" />
           </template>
         </os-button>
-      </ds-space>
+      </div>
       <!-- group list -->
-      <ds-space centered v-if="showPagination">
+      <div class="ds-mb-large ds-space-centered" v-if="showPagination">
         <pagination-buttons
           :hasNext="hasNext"
           :showPageCounter="true"
@@ -39,9 +39,9 @@
           @back="previousResults"
           @next="nextResults"
         />
-      </ds-space>
+      </div>
       <group-list :groups="myGroups" />
-      <ds-space centered v-if="showPagination">
+      <div class="ds-mb-large ds-space-centered" v-if="showPagination">
         <pagination-buttons
           :hasNext="hasNext"
           :showPageCounter="true"
@@ -53,8 +53,8 @@
           @back="previousResults"
           @next="nextResults"
         />
-      </ds-space>
-    </ds-space>
+      </div>
+    </div>
   </div>
 </template>
 

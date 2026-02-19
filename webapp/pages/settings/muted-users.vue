@@ -1,21 +1,21 @@
 <template>
   <div>
-    <ds-space>
+    <div class="ds-mb-large">
       <os-card>
         <h2 class="title">{{ $t('settings.muted-users.name') }}</h2>
-        <ds-text>
+        <p class="ds-text">
           {{ $t('settings.muted-users.explanation.intro') }}
-        </ds-text>
-        <ds-list>
-          <ds-list-item>
+        </p>
+        <ul class="ds-list">
+          <li class="ds-list-item">
             {{ $t('settings.muted-users.explanation.your-perspective') }}
-          </ds-list-item>
-          <ds-list-item>
+          </li>
+          <li class="ds-list-item">
             {{ $t('settings.muted-users.explanation.search') }}
-          </ds-list-item>
-        </ds-list>
+          </li>
+        </ul>
       </os-card>
-    </ds-space>
+    </div>
     <os-card v-if="mutedUsers && mutedUsers.length">
       <ds-table :data="mutedUsers" :fields="fields" condensed>
         <template #avatar="scope">
@@ -65,16 +65,16 @@
       </ds-table>
     </os-card>
     <os-card v-else>
-      <ds-space>
-        <ds-placeholder>
+      <div class="ds-mb-large">
+        <div class="ds-placeholder">
           {{ $t('settings.muted-users.empty') }}
-        </ds-placeholder>
-      </ds-space>
-      <ds-space>
-        <ds-text align="center">
+        </div>
+      </div>
+      <div class="ds-mb-large">
+        <p class="ds-text ds-text-center">
           {{ $t('settings.muted-users.how-to') }}
-        </ds-text>
-      </ds-space>
+        </p>
+      </div>
     </os-card>
   </div>
 </template>

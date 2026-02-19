@@ -14,13 +14,13 @@
           :data-test="tab.type + '-tab'"
         >
           <a :data-test="tab.type + '-tab-click'" @click="switchTab(tab)">
-            <ds-space margin="small">
+            <div class="ds-my-small">
               <client-only :placeholder="$t('client-only.loading')">
                 <ds-number :label="tab.title">
                   <hc-count-to slot="count" :end-val="tab.count" />
                 </ds-number>
               </client-only>
-            </ds-space>
+            </div>
           </a>
         </li>
       </ul>

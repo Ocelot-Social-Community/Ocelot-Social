@@ -1,8 +1,8 @@
 <template>
   <div class="add-group-member">
     <h2 class="title">{{ $t('group.addUser') }}</h2>
-    <ds-space margin-bottom="small" />
-    <ds-space>
+    <div class="ds-mb-small"></div>
+    <div class="ds-mb-large">
       <select-user-search :id="id" ref="selectUserSearch" @select-user="selectUser" />
       <ds-modal
         v-if="isOpen"
@@ -16,11 +16,11 @@
         @confirm="confirmModal"
         @cancel="cancelModal"
       >
-        <ds-text size="large">
+        <p class="ds-text ds-text-size-large">
           {{ $t('group.modal.confirmAddGroupMemberText', { name: user.name }) }}
-        </ds-text>
+        </p>
       </ds-modal>
-    </ds-space>
+    </div>
   </div>
 </template>
 

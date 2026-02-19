@@ -1,24 +1,24 @@
 <template>
   <div>
-    <ds-space>
+    <div class="ds-mb-large">
       <os-card>
         <h2 class="title">{{ $t('settings.blocked-users.name') }}</h2>
-        <ds-text>
+        <p class="ds-text">
           {{ $t('settings.blocked-users.explanation.intro') }}
-        </ds-text>
-        <ds-list>
-          <ds-list-item>
+        </p>
+        <ul class="ds-list">
+          <li class="ds-list-item">
             {{ $t('settings.blocked-users.explanation.your-perspective') }}
-          </ds-list-item>
-          <ds-list-item>
+          </li>
+          <li class="ds-list-item">
             {{ $t('settings.blocked-users.explanation.their-perspective') }}
-          </ds-list-item>
-          <ds-list-item>
+          </li>
+          <li class="ds-list-item">
             {{ $t('settings.blocked-users.explanation.notifications') }}
-          </ds-list-item>
-        </ds-list>
+          </li>
+        </ul>
       </os-card>
-    </ds-space>
+    </div>
     <os-card v-if="blockedUsers && blockedUsers.length">
       <ds-table :data="blockedUsers" :fields="fields" condensed>
         <template #avatar="scope">
@@ -69,16 +69,16 @@
       </ds-table>
     </os-card>
     <os-card v-else>
-      <ds-space>
-        <ds-placeholder>
+      <div class="ds-mb-large">
+        <div class="ds-placeholder">
           {{ $t('settings.blocked-users.empty') }}
-        </ds-placeholder>
-      </ds-space>
-      <ds-space>
-        <ds-text align="center">
+        </div>
+      </div>
+      <div class="ds-mb-large">
+        <p class="ds-text ds-text-center">
           {{ $t('settings.blocked-users.how-to') }}
-        </ds-text>
-      </ds-space>
+        </p>
+      </div>
     </os-card>
   </div>
 </template>

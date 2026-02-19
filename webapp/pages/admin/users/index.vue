@@ -3,15 +3,15 @@
     <os-card>
       <h2 class="title">{{ $t('admin.users.name') }}</h2>
       <ds-form v-model="form" @submit="submit">
-        <ds-flex gutter="small">
-          <ds-flex-item width="90%">
+        <div class="ds-flex ds-flex-gap-small">
+          <div style="flex: 0 0 90%; width: 90%">
             <ds-input
               model="query"
               :placeholder="$t('admin.users.form.placeholder')"
               icon="search"
             />
-          </ds-flex-item>
-          <ds-flex-item width="30px">
+          </div>
+          <div style="flex: 0 0 30px; width: 30px">
             <os-button
               variant="primary"
               appearance="filled"
@@ -22,8 +22,8 @@
             >
               <template #icon><os-icon :icon="icons.search" /></template>
             </os-button>
-          </ds-flex-item>
-        </ds-flex>
+          </div>
+        </div>
       </ds-form>
     </os-card>
     <os-card v-if="User && User.length">
@@ -69,7 +69,7 @@
                 {{ value }}
               </option>
             </select>
-            <ds-text v-else>{{ scope.row.role }}</ds-text>
+            <p class="ds-text" v-else>{{ scope.row.role }}</p>
           </template>
         </template>
         <template #badges="scope">
@@ -91,7 +91,7 @@
       <pagination-buttons :hasNext="hasNext" :hasPrevious="hasPrevious" @next="next" @back="back" />
     </os-card>
     <os-card v-else>
-      <ds-placeholder>{{ $t('admin.users.empty') }}</ds-placeholder>
+      <div class="ds-placeholder">{{ $t('admin.users.empty') }}</div>
     </os-card>
   </div>
 </template>

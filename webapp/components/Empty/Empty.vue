@@ -1,7 +1,7 @@
 <template>
   <div>
-    <ds-space class="hc-empty" centered :margin="margin">
-      <ds-text>
+    <div class="hc-empty ds-space-centered" :class="'ds-my-' + margin">
+      <p class="ds-text">
         <img
           :src="iconPath"
           width="80"
@@ -10,11 +10,11 @@
           alt="Empty"
         />
         <br />
-        <ds-text v-show="message" class="hc-empty-message" color="softer">
+        <span class="ds-text ds-text-softer hc-empty-message" v-show="message">
           {{ message }}
-        </ds-text>
-      </ds-text>
-    </ds-space>
+        </span>
+      </p>
+    </div>
     <slot />
   </div>
 </template>

@@ -1,13 +1,13 @@
 <template>
   <transition name="fade" appear>
-    <ds-container width="medium">
+    <div class="ds-container ds-container-medium">
       <os-card>
-        <ds-space>
+        <div class="ds-mb-large">
           <locale-switch class="login-locale-switch" offset="5" />
-        </ds-space>
-        <ds-flex>
-          <ds-flex-item :width="{ base: '100%', sm: 1, md: 1 }">
-            <ds-space>
+        </div>
+        <div class="ds-flex maintenance-layout">
+          <div class="maintenance-layout__image">
+            <div class="ds-mb-large">
               <!-- QUESTION: could we have internal page or even all internal pages here as well with PageParamsLink by having the footer underneath? -->
               <!--   I tried this out, but only could get the nginx page displayed. I guees the there were nuxt errors, because the nuxt config file 'webapp/maintenance/source/nuxt.config.maintenance.js' would have to be refactored for that as well and may be the missing folder `components/_new/generic/` plays a role, see https://github.com/Ocelot-Social-Community/Ocelot-Social/pull/4619 -->
               <!-- <page-params-link :pageParams="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)">
@@ -21,25 +21,25 @@
               > -->
               <img class="image" alt="Under maintenance" src="/img/custom/logo-squared.svg" />
               <!-- </a> -->
-            </ds-space>
-          </ds-flex-item>
-          <ds-flex-item :width="{ base: '100%', sm: 1, md: 1 }">
-            <ds-flex-item>
-              <ds-heading tag="h3">{{ $t('maintenance.title', metadata) }}</ds-heading>
-            </ds-flex-item>
-            <ds-flex-item>
-              <ds-space margin="small">
-                <ds-text>{{ $t('maintenance.explanation') }}</ds-text>
-                <ds-text>
+            </div>
+          </div>
+          <div class="maintenance-layout__content">
+            <div>
+              <h3 class="ds-heading ds-heading-h3">{{ $t('maintenance.title', metadata) }}</h3>
+            </div>
+            <div>
+              <div class="ds-my-small">
+                <p class="ds-text">{{ $t('maintenance.explanation') }}</p>
+                <p class="ds-text">
                   {{ $t('maintenance.questions') }}
                   <a :href="'mailto:' + supportEmail">{{ supportEmail }}</a>
-                </ds-text>
-              </ds-space>
-            </ds-flex-item>
-          </ds-flex-item>
-        </ds-flex>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </os-card>
-    </ds-container>
+    </div>
   </transition>
 </template>
 
@@ -69,5 +69,18 @@ export default {
 .image {
   width: 75%;
   height: auto;
+}
+.maintenance-layout__image,
+.maintenance-layout__content {
+  flex: 0 0 100%;
+  width: 100%;
+}
+@media #{$media-query-small} {
+  .maintenance-layout__image {
+    flex: 1 0 0;
+  }
+  .maintenance-layout__content {
+    flex: 1 0 0;
+  }
 }
 </style>

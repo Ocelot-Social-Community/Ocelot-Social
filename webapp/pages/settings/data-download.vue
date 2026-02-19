@@ -11,12 +11,12 @@
       <template #icon><os-icon :icon="icons.download" /></template>
       {{ $t('settings.download.json') }}
     </os-button>
-    <ds-space margin="large" />
-    <ds-text>{{ $t('settings.download.description') }}</ds-text>
-    <ds-space margin="large" />
+    <div class="ds-my-large"></div>
+    <p class="ds-text">{{ $t('settings.download.description') }}</p>
+    <div class="ds-my-large"></div>
     <os-card v-for="image in imageList" :key="image.key">
       <a :href="image.url" target="_blank" rel="noopener noreferrer">{{ image.title }}</a>
-      <ds-space margin="xxx-small" />
+      <div class="ds-my-xxx-small"></div>
     </os-card>
   </os-card>
 </template>

@@ -179,9 +179,9 @@ storiesOf('TabNavigator', module)
 
             <!-- no results -->
             <ds-grid-item v-else :row-span="7" column-span="fullWidth">
-              <ds-space centered>
+              <div class="ds-mb-large ds-space-centered">
                 <hc-empty icon="tasks" :message="$t('search.no-results', { search })" />
-              </ds-space>
+              </div>
             </ds-grid-item>
           </masonry-grid>
         </ds-flex-item>

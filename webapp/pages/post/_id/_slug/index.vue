@@ -1,20 +1,20 @@
 <template>
   <transition name="fade" appear>
     <div>
-      <ds-space margin="small">
-        <ds-heading tag="h1">{{ heading }}</ds-heading>
-        <ds-heading v-if="post && post.group && post.group.id && post.group.slug" tag="h2">
+      <div class="ds-my-small">
+        <h1 class="ds-heading ds-heading-h1">{{ heading }}</h1>
+        <h2 v-if="post && post.group && post.group.id && post.group.slug" class="ds-heading ds-heading-h2">
           {{ $t('post.viewPost.forGroup.title') }}
           <nuxt-link
             :to="{ name: 'groups-id-slug', params: { slug: post.group.slug, id: post.group.id } }"
           >
             {{ post.group.name }}
           </nuxt-link>
-        </ds-heading>
-      </ds-space>
-      <ds-space margin="large" />
-      <ds-flex gutter="small">
-        <ds-flex-item :width="{ base: '100%', sm: 2, md: 2, lg: 1 }">
+        </h2>
+      </div>
+      <div class="ds-my-large"></div>
+      <div class="ds-flex ds-flex-gap-small post-detail-layout">
+        <div class="post-detail-layout__main">
           <os-card
             v-if="post && ready"
             :lang="post.language"
@@ -51,9 +51,9 @@
             <section class="menu">
               <user-teaser :user="post.author" :group="post.group" wide :date-time="post.createdAt">
                 <template #dateTime>
-                  <ds-text v-if="post.createdAt !== post.updatedAt">
+                  <p class="ds-text" v-if="post.createdAt !== post.updatedAt">
                     ({{ $t('post.edited') }})
-                  </ds-text>
+                  </p>
                 </template>
               </user-teaser>
               <client-only>
@@ -73,12 +73,12 @@
                 />
               </client-only>
             </section>
-            <ds-space margin-bottom="small" />
+            <div class="ds-mb-small"></div>
             <h2 class="title hyphenate-text">{{ post.title }}</h2>
             <!-- event data -->
-            <ds-space
+            <div
               v-if="post && post.postType[0] === 'Event'"
-              margin-bottom="small"
+              class="ds-mb-small"
               style="padding: 10px"
             >
               <location-teaser
@@ -92,14 +92,14 @@
                 :startDate="post.eventStart"
                 :endDate="post.eventEnd"
               />
-            </ds-space>
-            <ds-space margin-bottom="small" />
+            </div>
+            <div class="ds-mb-small"></div>
             <!-- content -->
             <content-viewer class="content hyphenate-text" :content="post.content" />
             <!-- categories -->
             <div v-if="categoriesActive && post.categories.length > 0" class="categories">
-              <ds-space margin="xx-large" />
-              <ds-space margin="xx-small" />
+              <div class="ds-my-xx-large"></div>
+              <div class="ds-my-xx-small"></div>
               <hc-category
                 v-for="category in sortCategories(post.categories)"
                 :key="category.id"
@@ -111,10 +111,10 @@
                 }"
               />
             </div>
-            <ds-space margin-bottom="small" />
+            <div class="ds-mb-small"></div>
             <!-- Tags -->
             <div v-if="post.tags && post.tags.length" class="tags">
-              <ds-space margin="xx-small" />
+              <div class="ds-my-xx-small"></div>
               <hc-hashtag v-for="tag in sortedTags" :key="tag.id" :id="tag.id" />
             </div>
             <div class="actions">
@@ -135,14 +135,14 @@
               />
             </div>
             <!-- comments -->
-            <ds-section>
+            <section class="ds-section">
               <!-- comment list -->
               <comment-list
                 :post="post"
                 @toggleNewCommentForm="toggleNewCommentForm"
                 @reply="reply"
               />
-              <ds-space margin-bottom="large" />
+              <div class="ds-mb-large"></div>
               <!-- commenting form -->
               <comment-form
                 v-if="
@@ -155,7 +155,7 @@
                 @createComment="createComment"
               />
               <!-- commenting disabled -->
-              <ds-placeholder v-else>
+              <div class="ds-placeholder" v-else>
                 <hc-empty
                   margin="xxx-small"
                   icon="messages"
@@ -168,14 +168,14 @@
                     @update="updateJoinLeave"
                   />
                 </hc-empty>
-              </ds-placeholder>
-            </ds-section>
+              </div>
+            </section>
           </os-card>
-        </ds-flex-item>
-        <ds-flex-item :width="{ base: '200px' }">
+        </div>
+        <div class="post-detail-layout__sidebar" style="flex: 0 0 200px; width: 200px">
           <ds-menu :routes="routes" class="post-side-navigation" />
-        </ds-flex-item>
-      </ds-flex>
+        </div>
+      </div>
     </div>
   </transition>
 </template>
@@ -421,6 +421,25 @@ export default {
 </script>
 
 <style lang="scss">
+.post-detail-layout__main {
+  flex: 0 0 100%;
+  width: 100%;
+}
+@media #{$media-query-small} {
+  .post-detail-layout__main {
+    flex: 2 0 0;
+  }
+}
+@media #{$media-query-medium} {
+  .post-detail-layout__main {
+    flex: 2 0 0;
+  }
+}
+@media #{$media-query-large} {
+  .post-detail-layout__main {
+    flex: 1 0 0;
+  }
+}
 .post-side-navigation {
   position: sticky;
   top: 65px;

@@ -1,12 +1,12 @@
 <template>
-  <ds-space centered margin="xxx-small">
-    <ds-space margin-bottom="small" />
-    <ds-heading tag="h4">
+  <div class="ds-my-xxx-small ds-space-centered">
+    <div class="ds-mb-small"></div>
+    <h4 class="ds-heading ds-heading-h4">
       {{ $t('contribution.comment.commenting-disabled.blocked-author.reason') }}
-    </ds-heading>
-    <ds-text>
+    </h4>
+    <p class="ds-text">
       {{ $t('contribution.comment.commenting-disabled.blocked-author.call-to-action') }}
-    </ds-text>
+    </p>
     <os-button as="nuxt-link" :to="authorLink" variant="primary" appearance="filled">
       <template #icon><os-icon :icon="icons.arrowRight" /></template>
       {{
@@ -15,7 +15,7 @@
         })
       }}
     </os-button>
-  </ds-space>
+  </div>
 </template>
 
 <script>

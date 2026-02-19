@@ -5,7 +5,7 @@
       :groupMembers="groupMembers"
       @loadGroupMembers="loadGroupMembers"
     />
-    <ds-space margin-bottom="small" />
+    <div class="ds-mb-small"></div>
     <os-card>
       <group-member
         :groupId="group.id"

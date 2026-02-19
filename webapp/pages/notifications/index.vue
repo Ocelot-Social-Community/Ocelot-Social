@@ -1,17 +1,17 @@
 <template>
   <os-card>
-    <ds-flex class="notifications-page-flex">
-      <ds-flex-item :width="{ lg: '85%' }">
-        <ds-heading tag="h3">{{ $t('notifications.title') }}</ds-heading>
-      </ds-flex-item>
-      <ds-flex-item width="110px">
+    <div class="ds-flex notifications-page-flex">
+      <div class="notifications-layout__title">
+        <h3 class="ds-heading ds-heading-h3">{{ $t('notifications.title') }}</h3>
+      </div>
+      <div style="flex: 0 0 110px; width: 110px">
         <client-only>
           <dropdown-filter @filter="filter" :filterOptions="filterOptions" :selected="selected" />
         </client-only>
-      </ds-flex-item>
-    </ds-flex>
-    <ds-space />
-    <ds-flex-item class="notifications-header-button" :width="{ base: 'auto' }" centered>
+      </div>
+    </div>
+    <div class="ds-mb-large"></div>
+    <div class="notifications-header-button" style="flex: 0 0 auto; align-self: center">
       <os-button
         variant="primary"
         appearance="outline"
@@ -21,23 +21,23 @@
       >
         {{ $t('notifications.markAllAsRead') }}
       </os-button>
-    </ds-flex-item>
-    <ds-space />
+    </div>
+    <div class="ds-mb-large"></div>
     <notifications-table
       @markNotificationAsRead="markNotificationAsRead"
       :notifications="notifications"
     />
 
-    <ds-flex class="notifications-footer">
-      <ds-flex-item :width="{ base: 'auto' }" centered>
+    <div class="ds-flex notifications-footer">
+      <div style="flex: 0 0 auto; align-self: center">
         <pagination-buttons
           :hasNext="hasNext"
           :hasPrevious="hasPrevious"
           @back="back"
           @next="next"
         />
-      </ds-flex-item>
-    </ds-flex>
+      </div>
+    </div>
   </os-card>
 </template>
 
@@ -157,6 +157,12 @@ export default {
 }
 </script>
 <style lang="scss">
+@media #{$media-query-large} {
+  .notifications-layout__title {
+    flex: 0 0 85%;
+    width: 85%;
+  }
+}
 .notifications-page-flex {
   padding: 8px;
   justify-content: space-between;

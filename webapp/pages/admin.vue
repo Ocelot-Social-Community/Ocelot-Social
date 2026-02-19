@@ -1,16 +1,16 @@
 <template>
   <div>
-    <ds-heading tag="h1">{{ $t('admin.name') }}</ds-heading>
-    <ds-flex gutter="small">
-      <ds-flex-item :width="{ base: '100%', md: '200px' }">
+    <h1 class="ds-heading ds-heading-h1">{{ $t('admin.name') }}</h1>
+    <div class="ds-flex ds-flex-gap-small admin-layout">
+      <div class="admin-layout__sidebar">
         <ds-menu :routes="routes" :is-exact="() => true" />
-      </ds-flex-item>
-      <ds-flex-item :width="{ base: '100%', md: 1 }">
+      </div>
+      <div class="admin-layout__main">
         <transition name="slide-up" appear>
           <nuxt-child />
         </transition>
-      </ds-flex-item>
-    </ds-flex>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -69,3 +69,20 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.admin-layout__sidebar,
+.admin-layout__main {
+  flex: 0 0 100%;
+  width: 100%;
+}
+@media #{$media-query-medium} {
+  .admin-layout__sidebar {
+    flex: 0 0 200px;
+    width: 200px;
+  }
+  .admin-layout__main {
+    flex: 1 0 0;
+  }
+}
+</style>

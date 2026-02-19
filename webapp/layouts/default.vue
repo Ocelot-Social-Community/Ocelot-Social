@@ -3,11 +3,11 @@
     <div class="main-navigation">
       <header-menu :showMobileMenu="isMobile" />
     </div>
-    <ds-container>
+    <div class="ds-container ds-container-x-large">
       <div class="main-container">
         <nuxt />
       </div>
-    </ds-container>
+    </div>
     <page-footer v-if="!isMobile" />
     <div id="overlay" />
     <client-only>

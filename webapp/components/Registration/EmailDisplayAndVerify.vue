@@ -1,5 +1,5 @@
 <template>
-  <ds-text>
+  <p class="ds-text">
     <b v-if="emailAsString.length > 0">
       {{ emailAsString }}
       <b v-if="!isEmailFormat" class="email-warning">
@@ -9,7 +9,7 @@
     <b v-else class="email-warning">
       {{ $t('components.registration.email-display.warningUndef') }}
     </b>
-  </ds-text>
+  </p>
 </template>
 
 <script>

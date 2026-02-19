@@ -1,16 +1,16 @@
 <template>
-  <ds-container width="small">
-    <ds-flex>
-      <ds-flex-item :width="{ base: '100%' }" centered>
-        <ds-space style="text-align: center" margin-top="large" margin-bottom="xxx-small" centered>
+  <div class="ds-container ds-container-small">
+    <div class="ds-flex">
+      <div style="flex: 0 0 100%; width: 100%; align-self: center">
+        <div style="text-align: center" class="ds-mt-large ds-mb-xxx-small ds-space-centered">
           <logo logoType="logout" />
-        </ds-space>
-        <ds-space style="text-align: center" margin-top="small" margin-bottom="xxx-small" centered>
-          <ds-heading tag="h3" soft>Logging out...</ds-heading>
-        </ds-space>
-      </ds-flex-item>
-    </ds-flex>
-  </ds-container>
+        </div>
+        <div style="text-align: center" class="ds-mt-small ds-mb-xxx-small ds-space-centered">
+          <h3 class="ds-heading ds-heading-h3 ds-heading-soft">Logging out...</h3>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>

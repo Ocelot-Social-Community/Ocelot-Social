@@ -1,23 +1,23 @@
 <template>
   <os-card>
     <h2 class="title">{{ $t('settings.embeds.name') }}</h2>
-    <ds-section>
-      <ds-text>
+    <section class="ds-section">
+      <p class="ds-text">
         {{ $t('settings.embeds.status.description') }}
-        <ds-text bold>
+        <span class="ds-text ds-text-bold">
           <template v-if="disabled">
             {{ $t(`settings.embeds.status.disabled.on`) }}
           </template>
           <template v-else>
             {{ $t(`settings.embeds.status.disabled.off`) }}
           </template>
-        </ds-text>
+        </span>
         .
-      </ds-text>
-      <ds-text>
+      </p>
+      <p class="ds-text">
         {{ $t('settings.embeds.status.change.question') }}
-      </ds-text>
-      <ds-space margin-top="small" margin-bottom="base">
+      </p>
+      <div class="ds-mt-small ds-mb-base">
         <os-button
           @click="submit"
           :appearance="!disabled ? 'filled' : 'outline'"
@@ -34,23 +34,23 @@
         >
           {{ $t('settings.embeds.status.change.allow') }}
         </os-button>
-      </ds-space>
+      </div>
       <h3>{{ $t('settings.embeds.info-description') }}</h3>
-      <ds-space margin="small">
+      <div class="ds-my-small">
         <ul>
           <li
             v-for="provider in providers"
             :key="provider.provider_name"
             class="provider-list-item"
           >
-            <ds-text>
+            <p class="ds-text">
               {{ provider.provider_name }},
               <small>{{ provider.provider_url }}</small>
-            </ds-text>
+            </p>
           </li>
         </ul>
-      </ds-space>
-    </ds-section>
+      </div>
+    </section>
   </os-card>
 </template>
 

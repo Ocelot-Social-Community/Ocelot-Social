@@ -1,6 +1,6 @@
 <template>
   <os-card>
-    <ds-heading tag="h2" class="title">{{ $t('settings.social-media.name') }}</ds-heading>
+    <h2 class="ds-heading ds-heading-h2 title">{{ $t('settings.social-media.name') }}</h2>
     <my-something-list
       :useFormData="useFormData"
       :useFormSchema="useFormSchema"

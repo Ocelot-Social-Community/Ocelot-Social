@@ -1,25 +1,25 @@
 <template>
   <div>
-    <ds-space margin="small">
-      <ds-heading tag="h1">{{ $t('group.editGroupSettings.title') }}</ds-heading>
-      <ds-heading tag="h2">
+    <div class="ds-my-small">
+      <h1 class="ds-heading ds-heading-h1">{{ $t('group.editGroupSettings.title') }}</h1>
+      <h2 class="ds-heading ds-heading-h2">
         {{ $t('group.editGroupSettings.groupTitle') }}
         <nuxt-link :to="{ name: 'groups-id-slug', params: { slug: group.slug, id: group.id } }">
           {{ group.name }}
         </nuxt-link>
-      </ds-heading>
-    </ds-space>
-    <ds-space margin="large" />
-    <ds-flex gutter="small">
-      <ds-flex-item :width="{ base: '100%', md: '200px' }">
+      </h2>
+    </div>
+    <div class="ds-my-large"></div>
+    <div class="ds-flex ds-flex-gap-small group-edit-layout">
+      <div class="group-edit-layout__sidebar">
         <ds-menu :routes="routes" :is-exact="() => true" />
-      </ds-flex-item>
-      <ds-flex-item :width="{ base: '100%', md: 1 }">
+      </div>
+      <div class="group-edit-layout__main">
         <transition name="slide-up" appear>
           <nuxt-child :group="group" @update-invite-codes="updateInviteCodes" />
         </transition>
-      </ds-flex-item>
-    </ds-flex>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -85,5 +85,22 @@ export default {
 <style lang="scss" scoped>
 .ds-heading {
   margin-top: 0;
+}
+</style>
+
+<style lang="scss">
+.group-edit-layout__sidebar,
+.group-edit-layout__main {
+  flex: 0 0 100%;
+  width: 100%;
+}
+@media #{$media-query-medium} {
+  .group-edit-layout__sidebar {
+    flex: 0 0 200px;
+    width: 200px;
+  }
+  .group-edit-layout__main {
+    flex: 1 0 0;
+  }
 }
 </style>

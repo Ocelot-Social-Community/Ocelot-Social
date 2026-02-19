@@ -43,8 +43,8 @@
       </os-button>
     </template>
     <template #popover="{ closeMenu }">
-      <ds-flex class="notifications-link-container">
-        <ds-flex-item>
+      <div class="ds-flex notifications-link-container">
+        <div class="ds-flex-item">
           <os-button
             as="nuxt-link"
             :to="{ name: 'notifications' }"
@@ -67,8 +67,8 @@
             </template>
             {{ $t('notifications.markAllAsRead') }}
           </os-button>
-        </ds-flex-item>
-      </ds-flex>
+        </div>
+      </div>
       <div class="notifications-menu-popover">
         <notifications-table
           @markNotificationAsRead="markAsReadAndCloseMenu($event, closeMenu)"

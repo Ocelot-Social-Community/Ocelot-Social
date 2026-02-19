@@ -8,7 +8,6 @@ const localVue = global.localVue
 
 const stubs = {
   'client-only': true,
-  'ds-space': true,
   'nuxt-link': true,
 }
 

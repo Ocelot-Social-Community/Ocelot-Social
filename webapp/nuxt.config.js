@@ -88,6 +88,8 @@ export default {
     '~assets/styles/imports/_branding.scss',
     // @ocelot-social/ui CSS variables (loaded before styleguide)
     '~assets/_new/styles/ocelot-ui-variables.scss',
+    // Utility classes replacing ds-* Vue components
+    '~assets/_new/styles/_ds-compat.scss',
     // Note: @ocelot-social/ui/style.css is loaded via plugin after styleguide
   ],
 

@@ -1,23 +1,23 @@
 <template>
   <div>
-    <ds-space margin="small">
-      <ds-heading tag="h1">{{ $t('group.createNewGroup.title') }}</ds-heading>
-    </ds-space>
-    <ds-space margin="large" />
-    <ds-container>
+    <div class="ds-my-small">
+      <h1 class="ds-heading ds-heading-h1">{{ $t('group.createNewGroup.title') }}</h1>
+    </div>
+    <div class="ds-my-large"></div>
+    <div class="ds-container ds-container-x-large">
       <os-card>
-        <ds-space margin="large">
-          <ds-flex :width="{ base: '100%' }" gutter="base">
-            <ds-flex-item :width="{ base: '100%', md: 5 }">
-              <ds-container>
+        <div class="ds-my-large">
+          <div class="ds-flex ds-flex-gap-base group-create-layout">
+            <div class="group-create-layout__main">
+              <div class="ds-container ds-container-x-large">
                 <group-form @createGroup="createGroup" />
-              </ds-container>
-            </ds-flex-item>
-            <ds-flex-item :width="{ base: '100%', md: 1 }">&nbsp;</ds-flex-item>
-          </ds-flex>
-        </ds-space>
+              </div>
+            </div>
+            <div class="group-create-layout__aside">&nbsp;</div>
+          </div>
+        </div>
       </os-card>
-    </ds-container>
+    </div>
   </div>
 </template>
 
@@ -71,3 +71,19 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.group-create-layout__main,
+.group-create-layout__aside {
+  flex: 0 0 100%;
+  width: 100%;
+}
+@media #{$media-query-medium} {
+  .group-create-layout__main {
+    flex: 5 0 0;
+  }
+  .group-create-layout__aside {
+    flex: 1 0 0;
+  }
+}
+</style>

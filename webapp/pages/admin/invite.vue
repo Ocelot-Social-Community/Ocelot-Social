@@ -1,13 +1,13 @@
 <template>
-  <ds-section>
-    <ds-space>
-      <ds-heading size="h3">{{ $t('admin.invites.title') }}</ds-heading>
-      <ds-text>{{ $t('admin.invites.description') }}</ds-text>
-    </ds-space>
+  <section class="ds-section">
+    <div class="ds-mb-large">
+      <h1 class="ds-heading ds-heading-h3">{{ $t('admin.invites.title') }}</h1>
+      <p class="ds-text">{{ $t('admin.invites.description') }}</p>
+    </div>
     <os-card>
       <signup :invitation="true" />
     </os-card>
-  </ds-section>
+  </section>
 </template>
 
 <script>

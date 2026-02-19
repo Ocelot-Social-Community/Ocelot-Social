@@ -1,9 +1,9 @@
 <template>
   <ds-modal class="report-modal" :title="title" :is-open="isOpen" @cancel="cancel">
     <transition name="ds-transition-fade">
-      <ds-flex v-if="success" class="hc-modal-success" centered>
+      <div v-if="success" class="ds-flex ds-flex-centered hc-modal-success">
         <sweetalert-icon icon="success" />
-      </ds-flex>
+      </div>
     </transition>
 
     <!-- eslint-disable-next-line vue/no-v-html -->
@@ -27,7 +27,7 @@
     <small class="smallTag">
       {{ form.reasonDescription.length }}/{{ formSchema.reasonDescription.max }}
     </small>
-    <ds-space />
+    <div class="ds-mb-large"></div>
     <template #footer>
       <os-button class="cancel" variant="primary" appearance="outline" @click="cancel">
         <template #icon>

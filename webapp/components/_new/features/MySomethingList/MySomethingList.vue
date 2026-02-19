@@ -7,19 +7,19 @@
     @submit="handleSubmitItem"
   >
     <div v-if="isEditing">
-      <ds-space margin="base">
-        <ds-heading tag="h5">
+      <div class="ds-my-base">
+        <h5 class="ds-heading ds-heading-h5">
           {{ isCreation ? texts.addNew : texts.edit + ' — ' + editingItem[namePropertyKey] }}
-        </ds-heading>
-      </ds-space>
-      <ds-space v-if="items" margin-top="base">
+        </h5>
+      </div>
+      <div v-if="items" class="ds-mt-base ds-mb-large">
         <slot name="edit-item" />
-      </ds-space>
+      </div>
     </div>
     <div v-else>
-      <ds-space v-if="items" margin-top="base">
-        <ds-list>
-          <ds-list-item v-for="item in items" :key="item.id" class="list-item--high">
+      <div v-if="items" class="ds-mt-base ds-mb-large">
+        <ul class="ds-list">
+          <li v-for="item in items" :key="item.id" class="ds-list-item list-item--high">
             <template>
               <slot name="list-item" :item="item" />
               <span class="divider">|</span>
@@ -50,13 +50,13 @@
                 </template>
               </os-button>
             </template>
-          </ds-list-item>
-        </ds-list>
-      </ds-space>
+          </li>
+        </ul>
+      </div>
     </div>
 
-    <ds-space margin-top="base">
-      <ds-space margin-top="base">
+    <div class="ds-mt-base ds-mb-large">
+      <div class="ds-mt-base ds-mb-large">
         <os-button
           variant="primary"
           appearance="filled"
@@ -76,8 +76,8 @@
         >
           {{ $t('actions.cancel') }}
         </os-button>
-      </ds-space>
-    </ds-space>
+      </div>
+    </div>
   </ds-form>
 </template>
 

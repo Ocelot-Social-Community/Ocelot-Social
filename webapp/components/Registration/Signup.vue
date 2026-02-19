@@ -1,5 +1,5 @@
 <template>
-  <ds-space v-if="!data && !error" margin="large">
+  <div v-if="!data && !error" class="ds-my-large">
     <ds-form
       @input="handleInput"
       @input-valid="handleInputValid"
@@ -14,15 +14,15 @@
             : $t('components.registration.signup.title', metadata)
         }}
       </h1>
-      <ds-space margin-botton="large">
-        <ds-text>
+      <div class="ds-mb-large">
+        <p class="ds-text">
           {{
             invitation
               ? $t('profile.invites.description')
               : $t('components.registration.signup.form.description')
           }}
-        </ds-text>
-      </ds-space>
+        </p>
+      </div>
       <ds-input
         :placeholder="invitation ? $t('profile.invites.emailPlaceholder') : $t('login.email')"
         type="email"
@@ -41,22 +41,22 @@
       </os-button>
       <slot></slot>
     </ds-form>
-  </ds-space>
+  </div>
   <div v-else margin="large">
     <template v-if="!error">
       <transition name="ds-transition-fade">
         <sweetalert-icon icon="info" />
       </transition>
-      <ds-text align="center" v-html="submitMessage" />
+      <p class="ds-text ds-text-center" v-html="submitMessage" />
     </template>
     <template v-else>
       <transition name="ds-transition-fade">
         <sweetalert-icon icon="error" />
       </transition>
-      <ds-text align="center">{{ error.message }}</ds-text>
-      <ds-space centered class="space-top">
+      <p class="ds-text ds-text-center">{{ error.message }}</p>
+      <div class="ds-mb-large ds-space-centered space-top">
         <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
-      </ds-space>
+      </div>
     </template>
   </div>
 </template>

@@ -1,8 +1,8 @@
 <template>
   <div>
     <os-card>
-      <ds-heading tag="h3">{{ $t('group.general') }}</ds-heading>
-      <ds-space margin="large" />
+      <h3 class="ds-heading ds-heading-h3">{{ $t('group.general') }}</h3>
+      <div class="ds-my-large"></div>
       <group-form :group="group" :update="true" @updateGroup="updateGroup" />
     </os-card>
   </div>

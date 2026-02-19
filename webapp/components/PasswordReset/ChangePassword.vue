@@ -1,5 +1,5 @@
 <template>
-  <ds-space margin-top="base" margin-bottom="xxx-small">
+  <div class="ds-mt-base ds-mb-xxx-small">
     <ds-form
       v-if="!changePasswordResult"
       v-model="formData"
@@ -23,7 +23,7 @@
           :label="$t('settings.security.change-password.label-new-password-confirm')"
         />
         <password-strength :password="formData.password" />
-        <ds-space margin-top="base" margin-bottom="xxx-small">
+        <div class="ds-mt-base ds-mb-xxx-small">
           <os-button
             variant="primary"
             appearance="filled"
@@ -36,37 +36,37 @@
             </template>
             {{ $t('settings.security.change-password.button') }}
           </os-button>
-        </ds-space>
+        </div>
       </template>
     </ds-form>
-    <ds-space v-else>
+    <div v-else class="ds-mb-large">
       <template v-if="changePasswordResult === 'success'">
         <transition name="ds-transition-fade">
           <sweetalert-icon icon="success" />
         </transition>
-        <ds-text>
+        <p class="ds-text">
           {{ $t('components.password-reset.change-password.success') }}
-        </ds-text>
+        </p>
       </template>
       <template v-else>
         <transition name="ds-transition-fade">
           <sweetalert-icon icon="error" />
         </transition>
-        <ds-text>
-          <p>
+        <p class="ds-text">
+          <span>
             {{ $t(`components.password-reset.change-password.error`) }}
-          </p>
-          <p>
+          </span>
+          <span>
             {{ $t('components.password-reset.change-password.help') }}
-          </p>
-          <p>
+          </span>
+          <span>
             <a :href="'mailto:' + supportEmail">{{ supportEmail }}</a>
-          </p>
-        </ds-text>
+          </span>
+        </p>
       </template>
       <slot></slot>
-    </ds-space>
-  </ds-space>
+    </div>
+  </div>
 </template>
 
 <script>

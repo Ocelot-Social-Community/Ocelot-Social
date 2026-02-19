@@ -1,5 +1,5 @@
 <template>
-  <ds-container width="medium" class="terms-and-conditions-confirm">
+  <div class="ds-container ds-container-medium terms-and-conditions-confirm">
     <os-card>
       <os-icon :icon="icons.balanceScale" />
       <h2 class="title">{{ $t(`termsAndConditions.newTermsAndConditions`) }}</h2>
@@ -20,7 +20,7 @@
         {{ $t(`actions.save`) }}
       </os-button>
     </os-card>
-  </ds-container>
+  </div>
 </template>
 
 <script>

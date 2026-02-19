@@ -1,8 +1,8 @@
 <!-- Example Reference: https://codesandbox.io/s/v-mapbox-with-nuxt-lbrt6?file=/pages/index.vue -->
 <template>
   <div>
-    <ds-space margin="small">
-      <ds-heading tag="h1">{{ $t('map.pageTitle') }}</ds-heading>
+    <div class="ds-my-small">
+      <h1 class="ds-heading ds-heading-h1">{{ $t('map.pageTitle') }}</h1>
       <small>
         <div>
           <span v-for="type in markers.types" :key="type.id">
@@ -16,9 +16,9 @@
           </span>
         </div>
       </small>
-    </ds-space>
+    </div>
 
-    <ds-space margin="small" />
+    <div class="ds-my-small"></div>
     <client-only v-if="!isEmpty($env.MAPBOX_TOKEN)">
       <map-styles-buttons
         v-if="isMobile"

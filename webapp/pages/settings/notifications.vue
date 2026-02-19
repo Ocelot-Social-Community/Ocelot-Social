@@ -1,25 +1,24 @@
 <template>
   <os-card>
     <h2 class="title">{{ $t('settings.notifications.name') }}</h2>
-    <ds-space
-      margin-top="small"
-      margin-bottom="small"
+    <div
+      class="ds-mt-small ds-mb-small"
       v-for="topic in emailNotificationSettings"
       :key="topic.type"
     >
-      <ds-space margin-bottom="x-small">
+      <div class="ds-mb-x-small">
         <h4>{{ $t(`settings.notifications.${topic.type}`) }}</h4>
-      </ds-space>
+      </div>
       <div class="notifcation-settings-section">
-        <ds-space margin-bottom="x-small" v-for="setting in topic.settings" :key="setting.name">
+        <div class="ds-mb-x-small" v-for="setting in topic.settings" :key="setting.name">
           <input :id="setting.name" type="checkbox" v-model="setting.value" />
           <label :for="setting.name" class="label">
             {{ $t(`settings.notifications.${setting.name}`) }}
           </label>
-        </ds-space>
+        </div>
       </div>
-    </ds-space>
-    <ds-space margin-top="base" margin-bottom="x-small">
+    </div>
+    <div class="ds-mt-base ds-mb-x-small">
       <os-button
         appearance="outline"
         variant="primary"
@@ -39,7 +38,7 @@
       <os-button class="save-button" variant="primary" @click="submit" :disabled="isSubmitDisabled">
         {{ $t('actions.save') }}
       </os-button>
-    </ds-space>
+    </div>
   </os-card>
 </template>
 

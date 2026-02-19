@@ -1,8 +1,8 @@
 <template>
   <enter-nonce :email="email" @nonceEntered="nonceEntered">
-    <ds-space margin-bottom="xxx-small" margin-top="large" centered>
+    <div class="ds-mb-xxx-small ds-mt-large ds-space-centered">
       <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
-    </ds-space>
+    </div>
   </enter-nonce>
 </template>
 

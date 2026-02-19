@@ -1,11 +1,11 @@
 <template>
   <div>
-    <ds-space margin="small">
-      <ds-heading v-if="pageParams.internalPage.headlineIdent !== null" tag="h2">
+    <div class="ds-my-small">
+      <h2 v-if="pageParams.internalPage.headlineIdent !== null" class="ds-heading ds-heading-h2">
         {{ $t(pageParams.internalPage.headlineIdent) }}
-      </ds-heading>
-    </ds-space>
-    <ds-container v-if="pageParams.internalPage.hasContainer">
+      </h2>
+    </div>
+    <div class="ds-container ds-container-x-large" v-if="pageParams.internalPage.hasContainer">
       <div v-if="!pageParams.internalPage.hasBaseCard">
         <br />
         <div v-html="$t(pageParams.internalPage.htmlIdent)" />
@@ -13,7 +13,7 @@
       <os-card v-else>
         <div v-html="$t(pageParams.internalPage.htmlIdent)" />
       </os-card>
-    </ds-container>
+    </div>
     <div v-else-if="!pageParams.internalPage.hasBaseCard">
       <br />
       <div v-html="$t(pageParams.internalPage.htmlIdent)" />
