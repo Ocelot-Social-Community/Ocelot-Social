@@ -1,5 +1,5 @@
 <template>
-  <base-card>
+  <os-card>
     <h2 class="title">{{ $t('settings.privacy.name') }}</h2>
     <ds-space margin-bottom="small">
       <input id="allow-shouts" type="checkbox" v-model="shoutsAllowed" />
@@ -8,17 +8,18 @@
     <os-button variant="primary" @click="submit" :disabled="disabled">
       {{ $t('actions.save') }}
     </os-button>
-  </base-card>
+  </os-card>
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsCard } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 import { updateUserMutation } from '~/graphql/User'
 import scrollToContent from './scroll-to-content.js'
 
 export default {
-  components: { OsButton },
+  components: { OsButton,
+    OsCard },
   mixins: [scrollToContent],
   data() {
     return {

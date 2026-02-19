@@ -1,5 +1,5 @@
 <template>
-  <base-card>
+  <os-card>
     <ds-heading tag="h2" class="title">{{ $t('settings.social-media.name') }}</ds-heading>
     <my-something-list
       :useFormData="useFormData"
@@ -22,10 +22,11 @@
         />
       </template>
     </my-something-list>
-  </base-card>
+  </os-card>
 </template>
 
 <script>
+import { OsCard } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 import { iconRegistry } from '~/utils/iconRegistry'
 import unionBy from 'lodash/unionBy'
@@ -41,6 +42,7 @@ import scrollToContent from './scroll-to-content.js'
 export default {
   mixins: [scrollToContent],
   components: {
+    OsCard,
     MySomethingList,
     SocialMediaListItem,
   },

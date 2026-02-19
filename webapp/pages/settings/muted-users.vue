@@ -1,7 +1,7 @@
 <template>
   <div>
     <ds-space>
-      <base-card>
+      <os-card>
         <h2 class="title">{{ $t('settings.muted-users.name') }}</h2>
         <ds-text>
           {{ $t('settings.muted-users.explanation.intro') }}
@@ -14,9 +14,9 @@
             {{ $t('settings.muted-users.explanation.search') }}
           </ds-list-item>
         </ds-list>
-      </base-card>
+      </os-card>
     </ds-space>
-    <base-card v-if="mutedUsers && mutedUsers.length">
+    <os-card v-if="mutedUsers && mutedUsers.length">
       <ds-table :data="mutedUsers" :fields="fields" condensed>
         <template #avatar="scope">
           <nuxt-link
@@ -63,8 +63,8 @@
           </os-button>
         </template>
       </ds-table>
-    </base-card>
-    <base-card v-else>
+    </os-card>
+    <os-card v-else>
       <ds-space>
         <ds-placeholder>
           {{ $t('settings.muted-users.empty') }}
@@ -75,12 +75,12 @@
           {{ $t('settings.muted-users.how-to') }}
         </ds-text>
       </ds-space>
-    </base-card>
+    </os-card>
   </div>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mutedUsers, unmuteUser } from '~/graphql/settings/MutedUsers'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
@@ -90,6 +90,7 @@ export default {
   mixins: [scrollToContent],
   components: {
     OsButton,
+    OsCard,
     OsIcon,
     ProfileAvatar,
   },

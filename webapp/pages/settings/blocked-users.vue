@@ -1,7 +1,7 @@
 <template>
   <div>
     <ds-space>
-      <base-card>
+      <os-card>
         <h2 class="title">{{ $t('settings.blocked-users.name') }}</h2>
         <ds-text>
           {{ $t('settings.blocked-users.explanation.intro') }}
@@ -17,9 +17,9 @@
             {{ $t('settings.blocked-users.explanation.notifications') }}
           </ds-list-item>
         </ds-list>
-      </base-card>
+      </os-card>
     </ds-space>
-    <base-card v-if="blockedUsers && blockedUsers.length">
+    <os-card v-if="blockedUsers && blockedUsers.length">
       <ds-table :data="blockedUsers" :fields="fields" condensed>
         <template #avatar="scope">
           <nuxt-link
@@ -67,8 +67,8 @@
           </os-button>
         </template>
       </ds-table>
-    </base-card>
-    <base-card v-else>
+    </os-card>
+    <os-card v-else>
       <ds-space>
         <ds-placeholder>
           {{ $t('settings.blocked-users.empty') }}
@@ -79,12 +79,12 @@
           {{ $t('settings.blocked-users.how-to') }}
         </ds-text>
       </ds-space>
-    </base-card>
+    </os-card>
   </div>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { blockedUsers, unblockUser } from '~/graphql/settings/BlockedUsers'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
@@ -94,6 +94,7 @@ export default {
   mixins: [scrollToContent],
   components: {
     OsButton,
+    OsCard,
     OsIcon,
     ProfileAvatar,
   },

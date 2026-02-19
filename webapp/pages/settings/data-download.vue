@@ -1,5 +1,5 @@
 <template>
-  <base-card>
+  <os-card>
     <h2 class="title">{{ $t('settings.download.name') }}</h2>
     <os-button
       variant="primary"
@@ -14,15 +14,15 @@
     <ds-space margin="large" />
     <ds-text>{{ $t('settings.download.description') }}</ds-text>
     <ds-space margin="large" />
-    <base-card v-for="image in imageList" :key="image.key">
+    <os-card v-for="image in imageList" :key="image.key">
       <a :href="image.url" target="_blank" rel="noopener noreferrer">{{ image.title }}</a>
       <ds-space margin="xxx-small" />
-    </base-card>
-  </base-card>
+    </os-card>
+  </os-card>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import { userDataQuery } from '~/graphql/User'
@@ -33,6 +33,7 @@ export default {
   mixins: [scrollToContent],
   components: {
     OsButton,
+    OsCard,
     OsIcon,
   },
   created() {
