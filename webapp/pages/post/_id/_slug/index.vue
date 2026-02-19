@@ -15,7 +15,7 @@
       <ds-space margin="large" />
       <ds-flex gutter="small">
         <ds-flex-item :width="{ base: '100%', sm: 2, md: 2, lg: 1 }">
-          <base-card
+          <os-card
             v-if="post && ready"
             :lang="post.language"
             :class="{
@@ -170,7 +170,7 @@
                 </hc-empty>
               </ds-placeholder>
             </ds-section>
-          </base-card>
+          </os-card>
         </ds-flex-item>
         <ds-flex-item :width="{ base: '200px' }">
           <ds-menu :routes="routes" class="post-side-navigation" />
@@ -181,7 +181,7 @@
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
@@ -218,6 +218,7 @@ export default {
     mode: 'out-in',
   },
   components: {
+    OsCard,
     OsButton,
     OsIcon,
     CommentForm,
@@ -426,14 +427,14 @@ export default {
   z-index: 2;
 }
 .post-page {
-  > .hero-image {
+  > .os-card__hero-image {
     position: relative;
     /*  The padding top makes sure the correct height is set (according to the
         hero image aspect ratio) before the hero image loads so
         the autoscroll works correctly when following a comment link.
       */
 
-    padding-top: calc(var(--hero-image-aspect-ratio) * (100% + 48px));
+    padding-top: calc(var(--hero-image-aspect-ratio) * 100%);
     /*  Letting the image fill the container, since the container
         is the one determining height
       */
@@ -446,13 +447,13 @@ export default {
     }
   }
 
-  > .menu {
+  .menu {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
 
-  &.--blur-image > .hero-image > .image {
+  &.--blur-image > .os-card__hero-image > .image {
     filter: blur($blur-radius);
   }
 
