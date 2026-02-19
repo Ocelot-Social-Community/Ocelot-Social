@@ -109,7 +109,6 @@ export default {
    ** Plugins to load before mounting the App
    */
   plugins: [
-    { src: '~/plugins/base-components.js', ssr: true },
     {
       src: `~/plugins/styleguide.js`,
       ssr: true,
