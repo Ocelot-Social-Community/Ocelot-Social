@@ -1,11 +1,11 @@
 <template>
-  <base-card v-if="isUnavailable" class="comment-card">
+  <os-card as="article" v-if="isUnavailable" class="comment-card">
     <p>
       <os-icon :icon="icons.ban" />
       {{ $t('comment.content.unavailable-placeholder') }}
     </p>
-  </base-card>
-  <base-card v-else :class="commentClass" :id="anchor">
+  </os-card>
+  <os-card as="article" v-else :class="commentClass" :id="anchor">
     <header class="header">
       <user-teaser :user="comment.author" :date-time="comment.createdAt">
         <template v-if="wasEdited" #dateTime>
@@ -70,11 +70,11 @@
         </template>
       </os-button>
     </div>
-  </base-card>
+  </os-card>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import { COMMENT_MAX_UNTRUNCATED_LENGTH, COMMENT_TRUNCATE_TO_LENGTH } from '~/constants/comment'
@@ -89,6 +89,7 @@ import scrollToAnchor from '~/mixins/scrollToAnchor.js'
 export default {
   components: {
     OsButton,
+    OsCard,
     OsIcon,
     UserTeaser,
     ContentMenu,
