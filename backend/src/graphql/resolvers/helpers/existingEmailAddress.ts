@@ -8,7 +8,7 @@ export default async function alreadyExistingMail({ args, context }) {
   args.email = normalizeEmail(args.email)
   const session = context.driver.session()
   try {
-    const existingEmailAddressTxPromise = session.writeTransaction(async (transaction) => {
+    const result = await session.readTransaction(async (transaction) => {
       const existingEmailAddressTransactionResponse = await transaction.run(
         `
           MATCH (email:EmailAddress {email: $email})
@@ -24,13 +24,13 @@ export default async function alreadyExistingMail({ args, context }) {
         }
       })
     })
-    const [emailBelongsToUser] = await existingEmailAddressTxPromise
+    const [emailBelongsToUser] = result
     /*
       const { alreadyExistingEmail, user } = 
       if (user) throw new UserInputError('A user account with this email already exists.')
     */
     return emailBelongsToUser || {}
   } finally {
-    session.close()
+    await session.close()
   }
 }

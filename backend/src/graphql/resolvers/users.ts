@@ -49,21 +49,19 @@ export default {
     User: async (object, args, context, resolveInfo) => {
       if (args.email) {
         args.email = normalizeEmail(args.email)
-        let session
+        const session = context.driver.session()
         try {
-          session = context.driver.session()
           const readTxResult = await session.readTransaction((txc) => {
-            const result = txc.run(
+            return txc.run(
               `
-            MATCH (user:User)-[:PRIMARY_EMAIL]->(e:EmailAddress {email: $args.email})
-            RETURN user {.*, email: e.email}`,
+              MATCH (user:User)-[:PRIMARY_EMAIL]->(e:EmailAddress {email: $args.email})
+              RETURN user {.*, email: e.email}`,
               { args },
             )
-            return result
           })
           return readTxResult.records.map((r) => r.get('user'))
         } finally {
-          session.close()
+          await session.close()
         }
       }
       return neo4jgraphql(object, args, context, resolveInfo)
@@ -105,28 +103,27 @@ export default {
       if (currentUser.id === args.id) return null
 
       const session = context.driver.session()
-      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const unBlockUserTransactionResponse = await transaction.run(
-          `
-            MATCH (blockedUser:User {id: $args.id})
-            MATCH (currentUser:User {id: $currentUser.id})
-            OPTIONAL MATCH (currentUser)-[r:FOLLOWS]->(blockedUser)
-            DELETE r
-            CREATE (currentUser)-[:BLOCKED]->(blockedUser)
-            RETURN blockedUser {.*}
-          `,
-          { currentUser, args },
-        )
-        return unBlockUserTransactionResponse.records.map((record) => record.get('blockedUser'))[0]
-      })
       try {
-        const blockedUser = await writeTxResultPromise
+        const blockedUser = await session.writeTransaction(async (transaction) => {
+          const blockUserResponse = await transaction.run(
+            `
+              MATCH (blockedUser:User {id: $args.id})
+              MATCH (currentUser:User {id: $currentUser.id})
+              OPTIONAL MATCH (currentUser)-[r:FOLLOWS]->(blockedUser)
+              DELETE r
+              MERGE (currentUser)-[:BLOCKED]->(blockedUser)
+              RETURN blockedUser {.*}
+            `,
+            { currentUser, args },
+          )
+          return blockUserResponse.records.map((record) => record.get('blockedUser'))[0]
+        })
         if (!blockedUser) {
           throw new UserInputError('Could not find User')
         }
         return blockedUser
       } finally {
-        session.close()
+        await session.close()
       }
     },
     unblockUser: async (_object, args, context, _resolveInfo) => {
@@ -134,25 +131,22 @@ export default {
       if (currentUser.id === args.id) return null
 
       const session = context.driver.session()
-      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const unBlockUserTransactionResponse = await transaction.run(
-          `
-            MATCH(u:User {id: $currentUser.id})-[r:BLOCKED]->(blockedUser:User {id: $args.id})
-            DELETE r
-            RETURN blockedUser {.*}
-          `,
-          { currentUser, args },
-        )
-        return unBlockUserTransactionResponse.records.map((record) => record.get('blockedUser'))[0]
-      })
       try {
-        const unblockedUser = await writeTxResultPromise
+        const unblockedUser = await session.writeTransaction(async (transaction) => {
+          const unblockUserResponse = await transaction.run(
+            `
+              MATCH(u:User {id: $currentUser.id})-[r:BLOCKED]->(blockedUser:User {id: $args.id})
+              DELETE r
+              RETURN blockedUser {.*}
+            `,
+            { currentUser, args },
+          )
+          return unblockUserResponse.records.map((record) => record.get('blockedUser'))[0]
+        })
         if (!unblockedUser) {
-          throw new Error('Could not find blocked User')
+          throw new UserInputError('Could not find blocked User')
         }
         return unblockedUser
-      } catch {
-        throw new UserInputError('Could not find blocked User')
       } finally {
         await session.close()
       }
@@ -183,103 +177,100 @@ export default {
       }
 
       const session = context.driver.session()
-
-      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const updateUserTransactionResponse = await transaction.run(
-          `
-            MATCH (user:User {id: $params.id})
-            SET user += $params
-            SET user.updatedAt = toString(datetime())
-            RETURN user {.*}
-          `,
-          { params },
-        )
-        const [user] = updateUserTransactionResponse.records.map((record) => record.get('user'))
-        if (avatarInput) {
-          await images(context.config).mergeImage(user, 'AVATAR_IMAGE', avatarInput, {
-            transaction,
-          })
-        }
-        return user
-      })
       try {
-        const user = await writeTxResultPromise
+        const user = await session.writeTransaction(async (transaction) => {
+          const updateUserTransactionResponse = await transaction.run(
+            `
+              MATCH (user:User {id: $params.id})
+              SET user += $params
+              SET user.updatedAt = toString(datetime())
+              RETURN user {.*}
+            `,
+            { params },
+          )
+          const [user] = updateUserTransactionResponse.records.map((record) => record.get('user'))
+          if (avatarInput) {
+            await images(context.config).mergeImage(user, 'AVATAR_IMAGE', avatarInput, {
+              transaction,
+            })
+          }
+          return user
+        })
         // TODO: put in a middleware, see "CreateGroup", "UpdateGroup"
         await createOrUpdateLocations('User', params.id, params.locationName, session, context)
         return user
-      } catch (error) {
-        throw new UserInputError(error.message)
       } finally {
         await session.close()
       }
     },
     DeleteUser: async (_object, params, context: Context, _resolveInfo) => {
       const { resource, id: userId } = params
+      const allowedLabels = ['Post', 'Comment']
       const session = context.driver.session()
-
-      const deleteUserTxResultPromise = session.writeTransaction(async (transaction) => {
-        if (resource?.length) {
-          await Promise.all(
-            resource.map(async (node) => {
-              const txResult = await transaction.run(
-                `
-                MATCH (resource:${node})<-[:WROTE]-(author:User {id: $userId})
-                OPTIONAL MATCH (resource)<-[:COMMENTS]-(comment:Comment)
-                SET resource.deleted = true
-                SET resource.content = 'UNAVAILABLE'
-                SET resource.contentExcerpt = 'UNAVAILABLE'
-                SET resource.language = 'UNAVAILABLE'
-                SET resource.createdAt = 'UNAVAILABLE'
-                SET resource.updatedAt = 'UNAVAILABLE'
-                SET comment.deleted = true
-                RETURN resource {.*}
-              `,
-                {
-                  userId,
-                },
-              )
-              return Promise.all(
-                txResult.records
-                  .map((record) => record.get('resource'))
-                  .map((resource) =>
-                    images(context.config).deleteImage(resource, 'HERO_IMAGE', { transaction }),
-                  ),
-              )
-            }),
-          )
-        }
-
-        const deleteUserTransactionResponse = await transaction.run(
-          `
-              MATCH (user:User {id: $userId})
-              SET user.deleted = true
-              SET user.name = 'UNAVAILABLE'
-              SET user.about = 'UNAVAILABLE'
-              SET user.lastActiveAt = 'UNAVAILABLE'
-              SET user.createdAt = 'UNAVAILABLE'
-              SET user.updatedAt = 'UNAVAILABLE'
-              SET user.termsAndConditionsAgreedVersion = 'UNAVAILABLE'
-              SET user.encryptedPassword = null
-              WITH user
-              OPTIONAL MATCH (user)<-[:BELONGS_TO]-(email:EmailAddress)
-              DETACH DELETE email
-              WITH user
-              OPTIONAL MATCH (user)<-[:OWNED_BY]-(socialMedia:SocialMedia)
-              DETACH DELETE socialMedia
-              WITH user
-              OPTIONAL MATCH (user)-[follow:FOLLOWS]-(:User)
-              DELETE follow
-              RETURN user {.*}
-            `,
-          { userId },
-        )
-        const [user] = deleteUserTransactionResponse.records.map((record) => record.get('user'))
-        await images(context.config).deleteImage(user, 'AVATAR_IMAGE', { transaction })
-        return user
-      })
       try {
-        const user = await deleteUserTxResultPromise
-        return user
+        return await session.writeTransaction(async (transaction) => {
+          if (resource?.length) {
+            await Promise.all(
+              resource.map(async (node) => {
+                if (!allowedLabels.includes(node)) {
+                  throw new UserInputError(`Invalid resource type: ${node}`)
+                }
+                const txResult = await transaction.run(
+                  `
+                  MATCH (resource:${node})<-[:WROTE]-(author:User {id: $userId})
+                  OPTIONAL MATCH (resource)<-[:COMMENTS]-(comment:Comment)
+                  SET resource.deleted = true
+                  SET resource.content = 'UNAVAILABLE'
+                  SET resource.contentExcerpt = 'UNAVAILABLE'
+                  SET resource.language = 'UNAVAILABLE'
+                  SET resource.createdAt = 'UNAVAILABLE'
+                  SET resource.updatedAt = 'UNAVAILABLE'
+                  SET comment.deleted = true
+                  RETURN resource {.*}
+                `,
+                  {
+                    userId,
+                  },
+                )
+                return Promise.all(
+                  txResult.records
+                    .map((record) => record.get('resource'))
+                    .map((resource) =>
+                      images(context.config).deleteImage(resource, 'HERO_IMAGE', { transaction }),
+                    ),
+                )
+              }),
+            )
+          }
+
+          const deleteUserTransactionResponse = await transaction.run(
+            `
+                MATCH (user:User {id: $userId})
+                SET user.deleted = true
+                SET user.name = 'UNAVAILABLE'
+                SET user.about = 'UNAVAILABLE'
+                SET user.lastActiveAt = 'UNAVAILABLE'
+                SET user.createdAt = 'UNAVAILABLE'
+                SET user.updatedAt = 'UNAVAILABLE'
+                SET user.termsAndConditionsAgreedVersion = 'UNAVAILABLE'
+                SET user.encryptedPassword = null
+                WITH user
+                OPTIONAL MATCH (user)<-[:BELONGS_TO]-(email:EmailAddress)
+                DETACH DELETE email
+                WITH user
+                OPTIONAL MATCH (user)<-[:OWNED_BY]-(socialMedia:SocialMedia)
+                DETACH DELETE socialMedia
+                WITH user
+                OPTIONAL MATCH (user)-[follow:FOLLOWS]-(:User)
+                DELETE follow
+                RETURN user {.*}
+              `,
+            { userId },
+          )
+          const [user] = deleteUserTransactionResponse.records.map((record) => record.get('user'))
+          await images(context.config).deleteImage(user, 'AVATAR_IMAGE', { transaction })
+          return user
+        })
       } finally {
         await session.close()
       }
@@ -289,24 +280,26 @@ export default {
 
       if (context.user.id === id) throw new Error('you-cannot-change-your-own-role')
       const session = context.driver.session()
-      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const switchUserRoleResponse = await transaction.run(
-          `
-            MATCH (user:User {id: $id})
-            OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(e:EmailAddress)
-            SET user.role = $role
-            SET user.updatedAt = toString(datetime())
-            RETURN user {.*, email: e.email}
-          `,
-          { id, role },
-        )
-        return switchUserRoleResponse.records.map((record) => record.get('user'))[0]
-      })
       try {
-        const user = await writeTxResultPromise
+        const user = await session.writeTransaction(async (transaction) => {
+          const switchUserRoleResponse = await transaction.run(
+            `
+              MATCH (user:User {id: $id})
+              OPTIONAL MATCH (user)-[:PRIMARY_EMAIL]->(e:EmailAddress)
+              SET user.role = $role
+              SET user.updatedAt = toString(datetime())
+              RETURN user {.*, email: e.email}
+            `,
+            { id, role },
+          )
+          return switchUserRoleResponse.records.map((record) => record.get('user'))[0]
+        })
+        if (!user) {
+          throw new UserInputError('Could not find User')
+        }
         return user
       } finally {
-        session.close()
+        await session.close()
       }
     },
     saveCategorySettings: async (_object, args, context, _resolveInfo) => {
@@ -316,40 +309,30 @@ export default {
       } = context
 
       const session = context.driver.session()
-      await session.writeTransaction((transaction) => {
-        return transaction.run(
-          `
-          MATCH (user:User { id: $id })-[previousCategories:NOT_INTERESTED_IN]->(category:Category)
-          DELETE previousCategories
-          RETURN user, category
-        `,
-          { id },
-        )
-      })
-
-      // frontend gives [] when all categories are selected (default)
-      if (activeCategories.length === 0) return true
-
-      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const saveCategorySettingsResponse = await transaction.run(
-          `
-            MATCH (category:Category) WHERE NOT category.id IN $activeCategories
-            MATCH (user:User { id: $id })
-            MERGE (user)-[r:NOT_INTERESTED_IN]->(category)
-            RETURN user, r, category
-          `,
-          { id, activeCategories },
-        )
-        const [user] = await saveCategorySettingsResponse.records.map((record) =>
-          record.get('user'),
-        )
-        return user
-      })
       try {
-        await writeTxResultPromise
+        await session.writeTransaction(async (transaction) => {
+          await transaction.run(
+            `
+              MATCH (user:User { id: $id })-[previousCategories:NOT_INTERESTED_IN]->(:Category)
+              DELETE previousCategories
+            `,
+            { id },
+          )
+          // frontend gives [] when all categories are selected (default)
+          if (activeCategories.length > 0) {
+            await transaction.run(
+              `
+                MATCH (category:Category) WHERE NOT category.id IN $activeCategories
+                MATCH (user:User { id: $id })
+                MERGE (user)-[:NOT_INTERESTED_IN]->(category)
+              `,
+              { id, activeCategories },
+            )
+          }
+        })
         return true
       } finally {
-        session.close()
+        await session.close()
       }
     },
     updateOnlineStatus: async (_object, args, context: Context, _resolveInfo) => {
@@ -391,41 +374,37 @@ export default {
       }
 
       const session = context.driver.session()
-
-      const query = session.writeTransaction(async (transaction) => {
-        const queryBadge = `
-            MATCH (user:User {id: $userId})<-[:REWARDED]-(badge:Badge {id: $badgeId})
-            OPTIONAL MATCH (user)-[badgeRelation:SELECTED]->(badge)
-            OPTIONAL MATCH (user)-[slotRelation:SELECTED{slot: $slot}]->(:Badge)
-            DELETE badgeRelation, slotRelation
-            MERGE (user)-[:SELECTED{slot: toInteger($slot)}]->(badge)
-            RETURN user {.*}
-          `
-        const queryEmpty = `
-            MATCH (user:User {id: $userId})
-            OPTIONAL MATCH (user)-[slotRelation:SELECTED {slot: $slot}]->(:Badge)
-            DELETE slotRelation
-            RETURN user {.*}
-          `
-        const isDefault = !badgeId || badgeId === defaultTrophyBadge.id
-
-        const result = await transaction.run(isDefault ? queryEmpty : queryBadge, {
-          userId,
-          badgeId,
-          slot,
-        })
-        return result.records.map((record) => record.get('user'))[0]
-      })
       try {
-        const user = await query
+        const user = await session.writeTransaction(async (transaction) => {
+          const queryBadge = `
+              MATCH (user:User {id: $userId})<-[:REWARDED]-(badge:Badge {id: $badgeId})
+              OPTIONAL MATCH (user)-[badgeRelation:SELECTED]->(badge)
+              OPTIONAL MATCH (user)-[slotRelation:SELECTED{slot: $slot}]->(:Badge)
+              DELETE badgeRelation, slotRelation
+              MERGE (user)-[:SELECTED{slot: toInteger($slot)}]->(badge)
+              RETURN user {.*}
+            `
+          const queryEmpty = `
+              MATCH (user:User {id: $userId})
+              OPTIONAL MATCH (user)-[slotRelation:SELECTED {slot: $slot}]->(:Badge)
+              DELETE slotRelation
+              RETURN user {.*}
+            `
+          const isDefault = !badgeId || badgeId === defaultTrophyBadge.id
+
+          const result = await transaction.run(isDefault ? queryEmpty : queryBadge, {
+            userId,
+            badgeId,
+            slot,
+          })
+          return result.records.map((record) => record.get('user'))[0]
+        })
         if (!user) {
-          throw new Error('You cannot set badges not rewarded to you.')
+          throw new UserInputError('You cannot set badges not rewarded to you.')
         }
         return user
-      } catch (error) {
-        throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     resetTrophyBadgesSelected: async (_object, _args, context, _resolveInfo) => {
@@ -434,25 +413,21 @@ export default {
       } = context
 
       const session = context.driver.session()
-
-      const query = session.writeTransaction(async (transaction) => {
-        const result = await transaction.run(
-          `
-            MATCH (user:User {id: $userId})
-            OPTIONAL MATCH (user)-[relation:SELECTED]->(:Badge)
-            DELETE relation
-            RETURN user {.*}
-          `,
-          { userId },
-        )
-        return result.records.map((record) => record.get('user'))[0]
-      })
       try {
-        return await query
-      } catch (error) {
-        throw new Error(error)
+        return await session.writeTransaction(async (transaction) => {
+          const result = await transaction.run(
+            `
+              MATCH (user:User {id: $userId})
+              OPTIONAL MATCH (user)-[relation:SELECTED]->(:Badge)
+              DELETE relation
+              RETURN user {.*}
+            `,
+            { userId },
+          )
+          return result.records.map((record) => record.get('user'))[0]
+        })
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
@@ -539,97 +514,80 @@ export default {
     },
     badgeTrophiesSelected: async (parent, _params, context, _resolveInfo) => {
       const session = context.driver.session()
-
-      const query = session.readTransaction(async (transaction) => {
-        const result = await transaction.run(
-          `
-            MATCH (user:User {id: $parent.id})-[relation:SELECTED]->(badge:Badge)
-            WITH relation, badge
-            ORDER BY relation.slot ASC
-            RETURN relation.slot as slot, badge {.*}
-          `,
-          { parent },
-        )
-        return result.records
-      })
       try {
-        const badgesSelected = await query
+        const badgesSelected = await session.readTransaction(async (transaction) => {
+          const result = await transaction.run(
+            `
+              MATCH (user:User {id: $parent.id})-[relation:SELECTED]->(badge:Badge)
+              WITH relation, badge
+              ORDER BY relation.slot ASC
+              RETURN relation.slot as slot, badge {.*}
+            `,
+            { parent },
+          )
+          return result.records
+        })
         const result = Array(TROPHY_BADGES_SELECTED_MAX).fill(defaultTrophyBadge)
-        badgesSelected.map((record) => {
+        badgesSelected.forEach((record) => {
           result[record.get('slot')] = record.get('badge')
-          return true
         })
         return result
-      } catch (error) {
-        throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     badgeTrophiesUnused: async (parent, _params, context, _resolveInfo) => {
       const session = context.driver.session()
-
-      const query = session.readTransaction(async (transaction) => {
-        const result = await transaction.run(
-          `
-            MATCH (user:User {id: $parent.id})<-[:REWARDED]-(badge:Badge)
-            WHERE NOT (user)-[:SELECTED]-(badge)
-            RETURN badge {.*}
-          `,
-          { parent },
-        )
-        return result.records.map((record) => record.get('badge'))
-      })
       try {
-        return await query
-      } catch (error) {
-        throw new Error(error)
+        return await session.readTransaction(async (transaction) => {
+          const result = await transaction.run(
+            `
+              MATCH (user:User {id: $parent.id})<-[:REWARDED]-(badge:Badge)
+              WHERE NOT (user)-[:SELECTED]-(badge)
+              RETURN badge {.*}
+            `,
+            { parent },
+          )
+          return result.records.map((record) => record.get('badge'))
+        })
       } finally {
-        session.close()
+        await session.close()
       }
     },
     badgeTrophiesUnusedCount: async (parent, _params, context, _resolveInfo) => {
       const session = context.driver.session()
-
-      const query = session.readTransaction(async (transaction) => {
-        const result = await transaction.run(
-          `
-            MATCH (user:User {id: $parent.id})<-[:REWARDED]-(badge:Badge)
-            WHERE NOT (user)-[:SELECTED]-(badge)
-            RETURN toString(COUNT(badge)) as count
-          `,
-          { parent },
-        )
-        return result.records.map((record) => record.get('count'))[0]
-      })
       try {
-        return await query
-      } catch (error) {
-        throw new Error(error)
+        return await session.readTransaction(async (transaction) => {
+          const result = await transaction.run(
+            `
+              MATCH (user:User {id: $parent.id})<-[:REWARDED]-(badge:Badge)
+              WHERE NOT (user)-[:SELECTED]-(badge)
+              RETURN toString(COUNT(badge)) as count
+            `,
+            { parent },
+          )
+          return result.records.map((record) => record.get('count'))[0]
+        })
       } finally {
-        session.close()
+        await session.close()
       }
     },
     badgeVerification: async (parent, _params, context, _resolveInfo) => {
       const session = context.driver.session()
-
-      const query = session.writeTransaction(async (transaction) => {
-        const result = await transaction.run(
-          `
-            MATCH (user:User {id: $parent.id})<-[:VERIFIES]-(verification:Badge)
-            RETURN verification {.*}
-          `,
-          { parent },
-        )
-        return result.records.map((record) => record.get('verification'))[0]
-      })
       try {
-        const result = await query
+        const result = await session.readTransaction(async (transaction) => {
+          const response = await transaction.run(
+            `
+              MATCH (user:User {id: $parent.id})<-[:VERIFIES]-(verification:Badge)
+              RETURN verification {.*}
+            `,
+            { parent },
+          )
+          return response.records.map((record) => record.get('verification'))[0]
+        })
         return result ?? defaultVerificationBadge
-      } catch (error) {
-        throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     ...Resolver('User', {

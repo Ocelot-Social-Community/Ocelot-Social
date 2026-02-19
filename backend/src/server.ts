@@ -15,6 +15,7 @@ import helmet from 'helmet'
 import CONFIG from './config'
 import { context, getContext } from './context'
 import schema from './graphql/schema'
+import logger from './logger'
 import middleware from './middleware'
 
 import type { ApolloServerExpressConfig } from 'apollo-server-express'
@@ -24,8 +25,12 @@ const createServer = (options?: ApolloServerExpressConfig) => {
     context,
     schema: middleware(schema),
     subscriptions: {
+      keepAlive: 10000,
       onConnect: (connectionParams) =>
         getContext()(connectionParams as { headers: { authorization?: string } }),
+      onDisconnect: () => {
+        logger.debug('WebSocket client disconnected')
+      },
     },
     debug: !!CONFIG.DEBUG,
     uploads: false,

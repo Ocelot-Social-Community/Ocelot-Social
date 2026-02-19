@@ -5,11 +5,22 @@ import type { S3Config } from '@config/index'
 
 import { FileUploadCallback, FileDeleteCallback } from './types'
 
-export const s3Service = (config: S3Config, prefix: string) => {
-  const { AWS_BUCKET: Bucket } = config
+let cachedClient: S3Client | null = null
+let cachedConfig: S3Config | null = null
 
+const getS3Client = (config: S3Config): S3Client => {
+  if (cachedClient) {
+    if (
+      cachedConfig?.AWS_ENDPOINT !== config.AWS_ENDPOINT ||
+      cachedConfig?.AWS_ACCESS_KEY_ID !== config.AWS_ACCESS_KEY_ID ||
+      cachedConfig?.AWS_SECRET_ACCESS_KEY !== config.AWS_SECRET_ACCESS_KEY
+    ) {
+      throw new Error('S3Client singleton was created with different credentials')
+    }
+    return cachedClient
+  }
   const { AWS_ENDPOINT, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = config
-  const s3 = new S3Client({
+  cachedClient = new S3Client({
     credentials: {
       accessKeyId: AWS_ACCESS_KEY_ID,
       secretAccessKey: AWS_SECRET_ACCESS_KEY,
@@ -17,6 +28,13 @@ export const s3Service = (config: S3Config, prefix: string) => {
     endpoint: AWS_ENDPOINT,
     forcePathStyle: true,
   })
+  cachedConfig = config
+  return cachedClient
+}
+
+export const s3Service = (config: S3Config, prefix: string) => {
+  const { AWS_BUCKET: Bucket } = config
+  const s3 = getS3Client(config)
 
   const uploadFile: FileUploadCallback = async ({ createReadStream, uniqueFilename, mimetype }) => {
     const s3Location = prefix.length > 0 ? `${prefix}/${uniqueFilename}` : uniqueFilename

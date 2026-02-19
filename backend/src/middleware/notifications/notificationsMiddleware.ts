@@ -159,7 +159,7 @@ const postAuthorOfComment = async (commentId, { context }) => {
     })
     return postAuthorId.records.map((record) => record.get('authorId'))
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -186,21 +186,18 @@ const notifyFollowingUsers = async (postId, groupId, context) => {
     }
   `
   const session = context.driver.session()
-  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-    const notificationTransactionResponse = await transaction.run(cypher, {
-      postId,
-      reason,
-      groupId: groupId || null,
-      userId: context.user.id,
-    })
-    return notificationTransactionResponse.records.map((record) => record.get('notification'))
-  })
   try {
-    return await writeTxResultPromise
-  } catch (error) {
-    throw new Error(error)
+    return await session.writeTransaction(async (transaction) => {
+      const notificationTransactionResponse = await transaction.run(cypher, {
+        postId,
+        reason,
+        groupId: groupId || null,
+        userId: context.user.id,
+      })
+      return notificationTransactionResponse.records.map((record) => record.get('notification'))
+    })
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -232,21 +229,18 @@ const notifyGroupMembersOfNewPost = async (postId, groupId, context) => {
     }
   `
   const session = context.driver.session()
-  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-    const notificationTransactionResponse = await transaction.run(cypher, {
-      postId,
-      reason,
-      groupId,
-      userId: context.user.id,
-    })
-    return notificationTransactionResponse.records.map((record) => record.get('notification'))
-  })
   try {
-    return await writeTxResultPromise
-  } catch (error) {
-    throw new Error(error)
+    return await session.writeTransaction(async (transaction) => {
+      const notificationTransactionResponse = await transaction.run(cypher, {
+        postId,
+        reason,
+        groupId,
+        userId: context.user.id,
+      })
+      return notificationTransactionResponse.records.map((record) => record.get('notification'))
+    })
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -267,20 +261,17 @@ const notifyOwnersOfGroup = async (groupId, userId, reason, context) => {
     RETURN notification {.*, from: finalGroup, to: properties(owner), email: email, relatedUser: properties(user) }
   `
   const session = context.driver.session()
-  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-    const notificationTransactionResponse = await transaction.run(cypher, {
-      groupId,
-      reason,
-      userId,
-    })
-    return notificationTransactionResponse.records.map((record) => record.get('notification'))
-  })
   try {
-    return await writeTxResultPromise
-  } catch (error) {
-    throw new Error(error)
+    return await session.writeTransaction(async (transaction) => {
+      const notificationTransactionResponse = await transaction.run(cypher, {
+        groupId,
+        reason,
+        userId,
+      })
+      return notificationTransactionResponse.records.map((record) => record.get('notification'))
+    })
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -304,21 +295,18 @@ const notifyMemberOfGroup = async (groupId, userId, reason, context) => {
     RETURN notification {.*, from: finalGroup, to: properties(user), email: email, relatedUser: properties(owner) }
   `
   const session = context.driver.session()
-  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-    const notificationTransactionResponse = await transaction.run(cypher, {
-      groupId,
-      reason,
-      userId,
-      ownerId: owner.id,
-    })
-    return notificationTransactionResponse.records.map((record) => record.get('notification'))
-  })
   try {
-    return await writeTxResultPromise
-  } catch (error) {
-    throw new Error(error)
+    return await session.writeTransaction(async (transaction) => {
+      const notificationTransactionResponse = await transaction.run(cypher, {
+        groupId,
+        reason,
+        userId,
+        ownerId: owner.id,
+      })
+      return notificationTransactionResponse.records.map((record) => record.get('notification'))
+    })
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -376,62 +364,58 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
     RETURN notification {.*, from: finalResource, to: properties(user), email: email, relatedUser: properties(user) }
   `
   const session = context.driver.session()
-  const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-    const notificationTransactionResponse = await transaction.run(mentionedCypher, {
-      id,
-      idsOfUsers,
-      reason,
-    })
-    return notificationTransactionResponse.records.map((record) => record.get('notification'))
-  })
   try {
-    return await writeTxResultPromise
-  } catch (error) {
-    throw new Error(error)
+    return await session.writeTransaction(async (transaction) => {
+      const notificationTransactionResponse = await transaction.run(mentionedCypher, {
+        id,
+        idsOfUsers,
+        reason,
+      })
+      return notificationTransactionResponse.records.map((record) => record.get('notification'))
+    })
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
 const notifyUsersOfComment = async (label, commentId, reason, context) => {
   await validateNotifyUsers(label, reason)
   const session = context.driver.session()
-  const writeTxResultPromise = await session.writeTransaction(async (transaction) => {
-    const notificationTransactionResponse = await transaction.run(
-      `
-      MATCH (observingUser:User)-[:OBSERVES { active: true }]->(post:Post)<-[:COMMENTS]-(comment:Comment { id: $commentId })<-[:WROTE]-(commenter:User)
-        WHERE NOT (observingUser)-[:BLOCKED]-(commenter)
-        AND NOT (observingUser)-[:MUTED]->(commenter)
-        AND NOT observingUser.id = $userId
-      OPTIONAL MATCH (observingUser)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
-      WITH observingUser, emailAddress, post, comment, commenter
-      MATCH (postAuthor:User)-[:WROTE]->(post)
-      MERGE (comment)-[notification:NOTIFIED {reason: $reason}]->(observingUser)
-      SET notification.read = FALSE
-      SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
-      SET notification.updatedAt = toString(datetime())
-      WITH notification, observingUser, emailAddress.email as email, post, commenter, postAuthor,
-      comment {.*, __typename: labels(comment)[0], author: properties(commenter), post:  post {.*, author: properties(postAuthor) } } AS finalResource
-      RETURN notification {
-        .*,
-        from: finalResource,
-        to: properties(observingUser),
-        email: email,
-        relatedUser: properties(commenter)
-      }
-    `,
-      {
-        commentId,
-        reason,
-        userId: context.user.id,
-      },
-    )
-    return notificationTransactionResponse.records.map((record) => record.get('notification'))
-  })
   try {
-    return await writeTxResultPromise
+    return await session.writeTransaction(async (transaction) => {
+      const notificationTransactionResponse = await transaction.run(
+        `
+        MATCH (observingUser:User)-[:OBSERVES { active: true }]->(post:Post)<-[:COMMENTS]-(comment:Comment { id: $commentId })<-[:WROTE]-(commenter:User)
+          WHERE NOT (observingUser)-[:BLOCKED]-(commenter)
+          AND NOT (observingUser)-[:MUTED]->(commenter)
+          AND NOT observingUser.id = $userId
+        OPTIONAL MATCH (observingUser)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
+        WITH observingUser, emailAddress, post, comment, commenter
+        MATCH (postAuthor:User)-[:WROTE]->(post)
+        MERGE (comment)-[notification:NOTIFIED {reason: $reason}]->(observingUser)
+        SET notification.read = FALSE
+        SET notification.createdAt = COALESCE(notification.createdAt, toString(datetime()))
+        SET notification.updatedAt = toString(datetime())
+        WITH notification, observingUser, emailAddress.email as email, post, commenter, postAuthor,
+        comment {.*, __typename: labels(comment)[0], author: properties(commenter), post:  post {.*, author: properties(postAuthor) } } AS finalResource
+        RETURN notification {
+          .*,
+          from: finalResource,
+          to: properties(observingUser),
+          email: email,
+          relatedUser: properties(commenter)
+        }
+      `,
+        {
+          commentId,
+          reason,
+          userId: context.user.id,
+        },
+      )
+      return notificationTransactionResponse.records.map((record) => record.get('notification'))
+    })
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -447,30 +431,29 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
 
   // Find Recipient
   const session = context.driver.session()
-  const messageRecipient = session.readTransaction(async (transaction) => {
-    const messageRecipientCypher = `
-      MATCH (senderUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
-      MATCH (room)<-[:CHATS_IN]-(recipientUser:User)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
-        WHERE NOT recipientUser.id = $currentUserId
-        AND NOT (recipientUser)-[:BLOCKED]-(senderUser)
-        AND NOT (recipientUser)-[:MUTED]->(senderUser)
-      RETURN senderUser {.*}, recipientUser {.*}, emailAddress {.email}
-    `
-    const txResponse = await transaction.run(messageRecipientCypher, {
-      currentUserId,
-      roomId,
-    })
-
-    return {
-      senderUser: await txResponse.records.map((record) => record.get('senderUser'))[0],
-      recipientUser: await txResponse.records.map((record) => record.get('recipientUser'))[0],
-      email: await txResponse.records.map((record) => record.get('emailAddress'))[0]?.email,
-    }
-  })
-
   try {
-    // Execute Query
-    const { senderUser, recipientUser, email } = await messageRecipient
+    const { senderUser, recipientUser, email } = await session.readTransaction(
+      async (transaction) => {
+        const messageRecipientCypher = `
+          MATCH (senderUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+          MATCH (room)<-[:CHATS_IN]-(recipientUser:User)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
+            WHERE NOT recipientUser.id = $currentUserId
+            AND NOT (recipientUser)-[:BLOCKED]-(senderUser)
+            AND NOT (recipientUser)-[:MUTED]->(senderUser)
+          RETURN senderUser {.*}, recipientUser {.*}, emailAddress {.email}
+        `
+        const txResponse = await transaction.run(messageRecipientCypher, {
+          currentUserId,
+          roomId,
+        })
+
+        return {
+          senderUser: txResponse.records.map((record) => record.get('senderUser'))[0],
+          recipientUser: txResponse.records.map((record) => record.get('recipientUser'))[0],
+          email: txResponse.records.map((record) => record.get('emailAddress'))[0]?.email,
+        }
+      },
+    )
 
     if (recipientUser) {
       // send subscriptions
@@ -493,10 +476,8 @@ const handleCreateMessage = async (resolve, root, args, context, resolveInfo) =>
 
     // Return resolver result to client
     return message
-  } catch (error) {
-    throw new Error(error)
   } finally {
-    session.close()
+    await session.close()
   }
 }
 

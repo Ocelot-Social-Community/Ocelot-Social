@@ -65,7 +65,7 @@ export default {
             await setMessagesAsDistributed(undistributedMessagesIds, session)
           }
         } finally {
-          session.close()
+          await session.close()
         }
         // send subscription to author to updated the messages
       }
@@ -82,43 +82,41 @@ export default {
       const session = context.driver.session()
 
       try {
-        const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        return await session.writeTransaction(async (transaction) => {
           const createMessageCypher = `
-          MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
-          OPTIONAL MATCH (currentUser)-[:AVATAR_IMAGE]->(image:Image)
-          OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
-          OPTIONAL MATCH (room)<-[:CHATS_IN]-(recipientUser:User)
-            WHERE NOT recipientUser.id = $currentUserId
-          WITH MAX(m.indexId) as maxIndex, room, currentUser, image, recipientUser
-          CREATE (currentUser)-[:CREATED]->(message:Message {
-            createdAt: toString(datetime()),
-            id: apoc.create.uuid(),
-            indexId: CASE WHEN maxIndex IS NOT NULL THEN maxIndex + 1 ELSE 0 END,
-            content: LEFT($content,2000),
-            saved: true,
-            distributed: false,
-            seen: false
-          })-[:INSIDE]->(room)
-          SET room.lastMessageAt = toString(datetime())
-          RETURN message {
-            .*,
-            indexId: toString(message.indexId),
-            recipientId: recipientUser.id,
-            senderId: currentUser.id,
-            username: currentUser.name,
-            avatar: image.url,
-            date: message.createdAt
-          }
-        `
+            MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+            OPTIONAL MATCH (currentUser)-[:AVATAR_IMAGE]->(image:Image)
+            OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
+            OPTIONAL MATCH (room)<-[:CHATS_IN]-(recipientUser:User)
+              WHERE NOT recipientUser.id = $currentUserId
+            WITH MAX(m.indexId) as maxIndex, room, currentUser, image, recipientUser
+            CREATE (currentUser)-[:CREATED]->(message:Message {
+              createdAt: toString(datetime()),
+              id: apoc.create.uuid(),
+              indexId: CASE WHEN maxIndex IS NOT NULL THEN maxIndex + 1 ELSE 0 END,
+              content: LEFT($content,2000),
+              saved: true,
+              distributed: false,
+              seen: false
+            })-[:INSIDE]->(room)
+            SET room.lastMessageAt = toString(datetime())
+            RETURN message {
+              .*,
+              indexId: toString(message.indexId),
+              recipientId: recipientUser.id,
+              senderId: currentUser.id,
+              username: currentUser.name,
+              avatar: image.url,
+              date: message.createdAt
+            }
+          `
           const createMessageTxResponse = await transaction.run(createMessageCypher, {
             currentUserId,
             roomId,
             content,
           })
 
-          const [message] = await createMessageTxResponse.records.map((record) =>
-            record.get('message'),
-          )
+          const [message] = createMessageTxResponse.records.map((record) => record.get('message'))
 
           // this is the case if the room doesn't exist - requires refactoring for implicit rooms
           if (!message) {
@@ -142,38 +140,32 @@ export default {
 
           return { ...message, files: atns }
         })
-
-        return await writeTxResultPromise
-      } catch (error) {
-        throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
     MarkMessagesAsSeen: async (_parent, params, context, _resolveInfo) => {
       const { messageIds } = params
       const currentUserId = context.user.id
       const session = context.driver.session()
-      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const setSeenCypher = `
-          MATCH (m:Message)<-[:CREATED]-(user:User)
-          WHERE m.id IN $messageIds AND NOT user.id = $currentUserId
-          SET m.seen = true
-          RETURN m { .* }
-        `
-        const setSeenTxResponse = await transaction.run(setSeenCypher, {
-          messageIds,
-          currentUserId,
-        })
-        const messages = await setSeenTxResponse.records.map((record) => record.get('m'))
-        return messages
-      })
       try {
-        await writeTxResultPromise
+        await session.writeTransaction(async (transaction) => {
+          const setSeenCypher = `
+            MATCH (m:Message)<-[:CREATED]-(user:User)
+            WHERE m.id IN $messageIds AND NOT user.id = $currentUserId
+            SET m.seen = true
+            RETURN m { .* }
+          `
+          const setSeenTxResponse = await transaction.run(setSeenCypher, {
+            messageIds,
+            currentUserId,
+          })
+          return setSeenTxResponse.records.map((record) => record.get('m'))
+        })
         // send subscription to author to updated the messages
         return true
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

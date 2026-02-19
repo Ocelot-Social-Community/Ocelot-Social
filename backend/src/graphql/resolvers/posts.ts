@@ -88,7 +88,7 @@ export default {
         const [emotionsCount] = await readTxResultPromise
         return emotionsCount
       } finally {
-        session.close()
+        await session.close()
       }
     },
     PostsEmotionsByCurrentUser: async (_object, params, context: Context, _resolveInfo) => {
@@ -364,7 +364,7 @@ export default {
         const [emoted] = await writeTxResultPromise
         return emoted
       } finally {
-        session.close()
+        await session.close()
       }
     },
     pinPost: async (_parent, params, context: Context, _resolveInfo) => {
@@ -464,7 +464,7 @@ export default {
       try {
         ;[unpinnedPost] = await writeTxResultPromise
       } finally {
-        session.close()
+        await session.close()
       }
       return unpinnedPost
     },
@@ -552,7 +552,7 @@ export default {
         post.viewedTeaserCount = post.viewedTeaserCount.low
         return post
       } finally {
-        session.close()
+        await session.close()
       }
     },
     toggleObservePost: async (_parent, params, context, _resolveInfo) => {
@@ -581,7 +581,7 @@ export default {
         post.viewedTeaserCount = post.viewedTeaserCount.low
         return post
       } finally {
-        session.close()
+        await session.close()
       }
     },
     pushPost: async (_parent, params, context: Context, _resolveInfo) => {
@@ -705,7 +705,7 @@ export default {
         const relatedContributions = await writeTxResultPromise
         return relatedContributions
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

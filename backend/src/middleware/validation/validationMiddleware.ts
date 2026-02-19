@@ -38,7 +38,7 @@ const validateCreateComment = async (resolve, root, args, context, info) => {
       return resolve(root, args, context, info)
     }
   } finally {
-    session.close()
+    await session.close()
   }
 }
 
@@ -64,28 +64,27 @@ const validateReview = async (resolve, root, args, context, info) => {
   const { user, driver } = context
   if (resourceId === user.id) throw new Error('You cannot review yourself!')
   const session = driver.session()
-  const reportReadTxPromise = session.readTransaction(async (transaction) => {
-    const validateReviewTransactionResponse = await transaction.run(
-      `
-        MATCH (resource {id: $resourceId})
-        WHERE resource:User OR resource:Post OR resource:Comment
-        OPTIONAL MATCH (:User)-[filed:FILED]->(:Report {closed: false})-[:BELONGS_TO]->(resource)
-        OPTIONAL MATCH (resource)<-[:WROTE]-(author:User)
-        RETURN [l IN labels(resource) WHERE l IN ['Post', 'Comment', 'User']][0] AS label, author, filed
-      `,
-      {
-        resourceId,
-        submitterId: user.id,
-      },
-    )
-    return validateReviewTransactionResponse.records.map((record) => ({
-      label: record.get('label'),
-      author: record.get('author'),
-      filed: record.get('filed'),
-    }))
-  })
   try {
-    const txResult = await reportReadTxPromise
+    const txResult = await session.readTransaction(async (transaction) => {
+      const validateReviewTransactionResponse = await transaction.run(
+        `
+          MATCH (resource {id: $resourceId})
+          WHERE resource:User OR resource:Post OR resource:Comment
+          OPTIONAL MATCH (:User)-[filed:FILED]->(:Report {closed: false})-[:BELONGS_TO]->(resource)
+          OPTIONAL MATCH (resource)<-[:WROTE]-(author:User)
+          RETURN [l IN labels(resource) WHERE l IN ['Post', 'Comment', 'User']][0] AS label, author, filed
+        `,
+        {
+          resourceId,
+          submitterId: user.id,
+        },
+      )
+      return validateReviewTransactionResponse.records.map((record) => ({
+        label: record.get('label'),
+        author: record.get('author'),
+        filed: record.get('filed'),
+      }))
+    })
     existingReportedResource = txResult
     if (!existingReportedResource?.length)
       throw new Error(`Resource not found or is not a Post|Comment|User!`)
@@ -101,7 +100,7 @@ const validateReview = async (resolve, root, args, context, info) => {
     if (authorId && authorId === user.id)
       throw new Error(`You cannot review your own ${existingReportedResource.label}!`)
   } finally {
-    session.close()
+    await session.close()
   }
 
   return resolve(root, args, context, info)

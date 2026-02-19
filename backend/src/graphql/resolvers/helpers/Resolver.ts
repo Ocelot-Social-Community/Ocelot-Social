@@ -33,20 +33,19 @@ export default function Resolver(type, options: any = {}) {
       if (typeof parent[key] !== 'undefined') return parent[key]
       const id = parent[idAttribute]
       const session = driver.session()
-      const readTxResultPromise = session.readTransaction(async (txc) => {
-        const cypher = `
-        MATCH(:${type} {${idAttribute}: $id})${connection}
-        RETURN related {.*} as related
-        `
-        const result = await txc.run(cypher, { id, cypherParams })
-        return result.records.map((r) => r.get('related'))
-      })
       try {
-        let response = await readTxResultPromise
+        let response = await session.readTransaction(async (txc) => {
+          const cypher = `
+          MATCH(:${type} {${idAttribute}: $id})${connection}
+          RETURN related {.*} as related
+          `
+          const result = await txc.run(cypher, { id, cypherParams })
+          return result.records.map((r) => r.get('related'))
+        })
         if (returnType === 'object') response = response[0] || null
         return response
       } finally {
-        session.close()
+        await session.close()
       }
     }
   }
@@ -59,17 +58,16 @@ export default function Resolver(type, options: any = {}) {
         if (typeof parent[key] !== 'undefined') return parent[key]
         const id = parent[idAttribute]
         const session = driver.session()
-        const readTxResultPromise = session.readTransaction(async (txc) => {
-          const nodeCondition = condition.replace('this', 'this {id: $id}')
-          const cypher = `${nodeCondition} as ${key}`
-          const result = await txc.run(cypher, { id, cypherParams })
-          const [response] = result.records.map((r) => r.get(key))
-          return response
-        })
         try {
-          return await readTxResultPromise
+          return await session.readTransaction(async (txc) => {
+            const nodeCondition = condition.replace('this', 'this {id: $id}')
+            const cypher = `${nodeCondition} as ${key}`
+            const result = await txc.run(cypher, { id, cypherParams })
+            const [response] = result.records.map((r) => r.get(key))
+            return response
+          })
         } finally {
-          session.close()
+          await session.close()
         }
       }
     }
@@ -82,20 +80,19 @@ export default function Resolver(type, options: any = {}) {
       resolvers[key] = async (parent, _params, { driver, cypherParams }, _resolveInfo) => {
         if (typeof parent[key] !== 'undefined') return parent[key]
         const session = driver.session()
-        const readTxResultPromise = session.readTransaction(async (txc) => {
-          const id = parent[idAttribute]
-          const cypher = `
-            MATCH(u:${type} {${idAttribute}: $id})${connection}
-            RETURN COUNT(DISTINCT(related)) as count
-          `
-          const result = await txc.run(cypher, { id, cypherParams })
-          const [response] = result.records.map((r) => r.get('count').toNumber())
-          return response
-        })
         try {
-          return await readTxResultPromise
+          return await session.readTransaction(async (txc) => {
+            const id = parent[idAttribute]
+            const cypher = `
+              MATCH(u:${type} {${idAttribute}: $id})${connection}
+              RETURN COUNT(DISTINCT(related)) as count
+            `
+            const result = await txc.run(cypher, { id, cypherParams })
+            const [response] = result.records.map((r) => r.get('count').toNumber())
+            return response
+          })
         } finally {
-          session.close()
+          await session.close()
         }
       }
     }

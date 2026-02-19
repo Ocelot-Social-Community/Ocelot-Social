@@ -165,7 +165,7 @@ export default {
       } catch (error) {
         throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

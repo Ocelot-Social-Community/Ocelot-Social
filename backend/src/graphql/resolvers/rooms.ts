@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
@@ -53,7 +52,7 @@ export default {
         const count = await getUnreadRoomsCount(currentUserId, session)
         return count
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
@@ -67,43 +66,40 @@ export default {
         throw new Error('Cannot create a room with self')
       }
       const session = context.driver.session()
-      const writeTxResultPromise = session.writeTransaction(async (transaction) => {
-        const createRoomCypher = `
-          MATCH (currentUser:User { id: $currentUserId })
-          MATCH (user:User { id: $userId })
-          MERGE (currentUser)-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user)
-          ON CREATE SET
-            room.createdAt = toString(datetime()),
-            room.id = apoc.create.uuid()
-          WITH room, user, currentUser
-          OPTIONAL MATCH (room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
-          WHERE NOT sender.id = $currentUserId AND NOT message.seen
-          WITH room, user, currentUser, message,
-          user.name AS roomName
-          RETURN room {
-            .*,
-            users: [properties(currentUser), properties(user)],
-            roomName: roomName,
-            unreadCount: toString(COUNT(DISTINCT message))
-          }
-        `
-        const createRommTxResponse = await transaction.run(createRoomCypher, {
-          userId,
-          currentUserId,
-        })
-        const [room] = await createRommTxResponse.records.map((record) => record.get('room'))
-        return room
-      })
       try {
-        const room = await writeTxResultPromise
+        const room = await session.writeTransaction(async (transaction) => {
+          const createRoomCypher = `
+            MATCH (currentUser:User { id: $currentUserId })
+            MATCH (user:User { id: $userId })
+            MERGE (currentUser)-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user)
+            ON CREATE SET
+              room.createdAt = toString(datetime()),
+              room.id = apoc.create.uuid()
+            WITH room, user, currentUser
+            OPTIONAL MATCH (room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
+            WHERE NOT sender.id = $currentUserId AND NOT message.seen
+            WITH room, user, currentUser, message,
+            user.name AS roomName
+            RETURN room {
+              .*,
+              users: [properties(currentUser), properties(user)],
+              roomName: roomName,
+              unreadCount: toString(COUNT(DISTINCT message))
+            }
+          `
+          const createRoomTxResponse = await transaction.run(createRoomCypher, {
+            userId,
+            currentUserId,
+          })
+          const [room] = createRoomTxResponse.records.map((record) => record.get('room'))
+          return room
+        })
         if (room) {
           room.roomId = room.id
         }
         return room
-      } catch (error) {
-        throw new Error(error)
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },

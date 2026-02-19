@@ -1066,7 +1066,7 @@ describe('setTrophyBadgeSelected', () => {
         expect.objectContaining({
           errors: [
             expect.objectContaining({
-              message: 'Error: You cannot set badges not rewarded to you.',
+              message: 'You cannot set badges not rewarded to you.',
             }),
           ],
         }),
@@ -1083,7 +1083,7 @@ describe('setTrophyBadgeSelected', () => {
         expect.objectContaining({
           errors: [
             expect.objectContaining({
-              message: 'Error: You cannot set badges not rewarded to you.',
+              message: 'You cannot set badges not rewarded to you.',
             }),
           ],
         }),

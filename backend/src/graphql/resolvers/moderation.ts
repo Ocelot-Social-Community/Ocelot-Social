@@ -34,7 +34,7 @@ export default {
         const [reviewed] = await reviewWriteTxResultPromise
         return reviewed || null
       } finally {
-        session.close()
+        await session.close()
       }
     },
   },
