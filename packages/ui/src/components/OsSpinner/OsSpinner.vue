@@ -74,7 +74,7 @@
           const parentAttrs = proxy?.$vnode?.data?.attrs || {}
 
           const isDecorative =
-            parentAttrs['aria-hidden'] === 'true' || attrs['aria-hidden'] === 'true'
+            String(parentAttrs['aria-hidden']) === 'true' || String(attrs['aria-hidden']) === 'true'
           const a11yAttrs = isDecorative
             ? { 'aria-hidden': 'true' }
             : {
@@ -100,7 +100,7 @@
           ...restAttrs
         } = attrs as Record<string, unknown>
 
-        const isDecorative = ariaHidden === 'true'
+        const isDecorative = String(ariaHidden) === 'true'
         const a11yAttrs = isDecorative
           ? { 'aria-hidden': 'true' as const }
           : { role: 'status' as const, 'aria-label': (ariaLabel as string) || 'Loading' }
