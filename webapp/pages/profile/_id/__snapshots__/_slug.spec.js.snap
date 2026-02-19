@@ -465,11 +465,11 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
       >
         <div
           class="ds-grid"
-          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+          style="grid-auto-rows: 20px; gap: 16px;"
         >
           <div
             class="tab-navigation"
-            style="grid-row-end: span 3; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 3; grid-column: 1 / -1;"
           >
             <div
               class="ds-tab-nav os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
@@ -619,7 +619,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           <!---->
            
           <div
-            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 4; grid-column: 1 / -1;"
           >
             <div>
               <div
@@ -1232,11 +1232,11 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
       >
         <div
           class="ds-grid"
-          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+          style="grid-auto-rows: 20px; gap: 16px;"
         >
           <div
             class="tab-navigation"
-            style="grid-row-end: span 3; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 3; grid-column: 1 / -1;"
           >
             <div
               class="ds-tab-nav os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
@@ -1386,7 +1386,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           <!---->
            
           <div
-            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 4; grid-column: 1 / -1;"
           >
             <div>
               <div
@@ -1823,11 +1823,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
       >
         <div
           class="ds-grid"
-          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+          style="grid-auto-rows: 20px; gap: 16px;"
         >
           <div
             class="tab-navigation"
-            style="grid-row-end: span 3; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 3; grid-column: 1 / -1;"
           >
             <div
               class="ds-tab-nav os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
@@ -1975,7 +1975,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           </div>
            
           <div
-            style="grid-row-end: span 2; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 2; grid-column: 1 / -1;"
           >
             <div
               class="profile-post-add-button-container"
@@ -2015,7 +2015,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           </div>
            
           <div
-            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 4; grid-column: 1 / -1;"
           >
             <div>
               <div
@@ -2493,11 +2493,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
       >
         <div
           class="ds-grid"
-          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); grid-auto-rows: 20px;"
+          style="grid-auto-rows: 20px; gap: 16px;"
         >
           <div
             class="tab-navigation"
-            style="grid-row-end: span 3; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 3; grid-column: 1 / -1;"
           >
             <div
               class="ds-tab-nav os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
@@ -2645,7 +2645,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           </div>
            
           <div
-            style="grid-row-end: span 2; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 2; grid-column: 1 / -1;"
           >
             <div
               class="profile-post-add-button-container"
@@ -2685,7 +2685,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           </div>
            
           <div
-            style="grid-row-end: span 4; grid-column-start: 1; grid-column-end: -1;"
+            style="grid-row-end: span 4; grid-column: 1 / -1;"
           >
             <div>
               <div

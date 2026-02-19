@@ -161,28 +161,28 @@ storiesOf('TabNavigator', module)
               </template>
               <!-- users -->
               <template v-if="activeTab === 'User'">
-                <ds-grid-item v-for="user in activeResources" :key="user.id" :row-span="2">
+                <div v-for="user in activeResources" :key="user.id" style="grid-row-end: span 2;">
                   <os-card>
                     <user-teaser :user="user" />
                   </os-card>
-                </ds-grid-item>
+                </div>
               </template>
               <!-- hashtags -->
               <template v-if="activeTab === 'Hashtag'">
-                <ds-grid-item v-for="hashtag in activeResources" :key="hashtag.id" :row-span="2">
+                <div v-for="hashtag in activeResources" :key="hashtag.id" style="grid-row-end: span 2;">
                   <os-card>
                     <hc-hashtag :id="hashtag.id" />
                   </os-card>
-                </ds-grid-item>
+                </div>
               </template>
             </template>
 
             <!-- no results -->
-            <ds-grid-item v-else :row-span="7" column-span="fullWidth">
+            <div v-else style="grid-row-end: span 7; grid-column: 1 / -1;">
               <div class="ds-mb-large ds-space-centered">
                 <hc-empty icon="tasks" :message="$t('search.no-results', { search })" />
               </div>
-            </ds-grid-item>
+            </div>
           </masonry-grid>
         </ds-flex-item>
       </div>

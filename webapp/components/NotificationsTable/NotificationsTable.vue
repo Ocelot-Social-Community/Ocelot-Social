@@ -1,21 +1,21 @@
 <template>
   <div class="notification-grid" v-if="notifications && notifications.length">
-    <ds-grid>
-      <ds-grid-item v-if="!isMobile" column-span="fullWidth">
-        <ds-grid class="header-grid">
-          <ds-grid-item v-for="field in fields" :key="field.label" class="ds-table-head-col">
+    <div class="ds-grid">
+      <div v-if="!isMobile" style="grid-column: 1 / -1;">
+        <div class="ds-grid header-grid">
+          <div v-for="field in fields" :key="field.label" class="ds-table-head-col">
             {{ field.label }}
-          </ds-grid-item>
-        </ds-grid>
-      </ds-grid-item>
-      <ds-grid-item
+          </div>
+        </div>
+      </div>
+      <div
         v-for="notification in notifications"
         :key="notification.id"
-        column-span="fullWidth"
+        style="grid-column: 1 / -1;"
         class="notification-grid-row"
       >
-        <ds-grid>
-          <ds-grid-item>
+        <div class="ds-grid">
+          <div>
             <div class="ds-flex user-section">
               <div class="ds-flex-item">
                 <user-teaser
@@ -30,8 +30,8 @@
                 />
               </div>
             </div>
-          </ds-grid-item>
-          <ds-grid-item>
+          </div>
+          <div>
             <div class="notification-container">
               <!-- Icon with responsive sizing -->
               <div class="notification-icon">
@@ -78,10 +78,10 @@
                 </p>
               </div>
             </div>
-          </ds-grid-item>
-        </ds-grid>
-      </ds-grid-item>
-    </ds-grid>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   <hc-empty v-else icon="alert" :message="$t('notifications.empty')" />
 </template>
@@ -171,7 +171,6 @@ export default {
 .notification-grid .content-section {
   flex-wrap: nowrap;
 }
-/* dirty fix to override broken styleguide inline-styles */
 .notification-grid .ds-grid {
   grid-template-columns: 5fr 6fr !important;
   grid-auto-rows: auto !important;

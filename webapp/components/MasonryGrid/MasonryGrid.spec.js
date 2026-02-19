@@ -6,11 +6,9 @@ const localVue = global.localVue
 
 describe('MasonryGrid', () => {
   let wrapper
-  let masonryGridItem
 
   beforeEach(() => {
     wrapper = mount(MasonryGrid, { localVue })
-    masonryGridItem = wrapper.vm.$children[0]
   })
 
   it('adds the "reset-grid-height" class when itemsCalculating is more than 0', async () => {
@@ -25,16 +23,16 @@ describe('MasonryGrid', () => {
     expect(wrapper.classes()).not.toContain('reset-grid-height')
   })
 
-  it('adds 1 to itemsCalculating when a child emits "calculating-item-height"', async () => {
+  it('adds 1 to itemsCalculating when "calculating-item-height" is emitted', async () => {
     wrapper.setData({ itemsCalculating: 0 })
-    masonryGridItem.$emit('calculating-item-height')
+    wrapper.vm.$emit('calculating-item-height')
     await Vue.nextTick()
     expect(wrapper.vm.itemsCalculating).toBe(1)
   })
 
-  it('subtracts 1 from itemsCalculating when a child emits "finished-calculating-item-height"', async () => {
+  it('subtracts 1 from itemsCalculating when "finished-calculating-item-height" is emitted', async () => {
     wrapper.setData({ itemsCalculating: 2 })
-    masonryGridItem.$emit('finished-calculating-item-height')
+    wrapper.vm.$emit('finished-calculating-item-height')
     await Vue.nextTick()
     expect(wrapper.vm.itemsCalculating).toBe(1)
   })

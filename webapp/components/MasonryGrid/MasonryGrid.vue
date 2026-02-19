@@ -1,11 +1,11 @@
 <template>
-  <ds-grid
-    v-on:calculating-item-height="startCalculation"
-    v-on:finished-calculating-item-height="endCalculation"
+  <div
+    class="ds-grid"
+    :style="{ gridAutoRows: '20px', gridGap: '16px' }"
     :class="[itemsCalculating ? 'reset-grid-height' : '']"
   >
     <slot></slot>
-  </ds-grid>
+  </div>
 </template>
 
 <script>
@@ -14,6 +14,14 @@ export default {
     return {
       itemsCalculating: 0,
     }
+  },
+  created() {
+    this.$on('calculating-item-height', this.startCalculation)
+    this.$on('finished-calculating-item-height', this.endCalculation)
+  },
+  beforeDestroy() {
+    this.$off('calculating-item-height', this.startCalculation)
+    this.$off('finished-calculating-item-height', this.endCalculation)
   },
   methods: {
     startCalculation() {
@@ -27,11 +35,8 @@ export default {
 </script>
 
 <style lang="scss">
-/* dirty fix to override broken styleguide inline-styles */
 .ds-grid {
-  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)) !important;
-  gap: 16px !important;
-  grid-auto-rows: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
 }
 
 .reset-grid-height {

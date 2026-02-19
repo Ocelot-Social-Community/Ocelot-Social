@@ -53,6 +53,9 @@
   background-size: 0.6em;
 }
 
+// ds-grid Ersatz
+.ds-grid { display: grid; }
+
 // ds-flex Ersatz
 .ds-flex          { display: flex; flex-wrap: wrap; }
 .ds-flex-no-wrap  { flex-wrap: nowrap; }
