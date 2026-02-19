@@ -65,7 +65,7 @@
                     {{
                       notification.from.title ||
                       notification.from.groupName ||
-                      notification.from.post.title | truncate(50)
+                      (notification.from.post && notification.from.post.title) | truncate(50)
                     }}
                   </b>
                 </nuxt-link>
