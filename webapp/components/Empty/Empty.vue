@@ -45,7 +45,7 @@ export default {
      * Vertical spacing
      */
     margin: {
-      type: [String, Object],
+      type: String,
       default: 'x-large',
     },
   },
