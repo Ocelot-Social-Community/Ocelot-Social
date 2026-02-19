@@ -53,15 +53,13 @@
           <sweetalert-icon icon="error" />
         </transition>
         <p class="ds-text">
-          <span>
-            {{ $t(`components.password-reset.change-password.error`) }}
-          </span>
-          <span>
-            {{ $t('components.password-reset.change-password.help') }}
-          </span>
-          <span>
-            <a :href="'mailto:' + supportEmail">{{ supportEmail }}</a>
-          </span>
+          {{ $t(`components.password-reset.change-password.error`) }}
+        </p>
+        <p class="ds-text">
+          {{ $t('components.password-reset.change-password.help') }}
+        </p>
+        <p class="ds-text">
+          <a :href="'mailto:' + supportEmail">{{ supportEmail }}</a>
         </p>
       </template>
       <slot></slot>
