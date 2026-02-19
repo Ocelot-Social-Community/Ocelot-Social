@@ -12,16 +12,16 @@
       <div class="slug-location">
         <!-- group slug -->
         <div>
-          <ds-text color="soft">
+          <p class="ds-text ds-text-soft">
             {{ `&${group.slug}` }}
-          </ds-text>
+          </p>
         </div>
         <!-- group location -->
         <div class="location-item">
-          <ds-text v-if="group && group.location" color="soft">
+          <p class="ds-text ds-text-soft" v-if="group && group.location">
             <os-icon :icon="icons.mapMarker" />
             {{ group && group.location ? group.location.name : '' }}
-          </ds-text>
+          </p>
         </div>
       </div>
       <!-- TODO: replace editor content with tiptap render view -->
@@ -66,9 +66,9 @@
       <footer class="footer">
         <!-- group goal -->
         <div class="labeled-chip">
-          <ds-text class="label-text hyphenate-text" color="soft" size="small">
+          <p class="ds-text ds-text-soft ds-text-size-small label-text hyphenate-text">
             {{ $t('group.goal') }}
-          </ds-text>
+          </p>
           <div class="chip">
             <ds-chip v-if="group && group.about">{{ group ? group.about : '' }}</ds-chip>
           </div>

@@ -4,17 +4,14 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
 <div>
   <div>
     <div
-      class="ds-space"
-      style="margin-bottom: 32px;"
+      class="ds-mb-large"
     />
      
     <div
-      class="ds-flex"
-      style="margin-left: -12px; margin-right: -12px;"
+      class="ds-flex ds-flex-gap-base profile-layout"
     >
       <div
-        class="ds-flex-item"
-        style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
+        class="profile-layout__sidebar"
       >
         <div
           class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
@@ -215,8 +212,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           </client-only-stub>
            
           <div
-            class="ds-space"
-            style="margin-top: 16px; margin-bottom: 16px;"
+            class="ds-my-small"
           >
             <h3
               class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
@@ -227,7 +223,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
             </h3>
              
             <p
-              class="ds-text ds-text-soft ds-text-center"
+              class="ds-text ds-text-center ds-text-soft"
             >
               
             @undefined
@@ -269,7 +265,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
             </div>
              
             <p
-              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+              class="ds-text ds-text-center ds-text-soft ds-text-size-small"
             >
               
             profile.memberSince 
@@ -284,7 +280,6 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           >
             <div
               class="ds-flex-item"
-              style="flex-grow: 1; flex-shrink: 0; flex-basis: 0px;"
             >
               <client-only-stub>
                 <div
@@ -320,7 +315,6 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
              
             <div
               class="ds-flex-item"
-              style="flex-grow: 1; flex-shrink: 0; flex-basis: 0px;"
             >
               <client-only-stub>
                 <div
@@ -438,13 +432,11 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
         </div>
          
         <div
-          class="ds-space"
-          style="margin-bottom: 32px;"
+          class="ds-mb-large"
         />
          
         <h3
-          class="ds-heading ds-heading-h3 ds-heading-soft"
-          style="text-align: center; margin-bottom: 10px;"
+          class="ds-heading ds-heading-h3 ds-heading-soft ds-text-center ds-mb-x-small"
         >
           
         profile.network.title
@@ -457,8 +449,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
         />
          
         <div
-          class="ds-space"
-          style="margin-bottom: 32px;"
+          class="ds-mb-large"
         />
          
         <follow-list-stub
@@ -470,8 +461,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
       </div>
        
       <div
-        class="ds-flex-item"
-        style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
+        class="profile-layout__main"
       >
         <div
           class="ds-grid"
@@ -495,8 +485,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                     data-test="post-tab-click"
                   >
                     <div
-                      class="ds-space"
-                      style="margin-top: 16px; margin-bottom: 16px;"
+                      class="ds-my-small"
                     >
                       <client-only-stub
                         placeholder="client-only.loading"
@@ -541,8 +530,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                     data-test="comment-tab-click"
                   >
                     <div
-                      class="ds-space"
-                      style="margin-top: 16px; margin-bottom: 16px;"
+                      class="ds-my-small"
                     >
                       <client-only-stub
                         placeholder="client-only.loading"
@@ -587,8 +575,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                     data-test="shout-tab-click"
                   >
                     <div
-                      class="ds-space"
-                      style="margin-top: 16px; margin-bottom: 16px;"
+                      class="ds-my-small"
                     >
                       <client-only-stub
                         placeholder="client-only.loading"
@@ -636,8 +623,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           >
             <div>
               <div
-                class="ds-space hc-empty ds-space-centered"
-                style="margin-top: 64px; margin-bottom: 64px;"
+                class="hc-empty ds-space-centered ds-my-xx-large"
               >
                 <p
                   class="ds-text"
@@ -653,7 +639,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                   <br />
                    
                   <span
-                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    class="ds-text-softer hc-empty-message"
                     style="display: none;"
                   >
                     
@@ -749,17 +735,14 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
 <div>
   <div>
     <div
-      class="ds-space"
-      style="margin-bottom: 32px;"
+      class="ds-mb-large"
     />
      
     <div
-      class="ds-flex"
-      style="margin-left: -12px; margin-right: -12px;"
+      class="ds-flex ds-flex-gap-base profile-layout"
     >
       <div
-        class="ds-flex-item"
-        style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
+        class="profile-layout__sidebar"
       >
         <div
           class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
@@ -960,8 +943,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           </client-only-stub>
            
           <div
-            class="ds-space"
-            style="margin-top: 16px; margin-bottom: 16px;"
+            class="ds-my-small"
           >
             <h3
               class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
@@ -972,7 +954,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
             </h3>
              
             <p
-              class="ds-text ds-text-soft ds-text-center"
+              class="ds-text ds-text-center ds-text-soft"
             >
               
             @undefined
@@ -1014,7 +996,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
             </div>
              
             <p
-              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+              class="ds-text ds-text-center ds-text-soft ds-text-size-small"
             >
               
             profile.memberSince 
@@ -1023,8 +1005,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           </div>
            
           <div
-            class="ds-space"
-            style="margin-top: 8px; margin-bottom: 8px;"
+            class="ds-my-x-small"
           >
             <!---->
              
@@ -1066,7 +1047,6 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           >
             <div
               class="ds-flex-item"
-              style="flex-grow: 1; flex-shrink: 0; flex-basis: 0px;"
             >
               <client-only-stub>
                 <div
@@ -1102,7 +1082,6 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
              
             <div
               class="ds-flex-item"
-              style="flex-grow: 1; flex-shrink: 0; flex-basis: 0px;"
             >
               <client-only-stub>
                 <div
@@ -1220,13 +1199,11 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
         </div>
          
         <div
-          class="ds-space"
-          style="margin-bottom: 32px;"
+          class="ds-mb-large"
         />
          
         <h3
-          class="ds-heading ds-heading-h3 ds-heading-soft"
-          style="text-align: center; margin-bottom: 10px;"
+          class="ds-heading ds-heading-h3 ds-heading-soft ds-text-center ds-mb-x-small"
         >
           
         profile.network.title
@@ -1239,8 +1216,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
         />
          
         <div
-          class="ds-space"
-          style="margin-bottom: 32px;"
+          class="ds-mb-large"
         />
          
         <follow-list-stub
@@ -1252,8 +1228,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
       </div>
        
       <div
-        class="ds-flex-item"
-        style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
+        class="profile-layout__main"
       >
         <div
           class="ds-grid"
@@ -1277,8 +1252,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                     data-test="post-tab-click"
                   >
                     <div
-                      class="ds-space"
-                      style="margin-top: 16px; margin-bottom: 16px;"
+                      class="ds-my-small"
                     >
                       <client-only-stub
                         placeholder="client-only.loading"
@@ -1323,8 +1297,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                     data-test="comment-tab-click"
                   >
                     <div
-                      class="ds-space"
-                      style="margin-top: 16px; margin-bottom: 16px;"
+                      class="ds-my-small"
                     >
                       <client-only-stub
                         placeholder="client-only.loading"
@@ -1369,8 +1342,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                     data-test="shout-tab-click"
                   >
                     <div
-                      class="ds-space"
-                      style="margin-top: 16px; margin-bottom: 16px;"
+                      class="ds-my-small"
                     >
                       <client-only-stub
                         placeholder="client-only.loading"
@@ -1418,8 +1390,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           >
             <div>
               <div
-                class="ds-space hc-empty ds-space-centered"
-                style="margin-top: 64px; margin-bottom: 64px;"
+                class="hc-empty ds-space-centered ds-my-xx-large"
               >
                 <p
                   class="ds-text"
@@ -1435,7 +1406,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                   <br />
                    
                   <span
-                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    class="ds-text-softer hc-empty-message"
                     style="display: none;"
                   >
                     
@@ -1531,17 +1502,14 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
 <div>
   <div>
     <div
-      class="ds-space"
-      style="margin-bottom: 32px;"
+      class="ds-mb-large"
     />
      
     <div
-      class="ds-flex"
-      style="margin-left: -12px; margin-right: -12px;"
+      class="ds-flex ds-flex-gap-base profile-layout"
     >
       <div
-        class="ds-flex-item"
-        style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
+        class="profile-layout__sidebar"
       >
         <div
           class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
@@ -1685,8 +1653,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           </client-only-stub>
            
           <div
-            class="ds-space"
-            style="margin-top: 16px; margin-bottom: 16px;"
+            class="ds-my-small"
           >
             <h3
               class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
@@ -1697,7 +1664,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
             </h3>
              
             <p
-              class="ds-text ds-text-soft ds-text-center"
+              class="ds-text ds-text-center ds-text-soft"
             >
               
             @undefined
@@ -1733,7 +1700,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
             </div>
              
             <p
-              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+              class="ds-text ds-text-center ds-text-soft ds-text-size-small"
             >
               
             profile.memberSince 
@@ -1748,7 +1715,6 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           >
             <div
               class="ds-flex-item"
-              style="flex-grow: 1; flex-shrink: 0; flex-basis: 0px;"
             >
               <client-only-stub>
                 <div
@@ -1784,7 +1750,6 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
              
             <div
               class="ds-flex-item"
-              style="flex-grow: 1; flex-shrink: 0; flex-basis: 0px;"
             >
               <client-only-stub>
                 <div
@@ -1825,13 +1790,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         </div>
          
         <div
-          class="ds-space"
-          style="margin-bottom: 32px;"
+          class="ds-mb-large"
         />
          
         <h3
-          class="ds-heading ds-heading-h3 ds-heading-soft"
-          style="text-align: center; margin-bottom: 10px;"
+          class="ds-heading ds-heading-h3 ds-heading-soft ds-text-center ds-mb-x-small"
         >
           
         profile.network.title
@@ -1844,8 +1807,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         />
          
         <div
-          class="ds-space"
-          style="margin-bottom: 32px;"
+          class="ds-mb-large"
         />
          
         <follow-list-stub
@@ -1857,8 +1819,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
       </div>
        
       <div
-        class="ds-flex-item"
-        style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
+        class="profile-layout__main"
       >
         <div
           class="ds-grid"
@@ -1882,8 +1843,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                     data-test="post-tab-click"
                   >
                     <div
-                      class="ds-space"
-                      style="margin-top: 16px; margin-bottom: 16px;"
+                      class="ds-my-small"
                     >
                       <client-only-stub
                         placeholder="client-only.loading"
@@ -1928,8 +1888,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                     data-test="comment-tab-click"
                   >
                     <div
-                      class="ds-space"
-                      style="margin-top: 16px; margin-bottom: 16px;"
+                      class="ds-my-small"
                     >
                       <client-only-stub
                         placeholder="client-only.loading"
@@ -1974,8 +1933,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                     data-test="shout-tab-click"
                   >
                     <div
-                      class="ds-space"
-                      style="margin-top: 16px; margin-bottom: 16px;"
+                      class="ds-my-small"
                     >
                       <client-only-stub
                         placeholder="client-only.loading"
@@ -2061,8 +2019,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           >
             <div>
               <div
-                class="ds-space hc-empty ds-space-centered"
-                style="margin-top: 64px; margin-bottom: 64px;"
+                class="hc-empty ds-space-centered ds-my-xx-large"
               >
                 <p
                   class="ds-text"
@@ -2078,7 +2035,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                   <br />
                    
                   <span
-                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    class="ds-text-softer hc-empty-message"
                     style="display: none;"
                   >
                     
@@ -2174,17 +2131,14 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
 <div>
   <div>
     <div
-      class="ds-space"
-      style="margin-bottom: 32px;"
+      class="ds-mb-large"
     />
      
     <div
-      class="ds-flex"
-      style="margin-left: -12px; margin-right: -12px;"
+      class="ds-flex ds-flex-gap-base profile-layout"
     >
       <div
-        class="ds-flex-item"
-        style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
+        class="profile-layout__sidebar"
       >
         <div
           class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
@@ -2328,8 +2282,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           </client-only-stub>
            
           <div
-            class="ds-space"
-            style="margin-top: 16px; margin-bottom: 16px;"
+            class="ds-my-small"
           >
             <h3
               class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
@@ -2340,7 +2293,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
             </h3>
              
             <p
-              class="ds-text ds-text-soft ds-text-center"
+              class="ds-text ds-text-center ds-text-soft"
             >
               
             @undefined
@@ -2376,7 +2329,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
             </div>
              
             <p
-              class="ds-text ds-text-size-small ds-text-soft ds-text-center"
+              class="ds-text ds-text-center ds-text-soft ds-text-size-small"
             >
               
             profile.memberSince 
@@ -2385,8 +2338,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           </div>
            
           <div
-            class="ds-space"
-            style="margin-top: 8px; margin-bottom: 8px;"
+            class="ds-my-x-small"
           >
             <a
               class="badge-edit-link"
@@ -2433,7 +2385,6 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           >
             <div
               class="ds-flex-item"
-              style="flex-grow: 1; flex-shrink: 0; flex-basis: 0px;"
             >
               <client-only-stub>
                 <div
@@ -2469,7 +2420,6 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
              
             <div
               class="ds-flex-item"
-              style="flex-grow: 1; flex-shrink: 0; flex-basis: 0px;"
             >
               <client-only-stub>
                 <div
@@ -2510,13 +2460,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         </div>
          
         <div
-          class="ds-space"
-          style="margin-bottom: 32px;"
+          class="ds-mb-large"
         />
          
         <h3
-          class="ds-heading ds-heading-h3 ds-heading-soft"
-          style="text-align: center; margin-bottom: 10px;"
+          class="ds-heading ds-heading-h3 ds-heading-soft ds-text-center ds-mb-x-small"
         >
           
         profile.network.title
@@ -2529,8 +2477,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         />
          
         <div
-          class="ds-space"
-          style="margin-bottom: 32px;"
+          class="ds-mb-large"
         />
          
         <follow-list-stub
@@ -2542,8 +2489,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
       </div>
        
       <div
-        class="ds-flex-item"
-        style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
+        class="profile-layout__main"
       >
         <div
           class="ds-grid"
@@ -2567,8 +2513,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                     data-test="post-tab-click"
                   >
                     <div
-                      class="ds-space"
-                      style="margin-top: 16px; margin-bottom: 16px;"
+                      class="ds-my-small"
                     >
                       <client-only-stub
                         placeholder="client-only.loading"
@@ -2613,8 +2558,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                     data-test="comment-tab-click"
                   >
                     <div
-                      class="ds-space"
-                      style="margin-top: 16px; margin-bottom: 16px;"
+                      class="ds-my-small"
                     >
                       <client-only-stub
                         placeholder="client-only.loading"
@@ -2659,8 +2603,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                     data-test="shout-tab-click"
                   >
                     <div
-                      class="ds-space"
-                      style="margin-top: 16px; margin-bottom: 16px;"
+                      class="ds-my-small"
                     >
                       <client-only-stub
                         placeholder="client-only.loading"
@@ -2746,8 +2689,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           >
             <div>
               <div
-                class="ds-space hc-empty ds-space-centered"
-                style="margin-top: 64px; margin-bottom: 64px;"
+                class="hc-empty ds-space-centered ds-my-xx-large"
               >
                 <p
                   class="ds-text"
@@ -2763,7 +2705,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                   <br />
                    
                   <span
-                    class="ds-text hc-empty-message ds-text-softer ds-text-inline"
+                    class="ds-text-softer hc-empty-message"
                     style="display: none;"
                   >
                     

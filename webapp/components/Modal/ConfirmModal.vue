@@ -1,9 +1,9 @@
 <template>
   <ds-modal :title="title" :is-open="isOpen" @cancel="cancel" data-test="confirm-modal">
     <transition name="ds-transition-fade">
-      <ds-flex v-if="success" class="hc-modal-success" centered>
+      <div v-if="success" class="ds-flex ds-flex-centered hc-modal-success">
         <sweetalert-icon icon="success" />
-      </ds-flex>
+      </div>
     </transition>
 
     <!-- eslint-disable-next-line vue/no-v-html -->

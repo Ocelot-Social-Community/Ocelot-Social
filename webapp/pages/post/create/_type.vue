@@ -1,19 +1,19 @@
 <template>
   <div>
-    <ds-space margin="small">
-      <ds-heading tag="h1">
+    <div class="ds-my-small">
+      <h1 class="ds-heading ds-heading-h1">
         {{ heading }}
-      </ds-heading>
-      <ds-heading v-if="group && group.id && group.slug" tag="h2">
+      </h1>
+      <h2 v-if="group && group.id && group.slug" class="ds-heading ds-heading-h2">
         {{ $t('post.viewPost.forGroup.title') }}
         <nuxt-link :to="{ name: 'groups-id-slug', params: { slug: group.slug, id: group.id } }">
           {{ group.name }}
         </nuxt-link>
-      </ds-heading>
-    </ds-space>
-    <ds-space margin="large" />
-    <ds-flex gutter="small">
-      <ds-flex-item :width="{ base: '100%', md: '200px' }">
+      </h2>
+    </div>
+    <div class="ds-my-large"></div>
+    <div class="ds-flex ds-flex-gap-small post-create-layout">
+      <div class="post-create-layout__sidebar">
         <ds-menu :routes="routes">
           <ds-menu-item
             @click.prevent="switchPostType($event, item)"
@@ -24,13 +24,13 @@
             {{ item.route.name }}
           </ds-menu-item>
         </ds-menu>
-      </ds-flex-item>
-      <ds-flex-item :width="{ base: '100%', md: 1 }">
+      </div>
+      <div class="post-create-layout__main">
         <transition name="slide-up" appear>
           <contribution-form :group="group" :createEvent="createEvent" />
         </transition>
-      </ds-flex-item>
-    </ds-flex>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -131,5 +131,20 @@ export default {
 <style lang="scss" scoped>
 .ds-heading {
   margin-top: 0;
+}
+
+.post-create-layout__sidebar,
+.post-create-layout__main {
+  flex: 0 0 100%;
+  width: 100%;
+}
+@media #{$media-query-medium} {
+  .post-create-layout__sidebar {
+    flex: 0 0 200px;
+    width: 200px;
+  }
+  .post-create-layout__main {
+    flex: 1 0 0;
+  }
 }
 </style>

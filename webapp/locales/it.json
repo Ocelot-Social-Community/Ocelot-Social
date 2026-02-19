@@ -704,6 +704,7 @@
     "failure": null,
     "forgotPassword": null,
     "hello": "Ciao",
+    "loggingOut": "Disconnessione in corso …",
     "login": "Accesso",
     "logout": "Logout",
     "moreInfo": "Che cosa è {APPLICATION_NAME}?",

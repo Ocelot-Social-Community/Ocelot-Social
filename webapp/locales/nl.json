@@ -704,6 +704,7 @@
     "failure": null,
     "forgotPassword": null,
     "hello": "Hallo",
+    "loggingOut": "Uitloggen …",
     "login": "Inloggen",
     "logout": "Uitloggen",
     "moreInfo": "Wat is {APPLICATION_NAME}?",

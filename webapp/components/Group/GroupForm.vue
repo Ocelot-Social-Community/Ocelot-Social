@@ -31,12 +31,12 @@
           :placeholder="`${$t('group.labelSlug')} …`"
         ></ds-input>
 
-        <ds-space v-if="update" margin-top="small" />
+        <div v-if="update" class="ds-mt-small ds-mb-large"></div>
 
         <!-- groupType -->
-        <ds-text class="select-label">
+        <p class="ds-text select-label">
           {{ $t('group.type') }}
-        </ds-text>
+        </p>
         <select
           class="select ds-input appearance--auto"
           name="groupType"
@@ -69,12 +69,12 @@
           rows="3"
         />
 
-        <ds-space margin-top="small" />
+        <div class="ds-mt-small ds-mb-large"></div>
 
         <!-- description -->
-        <ds-text class="select-label">
+        <p class="ds-text select-label">
           {{ $t('group.description') }}
-        </ds-text>
+        </p>
         <editor
           name="description"
           model="description"
@@ -89,9 +89,9 @@
         </ds-chip>
 
         <!-- actionRadius -->
-        <ds-text class="select-label">
+        <p class="ds-text select-label">
           {{ $t('group.actionRadius') }}
-        </ds-text>
+        </p>
         <action-radius-select
           v-model="formData.actionRadius"
           @change.native="changeActionRadius($event)"
@@ -112,13 +112,13 @@
         <!-- location -->
         <location-select v-model="formData.locationName" />
 
-        <ds-space margin-top="small" />
+        <div class="ds-mt-small ds-mb-large"></div>
 
         <!-- category -->
         <div v-if="categoriesActive">
-          <ds-text class="select-label">
+          <p class="ds-text select-label">
             {{ $t('group.categoriesTitle') }}
-          </ds-text>
+          </p>
 
           <categories-select
             model="categoryIds"
@@ -131,7 +131,7 @@
           </ds-chip>
         </div>
         <!-- submit -->
-        <ds-space margin-top="large">
+        <div class="buttons ds-mt-large ds-mb-large">
           <os-button as="nuxt-link" to="/groups" variant="default" appearance="filled">
             {{ $t('actions.cancel') }}
           </os-button>
@@ -144,7 +144,7 @@
             <template #icon><os-icon :icon="icons.save" /></template>
             {{ update ? $t('group.update') : $t('group.save') }}
           </os-button>
-        </ds-space>
+        </div>
       </template>
     </ds-form>
   </div>

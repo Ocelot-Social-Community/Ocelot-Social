@@ -704,6 +704,7 @@
     "failure": "Dirección de correo electrónico o contraseña incorrecta.",
     "forgotPassword": "¿Olvidó su contraseña?",
     "hello": "Hola",
+    "loggingOut": "Cerrando sesión …",
     "login": "Iniciar sesión",
     "logout": "Cierre de sesión",
     "moreInfo": "¿Qué es {APPLICATION_NAME}?",

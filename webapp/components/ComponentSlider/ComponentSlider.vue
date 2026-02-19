@@ -2,7 +2,7 @@
   <div class="Sliders">
     <slot :name="'header'" />
 
-    <ds-heading
+    <h3
       v-if="
         sliderData.sliders[sliderIndex].titleIdent &&
         ((typeof sliderData.sliders[sliderIndex].titleIdent === 'string' &&
@@ -13,7 +13,7 @@
               sliderData.sliders[sliderIndex].titleIdent.data,
             ).length > 0))
       "
-      size="h3"
+      class="ds-heading ds-heading-h3"
     >
       {{
         (typeof sliderData.sliders[sliderIndex].titleIdent === 'string' &&
@@ -24,12 +24,12 @@
             sliderData.sliders[sliderIndex].titleIdent.data,
           ))
       }}
-    </ds-heading>
+    </h3>
 
     <slot :name="sliderData.sliders[sliderIndex].name" />
 
-    <ds-flex>
-      <ds-flex-item v-if="multipleSliders" :centered="true">
+    <div class="ds-flex">
+      <div v-if="multipleSliders" class="ds-flex-item" style="align-self: center">
         <div
           v-for="(slider, index) in sliderData.sliders"
           :key="slider.name"
@@ -49,8 +49,8 @@
             @click="sliderData.sliderSelectorCallback(index)"
           />
         </div>
-      </ds-flex-item>
-      <ds-flex-item>
+      </div>
+      <div class="ds-flex-item">
         <os-button
           :style="multipleSliders && 'float: right'"
           variant="primary"
@@ -69,8 +69,8 @@
           </template>
           {{ $t(sliderData.sliders[sliderIndex].button.titleIdent) }}
         </os-button>
-      </ds-flex-item>
-    </ds-flex>
+      </div>
+    </div>
 
     <slot :name="'footer'" />
   </div>

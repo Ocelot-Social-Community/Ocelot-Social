@@ -9,46 +9,37 @@
 
 ### Übersicht
 ```
-Phase 0: Analyse    ██████████ 100% (8/8 Schritte)
-Phase 3: Migration  ██████████ 100% (132/132 Buttons) ✅
-───────────────────────────────────────────
-Phase 3 ABGESCHLOSSEN: M4a ✅, M4b ✅, M4c ✅ — 0 <base-button> verbleibend
+Phase 0: Analyse       ██████████ 100% (8/8 Schritte) ✅
+Phase 3: OsButton      ██████████ 100% (133/133 Buttons) ✅
+Phase 4: Tier 1        ██████████ 100% (OsButton, OsIcon, OsSpinner, OsCard) ✅
+Phase 4: Tier A → HTML ██████████ 100% (10 ds-* Wrapper → Plain HTML) ✅
+Phase 4: Tier B → HTML ░░░░░░░░░░   0% (ds-chip, ds-number, ds-grid, ds-radio)
+Phase 4: Tier 2-4      ░░░░░░░░░░   0% (OsModal, OsInput, OsMenu, OsSelect, OsTable)
 ```
 
 ### Statistiken
 | Metrik | Wert |
 |--------|------|
 | Webapp Komponenten | 139 |
-| Styleguide Komponenten | 38 |
+| Styleguide Komponenten | 38 (23 in Webapp genutzt) |
 | **Gesamt** | **177** |
-| Detailiert analysiert | 3 Familien (Button, Modal, Menu) |
-| Duplikate gefunden | 5 direkte + 3 Familien |
-| Zur Migration priorisiert | 15 Kern-Komponenten |
+| ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard (4) |
+| ✅ → Plain HTML | Section, Placeholder, Tag, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem (11) |
+| ⬜ → Plain HTML | Chip, Number, Grid, GridItem, Radio (5) — Tier B |
+| ⬜ → UI-Library | Modal, Input, Menu, MenuItem, Select, Table (6) — Tier 2-4 |
+| ⬜ Offen | Form (18 Dateien — HTML oder OsForm?) |
+| ⬜ Nicht in Webapp | Code, CopyField, FormItem, InputError, InputLabel, Page, PageTitle, Logo, Avatar, TableCol, TableHeadCol (11) |
 
 ### OsButton Migration (Phase 3) ✅
-| Status | Anzahl | Details |
-|--------|--------|---------|
-| ✅ Migriert | 132 | 78 Dateien, alle `<base-button>` ersetzt |
-| ⬜ Verbleibend | 0 | Nur BaseButton.vue Definition + Test/Snapshot-Dateien |
-| **Gesamt** | **132** | **100% erledigt** |
 
-**Alle 132 Buttons migriert in 78 Dateien ✅**
-
-Migration vollständig abgeschlossen. 0 `<base-button>` Tags verbleiben in Vue-Templates.
+**133 Buttons migriert in 79 Dateien ✅** — BaseButton.vue gelöscht, base-components.js Plugin entfernt.
 
 **Erkenntnisse aus der Migration:**
 - `type="submit"` muss explizit gesetzt werden (OsButton Default: `type="button"`)
 - DsForm `errors` ist ein Objekt → `!!errors` für Boolean-Cast bei `:disabled`
 - CSS `.base-button` Selektoren → `> button` oder `button`
-- Position/Dimensions brauchen `!important` für Tailwind-Override
 - Filter-Buttons nutzen `:appearance="condition ? 'filled' : 'outline'"` Pattern
-- Circle-Buttons mit Icon: `<template #icon><base-icon :name="..." /></template>`
-
-**Verbleibende Cleanup-Aufgaben:**
-- [ ] Snapshot-Dateien aktualisieren (enthalten noch `base-button` Referenzen)
-- [ ] Test-Dateien aktualisieren (Selektoren `.base-button` → `button` oder `os-button-stub`)
-- [ ] BaseButton.vue Komponente ggf. entfernen (wenn nicht mehr referenziert)
-- [ ] CSS-Selektor `.base-button` in ImageUploader.vue entfernen
+- Circle-Buttons mit Icon: `<template #icon><os-icon :icon="..." /></template>`
 
 ---
 
@@ -58,62 +49,62 @@ Migration vollständig abgeschlossen. 0 `<base-button>` Tags verbleiben in Vue-T
 > Live: http://styleguide.ocelot.social/
 
 ### Data Display
-| # | Komponente | Status | Webapp-Duplikat | Varianten | Priorität | Notizen |
-|---|------------|--------|-----------------|-----------|-----------|---------|
-| 1 | Avatar | ⬜ Ausstehend | | | | |
-| 2 | Card | ⬜ Ausstehend | BaseCard? | | | |
-| 3 | Chip | ⬜ Ausstehend | | | | |
-| 4 | Code | ⬜ Ausstehend | | | | |
-| 5 | Icon | ⬜ Ausstehend | BaseIcon? | | | |
-| 6 | Number | ⬜ Ausstehend | | | | |
-| 7 | Placeholder | ⬜ Ausstehend | | | | |
-| 8 | Spinner | ⬜ Ausstehend | LoadingSpinner? | | | |
-| 9 | Table | ⬜ Ausstehend | | | | |
-| 10 | TableCol | ⬜ Ausstehend | | | | |
-| 11 | TableHeadCol | ⬜ Ausstehend | | | | |
-| 12 | Tag | ⬜ Ausstehend | | | | |
+| # | Komponente | Status | Notizen |
+|---|------------|--------|---------|
+| 1 | Avatar | ⬜ Nicht genutzt | Webapp nutzt eigenes ProfileAvatar |
+| 2 | Card | ✅ UI-Library | → OsCard (BaseCard gelöscht) |
+| 3 | Chip | ⬜ Tier B | 5 Dateien → Plain HTML `<span class="ds-chip">` |
+| 4 | Code | ⬜ Nicht genutzt | Nicht in Webapp verwendet |
+| 5 | Icon | ✅ UI-Library | → OsIcon (BaseIcon gelöscht, 82 Ocelot-Icons) |
+| 6 | Number | ⬜ Tier B | 5 Dateien → Plain HTML `<div class="ds-number">` |
+| 7 | Placeholder | ✅ → HTML | Tier A: `<div class="ds-placeholder">` |
+| 8 | Spinner | ✅ UI-Library | → OsSpinner (LoadingSpinner gelöscht) |
+| 9 | Table | ⬜ Tier 4 | 7 Dateien → OsTable |
+| 10 | TableCol | ⬜ Tier 4 | Intern von Table genutzt |
+| 11 | TableHeadCol | ⬜ Tier 4 | Intern von Table genutzt |
+| 12 | Tag | ✅ → HTML | Tier A: `<span class="ds-tag">` |
 
 ### Data Input
-| # | Komponente | Status | Webapp-Duplikat | Varianten | Priorität | Notizen |
-|---|------------|--------|-----------------|-----------|-----------|---------|
-| 13 | Button | ⏳ Migration | BaseButton, CustomButton, ActionButton, ... | | | → OsButton (41/90 migriert) |
-| 14 | CopyField | ⬜ Ausstehend | | | | |
-| 15 | Form | ⬜ Ausstehend | | | | |
-| 16 | FormItem | ⬜ Ausstehend | | | | |
-| 17 | Input | ⬜ Ausstehend | SearchableInput, LinkInput | | | |
-| 18 | InputError | ⬜ Ausstehend | | | | |
-| 19 | InputLabel | ⬜ Ausstehend | | | | |
-| 20 | Radio | ⬜ Ausstehend | | | | |
-| 21 | Select | ⬜ Ausstehend | Dropdown, LocationSelect | | | |
+| # | Komponente | Status | Notizen |
+|---|------------|--------|---------|
+| 13 | Button | ✅ UI-Library | → OsButton (133 Buttons in 79 Dateien, BaseButton gelöscht) |
+| 14 | CopyField | ⬜ Nicht genutzt | Nicht in Webapp verwendet |
+| 15 | Form | ⬜ Offen | 18 Dateien — HTML `<form>` oder OsForm? |
+| 16 | FormItem | ⬜ Nicht genutzt | Nicht in Webapp verwendet |
+| 17 | Input | ⬜ Tier 2 | 23 Dateien → OsInput (gekoppelt mit Form) |
+| 18 | InputError | ⬜ Nicht genutzt | Intern von Input genutzt |
+| 19 | InputLabel | ⬜ Nicht genutzt | Intern von Input genutzt |
+| 20 | Radio | ⬜ Tier B | 1 Datei → native `<input type="radio">` |
+| 21 | Select | ⬜ Tier 4 | 3 Dateien → OsSelect |
 
 ### Layout
-| # | Komponente | Status | Webapp-Duplikat | Varianten | Priorität | Notizen |
-|---|------------|--------|-----------------|-----------|-----------|---------|
-| 22 | Container | ⬜ Ausstehend | | | | |
-| 23 | Flex | ⬜ Ausstehend | | | | |
-| 24 | FlexItem | ⬜ Ausstehend | | | | |
-| 25 | Grid | ⬜ Ausstehend | MasonryGrid? | | | |
-| 26 | GridItem | ⬜ Ausstehend | MasonryGridItem? | | | |
-| 27 | Modal | ⬜ Ausstehend | Modal, ConfirmModal, ... | | | |
-| 28 | Page | ⬜ Ausstehend | InternalPage? | | | |
-| 29 | PageTitle | ⬜ Ausstehend | | | | |
-| 30 | Section | ⬜ Ausstehend | | | | |
-| 31 | Space | ⬜ Ausstehend | | | | |
+| # | Komponente | Status | Notizen |
+|---|------------|--------|---------|
+| 22 | Container | ✅ → HTML | Tier A: `<div class="ds-container ds-container-{width}">` |
+| 23 | Flex | ✅ → HTML | Tier A: Plain HTML + CSS @media Queries |
+| 24 | FlexItem | ✅ → HTML | Tier A: Plain HTML + CSS @media Queries |
+| 25 | Grid | ⬜ Tier B | 2 Dateien → CSS Grid |
+| 26 | GridItem | ⬜ Tier B | 8 Dateien → CSS Grid |
+| 27 | Modal | ⬜ Tier 2 | 7 Dateien → OsModal |
+| 28 | Page | ⬜ Nicht genutzt | Nicht direkt in Webapp verwendet |
+| 29 | PageTitle | ⬜ Nicht genutzt | Nicht direkt in Webapp verwendet |
+| 30 | Section | ✅ → HTML | Tier A: `<section class="ds-section">` |
+| 31 | Space | ✅ → HTML | Tier A: `<div class="ds-mb-{size}">` / `<div class="ds-my-{size}">` |
 
 ### Navigation
-| # | Komponente | Status | Webapp-Duplikat | Varianten | Priorität | Notizen |
-|---|------------|--------|-----------------|-----------|-----------|---------|
-| 32 | List | ⬜ Ausstehend | | | | |
-| 33 | ListItem | ⬜ Ausstehend | | | | |
-| 34 | Logo | ⬜ Ausstehend | Logo | | | DUPLIKAT |
-| 35 | Menu | ⬜ Ausstehend | HeaderMenu, ContentMenu, ... | | | |
-| 36 | MenuItem | ⬜ Ausstehend | | | | |
+| # | Komponente | Status | Notizen |
+|---|------------|--------|---------|
+| 32 | List | ✅ → HTML | Tier A: `<ul class="ds-list">` |
+| 33 | ListItem | ✅ → HTML | Tier A: `<li class="ds-list-item">` |
+| 34 | Logo | ⬜ Nicht genutzt | Webapp nutzt eigenes Logo |
+| 35 | Menu | ⬜ Tier 3 | 11 Dateien → OsMenu |
+| 36 | MenuItem | ⬜ Tier 3 | 6 Dateien → OsMenuItem |
 
 ### Typography
-| # | Komponente | Status | Webapp-Duplikat | Varianten | Priorität | Notizen |
-|---|------------|--------|-----------------|-----------|-----------|---------|
-| 37 | Heading | ⬜ Ausstehend | SearchHeading? | | | |
-| 38 | Text | ⬜ Ausstehend | | | | |
+| # | Komponente | Status | Notizen |
+|---|------------|--------|---------|
+| 37 | Heading | ✅ → HTML | Tier A: `<h1-h4 class="ds-heading ds-heading-h{n}">` |
+| 38 | Text | ✅ → HTML | Tier A: `<p class="ds-text ds-text-{color}">` |
 
 ---
 
@@ -132,7 +123,7 @@ Migration vollständig abgeschlossen. 0 `<base-button>` Tags verbleiben in Vue-T
 ### A-B
 | # | Komponente | Status | Kategorie | Styleguide-Pendant | Notizen |
 |---|------------|--------|-----------|-------------------|---------|
-| 1 | ActionButton | ⬜ Ausstehend | Button | Button | 🔄 Button-Familie |
+| 1 | ActionButton | ✅ Migriert | Button | Button | 🔄 Button-Familie, nutzt OsButton |
 | 2 | ActionRadiusSelect | ⬜ Ausstehend | Input | | |
 | 3 | AddChatRoomByUserSearch | ⬜ Ausstehend | Feature | | Chat-spezifisch |
 | 4 | AddGroupMember | ⬜ Ausstehend | Feature | | Group-spezifisch |
@@ -141,21 +132,21 @@ Migration vollständig abgeschlossen. 0 `<base-button>` Tags verbleiben in Vue-T
 | 7 | BadgeSelection | ⬜ Ausstehend | Input | | |
 | 8 | Badges | ⬜ Ausstehend | Display | | |
 | 9 | BadgesSection | ⬜ Ausstehend | Display | | |
-| 10 | BaseButton | ⏳ Migration | Button | Button | 🔄 → OsButton (41/90 migriert) |
-| 11 | BaseCard | ⬜ Ausstehend | Layout | Card | 🔗 DUPLIKAT |
-| 12 | BaseIcon | ⬜ Ausstehend | Display | Icon | 🔗 DUPLIKAT |
+| 10 | ~~BaseButton~~ | ✅ Gelöscht | Button | Button | → OsButton (133 Buttons, Komponente gelöscht) |
+| 11 | ~~BaseCard~~ | ✅ Gelöscht | Layout | Card | → OsCard (~30 Dateien, Komponente gelöscht) |
+| 12 | ~~BaseIcon~~ | ✅ Gelöscht | Display | Icon | → OsIcon (131 Nutzungen, Komponente gelöscht) |
 
 ### C
 | # | Komponente | Status | Kategorie | Styleguide-Pendant | Notizen |
 |---|------------|--------|-----------|-------------------|---------|
 | 13 | CategoriesFilter | ⬜ Ausstehend | Filter | | |
 | 14 | CategoriesMenu | ⬜ Ausstehend | Navigation | Menu | |
-| 15 | CategoriesSelect | ⏳ Teilweise | Input | Select | Buttons → OsButton (icon) |
+| 15 | CategoriesSelect | ✅ Migriert | Input | Select | Buttons → OsButton (icon) |
 | 16 | ChangePassword | ⬜ Ausstehend | Feature | | Auth-spezifisch |
 | 17 | Change | ⬜ Ausstehend | Feature | | |
 | 18 | Chat | ⬜ Ausstehend | Feature | | Chat-spezifisch |
 | 19 | ChatNotificationMenu | ⬜ Ausstehend | Feature | | Chat-spezifisch |
-| 20 | CommentCard | ⏳ Teilweise | Display | Card | 1/2 Buttons → OsButton |
+| 20 | CommentCard | ✅ Migriert | Display | Card | Buttons → OsButton, BaseCard → OsCard |
 | 21 | CommentForm | ⬜ Ausstehend | Input | Form | |
 | 22 | CommentList | ⬜ Ausstehend | Display | List | |
 | 23 | ComponentSlider | ⬜ Ausstehend | Layout | | |
@@ -163,31 +154,31 @@ Migration vollständig abgeschlossen. 0 `<base-button>` Tags verbleiben in Vue-T
 | 25 | ContentMenu | ⬜ Ausstehend | Navigation | Menu | |
 | 26 | ContentViewer | ⬜ Ausstehend | Display | | |
 | 27 | ContextMenu | ⬜ Ausstehend | Navigation | Menu | |
-| 28 | ContributionForm | ⏳ Teilweise | Feature | Form | Cancel → OsButton |
+| 28 | ContributionForm | ✅ Migriert | Feature | Form | Buttons → OsButton, ds-* → HTML |
 | 29 | CounterIcon | ⬜ Ausstehend | Display | Icon | |
 | 30 | CountTo | ⬜ Ausstehend | Display | Number | Animation |
 | 31 | CreateInvitation | ⬜ Ausstehend | Feature | | |
-| 32 | CtaJoinLeaveGroup | ⬜ Ausstehend | Button | Button | 🔄 Button-Familie |
-| 33 | CtaUnblockAuthor | ✅ Migriert | Button | Button | Button → OsButton (icon) |
-| 34 | CustomButton | ⬜ Ausstehend | Button | Button | 🔄 Button-Familie |
+| 32 | CtaJoinLeaveGroup | ✅ Migriert | Button | Button | 🔄 Button-Familie, nutzt OsButton |
+| 33 | CtaUnblockAuthor | ✅ Migriert | Button | Button | Nutzt OsButton (icon, as="nuxt-link") |
+| 34 | CustomButton | ✅ Migriert | Button | Button | 🔄 Button-Familie, nutzt OsButton |
 
 ### D-E
 | # | Komponente | Status | Kategorie | Styleguide-Pendant | Notizen |
 |---|------------|--------|-----------|-------------------|---------|
 | 35 | DateTimeRange | ⬜ Ausstehend | Input | | |
 | 36 | DeleteData | ⬜ Ausstehend | Feature | | |
-| 37 | DeleteUserModal | ⏳ Teilweise | Feedback | Modal | 🔄 Modal-Familie, Buttons → OsButton |
-| 38 | DisableModal | ⏳ Teilweise | Feedback | Modal | 🔄 Modal-Familie, Buttons → OsButton |
+| 37 | DeleteUserModal | ✅ Migriert | Feedback | Modal | 🔄 Modal-Familie, Buttons → OsButton |
+| 38 | DisableModal | ✅ Migriert | Feedback | Modal | 🔄 Modal-Familie, Buttons → OsButton |
 | 39 | DonationInfo | ✅ Migriert | Display | | Button → OsButton |
 | 40 | Dropdown | ⬜ Ausstehend | Input | Select | |
 | 41 | DropdownFilter | ⬜ Ausstehend | Filter | Select | |
 | 42 | Editor | ⬜ Ausstehend | Input | | Rich-Text |
 | 43 | EmailDisplayAndVerify | ⬜ Ausstehend | Feature | | |
-| 44 | EmbedComponent | ⏳ Teilweise | Display | | 2/3 Buttons → OsButton |
-| 45 | EmotionButton | ⬜ Ausstehend | Button | Button | |
+| 44 | EmbedComponent | ✅ Migriert | Display | | Buttons → OsButton |
+| 45 | EmotionButton | ✅ Migriert | Button | Button | Nutzt OsButton intern |
 | 46 | Emotions | ⬜ Ausstehend | Feature | | |
 | 47 | Empty | ⬜ Ausstehend | Feedback | Placeholder | |
-| 48 | EnterNonce | ⏳ Teilweise | Feature | | Auth, Submit → OsButton |
+| 48 | EnterNonce | ✅ Migriert | Feature | | Auth, Submit → OsButton |
 
 ### F-G
 | # | Komponente | Status | Kategorie | Styleguide-Pendant | Notizen |
@@ -197,12 +188,12 @@ Migration vollständig abgeschlossen. 0 `<base-button>` Tags verbleiben in Vue-T
 | 51 | FilterMenu | ⬜ Ausstehend | Navigation | Menu | |
 | 52 | FilterMenuComponent | ⬜ Ausstehend | Navigation | Menu | |
 | 53 | FilterMenuSection | ⬜ Ausstehend | Navigation | Menu | |
-| 54 | FollowButton | ⬜ Ausstehend | Button | Button | |
+| 54 | FollowButton | ✅ Migriert | Button | Button | Nutzt OsButton intern |
 | 55 | FollowingFilter | ⬜ Ausstehend | Filter | | |
 | 56 | FollowList | ⬜ Ausstehend | Display | List | |
-| 57 | GroupButton | ⬜ Ausstehend | Button | Button | |
+| 57 | GroupButton | ✅ Migriert | Button | Button | Nutzt OsButton intern |
 | 58 | GroupContentMenu | ⬜ Ausstehend | Navigation | Menu | |
-| 59 | GroupForm | ⏳ Teilweise | Input | Form | 1/2 Buttons → OsButton |
+| 59 | GroupForm | ✅ Migriert | Input | Form | Buttons → OsButton |
 | 60 | GroupLink | ⬜ Ausstehend | Navigation | | |
 | 61 | GroupList | ⬜ Ausstehend | Display | List | |
 | 62 | GroupMember | ✅ Migriert | Display | | Button → OsButton |
@@ -213,41 +204,41 @@ Migration vollständig abgeschlossen. 0 `<base-button>` Tags verbleiben in Vue-T
 |---|------------|--------|-----------|-------------------|---------|
 | 64 | Hashtag | ⬜ Ausstehend | Display | Tag/Chip | |
 | 65 | HashtagsFilter | ⬜ Ausstehend | Filter | | |
-| 66 | HeaderButton | ⬜ Ausstehend | Button | Button | 🔄 Button-Familie |
+| 66 | HeaderButton | ✅ Migriert | Button | Button | 🔄 Button-Familie, nutzt OsButton |
 | 67 | HeaderMenu | ⬜ Ausstehend | Navigation | Menu | |
-| 68 | ImageUploader | ⏳ Teilweise | Input | | Crop-Buttons → OsButton |
+| 68 | ImageUploader | ✅ Migriert | Input | | Crop-Buttons → OsButton, Spinner → OsSpinner |
 | 69 | index | ⬜ Ausstehend | ? | | Prüfen |
 | 70 | InternalPage | ⬜ Ausstehend | Layout | Page | |
 | 71 | Invitation | ⬜ Ausstehend | Feature | | |
 | 72 | InvitationList | ⬜ Ausstehend | Display | List | |
-| 73 | InviteButton | ⬜ Ausstehend | Button | Button | |
-| 74 | JoinLeaveButton | ⬜ Ausstehend | Button | Button | |
-| 75 | LabeledButton | ⬜ Ausstehend | Button | Button | 🔄 Button-Familie |
+| 73 | InviteButton | ✅ Migriert | Button | Button | Nutzt OsButton intern |
+| 74 | JoinLeaveButton | ✅ Migriert | Button | Button | Nutzt OsButton intern |
+| 75 | LabeledButton | ✅ Migriert | Button | Button | 🔄 Button-Familie, nutzt OsButton |
 | 76 | LinkInput | ⬜ Ausstehend | Input | Input | |
-| 77 | LoadingSpinner | ⬜ Ausstehend | Feedback | Spinner | 🔗 DUPLIKAT |
+| 77 | ~~LoadingSpinner~~ | ✅ Gelöscht | Feedback | Spinner | → OsSpinner (Komponente gelöscht) |
 | 78 | LocaleSwitch | ⬜ Ausstehend | Navigation | | |
 | 79 | LocationInfo | ⬜ Ausstehend | Display | | |
-| 80 | LocationSelect | ⏳ Teilweise | Input | Select | Close-Button → OsButton (icon) |
+| 80 | LocationSelect | ✅ Migriert | Input | Select | Close-Button → OsButton (icon) |
 | 81 | LocationTeaser | ⬜ Ausstehend | Display | Card | |
-| 82 | LoginButton | ⬜ Ausstehend | Button | Button | |
+| 82 | LoginButton | ✅ Migriert | Button | Button | Nutzt OsButton intern |
 | 83 | LoginForm | ⬜ Ausstehend | Feature | Form | Auth |
-| 84 | Logo | ⬜ Ausstehend | Display | Logo | 🔗 DUPLIKAT |
+| 84 | Logo | ⬜ Ausstehend | Display | Logo | 🔗 DUPLIKAT (noch ungelöst) |
 
 ### M-O
 | # | Komponente | Status | Kategorie | Styleguide-Pendant | Notizen |
 |---|------------|--------|-----------|-------------------|---------|
-| 85 | MapButton | ⬜ Ausstehend | Button | Button | |
+| 85 | MapButton | ✅ Migriert | Button | Button | Nutzt OsButton intern |
 | 86 | MapStylesButtons | ✅ Migriert | Button | Button | Button → OsButton |
 | 87 | MasonryGrid | ⬜ Ausstehend | Layout | Grid | |
 | 88 | MasonryGridItem | ⬜ Ausstehend | Layout | GridItem | |
 | 89 | MenuBar | ⬜ Ausstehend | Navigation | Menu | |
-| 90 | MenuBarButton | ⬜ Ausstehend | Button | Button | 🔄 Button-Familie |
+| 90 | MenuBarButton | ✅ Migriert | Button | Button | 🔄 Button-Familie, nutzt OsButton |
 | 91 | MenuLegend | ⬜ Ausstehend | Navigation | | |
 | 92 | Modal | ⬜ Ausstehend | Feedback | Modal | 🔗 DUPLIKAT |
-| 93 | MySomethingList | ⏳ Teilweise | Display | List | Cancel → OsButton |
-| 94 | NotificationMenu | ⏳ Teilweise | Navigation | Menu | 2/3 Buttons → OsButton |
+| 93 | MySomethingList | ✅ Migriert | Display | List | Buttons → OsButton |
+| 94 | NotificationMenu | ✅ Migriert | Navigation | Menu | Buttons → OsButton |
 | 95 | NotificationsTable | ⬜ Ausstehend | Display | Table | |
-| 96 | ObserveButton | ⬜ Ausstehend | Button | Button | |
+| 96 | ObserveButton | ✅ Migriert | Button | Button | Nutzt OsButton intern |
 | 97 | OrderByFilter | ⬜ Ausstehend | Filter | | |
 
 ### P-R
@@ -267,10 +258,10 @@ Migration vollständig abgeschlossen. 0 `<base-button>` Tags verbleiben in Vue-T
 | 109 | RegistrationSlideNonce | ⬜ Ausstehend | Feature | | Auth |
 | 110 | RegistrationSlideNoPublic | ⬜ Ausstehend | Feature | | Auth |
 | 111 | RegistrationSlider | ⬜ Ausstehend | Feature | | Auth |
-| 112 | ReleaseModal | ⏳ Teilweise | Feedback | Modal | 🔄 Modal-Familie, Cancel → OsButton |
+| 112 | ReleaseModal | ✅ Migriert | Feedback | Modal | 🔄 Modal-Familie, Buttons → OsButton |
 | 113 | ReportList | ⬜ Ausstehend | Display | List | |
 | 114 | ReportModal | ⬜ Ausstehend | Feedback | Modal | 🔄 Modal-Familie |
-| 115 | ReportRow | ⏳ Teilweise | Display | | More Details → OsButton |
+| 115 | ReportRow | ✅ Migriert | Display | | More Details → OsButton |
 | 116 | ReportsTable | ⬜ Ausstehend | Display | Table | |
 | 117 | Request | ⬜ Ausstehend | Feature | | |
 | 118 | ResponsiveImage | ⬜ Ausstehend | Display | | |
@@ -285,7 +276,7 @@ Migration vollständig abgeschlossen. 0 `<base-button>` Tags verbleiben in Vue-T
 | 123 | SearchPost | ⬜ Ausstehend | Feature | | Search |
 | 124 | SearchResults | ⬜ Ausstehend | Feature | | Search |
 | 125 | SelectUserSearch | ⬜ Ausstehend | Input | Select | |
-| 126 | ShoutButton | ⬜ Ausstehend | Button | Button | |
+| 126 | ShoutButton | ✅ Migriert | Button | Button | Nutzt OsButton intern |
 | 127 | ShowPassword | ⬜ Ausstehend | Input | | |
 | 128 | Signup | ⬜ Ausstehend | Feature | | Auth |
 | 129 | SocialMedia | ⬜ Ausstehend | Display | | |
@@ -307,36 +298,35 @@ Migration vollständig abgeschlossen. 0 `<base-button>` Tags verbleiben in Vue-T
 ## Identifizierte Duplikate & Konsolidierung
 
 ### Direkte Duplikate (Webapp ↔ Styleguide)
-| Webapp | Styleguide | Aktion |
-|--------|------------|--------|
-| Logo | Logo | Konsolidieren zu OsLogo |
-| Modal | Modal | Konsolidieren zu OsModal |
-| BaseCard | Card | Konsolidieren zu OsCard |
-| BaseIcon | Icon | Konsolidieren zu OsIcon |
-| LoadingSpinner | Spinner | Konsolidieren zu OsSpinner |
+| Webapp | Styleguide | Aktion | Status |
+|--------|------------|--------|--------|
+| Logo | Logo | Konsolidieren zu OsLogo | ⬜ Ausstehend |
+| Modal | Modal | Konsolidieren zu OsModal | ⬜ Ausstehend |
+| ~~BaseCard~~ | Card | → OsCard | ✅ Erledigt (BaseCard gelöscht) |
+| ~~BaseIcon~~ | Icon | → OsIcon | ✅ Erledigt (BaseIcon gelöscht) |
+| ~~LoadingSpinner~~ | Spinner | → OsSpinner | ✅ Erledigt (LoadingSpinner gelöscht) |
 
-### Button-Familie (zur Konsolidierung)
-| Komponente | Beschreibung | Ziel |
-|------------|--------------|------|
-| Button (Styleguide) | Basis-Button | OsButton |
-| BaseButton | Basis-Button | → OsButton |
-| CustomButton | Angepasster Button | → OsButton variant |
-| ActionButton | Aktions-Button | → OsButton variant |
-| HeaderButton | Header-Button | → OsButton variant |
-| LabeledButton | Button mit Label | → OsButton + Label |
-| MenuBarButton | Menü-Button | → OsButton variant |
-| FollowButton | Follow-Aktion | Feature-spezifisch |
-| GroupButton | Gruppen-Aktion | Feature-spezifisch |
-| InviteButton | Einladen | Feature-spezifisch |
-| LoginButton | Login | Feature-spezifisch |
-| ShoutButton | Shout-Aktion | Feature-spezifisch |
-| ObserveButton | Beobachten | Feature-spezifisch |
-| EmotionButton | Emotion | Feature-spezifisch |
-| JoinLeaveButton | Beitreten/Verlassen | Feature-spezifisch |
-| MapButton | Karten-Button | Feature-spezifisch |
-| MapStylesButtons | Kartenstile | ✅ → OsButton |
-| CtaJoinLeaveGroup | CTA | Feature-spezifisch |
-| CtaUnblockAuthor | CTA | Feature-spezifisch |
+### Button-Familie ✅ (alle nutzen OsButton)
+| Komponente | Status | Notizen |
+|------------|--------|---------|
+| ~~Button (Styleguide)~~ | ✅ Ersetzt | → OsButton |
+| ~~BaseButton~~ | ✅ Gelöscht | → OsButton (133 Buttons) |
+| CustomButton | ✅ Nutzt OsButton | Feature-Wrapper |
+| ActionButton | ✅ Nutzt OsButton | Feature-Wrapper |
+| HeaderButton | ✅ Nutzt OsButton | Feature-Wrapper |
+| LabeledButton | ✅ Nutzt OsButton | Feature-Wrapper |
+| MenuBarButton | ✅ Nutzt OsButton | Feature-Wrapper |
+| FollowButton | ✅ Nutzt OsButton | Feature-spezifisch |
+| GroupButton | ✅ Nutzt OsButton | Feature-spezifisch |
+| InviteButton | ✅ Nutzt OsButton | Feature-spezifisch |
+| LoginButton | ✅ Nutzt OsButton | Feature-spezifisch |
+| EmotionButton | ✅ Nutzt OsButton | Feature-spezifisch |
+| JoinLeaveButton | ✅ Nutzt OsButton | Feature-spezifisch |
+| MapButton | ✅ Nutzt OsButton | Feature-spezifisch |
+| MapStylesButtons | ✅ Nutzt OsButton | Feature-spezifisch |
+| PaginationButtons | ✅ Nutzt OsButton | Feature-spezifisch |
+| CtaJoinLeaveGroup | ✅ Nutzt OsButton | Feature-spezifisch |
+| CtaUnblockAuthor | ✅ Nutzt OsButton | Feature-spezifisch |
 
 ### Modal-Familie (zur Konsolidierung)
 | Komponente | Beschreibung | Ziel |
@@ -366,24 +356,26 @@ Migration vollständig abgeschlossen. 0 `<base-button>` Tags verbleiben in Vue-T
 
 ## Kategorisierung
 
-### Basis-Komponenten (hohe Priorität)
-Diese sollten zuerst migriert werden:
-- Button → OsButton
-- Card → OsCard
-- Icon → OsIcon
+### Basis-Komponenten — UI-Library ✅
+- ~~Button → OsButton~~ ✅
+- ~~Card → OsCard~~ ✅
+- ~~Icon → OsIcon~~ ✅
+- ~~Spinner → OsSpinner~~ ✅
+
+### Basis-Komponenten — UI-Library (ausstehend)
 - Modal → OsModal
 - Input → OsInput
 - Select → OsSelect
-- Avatar → OsAvatar
-- Spinner → OsSpinner
+- Avatar → OsAvatar (falls benötigt)
 
-### Layout-Komponenten
-- Container, Flex, Grid, Page, Section, Space
+### Layout & Typography — → Plain HTML ✅ (Tier A)
+- ~~Container, Flex, FlexItem, Section, Space~~ ✅ → HTML + CSS
+- ~~Heading, Text, List, ListItem, Tag, Placeholder~~ ✅ → HTML + CSS
 
-### Typography
-- Heading, Text
+### Noch zu migrieren (Tier B → Plain HTML)
+- Chip, Number, Grid, GridItem, Radio
 
-### Feature-Komponenten (niedrigere Priorität)
+### Feature-Komponenten (bleiben in Webapp)
 - Chat, Group, Registration, Search, etc.
 
 ---
@@ -409,6 +401,9 @@ Diese sollten zuerst migriert werden:
 | 2026-02-09 | Claude | **Milestone 4a abgeschlossen** | 6 weitere: donations, profile (2x), badges, notifications/index, ReportRow |
 | 2026-02-11 | Claude | **M4b: icon + circle** | icon-Slot implementiert, circle-Prop mit CVA |
 | 2026-02-11 | Claude | **9 icon-Buttons migriert (M4c)** | DisableModal, DeleteUserModal, CtaUnblockAuthor, LocationSelect, CategoriesSelect, my-email-address, profile Chat, PaginationButtons (2x circle) |
+| 2026-02-11→18 | Claude | **Sessions 12-26** | OsButton M4c abgeschlossen, OsIcon, OsSpinner, OsCard implementiert + Webapp-Migration, BaseButton/BaseCard/BaseIcon/LoadingSpinner gelöscht |
+| 2026-02-19 | Claude | **Tier A Migration** | 10 ds-* Vue-Wrapper → Plain HTML + CSS, _ds-compat.scss, ~450 Nutzungen in ~90 Dateien |
+| 2026-02-19 | Claude | **Katalog konsolidiert** | Styleguide- und Webapp-Tabellen aktualisiert, veraltete Status korrigiert |
 
 ---
 
@@ -417,40 +412,40 @@ Diese sollten zuerst migriert werden:
 ### Phase 0: Analyse ✅
 1. [x] Webapp-Komponenten auflisten
 2. [x] Styleguide-Komponenten auflisten
-3. [x] Offensichtliche Duplikate identifizieren
-4. [x] Button-Familie im Detail analysieren
-5. [x] Modal-Familie im Detail analysieren
-6. [x] Menu-Familie im Detail analysieren
-7. [x] Priorisierung festlegen
-8. [x] Konsolidierungsplan finalisieren
+3. [x] Duplikate und Familien identifizieren
+4. [x] Button/Modal/Menu im Detail analysieren
+5. [x] Priorisierung und Konsolidierungsplan
 
-### Phase 3: OsButton Migration (in Arbeit)
-9. [x] OsButton entwickeln (CVA, vue-demi)
-10. [x] Webapp-Integration (Jest, Docker, CI)
-11. [x] 16 Buttons migrieren (validiert ✅)
+### Phase 3: OsButton Migration ✅
+6. [x] OsButton entwickeln (CVA, vue-demi)
+7. [x] 133 Buttons in 79 Dateien migriert
+8. [x] BaseButton.vue gelöscht, base-components.js Plugin entfernt
 
-**Milestone 4a: 14 Buttons ohne neue Props** ✅
-12. [x] Modal Cancel-Buttons (3)
-13. [x] Form Cancel/Submit-Buttons (3)
-14. [x] ImageUploader Crop-Buttons (2)
-15. [x] Page Buttons (6)
+### Phase 4: Tier 1 — UI-Library Kern ✅
+9. [x] OsIcon + 82 Ocelot-Icons, BaseIcon gelöscht
+10. [x] OsSpinner + Webapp-Migration, LoadingSpinner gelöscht
+11. [x] OsCard + Webapp-Migration, BaseCard gelöscht
 
-**Milestone 4b: Props für ~49 Buttons hinzufügen**
-16. [x] icon-Slot zu OsButton hinzufügen ✅
-17. [x] circle-Variant zu OsButton hinzufügen ✅
-18. [ ] loading-Prop zu OsButton hinzufügen
+### Phase 4: Tier A — ds-* → Plain HTML ✅
+12. [x] _ds-compat.scss Utility-Klassen
+13. [x] 10 ds-* Wrapper → HTML + CSS (~450 Nutzungen, ~90 Dateien)
 
-**Milestone 4c: ~49 Buttons mit neuen Props migrieren**
-19. [ ] Button-Komponenten (~15)
-20. [ ] Navigation (~8)
-21. [ ] Editor (~15)
-22. [ ] Filter/Chat (~10)
-23. [ ] Forms/Modals (~5)
-24. [ ] Features/Pages (~12)
+### Phase 4: Tier B — ds-* → Plain HTML (ausstehend)
+14. [ ] ds-chip (5 Dateien) → `<span class="ds-chip">`
+15. [ ] ds-number (5 Dateien) → `<div class="ds-number">`
+16. [ ] ds-grid / ds-grid-item (10 Dateien) → CSS Grid
+17. [ ] ds-radio (1 Datei) → native `<input type="radio">`
+
+### Phase 4: Tier 2-4 — UI-Library (ausstehend)
+18. [ ] OsModal (7 Dateien)
+19. [ ] OsInput (23 Dateien, gekoppelt mit ds-form)
+20. [ ] OsMenu / OsMenuItem (17 Dateien)
+21. [ ] OsSelect (3 Dateien), OsTable (7 Dateien)
+22. [ ] ds-form → HTML `<form>` oder OsForm (18 Dateien)
 
 ---
 
-**✅ Phase 0 abgeschlossen!** Phase 3 zu 27% erledigt (24/90 Buttons migriert). Milestone 4a: 8/14 Buttons.
+**✅ Phase 0-3 abgeschlossen. Phase 4: Tier 1 + Tier A ✅, Tier B + Tier 2-4 ausstehend.**
 
 ---
 
@@ -544,65 +539,46 @@ Diese sollten zuerst migriert werden:
 
 ---
 
-### Feature-Buttons (Business-Logik)
+### Feature-Buttons (Business-Logik) ✅
 
-Diese Buttons enthalten Business-Logik und sollten **nicht** in OsButton konsolidiert werden:
+Feature-Buttons behalten Business-Logik, nutzen aber intern alle OsButton:
 
-| Komponente | Beschreibung | Migration |
-|------------|--------------|-----------|
-| FollowButton | Folgen/Entfolgen Logik | Bleibt Feature-Komponente |
-| GroupButton | Gruppen-Aktionen | Bleibt Feature-Komponente |
-| InviteButton | Einladungs-Logik | Bleibt Feature-Komponente |
-| LoginButton | Auth-Logik | Bleibt Feature-Komponente |
-| ShoutButton | Shout-Logik | Bleibt Feature-Komponente |
-| ObserveButton | Beobachten-Logik | Bleibt Feature-Komponente |
-| EmotionButton | Reaktions-Logik | Bleibt Feature-Komponente |
-| JoinLeaveButton | Gruppen Beitreten/Verlassen | Bleibt Feature-Komponente |
-| MapButton | Karten-Toggle | Bleibt Feature-Komponente |
-| MapStylesButtons | Kartenstil-Auswahl | Bleibt Feature-Komponente |
-| PaginationButtons | Seitennavigation | Bleibt Feature-Komponente |
+| Komponente | Status |
+|------------|--------|
+| FollowButton | ✅ Nutzt OsButton |
+| GroupButton | ✅ Nutzt OsButton |
+| InviteButton | ✅ Nutzt OsButton |
+| LoginButton | ✅ Nutzt OsButton |
+| ShoutButton | ✅ Nutzt OsButton |
+| ObserveButton | ✅ Nutzt OsButton |
+| EmotionButton | ✅ Nutzt OsButton |
+| JoinLeaveButton | ✅ Nutzt OsButton |
+| MapButton | ✅ Nutzt OsButton |
+| MapStylesButtons | ✅ Nutzt OsButton |
+| PaginationButtons | ✅ Nutzt OsButton |
 
 ---
 
-### Konsolidierungsvorschlag: OsButton
+### Konsolidierungsvorschlag: OsButton ✅ IMPLEMENTIERT
 
+> **Hinweis:** Die tatsächliche API weicht vom ursprünglichen Vorschlag ab.
+> Siehe `packages/ui/src/components/OsButton/OsButton.vue` für die aktuelle Implementierung.
+
+**Implementierte API (CVA-basiert):**
 ```typescript
 interface OsButtonProps {
-  // Variante
-  variant?: 'default' | 'primary' | 'secondary' | 'danger'
-
-  // Stil
-  filled?: boolean      // Gefüllter Hintergrund (default: false = outline)
-  ghost?: boolean       // Komplett transparent
-
-  // Größe
-  size?: 'tiny' | 'small' | 'base' | 'large'
-
-  // Form
-  circle?: boolean      // Runder Button
-  fullWidth?: boolean   // Volle Breite
-
-  // Icon
-  icon?: string
-  iconPosition?: 'left' | 'right'
-
-  // Zustände
+  variant?: 'default' | 'primary' | 'secondary' | 'danger' | 'warning' | 'success' | 'info'
+  appearance?: 'filled' | 'outline' | 'ghost'  // statt separate booleans
+  size?: 'sm' | 'md' | 'lg' | 'xl'             // vereinfachte Größen
+  circle?: boolean
+  fullWidth?: boolean
   loading?: boolean
   disabled?: boolean
-
-  // Link-Support
-  to?: string | RouteLocationRaw  // Router-Link
-  href?: string                    // Externer Link
-
-  // Button-Typ
-  type?: 'button' | 'submit'
+  as?: 'button' | 'a' | 'nuxt-link' | 'router-link' | Component  // polymorphes Rendering
+  type?: 'button' | 'submit' | 'reset'
+  // Icon: slot-basiert (<template #icon>), nicht prop-basiert
 }
 ```
-
-**Nicht übernommen:**
-- `bullet` → zu spezifisch, kann mit `circle` + custom size erreicht werden
-- `hover` prop → unnötig, CSS :hover reicht
-- `padding` prop → sollte über size geregelt werden
 
 ---
 
@@ -636,11 +612,11 @@ interface OsButtonProps {
 
 ---
 
-### Offene Fragen
+### Offene Fragen ✅ (alle gelöst)
 
-1. **secondary Variante:** Styleguide hat `secondary` (blau), Webapp nicht. Wird es gebraucht?
-2. **x-large Size:** Styleguide hat `x-large` in CSS, aber nicht als Prop. Übernehmen?
-3. **bullet Form:** Webapp-spezifisch. Brauchen wir das in OsButton?
+1. ~~secondary Variante~~ → ✅ Ja, implementiert als `variant="secondary"`
+2. ~~x-large Size~~ → ✅ Implementiert als `size="xl"`
+3. ~~bullet Form~~ → ✅ Nicht übernommen, `circle` + custom CSS reicht
 
 ---
 
@@ -956,120 +932,120 @@ interface OsDropdownProps {
 
 ## Priorisierung der Komponenten
 
-### Tier 1: Kern-Komponenten (höchste Priorität)
+### Tier 1: Kern-Komponenten ✅
 
-Diese Komponenten sind die Basis für alle anderen und sollten zuerst migriert werden:
+| # | Komponente | Status |
+|---|------------|--------|
+| 1 | **OsButton** | ✅ 133 Buttons in 79 Dateien, BaseButton gelöscht |
+| 2 | **OsIcon** | ✅ 131 Nutzungen, 82 Ocelot-Icons, BaseIcon gelöscht |
+| 3 | **OsSpinner** | ✅ 4 Spinner migriert, LoadingSpinner gelöscht |
+| 4 | **OsCard** | ✅ ~30 Dateien, BaseCard gelöscht |
 
-| # | Komponente | Begründung | Abhängigkeiten |
-|---|------------|------------|----------------|
-| 1 | **OsButton** | Meistgenutzte Komponente, Basis für viele Features | OsIcon |
-| 2 | **OsIcon** | Wird von Button, Menu, etc. benötigt | - |
-| 3 | **OsSpinner** | Loading-States für Button, Modal, etc. | - |
-| 4 | **OsCard** | Layout-Basis für viele Komponenten | - |
+### Tier A: Triviale ds-* → Plain HTML ✅
 
-### Tier 2: Layout & Feedback (mittlere Priorität)
+| # | Komponente | Status |
+|---|------------|--------|
+| — | ds-section, ds-placeholder, ds-tag, ds-list, ds-list-item | ✅ → HTML-Elemente + CSS-Klassen |
+| — | ds-container, ds-heading, ds-text | ✅ → HTML-Elemente + CSS-Klassen |
+| — | ds-space | ✅ → div + Margin-Utility-Klassen |
+| — | ds-flex, ds-flex-item | ✅ → HTML + CSS @media Queries |
 
-| # | Komponente | Begründung | Abhängigkeiten |
-|---|------------|------------|----------------|
-| 5 | **OsModal** | Dialoge, Bestätigungen, Formulare | OsButton, OsCard |
-| 6 | **OsDropdown** | Dropdown-Menüs, Selects | OsButton |
-| 7 | **OsAvatar** | Benutzerprofile, Kommentare | - |
-| 8 | **OsInput** | Formulare | - |
+### Tier B: Einfache ds-* → Plain HTML (ausstehend)
 
-### Tier 3: Navigation & Typography (niedrigere Priorität)
+| # | Komponente | Dateien | Ziel |
+|---|------------|---------|------|
+| — | ds-chip | 5 | `<span class="ds-chip">` |
+| — | ds-number | 5 | `<div class="ds-number">` |
+| — | ds-grid / ds-grid-item | 10 | CSS Grid |
+| — | ds-radio | 1 | native `<input type="radio">` |
 
-| # | Komponente | Begründung | Abhängigkeiten |
-|---|------------|------------|----------------|
-| 9 | **OsMenu** | Navigation (weniger kritisch) | OsMenuItem |
-| 10 | **OsMenuItem** | Menu-Items | - |
-| 11 | **OsHeading** | Überschriften | - |
-| 12 | **OsText** | Text-Formatierung | - |
+### Tier 2: Layout & Feedback (ausstehend)
 
-### Tier 4: Spezial-Komponenten (später)
+| # | Komponente | Dateien | Abhängigkeiten |
+|---|------------|---------|----------------|
+| 5 | **OsModal** | 7 | OsButton, OsCard |
+| 6 | **OsDropdown** | — | OsButton |
+| 7 | **OsAvatar** | — | - |
+| 8 | **OsInput** | 23 | gekoppelt mit ds-form (18 Dateien) |
 
-| # | Komponente | Begründung |
-|---|------------|------------|
-| 13 | OsSelect | Komplexere Formular-Komponente |
-| 14 | OsTable | Datentabellen |
-| 15 | OsTag/OsChip | Tags und Badges |
+### Tier 3: Navigation (ausstehend)
+
+| # | Komponente | Dateien | Abhängigkeiten |
+|---|------------|---------|----------------|
+| 9 | **OsMenu** | 11 | OsMenuItem |
+| 10 | **OsMenuItem** | 6 | - |
+
+### Tier 4: Spezial-Komponenten (ausstehend)
+
+| # | Komponente | Dateien |
+|---|------------|---------|
+| 11 | OsSelect | 3 |
+| 12 | OsTable | 7 |
+| 13 | ds-form → HTML `<form>` oder OsForm | 18 |
+
+> **Hinweis:** OsHeading, OsText, OsTag sind nicht mehr geplant — wurden zu Plain HTML migriert (Tier A).
 
 ---
 
 ## Finaler Konsolidierungsplan
 
-> **Hinweis:** "Tier 1/2/3" bezeichnet die Migrations-Reihenfolge innerhalb von Phase 4 (Komponenten-Migration).
-> Dies ist unabhängig von den Haupt-Phasen 0-5 des Projekts.
+> **Hinweis:** "Tier 1/A/B/2/3/4" bezeichnet die Migrations-Reihenfolge innerhalb von Phase 4.
 
-### Tier 1: Kern-Komponenten
-
-```
-1. OsIcon
-   └── Vereint: DsIcon (Styleguide), BaseIcon (Webapp)
-   └── Token: Keine eigenen (nur Größen via Props)
-
-2. OsSpinner
-   └── Vereint: DsSpinner (Styleguide), LoadingSpinner (Webapp)
-   └── Token: Farben, Größen
-
-3. OsButton
-   └── Vereint: DsButton (Styleguide), BaseButton (Webapp)
-   └── NICHT übernommen: Feature-Buttons (FollowButton, etc.)
-   └── Token: Farben, Größen, Border-Radius, Spacing
-
-4. OsCard
-   └── Vereint: DsCard (Styleguide), BaseCard (Webapp)
-   └── Token: Shadows, Border-Radius, Spacing
-```
-
-### Tier 2: Layout & Feedback
+### Tier 1: Kern-Komponenten ✅
 
 ```
-5. OsModal
-   └── Basis: DsModal (Styleguide) - bereits gut!
-   └── Feature-Modals bleiben in Webapp, nutzen OsModal
-   └── Token: Z-Index, Shadows, Spacing
-
-6. OsDropdown (NEU!)
-   └── Basis: Dropdown (Webapp)
-   └── Erkenntnis: Wichtiger als gedacht!
-   └── Token: Spacing, Shadows
-
-7. OsAvatar
-   └── Vereint: DsAvatar (Styleguide), ProfileAvatar (Webapp)
-   └── Token: Größen, Border-Radius
-
-8. OsInput
-   └── Basis: DsInput (Styleguide), InputField Patterns (Webapp)
-   └── Token: Border, Farben, Spacing
+1. OsIcon    ✅ Vereint: DsIcon + BaseIcon → 82 Ocelot-Icons
+2. OsSpinner ✅ Vereint: DsSpinner + LoadingSpinner
+3. OsButton  ✅ Vereint: DsButton + BaseButton → 133 Buttons in 79 Dateien
+4. OsCard    ✅ Vereint: DsCard + BaseCard → ~30 Dateien
 ```
 
-### Tier 3: Navigation
+### Tier A: Triviale ds-* Wrapper → Plain HTML ✅
 
 ```
-9. OsMenu + OsMenuItem
-   └── Basis: DsMenu/DsMenuItem (Styleguide)
-   └── Feature-Menus bleiben in Webapp
-   └── Token: Spacing, Farben
+ds-section, ds-placeholder, ds-tag, ds-list, ds-list-item  ✅ → HTML + CSS-Klassen
+ds-container, ds-heading, ds-text                           ✅ → HTML + CSS-Klassen
+ds-space                                                     ✅ → div + Margin-Utilities
+ds-flex, ds-flex-item                                        ✅ → HTML + CSS @media Queries
+```
+
+### Tier B: Einfache ds-* → Plain HTML (ausstehend)
+
+```
+ds-chip, ds-number, ds-grid/ds-grid-item, ds-radio → Plain HTML + CSS
+```
+
+### Tier 2-4: UI-Library (ausstehend)
+
+```
+5. OsModal    → Basis: DsModal, Feature-Modals bleiben in Webapp
+6. OsDropdown → Basis: Dropdown (Webapp) — wichtiger als gedacht!
+7. OsAvatar   → Vereint: DsAvatar + ProfileAvatar
+8. OsInput    → Basis: DsInput, gekoppelt mit ds-form
+9. OsMenu     → Basis: DsMenu/DsMenuItem
+10. OsSelect  → Basis: DsSelect
+11. OsTable   → Basis: DsTable
 ```
 
 ---
 
 ## Erkenntnisse aus der Analyse
 
-### Was funktioniert gut (beibehalten):
-1. **DsModal als Basis** - Feature-Modals nutzen bereits DsModal
-2. **BaseButton als Standard** - Webapp hat konsolidiert auf BaseButton
-3. **Dropdown-Pattern** - Funktioniert gut mit v-popover
+### Was funktioniert gut:
+1. **DsModal als Basis** - Feature-Modals nutzen bereits DsModal → OsModal wird gleich funktionieren
+2. **Dropdown-Pattern** - Funktioniert gut mit v-popover
+3. **Tier A Migration** - 10 ds-* Wrapper durch HTML + CSS ersetzt, kein Funktionsverlust
 
-### Was problematisch ist (verbessern):
-1. **Button-Varianten** - Zu viele unterschiedliche Buttons
-2. **Inkonsistente Naming** - ds-* vs base-* vs kebab-case
-3. **Doppelte Komponenten** - Logo, Icon, Card existieren doppelt
+### Was gelöst wurde: ✅
+1. ~~Button-Varianten~~ → OsButton mit CVA-Varianten vereinheitlicht
+2. ~~Inkonsistente Naming~~ → os-* Prefix für Library, ds-* CSS-Klassen temporär beibehalten
+3. ~~Doppelte Komponenten~~ → BaseCard, BaseIcon, LoadingSpinner gelöscht (3/5 Duplikate aufgelöst)
+4. ~~Layout-Shift bei ds-flex~~ → CSS @media Queries statt JavaScript window.innerWidth
 
-### Was überflüssig ist (nicht migrieren):
-1. **bullet Button** - Zu spezifisch, kann mit circle erreicht werden
-2. **hover Prop** - CSS :hover reicht
-3. **Viele Feature-Buttons** - Behalten Business-Logik, nutzen OsButton
+### Noch offen:
+1. **Logo** - Existiert doppelt (Webapp + Styleguide)
+2. **Modal** - Existiert doppelt (Webapp Modal.vue ist Modal-Router, DsModal ist UI)
+3. **ds-form Kopplung** - ds-input und ds-form sind stark gekoppelt (Schema-Validation)
 
 ---
 
@@ -1138,7 +1114,7 @@ $box-shadow-small-inset: inset 0 0 0 1px rgba(0,0,0,.05)
 
 ## Phase 3: Webapp-Integration (Tracking)
 
-### OsButton Migration - Abgeschlossen (132/132) ✅
+### OsButton Migration - Abgeschlossen (133/133) ✅
 
 | # | Datei | Button | Status |
 |---|-------|--------|--------|
@@ -1181,15 +1157,9 @@ $box-shadow-small-inset: inset 0 0 0 1px rgba(0,0,0,.05)
 | `fullWidth` Prop | ✅ |
 | `type` Prop (button/submit/reset) | ✅ |
 
-### Nächste Schritte
+### Status
 
-1. Snapshot-Dateien aktualisieren
-2. Test-Selektoren anpassen
-3. BaseButton.vue ggf. entfernen
-4. Phase 4: Weitere Komponenten (OsIcon, OsCard, OsModal, ...)
-
-### Integrations-Protokoll
-
-| Datum | Aktion | Details |
-|-------|--------|---------|
-| 2026-02-08 | Analyse | 6 Einsatzstellen identifiziert, 2 minimal (nur variant) |
+**OsButton Migration: ✅ Vollständig abgeschlossen.**
+- BaseButton.vue gelöscht, base-components.js Plugin entfernt
+- Alle Tests, Snapshots, Cypress E2E-Selektoren aktualisiert
+- Nächster Schritt: Tier B (ds-chip, ds-number, ds-grid, ds-radio) oder Tier 2 (OsModal)

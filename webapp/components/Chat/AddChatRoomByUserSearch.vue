@@ -1,6 +1,6 @@
 <template>
   <div class="add-chat-room-by-user-search">
-    <ds-flex class="headline">
+    <div class="ds-flex headline">
       <h2 class="title">{{ $t('chat.addRoomHeadline') }}</h2>
       <os-button
         class="close-button"
@@ -15,11 +15,11 @@
           <os-icon :icon="icons.close" />
         </template>
       </os-button>
-    </ds-flex>
-    <ds-space margin-bottom="small" />
-    <ds-space>
+    </div>
+    <div class="ds-mb-small"></div>
+    <div class="ds-mb-large">
       <select-user-search :id="id" ref="selectUserSearch" @select-user="selectUser" />
-    </ds-space>
+    </div>
   </div>
 </template>
 

@@ -14,11 +14,11 @@
       name="nonce"
       id="nonce"
     />
-    <ds-text>
+    <p class="ds-text">
       {{ $t('components.registration.email-nonce.form.description') }}
-    </ds-text>
+    </p>
     <slot></slot>
-    <ds-space margin="xxx-small" />
+    <div class="ds-my-xxx-small"></div>
   </ds-form>
 </template>
 

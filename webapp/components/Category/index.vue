@@ -1,8 +1,11 @@
 <template>
-  <ds-tag class="category-tag" :class="filterActive ? 'filterActive' : ''">
+  <span
+    class="ds-tag ds-tag-size-base ds-tag-medium category-tag"
+    :class="filterActive ? 'filterActive' : ''"
+  >
     <os-icon :icon="resolvedIcon" />
     {{ name }}
-  </ds-tag>
+  </span>
 </template>
 
 <script>

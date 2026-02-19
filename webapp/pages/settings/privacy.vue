@@ -1,10 +1,10 @@
 <template>
   <os-card>
     <h2 class="title">{{ $t('settings.privacy.name') }}</h2>
-    <ds-space margin-bottom="small">
+    <div class="ds-mb-small">
       <input id="allow-shouts" type="checkbox" v-model="shoutsAllowed" />
       <label for="allow-shouts">{{ $t('settings.privacy.make-shouts-public') }}</label>
-    </ds-space>
+    </div>
     <os-button variant="primary" @click="submit" :disabled="disabled">
       {{ $t('actions.save') }}
     </os-button>

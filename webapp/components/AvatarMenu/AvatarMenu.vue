@@ -28,9 +28,9 @@
         {{ $t('login.hello') }}
         <b>{{ userName }}</b>
         <template v-if="user.role !== 'user'">
-          <ds-text color="softer" size="small" style="margin-bottom: 0">
+          <p class="ds-text ds-text-softer ds-text-size-small" style="margin-bottom: 0">
             {{ user.role | camelCase }}
-          </ds-text>
+          </p>
         </template>
         <hr />
         <ds-menu :routes="routes" :matcher="matcher">

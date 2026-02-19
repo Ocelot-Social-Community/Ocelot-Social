@@ -1,15 +1,15 @@
 <template>
   <div id="search-results" class="search-results">
-    <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }">
+    <div class="search-results__content">
       <masonry-grid>
         <!-- search text -->
         <ds-grid-item class="grid-total-search-results" :row-span="1" column-span="fullWidth">
-          <ds-space margin-bottom="xxx-small" margin-top="xxx-small" centered>
-            <ds-text class="total-search-results">
+          <div class="ds-mb-xxx-small ds-mt-xxx-small ds-space-centered">
+            <p class="ds-text total-search-results">
               {{ $t('search.for') }}
               <strong>{{ '"' + (search || '') + '"' }}</strong>
-            </ds-text>
-          </ds-space>
+            </p>
+          </div>
         </ds-grid-item>
 
         <!-- tabs -->
@@ -20,7 +20,7 @@
         <template v-if="!(!activeResourceCount || searchCount === 0)">
           <!-- pagination buttons -->
           <ds-grid-item v-if="activeResourceCount > pageSize" :row-span="2" column-span="fullWidth">
-            <ds-space centered>
+            <div class="ds-mb-large ds-space-centered">
               <pagination-buttons
                 :hasNext="hasNext"
                 :showPageCounter="true"
@@ -32,7 +32,7 @@
                 @back="previousResults"
                 @next="nextResults"
               />
-            </ds-space>
+            </div>
           </ds-grid-item>
 
           <!-- posts -->
@@ -86,7 +86,7 @@
 
           <!-- pagination buttons -->
           <ds-grid-item v-if="activeResourceCount > pageSize" :row-span="2" column-span="fullWidth">
-            <ds-space centered>
+            <div class="ds-mb-large ds-space-centered">
               <pagination-buttons
                 :hasNext="hasNext"
                 :hasPrevious="hasPrevious"
@@ -99,18 +99,18 @@
                 @back="previousResults"
                 @next="nextResults"
               />
-            </ds-space>
+            </div>
           </ds-grid-item>
         </template>
 
         <!-- no results -->
         <ds-grid-item v-else :row-span="7" column-span="fullWidth">
-          <ds-space centered>
+          <div class="ds-mb-large ds-space-centered">
             <hc-empty icon="tasks" :message="$t('search.no-results', { search })" />
-          </ds-space>
+          </div>
         </ds-grid-item>
       </masonry-grid>
-    </ds-flex-item>
+    </div>
   </div>
 </template>
 
@@ -409,6 +409,25 @@ export default {
 </script>
 
 <style lang="scss">
+.search-results__content {
+  flex: 0 0 100%;
+  width: 100%;
+}
+@media #{$media-query-small} {
+  .search-results__content {
+    flex: 3 0 0;
+  }
+}
+@media #{$media-query-medium} {
+  .search-results__content {
+    flex: 5 0 0;
+  }
+}
+@media #{$media-query-large} {
+  .search-results__content {
+    flex: 3 0 0;
+  }
+}
 .search-results {
   > .results {
     padding: $space-small;

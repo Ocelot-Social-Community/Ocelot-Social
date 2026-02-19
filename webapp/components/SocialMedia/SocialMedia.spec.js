@@ -2,7 +2,6 @@ import { mount } from '@vue/test-utils'
 import SocialMedia from './SocialMedia.vue'
 
 const stubs = {
-  'ds-space': true,
   'ds-text': true,
 }
 

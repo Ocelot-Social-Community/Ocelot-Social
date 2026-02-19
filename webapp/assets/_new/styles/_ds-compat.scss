@@ -1,0 +1,67 @@
+// ==========================================================
+// DS-COMPAT: Temporäre Utility-Klassen für ds-* Migration
+// TODO(tailwind): Durch Tailwind-Utilities ersetzen
+// Grep: ds-mb-, ds-mt-, ds-my-, ds-space-centered, ds-flex
+// ==========================================================
+
+// ds-space Ersatz — Margin-Bottom
+.ds-mb-xxx-small { margin-bottom: $space-xxx-small; }
+.ds-mb-xx-small  { margin-bottom: $space-xx-small; }
+.ds-mb-x-small   { margin-bottom: $space-x-small; }
+.ds-mb-small     { margin-bottom: $space-small; }
+.ds-mb-base      { margin-bottom: $space-base; }
+.ds-mb-large     { margin-bottom: $space-large; }
+.ds-mb-x-large   { margin-bottom: $space-x-large; }
+.ds-mb-xx-large  { margin-bottom: $space-xx-large; }
+
+// ds-space Ersatz — Margin-Top
+.ds-mt-xxx-small { margin-top: $space-xxx-small; }
+.ds-mt-xx-small  { margin-top: $space-xx-small; }
+.ds-mt-x-small   { margin-top: $space-x-small; }
+.ds-mt-small     { margin-top: $space-small; }
+.ds-mt-base      { margin-top: $space-base; }
+.ds-mt-large     { margin-top: $space-large; }
+.ds-mt-x-large   { margin-top: $space-x-large; }
+.ds-mt-xx-large  { margin-top: $space-xx-large; }
+
+// ds-space Ersatz — Margin Y (top + bottom)
+.ds-my-xxx-small { margin-top: $space-xxx-small; margin-bottom: $space-xxx-small; }
+.ds-my-xx-small  { margin-top: $space-xx-small; margin-bottom: $space-xx-small; }
+.ds-my-x-small   { margin-top: $space-x-small; margin-bottom: $space-x-small; }
+.ds-my-small     { margin-top: $space-small; margin-bottom: $space-small; }
+.ds-my-base      { margin-top: $space-base; margin-bottom: $space-base; }
+.ds-my-large     { margin-top: $space-large; margin-bottom: $space-large; }
+.ds-my-x-large   { margin-top: $space-x-large; margin-bottom: $space-x-large; }
+.ds-my-xx-large  { margin-top: $space-xx-large; margin-bottom: $space-xx-large; }
+
+// ds-space centered
+.ds-space-centered {
+  display: flex;
+  flex: 1;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+// ds-list-item bullet icon (replaces DsListItem Vue component's angle-right prefix)
+.ds-list-item::before {
+  content: '';
+  flex: 0 0 1.5em;
+  height: 1.2em;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='%2370677e'%3E%3Cpath d='M12.969 4.281l11 11 .688.719-.688.719-11 11-1.438-1.438L21.812 16 11.531 5.719z'/%3E%3C/svg%3E") no-repeat left center;
+  background-size: 0.6em;
+}
+
+// ds-flex Ersatz
+.ds-flex          { display: flex; flex-wrap: wrap; }
+.ds-flex-no-wrap  { flex-wrap: nowrap; }
+.ds-flex-centered { align-items: center; justify-content: center; }
+.ds-flex-item     { flex: 1 0 0; min-width: 0; }
+
+.ds-flex-gap-xxx-small { gap: $space-xxx-small; }
+.ds-flex-gap-xx-small  { gap: $space-xx-small; }
+.ds-flex-gap-x-small   { gap: $space-x-small; }
+.ds-flex-gap-small     { gap: $space-small; }
+.ds-flex-gap-base      { gap: $space-base; }
+.ds-flex-gap-large     { gap: $space-large; }

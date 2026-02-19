@@ -15,9 +15,9 @@
       />
     </template>
     <template #reportedOn="scope">
-      <ds-text size="small">
+      <p class="ds-text ds-text-size-small">
         <date-time :date-time="scope.row.createdAt" data-test="filed-date" />
-      </ds-text>
+      </p>
     </template>
     <template #reasonCategory="scope">
       {{ $t('report.reason.category.options.' + scope.row.reasonCategory) }}

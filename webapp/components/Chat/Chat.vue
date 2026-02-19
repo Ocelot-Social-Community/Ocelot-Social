@@ -32,8 +32,8 @@
     @open-file="openFile($event.detail[0].file.file)"
   >
     <div v-if="selectedRoom && selectedRoom.roomId" slot="room-options" class="chat-room-options">
-      <ds-flex v-if="singleRoom">
-        <ds-flex-item centered class="single-chat-bubble">
+      <div v-if="singleRoom" class="ds-flex">
+        <div class="ds-flex-item single-chat-bubble" style="align-self: center">
           <os-button
             as="nuxt-link"
             :to="{ name: 'chat' }"
@@ -47,8 +47,8 @@
               <os-icon :icon="icons.expand" />
             </template>
           </os-button>
-        </ds-flex-item>
-        <ds-flex-item centered>
+        </div>
+        <div class="ds-flex-item" style="align-self: center">
           <div class="vac-svg-button vac-room-options">
             <slot name="menu-icon">
               <os-button
@@ -65,8 +65,8 @@
               </os-button>
             </slot>
           </div>
-        </ds-flex-item>
-      </ds-flex>
+        </div>
+      </div>
     </div>
 
     <div slot="room-header-avatar">

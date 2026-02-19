@@ -1,21 +1,21 @@
 <template>
-  <ds-space v-if="user.socialMedia && user.socialMedia.length" margin="large">
+  <div v-if="user.socialMedia && user.socialMedia.length" class="ds-my-large">
     <os-card class="social-media-bc">
-      <ds-space margin="x-small">
-        <ds-text tag="h5" color="soft" data-test="social-media-list-headline">
+      <div class="ds-my-x-small">
+        <h5 class="ds-text ds-text-soft" data-test="social-media-list-headline">
           {{ $t('profile.socialMedia') }} {{ userName | truncate(15) }}?
-        </ds-text>
+        </h5>
         <template>
-          <ds-space v-for="link in socialMediaLinks()" :key="link.id" margin="x-small">
+          <div v-for="link in socialMediaLinks()" :key="link.url" class="ds-my-x-small">
             <a :href="link.url" target="_blank">
               <img :src="link.favicon" alt="Link:" height="22" width="22" />
               {{ link.username }}
             </a>
-          </ds-space>
+          </div>
         </template>
-      </ds-space>
+      </div>
     </os-card>
-  </ds-space>
+  </div>
 </template>
 
 <script>

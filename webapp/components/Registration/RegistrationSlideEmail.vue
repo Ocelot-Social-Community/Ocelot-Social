@@ -6,18 +6,23 @@
     @input="handleInput"
     @input-valid="handleInputValid"
   >
-    <ds-text>
+    <p class="ds-text">
       {{ $t('components.registration.signup.form.description') }}
-    </ds-text>
+    </p>
     <ds-input :placeholder="$t('login.email')" type="email" id="email" model="email" name="email" />
     <slot></slot>
-    <ds-text v-if="sliderData.collectedInputData.emailSend">
-      <input id="checkbox" type="checkbox" v-model="sendEmailAgain" :checked="sendEmailAgain" />
-      <label for="checkbox0">
+    <p class="ds-text" v-if="sliderData.collectedInputData.emailSend">
+      <input
+        id="sendEmailAgain"
+        type="checkbox"
+        v-model="sendEmailAgain"
+        :checked="sendEmailAgain"
+      />
+      <label for="sendEmailAgain">
         {{ $t('components.registration.email.form.sendEmailAgain') }}
       </label>
-    </ds-text>
-    <ds-space margin="xxx-small" />
+    </p>
+    <div class="ds-my-xxx-small"></div>
   </ds-form>
 </template>
 

@@ -1,8 +1,8 @@
 <template>
   <div>
     <os-card>
-      <ds-heading tag="h3">{{ $t('invite-codes.group-invite-links') }}</ds-heading>
-      <ds-space margin="large" />
+      <h3 class="ds-heading ds-heading-h3">{{ $t('invite-codes.group-invite-links') }}</h3>
+      <div class="ds-my-large"></div>
       <invitation-list
         @generate-invite-code="generateGroupInviteCode"
         @invalidate-invite-code="invalidateInviteCode"

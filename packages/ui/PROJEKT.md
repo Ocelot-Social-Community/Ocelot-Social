@@ -81,10 +81,10 @@ Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
 Phase 3: ██████████ 100% (24/24 Aufgaben) ✅ - Webapp-Integration komplett
-Phase 4: █████░░░░░  47% (8/17 Aufgaben) - OsButton ✅, OsIcon ✅, System-Icons ✅, BaseIcon→OsIcon Migration ✅, OsSpinner ✅, Spinner Webapp-Migration ✅, OsCard ✅, BaseCard→OsCard Migration ✅
+Phase 4: █████░░░░░  46% (12/26 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅ | Tier B, Tier 2-4 ausstehend
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████████░░  81% (70/86 Aufgaben)
+Gesamt:  ████████░░  78% (74/95 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -177,17 +177,54 @@ BaseIcon → OsIcon Webapp-Migration: ✅
 ├─ Jest Mocks: @ocelot-social/ui/ocelot für ocelotIcons in Tests
 ├─ Tests aktualisiert: 911/939 Tests bestanden (3 pre-existing failures)
 └─ 0 base-icon/BaseIcon Referenzen verbleibend
+
+Tier A ds-* → Plain HTML + CSS: ✅
+├─ 10 triviale Vue-Wrapper-Komponenten durch HTML-Elemente + CSS-Klassen ersetzt
+├─ ~450 Nutzungen in ~90 Dateien migriert
+├─ _ds-compat.scss: Utility-Klassen für Margins (.ds-mb-*, .ds-mt-*, .ds-my-*),
+│  Flex (.ds-flex, .ds-flex-item, .ds-flex-gap-*), Centered (.ds-space-centered)
+├─ ds-flex/ds-flex-item: JavaScript window.innerWidth → CSS @media Queries
+│  (kein Layout-Shift bei SSR, bessere Performance)
+├─ system.css bleibt geladen — bestehende CSS-Klassen funktionieren weiter
+├─ Verbleibend: 13 ds-* Komponenten (Tier B: 4 einfache, Tier C: 6 komplexe → UI-Library)
+└─ 0 Tier-A ds-* Komponenten-Tags verbleibend
 ```
 
 ---
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-19 (Session 25)
+**Letzte Aktualisierung:** 2026-02-19 (Session 27)
 
-**Aktuelle Phase:** Phase 4 - OsIcon ✅, BaseIcon → OsIcon Migration ✅, OsSpinner ✅, Spinner Webapp-Migration ✅, OsCard ✅, BaseCard → OsCard Migration ✅
+**Aktuelle Phase:** Phase 4 - OsIcon ✅, BaseIcon → OsIcon Migration ✅, OsSpinner ✅, Spinner Webapp-Migration ✅, OsCard ✅, BaseCard → OsCard Migration ✅, Tier A ds-* → Plain HTML ✅
 
-**Zuletzt abgeschlossen (Session 25 - BaseCard → OsCard Webapp-Migration):**
+**Zuletzt abgeschlossen (Session 27 - Tier A: ds-* Komponenten → Plain HTML):**
+- [x] `_ds-compat.scss` erstellt (Utility-Klassen für Margins, Flex, Centered)
+- [x] `ds-section` → `<section class="ds-section">` (5 Dateien)
+- [x] `ds-placeholder` → `<div class="ds-placeholder">` (4 Dateien)
+- [x] `ds-tag` → `<span class="ds-tag">` (2 Dateien)
+- [x] `ds-list` → `<ul class="ds-list">` (4 Dateien)
+- [x] `ds-list-item` → `<li class="ds-list-item">` (8 Dateien)
+- [x] `ds-container` → `<div class="ds-container ds-container-{width}">` (14 Dateien, 12 Dateien)
+- [x] `ds-heading` → `<h1-h4 class="ds-heading ds-heading-h{n}">` (31 Nutzungen, 25 Dateien)
+- [x] `ds-text` → `<p/div class="ds-text ds-text-{color} ds-text-size-{size}">` (80 Nutzungen, 42 Dateien)
+- [x] `ds-space` → `<div class="ds-mb-{size}">` / `<div class="ds-my-{size}">` (139 Nutzungen, 55+ Dateien)
+- [x] `ds-flex` / `ds-flex-item` → Plain HTML + CSS Media Queries (103 Nutzungen, 29 Dateien)
+- [x] Responsive Layouts: JavaScript `window.innerWidth` → CSS `@media` Queries (kein Layout-Shift)
+- [x] Bugfix: `<p>` mit Block-Level-Kindern → `<div>` (DateTimeRange.vue, verify.vue)
+- [x] Test-Fix: Empty.spec.js `attributes().margin` → `classes().toContain('ds-my-xxx-small')`
+- [x] 0 Tier-A `ds-*` Komponenten-Tags verbleibend
+
+**Verbleibende ds-* Komponenten (13 Typen):**
+- Tier B (→ Plain HTML): ds-chip (5), ds-number (5), ds-grid/ds-grid-item (10), ds-radio (1)
+- Tier C (→ UI-Library): ds-input (23), ds-form (18), ds-modal (7), ds-menu/ds-menu-item (17), ds-table (7), ds-select (3)
+
+**Zuvor abgeschlossen (Session 26 - CodeRabbit Review Fixes):**
+- [x] Cypress: `.os-card .title` → `.os-card > .title` (Kind-Kombinator statt Nachfahren)
+- [x] OsCard.spec.ts: `compareDocumentPosition()` Bitmask-Assertion `!== 0` statt `.toBe(true)`
+- [x] Maintenance-App: `@ocelot-social/ui` Abhängigkeit + `./nuxt.config.js` Import als pre-existing (kein Scope) bewertet
+
+**Zuvor abgeschlossen (Session 25 - BaseCard → OsCard Webapp-Migration):**
 - [x] ~30 Webapp-Dateien: `<base-card>` → `<os-card>` mit lokalen Imports
 - [x] 3 Template-Dateien mit #imageColumn/#topMenu Slots → inline Layout (LoginForm, RegistrationSlider, password-reset)
 - [x] CSS: `.os-card.--columns` Layout in main.scss (flex, image-column, content-column, top-menu, responsive)
@@ -300,7 +337,12 @@ BaseIcon → OsIcon Webapp-Migration: ✅
 **Nächste Schritte:**
 - [x] OsSpinner Webapp-Migration (DsSpinner + LoadingSpinner → OsSpinner) ✅
 - [x] OsCard Komponente + BaseCard → OsCard Webapp-Migration ✅
+- [x] Tier A: 10 triviale ds-* Wrapper → Plain HTML + CSS ✅
+- [ ] Tier B: ds-chip, ds-number, ds-grid/ds-grid-item, ds-radio → Plain HTML
 - [ ] Weitere Tier 2 Komponenten (OsModal, OsDropdown, OsAvatar, OsInput)
+- [ ] ds-form + ds-input → OsForm + OsInput (stark gekoppelt, 18+23 Dateien)
+- [ ] ds-menu / ds-menu-item → OsMenu / OsMenuItem
+- [ ] ds-table → OsTable, ds-select → OsSelect
 - [ ] Browser-Fehler untersuchen: `TypeError: Cannot read properties of undefined (reading 'heartO')` (ocelotIcons undefined im Browser trotz korrekter Webpack-Aliase)
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
@@ -548,36 +590,50 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 - [ ] Alle Unit-Tests bestehen
 - [ ] Dokumentation aktualisieren
 
-### Phase 4: Komponenten-Migration (15 Komponenten + 2 Infrastruktur)
+### Phase 4: Komponenten-Migration
 
-**Tier 1: Kern-Komponenten**
+**Tier 1: Kern-Komponenten (UI-Library)** ✅
 - [x] OsIcon (vereint DsIcon + BaseIcon) ✅ System-Icons + vite-svg-icon Plugin
 - [x] OsSpinner (vereint DsSpinner + LoadingSpinner) ✅ OsButton nutzt OsSpinner als Komponente
-- [x] OsSpinner Webapp-Migration ✅ 4 Spinner migriert, LoadingSpinner gelöscht, Admin ApolloQuery→$apollo.loading
-- [x] OsButton (vereint DsButton + BaseButton) ✅ Entwickelt in Phase 2
-- [x] OsCard (vereint DsCard + BaseCard) ✅ Webapp-Migration abgeschlossen, BaseCard gelöscht
+- [x] OsSpinner Webapp-Migration ✅ 4 Spinner migriert, LoadingSpinner gelöscht
+- [x] OsButton (vereint DsButton + BaseButton) ✅ 133 Buttons in 79 Dateien
+- [x] OsCard (vereint DsCard + BaseCard) ✅ ~30 Dateien, BaseCard gelöscht
 
-**Tier 2: Layout & Feedback**
-- [ ] OsModal (Basis: DsModal)
+**Tier A: Triviale ds-* Wrapper → Plain HTML + CSS** ✅
+- [x] _ds-compat.scss Utility-Klassen (Margins, Flex, Centered)
+- [x] ds-section, ds-placeholder, ds-tag, ds-list, ds-list-item → HTML + CSS-Klassen
+- [x] ds-container, ds-heading, ds-text → HTML + CSS-Klassen
+- [x] ds-space → div + Margin-Utility-Klassen (139 Nutzungen)
+- [x] ds-flex / ds-flex-item → HTML + CSS @media Queries (103 Nutzungen)
+
+**Tier B: Einfache ds-* → Plain HTML (ausstehend)**
+- [ ] ds-chip (5 Dateien) → `<span class="ds-chip">`
+- [ ] ds-number (5 Dateien) → `<div class="ds-number">`
+- [ ] ds-grid / ds-grid-item (10 Dateien) → CSS Grid
+- [ ] ds-radio (1 Datei) → native `<input type="radio">`
+
+**Tier 2: Layout & Feedback (UI-Library)**
+- [ ] OsModal (Basis: DsModal, 7 Dateien)
 - [ ] OsDropdown (Basis: Webapp Dropdown)
 - [ ] OsAvatar (vereint DsAvatar + ProfileAvatar)
-- [ ] OsInput (Basis: DsInput)
+- [ ] OsInput (Basis: DsInput, 23 Dateien — gekoppelt mit ds-form)
 
-**Tier 3: Navigation & Typography**
-- [ ] OsMenu (Basis: DsMenu)
-- [ ] OsMenuItem (Basis: DsMenuItem)
-- [ ] OsHeading (Basis: DsHeading)
-- [ ] OsText (Basis: DsText)
+**Tier 3: Navigation (UI-Library)**
+- [ ] OsMenu (Basis: DsMenu, 11 Dateien)
+- [ ] OsMenuItem (Basis: DsMenuItem, 6 Dateien)
 
 **Tier 4: Spezial-Komponenten**
-- [ ] OsSelect
-- [ ] OsTable
-- [ ] OsTag
+- [ ] OsSelect (3 Dateien)
+- [ ] OsTable (7 Dateien)
+- [ ] ds-form → Plain HTML `<form>` oder OsForm (18 Dateien)
 
 **Infrastruktur**
 - [x] System-Icons einrichten ✅ vite-svg-icon Plugin, 3 System-Icons, Ocelot-Icons Entry-Point
 - [x] BaseIcon → OsIcon Webapp-Migration ✅ 131 Nutzungen, 82 Ocelot-Icons, 0 BaseIcon verbleibend
 - [ ] CI docs-check Workflow (JSDoc-Coverage, README-Aktualität)
+
+> **Hinweis:** ds-heading, ds-text, ds-tag wurden zu Plain HTML migriert (Tier A).
+> OsHeading/OsText/OsTag als UI-Library-Komponenten sind daher nicht mehr geplant.
 
 ### Phase 5: Finalisierung
 - [ ] Alle Komponenten migriert und getestet
@@ -1671,6 +1727,16 @@ Bei der Migration werden:
 | 2026-02-19 | **BaseCard gelöscht** | BaseCard.vue Komponente + base-components.js Plugin entfernt; nuxt.config, maintenance config, testSetup bereinigt |
 | 2026-02-19 | **CSS-Fixes** | ContributionForm Media-Query Selektoren, ProfileList Spezifität, InternalPage $space-small, OsCard highlight outline-1 Tests |
 | 2026-02-19 | **Code-Quality** | SocialMedia Props typisiert, LoginForm querySelector, redundante client-only entfernt, NotificationsTable optional chaining, HashtagsFilter doppeltes Mounting |
+| 2026-02-19 | **Review Fixes (Session 26)** | Cypress Kind-Kombinator `.os-card > .title`, OsCard.spec.ts Bitmask-Assertion fix, Maintenance-App Abhängigkeiten als pre-existing bewertet |
+| 2026-02-19 | **Tier A Migration (Session 27)** | 10 triviale ds-* Vue-Wrapper → Plain HTML + CSS-Klassen; `_ds-compat.scss` Utility-Klassen; ~90 Dateien geändert |
+| 2026-02-19 | **ds-section/placeholder/tag/list** | 19 Nutzungen in 13 Dateien → HTML-Elemente mit bestehenden CSS-Klassen aus system.css |
+| 2026-02-19 | **ds-container** | 14 Nutzungen in 12 Dateien → `<div class="ds-container ds-container-{width}">` |
+| 2026-02-19 | **ds-heading** | 31 Nutzungen in 25 Dateien → `<h1-h4 class="ds-heading ds-heading-h{n}">` mit soft/no-margin/align |
+| 2026-02-19 | **ds-text** | 80 Nutzungen in 42 Dateien → `<p/div class="ds-text ds-text-{color} ds-text-size-{size}">` |
+| 2026-02-19 | **ds-space** | 139 Nutzungen in 55+ Dateien → `<div class="ds-mb-{size}">` / `<div class="ds-my-{size}">`; neue Utility-Klassen in _ds-compat.scss |
+| 2026-02-19 | **ds-flex/ds-flex-item** | 103 Nutzungen in 29 Dateien → Plain HTML + CSS `@media` Queries; JS window.innerWidth → CSS Media Queries; `gap` statt negative-margin/padding |
+| 2026-02-19 | **HTML-Validierung Bugfix** | `<p>` mit Block-Level-Kindern → `<div>` in DateTimeRange.vue und verify.vue |
+| 2026-02-19 | **Test-Fix** | Empty.spec.js: `attributes().margin` → `classes().toContain('ds-my-xxx-small')` |
 
 ---
 
@@ -1680,11 +1746,20 @@ Bei der Migration werden:
 
 ### Zusammenfassung (aus KATALOG.md)
 
-| Quelle | Gesamt | Analysiert | Duplikate | Zu migrieren |
-|--------|--------|------------|-----------|--------------|
-| Webapp | 139 | ✅ | 5 | Priorisiert |
-| Styleguide | 38 | ✅ | 5 | Priorisiert |
-| **Gesamt** | **177** | **✅** | **5 direkte + 3 Familien** | **15 Kern-Komponenten** |
+| Quelle | Gesamt | Status |
+|--------|--------|--------|
+| Webapp | 139 | ✅ Katalogisiert |
+| Styleguide | 38 | ✅ Katalogisiert — 23 in Webapp genutzt |
+
+**Styleguide-Migration:**
+| Status | Komponenten |
+|--------|------------|
+| ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard (4) |
+| ✅ → Plain HTML | Section, Placeholder, Tag, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem (11) — Tier A |
+| ⬜ → Plain HTML | Chip, Number, Grid, GridItem, Radio (5) — Tier B |
+| ⬜ → UI-Library | Modal, Input, Menu, MenuItem, Select, Table (6) — Tier 2-4 |
+| ⬜ Nicht genutzt | Code, CopyField, FormItem, InputError, InputLabel, Page, PageTitle, Logo, Avatar, TableCol, TableHeadCol (11) |
+| ⬜ Offen | Form (18 Dateien — HTML `<form>` oder OsForm?) |
 
 ---
 

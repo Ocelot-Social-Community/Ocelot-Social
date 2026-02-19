@@ -1,8 +1,8 @@
 <template>
   <div>
-    <ds-space />
-    <ds-flex v-if="user" :width="{ base: '100%' }" gutter="base">
-      <ds-flex-item :width="{ base: '100%', sm: 2, md: 2, lg: 1 }">
+    <div class="ds-mb-large"></div>
+    <div v-if="user" class="ds-flex ds-flex-gap-base profile-layout">
+      <div class="profile-layout__sidebar">
         <os-card
           :class="{ 'disabled-content': user.disabled }"
           style="position: relative; height: auto; overflow: visible"
@@ -26,31 +26,31 @@
               @delete="deleteUser"
             />
           </client-only>
-          <ds-space margin="small">
-            <ds-heading tag="h3" align="center" no-margin>
+          <div class="ds-my-small">
+            <h3 class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin">
               {{ userName }}
-            </ds-heading>
-            <ds-text align="center" color="soft">
+            </h3>
+            <p class="ds-text ds-text-center ds-text-soft">
               {{ `@${userSlug}` }}
-            </ds-text>
+            </p>
             <location-info
               v-if="user.location"
               :location-data="user.location"
               :is-owner="myProfile"
               size="small"
             />
-            <ds-text align="center" color="soft" size="small">
+            <p class="ds-text ds-text-center ds-text-soft ds-text-size-small">
               {{ $t('profile.memberSince') }} {{ user.createdAt | date('MMMM yyyy') }}
-            </ds-text>
-          </ds-space>
-          <ds-space v-if="userBadges && userBadges.length" margin="x-small">
+            </p>
+          </div>
+          <div v-if="userBadges && userBadges.length" class="ds-my-x-small">
             <a v-if="myProfile" href="/settings/badges" class="badge-edit-link">
               <hc-badges :badges="userBadges" />
             </a>
             <hc-badges v-if="!myProfile" :badges="userBadges" />
-          </ds-space>
-          <ds-flex>
-            <ds-flex-item>
+          </div>
+          <div class="ds-flex">
+            <div class="ds-flex-item">
               <client-only>
                 <ds-number :label="$t('profile.followers')">
                   <hc-count-to
@@ -60,15 +60,15 @@
                   />
                 </ds-number>
               </client-only>
-            </ds-flex-item>
-            <ds-flex-item>
+            </div>
+            <div class="ds-flex-item">
               <client-only>
                 <ds-number :label="$t('profile.following')">
                   <hc-count-to slot="count" :end-val="user.followingCount" />
                 </ds-number>
               </client-only>
-            </ds-flex-item>
-          </ds-flex>
+            </div>
+          </div>
           <div v-if="!myProfile" class="action-buttons">
             <os-button
               v-if="user.isBlocked"
@@ -111,24 +111,24 @@
           </div>
           <template v-if="user.about">
             <hr />
-            <ds-space margin-top="small" margin-bottom="small">
-              <ds-text align="center" color="soft" size="small" class="hyphenate-text">
+            <div class="ds-mt-small ds-mb-small">
+              <p class="ds-text ds-text-center ds-text-soft ds-text-size-small hyphenate-text">
                 {{ user.about }}
-              </ds-text>
-            </ds-space>
+              </p>
+            </div>
           </template>
         </os-card>
-        <ds-space />
-        <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px">
+        <div class="ds-mb-large"></div>
+        <h3 class="ds-heading ds-heading-h3 ds-heading-soft ds-text-center ds-mb-x-small">
           {{ $t('profile.network.title') }}
-        </ds-heading>
+        </h3>
         <follow-list
           :loading="$apollo.loading"
           :user="user"
           type="followedBy"
           @fetchAllConnections="fetchAllConnections"
         />
-        <ds-space />
+        <div class="ds-mb-large"></div>
         <follow-list
           :loading="$apollo.loading"
           :user="user"
@@ -136,9 +136,9 @@
           @fetchAllConnections="fetchAllConnections"
         />
         <social-media :user-name="userName" :user="user" />
-      </ds-flex-item>
+      </div>
 
-      <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }">
+      <div class="profile-layout__main">
         <masonry-grid>
           <!-- TapNavigation -->
           <tab-navigation :tabs="tabOptions" :activeTab="tabActive" @switch-tab="handleTab" />
@@ -206,8 +206,8 @@
             <os-spinner slot="spinner" size="lg" />
           </infinite-loading>
         </client-only>
-      </ds-flex-item>
-    </ds-flex>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -506,10 +506,39 @@ export default {
   }
 }
 .page-name-profile-id-slug {
-  .ds-flex-item:first-child .content-menu {
+  .profile-layout__sidebar .content-menu {
     position: absolute;
     top: $space-x-small;
     right: $space-x-small;
+  }
+}
+.profile-layout__sidebar,
+.profile-layout__main {
+  flex: 0 0 100%;
+  width: 100%;
+}
+@media #{$media-query-small} {
+  .profile-layout__sidebar {
+    flex: 2 0 0;
+  }
+  .profile-layout__main {
+    flex: 3 0 0;
+  }
+}
+@media #{$media-query-medium} {
+  .profile-layout__sidebar {
+    flex: 2 0 0;
+  }
+  .profile-layout__main {
+    flex: 5 0 0;
+  }
+}
+@media #{$media-query-large} {
+  .profile-layout__sidebar {
+    flex: 1 0 0;
+  }
+  .profile-layout__main {
+    flex: 3 0 0;
   }
 }
 .profile-post-add-button-container {

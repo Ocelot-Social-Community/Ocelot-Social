@@ -704,6 +704,7 @@
     "failure": "Adresse mail ou mot de passe incorrect.",
     "forgotPassword": "Mot de passe oublié?",
     "hello": "Bonjour",
+    "loggingOut": "Déconnexion en cours …",
     "login": "Connexion",
     "logout": "Déconnexion",
     "moreInfo": "Qu'est-ce que {APPLICATION_NAME}?",

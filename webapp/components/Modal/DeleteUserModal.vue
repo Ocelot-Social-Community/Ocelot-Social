@@ -1,39 +1,39 @@
 <template>
   <ds-modal class="delete-user-modal" :title="title" :is-open="isOpen" @cancel="cancel">
     <transition name="ds-transition-fade">
-      <ds-flex v-if="success" class="hc-modal-success" centered>
+      <div v-if="success" class="ds-flex ds-flex-centered hc-modal-success">
         <sweetalert-icon icon="success" />
-      </ds-flex>
+      </div>
     </transition>
     <div>
-      <ds-section>
-        <ds-flex>
-          <ds-flex-item width="50%">
+      <section class="ds-section">
+        <div class="ds-flex">
+          <div style="flex: 0 0 50%; width: 50%">
             <user-teaser :user="userdata" />
-          </ds-flex-item>
-          <ds-flex-item width="20%">
-            <ds-text size="small">
+          </div>
+          <div style="flex: 0 0 20%; width: 20%">
+            <p class="ds-text ds-text-size-small">
               <span class="bold">{{ $t('modals.deleteUser.created') }}</span>
               <br />
               <date-time :date-time="userdata.createdAt" />
-            </ds-text>
-          </ds-flex-item>
-          <ds-flex-item width="15%">
-            <ds-text size="small">
+            </p>
+          </div>
+          <div style="flex: 0 0 15%; width: 15%">
+            <p class="ds-text ds-text-size-small">
               <span class="bold">{{ $t('common.post', null, userdata.contributionsCount) }}</span>
               <br />
               {{ userdata.contributionsCount }}
-            </ds-text>
-          </ds-flex-item>
-          <ds-flex-item width="15%">
-            <ds-text size="small">
+            </p>
+          </div>
+          <div style="flex: 0 0 15%; width: 15%">
+            <p class="ds-text ds-text-size-small">
               <span class="bold">{{ $t('common.comment', null, userdata.commentedCount) }}</span>
               <br />
               {{ userdata.commentedCount }}
-            </ds-text>
-          </ds-flex-item>
-        </ds-flex>
-      </ds-section>
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
 
     <template #footer>

@@ -14,12 +14,12 @@
       id="nonce"
       icon="question-circle"
     />
-    <ds-text>
+    <p class="ds-text">
       {{ $t('components.registration.email-nonce.form.description') }}
-    </ds-text>
-    <ds-text>
+    </p>
+    <p class="ds-text">
       {{ $t('components.registration.email-nonce.form.click-next') }}
-    </ds-text>
+    </p>
     <os-button
       variant="primary"
       appearance="filled"

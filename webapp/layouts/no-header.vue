@@ -1,11 +1,11 @@
 <template>
   <div class="layout-blank">
     <div class="layout-content">
-      <ds-container>
+      <div class="ds-container ds-container-x-large">
         <div>
           <nuxt />
         </div>
-      </ds-container>
+      </div>
     </div>
     <page-footer :is-sticky="false" />
     <div id="overlay" />

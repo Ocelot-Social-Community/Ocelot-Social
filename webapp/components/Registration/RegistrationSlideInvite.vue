@@ -14,9 +14,9 @@
       name="inviteCode"
       id="inviteCode"
     />
-    <ds-text v-if="!validInput">
+    <p class="ds-text" v-if="!validInput">
       {{ $t('components.registration.invite-code.form.description') }}
-    </ds-text>
+    </p>
     <div class="invitation-info" v-if="invitedBy">
       <profile-avatar :profile="invitedBy" size="small" />
       <span v-if="invitedTo && invitedTo.groupType === 'hidden'">
@@ -39,7 +39,7 @@
       </span>
     </div>
     <slot></slot>
-    <ds-space margin="xxx-small" />
+    <div class="ds-my-xxx-small"></div>
   </ds-form>
 </template>
 

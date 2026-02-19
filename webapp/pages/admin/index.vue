@@ -6,33 +6,33 @@
       </div>
     </template>
     <template v-else-if="statistics">
-      <ds-space margin="large">
-        <ds-flex>
-          <ds-flex-item
+      <div class="ds-my-large">
+        <div class="ds-flex">
+          <div
             v-for="(value, name) in filterStatistics(statistics)"
             :key="name"
-            :width="{ base: '100%', sm: '50%', md: '33%' }"
+            class="admin-stats__item"
           >
-            <ds-space margin="small">
+            <div class="ds-my-small">
               <ds-number :count="0" :label="$t('admin.dashboard.' + name)" size="x-large" uppercase>
                 <client-only slot="count">
                   <hc-count-to :end-val="value" />
                 </client-only>
               </ds-number>
-            </ds-space>
-          </ds-flex-item>
-        </ds-flex>
-      </ds-space>
+            </div>
+          </div>
+        </div>
+      </div>
     </template>
     <template v-else>
-      <ds-space centered>
-        <ds-space>
+      <div class="ds-mb-large ds-space-centered">
+        <div class="ds-mb-large">
           <img :src="errorIconPath" width="40" />
-        </ds-space>
-        <ds-text>
+        </div>
+        <p class="ds-text">
           {{ $t('site.error-occurred') }}
-        </ds-text>
-      </ds-space>
+        </p>
+      </div>
     </template>
   </os-card>
 </template>
@@ -70,3 +70,22 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.admin-stats__item {
+  flex: 0 0 100%;
+  width: 100%;
+}
+@media #{$media-query-small} {
+  .admin-stats__item {
+    flex: 0 0 50%;
+    width: 50%;
+  }
+}
+@media #{$media-query-medium} {
+  .admin-stats__item {
+    flex: 0 0 33.333%;
+    width: 33.333%;
+  }
+}
+</style>

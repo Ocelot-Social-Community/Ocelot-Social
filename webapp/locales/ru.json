@@ -704,6 +704,7 @@
     "failure": "Неверный адрес электронной почты или пароль.",
     "forgotPassword": "Забыли пароль?",
     "hello": "Здравствуйте",
+    "loggingOut": "Выход из системы …",
     "login": "Вход",
     "logout": "Выйти",
     "moreInfo": "Что такое {APPLICATION_NAME}?",

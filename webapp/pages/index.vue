@@ -138,8 +138,8 @@
       <template v-else>
         <ds-grid-item :row-span="2" column-span="fullWidth">
           <hc-empty icon="docs" />
-          <ds-text align="center">{{ $t('index.no-results') }}</ds-text>
-          <ds-text align="center">{{ $t('index.change-filter-settings') }}</ds-text>
+          <p class="ds-text ds-text-center">{{ $t('index.no-results') }}</p>
+          <p class="ds-text ds-text-center">{{ $t('index.change-filter-settings') }}</p>
         </ds-grid-item>
       </template>
     </masonry-grid>

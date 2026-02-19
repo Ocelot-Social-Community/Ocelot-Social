@@ -16,8 +16,8 @@
       >
         <ds-grid>
           <ds-grid-item>
-            <ds-flex class="user-section">
-              <ds-flex-item>
+            <div class="ds-flex user-section">
+              <div class="ds-flex-item">
                 <user-teaser
                   :user="
                     isGroup(notification.from) ? notification.relatedUser : notification.from.author
@@ -28,8 +28,8 @@
                   :injected-date="true"
                   :show-popover="showPopover"
                 />
-              </ds-flex-item>
-            </ds-flex>
+              </div>
+            </div>
           </ds-grid-item>
           <ds-grid-item>
             <div class="notification-container">

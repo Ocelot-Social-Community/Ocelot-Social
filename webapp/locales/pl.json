@@ -704,6 +704,7 @@
     "failure": null,
     "forgotPassword": "Zapomniałeś hasła?",
     "hello": "Cześć",
+    "loggingOut": "Wylogowywanie …",
     "login": "Logowanie",
     "logout": "Wyloguj się",
     "moreInfo": "Co to jest {APPLICATION_NAME}?",

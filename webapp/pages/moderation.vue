@@ -1,18 +1,18 @@
 <template>
   <div>
-    <ds-heading tag="h1">
+    <h1 class="ds-heading ds-heading-h1">
       {{ $t('moderation.name') }}
-    </ds-heading>
-    <ds-flex gutter="small">
-      <ds-flex-item :width="{ base: '100%', md: '200px' }">
+    </h1>
+    <div class="ds-flex ds-flex-gap-small moderation-layout">
+      <div class="moderation-layout__sidebar">
         <ds-menu :routes="routes" />
-      </ds-flex-item>
-      <ds-flex-item :width="{ base: '100%', md: 1 }">
+      </div>
+      <div class="moderation-layout__main">
         <transition name="slide-up" appear>
           <nuxt-child />
         </transition>
-      </ds-flex-item>
-    </ds-flex>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -31,3 +31,20 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.moderation-layout__sidebar,
+.moderation-layout__main {
+  flex: 0 0 100%;
+  width: 100%;
+}
+@media #{$media-query-medium} {
+  .moderation-layout__sidebar {
+    flex: 0 0 200px;
+    width: 200px;
+  }
+  .moderation-layout__main {
+    flex: 1 0 0;
+  }
+}
+</style>

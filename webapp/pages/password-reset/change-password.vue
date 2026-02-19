@@ -4,9 +4,9 @@
     :nonce="nonce"
     @passwordResetResponse="handlePasswordResetResponse"
   >
-    <ds-space centered>
+    <div class="ds-mb-large ds-space-centered">
       <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
-    </ds-space>
+    </div>
   </change-password>
 </template>
 

@@ -2,7 +2,7 @@
   <a v-if="showLinkOnly" :href="dataEmbedUrl" rel="noopener noreferrer nofollow" target="_blank">
     {{ dataEmbedUrl }}
   </a>
-  <ds-container v-else width="small" class="embed-component">
+  <div v-else class="ds-container ds-container-small embed-component">
     <section class="content">
       <div v-if="showEmbed" v-html="embedHtml" class="html" />
       <template v-else>
@@ -22,7 +22,7 @@
     </section>
     <aside v-if="showOverlay" class="overlay">
       <h3>{{ $t('editor.embed.data_privacy_warning') }}</h3>
-      <ds-text>{{ $t('editor.embed.data_privacy_info') }} {{ embedPublisher }}</ds-text>
+      <p class="ds-text">{{ $t('editor.embed.data_privacy_info') }} {{ embedPublisher }}</p>
       <div class="buttons">
         <os-button
           @click="closeOverlay()"
@@ -60,7 +60,7 @@
         <os-icon :icon="icons.close" />
       </template>
     </os-button>
-  </ds-container>
+  </div>
 </template>
 
 <script>

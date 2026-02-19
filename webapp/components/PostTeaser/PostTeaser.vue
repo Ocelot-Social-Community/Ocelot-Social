@@ -26,11 +26,7 @@
       </client-only>
       <h2 class="title hyphenate-text">{{ post.title }}</h2>
       <client-only>
-        <ds-space
-          v-if="post && post.postType[0] === 'Event'"
-          margin-bottom="small"
-          style="padding: 5px"
-        >
+        <div v-if="post && post.postType[0] === 'Event'" class="ds-mb-small" style="padding: 5px">
           <location-teaser
             class="event-info"
             size="base"
@@ -44,7 +40,7 @@
             :startDate="post.eventStart"
             :endDate="post.eventEnd"
           />
-        </ds-space>
+        </div>
       </client-only>
       <!-- TODO: replace editor content with tiptap render view -->
       <!-- eslint-disable-next-line vue/no-v-html -->

@@ -1,8 +1,8 @@
 <template>
   <div class="group-profile" v-if="isGroupVisible">
-    <ds-space />
-    <ds-flex v-if="group" :width="{ base: '100%' }" gutter="base">
-      <ds-flex-item :width="{ base: '100%', sm: 2, md: 2, lg: 1 }">
+    <div class="ds-mb-large"></div>
+    <div v-if="group" class="ds-flex ds-flex-gap-base group-layout">
+      <div class="group-layout__sidebar">
         <os-card
           :class="{ 'disabled-content': group.disabled }"
           style="position: relative; height: auto; overflow: visible"
@@ -27,15 +27,15 @@
               @unmute="unmuteGroup"
             />
           </client-only>
-          <ds-space margin="small">
+          <div class="ds-my-small">
             <!-- group name -->
-            <ds-heading tag="h3" align="center" no-margin>
+            <h3 class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin">
               {{ groupName }}
-            </ds-heading>
+            </h3>
             <!-- group slug -->
-            <ds-text align="center" color="soft">
+            <p class="ds-text ds-text-center ds-text-soft">
               {{ `&${groupSlug}` }}
-            </ds-text>
+            </p>
             <!-- group location -->
             <location-info
               v-if="group.location"
@@ -44,13 +44,13 @@
               size="small"
             />
             <!-- group created at -->
-            <ds-text align="center" color="soft" size="small">
+            <p class="ds-text ds-text-center ds-text-soft ds-text-size-small">
               {{ $t('group.foundation') }} {{ group.createdAt | date('MMMM yyyy') }}
-            </ds-text>
-          </ds-space>
-          <ds-flex v-if="isAllowedSeeingGroupMembers">
+            </p>
+          </div>
+          <div class="ds-flex" v-if="isAllowedSeeingGroupMembers">
             <!-- group members count -->
-            <ds-flex-item v-if="isAllowedSeeingGroupMembers">
+            <div class="ds-flex-item" v-if="isAllowedSeeingGroupMembers">
               <client-only>
                 <ds-number :label="$t('group.membersCount', {}, groupMembers.length)">
                   <count-to
@@ -60,8 +60,8 @@
                   />
                 </ds-number>
               </client-only>
-            </ds-flex-item>
-          </ds-flex>
+            </div>
+          </div>
           <div class="action-buttons">
             <os-button
               variant="danger"
@@ -85,12 +85,12 @@
             />
           </div>
           <hr />
-          <ds-space margin-top="small" margin-bottom="small">
+          <div class="ds-mt-small ds-mb-small">
             <!-- group my role in group -->
             <template v-if="isGroupMember">
-              <ds-text class="centered-text hyphenate-text" color="soft" size="small">
+              <p class="ds-text ds-text-soft ds-text-size-small centered-text hyphenate-text">
                 {{ $t('group.role') }}
-              </ds-text>
+              </p>
               <div class="chip" align="center">
                 <ds-chip color="primary">
                   {{ group && group.myRole ? $t('group.roles.' + group.myRole) : '' }}
@@ -98,18 +98,18 @@
               </div>
             </template>
             <!-- group type -->
-            <ds-text class="centered-text hyphenate-text" color="soft" size="small">
+            <p class="ds-text ds-text-soft ds-text-size-small centered-text hyphenate-text">
               {{ $t('group.type') }}
-            </ds-text>
+            </p>
             <div class="chip" align="center">
               <ds-chip color="primary">
                 {{ group && group.groupType ? $t('group.types.' + group.groupType) : '' }}
               </ds-chip>
             </div>
             <!-- group action radius -->
-            <ds-text class="centered-text hyphenate-text" color="soft" size="small">
+            <p class="ds-text ds-text-soft ds-text-size-small centered-text hyphenate-text">
               {{ $t('group.actionRadius') }}
-            </ds-text>
+            </p>
             <div class="chip" align="center">
               <ds-chip color="primary">
                 {{
@@ -117,15 +117,15 @@
                 }}
               </ds-chip>
             </div>
-            <ds-space margin="x-small" />
-          </ds-space>
+            <div class="ds-my-x-small"></div>
+          </div>
           <!-- group categories -->
           <template
             v-if="categoriesActive && group && group.categories && group.categories.length > 0"
           >
             <hr />
-            <ds-space margin-top="small" margin-bottom="small">
-              <ds-text class="centered-text hyphenate-text" color="soft" size="small">
+            <div class="ds-mt-small ds-mb-small">
+              <p class="ds-text ds-text-soft ds-text-size-small centered-text hyphenate-text">
                 {{
                   $t(
                     'group.categories',
@@ -133,8 +133,8 @@
                     group && group.categories ? group.categories.length : 0,
                   )
                 }}
-              </ds-text>
-              <ds-space margin="xx-small" />
+              </p>
+              <div class="ds-my-xx-small"></div>
               <div class="categories">
                 <div
                   v-for="(category, index) in sortCategories(
@@ -151,29 +151,32 @@
                       placement: 'bottom-start',
                     }"
                   />
-                  <ds-space v-if="index < group.categories.length - 1" margin="xxx-small" />
+                  <div v-if="index < group.categories.length - 1" class="ds-my-xxx-small"></div>
                 </div>
               </div>
-            </ds-space>
+            </div>
           </template>
           <!-- group goal -->
           <template v-if="group && group.about">
             <hr />
-            <ds-space margin-top="small" margin-bottom="small">
-              <ds-text class="centered-text hyphenate-text" color="soft" size="small">
+            <div class="ds-mt-small ds-mb-small">
+              <p class="ds-text ds-text-soft ds-text-size-small centered-text hyphenate-text">
                 {{ $t('group.goal') }}
-              </ds-text>
-              <ds-space margin="xx-small" />
+              </p>
+              <div class="ds-my-xx-small"></div>
               <div class="chip" align="center">
                 <ds-chip>{{ group ? group.about : '' }}</ds-chip>
               </div>
-            </ds-space>
+            </div>
           </template>
         </os-card>
-        <ds-space />
-        <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px">
+        <div class="ds-mb-large"></div>
+        <h3
+          class="ds-heading ds-heading-h3 ds-heading-soft"
+          style="text-align: center; margin-bottom: 10px"
+        >
           {{ $t('profile.network.title') }}
-        </ds-heading>
+        </h3>
         <!-- Group members list -->
         <profile-list
           :uniqueName="'groupMembersFilter'"
@@ -191,11 +194,11 @@
           @fetchAllProfiles="fetchAllMembers"
         />
         <!-- <social-media :user-name="groupName" :user="user" /> -->
-      </ds-flex-item>
+      </div>
 
-      <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }">
+      <div class="group-layout__main">
         <!-- Group description -->
-        <ds-space>
+        <div class="ds-mb-large">
           <os-card class="group-description">
             <!-- TODO: replace editor content with tiptap render view -->
             <!-- eslint-disable-next-line vue/no-v-html -->
@@ -215,8 +218,8 @@
               {{ isDescriptionCollapsed ? $t('comment.show.more') : $t('comment.show.less') }}
             </os-button>
           </os-card>
-        </ds-space>
-        <ds-space v-if="isGroupMemberNonePending" centered>
+        </div>
+        <div v-if="isGroupMemberNonePending" class="ds-mb-large ds-space-centered">
           <os-button
             as="nuxt-link"
             :to="{
@@ -237,7 +240,7 @@
               <os-icon :icon="icons.plus" />
             </template>
           </os-button>
-        </ds-space>
+        </div>
         <masonry-grid>
           <!-- TapNavigation -->
           <!-- <tab-navigation :tabs="tabOptions" :activeTab="tabActive" @switch-tab="handleTab" /> -->
@@ -284,8 +287,8 @@
             <os-spinner slot="spinner" size="lg" />
           </infinite-loading>
         </client-only>
-      </ds-flex-item>
-    </ds-flex>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -652,10 +655,39 @@ export default {
   margin-top: -60px;
 }
 .group-profile {
-  .ds-flex-item:first-child .group-profile-content-menu {
+  .group-layout__sidebar .group-profile-content-menu {
     position: absolute;
     top: $space-x-small;
     right: $space-x-small;
+  }
+}
+.group-layout__sidebar,
+.group-layout__main {
+  flex: 0 0 100%;
+  width: 100%;
+}
+@media #{$media-query-small} {
+  .group-layout__sidebar {
+    flex: 2 0 0;
+  }
+  .group-layout__main {
+    flex: 3 0 0;
+  }
+}
+@media #{$media-query-medium} {
+  .group-layout__sidebar {
+    flex: 2 0 0;
+  }
+  .group-layout__main {
+    flex: 5 0 0;
+  }
+}
+@media #{$media-query-large} {
+  .group-layout__sidebar {
+    flex: 1 0 0;
+  }
+  .group-layout__main {
+    flex: 3 0 0;
   }
 }
 .profile-post-add-button {

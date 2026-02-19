@@ -1,10 +1,10 @@
 <template>
   <div>
-    <ds-space margin="small">
-      <ds-heading tag="h1">{{ $t('settings.name') }}</ds-heading>
-    </ds-space>
-    <ds-space margin="large" />
-    <ds-flex gutter="small">
+    <div class="ds-my-small">
+      <h1 class="ds-heading ds-heading-h1">{{ $t('settings.name') }}</h1>
+    </div>
+    <div class="ds-my-large"></div>
+    <div class="ds-flex ds-flex-gap-small">
       <div class="menu-container">
         <ds-menu :routes="routes" :is-exact="() => true" />
       </div>
@@ -13,7 +13,7 @@
           <nuxt-child />
         </transition>
       </div>
-    </ds-flex>
+    </div>
   </div>
 </template>
 

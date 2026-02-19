@@ -1,7 +1,7 @@
 <template>
-  <ds-heading soft size="h5" class="search-heading">
+  <h5 class="ds-heading ds-heading-h5 ds-heading-soft search-heading">
     {{ $t(`search.heading.${resourceType}`, {}, 2) }}
-  </ds-heading>
+  </h5>
 </template>
 <script>
 export default {

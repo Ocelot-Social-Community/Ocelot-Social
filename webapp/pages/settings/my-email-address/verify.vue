@@ -5,34 +5,34 @@
         <sweetalert-icon :icon="sweetAlertIcon" />
       </client-only>
     </transition>
-    <ds-space v-if="success">
-      <ds-text bold align="center">
+    <div v-if="success" class="ds-mb-large">
+      <p class="ds-text ds-text-bold ds-text-center">
         {{ $t(`settings.email.change-successful`) }}
-      </ds-text>
-    </ds-space>
+      </p>
+    </div>
     <template v-else>
-      <ds-text bold align="center">
+      <p class="ds-text ds-text-bold ds-text-center">
         {{ $t(`settings.email.verification-error.message`) }}
-      </ds-text>
-      <ds-space class="message">
+      </p>
+      <div class="ds-mb-large message">
         <client-only>
-          <ds-text>
-            <ds-space margin-top="large" margin-bottom="small">
+          <div class="ds-text">
+            <div class="ds-mt-large ds-mb-small">
               {{ $t(`settings.email.verification-error.explanation`) }}
-            </ds-space>
-            <ds-list>
-              <ds-list-item>
+            </div>
+            <ul class="ds-list">
+              <li class="ds-list-item">
                 {{ $t(`settings.email.verification-error.reason.invalid-nonce`) }}
-              </ds-list-item>
-              <ds-list-item>
+              </li>
+              <li class="ds-list-item">
                 {{ $t(`settings.email.verification-error.reason.no-email-request`) }}
-              </ds-list-item>
-            </ds-list>
+              </li>
+            </ul>
             {{ $t('settings.email.verification-error.support') }}
             <a :href="'mailto:' + supportEmail">{{ supportEmail }}</a>
-          </ds-text>
+          </div>
         </client-only>
-      </ds-space>
+      </div>
     </template>
   </os-card>
 </template>

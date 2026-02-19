@@ -13,8 +13,7 @@ exports[`invites.vue renders 1`] = `
       </h3>
        
       <div
-        class="ds-space"
-        style="margin-top: 32px; margin-bottom: 32px;"
+        class="ds-my-large"
       />
        
       <div

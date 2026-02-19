@@ -1,13 +1,13 @@
 <template>
-  <ds-section>
-    <ds-space>
-      <ds-heading size="h3">
+  <section class="ds-section">
+    <div class="ds-mb-large">
+      <h1 class="ds-heading ds-heading-h3">
         {{ user && user.name }}
         -
         {{ $t('admin.badges.title') }}
-      </ds-heading>
-      <ds-text>{{ $t('admin.badges.description') }}</ds-text>
-    </ds-space>
+      </h1>
+      <p class="ds-text">{{ $t('admin.badges.description') }}</p>
+    </div>
     <os-card v-if="!isLoadingBadges">
       <badges-section
         :title="$t('admin.badges.verificationBadges')"
@@ -20,7 +20,7 @@
         @toggleBadge="toggleBadge"
       />
     </os-card>
-  </ds-section>
+  </section>
 </template>
 
 <script>

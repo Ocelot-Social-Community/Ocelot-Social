@@ -7,92 +7,83 @@ exports[`.vue renders 1`] = `
       class="ds-section"
     >
       <div
-        class="ds-section-content"
+        class="ds-mb-large"
       >
-        <div
-          class="ds-container ds-container-x-large"
+        <h1
+          class="ds-heading ds-heading-h3"
         >
-          <div
-            class="ds-space"
-            style="margin-bottom: 32px;"
-          >
-            <h1
-              class="ds-heading ds-heading-h3"
-            >
-              
+          
       User1
       -
       admin.badges.title
     
-            </h1>
-             
-            <p
-              class="ds-text"
-            >
-              admin.badges.description
-            </p>
-          </div>
+        </h1>
+         
+        <p
+          class="ds-text"
+        >
+          admin.badges.description
+        </p>
+      </div>
+       
+      <div
+        class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+      >
+        <div
+          class="badge-section"
+        >
+          <h4>
+            admin.badges.verificationBadges
+          </h4>
            
           <div
-            class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
+            class="badge-container"
           >
-            <div
-              class="badge-section"
+            <button
+              class="badge"
             >
-              <h4>
-                admin.badges.verificationBadges
-              </h4>
-               
-              <div
-                class="badge-container"
-              >
-                <button
-                  class="badge"
-                >
-                  <img
-                    alt="description-v-1"
-                    src="/api/icon1"
-                  />
-                </button>
-                <button
-                  class="badge inactive"
-                >
-                  <img
-                    alt="description-v-2"
-                    src="/api/icon2"
-                  />
-                </button>
-              </div>
-            </div>
-             
-            <div
-              class="badge-section"
+              <img
+                alt="description-v-1"
+                src="/api/icon1"
+              />
+            </button>
+            <button
+              class="badge inactive"
             >
-              <h4>
-                admin.badges.trophyBadges
-              </h4>
-               
-              <div
-                class="badge-container"
-              >
-                <button
-                  class="badge inactive"
-                >
-                  <img
-                    alt="description-t-1"
-                    src="/api/icon3"
-                  />
-                </button>
-                <button
-                  class="badge"
-                >
-                  <img
-                    alt="description-t-2"
-                    src="/api/icon4"
-                  />
-                </button>
-              </div>
-            </div>
+              <img
+                alt="description-v-2"
+                src="/api/icon2"
+              />
+            </button>
+          </div>
+        </div>
+         
+        <div
+          class="badge-section"
+        >
+          <h4>
+            admin.badges.trophyBadges
+          </h4>
+           
+          <div
+            class="badge-container"
+          >
+            <button
+              class="badge inactive"
+            >
+              <img
+                alt="description-t-1"
+                src="/api/icon3"
+              />
+            </button>
+            <button
+              class="badge"
+            >
+              <img
+                alt="description-t-2"
+                src="/api/icon4"
+              />
+            </button>
           </div>
         </div>
       </div>

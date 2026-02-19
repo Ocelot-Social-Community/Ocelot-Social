@@ -1,5 +1,5 @@
 <template>
-  <ds-container width="small" class="password-reset">
+  <div class="ds-container ds-container-small password-reset">
     <div class="back-link">
       <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
     </div>
@@ -17,7 +17,7 @@
         <locale-switch offset="5" />
       </aside>
     </os-card>
-  </ds-container>
+  </div>
 </template>
 
 <script>

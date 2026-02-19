@@ -704,6 +704,7 @@
     "failure": "Incorrect email address or password.",
     "forgotPassword": "Forgot Password?",
     "hello": "Hello",
+    "loggingOut": "Logging out…",
     "login": "Login",
     "logout": "Logout",
     "moreInfo": "What is {APPLICATION_NAME}?",

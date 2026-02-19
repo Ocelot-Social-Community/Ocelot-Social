@@ -3,26 +3,26 @@
     <transition name="ds-transition-fade">
       <sweetalert-icon icon="success" />
     </transition>
-    <ds-text align="center" bold color="success">
+    <p class="ds-text ds-text-center ds-text-bold ds-text-success">
       {{ $t('components.registration.create-user-account.success') }}
-    </ds-text>
-    <ds-space margin="xxx-small" />
+    </p>
+    <div class="ds-my-xxx-small"></div>
   </div>
   <div v-else-if="response === 'error'">
     <transition name="ds-transition-fade">
       <sweetalert-icon icon="error" />
     </transition>
-    <ds-text align="center" bold color="danger">
+    <p class="ds-text ds-text-center ds-text-bold ds-text-danger">
       {{ $t('components.registration.create-user-account.error') }}
-    </ds-text>
-    <ds-text align="center">
+    </p>
+    <p class="ds-text ds-text-center">
       {{ $t('components.registration.create-user-account.help') }}
       <a :href="'mailto:' + supportEmail">{{ supportEmail }}</a>
-    </ds-text>
-    <ds-space centered>
+    </p>
+    <div class="ds-mb-large ds-space-centered">
       <nuxt-link to="/login">{{ $t('site.back-to-login') }}</nuxt-link>
-    </ds-space>
-    <ds-space margin="xxx-small" />
+    </div>
+    <div class="ds-my-xxx-small"></div>
   </div>
   <div v-else class="create-account-card">
     <ds-form
@@ -150,7 +150,7 @@
           </div>
         </div>
       </template>
-      <ds-space margin="xxx-small" />
+      <div class="ds-my-xxx-small"></div>
     </ds-form>
   </div>
 </template>

@@ -1,10 +1,10 @@
 <template>
   <div class="layout-blank">
-    <ds-container>
+    <div class="ds-container ds-container-x-large">
       <div>
         <nuxt />
       </div>
-    </ds-container>
+    </div>
     <div id="overlay" />
   </div>
 </template>

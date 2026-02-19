@@ -19,12 +19,10 @@ exports[`Users given badges are disabled renders 1`] = `
       novalidate="novalidate"
     >
       <div
-        class="ds-flex"
-        style="margin-left: -8px; margin-right: -8px;"
+        class="ds-flex ds-flex-gap-small"
       >
         <div
-          class="ds-flex-item"
-          style="flex-basis: 90%; width: 90%; padding-left: 8px; padding-right: 8px; margin-bottom: 16px;"
+          style="flex: 0 0 90%; width: 90%;"
         >
           <div
             class="ds-form-item ds-input-size-base"
@@ -83,8 +81,7 @@ exports[`Users given badges are disabled renders 1`] = `
         </div>
          
         <div
-          class="ds-flex-item"
-          style="flex-basis: 30px; width: 30px; padding-left: 8px; padding-right: 8px; margin-bottom: 16px;"
+          style="flex: 0 0 30px; width: 30px;"
         >
           <button
             aria-label="actions.search"
@@ -473,12 +470,10 @@ exports[`Users given badges are enabled renders 1`] = `
       novalidate="novalidate"
     >
       <div
-        class="ds-flex"
-        style="margin-left: -8px; margin-right: -8px;"
+        class="ds-flex ds-flex-gap-small"
       >
         <div
-          class="ds-flex-item"
-          style="flex-basis: 90%; width: 90%; padding-left: 8px; padding-right: 8px; margin-bottom: 16px;"
+          style="flex: 0 0 90%; width: 90%;"
         >
           <div
             class="ds-form-item ds-input-size-base"
@@ -537,8 +532,7 @@ exports[`Users given badges are enabled renders 1`] = `
         </div>
          
         <div
-          class="ds-flex-item"
-          style="flex-basis: 30px; width: 30px; padding-left: 8px; padding-right: 8px; margin-bottom: 16px;"
+          style="flex: 0 0 30px; width: 30px;"
         >
           <button
             aria-label="actions.search"

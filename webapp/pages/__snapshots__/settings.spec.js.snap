@@ -4,8 +4,7 @@ exports[`settings.vue given badges are disabled renders 1`] = `
 <div>
   <div>
     <div
-      class="ds-space"
-      style="margin-top: 16px; margin-bottom: 16px;"
+      class="ds-my-small"
     >
       <h1
         class="ds-heading ds-heading-h1"
@@ -15,13 +14,11 @@ exports[`settings.vue given badges are disabled renders 1`] = `
     </div>
      
     <div
-      class="ds-space"
-      style="margin-top: 32px; margin-bottom: 32px;"
+      class="ds-my-large"
     />
      
     <div
-      class="ds-flex"
-      style="margin-left: -8px; margin-right: -8px;"
+      class="ds-flex ds-flex-gap-small"
     >
       <div
         class="menu-container"
@@ -210,8 +207,7 @@ exports[`settings.vue given badges are enabled renders 1`] = `
 <div>
   <div>
     <div
-      class="ds-space"
-      style="margin-top: 16px; margin-bottom: 16px;"
+      class="ds-my-small"
     >
       <h1
         class="ds-heading ds-heading-h1"
@@ -221,13 +217,11 @@ exports[`settings.vue given badges are enabled renders 1`] = `
     </div>
      
     <div
-      class="ds-space"
-      style="margin-top: 32px; margin-bottom: 32px;"
+      class="ds-my-large"
     />
      
     <div
-      class="ds-flex"
-      style="margin-left: -8px; margin-right: -8px;"
+      class="ds-flex ds-flex-gap-small"
     >
       <div
         class="menu-container"

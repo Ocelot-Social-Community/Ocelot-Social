@@ -3,7 +3,7 @@
     <transition name="ds-transition-fade">
       <sweetalert-icon icon="info" />
     </transition>
-    <ds-text v-html="submitMessage" />
+    <p class="ds-text" v-html="submitMessage" />
   </os-card>
   <ds-form v-else v-model="form" :schema="formSchema" @submit="submit">
     <template #default="{ errors }">
@@ -15,9 +15,11 @@
           icon="envelope"
           :label="$t('settings.email.labelEmail')"
         />
-        <ds-space class="backendErrors" v-if="backendErrors">
-          <ds-text align="center" bold color="danger">{{ backendErrors.message }}</ds-text>
-        </ds-space>
+        <div class="ds-mb-large backendErrors" v-if="backendErrors">
+          <p class="ds-text ds-text-center ds-text-bold ds-text-danger">
+            {{ backendErrors.message }}
+          </p>
+        </div>
         <os-button
           :disabled="!!errors"
           :loading="loadingData"

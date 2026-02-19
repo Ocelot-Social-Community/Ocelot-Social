@@ -4,8 +4,7 @@ exports[`_static mount renders 1`] = `
 <div>
   <div>
     <div
-      class="ds-space"
-      style="margin-top: 16px; margin-bottom: 16px;"
+      class="ds-my-small"
     >
       <h2
         class="ds-heading ds-heading-h2"

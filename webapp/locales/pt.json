@@ -704,6 +704,7 @@
     "failure": "Endereço de e-mail ou senha incorretos.",
     "forgotPassword": "Esqueceu a sua senha?",
     "hello": "Olá",
+    "loggingOut": "A terminar sessão …",
     "login": "Entrar",
     "logout": "Sair",
     "moreInfo": "O que é a {APPLICATION_NAME}?",

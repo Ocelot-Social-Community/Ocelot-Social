@@ -7,7 +7,7 @@
     :schema="formSchema"
     @submit="handleSubmit"
   >
-    <ds-space margin="small">
+    <div class="ds-my-small">
       <ds-input
         :placeholder="$t('login.email')"
         type="email"
@@ -16,10 +16,12 @@
         name="email"
         icon="envelope"
       />
-    </ds-space>
-    <ds-space margin-botton="large">
-      <ds-text align="left">{{ $t('components.password-reset.request.form.description') }}</ds-text>
-    </ds-space>
+    </div>
+    <div class="ds-mb-large">
+      <p class="ds-text ds-text-left">
+        {{ $t('components.password-reset.request.form.description') }}
+      </p>
+    </div>
     <os-button
       variant="primary"
       appearance="filled"
@@ -33,11 +35,11 @@
   </ds-form>
   <div v-else>
     <transition name="ds-transition-fade">
-      <ds-flex centered>
+      <div class="ds-flex ds-flex-centered">
         <sweetalert-icon icon="info" />
-      </ds-flex>
+      </div>
     </transition>
-    <ds-text v-html="submitMessage" align="left" />
+    <p class="ds-text ds-text-left" v-html="submitMessage" />
   </div>
 </template>
 

@@ -31,7 +31,7 @@
               <os-icon :icon="icons.questionCircle" />
             </page-params-link>
           </div>
-          <ds-space margin-top="base" />
+          <div class="ds-mt-base ds-mb-large"></div>
           <ds-input
             model="title"
             :placeholder="$t('contribution.title')"
@@ -57,7 +57,7 @@
           <!-- Eventdata -->
           <div v-if="createEvent" class="eventDatas">
             <hr />
-            <ds-space margin-top="x-small" />
+            <div class="ds-mt-x-small ds-mb-large"></div>
             <ds-grid>
               <ds-grid-item class="event-grid-item">
                 <!-- <label>Beginn</label> -->
@@ -147,7 +147,7 @@
               {{ $t('post.viewEvent.eventIsOnline') }}
             </div>
           </div>
-          <ds-space margin-top="x-small" />
+          <div class="ds-mt-x-small ds-mb-large"></div>
           <categories-select
             v-if="categoriesActive"
             model="categoryIds"
@@ -161,18 +161,17 @@
             {{ formData.categoryIds.length }} / 3
             <os-icon v-if="errors && errors.categoryIds" :icon="icons.warning" />
           </ds-chip>
-          <ds-flex class="buttons-footer" gutter="xxx-small">
-            <ds-flex-item width="3.5" class="buttons-footer-helper">
-              <!-- eslint-disable vue/no-v-text-v-html-on-component -->
+          <div class="ds-flex ds-flex-gap-xxx-small buttons-footer">
+            <div style="flex: 3.5 0 0" class="buttons-footer-helper">
               <!-- TODO => remove v-html! only text ! no html! security first! -->
-              <ds-text
+              <p
+                class="ds-text"
                 v-if="showGroupHint"
                 v-html="$t('contribution.visibleOnlyForMembersOfGroup', { name: groupName })"
               />
-              <!-- eslint-enable vue/no-v-text-v-html-on-component -->
-            </ds-flex-item>
-            <ds-flex-item width="0.15" />
-            <ds-flex-item class="action-buttons-group" width="2">
+            </div>
+            <div style="flex: 0.15 0 0"></div>
+            <div class="action-buttons-group" style="flex: 2 0 0">
               <os-button
                 data-test="cancel-button"
                 variant="primary"
@@ -194,8 +193,8 @@
                 </template>
                 {{ $t('actions.save') }}
               </os-button>
-            </ds-flex-item>
-          </ds-flex>
+            </div>
+          </div>
         </os-card>
       </template>
     </ds-form>
