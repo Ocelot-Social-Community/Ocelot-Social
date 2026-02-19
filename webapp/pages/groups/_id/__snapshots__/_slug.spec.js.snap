@@ -18,8 +18,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
         class="ds-flex-item"
         style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
       >
-        <article
-          class="base-card"
+        <div
+          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -566,9 +566,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               </span>
             </div>
           </div>
-           
-          <!---->
-        </article>
+        </div>
          
         <div
           class="ds-space"
@@ -584,8 +582,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
       
         </h3>
          
-        <article
-          class="profile-list base-card"
+        <div
+          class="profile-list os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-list"
         >
           <h5
             class="title spacer-x-small"
@@ -927,9 +925,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           <!---->
            
           <!---->
-           
-          <!---->
-        </article>
+        </div>
       </div>
        
       <div
@@ -940,8 +936,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           class="ds-space"
           style="margin-bottom: 32px;"
         >
-          <article
-            class="group-description base-card"
+          <div
+            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text"
@@ -979,9 +975,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           
               </span>
             </button>
-             
-            <!---->
-          </article>
+          </div>
         </div>
          
         <div
@@ -1159,8 +1153,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
         class="ds-flex-item"
         style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
       >
-        <article
-          class="base-card"
+        <div
+          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -1465,9 +1459,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               </span>
             </div>
           </div>
-           
-          <!---->
-        </article>
+        </div>
          
         <div
           class="ds-space"
@@ -1483,17 +1475,15 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
       
         </h3>
          
-        <article
-          class="profile-list base-card"
+        <div
+          class="profile-list os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-list"
         >
           <p
             class="nobody-message"
           >
             group.membersListTitleNotAllowedSeeingGroupMembers
           </p>
-           
-          <!---->
-        </article>
+        </div>
       </div>
        
       <div
@@ -1504,8 +1494,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           class="ds-space"
           style="margin-bottom: 32px;"
         >
-          <article
-            class="group-description base-card"
+          <div
+            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text"
@@ -1543,9 +1533,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           
               </span>
             </button>
-             
-            <!---->
-          </article>
+          </div>
         </div>
          
         <!---->
@@ -1688,8 +1676,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
         class="ds-flex-item"
         style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
       >
-        <article
-          class="base-card"
+        <div
+          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -2014,9 +2002,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               </span>
             </div>
           </div>
-           
-          <!---->
-        </article>
+        </div>
          
         <div
           class="ds-space"
@@ -2032,17 +2018,15 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
       
         </h3>
          
-        <article
-          class="profile-list base-card"
+        <div
+          class="profile-list os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-list"
         >
           <p
             class="nobody-message"
           >
             group.membersListTitleNotAllowedSeeingGroupMembers
           </p>
-           
-          <!---->
-        </article>
+        </div>
       </div>
        
       <div
@@ -2053,8 +2037,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           class="ds-space"
           style="margin-bottom: 32px;"
         >
-          <article
-            class="group-description base-card"
+          <div
+            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text"
@@ -2092,9 +2076,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           
               </span>
             </button>
-             
-            <!---->
-          </article>
+          </div>
         </div>
          
         <!---->
@@ -2237,8 +2219,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
         class="ds-flex-item"
         style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
       >
-        <article
-          class="base-card"
+        <div
+          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -2696,9 +2678,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               </span>
             </div>
           </div>
-           
-          <!---->
-        </article>
+        </div>
          
         <div
           class="ds-space"
@@ -2714,8 +2694,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
       
         </h3>
          
-        <article
-          class="profile-list base-card"
+        <div
+          class="profile-list os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-list"
         >
           <h5
             class="title spacer-x-small"
@@ -3057,9 +3037,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           <!---->
            
           <!---->
-           
-          <!---->
-        </article>
+        </div>
       </div>
        
       <div
@@ -3070,8 +3048,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           class="ds-space"
           style="margin-bottom: 32px;"
         >
-          <article
-            class="group-description base-card"
+          <div
+            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text"
@@ -3109,9 +3087,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           
               </span>
             </button>
-             
-            <!---->
-          </article>
+          </div>
         </div>
          
         <div
@@ -3289,8 +3265,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
         class="ds-flex-item"
         style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
       >
-        <article
-          class="base-card"
+        <div
+          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -3762,9 +3738,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           </div>
            
           <!---->
-           
-          <!---->
-        </article>
+        </div>
          
         <div
           class="ds-space"
@@ -3780,8 +3754,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
       
         </h3>
          
-        <article
-          class="profile-list base-card"
+        <div
+          class="profile-list os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-list"
         >
           <h5
             class="title spacer-x-small"
@@ -4123,9 +4097,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           <!---->
            
           <!---->
-           
-          <!---->
-        </article>
+        </div>
       </div>
        
       <div
@@ -4136,8 +4108,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           class="ds-space"
           style="margin-bottom: 32px;"
         >
-          <article
-            class="group-description base-card"
+          <div
+            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text"
@@ -4180,9 +4152,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           
               </span>
             </button>
-             
-            <!---->
-          </article>
+          </div>
         </div>
          
         <div
@@ -4360,8 +4330,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
         class="ds-flex-item"
         style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
       >
-        <article
-          class="base-card"
+        <div
+          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -4629,9 +4599,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           </div>
            
           <!---->
-           
-          <!---->
-        </article>
+        </div>
          
         <div
           class="ds-space"
@@ -4647,8 +4615,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
       
         </h3>
          
-        <article
-          class="profile-list base-card"
+        <div
+          class="profile-list os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-list"
         >
           <h5
             class="title spacer-x-small"
@@ -4990,9 +4958,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           <!---->
            
           <!---->
-           
-          <!---->
-        </article>
+        </div>
       </div>
        
       <div
@@ -5003,8 +4969,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           class="ds-space"
           style="margin-bottom: 32px;"
         >
-          <article
-            class="group-description base-card"
+          <div
+            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text"
@@ -5047,9 +5013,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           
               </span>
             </button>
-             
-            <!---->
-          </article>
+          </div>
         </div>
          
         <!---->
@@ -5192,8 +5156,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
         class="ds-flex-item"
         style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
       >
-        <article
-          class="base-card"
+        <div
+          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -5481,9 +5445,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           </div>
            
           <!---->
-           
-          <!---->
-        </article>
+        </div>
          
         <div
           class="ds-space"
@@ -5499,8 +5461,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
       
         </h3>
          
-        <article
-          class="profile-list base-card"
+        <div
+          class="profile-list os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-list"
         >
           <h5
             class="title spacer-x-small"
@@ -5842,9 +5804,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           <!---->
            
           <!---->
-           
-          <!---->
-        </article>
+        </div>
       </div>
        
       <div
@@ -5855,8 +5815,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           class="ds-space"
           style="margin-bottom: 32px;"
         >
-          <article
-            class="group-description base-card"
+          <div
+            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text"
@@ -5899,9 +5859,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           
               </span>
             </button>
-             
-            <!---->
-          </article>
+          </div>
         </div>
          
         <!---->
@@ -6044,8 +6002,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
         class="ds-flex-item"
         style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
       >
-        <article
-          class="base-card"
+        <div
+          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -6428,9 +6386,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           </div>
            
           <!---->
-           
-          <!---->
-        </article>
+        </div>
          
         <div
           class="ds-space"
@@ -6446,8 +6402,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
       
         </h3>
          
-        <article
-          class="profile-list base-card"
+        <div
+          class="profile-list os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-list"
         >
           <h5
             class="title spacer-x-small"
@@ -6789,9 +6745,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           <!---->
            
           <!---->
-           
-          <!---->
-        </article>
+        </div>
       </div>
        
       <div
@@ -6802,8 +6756,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           class="ds-space"
           style="margin-bottom: 32px;"
         >
-          <article
-            class="group-description base-card"
+          <div
+            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text"
@@ -6846,9 +6800,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           
               </span>
             </button>
-             
-            <!---->
-          </article>
+          </div>
         </div>
          
         <div
@@ -7026,8 +6978,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
         class="ds-flex-item"
         style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
       >
-        <article
-          class="base-card"
+        <div
+          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -7574,9 +7526,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               </span>
             </div>
           </div>
-           
-          <!---->
-        </article>
+        </div>
          
         <div
           class="ds-space"
@@ -7592,8 +7542,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
       
         </h3>
          
-        <article
-          class="profile-list base-card"
+        <div
+          class="profile-list os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-list"
         >
           <h5
             class="title spacer-x-small"
@@ -7935,9 +7885,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           <!---->
            
           <!---->
-           
-          <!---->
-        </article>
+        </div>
       </div>
        
       <div
@@ -7948,8 +7896,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           class="ds-space"
           style="margin-bottom: 32px;"
         >
-          <article
-            class="group-description base-card"
+          <div
+            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text"
@@ -8004,9 +7952,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           
               </span>
             </button>
-             
-            <!---->
-          </article>
+          </div>
         </div>
          
         <div
@@ -8196,8 +8142,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
         class="ds-flex-item"
         style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
       >
-        <article
-          class="base-card"
+        <div
+          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -8655,9 +8601,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               </span>
             </div>
           </div>
-           
-          <!---->
-        </article>
+        </div>
          
         <div
           class="ds-space"
@@ -8673,8 +8617,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
       
         </h3>
          
-        <article
-          class="profile-list base-card"
+        <div
+          class="profile-list os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 profile-list"
         >
           <h5
             class="title spacer-x-small"
@@ -9016,9 +8960,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           <!---->
            
           <!---->
-           
-          <!---->
-        </article>
+        </div>
       </div>
        
       <div
@@ -9029,8 +8971,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           class="ds-space"
           style="margin-bottom: 32px;"
         >
-          <article
-            class="group-description base-card"
+          <div
+            class="group-description os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 group-description"
           >
             <div
               class="content hyphenate-text"
@@ -9085,9 +9027,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           
               </span>
             </button>
-             
-            <!---->
-          </article>
+          </div>
         </div>
          
         <div

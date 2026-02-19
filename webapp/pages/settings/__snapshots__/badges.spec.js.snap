@@ -2,8 +2,8 @@
 
 exports[`badge settings with badges more badges available selecting an empty slot shows list with available badges 1`] = `
 <div>
-  <article
-    class="base-card"
+  <div
+    class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
   >
     <h2
       class="title"
@@ -129,16 +129,14 @@ exports[`badge settings with badges more badges available selecting an empty slo
         </div>
       </div>
     </div>
-     
-    <!---->
-  </article>
+  </div>
 </div>
 `;
 
 exports[`badge settings with badges no more badges available selecting an empty slot shows no more badges available message 1`] = `
 <div>
-  <article
-    class="base-card"
+  <div
+    class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
   >
     <h2
       class="title"
@@ -211,16 +209,14 @@ exports[`badge settings with badges no more badges available selecting an empty 
        
       <!---->
     </div>
-     
-    <!---->
-  </article>
+  </div>
 </div>
 `;
 
 exports[`badge settings with badges renders 1`] = `
 <div>
-  <article
-    class="base-card"
+  <div
+    class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
   >
     <h2
       class="title"
@@ -295,9 +291,7 @@ exports[`badge settings with badges renders 1`] = `
        
       <!---->
     </div>
-     
-    <!---->
-  </article>
+  </div>
 </div>
 `;
 
@@ -379,8 +373,8 @@ exports[`badge settings with badges selecting a used badge clicking remove badge
 
 exports[`badge settings without badges renders 1`] = `
 <div>
-  <article
-    class="base-card"
+  <div
+    class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
   >
     <h2
       class="title"
@@ -422,8 +416,6 @@ exports[`badge settings without badges renders 1`] = `
        
       <!---->
     </div>
-     
-    <!---->
-  </article>
+  </div>
 </div>
 `;

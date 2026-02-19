@@ -2,8 +2,8 @@
 
 exports[`notifications.vue mount renders 1`] = `
 <div>
-  <article
-    class="base-card"
+  <div
+    class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
   >
     <h2
       class="title"
@@ -206,8 +206,6 @@ exports[`notifications.vue mount renders 1`] = `
         </span>
       </button>
     </div>
-     
-    <!---->
-  </article>
+  </div>
 </div>
 `;

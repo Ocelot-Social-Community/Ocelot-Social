@@ -4,8 +4,8 @@ exports[`Users given badges are disabled renders 1`] = `
 <div
   class="admin-users"
 >
-  <article
-    class="base-card"
+  <div
+    class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
   >
     <h2
       class="title"
@@ -119,12 +119,10 @@ exports[`Users given badges are disabled renders 1`] = `
         </div>
       </div>
     </form>
-     
-    <!---->
-  </article>
+  </div>
    
-  <article
-    class="base-card"
+  <div
+    class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
   >
     <div
       class="ds-table-wrap"
@@ -452,9 +450,7 @@ exports[`Users given badges are disabled renders 1`] = `
         </span>
       </button>
     </div>
-     
-    <!---->
-  </article>
+  </div>
 </div>
 `;
 
@@ -462,8 +458,8 @@ exports[`Users given badges are enabled renders 1`] = `
 <div
   class="admin-users"
 >
-  <article
-    class="base-card"
+  <div
+    class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
   >
     <h2
       class="title"
@@ -577,12 +573,10 @@ exports[`Users given badges are enabled renders 1`] = `
         </div>
       </div>
     </form>
-     
-    <!---->
-  </article>
+  </div>
    
-  <article
-    class="base-card"
+  <div
+    class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
   >
     <div
       class="ds-table-wrap"
@@ -988,8 +982,6 @@ exports[`Users given badges are enabled renders 1`] = `
         </span>
       </button>
     </div>
-     
-    <!---->
-  </article>
+  </div>
 </div>
 `;

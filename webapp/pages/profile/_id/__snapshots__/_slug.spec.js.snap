@@ -16,8 +16,8 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
         class="ds-flex-item"
         style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
       >
-        <article
-          class="base-card"
+        <div
+          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -435,9 +435,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           </div>
            
           <!---->
-           
-          <!---->
-        </article>
+        </div>
          
         <div
           class="ds-space"
@@ -483,8 +481,8 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
             class="tab-navigation"
             style="grid-row-end: span 3; grid-column-start: 1; grid-column-end: -1;"
           >
-            <article
-              class="ds-tab-nav base-card"
+            <div
+              class="ds-tab-nav os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
             >
               <ul
                 class="Tabs"
@@ -628,9 +626,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                   </a>
                 </li>
               </ul>
-               
-              <!---->
-            </article>
+            </div>
           </div>
            
           <!---->
@@ -765,8 +761,8 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
         class="ds-flex-item"
         style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
       >
-        <article
-          class="base-card"
+        <div
+          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -1221,9 +1217,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
           </div>
            
           <!---->
-           
-          <!---->
-        </article>
+        </div>
          
         <div
           class="ds-space"
@@ -1269,8 +1263,8 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
             class="tab-navigation"
             style="grid-row-end: span 3; grid-column-start: 1; grid-column-end: -1;"
           >
-            <article
-              class="ds-tab-nav base-card"
+            <div
+              class="ds-tab-nav os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
             >
               <ul
                 class="Tabs"
@@ -1414,9 +1408,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                   </a>
                 </li>
               </ul>
-               
-              <!---->
-            </article>
+            </div>
           </div>
            
           <!---->
@@ -1551,8 +1543,8 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         class="ds-flex-item"
         style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
       >
-        <article
-          class="base-card"
+        <div
+          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -1830,9 +1822,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           <!---->
            
           <!---->
-           
-          <!---->
-        </article>
+        </div>
          
         <div
           class="ds-space"
@@ -1878,8 +1868,8 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
             class="tab-navigation"
             style="grid-row-end: span 3; grid-column-start: 1; grid-column-end: -1;"
           >
-            <article
-              class="ds-tab-nav base-card"
+            <div
+              class="ds-tab-nav os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
             >
               <ul
                 class="Tabs"
@@ -2023,9 +2013,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                   </a>
                 </li>
               </ul>
-               
-              <!---->
-            </article>
+            </div>
           </div>
            
           <div
@@ -2198,8 +2186,8 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         class="ds-flex-item"
         style="flex-basis: 100%; width: 100%; padding-left: 12px; padding-right: 12px; margin-bottom: 24px;"
       >
-        <article
-          class="base-card"
+        <div
+          class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
           style="position: relative; height: auto; overflow: visible;"
         >
           <div
@@ -2519,9 +2507,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
           <!---->
            
           <!---->
-           
-          <!---->
-        </article>
+        </div>
          
         <div
           class="ds-space"
@@ -2567,8 +2553,8 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
             class="tab-navigation"
             style="grid-row-end: span 3; grid-column-start: 1; grid-column-end: -1;"
           >
-            <article
-              class="ds-tab-nav base-card"
+            <div
+              class="ds-tab-nav os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
             >
               <ul
                 class="Tabs"
@@ -2712,9 +2698,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                   </a>
                 </li>
               </ul>
-               
-              <!---->
-            </article>
+            </div>
           </div>
            
           <div
