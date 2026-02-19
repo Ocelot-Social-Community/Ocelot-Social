@@ -1001,7 +1001,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; gap: 16px;"
+          style="grid-auto-rows: 20px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -1509,7 +1509,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; gap: 16px;"
+          style="grid-auto-rows: 20px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -2037,7 +2037,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; gap: 16px;"
+          style="grid-auto-rows: 20px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -3066,7 +3066,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; gap: 16px;"
+          style="grid-auto-rows: 20px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -4115,7 +4115,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; gap: 16px;"
+          style="grid-auto-rows: 20px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -4926,7 +4926,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; gap: 16px;"
+          style="grid-auto-rows: 20px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -5757,7 +5757,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; gap: 16px;"
+          style="grid-auto-rows: 20px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -6717,7 +6717,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; gap: 16px;"
+          style="grid-auto-rows: 20px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -7851,7 +7851,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; gap: 16px;"
+          style="grid-auto-rows: 20px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -8908,7 +8908,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; gap: 16px;"
+          style="grid-auto-rows: 20px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
