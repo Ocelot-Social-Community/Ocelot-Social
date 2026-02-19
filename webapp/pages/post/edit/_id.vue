@@ -30,7 +30,7 @@
           :createEvent="contribution && contribution.postType[0] === 'Event'"
         />
       </div>
-      <div class="post-edit-layout__aside">&nbsp;</div>
+      <div class="post-edit-layout__aside"></div>
     </div>
   </div>
 </template>
@@ -89,9 +89,7 @@ export default {
 .ds-heading {
   margin-top: 0;
 }
-</style>
 
-<style lang="scss">
 .post-edit-layout__main,
 .post-edit-layout__aside {
   flex: 0 0 100%;
