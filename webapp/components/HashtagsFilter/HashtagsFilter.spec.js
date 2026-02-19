@@ -28,7 +28,6 @@ describe('HashtagsFilter.vue', () => {
       })
 
       it('renders a card', () => {
-        wrapper = Wrapper()
         expect(wrapper.classes('os-card')).toBe(true)
       })
 
