@@ -1,0 +1,56 @@
+// ==========================================================
+// DS-COMPAT: Temporäre Utility-Klassen für ds-* Migration
+// TODO(tailwind): Durch Tailwind-Utilities ersetzen
+// Grep: ds-mb-, ds-mt-, ds-my-, ds-space-centered, ds-flex
+// ==========================================================
+
+// ds-space Ersatz — Margin-Bottom
+.ds-mb-xxx-small { margin-bottom: $space-xxx-small; }
+.ds-mb-xx-small  { margin-bottom: $space-xx-small; }
+.ds-mb-x-small   { margin-bottom: $space-x-small; }
+.ds-mb-small     { margin-bottom: $space-small; }
+.ds-mb-base      { margin-bottom: $space-base; }
+.ds-mb-large     { margin-bottom: $space-large; }
+.ds-mb-x-large   { margin-bottom: $space-x-large; }
+.ds-mb-xx-large  { margin-bottom: $space-xx-large; }
+
+// ds-space Ersatz — Margin-Top
+.ds-mt-xxx-small { margin-top: $space-xxx-small; }
+.ds-mt-xx-small  { margin-top: $space-xx-small; }
+.ds-mt-x-small   { margin-top: $space-x-small; }
+.ds-mt-small     { margin-top: $space-small; }
+.ds-mt-base      { margin-top: $space-base; }
+.ds-mt-large     { margin-top: $space-large; }
+.ds-mt-x-large   { margin-top: $space-x-large; }
+.ds-mt-xx-large  { margin-top: $space-xx-large; }
+
+// ds-space Ersatz — Margin Y (top + bottom)
+.ds-my-xxx-small { margin-top: $space-xxx-small; margin-bottom: $space-xxx-small; }
+.ds-my-xx-small  { margin-top: $space-xx-small; margin-bottom: $space-xx-small; }
+.ds-my-x-small   { margin-top: $space-x-small; margin-bottom: $space-x-small; }
+.ds-my-small     { margin-top: $space-small; margin-bottom: $space-small; }
+.ds-my-base      { margin-top: $space-base; margin-bottom: $space-base; }
+.ds-my-large     { margin-top: $space-large; margin-bottom: $space-large; }
+.ds-my-x-large   { margin-top: $space-x-large; margin-bottom: $space-x-large; }
+.ds-my-xx-large  { margin-top: $space-xx-large; margin-bottom: $space-xx-large; }
+
+// ds-space centered
+.ds-space-centered {
+  text-align: center;
+  flex: 1;
+  align-content: center;
+  justify-content: center;
+}
+
+// ds-flex Ersatz
+.ds-flex          { display: flex; flex-wrap: wrap; }
+.ds-flex-no-wrap  { flex-wrap: nowrap; }
+.ds-flex-centered { align-items: center; justify-content: center; }
+.ds-flex-item     { flex: 1 0 0; min-width: 0; }
+
+.ds-flex-gap-xxx-small { gap: $space-xxx-small; }
+.ds-flex-gap-xx-small  { gap: $space-xx-small; }
+.ds-flex-gap-x-small   { gap: $space-x-small; }
+.ds-flex-gap-small     { gap: $space-small; }
+.ds-flex-gap-base      { gap: $space-base; }
+.ds-flex-gap-large     { gap: $space-large; }
