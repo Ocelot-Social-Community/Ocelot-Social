@@ -171,7 +171,10 @@
           </template>
         </os-card>
         <div class="ds-mb-large"></div>
-        <h3 class="ds-heading ds-heading-h3 ds-heading-soft" style="text-align: center; margin-bottom: 10px">
+        <h3
+          class="ds-heading ds-heading-h3 ds-heading-soft"
+          style="text-align: center; margin-bottom: 10px"
+        >
           {{ $t('profile.network.title') }}
         </h3>
         <!-- Group members list -->

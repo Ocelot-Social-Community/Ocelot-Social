@@ -3,7 +3,10 @@
     <div>
       <div class="ds-my-small">
         <h1 class="ds-heading ds-heading-h1">{{ heading }}</h1>
-        <h2 v-if="post && post.group && post.group.id && post.group.slug" class="ds-heading ds-heading-h2">
+        <h2
+          v-if="post && post.group && post.group.id && post.group.slug"
+          class="ds-heading ds-heading-h2"
+        >
           {{ $t('post.viewPost.forGroup.title') }}
           <nuxt-link
             :to="{ name: 'groups-id-slug', params: { slug: post.group.slug, id: post.group.id } }"

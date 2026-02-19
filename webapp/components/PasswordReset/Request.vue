@@ -18,7 +18,9 @@
       />
     </div>
     <div class="ds-mb-large">
-      <p class="ds-text ds-text-left">{{ $t('components.password-reset.request.form.description') }}</p>
+      <p class="ds-text ds-text-left">
+        {{ $t('components.password-reset.request.form.description') }}
+      </p>
     </div>
     <os-button
       variant="primary"

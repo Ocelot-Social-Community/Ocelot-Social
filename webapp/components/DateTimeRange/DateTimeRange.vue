@@ -1,5 +1,8 @@
 <template>
-  <div class="ds-text ds-text-left ds-text-soft date-time-range" :class="size && 'ds-text-size-' + size">
+  <div
+    class="ds-text ds-text-left ds-text-soft date-time-range"
+    :class="size && 'ds-text-size-' + size"
+  >
     <div class="date-time-row">
       <div>
         <os-icon :icon="icons.calendar" data-test="calendar" />

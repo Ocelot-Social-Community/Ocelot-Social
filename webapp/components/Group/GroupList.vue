@@ -1,10 +1,6 @@
 <template>
   <div class="ds-flex group-list">
-    <div
-      v-for="group in groups"
-      :key="group.id"
-      class="group-list__item group-item"
-    >
+    <div v-for="group in groups" :key="group.id" class="group-list__item group-item">
       <group-teaser :group="group" />
     </div>
   </div>

@@ -1,5 +1,8 @@
 <template>
-  <p class="ds-text ds-text-left ds-text-soft location-teaser" :class="size && 'ds-text-size-' + size">
+  <p
+    class="ds-text ds-text-left ds-text-soft location-teaser"
+    :class="size && 'ds-text-size-' + size"
+  >
     <os-icon :icon="icons.mapMarker" data-test="map-marker" />
     <span v-if="venue">{{ venue }}</span>
     <span v-if="venue">&nbsp;&mdash;&nbsp;</span>

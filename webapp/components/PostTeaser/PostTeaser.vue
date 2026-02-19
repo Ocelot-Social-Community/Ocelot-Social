@@ -26,11 +26,7 @@
       </client-only>
       <h2 class="title hyphenate-text">{{ post.title }}</h2>
       <client-only>
-        <div
-          v-if="post && post.postType[0] === 'Event'"
-          class="ds-mb-small"
-          style="padding: 5px"
-        >
+        <div v-if="post && post.postType[0] === 'Event'" class="ds-mb-small" style="padding: 5px">
           <location-teaser
             class="event-info"
             size="base"

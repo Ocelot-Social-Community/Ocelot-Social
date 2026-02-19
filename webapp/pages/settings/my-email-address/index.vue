@@ -16,7 +16,9 @@
           :label="$t('settings.email.labelEmail')"
         />
         <div class="ds-mb-large backendErrors" v-if="backendErrors">
-          <p class="ds-text ds-text-center ds-text-bold ds-text-danger">{{ backendErrors.message }}</p>
+          <p class="ds-text ds-text-center ds-text-bold ds-text-danger">
+            {{ backendErrors.message }}
+          </p>
         </div>
         <os-button
           :disabled="!!errors"

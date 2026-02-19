@@ -1,7 +1,10 @@
 <template>
   <div class="layout-blank">
     <div class="main-navigation">
-      <div class="ds-container ds-container-x-large main-navigation-container" style="padding: 10px 10px">
+      <div
+        class="ds-container ds-container-x-large main-navigation-container"
+        style="padding: 10px 10px"
+      >
         <div class="ds-flex ds-flex-centered main-navigation-flex">
           <div style="flex: 0 0 5.5%; width: 5.5%"></div>
           <div style="flex: 0 0 20%; width: 20%; flex-grow: 1">

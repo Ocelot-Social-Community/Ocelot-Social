@@ -138,7 +138,10 @@
       <div v-else class="mobil-header-box">
         <!-- logo, hamburger-->
         <div class="ds-flex" style="align-items: center">
-          <div class="ds-flex-item logo-container" :style="{ flex: '0 0 ' + LOGOS.LOGO_HEADER_WIDTH, width: LOGOS.LOGO_HEADER_WIDTH }">
+          <div
+            class="ds-flex-item logo-container"
+            :style="{ flex: '0 0 ' + LOGOS.LOGO_HEADER_WIDTH, width: LOGOS.LOGO_HEADER_WIDTH }"
+          >
             <div @click="toggleMobileMenu ? toggleMobileMenuView() : ''">
               <a
                 v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
@@ -299,7 +302,11 @@
             </client-only>
           </div>
           <!-- avatar menu mobile -->
-          <div class="ds-flex-item" :class="{ 'hide-mobile-menu': !toggleMobileMenu }" style="text-align: end">
+          <div
+            class="ds-flex-item"
+            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
+            style="text-align: end"
+          >
             <client-only>
               <avatar-menu placement="top" @toggle-Mobile-Menu-view="toggleMobileMenuView" />
             </client-only>
