@@ -10,7 +10,7 @@
           alt="Empty"
         />
         <br />
-        <span class="ds-text ds-text-softer hc-empty-message" v-show="message">
+        <span class="ds-text-softer hc-empty-message" v-show="message">
           {{ message }}
         </span>
       </p>

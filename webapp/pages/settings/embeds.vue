@@ -4,7 +4,7 @@
     <section class="ds-section">
       <p class="ds-text">
         {{ $t('settings.embeds.status.description') }}
-        <span class="ds-text ds-text-bold">
+        <span class="ds-text-bold">
           <template v-if="disabled">
             {{ $t(`settings.embeds.status.disabled.on`) }}
           </template>

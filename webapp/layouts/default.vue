@@ -63,7 +63,7 @@ export default {
 }
 .main-container {
   padding-top: 6rem;
-  padding-bottom: 5rem;
+  padding-bottom: 8rem;
 }
 
 .chat-modul {
