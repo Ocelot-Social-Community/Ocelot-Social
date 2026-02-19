@@ -42,6 +42,15 @@
   justify-content: center;
 }
 
+// ds-list-item bullet icon (replaces DsListItem Vue component's angle-right prefix)
+.ds-list-item::before {
+  content: '';
+  flex: 0 0 1.5em;
+  height: 1.2em;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='%2370677e'%3E%3Cpath d='M12.969 4.281l11 11 .688.719-.688.719-11 11-1.438-1.438L21.812 16 11.531 5.719z'/%3E%3C/svg%3E") no-repeat left center;
+  background-size: 0.6em;
+}
+
 // ds-flex Ersatz
 .ds-flex          { display: flex; flex-wrap: wrap; }
 .ds-flex-no-wrap  { flex-wrap: nowrap; }

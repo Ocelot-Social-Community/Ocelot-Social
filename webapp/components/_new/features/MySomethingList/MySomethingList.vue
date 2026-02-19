@@ -216,13 +216,7 @@ export default {
 }
 
 .list-item--high {
-  .ds-list-item-prefix {
-    align-self: center;
-  }
-
-  .ds-list-item-content {
-    display: flex;
-    align-items: center;
-  }
+  display: flex;
+  align-items: center;
 }
 </style>

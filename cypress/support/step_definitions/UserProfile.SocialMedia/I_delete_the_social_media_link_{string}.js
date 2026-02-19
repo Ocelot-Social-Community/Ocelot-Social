@@ -7,6 +7,6 @@ defineStep('I delete the social media link {string}', (link) => {
     .should("be.visible")
   cy.get('[data-test="confirm-button"]')
     .click()
-  cy.get('.ds-list-item-content > a')
+  cy.get('.ds-list-item a')
     .should('not.exist')
 })

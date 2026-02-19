@@ -8,6 +8,6 @@ defineStep('I have added the social media link {string}', (link) => {
     .type(link)
     .get('[data-test="add-save-button"]')
     .click()
-  cy.get('.ds-list-item-content > a')
+  cy.get('.ds-list-item a')
     .contains(link)
 })
