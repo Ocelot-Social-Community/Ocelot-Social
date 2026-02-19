@@ -4,6 +4,7 @@
   import { cn } from '#src/utils'
 
   import type { ClassValue } from 'clsx'
+  import type { PropType } from 'vue-demi'
 
   const CARD_BASE =
     'os-card relative rounded-[5px] overflow-hidden break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)]'
@@ -15,7 +16,8 @@
 
   /**
    * Content card container with rounded corners, background, and shadow.
-   * Renders as `<article>` by default.
+   * Renders as `<div>` by default. Use `as="article"` for self-contained
+   * content like posts or comments.
    *
    * When `heroImage` slot is provided, the card uses a two-section layout:
    * the hero image spans full width (no padding), followed by padded content.
@@ -28,6 +30,15 @@
     name: 'OsCard',
     inheritAttrs: false,
     props: {
+      /**
+       * HTML element to render as. Use `article` for self-contained content
+       * (posts, comments), `section` for thematic groups, or `div` (default)
+       * for generic containers.
+       */
+      as: {
+        type: String as PropType<'div' | 'article' | 'section' | 'aside'>,
+        default: 'div',
+      },
       /**
        * Adds a colored border to highlight the card (e.g. for pinned posts).
        * Uses `--color-warning` CSS variable for border color.
@@ -56,6 +67,8 @@
             ]
           : defaultContent
 
+        const tag = props.as
+
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
         if (isVue2) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -65,7 +78,7 @@
           const parentAttrs = proxy?.$vnode?.data?.attrs || {}
 
           return h(
-            'article',
+            tag,
             {
               class: cn(cardClass, parentClass, parentDynClass),
               attrs: { ...parentAttrs, ...attrs },
@@ -78,7 +91,7 @@
         const { class: attrClass, ...restAttrs } = attrs as Record<string, unknown>
 
         return h(
-          'article',
+          tag,
           {
             class: cn(cardClass, attrClass as ClassValue),
             ...restAttrs,

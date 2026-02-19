@@ -5,10 +5,10 @@ import OsCard from './OsCard.vue'
 
 describe('osCard', () => {
   describe('rendering', () => {
-    it('renders as article element', () => {
+    it('renders as div element by default', () => {
       const wrapper = mount(OsCard)
 
-      expect((wrapper.element as HTMLElement).tagName).toBe('ARTICLE')
+      expect((wrapper.element as HTMLElement).tagName).toBe('DIV')
     })
 
     it('renders default slot content', () => {
@@ -24,6 +24,32 @@ describe('osCard', () => {
 
       expect(wrapper.exists()).toBe(true)
       expect(wrapper.text()).toBe('')
+    })
+  })
+
+  describe('as prop', () => {
+    it('renders as article when as="article"', () => {
+      const wrapper = mount(OsCard, {
+        props: { as: 'article' },
+      })
+
+      expect((wrapper.element as HTMLElement).tagName).toBe('ARTICLE')
+    })
+
+    it('renders as section when as="section"', () => {
+      const wrapper = mount(OsCard, {
+        props: { as: 'section' },
+      })
+
+      expect((wrapper.element as HTMLElement).tagName).toBe('SECTION')
+    })
+
+    it('renders as aside when as="aside"', () => {
+      const wrapper = mount(OsCard, {
+        props: { as: 'aside' },
+      })
+
+      expect((wrapper.element as HTMLElement).tagName).toBe('ASIDE')
     })
   })
 
@@ -162,7 +188,7 @@ describe('osCard', () => {
         },
       })
 
-      const divs = wrapper.findAll('article > div')
+      const divs = wrapper.findAll('.os-card > div')
 
       expect(divs).toHaveLength(2)
       expect(divs[0].classes()).toContain('os-card__hero-image')
