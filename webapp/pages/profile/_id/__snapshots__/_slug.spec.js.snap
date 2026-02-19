@@ -436,8 +436,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
         />
          
         <h3
-          class="ds-heading ds-heading-h3 ds-heading-soft"
-          style="text-align: center; margin-bottom: 10px;"
+          class="ds-heading ds-heading-h3 ds-heading-soft ds-text-center ds-mb-x-small"
         >
           
         profile.network.title
@@ -640,7 +639,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                   <br />
                    
                   <span
-                    class="ds-text ds-text-softer hc-empty-message"
+                    class="ds-text-softer hc-empty-message"
                     style="display: none;"
                   >
                     
@@ -1204,8 +1203,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
         />
          
         <h3
-          class="ds-heading ds-heading-h3 ds-heading-soft"
-          style="text-align: center; margin-bottom: 10px;"
+          class="ds-heading ds-heading-h3 ds-heading-soft ds-text-center ds-mb-x-small"
         >
           
         profile.network.title
@@ -1408,7 +1406,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                   <br />
                    
                   <span
-                    class="ds-text ds-text-softer hc-empty-message"
+                    class="ds-text-softer hc-empty-message"
                     style="display: none;"
                   >
                     
@@ -1796,8 +1794,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         />
          
         <h3
-          class="ds-heading ds-heading-h3 ds-heading-soft"
-          style="text-align: center; margin-bottom: 10px;"
+          class="ds-heading ds-heading-h3 ds-heading-soft ds-text-center ds-mb-x-small"
         >
           
         profile.network.title
@@ -2038,7 +2035,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                   <br />
                    
                   <span
-                    class="ds-text ds-text-softer hc-empty-message"
+                    class="ds-text-softer hc-empty-message"
                     style="display: none;"
                   >
                     
@@ -2467,8 +2464,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         />
          
         <h3
-          class="ds-heading ds-heading-h3 ds-heading-soft"
-          style="text-align: center; margin-bottom: 10px;"
+          class="ds-heading ds-heading-h3 ds-heading-soft ds-text-center ds-mb-x-small"
         >
           
         profile.network.title
@@ -2709,7 +2705,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                   <br />
                    
                   <span
-                    class="ds-text ds-text-softer hc-empty-message"
+                    class="ds-text-softer hc-empty-message"
                     style="display: none;"
                   >
                     
