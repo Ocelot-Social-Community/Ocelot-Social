@@ -15,7 +15,6 @@
         </os-button>
       </div>
       <div class="category-filter-list">
-        <!-- <ds-space margin="small" /> -->
         <os-button
           v-for="category in sortCategories(categories)"
           :key="category.id"
