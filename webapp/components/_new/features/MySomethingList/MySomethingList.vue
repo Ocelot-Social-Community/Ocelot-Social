@@ -56,27 +56,25 @@
     </div>
 
     <div class="ds-mt-base ds-mb-large">
-      <div class="ds-mt-base ds-mb-large">
-        <os-button
-          variant="primary"
-          appearance="filled"
-          :disabled="loading || (isEditing && disabled)"
-          :loading="loading"
-          type="submit"
-          data-test="add-save-button"
-        >
-          {{ isEditing ? $t('actions.save') : texts.addButton }}
-        </os-button>
-        <os-button
-          v-if="isEditing"
-          id="cancel"
-          variant="primary"
-          appearance="outline"
-          @click="handleCancel()"
-        >
-          {{ $t('actions.cancel') }}
-        </os-button>
-      </div>
+      <os-button
+        variant="primary"
+        appearance="filled"
+        :disabled="loading || (isEditing && disabled)"
+        :loading="loading"
+        type="submit"
+        data-test="add-save-button"
+      >
+        {{ isEditing ? $t('actions.save') : texts.addButton }}
+      </os-button>
+      <os-button
+        v-if="isEditing"
+        id="cancel"
+        variant="primary"
+        appearance="outline"
+        @click="handleCancel()"
+      >
+        {{ $t('actions.cancel') }}
+      </os-button>
     </div>
   </ds-form>
 </template>
