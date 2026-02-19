@@ -16,7 +16,7 @@
       </p>
       <div class="ds-mb-large message">
         <client-only>
-          <p class="ds-text">
+          <div class="ds-text">
             <div class="ds-mt-large ds-mb-small">
               {{ $t(`settings.email.verification-error.explanation`) }}
             </div>
@@ -30,7 +30,7 @@
             </ul>
             {{ $t('settings.email.verification-error.support') }}
             <a :href="'mailto:' + supportEmail">{{ supportEmail }}</a>
-          </p>
+          </div>
         </client-only>
       </div>
     </template>
