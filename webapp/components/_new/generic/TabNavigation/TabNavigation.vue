@@ -44,6 +44,7 @@ export default {
     },
     activeTab: {
       type: String,
+      default: null,
     },
   },
   methods: {
