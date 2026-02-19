@@ -124,12 +124,15 @@ export const Highlight: Story = {
 export const HeroImage: Story = {
   render: () => ({
     components: { OsCard },
+    setup() {
+      return { HERO_SVG }
+    },
     template: `
       <div data-testid="hero-image" class="flex flex-col gap-4" style="max-width: 400px">
         <OsCard as="article" :highlight="true">
           <template #heroImage>
             <img
-              src="${HERO_SVG}"
+              :src="HERO_SVG"
               alt="Hero placeholder"
               style="display: block; width: 100%; height: auto"
             />
@@ -140,7 +143,7 @@ export const HeroImage: Story = {
         <OsCard>
           <template #heroImage>
             <img
-              src="${HERO_SVG}"
+              :src="HERO_SVG"
               alt="Hero placeholder"
               style="display: block; width: 100%; height: auto"
             />
