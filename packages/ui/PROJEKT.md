@@ -194,11 +194,32 @@ Tier A ds-* → Plain HTML + CSS: ✅
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-19 (Session 27)
+**Letzte Aktualisierung:** 2026-02-19 (Session 28)
 
 **Aktuelle Phase:** Phase 4 - OsIcon ✅, BaseIcon → OsIcon Migration ✅, OsSpinner ✅, Spinner Webapp-Migration ✅, OsCard ✅, BaseCard → OsCard Migration ✅, Tier A ds-* → Plain HTML ✅
 
-**Zuletzt abgeschlossen (Session 27 - Tier A: ds-* Komponenten → Plain HTML):**
+**Zuletzt abgeschlossen (Session 28 - CodeRabbit Review Fixes für Tier A PR):**
+- [x] GroupForm.vue: Fehlende `buttons`-Klasse auf Button-Container ergänzt (CSS-Regel `.group-form > .buttons` griff nicht)
+- [x] ComponentSlider.vue: `<h1>` → `<h3>` (Original war `<ds-heading size="h3">`, falsch zu h1 migriert)
+- [x] SearchHeading.vue: `<h1>` → `<h5>` (Original war `<ds-heading size="h5">`, falsch zu h1 migriert)
+- [x] MySomethingList.vue: Redundantes verschachteltes `<div class="ds-mt-base ds-mb-large">` entfernt (Überbleibsel von verschachtelten ds-space)
+- [x] Empty.vue: Prop-Type `[String, Object]` → `String` (Object-Support war ds-space-Relikt, nicht implementiert)
+- [x] ChangePassword.vue: Inline-Spans → separate `<p class="ds-text">` Elemente (visuelle Regression: fehlende Block-Level-Trennung)
+- [x] RegistrationSlideEmail.vue: Label `for="checkbox0"` → `for="sendEmailAgain"` passend zu `id="sendEmailAgain"` (A11y WCAG 1.3.1/4.1.2)
+- [x] Signup.vue: `margin="large"` (totes ds-space-Attribut auf div) → `class="ds-my-large"` + `<style>` → `<style scoped>`
+- [x] SocialMedia.vue: `:key="link.id"` → `:key="link.url"` (link.id war immer undefined, socialMediaLinks() gibt kein id zurück)
+- [x] logout.vue: Hardcodierter "Logging out..." → `$t('login.loggingOut')` mit Übersetzungen in allen 9 Sprachen
+- [x] maintenance/index.vue: `alt="Under maintenance"` → `:alt="$t('maintenance.title', metadata)"` (i18n-Konsistenz) + `<style scoped>`
+- [x] admin/index.vue: `33%` → `33.333%` (Rundungsfehler bei 3-Spalten-Layout)
+- [x] profile/_id/_slug.vue: Inline-Style `margin-bottom: 10px; text-align: center` → `ds-text-center ds-mb-x-small` Utility-Klassen
+- [x] post/edit/_id.vue: `&nbsp;` aus Aside-Div entfernt (Screenreader-Problem) + zwei Style-Blöcke zu einem scoped Block gemergt
+- [x] post/create/_type.vue: Zwei Style-Blöcke (scoped + unscoped) zu einem scoped Block gemergt
+- [x] _ds-compat.scss: `display: flex` zu `.ds-space-centered` hinzugefügt (justify-content/align-items wirkten ohne display:flex nicht)
+- [x] blocked-users.vue: Unnötiges Wrapper-Div `ds-mb-large` am Kartenende entfernt
+- [x] Cypress SocialMedia: `cy.get('.ds-list-item a')` → `cy.get('.ds-list-item a[href="${link}"]')` (nutzt link-Parameter)
+- [x] Als "nicht in diesem PR" bewertet: pre-existing Code-Style Nitpicks (required:false, Ternary-Syntax, Prop-Validierung, Spacer-Divs, flex:1 0 0 Einheit, v-if="user", CSS-Nesting, Dark-Mode SVG-Farbe)
+
+**Zuvor abgeschlossen (Session 27 - Tier A: ds-* Komponenten → Plain HTML):**
 - [x] `_ds-compat.scss` erstellt (Utility-Klassen für Margins, Flex, Centered)
 - [x] `ds-section` → `<section class="ds-section">` (5 Dateien)
 - [x] `ds-placeholder` → `<div class="ds-placeholder">` (4 Dateien)
@@ -1737,6 +1758,13 @@ Bei der Migration werden:
 | 2026-02-19 | **ds-flex/ds-flex-item** | 103 Nutzungen in 29 Dateien → Plain HTML + CSS `@media` Queries; JS window.innerWidth → CSS Media Queries; `gap` statt negative-margin/padding |
 | 2026-02-19 | **HTML-Validierung Bugfix** | `<p>` mit Block-Level-Kindern → `<div>` in DateTimeRange.vue und verify.vue |
 | 2026-02-19 | **Test-Fix** | Empty.spec.js: `attributes().margin` → `classes().toContain('ds-my-xxx-small')` |
+| 2026-02-19 | **Review Fixes (Session 28)** | ~20 CodeRabbit Review-Kommentare für Tier A PR bearbeitet; Bugfixes, A11y, i18n, Scoping |
+| 2026-02-19 | **Heading-Semantik** | ComponentSlider h1→h3, SearchHeading h1→h5 (ds-heading size-Prop wurde falsch zu h1 migriert) |
+| 2026-02-19 | **A11y Fixes** | Label-for Mismatch (RegistrationSlideEmail), &nbsp; in Aside entfernt, link.id→link.url Key |
+| 2026-02-19 | **i18n** | logout.vue "Logging out..." → $t() mit 9 Sprachen; maintenance alt-Text → $t() |
+| 2026-02-19 | **CSS Fixes** | .buttons Klasse ergänzt (GroupForm), display:flex auf .ds-space-centered, 33%→33.333%, inline-style→Utilities |
+| 2026-02-19 | **Scoping** | Signup.vue, maintenance/index.vue, post/create/_type.vue, post/edit/_id.vue: unscoped → scoped Style-Blöcke |
+| 2026-02-19 | **Migration-Artefakte** | Redundante Wrapper-Divs, tote Attribute (margin="large"), Span→P Block-Level Regression |
 
 ---
 
