@@ -151,12 +151,20 @@ body.dropdown-open {
   overflow: hidden;
 }
 
-.base-card > .ds-section {
+.base-card > .ds-section,
+.os-card > .ds-section {
   padding: 0;
   margin: -$space-base;
 
   .ds-container {
     padding: $space-base;
+  }
+}
+
+.os-card {
+  > .title {
+    font-size: $font-size-large;
+    margin-bottom: $space-x-small;
   }
 }
 
