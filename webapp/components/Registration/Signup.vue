@@ -143,7 +143,7 @@ export default {
   },
 }
 </script>
-<style>
+<style scoped>
 .space-top {
   margin-top: 6ex;
 }
