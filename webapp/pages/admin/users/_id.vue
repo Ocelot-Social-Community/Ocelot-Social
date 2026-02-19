@@ -8,7 +8,7 @@
       </ds-heading>
       <ds-text>{{ $t('admin.badges.description') }}</ds-text>
     </ds-space>
-    <base-card v-if="!isLoadingBadges">
+    <os-card v-if="!isLoadingBadges">
       <badges-section
         :title="$t('admin.badges.verificationBadges')"
         :badges="verificationBadges"
@@ -19,11 +19,12 @@
         :badges="trophyBadges"
         @toggleBadge="toggleBadge"
       />
-    </base-card>
+    </os-card>
   </ds-section>
 </template>
 
 <script>
+import { OsCard } from '@ocelot-social/ui'
 import BadgesSection from '~/components/_new/features/Admin/Badges/BadgesSection.vue'
 import {
   queryBadges,
@@ -35,6 +36,7 @@ import { adminUserBadgesQuery } from '~/graphql/User'
 
 export default {
   components: {
+    OsCard,
     BadgesSection,
   },
   data() {

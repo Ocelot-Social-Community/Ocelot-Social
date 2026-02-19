@@ -1,5 +1,5 @@
 <template>
-  <base-card>
+  <os-card>
     <template v-if="$apollo.loading">
       <div style="text-align: center; padding: 48px 0">
         <os-spinner size="xl" />
@@ -34,16 +34,17 @@
         </ds-text>
       </ds-space>
     </template>
-  </base-card>
+  </os-card>
 </template>
 
 <script>
-import { OsSpinner } from '@ocelot-social/ui'
+import { OsCard, OsSpinner } from '@ocelot-social/ui'
 import HcCountTo from '~/components/CountTo.vue'
 import { Statistics } from '~/graphql/admin/Statistics'
 
 export default {
   components: {
+    OsCard,
     OsSpinner,
     HcCountTo,
   },

@@ -1,5 +1,5 @@
 <template>
-  <base-card>
+  <os-card>
     <h2 class="title">{{ $t('admin.hashtags.name') }}</h2>
     <ds-table :data="Tag" :fields="fields" condensed>
       <template #index="scope">{{ scope.index + 1 }}.</template>
@@ -9,13 +9,15 @@
         </nuxt-link>
       </template>
     </ds-table>
-  </base-card>
+  </os-card>
 </template>
 
 <script>
+import { OsCard } from '@ocelot-social/ui'
 import gql from 'graphql-tag'
 
 export default {
+  components: { OsCard },
   data() {
     return {
       Tag: [],

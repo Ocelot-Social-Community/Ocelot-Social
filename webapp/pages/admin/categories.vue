@@ -1,21 +1,21 @@
 <template>
-  <base-card>
+  <os-card>
     <h2 class="title">{{ $t('admin.categories.name') }}</h2>
     <ds-table :data="Category" :fields="fields" condensed>
       <template #icon="scope">
         <os-icon :icon="resolveIcon(scope.row.icon)" />
       </template>
     </ds-table>
-  </base-card>
+  </os-card>
 </template>
 
 <script>
-import { OsIcon } from '@ocelot-social/ui'
+import { OsCard, OsIcon } from '@ocelot-social/ui'
 import { resolveIcon } from '~/utils/iconRegistry'
 import gql from 'graphql-tag'
 
 export default {
-  components: { OsIcon },
+  components: { OsCard, OsIcon },
   data() {
     return {
       Category: [],
