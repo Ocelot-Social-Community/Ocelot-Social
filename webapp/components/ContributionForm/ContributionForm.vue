@@ -613,7 +613,7 @@ export default {
   }
 
   @media screen and (max-width: 656px) {
-    > .buttons-footer {
+    > .os-card__content > .buttons-footer {
       flex-direction: column;
       margin-top: 5px;
 
@@ -626,7 +626,7 @@ export default {
   }
 
   @media screen and (max-width: 280px) {
-    > .buttons-footer {
+    > .os-card__content > .buttons-footer {
       > .action-buttons-group {
         flex-direction: column;
 
