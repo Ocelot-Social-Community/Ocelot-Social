@@ -131,7 +131,7 @@
           </ds-chip>
         </div>
         <!-- submit -->
-        <div class="ds-mt-large ds-mb-large">
+        <div class="buttons ds-mt-large ds-mb-large">
           <os-button as="nuxt-link" to="/groups" variant="default" appearance="filled">
             {{ $t('actions.cancel') }}
           </os-button>
