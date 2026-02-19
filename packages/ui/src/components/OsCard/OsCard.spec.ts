@@ -168,7 +168,10 @@ describe('osCard', () => {
 
       expect(heroImage.exists()).toBe(true)
       expect(content.exists()).toBe(true)
-      expect(heroImage.element.compareDocumentPosition(content.element) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+      expect(
+        heroImage.element.compareDocumentPosition(content.element) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).not.toBe(0)
     })
   })
 
