@@ -26,7 +26,7 @@ describe('my-organizations.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.element.tagName).toBe('ARTICLE')
+      expect(wrapper.classes('os-card')).toBe(true)
     })
   })
 })
