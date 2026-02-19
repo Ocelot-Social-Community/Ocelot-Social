@@ -18,3 +18,4 @@ export {
   type SystemIconName,
 } from './OsIcon'
 export { OsSpinner, SPINNER_SIZES } from './OsSpinner'
+export { OsCard } from './OsCard'
