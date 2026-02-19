@@ -119,9 +119,7 @@
           </template>
         </os-card>
         <div class="ds-mb-large"></div>
-        <h3
-          class="ds-heading ds-heading-h3 ds-heading-soft ds-text-center ds-mb-x-small"
-        >
+        <h3 class="ds-heading ds-heading-h3 ds-heading-soft ds-text-center ds-mb-x-small">
           {{ $t('profile.network.title') }}
         </h3>
         <follow-list

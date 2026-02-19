@@ -12,7 +12,12 @@
     <ds-input :placeholder="$t('login.email')" type="email" id="email" model="email" name="email" />
     <slot></slot>
     <p class="ds-text" v-if="sliderData.collectedInputData.emailSend">
-      <input id="sendEmailAgain" type="checkbox" v-model="sendEmailAgain" :checked="sendEmailAgain" />
+      <input
+        id="sendEmailAgain"
+        type="checkbox"
+        v-model="sendEmailAgain"
+        :checked="sendEmailAgain"
+      />
       <label for="sendEmailAgain">
         {{ $t('components.registration.email.form.sendEmailAgain') }}
       </label>
