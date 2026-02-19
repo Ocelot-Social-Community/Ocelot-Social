@@ -3,5 +3,5 @@ import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 defineStep('I can visit the post page', () => {
   cy.contains('Fake news').click()
   cy.location('pathname').should('contain', '/post')
-    .get('.base-card .title').should('contain', 'Fake news')
+    .get('.os-card .title').should('contain', 'Fake news')
 })
