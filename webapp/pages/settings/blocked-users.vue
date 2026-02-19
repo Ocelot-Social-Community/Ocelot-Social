@@ -74,11 +74,9 @@
           {{ $t('settings.blocked-users.empty') }}
         </div>
       </div>
-      <div class="ds-mb-large">
-        <p class="ds-text ds-text-center">
-          {{ $t('settings.blocked-users.how-to') }}
-        </p>
-      </div>
+      <p class="ds-text ds-text-center">
+        {{ $t('settings.blocked-users.how-to') }}
+      </p>
     </os-card>
   </div>
 </template>
