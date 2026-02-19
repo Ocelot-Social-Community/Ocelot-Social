@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CtaUnblockAuthor.vue shallowMount renders 1`] = `
+<div class="ds-my-xxx-small ds-space-centered">
+  <div class="ds-mb-small"></div>
+  <h4 class="ds-heading ds-heading-h4">
+    contribution.comment.commenting-disabled.blocked-author.reason
+  </h4>
+  <p class="ds-text">
+    contribution.comment.commenting-disabled.blocked-author.call-to-action
+  </p>
+  <os-button-stub as="nuxt-link" variant="primary" appearance="filled" size="md" type="button" to="[object Object]">
+    contribution.comment.commenting-disabled.blocked-author.button-label
+  </os-button-stub>
+</div>
+`;
