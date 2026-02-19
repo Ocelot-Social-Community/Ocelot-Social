@@ -3,7 +3,7 @@
     class="group-teaser"
     :to="{ name: 'groups-id-slug', params: { id: group.id, slug: group.slug } }"
   >
-    <base-card
+    <os-card
       :class="{
         'disabled-content': group.disabled,
       }"
@@ -74,12 +74,12 @@
           </div>
         </div>
       </footer>
-    </base-card>
+    </os-card>
   </nuxt-link>
 </template>
 
 <script>
-import { OsIcon } from '@ocelot-social/ui'
+import { OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Category from '~/components/Category'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
@@ -91,6 +91,7 @@ export default {
   components: {
     Category,
     GroupContentMenu,
+    OsCard,
     OsIcon,
   },
   props: {
@@ -130,7 +131,7 @@ export default {
   }
 }
 
-.group-teaser > .base-card {
+.group-teaser > .os-card {
   display: flex;
   flex-direction: column;
   height: 100%;

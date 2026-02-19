@@ -1,5 +1,5 @@
 <template>
-  <base-card>
+  <os-card>
     <h2 class="title">{{ $t('settings.notifications.name') }}</h2>
     <ds-space
       margin-top="small"
@@ -40,17 +40,17 @@
         {{ $t('actions.save') }}
       </os-button>
     </ds-space>
-  </base-card>
+  </os-card>
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsCard } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 import { updateUserMutation } from '~/graphql/User'
 import scrollToContent from './scroll-to-content.js'
 
 export default {
-  components: { OsButton },
+  components: { OsButton, OsCard },
   mixins: [scrollToContent],
   data() {
     return {

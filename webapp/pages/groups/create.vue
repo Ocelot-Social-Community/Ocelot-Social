@@ -5,7 +5,7 @@
     </ds-space>
     <ds-space margin="large" />
     <ds-container>
-      <base-card>
+      <os-card>
         <ds-space margin="large">
           <ds-flex :width="{ base: '100%' }" gutter="base">
             <ds-flex-item :width="{ base: '100%', md: 5 }">
@@ -16,17 +16,19 @@
             <ds-flex-item :width="{ base: '100%', md: 1 }">&nbsp;</ds-flex-item>
           </ds-flex>
         </ds-space>
-      </base-card>
+      </os-card>
     </ds-container>
   </div>
 </template>
 
 <script>
+import { OsCard } from '@ocelot-social/ui'
 import GroupForm from '~/components/Group/GroupForm'
 import { createGroupMutation } from '~/graphql/groups.js'
 
 export default {
   components: {
+    OsCard,
     GroupForm,
   },
   data() {

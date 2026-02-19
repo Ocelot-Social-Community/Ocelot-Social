@@ -81,10 +81,10 @@ Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
 Phase 3: ██████████ 100% (24/24 Aufgaben) ✅ - Webapp-Integration komplett
-Phase 4: ████░░░░░░  35% (6/17 Aufgaben) - OsButton ✅, OsIcon ✅, System-Icons ✅, BaseIcon→OsIcon Migration ✅, OsSpinner ✅, Spinner Webapp-Migration ✅
+Phase 4: █████░░░░░  47% (8/17 Aufgaben) - OsButton ✅, OsIcon ✅, System-Icons ✅, BaseIcon→OsIcon Migration ✅, OsSpinner ✅, Spinner Webapp-Migration ✅, OsCard ✅, BaseCard→OsCard Migration ✅
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████████░░  79% (68/86 Aufgaben)
+Gesamt:  ████████░░  81% (70/86 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -142,6 +142,23 @@ OsSpinner:
 ├─ vue-compat: ✅ h() Render-Function mit isVue2
 └─ webapp:     ✅ 4 Spinner migriert (DsSpinner + LoadingSpinner → OsSpinner)
 
+BaseCard → OsCard Webapp-Migration: ✅
+├─ ~30 Webapp-Dateien: <base-card> → <os-card> (lokale Imports)
+├─ 3 Template-Dateien: #imageColumn/#topMenu Slots → inline Layout mit --columns CSS
+├─ 16 Spec-Dateien: wrapper.classes('base-card') → wrapper.classes('os-card')
+├─ 4 Story-Dateien: <base-card> → <os-card> mit Import
+├─ 12 Cypress E2E-Dateien: .base-card → .os-card Selektoren
+├─ 2 Cypress-Dateien: .hero-image → .os-card__hero-image
+├─ BaseCard.vue Komponente gelöscht
+├─ base-components.js Plugin gelöscht (keine Base*.vue mehr)
+├─ nuxt.config.js, maintenance config, testSetup.js bereinigt
+├─ main.scss: .os-card Regeln (title, ds-section, hero-image, --columns Layout)
+├─ CSS Fixes: Tailwind p-6 Override (!important), outline statt border (highlight),
+│  child selectors → descendant selectors (hero-image content wrapper)
+├─ ContributionForm: Media-Query Selektoren auf .os-card__content korrigiert
+├─ ProfileList: .profile-list.os-card Spezifität erhöht (0,3,0 vs 0,2,0)
+└─ 0 <base-card> Template-Nutzungen verbleibend
+
 DsSpinner/LoadingSpinner → OsSpinner Webapp-Migration: ✅
 ├─ ImageUploader.vue: LoadingSpinner → OsSpinner (size="lg")
 ├─ pages/profile: ds-spinner → os-spinner (size="lg")
@@ -166,11 +183,30 @@ BaseIcon → OsIcon Webapp-Migration: ✅
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-18 (Session 24)
+**Letzte Aktualisierung:** 2026-02-19 (Session 25)
 
-**Aktuelle Phase:** Phase 4 - OsIcon ✅, BaseIcon → OsIcon Migration ✅, OsSpinner ✅, Spinner Webapp-Migration ✅
+**Aktuelle Phase:** Phase 4 - OsIcon ✅, BaseIcon → OsIcon Migration ✅, OsSpinner ✅, Spinner Webapp-Migration ✅, OsCard ✅, BaseCard → OsCard Migration ✅
 
-**Zuletzt abgeschlossen (Session 24 - OsSpinner Webapp-Migration + Refactoring):**
+**Zuletzt abgeschlossen (Session 25 - BaseCard → OsCard Webapp-Migration):**
+- [x] ~30 Webapp-Dateien: `<base-card>` → `<os-card>` mit lokalen Imports
+- [x] 3 Template-Dateien mit #imageColumn/#topMenu Slots → inline Layout (LoginForm, RegistrationSlider, password-reset)
+- [x] CSS: `.os-card.--columns` Layout in main.scss (flex, image-column, content-column, top-menu, responsive)
+- [x] 16 Spec-Dateien: `wrapper.classes('base-card')` → `wrapper.classes('os-card')`
+- [x] 4 Story-Dateien: `<base-card>` → `<os-card>` mit OsCard-Import
+- [x] 12 Cypress E2E Step-Definitions: `.base-card` → `.os-card` Selektoren
+- [x] 2 Cypress-Dateien: `.hero-image` → `.os-card__hero-image`
+- [x] BaseCard.vue Komponente gelöscht
+- [x] `base-components.js` Plugin gelöscht (keine Base*.vue Komponenten mehr)
+- [x] Plugin-Referenzen entfernt: nuxt.config.js, nuxt.config.maintenance.js, testSetup.js
+- [x] main.scss bereinigt: `.base-card > .ds-section` entfernt, `.os-card` Regeln hinzugefügt
+- [x] CSS-Fixes: Tailwind `p-6` Override (`!important`), `outline` statt `border` (highlight), child → descendant selectors
+- [x] ContributionForm: Media-Query Selektoren auf `.os-card__content > .buttons-footer` korrigiert
+- [x] ProfileList: Spezifität `.profile-list.os-card` erhöht (0,3,0 vs 0,2,0)
+- [x] OsCard highlight Tests: `border` → `outline-1` (twMerge), Testnamen aktualisiert
+- [x] Kleinere Verbesserungen: SocialMedia Props typisiert, LoginForm querySelector statt fragiler DOM-Traversierung, redundante `<client-only>` entfernt, NotificationsTable optional chaining
+- [x] `hasBaseCard` Property verbleibt in 4 Dateien (rein semantisch, kein Komponentenbezug)
+
+**Zuvor abgeschlossen (Session 24 - OsSpinner Webapp-Migration + Refactoring):**
 - [x] OsButton refactored: nutzt `h(OsSpinner, { 'aria-hidden': 'true' })` statt Inline-SVG
 - [x] OsSpinner: Decorative-Modus (`aria-hidden="true"` unterdrückt role/aria-label)
 - [x] `ButtonSize` Type exportiert (sm/md/lg/xl), `types.d.ts` Kommentar aktualisiert
@@ -263,8 +299,8 @@ BaseIcon → OsIcon Webapp-Migration: ✅
 
 **Nächste Schritte:**
 - [x] OsSpinner Webapp-Migration (DsSpinner + LoadingSpinner → OsSpinner) ✅
-- [ ] OsCard Komponente (vereint DsCard + BaseCard)
-- [ ] Weitere Tier 1 Komponenten
+- [x] OsCard Komponente + BaseCard → OsCard Webapp-Migration ✅
+- [ ] Weitere Tier 2 Komponenten (OsModal, OsDropdown, OsAvatar, OsInput)
 - [ ] Browser-Fehler untersuchen: `TypeError: Cannot read properties of undefined (reading 'heartO')` (ocelotIcons undefined im Browser trotz korrekter Webpack-Aliase)
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
@@ -519,7 +555,7 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 - [x] OsSpinner (vereint DsSpinner + LoadingSpinner) ✅ OsButton nutzt OsSpinner als Komponente
 - [x] OsSpinner Webapp-Migration ✅ 4 Spinner migriert, LoadingSpinner gelöscht, Admin ApolloQuery→$apollo.loading
 - [x] OsButton (vereint DsButton + BaseButton) ✅ Entwickelt in Phase 2
-- [ ] OsCard (vereint DsCard + BaseCard)
+- [x] OsCard (vereint DsCard + BaseCard) ✅ Webapp-Migration abgeschlossen, BaseCard gelöscht
 
 **Tier 2: Layout & Feedback**
 - [ ] OsModal (Basis: DsModal)
@@ -1629,6 +1665,12 @@ Bei der Migration werden:
 | 2026-02-18 | **Admin Spinner Fix** | `<ApolloQuery>` → `apollo`-Option + `$apollo.loading`; SSR-Prefetch verhinderte Loading-State im Client |
 | 2026-02-18 | **filterStatistics Fix** | `delete data.__typename` → Destructuring `{ __typename, ...rest }` (keine Mutation des Originalobjekts) |
 | 2026-02-18 | **infinite-loading Spinner-Slot** | OsSpinner im `spinner`-Slot von vue-infinite-loading in 3 Seiten (index, profile, groups); einheitliches Spinner-Design |
+| 2026-02-19 | **BaseCard → OsCard Migration** | ~30 Webapp-Dateien: `<base-card>` → `<os-card>` mit lokalen Imports; CSS-Fixes für Tailwind p-6 Override, outline highlight, child→descendant selectors |
+| 2026-02-19 | **#imageColumn/#topMenu inline** | LoginForm, RegistrationSlider, password-reset: BaseCard-Slots → inline Layout mit `.os-card.--columns` CSS in main.scss |
+| 2026-02-19 | **Tests & Stories migriert** | 16 Spec-Dateien, 4 Story-Dateien, 12+2 Cypress E2E Step-Definitions: base-card → os-card Selektoren |
+| 2026-02-19 | **BaseCard gelöscht** | BaseCard.vue Komponente + base-components.js Plugin entfernt; nuxt.config, maintenance config, testSetup bereinigt |
+| 2026-02-19 | **CSS-Fixes** | ContributionForm Media-Query Selektoren, ProfileList Spezifität, InternalPage $space-small, OsCard highlight outline-1 Tests |
+| 2026-02-19 | **Code-Quality** | SocialMedia Props typisiert, LoginForm querySelector, redundante client-only entfernt, NotificationsTable optional chaining, HashtagsFilter doppeltes Mounting |
 
 ---
 

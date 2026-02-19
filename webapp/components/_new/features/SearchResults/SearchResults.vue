@@ -62,25 +62,25 @@
           <!-- users -->
           <template v-if="activeTab === 'User'">
             <ds-grid-item v-for="user in activeResources" :key="user.id" :row-span="2">
-              <base-card :wideContent="true">
+              <os-card>
                 <user-teaser :user="user" />
-              </base-card>
+              </os-card>
             </ds-grid-item>
           </template>
           <!-- groups -->
           <template v-if="activeTab === 'Group'">
             <ds-grid-item v-for="group in activeResources" :key="group.id" :row-span="2">
-              <base-card :wideContent="true" class="group-teaser-card-wrapper">
+              <os-card class="group-teaser-card-wrapper">
                 <group-teaser :group="{ ...group, name: group.groupName }" />
-              </base-card>
+              </os-card>
             </ds-grid-item>
           </template>
           <!-- hashtags -->
           <template v-if="activeTab === 'Hashtag'">
             <ds-grid-item v-for="hashtag in activeResources" :key="hashtag.id" :row-span="2">
-              <base-card :wideContent="true">
+              <os-card>
                 <hc-hashtag :id="hashtag.id" />
-              </base-card>
+              </os-card>
             </ds-grid-item>
           </template>
 
@@ -115,6 +115,7 @@
 </template>
 
 <script>
+import { OsCard } from '@ocelot-social/ui'
 import postListActions from '~/mixins/postListActions'
 import { searchPosts, searchUsers, searchGroups, searchHashtags } from '~/graphql/Search.js'
 import HcEmpty from '~/components/Empty/Empty'
@@ -130,6 +131,7 @@ import HcHashtag from '~/components/Hashtag/Hashtag'
 export default {
   name: 'SearchResults',
   components: {
+    OsCard,
     TabNavigation,
     HcEmpty,
     MasonryGrid,

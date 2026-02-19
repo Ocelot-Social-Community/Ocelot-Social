@@ -1,7 +1,7 @@
 <template>
   <transition name="fade" appear>
     <ds-container width="medium">
-      <base-card>
+      <os-card>
         <ds-space>
           <locale-switch class="login-locale-switch" offset="5" />
         </ds-space>
@@ -38,12 +38,13 @@
             </ds-flex-item>
           </ds-flex-item>
         </ds-flex>
-      </base-card>
+      </os-card>
     </ds-container>
   </transition>
 </template>
 
 <script>
+import { OsCard } from '@ocelot-social/ui'
 import emails from '~/constants/emails.js'
 // import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
@@ -53,6 +54,7 @@ import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 export default {
   layout: 'blank',
   components: {
+    OsCard,
     LocaleSwitch,
     // Logo,
   },

@@ -3,7 +3,7 @@
     class="post-teaser"
     :to="{ name: 'post-id-slug', params: { id: post.id, slug: post.slug } }"
   >
-    <base-card
+    <os-card
       :lang="post.language"
       :class="{
         'disabled-content': post.disabled,
@@ -138,12 +138,12 @@
           </span>
         </div>
       </client-only>
-    </base-card>
+    </os-card>
   </nuxt-link>
 </template>
 
 <script>
-import { OsIcon } from '@ocelot-social/ui'
+import { OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Category from '~/components/Category'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
@@ -165,6 +165,7 @@ export default {
   components: {
     Category,
     ContentMenu,
+    OsCard,
     OsIcon,
     CounterIcon,
     DateTimeRange,
@@ -197,7 +198,7 @@ export default {
     if (!image) return
     const width = this.$el.offsetWidth
     const height = Math.min(width / image.aspectRatio, 2000)
-    const imageElement = this.$el.querySelector('.hero-image')
+    const imageElement = this.$el.querySelector('.os-card__hero-image')
     if (imageElement) {
       imageElement.style.height = `${height}px`
     }
@@ -301,40 +302,46 @@ export default {
     position: absolute;
     // 14px (~height of ribbon element) + 24px(=margin of hero image)
     top: -38px;
-    // 7px+24px(=padding of parent)
-    right: -31px;
+    // 7px+24px(=padding of parent) - 1px adjustment
+    right: -29px;
   }
   > .post-ribbon {
     position: absolute;
     // 14px (~height of ribbon element) + 24px(=margin of hero image)
     top: -24px;
-    // 7px(=offset)+24px(=margin of parent)
-    right: -31px;
+    // 7px(=offset)+24px(=margin of parent) - 2px adjustment
+    right: -29px;
   }
 }
 
-.post-teaser > .base-card {
+.post-teaser > .os-card {
   display: flex;
   flex-direction: column;
   overflow: visible;
   height: 100%;
   padding-bottom: $space-x-small;
 
-  > .hero-image {
+  > .os-card__hero-image {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
   }
 
-  &.--blur-image > .hero-image > .image {
+  &.--blur-image > .os-card__hero-image .image {
     filter: blur($blur-radius);
   }
 
-  > .content {
+  > .os-card__content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .content {
     flex-grow: 1;
     margin-bottom: $space-small;
   }
 
-  > .footer {
+  .footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -363,7 +370,8 @@ export default {
   .user-teaser {
     margin-bottom: $space-small;
   }
-  > .date-row {
+
+  .date-row {
     display: flex;
     justify-content: flex-end;
     margin-top: $space-small;

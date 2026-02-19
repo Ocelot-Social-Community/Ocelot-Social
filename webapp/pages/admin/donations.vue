@@ -1,5 +1,5 @@
 <template>
-  <base-card>
+  <os-card>
     <h2 class="title">{{ $t('admin.donations.name') }}</h2>
     <ds-form v-model="formData" @submit="submit">
       <ds-text class="show-donations-checkbox">
@@ -32,15 +32,15 @@
         {{ $t('actions.save') }}
       </os-button>
     </ds-form>
-  </base-card>
+  </os-card>
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsCard } from '@ocelot-social/ui'
 import { DonationsQuery, UpdateDonations } from '~/graphql/Donations'
 
 export default {
-  components: { OsButton },
+  components: { OsButton, OsCard },
   data() {
     return {
       formData: {

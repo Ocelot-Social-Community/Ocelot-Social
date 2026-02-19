@@ -1,6 +1,6 @@
 <template>
   <div class="admin-users">
-    <base-card>
+    <os-card>
       <h2 class="title">{{ $t('admin.users.name') }}</h2>
       <ds-form v-model="form" @submit="submit">
         <ds-flex gutter="small">
@@ -25,8 +25,8 @@
           </ds-flex-item>
         </ds-flex>
       </ds-form>
-    </base-card>
-    <base-card v-if="User && User.length">
+    </os-card>
+    <os-card v-if="User && User.length">
       <ds-table :data="User" :fields="fields" condensed>
         <template #index="scope">{{ scope.row.index + 1 }}.</template>
         <template #name="scope">
@@ -89,15 +89,15 @@
         </template>
       </ds-table>
       <pagination-buttons :hasNext="hasNext" :hasPrevious="hasPrevious" @next="next" @back="back" />
-    </base-card>
-    <base-card v-else>
+    </os-card>
+    <os-card v-else>
       <ds-placeholder>{{ $t('admin.users.empty') }}</ds-placeholder>
-    </base-card>
+    </os-card>
   </div>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import { isEmail } from 'validator'
@@ -108,6 +108,7 @@ import { FetchAllRoles, updateUserRole } from '~/graphql/admin/Roles'
 export default {
   components: {
     OsButton,
+    OsCard,
     OsIcon,
     PaginationButtons,
   },
@@ -241,7 +242,7 @@ export default {
 </script>
 
 <style lang="scss">
-.admin-users > .base-card:first-child {
+.admin-users > .os-card:first-child {
   margin-bottom: $space-small;
 }
 

@@ -1,7 +1,7 @@
 <template>
   <ds-form class="settings-form" v-model="formData" :schema="formSchema" @submit="submit">
     <template #default="{ errors }">
-      <base-card>
+      <os-card>
         <h2 class="title">{{ $t('settings.data.name') }}</h2>
         <ds-input
           id="name"
@@ -39,13 +39,13 @@
           <template #icon><os-icon :icon="icons.check" /></template>
           {{ $t('actions.save') }}
         </os-button>
-      </base-card>
+      </os-card>
     </template>
   </ds-form>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
 import UniqueSlugForm from '~/components/utils/UniqueSlugForm'
@@ -58,6 +58,7 @@ export default {
   name: 'Settings',
   components: {
     OsButton,
+    OsCard,
     OsIcon,
     LocationSelect,
   },

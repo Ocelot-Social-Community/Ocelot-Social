@@ -1,5 +1,5 @@
 <template>
-  <base-card>
+  <os-card>
     <ds-flex class="notifications-page-flex">
       <ds-flex-item :width="{ lg: '85%' }">
         <ds-heading tag="h3">{{ $t('notifications.title') }}</ds-heading>
@@ -38,11 +38,11 @@
         />
       </ds-flex-item>
     </ds-flex>
-  </base-card>
+  </os-card>
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsCard } from '@ocelot-social/ui'
 import NotificationsTable from '~/components/NotificationsTable/NotificationsTable'
 import DropdownFilter from '~/components/DropdownFilter/DropdownFilter'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
@@ -50,6 +50,7 @@ import { notificationQuery, markAsReadMutation, markAllAsReadMutation } from '~/
 
 export default {
   components: {
+    OsCard,
     OsButton,
     DropdownFilter,
     NotificationsTable,

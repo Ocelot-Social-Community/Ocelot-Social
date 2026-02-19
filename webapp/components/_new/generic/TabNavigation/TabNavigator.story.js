@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { storiesOf } from '@storybook/vue'
 import { withA11y } from '@storybook/addon-a11y'
+import { OsCard } from '@ocelot-social/ui'
 import HcEmpty from '~/components/Empty/Empty'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem'
@@ -72,6 +73,7 @@ storiesOf('TabNavigator', module)
       PostTeaser,
       UserTeaser,
       HcHashtag,
+      OsCard,
     },
     store: helpers.store,
     data: () => ({
@@ -160,17 +162,17 @@ storiesOf('TabNavigator', module)
               <!-- users -->
               <template v-if="activeTab === 'User'">
                 <ds-grid-item v-for="user in activeResources" :key="user.id" :row-span="2">
-                  <base-card :wideContent="true">
+                  <os-card>
                     <user-teaser :user="user" />
-                  </base-card>
+                  </os-card>
                 </ds-grid-item>
               </template>
               <!-- hashtags -->
               <template v-if="activeTab === 'Hashtag'">
                 <ds-grid-item v-for="hashtag in activeResources" :key="hashtag.id" :row-span="2">
-                  <base-card :wideContent="true">
+                  <os-card>
                     <hc-hashtag :id="hashtag.id" />
-                  </base-card>
+                  </os-card>
                 </ds-grid-item>
               </template>
             </template>

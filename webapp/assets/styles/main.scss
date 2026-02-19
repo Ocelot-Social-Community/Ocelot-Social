@@ -151,12 +151,63 @@ body.dropdown-open {
   overflow: hidden;
 }
 
-.base-card > .ds-section {
+.os-card > .ds-section {
   padding: 0;
   margin: -$space-base;
 
   .ds-container {
     padding: $space-base;
+  }
+}
+
+.os-card {
+  > .title,
+  > .content-column > .title {
+    font-size: $font-size-large;
+    margin-bottom: $space-x-small;
+  }
+
+  > .os-card__hero-image > .image {
+    width: 100%;
+    object-fit: contain;
+  }
+
+  &.--columns {
+    display: flex;
+
+    > .image-column {
+      flex-basis: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding-right: $space-base;
+
+      .image {
+        width: 100%;
+        max-width: 200px;
+      }
+    }
+
+    > .content-column {
+      flex-basis: 50%;
+    }
+
+    > .top-menu {
+      position: absolute;
+      top: $space-small;
+      left: $space-small;
+    }
+  }
+}
+
+@media (max-width: 565px) {
+  .os-card.--columns {
+    flex-direction: column;
+
+    > .image-column {
+      padding-right: 0;
+      margin-bottom: $space-base;
+    }
   }
 }
 

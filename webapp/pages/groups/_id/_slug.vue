@@ -3,7 +3,7 @@
     <ds-space />
     <ds-flex v-if="group" :width="{ base: '100%' }" gutter="base">
       <ds-flex-item :width="{ base: '100%', sm: 2, md: 2, lg: 1 }">
-        <base-card
+        <os-card
           :class="{ 'disabled-content': group.disabled }"
           style="position: relative; height: auto; overflow: visible"
         >
@@ -169,7 +169,7 @@
               </div>
             </ds-space>
           </template>
-        </base-card>
+        </os-card>
         <ds-space />
         <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px">
           {{ $t('profile.network.title') }}
@@ -196,7 +196,7 @@
       <ds-flex-item :width="{ base: '100%', sm: 3, md: 5, lg: 3 }">
         <!-- Group description -->
         <ds-space>
-          <base-card class="group-description">
+          <os-card class="group-description">
             <!-- TODO: replace editor content with tiptap render view -->
             <!-- eslint-disable-next-line vue/no-v-html -->
             <div
@@ -214,7 +214,7 @@
             >
               {{ isDescriptionCollapsed ? $t('comment.show.more') : $t('comment.show.less') }}
             </os-button>
-          </base-card>
+          </os-card>
         </ds-space>
         <ds-space v-if="isGroupMemberNonePending" centered>
           <os-button
@@ -290,7 +290,7 @@
 </template>
 
 <script>
-import { OsButton, OsIcon, OsSpinner } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon, OsSpinner } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
@@ -327,6 +327,7 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   components: {
+    OsCard,
     OsButton,
     OsIcon,
     OsSpinner,
@@ -673,17 +674,18 @@ export default {
 .chip {
   margin-bottom: $space-x-small;
 }
-.group-description > .base-card {
+.group-description.os-card {
   display: flex;
   flex-direction: column;
   height: 100%;
+  padding-bottom: $space-base !important;
 
-  > .content {
+  .content {
     flex-grow: 1;
     margin-bottom: $space-small;
   }
 }
 .collaps-button {
-  float: right;
+  align-self: flex-end;
 }
 </style>

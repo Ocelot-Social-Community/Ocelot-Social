@@ -1,5 +1,5 @@
 <template>
-  <base-card>
+  <os-card>
     <h2 class="title">{{ $t('settings.embeds.name') }}</h2>
     <ds-section>
       <ds-text>
@@ -51,18 +51,18 @@
         </ul>
       </ds-space>
     </ds-section>
-  </base-card>
+  </os-card>
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsCard } from '@ocelot-social/ui'
 import axios from 'axios'
 import { mapGetters, mapMutations } from 'vuex'
 import { updateUserMutation } from '~/graphql/User.js'
 import scrollToContent from './scroll-to-content.js'
 
 export default {
-  components: { OsButton },
+  components: { OsButton, OsCard },
   mixins: [scrollToContent],
   head() {
     return {

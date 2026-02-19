@@ -1,5 +1,5 @@
 <template>
-  <base-card>
+  <os-card>
     <h2 class="title">{{ $t('settings.badges.name') }}</h2>
     <p>{{ $t('settings.badges.description') }}</p>
     <ds-space centered margin-bottom="small" margin-top="base">
@@ -50,11 +50,11 @@
         />
       </div>
     </ds-space>
-  </base-card>
+  </os-card>
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsCard } from '@ocelot-social/ui'
 import { mapGetters, mapMutations } from 'vuex'
 import { setTrophyBadgeSelected } from '~/graphql/User'
 import scrollToContent from './scroll-to-content.js'
@@ -62,7 +62,7 @@ import Badges from '../../components/Badges.vue'
 import BadgeSelection from '../../components/BadgeSelection.vue'
 
 export default {
-  components: { OsButton, BadgeSelection, Badges },
+  components: { OsButton, OsCard, BadgeSelection, Badges },
   mixins: [scrollToContent],
   data() {
     return {

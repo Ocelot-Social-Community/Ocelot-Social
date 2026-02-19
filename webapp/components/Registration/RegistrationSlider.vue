@@ -3,45 +3,46 @@
     <div v-if="registrationType !== 'no-public-registration'" class="back-link" left>
       <nuxt-link :to="loginLink">{{ $t('site.back-to-login') }}</nuxt-link>
     </div>
-    <base-card>
-      <template #imageColumn>
+    <os-card class="--columns">
+      <aside class="image-column" :aria-label="$t('login.moreInfo', metadata)">
         <page-params-link :pageParams="links.ORGANIZATION" :title="$t('login.moreInfo', metadata)">
           <logo logoType="signup" />
         </page-params-link>
-      </template>
+      </aside>
+      <section class="content-column">
+        <component-slider :sliderData="sliderData">
+          <template #no-public-registration>
+            <registration-slide-no-public :sliderData="sliderData" />
+          </template>
 
-      <component-slider :sliderData="sliderData">
-        <template #no-public-registration>
-          <registration-slide-no-public :sliderData="sliderData" />
-        </template>
+          <template #enter-invite>
+            <registration-slide-invite :sliderData="sliderData" />
+          </template>
 
-        <template #enter-invite>
-          <registration-slide-invite :sliderData="sliderData" />
-        </template>
+          <template #enter-email>
+            <registration-slide-email :sliderData="sliderData" :invitation="false" />
+          </template>
 
-        <template #enter-email>
-          <registration-slide-email :sliderData="sliderData" :invitation="false" />
-        </template>
+          <template #enter-nonce>
+            <registration-slide-nonce :sliderData="sliderData" />
+          </template>
 
-        <template #enter-nonce>
-          <registration-slide-nonce :sliderData="sliderData" />
-        </template>
-
-        <template #create-user-account>
-          <registration-slide-create :sliderData="sliderData" />
-        </template>
-      </component-slider>
-
-      <template #topMenu>
+          <template #create-user-account>
+            <registration-slide-create :sliderData="sliderData" />
+          </template>
+        </component-slider>
+      </section>
+      <aside class="top-menu" :aria-label="$t('localeSwitch.tooltip')">
         <locale-switch offset="5" />
-      </template>
-    </base-card>
+      </aside>
+    </os-card>
   </section>
 </template>
 
 <script>
 import links from '~/constants/links.js'
 import metadata from '~/constants/metadata.js'
+import { OsCard } from '@ocelot-social/ui'
 import ComponentSlider from '~/components/ComponentSlider/ComponentSlider'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
@@ -58,6 +59,7 @@ export default {
     ComponentSlider,
     LocaleSwitch,
     Logo,
+    OsCard,
     PageParamsLink,
     RegistrationSlideCreate,
     RegistrationSlideEmail,

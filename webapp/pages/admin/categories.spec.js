@@ -26,7 +26,7 @@ describe('categories.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.classes('base-card')).toBe(true)
+      expect(wrapper.classes('os-card')).toBe(true)
     })
   })
 })

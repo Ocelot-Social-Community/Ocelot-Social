@@ -1,7 +1,7 @@
 <template>
   <ds-form v-model="form" @submit="handleSubmit" class="comment-form">
     <template #default="{ errors }">
-      <base-card>
+      <os-card>
         <hc-editor ref="editor" :users="users" :value="form.content" @input="updateEditorContent" />
         <div class="buttons">
           <os-button
@@ -26,13 +26,13 @@
             {{ $t('post.comment.submit') }}
           </os-button>
         </div>
-      </base-card>
+      </os-card>
     </template>
   </ds-form>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import HcEditor from '~/components/Editor/Editor'
 import { COMMENT_MIN_LENGTH } from '~/constants/comment'
@@ -42,6 +42,7 @@ import CommentMutations from '~/graphql/CommentMutations'
 export default {
   components: {
     OsButton,
+    OsCard,
     OsIcon,
     HcEditor,
   },

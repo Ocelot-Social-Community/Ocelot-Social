@@ -1,7 +1,7 @@
 <template>
   <ds-form v-model="form" :schema="formSchema" @submit="submit">
     <template #default="{ errors }">
-      <base-card>
+      <os-card>
         <h2 class="title">{{ $t('settings.email.name') }}</h2>
         <ds-input
           id="email"
@@ -20,17 +20,17 @@
           <template #icon><os-icon :icon="icons.check" /></template>
           {{ $t('actions.save') }}
         </os-button>
-      </base-card>
+      </os-card>
     </template>
   </ds-form>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 
 export default {
-  components: { OsButton, OsIcon },
+  components: { OsButton, OsCard, OsIcon },
   data() {
     return {
       formSchema: {

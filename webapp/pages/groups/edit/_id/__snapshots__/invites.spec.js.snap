@@ -3,8 +3,8 @@
 exports[`invites.vue renders 1`] = `
 <div>
   <div>
-    <article
-      class="base-card"
+    <div
+      class="os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6"
     >
       <h3
         class="ds-heading ds-heading-h3"
@@ -207,9 +207,7 @@ exports[`invites.vue renders 1`] = `
           </form>
         </div>
       </div>
-       
-      <!---->
-    </article>
+    </div>
   </div>
 </div>
 `;

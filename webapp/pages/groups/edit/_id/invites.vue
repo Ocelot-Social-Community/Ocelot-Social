@@ -1,6 +1,6 @@
 <template>
   <div>
-    <base-card>
+    <os-card>
       <ds-heading tag="h3">{{ $t('invite-codes.group-invite-links') }}</ds-heading>
       <ds-space margin="large" />
       <invitation-list
@@ -18,16 +18,18 @@
               })
         "
       />
-    </base-card>
+    </os-card>
   </div>
 </template>
 
 <script>
+import { OsCard } from '@ocelot-social/ui'
 import InvitationList from '~/components/_new/features/Invitations/InvitationList.vue'
 import { generateGroupInviteCode, invalidateInviteCode } from '~/graphql/InviteCode'
 
 export default {
   components: {
+    OsCard,
     InvitationList,
   },
   props: {

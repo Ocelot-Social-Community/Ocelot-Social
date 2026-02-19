@@ -3,7 +3,7 @@
     <ds-space />
     <ds-flex v-if="user" :width="{ base: '100%' }" gutter="base">
       <ds-flex-item :width="{ base: '100%', sm: 2, md: 2, lg: 1 }">
-        <base-card
+        <os-card
           :class="{ 'disabled-content': user.disabled }"
           style="position: relative; height: auto; overflow: visible"
         >
@@ -117,7 +117,7 @@
               </ds-text>
             </ds-space>
           </template>
-        </base-card>
+        </os-card>
         <ds-space />
         <ds-heading tag="h3" soft style="text-align: center; margin-bottom: 10px">
           {{ $t('profile.network.title') }}
@@ -212,7 +212,7 @@
 </template>
 
 <script>
-import { OsButton, OsIcon, OsSpinner } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon, OsSpinner } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import uniqBy from 'lodash/uniqBy'
 import { mapGetters, mapMutations } from 'vuex'
@@ -247,6 +247,7 @@ const tabToFilterMapping = ({ tab, id }) => {
 
 export default {
   components: {
+    OsCard,
     OsButton,
     OsIcon,
     OsSpinner,
