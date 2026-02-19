@@ -113,7 +113,7 @@ export default {
       const supportedFormats = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif']
       if (supportedFormats.indexOf(file.type) < 0) {
         this.onUnSupportedFormat(this.$t('contribution.teaserImage.errors.unSupported-file-format'))
-        this.$nextTick((this.isLoadingImage = false))
+        this.$nextTick(() => { this.isLoadingImage = false })
         return null
       }
       const imageURL = URL.createObjectURL(file)
@@ -126,7 +126,7 @@ export default {
       this.saveImage(aspectRatio, file, file.type)
       this.file = file
       if (this.file.type === 'image/jpeg') this.imageCanBeCropped = true
-      this.$nextTick((this.isLoadingImage = false))
+      this.$nextTick(() => { this.isLoadingImage = false })
     },
     initCropper() {
       this.showCropper = true
@@ -138,7 +138,7 @@ export default {
       this.isLoadingImage = true
       const onCropComplete = (aspectRatio, imageFile, imageType) => {
         this.saveImage(aspectRatio, imageFile, imageType)
-        this.$nextTick((this.isLoadingImage = false))
+        this.$nextTick(() => { this.isLoadingImage = false })
         this.closeCropper()
       }
       if (this.file.type === 'image/jpeg') {
