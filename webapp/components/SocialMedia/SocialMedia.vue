@@ -25,8 +25,8 @@ export default {
   name: 'social-media',
   components: { OsCard },
   props: {
-    userName: {},
-    user: {},
+    userName: { type: String, required: true },
+    user: { type: Object, required: true },
   },
   methods: {
     socialMediaLinks() {
