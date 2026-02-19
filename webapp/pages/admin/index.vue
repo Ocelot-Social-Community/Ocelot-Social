@@ -84,8 +84,8 @@ export default {
 }
 @media #{$media-query-medium} {
   .admin-stats__item {
-    flex: 0 0 33%;
-    width: 33%;
+    flex: 0 0 33.333%;
+    width: 33.333%;
   }
 }
 </style>
