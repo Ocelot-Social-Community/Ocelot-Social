@@ -242,7 +242,4 @@ export default {
   margin-bottom: $space-small;
 }
 
-.ds-table-col {
-  vertical-align: middle;
-}
 </style>

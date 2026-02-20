@@ -147,7 +147,4 @@ export default {
 </script>
 
 <style lang="scss">
-.ds-table-col {
-  vertical-align: middle;
-}
 </style>

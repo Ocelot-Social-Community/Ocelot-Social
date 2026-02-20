@@ -73,7 +73,7 @@
 .ds-table-wrap { width: 100%; overflow: auto; }
 .ds-table { width: 100%; }
 .ds-table-col {
-  vertical-align: top;
+  vertical-align: middle;
   padding: $space-small $space-xx-small;
   &:last-child { padding-right: 0; }
 }
