@@ -8,9 +8,9 @@ const user = {
   id: 'id',
   name: 'Tilda Swinton',
   slug: 'tilda-swinton',
-  followedByCount: 0,
-  contributionsCount: 0,
-  commentedCount: 0,
+  followedByCount: 42,
+  contributionsCount: 7,
+  commentedCount: 13,
   badgeVerification: {
     id: 'bv1',
     icon: '/icons/verified',
