@@ -48,13 +48,12 @@ describe('DonationInfo.vue', () => {
 
     describe('mount with data', () => {
       describe('given german locale', () => {
+        let toLocaleStringSpy
+
         beforeEach(() => {
           mocks.$i18n.locale = () => 'de'
-        })
-
-        it('creates a label from the given amounts and a translation string', () => {
           const originalToLocaleString = Number.prototype.toLocaleString
-          const toLocaleStringSpy = jest.spyOn(Number.prototype, 'toLocaleString')
+          toLocaleStringSpy = jest.spyOn(Number.prototype, 'toLocaleString')
           toLocaleStringSpy.mockImplementation(function (locale) {
             if (locale === 'de')
               return this.valueOf()
@@ -62,12 +61,18 @@ describe('DonationInfo.vue', () => {
                 .replace(/\B(?=(\d{3})+(?!\d))/g, '.')
             return originalToLocaleString.call(this, locale)
           })
+        })
+
+        afterEach(() => {
+          toLocaleStringSpy.mockRestore()
+        })
+
+        it('creates a label from the given amounts and a translation string', () => {
           wrapper = Wrapper()
           expect(mocks.$t).toHaveBeenCalledWith('donations.amount-of-total', {
             amount: '10.000',
             total: '50.000',
           })
-          toLocaleStringSpy.mockRestore()
         })
       })
 
