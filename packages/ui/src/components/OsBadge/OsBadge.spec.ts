@@ -1,0 +1,121 @@
+import { mount } from '@vue/test-utils'
+import { describe, expect, it } from 'vitest'
+
+import OsBadge from './OsBadge.vue'
+
+describe('osBadge', () => {
+  describe('rendering', () => {
+    it('renders as span element', () => {
+      const wrapper = mount(OsBadge)
+
+      expect((wrapper.element as HTMLElement).tagName).toBe('SPAN')
+    })
+
+    it('renders default slot content', () => {
+      const wrapper = mount(OsBadge, {
+        slots: { default: 'Badge text' },
+      })
+
+      expect(wrapper.text()).toBe('Badge text')
+    })
+
+    it('renders without content', () => {
+      const wrapper = mount(OsBadge)
+
+      expect(wrapper.exists()).toBe(true)
+      expect(wrapper.text()).toBe('')
+    })
+  })
+
+  describe('css', () => {
+    it('has os-badge class', () => {
+      const wrapper = mount(OsBadge)
+
+      expect(wrapper.classes()).toContain('os-badge')
+    })
+
+    it('merges custom classes', () => {
+      const wrapper = mount(OsBadge, {
+        attrs: { class: 'my-custom-class' },
+      })
+
+      expect(wrapper.classes()).toContain('os-badge')
+      expect(wrapper.classes()).toContain('my-custom-class')
+    })
+
+    it('passes through attributes', () => {
+      const wrapper = mount(OsBadge, {
+        attrs: { 'data-testid': 'my-badge' },
+      })
+
+      expect(wrapper.attributes('data-testid')).toBe('my-badge')
+    })
+  })
+
+  describe('variant prop', () => {
+    it('applies default variant classes when no variant specified', () => {
+      const wrapper = mount(OsBadge)
+
+      expect(wrapper.classes()).toContain('bg-[var(--color-bg-softest)]')
+      expect(wrapper.classes()).toContain('text-[var(--color-default-contrast)]')
+    })
+
+    it('applies primary variant classes', () => {
+      const wrapper = mount(OsBadge, {
+        props: { variant: 'primary' },
+      })
+
+      expect(wrapper.classes()).toContain('bg-[var(--color-primary)]')
+      expect(wrapper.classes()).toContain('text-[var(--color-primary-contrast)]')
+    })
+
+    it('applies danger variant classes', () => {
+      const wrapper = mount(OsBadge, {
+        props: { variant: 'danger' },
+      })
+
+      expect(wrapper.classes()).toContain('bg-[var(--color-danger)]')
+      expect(wrapper.classes()).toContain('text-[var(--color-danger-contrast)]')
+    })
+  })
+
+  describe('size prop', () => {
+    it('applies sm size classes by default', () => {
+      const wrapper = mount(OsBadge)
+
+      expect(wrapper.classes()).toContain('px-[0.6em]')
+    })
+
+    it('applies base size classes', () => {
+      const wrapper = mount(OsBadge, {
+        props: { size: 'base' },
+      })
+
+      expect(wrapper.classes()).toContain('text-[0.8rem]')
+      expect(wrapper.classes()).toContain('px-[0.8em]')
+    })
+
+    it('applies lg size classes', () => {
+      const wrapper = mount(OsBadge, {
+        props: { size: 'lg' },
+      })
+
+      expect(wrapper.classes()).toContain('text-[1rem]')
+      expect(wrapper.classes()).toContain('px-[1em]')
+    })
+  })
+
+  describe('keyboard accessibility', () => {
+    it('is not focusable (non-interactive element)', () => {
+      const wrapper = mount(OsBadge)
+
+      expect(wrapper.attributes('tabindex')).toBeUndefined()
+    })
+
+    it('has no interactive role', () => {
+      const wrapper = mount(OsBadge)
+
+      expect(wrapper.attributes('role')).toBeUndefined()
+    })
+  })
+})
