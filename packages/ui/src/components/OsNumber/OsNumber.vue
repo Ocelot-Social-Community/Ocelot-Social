@@ -110,7 +110,7 @@
           children.push(
             h(
               'span',
-              { class: 'os-number-label text-[0.75rem] text-[var(--color-text-soft)]' },
+              { class: 'os-number-label text-[12px] text-[var(--color-text-soft)]' },
               [props.label],
             ),
           )

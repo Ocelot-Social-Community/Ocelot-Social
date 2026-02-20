@@ -91,7 +91,7 @@ describe('osNumber', () => {
         props: { count: 0, label: 'Test' },
       })
 
-      expect(wrapper.find('.os-number-label').classes()).toContain('text-[0.75rem]')
+      expect(wrapper.find('.os-number-label').classes()).toContain('text-[12px]')
       expect(wrapper.find('.os-number-label').classes()).toContain('text-[var(--color-text-soft)]')
     })
   })
