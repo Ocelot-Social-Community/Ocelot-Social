@@ -125,6 +125,7 @@ export default {
     groupMembers: {
       type: Array,
       required: false,
+      default: () => [],
     },
   },
   created() {
