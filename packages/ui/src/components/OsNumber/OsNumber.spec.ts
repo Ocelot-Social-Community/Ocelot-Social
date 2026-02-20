@@ -6,13 +6,17 @@ import OsNumber from './OsNumber.vue'
 describe('osNumber', () => {
   describe('rendering', () => {
     it('renders as div element', () => {
-      const wrapper = mount(OsNumber)
+      const wrapper = mount(OsNumber, {
+        props: { count: 0 },
+      })
 
       expect((wrapper.element as HTMLElement).tagName).toBe('DIV')
     })
 
     it('has os-number class', () => {
-      const wrapper = mount(OsNumber)
+      const wrapper = mount(OsNumber, {
+        props: { count: 0 },
+      })
 
       expect(wrapper.classes()).toContain('os-number')
     })
@@ -25,8 +29,10 @@ describe('osNumber', () => {
       expect(wrapper.find('.os-number-count').text()).toBe('42')
     })
 
-    it('displays 0 by default', () => {
-      const wrapper = mount(OsNumber)
+    it('displays 0 when count is 0', () => {
+      const wrapper = mount(OsNumber, {
+        props: { count: 0 },
+      })
 
       expect(wrapper.find('.os-number-count').text()).toBe('0')
     })
@@ -35,7 +41,7 @@ describe('osNumber', () => {
   describe('label', () => {
     it('shows label when set', () => {
       const wrapper = mount(OsNumber, {
-        props: { label: 'Followers' },
+        props: { count: 0, label: 'Followers' },
       })
 
       expect(wrapper.find('.os-number-label').exists()).toBe(true)
@@ -43,7 +49,9 @@ describe('osNumber', () => {
     })
 
     it('hides label when not set', () => {
-      const wrapper = mount(OsNumber)
+      const wrapper = mount(OsNumber, {
+        props: { count: 0 },
+      })
 
       expect(wrapper.find('.os-number-label').exists()).toBe(false)
     })
@@ -52,6 +60,7 @@ describe('osNumber', () => {
   describe('css', () => {
     it('merges custom classes', () => {
       const wrapper = mount(OsNumber, {
+        props: { count: 0 },
         attrs: { class: 'my-custom-class' },
       })
 
@@ -61,6 +70,7 @@ describe('osNumber', () => {
 
     it('passes through attributes', () => {
       const wrapper = mount(OsNumber, {
+        props: { count: 0 },
         attrs: { 'data-testid': 'my-number' },
       })
 
@@ -78,7 +88,7 @@ describe('osNumber', () => {
 
     it('applies label styling classes', () => {
       const wrapper = mount(OsNumber, {
-        props: { label: 'Test' },
+        props: { count: 0, label: 'Test' },
       })
 
       expect(wrapper.find('.os-number-label').classes()).toContain('text-[0.75rem]')
@@ -88,7 +98,9 @@ describe('osNumber', () => {
 
   describe('keyboard accessibility', () => {
     it('is not focusable (non-interactive element)', () => {
-      const wrapper = mount(OsNumber)
+      const wrapper = mount(OsNumber, {
+        props: { count: 0 },
+      })
 
       expect(wrapper.attributes('tabindex')).toBeUndefined()
     })

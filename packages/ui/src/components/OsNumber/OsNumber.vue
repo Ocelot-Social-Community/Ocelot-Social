@@ -27,7 +27,7 @@
        */
       count: {
         type: Number,
-        default: 0,
+        required: true,
       },
       /**
        * Optional label displayed below the count.
