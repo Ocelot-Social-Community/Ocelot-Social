@@ -97,7 +97,10 @@
 
         const countChild = h(
           'span',
-          { class: 'os-number-count font-bold text-[1.5rem]' },
+          {
+            class: 'os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block',
+            style: { minWidth: `${String(props.count).length}ch` },
+          },
           [String(displayValue.value)],
         )
 
