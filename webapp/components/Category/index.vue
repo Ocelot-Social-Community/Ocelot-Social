@@ -1,9 +1,5 @@
 <template>
-  <os-badge
-    shape="square"
-    class="category-tag"
-    :class="filterActive ? 'filterActive' : ''"
-  >
+  <os-badge shape="square" class="category-tag" :class="filterActive ? 'filterActive' : ''">
     <os-icon :icon="resolvedIcon" />
     {{ name }}
   </os-badge>
