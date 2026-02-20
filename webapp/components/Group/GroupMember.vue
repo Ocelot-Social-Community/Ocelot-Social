@@ -58,7 +58,7 @@
                 @change="changeMemberRole(member.user.id, $event)"
               >
                 <option
-                  v-for="role in ['pending', 'usual', 'admin', 'owner']"
+                  v-for="role in groupRoles"
                   :key="role"
                   :value="role"
                 >
@@ -108,6 +108,8 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import { changeGroupMemberRoleMutation, removeUserFromGroupMutation } from '~/graphql/groups.js'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 
+const GROUP_ROLES = ['pending', 'usual', 'admin', 'owner']
+
 export default {
   name: 'GroupMember',
   components: {
@@ -129,6 +131,7 @@ export default {
   },
   created() {
     this.icons = iconRegistry
+    this.groupRoles = GROUP_ROLES
   },
   data() {
     return {
