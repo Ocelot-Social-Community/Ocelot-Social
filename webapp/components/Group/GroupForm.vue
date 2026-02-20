@@ -20,7 +20,7 @@
         <os-badge
           role="status"
           aria-live="polite"
-          :variant="errors && errors.name ? 'danger' : 'default'"
+          :variant="errors && errors.name ? 'danger' : undefined"
         >
           {{ `${formData.name.length} / ${formSchema.name.min}–${formSchema.name.max}` }}
           <os-icon v-if="errors && errors.name" :icon="icons.warning" />
@@ -56,7 +56,7 @@
         <os-badge
           role="status"
           aria-live="polite"
-          :variant="errors && errors.groupType && formData.groupType === '' ? 'danger' : 'default'"
+          :variant="errors && errors.groupType && formData.groupType === '' ? 'danger' : undefined"
         >
           {{ `${formData.groupType === '' ? 0 : 1} / 1` }}
           <os-icon
@@ -91,7 +91,7 @@
         <os-badge
           role="status"
           aria-live="polite"
-          :variant="errors && errors.description ? 'danger' : 'default'"
+          :variant="errors && errors.description ? 'danger' : undefined"
         >
           {{ `${descriptionLength} / ${formSchema.description.min}` }}
           <os-icon v-if="errors && errors.description" :icon="icons.warning" />
@@ -138,7 +138,7 @@
           <os-badge
             role="status"
             aria-live="polite"
-            :variant="errors && errors.categoryIds ? 'danger' : 'default'"
+            :variant="errors && errors.categoryIds ? 'danger' : undefined"
           >
             {{ formData.categoryIds.length }} / 3
             <os-icon v-if="errors && errors.categoryIds" :icon="icons.warning" />
