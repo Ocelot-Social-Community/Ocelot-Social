@@ -19,7 +19,7 @@ export const badgeVariants = cva(
         danger: 'text-[var(--color-danger-contrast)] bg-[var(--color-danger)]',
       },
       size: {
-        sm: 'py-[0.2em] pb-[0.1em] px-[0.6em]',
+        sm: 'text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]',
         base: 'text-[0.8rem] pt-[0.1em] pb-[0.1em] px-[0.8em]',
         lg: 'text-[1rem] py-[0.2em] pb-[0.1em] px-[1em]',
       },

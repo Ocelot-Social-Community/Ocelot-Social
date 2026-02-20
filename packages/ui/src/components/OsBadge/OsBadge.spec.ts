@@ -83,6 +83,7 @@ describe('osBadge', () => {
     it('applies sm size classes by default', () => {
       const wrapper = mount(OsBadge)
 
+      expect(wrapper.classes()).toContain('text-[0.75rem]')
       expect(wrapper.classes()).toContain('px-[0.6em]')
     })
 
