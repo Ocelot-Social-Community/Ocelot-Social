@@ -47,7 +47,7 @@ describe('Embed.vue', () => {
     })
 
     describe('without embedded html but some meta data instead', () => {
-      it('renders description and link', async () => {
+      it('renders embed with metadata but no html', async () => {
         propsData.options = {
           onEmbed: () => ({
             description: 'A nice description',
