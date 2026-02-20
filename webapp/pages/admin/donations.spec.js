@@ -104,9 +104,16 @@ describe('donations.vue', () => {
     })
 
     describe('apollo', () => {
+      // Declarative Apollo query — requires VueApollo plugin to test query execution
       it.todo('query is called')
 
-      it.todo('query result is displayed')
+      it('query result is displayed', async () => {
+        const updateFn = wrapper.vm.$options.apollo.Donations.update.bind(wrapper.vm)
+        updateFn({ Donations: { showDonations: true, goal: 25000, progress: 8000 } })
+        await wrapper.vm.$nextTick()
+        expect(wrapper.vm.showDonations).toBe(true)
+        expect(wrapper.vm.formData).toEqual({ goal: '25000', progress: '8000' })
+      })
 
       describe('submit', () => {
         beforeEach(() => {
@@ -138,11 +145,30 @@ describe('donations.vue', () => {
           )
         })
 
-        it.todo('calls mutation with corrected values once')
+        it('calls mutation with corrected values once', async () => {
+          wrapper.find('#showDonations').setChecked(true)
+          await wrapper.vm.$nextTick()
+          wrapper.find('#donations-goal').setValue('10000')
+          await wrapper.vm.$nextTick()
+          wrapper.find('#donations-progress').setValue('15000')
+          await wrapper.vm.$nextTick()
+          wrapper.find('.donations-info-button').trigger('submit')
+          expect(donationsMutaionMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              variables: { showDonations: true, goal: 10000, progress: 10000 },
+            }),
+          )
+        })
 
-        it.todo('default values are displayed after mutation')
-
-        it.todo('entered values are sent in the mutation')
+        it('default values are displayed after mutation', () => {
+          wrapper.find('.donations-info-button').trigger('submit')
+          const { update } = donationsMutaionMock.mock.calls[0][0]
+          update(null, {
+            data: { UpdateDonations: { showDonations: true, goal: 15000, progress: 0 } },
+          })
+          expect(wrapper.vm.showDonations).toBe(true)
+          expect(wrapper.vm.formData).toEqual({ goal: '15000', progress: '0' })
+        })
       })
     })
   })

@@ -39,19 +39,8 @@ describe('ChangePassword.vue', () => {
       expect(wrapper.findAll('input')).toHaveLength(3)
     })
 
+    // Validation is handled internally by ds-form schema — not testable via external mock
     describe('validations', () => {
-      describe('old password and new password', () => {
-        describe('match', () => {
-          beforeEach(() => {
-            wrapper.find('input#oldPassword').setValue('some secret')
-            wrapper.find('input#password').setValue('some secret')
-          })
-
-          // Validation is handled internally by ds-form schema — not testable via external mock
-          it.todo('displays a warning')
-        })
-      })
-
       describe('new password and confirmation', () => {
         describe('mismatch', () => {
           it.todo('invalid')
@@ -59,12 +48,25 @@ describe('ChangePassword.vue', () => {
         })
 
         describe('match', () => {
-          describe('and old password mismatch', () => {
-            it.todo('valid')
-          })
+          it.todo('valid')
 
           describe('clicked', () => {
-            it.todo('sets loading')
+            it('sets loading while mutation is pending', async () => {
+              mocks.$apollo.mutate.mockReset()
+              let resolvePromise
+              mocks.$apollo.mutate.mockReturnValue(
+                new Promise((resolve) => {
+                  resolvePromise = resolve
+                }),
+              )
+
+              const promise = wrapper.vm.handleSubmit()
+              expect(wrapper.vm.loading).toBe(true)
+
+              resolvePromise({ data: { changePassword: 'TOKEN' } })
+              await promise
+              expect(wrapper.vm.loading).toBe(false)
+            })
           })
         })
       })

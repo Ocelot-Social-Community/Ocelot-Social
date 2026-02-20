@@ -47,11 +47,40 @@ describe('Embed.vue', () => {
     })
 
     describe('without embedded html but some meta data instead', () => {
-      it.todo('renders description and link')
+      it('renders description and link', async () => {
+        propsData.options = {
+          onEmbed: () => ({
+            description: 'A nice description',
+            url: someUrl,
+            title: 'Some Title',
+            image: 'https://example.com/image.jpg',
+          }),
+        }
+        propsData.node = { attrs: { dataEmbedUrl: someUrl } }
+        const wrapper = Wrapper({ propsData })
+        await wrapper.vm.$nextTick()
+        expect(wrapper.find('embed-component-stub').exists()).toBe(true)
+        expect(wrapper.vm.embedData).toEqual(
+          expect.objectContaining({
+            description: 'A nice description',
+            title: 'Some Title',
+          }),
+        )
+        expect(wrapper.vm.embedData.html).toBeUndefined()
+      })
     })
 
     describe('without any meta data', () => {
-      it.todo('renders a link without `embed` class')
+      it('renders a link without `embed` class', async () => {
+        propsData.options = {
+          onEmbed: () => ({}),
+        }
+        propsData.node = { attrs: { dataEmbedUrl: someUrl } }
+        const wrapper = Wrapper({ propsData })
+        await wrapper.vm.$nextTick()
+        expect(wrapper.find('embed-component-stub').exists()).toBe(true)
+        expect(wrapper.vm.embedData).toEqual({})
+      })
     })
   })
 })
