@@ -76,7 +76,6 @@
               :isNonePendingMember="isGroupMemberNonePending"
               :disabled="isGroupOwner"
               :loading="$apollo.loading"
-              @prepare="prepareJoinLeave"
               @update="updateJoinLeave"
             />
           </div>
@@ -571,9 +570,6 @@ export default {
     //   this.user.followedByCurrentUser = followedByCurrentUser
     //   this.user.followedBy = followedBy
     // },
-    prepareJoinLeave() {
-      // OsNumber handles animation from old→new value automatically via watch
-    },
     updateJoinLeave() {
       this.$apollo.queries.Group.refetch()
       if (this.isAllowedSeeingGroupMembers) {
