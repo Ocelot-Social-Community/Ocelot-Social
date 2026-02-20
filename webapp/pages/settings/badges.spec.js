@@ -250,16 +250,16 @@ describe('badge settings', () => {
                 id: 'u23',
                 badgeTrophiesSelected: [
                   {
-                    id: '4',
-                    icon: '/path/to/fourth/icon',
-                    description: 'Fourth description',
+                    id: '1',
+                    icon: '/path/to/some/icon',
                     isDefault: false,
+                    description: 'Some description',
                   },
                   {
-                    id: '2',
-                    icon: '/path/to/empty/icon',
-                    isDefault: true,
-                    description: 'Empty',
+                    id: '4',
+                    icon: '/path/to/fourth/icon',
+                    isDefault: false,
+                    description: 'Fourth description',
                   },
                   {
                     id: '3',
