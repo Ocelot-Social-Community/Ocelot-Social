@@ -9,15 +9,15 @@ describe('donations.vue', () => {
 
   const donationsQueryMock = jest.fn()
   const donationsUpdateMock = jest.fn()
-  const donationsMutaionMock = jest.fn()
-  donationsMutaionMock.mockResolvedValue({
-    then: jest.fn(),
-    catch: jest.fn(),
-  })
+  const donationsMutaionMock = jest.fn().mockResolvedValue({})
 
   beforeEach(() => {
     mocks = {
       $t: jest.fn((string) => string),
+      $toast: {
+        success: jest.fn(),
+        error: jest.fn(),
+      },
       $apollo: {
         Donations: {
           query: donationsQueryMock,
