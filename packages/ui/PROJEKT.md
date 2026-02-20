@@ -81,10 +81,10 @@ Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
 Phase 3: ██████████ 100% (24/24 Aufgaben) ✅ - Webapp-Integration komplett
-Phase 4: ██████░░░░  54% (14/26 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅, OsBadge ✅ | Tier B (rest), Tier 2-4 ausstehend
+Phase 4: ██████░░░░  59% (16/27 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅ | Tier B (rest), Tier 2-3 ausstehend
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████████░░  80% (76/95 Aufgaben)
+Gesamt:  ████████░░  81% (78/96 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -205,11 +205,24 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-20 (Session 30)
+**Letzte Aktualisierung:** 2026-02-20 (Session 31)
 
-**Aktuelle Phase:** Phase 4 - Tier 1 ✅, Tier A ✅, OsBadge ✅ (ds-chip + ds-tag → UI-Library) | Tier B, Tier 2-4 ausstehend
+**Aktuelle Phase:** Phase 4 - Tier 1 ✅, Tier A ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅ | Tier B (rest), Tier 2-3 ausstehend
 
-**Zuletzt abgeschlossen (Session 30 - OsBadge Code-Review Fixes):**
+**Zuletzt abgeschlossen (Session 31 - ds-table → Plain HTML):**
+- [x] ds-table (7 Nutzungen) → native `<table>` + CSS-Klassen (kein OsTable nötig)
+- [x] Table-CSS in `_ds-compat.scss`: .ds-table-wrap, .ds-table, .ds-table-col, .ds-table-head-col, .ds-table-bordered, .ds-table-condensed, Alignment-Klassen
+- [x] `pages/admin/hashtags.vue`: 4 Spalten (index, id-Link, taggedCountUnique, taggedCount)
+- [x] `pages/admin/categories.vue`: 3 Spalten (icon, name, postCount)
+- [x] `pages/admin/users/index.vue`: 9-10 Spalten (conditional badges), komplexeste Tabelle
+- [x] `pages/settings/blocked-users.vue`: 4 Spalten, unblockUser() auf direktes User-Objekt umgestellt
+- [x] `pages/settings/muted-users.vue`: 4 Spalten, unmuteUser() auf direktes User-Objekt umgestellt
+- [x] `components/Group/GroupMember.vue`: 5 Spalten (avatar, name, slug, roleInGroup, edit)
+- [x] `components/features/FiledReportsTable/FiledReportsTable.vue`: 4 Spalten mit colgroup widths
+- [x] `fields()` / `tableFields()` Computed Properties aus allen 7 Dateien entfernt (Labels direkt in `<th>`)
+- [x] Alle 16 Tests bestanden (3 Test-Suites: admin/users Snapshots aktualisiert, FiledReportsTable ✅, ReportsTable ✅)
+
+**Zuvor abgeschlossen (Session 30 - OsBadge Code-Review Fixes):**
 - [x] `--color-default-contrast` zu `requiredCssVariables` in tailwind.preset.ts hinzugefügt
 - [x] Doppelte `--color-default`-Deklaration in ocelot-ui-variables.scss entfernt (softest → softer konsolidiert)
 - [x] Redundante Ternär-Ausdrücke entfernt: GroupTeaser.vue + groups/_slug.vue (`group ? group.about : ''` → `group.about`)
@@ -248,9 +261,9 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 - [x] Test-Fix: Empty.spec.js `attributes().margin` → `classes().toContain('ds-my-xxx-small')`
 - [x] 0 Tier-A `ds-*` Komponenten-Tags verbleibend
 
-**Verbleibende ds-* Komponenten (9 Typen):**
+**Verbleibende ds-* Komponenten (8 Typen):**
 - Tier B Rest (→ Plain HTML): ds-number (5), ds-radio (1)
-- Tier C (→ UI-Library): ds-input (23), ds-form (18), ds-modal (7), ds-menu/ds-menu-item (17), ds-table (7), ds-select (3)
+- Tier C (→ UI-Library): ds-input (23), ds-form (18), ds-modal (7), ds-menu/ds-menu-item (17), ds-select (3)
 
 **Zuvor abgeschlossen (Session 26 - CodeRabbit Review Fixes):**
 - [x] Cypress: `.os-card .title` → `.os-card > .title` (Kind-Kombinator statt Nachfahren)
@@ -644,7 +657,7 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 - [x] ds-chip (5 Dateien) → OsBadge (UI-Library) ✅
 - [x] ds-tag (3 Dateien) → OsBadge shape="square" (UI-Library) ✅
 - [ ] ds-number (5 Dateien) → `<div class="ds-number">`
-- [ ] ds-grid / ds-grid-item (10 Dateien) → CSS Grid
+- [x] ds-grid / ds-grid-item (10 Dateien) → CSS Grid ✅
 - [ ] ds-radio (1 Datei) → native `<input type="radio">`
 
 **Tier 2: Layout & Feedback (UI-Library)**
@@ -659,7 +672,7 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 
 **Tier 4: Spezial-Komponenten**
 - [ ] OsSelect (3 Dateien)
-- [ ] OsTable (7 Dateien)
+- [x] ds-table (7 Dateien) → Plain HTML `<table>` + CSS-Klassen ✅ (kein OsTable nötig)
 - [ ] ds-form → Plain HTML `<form>` oder OsForm (18 Dateien)
 
 **Infrastruktur**
@@ -1788,6 +1801,11 @@ Bei der Migration werden:
 | 2026-02-20 | **Type Safety** | BadgeVariant Typ exportiert, PlaygroundArgs typisiert, redundante Ternäre entfernt |
 | 2026-02-20 | **Layout-Konsistenz** | GroupForm float:right → Flexbox align-self:flex-end, Inline-Style → Tailwind in Stories |
 | 2026-02-20 | **ARIA Live Regions** | role="status"/aria-live="polite" auf 11 Form-Badges (WCAG 4.1.3), live Prop → Standard-Attribute |
+| 2026-02-20 | **ds-grid → CSS Grid** | 10 Dateien migriert: ds-grid/ds-grid-item → native CSS Grid + Klassen |
+| 2026-02-20 | **ds-table → Plain HTML (Session 31)** | 7 Dateien: `<ds-table>` → native `<table>` + CSS-Klassen (.ds-table, .ds-table-col, etc.) |
+| 2026-02-20 | **Table-CSS** | _ds-compat.scss erweitert: .ds-table-wrap, .ds-table, .ds-table-col, .ds-table-head-col, bordered, condensed, alignment |
+| 2026-02-20 | **fields() entfernt** | Computed Properties `fields()`/`tableFields()` aus 7 Dateien entfernt — Labels direkt in `<th>` |
+| 2026-02-20 | **Scope-Objekte entfernt** | `scope.row` Zugriffe → direkte Iteration-Variable (user, tag, member, report) |
 
 ---
 
@@ -1806,10 +1824,10 @@ Bei der Migration werden:
 | Status | Komponenten |
 |--------|------------|
 | ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard, OsBadge (5) |
-| ✅ → Plain HTML | Section, Placeholder, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem (10) — Tier A |
+| ✅ → Plain HTML | Section, Placeholder, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem, Grid, GridItem, Table (13) — Tier A/B |
 | ✅ → UI-Library | Chip, Tag → OsBadge (2) — Tier B |
-| ⬜ → Plain HTML | Number, Grid, GridItem, Radio (4) — Tier B |
-| ⬜ → UI-Library | Modal, Input, Menu, MenuItem, Select, Table (6) — Tier 2-4 |
+| ⬜ → Plain HTML | Number, Radio (2) — Tier B |
+| ⬜ → UI-Library | Modal, Input, Menu, MenuItem, Select (5) — Tier 2-3 |
 | ⬜ Nicht genutzt | Code, CopyField, FormItem, InputError, InputLabel, Page, PageTitle, Logo, Avatar, TableCol, TableHeadCol (11) |
 | ⬜ Offen | Form (18 Dateien — HTML `<form>` oder OsForm?) |
 
