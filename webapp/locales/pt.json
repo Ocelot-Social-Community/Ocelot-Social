@@ -39,6 +39,7 @@
     },
     "categories": {
       "categoryName": "Nome",
+      "empty": "Nenhuma categoria encontrada.",
       "name": "Categorias",
       "postCount": "Postagens"
     },

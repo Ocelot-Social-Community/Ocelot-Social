@@ -39,6 +39,7 @@
     },
     "categories": {
       "categoryName": "Name",
+      "empty": "Keine Themen gefunden.",
       "name": "Themen",
       "postCount": "Beiträge"
     },

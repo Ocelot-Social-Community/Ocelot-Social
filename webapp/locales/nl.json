@@ -39,6 +39,7 @@
     },
     "categories": {
       "categoryName": "Naam",
+      "empty": "Geen categorieën gevonden.",
       "name": "Categorieën",
       "postCount": "Berichten"
     },

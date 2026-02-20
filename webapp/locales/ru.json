@@ -39,6 +39,7 @@
     },
     "categories": {
       "categoryName": "Имя",
+      "empty": "Категории не найдены.",
       "name": "Категории",
       "postCount": "Посты"
     },

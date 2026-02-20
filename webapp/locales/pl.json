@@ -39,6 +39,7 @@
     },
     "categories": {
       "categoryName": "Nazwa",
+      "empty": "Nie znaleziono kategorii.",
       "name": "Kategorie",
       "postCount": "Stanowiska"
     },
