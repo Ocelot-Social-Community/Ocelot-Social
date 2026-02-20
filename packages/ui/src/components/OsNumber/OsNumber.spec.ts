@@ -244,6 +244,16 @@ describe('osNumber', () => {
 
       expect(window.cancelAnimationFrame).toHaveBeenCalledWith(expect.any(Number))
     })
+
+    it('does not cancel animation on unmount when not animated', () => {
+      const wrapper = mount(OsNumber, {
+        props: { count: 100 },
+      })
+
+      wrapper.unmount()
+
+      expect(window.cancelAnimationFrame).not.toHaveBeenCalled()
+    })
   })
 
   describe('keyboard accessibility', () => {
