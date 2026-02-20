@@ -19,4 +19,10 @@ export {
 } from './OsIcon'
 export { OsSpinner, SPINNER_SIZES } from './OsSpinner'
 export { OsCard } from './OsCard'
-export { OsBadge, badgeVariants, type BadgeShape, type BadgeSize, type BadgeVariants } from './OsBadge'
+export {
+  OsBadge,
+  badgeVariants,
+  type BadgeShape,
+  type BadgeSize,
+  type BadgeVariants,
+} from './OsBadge'

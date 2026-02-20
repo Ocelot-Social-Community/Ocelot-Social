@@ -2,11 +2,12 @@
   import { defineComponent, getCurrentInstance, h, isVue2 } from 'vue-demi'
 
   import { cn } from '#src/utils'
+
   import { badgeVariants } from './badge.variants'
 
+  import type { BadgeShape, BadgeSize, BadgeVariants } from './badge.variants'
   import type { ClassValue } from 'clsx'
   import type { PropType } from 'vue-demi'
-  import type { BadgeShape, BadgeSize, BadgeVariants } from './badge.variants'
 
   /**
    * Non-interactive label for metadata display (e.g. group info) and
@@ -55,7 +56,10 @@
 
       return () => {
         const children = slots.default?.()
-        const badgeClass = cn('os-badge', badgeVariants({ variant: props.variant, size: props.size, shape: props.shape }))
+        const badgeClass = cn(
+          'os-badge',
+          badgeVariants({ variant: props.variant, size: props.size, shape: props.shape }),
+        )
 
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
         if (isVue2) {
