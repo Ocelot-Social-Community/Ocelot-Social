@@ -70,6 +70,7 @@
                   appearance="outline"
                   circle
                   size="sm"
+                  :loading="unmutingUserId === user.id"
                   :aria-label="$t('settings.muted-users.columns.unmute')"
                   @click="unmuteUser(user)"
                 >
@@ -117,6 +118,7 @@ export default {
   data() {
     return {
       mutedUsers: [],
+      unmutingUserId: null,
     }
   },
   apollo: {
@@ -124,13 +126,20 @@ export default {
   },
   methods: {
     async unmuteUser(user) {
-      await this.$apollo.mutate({
-        mutation: unmuteUser(),
-        variables: { id: user.id },
-      })
-      this.$apollo.queries.mutedUsers.refetch()
-      const { name } = user
-      this.$toast.success(this.$t('settings.muted-users.unmuted', { name }))
+      this.unmutingUserId = user.id
+      try {
+        await this.$apollo.mutate({
+          mutation: unmuteUser(),
+          variables: { id: user.id },
+        })
+        this.$apollo.queries.mutedUsers.refetch()
+        const { name } = user
+        this.$toast.success(this.$t('settings.muted-users.unmuted', { name }))
+      } catch (error) {
+        this.$toast.error(error.message)
+      } finally {
+        this.unmutingUserId = null
+      }
     },
   },
 }
