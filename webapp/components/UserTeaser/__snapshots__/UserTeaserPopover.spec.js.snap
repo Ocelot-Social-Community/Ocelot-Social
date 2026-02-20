@@ -14,61 +14,55 @@ exports[`UserTeaserPopover does not show badges when disabled 1`] = `
     >
       <li>
         <div
-          class="ds-number ds-number-size-x-large"
+          class="os-number flex flex-col items-center text-center"
         >
-          <p
-            class="ds-text ds-number-count ds-text-size-x-large"
-            style="margin-bottom: 0px;"
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
           >
             0
-          </p>
-          <p
-            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            
-    profile.followers
-  
-          </p>
+            profile.followers
+          </span>
         </div>
       </li>
        
       <li>
         <div
-          class="ds-number ds-number-size-x-large"
+          class="os-number flex flex-col items-center text-center"
         >
-          <p
-            class="ds-text ds-number-count ds-text-size-x-large"
-            style="margin-bottom: 0px;"
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
           >
             0
-          </p>
-          <p
-            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            
-    common.post
-  
-          </p>
+            common.post
+          </span>
         </div>
       </li>
        
       <li>
         <div
-          class="ds-number ds-number-size-x-large"
+          class="os-number flex flex-col items-center text-center"
         >
-          <p
-            class="ds-text ds-number-count ds-text-size-x-large"
-            style="margin-bottom: 0px;"
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
           >
             0
-          </p>
-          <p
-            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            
-    common.comment
-  
-          </p>
+            common.comment
+          </span>
         </div>
       </li>
     </ul>
@@ -131,61 +125,55 @@ exports[`UserTeaserPopover given a non-touch device does not show button when us
     >
       <li>
         <div
-          class="ds-number ds-number-size-x-large"
+          class="os-number flex flex-col items-center text-center"
         >
-          <p
-            class="ds-text ds-number-count ds-text-size-x-large"
-            style="margin-bottom: 0px;"
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
           >
             0
-          </p>
-          <p
-            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            
-    profile.followers
-  
-          </p>
+            profile.followers
+          </span>
         </div>
       </li>
        
       <li>
         <div
-          class="ds-number ds-number-size-x-large"
+          class="os-number flex flex-col items-center text-center"
         >
-          <p
-            class="ds-text ds-number-count ds-text-size-x-large"
-            style="margin-bottom: 0px;"
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
           >
             0
-          </p>
-          <p
-            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            
-    common.post
-  
-          </p>
+            common.post
+          </span>
         </div>
       </li>
        
       <li>
         <div
-          class="ds-number ds-number-size-x-large"
+          class="os-number flex flex-col items-center text-center"
         >
-          <p
-            class="ds-text ds-number-count ds-text-size-x-large"
-            style="margin-bottom: 0px;"
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
           >
             0
-          </p>
-          <p
-            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            
-    common.comment
-  
-          </p>
+            common.comment
+          </span>
         </div>
       </li>
     </ul>
@@ -248,61 +236,55 @@ exports[`UserTeaserPopover given a touch device does not show button when userLi
     >
       <li>
         <div
-          class="ds-number ds-number-size-x-large"
+          class="os-number flex flex-col items-center text-center"
         >
-          <p
-            class="ds-text ds-number-count ds-text-size-x-large"
-            style="margin-bottom: 0px;"
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
           >
             0
-          </p>
-          <p
-            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            
-    profile.followers
-  
-          </p>
+            profile.followers
+          </span>
         </div>
       </li>
        
       <li>
         <div
-          class="ds-number ds-number-size-x-large"
+          class="os-number flex flex-col items-center text-center"
         >
-          <p
-            class="ds-text ds-number-count ds-text-size-x-large"
-            style="margin-bottom: 0px;"
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
           >
             0
-          </p>
-          <p
-            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            
-    common.post
-  
-          </p>
+            common.post
+          </span>
         </div>
       </li>
        
       <li>
         <div
-          class="ds-number ds-number-size-x-large"
+          class="os-number flex flex-col items-center text-center"
         >
-          <p
-            class="ds-text ds-number-count ds-text-size-x-large"
-            style="margin-bottom: 0px;"
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
           >
             0
-          </p>
-          <p
-            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            
-    common.comment
-  
-          </p>
+            common.comment
+          </span>
         </div>
       </li>
     </ul>
@@ -365,61 +347,55 @@ exports[`UserTeaserPopover given a touch device shows button when userLink is pr
     >
       <li>
         <div
-          class="ds-number ds-number-size-x-large"
+          class="os-number flex flex-col items-center text-center"
         >
-          <p
-            class="ds-text ds-number-count ds-text-size-x-large"
-            style="margin-bottom: 0px;"
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
           >
             0
-          </p>
-          <p
-            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            
-    profile.followers
-  
-          </p>
+            profile.followers
+          </span>
         </div>
       </li>
        
       <li>
         <div
-          class="ds-number ds-number-size-x-large"
+          class="os-number flex flex-col items-center text-center"
         >
-          <p
-            class="ds-text ds-number-count ds-text-size-x-large"
-            style="margin-bottom: 0px;"
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
           >
             0
-          </p>
-          <p
-            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            
-    common.post
-  
-          </p>
+            common.post
+          </span>
         </div>
       </li>
        
       <li>
         <div
-          class="ds-number ds-number-size-x-large"
+          class="os-number flex flex-col items-center text-center"
         >
-          <p
-            class="ds-text ds-number-count ds-text-size-x-large"
-            style="margin-bottom: 0px;"
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
           >
             0
-          </p>
-          <p
-            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            
-    common.comment
-  
-          </p>
+            common.comment
+          </span>
         </div>
       </li>
     </ul>
@@ -482,61 +458,55 @@ exports[`UserTeaserPopover shows badges when enabled 1`] = `
     >
       <li>
         <div
-          class="ds-number ds-number-size-x-large"
+          class="os-number flex flex-col items-center text-center"
         >
-          <p
-            class="ds-text ds-number-count ds-text-size-x-large"
-            style="margin-bottom: 0px;"
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
           >
             0
-          </p>
-          <p
-            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            
-    profile.followers
-  
-          </p>
+            profile.followers
+          </span>
         </div>
       </li>
        
       <li>
         <div
-          class="ds-number ds-number-size-x-large"
+          class="os-number flex flex-col items-center text-center"
         >
-          <p
-            class="ds-text ds-number-count ds-text-size-x-large"
-            style="margin-bottom: 0px;"
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
           >
             0
-          </p>
-          <p
-            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            
-    common.post
-  
-          </p>
+            common.post
+          </span>
         </div>
       </li>
        
       <li>
         <div
-          class="ds-number ds-number-size-x-large"
+          class="os-number flex flex-col items-center text-center"
         >
-          <p
-            class="ds-text ds-number-count ds-text-size-x-large"
-            style="margin-bottom: 0px;"
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
           >
             0
-          </p>
-          <p
-            class="ds-text ds-number-label ds-text-size-small ds-text-soft"
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
           >
-            
-    common.comment
-  
-          </p>
+            common.comment
+          </span>
         </div>
       </li>
     </ul>
