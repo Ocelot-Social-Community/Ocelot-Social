@@ -9,7 +9,7 @@ describe('donations.vue', () => {
 
   const donationsQueryMock = jest.fn()
   const donationsUpdateMock = jest.fn()
-  const donationsMutaionMock = jest.fn().mockResolvedValue({})
+  const donationsMutationMock = jest.fn().mockResolvedValue({})
 
   beforeEach(() => {
     mocks = {
@@ -23,7 +23,7 @@ describe('donations.vue', () => {
           query: donationsQueryMock,
           update: donationsUpdateMock,
         },
-        mutate: donationsMutaionMock,
+        mutate: donationsMutationMock,
         queries: {
           Donations: {
             query: donationsQueryMock,
@@ -127,7 +127,7 @@ describe('donations.vue', () => {
 
         it('calls mutation with default values once', () => {
           wrapper.find('.donations-info-button').trigger('submit')
-          expect(donationsMutaionMock).toHaveBeenCalledWith(
+          expect(donationsMutationMock).toHaveBeenCalledWith(
             expect.objectContaining({
               variables: { showDonations: false, goal: 15000, progress: 0 },
             }),
@@ -158,7 +158,7 @@ describe('donations.vue', () => {
           wrapper.find('#donations-progress').setValue('15000')
           await wrapper.vm.$nextTick()
           wrapper.find('.donations-info-button').trigger('submit')
-          expect(donationsMutaionMock).toHaveBeenCalledWith(
+          expect(donationsMutationMock).toHaveBeenCalledWith(
             expect.objectContaining({
               variables: { showDonations: true, goal: 10000, progress: 10000 },
             }),
@@ -167,7 +167,7 @@ describe('donations.vue', () => {
 
         it('default values are displayed after mutation', () => {
           wrapper.find('.donations-info-button').trigger('submit')
-          const { update } = donationsMutaionMock.mock.calls[0][0]
+          const { update } = donationsMutationMock.mock.calls[0][0]
           update(null, {
             data: { UpdateDonations: { showDonations: true, goal: 15000, progress: 0 } },
           })
