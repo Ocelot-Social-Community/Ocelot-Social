@@ -36,9 +36,24 @@
               <th class="ds-table-head-col">{{ $t('admin.users.table.columns.email') }}</th>
               <th class="ds-table-head-col">{{ $t('admin.users.table.columns.slug') }}</th>
               <th class="ds-table-head-col">{{ $t('admin.users.table.columns.createdAt') }}</th>
-              <th class="ds-table-head-col ds-table-head-col-right" :aria-label="$t('admin.users.table.columns.contributions')">🖉</th>
-              <th class="ds-table-head-col ds-table-head-col-right" :aria-label="$t('admin.users.table.columns.comments')">🗨</th>
-              <th class="ds-table-head-col ds-table-head-col-right" :aria-label="$t('admin.users.table.columns.shouted')">❤</th>
+              <th
+                class="ds-table-head-col ds-table-head-col-right"
+                :aria-label="$t('admin.users.table.columns.contributions')"
+              >
+                🖉
+              </th>
+              <th
+                class="ds-table-head-col ds-table-head-col-right"
+                :aria-label="$t('admin.users.table.columns.comments')"
+              >
+                🗨
+              </th>
+              <th
+                class="ds-table-head-col ds-table-head-col-right"
+                :aria-label="$t('admin.users.table.columns.shouted')"
+              >
+                ❤
+              </th>
               <th class="ds-table-head-col ds-table-head-col-right">
                 {{ $t('admin.users.table.columns.role') }}
               </th>
@@ -237,5 +252,4 @@ export default {
 .admin-users > .os-card:first-child {
   margin-bottom: $space-small;
 }
-
 </style>
