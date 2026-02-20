@@ -10,6 +10,7 @@
       :is-owner="userId === $store.getters['auth/user'].id"
       class="location-info"
     />
+    <!-- No :animated on OsNumber — popover appears on hover, animation would be distracting -->
     <ul class="statistics">
       <li>
         <os-number :count="user.followedByCount" :label="$t('profile.followers')" />
