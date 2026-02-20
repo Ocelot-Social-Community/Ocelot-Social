@@ -54,7 +54,6 @@
             <td class="ds-table-col">
               <select
                 v-if="member.membership.role !== 'owner'"
-                :options="['pending', 'usual', 'admin', 'owner']"
                 :value="`${member.membership.role}`"
                 @change="changeMemberRole(member.user.id, $event)"
               >
