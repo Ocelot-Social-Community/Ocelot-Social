@@ -139,7 +139,7 @@ describe('badge settings', () => {
               id: 'u23',
               badgeTrophiesSelected: [
                 {
-                  id: '2',
+                  id: 'empty-0',
                   icon: '/path/to/empty/icon',
                   isDefault: true,
                   description: 'Empty',
