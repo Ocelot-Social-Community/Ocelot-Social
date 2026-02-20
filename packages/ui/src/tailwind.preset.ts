@@ -1,36 +1,22 @@
 /**
- * Tailwind CSS Preset for @ocelot-social/ui
+ * CSS Variable contract for @ocelot-social/ui
  *
- * This preset defines CSS Custom Properties used by components.
- * The library does NOT provide default values - the consuming app must define all variables.
+ * Components use CSS Custom Properties via arbitrary values (e.g. `bg-[var(--color-primary)]`)
+ * rather than Tailwind theme tokens. No Tailwind preset or @config/@theme is needed.
  *
- * Branding hierarchy:
- * 1. Webapp defines default branding (base colors)
- * 2. Specialized brandings override the defaults
- *
- * Usage (Tailwind v4 with legacy config):
- * ```js
- * // tailwind.config.js
- * import { ocelotPreset } from '@ocelot-social/ui/tailwind.preset'
- *
- * export default {
- *   presets: [ocelotPreset],
+ * The consuming app must define all required CSS variables on :root:
+ * ```css
+ * :root {
+ *   --color-primary: #6dba4a;
+ *   --color-primary-hover: #7ecf5a;
+ *   --color-primary-active: #4a8a30;
+ *   --color-primary-contrast: #ffffff;
+ *   // ... see requiredCssVariables for the full list
  * }
  * ```
- * ```css
- * // app.css - required for Tailwind v4 to pick up the config
- * @config "./tailwind.config.js";
- * ```
  *
- * Note: Tailwind v4 uses CSS-first configuration (@theme) by default.
- * The tailwind.config.js approach is supported for backward compatibility
- * but may be removed in future versions.
- *
- * Required CSS Variables (defined by webapp):
- * - See `requiredCssVariables` export for the full list
+ * Use `validateCssVariables()` in development to catch missing variables early.
  */
-
-import type { Config } from 'tailwindcss'
 
 /**
  * List of CSS Custom Properties that must be defined by the consuming app.
@@ -107,12 +93,13 @@ export function validateCssVariables(): void {
   }
 }
 
-export const ocelotPreset: Partial<Config> = {
+/**
+ * @deprecated This preset is currently empty. Components use CSS Custom Properties
+ * via arbitrary values (e.g. `bg-[var(--color-primary)]`) and do not require
+ * Tailwind theme tokens. Kept for backward compatibility.
+ */
+export const ocelotPreset = {
   theme: {
-    extend: {
-      // Colors and other theme extensions will be added here as components are developed.
-      // All values use CSS Custom Properties WITHOUT defaults.
-      // Example: primary: { DEFAULT: 'var(--color-primary)' }
-    },
+    extend: {},
   },
-}
+} as const
