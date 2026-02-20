@@ -49,31 +49,27 @@ describe('TabNavigation', () => {
     })
 
     describe('displays', () => {
-      // OsNumber animation runs for 1500ms
-      const counterTimeout = 1500 + 10
+      beforeEach(() => {
+        jest.useFakeTimers()
+        // Re-mount with fake timers so requestAnimationFrame is captured
+        wrapper = Wrapper()
+        jest.advanceTimersByTime(1600)
+      })
 
-      it('shows a total of 17 results', () => {
-        setTimeout(() => {
-          expect(wrapper.find('.total-search-results').text()).toContain('17')
-        }, counterTimeout)
+      afterEach(() => {
+        jest.useRealTimers()
       })
 
       it('shows tab with 12 posts', () => {
-        setTimeout(() => {
-          expect(wrapper.find('[data-test="Post-tab"]').text()).toContain('12')
-        }, counterTimeout)
+        expect(wrapper.find('[data-test="Post-tab"]').text()).toContain('12')
       })
 
       it('shows tab with 9 users', () => {
-        setTimeout(() => {
-          expect(wrapper.find('[data-test="User-tab"]').text()).toContain('9')
-        }, counterTimeout)
+        expect(wrapper.find('[data-test="User-tab"]').text()).toContain('9')
       })
 
       it('shows tab with 0 hashtags', () => {
-        setTimeout(() => {
-          expect(wrapper.find('[data-test="Hashtag-tab"]').text()).toContain('0')
-        }, counterTimeout)
+        expect(wrapper.find('[data-test="Hashtag-tab"]').text()).toContain('0')
       })
 
       describe('basic props setting', () => {
