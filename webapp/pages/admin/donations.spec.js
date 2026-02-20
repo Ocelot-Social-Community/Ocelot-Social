@@ -97,9 +97,11 @@ describe('donations.vue', () => {
         expect(wrapper.vm.showDonations).toBe(false)
       })
 
-      it('donations-goal input exists and is editable', () => {
+      it('donations-goal input exists and accepts input', async () => {
         const goalInput = wrapper.find('#donations-goal')
         expect(goalInput.exists()).toBe(true)
+        await goalInput.setValue('42000')
+        expect(goalInput.element.value).toBe('42000')
       })
     })
 
