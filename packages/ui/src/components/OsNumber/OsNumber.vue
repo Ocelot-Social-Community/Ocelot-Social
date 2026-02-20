@@ -108,11 +108,9 @@
 
         if (props.label) {
           children.push(
-            h(
-              'span',
-              { class: 'os-number-label text-[12px] text-[var(--color-text-soft)]' },
-              [props.label],
-            ),
+            h('span', { class: 'os-number-label text-[12px] text-[var(--color-text-soft)]' }, [
+              props.label,
+            ]),
           )
         }
 

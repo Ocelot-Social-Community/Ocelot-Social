@@ -68,8 +68,8 @@ test.describe('OsNumber visual regression', () => {
     await root.waitFor()
     await waitForReady(page)
 
-    // Wait for animation to complete (1500ms duration + buffer)
-    await page.waitForTimeout(2000)
+    // Wait for animation to complete (first counter animates to 128)
+    await expect(root.locator('.os-number-count').first()).toHaveText('128', { timeout: 3000 })
 
     await expect(root.locator('[data-testid="animated"]')).toHaveScreenshot('animated.png')
 
