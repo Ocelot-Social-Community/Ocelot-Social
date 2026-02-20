@@ -1,7 +1,6 @@
 import { mount } from '@vue/test-utils'
 import CommentList from './CommentList'
 import Vuex from 'vuex'
-import Vue from 'vue'
 
 const localVue = global.localVue
 
