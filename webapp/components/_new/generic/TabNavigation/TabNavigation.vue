@@ -64,7 +64,6 @@ export default {
 
 .Tabs {
   position: relative;
-  background-color: #fff;
   height: 100%;
   display: flex;
   margin: 0;
@@ -98,6 +97,7 @@ export default {
 }
 .ds-tab-nav.os-card {
   padding: 0 !important;
+  border-radius: $border-radius-x-large $border-radius-x-large 0 0 !important;
 
   .ds-tab-nav-item {
     &.ds-tab-nav-item-active {
