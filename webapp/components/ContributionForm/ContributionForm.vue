@@ -39,7 +39,11 @@
             autofocus
             size="large"
           />
-          <os-badge role="status" aria-live="polite" :variant="errors && errors.title ? 'danger' : undefined">
+          <os-badge
+            role="status"
+            aria-live="polite"
+            :variant="errors && errors.title ? 'danger' : undefined"
+          >
             {{ formData.title.length }}/{{ formSchema.title.max }}
             <os-icon v-if="errors && errors.title" :icon="icons.warning" />
           </os-badge>
@@ -49,7 +53,11 @@
             :hashtags="hashtags"
             @input="updateEditorContent"
           />
-          <os-badge role="status" aria-live="polite" :variant="errors && errors.content ? 'danger' : undefined">
+          <os-badge
+            role="status"
+            aria-live="polite"
+            :variant="errors && errors.content ? 'danger' : undefined"
+          >
             {{ contentLength }}
             <os-icon v-if="errors && errors.content" :icon="icons.warning" />
           </os-badge>
@@ -81,7 +89,11 @@
                   v-if="errors && errors.eventStart"
                   class="chipbox event-grid-item-margin-helper"
                 >
-                  <os-badge role="alert" aria-live="assertive" :variant="errors && errors.eventStart ? 'danger' : undefined">
+                  <os-badge
+                    role="alert"
+                    aria-live="assertive"
+                    :variant="errors && errors.eventStart ? 'danger' : undefined"
+                  >
                     <os-icon :icon="icons.warning" />
                   </os-badge>
                 </div>
@@ -114,7 +126,11 @@
                   :placeholder="$t('post.viewEvent.eventVenue')"
                 />
                 <div class="chipbox">
-                  <os-badge role="status" aria-live="polite" :variant="errors && errors.eventVenue ? 'danger' : undefined">
+                  <os-badge
+                    role="status"
+                    aria-live="polite"
+                    :variant="errors && errors.eventVenue ? 'danger' : undefined"
+                  >
                     {{ formData.eventVenue.length }}/{{ formSchema.eventVenue.max }}
                     <os-icon v-if="errors && errors.eventVenue" :icon="icons.warning" />
                   </os-badge>
@@ -127,7 +143,11 @@
                   :placeholder="$t('post.viewEvent.eventLocationName')"
                 />
                 <div class="chipbox">
-                  <os-badge role="status" aria-live="polite" :variant="errors && errors.eventLocationName ? 'danger' : undefined">
+                  <os-badge
+                    role="status"
+                    aria-live="polite"
+                    :variant="errors && errors.eventLocationName ? 'danger' : undefined"
+                  >
                     {{ formData.eventLocationName.length }}/{{ formSchema.eventLocationName.max }}
                     <os-icon v-if="errors && errors.eventLocationName" :icon="icons.warning" />
                   </os-badge>

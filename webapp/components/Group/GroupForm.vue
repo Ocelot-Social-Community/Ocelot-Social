@@ -17,7 +17,11 @@
           autofocus
           :placeholder="`${$t('group.name')} …`"
         />
-        <os-badge role="status" aria-live="polite" :variant="errors && errors.name ? 'danger' : 'default'">
+        <os-badge
+          role="status"
+          aria-live="polite"
+          :variant="errors && errors.name ? 'danger' : 'default'"
+        >
           {{ `${formData.name.length} / ${formSchema.name.min}–${formSchema.name.max}` }}
           <os-icon v-if="errors && errors.name" :icon="icons.warning" />
         </os-badge>
@@ -84,7 +88,11 @@
           :hashtags="null"
           @input="updateEditorDescription"
         />
-        <os-badge role="status" aria-live="polite" :variant="errors && errors.description ? 'danger' : 'default'">
+        <os-badge
+          role="status"
+          aria-live="polite"
+          :variant="errors && errors.description ? 'danger' : 'default'"
+        >
           {{ `${descriptionLength} / ${formSchema.description.min}` }}
           <os-icon v-if="errors && errors.description" :icon="icons.warning" />
         </os-badge>
@@ -127,7 +135,11 @@
             name="categoryIds"
             :existingCategoryIds="formData.categoryIds"
           />
-          <os-badge role="status" aria-live="polite" :variant="errors && errors.categoryIds ? 'danger' : 'default'">
+          <os-badge
+            role="status"
+            aria-live="polite"
+            :variant="errors && errors.categoryIds ? 'danger' : 'default'"
+          >
             {{ formData.categoryIds.length }} / 3
             <os-icon v-if="errors && errors.categoryIds" :icon="icons.warning" />
           </os-badge>
