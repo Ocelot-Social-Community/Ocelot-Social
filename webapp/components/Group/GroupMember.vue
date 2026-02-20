@@ -18,7 +18,7 @@
             <th scope="col" class="ds-table-head-col">
               {{ $t('group.membersAdministrationList.roleInGroup') }}
             </th>
-            <th scope="col" class="ds-table-head-col" aria-hidden="true"></th>
+            <th class="ds-table-head-col" aria-hidden="true"></th>
           </tr>
         </thead>
         <tbody>

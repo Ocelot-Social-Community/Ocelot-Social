@@ -13,7 +13,7 @@
     </colgroup>
     <thead class="ds-table-col ds-table-head-col">
       <tr>
-        <th scope="col" class="ds-table-head-col" aria-hidden="true"></th>
+        <th class="ds-table-head-col" aria-hidden="true"></th>
         <th scope="col" class="ds-table-head-col">{{ $t('moderation.reports.submitter') }}</th>
         <th scope="col" class="ds-table-head-col">{{ $t('moderation.reports.content') }}</th>
         <th scope="col" class="ds-table-head-col">{{ $t('moderation.reports.author') }}</th>
