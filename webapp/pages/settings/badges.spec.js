@@ -17,6 +17,7 @@ describe('badge settings', () => {
   }
 
   beforeEach(() => {
+    apolloMutateMock.mockReset()
     mocks = {
       $t: jest.fn((t) => t),
       $toast: {
