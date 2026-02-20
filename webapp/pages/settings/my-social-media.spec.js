@@ -189,6 +189,20 @@ describe('my-social-media.vue', () => {
             expect(mocks.$toast.success).toHaveBeenCalledTimes(1)
           })
         })
+
+        describe('when deletion fails', () => {
+          beforeEach(async () => {
+            mocks.$apollo.mutate.mockRejectedValue(new Error('Network error'))
+            const modalCall = mutations['modal/SET_OPEN'].mock.calls[0][1]
+            modalCall.data.modalData.buttons.confirm.callback()
+            await flushPromises()
+          })
+
+          it('displays an error message', () => {
+            expect(mocks.$toast.error).toHaveBeenCalledTimes(1)
+            expect(mocks.$toast.error).toHaveBeenCalledWith('Network error')
+          })
+        })
       })
     })
   })
