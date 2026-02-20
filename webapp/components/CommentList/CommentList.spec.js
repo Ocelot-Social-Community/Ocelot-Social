@@ -162,7 +162,7 @@ describe('CommentList.vue', () => {
         wrapper = Wrapper()
       })
 
-      it('hides counter when all comments are deleted', async () => {
+      it('hides counter when no visible comments remain', async () => {
         wrapper.vm.updateCommentList({
           id: 'comment134',
           contentExcerpt: 'this is another deleted comment',
