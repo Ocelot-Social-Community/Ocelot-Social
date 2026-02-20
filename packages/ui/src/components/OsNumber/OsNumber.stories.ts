@@ -44,9 +44,10 @@ export const Playground: StoryObj<PlaygroundArgs> = {
         label: args.label,
         animated: args.animated,
       }))
-      return { numberProps }
+      const remountKey = computed(() => (args.animated ? Date.now() : 'static'))
+      return { numberProps, remountKey }
     },
-    template: `<OsNumber v-bind="numberProps" />`,
+    template: `<OsNumber :key="remountKey" v-bind="numberProps" />`,
   }),
 }
 
