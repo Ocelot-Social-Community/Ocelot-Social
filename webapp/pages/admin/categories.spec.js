@@ -9,24 +9,53 @@ describe('categories.vue', () => {
 
   beforeEach(() => {
     mocks = {
-      $t: jest.fn(),
+      $t: jest.fn((key) => key),
     }
   })
 
-  describe('mount', () => {
-    const Wrapper = () => {
-      return mount(Categories, {
-        mocks,
-        localVue,
-      })
-    }
+  const Wrapper = (data) => {
+    return mount(Categories, {
+      mocks,
+      localVue,
+      data: () => data,
+    })
+  }
 
+  describe('when categories exist', () => {
     beforeEach(() => {
-      wrapper = Wrapper()
+      wrapper = Wrapper({
+        Category: [
+          { id: '1', name: 'Environment', slug: 'environment', icon: 'tree', postCount: 12 },
+          { id: '2', name: 'Democracy', slug: 'democracy', icon: 'balance-scale', postCount: 5 },
+        ],
+      })
     })
 
-    it('renders', () => {
-      expect(wrapper.classes('os-card')).toBe(true)
+    it('renders the table', () => {
+      expect(wrapper.find('table').exists()).toBe(true)
+    })
+
+    it('renders a row for each category', () => {
+      expect(wrapper.findAll('tbody tr')).toHaveLength(2)
+    })
+
+    it('does not show the empty placeholder', () => {
+      expect(wrapper.find('.ds-placeholder').exists()).toBe(false)
+    })
+  })
+
+  describe('when categories are empty', () => {
+    beforeEach(() => {
+      wrapper = Wrapper({ Category: [] })
+    })
+
+    it('does not render the table', () => {
+      expect(wrapper.find('table').exists()).toBe(false)
+    })
+
+    it('shows the empty placeholder', () => {
+      expect(wrapper.find('.ds-placeholder').exists()).toBe(true)
+      expect(mocks.$t).toHaveBeenCalledWith('admin.categories.empty')
     })
   })
 })
