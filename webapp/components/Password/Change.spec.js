@@ -82,7 +82,7 @@ describe('ChangePassword.vue', () => {
             expect(mocks.$apollo.mutate).toHaveBeenCalled()
           })
 
-          describe('clicked', () => {
+          describe('while mutation is pending', () => {
             it('sets loading while mutation is pending', async () => {
               mocks.$apollo.mutate.mockReset()
               let resolvePromise
