@@ -54,7 +54,7 @@ export const requiredCssVariables: string[] = [
   '--color-info-hover',
   '--color-info-contrast',
   // Background (neutral surfaces)
-  '--color-bg-softest',
+  '--color-default',
 ]
 
 /**

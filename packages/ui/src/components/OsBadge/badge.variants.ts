@@ -14,7 +14,7 @@ export const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: 'text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)]',
+        default: 'text-[var(--color-default-contrast)] bg-[var(--color-default)]',
         primary: 'text-[var(--color-primary-contrast)] bg-[var(--color-primary)]',
         danger: 'text-[var(--color-danger-contrast)] bg-[var(--color-danger)]',
       },

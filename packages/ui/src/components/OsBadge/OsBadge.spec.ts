@@ -56,7 +56,7 @@ describe('osBadge', () => {
     it('applies default variant classes when no variant specified', () => {
       const wrapper = mount(OsBadge)
 
-      expect(wrapper.classes()).toContain('bg-[var(--color-bg-softest)]')
+      expect(wrapper.classes()).toContain('bg-[var(--color-default)]')
       expect(wrapper.classes()).toContain('text-[var(--color-default-contrast)]')
     })
 
@@ -84,7 +84,7 @@ describe('osBadge', () => {
       const wrapper = mount(OsBadge)
 
       expect(wrapper.classes()).toContain('text-[0.75rem]')
-      expect(wrapper.classes()).toContain('px-[0.6em]')
+      expect(wrapper.classes()).toContain('px-[0.8em]')
     })
 
     it('applies base size classes', () => {
@@ -93,7 +93,7 @@ describe('osBadge', () => {
       })
 
       expect(wrapper.classes()).toContain('text-[0.8rem]')
-      expect(wrapper.classes()).toContain('px-[0.8em]')
+      expect(wrapper.classes()).toContain('px-[1em]')
     })
 
     it('applies lg size classes', () => {
@@ -102,7 +102,7 @@ describe('osBadge', () => {
       })
 
       expect(wrapper.classes()).toContain('text-[1rem]')
-      expect(wrapper.classes()).toContain('px-[1em]')
+      expect(wrapper.classes()).toContain('px-[1.2em]')
     })
   })
 
