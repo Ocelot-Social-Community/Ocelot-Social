@@ -1,5 +1,4 @@
 import { mount } from '@vue/test-utils'
-import Vue from 'vue'
 import Donations from './donations.vue'
 
 const localVue = global.localVue
@@ -105,20 +104,9 @@ describe('donations.vue', () => {
     })
 
     describe('apollo', () => {
-      it.skip('query is called', () => {
-        expect(donationsQueryMock).toHaveBeenCalledTimes(1)
-        expect(mocks.$apollo.queries.Donations.refetch).toHaveBeenCalledTimes(1)
-        // expect(mocks.$apollo.Donations.query().exists()).toBeTruthy()
-        // console.log('mocks.$apollo: ', mocks.$apollo)
-      })
+      it.todo('query is called')
 
-      it.skip('query result is displayed', () => {
-        mocks.$apollo.queries = jest.fn().mockResolvedValue({
-          data: {
-            PostsEmotionsCountByEmotion: 1,
-          },
-        })
-      })
+      it.todo('query result is displayed')
 
       describe('submit', () => {
         beforeEach(() => {
@@ -150,47 +138,11 @@ describe('donations.vue', () => {
           )
         })
 
-        it.skip('calls mutation with corrected values once', async () => {
-          wrapper.find('.show-donations-checkbox').trigger('click')
-          await Vue.nextTick()
-          expect(wrapper.vm.showDonations).toBe(false)
-          // wrapper.find('.donations-info-button').trigger('submit')
-          // await mocks.$apollo.mutate
-          // expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining({variables: { showDonations: false, goal: 15000, progress: 7000 }}))
-          // expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
-        })
+        it.todo('calls mutation with corrected values once')
 
-        it.skip('default values are displayed', async () => {
-          mocks.$apollo.mutate = jest.fn().mockResolvedValue({
-            data: { UpdateDonations: { showDonations: true, goal: 10, progress: 20 } },
-          })
-          wrapper.find('.donations-info-button').trigger('submit')
-          await mocks.$apollo.mutate
-          await Vue.nextTick()
-          expect(wrapper.vm.showDonations).toBe(false)
-          expect(wrapper.vm.formData.goal).toBe(1)
-          expect(wrapper.vm.formData.progress).toBe(1)
-        })
+        it.todo('default values are displayed after mutation')
 
-        it.skip('entered values are send in the mutation', async () => {
-          // mocks.$apollo.mutate = jest.fn().mockResolvedValue({ data: { UpdateDonations: { showDonations: true, goal: 10, progress: 20 } } })
-
-          // expect(wrapper.vm.showDonations).toBe(null)
-          // expect(wrapper.vm.formData.goal).toBe(null)
-          // expect(wrapper.vm.formData.progress).toBe(null)
-          // wrapper.find('button').trigger('click')
-          // await Vue.nextTick()
-          // expect(wrapper.vm.showDonations).toBe(true)
-          // expect(wrapper.vm.formData.goal).toBe(1)
-          // expect(wrapper.vm.formData.progress).toBe(1)
-
-          // wrapper.find('button').trigger('click')
-          // wrapper.find('.donations-info-button').trigger('click')
-          // await Vue.nextTick()
-          // wrapper.find('.donations-info-button').trigger('submit')
-          await mocks.$apollo.mutate
-          expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
-        })
+        it.todo('entered values are sent in the mutation')
       })
     })
   })
