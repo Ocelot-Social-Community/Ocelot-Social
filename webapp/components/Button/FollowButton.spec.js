@@ -89,9 +89,7 @@ describe('FollowButton.vue', () => {
 
       it('emits update with server response', async () => {
         await wrapper.vm.toggle()
-        expect(wrapper.emitted('update')[0]).toEqual([
-          { id: 'u1', followedByCurrentUser: false },
-        ])
+        expect(wrapper.emitted('update')[0]).toEqual([{ id: 'u1', followedByCurrentUser: false }])
       })
     })
   })
