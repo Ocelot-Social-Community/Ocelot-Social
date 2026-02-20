@@ -169,6 +169,19 @@ describe('donations.vue', () => {
           expect(wrapper.vm.showDonations).toBe(true)
           expect(wrapper.vm.formData).toEqual({ goal: '15000', progress: '0' })
         })
+
+        it('shows success toast after successful mutation', async () => {
+          await wrapper.find('.donations-info-button').trigger('submit')
+          await wrapper.vm.$nextTick()
+          expect(mocks.$toast.success).toHaveBeenCalledWith('admin.donations.successfulUpdate')
+        })
+
+        it('shows error toast when mutation fails', async () => {
+          donationsMutationMock.mockRejectedValueOnce(new Error('Network error'))
+          await wrapper.find('.donations-info-button').trigger('submit')
+          await wrapper.vm.$nextTick()
+          expect(mocks.$toast.error).toHaveBeenCalledWith('Network error')
+        })
       })
     })
   })
