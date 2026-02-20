@@ -78,13 +78,13 @@
   &:last-child { padding-right: 0; }
 }
 .ds-table-head-col {
-  border-bottom: $border-color-softer solid $border-size-base;
+  border-bottom: $border-size-base solid $border-color-softer;
   padding: $space-small $space-xx-small;
   text-align: left;
   font-weight: $font-weight-bold;
 }
 .ds-table-bordered {
-  .ds-table-col, .ds-table-head-col { border-bottom: $border-color-softer dotted $border-size-base; }
+  .ds-table-col, .ds-table-head-col { border-bottom: $border-size-base dotted $border-color-softer; }
   tr:last-child .ds-table-col { border-bottom: none; }
 }
 .ds-table-condensed {
