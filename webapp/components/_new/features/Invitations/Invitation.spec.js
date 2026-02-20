@@ -21,6 +21,7 @@ describe('Invitation.vue', () => {
 
   beforeEach(() => {
     mutations['modal/SET_OPEN'].mockClear()
+    navigator.clipboard.writeText.mockClear()
   })
 
   const Wrapper = ({ wasRedeemed = false, withCopymessage = false }) => {
@@ -92,10 +93,9 @@ describe('Invitation.vue', () => {
     })
 
     it('can copy the link', async () => {
-      const clipboardMock = jest.spyOn(navigator.clipboard, 'writeText').mockResolvedValue()
       const copyButton = screen.getByLabelText('invite-codes.copy-code')
       await fireEvent.click(copyButton)
-      expect(clipboardMock).toHaveBeenCalledWith(
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
         'http://localhost/registration?method=invite-code&inviteCode=test-invite-code',
       )
     })
@@ -107,10 +107,9 @@ describe('Invitation.vue', () => {
     })
 
     it('can copy the link with message', async () => {
-      const clipboardMock = jest.spyOn(navigator.clipboard, 'writeText').mockResolvedValue()
       const copyButton = screen.getByLabelText('invite-codes.copy-code')
       await fireEvent.click(copyButton)
-      expect(clipboardMock).toHaveBeenCalledWith(
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
         'test-copy-message http://localhost/registration?method=invite-code&inviteCode=test-invite-code',
       )
     })
