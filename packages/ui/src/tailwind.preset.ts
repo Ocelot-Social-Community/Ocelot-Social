@@ -8,15 +8,23 @@
  * 1. Webapp defines default branding (base colors)
  * 2. Specialized brandings override the defaults
  *
- * Usage in your tailwind.config.js:
+ * Usage (Tailwind v4 with legacy config):
  * ```js
+ * // tailwind.config.js
  * import { ocelotPreset } from '@ocelot-social/ui/tailwind.preset'
  *
  * export default {
  *   presets: [ocelotPreset],
- *   // your config...
  * }
  * ```
+ * ```css
+ * /* app.css - required for Tailwind v4 to pick up the config */
+ * @config "./tailwind.config.js";
+ * ```
+ *
+ * Note: Tailwind v4 uses CSS-first configuration (@theme) by default.
+ * The tailwind.config.js approach is supported for backward compatibility
+ * but may be removed in future versions.
  *
  * Required CSS Variables (defined by webapp):
  * - See `requiredCssVariables` export for the full list
