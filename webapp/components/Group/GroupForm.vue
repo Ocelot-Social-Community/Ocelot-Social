@@ -109,7 +109,7 @@
           role="status"
           aria-live="polite"
           :variant="
-            errors && errors.actionRadius && formData.actionRadius === '' ? 'danger' : 'default'
+            errors && errors.actionRadius && formData.actionRadius === '' ? 'danger' : undefined
           "
         >
           {{ `${formData.actionRadius === '' ? 0 : 1} / 1` }}
