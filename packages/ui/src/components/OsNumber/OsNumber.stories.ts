@@ -92,11 +92,19 @@ export const MultipleCounters: Story = {
   render: () => ({
     components: { OsNumber },
     template: `
-      <div data-testid="multiple-counters" class="flex items-center gap-8">
-        <OsNumber :count="156" label="Users" />
-        <OsNumber :count="42" label="Posts" />
-        <OsNumber :count="7" label="Comments" />
-        <OsNumber :count="3" label="Groups" />
+      <div data-testid="multiple-counters" class="flex flex-col gap-6">
+        <div class="flex items-center gap-8">
+          <OsNumber :count="156" label="Users" />
+          <OsNumber :count="42" label="Posts" />
+          <OsNumber :count="7" label="Comments" />
+          <OsNumber :count="3" label="Groups" />
+        </div>
+        <div class="flex items-center gap-8">
+          <OsNumber :count="156" label="Users" :animated="true" />
+          <OsNumber :count="42" label="Posts" :animated="true" />
+          <OsNumber :count="7" label="Comments" :animated="true" />
+          <OsNumber :count="3" label="Groups" :animated="true" />
+        </div>
       </div>
     `,
   }),
