@@ -2,7 +2,6 @@ const path = require('path')
 
 module.exports = {
   verbose: true,
-  collectCoverage: true,
   collectCoverageFrom: [
     '**/*.{js,vue}',
     '!**/?(*.)+(spec|test|story).js?(x)',
