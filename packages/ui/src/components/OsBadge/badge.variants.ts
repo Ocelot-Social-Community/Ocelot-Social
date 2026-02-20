@@ -36,6 +36,9 @@ export const badgeVariants = cva(
 
 export type BadgeVariants = VariantProps<typeof badgeVariants>
 
+/** Badge color variant: default | primary | danger */
+export type BadgeVariant = NonNullable<BadgeVariants['variant']>
+
 /** Badge-specific size subset: sm | md | lg */
 export type BadgeSize = NonNullable<BadgeVariants['size']>
 

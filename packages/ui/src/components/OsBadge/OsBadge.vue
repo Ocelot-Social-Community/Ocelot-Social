@@ -5,7 +5,7 @@
 
   import { badgeVariants } from './badge.variants'
 
-  import type { BadgeShape, BadgeSize, BadgeVariants } from './badge.variants'
+  import type { BadgeShape, BadgeSize, BadgeVariant } from './badge.variants'
   import type { ClassValue } from 'clsx'
   import type { PropType } from 'vue-demi'
 
@@ -26,7 +26,7 @@
        * - `danger` — error/warning color (red)
        */
       variant: {
-        type: String as PropType<NonNullable<BadgeVariants['variant']>>,
+        type: String as PropType<BadgeVariant>,
         default: undefined,
       },
       /**
