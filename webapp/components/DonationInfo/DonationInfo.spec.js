@@ -72,6 +72,10 @@ describe('DonationInfo.vue', () => {
       })
 
       describe('given english locale', () => {
+        beforeEach(() => {
+          mocks.$i18n.locale = () => 'en'
+        })
+
         it('creates a label from the given amounts and a translation string', () => {
           expect(mocks.$t).toHaveBeenCalledWith(
             'donations.amount-of-total',
