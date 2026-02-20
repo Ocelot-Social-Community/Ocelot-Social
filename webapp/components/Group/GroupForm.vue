@@ -17,10 +17,10 @@
           autofocus
           :placeholder="`${$t('group.name')} …`"
         />
-        <ds-chip size="base" :color="errors && errors.name ? 'danger' : 'medium'">
+        <os-badge size="base" :variant="errors && errors.name ? 'danger' : 'default'">
           {{ `${formData.name.length} / ${formSchema.name.min}–${formSchema.name.max}` }}
           <os-icon v-if="errors && errors.name" :icon="icons.warning" />
-        </ds-chip>
+        </os-badge>
 
         <!-- group Slug -->
         <ds-input
@@ -49,16 +49,16 @@
             {{ $t(`group.typesOptions.${groupType}`) }}
           </option>
         </select>
-        <ds-chip
+        <os-badge
           size="base"
-          :color="errors && errors.groupType && formData.groupType === '' ? 'danger' : 'medium'"
+          :variant="errors && errors.groupType && formData.groupType === '' ? 'danger' : 'default'"
         >
           {{ `${formData.groupType === '' ? 0 : 1} / 1` }}
           <os-icon
             v-if="errors && errors.groupType && formData.groupType === ''"
             :icon="icons.warning"
           />
-        </ds-chip>
+        </os-badge>
 
         <!-- goal -->
         <ds-input
@@ -83,10 +83,10 @@
           :hashtags="null"
           @input="updateEditorDescription"
         />
-        <ds-chip size="base" :color="errors && errors.description ? 'danger' : 'medium'">
+        <os-badge size="base" :variant="errors && errors.description ? 'danger' : 'default'">
           {{ `${descriptionLength} / ${formSchema.description.min}` }}
           <os-icon v-if="errors && errors.description" :icon="icons.warning" />
-        </ds-chip>
+        </os-badge>
 
         <!-- actionRadius -->
         <p class="ds-text select-label">
@@ -96,10 +96,10 @@
           v-model="formData.actionRadius"
           @change.native="changeActionRadius($event)"
         />
-        <ds-chip
+        <os-badge
           size="base"
-          :color="
-            errors && errors.actionRadius && formData.actionRadius === '' ? 'danger' : 'medium'
+          :variant="
+            errors && errors.actionRadius && formData.actionRadius === '' ? 'danger' : 'default'
           "
         >
           {{ `${formData.actionRadius === '' ? 0 : 1} / 1` }}
@@ -107,7 +107,7 @@
             v-if="errors && errors.actionRadius && formData.actionRadius === ''"
             :icon="icons.warning"
           />
-        </ds-chip>
+        </os-badge>
 
         <!-- location -->
         <location-select v-model="formData.locationName" />
@@ -125,10 +125,10 @@
             name="categoryIds"
             :existingCategoryIds="formData.categoryIds"
           />
-          <ds-chip size="base" :color="errors && errors.categoryIds ? 'danger' : 'medium'">
+          <os-badge size="base" :variant="errors && errors.categoryIds ? 'danger' : 'default'">
             {{ formData.categoryIds.length }} / 3
             <os-icon v-if="errors && errors.categoryIds" :icon="icons.warning" />
-          </ds-chip>
+          </os-badge>
         </div>
         <!-- submit -->
         <div class="buttons ds-mt-large ds-mb-large">
@@ -151,7 +151,7 @@
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsBadge, OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import CategoriesSelect from '~/components/CategoriesSelect/CategoriesSelect'
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '~/constants/categories.js'
@@ -173,6 +173,7 @@ export default {
     Editor,
     ActionRadiusSelect,
     LocationSelect,
+    OsBadge,
     OsButton,
     OsIcon,
   },
@@ -353,8 +354,14 @@ export default {
     margin: 0;
   }
 
-  > .ds-chip {
+  > .os-badge {
     align-self: flex-end;
+    margin: $space-xx-small 0 $space-base;
+    cursor: default;
+  }
+
+  > div > .os-badge {
+    float: right;
     margin: $space-xx-small 0 $space-base;
     cursor: default;
   }

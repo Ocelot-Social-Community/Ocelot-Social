@@ -39,20 +39,20 @@
             autofocus
             size="large"
           />
-          <ds-chip size="base" :color="errors && errors.title && 'danger'">
+          <os-badge size="base" :variant="errors && errors.title ? 'danger' : undefined">
             {{ formData.title.length }}/{{ formSchema.title.max }}
             <os-icon v-if="errors && errors.title" :icon="icons.warning" />
-          </ds-chip>
+          </os-badge>
           <editor
             :users="users"
             :value="formData.content"
             :hashtags="hashtags"
             @input="updateEditorContent"
           />
-          <ds-chip size="base" :color="errors && errors.content && 'danger'">
+          <os-badge size="base" :variant="errors && errors.content ? 'danger' : undefined">
             {{ contentLength }}
             <os-icon v-if="errors && errors.content" :icon="icons.warning" />
-          </ds-chip>
+          </os-badge>
 
           <!-- Eventdata -->
           <div v-if="createEvent" class="eventDatas">
@@ -81,9 +81,9 @@
                   v-if="errors && errors.eventStart"
                   class="chipbox event-grid-item-margin-helper"
                 >
-                  <ds-chip size="base" :color="errors && errors.eventStart && 'danger'">
+                  <os-badge size="base" :variant="errors && errors.eventStart ? 'danger' : undefined">
                     <os-icon :icon="icons.warning" />
-                  </ds-chip>
+                  </os-badge>
                 </div>
               </div>
               <div class="event-grid-item">
@@ -114,10 +114,10 @@
                   :placeholder="$t('post.viewEvent.eventVenue')"
                 />
                 <div class="chipbox">
-                  <ds-chip size="base" :color="errors && errors.eventVenue && 'danger'">
+                  <os-badge size="base" :variant="errors && errors.eventVenue ? 'danger' : undefined">
                     {{ formData.eventVenue.length }}/{{ formSchema.eventVenue.max }}
                     <os-icon v-if="errors && errors.eventVenue" :icon="icons.warning" />
-                  </ds-chip>
+                  </os-badge>
                 </div>
               </div>
               <div v-if="showEventLocationName" class="event-grid-item">
@@ -127,10 +127,10 @@
                   :placeholder="$t('post.viewEvent.eventLocationName')"
                 />
                 <div class="chipbox">
-                  <ds-chip size="base" :color="errors && errors.eventLocationName && 'danger'">
+                  <os-badge size="base" :variant="errors && errors.eventLocationName ? 'danger' : undefined">
                     {{ formData.eventLocationName.length }}/{{ formSchema.eventLocationName.max }}
                     <os-icon v-if="errors && errors.eventLocationName" :icon="icons.warning" />
-                  </ds-chip>
+                  </os-badge>
                 </div>
               </div>
             </div>
@@ -153,14 +153,14 @@
             model="categoryIds"
             :existingCategoryIds="formData.categoryIds"
           />
-          <ds-chip
+          <os-badge
             v-if="categoriesActive"
             size="base"
-            :color="errors && errors.categoryIds && 'danger'"
+            :variant="errors && errors.categoryIds ? 'danger' : undefined"
           >
             {{ formData.categoryIds.length }} / 3
             <os-icon v-if="errors && errors.categoryIds" :icon="icons.warning" />
-          </ds-chip>
+          </os-badge>
           <div class="ds-flex ds-flex-gap-xxx-small buttons-footer">
             <div style="flex: 3.5 0 0" class="buttons-footer-helper">
               <!-- TODO => remove v-html! only text ! no html! security first! -->
@@ -201,7 +201,7 @@
   </div>
 </template>
 <script>
-import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
+import { OsBadge, OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import gql from 'graphql-tag'
 import { mapGetters } from 'vuex'
@@ -222,6 +222,7 @@ export default {
     DatePicker,
     Editor,
     ImageUploader,
+    OsBadge,
     OsButton,
     OsCard,
     OsIcon,
@@ -516,7 +517,7 @@ export default {
     display: flex;
     justify-content: flex-end;
 
-    > .ds-chip {
+    > .os-badge {
       margin-top: -10px;
     }
   }
@@ -568,7 +569,7 @@ export default {
       margin: 0;
     }
 
-    > .ds-chip {
+    > .os-badge {
       align-self: flex-end;
       margin: $space-xx-small 0 $space-base;
       cursor: default;

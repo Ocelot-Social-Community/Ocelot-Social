@@ -51,6 +51,9 @@
   --color-info-active: #{darken($color-secondary, 15%)};
   --color-info-contrast: #{$text-color-secondary-inverse};
 
+  // Background (neutral surfaces)
+  --color-bg-softest: #{$background-color-softest};
+
   // Disabled state
   --color-disabled: #{$color-neutral-60}; // rgb(177, 171, 186)
   --color-disabled-contrast: #{$color-neutral-100}; // weiß

@@ -412,12 +412,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
                 group.roles.owner
               
-                <!---->
               </span>
             </div>
              
@@ -434,12 +433,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.closed
             
-                <!---->
               </span>
             </div>
              
@@ -456,12 +454,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.national
             
-                <!---->
               </span>
             </div>
              
@@ -547,10 +544,9 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-medium ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 Our children shall receive education for life.
-                <!---->
               </span>
             </div>
           </div>
@@ -1311,12 +1307,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.closed
             
-                <!---->
               </span>
             </div>
              
@@ -1333,12 +1328,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.national
             
-                <!---->
               </span>
             </div>
              
@@ -1424,10 +1418,9 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-medium ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 Our children shall receive education for life.
-                <!---->
               </span>
             </div>
           </div>
@@ -1817,12 +1810,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
                 group.roles.pending
               
-                <!---->
               </span>
             </div>
              
@@ -1839,12 +1831,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.closed
             
-                <!---->
               </span>
             </div>
              
@@ -1861,12 +1852,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.national
             
-                <!---->
               </span>
             </div>
              
@@ -1952,10 +1942,9 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-medium ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 Our children shall receive education for life.
-                <!---->
               </span>
             </div>
           </div>
@@ -2477,12 +2466,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
                 group.roles.usual
               
-                <!---->
               </span>
             </div>
              
@@ -2499,12 +2487,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.closed
             
-                <!---->
               </span>
             </div>
              
@@ -2521,12 +2508,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.national
             
-                <!---->
               </span>
             </div>
              
@@ -2612,10 +2598,9 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-medium ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 Our children shall receive education for life.
-                <!---->
               </span>
             </div>
           </div>
@@ -3532,12 +3517,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
                 group.roles.owner
               
-                <!---->
               </span>
             </div>
              
@@ -3554,12 +3538,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.public
             
-                <!---->
               </span>
             </div>
              
@@ -3576,12 +3559,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.interplanetary
             
-                <!---->
               </span>
             </div>
              
@@ -4399,12 +4381,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.public
             
-                <!---->
               </span>
             </div>
              
@@ -4421,12 +4402,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.interplanetary
             
-                <!---->
               </span>
             </div>
              
@@ -5208,12 +5188,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
                 group.roles.pending
               
-                <!---->
               </span>
             </div>
              
@@ -5230,12 +5209,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.public
             
-                <!---->
               </span>
             </div>
              
@@ -5252,12 +5230,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.interplanetary
             
-                <!---->
               </span>
             </div>
              
@@ -6134,12 +6111,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
                 group.roles.usual
               
-                <!---->
               </span>
             </div>
              
@@ -6156,12 +6132,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.public
             
-                <!---->
               </span>
             </div>
              
@@ -6178,12 +6153,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.interplanetary
             
-                <!---->
               </span>
             </div>
              
@@ -7215,12 +7189,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
                 group.roles.owner
               
-                <!---->
               </span>
             </div>
              
@@ -7237,12 +7210,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.hidden
             
-                <!---->
               </span>
             </div>
              
@@ -7259,12 +7231,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.global
             
-                <!---->
               </span>
             </div>
              
@@ -7380,10 +7351,9 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-medium ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 Investigative journalists share ideas and insights and can collaborate.
-                <!---->
               </span>
             </div>
           </div>
@@ -8272,12 +8242,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
                 group.roles.usual
               
-                <!---->
               </span>
             </div>
              
@@ -8294,12 +8263,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.hidden
             
-                <!---->
               </span>
             </div>
              
@@ -8316,12 +8284,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-primary ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.global
             
-                <!---->
               </span>
             </div>
              
@@ -8437,10 +8404,9 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="ds-chip ds-chip-size-base ds-chip-medium ds-chip-round"
+                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 Investigative journalists share ideas and insights and can collaborate.
-                <!---->
               </span>
             </div>
           </div>
