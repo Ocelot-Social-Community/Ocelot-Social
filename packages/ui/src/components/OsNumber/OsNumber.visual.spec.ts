@@ -82,6 +82,10 @@ test.describe('OsNumber visual regression', () => {
     await root.waitFor()
     await waitForReady(page)
 
+    // Wait for animated counters to finish (second row has animated OsNumber instances)
+    const animatedCounters = root.locator('.os-number-count')
+    await expect(animatedCounters.nth(4)).toHaveText('156', { timeout: 3000 })
+
     await expect(root.locator('[data-testid="multiple-counters"]')).toHaveScreenshot(
       'multiple-counters.png',
     )
