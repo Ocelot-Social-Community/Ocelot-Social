@@ -6,11 +6,9 @@ import type { VariantProps } from 'class-variance-authority'
  * Badge variants using CVA (Class Variance Authority)
  *
  * Non-interactive label for metadata display and form counters.
- * Renders as a pill-shaped inline element.
  */
 export const badgeVariants = cva(
-  // Base classes (always applied) - pill shape matching ds-chip round=true
-  ['inline-flex w-fit items-center gap-[0.25em] font-semibold leading-[1.3] rounded-[2em]'],
+  ['inline-flex w-fit items-center gap-[0.25em] font-semibold leading-[1.3]'],
   {
     variants: {
       variant: {
@@ -23,10 +21,15 @@ export const badgeVariants = cva(
         md: 'text-[0.875rem] py-[0.15em] px-[1em]',
         lg: 'text-[1rem] py-[0.15em] px-[1.2em]',
       },
+      shape: {
+        pill: 'rounded-[2em]',
+        square: 'rounded-[0.25em]',
+      },
     },
     defaultVariants: {
       variant: 'default',
       size: 'sm',
+      shape: 'pill',
     },
   },
 )
@@ -35,3 +38,6 @@ export type BadgeVariants = VariantProps<typeof badgeVariants>
 
 /** Badge-specific size subset: sm | md | lg */
 export type BadgeSize = NonNullable<BadgeVariants['size']>
+
+/** Badge shape: pill | square */
+export type BadgeShape = NonNullable<BadgeVariants['shape']>

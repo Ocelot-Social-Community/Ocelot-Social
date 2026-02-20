@@ -106,6 +106,22 @@ describe('osBadge', () => {
     })
   })
 
+  describe('shape prop', () => {
+    it('applies pill shape by default', () => {
+      const wrapper = mount(OsBadge)
+
+      expect(wrapper.classes()).toContain('rounded-[2em]')
+    })
+
+    it('applies square shape', () => {
+      const wrapper = mount(OsBadge, {
+        props: { shape: 'square' },
+      })
+
+      expect(wrapper.classes()).toContain('rounded-[0.25em]')
+    })
+  })
+
   describe('keyboard accessibility', () => {
     it('is not focusable (non-interactive element)', () => {
       const wrapper = mount(OsBadge)

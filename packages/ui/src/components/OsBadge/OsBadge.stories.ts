@@ -16,6 +16,7 @@ type Story = StoryObj<typeof OsBadge>
 interface PlaygroundArgs {
   variant: string
   size: string
+  shape: string
   content: string
 }
 
@@ -29,6 +30,10 @@ export const Playground: StoryObj<PlaygroundArgs> = {
       control: 'select',
       options: ['sm', 'md', 'lg'],
     },
+    shape: {
+      control: 'select',
+      options: ['pill', 'square'],
+    },
     content: {
       control: 'text',
     },
@@ -36,6 +41,7 @@ export const Playground: StoryObj<PlaygroundArgs> = {
   args: {
     variant: 'default',
     size: 'sm',
+    shape: 'pill',
     content: 'Badge',
   },
   render: (args) => ({
@@ -44,6 +50,7 @@ export const Playground: StoryObj<PlaygroundArgs> = {
       const badgeProps = computed(() => ({
         variant: args.variant,
         size: args.size,
+        shape: args.shape,
       }))
       const content = computed(() => args.content)
       return { badgeProps, content }
@@ -82,6 +89,18 @@ export const AllSizes: Story = {
           <OsBadge size="lg">Large</OsBadge>
           <span class="text-xs text-gray-500">lg</span>
         </div>
+      </div>
+    `,
+  }),
+}
+
+export const AllShapes: Story = {
+  render: () => ({
+    components: { OsBadge },
+    template: `
+      <div data-testid="all-shapes" class="flex items-center gap-3">
+        <OsBadge shape="pill">Pill</OsBadge>
+        <OsBadge shape="square">Square</OsBadge>
       </div>
     `,
   }),

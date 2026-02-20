@@ -62,6 +62,17 @@ test.describe('OsBadge visual regression', () => {
     await checkA11y(page)
   })
 
+  test('all shapes', async ({ page }) => {
+    await page.goto(`${STORY_URL}--all-shapes&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForReady(page)
+
+    await expect(root.locator('[data-testid="all-shapes"]')).toHaveScreenshot('all-shapes.png')
+
+    await checkA11y(page)
+  })
+
   test('form counter', async ({ page }) => {
     await page.goto(`${STORY_URL}--form-counter&viewMode=story`)
     const root = page.locator(STORY_ROOT)

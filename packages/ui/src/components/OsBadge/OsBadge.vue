@@ -6,13 +6,11 @@
 
   import type { ClassValue } from 'clsx'
   import type { PropType } from 'vue-demi'
-  import type { BadgeSize, BadgeVariants } from './badge.variants'
+  import type { BadgeShape, BadgeSize, BadgeVariants } from './badge.variants'
 
   /**
    * Non-interactive label for metadata display (e.g. group info) and
    * form counters (e.g. character count with validation state).
-   *
-   * Renders as a pill-shaped `<span>`.
    *
    * @slot default - Badge content (text, icons)
    */
@@ -33,11 +31,20 @@
       /**
        * Size of the badge.
        * - `sm` — compact (default)
-       * - `base` — medium, used for form counters
+       * - `md` — medium
        * - `lg` — large
        */
       size: {
         type: String as PropType<BadgeSize>,
+        default: undefined,
+      },
+      /**
+       * Shape of the badge.
+       * - `pill` — fully rounded (default)
+       * - `square` — slightly rounded corners
+       */
+      shape: {
+        type: String as PropType<BadgeShape>,
         default: undefined,
       },
     },
@@ -48,7 +55,7 @@
 
       return () => {
         const children = slots.default?.()
-        const badgeClass = cn('os-badge', badgeVariants({ variant: props.variant, size: props.size }))
+        const badgeClass = cn('os-badge', badgeVariants({ variant: props.variant, size: props.size, shape: props.shape }))
 
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
         if (isVue2) {
