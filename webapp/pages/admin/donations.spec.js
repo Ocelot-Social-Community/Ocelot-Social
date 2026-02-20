@@ -169,6 +169,7 @@ describe('donations.vue', () => {
           update(null, {
             data: { UpdateDonations: { showDonations: true, goal: 15000, progress: 0 } },
           })
+          await wrapper.vm.$nextTick()
           expect(wrapper.vm.showDonations).toBe(true)
           expect(wrapper.vm.formData).toEqual({ goal: '15000', progress: '0' })
         })
