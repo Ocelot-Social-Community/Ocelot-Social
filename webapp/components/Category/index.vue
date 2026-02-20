@@ -1,20 +1,17 @@
 <template>
-  <span
-    class="ds-tag ds-tag-size-base ds-tag-medium category-tag"
-    :class="filterActive ? 'filterActive' : ''"
-  >
+  <os-badge shape="square" class="category-tag" :class="filterActive ? 'filterActive' : ''">
     <os-icon :icon="resolvedIcon" />
     {{ name }}
-  </span>
+  </os-badge>
 </template>
 
 <script>
-import { OsIcon } from '@ocelot-social/ui'
+import { OsBadge, OsIcon } from '@ocelot-social/ui'
 import { resolveIcon } from '~/utils/iconRegistry'
 
 export default {
   name: 'HcCategory',
-  components: { OsIcon },
+  components: { OsBadge, OsIcon },
   props: {
     icon: { type: String, required: true },
     name: { type: String, default: '' },
@@ -30,14 +27,11 @@ export default {
 
 <style lang="scss">
 .category-tag {
-  display: inline-flex;
-  align-items: center;
   &.language {
     float: right;
   }
 
   > .os-icon {
-    margin-right: $space-xx-small;
     font-size: $font-size-base;
   }
 }

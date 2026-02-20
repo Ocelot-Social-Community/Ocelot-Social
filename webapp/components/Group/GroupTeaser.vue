@@ -30,17 +30,17 @@
       <footer class="footer">
         <div>
           <!-- group my role in group -->
-          <ds-chip v-if="group && group.myRole" color="primary">
+          <os-badge v-if="group && group.myRole" variant="primary">
             {{ group && group.myRole ? $t('group.roles.' + group.myRole) : '' }}
-          </ds-chip>
+          </os-badge>
           <!-- group type -->
-          <ds-chip color="primary">
+          <os-badge variant="primary">
             {{ group && group.groupType ? $t('group.types.' + group.groupType) : '' }}
-          </ds-chip>
+          </os-badge>
           <!-- group action radius -->
-          <ds-chip color="primary">
+          <os-badge variant="primary">
             {{ group && group.actionRadius ? $t('group.actionRadii.' + group.actionRadius) : '' }}
-          </ds-chip>
+          </os-badge>
         </div>
         <!-- group categories -->
         <div
@@ -70,7 +70,7 @@
             {{ $t('group.goal') }}
           </p>
           <div class="chip">
-            <ds-chip v-if="group && group.about">{{ group ? group.about : '' }}</ds-chip>
+            <os-badge v-if="group && group.about">{{ group.about }}</os-badge>
           </div>
         </div>
       </footer>
@@ -79,7 +79,7 @@
 </template>
 
 <script>
-import { OsCard, OsIcon } from '@ocelot-social/ui'
+import { OsBadge, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Category from '~/components/Category'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
@@ -91,6 +91,7 @@ export default {
   components: {
     Category,
     GroupContentMenu,
+    OsBadge,
     OsCard,
     OsIcon,
   },

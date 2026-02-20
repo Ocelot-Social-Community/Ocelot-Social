@@ -48,9 +48,9 @@
             {{ $t(`group.roles.${role}`) }}
           </option>
         </select>
-        <ds-chip v-else color="primary">
+        <os-badge v-else variant="primary">
           {{ $t(`group.roles.${scope.row.membership.role}`) }}
-        </ds-chip>
+        </os-badge>
       </template>
       <template #edit="scope">
         <os-button
@@ -83,7 +83,7 @@
   </div>
 </template>
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsBadge, OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { changeGroupMemberRoleMutation, removeUserFromGroupMutation } from '~/graphql/groups.js'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
@@ -91,6 +91,7 @@ import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar
 export default {
   name: 'GroupMember',
   components: {
+    OsBadge,
     OsButton,
     OsIcon,
     ProfileAvatar,

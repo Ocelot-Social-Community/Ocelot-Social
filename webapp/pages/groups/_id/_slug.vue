@@ -92,9 +92,9 @@
                 {{ $t('group.role') }}
               </p>
               <div class="chip" align="center">
-                <ds-chip color="primary">
+                <os-badge variant="primary">
                   {{ group && group.myRole ? $t('group.roles.' + group.myRole) : '' }}
-                </ds-chip>
+                </os-badge>
               </div>
             </template>
             <!-- group type -->
@@ -102,20 +102,20 @@
               {{ $t('group.type') }}
             </p>
             <div class="chip" align="center">
-              <ds-chip color="primary">
+              <os-badge variant="primary">
                 {{ group && group.groupType ? $t('group.types.' + group.groupType) : '' }}
-              </ds-chip>
+              </os-badge>
             </div>
             <!-- group action radius -->
             <p class="ds-text ds-text-soft ds-text-size-small centered-text hyphenate-text">
               {{ $t('group.actionRadius') }}
             </p>
             <div class="chip" align="center">
-              <ds-chip color="primary">
+              <os-badge variant="primary">
                 {{
                   group && group.actionRadius ? $t('group.actionRadii.' + group.actionRadius) : ''
                 }}
-              </ds-chip>
+              </os-badge>
             </div>
             <div class="ds-my-x-small"></div>
           </div>
@@ -165,7 +165,7 @@
               </p>
               <div class="ds-my-xx-small"></div>
               <div class="chip" align="center">
-                <ds-chip>{{ group ? group.about : '' }}</ds-chip>
+                <os-badge>{{ group.about }}</os-badge>
               </div>
             </div>
           </template>
@@ -293,7 +293,7 @@
 </template>
 
 <script>
-import { OsButton, OsCard, OsIcon, OsSpinner } from '@ocelot-social/ui'
+import { OsBadge, OsButton, OsCard, OsIcon, OsSpinner } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
@@ -330,6 +330,7 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
   components: {
+    OsBadge,
     OsCard,
     OsButton,
     OsIcon,

@@ -1,13 +1,15 @@
+/* eslint-disable import-x/no-deprecated */
 import { describe, it, expect, vi, afterEach, expectTypeOf } from 'vitest'
 
 import { ocelotPreset, requiredCssVariables, validateCssVariables } from './tailwind.preset'
 
 describe('tailwind.preset', () => {
-  describe('ocelotPreset', () => {
-    it('exports a valid Tailwind preset with theme.extend structure', () => {
+  describe('ocelotPreset (deprecated)', () => {
+    it('exports empty preset for backward compatibility', () => {
       expect(ocelotPreset).toBeDefined()
       expect(ocelotPreset).toHaveProperty('theme')
       expect(ocelotPreset.theme).toHaveProperty('extend')
+      expect(ocelotPreset.theme.extend).toStrictEqual({})
     })
   })
 

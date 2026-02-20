@@ -1,12 +1,15 @@
 <template>
-  <span class="ds-tag ds-tag-size-base ds-tag-medium hc-hashtag">
+  <os-badge shape="square" class="hc-hashtag">
     <nuxt-link :to="hashtagUrl">#{{ id }}</nuxt-link>
-  </span>
+  </os-badge>
 </template>
 
 <script>
+import { OsBadge } from '@ocelot-social/ui'
+
 export default {
   name: 'HcHashtag',
+  components: { OsBadge },
   props: {
     id: { type: String, required: true },
   },

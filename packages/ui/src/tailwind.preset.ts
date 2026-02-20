@@ -1,28 +1,22 @@
 /**
- * Tailwind CSS Preset for @ocelot-social/ui
+ * CSS Variable contract for @ocelot-social/ui
  *
- * This preset defines CSS Custom Properties used by components.
- * The library does NOT provide default values - the consuming app must define all variables.
+ * Components use CSS Custom Properties via arbitrary values (e.g. `bg-[var(--color-primary)]`)
+ * rather than Tailwind theme tokens. No Tailwind preset or @config/@theme is needed.
  *
- * Branding hierarchy:
- * 1. Webapp defines default branding (base colors)
- * 2. Specialized brandings override the defaults
- *
- * Usage in your tailwind.config.js:
- * ```js
- * import { ocelotPreset } from '@ocelot-social/ui/tailwind.preset'
- *
- * export default {
- *   presets: [ocelotPreset],
- *   // your config...
+ * The consuming app must define all required CSS variables on :root:
+ * ```css
+ * :root {
+ *   --color-primary: #6dba4a;
+ *   --color-primary-hover: #7ecf5a;
+ *   --color-primary-active: #4a8a30;
+ *   --color-primary-contrast: #ffffff;
+ *   // ... see requiredCssVariables for the full list
  * }
  * ```
  *
- * Required CSS Variables (defined by webapp):
- * - See `requiredCssVariables` export for the full list
+ * Use `validateCssVariables()` in development to catch missing variables early.
  */
-
-import type { Config } from 'tailwindcss'
 
 /**
  * List of CSS Custom Properties that must be defined by the consuming app.
@@ -32,27 +26,42 @@ export const requiredCssVariables: string[] = [
   // Primary
   '--color-primary',
   '--color-primary-hover',
+  '--color-primary-active',
   '--color-primary-contrast',
   // Secondary
   '--color-secondary',
   '--color-secondary-hover',
+  '--color-secondary-active',
   '--color-secondary-contrast',
   // Danger
   '--color-danger',
   '--color-danger-hover',
+  '--color-danger-active',
   '--color-danger-contrast',
   // Warning
   '--color-warning',
   '--color-warning-hover',
+  '--color-warning-active',
   '--color-warning-contrast',
   // Success
   '--color-success',
   '--color-success-hover',
+  '--color-success-active',
   '--color-success-contrast',
   // Info
   '--color-info',
   '--color-info-hover',
+  '--color-info-active',
   '--color-info-contrast',
+  // Default (neutral)
+  '--color-default',
+  '--color-default-hover',
+  '--color-default-active',
+  '--color-default-contrast',
+  '--color-default-contrast-inverse',
+  // Disabled
+  '--color-disabled',
+  '--color-disabled-contrast',
 ]
 
 /**
@@ -84,12 +93,13 @@ export function validateCssVariables(): void {
   }
 }
 
-export const ocelotPreset: Partial<Config> = {
+/**
+ * @deprecated This preset is currently empty. Components use CSS Custom Properties
+ * via arbitrary values (e.g. `bg-[var(--color-primary)]`) and do not require
+ * Tailwind theme tokens. Kept for backward compatibility.
+ */
+export const ocelotPreset = {
   theme: {
-    extend: {
-      // Colors and other theme extensions will be added here as components are developed.
-      // All values use CSS Custom Properties WITHOUT defaults.
-      // Example: primary: { DEFAULT: 'var(--color-primary)' }
-    },
+    extend: {},
   },
-}
+} as const
