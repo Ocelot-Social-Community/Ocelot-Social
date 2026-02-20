@@ -65,5 +65,34 @@ describe('FollowButton.vue', () => {
         expect(wrapper.emitted('update')[0]).toEqual([{ id: 'u1', followedByCurrentUser: true }])
       })
     })
+
+    describe('clicking the unfollow button', () => {
+      beforeEach(() => {
+        propsData = { followId: 'u1', isFollowed: true }
+        mocks.$apollo.mutate.mockResolvedValue({
+          data: { unfollowUser: { id: 'u1', followedByCurrentUser: false } },
+        })
+        wrapper = Wrapper()
+      })
+
+      it('emits optimistic result', async () => {
+        await wrapper.vm.toggle()
+        expect(wrapper.emitted('optimistic')[0]).toEqual([{ followedByCurrentUser: false }])
+      })
+
+      it('calls unfollowUser mutation', async () => {
+        await wrapper.vm.toggle()
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({ variables: { id: 'u1' } }),
+        )
+      })
+
+      it('emits update with server response', async () => {
+        await wrapper.vm.toggle()
+        expect(wrapper.emitted('update')[0]).toEqual([
+          { id: 'u1', followedByCurrentUser: false },
+        ])
+      })
+    })
   })
 })
