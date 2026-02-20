@@ -69,6 +69,43 @@
 .ds-flex-gap-base      { gap: $space-base; }
 .ds-flex-gap-large     { gap: $space-large; }
 
+// ds-text Ersatz — Typography utility classes
+// Grep: ds-text, ds-text-soft, ds-text-size-small, ds-text-center, ds-text-bold
+.ds-text {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  margin-bottom: $font-space-x-large;
+  &:last-child { margin-bottom: 0; }
+  font-family: $font-family-text;
+  line-height: $line-height-base;
+  display: block;
+}
+
+.ds-text-bold      { font-weight: $font-weight-bold; }
+.ds-text-inline    { display: inline; }
+.ds-text-left      { text-align: left; }
+.ds-text-center    { text-align: center; }
+.ds-text-uppercase { text-transform: uppercase; }
+
+.ds-text-size-small   { font-size: $font-size-small; }
+.ds-text-size-base    { font-size: $font-size-base; }
+.ds-text-size-large   { font-size: $font-size-large; }
+.ds-text-size-x-large { font-size: $font-size-x-large; }
+
+.ds-text-soft    { color: $text-color-soft; }
+.ds-text-softer  { color: $text-color-softer; }
+.ds-text-primary { color: $text-color-primary; }
+.ds-text-success { color: $text-color-success; }
+.ds-text-warning { color: $text-color-warning; }
+.ds-text-danger  { color: $text-color-danger; }
+
+// ds-number Ersatz — Statistic display (count + label)
+// Grep: os-number
+.os-number       { text-align: center; }
+.os-number-count { font-weight: $font-weight-bold; font-size: $font-size-x-large; display: block; }
+.os-number-label { font-size: $font-size-small; color: $text-color-soft; display: block; }
+
 // ds-table Ersatz
 .ds-table-wrap { width: 100%; overflow: auto; }
 .ds-table { width: 100%; border-collapse: collapse; }
