@@ -1,31 +1,45 @@
 <template>
-  <ds-table
-    class="nested-table"
-    v-if="filed && filed.length"
-    :data="filed"
-    :fields="fields"
-    condensed
-  >
-    <template #submitter="scope">
-      <user-teaser
-        :user="scope.row.submitter"
-        :showAvatar="false"
-        :showPopover="false"
-        data-test="filing-user"
-      />
-    </template>
-    <template #reportedOn="scope">
-      <p class="ds-text ds-text-size-small">
-        <date-time :date-time="scope.row.createdAt" data-test="filed-date" />
-      </p>
-    </template>
-    <template #reasonCategory="scope">
-      {{ $t('report.reason.category.options.' + scope.row.reasonCategory) }}
-    </template>
-    <template #reasonDescription="scope">
-      {{ scope.row.reasonDescription.length ? scope.row.reasonDescription : '—' }}
-    </template>
-  </ds-table>
+  <div v-if="filed && filed.length" class="nested-table ds-table-wrap">
+    <table class="ds-table ds-table-condensed ds-table-bordered" cellpadding="0" cellspacing="0">
+      <colgroup>
+        <col width="15%" />
+        <col width="20%" />
+        <col width="30%" />
+        <col width="35%" />
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="ds-table-head-col">{{ $t('moderation.reports.submitter') }}</th>
+          <th class="ds-table-head-col">{{ $t('moderation.reports.reportedOn') }}</th>
+          <th class="ds-table-head-col">{{ $t('moderation.reports.reasonCategory') }}</th>
+          <th class="ds-table-head-col">{{ $t('moderation.reports.reasonDescription') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="report in filed" :key="report.id">
+          <td class="ds-table-col">
+            <user-teaser
+              :user="report.submitter"
+              :showAvatar="false"
+              :showPopover="false"
+              data-test="filing-user"
+            />
+          </td>
+          <td class="ds-table-col">
+            <p class="ds-text ds-text-size-small">
+              <date-time :date-time="report.createdAt" data-test="filed-date" />
+            </p>
+          </td>
+          <td class="ds-table-col">
+            {{ $t('report.reason.category.options.' + report.reasonCategory) }}
+          </td>
+          <td class="ds-table-col">
+            {{ report.reasonDescription.length ? report.reasonDescription : '—' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 <script>
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
@@ -38,28 +52,6 @@ export default {
   },
   props: {
     filed: { type: Array, default: () => [] },
-  },
-  computed: {
-    fields() {
-      return {
-        submitter: {
-          label: this.$t('moderation.reports.submitter'),
-          width: '15%',
-        },
-        reportedOn: {
-          label: this.$t('moderation.reports.reportedOn'),
-          width: '20%',
-        },
-        reasonCategory: {
-          label: this.$t('moderation.reports.reasonCategory'),
-          width: '30%',
-        },
-        reasonDescription: {
-          label: this.$t('moderation.reports.reasonDescription'),
-          width: '35%',
-        },
-      }
-    },
   },
 }
 </script>

@@ -2,74 +2,89 @@
   <div class="group-member">
     <h2 class="title">{{ $t('group.membersListTitle') }}</h2>
     <div class="ds-mb-small"></div>
-    <ds-table :fields="tableFields" :data="groupMembers" condensed>
-      <template #avatar="scope">
-        <nuxt-link
-          :to="{
-            name: 'profile-id-slug',
-            params: { id: scope.row.user.id, slug: scope.row.user.slug },
-          }"
-        >
-          <profile-avatar :profile="scope.row.user" size="small" />
-        </nuxt-link>
-      </template>
-      <template #name="scope">
-        <nuxt-link
-          :to="{
-            name: 'profile-id-slug',
-            params: { id: scope.row.user.id, slug: scope.row.user.slug },
-          }"
-        >
-          <p class="ds-text">
-            <b>{{ scope.row.user.name | truncate(20) }}</b>
-          </p>
-        </nuxt-link>
-      </template>
-      <template #slug="scope">
-        <nuxt-link
-          :to="{
-            name: 'profile-id-slug',
-            params: { id: scope.row.user.id, slug: scope.row.user.slug },
-          }"
-        >
-          <p class="ds-text">
-            <b>{{ `@${scope.row.user.slug}` | truncate(20) }}</b>
-          </p>
-        </nuxt-link>
-      </template>
-      <template #roleInGroup="scope">
-        <select
-          v-if="scope.row.membership.role !== 'owner'"
-          :options="['pending', 'usual', 'admin', 'owner']"
-          :value="`${scope.row.membership.role}`"
-          @change="changeMemberRole(scope.row.user.id, $event)"
-        >
-          <option v-for="role in ['pending', 'usual', 'admin', 'owner']" :key="role" :value="role">
-            {{ $t(`group.roles.${role}`) }}
-          </option>
-        </select>
-        <os-badge v-else variant="primary">
-          {{ $t(`group.roles.${scope.row.membership.role}`) }}
-        </os-badge>
-      </template>
-      <template #edit="scope">
-        <os-button
-          v-if="scope.row.membership.role !== 'owner'"
-          appearance="outline"
-          variant="primary"
-          size="sm"
-          @click="
-            isOpen = true
-            userId = scope.row.user.id
-          "
-        >
-          <template #icon>
-            <os-icon :icon="icons.userTimes" />
-          </template>
-          {{ $t('group.removeMemberButton') }}
-        </os-button>
-      </template>
-    </ds-table>
+    <div class="ds-table-wrap">
+      <table class="ds-table ds-table-condensed ds-table-bordered" cellpadding="0" cellspacing="0">
+        <thead>
+          <tr>
+            <th class="ds-table-head-col">{{ $t('group.membersAdministrationList.avatar') }}</th>
+            <th class="ds-table-head-col">{{ $t('group.membersAdministrationList.name') }}</th>
+            <th class="ds-table-head-col">{{ $t('group.membersAdministrationList.slug') }}</th>
+            <th class="ds-table-head-col">{{ $t('group.membersAdministrationList.roleInGroup') }}</th>
+            <th class="ds-table-head-col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="member in groupMembers" :key="member.user.id">
+            <td class="ds-table-col">
+              <nuxt-link
+                :to="{
+                  name: 'profile-id-slug',
+                  params: { id: member.user.id, slug: member.user.slug },
+                }"
+              >
+                <profile-avatar :profile="member.user" size="small" />
+              </nuxt-link>
+            </td>
+            <td class="ds-table-col">
+              <nuxt-link
+                :to="{
+                  name: 'profile-id-slug',
+                  params: { id: member.user.id, slug: member.user.slug },
+                }"
+              >
+                <p class="ds-text">
+                  <b>{{ member.user.name | truncate(20) }}</b>
+                </p>
+              </nuxt-link>
+            </td>
+            <td class="ds-table-col">
+              <nuxt-link
+                :to="{
+                  name: 'profile-id-slug',
+                  params: { id: member.user.id, slug: member.user.slug },
+                }"
+              >
+                <p class="ds-text">
+                  <b>{{ `@${member.user.slug}` | truncate(20) }}</b>
+                </p>
+              </nuxt-link>
+            </td>
+            <td class="ds-table-col">
+              <select
+                v-if="member.membership.role !== 'owner'"
+                :options="['pending', 'usual', 'admin', 'owner']"
+                :value="`${member.membership.role}`"
+                @change="changeMemberRole(member.user.id, $event)"
+              >
+                <option v-for="role in ['pending', 'usual', 'admin', 'owner']" :key="role" :value="role">
+                  {{ $t(`group.roles.${role}`) }}
+                </option>
+              </select>
+              <os-badge v-else variant="primary">
+                {{ $t(`group.roles.${member.membership.role}`) }}
+              </os-badge>
+            </td>
+            <td class="ds-table-col">
+              <os-button
+                v-if="member.membership.role !== 'owner'"
+                appearance="outline"
+                variant="primary"
+                size="sm"
+                @click="
+                  isOpen = true
+                  userId = member.user.id
+                "
+              >
+                <template #icon>
+                  <os-icon :icon="icons.userTimes" />
+                </template>
+                {{ $t('group.removeMemberButton') }}
+              </os-button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <ds-modal
       v-if="isOpen"
       v-model="isOpen"
@@ -118,32 +133,6 @@ export default {
       isOpen: false,
       userId: null,
     }
-  },
-  computed: {
-    tableFields() {
-      return {
-        avatar: {
-          label: this.$t('group.membersAdministrationList.avatar'),
-          align: 'left',
-        },
-        name: {
-          label: this.$t('group.membersAdministrationList.name'),
-          align: 'left',
-        },
-        slug: {
-          label: this.$t('group.membersAdministrationList.slug'),
-          align: 'left',
-        },
-        roleInGroup: {
-          label: this.$t('group.membersAdministrationList.roleInGroup'),
-          align: 'left',
-        },
-        edit: {
-          label: '',
-          align: 'left',
-        },
-      }
-    },
   },
   methods: {
     async changeMemberRole(id, event) {

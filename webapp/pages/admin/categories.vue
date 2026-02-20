@@ -1,11 +1,26 @@
 <template>
   <os-card>
     <h2 class="title">{{ $t('admin.categories.name') }}</h2>
-    <ds-table :data="Category" :fields="fields" condensed>
-      <template #icon="scope">
-        <os-icon :icon="resolveIcon(scope.row.icon)" />
-      </template>
-    </ds-table>
+    <div class="ds-table-wrap">
+      <table class="ds-table ds-table-condensed ds-table-bordered" cellpadding="0" cellspacing="0">
+        <thead>
+          <tr>
+            <th class="ds-table-head-col">&nbsp;</th>
+            <th class="ds-table-head-col">{{ $t('admin.categories.categoryName') }}</th>
+            <th class="ds-table-head-col ds-table-head-col-right">{{ $t('admin.categories.postCount') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="category in Category" :key="category.id">
+            <td class="ds-table-col">
+              <os-icon :icon="resolveIcon(category.icon)" />
+            </td>
+            <td class="ds-table-col">{{ category.name }}</td>
+            <td class="ds-table-col ds-table-col-right">{{ category.postCount }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </os-card>
 </template>
 
@@ -20,18 +35,6 @@ export default {
     return {
       Category: [],
     }
-  },
-  computed: {
-    fields() {
-      return {
-        icon: ' ',
-        name: this.$t('admin.categories.categoryName'),
-        postCount: {
-          label: this.$t('admin.categories.postCount'),
-          align: 'right',
-        },
-      }
-    },
   },
   methods: {
     resolveIcon(iconName) {
