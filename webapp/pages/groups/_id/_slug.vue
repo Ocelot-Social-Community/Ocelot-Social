@@ -51,15 +51,11 @@
           <div class="ds-flex" v-if="isAllowedSeeingGroupMembers">
             <!-- group members count -->
             <div class="ds-flex-item" v-if="isAllowedSeeingGroupMembers">
-              <client-only>
-                <ds-number :label="$t('group.membersCount', {}, groupMembers.length)">
-                  <count-to
-                    slot="count"
-                    :start-val="membersCountStartValue"
-                    :end-val="group.membersCount"
-                  />
-                </ds-number>
-              </client-only>
+              <os-number
+                :count="group.membersCount"
+                :label="$t('group.membersCount', {}, groupMembers.length)"
+                :animated="true"
+              />
             </div>
           </div>
           <div class="action-buttons">
@@ -293,7 +289,7 @@
 </template>
 
 <script>
-import { OsBadge, OsButton, OsCard, OsIcon, OsSpinner } from '@ocelot-social/ui'
+import { OsBadge, OsButton, OsCard, OsIcon, OsNumber, OsSpinner } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import uniqBy from 'lodash/uniqBy'
 import { profilePagePosts } from '~/graphql/PostQuery'
@@ -304,7 +300,6 @@ import postListActions from '~/mixins/postListActions'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
 import Category from '~/components/Category'
 import ContentViewer from '~/components/Editor/ContentViewer'
-import CountTo from '~/components/CountTo.vue'
 import Empty from '~/components/Empty/Empty'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
 import JoinLeaveButton from '~/components/Button/JoinLeaveButton'
@@ -334,11 +329,11 @@ export default {
     OsCard,
     OsButton,
     OsIcon,
+    OsNumber,
     OsSpinner,
     AvatarUploader,
     Category,
     ContentViewer,
-    CountTo,
     Empty,
     GroupContentMenu,
     JoinLeaveButton,
@@ -372,7 +367,6 @@ export default {
       pageSize: 6,
       // tabActive: 'post',
       filter,
-      membersCountStartValue: 0,
       membersCountToLoad: 25,
       updateGroupMutation,
       isDescriptionCollapsed: true,
@@ -578,8 +572,7 @@ export default {
     //   this.user.followedBy = followedBy
     // },
     prepareJoinLeave() {
-      // "membersCountStartValue" is updated to avoid counting from 0 when join/leave
-      this.membersCountStartValue = (this.GroupMembers && this.GroupMembers.length) || 0
+      // OsNumber handles animation from old→new value automatically via watch
     },
     updateJoinLeave() {
       this.$apollo.queries.Group.refetch()

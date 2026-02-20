@@ -288,36 +288,21 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             <div
               class="ds-flex-item"
             >
-              <client-only-stub>
-                <div
-                  class="ds-number ds-number-size-x-large"
+              <div
+                class="os-number flex flex-col items-center text-center"
+              >
+                <span
+                  class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+                  style="min-width: 1ch;"
                 >
-                  <p
-                    class="ds-text ds-number-count ds-text-size-x-large"
-                    style="margin-bottom: 0px;"
-                  >
-                    <span>
-                      <client-only-stub
-                        placeholder="0"
-                        tag="span"
-                      >
-                        <span>
-                          
-  0
-
-                        </span>
-                      </client-only-stub>
-                    </span>
-                  </p>
-                  <p
-                    class="ds-text ds-number-label ds-text-size-small ds-text-soft"
-                  >
-                    
-    group.membersCount
-  
-                  </p>
-                </div>
-              </client-only-stub>
+                  0
+                </span>
+                <span
+                  class="os-number-label text-[12px] text-[var(--color-text-soft)]"
+                >
+                  group.membersCount
+                </span>
+              </div>
             </div>
           </div>
            
@@ -2343,36 +2328,21 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             <div
               class="ds-flex-item"
             >
-              <client-only-stub>
-                <div
-                  class="ds-number ds-number-size-x-large"
+              <div
+                class="os-number flex flex-col items-center text-center"
+              >
+                <span
+                  class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+                  style="min-width: 1ch;"
                 >
-                  <p
-                    class="ds-text ds-number-count ds-text-size-x-large"
-                    style="margin-bottom: 0px;"
-                  >
-                    <span>
-                      <client-only-stub
-                        placeholder="0"
-                        tag="span"
-                      >
-                        <span>
-                          
-  0
-
-                        </span>
-                      </client-only-stub>
-                    </span>
-                  </p>
-                  <p
-                    class="ds-text ds-number-label ds-text-size-small ds-text-soft"
-                  >
-                    
-    group.membersCount
-  
-                  </p>
-                </div>
-              </client-only-stub>
+                  0
+                </span>
+                <span
+                  class="os-number-label text-[12px] text-[var(--color-text-soft)]"
+                >
+                  group.membersCount
+                </span>
+              </div>
             </div>
           </div>
            
@@ -3424,36 +3394,21 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             <div
               class="ds-flex-item"
             >
-              <client-only-stub>
-                <div
-                  class="ds-number ds-number-size-x-large"
+              <div
+                class="os-number flex flex-col items-center text-center"
+              >
+                <span
+                  class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+                  style="min-width: 1ch;"
                 >
-                  <p
-                    class="ds-text ds-number-count ds-text-size-x-large"
-                    style="margin-bottom: 0px;"
-                  >
-                    <span>
-                      <client-only-stub
-                        placeholder="0"
-                        tag="span"
-                      >
-                        <span>
-                          
-  0
-
-                        </span>
-                      </client-only-stub>
-                    </span>
-                  </p>
-                  <p
-                    class="ds-text ds-number-label ds-text-size-small ds-text-soft"
-                  >
-                    
-    group.membersCount
-  
-                  </p>
-                </div>
-              </client-only-stub>
+                  0
+                </span>
+                <span
+                  class="os-number-label text-[12px] text-[var(--color-text-soft)]"
+                >
+                  group.membersCount
+                </span>
+              </div>
             </div>
           </div>
            
@@ -4287,36 +4242,21 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             <div
               class="ds-flex-item"
             >
-              <client-only-stub>
-                <div
-                  class="ds-number ds-number-size-x-large"
+              <div
+                class="os-number flex flex-col items-center text-center"
+              >
+                <span
+                  class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+                  style="min-width: 1ch;"
                 >
-                  <p
-                    class="ds-text ds-number-count ds-text-size-x-large"
-                    style="margin-bottom: 0px;"
-                  >
-                    <span>
-                      <client-only-stub
-                        placeholder="0"
-                        tag="span"
-                      >
-                        <span>
-                          
-  0
-
-                        </span>
-                      </client-only-stub>
-                    </span>
-                  </p>
-                  <p
-                    class="ds-text ds-number-label ds-text-size-small ds-text-soft"
-                  >
-                    
-    group.membersCount
-  
-                  </p>
-                </div>
-              </client-only-stub>
+                  0
+                </span>
+                <span
+                  class="os-number-label text-[12px] text-[var(--color-text-soft)]"
+                >
+                  group.membersCount
+                </span>
+              </div>
             </div>
           </div>
            
@@ -5096,36 +5036,21 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             <div
               class="ds-flex-item"
             >
-              <client-only-stub>
-                <div
-                  class="ds-number ds-number-size-x-large"
+              <div
+                class="os-number flex flex-col items-center text-center"
+              >
+                <span
+                  class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+                  style="min-width: 1ch;"
                 >
-                  <p
-                    class="ds-text ds-number-count ds-text-size-x-large"
-                    style="margin-bottom: 0px;"
-                  >
-                    <span>
-                      <client-only-stub
-                        placeholder="0"
-                        tag="span"
-                      >
-                        <span>
-                          
-  0
-
-                        </span>
-                      </client-only-stub>
-                    </span>
-                  </p>
-                  <p
-                    class="ds-text ds-number-label ds-text-size-small ds-text-soft"
-                  >
-                    
-    group.membersCount
-  
-                  </p>
-                </div>
-              </client-only-stub>
+                  0
+                </span>
+                <span
+                  class="os-number-label text-[12px] text-[var(--color-text-soft)]"
+                >
+                  group.membersCount
+                </span>
+              </div>
             </div>
           </div>
            
@@ -6019,36 +5944,21 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             <div
               class="ds-flex-item"
             >
-              <client-only-stub>
-                <div
-                  class="ds-number ds-number-size-x-large"
+              <div
+                class="os-number flex flex-col items-center text-center"
+              >
+                <span
+                  class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+                  style="min-width: 1ch;"
                 >
-                  <p
-                    class="ds-text ds-number-count ds-text-size-x-large"
-                    style="margin-bottom: 0px;"
-                  >
-                    <span>
-                      <client-only-stub
-                        placeholder="0"
-                        tag="span"
-                      >
-                        <span>
-                          
-  0
-
-                        </span>
-                      </client-only-stub>
-                    </span>
-                  </p>
-                  <p
-                    class="ds-text ds-number-label ds-text-size-small ds-text-soft"
-                  >
-                    
-    group.membersCount
-  
-                  </p>
-                </div>
-              </client-only-stub>
+                  0
+                </span>
+                <span
+                  class="os-number-label text-[12px] text-[var(--color-text-soft)]"
+                >
+                  group.membersCount
+                </span>
+              </div>
             </div>
           </div>
            
@@ -7096,36 +7006,21 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             <div
               class="ds-flex-item"
             >
-              <client-only-stub>
-                <div
-                  class="ds-number ds-number-size-x-large"
+              <div
+                class="os-number flex flex-col items-center text-center"
+              >
+                <span
+                  class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+                  style="min-width: 1ch;"
                 >
-                  <p
-                    class="ds-text ds-number-count ds-text-size-x-large"
-                    style="margin-bottom: 0px;"
-                  >
-                    <span>
-                      <client-only-stub
-                        placeholder="0"
-                        tag="span"
-                      >
-                        <span>
-                          
-  0
-
-                        </span>
-                      </client-only-stub>
-                    </span>
-                  </p>
-                  <p
-                    class="ds-text ds-number-label ds-text-size-small ds-text-soft"
-                  >
-                    
-    group.membersCount
-  
-                  </p>
-                </div>
-              </client-only-stub>
+                  0
+                </span>
+                <span
+                  class="os-number-label text-[12px] text-[var(--color-text-soft)]"
+                >
+                  group.membersCount
+                </span>
+              </div>
             </div>
           </div>
            
@@ -8150,36 +8045,21 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             <div
               class="ds-flex-item"
             >
-              <client-only-stub>
-                <div
-                  class="ds-number ds-number-size-x-large"
+              <div
+                class="os-number flex flex-col items-center text-center"
+              >
+                <span
+                  class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+                  style="min-width: 1ch;"
                 >
-                  <p
-                    class="ds-text ds-number-count ds-text-size-x-large"
-                    style="margin-bottom: 0px;"
-                  >
-                    <span>
-                      <client-only-stub
-                        placeholder="0"
-                        tag="span"
-                      >
-                        <span>
-                          
-  0
-
-                        </span>
-                      </client-only-stub>
-                    </span>
-                  </p>
-                  <p
-                    class="ds-text ds-number-label ds-text-size-small ds-text-soft"
-                  >
-                    
-    group.membersCount
-  
-                  </p>
-                </div>
-              </client-only-stub>
+                  0
+                </span>
+                <span
+                  class="os-number-label text-[12px] text-[var(--color-text-soft)]"
+                >
+                  group.membersCount
+                </span>
+              </div>
             </div>
           </div>
            
