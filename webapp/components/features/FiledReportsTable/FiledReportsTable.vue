@@ -34,7 +34,7 @@
             {{ $t('report.reason.category.options.' + report.reasonCategory) }}
           </td>
           <td class="ds-table-col">
-            {{ report.reasonDescription.length ? report.reasonDescription : '—' }}
+            {{ report.reasonDescription || '—' }}
           </td>
         </tr>
       </tbody>
