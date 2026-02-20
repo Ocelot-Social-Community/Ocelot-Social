@@ -186,16 +186,18 @@ Tier A ds-* → Plain HTML + CSS: ✅
 ├─ ds-flex/ds-flex-item: JavaScript window.innerWidth → CSS @media Queries
 │  (kein Layout-Shift bei SSR, bessere Performance)
 ├─ system.css bleibt geladen — bestehende CSS-Klassen funktionieren weiter
-├─ Verbleibend: 13 ds-* Komponenten (Tier B: 4 einfache, Tier C: 6 komplexe → UI-Library)
+├─ Verbleibend: 9 ds-* Komponenten (Tier B Rest: 2 einfache, Tier C: 6 komplexe → UI-Library)
 └─ 0 Tier-A ds-* Komponenten-Tags verbleibend
 
 ds-chip + ds-tag → OsBadge (UI-Library): ✅
 ├─ OsBadge Komponente: CVA-Varianten, h() Render-Function, inheritAttrs: false
 ├─ Props: variant (default/primary/danger), size (sm/md/lg), shape (pill/square)
+├─ Types: BadgeVariant, BadgeSize, BadgeShape (+ BadgeVariants)
 ├─ ds-chip: 20 Nutzungen in 5 Dateien → <os-badge> (Formzähler + Gruppen-Metadaten)
 ├─ ds-tag: 3 Nutzungen in 3 Dateien → <os-badge shape="square"> (Category, Hashtag)
-├─ CSS-Variable: --color-default (neutraler Hintergrund), --color-default-contrast
-├─ 16 Unit-Tests, 6 Stories, 5 Visual Tests + 1 Keyboard Test
+├─ ARIA: role="status" aria-live="polite" auf Form-Zähler (11 Stellen in 2 Dateien)
+├─ CSS-Variable: --color-default + --color-default-contrast (beide in requiredCssVariables)
+├─ 18 Unit-Tests, 6 Stories, 5 Visual Tests + 1 Keyboard Test
 └─ 0 ds-chip/ds-tag Nutzungen verbleibend
 ```
 
@@ -203,11 +205,24 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-20 (Session 29)
+**Letzte Aktualisierung:** 2026-02-20 (Session 30)
 
 **Aktuelle Phase:** Phase 4 - Tier 1 ✅, Tier A ✅, OsBadge ✅ (ds-chip + ds-tag → UI-Library) | Tier B, Tier 2-4 ausstehend
 
-**Zuletzt abgeschlossen (Session 29 - OsBadge: ds-chip + ds-tag Migration):**
+**Zuletzt abgeschlossen (Session 30 - OsBadge Code-Review Fixes):**
+- [x] `--color-default-contrast` zu `requiredCssVariables` in tailwind.preset.ts hinzugefügt
+- [x] Doppelte `--color-default`-Deklaration in ocelot-ui-variables.scss entfernt (softest → softer konsolidiert)
+- [x] Redundante Ternär-Ausdrücke entfernt: GroupTeaser.vue + groups/_slug.vue (`group ? group.about : ''` → `group.about`)
+- [x] `BadgeVariant` Typ hinzugefügt und in OsBadge.vue verwendet (statt `NonNullable<BadgeVariants['variant']>`)
+- [x] Exports erweitert: BadgeVariant in index.ts + components/index.ts
+- [x] GroupForm.vue: `float: right` → `display: flex; flex-direction: column; align-self: flex-end` (konsistentes Flexbox-Layout)
+- [x] PlaygroundArgs in Stories: `string` → `BadgeVariant | BadgeSize | BadgeShape` (typsichere Story-Args)
+- [x] WithIcon-Story: Inline-Style `style="margin-right: 4px"` → Tailwind `class="mr-1"`
+- [x] ARIA Live Regions: `role="status" aria-live="polite"` auf 10 Form-Zähler + `role="alert" aria-live="assertive"` auf 1 Fehler-Badge
+- [x] `live` Prop entfernt — Standard-ARIA-Attribute werden direkt durchgereicht (attrs)
+- [x] KATALOG.md: Übersichtstabelle, Tier B Status, Komponenten-Tabelle, Zusammenfassungen aktualisiert
+
+**Zuvor abgeschlossen (Session 29 - OsBadge: ds-chip + ds-tag Migration):**
 - [x] OsBadge Komponente in packages/ui erstellt (CVA-Varianten, h() Render-Function)
 - [x] Props: variant (default/primary/danger), size (sm/md/lg), shape (pill/square)
 - [x] ds-chip → OsBadge: 20 Nutzungen in 5 Webapp-Dateien (GroupTeaser, GroupMember, GroupForm, ContributionForm, groups/_slug)
@@ -215,19 +230,6 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 - [x] CSS-Variable --color-default für neutralen Badge-Hintergrund
 - [x] Unit-Tests (16), Stories (6), Visual Tests (5+1 Keyboard), 100% Coverage
 - [x] Exports: OsBadge, badgeVariants, BadgeShape, BadgeSize, BadgeVariants
-- [x] RegistrationSlideEmail.vue: Label `for="checkbox0"` → `for="sendEmailAgain"` passend zu `id="sendEmailAgain"` (A11y WCAG 1.3.1/4.1.2)
-- [x] Signup.vue: `margin="large"` (totes ds-space-Attribut auf div) → `class="ds-my-large"` + `<style>` → `<style scoped>`
-- [x] SocialMedia.vue: `:key="link.id"` → `:key="link.url"` (link.id war immer undefined, socialMediaLinks() gibt kein id zurück)
-- [x] logout.vue: Hardcodierter "Logging out..." → `$t('login.loggingOut')` mit Übersetzungen in allen 9 Sprachen
-- [x] maintenance/index.vue: `alt="Under maintenance"` → `:alt="$t('maintenance.title', metadata)"` (i18n-Konsistenz) + `<style scoped>`
-- [x] admin/index.vue: `33%` → `33.333%` (Rundungsfehler bei 3-Spalten-Layout)
-- [x] profile/_id/_slug.vue: Inline-Style `margin-bottom: 10px; text-align: center` → `ds-text-center ds-mb-x-small` Utility-Klassen
-- [x] post/edit/_id.vue: `&nbsp;` aus Aside-Div entfernt (Screenreader-Problem) + zwei Style-Blöcke zu einem scoped Block gemergt
-- [x] post/create/_type.vue: Zwei Style-Blöcke (scoped + unscoped) zu einem scoped Block gemergt
-- [x] _ds-compat.scss: `display: flex` zu `.ds-space-centered` hinzugefügt (justify-content/align-items wirkten ohne display:flex nicht)
-- [x] blocked-users.vue: Unnötiges Wrapper-Div `ds-mb-large` am Kartenende entfernt
-- [x] Cypress SocialMedia: `cy.get('.ds-list-item a')` → `cy.get('.ds-list-item a[href="${link}"]')` (nutzt link-Parameter)
-- [x] Als "nicht in diesem PR" bewertet: pre-existing Code-Style Nitpicks (required:false, Ternary-Syntax, Prop-Validierung, Spacer-Divs, flex:1 0 0 Einheit, v-if="user", CSS-Nesting, Dark-Mode SVG-Farbe)
 
 **Zuvor abgeschlossen (Session 27 - Tier A: ds-* Komponenten → Plain HTML):**
 - [x] `_ds-compat.scss` erstellt (Utility-Klassen für Margins, Flex, Centered)
@@ -246,8 +248,8 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 - [x] Test-Fix: Empty.spec.js `attributes().margin` → `classes().toContain('ds-my-xxx-small')`
 - [x] 0 Tier-A `ds-*` Komponenten-Tags verbleibend
 
-**Verbleibende ds-* Komponenten (11 Typen):**
-- Tier B (→ Plain HTML): ds-number (5), ds-grid/ds-grid-item (10), ds-radio (1)
+**Verbleibende ds-* Komponenten (9 Typen):**
+- Tier B Rest (→ Plain HTML): ds-number (5), ds-radio (1)
 - Tier C (→ UI-Library): ds-input (23), ds-form (18), ds-modal (7), ds-menu/ds-menu-item (17), ds-table (7), ds-select (3)
 
 **Zuvor abgeschlossen (Session 26 - CodeRabbit Review Fixes):**
@@ -1782,6 +1784,10 @@ Bei der Migration werden:
 | 2026-02-20 | **ds-tag → OsBadge** | 3 Nutzungen in 3 Dateien: Category (shape="square"), Hashtag (shape="square"), PostTeaser (CSS) |
 | 2026-02-20 | **OsBadge Features** | shape-Prop (pill/square), w-fit (Flex-Container-Fix), inline-flex items-center (Icon-Zentrierung) |
 | 2026-02-20 | **CSS-Variable** | --color-default + --color-default-contrast für neutralen Badge-Hintergrund |
+| 2026-02-20 | **Code-Review Fixes (Session 30)** | --color-default-contrast in requiredCssVariables, doppelte --color-default Deklaration entfernt |
+| 2026-02-20 | **Type Safety** | BadgeVariant Typ exportiert, PlaygroundArgs typisiert, redundante Ternäre entfernt |
+| 2026-02-20 | **Layout-Konsistenz** | GroupForm float:right → Flexbox align-self:flex-end, Inline-Style → Tailwind in Stories |
+| 2026-02-20 | **ARIA Live Regions** | role="status"/aria-live="polite" auf 11 Form-Badges (WCAG 4.1.3), live Prop → Standard-Attribute |
 
 ---
 
