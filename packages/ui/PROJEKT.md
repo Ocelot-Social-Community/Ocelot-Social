@@ -81,10 +81,10 @@ Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
 Phase 3: ██████████ 100% (24/24 Aufgaben) ✅ - Webapp-Integration komplett
-Phase 4: █████░░░░░  46% (12/26 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅ | Tier B, Tier 2-4 ausstehend
+Phase 4: ██████░░░░  54% (14/26 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅, OsBadge ✅ | Tier B (rest), Tier 2-4 ausstehend
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████████░░  78% (74/95 Aufgaben)
+Gesamt:  ████████░░  80% (76/95 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -188,23 +188,33 @@ Tier A ds-* → Plain HTML + CSS: ✅
 ├─ system.css bleibt geladen — bestehende CSS-Klassen funktionieren weiter
 ├─ Verbleibend: 13 ds-* Komponenten (Tier B: 4 einfache, Tier C: 6 komplexe → UI-Library)
 └─ 0 Tier-A ds-* Komponenten-Tags verbleibend
+
+ds-chip + ds-tag → OsBadge (UI-Library): ✅
+├─ OsBadge Komponente: CVA-Varianten, h() Render-Function, inheritAttrs: false
+├─ Props: variant (default/primary/danger), size (sm/md/lg), shape (pill/square)
+├─ ds-chip: 20 Nutzungen in 5 Dateien → <os-badge> (Formzähler + Gruppen-Metadaten)
+├─ ds-tag: 3 Nutzungen in 3 Dateien → <os-badge shape="square"> (Category, Hashtag)
+├─ CSS-Variable: --color-default (neutraler Hintergrund), --color-default-contrast
+├─ 16 Unit-Tests, 6 Stories, 5 Visual Tests + 1 Keyboard Test
+└─ 0 ds-chip/ds-tag Nutzungen verbleibend
 ```
 
 ---
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-19 (Session 28)
+**Letzte Aktualisierung:** 2026-02-20 (Session 29)
 
-**Aktuelle Phase:** Phase 4 - OsIcon ✅, BaseIcon → OsIcon Migration ✅, OsSpinner ✅, Spinner Webapp-Migration ✅, OsCard ✅, BaseCard → OsCard Migration ✅, Tier A ds-* → Plain HTML ✅
+**Aktuelle Phase:** Phase 4 - Tier 1 ✅, Tier A ✅, OsBadge ✅ (ds-chip + ds-tag → UI-Library) | Tier B, Tier 2-4 ausstehend
 
-**Zuletzt abgeschlossen (Session 28 - CodeRabbit Review Fixes für Tier A PR):**
-- [x] GroupForm.vue: Fehlende `buttons`-Klasse auf Button-Container ergänzt (CSS-Regel `.group-form > .buttons` griff nicht)
-- [x] ComponentSlider.vue: `<h1>` → `<h3>` (Original war `<ds-heading size="h3">`, falsch zu h1 migriert)
-- [x] SearchHeading.vue: `<h1>` → `<h5>` (Original war `<ds-heading size="h5">`, falsch zu h1 migriert)
-- [x] MySomethingList.vue: Redundantes verschachteltes `<div class="ds-mt-base ds-mb-large">` entfernt (Überbleibsel von verschachtelten ds-space)
-- [x] Empty.vue: Prop-Type `[String, Object]` → `String` (Object-Support war ds-space-Relikt, nicht implementiert)
-- [x] ChangePassword.vue: Inline-Spans → separate `<p class="ds-text">` Elemente (visuelle Regression: fehlende Block-Level-Trennung)
+**Zuletzt abgeschlossen (Session 29 - OsBadge: ds-chip + ds-tag Migration):**
+- [x] OsBadge Komponente in packages/ui erstellt (CVA-Varianten, h() Render-Function)
+- [x] Props: variant (default/primary/danger), size (sm/md/lg), shape (pill/square)
+- [x] ds-chip → OsBadge: 20 Nutzungen in 5 Webapp-Dateien (GroupTeaser, GroupMember, GroupForm, ContributionForm, groups/_slug)
+- [x] ds-tag → OsBadge: 3 Nutzungen in 3 Webapp-Dateien (Category, Hashtag, PostTeaser CSS)
+- [x] CSS-Variable --color-default für neutralen Badge-Hintergrund
+- [x] Unit-Tests (16), Stories (6), Visual Tests (5+1 Keyboard), 100% Coverage
+- [x] Exports: OsBadge, badgeVariants, BadgeShape, BadgeSize, BadgeVariants
 - [x] RegistrationSlideEmail.vue: Label `for="checkbox0"` → `for="sendEmailAgain"` passend zu `id="sendEmailAgain"` (A11y WCAG 1.3.1/4.1.2)
 - [x] Signup.vue: `margin="large"` (totes ds-space-Attribut auf div) → `class="ds-my-large"` + `<style>` → `<style scoped>`
 - [x] SocialMedia.vue: `:key="link.id"` → `:key="link.url"` (link.id war immer undefined, socialMediaLinks() gibt kein id zurück)
@@ -236,8 +246,8 @@ Tier A ds-* → Plain HTML + CSS: ✅
 - [x] Test-Fix: Empty.spec.js `attributes().margin` → `classes().toContain('ds-my-xxx-small')`
 - [x] 0 Tier-A `ds-*` Komponenten-Tags verbleibend
 
-**Verbleibende ds-* Komponenten (13 Typen):**
-- Tier B (→ Plain HTML): ds-chip (5), ds-number (5), ds-grid/ds-grid-item (10), ds-radio (1)
+**Verbleibende ds-* Komponenten (11 Typen):**
+- Tier B (→ Plain HTML): ds-number (5), ds-grid/ds-grid-item (10), ds-radio (1)
 - Tier C (→ UI-Library): ds-input (23), ds-form (18), ds-modal (7), ds-menu/ds-menu-item (17), ds-table (7), ds-select (3)
 
 **Zuvor abgeschlossen (Session 26 - CodeRabbit Review Fixes):**
@@ -359,7 +369,8 @@ Tier A ds-* → Plain HTML + CSS: ✅
 - [x] OsSpinner Webapp-Migration (DsSpinner + LoadingSpinner → OsSpinner) ✅
 - [x] OsCard Komponente + BaseCard → OsCard Webapp-Migration ✅
 - [x] Tier A: 10 triviale ds-* Wrapper → Plain HTML + CSS ✅
-- [ ] Tier B: ds-chip, ds-number, ds-grid/ds-grid-item, ds-radio → Plain HTML
+- [x] OsBadge Komponente + ds-chip/ds-tag → OsBadge Webapp-Migration ✅
+- [ ] Tier B (Rest): ds-number, ds-grid/ds-grid-item, ds-radio → Plain HTML
 - [ ] Weitere Tier 2 Komponenten (OsModal, OsDropdown, OsAvatar, OsInput)
 - [ ] ds-form + ds-input → OsForm + OsInput (stark gekoppelt, 18+23 Dateien)
 - [ ] ds-menu / ds-menu-item → OsMenu / OsMenuItem
@@ -627,8 +638,9 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 - [x] ds-space → div + Margin-Utility-Klassen (139 Nutzungen)
 - [x] ds-flex / ds-flex-item → HTML + CSS @media Queries (103 Nutzungen)
 
-**Tier B: Einfache ds-* → Plain HTML (ausstehend)**
-- [ ] ds-chip (5 Dateien) → `<span class="ds-chip">`
+**Tier B: Einfache ds-* → Plain HTML / UI-Library**
+- [x] ds-chip (5 Dateien) → OsBadge (UI-Library) ✅
+- [x] ds-tag (3 Dateien) → OsBadge shape="square" (UI-Library) ✅
 - [ ] ds-number (5 Dateien) → `<div class="ds-number">`
 - [ ] ds-grid / ds-grid-item (10 Dateien) → CSS Grid
 - [ ] ds-radio (1 Datei) → native `<input type="radio">`
@@ -1765,6 +1777,11 @@ Bei der Migration werden:
 | 2026-02-19 | **CSS Fixes** | .buttons Klasse ergänzt (GroupForm), display:flex auf .ds-space-centered, 33%→33.333%, inline-style→Utilities |
 | 2026-02-19 | **Scoping** | Signup.vue, maintenance/index.vue, post/create/_type.vue, post/edit/_id.vue: unscoped → scoped Style-Blöcke |
 | 2026-02-19 | **Migration-Artefakte** | Redundante Wrapper-Divs, tote Attribute (margin="large"), Span→P Block-Level Regression |
+| 2026-02-20 | **OsBadge Komponente (Session 29)** | Neue Komponente: CVA-Varianten (variant, size, shape), h() Render-Function, 16 Tests, 6 Stories |
+| 2026-02-20 | **ds-chip → OsBadge** | 20 Nutzungen in 5 Dateien: GroupTeaser, GroupMember, GroupForm, ContributionForm, groups/_slug |
+| 2026-02-20 | **ds-tag → OsBadge** | 3 Nutzungen in 3 Dateien: Category (shape="square"), Hashtag (shape="square"), PostTeaser (CSS) |
+| 2026-02-20 | **OsBadge Features** | shape-Prop (pill/square), w-fit (Flex-Container-Fix), inline-flex items-center (Icon-Zentrierung) |
+| 2026-02-20 | **CSS-Variable** | --color-default + --color-default-contrast für neutralen Badge-Hintergrund |
 
 ---
 
@@ -1782,9 +1799,10 @@ Bei der Migration werden:
 **Styleguide-Migration:**
 | Status | Komponenten |
 |--------|------------|
-| ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard (4) |
-| ✅ → Plain HTML | Section, Placeholder, Tag, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem (11) — Tier A |
-| ⬜ → Plain HTML | Chip, Number, Grid, GridItem, Radio (5) — Tier B |
+| ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard, OsBadge (5) |
+| ✅ → Plain HTML | Section, Placeholder, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem (10) — Tier A |
+| ✅ → UI-Library | Chip, Tag → OsBadge (2) — Tier B |
+| ⬜ → Plain HTML | Number, Grid, GridItem, Radio (4) — Tier B |
 | ⬜ → UI-Library | Modal, Input, Menu, MenuItem, Select, Table (6) — Tier 2-4 |
 | ⬜ Nicht genutzt | Code, CopyField, FormItem, InputError, InputLabel, Page, PageTitle, Logo, Avatar, TableCol, TableHeadCol (11) |
 | ⬜ Offen | Form (18 Dateien — HTML `<form>` oder OsForm?) |

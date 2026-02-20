@@ -13,7 +13,7 @@ Phase 0: Analyse       ██████████ 100% (8/8 Schritte) ✅
 Phase 3: OsButton      ██████████ 100% (133/133 Buttons) ✅
 Phase 4: Tier 1        ██████████ 100% (OsButton, OsIcon, OsSpinner, OsCard) ✅
 Phase 4: Tier A → HTML ██████████ 100% (10 ds-* Wrapper → Plain HTML) ✅
-Phase 4: Tier B → HTML ░░░░░░░░░░   0% (ds-chip, ds-number, ds-grid, ds-radio)
+Phase 4: Tier B        ██████░░░░  60% (ds-chip→OsBadge✅, ds-tag→OsBadge✅, ds-grid✅, ds-number⬜, ds-radio⬜)
 Phase 4: Tier 2-4      ░░░░░░░░░░   0% (OsModal, OsInput, OsMenu, OsSelect, OsTable)
 ```
 
@@ -23,9 +23,10 @@ Phase 4: Tier 2-4      ░░░░░░░░░░   0% (OsModal, OsInput, Os
 | Webapp Komponenten | 139 |
 | Styleguide Komponenten | 38 (23 in Webapp genutzt) |
 | **Gesamt** | **177** |
-| ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard (4) |
-| ✅ → Plain HTML | Section, Placeholder, Tag, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem (11) |
-| ⬜ → Plain HTML | Chip, Number, Grid, GridItem, Radio (5) — Tier B |
+| ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard, OsBadge (5) |
+| ✅ → Plain HTML | Section, Placeholder, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem, Grid, GridItem (12) |
+| ✅ → OsBadge | Chip (20 Nutzungen → OsBadge), Tag (3 → OsBadge shape="square") |
+| ⬜ → Plain HTML | Number, Radio (2) — Tier B Rest |
 | ⬜ → UI-Library | Modal, Input, Menu, MenuItem, Select, Table (6) — Tier 2-4 |
 | ⬜ Offen | Form (18 Dateien — HTML oder OsForm?) |
 | ⬜ Nicht in Webapp | Code, CopyField, FormItem, InputError, InputLabel, Page, PageTitle, Logo, Avatar, TableCol, TableHeadCol (11) |
@@ -53,7 +54,7 @@ Phase 4: Tier 2-4      ░░░░░░░░░░   0% (OsModal, OsInput, Os
 |---|------------|--------|---------|
 | 1 | Avatar | ⬜ Nicht genutzt | Webapp nutzt eigenes ProfileAvatar |
 | 2 | Card | ✅ UI-Library | → OsCard (BaseCard gelöscht) |
-| 3 | Chip | ⬜ Tier B | 5 Dateien → Plain HTML `<span class="ds-chip">` |
+| 3 | Chip | ✅ UI-Library | → OsBadge (20 Nutzungen in 5 Dateien) |
 | 4 | Code | ⬜ Nicht genutzt | Nicht in Webapp verwendet |
 | 5 | Icon | ✅ UI-Library | → OsIcon (BaseIcon gelöscht, 82 Ocelot-Icons) |
 | 6 | Number | ⬜ Tier B | 5 Dateien → Plain HTML `<div class="ds-number">` |
@@ -62,7 +63,7 @@ Phase 4: Tier 2-4      ░░░░░░░░░░   0% (OsModal, OsInput, Os
 | 9 | Table | ⬜ Tier 4 | 7 Dateien → OsTable |
 | 10 | TableCol | ⬜ Tier 4 | Intern von Table genutzt |
 | 11 | TableHeadCol | ⬜ Tier 4 | Intern von Table genutzt |
-| 12 | Tag | ✅ → HTML | Tier A: `<span class="ds-tag">` |
+| 12 | Tag | ✅ UI-Library | → OsBadge shape="square" (3 Nutzungen in 3 Dateien) |
 
 ### Data Input
 | # | Komponente | Status | Notizen |
@@ -83,8 +84,8 @@ Phase 4: Tier 2-4      ░░░░░░░░░░   0% (OsModal, OsInput, Os
 | 22 | Container | ✅ → HTML | Tier A: `<div class="ds-container ds-container-{width}">` |
 | 23 | Flex | ✅ → HTML | Tier A: Plain HTML + CSS @media Queries |
 | 24 | FlexItem | ✅ → HTML | Tier A: Plain HTML + CSS @media Queries |
-| 25 | Grid | ⬜ Tier B | 2 Dateien → CSS Grid |
-| 26 | GridItem | ⬜ Tier B | 8 Dateien → CSS Grid |
+| 25 | Grid | ✅ → HTML | 2 Dateien → CSS Grid (class="ds-grid") |
+| 26 | GridItem | ✅ → HTML | 8 Dateien → CSS Grid |
 | 27 | Modal | ⬜ Tier 2 | 7 Dateien → OsModal |
 | 28 | Page | ⬜ Nicht genutzt | Nicht direkt in Webapp verwendet |
 | 29 | PageTitle | ⬜ Nicht genutzt | Nicht direkt in Webapp verwendet |
@@ -202,7 +203,7 @@ Phase 4: Tier 2-4      ░░░░░░░░░░   0% (OsModal, OsInput, Os
 ### H-L
 | # | Komponente | Status | Kategorie | Styleguide-Pendant | Notizen |
 |---|------------|--------|-----------|-------------------|---------|
-| 64 | Hashtag | ⬜ Ausstehend | Display | Tag/Chip | |
+| 64 | Hashtag | ✅ Migriert | Display | Tag/Chip | 🔄 nutzt OsBadge shape="square" |
 | 65 | HashtagsFilter | ⬜ Ausstehend | Filter | | |
 | 66 | HeaderButton | ✅ Migriert | Button | Button | 🔄 Button-Familie, nutzt OsButton |
 | 67 | HeaderMenu | ⬜ Ausstehend | Navigation | Menu | |
@@ -370,10 +371,12 @@ Phase 4: Tier 2-4      ░░░░░░░░░░   0% (OsModal, OsInput, Os
 
 ### Layout & Typography — → Plain HTML ✅ (Tier A)
 - ~~Container, Flex, FlexItem, Section, Space~~ ✅ → HTML + CSS
-- ~~Heading, Text, List, ListItem, Tag, Placeholder~~ ✅ → HTML + CSS
+- ~~Heading, Text, List, ListItem, Placeholder~~ ✅ → HTML + CSS
+- ~~Chip, Tag~~ ✅ → OsBadge (UI-Library)
 
-### Noch zu migrieren (Tier B → Plain HTML)
-- Chip, Number, Grid, GridItem, Radio
+### Noch zu migrieren (Tier B Rest)
+- Number (5 Dateien), Radio (1 Datei)
+- ~~Grid, GridItem~~ ✅ → CSS Grid (Plain HTML)
 
 ### Feature-Komponenten (bleiben in Webapp)
 - Chat, Group, Registration, Search, etc.
@@ -430,11 +433,12 @@ Phase 4: Tier 2-4      ░░░░░░░░░░   0% (OsModal, OsInput, Os
 12. [x] _ds-compat.scss Utility-Klassen
 13. [x] 10 ds-* Wrapper → HTML + CSS (~450 Nutzungen, ~90 Dateien)
 
-### Phase 4: Tier B — ds-* → Plain HTML (ausstehend)
-14. [ ] ds-chip (5 Dateien) → `<span class="ds-chip">`
-15. [ ] ds-number (5 Dateien) → `<div class="ds-number">`
-16. [ ] ds-grid / ds-grid-item (10 Dateien) → CSS Grid
-17. [ ] ds-radio (1 Datei) → native `<input type="radio">`
+### Phase 4: Tier B — ds-* Migration (60%)
+14. [x] ds-chip (5 Dateien, 20 Nutzungen) → OsBadge (UI-Library)
+15. [x] ds-tag (3 Dateien) → OsBadge shape="square" (UI-Library)
+16. [x] ds-grid / ds-grid-item (10 Dateien) → CSS Grid (Plain HTML)
+17. [ ] ds-number (5 Dateien) → `<div class="ds-number">`
+18. [ ] ds-radio (1 Datei) → native `<input type="radio">`
 
 ### Phase 4: Tier 2-4 — UI-Library (ausstehend)
 18. [ ] OsModal (7 Dateien)
@@ -445,7 +449,7 @@ Phase 4: Tier 2-4      ░░░░░░░░░░   0% (OsModal, OsInput, Os
 
 ---
 
-**✅ Phase 0-3 abgeschlossen. Phase 4: Tier 1 + Tier A ✅, Tier B + Tier 2-4 ausstehend.**
+**✅ Phase 0-3 abgeschlossen. Phase 4: Tier 1 + Tier A ✅, Tier B 60% (Chip→OsBadge, Tag→OsBadge, Grid→HTML), Tier 2-4 ausstehend.**
 
 ---
 
@@ -945,19 +949,19 @@ interface OsDropdownProps {
 
 | # | Komponente | Status |
 |---|------------|--------|
-| — | ds-section, ds-placeholder, ds-tag, ds-list, ds-list-item | ✅ → HTML-Elemente + CSS-Klassen |
+| — | ds-section, ds-placeholder, ds-list, ds-list-item | ✅ → HTML-Elemente + CSS-Klassen |
 | — | ds-container, ds-heading, ds-text | ✅ → HTML-Elemente + CSS-Klassen |
 | — | ds-space | ✅ → div + Margin-Utility-Klassen |
 | — | ds-flex, ds-flex-item | ✅ → HTML + CSS @media Queries |
 
-### Tier B: Einfache ds-* → Plain HTML (ausstehend)
+### Tier B: Einfache ds-* Migration (60%)
 
-| # | Komponente | Dateien | Ziel |
-|---|------------|---------|------|
-| — | ds-chip | 5 | `<span class="ds-chip">` |
-| — | ds-number | 5 | `<div class="ds-number">` |
-| — | ds-grid / ds-grid-item | 10 | CSS Grid |
-| — | ds-radio | 1 | native `<input type="radio">` |
+| # | Komponente | Dateien | Ziel | Status |
+|---|------------|---------|------|--------|
+| 5 | **OsBadge** | — | ds-chip (20 Nutzungen, 5 Dateien) + ds-tag (3 Dateien) | ✅ |
+| — | ds-grid / ds-grid-item | 10 | CSS Grid (Plain HTML) | ✅ |
+| — | ds-number | 5 | `<div class="ds-number">` | ⬜ |
+| — | ds-radio | 1 | native `<input type="radio">` | ⬜ |
 
 ### Tier 2: Layout & Feedback (ausstehend)
 
@@ -998,21 +1002,26 @@ interface OsDropdownProps {
 2. OsSpinner ✅ Vereint: DsSpinner + LoadingSpinner
 3. OsButton  ✅ Vereint: DsButton + BaseButton → 133 Buttons in 79 Dateien
 4. OsCard    ✅ Vereint: DsCard + BaseCard → ~30 Dateien
+5. OsBadge   ✅ Vereint: ds-chip (20 Nutzungen) + ds-tag (3 Dateien)
 ```
 
 ### Tier A: Triviale ds-* Wrapper → Plain HTML ✅
 
 ```
-ds-section, ds-placeholder, ds-tag, ds-list, ds-list-item  ✅ → HTML + CSS-Klassen
-ds-container, ds-heading, ds-text                           ✅ → HTML + CSS-Klassen
-ds-space                                                     ✅ → div + Margin-Utilities
-ds-flex, ds-flex-item                                        ✅ → HTML + CSS @media Queries
+ds-section, ds-placeholder, ds-list, ds-list-item  ✅ → HTML + CSS-Klassen
+ds-container, ds-heading, ds-text                   ✅ → HTML + CSS-Klassen
+ds-space                                             ✅ → div + Margin-Utilities
+ds-flex, ds-flex-item                                ✅ → HTML + CSS @media Queries
 ```
 
-### Tier B: Einfache ds-* → Plain HTML (ausstehend)
+### Tier B: Einfache ds-* Migration (60%)
 
 ```
-ds-chip, ds-number, ds-grid/ds-grid-item, ds-radio → Plain HTML + CSS
+ds-chip → OsBadge (UI-Library)               ✅
+ds-tag  → OsBadge shape="square" (UI-Library) ✅
+ds-grid / ds-grid-item → CSS Grid (HTML)     ✅
+ds-number → Plain HTML                       ⬜ (5 Dateien)
+ds-radio  → native <input type="radio">      ⬜ (1 Datei)
 ```
 
 ### Tier 2-4: UI-Library (ausstehend)
@@ -1162,4 +1171,4 @@ $box-shadow-small-inset: inset 0 0 0 1px rgba(0,0,0,.05)
 **OsButton Migration: ✅ Vollständig abgeschlossen.**
 - BaseButton.vue gelöscht, base-components.js Plugin entfernt
 - Alle Tests, Snapshots, Cypress E2E-Selektoren aktualisiert
-- Nächster Schritt: Tier B (ds-chip, ds-number, ds-grid, ds-radio) oder Tier 2 (OsModal)
+- Nächster Schritt: Tier B Rest (ds-number, ds-radio) oder Tier 2 (OsModal)
