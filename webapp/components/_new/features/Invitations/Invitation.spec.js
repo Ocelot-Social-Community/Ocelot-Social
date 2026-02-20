@@ -120,10 +120,32 @@ describe('Invitation.vue', () => {
       wrapper = Wrapper({ wasRedeemed: false })
     })
 
-    it('opens the delete modal', async () => {
+    it('opens the delete modal with correct payload', async () => {
       const deleteButton = screen.getByLabelText('invite-codes.invalidate')
       await fireEvent.click(deleteButton)
-      expect(mutations['modal/SET_OPEN']).toHaveBeenCalledTimes(1)
+      expect(mutations['modal/SET_OPEN']).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          name: 'confirm',
+          data: expect.objectContaining({
+            modalData: expect.objectContaining({
+              titleIdent: 'invite-codes.delete-modal.title',
+              messageIdent: 'invite-codes.delete-modal.message',
+              buttons: expect.objectContaining({
+                confirm: expect.objectContaining({
+                  danger: true,
+                  textIdent: 'actions.delete',
+                  callback: expect.any(Function),
+                }),
+                cancel: expect.objectContaining({
+                  textIdent: 'actions.cancel',
+                  callback: expect.any(Function),
+                }),
+              }),
+            }),
+          }),
+        }),
+      )
     })
   })
 })
