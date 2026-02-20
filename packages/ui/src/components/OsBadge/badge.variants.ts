@@ -10,7 +10,7 @@ import type { VariantProps } from 'class-variance-authority'
  */
 export const badgeVariants = cva(
   // Base classes (always applied) - pill shape matching ds-chip round=true
-  ['inline-block font-semibold leading-[1.3] rounded-[2em]'],
+  ['inline-flex items-center gap-[0.25em] font-semibold leading-[1.3] rounded-[2em]'],
   {
     variants: {
       variant: {

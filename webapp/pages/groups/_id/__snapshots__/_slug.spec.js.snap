@@ -412,7 +412,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
                 group.roles.owner
@@ -433,7 +433,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.closed
@@ -454,7 +454,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.national
@@ -544,7 +544,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 Our children shall receive education for life.
               </span>
@@ -1307,7 +1307,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.closed
@@ -1328,7 +1328,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.national
@@ -1418,7 +1418,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 Our children shall receive education for life.
               </span>
@@ -1810,7 +1810,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
                 group.roles.pending
@@ -1831,7 +1831,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.closed
@@ -1852,7 +1852,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.national
@@ -1942,7 +1942,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 Our children shall receive education for life.
               </span>
@@ -2466,7 +2466,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
                 group.roles.usual
@@ -2487,7 +2487,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.closed
@@ -2508,7 +2508,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.national
@@ -2598,7 +2598,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 Our children shall receive education for life.
               </span>
@@ -3517,7 +3517,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
                 group.roles.owner
@@ -3538,7 +3538,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.public
@@ -3559,7 +3559,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.interplanetary
@@ -4381,7 +4381,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.public
@@ -4402,7 +4402,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.interplanetary
@@ -5188,7 +5188,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
                 group.roles.pending
@@ -5209,7 +5209,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.public
@@ -5230,7 +5230,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.interplanetary
@@ -6111,7 +6111,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
                 group.roles.usual
@@ -6132,7 +6132,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.public
@@ -6153,7 +6153,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.interplanetary
@@ -7189,7 +7189,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
                 group.roles.owner
@@ -7210,7 +7210,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.hidden
@@ -7231,7 +7231,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.global
@@ -7351,7 +7351,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 Investigative journalists share ideas and insights and can collaborate.
               </span>
@@ -8242,7 +8242,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
                 group.roles.usual
@@ -8263,7 +8263,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.types.hidden
@@ -8284,7 +8284,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-primary-contrast)] bg-[var(--color-primary)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 
               group.actionRadii.global
@@ -8404,7 +8404,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="os-badge inline-block font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
+                class="os-badge inline-flex items-center gap-[0.25em] font-semibold rounded-[2em] text-[var(--color-default-contrast)] bg-[var(--color-bg-softest)] text-[0.75rem] py-[0.2em] pb-[0.1em] px-[0.6em]"
               >
                 Investigative journalists share ideas and insights and can collaborate.
               </span>
