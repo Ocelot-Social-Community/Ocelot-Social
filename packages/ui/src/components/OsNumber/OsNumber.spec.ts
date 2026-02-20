@@ -1,9 +1,34 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import OsNumber from './OsNumber.vue'
 
 describe('osNumber', () => {
+  let rafCallbacks: ((time: number) => void)[]
+  let mockTime: number
+
+  beforeEach(() => {
+    rafCallbacks = []
+    mockTime = 0
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+      rafCallbacks.push(cb)
+      return rafCallbacks.length
+    })
+    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {})
+    vi.spyOn(performance, 'now').mockImplementation(() => mockTime)
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  function flushAnimation() {
+    mockTime += 1500
+    let safety = 0
+    while (rafCallbacks.length > 0 && safety++ < 100) {
+      rafCallbacks.shift()!(mockTime)
+    }
+  }
   describe('rendering', () => {
     it('renders as div element', () => {
       const wrapper = mount(OsNumber, {
@@ -93,6 +118,87 @@ describe('osNumber', () => {
 
       expect(wrapper.find('.os-number-label').classes()).toContain('text-[12px]')
       expect(wrapper.find('.os-number-label').classes()).toContain('text-[var(--color-text-soft)]')
+    })
+  })
+
+  describe('animation', () => {
+    it('starts at 0 when animated is true', () => {
+      const wrapper = mount(OsNumber, {
+        props: { count: 100, animated: true },
+      })
+
+      expect(wrapper.find('.os-number-count').text()).toBe('0')
+    })
+
+    it('animates to target value after mount', async () => {
+      const wrapper = mount(OsNumber, {
+        props: { count: 100, animated: true },
+      })
+
+      flushAnimation()
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('.os-number-count').text()).toBe('100')
+    })
+
+    it('re-animates when count changes', async () => {
+      const wrapper = mount(OsNumber, {
+        props: { count: 50, animated: true },
+      })
+
+      flushAnimation()
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('.os-number-count').text()).toBe('50')
+
+      await wrapper.setProps({ count: 100 })
+      flushAnimation()
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('.os-number-count').text()).toBe('100')
+    })
+
+    it('shows intermediate value during animation', async () => {
+      const wrapper = mount(OsNumber, {
+        props: { count: 100, animated: true },
+      })
+
+      mockTime += 750
+      rafCallbacks.shift()!(mockTime)
+      await wrapper.vm.$nextTick()
+
+      const intermediate = Number(wrapper.find('.os-number-count').text())
+      expect(intermediate).toBeGreaterThan(0)
+      expect(intermediate).toBeLessThan(100)
+    })
+
+    it('updates value directly when not animated', async () => {
+      const wrapper = mount(OsNumber, {
+        props: { count: 50, animated: false },
+      })
+
+      expect(wrapper.find('.os-number-count').text()).toBe('50')
+
+      await wrapper.setProps({ count: 100 })
+
+      expect(wrapper.find('.os-number-count').text()).toBe('100')
+    })
+
+    it('cancels previous animation when count changes rapidly', async () => {
+      const wrapper = mount(OsNumber, {
+        props: { count: 50, animated: true },
+      })
+
+      // First animation starts on mount
+      expect(window.requestAnimationFrame).toHaveBeenCalled()
+
+      await wrapper.setProps({ count: 200 })
+
+      expect(window.cancelAnimationFrame).toHaveBeenCalled()
+
+      flushAnimation()
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('.os-number-count').text()).toBe('200')
     })
   })
 

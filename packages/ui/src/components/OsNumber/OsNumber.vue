@@ -85,7 +85,9 @@
         () => props.count,
         (newVal, oldVal) => {
           if (props.animated) {
+            /* v8 ignore start -- oldVal is always numeric from Vue's watch */
             animateTo(oldVal ?? 0, newVal)
+            /* v8 ignore stop */
           } else {
             displayValue.value = newVal
           }
