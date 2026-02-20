@@ -256,10 +256,12 @@ export default {
           : `[contenthash:7]${isModern ? '.modern' : ''}_${CONFIG.VERSION}.js`,
       css: ({ isDev }) => (isDev ? '[name].css' : `css/[contenthash:7]_${CONFIG.VERSION}.css`),
     },
+    cache: true,
     // babel config
     babel: {
       // To prevent  ERROR  [BABEL] Note: The code generator has deoptimised the styling of [..] as it exceeds the max of 500KB.
       compact: true,
+      cacheDirectory: true,
     },
     /*
      ** You can extend webpack config here
@@ -274,7 +276,7 @@ export default {
       }
 
       if (ctx.isClient) {
-        config.devtool = 'source-map'
+        config.devtool = ctx.isDev ? 'eval-source-map' : 'hidden-source-map'
       }
 
       config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/dist`)
