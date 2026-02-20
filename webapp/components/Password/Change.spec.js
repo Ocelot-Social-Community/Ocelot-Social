@@ -58,11 +58,13 @@ describe('ChangePassword.vue', () => {
           it('does not submit the form', async () => {
             mocks.$apollo.mutate.mockReset()
             await wrapper.find('form').trigger('submit')
+            await wrapper.vm.$nextTick()
             expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
           })
 
           it('displays a validation error', async () => {
             await wrapper.find('form').trigger('submit')
+            await wrapper.vm.$nextTick()
             const dsForm = wrapper.findComponent({ name: 'DsForm' })
             expect(dsForm.vm.errors).toHaveProperty('passwordConfirmation')
           })
