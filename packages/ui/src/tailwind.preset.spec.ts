@@ -1,3 +1,4 @@
+/* eslint-disable import-x/no-deprecated */
 import { describe, it, expect, vi, afterEach, expectTypeOf } from 'vitest'
 
 import { ocelotPreset, requiredCssVariables, validateCssVariables } from './tailwind.preset'
@@ -8,7 +9,7 @@ describe('tailwind.preset', () => {
       expect(ocelotPreset).toBeDefined()
       expect(ocelotPreset).toHaveProperty('theme')
       expect(ocelotPreset.theme).toHaveProperty('extend')
-      expect(ocelotPreset.theme.extend).toEqual({})
+      expect(ocelotPreset.theme.extend).toStrictEqual({})
     })
   })
 
