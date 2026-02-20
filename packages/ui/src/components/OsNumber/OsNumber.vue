@@ -112,16 +112,31 @@
       return () => {
         const rootClass = cn('os-number', numberVariants())
 
-        const countChild = h(
-          'span',
-          {
-            class: 'os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block',
-            style: { minWidth: `${String(props.count).length}ch` },
-          },
-          [String(displayValue.value)],
-        )
+        const countAttrs: Record<string, unknown> = {
+          class: 'os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block',
+          style: { minWidth: `${String(props.count).length}ch` },
+        }
+
+        if (props.animated) {
+          countAttrs['aria-hidden'] = 'true'
+        }
+
+        const countChild = h('span', countAttrs, [String(displayValue.value)])
 
         const children = [countChild]
+
+        if (props.animated) {
+          children.push(
+            h(
+              'span',
+              {
+                class: 'sr-only',
+                'aria-live': 'polite',
+              },
+              [String(props.count)],
+            ),
+          )
+        }
 
         if (props.label) {
           children.push(

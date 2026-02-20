@@ -135,6 +135,29 @@ describe('osNumber', () => {
       expect(wrapper.find('.os-number-count').text()).toBe('0')
     })
 
+    it('hides animated count from screen readers and provides live region', () => {
+      const wrapper = mount(OsNumber, {
+        props: { count: 100, animated: true },
+      })
+
+      expect(wrapper.find('.os-number-count').attributes('aria-hidden')).toBe('true')
+
+      const liveRegion = wrapper.find('[aria-live="polite"]')
+
+      expect(liveRegion.exists()).toBe(true)
+      expect(liveRegion.text()).toBe('100')
+      expect(liveRegion.classes()).toContain('sr-only')
+    })
+
+    it('does not add aria attributes when not animated', () => {
+      const wrapper = mount(OsNumber, {
+        props: { count: 42 },
+      })
+
+      expect(wrapper.find('.os-number-count').attributes('aria-hidden')).toBeUndefined()
+      expect(wrapper.find('[aria-live]').exists()).toBe(false)
+    })
+
     it('animates to target value after mount', async () => {
       const wrapper = mount(OsNumber, {
         props: { count: 100, animated: true },
