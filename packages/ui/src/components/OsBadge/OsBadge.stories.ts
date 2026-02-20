@@ -87,24 +87,6 @@ export const AllSizes: Story = {
   }),
 }
 
-export const InfoLabels: Story = {
-  render: () => ({
-    components: { OsBadge },
-    template: `
-      <div data-testid="info-labels" class="flex flex-col gap-3">
-        <p class="text-sm text-gray-500 m-0">Group metadata (primary badges):</p>
-        <div class="flex flex-wrap gap-2">
-          <OsBadge variant="primary">Owner</OsBadge>
-          <OsBadge variant="primary">Public</OsBadge>
-          <OsBadge variant="primary">Regional</OsBadge>
-        </div>
-        <p class="text-sm text-gray-500 m-0">Group goal (default badge):</p>
-        <OsBadge>Build a sustainable community garden in our neighborhood</OsBadge>
-      </div>
-    `,
-  }),
-}
-
 export const FormCounter: Story = {
   render: () => ({
     components: { OsBadge },
