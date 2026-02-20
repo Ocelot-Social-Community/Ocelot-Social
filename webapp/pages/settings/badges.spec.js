@@ -17,6 +17,7 @@ describe('badge settings', () => {
   }
 
   beforeEach(() => {
+    apolloMutateMock.mockReset()
     mocks = {
       $t: jest.fn((t) => t),
       $toast: {
@@ -94,6 +95,7 @@ describe('badge settings', () => {
 
     beforeEach(() => {
       mocks.$store = {
+        commit: jest.fn(),
         getters: {
           'auth/isModerator': () => false,
           'auth/user': {
@@ -133,35 +135,39 @@ describe('badge settings', () => {
         }
 
         describe('with successful server request', () => {
-          beforeEach(() => {
-            apolloMutateMock.mockResolvedValue({
-              data: {
-                setTrophyBadgeSelected: {
-                  id: 'u23',
-                  badgeTrophiesSelected: [
-                    {
-                      id: '2',
-                      icon: '/path/to/empty/icon',
-                      isDefault: true,
-                      description: 'Empty',
-                    },
-                    {
-                      id: '2',
-                      icon: '/path/to/empty/icon',
-                      isDefault: true,
-                      description: 'Empty',
-                    },
-                    {
-                      id: '3',
-                      icon: '/path/to/third/icon',
-                      isDefault: false,
-                      description: 'Third description',
-                    },
-                  ],
+          const removedResponseData = {
+            setTrophyBadgeSelected: {
+              id: 'u23',
+              badgeTrophiesSelected: [
+                {
+                  id: 'empty-0',
+                  icon: '/path/to/empty/icon',
+                  isDefault: true,
+                  description: 'Empty',
                 },
-              },
+                {
+                  id: '2',
+                  icon: '/path/to/empty/icon',
+                  isDefault: true,
+                  description: 'Empty',
+                },
+                {
+                  id: '3',
+                  icon: '/path/to/third/icon',
+                  isDefault: false,
+                  description: 'Third description',
+                },
+              ],
+            },
+          }
+
+          beforeEach(async () => {
+            apolloMutateMock.mockImplementation(({ update }) => {
+              const result = { data: removedResponseData }
+              if (update) update(null, result)
+              return Promise.resolve(result)
             })
-            clickButton()
+            await clickButton()
           })
 
           it('calls the server', () => {
@@ -175,9 +181,15 @@ describe('badge settings', () => {
             })
           })
 
-          /* To test this, we would need a better apollo mock */
-          it.skip('removes the badge', async () => {
-            expect(wrapper.container).toMatchSnapshot()
+          it('updates badges in store via update callback', () => {
+            expect(mocks.$store.commit).toHaveBeenCalledWith(
+              'auth/SET_USER',
+              expect.objectContaining({
+                id: 'u23',
+                badgeTrophiesSelected:
+                  removedResponseData.setTrophyBadgeSelected.badgeTrophiesSelected,
+              }),
+            )
           })
 
           it('shows a success message', () => {
@@ -186,9 +198,9 @@ describe('badge settings', () => {
         })
 
         describe('with failed server request', () => {
-          beforeEach(() => {
+          beforeEach(async () => {
             apolloMutateMock.mockRejectedValue({ message: 'Ouch!' })
-            clickButton()
+            await clickButton()
           })
 
           it('shows an error message', () => {
@@ -233,35 +245,39 @@ describe('badge settings', () => {
           }
 
           describe('with successful server request', () => {
-            beforeEach(() => {
-              apolloMutateMock.mockResolvedValue({
-                data: {
-                  setTrophyBadgeSelected: {
-                    id: 'u23',
-                    badgeTrophiesSelected: [
-                      {
-                        id: '4',
-                        icon: '/path/to/fourth/icon',
-                        description: 'Fourth description',
-                        isDefault: false,
-                      },
-                      {
-                        id: '2',
-                        icon: '/path/to/empty/icon',
-                        isDefault: true,
-                        description: 'Empty',
-                      },
-                      {
-                        id: '3',
-                        icon: '/path/to/third/icon',
-                        isDefault: false,
-                        description: 'Third description',
-                      },
-                    ],
+            const addedResponseData = {
+              setTrophyBadgeSelected: {
+                id: 'u23',
+                badgeTrophiesSelected: [
+                  {
+                    id: '1',
+                    icon: '/path/to/some/icon',
+                    isDefault: false,
+                    description: 'Some description',
                   },
-                },
+                  {
+                    id: '4',
+                    icon: '/path/to/fourth/icon',
+                    isDefault: false,
+                    description: 'Fourth description',
+                  },
+                  {
+                    id: '3',
+                    icon: '/path/to/third/icon',
+                    isDefault: false,
+                    description: 'Third description',
+                  },
+                ],
+              },
+            }
+
+            beforeEach(async () => {
+              apolloMutateMock.mockImplementation(({ update }) => {
+                const result = { data: addedResponseData }
+                if (update) update(null, result)
+                return Promise.resolve(result)
               })
-              clickBadge()
+              await clickBadge()
             })
 
             it('calls the server', () => {
@@ -275,9 +291,15 @@ describe('badge settings', () => {
               })
             })
 
-            /* To test this, we would need a better apollo mock */
-            it.skip('adds the badge', async () => {
-              expect(wrapper.container).toMatchSnapshot()
+            it('updates badges in store via update callback', () => {
+              expect(mocks.$store.commit).toHaveBeenCalledWith(
+                'auth/SET_USER',
+                expect.objectContaining({
+                  id: 'u23',
+                  badgeTrophiesSelected:
+                    addedResponseData.setTrophyBadgeSelected.badgeTrophiesSelected,
+                }),
+              )
             })
 
             it('shows a success message', () => {
@@ -286,9 +308,9 @@ describe('badge settings', () => {
           })
 
           describe('with failed server request', () => {
-            beforeEach(() => {
+            beforeEach(async () => {
               apolloMutateMock.mockRejectedValue({ message: 'Ouch!' })
-              clickBadge()
+              await clickBadge()
             })
 
             it('shows an error message', () => {

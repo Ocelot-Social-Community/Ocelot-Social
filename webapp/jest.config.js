@@ -2,7 +2,6 @@ const path = require('path')
 
 module.exports = {
   verbose: true,
-  collectCoverage: true,
   collectCoverageFrom: [
     '**/*.{js,vue}',
     '!**/?(*.)+(spec|test|story).js?(x)',
@@ -19,7 +18,7 @@ module.exports = {
   ],
   coverageThreshold: {
     global: {
-      lines: 82,
+      lines: 83,
     },
   },
   coverageProvider: 'v8',

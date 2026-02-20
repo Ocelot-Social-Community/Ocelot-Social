@@ -16,9 +16,9 @@
     "locales": "../scripts/translations/missing-keys.sh && ../scripts/translations/sort.sh",
     "locales:normalize": "../scripts/translations/normalize.sh",
     "precommit": "yarn lint",
-    "test": "cross-env NODE_ENV=test jest --coverage --forceExit --detectOpenHandles",
+    "test": "cross-env NODE_ENV=test jest --coverage",
     "test:unit:update": "yarn test -- --updateSnapshot",
-    "test:unit:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --no-cache --runInBand",
+    "test:unit:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --no-cache --runInBand  --forceExit --detectOpenHandles",
     "postinstall": "node scripts/fix-vue2-jest.js && node scripts/fix-v-mapbox.js"
   },
   "dependencies": {

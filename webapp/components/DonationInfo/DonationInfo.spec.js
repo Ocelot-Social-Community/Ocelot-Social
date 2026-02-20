@@ -48,13 +48,28 @@ describe('DonationInfo.vue', () => {
 
     describe('mount with data', () => {
       describe('given german locale', () => {
+        let toLocaleStringSpy
+
         beforeEach(() => {
           mocks.$i18n.locale = () => 'de'
+          const originalToLocaleString = Number.prototype.toLocaleString
+          toLocaleStringSpy = jest.spyOn(Number.prototype, 'toLocaleString')
+          toLocaleStringSpy.mockImplementation(function (locale) {
+            if (locale === 'de')
+              return this.valueOf()
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+            return originalToLocaleString.call(this, locale)
+          })
         })
 
-        // it looks to me that toLocaleString for some reason is not working as expected
-        it.skip('creates a label from the given amounts and a translation string', () => {
-          expect(mocks.$t).toHaveBeenNthCalledWith(1, 'donations.amount-of-total', {
+        afterEach(() => {
+          toLocaleStringSpy.mockRestore()
+        })
+
+        it('creates a label from the given amounts and a translation string', () => {
+          wrapper = Wrapper()
+          expect(mocks.$t).toHaveBeenCalledWith('donations.amount-of-total', {
             amount: '10.000',
             total: '50.000',
           })
@@ -62,6 +77,10 @@ describe('DonationInfo.vue', () => {
       })
 
       describe('given english locale', () => {
+        beforeEach(() => {
+          mocks.$i18n.locale = () => 'en'
+        })
+
         it('creates a label from the given amounts and a translation string', () => {
           expect(mocks.$t).toHaveBeenCalledWith(
             'donations.amount-of-total',

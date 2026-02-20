@@ -13,18 +13,13 @@ describe('request.vue', () => {
 
   beforeEach(() => {
     mocks = {
-      /* $toast: {
-        success: jest.fn(),
-        error: jest.fn(),
-      }, */
       $t: jest.fn(),
       $apollo: {
         loading: false,
-        // mutate: jest.fn().mockResolvedValue({ data: { reqestPasswordReset: true } }),
       },
-      /* $router: {
-        push: jest.fn()
-      } */
+      $router: {
+        push: jest.fn(),
+      },
     }
   })
 
@@ -41,12 +36,8 @@ describe('request.vue', () => {
       expect(wrapper.findAll('.ds-form')).toHaveLength(1)
     })
 
-    it.skip('calls "handlePasswordResetRequested" on submit', async () => {
-      await jest.useFakeTimers()
-      await wrapper.find('input#email').setValue('mail@example.org')
-      await wrapper.findAll('.ds-form').trigger('submit')
-      await jest.runAllTimers()
-      expect(wrapper.emitted('handleSubmitted')).toEqual([[{ email: 'mail@example.org' }]])
+    it('navigates to enter-nonce on handlePasswordResetRequested', () => {
+      wrapper.vm.handlePasswordResetRequested({ email: 'mail@example.org' })
       expect(mocks.$router.push).toHaveBeenCalledWith({
         path: 'enter-nonce',
         query: { email: 'mail@example.org' },

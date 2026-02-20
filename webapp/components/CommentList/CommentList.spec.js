@@ -1,7 +1,6 @@
 import { mount } from '@vue/test-utils'
 import CommentList from './CommentList'
 import Vuex from 'vuex'
-import Vue from 'vue'
 
 const localVue = global.localVue
 
@@ -163,8 +162,7 @@ describe('CommentList.vue', () => {
         wrapper = Wrapper()
       })
 
-      // TODO: Test does not find .count = 0 but 1. Can't understand why...
-      it.skip('sets counter to 0', async () => {
+      it('hides counter when no visible comments remain', async () => {
         wrapper.vm.updateCommentList({
           id: 'comment134',
           contentExcerpt: 'this is another deleted comment',
@@ -175,8 +173,8 @@ describe('CommentList.vue', () => {
             slug: 'some-slug',
           },
         })
-        await Vue.nextTick()
-        await expect(wrapper.find('.count').text()).toEqual('0')
+        await wrapper.vm.$nextTick()
+        expect(wrapper.find('.count').exists()).toBe(false)
       })
     })
   })

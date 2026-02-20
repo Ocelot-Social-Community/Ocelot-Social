@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import Vue from 'vue'
+import flushPromises from 'flush-promises'
 import Donations from './donations.vue'
 
 const localVue = global.localVue
@@ -10,21 +10,25 @@ describe('donations.vue', () => {
 
   const donationsQueryMock = jest.fn()
   const donationsUpdateMock = jest.fn()
-  const donationsMutaionMock = jest.fn()
-  donationsMutaionMock.mockResolvedValue({
-    then: jest.fn(),
-    catch: jest.fn(),
+  const donationsMutationMock = jest.fn().mockResolvedValue({})
+
+  afterEach(() => {
+    donationsMutationMock.mockClear()
   })
 
   beforeEach(() => {
     mocks = {
       $t: jest.fn((string) => string),
+      $toast: {
+        success: jest.fn(),
+        error: jest.fn(),
+      },
       $apollo: {
         Donations: {
           query: donationsQueryMock,
           update: donationsUpdateMock,
         },
-        mutate: donationsMutaionMock,
+        mutate: donationsMutationMock,
         queries: {
           Donations: {
             query: donationsQueryMock,
@@ -98,36 +102,36 @@ describe('donations.vue', () => {
         expect(wrapper.vm.showDonations).toBe(false)
       })
 
-      it.skip('on donations-goal and enter value XXX', async () => {
-        await wrapper.find('#donations-goal').setValue('20000')
-        expect(wrapper.vm.formData.goal).toBe('20000')
+      it('donations-goal input exists and accepts input', async () => {
+        const goalInput = wrapper.find('#donations-goal')
+        expect(goalInput.exists()).toBe(true)
+        await goalInput.setValue('42000')
+        expect(goalInput.element.value).toBe('42000')
       })
     })
 
     describe('apollo', () => {
-      it.skip('query is called', () => {
-        expect(donationsQueryMock).toHaveBeenCalledTimes(1)
-        expect(mocks.$apollo.queries.Donations.refetch).toHaveBeenCalledTimes(1)
-        // expect(mocks.$apollo.Donations.query().exists()).toBeTruthy()
-        // console.log('mocks.$apollo: ', mocks.$apollo)
+      it('query is defined and returns a GraphQL document', () => {
+        const apolloOption = wrapper.vm.$options.apollo.Donations
+        expect(apolloOption.query).toBeInstanceOf(Function)
+        const query = apolloOption.query.call(wrapper.vm)
+        expect(query).toBeDefined()
+        expect(query.kind).toBe('Document')
       })
 
-      it.skip('query result is displayed', () => {
-        mocks.$apollo.queries = jest.fn().mockResolvedValue({
-          data: {
-            PostsEmotionsCountByEmotion: 1,
-          },
-        })
+      it('query result is displayed', async () => {
+        const updateFn = wrapper.vm.$options.apollo.Donations.update.bind(wrapper.vm)
+        updateFn({ Donations: { showDonations: true, goal: 25000, progress: 8000 } })
+        await wrapper.vm.$nextTick()
+        expect(wrapper.vm.showDonations).toBe(true)
+        expect(wrapper.vm.formData).toEqual({ goal: '25000', progress: '8000' })
       })
 
       describe('submit', () => {
-        beforeEach(() => {
-          jest.clearAllMocks()
-        })
-
-        it('calls mutation with default values once', () => {
-          wrapper.find('.donations-info-button').trigger('submit')
-          expect(donationsMutaionMock).toHaveBeenCalledWith(
+        it('calls mutation with default values once', async () => {
+          await wrapper.find('.donations-info-button').trigger('submit')
+          expect(donationsMutationMock).toHaveBeenCalledTimes(1)
+          expect(donationsMutationMock).toHaveBeenCalledWith(
             expect.objectContaining({
               variables: { showDonations: false, goal: 15000, progress: 0 },
             }),
@@ -135,61 +139,53 @@ describe('donations.vue', () => {
         })
 
         it('calls mutation with input values once', async () => {
-          wrapper.find('#showDonations').setChecked(true)
-          await wrapper.vm.$nextTick()
-          wrapper.find('#donations-goal').setValue('20000')
-          await wrapper.vm.$nextTick()
-          wrapper.find('#donations-progress').setValue('10000')
-          await wrapper.vm.$nextTick()
-          wrapper.find('.donations-info-button').trigger('submit')
-          await wrapper.vm.$nextTick()
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          await wrapper.find('#showDonations').setChecked(true)
+          await wrapper.find('#donations-goal').setValue('20000')
+          await wrapper.find('#donations-progress').setValue('10000')
+          await wrapper.find('.donations-info-button').trigger('submit')
+          expect(donationsMutationMock).toHaveBeenCalledTimes(1)
+          expect(donationsMutationMock).toHaveBeenCalledWith(
             expect.objectContaining({
               variables: { showDonations: true, goal: 20000, progress: 10000 },
             }),
           )
         })
 
-        it.skip('calls mutation with corrected values once', async () => {
-          wrapper.find('.show-donations-checkbox').trigger('click')
-          await Vue.nextTick()
-          expect(wrapper.vm.showDonations).toBe(false)
-          // wrapper.find('.donations-info-button').trigger('submit')
-          // await mocks.$apollo.mutate
-          // expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expect.objectContaining({variables: { showDonations: false, goal: 15000, progress: 7000 }}))
-          // expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
+        it('calls mutation with corrected values once', async () => {
+          await wrapper.find('#showDonations').setChecked(true)
+          await wrapper.find('#donations-goal').setValue('10000')
+          await wrapper.find('#donations-progress').setValue('15000')
+          await wrapper.find('.donations-info-button').trigger('submit')
+          expect(donationsMutationMock).toHaveBeenCalledTimes(1)
+          expect(donationsMutationMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              variables: { showDonations: true, goal: 10000, progress: 10000 },
+            }),
+          )
         })
 
-        it.skip('default values are displayed', async () => {
-          mocks.$apollo.mutate = jest.fn().mockResolvedValue({
-            data: { UpdateDonations: { showDonations: true, goal: 10, progress: 20 } },
+        it('default values are displayed after mutation', async () => {
+          await wrapper.find('.donations-info-button').trigger('submit')
+          const { update } = donationsMutationMock.mock.calls[0][0]
+          update(null, {
+            data: { UpdateDonations: { showDonations: true, goal: 15000, progress: 0 } },
           })
-          wrapper.find('.donations-info-button').trigger('submit')
-          await mocks.$apollo.mutate
-          await Vue.nextTick()
-          expect(wrapper.vm.showDonations).toBe(false)
-          expect(wrapper.vm.formData.goal).toBe(1)
-          expect(wrapper.vm.formData.progress).toBe(1)
+          await wrapper.vm.$nextTick()
+          expect(wrapper.vm.showDonations).toBe(true)
+          expect(wrapper.vm.formData).toEqual({ goal: '15000', progress: '0' })
         })
 
-        it.skip('entered values are send in the mutation', async () => {
-          // mocks.$apollo.mutate = jest.fn().mockResolvedValue({ data: { UpdateDonations: { showDonations: true, goal: 10, progress: 20 } } })
+        it('shows success toast after successful mutation', async () => {
+          await wrapper.find('.donations-info-button').trigger('submit')
+          await flushPromises()
+          expect(mocks.$toast.success).toHaveBeenCalledWith('admin.donations.successfulUpdate')
+        })
 
-          // expect(wrapper.vm.showDonations).toBe(null)
-          // expect(wrapper.vm.formData.goal).toBe(null)
-          // expect(wrapper.vm.formData.progress).toBe(null)
-          // wrapper.find('button').trigger('click')
-          // await Vue.nextTick()
-          // expect(wrapper.vm.showDonations).toBe(true)
-          // expect(wrapper.vm.formData.goal).toBe(1)
-          // expect(wrapper.vm.formData.progress).toBe(1)
-
-          // wrapper.find('button').trigger('click')
-          // wrapper.find('.donations-info-button').trigger('click')
-          // await Vue.nextTick()
-          // wrapper.find('.donations-info-button').trigger('submit')
-          await mocks.$apollo.mutate
-          expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
+        it('shows error toast when mutation fails', async () => {
+          donationsMutationMock.mockRejectedValueOnce(new Error('Network error'))
+          await wrapper.find('.donations-info-button').trigger('submit')
+          await flushPromises()
+          expect(mocks.$toast.error).toHaveBeenCalledWith('Network error')
         })
       })
     })
