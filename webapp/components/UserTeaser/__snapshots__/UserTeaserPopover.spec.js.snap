@@ -18,9 +18,9 @@ exports[`UserTeaserPopover does not show badges when disabled 1`] = `
         >
           <span
             class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
-            style="min-width: 1ch;"
+            style="min-width: 2ch;"
           >
-            0
+            42
           </span>
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -38,7 +38,7 @@ exports[`UserTeaserPopover does not show badges when disabled 1`] = `
             class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
             style="min-width: 1ch;"
           >
-            0
+            7
           </span>
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -54,9 +54,9 @@ exports[`UserTeaserPopover does not show badges when disabled 1`] = `
         >
           <span
             class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
-            style="min-width: 1ch;"
+            style="min-width: 2ch;"
           >
-            0
+            13
           </span>
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -129,9 +129,9 @@ exports[`UserTeaserPopover given a non-touch device does not show button when us
         >
           <span
             class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
-            style="min-width: 1ch;"
+            style="min-width: 2ch;"
           >
-            0
+            42
           </span>
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -149,7 +149,7 @@ exports[`UserTeaserPopover given a non-touch device does not show button when us
             class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
             style="min-width: 1ch;"
           >
-            0
+            7
           </span>
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -165,9 +165,9 @@ exports[`UserTeaserPopover given a non-touch device does not show button when us
         >
           <span
             class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
-            style="min-width: 1ch;"
+            style="min-width: 2ch;"
           >
-            0
+            13
           </span>
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -240,9 +240,9 @@ exports[`UserTeaserPopover given a touch device does not show button when userLi
         >
           <span
             class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
-            style="min-width: 1ch;"
+            style="min-width: 2ch;"
           >
-            0
+            42
           </span>
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -260,7 +260,7 @@ exports[`UserTeaserPopover given a touch device does not show button when userLi
             class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
             style="min-width: 1ch;"
           >
-            0
+            7
           </span>
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -276,9 +276,9 @@ exports[`UserTeaserPopover given a touch device does not show button when userLi
         >
           <span
             class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
-            style="min-width: 1ch;"
+            style="min-width: 2ch;"
           >
-            0
+            13
           </span>
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -351,9 +351,9 @@ exports[`UserTeaserPopover given a touch device shows button when userLink is pr
         >
           <span
             class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
-            style="min-width: 1ch;"
+            style="min-width: 2ch;"
           >
-            0
+            42
           </span>
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -371,7 +371,7 @@ exports[`UserTeaserPopover given a touch device shows button when userLink is pr
             class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
             style="min-width: 1ch;"
           >
-            0
+            7
           </span>
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -387,9 +387,9 @@ exports[`UserTeaserPopover given a touch device shows button when userLink is pr
         >
           <span
             class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
-            style="min-width: 1ch;"
+            style="min-width: 2ch;"
           >
-            0
+            13
           </span>
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -462,9 +462,9 @@ exports[`UserTeaserPopover shows badges when enabled 1`] = `
         >
           <span
             class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
-            style="min-width: 1ch;"
+            style="min-width: 2ch;"
           >
-            0
+            42
           </span>
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -482,7 +482,7 @@ exports[`UserTeaserPopover shows badges when enabled 1`] = `
             class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
             style="min-width: 1ch;"
           >
-            0
+            7
           </span>
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -498,9 +498,9 @@ exports[`UserTeaserPopover shows badges when enabled 1`] = `
         >
           <span
             class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
-            style="min-width: 1ch;"
+            style="min-width: 2ch;"
           >
-            0
+            13
           </span>
           <span
             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
