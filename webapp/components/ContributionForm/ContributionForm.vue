@@ -155,7 +155,6 @@
           />
           <os-badge
             v-if="categoriesActive"
-            size="base"
             :variant="errors && errors.categoryIds ? 'danger' : undefined"
           >
             {{ formData.categoryIds.length }} / 3

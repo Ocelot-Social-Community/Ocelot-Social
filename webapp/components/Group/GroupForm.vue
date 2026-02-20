@@ -50,7 +50,6 @@
           </option>
         </select>
         <os-badge
-          size="base"
           :variant="errors && errors.groupType && formData.groupType === '' ? 'danger' : 'default'"
         >
           {{ `${formData.groupType === '' ? 0 : 1} / 1` }}
@@ -97,7 +96,6 @@
           @change.native="changeActionRadius($event)"
         />
         <os-badge
-          size="base"
           :variant="
             errors && errors.actionRadius && formData.actionRadius === '' ? 'danger' : 'default'
           "
