@@ -60,7 +60,7 @@ describe('SearchResults', () => {
 
       describe('result contains 25 posts, 8 users and 0 hashtags', () => {
         // we couldn't get it running with "jest.runAllTimers()" and so we used "setTimeout"
-        // time is a bit more then 3000 milisec see "webapp/components/CountTo.vue"
+        // OsNumber animation runs for 1500ms
         const counterTimeout = 3000 + 10
 
         beforeEach(async () => {
