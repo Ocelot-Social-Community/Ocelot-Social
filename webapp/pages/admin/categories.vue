@@ -7,7 +7,9 @@
           <tr>
             <th class="ds-table-head-col">&nbsp;</th>
             <th class="ds-table-head-col">{{ $t('admin.categories.categoryName') }}</th>
-            <th class="ds-table-head-col ds-table-head-col-right">{{ $t('admin.categories.postCount') }}</th>
+            <th class="ds-table-head-col ds-table-head-col-right">
+              {{ $t('admin.categories.postCount') }}
+            </th>
           </tr>
         </thead>
         <tbody>

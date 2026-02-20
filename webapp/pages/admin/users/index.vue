@@ -28,7 +28,11 @@
     </os-card>
     <os-card v-if="User && User.length">
       <div class="ds-table-wrap">
-        <table class="ds-table ds-table-condensed ds-table-bordered" cellpadding="0" cellspacing="0">
+        <table
+          class="ds-table ds-table-condensed ds-table-bordered"
+          cellpadding="0"
+          cellspacing="0"
+        >
           <thead>
             <tr>
               <th class="ds-table-head-col">{{ $t('admin.users.table.columns.number') }}</th>
@@ -39,8 +43,12 @@
               <th class="ds-table-head-col ds-table-head-col-right">🖉</th>
               <th class="ds-table-head-col ds-table-head-col-right">🗨</th>
               <th class="ds-table-head-col ds-table-head-col-right">❤</th>
-              <th class="ds-table-head-col ds-table-head-col-right">{{ $t('admin.users.table.columns.role') }}</th>
-              <th v-if="$env.BADGES_ENABLED" class="ds-table-head-col ds-table-head-col-right">{{ $t('admin.users.table.columns.badges') }}</th>
+              <th class="ds-table-head-col ds-table-head-col-right">
+                {{ $t('admin.users.table.columns.role') }}
+              </th>
+              <th v-if="$env.BADGES_ENABLED" class="ds-table-head-col ds-table-head-col-right">
+                {{ $t('admin.users.table.columns.badges') }}
+              </th>
             </tr>
           </thead>
           <tbody>

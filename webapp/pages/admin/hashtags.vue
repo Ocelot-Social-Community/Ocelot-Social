@@ -7,8 +7,12 @@
           <tr>
             <th class="ds-table-head-col">{{ $t('admin.hashtags.number') }}</th>
             <th class="ds-table-head-col">{{ $t('admin.hashtags.name') }}</th>
-            <th class="ds-table-head-col ds-table-head-col-right">{{ $t('admin.hashtags.tagCountUnique') }}</th>
-            <th class="ds-table-head-col ds-table-head-col-right">{{ $t('admin.hashtags.tagCount') }}</th>
+            <th class="ds-table-head-col ds-table-head-col-right">
+              {{ $t('admin.hashtags.tagCountUnique') }}
+            </th>
+            <th class="ds-table-head-col ds-table-head-col-right">
+              {{ $t('admin.hashtags.tagCount') }}
+            </th>
           </tr>
         </thead>
         <tbody>

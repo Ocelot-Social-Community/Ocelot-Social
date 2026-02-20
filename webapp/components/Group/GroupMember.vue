@@ -9,7 +9,9 @@
             <th class="ds-table-head-col">{{ $t('group.membersAdministrationList.avatar') }}</th>
             <th class="ds-table-head-col">{{ $t('group.membersAdministrationList.name') }}</th>
             <th class="ds-table-head-col">{{ $t('group.membersAdministrationList.slug') }}</th>
-            <th class="ds-table-head-col">{{ $t('group.membersAdministrationList.roleInGroup') }}</th>
+            <th class="ds-table-head-col">
+              {{ $t('group.membersAdministrationList.roleInGroup') }}
+            </th>
             <th class="ds-table-head-col"></th>
           </tr>
         </thead>
@@ -56,7 +58,11 @@
                 :value="`${member.membership.role}`"
                 @change="changeMemberRole(member.user.id, $event)"
               >
-                <option v-for="role in ['pending', 'usual', 'admin', 'owner']" :key="role" :value="role">
+                <option
+                  v-for="role in ['pending', 'usual', 'admin', 'owner']"
+                  :key="role"
+                  :value="role"
+                >
                   {{ $t(`group.roles.${role}`) }}
                 </option>
               </select>
