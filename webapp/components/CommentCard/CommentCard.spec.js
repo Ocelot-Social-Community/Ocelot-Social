@@ -119,7 +119,7 @@ describe('CommentCard.vue', () => {
 
           it('renders comment data', () => {
             wrapper = Wrapper()
-            expect(wrapper.text()).toMatch('comment content')
+            expect(wrapper.text()).toMatch('Hello I am comment content')
           })
 
           it('has a "disabled-content" css class', () => {
