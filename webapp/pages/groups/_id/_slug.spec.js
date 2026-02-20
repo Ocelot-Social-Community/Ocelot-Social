@@ -118,7 +118,7 @@ describe('GroupProfileSlug', () => {
       locationName: null,
       location: null,
       isMutedByMe: false,
-      membersCount: 0,
+      membersCount: 4,
       // myRole: 'usual',
     }
     schoolForCitizens = {
