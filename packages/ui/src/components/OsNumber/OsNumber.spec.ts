@@ -208,6 +208,19 @@ describe('osNumber', () => {
 
       expect(wrapper.find('.os-number-count').text()).toBe('200')
     })
+
+    it('cancels animation on unmount', () => {
+      const wrapper = mount(OsNumber, {
+        props: { count: 100, animated: true },
+      })
+
+      // Animation is running
+      expect(window.requestAnimationFrame).toHaveBeenCalledWith(expect.any(Function))
+
+      wrapper.unmount()
+
+      expect(window.cancelAnimationFrame).toHaveBeenCalledWith(expect.any(Number))
+    })
   })
 
   describe('keyboard accessibility', () => {

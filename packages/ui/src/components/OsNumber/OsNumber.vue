@@ -1,5 +1,14 @@
 <script lang="ts">
-  import { defineComponent, getCurrentInstance, h, isVue2, onMounted, ref, watch } from 'vue-demi'
+  import {
+    defineComponent,
+    getCurrentInstance,
+    h,
+    isVue2,
+    onMounted,
+    onUnmounted,
+    ref,
+    watch,
+  } from 'vue-demi'
 
   import { cn } from '#src/utils'
 
@@ -78,6 +87,12 @@
       onMounted(() => {
         if (props.animated) {
           animateTo(0, props.count)
+        }
+      })
+
+      onUnmounted(() => {
+        if (animationFrame !== undefined) {
+          cancelAnimationFrame(animationFrame)
         }
       })
 
