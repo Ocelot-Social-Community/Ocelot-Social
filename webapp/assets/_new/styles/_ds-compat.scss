@@ -71,7 +71,7 @@
 
 // ds-table Ersatz
 .ds-table-wrap { width: 100%; overflow: auto; }
-.ds-table { width: 100%; }
+.ds-table { width: 100%; border-collapse: collapse; }
 .ds-table-col {
   vertical-align: middle;
   padding: $space-small $space-xx-small;

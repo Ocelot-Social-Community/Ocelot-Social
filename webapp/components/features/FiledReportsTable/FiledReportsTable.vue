@@ -1,6 +1,6 @@
 <template>
   <div v-if="filed && filed.length" class="nested-table ds-table-wrap">
-    <table class="ds-table ds-table-condensed ds-table-bordered" cellpadding="0" cellspacing="0">
+    <table class="ds-table ds-table-condensed ds-table-bordered">
       <colgroup>
         <col width="15%" />
         <col width="20%" />

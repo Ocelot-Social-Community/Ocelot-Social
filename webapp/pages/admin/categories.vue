@@ -2,7 +2,7 @@
   <os-card>
     <h2 class="title">{{ $t('admin.categories.name') }}</h2>
     <div class="ds-table-wrap">
-      <table class="ds-table ds-table-condensed ds-table-bordered" cellpadding="0" cellspacing="0">
+      <table class="ds-table ds-table-condensed ds-table-bordered">
         <thead>
           <tr>
             <th class="ds-table-head-col">&nbsp;</th>

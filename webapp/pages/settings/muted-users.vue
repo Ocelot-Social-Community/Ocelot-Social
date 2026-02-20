@@ -18,11 +18,7 @@
     </div>
     <os-card v-if="mutedUsers && mutedUsers.length">
       <div class="ds-table-wrap">
-        <table
-          class="ds-table ds-table-condensed ds-table-bordered"
-          cellpadding="0"
-          cellspacing="0"
-        >
+        <table class="ds-table ds-table-condensed ds-table-bordered">
           <thead>
             <tr>
               <th class="ds-table-head-col"></th>

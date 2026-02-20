@@ -2,8 +2,6 @@
   <table
     v-if="reports && reports.length"
     class="ds-table ds-table-condensed ds-table-bordered reports-table"
-    cellspacing="0"
-    cellpadding="0"
   >
     <colgroup>
       <col width="4%" />
@@ -14,7 +12,7 @@
       <col width="12%" />
     </colgroup>
     <thead class="ds-table-col ds-table-head-col">
-      <tr valign="top">
+      <tr>
         <th class="ds-table-head-col"></th>
         <th class="ds-table-head-col">{{ $t('moderation.reports.submitter') }}</th>
         <th class="ds-table-head-col">{{ $t('moderation.reports.content') }}</th>
