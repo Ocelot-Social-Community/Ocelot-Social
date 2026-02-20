@@ -28,25 +28,19 @@ describe('admin/index.vue', () => {
     }
 
     describe('in loading state', () => {
-      beforeEach(() => {
-        mocks = { ...mocks, $apolloData: { loading: true } }
-      })
-
-      it.skip('shows a loading spinner', () => {
-        // I don't know how to mock the data that gets passed to
-        // ApolloQuery component
-        // What I found:
-        // https://github.com/Akryum/vue-apollo/issues/656
-        // https://github.com/Akryum/vue-apollo/issues/609
-        Wrapper()
-        const calls = mocks.$t.mock.calls
-        const expected = [['site.error-occurred']]
-        expect(calls).toEqual(expected)
+      it('shows a loading spinner and no error message', async () => {
+        const wrapper = Wrapper()
+        wrapper.vm.$data.$apolloData.loading = 1
+        await wrapper.vm.$nextTick()
+        expect(wrapper.findComponent({ name: 'OsSpinner' }).exists()).toBe(true)
       })
     })
 
-    describe('in error state', () => {
-      it.todo('displays an error message')
+    describe('in default state (no data, not loading)', () => {
+      it('displays the error message', () => {
+        Wrapper()
+        expect(mocks.$t).toHaveBeenCalledWith('site.error-occurred')
+      })
     })
   })
 })
