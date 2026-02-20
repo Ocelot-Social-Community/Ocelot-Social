@@ -31,7 +31,7 @@
             </p>
           </td>
           <td class="ds-table-col">
-            {{ $t('report.reason.category.options.' + report.reasonCategory) }}
+            {{ report.reasonCategory ? $t('report.reason.category.options.' + report.reasonCategory) : '—' }}
           </td>
           <td class="ds-table-col">
             {{ report.reasonDescription || '—' }}
