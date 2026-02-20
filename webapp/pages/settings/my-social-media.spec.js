@@ -32,7 +32,7 @@ describe('my-social-media.vue', () => {
       },
     }
     mutations = {
-      'modal/SET_OPEN': jest.fn().mockResolvedValueOnce(),
+      'modal/SET_OPEN': jest.fn(),
     }
   })
 
