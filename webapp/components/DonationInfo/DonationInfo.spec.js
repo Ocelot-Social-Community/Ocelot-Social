@@ -53,13 +53,14 @@ describe('DonationInfo.vue', () => {
         })
 
         it('creates a label from the given amounts and a translation string', () => {
+          const originalToLocaleString = Number.prototype.toLocaleString
           const toLocaleStringSpy = jest.spyOn(Number.prototype, 'toLocaleString')
           toLocaleStringSpy.mockImplementation(function (locale) {
             if (locale === 'de')
               return this.valueOf()
                 .toString()
                 .replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-            return this.valueOf().toLocaleString()
+            return originalToLocaleString.call(this, locale)
           })
           wrapper = Wrapper()
           expect(mocks.$t).toHaveBeenCalledWith('donations.amount-of-total', {
