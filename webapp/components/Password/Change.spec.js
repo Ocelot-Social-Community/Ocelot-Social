@@ -8,7 +8,6 @@ describe('ChangePassword.vue', () => {
 
   beforeEach(() => {
     mocks = {
-      validate: jest.fn(),
       $toast: {
         error: jest.fn(),
         success: jest.fn(),
@@ -48,11 +47,8 @@ describe('ChangePassword.vue', () => {
             wrapper.find('input#password').setValue('some secret')
           })
 
-          it.skip('displays a warning', () => {
-            const calls = mocks.validate.mock.calls
-            const expected = [['change-password.validations.old-and-new-password-match']]
-            expect(calls).toEqual(expect.arrayContaining(expected))
-          })
+          // Validation is handled internally by ds-form schema — not testable via external mock
+          it.todo('displays a warning')
         })
       })
 

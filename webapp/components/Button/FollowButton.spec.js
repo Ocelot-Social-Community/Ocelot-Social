@@ -39,9 +39,33 @@ describe('FollowButton.vue', () => {
       expect(wrapper.findAll('[data-test="follow-btn"]')).toHaveLength(1)
     })
 
-    it.skip('toggle the button', async () => {
-      wrapper.find('[data-test="follow-btn"]').trigger('click') // This does not work since @click.prevent is used
-      expect(wrapper.vm.isFollowed).toBe(true)
+    describe('clicking the follow button', () => {
+      beforeEach(() => {
+        propsData = { followId: 'u1' }
+        mocks.$apollo.mutate.mockResolvedValue({
+          data: { followUser: { id: 'u1', followedByCurrentUser: true } },
+        })
+        wrapper = Wrapper()
+      })
+
+      it('emits optimistic result', async () => {
+        await wrapper.vm.toggle()
+        expect(wrapper.emitted('optimistic')[0]).toEqual([{ followedByCurrentUser: true }])
+      })
+
+      it('calls followUser mutation', async () => {
+        await wrapper.vm.toggle()
+        expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect.objectContaining({ variables: { id: 'u1' } }),
+        )
+      })
+
+      it('emits update with server response', async () => {
+        await wrapper.vm.toggle()
+        expect(wrapper.emitted('update')[0]).toEqual([
+          { id: 'u1', followedByCurrentUser: true },
+        ])
+      })
     })
   })
 })
