@@ -10,10 +10,13 @@ describe('osNumber', () => {
   beforeEach(() => {
     rafCallbacks = []
     mockTime = 0
-    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
-      rafCallbacks.push(cb)
-      return rafCallbacks.length
-    })
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
+      // eslint-disable-next-line promise/prefer-await-to-callbacks
+      (cb) => {
+        rafCallbacks.push(cb)
+        return rafCallbacks.length
+      },
+    )
     vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {})
     vi.spyOn(performance, 'now').mockImplementation(() => mockTime)
   })
@@ -26,9 +29,11 @@ describe('osNumber', () => {
     mockTime += 1500
     let safety = 0
     while (rafCallbacks.length > 0 && safety++ < 100) {
-      rafCallbacks.shift()!(mockTime)
+      const fn = rafCallbacks.shift() as (time: number) => void
+      fn(mockTime)
     }
   }
+
   describe('rendering', () => {
     it('renders as div element', () => {
       const wrapper = mount(OsNumber, {
@@ -148,6 +153,7 @@ describe('osNumber', () => {
 
       flushAnimation()
       await wrapper.vm.$nextTick()
+
       expect(wrapper.find('.os-number-count').text()).toBe('50')
 
       await wrapper.setProps({ count: 100 })
@@ -163,10 +169,12 @@ describe('osNumber', () => {
       })
 
       mockTime += 750
-      rafCallbacks.shift()!(mockTime)
+      const fn = rafCallbacks.shift() as (time: number) => void
+      fn(mockTime)
       await wrapper.vm.$nextTick()
 
       const intermediate = Number(wrapper.find('.os-number-count').text())
+
       expect(intermediate).toBeGreaterThan(0)
       expect(intermediate).toBeLessThan(100)
     })
@@ -189,11 +197,11 @@ describe('osNumber', () => {
       })
 
       // First animation starts on mount
-      expect(window.requestAnimationFrame).toHaveBeenCalled()
+      expect(window.requestAnimationFrame).toHaveBeenCalledWith(expect.any(Function))
 
       await wrapper.setProps({ count: 200 })
 
-      expect(window.cancelAnimationFrame).toHaveBeenCalled()
+      expect(window.cancelAnimationFrame).toHaveBeenCalledWith(expect.any(Number))
 
       flushAnimation()
       await wrapper.vm.$nextTick()
