@@ -150,27 +150,44 @@ describe('my-social-media.vue', () => {
         })
       })
 
-      // TODO: confirm deletion modal is not present
-      describe.skip('deleting social media link', () => {
+      describe('deleting social media link', () => {
         beforeEach(async () => {
           const deleteButton = wrapper.find('button[data-test="delete-button"]')
           deleteButton.trigger('click')
           await Vue.nextTick()
-          // wrapper.find('button.cancel').trigger('click')
-          // await Vue.nextTick()
         })
 
-        it('sends the link id to the backend', () => {
-          const expected = expect.objectContaining({
-            variables: { id: 's1' },
+        it('opens the confirmation modal', () => {
+          expect(mutations['modal/SET_OPEN']).toHaveBeenCalledTimes(1)
+          expect(mutations['modal/SET_OPEN']).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.objectContaining({
+              name: 'confirm',
+            }),
+          )
+        })
+
+        describe('when user confirms deletion', () => {
+          beforeEach(async () => {
+            mocks.$apollo.mutate.mockResolvedValue({
+              data: { DeleteSocialMedia: { id: 's1' } },
+            })
+            const modalCall = mutations['modal/SET_OPEN'].mock.calls[0][1]
+            modalCall.data.modalData.buttons.confirm.callback()
+            await flushPromises()
           })
-          expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
-        })
 
-        it('displays a success message', async () => {
-          await flushPromises()
-          expect(mocks.$toast.success).toHaveBeenCalledTimes(1)
+          it('sends the link id to the backend', () => {
+            const expected = expect.objectContaining({
+              variables: { id: 's1' },
+            })
+            expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
+            expect(mocks.$apollo.mutate).toHaveBeenCalledWith(expected)
+          })
+
+          it('displays a success message', () => {
+            expect(mocks.$toast.success).toHaveBeenCalledTimes(1)
+          })
         })
       })
     })
