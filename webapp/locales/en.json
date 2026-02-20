@@ -108,11 +108,14 @@
       "table": {
         "columns": {
           "badges": "Badges",
+          "comments": "Comments",
+          "contributions": "Contributions",
           "createdAt": "Created at",
           "email": "E-mail",
           "name": "Name",
           "number": "No.",
           "role": "Role",
+          "shouted": "Shouted",
           "slug": "Slug"
         }
       }

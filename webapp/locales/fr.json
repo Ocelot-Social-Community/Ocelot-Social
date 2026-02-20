@@ -107,13 +107,16 @@
       "roleChanged": null,
       "table": {
         "columns": {
-          "badges": null,
-          "createdAt": "Créé à",
-          "email": "Mail",
+          "badges": "Badges",
+          "comments": "Commentaires",
+          "contributions": "Contributions",
+          "createdAt": "Créé le",
+          "email": "E-mail",
           "name": "Nom",
-          "number": "Num.",
+          "number": "N°",
           "role": "Rôle",
-          "slug": "Slug"
+          "shouted": "Partagé",
+          "slug": "Identifiant"
         }
       }
     }

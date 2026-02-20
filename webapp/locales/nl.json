@@ -107,13 +107,16 @@
       "roleChanged": null,
       "table": {
         "columns": {
-          "badges": null,
-          "createdAt": null,
-          "email": null,
-          "name": null,
-          "number": null,
-          "role": null,
-          "slug": null
+          "badges": "Badges",
+          "comments": "Reacties",
+          "contributions": "Bijdragen",
+          "createdAt": "Aangemaakt op",
+          "email": "E-mail",
+          "name": "Naam",
+          "number": "Nr.",
+          "role": "Rol",
+          "shouted": "Gedeeld",
+          "slug": "Alias"
         }
       }
     }

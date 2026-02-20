@@ -108,11 +108,14 @@
       "table": {
         "columns": {
           "badges": "Auszeichnungen",
+          "comments": "Kommentare",
+          "contributions": "Beiträge",
           "createdAt": "Erstellt am",
           "email": "E-Mail",
           "name": "Name",
           "number": "Nr.",
           "role": "Rolle",
+          "shouted": "Geteilt",
           "slug": "Alias"
         }
       }
