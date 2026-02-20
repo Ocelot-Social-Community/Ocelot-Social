@@ -122,17 +122,36 @@ describe('osBadge', () => {
     })
   })
 
+  describe('aria attributes', () => {
+    it('has no role or aria-live by default', () => {
+      const wrapper = mount(OsBadge)
+
+      expect(wrapper.attributes('role')).toBeUndefined()
+      expect(wrapper.attributes('aria-live')).toBeUndefined()
+    })
+
+    it('passes through role attribute', () => {
+      const wrapper = mount(OsBadge, {
+        attrs: { role: 'status' },
+      })
+
+      expect(wrapper.attributes('role')).toBe('status')
+    })
+
+    it('passes through aria-live attribute', () => {
+      const wrapper = mount(OsBadge, {
+        attrs: { 'aria-live': 'polite' },
+      })
+
+      expect(wrapper.attributes('aria-live')).toBe('polite')
+    })
+  })
+
   describe('keyboard accessibility', () => {
     it('is not focusable (non-interactive element)', () => {
       const wrapper = mount(OsBadge)
 
       expect(wrapper.attributes('tabindex')).toBeUndefined()
-    })
-
-    it('has no interactive role', () => {
-      const wrapper = mount(OsBadge)
-
-      expect(wrapper.attributes('role')).toBeUndefined()
     })
   })
 })
