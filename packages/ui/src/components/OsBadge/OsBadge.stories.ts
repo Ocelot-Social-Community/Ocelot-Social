@@ -129,10 +129,10 @@ export const WithIcon: Story = {
     template: `
       <div data-testid="with-icon" class="flex items-center gap-3">
         <OsBadge variant="primary">
-          <span style="margin-right: 4px">✓</span> Verified
+          <span class="mr-1">✓</span> Verified
         </OsBadge>
         <OsBadge variant="danger">
-          <span style="margin-right: 4px">⚠</span> Error
+          <span class="mr-1">⚠</span> Error
         </OsBadge>
       </div>
     `,
