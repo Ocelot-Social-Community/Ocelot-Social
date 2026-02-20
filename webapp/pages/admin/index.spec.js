@@ -9,7 +9,6 @@ localVue.use(VueApollo)
 
 describe('admin/index.vue', () => {
   let Wrapper
-  let store
   let mocks
 
   beforeEach(() => {
@@ -21,7 +20,6 @@ describe('admin/index.vue', () => {
   describe('mount', () => {
     Wrapper = () => {
       return mount(AdminIndexPage, {
-        store,
         mocks,
         localVue,
       })
