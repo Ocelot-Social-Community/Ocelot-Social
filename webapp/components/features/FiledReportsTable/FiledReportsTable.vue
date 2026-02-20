@@ -9,10 +9,10 @@
       </colgroup>
       <thead>
         <tr>
-          <th class="ds-table-head-col">{{ $t('moderation.reports.submitter') }}</th>
-          <th class="ds-table-head-col">{{ $t('moderation.reports.reportedOn') }}</th>
-          <th class="ds-table-head-col">{{ $t('moderation.reports.reasonCategory') }}</th>
-          <th class="ds-table-head-col">{{ $t('moderation.reports.reasonDescription') }}</th>
+          <th scope="col" class="ds-table-head-col">{{ $t('moderation.reports.submitter') }}</th>
+          <th scope="col" class="ds-table-head-col">{{ $t('moderation.reports.reportedOn') }}</th>
+          <th scope="col" class="ds-table-head-col">{{ $t('moderation.reports.reasonCategory') }}</th>
+          <th scope="col" class="ds-table-head-col">{{ $t('moderation.reports.reasonDescription') }}</th>
         </tr>
       </thead>
       <tbody>

@@ -6,13 +6,13 @@
       <table class="ds-table ds-table-condensed ds-table-bordered">
         <thead>
           <tr>
-            <th class="ds-table-head-col">{{ $t('group.membersAdministrationList.avatar') }}</th>
-            <th class="ds-table-head-col">{{ $t('group.membersAdministrationList.name') }}</th>
-            <th class="ds-table-head-col">{{ $t('group.membersAdministrationList.slug') }}</th>
-            <th class="ds-table-head-col">
+            <th scope="col" class="ds-table-head-col">{{ $t('group.membersAdministrationList.avatar') }}</th>
+            <th scope="col" class="ds-table-head-col">{{ $t('group.membersAdministrationList.name') }}</th>
+            <th scope="col" class="ds-table-head-col">{{ $t('group.membersAdministrationList.slug') }}</th>
+            <th scope="col" class="ds-table-head-col">
               {{ $t('group.membersAdministrationList.roleInGroup') }}
             </th>
-            <th class="ds-table-head-col"></th>
+            <th scope="col" class="ds-table-head-col" aria-hidden="true"></th>
           </tr>
         </thead>
         <tbody>

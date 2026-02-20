@@ -21,10 +21,10 @@
         <table class="ds-table ds-table-condensed ds-table-bordered">
           <thead>
             <tr>
-              <th class="ds-table-head-col"></th>
-              <th class="ds-table-head-col">{{ $t('settings.muted-users.columns.name') }}</th>
-              <th class="ds-table-head-col">{{ $t('settings.muted-users.columns.slug') }}</th>
-              <th class="ds-table-head-col">{{ $t('settings.muted-users.columns.unmute') }}</th>
+              <th scope="col" class="ds-table-head-col" aria-hidden="true"></th>
+              <th scope="col" class="ds-table-head-col">{{ $t('settings.muted-users.columns.name') }}</th>
+              <th scope="col" class="ds-table-head-col">{{ $t('settings.muted-users.columns.slug') }}</th>
+              <th scope="col" class="ds-table-head-col">{{ $t('settings.muted-users.columns.unmute') }}</th>
             </tr>
           </thead>
           <tbody>

@@ -5,12 +5,12 @@
       <table class="ds-table ds-table-condensed ds-table-bordered">
         <thead>
           <tr>
-            <th class="ds-table-head-col">{{ $t('admin.hashtags.number') }}</th>
-            <th class="ds-table-head-col">{{ $t('admin.hashtags.nameOfHashtag') }}</th>
-            <th class="ds-table-head-col ds-table-head-col-right">
+            <th scope="col" class="ds-table-head-col">{{ $t('admin.hashtags.number') }}</th>
+            <th scope="col" class="ds-table-head-col">{{ $t('admin.hashtags.nameOfHashtag') }}</th>
+            <th scope="col" class="ds-table-head-col ds-table-head-col-right">
               {{ $t('admin.hashtags.tagCountUnique') }}
             </th>
-            <th class="ds-table-head-col ds-table-head-col-right">
+            <th scope="col" class="ds-table-head-col ds-table-head-col-right">
               {{ $t('admin.hashtags.tagCount') }}
             </th>
           </tr>

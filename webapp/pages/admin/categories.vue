@@ -5,9 +5,9 @@
       <table class="ds-table ds-table-condensed ds-table-bordered">
         <thead>
           <tr>
-            <th class="ds-table-head-col">&nbsp;</th>
-            <th class="ds-table-head-col">{{ $t('admin.categories.categoryName') }}</th>
-            <th class="ds-table-head-col ds-table-head-col-right">
+            <th scope="col" class="ds-table-head-col" aria-hidden="true"></th>
+            <th scope="col" class="ds-table-head-col">{{ $t('admin.categories.categoryName') }}</th>
+            <th scope="col" class="ds-table-head-col ds-table-head-col-right">
               {{ $t('admin.categories.postCount') }}
             </th>
           </tr>
