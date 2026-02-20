@@ -29,11 +29,12 @@ describe('admin/index.vue', () => {
 
     describe('in loading state', () => {
       it('shows a loading spinner and no error message', async () => {
+        mocks.$t.mockImplementation((key) => key)
         const wrapper = Wrapper()
         wrapper.vm.$data.$apolloData.loading = 1
         await wrapper.vm.$nextTick()
         expect(wrapper.findComponent({ name: 'OsSpinner' }).exists()).toBe(true)
-        expect(wrapper.find('.error-message').exists()).toBe(false)
+        expect(wrapper.text()).not.toContain('site.error-occurred')
       })
     })
 
