@@ -17,7 +17,7 @@
           autofocus
           :placeholder="`${$t('group.name')} …`"
         />
-        <os-badge size="base" :variant="errors && errors.name ? 'danger' : 'default'">
+        <os-badge :variant="errors && errors.name ? 'danger' : 'default'">
           {{ `${formData.name.length} / ${formSchema.name.min}–${formSchema.name.max}` }}
           <os-icon v-if="errors && errors.name" :icon="icons.warning" />
         </os-badge>
@@ -83,7 +83,7 @@
           :hashtags="null"
           @input="updateEditorDescription"
         />
-        <os-badge size="base" :variant="errors && errors.description ? 'danger' : 'default'">
+        <os-badge :variant="errors && errors.description ? 'danger' : 'default'">
           {{ `${descriptionLength} / ${formSchema.description.min}` }}
           <os-icon v-if="errors && errors.description" :icon="icons.warning" />
         </os-badge>
@@ -125,7 +125,7 @@
             name="categoryIds"
             :existingCategoryIds="formData.categoryIds"
           />
-          <os-badge size="base" :variant="errors && errors.categoryIds ? 'danger' : 'default'">
+          <os-badge :variant="errors && errors.categoryIds ? 'danger' : 'default'">
             {{ formData.categoryIds.length }} / 3
             <os-icon v-if="errors && errors.categoryIds" :icon="icons.warning" />
           </os-badge>
