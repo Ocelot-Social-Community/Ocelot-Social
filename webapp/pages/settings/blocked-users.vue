@@ -25,9 +25,15 @@
           <thead>
             <tr>
               <th scope="col" class="ds-table-head-col" aria-hidden="true"></th>
-              <th scope="col" class="ds-table-head-col">{{ $t('settings.blocked-users.columns.name') }}</th>
-              <th scope="col" class="ds-table-head-col">{{ $t('settings.blocked-users.columns.slug') }}</th>
-              <th scope="col" class="ds-table-head-col">{{ $t('settings.blocked-users.columns.unblock') }}</th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('settings.blocked-users.columns.name') }}
+              </th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('settings.blocked-users.columns.slug') }}
+              </th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('settings.blocked-users.columns.unblock') }}
+              </th>
             </tr>
           </thead>
           <tbody>

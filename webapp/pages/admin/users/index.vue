@@ -31,25 +31,38 @@
         <table class="ds-table ds-table-condensed ds-table-bordered">
           <thead>
             <tr>
-              <th scope="col" class="ds-table-head-col">{{ $t('admin.users.table.columns.number') }}</th>
-              <th scope="col" class="ds-table-head-col">{{ $t('admin.users.table.columns.name') }}</th>
-              <th scope="col" class="ds-table-head-col">{{ $t('admin.users.table.columns.email') }}</th>
-              <th scope="col" class="ds-table-head-col">{{ $t('admin.users.table.columns.slug') }}</th>
-              <th scope="col" class="ds-table-head-col">{{ $t('admin.users.table.columns.createdAt') }}</th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('admin.users.table.columns.number') }}
+              </th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('admin.users.table.columns.name') }}
+              </th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('admin.users.table.columns.email') }}
+              </th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('admin.users.table.columns.slug') }}
+              </th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('admin.users.table.columns.createdAt') }}
+              </th>
               <th
-                scope="col" class="ds-table-head-col ds-table-head-col-right"
+                scope="col"
+                class="ds-table-head-col ds-table-head-col-right"
                 :aria-label="$t('admin.users.table.columns.contributions')"
               >
                 🖉
               </th>
               <th
-                scope="col" class="ds-table-head-col ds-table-head-col-right"
+                scope="col"
+                class="ds-table-head-col ds-table-head-col-right"
                 :aria-label="$t('admin.users.table.columns.comments')"
               >
                 🗨
               </th>
               <th
-                scope="col" class="ds-table-head-col ds-table-head-col-right"
+                scope="col"
+                class="ds-table-head-col ds-table-head-col-right"
                 :aria-label="$t('admin.users.table.columns.shouted')"
               >
                 ❤
@@ -57,7 +70,11 @@
               <th scope="col" class="ds-table-head-col ds-table-head-col-right">
                 {{ $t('admin.users.table.columns.role') }}
               </th>
-              <th v-if="$env.BADGES_ENABLED" scope="col" class="ds-table-head-col ds-table-head-col-right">
+              <th
+                v-if="$env.BADGES_ENABLED"
+                scope="col"
+                class="ds-table-head-col ds-table-head-col-right"
+              >
                 {{ $t('admin.users.table.columns.badges') }}
               </th>
             </tr>

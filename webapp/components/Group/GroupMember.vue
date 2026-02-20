@@ -6,9 +6,15 @@
       <table class="ds-table ds-table-condensed ds-table-bordered">
         <thead>
           <tr>
-            <th scope="col" class="ds-table-head-col">{{ $t('group.membersAdministrationList.avatar') }}</th>
-            <th scope="col" class="ds-table-head-col">{{ $t('group.membersAdministrationList.name') }}</th>
-            <th scope="col" class="ds-table-head-col">{{ $t('group.membersAdministrationList.slug') }}</th>
+            <th scope="col" class="ds-table-head-col">
+              {{ $t('group.membersAdministrationList.avatar') }}
+            </th>
+            <th scope="col" class="ds-table-head-col">
+              {{ $t('group.membersAdministrationList.name') }}
+            </th>
+            <th scope="col" class="ds-table-head-col">
+              {{ $t('group.membersAdministrationList.slug') }}
+            </th>
             <th scope="col" class="ds-table-head-col">
               {{ $t('group.membersAdministrationList.roleInGroup') }}
             </th>
@@ -57,11 +63,7 @@
                 :value="`${member.membership.role}`"
                 @change="changeMemberRole(member.user.id, $event)"
               >
-                <option
-                  v-for="role in groupRoles"
-                  :key="role"
-                  :value="role"
-                >
+                <option v-for="role in groupRoles" :key="role" :value="role">
                   {{ $t(`group.roles.${role}`) }}
                 </option>
               </select>

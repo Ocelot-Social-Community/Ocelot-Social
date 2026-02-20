@@ -22,9 +22,15 @@
           <thead>
             <tr>
               <th scope="col" class="ds-table-head-col" aria-hidden="true"></th>
-              <th scope="col" class="ds-table-head-col">{{ $t('settings.muted-users.columns.name') }}</th>
-              <th scope="col" class="ds-table-head-col">{{ $t('settings.muted-users.columns.slug') }}</th>
-              <th scope="col" class="ds-table-head-col">{{ $t('settings.muted-users.columns.unmute') }}</th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('settings.muted-users.columns.name') }}
+              </th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('settings.muted-users.columns.slug') }}
+              </th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('settings.muted-users.columns.unmute') }}
+              </th>
             </tr>
           </thead>
           <tbody>
