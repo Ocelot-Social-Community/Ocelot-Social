@@ -97,7 +97,7 @@
               <td class="ds-table-col ds-table-col-right">{{ user.commentedCount }}</td>
               <td class="ds-table-col ds-table-col-right">{{ user.shoutedCount }}</td>
               <td class="ds-table-col ds-table-col-right">
-                <template v-if="userRoles">
+                <template v-if="userRoles.length">
                   <select
                     v-if="user.id !== currentUser.id"
                     :value="user.role"
