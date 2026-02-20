@@ -25,7 +25,7 @@ Feature: Admin tag overview
   Scenario: See an overview of tags
     When I navigate to page "/admin/hashtags"
     Then I can see the following table:
-      | No. | Hashtags   | Users | Posts |
+      | No. | Name       | Users | Posts |
       | 1   | #Democracy | 3     | 3     |
       | 2   | #Nature    | 2     | 2     |
       | 3   | #Ecology   | 1     | 1     |
