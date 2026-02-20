@@ -71,7 +71,7 @@ describe('Embed.vue', () => {
     })
 
     describe('without any meta data', () => {
-      it('renders a link without `embed` class', async () => {
+      it('renders with empty embed data', async () => {
         propsData.options = {
           onEmbed: () => ({}),
         }
