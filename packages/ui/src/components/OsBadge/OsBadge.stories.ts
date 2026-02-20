@@ -27,7 +27,7 @@ export const Playground: StoryObj<PlaygroundArgs> = {
     },
     size: {
       control: 'select',
-      options: ['sm', 'base', 'lg'],
+      options: ['sm', 'md', 'lg'],
     },
     content: {
       control: 'text',
@@ -75,8 +75,8 @@ export const AllSizes: Story = {
           <span class="text-xs text-gray-500">sm</span>
         </div>
         <div class="flex flex-col items-center gap-2">
-          <OsBadge size="base">Base</OsBadge>
-          <span class="text-xs text-gray-500">base</span>
+          <OsBadge size="md">Medium</OsBadge>
+          <span class="text-xs text-gray-500">md</span>
         </div>
         <div class="flex flex-col items-center gap-2">
           <OsBadge size="lg">Large</OsBadge>
@@ -93,11 +93,11 @@ export const FormCounter: Story = {
     template: `
       <div data-testid="form-counter" class="flex flex-col gap-3">
         <p class="text-sm text-gray-500 m-0">Valid counter:</p>
-        <OsBadge size="base">42/100</OsBadge>
+        <OsBadge size="md">42/100</OsBadge>
         <p class="text-sm text-gray-500 m-0">Error counter (danger):</p>
-        <OsBadge size="base" variant="danger">105/100 ⚠</OsBadge>
+        <OsBadge size="md" variant="danger">105/100 ⚠</OsBadge>
         <p class="text-sm text-gray-500 m-0">Default with counter (form idle):</p>
-        <OsBadge size="base" variant="default">0/100</OsBadge>
+        <OsBadge size="md" variant="default">0/100</OsBadge>
       </div>
     `,
   }),

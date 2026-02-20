@@ -20,7 +20,7 @@ export const badgeVariants = cva(
       },
       size: {
         sm: 'text-[0.75rem] py-[0.2em] px-[0.8em]',
-        base: 'text-[0.8rem] py-[0.1em] px-[1em]',
+        md: 'text-[0.875rem] py-[0.15em] px-[1em]',
         lg: 'text-[1rem] py-[0.15em] px-[1.2em]',
       },
     },
@@ -33,5 +33,5 @@ export const badgeVariants = cva(
 
 export type BadgeVariants = VariantProps<typeof badgeVariants>
 
-/** Badge-specific size subset: sm | base | lg */
+/** Badge-specific size subset: sm | md | lg */
 export type BadgeSize = NonNullable<BadgeVariants['size']>

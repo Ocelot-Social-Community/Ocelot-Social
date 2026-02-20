@@ -87,12 +87,12 @@ describe('osBadge', () => {
       expect(wrapper.classes()).toContain('px-[0.8em]')
     })
 
-    it('applies base size classes', () => {
+    it('applies md size classes', () => {
       const wrapper = mount(OsBadge, {
-        props: { size: 'base' },
+        props: { size: 'md' },
       })
 
-      expect(wrapper.classes()).toContain('text-[0.8rem]')
+      expect(wrapper.classes()).toContain('text-[0.875rem]')
       expect(wrapper.classes()).toContain('px-[1em]')
     })
 
