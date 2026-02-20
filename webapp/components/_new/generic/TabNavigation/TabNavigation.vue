@@ -92,8 +92,9 @@ export default {
 }
 .tab-navigation {
   position: sticky;
-  top: 53px;
+  top: var(--header-height, 53px);
   z-index: 2;
+  transition: top 0.15s ease;
 }
 .ds-tab-nav.os-card {
   padding: 0 !important;

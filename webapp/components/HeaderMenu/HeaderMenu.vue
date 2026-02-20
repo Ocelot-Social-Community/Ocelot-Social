@@ -435,6 +435,14 @@ export default {
         }
       }
       this.prevScrollpos = currentScrollPos
+      this.updateHeaderOffset()
+    },
+    updateHeaderOffset() {
+      const el = this.$el
+      if (el) {
+        const height = this.hideNavbar ? 0 : el.offsetHeight
+        document.documentElement.style.setProperty('--header-height', `${height}px`)
+      }
     },
     toggleMobileMenuView() {
       this.toggleMobileMenu = !this.toggleMobileMenu
@@ -442,6 +450,7 @@ export default {
   },
   mounted() {
     window.addEventListener('scroll', this.handleScroll)
+    this.$nextTick(() => this.updateHeaderOffset())
   },
   beforeDestroy() {
     window.removeEventListener('scroll', this.handleScroll)
