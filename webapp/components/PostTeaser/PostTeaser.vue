@@ -357,7 +357,7 @@ export default {
       z-index: $z-index-post-teaser-link;
     }
 
-    .ds-tag {
+    .os-badge {
       margin: 0;
       margin-right: $space-xx-small;
     }
