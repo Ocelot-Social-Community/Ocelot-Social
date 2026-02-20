@@ -52,12 +52,18 @@ describe('DonationInfo.vue', () => {
           mocks.$i18n.locale = () => 'de'
         })
 
-        // it looks to me that toLocaleString for some reason is not working as expected
-        it.skip('creates a label from the given amounts and a translation string', () => {
-          expect(mocks.$t).toHaveBeenNthCalledWith(1, 'donations.amount-of-total', {
+        it('creates a label from the given amounts and a translation string', () => {
+          const toLocaleStringSpy = jest.spyOn(Number.prototype, 'toLocaleString')
+          toLocaleStringSpy.mockImplementation(function (locale) {
+            if (locale === 'de') return this.valueOf().toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+            return this.valueOf().toLocaleString()
+          })
+          wrapper = Wrapper()
+          expect(mocks.$t).toHaveBeenCalledWith('donations.amount-of-total', {
             amount: '10.000',
             total: '50.000',
           })
+          toLocaleStringSpy.mockRestore()
         })
       })
 

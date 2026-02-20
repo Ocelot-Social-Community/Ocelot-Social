@@ -42,7 +42,7 @@ describe('CommentCard.vue', () => {
       },
     }
     stubs = {
-      ContentViewer: true,
+      ContentViewer: { template: '<div>{{ content }}</div>', props: ['content'] },
       'client-only': true,
       'nuxt-link': true,
     }
@@ -85,10 +85,9 @@ describe('CommentCard.vue', () => {
         }
       })
 
-      // skipped for now because of the immense difficulty in testing tiptap editor
-      it.skip('renders content', () => {
+      it('renders content', () => {
         wrapper = Wrapper()
-        expect(wrapper.text()).toMatch('Hello I am a comment content')
+        expect(wrapper.text()).toMatch('Hello I am comment content')
       })
 
       describe('which is disabled', () => {
@@ -118,7 +117,7 @@ describe('CommentCard.vue', () => {
             getters['auth/isModerator'] = () => true
           })
 
-          it.skip('renders comment data', () => {
+          it('renders comment data', () => {
             wrapper = Wrapper()
             expect(wrapper.text()).toMatch('comment content')
           })

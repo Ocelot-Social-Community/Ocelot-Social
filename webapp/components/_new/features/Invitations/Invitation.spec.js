@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/vue'
 import '@testing-library/jest-dom'
+import Vuex from 'vuex'
 
 import Invitation from './Invitation.vue'
 
@@ -12,13 +13,27 @@ Object.assign(navigator, {
 })
 
 const mutations = {
-  'modal/SET_OPEN': jest.fn().mockResolvedValue(),
+  'modal/SET_OPEN': jest.fn(),
 }
 
 describe('Invitation.vue', () => {
   let wrapper
 
+  beforeEach(() => {
+    mutations['modal/SET_OPEN'].mockClear()
+  })
+
   const Wrapper = ({ wasRedeemed = false, withCopymessage = false }) => {
+    const store = new Vuex.Store({
+      modules: {
+        modal: {
+          namespaced: true,
+          mutations: {
+            SET_OPEN: mutations['modal/SET_OPEN'],
+          },
+        },
+      },
+    })
     const propsData = {
       inviteCode: {
         code: 'test-invite-code',
@@ -29,6 +44,7 @@ describe('Invitation.vue', () => {
     }
     return render(Invitation, {
       localVue,
+      store,
       propsData,
       mocks: {
         $t: jest.fn((v) => v),
@@ -37,7 +53,6 @@ describe('Invitation.vue', () => {
           error: jest.fn(),
         },
       },
-      mutations,
     })
   }
 
@@ -101,7 +116,7 @@ describe('Invitation.vue', () => {
     })
   })
 
-  describe.skip('invalidate button', () => {
+  describe('invalidate button', () => {
     beforeEach(() => {
       wrapper = Wrapper({ wasRedeemed: false })
     })
