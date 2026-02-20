@@ -2,6 +2,7 @@ import { computed } from 'vue'
 
 import OsBadge from './OsBadge.vue'
 
+import type { BadgeShape, BadgeSize, BadgeVariant } from './badge.variants'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 const meta: Meta<typeof OsBadge> = {
@@ -14,9 +15,9 @@ export default meta
 type Story = StoryObj<typeof OsBadge>
 
 interface PlaygroundArgs {
-  variant: string
-  size: string
-  shape: string
+  variant: BadgeVariant
+  size: BadgeSize
+  shape: BadgeShape
   content: string
 }
 
