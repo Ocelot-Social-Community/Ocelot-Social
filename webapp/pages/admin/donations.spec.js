@@ -127,8 +127,8 @@ describe('donations.vue', () => {
           jest.clearAllMocks()
         })
 
-        it('calls mutation with default values once', () => {
-          wrapper.find('.donations-info-button').trigger('submit')
+        it('calls mutation with default values once', async () => {
+          await wrapper.find('.donations-info-button').trigger('submit')
           expect(donationsMutationMock).toHaveBeenCalledWith(
             expect.objectContaining({
               variables: { showDonations: false, goal: 15000, progress: 0 },
@@ -137,14 +137,10 @@ describe('donations.vue', () => {
         })
 
         it('calls mutation with input values once', async () => {
-          wrapper.find('#showDonations').setChecked(true)
-          await wrapper.vm.$nextTick()
-          wrapper.find('#donations-goal').setValue('20000')
-          await wrapper.vm.$nextTick()
-          wrapper.find('#donations-progress').setValue('10000')
-          await wrapper.vm.$nextTick()
-          wrapper.find('.donations-info-button').trigger('submit')
-          await wrapper.vm.$nextTick()
+          await wrapper.find('#showDonations').setChecked(true)
+          await wrapper.find('#donations-goal').setValue('20000')
+          await wrapper.find('#donations-progress').setValue('10000')
+          await wrapper.find('.donations-info-button').trigger('submit')
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
             expect.objectContaining({
               variables: { showDonations: true, goal: 20000, progress: 10000 },
@@ -153,13 +149,10 @@ describe('donations.vue', () => {
         })
 
         it('calls mutation with corrected values once', async () => {
-          wrapper.find('#showDonations').setChecked(true)
-          await wrapper.vm.$nextTick()
-          wrapper.find('#donations-goal').setValue('10000')
-          await wrapper.vm.$nextTick()
-          wrapper.find('#donations-progress').setValue('15000')
-          await wrapper.vm.$nextTick()
-          wrapper.find('.donations-info-button').trigger('submit')
+          await wrapper.find('#showDonations').setChecked(true)
+          await wrapper.find('#donations-goal').setValue('10000')
+          await wrapper.find('#donations-progress').setValue('15000')
+          await wrapper.find('.donations-info-button').trigger('submit')
           expect(donationsMutationMock).toHaveBeenCalledWith(
             expect.objectContaining({
               variables: { showDonations: true, goal: 10000, progress: 10000 },
@@ -167,8 +160,8 @@ describe('donations.vue', () => {
           )
         })
 
-        it('default values are displayed after mutation', () => {
-          wrapper.find('.donations-info-button').trigger('submit')
+        it('default values are displayed after mutation', async () => {
+          await wrapper.find('.donations-info-button').trigger('submit')
           const { update } = donationsMutationMock.mock.calls[0][0]
           update(null, {
             data: { UpdateDonations: { showDonations: true, goal: 15000, progress: 0 } },
