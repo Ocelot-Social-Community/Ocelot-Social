@@ -11,6 +11,10 @@ describe('donations.vue', () => {
   const donationsUpdateMock = jest.fn()
   const donationsMutationMock = jest.fn().mockResolvedValue({})
 
+  afterEach(() => {
+    donationsMutationMock.mockClear()
+  })
+
   beforeEach(() => {
     mocks = {
       $t: jest.fn((string) => string),
@@ -123,10 +127,6 @@ describe('donations.vue', () => {
       })
 
       describe('submit', () => {
-        beforeEach(() => {
-          jest.clearAllMocks()
-        })
-
         it('calls mutation with default values once', async () => {
           await wrapper.find('.donations-info-button').trigger('submit')
           expect(donationsMutationMock).toHaveBeenCalledTimes(1)
