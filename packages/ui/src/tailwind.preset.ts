@@ -18,7 +18,7 @@
  * }
  * ```
  * ```css
- * /* app.css - required for Tailwind v4 to pick up the config */
+ * // app.css - required for Tailwind v4 to pick up the config
  * @config "./tailwind.config.js";
  * ```
  *
@@ -40,30 +40,42 @@ export const requiredCssVariables: string[] = [
   // Primary
   '--color-primary',
   '--color-primary-hover',
+  '--color-primary-active',
   '--color-primary-contrast',
   // Secondary
   '--color-secondary',
   '--color-secondary-hover',
+  '--color-secondary-active',
   '--color-secondary-contrast',
   // Danger
   '--color-danger',
   '--color-danger-hover',
+  '--color-danger-active',
   '--color-danger-contrast',
   // Warning
   '--color-warning',
   '--color-warning-hover',
+  '--color-warning-active',
   '--color-warning-contrast',
   // Success
   '--color-success',
   '--color-success-hover',
+  '--color-success-active',
   '--color-success-contrast',
   // Info
   '--color-info',
   '--color-info-hover',
+  '--color-info-active',
   '--color-info-contrast',
   // Default (neutral)
   '--color-default',
+  '--color-default-hover',
+  '--color-default-active',
   '--color-default-contrast',
+  '--color-default-contrast-inverse',
+  // Disabled
+  '--color-disabled',
+  '--color-disabled-contrast',
 ]
 
 /**
