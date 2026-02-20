@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 import Donations from './donations.vue'
 
 const localVue = global.localVue
@@ -176,14 +177,14 @@ describe('donations.vue', () => {
 
         it('shows success toast after successful mutation', async () => {
           await wrapper.find('.donations-info-button').trigger('submit')
-          await wrapper.vm.$nextTick()
+          await flushPromises()
           expect(mocks.$toast.success).toHaveBeenCalledWith('admin.donations.successfulUpdate')
         })
 
         it('shows error toast when mutation fails', async () => {
           donationsMutationMock.mockRejectedValueOnce(new Error('Network error'))
           await wrapper.find('.donations-info-button').trigger('submit')
-          await wrapper.vm.$nextTick()
+          await flushPromises()
           expect(mocks.$toast.error).toHaveBeenCalledWith('Network error')
         })
       })
