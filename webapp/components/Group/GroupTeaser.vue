@@ -70,7 +70,7 @@
             {{ $t('group.goal') }}
           </p>
           <div class="chip">
-            <os-badge v-if="group && group.about">{{ group ? group.about : '' }}</os-badge>
+            <os-badge v-if="group && group.about">{{ group.about }}</os-badge>
           </div>
         </div>
       </footer>

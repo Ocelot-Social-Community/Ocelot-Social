@@ -165,7 +165,7 @@
               </p>
               <div class="ds-my-xx-small"></div>
               <div class="chip" align="center">
-                <os-badge>{{ group ? group.about : '' }}</os-badge>
+                <os-badge>{{ group.about }}</os-badge>
               </div>
             </div>
           </template>
