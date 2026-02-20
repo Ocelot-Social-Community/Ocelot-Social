@@ -141,7 +141,7 @@ describe('donations.vue', () => {
           await wrapper.find('#donations-goal').setValue('20000')
           await wrapper.find('#donations-progress').setValue('10000')
           await wrapper.find('.donations-info-button').trigger('submit')
-          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+          expect(donationsMutationMock).toHaveBeenCalledWith(
             expect.objectContaining({
               variables: { showDonations: true, goal: 20000, progress: 10000 },
             }),
