@@ -20,53 +20,72 @@
       </os-card>
     </div>
     <os-card v-if="blockedUsers && blockedUsers.length">
-      <ds-table :data="blockedUsers" :fields="fields" condensed>
-        <template #avatar="scope">
-          <nuxt-link
-            :to="{
-              name: 'profile-id-slug',
-              params: { id: scope.row.id, slug: scope.row.slug },
-            }"
-          >
-            <profile-avatar :profile="scope.row" size="small" />
-          </nuxt-link>
-        </template>
-        <template #name="scope">
-          <nuxt-link
-            :to="{
-              name: 'profile-id-slug',
-              params: { id: scope.row.id, slug: scope.row.slug },
-            }"
-          >
-            <b>{{ scope.row.name | truncate(20) }}</b>
-          </nuxt-link>
-        </template>
-        <template #slug="scope">
-          <nuxt-link
-            :to="{
-              name: 'profile-id-slug',
-              params: { id: scope.row.id, slug: scope.row.slug },
-            }"
-          >
-            <b>{{ scope.row.slug | truncate(20) }}</b>
-          </nuxt-link>
-        </template>
-
-        <template #unblockUser="scope">
-          <os-button
-            data-test="unblock-btn"
-            variant="primary"
-            appearance="outline"
-            circle
-            size="sm"
-            :loading="unblockingUserId === scope.row.id"
-            :aria-label="$t('settings.blocked-users.columns.unblock')"
-            @click="unblockUser(scope)"
-          >
-            <template #icon><os-icon :icon="icons.userPlus" /></template>
-          </os-button>
-        </template>
-      </ds-table>
+      <div class="ds-table-wrap">
+        <table class="ds-table ds-table-condensed ds-table-bordered">
+          <thead>
+            <tr>
+              <th class="ds-table-head-col" aria-hidden="true"></th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('settings.blocked-users.columns.name') }}
+              </th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('settings.blocked-users.columns.slug') }}
+              </th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('settings.blocked-users.columns.unblock') }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="user in blockedUsers" :key="user.id">
+              <td class="ds-table-col">
+                <nuxt-link
+                  :to="{
+                    name: 'profile-id-slug',
+                    params: { id: user.id, slug: user.slug },
+                  }"
+                >
+                  <profile-avatar :profile="user" size="small" />
+                </nuxt-link>
+              </td>
+              <td class="ds-table-col">
+                <nuxt-link
+                  :to="{
+                    name: 'profile-id-slug',
+                    params: { id: user.id, slug: user.slug },
+                  }"
+                >
+                  <b>{{ user.name | truncate(20) }}</b>
+                </nuxt-link>
+              </td>
+              <td class="ds-table-col">
+                <nuxt-link
+                  :to="{
+                    name: 'profile-id-slug',
+                    params: { id: user.id, slug: user.slug },
+                  }"
+                >
+                  <b>{{ user.slug | truncate(20) }}</b>
+                </nuxt-link>
+              </td>
+              <td class="ds-table-col">
+                <os-button
+                  data-test="unblock-btn"
+                  variant="primary"
+                  appearance="outline"
+                  circle
+                  size="sm"
+                  :loading="unblockingUserId === user.id"
+                  :aria-label="$t('settings.blocked-users.columns.unblock')"
+                  @click="unblockUser(user)"
+                >
+                  <template #icon><os-icon :icon="icons.userPlus" /></template>
+                </os-button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </os-card>
     <os-card v-else>
       <div class="ds-mb-large">
@@ -105,29 +124,19 @@ export default {
       unblockingUserId: null,
     }
   },
-  computed: {
-    fields() {
-      return {
-        avatar: '',
-        name: this.$t('settings.blocked-users.columns.name'),
-        slug: this.$t('settings.blocked-users.columns.slug'),
-        unblockUser: this.$t('settings.blocked-users.columns.unblock'),
-      }
-    },
-  },
   apollo: {
     blockedUsers: { query: blockedUsers, fetchPolicy: 'cache-and-network' },
   },
   methods: {
     async unblockUser(user) {
-      this.unblockingUserId = user.row.id
+      this.unblockingUserId = user.id
       try {
         await this.$apollo.mutate({
           mutation: unblockUser(),
-          variables: { id: user.row.id },
+          variables: { id: user.id },
         })
         this.$apollo.queries.blockedUsers.refetch()
-        const { name } = user.row
+        const { name } = user
         this.$toast.success(this.$t('settings.blocked-users.unblocked', { name }))
       } catch (error) {
         this.$toast.error(error.message)
@@ -138,9 +147,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss">
-.ds-table-col {
-  vertical-align: middle;
-}
-</style>

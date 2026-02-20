@@ -27,67 +27,125 @@
       </ds-form>
     </os-card>
     <os-card v-if="User && User.length">
-      <ds-table :data="User" :fields="fields" condensed>
-        <template #index="scope">{{ scope.row.index + 1 }}.</template>
-        <template #name="scope">
-          <nuxt-link
-            :to="{
-              name: 'profile-id-slug',
-              params: { id: scope.row.id, slug: scope.row.slug },
-            }"
-          >
-            <b>{{ scope.row.name | truncate(20) }}</b>
-          </nuxt-link>
-        </template>
-        <template #email="scope">
-          <a :href="`mailto:${scope.row.email}`">
-            <b>{{ scope.row.email }}</b>
-          </a>
-        </template>
-        <template #slug="scope">
-          <nuxt-link
-            :to="{
-              name: 'profile-id-slug',
-              params: { id: scope.row.id, slug: scope.row.slug },
-            }"
-          >
-            <b>{{ scope.row.slug | truncate(20) }}</b>
-          </nuxt-link>
-        </template>
-        <template #createdAt="scope">
-          {{ scope.row.createdAt | dateTime }}
-        </template>
-
-        <template #role="scope">
-          <template v-if="userRoles">
-            <select
-              v-if="scope.row.id !== currentUser.id"
-              :value="`${scope.row.role}`"
-              v-on:change="changeUserRole(scope.row.id, $event)"
-            >
-              <option v-for="value in userRoles" :key="value">
-                {{ value }}
-              </option>
-            </select>
-            <p class="ds-text" v-else>{{ scope.row.role }}</p>
-          </template>
-        </template>
-        <template #badges="scope">
-          <os-button
-            as="nuxt-link"
-            :to="{
-              name: 'admin-users-id',
-              params: { id: scope.row.id },
-            }"
-            variant="primary"
-            appearance="filled"
-            circle
-            :aria-label="$t('actions.edit')"
-          >
-            <template #icon><os-icon :icon="icons.pencil" /></template>
-          </os-button>
-        </template>
-      </ds-table>
+      <div class="ds-table-wrap">
+        <table class="ds-table ds-table-condensed ds-table-bordered">
+          <thead>
+            <tr>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('admin.users.table.columns.number') }}
+              </th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('admin.users.table.columns.name') }}
+              </th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('admin.users.table.columns.email') }}
+              </th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('admin.users.table.columns.slug') }}
+              </th>
+              <th scope="col" class="ds-table-head-col">
+                {{ $t('admin.users.table.columns.createdAt') }}
+              </th>
+              <th
+                scope="col"
+                class="ds-table-head-col ds-table-head-col-right"
+                :aria-label="$t('admin.users.table.columns.contributions')"
+              >
+                🖉
+              </th>
+              <th
+                scope="col"
+                class="ds-table-head-col ds-table-head-col-right"
+                :aria-label="$t('admin.users.table.columns.comments')"
+              >
+                🗨
+              </th>
+              <th
+                scope="col"
+                class="ds-table-head-col ds-table-head-col-right"
+                :aria-label="$t('admin.users.table.columns.shouted')"
+              >
+                ❤
+              </th>
+              <th scope="col" class="ds-table-head-col ds-table-head-col-right">
+                {{ $t('admin.users.table.columns.role') }}
+              </th>
+              <th
+                v-if="$env.BADGES_ENABLED"
+                scope="col"
+                class="ds-table-head-col ds-table-head-col-right"
+              >
+                {{ $t('admin.users.table.columns.badges') }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="user in User" :key="user.id">
+              <td class="ds-table-col">{{ user.index + 1 }}.</td>
+              <td class="ds-table-col">
+                <nuxt-link
+                  :to="{
+                    name: 'profile-id-slug',
+                    params: { id: user.id, slug: user.slug },
+                  }"
+                >
+                  <b>{{ user.name | truncate(20) }}</b>
+                </nuxt-link>
+              </td>
+              <td class="ds-table-col">
+                <a :href="`mailto:${user.email}`">
+                  <b>{{ user.email }}</b>
+                </a>
+              </td>
+              <td class="ds-table-col">
+                <nuxt-link
+                  :to="{
+                    name: 'profile-id-slug',
+                    params: { id: user.id, slug: user.slug },
+                  }"
+                >
+                  <b>{{ user.slug | truncate(20) }}</b>
+                </nuxt-link>
+              </td>
+              <td class="ds-table-col">
+                {{ user.createdAt | dateTime }}
+              </td>
+              <td class="ds-table-col ds-table-col-right">{{ user.contributionsCount }}</td>
+              <td class="ds-table-col ds-table-col-right">{{ user.commentedCount }}</td>
+              <td class="ds-table-col ds-table-col-right">{{ user.shoutedCount }}</td>
+              <td class="ds-table-col ds-table-col-right">
+                <template v-if="userRoles.length">
+                  <select
+                    v-if="user.id !== currentUser.id"
+                    :value="user.role"
+                    @change="changeUserRole(user.id, $event)"
+                  >
+                    <option v-for="value in userRoles" :key="value" :value="value">
+                      {{ value }}
+                    </option>
+                  </select>
+                  <p class="ds-text" v-else>{{ user.role }}</p>
+                </template>
+              </td>
+              <td v-if="$env.BADGES_ENABLED" class="ds-table-col ds-table-col-right">
+                <os-button
+                  as="nuxt-link"
+                  :to="{
+                    name: 'admin-users-id',
+                    params: { id: user.id },
+                  }"
+                  variant="primary"
+                  appearance="filled"
+                  circle
+                  :aria-label="$t('actions.edit')"
+                >
+                  <template #icon><os-icon :icon="icons.pencil" /></template>
+                </os-button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <pagination-buttons :hasNext="hasNext" :hasPrevious="hasPrevious" @next="next" @back="back" />
     </os-card>
     <os-card v-else>
@@ -140,40 +198,6 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
-    fields() {
-      const fields = {
-        index: this.$t('admin.users.table.columns.number'),
-        name: this.$t('admin.users.table.columns.name'),
-        email: this.$t('admin.users.table.columns.email'),
-        slug: this.$t('admin.users.table.columns.slug'),
-        createdAt: this.$t('admin.users.table.columns.createdAt'),
-        contributionsCount: {
-          label: '🖉',
-          align: 'right',
-        },
-        commentedCount: {
-          label: '🗨',
-          align: 'right',
-        },
-        shoutedCount: {
-          label: '❤',
-          align: 'right',
-        },
-        role: {
-          label: this.$t('admin.users.table.columns.role'),
-          align: 'right',
-        },
-      }
-
-      if (this.$env.BADGES_ENABLED) {
-        fields.badges = {
-          label: this.$t('admin.users.table.columns.badges'),
-          align: 'right',
-        }
-      }
-
-      return fields
-    },
   },
   apollo: {
     User: {
@@ -244,9 +268,5 @@ export default {
 <style lang="scss">
 .admin-users > .os-card:first-child {
   margin-bottom: $space-small;
-}
-
-.ds-table-col {
-  vertical-align: middle;
 }
 </style>

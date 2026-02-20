@@ -14,7 +14,7 @@ Phase 3: OsButton      ██████████ 100% (133/133 Buttons) ✅
 Phase 4: Tier 1        ██████████ 100% (OsButton, OsIcon, OsSpinner, OsCard) ✅
 Phase 4: Tier A → HTML ██████████ 100% (10 ds-* Wrapper → Plain HTML) ✅
 Phase 4: Tier B        ██████░░░░  60% (ds-chip→OsBadge✅, ds-tag→OsBadge✅, ds-grid✅, ds-number⬜, ds-radio⬜)
-Phase 4: Tier 2-4      ░░░░░░░░░░   0% (OsModal, OsInput, OsMenu, OsSelect, OsTable)
+Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) | Tier 2-3 ausstehend (OsModal, OsInput, OsMenu, OsSelect)
 ```
 
 ### Statistiken
@@ -24,10 +24,10 @@ Phase 4: Tier 2-4      ░░░░░░░░░░   0% (OsModal, OsInput, Os
 | Styleguide Komponenten | 38 (23 in Webapp genutzt) |
 | **Gesamt** | **177** |
 | ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard, OsBadge (5) |
-| ✅ → Plain HTML | Section, Placeholder, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem, Grid, GridItem (12) |
+| ✅ → Plain HTML | Section, Placeholder, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem, Grid, GridItem, Table (13) |
 | ✅ → OsBadge | Chip (20 Nutzungen → OsBadge), Tag (3 → OsBadge shape="square") |
 | ⬜ → Plain HTML | Number, Radio (2) — Tier B Rest |
-| ⬜ → UI-Library | Modal, Input, Menu, MenuItem, Select, Table (6) — Tier 2-4 |
+| ⬜ → UI-Library | Modal, Input, Menu, MenuItem, Select (5) — Tier 2-3 |
 | ⬜ Offen | Form (18 Dateien — HTML oder OsForm?) |
 | ⬜ Nicht in Webapp | Code, CopyField, FormItem, InputError, InputLabel, Page, PageTitle, Logo, Avatar, TableCol, TableHeadCol (11) |
 
@@ -60,9 +60,9 @@ Phase 4: Tier 2-4      ░░░░░░░░░░   0% (OsModal, OsInput, Os
 | 6 | Number | ⬜ Tier B | 5 Dateien → Plain HTML `<div class="ds-number">` |
 | 7 | Placeholder | ✅ → HTML | Tier A: `<div class="ds-placeholder">` |
 | 8 | Spinner | ✅ UI-Library | → OsSpinner (LoadingSpinner gelöscht) |
-| 9 | Table | ⬜ Tier 4 | 7 Dateien → OsTable |
-| 10 | TableCol | ⬜ Tier 4 | Intern von Table genutzt |
-| 11 | TableHeadCol | ⬜ Tier 4 | Intern von Table genutzt |
+| 9 | Table | ✅ → HTML | 7 Dateien → Plain HTML `<table>` + CSS-Klassen (kein OsTable nötig) |
+| 10 | TableCol | ✅ → HTML | Ersetzt durch native `<td class="ds-table-col">` |
+| 11 | TableHeadCol | ✅ → HTML | Ersetzt durch native `<th class="ds-table-head-col">` |
 | 12 | Tag | ✅ UI-Library | → OsBadge shape="square" (3 Nutzungen in 3 Dateien) |
 
 ### Data Input

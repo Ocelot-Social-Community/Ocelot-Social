@@ -39,6 +39,7 @@
     },
     "categories": {
       "categoryName": "Nazwa",
+      "empty": "Nie znaleziono kategorii.",
       "name": "Kategorie",
       "postCount": "Stanowiska"
     },
@@ -107,13 +108,16 @@
       "roleChanged": null,
       "table": {
         "columns": {
-          "badges": null,
-          "createdAt": null,
-          "email": null,
-          "name": null,
-          "number": null,
-          "role": null,
-          "slug": null
+          "badges": "Odznaki",
+          "comments": "Komentarze",
+          "contributions": "Wpisy",
+          "createdAt": "Utworzono",
+          "email": "E-mail",
+          "name": "Nazwa",
+          "number": "Nr",
+          "role": "Rola",
+          "shouted": "Udostępniono",
+          "slug": "Alias"
         }
       }
     }

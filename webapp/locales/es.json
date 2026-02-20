@@ -39,6 +39,7 @@
     },
     "categories": {
       "categoryName": "Nombre",
+      "empty": "No se encontraron categorías.",
       "name": "Categorías",
       "postCount": "Contribuciones"
     },
@@ -107,12 +108,15 @@
       "roleChanged": null,
       "table": {
         "columns": {
-          "badges": null,
+          "badges": "Insignias",
+          "comments": "Comentarios",
+          "contributions": "Contribuciones",
           "createdAt": "Creado el",
           "email": "Correo electrónico",
           "name": "Nombre",
-          "number": "No.",
+          "number": "N.º",
           "role": "Rol",
+          "shouted": "Compartido",
           "slug": "Alias"
         }
       }

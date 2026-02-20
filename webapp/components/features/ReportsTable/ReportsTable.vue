@@ -2,8 +2,6 @@
   <table
     v-if="reports && reports.length"
     class="ds-table ds-table-condensed ds-table-bordered reports-table"
-    cellspacing="0"
-    cellpadding="0"
   >
     <colgroup>
       <col width="4%" />
@@ -14,13 +12,13 @@
       <col width="12%" />
     </colgroup>
     <thead class="ds-table-col ds-table-head-col">
-      <tr valign="top">
-        <th class="ds-table-head-col"></th>
-        <th class="ds-table-head-col">{{ $t('moderation.reports.submitter') }}</th>
-        <th class="ds-table-head-col">{{ $t('moderation.reports.content') }}</th>
-        <th class="ds-table-head-col">{{ $t('moderation.reports.author') }}</th>
-        <th class="ds-table-head-col">{{ $t('moderation.reports.status') }}</th>
-        <th class="ds-table-head-col">{{ $t('moderation.reports.decision') }}</th>
+      <tr>
+        <th class="ds-table-head-col" aria-hidden="true"></th>
+        <th scope="col" class="ds-table-head-col">{{ $t('moderation.reports.submitter') }}</th>
+        <th scope="col" class="ds-table-head-col">{{ $t('moderation.reports.content') }}</th>
+        <th scope="col" class="ds-table-head-col">{{ $t('moderation.reports.author') }}</th>
+        <th scope="col" class="ds-table-head-col">{{ $t('moderation.reports.status') }}</th>
+        <th scope="col" class="ds-table-head-col">{{ $t('moderation.reports.decision') }}</th>
       </tr>
     </thead>
     <template v-for="report in reports">

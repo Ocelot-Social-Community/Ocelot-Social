@@ -125,106 +125,98 @@ exports[`Users given badges are disabled renders 1`] = `
       class="ds-table-wrap"
     >
       <table
-        cellpadding="0"
-        cellspacing="0"
         class="ds-table ds-table-condensed ds-table-bordered"
       >
-        <colgroup>
-          <col
-            width=""
-          />
-          <col
-            width=""
-          />
-          <col
-            width=""
-          />
-          <col
-            width=""
-          />
-          <col
-            width=""
-          />
-          <col
-            width=""
-          />
-          <col
-            width=""
-          />
-          <col
-            width=""
-          />
-          <col
-            width=""
-          />
-        </colgroup>
         <thead>
           <tr>
             <th
               class="ds-table-head-col"
+              scope="col"
             >
               
-          admin.users.table.columns.number
-        
+              admin.users.table.columns.number
+            
             </th>
+             
             <th
               class="ds-table-head-col"
+              scope="col"
             >
               
-          admin.users.table.columns.name
-        
+              admin.users.table.columns.name
+            
             </th>
+             
             <th
               class="ds-table-head-col"
+              scope="col"
             >
               
-          admin.users.table.columns.email
-        
+              admin.users.table.columns.email
+            
             </th>
+             
             <th
               class="ds-table-head-col"
+              scope="col"
             >
               
-          admin.users.table.columns.slug
-        
+              admin.users.table.columns.slug
+            
             </th>
+             
             <th
               class="ds-table-head-col"
+              scope="col"
             >
               
-          admin.users.table.columns.createdAt
-        
+              admin.users.table.columns.createdAt
+            
             </th>
+             
+            <th
+              aria-label="admin.users.table.columns.contributions"
+              class="ds-table-head-col ds-table-head-col-right"
+              scope="col"
+            >
+              
+              🖉
+            
+            </th>
+             
+            <th
+              aria-label="admin.users.table.columns.comments"
+              class="ds-table-head-col ds-table-head-col-right"
+              scope="col"
+            >
+              
+              🗨
+            
+            </th>
+             
+            <th
+              aria-label="admin.users.table.columns.shouted"
+              class="ds-table-head-col ds-table-head-col-right"
+              scope="col"
+            >
+              
+              ❤
+            
+            </th>
+             
             <th
               class="ds-table-head-col ds-table-head-col-right"
+              scope="col"
             >
               
-          🖉
-        
+              admin.users.table.columns.role
+            
             </th>
-            <th
-              class="ds-table-head-col ds-table-head-col-right"
-            >
-              
-          🗨
-        
-            </th>
-            <th
-              class="ds-table-head-col ds-table-head-col-right"
-            >
-              
-          ❤
-        
-            </th>
-            <th
-              class="ds-table-head-col ds-table-head-col-right"
-            >
-              
-          admin.users.table.columns.role
-        
-            </th>
+             
+            <!---->
           </tr>
         </thead>
+         
         <tbody>
           <tr>
             <td
@@ -232,6 +224,7 @@ exports[`Users given badges are disabled renders 1`] = `
             >
               NaN.
             </td>
+             
             <td
               class="ds-table-col"
             >
@@ -243,6 +236,7 @@ exports[`Users given badges are disabled renders 1`] = `
                 </b>
               </nuxt-link-stub>
             </td>
+             
             <td
               class="ds-table-col"
             >
@@ -254,6 +248,7 @@ exports[`Users given badges are disabled renders 1`] = `
                 </b>
               </a>
             </td>
+             
             <td
               class="ds-table-col"
             >
@@ -265,39 +260,40 @@ exports[`Users given badges are disabled renders 1`] = `
                 </b>
               </nuxt-link-stub>
             </td>
+             
             <td
               class="ds-table-col"
             >
               
-        
-      
+              
+            
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
               
-            
-          
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
               
-            
-          
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
               
-            
-          
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
-              <select />
+              <!---->
             </td>
+             
+            <!---->
           </tr>
           <tr>
             <td
@@ -305,6 +301,7 @@ exports[`Users given badges are disabled renders 1`] = `
             >
               NaN.
             </td>
+             
             <td
               class="ds-table-col"
             >
@@ -316,6 +313,7 @@ exports[`Users given badges are disabled renders 1`] = `
                 </b>
               </nuxt-link-stub>
             </td>
+             
             <td
               class="ds-table-col"
             >
@@ -327,6 +325,7 @@ exports[`Users given badges are disabled renders 1`] = `
                 </b>
               </a>
             </td>
+             
             <td
               class="ds-table-col"
             >
@@ -338,39 +337,40 @@ exports[`Users given badges are disabled renders 1`] = `
                 </b>
               </nuxt-link-stub>
             </td>
+             
             <td
               class="ds-table-col"
             >
               
-        
-      
+              
+            
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
               
-            
-          
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
               
-            
-          
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
               
-            
-          
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
-              <select />
+              <!---->
             </td>
+             
+            <!---->
           </tr>
         </tbody>
       </table>
@@ -576,116 +576,105 @@ exports[`Users given badges are enabled renders 1`] = `
       class="ds-table-wrap"
     >
       <table
-        cellpadding="0"
-        cellspacing="0"
         class="ds-table ds-table-condensed ds-table-bordered"
       >
-        <colgroup>
-          <col
-            width=""
-          />
-          <col
-            width=""
-          />
-          <col
-            width=""
-          />
-          <col
-            width=""
-          />
-          <col
-            width=""
-          />
-          <col
-            width=""
-          />
-          <col
-            width=""
-          />
-          <col
-            width=""
-          />
-          <col
-            width=""
-          />
-          <col
-            width=""
-          />
-        </colgroup>
         <thead>
           <tr>
             <th
               class="ds-table-head-col"
+              scope="col"
             >
               
-          admin.users.table.columns.number
-        
+              admin.users.table.columns.number
+            
             </th>
+             
             <th
               class="ds-table-head-col"
+              scope="col"
             >
               
-          admin.users.table.columns.name
-        
+              admin.users.table.columns.name
+            
             </th>
+             
             <th
               class="ds-table-head-col"
+              scope="col"
             >
               
-          admin.users.table.columns.email
-        
+              admin.users.table.columns.email
+            
             </th>
+             
             <th
               class="ds-table-head-col"
+              scope="col"
             >
               
-          admin.users.table.columns.slug
-        
+              admin.users.table.columns.slug
+            
             </th>
+             
             <th
               class="ds-table-head-col"
+              scope="col"
             >
               
-          admin.users.table.columns.createdAt
-        
+              admin.users.table.columns.createdAt
+            
             </th>
+             
+            <th
+              aria-label="admin.users.table.columns.contributions"
+              class="ds-table-head-col ds-table-head-col-right"
+              scope="col"
+            >
+              
+              🖉
+            
+            </th>
+             
+            <th
+              aria-label="admin.users.table.columns.comments"
+              class="ds-table-head-col ds-table-head-col-right"
+              scope="col"
+            >
+              
+              🗨
+            
+            </th>
+             
+            <th
+              aria-label="admin.users.table.columns.shouted"
+              class="ds-table-head-col ds-table-head-col-right"
+              scope="col"
+            >
+              
+              ❤
+            
+            </th>
+             
             <th
               class="ds-table-head-col ds-table-head-col-right"
+              scope="col"
             >
               
-          🖉
-        
+              admin.users.table.columns.role
+            
             </th>
+             
             <th
               class="ds-table-head-col ds-table-head-col-right"
+              scope="col"
             >
               
-          🗨
-        
-            </th>
-            <th
-              class="ds-table-head-col ds-table-head-col-right"
-            >
-              
-          ❤
-        
-            </th>
-            <th
-              class="ds-table-head-col ds-table-head-col-right"
-            >
-              
-          admin.users.table.columns.role
-        
-            </th>
-            <th
-              class="ds-table-head-col ds-table-head-col-right"
-            >
-              
-          admin.users.table.columns.badges
-        
+              admin.users.table.columns.badges
+            
             </th>
           </tr>
         </thead>
+         
         <tbody>
           <tr>
             <td
@@ -693,6 +682,7 @@ exports[`Users given badges are enabled renders 1`] = `
             >
               NaN.
             </td>
+             
             <td
               class="ds-table-col"
             >
@@ -704,6 +694,7 @@ exports[`Users given badges are enabled renders 1`] = `
                 </b>
               </nuxt-link-stub>
             </td>
+             
             <td
               class="ds-table-col"
             >
@@ -715,6 +706,7 @@ exports[`Users given badges are enabled renders 1`] = `
                 </b>
               </a>
             </td>
+             
             <td
               class="ds-table-col"
             >
@@ -726,39 +718,39 @@ exports[`Users given badges are enabled renders 1`] = `
                 </b>
               </nuxt-link-stub>
             </td>
+             
             <td
               class="ds-table-col"
             >
               
-        
-      
+              
+            
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
               
-            
-          
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
               
-            
-          
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
               
-            
-          
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
-              <select />
+              <!---->
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
@@ -800,6 +792,7 @@ exports[`Users given badges are enabled renders 1`] = `
             >
               NaN.
             </td>
+             
             <td
               class="ds-table-col"
             >
@@ -811,6 +804,7 @@ exports[`Users given badges are enabled renders 1`] = `
                 </b>
               </nuxt-link-stub>
             </td>
+             
             <td
               class="ds-table-col"
             >
@@ -822,6 +816,7 @@ exports[`Users given badges are enabled renders 1`] = `
                 </b>
               </a>
             </td>
+             
             <td
               class="ds-table-col"
             >
@@ -833,39 +828,39 @@ exports[`Users given badges are enabled renders 1`] = `
                 </b>
               </nuxt-link-stub>
             </td>
+             
             <td
               class="ds-table-col"
             >
               
-        
-      
+              
+            
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
               
-            
-          
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
               
-            
-          
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
               
-            
-          
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
-              <select />
+              <!---->
             </td>
+             
             <td
               class="ds-table-col ds-table-col-right"
             >
