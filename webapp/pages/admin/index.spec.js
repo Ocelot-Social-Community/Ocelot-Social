@@ -33,6 +33,7 @@ describe('admin/index.vue', () => {
         wrapper.vm.$data.$apolloData.loading = 1
         await wrapper.vm.$nextTick()
         expect(wrapper.findComponent({ name: 'OsSpinner' }).exists()).toBe(true)
+        expect(mocks.$t).not.toHaveBeenCalledWith('site.error-occurred')
       })
     })
 
