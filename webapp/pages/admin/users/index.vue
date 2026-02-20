@@ -100,10 +100,10 @@
                 <template v-if="userRoles">
                   <select
                     v-if="user.id !== currentUser.id"
-                    :value="`${user.role}`"
+                    :value="user.role"
                     v-on:change="changeUserRole(user.id, $event)"
                   >
-                    <option v-for="value in userRoles" :key="value">
+                    <option v-for="value in userRoles" :key="value" :value="value">
                       {{ value }}
                     </option>
                   </select>
