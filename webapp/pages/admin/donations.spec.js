@@ -104,8 +104,13 @@ describe('donations.vue', () => {
     })
 
     describe('apollo', () => {
-      // Declarative Apollo query — requires VueApollo plugin to test query execution
-      it.todo('query is called')
+      it('query is defined and returns a GraphQL document', () => {
+        const apolloOption = wrapper.vm.$options.apollo.Donations
+        expect(apolloOption.query).toBeInstanceOf(Function)
+        const query = apolloOption.query.call(wrapper.vm)
+        expect(query).toBeDefined()
+        expect(query.kind).toBe('Document')
+      })
 
       it('query result is displayed', async () => {
         const updateFn = wrapper.vm.$options.apollo.Donations.update.bind(wrapper.vm)

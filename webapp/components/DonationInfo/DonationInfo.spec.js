@@ -55,7 +55,10 @@ describe('DonationInfo.vue', () => {
         it('creates a label from the given amounts and a translation string', () => {
           const toLocaleStringSpy = jest.spyOn(Number.prototype, 'toLocaleString')
           toLocaleStringSpy.mockImplementation(function (locale) {
-            if (locale === 'de') return this.valueOf().toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+            if (locale === 'de')
+              return this.valueOf()
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, '.')
             return this.valueOf().toLocaleString()
           })
           wrapper = Wrapper()

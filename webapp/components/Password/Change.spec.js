@@ -39,16 +39,48 @@ describe('ChangePassword.vue', () => {
       expect(wrapper.findAll('input')).toHaveLength(3)
     })
 
-    // Validation is handled internally by ds-form schema — not testable via external mock
     describe('validations', () => {
+      beforeEach(() => {
+        // $t must return strings so async-validator produces proper error messages
+        // (jest.fn() returns undefined which causes Error(undefined) → DsInputError type warning)
+        mocks.$t = jest.fn((key) => key)
+        wrapper = Wrapper()
+      })
+
       describe('new password and confirmation', () => {
         describe('mismatch', () => {
-          it.todo('invalid')
-          it.todo('displays a warning')
+          beforeEach(async () => {
+            await wrapper.find('input#oldPassword').setValue('oldsecret')
+            await wrapper.find('input#password').setValue('superdupersecret')
+            await wrapper.find('input#passwordConfirmation').setValue('different')
+          })
+
+          it('does not submit the form', async () => {
+            mocks.$apollo.mutate.mockReset()
+            await wrapper.find('form').trigger('submit')
+            expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+          })
+
+          it('displays a validation error', async () => {
+            await wrapper.find('form').trigger('submit')
+            const dsForm = wrapper.findComponent({ name: 'DsForm' })
+            expect(dsForm.vm.errors).toHaveProperty('passwordConfirmation')
+          })
         })
 
         describe('match', () => {
-          it.todo('valid')
+          beforeEach(async () => {
+            await wrapper.find('input#oldPassword').setValue('oldsecret')
+            await wrapper.find('input#password').setValue('superdupersecret')
+            await wrapper.find('input#passwordConfirmation').setValue('superdupersecret')
+          })
+
+          it('passes validation and submits', async () => {
+            mocks.$apollo.mutate.mockReset()
+            mocks.$apollo.mutate.mockResolvedValue({ data: { changePassword: 'TOKEN' } })
+            await wrapper.find('form').trigger('submit')
+            expect(mocks.$apollo.mutate).toHaveBeenCalled()
+          })
 
           describe('clicked', () => {
             it('sets loading while mutation is pending', async () => {
