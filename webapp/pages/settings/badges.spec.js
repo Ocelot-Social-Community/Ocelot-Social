@@ -160,13 +160,13 @@ describe('badge settings', () => {
             },
           }
 
-          beforeEach(() => {
+          beforeEach(async () => {
             apolloMutateMock.mockImplementation(({ update }) => {
               const result = { data: removedResponseData }
               if (update) update(null, result)
               return Promise.resolve(result)
             })
-            clickButton()
+            await clickButton()
           })
 
           it('calls the server', () => {
@@ -197,9 +197,9 @@ describe('badge settings', () => {
         })
 
         describe('with failed server request', () => {
-          beforeEach(() => {
+          beforeEach(async () => {
             apolloMutateMock.mockRejectedValue({ message: 'Ouch!' })
-            clickButton()
+            await clickButton()
           })
 
           it('shows an error message', () => {
@@ -270,13 +270,13 @@ describe('badge settings', () => {
               },
             }
 
-            beforeEach(() => {
+            beforeEach(async () => {
               apolloMutateMock.mockImplementation(({ update }) => {
                 const result = { data: addedResponseData }
                 if (update) update(null, result)
                 return Promise.resolve(result)
               })
-              clickBadge()
+              await clickBadge()
             })
 
             it('calls the server', () => {
@@ -307,9 +307,9 @@ describe('badge settings', () => {
           })
 
           describe('with failed server request', () => {
-            beforeEach(() => {
+            beforeEach(async () => {
               apolloMutateMock.mockRejectedValue({ message: 'Ouch!' })
-              clickBadge()
+              await clickBadge()
             })
 
             it('shows an error message', () => {
