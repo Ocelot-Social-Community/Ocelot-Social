@@ -13,7 +13,7 @@ Phase 0: Analyse       ██████████ 100% (8/8 Schritte) ✅
 Phase 3: OsButton      ██████████ 100% (133/133 Buttons) ✅
 Phase 4: Tier 1        ██████████ 100% (OsButton, OsIcon, OsSpinner, OsCard) ✅
 Phase 4: Tier A → HTML ██████████ 100% (10 ds-* Wrapper → Plain HTML) ✅
-Phase 4: Tier B        ██████░░░░  60% (ds-chip→OsBadge✅, ds-tag→OsBadge✅, ds-grid✅, ds-number⬜, ds-radio⬜)
+Phase 4: Tier B        ████████░░  80% (ds-chip→OsBadge✅, ds-tag→OsBadge✅, ds-grid✅, ds-number→OsNumber✅, ds-radio⬜)
 Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) | Tier 2-3 ausstehend (OsModal, OsInput, OsMenu, OsSelect)
 ```
 
@@ -23,10 +23,11 @@ Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) 
 | Webapp Komponenten | 139 |
 | Styleguide Komponenten | 38 (23 in Webapp genutzt) |
 | **Gesamt** | **177** |
-| ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard, OsBadge (5) |
+| ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard, OsBadge, OsNumber (6) |
 | ✅ → Plain HTML | Section, Placeholder, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem, Grid, GridItem, Table (13) |
 | ✅ → OsBadge | Chip (20 Nutzungen → OsBadge), Tag (3 → OsBadge shape="square") |
-| ⬜ → Plain HTML | Number, Radio (2) — Tier B Rest |
+| ✅ → OsNumber | Number (5 Nutzungen → OsNumber, CountTo.vue gelöscht, vue-count-to entfernt) |
+| ⬜ → Plain HTML | Radio (1) — Tier B Rest |
 | ⬜ → UI-Library | Modal, Input, Menu, MenuItem, Select (5) — Tier 2-3 |
 | ⬜ Offen | Form (18 Dateien — HTML oder OsForm?) |
 | ⬜ Nicht in Webapp | Code, CopyField, FormItem, InputError, InputLabel, Page, PageTitle, Logo, Avatar, TableCol, TableHeadCol (11) |
@@ -57,7 +58,7 @@ Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) 
 | 3 | Chip | ✅ UI-Library | → OsBadge (20 Nutzungen in 5 Dateien) |
 | 4 | Code | ⬜ Nicht genutzt | Nicht in Webapp verwendet |
 | 5 | Icon | ✅ UI-Library | → OsIcon (BaseIcon gelöscht, 82 Ocelot-Icons) |
-| 6 | Number | ⬜ Tier B | 5 Dateien → Plain HTML `<div class="ds-number">` |
+| 6 | Number | ✅ UI-Library | → OsNumber (5 Dateien, CountTo.vue gelöscht, vue-count-to entfernt) |
 | 7 | Placeholder | ✅ → HTML | Tier A: `<div class="ds-placeholder">` |
 | 8 | Spinner | ✅ UI-Library | → OsSpinner (LoadingSpinner gelöscht) |
 | 9 | Table | ✅ → HTML | 7 Dateien → Plain HTML `<table>` + CSS-Klassen (kein OsTable nötig) |
@@ -157,7 +158,7 @@ Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) 
 | 27 | ContextMenu | ⬜ Ausstehend | Navigation | Menu | |
 | 28 | ContributionForm | ✅ Migriert | Feature | Form | Buttons → OsButton, ds-* → HTML |
 | 29 | CounterIcon | ⬜ Ausstehend | Display | Icon | |
-| 30 | CountTo | ⬜ Ausstehend | Display | Number | Animation |
+| 30 | ~~CountTo~~ | ✅ Gelöscht | Display | Number | → OsNumber (Animation eingebaut, vue-count-to entfernt) |
 | 31 | CreateInvitation | ⬜ Ausstehend | Feature | | |
 | 32 | CtaJoinLeaveGroup | ✅ Migriert | Button | Button | 🔄 Button-Familie, nutzt OsButton |
 | 33 | CtaUnblockAuthor | ✅ Migriert | Button | Button | Nutzt OsButton (icon, as="nuxt-link") |
