@@ -330,6 +330,7 @@ export default {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    padding-bottom: 0 !important;
   }
 
   .content {
