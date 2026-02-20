@@ -129,6 +129,7 @@ describe('donations.vue', () => {
 
         it('calls mutation with default values once', async () => {
           await wrapper.find('.donations-info-button').trigger('submit')
+          expect(donationsMutationMock).toHaveBeenCalledTimes(1)
           expect(donationsMutationMock).toHaveBeenCalledWith(
             expect.objectContaining({
               variables: { showDonations: false, goal: 15000, progress: 0 },
@@ -141,6 +142,7 @@ describe('donations.vue', () => {
           await wrapper.find('#donations-goal').setValue('20000')
           await wrapper.find('#donations-progress').setValue('10000')
           await wrapper.find('.donations-info-button').trigger('submit')
+          expect(donationsMutationMock).toHaveBeenCalledTimes(1)
           expect(donationsMutationMock).toHaveBeenCalledWith(
             expect.objectContaining({
               variables: { showDonations: true, goal: 20000, progress: 10000 },
@@ -153,6 +155,7 @@ describe('donations.vue', () => {
           await wrapper.find('#donations-goal').setValue('10000')
           await wrapper.find('#donations-progress').setValue('15000')
           await wrapper.find('.donations-info-button').trigger('submit')
+          expect(donationsMutationMock).toHaveBeenCalledTimes(1)
           expect(donationsMutationMock).toHaveBeenCalledWith(
             expect.objectContaining({
               variables: { showDonations: true, goal: 10000, progress: 10000 },
