@@ -358,10 +358,15 @@ export default {
     cursor: default;
   }
 
-  > div > .os-badge {
-    float: right;
-    margin: $space-xx-small 0 $space-base;
-    cursor: default;
+  > div:not(.buttons) {
+    display: flex;
+    flex-direction: column;
+
+    > .os-badge {
+      align-self: flex-end;
+      margin: $space-xx-small 0 $space-base;
+      cursor: default;
+    }
   }
 
   > .select-field {
