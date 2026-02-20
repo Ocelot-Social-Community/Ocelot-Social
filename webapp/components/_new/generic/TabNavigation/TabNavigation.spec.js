@@ -49,9 +49,8 @@ describe('TabNavigation', () => {
     })
 
     describe('displays', () => {
-      // we couldn't get it running with "jest.runAllTimers()" and so we used "setTimeout"
-      // time is a bit more then 3000 milisec see "webapp/components/CountTo.vue"
-      const counterTimeout = 3000 + 10
+      // OsNumber animation runs for 1500ms
+      const counterTimeout = 1500 + 10
 
       it('shows a total of 17 results', () => {
         setTimeout(() => {

@@ -16,9 +16,7 @@
           <a :data-test="tab.type + '-tab-click'" @click="switchTab(tab)">
             <div class="ds-my-small">
               <client-only :placeholder="$t('client-only.loading')">
-                <ds-number :label="tab.title">
-                  <hc-count-to slot="count" :end-val="tab.count" />
-                </ds-number>
+                <os-number :count="tab.count" :label="tab.title" :animated="true" />
               </client-only>
             </div>
           </a>
@@ -29,13 +27,12 @@
 </template>
 
 <script>
-import { OsCard } from '@ocelot-social/ui'
-import HcCountTo from '~/components/CountTo.vue'
+import { OsCard, OsNumber } from '@ocelot-social/ui'
 
 export default {
   components: {
     OsCard,
-    HcCountTo,
+    OsNumber,
   },
   props: {
     tabs: {
