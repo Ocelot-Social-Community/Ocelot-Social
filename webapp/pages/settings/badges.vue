@@ -109,7 +109,10 @@ export default {
     },
     dragSupported() {
       if (typeof window === 'undefined') return false
-      return !('ontouchstart' in window && navigator.maxTouchPoints > 0 && !('onmousedown' in window))
+      if (window.matchMedia) {
+        return window.matchMedia('(pointer: fine)').matches
+      }
+      return !('ontouchstart' in window)
     },
   },
   created() {
