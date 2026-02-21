@@ -203,9 +203,9 @@ export default {
       try {
         // Mutation 2: Move former target badge to now-empty source slot
         await this.setSlot(targetBadge, sourceIndex)
-      } catch (error) {
+      } catch {
         this.$toast.error(this.$t('settings.badges.swap-partial-error'))
-        throw error
+        return
       }
       this.$toast.success(this.$t('settings.badges.success-update'))
     },
