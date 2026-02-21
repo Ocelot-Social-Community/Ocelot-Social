@@ -376,15 +376,34 @@
             >
               {{ $t(pageParams.internalPage.footerIdent) }}
             </page-params-link>
-            <hr />
-            <!-- locale switch -->
-            <div class="mobile-more-item">
-              <locale-switch
-                class="topbar-locale-switch"
-                placement="top"
-                offset="8"
-              />
-            </div>
+          </div>
+        </div>
+
+        <!-- Locale switch collapsible (only when open) -->
+        <div v-if="toggleMobileMenu" class="mobile-locale-section">
+          <div
+            class="mobile-nav-item"
+            @click="mobileLocaleMenuOpen = !mobileLocaleMenuOpen"
+          >
+            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button">
+              <template #icon>
+                <os-icon :icon="icons.globe" />
+              </template>
+            </os-button>
+            <span>{{ $t('localeSwitch.tooltip') }} ({{ currentLocale.code.toUpperCase() }})</span>
+            <os-icon :icon="mobileLocaleMenuOpen ? icons.angleUp : icons.angleDown" />
+          </div>
+          <div v-if="mobileLocaleMenuOpen" class="mobile-locale-items">
+            <a
+              v-for="locale in sortedLocales"
+              :key="locale.code"
+              href="#"
+              class="mobile-locale-item"
+              :class="{ '--active': locale.code === $i18n.locale() }"
+              @click.prevent="changeLocale(locale.code)"
+            >
+              {{ locale.name }}
+            </a>
           </div>
         </div>
 
@@ -410,8 +429,12 @@
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
+import gql from 'graphql-tag'
+import find from 'lodash/find'
 import isEmpty from 'lodash/isEmpty'
+import orderBy from 'lodash/orderBy'
+import locales from '~/locales'
 import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
 import { SHOW_CONTENT_FILTER_HEADER_MENU } from '~/constants/filter.js'
 import LOGOS from '~/constants/logosBranded.js'
@@ -465,6 +488,7 @@ export default {
       toggleMobileMenu: false,
       mobileAvatarMenuOpen: false,
       mobileMoreMenuOpen: false,
+      mobileLocaleMenuOpen: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
     }
   },
@@ -482,6 +506,12 @@ export default {
     userName() {
       const { name } = this.user || {}
       return name || this.$t('profile.userAnonym')
+    },
+    currentLocale() {
+      return find(locales, { code: this.$i18n.locale() }) || { code: 'en', name: 'English' }
+    },
+    sortedLocales() {
+      return orderBy(locales, 'name')
     },
     mobileAvatarRoutes() {
       if (!this.user.slug) return []
@@ -562,6 +592,42 @@ export default {
       if (!this.toggleMobileMenu) {
         this.mobileAvatarMenuOpen = false
         this.mobileMoreMenuOpen = false
+        this.mobileLocaleMenuOpen = false
+      }
+    },
+    ...mapMutations({
+      setCurrentUser: 'auth/SET_USER',
+    }),
+    changeLocale(code) {
+      this.$i18n.set(code)
+      this.mobileLocaleMenuOpen = false
+      this.updateUserLocale()
+    },
+    async updateUserLocale() {
+      if (!this.user || !this.user.id) return
+      try {
+        await this.$apollo.mutate({
+          mutation: gql`
+            mutation ($id: ID!, $locale: String) {
+              UpdateUser(id: $id, locale: $locale) {
+                id
+                locale
+              }
+            }
+          `,
+          variables: {
+            id: this.user.id,
+            locale: this.$i18n.locale(),
+          },
+          update: (store, { data: { UpdateUser } }) => {
+            this.setCurrentUser({
+              ...this.user,
+              locale: UpdateUser.locale,
+            })
+          },
+        })
+      } catch (err) {
+        this.$toast.error(err.message)
       }
     },
   },
@@ -822,6 +888,37 @@ export default {
     color: $text-color-base;
 
     &:hover {
+      color: $text-color-link;
+    }
+  }
+
+  .mobile-locale-section {
+    padding: 5px 0;
+
+    > .mobile-nav-item {
+      cursor: pointer;
+
+      > .os-icon:last-child {
+        margin-left: auto;
+      }
+    }
+  }
+
+  .mobile-locale-items {
+    padding: 5px 0 0 0;
+  }
+
+  .mobile-locale-item {
+    display: block;
+    padding: 8px 0 8px 20px;
+    color: $text-color-base;
+
+    &:hover {
+      color: $text-color-link;
+    }
+
+    &.--active {
+      font-weight: bold;
       color: $text-color-link;
     }
   }
