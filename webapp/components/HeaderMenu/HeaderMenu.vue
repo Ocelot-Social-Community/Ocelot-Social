@@ -141,47 +141,31 @@
         :class="{ 'mobil-header-box--open': toggleMobileMenu }"
         ref="mobileMenu"
       >
-        <!-- Zeile 1: Logo + Search + Burger -->
+        <!-- Zeile 1: Logo/Search + Burger -->
         <div class="ds-flex mobile-header-row" style="align-items: center">
-          <!-- logo: icon when open, full logo when closed -->
+          <!-- logo (only when closed) -->
           <div
+            v-if="!toggleMobileMenu"
             class="ds-flex-item logo-container"
-            :style="{
-              flex: toggleMobileMenu ? '0 0 auto' : '0 0 ' + LOGOS.LOGO_HEADER_WIDTH,
-              width: toggleMobileMenu ? 'auto' : LOGOS.LOGO_HEADER_WIDTH,
-            }"
+            :style="{ flex: '0 0 ' + LOGOS.LOGO_HEADER_WIDTH, width: LOGOS.LOGO_HEADER_WIDTH }"
           >
-            <div @click="toggleMobileMenu ? toggleMobileMenuView() : ''">
-              <a
-                v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
-                :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
-                :target="LOGOS.LOGO_HEADER_CLICK.externalLink.target"
-              >
-                <img
-                  v-if="toggleMobileMenu"
-                  src="/icon.png"
-                  alt="Logo"
-                  class="mobile-icon-logo"
-                />
-                <logo v-else logoType="header" />
-              </a>
-              <nuxt-link
-                v-else
-                :to="LOGOS.LOGO_HEADER_CLICK.internalPath.to"
-                v-scroll-to="LOGOS.LOGO_HEADER_CLICK.internalPath.scrollTo"
-              >
-                <img
-                  v-if="toggleMobileMenu"
-                  src="/icon.png"
-                  alt="Logo"
-                  class="mobile-icon-logo"
-                />
-                <logo v-else logoType="header" />
-              </nuxt-link>
-            </div>
+            <a
+              v-if="LOGOS.LOGO_HEADER_CLICK.externalLink"
+              :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
+              :target="LOGOS.LOGO_HEADER_CLICK.externalLink.target"
+            >
+              <logo logoType="header" />
+            </a>
+            <nuxt-link
+              v-else
+              :to="LOGOS.LOGO_HEADER_CLICK.internalPath.to"
+              v-scroll-to="LOGOS.LOGO_HEADER_CLICK.internalPath.scrollTo"
+            >
+              <logo logoType="header" />
+            </nuxt-link>
           </div>
 
-          <!-- search field in header row (only when open + logged in) -->
+          <!-- search field (only when open + logged in) -->
           <div v-if="isLoggedIn && toggleMobileMenu" class="ds-flex-item mobile-header-search">
             <search-field />
           </div>
