@@ -381,6 +381,11 @@ export default {
   position: fixed !important;
   right: max(20px, calc((100vw - 1200px) / 2 + 48px)) !important;
   top: 81px !important;
+  transition: top 0.3s ease !important;
+}
+
+.main-navigation:has(.hide-navbar) ~ .ds-container .post-add-button {
+  top: 20px !important;
 }
 
 .top-info-bar {
