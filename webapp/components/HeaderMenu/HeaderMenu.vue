@@ -167,8 +167,11 @@
             class="ds-flex-item mobile-hamburger-menu"
             :style="{ flex: toggleMobileMenu ? '0 0 auto' : '1 0 auto' }"
           >
-            <!-- chat + notifications only when closed -->
+            <!-- chat + notifications + filter only when closed -->
             <template v-if="!toggleMobileMenu">
+              <client-only v-if="isLoggedIn && filterActive && SHOW_CONTENT_FILTER_HEADER_MENU">
+                <filter-menu />
+              </client-only>
               <client-only>
                 <div>
                   <chat-notification-menu />
@@ -325,7 +328,7 @@
               </template>
             </os-button>
           </div>
-          <div v-if="mobileFilterMenuOpen" class="mobile-filter-items">
+          <div v-if="mobileFilterMenuOpen" class="mobile-filter-items" @click="toggleMobileMenuView">
             <client-only>
               <filter-menu-component />
             </client-only>
@@ -539,6 +542,7 @@ export default {
       user: 'auth/user',
       isModerator: 'auth/isModerator',
       isAdmin: 'auth/isAdmin',
+      filterActive: 'posts/isActive',
     }),
     showFilterMenuDropdown() {
       const [firstRoute] = this.$route.matched
