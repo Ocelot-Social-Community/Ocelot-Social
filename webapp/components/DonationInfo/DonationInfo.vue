@@ -1,7 +1,7 @@
 <template>
-  <div class="donation-info">
+  <div class="donation-info" @click="redirectToPage(links.DONATE)">
     <progress-bar :label="label" :goal="goal" :progress="progress">
-      <os-button size="sm" variant="primary" @click="redirectToPage(links.DONATE)">
+      <os-button size="sm" variant="primary">
         {{ $t('donations.donate-now') }}
         <template #suffix>
           <os-icon :icon="icons.heartO" />
@@ -58,5 +58,6 @@ export default {
   flex: 1;
   margin-bottom: $space-x-small;
   margin-top: 16px;
+  cursor: pointer;
 }
 </style>
