@@ -359,7 +359,7 @@ export default {
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  margin-top: 4px;
+  margin-top: -6px;
 }
 
 .filterButtonMenu {
@@ -380,7 +380,7 @@ export default {
   z-index: $z-index-sticky-float !important;
   position: fixed !important;
   right: max(20px, calc((100vw - 1200px) / 2 + 48px)) !important;
-  top: 91px !important;
+  top: 81px !important;
 }
 
 .top-info-bar {
