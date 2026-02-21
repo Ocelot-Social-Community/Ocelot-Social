@@ -427,21 +427,30 @@ export default {
   methods: {
     handleScroll() {
       const currentScrollPos = window.pageYOffset
+      const wasHidden = this.hideNavbar
       if (this.prevScrollpos > 50) {
-        if (this.prevScrollpos > currentScrollPos) {
-          this.hideNavbar = false
-        } else {
-          this.hideNavbar = true
-        }
+        this.hideNavbar = this.prevScrollpos <= currentScrollPos
       }
       this.prevScrollpos = currentScrollPos
+      if (wasHidden !== this.hideNavbar) {
+        this.$nextTick(() => this.updateHeaderOffset())
+      }
+    },
+    updateHeaderOffset() {
+      const el = this.$el
+      if (el) {
+        const height = this.hideNavbar ? 0 : el.offsetHeight
+        document.documentElement.style.setProperty('--header-height', `${height}px`)
+      }
     },
     toggleMobileMenuView() {
       this.toggleMobileMenu = !this.toggleMobileMenu
+      this.$nextTick(() => this.updateHeaderOffset())
     },
   },
   mounted() {
     window.addEventListener('scroll', this.handleScroll)
+    this.$nextTick(() => this.updateHeaderOffset())
   },
   beforeDestroy() {
     window.removeEventListener('scroll', this.handleScroll)

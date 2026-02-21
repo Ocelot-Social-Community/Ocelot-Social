@@ -61,7 +61,6 @@ export default {
 
 .Tabs {
   position: relative;
-  background-color: #fff;
   height: 100%;
   display: flex;
   margin: 0;
@@ -90,8 +89,13 @@ export default {
 }
 .tab-navigation {
   position: sticky;
-  top: 53px;
-  z-index: 2;
+  top: var(--header-height, 53px);
+  z-index: $z-index-sticky;
+  transition: top 0.15s ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
 }
 .ds-tab-nav.os-card {
   padding: 0 !important;
@@ -105,6 +109,25 @@ export default {
       &:last-child {
         border-bottom-right-radius: $border-radius-x-large;
       }
+    }
+  }
+}
+@supports (container-type: scroll-state) {
+  .tab-navigation {
+    container-type: scroll-state;
+    container-name: tab-nav;
+  }
+  .ds-tab-nav.os-card {
+    border-radius: $border-radius-x-large $border-radius-x-large 0 0 !important;
+    transition: border-radius 0.15s ease;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+  @container tab-nav scroll-state(stuck: top) {
+    .ds-tab-nav.os-card {
+      border-radius: 0 !important;
     }
   }
 }
