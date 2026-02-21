@@ -300,6 +300,10 @@ export default {
   height: 100%;
   color: $text-color-base;
   padding-top: 16px;
+
+  @media (max-width: 810px) {
+    padding-top: 8px;
+  }
 }
 
 .post-user-row {
