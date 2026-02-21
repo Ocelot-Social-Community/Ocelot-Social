@@ -747,7 +747,9 @@ export default {
 
 .main-navigation-right {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  gap: 4px;
 }
 
 // Mobile Header mit verbessertem Layout
