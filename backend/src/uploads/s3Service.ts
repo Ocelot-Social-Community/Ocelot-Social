@@ -43,6 +43,7 @@ export const s3Service = (config: S3Config, prefix: string) => {
       Bucket,
       Key: s3Location,
       ACL: ObjectCannedACL.public_read,
+      CacheControl: 'public, max-age=604800',
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       ContentType: mimetype,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
