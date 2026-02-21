@@ -117,9 +117,15 @@ export default {
 .progress-bar-button {
   position: relative;
   margin-left: $space-x-small;
+}
 
-  @media (max-width: 810px) {
+@media (max-width: 810px) {
+  .progress-bar {
     display: none;
+  }
+
+  .progress-bar-button {
+    margin-left: 0;
   }
 }
 </style>

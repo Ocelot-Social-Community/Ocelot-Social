@@ -26,6 +26,10 @@
           {{ $t('contribution.filterMasonryGrid.noFilter') }}
         </os-button>
 
+        <div v-if="showDonations" class="donation-mobile-only">
+          <donation-info :goal="goal" :progress="progress" />
+        </div>
+
         <header-button
           v-if="filteredPostTypes.includes('Article')"
           :title="$t('contribution.filterMasonryGrid.onlyArticles')"
@@ -102,7 +106,7 @@
       <div v-if="hashtag">
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
       </div>
-      <div v-if="showDonations" class="top-info-bar">
+      <div v-if="showDonations" class="top-info-bar donation-desktop-only">
         <donation-info :goal="goal" :progress="progress" />
       </div>
     </div>
@@ -379,7 +383,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-top: -10px;
+  margin-top: -8px;
 }
 
 .filterButtonMenu {
@@ -400,7 +404,7 @@ export default {
   z-index: $z-index-sticky-float !important;
   position: fixed !important;
   right: max(20px, calc((100vw - $container-max-width-x-large) / 2 + 52px)) !important;
-  top: 85px !important;
+  top: 80px !important;
   transition: top 0.3s ease !important;
 }
 
@@ -479,6 +483,32 @@ export default {
     padding-bottom: 80px;
   }
 }
+.donation-mobile-only {
+  display: none;
+
+  .donation-info {
+    margin: 0;
+  }
+
+  .progress-bar-component {
+    top: 0;
+  }
+}
+
+@media (max-width: 810px) {
+  .donation-mobile-only {
+    display: block;
+  }
+
+  .donation-desktop-only {
+    display: none;
+  }
+
+  .post-add-button {
+    top: 67px !important;
+  }
+}
+
 @media screen and (max-width: 650px) {
   .newsfeed-controls {
     margin-top: 8px;
