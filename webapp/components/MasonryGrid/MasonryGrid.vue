@@ -1,7 +1,7 @@
 <template>
   <div
     class="ds-grid"
-    :style="{ gridAutoRows: '2px', rowGap: '2px', columnGap: '16px' }"
+    :style="{ gridAutoRows: '2px', rowGap: '2px' }"
     :class="[itemsCalculating ? 'reset-grid-height' : '']"
   >
     <slot></slot>
@@ -37,6 +37,13 @@ export default {
 <style lang="scss">
 .ds-grid {
   grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  column-gap: 16px;
+
+  @media (max-width: 810px) {
+    column-gap: 8px;
+    row-gap: 1px !important;
+    grid-auto-rows: 1px !important;
+  }
 }
 
 .reset-grid-height {

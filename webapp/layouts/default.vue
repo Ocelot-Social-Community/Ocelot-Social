@@ -66,9 +66,14 @@ export default {
   padding-bottom: 8rem;
 }
 
-.desktop-footer {
-  @media (max-width: 810px) {
+@media (max-width: 810px) {
+  .desktop-footer {
     display: none;
+  }
+
+  .ds-container {
+    padding-left: $space-x-small !important;
+    padding-right: $space-x-small !important;
   }
 }
 
