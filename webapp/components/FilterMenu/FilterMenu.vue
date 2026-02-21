@@ -1,5 +1,5 @@
 <template>
-  <dropdown ref="menu" placement="top-start" :offset="8" class="filter-menu">
+  <dropdown ref="menu" :placement="placement" :offset="offset" class="filter-menu">
     <template #default="{ toggleMenu }">
       <os-button
         variant="primary"
@@ -34,8 +34,8 @@ export default {
     OsIcon,
   },
   props: {
-    placement: { type: String },
-    offset: { type: [String, Number] },
+    placement: { type: String, default: 'top-start' },
+    offset: { type: [String, Number], default: 8 },
   },
   computed: {
     ...mapGetters({
