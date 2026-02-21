@@ -136,11 +136,15 @@
 
       <!-- mobile header menu -->
       <div v-else class="mobil-header-box">
-        <!-- logo, hamburger-->
+        <!-- Zeile 1: Logo + Search + Burger -->
         <div class="ds-flex" style="align-items: center">
+          <!-- logo: icon when open, full logo when closed -->
           <div
             class="ds-flex-item logo-container"
-            :style="{ flex: '0 0 ' + LOGOS.LOGO_HEADER_WIDTH, width: LOGOS.LOGO_HEADER_WIDTH }"
+            :style="{
+              flex: toggleMobileMenu ? '0 0 auto' : '0 0 ' + LOGOS.LOGO_HEADER_WIDTH,
+              width: toggleMobileMenu ? 'auto' : LOGOS.LOGO_HEADER_WIDTH,
+            }"
           >
             <div @click="toggleMobileMenu ? toggleMobileMenuView() : ''">
               <a
@@ -148,31 +152,52 @@
                 :href="LOGOS.LOGO_HEADER_CLICK.externalLink.url"
                 :target="LOGOS.LOGO_HEADER_CLICK.externalLink.target"
               >
-                <logo logoType="header" />
+                <img
+                  v-if="toggleMobileMenu"
+                  src="/icon.png"
+                  alt="Logo"
+                  class="mobile-icon-logo"
+                />
+                <logo v-else logoType="header" />
               </a>
               <nuxt-link
                 v-else
                 :to="LOGOS.LOGO_HEADER_CLICK.internalPath.to"
                 v-scroll-to="LOGOS.LOGO_HEADER_CLICK.internalPath.scrollTo"
               >
-                <logo logoType="header" />
+                <img
+                  v-if="toggleMobileMenu"
+                  src="/icon.png"
+                  alt="Logo"
+                  class="mobile-icon-logo"
+                />
+                <logo v-else logoType="header" />
               </nuxt-link>
             </div>
           </div>
 
+          <!-- search field in header row (only when open + logged in) -->
+          <div v-if="isLoggedIn && toggleMobileMenu" class="ds-flex-item mobile-header-search">
+            <search-field />
+          </div>
+
           <!-- mobile hamburger menu -->
-          <div class="ds-flex-item mobile-hamburger-menu">
-            <client-only>
-              <!-- chat menu -->
-              <div>
-                <chat-notification-menu />
-              </div>
-              <!-- notification menu -->
-              <div>
-                <notification-menu no-menu />
-              </div>
-            </client-only>
-            <!-- hamburger menu -->
+          <div
+            class="ds-flex-item mobile-hamburger-menu"
+            :style="{ flex: toggleMobileMenu ? '0 0 auto' : '1 0 auto' }"
+          >
+            <!-- chat + notifications only when closed -->
+            <template v-if="!toggleMobileMenu">
+              <client-only>
+                <div>
+                  <chat-notification-menu />
+                </div>
+                <div>
+                  <notification-menu no-menu />
+                </div>
+              </client-only>
+            </template>
+            <!-- hamburger button -->
             <os-button
               variant="primary"
               :appearance="toggleMobileMenu ? 'filled' : 'outline'"
@@ -187,132 +212,85 @@
             </os-button>
           </div>
         </div>
-        <!-- search, filter -->
-        <div class="ds-flex mobile-menu">
-          <!-- search field mobile -->
-          <div
-            v-if="isLoggedIn"
-            class="ds-flex-item"
-            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-            style="padding: 20px"
-          >
-            <search-field />
-          </div>
-          <!-- filter menu mobile -->
-          <div
-            v-if="isLoggedIn"
-            class="ds-flex-item"
-            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-            style="flex-grow: 0; flex-basis: auto; padding: 20px 0"
-          >
-            <client-only>
-              <filter-menu v-if="showFilterMenuDropdown && SHOW_CONTENT_FILTER_HEADER_MENU" />
-            </client-only>
-          </div>
+
+        <!-- Zeile 2: Shortcuts (only when open) -->
+        <div v-if="toggleMobileMenu" class="mobile-shortcuts-row">
+          <client-only>
+            <chat-notification-menu />
+            <notification-menu no-menu />
+          </client-only>
+          <locale-switch
+            class="topbar-locale-switch topbar-locale-switch-mobile"
+            placement="top"
+            offset="8"
+          />
+          <client-only>
+            <avatar-menu placement="top" @toggle-Mobile-Menu-view="toggleMobileMenuView" />
+          </client-only>
+          <client-only v-if="inviteRegistration">
+            <invite-button placement="top" />
+          </client-only>
+          <client-only v-if="SHOW_GROUP_BUTTON_IN_HEADER">
+            <div @click="toggleMobileMenuView">
+              <os-button
+                as="nuxt-link"
+                to="/groups"
+                variant="primary"
+                appearance="ghost"
+                circle
+                :aria-label="$t('header.groups.tooltip')"
+                v-tooltip="{
+                  content: $t('header.groups.tooltip'),
+                  placement: 'bottom-start',
+                }"
+              >
+                <template #icon>
+                  <os-icon :icon="icons.users" />
+                </template>
+              </os-button>
+            </div>
+          </client-only>
+          <client-only v-if="!isEmpty(this.$env.MAPBOX_TOKEN)">
+            <div @click="toggleMobileMenuView">
+              <os-button
+                as="nuxt-link"
+                to="/map"
+                class="map-button"
+                variant="primary"
+                appearance="ghost"
+                circle
+                :aria-label="$t('header.map.tooltip')"
+                v-tooltip="{
+                  content: $t('header.map.tooltip'),
+                  placement: 'bottom-start',
+                }"
+              >
+                <template #icon>
+                  <os-icon :icon="icons.globeDetailed" size="xl" />
+                </template>
+              </os-button>
+            </div>
+          </client-only>
+          <client-only v-if="!isEmpty(customButton)">
+            <div @click="toggleMobileMenuView">
+              <custom-button :settings="customButton" />
+            </div>
+          </client-only>
         </div>
-        <!-- right symbols -->
-        <div class="ds-flex" style="margin: 0 20px">
-          <!-- locale switch mobile -->
-          <div class="ds-flex-item" :class="{ 'hide-mobile-menu': !toggleMobileMenu }">
-            <locale-switch
-              class="topbar-locale-switch topbar-locale-switch-mobile"
-              placement="top"
-              offset="8"
-            />
-          </div>
-          <!-- invite button mobile -->
-          <div
-            v-if="inviteRegistration"
-            class="ds-flex-item"
-            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-            style="text-align: center"
-          >
-            <client-only>
-              <invite-button placement="top" />
-            </client-only>
-          </div>
-          <!-- group button -->
-          <div
-            v-if="SHOW_GROUP_BUTTON_IN_HEADER"
-            class="ds-flex-item"
-            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-            style="text-align: center"
-          >
-            <client-only>
-              <div @click="toggleMobileMenuView">
-                <os-button
-                  as="nuxt-link"
-                  to="/groups"
-                  variant="primary"
-                  appearance="ghost"
-                  circle
-                  :aria-label="$t('header.groups.tooltip')"
-                  v-tooltip="{
-                    content: $t('header.groups.tooltip'),
-                    placement: 'bottom-start',
-                  }"
-                >
-                  <template #icon>
-                    <os-icon :icon="icons.users" />
-                  </template>
-                </os-button>
-              </div>
-            </client-only>
-          </div>
-          <!-- map button -->
-          <div
-            v-if="!isEmpty(this.$env.MAPBOX_TOKEN)"
-            class="ds-flex-item"
-            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-            style="text-align: center"
-          >
-            <client-only>
-              <div @click="toggleMobileMenuView">
-                <os-button
-                  as="nuxt-link"
-                  to="/map"
-                  class="map-button"
-                  variant="primary"
-                  appearance="ghost"
-                  circle
-                  :aria-label="$t('header.map.tooltip')"
-                  v-tooltip="{
-                    content: $t('header.map.tooltip'),
-                    placement: 'bottom-start',
-                  }"
-                >
-                  <template #icon>
-                    <os-icon :icon="icons.globeDetailed" size="xl" />
-                  </template>
-                </os-button>
-              </div>
-            </client-only>
-          </div>
-          <!-- custom button -->
-          <div
-            v-if="!isEmpty(customButton)"
-            class="ds-flex-item"
-            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-            style="text-align: center"
-          >
-            <client-only>
-              <div @click="toggleMobileMenuView">
-                <custom-button :settings="customButton" />
-              </div>
-            </client-only>
-          </div>
-          <!-- avatar menu mobile -->
-          <div
-            class="ds-flex-item"
-            :class="{ 'hide-mobile-menu': !toggleMobileMenu }"
-            style="text-align: end"
-          >
-            <client-only>
-              <avatar-menu placement="top" @toggle-Mobile-Menu-view="toggleMobileMenuView" />
-            </client-only>
-          </div>
+
+        <!-- filter menu (only when open + logged in) -->
+        <div
+          v-if="isLoggedIn && toggleMobileMenu && showFilterMenuDropdown && SHOW_CONTENT_FILTER_HEADER_MENU"
+          class="mobile-menu"
+          style="padding: 20px 0"
+        >
+          <client-only>
+            <filter-menu />
+          </client-only>
         </div>
-        <div :class="{ 'hide-mobile-menu': !toggleMobileMenu }" class="mobile-menu footer-mobile">
+
+        <!-- footer (only when open) -->
+        <div v-if="toggleMobileMenu" class="mobile-menu footer-mobile">
           <!-- dynamic branding menus -->
           <ul v-if="isHeaderMenu" class="dynamic-branding-mobil">
             <li v-for="item in menu" :key="item.name">
@@ -336,7 +314,7 @@
             </li>
           </ul>
           <hr />
-          <!-- dynamic footer menu in header  -->
+          <!-- dynamic footer menu in header -->
           <ul class="dynamic-footer-mobil">
             <li
               v-for="pageParams in links.FOOTER_LINK_LIST"
@@ -407,7 +385,6 @@ export default {
       isHeaderMenu: headerMenuBranded.MENU.length > 0,
       customButton: headerMenuBranded.CUSTOM_BUTTON,
       menu: headerMenuBranded.MENU,
-      mobileSearchVisible: false,
       toggleMobileMenu: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
     }
@@ -516,13 +493,21 @@ export default {
 // Mobile Header mit verbessertem Layout
 .mobil-header-box {
   .logo-container {
+    min-width: 36px;
+  }
+
+  .mobile-icon-logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .mobile-header-search {
     flex: 1 1 auto;
-    min-width: 60px;
-    max-width: calc(100vw - 200px);
+    min-width: 0;
+    padding: 0 10px;
   }
 
   .mobile-hamburger-menu {
-    flex: 1 0 auto;
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
@@ -530,7 +515,7 @@ export default {
     gap: 10px;
 
     > div {
-      flex-shrink: 0; // Buttons remain their size
+      flex-shrink: 0;
 
       button {
         overflow: visible;
@@ -540,12 +525,18 @@ export default {
       }
     }
   }
+
   .hamburger-button .os-icon {
     height: 1.5em;
   }
-}
-.mobile-search {
-  margin-top: 20px;
+
+  .mobile-shortcuts-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+  }
 }
 .dynamic-branding-mobil,
 .dynamic-footer-mobil {
@@ -554,9 +545,6 @@ export default {
 }
 .dynamic-branding-mobil li {
   margin: 17px 0;
-}
-.hide-mobile-menu {
-  display: none;
 }
 .map-button {
   margin-left: 3px;
