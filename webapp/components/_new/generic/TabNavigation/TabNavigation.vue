@@ -95,6 +95,10 @@ export default {
   top: var(--header-height, 53px);
   z-index: $z-index-sticky;
   transition: top 0.15s ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
 }
 .ds-tab-nav.os-card {
   padding: 0 !important;
@@ -118,6 +122,10 @@ export default {
   .ds-tab-nav.os-card {
     border-radius: $border-radius-x-large $border-radius-x-large 0 0 !important;
     transition: border-radius 0.15s ease;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
   }
   @container scroll-state(stuck: top) {
     .ds-tab-nav.os-card {
