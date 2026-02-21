@@ -60,10 +60,6 @@ export default {
       this.$emit('badge-selected', badge)
     },
     handleItemDragStart(event, badge, index) {
-      if (!this.dragEnabled) {
-        event.preventDefault()
-        return
-      }
       this.draggingIndex = index
       event.dataTransfer.effectAllowed = 'move'
       event.dataTransfer.setData('application/json', JSON.stringify({ source: 'reserve', badge }))
