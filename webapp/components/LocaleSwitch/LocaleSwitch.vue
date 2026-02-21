@@ -2,18 +2,21 @@
   <client-only>
     <dropdown ref="menu" :placement="placement" :offset="offset">
       <template #default="{ toggleMenu }">
-        <a
-          class="locale-menu"
-          href="#"
+        <os-button
+          variant="primary"
+          appearance="ghost"
+          circle
+          :aria-label="$t('localeSwitch.tooltip')"
           v-tooltip="{
             content: $t('localeSwitch.tooltip'),
             placement: 'bottom-start',
           }"
           @click.prevent="toggleMenu()"
         >
-          <span class="label">{{ current.code.toUpperCase() }}</span>
-          <os-icon class="dropdown-arrow" :icon="icons.angleDown" />
-        </a>
+          <template #icon>
+            <os-icon :icon="icons.language" />
+          </template>
+        </os-button>
       </template>
       <template #popover="{ toggleMenu }">
         <ds-menu class="locale-menu-popover" :matcher="matcher" :routes="routes">
@@ -35,7 +38,7 @@
 </template>
 
 <script>
-import { OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Dropdown from '~/components/Dropdown'
 import find from 'lodash/find'
@@ -47,6 +50,7 @@ export default {
   mixins: [localeUpdate],
   components: {
     Dropdown,
+    OsButton,
     OsIcon,
   },
   props: {
@@ -87,32 +91,6 @@ export default {
 </script>
 
 <style lang="scss">
-.locale-menu {
-  user-select: none;
-  display: flex;
-  align-items: center;
-  height: 100%;
-  padding: $space-xx-small;
-  color: var(--color-primary);
-  border-radius: 4px;
-  transition: color 80ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    background-color 80ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-
-  &:hover {
-    background-color: var(--color-primary);
-    color: var(--color-primary-contrast);
-  }
-
-  &:active {
-    background-color: var(--color-primary-active);
-    color: var(--color-primary-contrast);
-  }
-
-  > .label {
-    margin: 0 $space-xx-small;
-  }
-}
-
 nav.locale-menu-popover {
   margin-left: -$space-small !important;
   margin-right: -$space-small !important;

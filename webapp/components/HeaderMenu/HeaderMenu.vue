@@ -364,7 +364,7 @@
           >
             <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
               <template #icon>
-                <os-icon :icon="icons.globe" />
+                <os-icon :icon="icons.language" />
               </template>
             </os-button>
             <span>{{ $t('localeSwitch.tooltip') }} ({{ currentLocale.code.toUpperCase() }})</span>
