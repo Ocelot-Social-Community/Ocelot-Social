@@ -3,6 +3,7 @@
     <dropdown ref="menu" :placement="placement" :offset="offset">
       <template #default="{ toggleMenu }">
         <os-button
+          class="locale-menu"
           variant="primary"
           appearance="ghost"
           circle
