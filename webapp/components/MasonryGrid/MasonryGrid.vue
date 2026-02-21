@@ -1,7 +1,7 @@
 <template>
   <div
     class="ds-grid"
-    :style="{ gridAutoRows: '20px', rowGap: '16px', columnGap: '16px' }"
+    :style="{ gridAutoRows: '2px', rowGap: '2px', columnGap: '16px' }"
     :class="[itemsCalculating ? 'reset-grid-height' : '']"
   >
     <slot></slot>
