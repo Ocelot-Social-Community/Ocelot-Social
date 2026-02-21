@@ -791,16 +791,16 @@ export default {
   }
 
   .mobile-nav-items {
-    padding: 5px 0;
+    padding: 0;
   }
 
   .mobile-nav-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 0;
+    gap: 8px;
+    padding: 2px 0;
     color: $text-color-base;
-    font-weight: bold;
+    min-height: 36px;
 
     &:hover {
       color: $text-color-link;
@@ -809,8 +809,8 @@ export default {
     &.mobile-logout-item {
       color: $text-color-danger;
       border-top: 1px solid $color-neutral-90;
-      padding-top: 12px;
-      margin-top: 4px;
+      padding-top: 4px;
+      margin-top: 2px;
 
       &:hover {
         color: color.adjust($text-color-danger, $lightness: -10%);
@@ -860,7 +860,7 @@ export default {
   }
 
   .mobile-user-info {
-    padding: 10px 0;
+    padding: 6px 0;
     border-bottom: 1px solid $color-neutral-90;
   }
 
@@ -891,20 +891,21 @@ export default {
   }
 
   .mobile-avatar-menu-items {
-    padding: 10px 0 0 0;
+    padding: 4px 0 0 0;
 
     hr {
       color: $color-neutral-90;
       background-color: $color-neutral-90;
-      margin: 5px 0;
+      margin: 2px 0;
     }
   }
 
   .mobile-avatar-menu-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 0;
+    gap: 8px;
+    padding: 2px 0 2px 20px;
+    min-height: 32px;
     color: $text-color-base;
 
     &:hover {
@@ -913,32 +914,34 @@ export default {
   }
 
   .mobile-more-section {
-    padding: 10px 0;
+    padding: 2px 0;
     border-top: 1px solid $color-neutral-90;
   }
 
   .mobile-more-header {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     cursor: pointer;
-    padding: 8px 0;
-    font-weight: bold;
+    padding: 2px 0;
+    min-height: 36px;
   }
 
   .mobile-more-items {
-    padding: 5px 0 0 0;
+    padding: 0;
 
     hr {
       color: $color-neutral-90;
       background-color: $color-neutral-90;
-      margin: 5px 0;
+      margin: 2px 0;
     }
   }
 
   .mobile-more-item {
     display: block;
-    padding: 8px 0;
+    padding: 2px 0 2px 20px;
+    min-height: 32px;
+    line-height: 32px;
     color: $text-color-base;
 
     &:hover {
@@ -947,7 +950,7 @@ export default {
   }
 
   .mobile-locale-section {
-    padding: 5px 0;
+    padding: 2px 0;
 
     > .mobile-nav-item {
       cursor: pointer;
@@ -955,12 +958,14 @@ export default {
   }
 
   .mobile-locale-items {
-    padding: 5px 0 0 0;
+    padding: 0;
   }
 
   .mobile-locale-item {
     display: block;
-    padding: 8px 0 8px 20px;
+    padding: 2px 0 2px 20px;
+    min-height: 32px;
+    line-height: 32px;
     color: $text-color-base;
 
     &:hover {
