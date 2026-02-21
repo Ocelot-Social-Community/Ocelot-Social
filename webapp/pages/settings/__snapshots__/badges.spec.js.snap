@@ -16,7 +16,7 @@ exports[`badge settings with badges more badges available selecting an empty slo
     </p>
      
     <div
-      class="ds-mb-small ds-mt-base ds-space-centered"
+      class="ds-mb-small ds-mt-base badge-content"
     >
       <div
         class="presenterContainer"
@@ -148,7 +148,7 @@ exports[`badge settings with badges no more badges available selecting an empty 
     </p>
      
     <div
-      class="ds-mb-small ds-mt-base ds-space-centered"
+      class="ds-mb-small ds-mt-base badge-content"
     >
       <div
         class="presenterContainer"
@@ -227,7 +227,7 @@ exports[`badge settings with badges renders 1`] = `
     </p>
      
     <div
-      class="ds-mb-small ds-mt-base ds-space-centered"
+      class="ds-mb-small ds-mt-base badge-content"
     >
       <div
         class="presenterContainer"
@@ -308,7 +308,7 @@ exports[`badge settings without badges renders 1`] = `
     </p>
      
     <div
-      class="ds-mb-small ds-mt-base ds-space-centered"
+      class="ds-mb-small ds-mt-base badge-content"
     >
       <div
         class="presenterContainer"

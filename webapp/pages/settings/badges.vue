@@ -2,7 +2,7 @@
   <os-card>
     <h2 class="title">{{ $t('settings.badges.name') }}</h2>
     <p>{{ $t('settings.badges.description') }}</p>
-    <div class="ds-mb-small ds-mt-base ds-space-centered">
+    <div class="ds-mb-small ds-mt-base badge-content">
       <div class="presenterContainer">
         <badges
           :badges="[currentUser.badgeVerification, ...selectedBadges]"
@@ -143,15 +143,21 @@ export default {
       } catch (error) {
         this.$toast.error(this.$t('settings.badges.error-update'))
       }
-
-      this.$refs.badgesComponent.resetSelection()
-      this.selectedBadgeIndex = null
+      // Keep the slot selected so the (now empty) slot immediately shows
+      // available badges, including the one that was just removed.
     },
   },
 }
 </script>
 
 <style scoped>
+.badge-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
 .presenterContainer {
   margin-top: 20px;
   padding-top: 50px;

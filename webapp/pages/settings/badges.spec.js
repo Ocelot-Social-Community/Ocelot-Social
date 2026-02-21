@@ -158,6 +158,23 @@ describe('badge settings', () => {
                   description: 'Third description',
                 },
               ],
+              badgeTrophiesUnused: [
+                {
+                  id: '1',
+                  icon: '/path/to/some/icon',
+                  description: 'Some description',
+                },
+                {
+                  id: '4',
+                  icon: '/path/to/fourth/icon',
+                  description: 'Fourth description',
+                },
+                {
+                  id: '5',
+                  icon: '/path/to/fifth/icon',
+                  description: 'Fifth description',
+                },
+              ],
             },
           }
 
@@ -188,6 +205,8 @@ describe('badge settings', () => {
                 id: 'u23',
                 badgeTrophiesSelected:
                   removedResponseData.setTrophyBadgeSelected.badgeTrophiesSelected,
+                badgeTrophiesUnused:
+                  removedResponseData.setTrophyBadgeSelected.badgeTrophiesUnused,
               }),
             )
           })
