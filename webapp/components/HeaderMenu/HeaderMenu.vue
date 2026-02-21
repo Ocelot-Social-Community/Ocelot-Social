@@ -435,7 +435,7 @@ export default {
         }
       }
       this.prevScrollpos = currentScrollPos
-      this.updateHeaderOffset()
+      this.$nextTick(() => this.updateHeaderOffset())
     },
     updateHeaderOffset() {
       const el = this.$el
