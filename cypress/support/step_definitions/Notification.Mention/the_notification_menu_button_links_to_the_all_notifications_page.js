@@ -1,7 +1,8 @@
 import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('the notification menu button links to the all notifications page', () => {
-  cy.get('.notifications-menu')
+  cy.get('.notifications-menu:visible')
+    .first()
     .click()
   cy.location('pathname')
     .should('contain', '/notifications')
