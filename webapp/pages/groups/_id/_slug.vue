@@ -216,7 +216,7 @@
             </os-button>
           </os-card>
         </div>
-        <div v-if="isGroupMemberNonePending" class="ds-mb-large ds-space-centered">
+        <div v-if="isGroupMemberNonePending" class="ds-mt-small ds-mb-small ds-space-centered">
           <os-button
             as="nuxt-link"
             :to="{
@@ -238,10 +238,7 @@
             </template>
           </os-button>
         </div>
-        <masonry-grid>
-          <!-- TapNavigation -->
-          <!-- <tab-navigation :tabs="tabOptions" :activeTab="tabActive" @switch-tab="handleTab" /> -->
-
+        <masonry-grid class="ds-mt-small">
           <!-- Group post feed -->
           <template v-if="posts && posts.length">
             <masonry-grid-item
