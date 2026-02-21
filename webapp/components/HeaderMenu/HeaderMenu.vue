@@ -323,10 +323,7 @@
           </div>
 
           <!-- filter menu (only when open + logged in + on index page) -->
-          <div
-            v-if="isLoggedIn && SHOW_CONTENT_FILTER_HEADER_MENU"
-            class="mobile-filter-section"
-          >
+          <div v-if="isLoggedIn && SHOW_CONTENT_FILTER_HEADER_MENU" class="mobile-filter-section">
             <div
               class="mobile-nav-item"
               role="button"
