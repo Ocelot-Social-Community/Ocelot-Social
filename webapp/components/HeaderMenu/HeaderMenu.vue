@@ -596,6 +596,7 @@ export default {
   },
   methods: {
     handleScroll() {
+      if (this.toggleMobileMenu) return
       const currentScrollPos = window.pageYOffset
       const wasHidden = this.hideNavbar
       if (this.prevScrollpos > 50) {
