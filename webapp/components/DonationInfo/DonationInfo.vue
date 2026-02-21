@@ -1,5 +1,5 @@
 <template>
-  <div class="donation-info" @click="redirectToPage(links.DONATE)">
+  <page-params-link :pageParams="links.DONATE" class="donation-info">
     <progress-bar :label="label" :goal="goal" :progress="progress">
       <os-button size="sm" variant="primary">
         {{ $t('donations.donate-now') }}
@@ -8,19 +8,21 @@
         </template>
       </os-button>
     </progress-bar>
-  </div>
+  </page-params-link>
 </template>
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import links from '~/constants/links.js'
+import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 import ProgressBar from '~/components/ProgressBar/ProgressBar.vue'
 
 export default {
   components: {
     OsButton,
     OsIcon,
+    PageParamsLink,
     ProgressBar,
   },
   props: {
@@ -42,11 +44,6 @@ export default {
         amount: this.progress.toLocaleString(this.$i18n.locale()),
         total: this.goal.toLocaleString(this.$i18n.locale()),
       })
-    },
-  },
-  methods: {
-    redirectToPage(pageParams) {
-      pageParams.redirectToPage(this)
     },
   },
 }
