@@ -117,10 +117,6 @@ export default {
       if (!(id && slug)) return ''
       return { name: 'groups-id-slug', params: { slug, id } }
     },
-    groupSlug() {
-      const { slug } = this.group || {}
-      return slug && `&${slug}`
-    },
     groupName() {
       const { name } = this.group || {}
       return name || this.$t('profile.userAnonym')
