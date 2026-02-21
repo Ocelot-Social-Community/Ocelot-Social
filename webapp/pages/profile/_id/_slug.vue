@@ -222,7 +222,6 @@ import HcEmpty from '~/components/Empty/Empty'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
-import LayoutToggle from '~/components/LayoutToggle/LayoutToggle'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
@@ -257,7 +256,6 @@ export default {
     ProfileAvatar,
     ContentMenu,
     AvatarUploader,
-    LayoutToggle,
     MasonryGrid,
     MasonryGridItem,
     FollowList,
@@ -290,7 +288,6 @@ export default {
       followedByCount: followListVisibleCount,
       followingCount: followListVisibleCount,
       updateUserMutation,
-      singleColumn: false,
     }
   },
   computed: {
@@ -534,9 +531,6 @@ export default {
   .profile-layout__main {
     flex: 3 0 0;
   }
-}
-.layout-toggle-row {
-  margin-bottom: $space-x-small;
 }
 .profile-post-add-button-container {
   display: flex;
