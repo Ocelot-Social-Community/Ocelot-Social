@@ -213,6 +213,51 @@
           </div>
         </div>
 
+        <!-- User info with collapsible menu (only when open + logged in) -->
+        <div v-if="toggleMobileMenu && isLoggedIn" class="mobile-user-info">
+          <div class="mobile-user-header">
+            <profile-avatar :profile="user" size="small" />
+            <div class="mobile-user-details">
+              <b>{{ userName }}</b>
+              <span v-if="user.role !== 'user'" class="mobile-user-role">
+                {{ user.role | camelCase }}
+              </span>
+            </div>
+            <os-button
+              variant="primary"
+              appearance="ghost"
+              circle
+              :aria-label="$t('header.avatarMenu.button.tooltip')"
+              @click="mobileAvatarMenuOpen = !mobileAvatarMenuOpen"
+            >
+              <template #icon>
+                <os-icon :icon="mobileAvatarMenuOpen ? icons.angleUp : icons.angleDown" />
+              </template>
+            </os-button>
+          </div>
+          <div v-if="mobileAvatarMenuOpen" class="mobile-avatar-menu-items">
+            <nuxt-link
+              v-for="route in mobileAvatarRoutes"
+              :key="route.path"
+              :to="route.path"
+              class="mobile-avatar-menu-item"
+              @click.native="toggleMobileMenuView"
+            >
+              <os-icon :icon="route.icon" />
+              {{ route.name }}
+            </nuxt-link>
+            <hr />
+            <nuxt-link
+              class="mobile-avatar-menu-item logout-link"
+              :to="{ name: 'logout' }"
+              @click.native="toggleMobileMenuView"
+            >
+              <os-icon :icon="icons.signOut" />
+              {{ $t('login.logout') }}
+            </nuxt-link>
+          </div>
+        </div>
+
         <!-- Zeile 2: Shortcuts (only when open) -->
         <div v-if="toggleMobileMenu" class="mobile-shortcuts-row">
           <client-only>
@@ -224,9 +269,6 @@
             placement="top"
             offset="8"
           />
-          <client-only>
-            <avatar-menu placement="top" @toggle-Mobile-Menu-view="toggleMobileMenuView" />
-          </client-only>
           <client-only v-if="inviteRegistration">
             <invite-button placement="top" />
           </client-only>
@@ -352,6 +394,7 @@ import SearchField from '~/components/features/SearchField/SearchField.vue'
 import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
 import links from '~/constants/links.js'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
@@ -368,6 +411,7 @@ export default {
     Logo,
     NotificationMenu,
     PageParamsLink,
+    ProfileAvatar,
     SearchField,
   },
   props: {
@@ -386,16 +430,74 @@ export default {
       customButton: headerMenuBranded.CUSTOM_BUTTON,
       menu: headerMenuBranded.MENU,
       toggleMobileMenu: false,
+      mobileAvatarMenuOpen: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
     }
   },
   computed: {
     ...mapGetters({
       isLoggedIn: 'auth/isLoggedIn',
+      user: 'auth/user',
+      isModerator: 'auth/isModerator',
+      isAdmin: 'auth/isAdmin',
     }),
     showFilterMenuDropdown() {
       const [firstRoute] = this.$route.matched
       return firstRoute && firstRoute.name === 'index'
+    },
+    userName() {
+      const { name } = this.user || {}
+      return name || this.$t('profile.userAnonym')
+    },
+    mobileAvatarRoutes() {
+      if (!this.user.slug) return []
+      const routes = [
+        {
+          name: this.$t('header.avatarMenu.myProfile'),
+          path: `/profile/${this.user.id}/${this.user.slug}`,
+          icon: this.icons.user,
+        },
+        {
+          name: this.$t('header.avatarMenu.groups'),
+          path: '/groups',
+          icon: this.icons.users,
+        },
+        {
+          name: this.$t('header.avatarMenu.map'),
+          path: '/map',
+          icon: this.icons.globe,
+        },
+        {
+          name: this.$t('header.avatarMenu.chats'),
+          path: '/chat',
+          icon: this.icons.chatBubble,
+        },
+        {
+          name: this.$t('header.avatarMenu.notifications'),
+          path: '/notifications',
+          icon: this.icons.bell,
+        },
+        {
+          name: this.$t('settings.name'),
+          path: '/settings',
+          icon: this.icons.cogs,
+        },
+      ]
+      if (this.isModerator) {
+        routes.push({
+          name: this.$t('moderation.name'),
+          path: '/moderation',
+          icon: this.icons.balanceScale,
+        })
+      }
+      if (this.isAdmin) {
+        routes.push({
+          name: this.$t('admin.name'),
+          path: '/admin',
+          icon: this.icons.shield,
+        })
+      }
+      return routes
     },
   },
   created() {
@@ -423,6 +525,9 @@ export default {
     toggleMobileMenuView() {
       this.toggleMobileMenu = !this.toggleMobileMenu
       this.$nextTick(() => this.updateHeaderOffset())
+      if (!this.toggleMobileMenu) {
+        this.mobileAvatarMenuOpen = false
+      }
     },
   },
   mounted() {
@@ -536,6 +641,65 @@ export default {
     align-items: center;
     gap: 10px;
     padding: 10px 0;
+  }
+
+  .mobile-user-info {
+    padding: 10px 0;
+    border-bottom: 1px solid $color-neutral-90;
+  }
+
+  .mobile-user-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mobile-user-details {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+
+    b {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .mobile-user-role {
+    font-size: $font-size-small;
+    color: $text-color-softer;
+  }
+
+  .mobile-avatar-menu-items {
+    padding: 10px 0 0 0;
+
+    hr {
+      color: $color-neutral-90;
+      background-color: $color-neutral-90;
+      margin: 5px 0;
+    }
+  }
+
+  .mobile-avatar-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    color: $text-color-base;
+
+    &:hover {
+      color: $text-color-link;
+    }
+
+    &.logout-link {
+      color: $text-color-danger;
+      &:hover {
+        color: color.adjust($text-color-danger, $lightness: -10%);
+      }
+    }
   }
 }
 .dynamic-branding-mobil,
