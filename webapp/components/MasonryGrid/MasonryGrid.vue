@@ -1,7 +1,7 @@
 <template>
   <div
     class="ds-grid"
-    :style="{ gridAutoRows: '2px', rowGap: '2px' }"
+    :style="gridStyle"
     :class="[itemsCalculating ? 'reset-grid-height' : '']"
   >
     <slot></slot>
@@ -13,7 +13,14 @@ export default {
   data() {
     return {
       itemsCalculating: 0,
+      isMobile: false,
     }
+  },
+  computed: {
+    gridStyle() {
+      const size = this.isMobile ? '1px' : '2px'
+      return { gridAutoRows: size, rowGap: size }
+    },
   },
   created() {
     this.$on('calculating-item-height', this.startCalculation)
@@ -30,6 +37,16 @@ export default {
     endCalculation() {
       this.itemsCalculating -= 1
     },
+    checkMobile() {
+      this.isMobile = window.innerWidth <= 810
+    },
+  },
+  mounted() {
+    this.checkMobile()
+    window.addEventListener('resize', this.checkMobile)
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.checkMobile)
   },
 }
 </script>
@@ -41,8 +58,6 @@ export default {
 
   @media (max-width: 810px) {
     column-gap: 8px;
-    row-gap: 1px !important;
-    grid-auto-rows: 1px !important;
   }
 }
 
