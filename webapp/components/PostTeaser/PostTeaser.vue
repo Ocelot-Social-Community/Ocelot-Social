@@ -216,16 +216,6 @@ export default {
       imageLoaded: false,
     }
   },
-  mounted() {
-    const { image } = this.post
-    if (!image) return
-    const width = this.$el.offsetWidth
-    const height = Math.min(width / image.aspectRatio, 2000)
-    const imageElement = this.$el.querySelector('.os-card__hero-image')
-    if (imageElement) {
-      imageElement.style.height = `${height}px`
-    }
-  },
   computed: {
     ...mapGetters({
       user: 'auth/user',
