@@ -359,7 +359,7 @@ export default {
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  margin-top: -6px;
+  margin-top: 0px;
 }
 
 .filterButtonMenu {
