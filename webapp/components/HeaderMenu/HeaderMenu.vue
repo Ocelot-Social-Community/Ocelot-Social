@@ -805,7 +805,7 @@ export default {
   gap: 20px;
   min-width: 0;
 }
-@media (max-width: 800px) {
+@media (max-width: 810px) {
   .main-navigation-flex {
     gap: 10px;
   }
