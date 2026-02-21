@@ -1047,19 +1047,19 @@
   },
   "settings": {
     "badges": {
-      "click-to-select": null,
-      "click-to-use": null,
-      "description": null,
-      "drag-instruction": null,
-      "drop-to-remove": null,
-      "error-update": null,
-      "name": null,
-      "no-badges-available": null,
-      "remove": null,
-      "reserve-title": null,
-      "success-update": null,
-      "swap-partial-error": null,
-      "verification": null
+      "click-to-select": "Нажмите на пустое место, чтобы добавить награду.",
+      "click-to-use": "Нажмите на награду, чтобы поместить её в выбранное место.",
+      "description": "Здесь вы можете выбрать, как отображать полученные награды в вашем профиле.",
+      "drag-instruction": "Перетаскивайте награды, чтобы изменить их расположение.",
+      "drop-to-remove": "Перетащите сюда, чтобы убрать награду.",
+      "error-update": "При обновлении наград произошла ошибка.",
+      "name": "Награды",
+      "no-badges-available": "В настоящее время у вас нет доступных наград для добавления.",
+      "remove": "Убрать награду",
+      "reserve-title": "Доступные награды",
+      "success-update": "Ваши награды были успешно обновлены.",
+      "swap-partial-error": "Обмен наградами не удалось завершить. Попробуйте ещё раз.",
+      "verification": "Это ваша награда за верификацию, её нельзя изменить."
     },
     "blocked-users": {
       "block": "Блокировать",

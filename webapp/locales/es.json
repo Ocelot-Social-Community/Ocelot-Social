@@ -1047,19 +1047,19 @@
   },
   "settings": {
     "badges": {
-      "click-to-select": null,
-      "click-to-use": null,
-      "description": null,
-      "drag-instruction": null,
-      "drop-to-remove": null,
-      "error-update": null,
-      "name": null,
-      "no-badges-available": null,
-      "remove": null,
-      "reserve-title": null,
-      "success-update": null,
-      "swap-partial-error": null,
-      "verification": null
+      "click-to-select": "Haz clic en un espacio vacío para añadir una insignia.",
+      "click-to-use": "Haz clic en una insignia para colocarla en el espacio seleccionado.",
+      "description": "Aquí puedes elegir cómo mostrar tus insignias obtenidas en tu perfil.",
+      "drag-instruction": "Arrastra y suelta las insignias para reorganizarlas.",
+      "drop-to-remove": "Suelta aquí para quitar la insignia.",
+      "error-update": "Se produjo un error al actualizar tus insignias.",
+      "name": "Insignias",
+      "no-badges-available": "Actualmente no tienes insignias disponibles para añadir.",
+      "remove": "Quitar insignia",
+      "reserve-title": "Insignias disponibles",
+      "success-update": "Tus insignias se han actualizado correctamente.",
+      "swap-partial-error": "El intercambio de insignias no se pudo completar. Inténtalo de nuevo.",
+      "verification": "Esta es tu insignia de verificación y no se puede cambiar."
     },
     "blocked-users": {
       "block": "Bloquear usuario",

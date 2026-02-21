@@ -1047,19 +1047,19 @@
   },
   "settings": {
     "badges": {
-      "click-to-select": null,
-      "click-to-use": null,
-      "description": null,
-      "drag-instruction": null,
-      "drop-to-remove": null,
-      "error-update": null,
-      "name": null,
-      "no-badges-available": null,
-      "remove": null,
-      "reserve-title": null,
-      "success-update": null,
-      "swap-partial-error": null,
-      "verification": null
+      "click-to-select": "Cliquez sur un emplacement vide pour ajouter un badge.",
+      "click-to-use": "Cliquez sur un badge pour le placer dans l'emplacement sélectionné.",
+      "description": "Ici, vous pouvez choisir comment afficher vos badges obtenus sur votre profil.",
+      "drag-instruction": "Glissez-déposez les badges pour les réorganiser.",
+      "drop-to-remove": "Déposez ici pour retirer le badge.",
+      "error-update": "Une erreur est survenue lors de la mise à jour de vos badges.",
+      "name": "Badges",
+      "no-badges-available": "Vous n'avez actuellement aucun badge disponible à ajouter.",
+      "remove": "Retirer le badge",
+      "reserve-title": "Badges disponibles",
+      "success-update": "Vos badges ont été mis à jour avec succès.",
+      "swap-partial-error": "L'échange de badges n'a pas pu être effectué. Veuillez réessayer.",
+      "verification": "Ceci est votre badge de vérification et ne peut pas être modifié."
     },
     "blocked-users": {
       "block": "Bloquer l'utilisateur",
