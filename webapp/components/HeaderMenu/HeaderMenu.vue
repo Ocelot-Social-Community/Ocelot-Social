@@ -840,7 +840,15 @@ export default {
     min-height: 36px;
 
     &:hover {
+      color: $text-color-link-active;
+      background-color: $background-color-soft;
+    }
+
+    &.nuxt-link-active,
+    &.router-link-active {
       color: $text-color-link;
+      background-color: $background-color-soft;
+      box-shadow: inset 3px 0 0 $color-primary;
     }
 
     &.mobile-logout-item {
@@ -851,6 +859,14 @@ export default {
 
       &:hover {
         color: color.adjust($text-color-danger, $lightness: -10%);
+        background-color: $background-color-soft;
+      }
+
+      &.nuxt-link-active,
+      &.router-link-active {
+        color: $text-color-danger;
+        box-shadow: none;
+        background-color: transparent;
       }
     }
 
@@ -906,6 +922,10 @@ export default {
     align-items: center;
     gap: 10px;
     cursor: pointer;
+
+    &:hover {
+      background-color: $background-color-soft;
+    }
   }
 
   .mobile-user-details {
@@ -946,7 +966,15 @@ export default {
     color: $text-color-base;
 
     &:hover {
+      color: $text-color-link-active;
+      background-color: $background-color-soft;
+    }
+
+    &.nuxt-link-active,
+    &.router-link-active {
       color: $text-color-link;
+      background-color: $background-color-soft;
+      box-shadow: inset 3px 0 0 $color-primary;
     }
   }
 
@@ -962,6 +990,11 @@ export default {
     cursor: pointer;
     padding: 2px 0;
     min-height: 36px;
+
+    &:hover {
+      color: $text-color-link-active;
+      background-color: $background-color-soft;
+    }
   }
 
   .mobile-more-items {
@@ -983,7 +1016,15 @@ export default {
     color: $text-color-base;
 
     &:hover {
+      color: $text-color-link-active;
+      background-color: $background-color-soft;
+    }
+
+    &.nuxt-link-active,
+    &.router-link-active {
       color: $text-color-link;
+      background-color: $background-color-soft;
+      box-shadow: inset 3px 0 0 $color-primary;
     }
   }
 
@@ -1008,12 +1049,15 @@ export default {
     color: $text-color-base;
 
     &:hover {
-      color: $text-color-link;
+      color: $text-color-link-active;
+      background-color: $background-color-soft;
     }
 
     &.--active {
       font-weight: bold;
       color: $text-color-link;
+      background-color: $background-color-soft;
+      box-shadow: inset 3px 0 0 $color-primary;
     }
   }
 
