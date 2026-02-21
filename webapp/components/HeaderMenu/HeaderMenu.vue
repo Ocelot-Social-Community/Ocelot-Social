@@ -726,10 +726,12 @@ export default {
     display: flex;
     flex-direction: column;
     max-height: calc(100vh - 20px);
+    margin: 0 -10px; // extend to screen edge
   }
 
   .mobile-header-row {
     flex-shrink: 0;
+    padding: 0 10px; // keep header content at original position
   }
 
   .mobile-menu-scroll {
@@ -799,7 +801,7 @@ export default {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 2px 0;
+    padding: 2px 10px;
     color: $text-color-base;
     min-height: 36px;
 
@@ -885,6 +887,7 @@ export default {
     display: flex;
     align-items: center;
     gap: 10px;
+    padding: 0 10px;
     cursor: pointer;
 
     &:hover {
@@ -925,7 +928,7 @@ export default {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 2px 0;
+    padding: 2px 10px;
     min-height: 32px;
     color: $text-color-base;
 
@@ -952,7 +955,7 @@ export default {
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    padding: 2px 0;
+    padding: 2px 10px;
     min-height: 36px;
 
     &:hover {
@@ -975,7 +978,7 @@ export default {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 2px 0;
+    padding: 2px 10px;
     min-height: 32px;
     color: $text-color-base;
 
@@ -1008,7 +1011,7 @@ export default {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 2px 0;
+    padding: 2px 10px;
     min-height: 32px;
     color: $text-color-base;
 
