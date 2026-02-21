@@ -118,6 +118,7 @@ export default {
 @supports (container-type: scroll-state) {
   .tab-navigation {
     container-type: scroll-state;
+    container-name: tab-nav;
   }
   .ds-tab-nav.os-card {
     border-radius: $border-radius-x-large $border-radius-x-large 0 0 !important;
@@ -127,7 +128,7 @@ export default {
       transition: none;
     }
   }
-  @container scroll-state(stuck: top) {
+  @container tab-nav scroll-state(stuck: top) {
     .ds-tab-nav.os-card {
       border-radius: 0 !important;
     }
