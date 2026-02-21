@@ -690,7 +690,7 @@ export default {
         const navbar = document.getElementById('navbar')
         if (navbar) {
           const rect = navbar.getBoundingClientRect()
-          if (event.clientY > rect.bottom) {
+          if (event.clientY > rect.bottom + 50) {
             this.hideNavbar = true
             this.navbarRevealedByHover = false
           }
