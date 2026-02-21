@@ -502,8 +502,8 @@ export default {
       customButton: headerMenuBranded.CUSTOM_BUTTON,
       menu: headerMenuBranded.MENU,
       toggleMobileMenu: false,
-      mobileAvatarMenuOpen: false,
-      mobileMoreMenuOpen: false,
+      mobileAvatarMenuToggled: null,
+      mobileMoreMenuToggled: null,
       mobileLocaleMenuOpen: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
       localeFlags: {
@@ -539,6 +539,27 @@ export default {
     },
     sortedLocales() {
       return orderBy(locales, 'name')
+    },
+    mobileAvatarMenuOpen: {
+      get() {
+        if (this.mobileAvatarMenuToggled !== null) return this.mobileAvatarMenuToggled
+        return this.mobileAvatarRoutes.some((route) => this.$route.path.indexOf(route.path) === 0)
+      },
+      set(val) {
+        this.mobileAvatarMenuToggled = val
+      },
+    },
+    mobileMoreMenuOpen: {
+      get() {
+        if (this.mobileMoreMenuToggled !== null) return this.mobileMoreMenuToggled
+        const footerPaths = this.links.FOOTER_LINK_LIST.map(
+          (p) => p.internalPage && p.internalPage.pageRoute,
+        ).filter(Boolean)
+        return footerPaths.some((path) => this.$route.path.indexOf(path) === 0)
+      },
+      set(val) {
+        this.mobileMoreMenuToggled = val
+      },
     },
     mobileAvatarRoutes() {
       if (!this.user.slug) return []
@@ -602,8 +623,8 @@ export default {
       this.toggleMobileMenu = !this.toggleMobileMenu
       this.$nextTick(() => this.updateHeaderOffset())
       if (!this.toggleMobileMenu) {
-        this.mobileAvatarMenuOpen = false
-        this.mobileMoreMenuOpen = false
+        this.mobileAvatarMenuToggled = null
+        this.mobileMoreMenuToggled = null
         this.mobileLocaleMenuOpen = false
       }
     },
