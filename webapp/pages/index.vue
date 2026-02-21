@@ -65,6 +65,9 @@
           :titleRemove="$t('filter-menu.deleteFilter')"
           :clickRemove="resetByGroups"
         />
+        <div v-if="showDonations" class="donation-mobile-only">
+          <donation-info :goal="goal" :progress="progress" />
+        </div>
         <layout-toggle v-model="singleColumn" />
         <div id="my-filter" v-if="showFilter">
           <div @mouseleave="mouseLeaveFilterMenu">
@@ -73,7 +76,7 @@
         </div>
       </div>
       <layout-toggle v-if="!SHOW_CONTENT_FILTER_MASONRY_GRID" v-model="singleColumn" />
-      <div v-if="showDonations" class="donation-mobile-only">
+      <div v-if="showDonations && !SHOW_CONTENT_FILTER_MASONRY_GRID" class="donation-mobile-only">
         <donation-info :goal="goal" :progress="progress" />
       </div>
       <client-only>
