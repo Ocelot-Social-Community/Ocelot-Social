@@ -135,9 +135,14 @@
       </div>
 
       <!-- mobile header menu -->
-      <div v-else class="mobil-header-box" ref="mobileMenu">
+      <div
+        v-else
+        class="mobil-header-box"
+        :class="{ 'mobil-header-box--open': toggleMobileMenu }"
+        ref="mobileMenu"
+      >
         <!-- Zeile 1: Logo + Search + Burger -->
-        <div class="ds-flex" style="align-items: center">
+        <div class="ds-flex mobile-header-row" style="align-items: center">
           <!-- logo: icon when open, full logo when closed -->
           <div
             class="ds-flex-item logo-container"
@@ -212,6 +217,9 @@
             </os-button>
           </div>
         </div>
+
+        <!-- Scrollable menu content (only when open) -->
+        <div v-if="toggleMobileMenu" class="mobile-menu-scroll">
 
         <!-- User info with collapsible menu (only when open + logged in) -->
         <div v-if="toggleMobileMenu && isLoggedIn" class="mobile-user-info">
@@ -421,6 +429,8 @@
           </os-button>
           <span>{{ $t('login.logout') }}</span>
         </nuxt-link>
+
+        </div><!-- /mobile-menu-scroll -->
       </div>
     </div>
   </div>
@@ -702,6 +712,22 @@ export default {
 
 // Mobile Header mit verbessertem Layout
 .mobil-header-box {
+  &.mobil-header-box--open {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 20px);
+  }
+
+  .mobile-header-row {
+    flex-shrink: 0;
+  }
+
+  .mobile-menu-scroll {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .logo-container {
     min-width: 36px;
   }
