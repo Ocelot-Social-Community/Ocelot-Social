@@ -970,6 +970,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
             >
               <div
                 class="hc-badge-container"
+                draggable="false"
               >
                 <img
                   class="hc-badge"
@@ -979,6 +980,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
               </div>
               <div
                 class="hc-badge-container"
+                draggable="false"
               >
                 <img
                   class="hc-badge"
@@ -988,6 +990,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
               </div>
               <div
                 class="hc-badge-container"
+                draggable="false"
               >
                 <img
                   class="hc-badge"
@@ -2213,6 +2216,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
               >
                 <div
                   class="hc-badge-container"
+                  draggable="false"
                 >
                   <img
                     class="hc-badge"
@@ -2222,6 +2226,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                 </div>
                 <div
                   class="hc-badge-container"
+                  draggable="false"
                 >
                   <img
                     class="hc-badge"
@@ -2231,6 +2236,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                 </div>
                 <div
                   class="hc-badge-container"
+                  draggable="false"
                 >
                   <img
                     class="hc-badge"
