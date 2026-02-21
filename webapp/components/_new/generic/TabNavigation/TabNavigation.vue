@@ -93,7 +93,7 @@ export default {
 .tab-navigation {
   position: sticky;
   top: var(--header-height, 53px);
-  z-index: 2;
+  z-index: $z-index-sticky;
   transition: top 0.15s ease;
   container-type: scroll-state;
 }
