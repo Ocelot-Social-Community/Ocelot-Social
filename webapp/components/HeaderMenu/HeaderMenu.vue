@@ -748,11 +748,14 @@ export default {
     flex-direction: column;
     max-height: calc(100vh - 20px);
     margin: 0 -10px; // extend to screen edge
+
+    > .mobile-header-row {
+      padding: 0 10px; // compensate negative margin
+    }
   }
 
   .mobile-header-row {
     flex-shrink: 0;
-    padding: 0 10px; // keep header content at original position
   }
 
   .mobile-menu-scroll {
