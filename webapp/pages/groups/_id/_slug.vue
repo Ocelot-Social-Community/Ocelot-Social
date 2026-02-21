@@ -30,13 +30,12 @@
           <div class="ds-my-small">
             <!-- group name -->
             <h3
-              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
-              style="word-break: break-all"
+              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin word-break-all"
             >
               {{ groupName }}
             </h3>
             <!-- group slug -->
-            <p class="ds-text ds-text-center ds-text-soft" style="word-break: break-all">
+            <p class="ds-text ds-text-center ds-text-soft word-break-all">
               {{ `&${groupSlug}` }}
             </p>
             <!-- group location -->
@@ -163,7 +162,7 @@
               </p>
               <div class="ds-my-xx-small"></div>
               <div class="chip" align="center">
-                <os-badge style="word-break: break-all">{{ group.about }}</os-badge>
+                <os-badge class="word-break-all">{{ group.about }}</os-badge>
               </div>
             </div>
           </template>
@@ -709,6 +708,9 @@ export default {
     flex-grow: 1;
     margin-bottom: $space-small;
   }
+}
+.word-break-all {
+  word-break: break-all;
 }
 .collaps-button {
   align-self: flex-end;
