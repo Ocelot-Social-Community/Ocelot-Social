@@ -35,6 +35,15 @@ describe('MasonryGrid', () => {
     expect(wrapper.element.style.rowGap).toBe('2px')
   })
 
+  it('does not set grid-template-columns by default', () => {
+    expect(wrapper.element.style.gridTemplateColumns).toBe('')
+  })
+
+  it('sets grid-template-columns to 1fr when singleColumn is true', () => {
+    wrapper = mount(MasonryGrid, { localVue, propsData: { singleColumn: true } })
+    expect(wrapper.element.style.gridTemplateColumns).toBe('1fr')
+  })
+
   it('calculates rowSpan for children via batchRecalculate', async () => {
     wrapper = mount(MasonryGrid, {
       localVue,

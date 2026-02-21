@@ -70,6 +70,7 @@
           </div>
         </div>
       </div>
+      <layout-toggle v-model="singleColumn" />
       <client-only>
         <os-button
           as="nuxt-link"
@@ -105,9 +106,10 @@
     </div>
     <!-- content grid -->
     <masonry-grid
+      :single-column="singleColumn"
       :class="[
         !hashtag && !showDonations ? 'grid-margin-top' : '',
-        !isMobile && posts.length <= 2 ? 'grid-column-helper' : '',
+        !isMobile && !singleColumn && posts.length <= 2 ? 'grid-column-helper' : '',
       ]"
     >
       <!-- skeleton placeholders while loading -->
@@ -170,6 +172,7 @@ import PostTeaserSkeleton from '~/components/PostTeaser/PostTeaserSkeleton.vue'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import HeaderButton from '~/components/FilterMenu/HeaderButton'
+import LayoutToggle from '~/components/LayoutToggle/LayoutToggle'
 import { mapGetters, mapMutations } from 'vuex'
 import { DonationsQuery } from '~/graphql/Donations'
 import { filterPosts } from '~/graphql/PostQuery.js'
@@ -192,6 +195,7 @@ export default {
     MasonryGridItem,
     FilterMenuComponent,
     HeaderButton,
+    LayoutToggle,
   },
   mixins: [postListActions, mobile(), GetCategories],
   data() {
@@ -211,6 +215,7 @@ export default {
       pageSize: 12,
       hashtag,
       SHOW_CONTENT_FILTER_MASONRY_GRID,
+      singleColumn: false,
     }
   },
   computed: {

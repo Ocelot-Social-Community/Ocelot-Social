@@ -701,6 +701,13 @@
   "localeSwitch": {
     "tooltip": null
   },
+  "layout": {
+    "toggle": {
+      "label": "Макет",
+      "multiColumn": "Несколько колонок",
+      "singleColumn": "Одна колонка"
+    }
+  },
   "location": {
     "distance": null
   },

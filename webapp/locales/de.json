@@ -701,6 +701,13 @@
   "localeSwitch": {
     "tooltip": "Sprache wählen"
   },
+  "layout": {
+    "toggle": {
+      "label": "Layout",
+      "multiColumn": "Mehrspaltig",
+      "singleColumn": "Einspaltig"
+    }
+  },
   "location": {
     "distance": "{distance} km von mir entfernt"
   },

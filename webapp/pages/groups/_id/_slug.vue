@@ -302,6 +302,7 @@ import Empty from '~/components/Empty/Empty'
 import GroupContentMenu from '~/components/ContentMenu/GroupContentMenu'
 import JoinLeaveButton from '~/components/Button/JoinLeaveButton'
 import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
+import LayoutToggle from '~/components/LayoutToggle/LayoutToggle'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
@@ -335,6 +336,7 @@ export default {
     Empty,
     GroupContentMenu,
     JoinLeaveButton,
+    LayoutToggle,
     LocationInfo,
     PostTeaser,
     ProfileAvatar,
@@ -369,6 +371,7 @@ export default {
       updateGroupMutation,
       isDescriptionCollapsed: true,
       group: {},
+      singleColumn: false,
     }
   },
   computed: {

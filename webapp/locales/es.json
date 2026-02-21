@@ -701,6 +701,13 @@
   "localeSwitch": {
     "tooltip": null
   },
+  "layout": {
+    "toggle": {
+      "label": "Diseño",
+      "multiColumn": "Varias columnas",
+      "singleColumn": "Una columna"
+    }
+  },
   "location": {
     "distance": null
   },
