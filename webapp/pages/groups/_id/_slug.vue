@@ -33,7 +33,7 @@
               {{ groupName }}
             </h3>
             <!-- group slug -->
-            <p class="ds-text ds-text-center ds-text-soft">
+            <p class="ds-text ds-text-center ds-text-soft" style="word-break: break-all">
               {{ `&${groupSlug}` }}
             </p>
             <!-- group location -->
