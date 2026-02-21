@@ -135,33 +135,34 @@
       </div>
 
       <div class="profile-layout__main">
+        <tab-navigation
+          :tabs="tabOptions"
+          :activeTab="tabActive"
+          class="ds-mb-large"
+          @switch-tab="handleTab"
+        />
+
+        <div v-if="myProfile" class="profile-post-add-button-container">
+          <os-button
+            as="nuxt-link"
+            :to="{ name: 'post-create-type' }"
+            v-tooltip="{
+              content: $t('contribution.newPost'),
+              placement: 'left',
+            }"
+            class="profile-post-add-button"
+            variant="primary"
+            appearance="filled"
+            circle
+            :aria-label="$t('contribution.newPost')"
+          >
+            <template #icon>
+              <os-icon :icon="icons.plus" />
+            </template>
+          </os-button>
+        </div>
+
         <masonry-grid>
-          <!-- TapNavigation -->
-          <tab-navigation :tabs="tabOptions" :activeTab="tabActive" @switch-tab="handleTab" />
-
-          <!-- feed -->
-          <div v-if="myProfile" style="grid-row-end: span 2; grid-column: 1 / -1">
-            <div class="profile-post-add-button-container">
-              <os-button
-                as="nuxt-link"
-                :to="{ name: 'post-create-type' }"
-                v-tooltip="{
-                  content: $t('contribution.newPost'),
-                  placement: 'left',
-                }"
-                class="profile-post-add-button"
-                variant="primary"
-                appearance="filled"
-                circle
-                :aria-label="$t('contribution.newPost')"
-              >
-                <template #icon>
-                  <os-icon :icon="icons.plus" />
-                </template>
-              </os-button>
-            </div>
-          </div>
-
           <template v-if="posts.length">
             <masonry-grid-item
               v-for="post in posts"
@@ -505,6 +506,7 @@ export default {
 .profile-layout__main {
   flex: 0 0 100%;
   width: 100%;
+  min-width: 0;
 }
 @media #{$media-query-small} {
   .profile-layout__sidebar {
@@ -533,7 +535,7 @@ export default {
 .profile-post-add-button-container {
   display: flex;
   justify-content: center;
-  padding: $space-x-small 0;
+  margin: $space-small 0;
 }
 .profile-post-add-button {
   box-shadow: $box-shadow-x-large !important;
