@@ -17,6 +17,7 @@
           "
           variant="primary"
           appearance="filled"
+          size="sm"
           @click="showFilter = !showFilter"
         >
           <template #suffix>
@@ -399,7 +400,7 @@ export default {
   z-index: $z-index-sticky-float !important;
   position: fixed !important;
   right: max(20px, calc((100vw - $container-max-width-x-large) / 2 + 52px)) !important;
-  top: 90px !important;
+  top: 85px !important;
   transition: top 0.3s ease !important;
 }
 
