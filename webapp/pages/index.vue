@@ -381,7 +381,7 @@ export default {
   box-shadow: $box-shadow-x-large !important;
   z-index: $z-index-sticky-float !important;
   position: fixed !important;
-  right: max(20px, calc((100vw - 1200px) / 2 + 48px)) !important;
+  right: max(20px, calc((100vw - $container-max-width-x-large) / 2 + 48px)) !important;
   top: 81px !important;
   transition: top 0.3s ease !important;
 }
