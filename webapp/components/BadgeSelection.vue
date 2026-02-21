@@ -122,6 +122,10 @@ export default {
     padding: 12px 16px;
     margin-bottom: 8px;
     border-radius: 8px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
     background-color: #f5f5f5;
     transition: all 0.2s ease;
     width: 100%;
