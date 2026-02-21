@@ -1047,14 +1047,19 @@
   },
   "settings": {
     "badges": {
-      "click-to-select": null,
-      "click-to-use": null,
-      "description": null,
-      "name": null,
-      "no-badges-available": null,
-      "remove": null,
-      "success-update": null,
-      "verification": null
+      "click-to-select": "Kliknij na puste miejsce, aby dodać odznakę.",
+      "click-to-use": "Kliknij na odznakę, aby umieścić ją w wybranym miejscu.",
+      "description": "Tutaj możesz wybrać, jak wyświetlać zdobyte odznaki na swoim profilu.",
+      "drag-instruction": "Przeciągnij i upuść odznaki, aby je uporządkować.",
+      "drop-to-remove": "Upuść tutaj, aby usunąć odznakę.",
+      "error-update": "Wystąpił błąd podczas aktualizacji odznak.",
+      "name": "Odznaki",
+      "no-badges-available": "Obecnie nie masz żadnych dostępnych odznak do dodania.",
+      "remove": "Usuń odznakę",
+      "reserve-title": "Dostępne odznaki",
+      "success-update": "Twoje odznaki zostały pomyślnie zaktualizowane.",
+      "swap-partial-error": "Zamiana odznak nie mogła zostać ukończona. Spróbuj ponownie.",
+      "verification": "To jest Twoja odznaka weryfikacyjna i nie można jej zmienić."
     },
     "blocked-users": {
       "block": null,

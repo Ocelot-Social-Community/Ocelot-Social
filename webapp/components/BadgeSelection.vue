@@ -1,10 +1,21 @@
 <template>
-  <div class="badge-selection">
+  <div
+    class="badge-selection"
+    :class="{ 'reserve-drag-over': reserveDragOver }"
+    @dragover.prevent
+    @dragenter="handleContainerDragEnter"
+    @dragleave="handleContainerDragLeave"
+    @drop.prevent="handleContainerDrop"
+  >
     <button
       v-for="(badge, index) in badges"
       :key="badge.id"
       class="badge-selection-item"
+      :class="{ dragging: draggingIndex === index }"
+      :draggable="dragEnabled"
       @click="handleBadgeClick(badge, index)"
+      @dragstart="handleItemDragStart($event, badge, index)"
+      @dragend="handleItemDragEnd"
     >
       <div class="badge-icon">
         <img :src="backendPath(badge.icon)" :alt="badge.id" />
@@ -25,10 +36,17 @@ export default {
       type: Array,
       default: () => [],
     },
+    dragEnabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       selectedIndex: null,
+      draggingIndex: null,
+      reserveDragOver: false,
+      dragEnterCount: 0,
     }
   },
   methods: {
@@ -43,6 +61,37 @@ export default {
       this.selectedIndex = index
       this.$emit('badge-selected', badge)
     },
+    handleItemDragStart(event, badge, index) {
+      this.draggingIndex = index
+      event.dataTransfer.effectAllowed = 'move'
+      event.dataTransfer.setData('application/json', JSON.stringify({ source: 'reserve', badge }))
+    },
+    handleItemDragEnd() {
+      this.draggingIndex = null
+    },
+    handleContainerDragEnter() {
+      this.dragEnterCount++
+      this.reserveDragOver = true
+    },
+    handleContainerDragLeave() {
+      this.dragEnterCount--
+      if (this.dragEnterCount <= 0) {
+        this.dragEnterCount = 0
+        this.reserveDragOver = false
+      }
+    },
+    handleContainerDrop(event) {
+      this.dragEnterCount = 0
+      this.reserveDragOver = false
+      try {
+        const data = JSON.parse(event.dataTransfer.getData('application/json'))
+        if (data.source === 'hex') {
+          this.$emit('badge-returned', data)
+        }
+      } catch {
+        // ignore invalid drag data
+      }
+    },
     resetSelection() {
       this.selectedIndex = null
     },
@@ -55,6 +104,17 @@ export default {
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+
+  &.reserve-drag-over {
+    border-color: $color-success;
+    border-style: dashed;
+    background-color: rgba($color-success, 0.05);
+  }
 
   .badge-selection-item {
     display: flex;
@@ -62,6 +122,10 @@ export default {
     padding: 12px 16px;
     margin-bottom: 8px;
     border-radius: 8px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
     background-color: #f5f5f5;
     transition: all 0.2s ease;
     width: 100%;
@@ -70,6 +134,10 @@ export default {
 
     &:hover {
       background-color: #e0e0e0;
+    }
+
+    &.dragging {
+      opacity: 0.4;
     }
 
     .badge-icon {

@@ -1047,14 +1047,19 @@
   },
   "settings": {
     "badges": {
-      "click-to-select": null,
-      "click-to-use": null,
-      "description": null,
-      "name": null,
-      "no-badges-available": null,
-      "remove": null,
-      "success-update": null,
-      "verification": null
+      "click-to-select": "Clique num espaço vazio para adicionar uma medalha.",
+      "click-to-use": "Clique numa medalha para a colocar no espaço selecionado.",
+      "description": "Aqui pode escolher como exibir as suas medalhas conquistadas no seu perfil.",
+      "drag-instruction": "Arraste e solte as medalhas para reorganizá-las.",
+      "drop-to-remove": "Solte aqui para remover a medalha.",
+      "error-update": "Ocorreu um erro ao atualizar as suas medalhas.",
+      "name": "Medalhas",
+      "no-badges-available": "De momento não tem medalhas disponíveis para adicionar.",
+      "remove": "Remover medalha",
+      "reserve-title": "Medalhas disponíveis",
+      "success-update": "As suas medalhas foram atualizadas com sucesso.",
+      "swap-partial-error": "A troca de medalhas não pôde ser concluída. Tente novamente.",
+      "verification": "Esta é a sua medalha de verificação e não pode ser alterada."
     },
     "blocked-users": {
       "block": "Bloquear usuário",

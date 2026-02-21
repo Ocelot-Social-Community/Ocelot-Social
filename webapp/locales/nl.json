@@ -1047,14 +1047,19 @@
   },
   "settings": {
     "badges": {
-      "click-to-select": null,
-      "click-to-use": null,
-      "description": null,
-      "name": null,
-      "no-badges-available": null,
-      "remove": null,
-      "success-update": null,
-      "verification": null
+      "click-to-select": "Klik op een lege plek om een badge toe te voegen.",
+      "click-to-use": "Klik op een badge om deze in de geselecteerde plek te plaatsen.",
+      "description": "Hier kun je kiezen hoe je verdiende badges op je profiel worden weergegeven.",
+      "drag-instruction": "Sleep badges om ze te herschikken.",
+      "drop-to-remove": "Laat hier los om de badge te verwijderen.",
+      "error-update": "Er is een fout opgetreden bij het bijwerken van je badges.",
+      "name": "Badges",
+      "no-badges-available": "Je hebt momenteel geen badges beschikbaar om toe te voegen.",
+      "remove": "Badge verwijderen",
+      "reserve-title": "Beschikbare badges",
+      "success-update": "Je badges zijn succesvol bijgewerkt.",
+      "swap-partial-error": "Het wisselen van badges kon niet worden voltooid. Probeer het opnieuw.",
+      "verification": "Dit is je verificatiebadge en kan niet worden gewijzigd."
     },
     "blocked-users": {
       "block": null,

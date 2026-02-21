@@ -82,6 +82,7 @@ exports[`UserTeaserPopover given a non-touch device does not show button when us
     >
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -91,6 +92,7 @@ exports[`UserTeaserPopover given a non-touch device does not show button when us
       </div>
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -100,6 +102,7 @@ exports[`UserTeaserPopover given a non-touch device does not show button when us
       </div>
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -109,6 +112,7 @@ exports[`UserTeaserPopover given a non-touch device does not show button when us
       </div>
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -193,6 +197,7 @@ exports[`UserTeaserPopover given a touch device does not show button when userLi
     >
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -202,6 +207,7 @@ exports[`UserTeaserPopover given a touch device does not show button when userLi
       </div>
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -211,6 +217,7 @@ exports[`UserTeaserPopover given a touch device does not show button when userLi
       </div>
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -220,6 +227,7 @@ exports[`UserTeaserPopover given a touch device does not show button when userLi
       </div>
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -304,6 +312,7 @@ exports[`UserTeaserPopover given a touch device shows button when userLink is pr
     >
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -313,6 +322,7 @@ exports[`UserTeaserPopover given a touch device shows button when userLink is pr
       </div>
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -322,6 +332,7 @@ exports[`UserTeaserPopover given a touch device shows button when userLink is pr
       </div>
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -331,6 +342,7 @@ exports[`UserTeaserPopover given a touch device shows button when userLink is pr
       </div>
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -415,6 +427,7 @@ exports[`UserTeaserPopover renders correctly for a fresh user with zero counts 1
     >
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -424,6 +437,7 @@ exports[`UserTeaserPopover renders correctly for a fresh user with zero counts 1
       </div>
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -433,6 +447,7 @@ exports[`UserTeaserPopover renders correctly for a fresh user with zero counts 1
       </div>
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -442,6 +457,7 @@ exports[`UserTeaserPopover renders correctly for a fresh user with zero counts 1
       </div>
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -526,6 +542,7 @@ exports[`UserTeaserPopover shows badges when enabled 1`] = `
     >
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -535,6 +552,7 @@ exports[`UserTeaserPopover shows badges when enabled 1`] = `
       </div>
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -544,6 +562,7 @@ exports[`UserTeaserPopover shows badges when enabled 1`] = `
       </div>
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"
@@ -553,6 +572,7 @@ exports[`UserTeaserPopover shows badges when enabled 1`] = `
       </div>
       <div
         class="hc-badge-container"
+        draggable="false"
       >
         <img
           class="hc-badge"

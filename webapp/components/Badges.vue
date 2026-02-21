@@ -5,8 +5,19 @@
       class="hc-badge-container"
       v-for="(badge, index) in badges"
       :key="index"
-      :class="{ selectable: selectionMode && index > 0, selected: selectedIndex === index }"
+      :class="{
+        selectable: selectionMode && index > 0,
+        selected: selectedIndex === index,
+        dragging: draggingIndex === index,
+        'drag-over': dragOverIndex === index,
+      }"
+      :draggable="isDraggable(index, badge)"
       @click="handleBadgeClick(index)"
+      @dragstart="handleDragStart($event, index, badge)"
+      @dragend="handleDragEnd"
+      @dragover.prevent="handleDragOver(index)"
+      @dragleave="handleDragLeave(index)"
+      @drop.prevent="handleDrop($event, index)"
     >
       <img :title="badge.description" :src="backendPath(badge.icon)" class="hc-badge" />
     </component>
@@ -26,14 +37,25 @@ export default {
       type: Boolean,
       default: false,
     },
+    dragEnabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       selectedIndex: null,
+      draggingIndex: null,
+      dragOverIndex: null,
     }
   },
   methods: {
     backendPath,
+    isDraggable(index, badge) {
+      if (!this.dragEnabled || index === 0) return false
+      if (badge.isDefault) return false
+      return true
+    },
     handleBadgeClick(index) {
       if (!this.selectionMode || index === 0) {
         return
@@ -46,6 +68,46 @@ export default {
 
       this.selectedIndex = index
       this.$emit('badge-selected', index)
+    },
+    handleDragStart(event, index, badge) {
+      if (!this.isDraggable(index, badge)) {
+        event.preventDefault()
+        return
+      }
+      this.draggingIndex = index
+      event.dataTransfer.effectAllowed = 'move'
+      event.dataTransfer.setData(
+        'application/json',
+        JSON.stringify({ source: 'hex', index, badge }),
+      )
+      this.$emit('drag-start', { source: 'hex', index, badge })
+    },
+    handleDragEnd() {
+      this.draggingIndex = null
+      this.dragOverIndex = null
+      this.$emit('drag-end')
+    },
+    handleDragOver(index) {
+      if (index === 0) return
+      this.dragOverIndex = index
+    },
+    handleDragLeave(index) {
+      if (this.dragOverIndex === index) {
+        this.dragOverIndex = null
+      }
+    },
+    handleDrop(event, index) {
+      if (index === 0) return
+      this.dragOverIndex = null
+      const badge = this.badges[index]
+      let source = null
+      try {
+        source = JSON.parse(event.dataTransfer.getData('application/json'))
+      } catch {
+        return
+      }
+      if (!source) return
+      this.$emit('badge-drop', { source, targetIndex: index, targetBadge: badge })
     },
     resetSelection() {
       this.selectedIndex = null
@@ -98,6 +160,16 @@ export default {
       img {
         opacity: 0.6;
       }
+    }
+
+    &.dragging {
+      opacity: 0.4;
+    }
+
+    &.drag-over {
+      filter: drop-shadow(0 0 4px $color-success);
+      transform: scale(1.15);
+      transition: transform 0.15s ease;
     }
   }
 

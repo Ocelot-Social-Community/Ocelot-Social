@@ -7,6 +7,7 @@ exports[`Badges.vue with badges renders 1`] = `
   >
     <button
       class="badge-selection-item"
+      draggable="false"
     >
       <div
         class="badge-icon"
@@ -29,6 +30,7 @@ exports[`Badges.vue with badges renders 1`] = `
     </button>
     <button
       class="badge-selection-item"
+      draggable="false"
     >
       <div
         class="badge-icon"
@@ -51,6 +53,7 @@ exports[`Badges.vue with badges renders 1`] = `
     </button>
     <button
       class="badge-selection-item"
+      draggable="false"
     >
       <div
         class="badge-icon"

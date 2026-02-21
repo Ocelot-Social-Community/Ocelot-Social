@@ -8,6 +8,7 @@ exports[`Badges.vue with badges in presentation mode renders 1`] = `
   >
     <div
       class="hc-badge-container"
+      draggable="false"
     >
       <img
         class="hc-badge"
@@ -17,6 +18,7 @@ exports[`Badges.vue with badges in presentation mode renders 1`] = `
     </div>
     <div
       class="hc-badge-container"
+      draggable="false"
     >
       <img
         class="hc-badge"
@@ -26,6 +28,7 @@ exports[`Badges.vue with badges in presentation mode renders 1`] = `
     </div>
     <div
       class="hc-badge-container"
+      draggable="false"
     >
       <img
         class="hc-badge"
@@ -45,6 +48,7 @@ exports[`Badges.vue with badges in selection mode clicking on second badge selec
   >
     <div
       class="hc-badge-container"
+      draggable="false"
     >
       <img
         class="hc-badge"
@@ -54,6 +58,7 @@ exports[`Badges.vue with badges in selection mode clicking on second badge selec
     </div>
     <button
       class="hc-badge-container selectable selected"
+      draggable="false"
     >
       <img
         class="hc-badge"
@@ -63,6 +68,7 @@ exports[`Badges.vue with badges in selection mode clicking on second badge selec
     </button>
     <button
       class="hc-badge-container selectable"
+      draggable="false"
     >
       <img
         class="hc-badge"
@@ -82,6 +88,7 @@ exports[`Badges.vue with badges in selection mode clicking twice on second badge
   >
     <div
       class="hc-badge-container"
+      draggable="false"
     >
       <img
         class="hc-badge"
@@ -91,6 +98,7 @@ exports[`Badges.vue with badges in selection mode clicking twice on second badge
     </div>
     <button
       class="hc-badge-container selectable"
+      draggable="false"
     >
       <img
         class="hc-badge"
@@ -100,6 +108,7 @@ exports[`Badges.vue with badges in selection mode clicking twice on second badge
     </button>
     <button
       class="hc-badge-container selectable"
+      draggable="false"
     >
       <img
         class="hc-badge"
@@ -119,6 +128,7 @@ exports[`Badges.vue with badges in selection mode renders 1`] = `
   >
     <div
       class="hc-badge-container"
+      draggable="false"
     >
       <img
         class="hc-badge"
@@ -128,6 +138,7 @@ exports[`Badges.vue with badges in selection mode renders 1`] = `
     </div>
     <button
       class="hc-badge-container selectable"
+      draggable="false"
     >
       <img
         class="hc-badge"
@@ -137,6 +148,7 @@ exports[`Badges.vue with badges in selection mode renders 1`] = `
     </button>
     <button
       class="hc-badge-container selectable"
+      draggable="false"
     >
       <img
         class="hc-badge"

@@ -1050,10 +1050,15 @@
       "click-to-select": "Klicke auf einen freien Platz, um eine Badge hinzufügen.",
       "click-to-use": "Klicke auf eine Badge, um sie zu platzieren.",
       "description": "Hier hast du die Möglichkeit zu entscheiden, wie deine bereits erworbenen Badges in deinem Profil gezeigt werden sollen.",
+      "drag-instruction": "Badges per Drag & Drop verschieben.",
+      "drop-to-remove": "Hier ablegen, um die Badge zu entfernen.",
+      "error-update": "Beim Aktualisieren deiner Badges ist ein Fehler aufgetreten.",
       "name": "Badges",
       "no-badges-available": "Im Moment stehen dir keine Badges zur Verfügung, die du hinzufügen könntest.",
       "remove": "Badge entfernen",
+      "reserve-title": "Verfügbare Badges",
       "success-update": "Deine Badges wurden erfolgreich gespeichert.",
+      "swap-partial-error": "Der Badge-Tausch konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
       "verification": "Dies ist deine Verifikations-Badge und kann nicht geändert werden."
     },
     "blocked-users": {
