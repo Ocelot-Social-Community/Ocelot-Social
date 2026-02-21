@@ -190,7 +190,7 @@ export default {
     const { hashtag = null } = this.$route.query
     return {
       hideByScroll: false,
-      revScrollpos: 0,
+      prevScrollpos: 0,
       showFilter: false,
       developerNoAutoClosingFilterMenu: false, // stops automatic closing of filter menu for developer purposes: default is 'false'
       showDonations: false,
