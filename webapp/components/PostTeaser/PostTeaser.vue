@@ -12,8 +12,12 @@
       :highlight="isPinned"
     >
       <template v-if="post.image" #heroImage>
-        <div class="image-placeholder" :style="{ aspectRatio: post.image.aspectRatio }">
-          <responsive-image :image="post.image" sizes="640px" class="image" />
+        <div
+          class="image-placeholder"
+          :class="{ 'image-placeholder--loaded': imageLoaded }"
+          :style="{ aspectRatio: post.image.aspectRatio }"
+        >
+          <responsive-image :image="post.image" sizes="640px" class="image" @loaded="imageLoaded = true" />
         </div>
       </template>
       <client-only>
@@ -207,6 +211,21 @@ export default {
       default: false,
     },
   },
+  data() {
+    return {
+      imageLoaded: false,
+    }
+  },
+  mounted() {
+    const { image } = this.post
+    if (!image) return
+    const width = this.$el.offsetWidth
+    const height = Math.min(width / image.aspectRatio, 2000)
+    const imageElement = this.$el.querySelector('.os-card__hero-image')
+    if (imageElement) {
+      imageElement.style.height = `${height}px`
+    }
+  },
   computed: {
     ...mapGetters({
       user: 'auth/user',
@@ -303,6 +322,18 @@ export default {
   }
 }
 
+@keyframes image-placeholder-pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
 .post-user-row {
   position: relative;
 
@@ -335,7 +366,12 @@ export default {
 
   .image-placeholder {
     width: 100%;
-    background-color: $color-neutral-80;
+    background-color: $background-color-softer;
+    animation: image-placeholder-pulse 1.5s ease-in-out infinite;
+
+    &--loaded {
+      animation: none;
+    }
 
     > .image {
       display: block;
