@@ -71,9 +71,12 @@ describe('LocaleSwitch.vue', () => {
   }
 
   describe('with current user', () => {
+    let toggleMenu
+
     beforeEach(() => {
+      toggleMenu = jest.fn()
       wrapper = Wrapper()
-      wrapper.vm.changeLanguage('de', jest.fn())
+      wrapper.vm.changeLanguage('de', toggleMenu)
     })
 
     it("sets a user's locale", () => {
@@ -82,6 +85,10 @@ describe('LocaleSwitch.vue', () => {
 
     it("updates the user's locale in the database", () => {
       expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
+    })
+
+    it('closes the menu', () => {
+      expect(toggleMenu).toHaveBeenCalled()
     })
   })
 
@@ -100,18 +107,25 @@ describe('LocaleSwitch.vue', () => {
   })
 
   describe('no current user', () => {
+    let toggleMenu
+
     beforeEach(() => {
+      toggleMenu = jest.fn()
       getters = {
         'auth/user': () => {
           return null
         },
       }
       wrapper = Wrapper()
-      wrapper.vm.changeLanguage('de', jest.fn())
+      wrapper.vm.changeLanguage('de', toggleMenu)
     })
 
     it('does not send a UpdateUser mutation', () => {
       expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+    })
+
+    it('still closes the menu', () => {
+      expect(toggleMenu).toHaveBeenCalled()
     })
   })
 })
