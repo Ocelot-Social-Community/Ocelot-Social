@@ -132,9 +132,7 @@ export default {
     },
     groupNameTruncated() {
       const name = this.groupName
-      return name.length > this.maxGroupChars
-        ? name.slice(0, this.maxGroupChars) + '...'
-        : name
+      return name.length > this.maxGroupChars ? name.slice(0, this.maxGroupChars) + '...' : name
     },
   },
   created() {
