@@ -107,21 +107,22 @@ export default {
     isEmptySlotSelected() {
       return this.selectedBadges[this.selectedBadgeIndex]?.isDefault ?? false
     },
-    dragSupported() {
+  },
+  created() {
+    this.userBadges = [...(this.currentUser.badgeTrophiesSelected || [])]
+    this.dragSupported = this.detectDragSupport()
+  },
+  methods: {
+    ...mapMutations({
+      setCurrentUser: 'auth/SET_USER',
+    }),
+    detectDragSupport() {
       if (typeof window === 'undefined') return false
       if (!window.matchMedia) return !('ontouchstart' in window)
       const hasFinePointer = window.matchMedia('(pointer: fine)').matches
       const isWideScreen = window.matchMedia('(min-width: 640px)').matches
       return hasFinePointer && isWideScreen
     },
-  },
-  created() {
-    this.userBadges = [...(this.currentUser.badgeTrophiesSelected || [])]
-  },
-  methods: {
-    ...mapMutations({
-      setCurrentUser: 'auth/SET_USER',
-    }),
     handleBadgeSlotSelection(index) {
       if (index === 0) {
         this.$toast.info(this.$t('settings.badges.verification'))
