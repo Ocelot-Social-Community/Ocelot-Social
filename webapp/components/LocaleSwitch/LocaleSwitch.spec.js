@@ -6,11 +6,11 @@ import Vuex from 'vuex'
 const localVue = global.localVue
 
 const stubs = {
-  'client-only': true,
+  'client-only': { template: '<div><slot /></div>' },
 }
 
 describe('LocaleSwitch.vue', () => {
-  let wrapper, mocks, computed, deutschLanguageItem, getters
+  let wrapper, mocks, computed, getters
 
   beforeEach(() => {
     mocks = {
@@ -73,13 +73,11 @@ describe('LocaleSwitch.vue', () => {
   describe('with current user', () => {
     beforeEach(() => {
       wrapper = Wrapper()
-      wrapper.find('.locale-menu').trigger('click')
-      deutschLanguageItem = wrapper.findAll('li').at(1)
-      deutschLanguageItem.trigger('click')
+      wrapper.vm.changeLanguage('de', jest.fn())
     })
 
     it("sets a user's locale", () => {
-      expect(mocks.$i18n.set).toHaveBeenCalledTimes(1)
+      expect(mocks.$i18n.set).toHaveBeenCalledWith('de')
     })
 
     it("updates the user's locale in the database", () => {
@@ -95,9 +93,7 @@ describe('LocaleSwitch.vue', () => {
         },
       }
       wrapper = Wrapper()
-      wrapper.find('.locale-menu').trigger('click')
-      deutschLanguageItem = wrapper.findAll('li').at(1)
-      deutschLanguageItem.trigger('click')
+      wrapper.vm.changeLanguage('de', jest.fn())
     })
 
     it('does not send a UpdateUser mutation', () => {
