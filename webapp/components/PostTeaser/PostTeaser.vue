@@ -356,6 +356,8 @@ export default {
     padding-bottom: 0 !important;
   }
 
+  padding-bottom: $space-x-small !important;
+
   .content {
     flex-grow: 1;
     margin-bottom: $space-small;
@@ -419,8 +421,12 @@ export default {
       background: currentColor;
       opacity: 0.15;
 
-      &--name { width: 120px; }
-      &--date { width: 80px; }
+      &--name {
+        width: 120px;
+      }
+      &--date {
+        width: 80px;
+      }
     }
   }
 
