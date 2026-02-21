@@ -224,8 +224,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             class="ds-my-small"
           >
             <h3
-              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
-              style="word-break: break-all;"
+              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin word-break-all"
             >
               
             School For Citizens
@@ -233,8 +232,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             </h3>
              
             <p
-              class="ds-text ds-text-center ds-text-soft"
-              style="word-break: break-all;"
+              class="ds-text ds-text-center ds-text-soft word-break-all"
             >
               
             &school-for-citizens
@@ -536,8 +534,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
-                style="word-break: break-all;"
+                class="word-break-all os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em] word-break-all"
               >
                 Our children shall receive education for life.
               </span>
@@ -990,7 +987,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
+          style="grid-auto-rows: 2px; row-gap: 2px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -1148,8 +1145,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             class="ds-my-small"
           >
             <h3
-              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
-              style="word-break: break-all;"
+              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin word-break-all"
             >
               
             School For Citizens
@@ -1157,8 +1153,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             </h3>
              
             <p
-              class="ds-text ds-text-center ds-text-soft"
-              style="word-break: break-all;"
+              class="ds-text ds-text-center ds-text-soft word-break-all"
             >
               
             &school-for-citizens
@@ -1413,8 +1408,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
-                style="word-break: break-all;"
+                class="word-break-all os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em] word-break-all"
               >
                 Our children shall receive education for life.
               </span>
@@ -1498,7 +1492,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
+          style="grid-auto-rows: 2px; row-gap: 2px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -1656,8 +1650,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             class="ds-my-small"
           >
             <h3
-              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
-              style="word-break: break-all;"
+              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin word-break-all"
             >
               
             School For Citizens
@@ -1665,8 +1658,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             </h3>
              
             <p
-              class="ds-text ds-text-center ds-text-soft"
-              style="word-break: break-all;"
+              class="ds-text ds-text-center ds-text-soft word-break-all"
             >
               
             &school-for-citizens
@@ -1940,8 +1932,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
-                style="word-break: break-all;"
+                class="word-break-all os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em] word-break-all"
               >
                 Our children shall receive education for life.
               </span>
@@ -2025,7 +2016,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
+          style="grid-auto-rows: 2px; row-gap: 2px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -2278,8 +2269,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             class="ds-my-small"
           >
             <h3
-              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
-              style="word-break: break-all;"
+              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin word-break-all"
             >
               
             School For Citizens
@@ -2287,8 +2277,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             </h3>
              
             <p
-              class="ds-text ds-text-center ds-text-soft"
-              style="word-break: break-all;"
+              class="ds-text ds-text-center ds-text-soft word-break-all"
             >
               
             &school-for-citizens
@@ -2589,8 +2578,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
               class="chip"
             >
               <span
-                class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
-                style="word-break: break-all;"
+                class="word-break-all os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em] word-break-all"
               >
                 Our children shall receive education for life.
               </span>
@@ -3043,7 +3031,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
+          style="grid-auto-rows: 2px; row-gap: 2px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -3384,8 +3372,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             class="ds-my-small"
           >
             <h3
-              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
-              style="word-break: break-all;"
+              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin word-break-all"
             >
               
             Yoga Practice
@@ -3393,8 +3380,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             </h3>
              
             <p
-              class="ds-text ds-text-center ds-text-soft"
-              style="word-break: break-all;"
+              class="ds-text ds-text-center ds-text-soft word-break-all"
             >
               
             &yoga-practice
@@ -4081,7 +4067,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
+          style="grid-auto-rows: 2px; row-gap: 2px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -4239,8 +4225,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             class="ds-my-small"
           >
             <h3
-              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
-              style="word-break: break-all;"
+              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin word-break-all"
             >
               
             Yoga Practice
@@ -4248,8 +4233,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             </h3>
              
             <p
-              class="ds-text ds-text-center ds-text-soft"
-              style="word-break: break-all;"
+              class="ds-text ds-text-center ds-text-soft word-break-all"
             >
               
             &yoga-practice
@@ -4882,7 +4866,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
+          style="grid-auto-rows: 2px; row-gap: 2px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -5040,8 +5024,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             class="ds-my-small"
           >
             <h3
-              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
-              style="word-break: break-all;"
+              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin word-break-all"
             >
               
             Yoga Practice
@@ -5049,8 +5032,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             </h3>
              
             <p
-              class="ds-text ds-text-center ds-text-soft"
-              style="word-break: break-all;"
+              class="ds-text ds-text-center ds-text-soft word-break-all"
             >
               
             &yoga-practice
@@ -5702,7 +5684,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
+          style="grid-auto-rows: 2px; row-gap: 2px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -5955,8 +5937,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             class="ds-my-small"
           >
             <h3
-              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
-              style="word-break: break-all;"
+              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin word-break-all"
             >
               
             Yoga Practice
@@ -5964,8 +5945,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
             </h3>
              
             <p
-              class="ds-text ds-text-center ds-text-soft"
-              style="word-break: break-all;"
+              class="ds-text ds-text-center ds-text-soft word-break-all"
             >
               
             &yoga-practice
@@ -6651,7 +6631,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
+          style="grid-auto-rows: 2px; row-gap: 2px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -6992,8 +6972,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             class="ds-my-small"
           >
             <h3
-              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
-              style="word-break: break-all;"
+              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin word-break-all"
             >
               
             Investigative Journalism
@@ -7001,8 +6980,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             </h3>
              
             <p
-              class="ds-text ds-text-center ds-text-soft"
-              style="word-break: break-all;"
+              class="ds-text ds-text-center ds-text-soft word-break-all"
             >
               
             &investigative-journalism
@@ -7303,8 +7281,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
-                style="word-break: break-all;"
+                class="word-break-all os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em] word-break-all"
               >
                 Investigative journalists share ideas and insights and can collaborate.
               </span>
@@ -7774,7 +7751,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
+          style="grid-auto-rows: 2px; row-gap: 2px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
@@ -8039,8 +8016,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             class="ds-my-small"
           >
             <h3
-              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
-              style="word-break: break-all;"
+              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin word-break-all"
             >
               
             Investigative Journalism
@@ -8048,8 +8024,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             </h3>
              
             <p
-              class="ds-text ds-text-center ds-text-soft"
-              style="word-break: break-all;"
+              class="ds-text ds-text-center ds-text-soft word-break-all"
             >
               
             &investigative-journalism
@@ -8349,8 +8324,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
               class="chip"
             >
               <span
-                class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
-                style="word-break: break-all;"
+                class="word-break-all os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em] word-break-all"
               >
                 Investigative journalists share ideas and insights and can collaborate.
               </span>
@@ -8820,7 +8794,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
          
         <div
           class="ds-grid"
-          style="grid-auto-rows: 20px; row-gap: 16px; column-gap: 16px;"
+          style="grid-auto-rows: 2px; row-gap: 2px;"
         >
           <div
             style="grid-row-end: span 4; grid-column: 1 / -1;"
