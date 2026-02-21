@@ -166,7 +166,6 @@ import { filterPosts } from '~/graphql/PostQuery.js'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
 import { SHOW_CONTENT_FILTER_MASONRY_GRID } from '~/constants/filter.js'
-import { POST_ADD_BUTTON_POSITION_TOP } from '~/constants/posts.js'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 
 export default {
@@ -201,7 +200,6 @@ export default {
       pageSize: 12,
       hashtag,
       SHOW_CONTENT_FILTER_MASONRY_GRID,
-      POST_ADD_BUTTON_POSITION_TOP,
     }
   },
   computed: {
