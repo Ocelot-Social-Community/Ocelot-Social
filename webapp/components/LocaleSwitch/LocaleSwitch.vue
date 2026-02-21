@@ -36,14 +36,14 @@
 <script>
 import { OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import gql from 'graphql-tag'
 import Dropdown from '~/components/Dropdown'
 import find from 'lodash/find'
 import orderBy from 'lodash/orderBy'
 import locales from '~/locales'
-import { mapGetters, mapMutations } from 'vuex'
+import localeUpdate from '~/mixins/localeUpdate.js'
 
 export default {
+  mixins: [localeUpdate],
   components: {
     Dropdown,
     OsIcon,
@@ -70,9 +70,6 @@ export default {
       })
       return routes
     },
-    ...mapGetters({
-      currentUser: 'auth/user',
-    }),
   },
   created() {
     this.icons = iconRegistry
@@ -85,39 +82,6 @@ export default {
     },
     matcher(locale) {
       return locale === this.$i18n.locale()
-    },
-
-    ...mapMutations({
-      setCurrentUser: 'auth/SET_USER',
-    }),
-    async updateUserLocale() {
-      if (!this.currentUser || !this.currentUser.id) return null
-      try {
-        await this.$apollo.mutate({
-          mutation: gql`
-            mutation ($id: ID!, $locale: String) {
-              UpdateUser(id: $id, locale: $locale) {
-                id
-                locale
-              }
-            }
-          `,
-          variables: {
-            id: this.currentUser.id,
-            locale: this.$i18n.locale(),
-          },
-          update: (store, { data: { UpdateUser } }) => {
-            const { locale } = UpdateUser
-            this.setCurrentUser({
-              ...this.currentUser,
-              locale,
-            })
-          },
-        })
-        this.$toast.success(this.$t('contribution.success'))
-      } catch (err) {
-        this.$toast.error(err.message)
-      }
     },
   },
 }

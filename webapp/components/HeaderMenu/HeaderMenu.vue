@@ -488,8 +488,7 @@
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import { mapGetters, mapMutations } from 'vuex'
-import gql from 'graphql-tag'
+import { mapGetters } from 'vuex'
 import find from 'lodash/find'
 import isEmpty from 'lodash/isEmpty'
 import orderBy from 'lodash/orderBy'
@@ -512,9 +511,10 @@ import links from '~/constants/links.js'
 import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParamsLink.vue'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
+import localeUpdate from '~/mixins/localeUpdate.js'
 
 export default {
-  mixins: [GetCategories],
+  mixins: [GetCategories, localeUpdate],
   components: {
     OsButton,
     OsIcon,
@@ -687,9 +687,6 @@ export default {
         this.mobileLocaleMenuOpen = false
       }
     },
-    ...mapMutations({
-      setCurrentUser: 'auth/SET_USER',
-    }),
     moreItemIcon(name) {
       const iconMap = {
         'organization': this.icons.home,
@@ -708,33 +705,7 @@ export default {
       this.mobileLocaleMenuOpen = false
       this.updateUserLocale()
     },
-    async updateUserLocale() {
-      if (!this.user || !this.user.id) return
-      try {
-        await this.$apollo.mutate({
-          mutation: gql`
-            mutation ($id: ID!, $locale: String) {
-              UpdateUser(id: $id, locale: $locale) {
-                id
-                locale
-              }
-            }
-          `,
-          variables: {
-            id: this.user.id,
-            locale: this.$i18n.locale(),
-          },
-          update: (store, { data: { UpdateUser } }) => {
-            this.setCurrentUser({
-              ...this.user,
-              locale: UpdateUser.locale,
-            })
-          },
-        })
-      } catch (err) {
-        this.$toast.error(err.message)
-      }
-    },
+    // updateUserLocale() provided by localeUpdate mixin
   },
   mounted() {
     window.addEventListener('scroll', this.handleScroll)
