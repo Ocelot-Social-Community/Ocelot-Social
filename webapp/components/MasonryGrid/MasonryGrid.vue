@@ -1,7 +1,7 @@
 <template>
   <div
     class="ds-grid"
-    :style="{ gridAutoRows: '20px', rowGap: '16px', columnGap: '16px' }"
+    :style="{ gridAutoRows: '20px', rowGap: '16px' }"
     :class="[measuring ? 'reset-grid-height' : '']"
   >
     <slot></slot>
@@ -52,24 +52,6 @@ export default {
         this.measuring = false
       })
     },
-    checkMobile() {
-      this.isMobile = window.innerWidth <= 810
-    },
-  },
-  mounted() {
-    this.checkMobile()
-    // Children mount before parent — recalculate their spans with correct grid values
-    this.$nextTick(() => {
-      this.$children.forEach((child) => {
-        if (child.calculateItemHeight) child.calculateItemHeight()
-      })
-    })
-    window.addEventListener('resize', this.checkMobile)
-  },
-  beforeDestroy() {
-    this.$off('calculating-item-height', this.startCalculation)
-    this.$off('finished-calculating-item-height', this.endCalculation)
-    window.removeEventListener('resize', this.checkMobile)
   },
 }
 </script>
