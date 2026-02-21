@@ -225,6 +225,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           >
             <h3
               class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
+              style="word-break: break-all;"
             >
               
             School For Citizens
@@ -536,6 +537,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             >
               <span
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
+                style="word-break: break-all;"
               >
                 Our children shall receive education for life.
               </span>
@@ -1147,6 +1149,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           >
             <h3
               class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
+              style="word-break: break-all;"
             >
               
             School For Citizens
@@ -1411,6 +1414,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             >
               <span
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
+                style="word-break: break-all;"
               >
                 Our children shall receive education for life.
               </span>
@@ -1653,6 +1657,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           >
             <h3
               class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
+              style="word-break: break-all;"
             >
               
             School For Citizens
@@ -1936,6 +1941,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             >
               <span
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
+                style="word-break: break-all;"
               >
                 Our children shall receive education for life.
               </span>
@@ -2273,6 +2279,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
           >
             <h3
               class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
+              style="word-break: break-all;"
             >
               
             School For Citizens
@@ -2583,6 +2590,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
             >
               <span
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
+                style="word-break: break-all;"
               >
                 Our children shall receive education for life.
               </span>
@@ -3377,6 +3385,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           >
             <h3
               class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
+              style="word-break: break-all;"
             >
               
             Yoga Practice
@@ -4231,6 +4240,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           >
             <h3
               class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
+              style="word-break: break-all;"
             >
               
             Yoga Practice
@@ -5031,6 +5041,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           >
             <h3
               class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
+              style="word-break: break-all;"
             >
               
             Yoga Practice
@@ -5945,6 +5956,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
           >
             <h3
               class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
+              style="word-break: break-all;"
             >
               
             Yoga Practice
@@ -6981,6 +6993,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           >
             <h3
               class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
+              style="word-break: break-all;"
             >
               
             Investigative Journalism
@@ -7291,6 +7304,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             >
               <span
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
+                style="word-break: break-all;"
               >
                 Investigative journalists share ideas and insights and can collaborate.
               </span>
@@ -8026,6 +8040,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
           >
             <h3
               class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
+              style="word-break: break-all;"
             >
               
             Investigative Journalism
@@ -8335,6 +8350,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
             >
               <span
                 class="os-badge inline-flex w-fit items-center gap-[0.25em] font-semibold text-[var(--color-default-contrast)] bg-[var(--color-default)] text-[0.75rem] py-[0.2em] px-[0.8em] rounded-[2em]"
+                style="word-break: break-all;"
               >
                 Investigative journalists share ideas and insights and can collaborate.
               </span>
