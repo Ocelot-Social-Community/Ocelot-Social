@@ -29,11 +29,14 @@
           </client-only>
           <div class="ds-my-small">
             <!-- group name -->
-            <h3 class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin">
+            <h3
+              class="ds-heading ds-heading-h3 ds-heading-align-center ds-heading-no-margin"
+              style="word-break: break-all"
+            >
               {{ groupName }}
             </h3>
             <!-- group slug -->
-            <p class="ds-text ds-text-center ds-text-soft">
+            <p class="ds-text ds-text-center ds-text-soft" style="word-break: break-all">
               {{ `&${groupSlug}` }}
             </p>
             <!-- group location -->
@@ -160,7 +163,7 @@
               </p>
               <div class="ds-my-xx-small"></div>
               <div class="chip" align="center">
-                <os-badge>{{ group.about }}</os-badge>
+                <os-badge style="word-break: break-all">{{ group.about }}</os-badge>
               </div>
             </div>
           </template>

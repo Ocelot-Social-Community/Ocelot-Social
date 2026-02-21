@@ -84,6 +84,8 @@ export default {
   }
 
   .info {
+    flex: 1;
+    min-width: 0;
     padding-left: 10px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -109,6 +111,12 @@ export default {
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
+
+    > a,
+    > button,
+    > span:not(.group-info) {
+      display: contents;
+    }
   }
 
   .flex-direction-row {
@@ -126,6 +134,27 @@ export default {
     > .ds-text {
       display: inline;
     }
+  }
+
+  .group-info {
+    display: flex;
+    align-self: stretch;
+    align-items: baseline;
+    gap: 4px;
+    min-width: 0;
+    overflow: hidden;
+
+    > .text {
+      flex-shrink: 0;
+    }
+  }
+
+  .group-link {
+    color: $color-primary;
+    font-size: $font-size-base;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }
 </style>

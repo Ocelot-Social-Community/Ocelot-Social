@@ -2,7 +2,11 @@
   <div>
     <!-- feed top row: filter (left) + create post (right) -->
     <div class="feed-top-row">
-      <div v-if="SHOW_CONTENT_FILTER_MASONRY_GRID" class="filterButtonMenu">
+      <div
+        v-if="SHOW_CONTENT_FILTER_MASONRY_GRID"
+        class="filterButtonMenu"
+        :class="{ 'hide-filter': hideByScroll }"
+      >
         <os-button
           class="my-filter-button"
           v-if="
@@ -75,7 +79,6 @@
             placement: 'left',
           }"
           class="post-add-button"
-          :class="{ 'hide-filter': hideByScroll }"
           variant="primary"
           appearance="filled"
           circle
@@ -187,7 +190,7 @@ export default {
     const { hashtag = null } = this.$route.query
     return {
       hideByScroll: false,
-      revScrollpos: 0,
+      prevScrollpos: 0,
       showFilter: false,
       developerNoAutoClosingFilterMenu: false, // stops automatic closing of filter menu for developer purposes: default is 'false'
       showDonations: false,
