@@ -119,7 +119,7 @@ export default {
   margin-left: $space-x-small;
 }
 
-@media (max-width: 810px) {
+@media (max-width: 639px) {
   .progress-bar {
     display: none;
   }

@@ -495,7 +495,7 @@ export default {
   }
 }
 
-@media (max-width: 810px) {
+@media (max-width: 639px) {
   .donation-mobile-only {
     display: block;
   }

@@ -81,7 +81,7 @@ describe('LayoutToggle', () => {
 
   it('adds layout-toggle--hidden class when isMobile is true', async () => {
     wrapper = Wrapper()
-    wrapper.setData({ windowWidth: 500 })
+    wrapper.setData({ windowWidth: 400 })
     await wrapper.vm.$nextTick()
     expect(wrapper.find('.layout-toggle').classes()).toContain('layout-toggle--hidden')
   })

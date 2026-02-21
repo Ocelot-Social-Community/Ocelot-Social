@@ -50,7 +50,7 @@ export default {
     OsButton,
     OsIcon,
   },
-  mixins: [mobile()],
+  mixins: [mobile(639)],
   props: {
     value: {
       type: Boolean,
