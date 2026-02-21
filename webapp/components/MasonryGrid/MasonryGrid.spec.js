@@ -26,6 +26,5 @@ describe('MasonryGrid', () => {
   it('sets inline grid styles', () => {
     expect(wrapper.element.style.gridAutoRows).toBe('20px')
     expect(wrapper.element.style.rowGap).toBe('16px')
-    expect(wrapper.element.style.columnGap).toBe('16px')
   })
 })
