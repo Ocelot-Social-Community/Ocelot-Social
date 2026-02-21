@@ -698,6 +698,13 @@
     "redeemed-count": null,
     "redeemed-count-0": null
   },
+  "layout": {
+    "toggle": {
+      "label": "Układ",
+      "multiColumn": "Wiele kolumn",
+      "singleColumn": "Jedna kolumna"
+    }
+  },
   "localeSwitch": {
     "tooltip": null
   },

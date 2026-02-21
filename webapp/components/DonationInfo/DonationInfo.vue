@@ -57,5 +57,15 @@ export default {
   margin-top: 16px;
   cursor: pointer;
   color: $text-color-base;
+  text-decoration: none !important;
+
+  &:hover {
+    text-decoration: none !important;
+    color: $text-color-base !important;
+  }
+
+  .os-button {
+    color: revert;
+  }
 }
 </style>

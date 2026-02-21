@@ -698,6 +698,13 @@
     "redeemed-count": "This code has been used {count} times.",
     "redeemed-count-0": "No one has used this code yet."
   },
+  "layout": {
+    "toggle": {
+      "label": "Layout",
+      "multiColumn": "Multi-column",
+      "singleColumn": "Single column"
+    }
+  },
   "localeSwitch": {
     "tooltip": "Choose language"
   },

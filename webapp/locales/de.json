@@ -698,6 +698,13 @@
     "redeemed-count": "{count} mal eingelöst",
     "redeemed-count-0": "Noch von niemandem eingelöst"
   },
+  "layout": {
+    "toggle": {
+      "label": "Layout",
+      "multiColumn": "Mehrspaltig",
+      "singleColumn": "Einspaltig"
+    }
+  },
   "localeSwitch": {
     "tooltip": "Sprache wählen"
   },

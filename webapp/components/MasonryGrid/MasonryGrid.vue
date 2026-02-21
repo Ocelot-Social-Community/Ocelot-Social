@@ -1,9 +1,5 @@
 <template>
-  <div
-    class="ds-grid"
-    :style="{ gridAutoRows: '2px', rowGap: '2px' }"
-    :class="[measuring ? 'reset-grid-height' : '']"
-  >
+  <div class="ds-grid" :style="gridStyle" :class="[measuring ? 'reset-grid-height' : '']">
     <slot></slot>
   </div>
 </template>
@@ -13,11 +9,31 @@ const ROW_HEIGHT = 2
 const ROW_GAP = 2
 
 export default {
+  props: {
+    singleColumn: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       measuring: false,
       childCount: 0,
     }
+  },
+  computed: {
+    gridStyle() {
+      return {
+        gridAutoRows: `${ROW_HEIGHT}px`,
+        rowGap: `${ROW_GAP}px`,
+        ...(this.singleColumn ? { gridTemplateColumns: '1fr' } : {}),
+      }
+    },
+  },
+  watch: {
+    singleColumn() {
+      this.$nextTick(() => this.batchRecalculate())
+    },
   },
   mounted() {
     this.$nextTick(() => this.batchRecalculate())
@@ -76,9 +92,15 @@ export default {
 .ds-grid {
   grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
   column-gap: 16px;
+  min-width: 0;
+  max-width: 100%;
 
   @media (max-width: 810px) {
     column-gap: 8px;
+  }
+
+  > * {
+    min-width: 0;
   }
 }
 

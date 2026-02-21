@@ -698,6 +698,13 @@
     "redeemed-count": null,
     "redeemed-count-0": null
   },
+  "layout": {
+    "toggle": {
+      "label": "Макет",
+      "multiColumn": "Несколько колонок",
+      "singleColumn": "Одна колонка"
+    }
+  },
   "localeSwitch": {
     "tooltip": null
   },

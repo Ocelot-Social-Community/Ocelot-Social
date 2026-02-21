@@ -698,6 +698,13 @@
     "redeemed-count": null,
     "redeemed-count-0": null
   },
+  "layout": {
+    "toggle": {
+      "label": "Weergave",
+      "multiColumn": "Meerdere kolommen",
+      "singleColumn": "Eén kolom"
+    }
+  },
   "localeSwitch": {
     "tooltip": null
   },

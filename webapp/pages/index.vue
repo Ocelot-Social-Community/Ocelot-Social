@@ -17,6 +17,7 @@
           "
           variant="primary"
           appearance="filled"
+          size="sm"
           @click="showFilter = !showFilter"
         >
           <template #suffix>
@@ -64,11 +65,19 @@
           :titleRemove="$t('filter-menu.deleteFilter')"
           :clickRemove="resetByGroups"
         />
+        <div v-if="showDonations" class="donation-mobile-only">
+          <donation-info :goal="goal" :progress="progress" />
+        </div>
+        <layout-toggle v-model="singleColumn" />
         <div id="my-filter" v-if="showFilter">
           <div @mouseleave="mouseLeaveFilterMenu">
             <filter-menu-component @showFilterMenu="showFilterMenu" />
           </div>
         </div>
+      </div>
+      <layout-toggle v-if="!SHOW_CONTENT_FILTER_MASONRY_GRID" v-model="singleColumn" />
+      <div v-if="showDonations && !SHOW_CONTENT_FILTER_MASONRY_GRID" class="donation-mobile-only">
+        <donation-info :goal="goal" :progress="progress" />
       </div>
       <client-only>
         <os-button
@@ -99,15 +108,16 @@
       <div v-if="hashtag">
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
       </div>
-      <div v-if="showDonations" class="top-info-bar">
+      <div v-if="showDonations" class="top-info-bar donation-desktop-only">
         <donation-info :goal="goal" :progress="progress" />
       </div>
     </div>
     <!-- content grid -->
     <masonry-grid
+      :single-column="singleColumn"
       :class="[
         !hashtag && !showDonations ? 'grid-margin-top' : '',
-        !isMobile && posts.length <= 2 ? 'grid-column-helper' : '',
+        !isMobile && !singleColumn && posts.length <= 2 ? 'grid-column-helper' : '',
       ]"
     >
       <!-- skeleton placeholders while loading -->
@@ -170,6 +180,7 @@ import PostTeaserSkeleton from '~/components/PostTeaser/PostTeaserSkeleton.vue'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import HeaderButton from '~/components/FilterMenu/HeaderButton'
+import LayoutToggle from '~/components/LayoutToggle/LayoutToggle'
 import { mapGetters, mapMutations } from 'vuex'
 import { DonationsQuery } from '~/graphql/Donations'
 import { filterPosts } from '~/graphql/PostQuery.js'
@@ -192,6 +203,7 @@ export default {
     MasonryGridItem,
     FilterMenuComponent,
     HeaderButton,
+    LayoutToggle,
   },
   mixins: [postListActions, mobile(), GetCategories],
   data() {
@@ -211,6 +223,7 @@ export default {
       pageSize: 12,
       hashtag,
       SHOW_CONTENT_FILTER_MASONRY_GRID,
+      singleColumn: false,
     }
   },
   computed: {
@@ -249,6 +262,14 @@ export default {
     this.icons = iconRegistry
   },
   mounted() {
+    try {
+      const stored = localStorage.getItem('ocelot-layout-single-column')
+      if (stored !== null) {
+        this.singleColumn = stored === 'true'
+      }
+    } catch (e) {
+      // localStorage not available
+    }
     if (this.categoryId) {
       this.resetCategories()
       this.toggleCategory(this.categoryId)
@@ -370,9 +391,9 @@ export default {
 
 .feed-top-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 16px;
-  margin-top: 0px;
+  margin-top: -8px;
 }
 
 .filterButtonMenu {
@@ -392,8 +413,8 @@ export default {
   box-shadow: $box-shadow-x-large !important;
   z-index: $z-index-sticky-float !important;
   position: fixed !important;
-  right: max(20px, calc((100vw - $container-max-width-x-large) / 2 + 48px)) !important;
-  top: 81px !important;
+  right: max(20px, calc((100vw - $container-max-width-x-large) / 2 + 52px)) !important;
+  top: 88px !important;
   transition: top 0.3s ease !important;
 }
 
@@ -406,15 +427,14 @@ export default {
   align-items: center;
 }
 .newsfeed-controls {
-  margin-top: 8px;
+  margin-top: 0;
 
-  &.newsfeed-controls--no-filter {
-    margin-top: -16px;
-    margin-bottom: 16px;
+  .donation-info {
+    margin-top: 4px;
+  }
 
-    .top-info-bar {
-      padding-right: 70px;
-    }
+  .top-info-bar {
+    padding-right: 70px;
   }
 }
 .main-container .grid-column-helper {
@@ -431,7 +451,7 @@ export default {
   z-index: $z-index-page-submenu;
 }
 .grid-margin-top {
-  margin-top: 8px;
+  margin-top: 4px;
 }
 @media screen and (min-height: 401px) {
   #my-filter {
@@ -473,7 +493,31 @@ export default {
     padding-bottom: 80px;
   }
 }
-@media screen and (max-width: 650px) {
+.donation-mobile-only {
+  display: none;
+
+  .donation-info {
+    margin: 0;
+  }
+
+  .progress-bar-component {
+    top: 0;
+  }
+}
+
+@media (max-width: 639px) {
+  .donation-mobile-only {
+    display: block;
+  }
+
+  .donation-desktop-only {
+    display: none;
+  }
+
+  .post-add-button {
+    top: 67px !important;
+  }
+
   .newsfeed-controls {
     margin-top: 8px;
   }
