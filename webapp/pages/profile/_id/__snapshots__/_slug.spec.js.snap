@@ -291,6 +291,11 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                   0
                 </span>
                 <span
+                  class="sr-only"
+                >
+                  0
+                </span>
+                <span
                   class="os-number-label text-[12px] text-[var(--color-text-soft)]"
                 >
                   profile.followers
@@ -307,6 +312,11 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                 <span
                   class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
                   style="min-width: 1ch;"
+                >
+                  0
+                </span>
+                <span
+                  class="sr-only"
                 >
                   0
                 </span>
@@ -470,6 +480,11 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                             0
                           </span>
                           <span
+                            class="sr-only"
+                          >
+                            6
+                          </span>
+                          <span
                             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
                           >
                             common.post
@@ -502,6 +517,11 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                             0
                           </span>
                           <span
+                            class="sr-only"
+                          >
+                            8
+                          </span>
+                          <span
                             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
                           >
                             profile.commented
@@ -532,6 +552,11 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                             style="min-width: 1ch;"
                           >
                             0
+                          </span>
+                          <span
+                            class="sr-only"
+                          >
+                            7
                           </span>
                           <span
                             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -989,6 +1014,11 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                   0
                 </span>
                 <span
+                  class="sr-only"
+                >
+                  0
+                </span>
+                <span
                   class="os-number-label text-[12px] text-[var(--color-text-soft)]"
                 >
                   profile.followers
@@ -1005,6 +1035,11 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                 <span
                   class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
                   style="min-width: 1ch;"
+                >
+                  0
+                </span>
+                <span
+                  class="sr-only"
                 >
                   0
                 </span>
@@ -1168,6 +1203,11 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                             0
                           </span>
                           <span
+                            class="sr-only"
+                          >
+                            6
+                          </span>
+                          <span
                             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
                           >
                             common.post
@@ -1200,6 +1240,11 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                             0
                           </span>
                           <span
+                            class="sr-only"
+                          >
+                            8
+                          </span>
+                          <span
                             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
                           >
                             profile.commented
@@ -1230,6 +1275,11 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                             style="min-width: 1ch;"
                           >
                             0
+                          </span>
+                          <span
+                            class="sr-only"
+                          >
+                            7
                           </span>
                           <span
                             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -1588,6 +1638,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                   0
                 </span>
                 <span
+                  class="sr-only"
+                >
+                  0
+                </span>
+                <span
                   class="os-number-label text-[12px] text-[var(--color-text-soft)]"
                 >
                   profile.followers
@@ -1604,6 +1659,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                 <span
                   class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
                   style="min-width: 1ch;"
+                >
+                  0
+                </span>
+                <span
+                  class="sr-only"
                 >
                   0
                 </span>
@@ -1690,6 +1750,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                             0
                           </span>
                           <span
+                            class="sr-only"
+                          >
+                            6
+                          </span>
+                          <span
                             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
                           >
                             common.post
@@ -1722,6 +1787,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                             0
                           </span>
                           <span
+                            class="sr-only"
+                          >
+                            8
+                          </span>
+                          <span
                             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
                           >
                             profile.commented
@@ -1752,6 +1822,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                             style="min-width: 1ch;"
                           >
                             0
+                          </span>
+                          <span
+                            class="sr-only"
+                          >
+                            7
                           </span>
                           <span
                             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -2189,6 +2264,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                   0
                 </span>
                 <span
+                  class="sr-only"
+                >
+                  0
+                </span>
+                <span
                   class="os-number-label text-[12px] text-[var(--color-text-soft)]"
                 >
                   profile.followers
@@ -2205,6 +2285,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                 <span
                   class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
                   style="min-width: 1ch;"
+                >
+                  0
+                </span>
+                <span
+                  class="sr-only"
                 >
                   0
                 </span>
@@ -2291,6 +2376,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                             0
                           </span>
                           <span
+                            class="sr-only"
+                          >
+                            6
+                          </span>
+                          <span
                             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
                           >
                             common.post
@@ -2323,6 +2413,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                             0
                           </span>
                           <span
+                            class="sr-only"
+                          >
+                            8
+                          </span>
+                          <span
                             class="os-number-label text-[12px] text-[var(--color-text-soft)]"
                           >
                             profile.commented
@@ -2353,6 +2448,11 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                             style="min-width: 1ch;"
                           >
                             0
+                          </span>
+                          <span
+                            class="sr-only"
+                          >
+                            7
                           </span>
                           <span
                             class="os-number-label text-[12px] text-[var(--color-text-soft)]"

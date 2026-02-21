@@ -298,6 +298,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                   0
                 </span>
                 <span
+                  class="sr-only"
+                >
+                  0
+                </span>
+                <span
                   class="os-number-label text-[12px] text-[var(--color-text-soft)]"
                 >
                   group.membersCount
@@ -2338,6 +2343,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                   0
                 </span>
                 <span
+                  class="sr-only"
+                >
+                  0
+                </span>
+                <span
                   class="os-number-label text-[12px] text-[var(--color-text-soft)]"
                 >
                   group.membersCount
@@ -3404,6 +3414,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                   0
                 </span>
                 <span
+                  class="sr-only"
+                >
+                  4
+                </span>
+                <span
                   class="os-number-label text-[12px] text-[var(--color-text-soft)]"
                 >
                   group.membersCount
@@ -4252,6 +4267,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                   0
                 </span>
                 <span
+                  class="sr-only"
+                >
+                  4
+                </span>
+                <span
                   class="os-number-label text-[12px] text-[var(--color-text-soft)]"
                 >
                   group.membersCount
@@ -5044,6 +5064,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                   style="min-width: 1ch;"
                 >
                   0
+                </span>
+                <span
+                  class="sr-only"
+                >
+                  4
                 </span>
                 <span
                   class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -5952,6 +5977,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                   style="min-width: 1ch;"
                 >
                   0
+                </span>
+                <span
+                  class="sr-only"
+                >
+                  4
                 </span>
                 <span
                   class="os-number-label text-[12px] text-[var(--color-text-soft)]"
@@ -7016,6 +7046,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                   0
                 </span>
                 <span
+                  class="sr-only"
+                >
+                  0
+                </span>
+                <span
                   class="os-number-label text-[12px] text-[var(--color-text-soft)]"
                 >
                   group.membersCount
@@ -8051,6 +8086,11 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                 <span
                   class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
                   style="min-width: 1ch;"
+                >
+                  0
+                </span>
+                <span
+                  class="sr-only"
                 >
                   0
                 </span>
