@@ -5,8 +5,11 @@
       :class="{ 'layout-toggle--hidden': isMobile }"
       role="radiogroup"
       :aria-label="$t('layout.toggle.label')"
+      @keydown.left.prevent="setLayout(true)"
+      @keydown.right.prevent="setLayout(false)"
     >
       <os-button
+        ref="singleBtn"
         circle
         size="sm"
         :appearance="value ? 'filled' : 'ghost'"
@@ -14,6 +17,7 @@
         role="radio"
         :aria-checked="String(value)"
         :aria-label="$t('layout.toggle.singleColumn')"
+        :tabindex="value ? '0' : '-1'"
         @click="setLayout(true)"
       >
         <template #icon>
@@ -21,6 +25,7 @@
         </template>
       </os-button>
       <os-button
+        ref="multiBtn"
         circle
         size="sm"
         :appearance="!value ? 'filled' : 'ghost'"
@@ -28,6 +33,7 @@
         role="radio"
         :aria-checked="String(!value)"
         :aria-label="$t('layout.toggle.multiColumn')"
+        :tabindex="!value ? '0' : '-1'"
         @click="setLayout(false)"
       >
         <template #icon>
@@ -78,6 +84,11 @@ export default {
         // localStorage not available
       }
       this.$emit('input', val)
+      this.$nextTick(() => {
+        const ref = val ? this.$refs.singleBtn : this.$refs.multiBtn
+        const el = ref?.$el || ref
+        if (el) el.focus()
+      })
     },
   },
 }
