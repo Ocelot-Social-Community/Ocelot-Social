@@ -517,9 +517,7 @@ export default {
   .post-add-button {
     top: 67px !important;
   }
-}
 
-@media screen and (max-width: 650px) {
   .newsfeed-controls {
     margin-top: 8px;
   }
