@@ -26,6 +26,7 @@ exports[`badge settings with badges more badges available selecting an empty slo
         >
           <div
             class="hc-badge-container"
+            draggable="false"
           >
             <img
               class="hc-badge"
@@ -35,6 +36,7 @@ exports[`badge settings with badges more badges available selecting an empty slo
           </div>
           <button
             class="hc-badge-container selectable"
+            draggable="true"
           >
             <img
               class="hc-badge"
@@ -44,6 +46,7 @@ exports[`badge settings with badges more badges available selecting an empty slo
           </button>
           <button
             class="hc-badge-container selectable selected"
+            draggable="false"
           >
             <img
               class="hc-badge"
@@ -53,6 +56,7 @@ exports[`badge settings with badges more badges available selecting an empty slo
           </button>
           <button
             class="hc-badge-container selectable"
+            draggable="true"
           >
             <img
               class="hc-badge"
@@ -62,6 +66,14 @@ exports[`badge settings with badges more badges available selecting an empty slo
           </button>
         </div>
       </div>
+       
+      <p
+        class="drag-instruction"
+      >
+        
+      settings.badges.drag-instruction
+    
+      </p>
        
       <!---->
        
@@ -78,11 +90,20 @@ exports[`badge settings with badges more badges available selecting an empty slo
       <div
         class="selection-info"
       >
+        <h3
+          class="reserve-title"
+        >
+          
+        settings.badges.reserve-title
+      
+        </h3>
+         
         <div
           class="badge-selection"
         >
           <button
             class="badge-selection-item"
+            draggable="true"
           >
             <div
               class="badge-icon"
@@ -105,6 +126,7 @@ exports[`badge settings with badges more badges available selecting an empty slo
           </button>
           <button
             class="badge-selection-item"
+            draggable="true"
           >
             <div
               class="badge-icon"
@@ -127,6 +149,8 @@ exports[`badge settings with badges more badges available selecting an empty slo
           </button>
         </div>
       </div>
+       
+      <!---->
     </div>
   </div>
 </div>
@@ -158,6 +182,7 @@ exports[`badge settings with badges no more badges available selecting an empty 
         >
           <div
             class="hc-badge-container"
+            draggable="false"
           >
             <img
               class="hc-badge"
@@ -167,6 +192,7 @@ exports[`badge settings with badges no more badges available selecting an empty 
           </div>
           <button
             class="hc-badge-container selectable"
+            draggable="true"
           >
             <img
               class="hc-badge"
@@ -176,6 +202,7 @@ exports[`badge settings with badges no more badges available selecting an empty 
           </button>
           <button
             class="hc-badge-container selectable selected"
+            draggable="false"
           >
             <img
               class="hc-badge"
@@ -185,6 +212,7 @@ exports[`badge settings with badges no more badges available selecting an empty 
           </button>
           <button
             class="hc-badge-container selectable"
+            draggable="true"
           >
             <img
               class="hc-badge"
@@ -195,11 +223,21 @@ exports[`badge settings with badges no more badges available selecting an empty 
         </div>
       </div>
        
+      <p
+        class="drag-instruction"
+      >
+        
+      settings.badges.drag-instruction
+    
+      </p>
+       
       <p>
         
       settings.badges.no-badges-available
     
       </p>
+       
+      <!---->
        
       <!---->
        
@@ -237,6 +275,7 @@ exports[`badge settings with badges renders 1`] = `
         >
           <div
             class="hc-badge-container"
+            draggable="false"
           >
             <img
               class="hc-badge"
@@ -246,6 +285,7 @@ exports[`badge settings with badges renders 1`] = `
           </div>
           <button
             class="hc-badge-container selectable"
+            draggable="true"
           >
             <img
               class="hc-badge"
@@ -255,6 +295,7 @@ exports[`badge settings with badges renders 1`] = `
           </button>
           <button
             class="hc-badge-container selectable"
+            draggable="false"
           >
             <img
               class="hc-badge"
@@ -264,6 +305,7 @@ exports[`badge settings with badges renders 1`] = `
           </button>
           <button
             class="hc-badge-container selectable"
+            draggable="true"
           >
             <img
               class="hc-badge"
@@ -273,6 +315,14 @@ exports[`badge settings with badges renders 1`] = `
           </button>
         </div>
       </div>
+       
+      <p
+        class="drag-instruction"
+      >
+        
+      settings.badges.drag-instruction
+    
+      </p>
        
       <!---->
        
@@ -285,6 +335,69 @@ exports[`badge settings with badges renders 1`] = `
       </div>
        
       <!---->
+       
+      <div
+        class="selection-info"
+      >
+        <h3
+          class="reserve-title"
+        >
+          
+        settings.badges.reserve-title
+      
+        </h3>
+         
+        <div
+          class="badge-selection"
+        >
+          <button
+            class="badge-selection-item"
+            draggable="true"
+          >
+            <div
+              class="badge-icon"
+            >
+              <img
+                alt="4"
+                src="/api/path/to/fourth/icon"
+              />
+            </div>
+             
+            <div
+              class="badge-info"
+            >
+              <div
+                class="badge-description"
+              >
+                Fourth description
+              </div>
+            </div>
+          </button>
+          <button
+            class="badge-selection-item"
+            draggable="true"
+          >
+            <div
+              class="badge-icon"
+            >
+              <img
+                alt="5"
+                src="/api/path/to/fifth/icon"
+              />
+            </div>
+             
+            <div
+              class="badge-info"
+            >
+              <div
+                class="badge-description"
+              >
+                Fifth description
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
        
       <!---->
     </div>
@@ -318,6 +431,7 @@ exports[`badge settings without badges renders 1`] = `
         >
           <div
             class="hc-badge-container"
+            draggable="false"
           >
             <img
               class="hc-badge"
@@ -327,6 +441,16 @@ exports[`badge settings without badges renders 1`] = `
           </div>
         </div>
       </div>
+       
+      <p
+        class="drag-instruction"
+      >
+        
+      settings.badges.drag-instruction
+    
+      </p>
+       
+      <!---->
        
       <!---->
        

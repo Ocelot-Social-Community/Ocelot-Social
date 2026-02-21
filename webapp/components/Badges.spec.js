@@ -111,5 +111,97 @@ describe('Badges.vue', () => {
         })
       })
     })
+
+    describe('with drag enabled', () => {
+      let wrapper
+
+      beforeEach(() => {
+        wrapper = Wrapper({ badges, selectionMode: true, dragEnabled: true })
+      })
+
+      it('renders draggable badges except first and default ones', () => {
+        const containers = wrapper.container.querySelectorAll('.hc-badge-container')
+        expect(containers[0].getAttribute('draggable')).toBe('false')
+        expect(containers[1].getAttribute('draggable')).toBe('false') // isDefault: true
+        expect(containers[2].getAttribute('draggable')).toBe('true')
+      })
+
+      it('first badge (index 0) is never draggable', () => {
+        const firstBadge = wrapper.container.querySelector('.hc-badge-container')
+        expect(firstBadge.getAttribute('draggable')).toBe('false')
+      })
+
+      describe('dragstart on non-default badge', () => {
+        it('emits drag-start with badge data', async () => {
+          const badge = screen.getByTitle(badges[2].description)
+          const container = badge.closest('.hc-badge-container')
+          await fireEvent.dragStart(container, {
+            dataTransfer: {
+              setData: jest.fn(),
+              effectAllowed: '',
+            },
+          })
+          expect(wrapper.emitted()['drag-start']).toBeTruthy()
+          expect(wrapper.emitted()['drag-start'][0][0]).toEqual({
+            source: 'hex',
+            index: 2,
+            badge: badges[2],
+          })
+        })
+      })
+
+      describe('drop on a slot', () => {
+        it('emits badge-drop with parsed source and target data', async () => {
+          const targetBadge = screen.getByTitle(badges[2].description)
+          const container = targetBadge.closest('.hc-badge-container')
+          const sourceData = JSON.stringify({ source: 'reserve', badge: { id: '99', icon: '/x' } })
+          await fireEvent.drop(container, {
+            dataTransfer: {
+              getData: () => sourceData,
+            },
+          })
+          expect(wrapper.emitted()['badge-drop']).toBeTruthy()
+          const emitted = wrapper.emitted()['badge-drop'][0][0]
+          expect(emitted.targetIndex).toBe(2)
+          expect(emitted.targetBadge).toEqual(badges[2])
+          expect(emitted.source).toEqual({ source: 'reserve', badge: { id: '99', icon: '/x' } })
+        })
+
+        it('does not emit badge-drop when dropping on index 0', async () => {
+          const firstBadge = screen.getByTitle(badges[0].description)
+          const container = firstBadge.closest('.hc-badge-container')
+          await fireEvent.drop(container, {
+            dataTransfer: {
+              getData: () => '{}',
+            },
+          })
+          expect(wrapper.emitted()['badge-drop']).toBeFalsy()
+        })
+      })
+
+      describe('dragend', () => {
+        it('emits drag-end', async () => {
+          const badge = screen.getByTitle(badges[2].description)
+          const container = badge.closest('.hc-badge-container')
+          await fireEvent.dragEnd(container)
+          expect(wrapper.emitted()['drag-end']).toBeTruthy()
+        })
+      })
+    })
+
+    describe('with drag disabled', () => {
+      let wrapper
+
+      beforeEach(() => {
+        wrapper = Wrapper({ badges, selectionMode: true, dragEnabled: false })
+      })
+
+      it('no badges are draggable', () => {
+        const containers = wrapper.container.querySelectorAll('.hc-badge-container')
+        containers.forEach((container) => {
+          expect(container.getAttribute('draggable')).toBe('false')
+        })
+      })
+    })
   })
 })

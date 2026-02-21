@@ -1050,10 +1050,15 @@
       "click-to-select": null,
       "click-to-use": null,
       "description": null,
+      "drag-instruction": null,
+      "drop-to-remove": null,
+      "error-update": null,
       "name": null,
       "no-badges-available": null,
       "remove": null,
+      "reserve-title": null,
       "success-update": null,
+      "swap-partial-error": null,
       "verification": null
     },
     "blocked-users": {

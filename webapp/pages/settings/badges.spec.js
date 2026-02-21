@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/vue'
+import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import '@testing-library/jest-dom'
 import badges from './badges.vue'
 
@@ -23,6 +23,7 @@ describe('badge settings', () => {
       $toast: {
         success: jest.fn(),
         error: jest.fn(),
+        info: jest.fn(),
       },
       $apollo: {
         mutate: apolloMutateMock,
@@ -336,6 +337,263 @@ describe('badge settings', () => {
               expect(mocks.$toast.error).toHaveBeenCalledWith('settings.badges.error-update')
             })
           })
+        })
+      })
+    })
+
+    describe('drag and drop', () => {
+      const makeDropData = (source) => JSON.stringify(source)
+
+      describe('assign badge from reserve to empty slot via DnD', () => {
+        const assignResponseData = {
+          setTrophyBadgeSelected: {
+            id: 'u23',
+            badgeTrophiesSelected: [
+              badgeTrophiesSelected[0],
+              {
+                id: '4',
+                icon: '/path/to/fourth/icon',
+                isDefault: false,
+                description: 'Fourth description',
+              },
+              badgeTrophiesSelected[2],
+            ],
+            badgeTrophiesUnused: [badgeTrophiesUnused[1]],
+          },
+        }
+
+        beforeEach(async () => {
+          apolloMutateMock.mockImplementation(({ update }) => {
+            const result = { data: assignResponseData }
+            if (update) update(null, result)
+            return Promise.resolve(result)
+          })
+
+          // Simulate dropping a reserve badge on the empty hex slot (index 2 in Badges = slot 1)
+          const emptySlot = screen.getAllByTitle('Empty')[0]
+          const container = emptySlot.closest('.hc-badge-container')
+          const sourceData = makeDropData({
+            source: 'reserve',
+            badge: badgeTrophiesUnused[0],
+          })
+          await fireEvent.drop(container, {
+            dataTransfer: { getData: () => sourceData },
+          })
+        })
+
+        it('calls the server with correct badge and slot', () => {
+          expect(apolloMutateMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              variables: {
+                badgeId: '4',
+                slot: 1,
+              },
+            }),
+          )
+        })
+
+        it('shows success message', () => {
+          expect(mocks.$toast.success).toHaveBeenCalledWith('settings.badges.success-update')
+        })
+      })
+
+      describe('remove badge from hex to reserve via DnD', () => {
+        const removeResponseData = {
+          setTrophyBadgeSelected: {
+            id: 'u23',
+            badgeTrophiesSelected: [
+              {
+                id: 'empty-0',
+                icon: '/path/to/empty/icon',
+                isDefault: true,
+                description: 'Empty',
+              },
+              badgeTrophiesSelected[1],
+              badgeTrophiesSelected[2],
+            ],
+            badgeTrophiesUnused: [
+              badgeTrophiesSelected[0],
+              ...badgeTrophiesUnused,
+            ],
+          },
+        }
+
+        beforeEach(async () => {
+          apolloMutateMock.mockImplementation(({ update }) => {
+            const result = { data: removeResponseData }
+            if (update) update(null, result)
+            return Promise.resolve(result)
+          })
+
+          // Simulate dropping a hex badge on the reserve container
+          const reserveContainer = wrapper.container.querySelector('.badge-selection')
+          const hexData = makeDropData({
+            source: 'hex',
+            index: 1,
+            badge: badgeTrophiesSelected[0],
+          })
+          await fireEvent.drop(reserveContainer, {
+            dataTransfer: { getData: () => hexData },
+          })
+        })
+
+        it('calls the server to remove badge', () => {
+          expect(apolloMutateMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+              variables: {
+                badgeId: null,
+                slot: 0,
+              },
+            }),
+          )
+        })
+
+        it('shows success message', () => {
+          expect(mocks.$toast.success).toHaveBeenCalledWith('settings.badges.success-update')
+        })
+      })
+
+      describe('swap two badges via DnD', () => {
+        const swapResponse1 = {
+          setTrophyBadgeSelected: {
+            id: 'u23',
+            badgeTrophiesSelected: [
+              {
+                id: '3',
+                icon: '/path/to/third/icon',
+                isDefault: false,
+                description: 'Third description',
+              },
+              badgeTrophiesSelected[1],
+              {
+                id: 'empty-temp',
+                icon: '/path/to/empty/icon',
+                isDefault: true,
+                description: 'Empty',
+              },
+            ],
+            badgeTrophiesUnused: [
+              badgeTrophiesSelected[0],
+              ...badgeTrophiesUnused,
+            ],
+          },
+        }
+
+        const swapResponse2 = {
+          setTrophyBadgeSelected: {
+            id: 'u23',
+            badgeTrophiesSelected: [
+              {
+                id: '3',
+                icon: '/path/to/third/icon',
+                isDefault: false,
+                description: 'Third description',
+              },
+              badgeTrophiesSelected[1],
+              {
+                id: '1',
+                icon: '/path/to/some/icon',
+                isDefault: false,
+                description: 'Some description',
+              },
+            ],
+            badgeTrophiesUnused,
+          },
+        }
+
+        beforeEach(async () => {
+          let callCount = 0
+          apolloMutateMock.mockImplementation(({ update }) => {
+            callCount++
+            const responseData = callCount === 1 ? swapResponse1 : swapResponse2
+            const result = { data: responseData }
+            if (update) update(null, result)
+            return Promise.resolve(result)
+          })
+
+          // Simulate dragging badge at index 1 onto badge at index 3 (both occupied)
+          const targetBadge = screen.getByTitle(badgeTrophiesSelected[2].description)
+          const container = targetBadge.closest('.hc-badge-container')
+          const sourceData = makeDropData({
+            source: 'hex',
+            index: 1,
+            badge: badgeTrophiesSelected[0],
+          })
+          await fireEvent.drop(container, {
+            dataTransfer: { getData: () => sourceData },
+          })
+        })
+
+        it('calls the server twice for swap', () => {
+          expect(apolloMutateMock).toHaveBeenCalledTimes(2)
+        })
+
+        it('first mutation moves source to target slot', () => {
+          expect(apolloMutateMock).toHaveBeenNthCalledWith(
+            1,
+            expect.objectContaining({
+              variables: {
+                badgeId: '1',
+                slot: 2,
+              },
+            }),
+          )
+        })
+
+        it('second mutation moves former target to source slot', () => {
+          expect(apolloMutateMock).toHaveBeenNthCalledWith(
+            2,
+            expect.objectContaining({
+              variables: {
+                badgeId: '3',
+                slot: 0,
+              },
+            }),
+          )
+        })
+
+        it('shows success message', () => {
+          expect(mocks.$toast.success).toHaveBeenCalledWith('settings.badges.success-update')
+        })
+      })
+
+      describe('swap with partial failure', () => {
+        beforeEach(async () => {
+          let callCount = 0
+          apolloMutateMock.mockImplementation(({ update }) => {
+            callCount++
+            if (callCount === 1) {
+              const result = {
+                data: {
+                  setTrophyBadgeSelected: {
+                    id: 'u23',
+                    badgeTrophiesSelected: badgeTrophiesSelected,
+                    badgeTrophiesUnused: badgeTrophiesUnused,
+                  },
+                },
+              }
+              if (update) update(null, result)
+              return Promise.resolve(result)
+            }
+            return Promise.reject({ message: 'Server error' })
+          })
+
+          const targetBadge = screen.getByTitle(badgeTrophiesSelected[2].description)
+          const container = targetBadge.closest('.hc-badge-container')
+          const sourceData = makeDropData({
+            source: 'hex',
+            index: 1,
+            badge: badgeTrophiesSelected[0],
+          })
+          await fireEvent.drop(container, {
+            dataTransfer: { getData: () => sourceData },
+          })
+        })
+
+        it('shows swap partial error', () => {
+          expect(mocks.$toast.error).toHaveBeenCalledWith(
+            'settings.badges.swap-partial-error',
+          )
         })
       })
     })

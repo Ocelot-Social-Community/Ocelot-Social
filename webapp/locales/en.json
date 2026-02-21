@@ -1050,10 +1050,15 @@
       "click-to-select": "Click on an empty space to add a badge.",
       "click-to-use": "Click on a badge to use it in the selected slot.",
       "description": "Here you can choose how to display your earned badges on your profile.",
+      "drag-instruction": "Drag and drop badges to rearrange them.",
+      "drop-to-remove": "Drop here to remove the badge.",
+      "error-update": "An error occurred while updating your badges.",
       "name": "Badges",
       "no-badges-available": "You currently don't have any badges available to add.",
       "remove": "Remove Badge",
+      "reserve-title": "Available Badges",
       "success-update": "Your badges have been updated successfully.",
+      "swap-partial-error": "The badge swap could not be completed. Please try again.",
       "verification": "This is your verification badge and cannot be changed."
     },
     "blocked-users": {
