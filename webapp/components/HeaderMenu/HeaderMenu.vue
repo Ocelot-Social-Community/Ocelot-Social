@@ -556,6 +556,7 @@ export default {
     return {
       hideNavbar: false,
       prevScrollpos: 0,
+      navbarRevealedByHover: false,
       isEmpty,
       links,
       LOGOS,
@@ -662,7 +663,12 @@ export default {
       const currentScrollPos = window.pageYOffset
       const wasHidden = this.hideNavbar
       if (this.prevScrollpos > 50) {
-        this.hideNavbar = this.prevScrollpos <= currentScrollPos
+        if (this.prevScrollpos > currentScrollPos) {
+          this.hideNavbar = false
+          this.navbarRevealedByHover = false
+        } else {
+          this.hideNavbar = true
+        }
       }
       this.prevScrollpos = currentScrollPos
       if (wasHidden !== this.hideNavbar) {
@@ -674,6 +680,21 @@ export default {
       if (el) {
         const height = this.hideNavbar ? 0 : el.offsetHeight
         document.documentElement.style.setProperty('--header-height', `${height}px`)
+      }
+    },
+    handleMouseMove(event) {
+      if (this.hideNavbar && event.clientY < 50) {
+        this.hideNavbar = false
+        this.navbarRevealedByHover = true
+      } else if (this.navbarRevealedByHover && !this.hideNavbar) {
+        const navbar = document.getElementById('navbar')
+        if (navbar) {
+          const rect = navbar.getBoundingClientRect()
+          if (event.clientY > rect.bottom) {
+            this.hideNavbar = true
+            this.navbarRevealedByHover = false
+          }
+        }
       }
     },
     handleClickOutside(event) {
@@ -719,13 +740,15 @@ export default {
     // updateUserLocale() provided by localeUpdate mixin
   },
   mounted() {
-    window.addEventListener('scroll', this.handleScroll)
     this.$nextTick(() => this.updateHeaderOffset())
+    window.addEventListener('scroll', this.handleScroll)
+    document.addEventListener('mousemove', this.handleMouseMove)
     document.addEventListener('click', this.handleClickOutside)
   },
   beforeDestroy() {
     document.body.style.overflow = ''
     window.removeEventListener('scroll', this.handleScroll)
+    document.removeEventListener('mousemove', this.handleMouseMove)
     document.removeEventListener('click', this.handleClickOutside)
   },
 }
@@ -755,8 +778,12 @@ export default {
     }
   }
 }
-.hide-navbar {
-  display: none;
+.main-navigation {
+  transition: transform 0.3s ease;
+
+  &:has(.hide-navbar) {
+    transform: translateY(-100%);
+  }
 }
 .margin-right-20 {
   margin-right: 20px;
