@@ -35,10 +35,6 @@ export default {
     this.$on('calculating-item-height', this.startCalculation)
     this.$on('finished-calculating-item-height', this.endCalculation)
   },
-  beforeDestroy() {
-    this.$off('calculating-item-height', this.startCalculation)
-    this.$off('finished-calculating-item-height', this.endCalculation)
-  },
   methods: {
     startCalculation() {
       this.itemsCalculating += 1
@@ -61,6 +57,8 @@ export default {
     window.addEventListener('resize', this.checkMobile)
   },
   beforeDestroy() {
+    this.$off('calculating-item-height', this.startCalculation)
+    this.$off('finished-calculating-item-height', this.endCalculation)
     window.removeEventListener('resize', this.checkMobile)
   },
 }
