@@ -246,15 +246,6 @@
               <os-icon :icon="route.icon" />
               {{ route.name }}
             </nuxt-link>
-            <hr />
-            <nuxt-link
-              class="mobile-avatar-menu-item logout-link"
-              :to="{ name: 'logout' }"
-              @click.native="toggleMobileMenuView"
-            >
-              <os-icon :icon="icons.signOut" />
-              {{ $t('login.logout') }}
-            </nuxt-link>
           </div>
         </div>
 
@@ -396,6 +387,21 @@
             </div>
           </div>
         </div>
+
+        <!-- Logout (only when open + logged in) -->
+        <nuxt-link
+          v-if="toggleMobileMenu && isLoggedIn"
+          :to="{ name: 'logout' }"
+          class="mobile-nav-item mobile-logout-item"
+          @click.native="toggleMobileMenuView"
+        >
+          <os-button variant="danger" appearance="ghost" circle class="mobile-nav-icon-button">
+            <template #icon>
+              <os-icon :icon="icons.signOut" />
+            </template>
+          </os-button>
+          <span>{{ $t('login.logout') }}</span>
+        </nuxt-link>
       </div>
     </div>
   </div>
@@ -677,6 +683,17 @@ export default {
       color: $text-color-link;
     }
 
+    &.mobile-logout-item {
+      color: $text-color-danger;
+      border-top: 1px solid $color-neutral-90;
+      padding-top: 12px;
+      margin-top: 4px;
+
+      &:hover {
+        color: color.adjust($text-color-danger, $lightness: -10%);
+      }
+    }
+
     // Flatten embedded component buttons to plain icons
     .chat-notification-menu,
     .notifications-menu,
@@ -768,13 +785,6 @@ export default {
 
     &:hover {
       color: $text-color-link;
-    }
-
-    &.logout-link {
-      color: $text-color-danger;
-      &:hover {
-        color: color.adjust($text-color-danger, $lightness: -10%);
-      }
     }
   }
 
