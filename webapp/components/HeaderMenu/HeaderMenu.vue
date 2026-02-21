@@ -522,7 +522,7 @@ export default {
   }
 
   .mobile-hamburger-menu {
-    flex: 0 0 auto; // no shrinking
+    flex: 1 0 auto;
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
