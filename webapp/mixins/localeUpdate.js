@@ -1,5 +1,5 @@
-import gql from 'graphql-tag'
 import { mapGetters, mapMutations } from 'vuex'
+import { updateUserMutation } from '~/graphql/User.js'
 
 export default {
   computed: {
@@ -15,14 +15,7 @@ export default {
       if (!this.currentUser || !this.currentUser.id) return
       try {
         await this.$apollo.mutate({
-          mutation: gql`
-            mutation ($id: ID!, $locale: String) {
-              UpdateUser(id: $id, locale: $locale) {
-                id
-                locale
-              }
-            }
-          `,
+          mutation: updateUserMutation(),
           variables: {
             id: this.currentUser.id,
             locale: this.$i18n.locale(),
