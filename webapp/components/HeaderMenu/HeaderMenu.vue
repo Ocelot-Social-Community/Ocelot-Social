@@ -185,7 +185,7 @@
               circle
               class="hamburger-button"
               :aria-label="$t('site.navigation')"
-              @click="toggleMobileMenuView"
+              @click.stop="toggleMobileMenuView"
             >
               <template #icon>
                 <os-icon :icon="icons.bars" />
@@ -302,15 +302,34 @@
           </template>
         </div>
 
-        <!-- filter menu (only when open + logged in) -->
+        <!-- filter menu (only when open + logged in + on index page) -->
         <div
-          v-if="isLoggedIn && toggleMobileMenu && showFilterMenuDropdown && SHOW_CONTENT_FILTER_HEADER_MENU"
-          class="mobile-menu"
-          style="padding: 20px 0"
+          v-if="isLoggedIn && toggleMobileMenu && SHOW_CONTENT_FILTER_HEADER_MENU"
+          class="mobile-filter-section"
         >
-          <client-only>
-            <filter-menu />
-          </client-only>
+          <div class="mobile-nav-item" @click="mobileFilterMenuOpen = !mobileFilterMenuOpen">
+            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
+              <template #icon>
+                <os-icon :icon="icons.filter" />
+              </template>
+            </os-button>
+            <span>{{ $t('common.filter') }}</span>
+            <os-button
+              variant="primary"
+              appearance="ghost"
+              circle
+              class="mobile-collapse-toggle"
+            >
+              <template #icon>
+                <os-icon :icon="mobileFilterMenuOpen ? icons.angleUp : icons.angleDown" />
+              </template>
+            </os-button>
+          </div>
+          <div v-if="mobileFilterMenuOpen" class="mobile-filter-items">
+            <client-only>
+              <filter-menu-component />
+            </client-only>
+          </div>
         </div>
 
         <!-- Locale switch collapsible (only when open) -->
@@ -450,6 +469,7 @@ import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
 import ChatNotificationMenu from '~/components/ChatNotificationMenu/ChatNotificationMenu'
 import CustomButton from '~/components/CustomButton/CustomButton'
 import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
+import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
 import headerMenuBranded from '~/constants/headerMenuBranded.js'
 import InviteButton from '~/components/InviteButton/InviteButton'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
@@ -470,6 +490,7 @@ export default {
     ChatNotificationMenu,
     CustomButton,
     FilterMenu,
+    FilterMenuComponent,
     InviteButton,
     LocaleSwitch,
     Logo,
@@ -496,6 +517,7 @@ export default {
       toggleMobileMenu: false,
       mobileAvatarMenuToggled: null,
       mobileMoreMenuToggled: null,
+      mobileFilterMenuOpen: false,
       mobileLocaleMenuOpen: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
       localeFlags: {
@@ -615,9 +637,13 @@ export default {
     toggleMobileMenuView() {
       this.toggleMobileMenu = !this.toggleMobileMenu
       this.$nextTick(() => this.updateHeaderOffset())
-      if (!this.toggleMobileMenu) {
+      if (this.toggleMobileMenu) {
+        document.body.style.overflow = 'hidden'
+      } else {
+        document.body.style.overflow = ''
         this.mobileAvatarMenuToggled = null
         this.mobileMoreMenuToggled = null
+        this.mobileFilterMenuOpen = false
         this.mobileLocaleMenuOpen = false
       }
     },
@@ -676,6 +702,7 @@ export default {
     document.addEventListener('click', this.handleClickOutside)
   },
   beforeDestroy() {
+    document.body.style.overflow = ''
     window.removeEventListener('scroll', this.handleScroll)
     document.removeEventListener('click', this.handleClickOutside)
   },
@@ -699,6 +726,10 @@ export default {
     }
     .mobile-menu {
       display: block;
+
+      &.mobil-header-box--open {
+        display: flex;
+      }
     }
   }
 }
@@ -757,10 +788,12 @@ export default {
   &.mobil-header-box--open {
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 20px);
+    height: calc(100vh - 20px);
     margin: 0 -10px; // extend to screen edge
+    background-color: #fff;
 
     > .mobile-header-row {
+      flex: 0 0 auto;
       padding: 0 10px; // compensate negative margin
     }
 
@@ -987,6 +1020,18 @@ export default {
       background-color: $background-color-soft;
       box-shadow: inset 3px 0 0 $color-primary;
     }
+  }
+
+  .mobile-filter-section {
+    padding: 2px 0;
+
+    > .mobile-nav-item {
+      cursor: pointer;
+    }
+  }
+
+  .mobile-filter-items {
+    padding: 4px 10px;
   }
 
   .mobile-more-section {
