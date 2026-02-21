@@ -99,7 +99,6 @@ export default {
   display: inline-flex;
   gap: 4px;
   align-items: center;
-
 }
 
 .layout-toggle--hidden {
