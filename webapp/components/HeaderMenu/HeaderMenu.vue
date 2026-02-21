@@ -251,7 +251,7 @@
               class="mobile-avatar-menu-item"
               @click.native="toggleMobileMenuView"
             >
-              <os-icon :icon="route.icon" />
+              <os-icon :icon="route.icon" class="mobile-icon-col" />
               {{ route.name }}
             </nuxt-link>
           </div>
@@ -261,7 +261,7 @@
         <div v-if="toggleMobileMenu && isLoggedIn" class="mobile-nav-items">
           <nuxt-link to="/chat" class="mobile-nav-item" @click.native="toggleMobileMenuView">
             <client-only>
-              <chat-notification-menu />
+              <chat-notification-menu class="mobile-icon-col" />
             </client-only>
             <span>{{ $t('header.chats.tooltip') }}</span>
           </nuxt-link>
@@ -271,7 +271,7 @@
             @click.native="toggleMobileMenuView"
           >
             <client-only>
-              <notification-menu no-menu />
+              <notification-menu no-menu class="mobile-icon-col" />
             </client-only>
             <span>{{ $t('header.notifications.tooltip') }}</span>
           </nuxt-link>
@@ -285,7 +285,7 @@
               variant="primary"
               appearance="ghost"
               circle
-              class="mobile-nav-icon-button map-button"
+              class="mobile-nav-icon-button mobile-icon-col map-button"
             >
               <template #icon>
                 <os-icon :icon="icons.globeDetailed" size="xl" />
@@ -299,7 +299,7 @@
             class="mobile-nav-item"
             @click.native="toggleMobileMenuView"
           >
-            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button">
+            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
               <template #icon>
                 <os-icon :icon="icons.users" />
               </template>
@@ -312,7 +312,7 @@
             class="mobile-nav-item"
             @click.native="toggleMobileMenuView"
           >
-            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button">
+            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
               <template #icon>
                 <os-icon :icon="icons.userPlus" />
               </template>
@@ -340,7 +340,7 @@
         <!-- "More" collapsible section (only when open) -->
         <div v-if="toggleMobileMenu" class="mobile-more-section">
           <div class="mobile-more-header" @click="mobileMoreMenuOpen = !mobileMoreMenuOpen">
-            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button">
+            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
               <template #icon>
                 <os-icon :icon="icons.questionCircle" />
               </template>
@@ -369,7 +369,7 @@
                   class="mobile-more-item"
                   @click="toggleMobileMenuView"
                 >
-                  <os-icon :icon="icons.link" />
+                  <os-icon :icon="icons.link" class="mobile-icon-col" />
                   {{ $t(item.nameIdent) }}
                 </a>
                 <nuxt-link
@@ -379,7 +379,7 @@
                   class="mobile-more-item"
                   @click.native="toggleMobileMenuView"
                 >
-                  <os-icon :icon="icons.link" />
+                  <os-icon :icon="icons.link" class="mobile-icon-col" />
                   {{ $t(item.nameIdent) }}
                 </nuxt-link>
               </template>
@@ -393,7 +393,7 @@
               class="mobile-more-item"
               @click.native="toggleMobileMenuView"
             >
-              <os-icon :icon="moreItemIcon(pageParams.name)" />
+              <os-icon :icon="moreItemIcon(pageParams.name)" class="mobile-icon-col" />
               {{ $t(pageParams.internalPage.footerIdent) }}
             </page-params-link>
           </div>
@@ -405,7 +405,7 @@
             class="mobile-nav-item"
             @click="mobileLocaleMenuOpen = !mobileLocaleMenuOpen"
           >
-            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button">
+            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
               <template #icon>
                 <os-icon :icon="icons.globe" />
               </template>
@@ -431,7 +431,7 @@
               :class="{ '--active': locale.code === $i18n.locale() }"
               @click.prevent="changeLocale(locale.code)"
             >
-              <span class="mobile-locale-flag">{{ localeFlags[locale.code] }}</span>
+              <span class="mobile-locale-flag mobile-icon-col">{{ localeFlags[locale.code] }}</span>
               {{ locale.name }}
             </a>
           </div>
@@ -444,7 +444,7 @@
           class="mobile-nav-item mobile-logout-item"
           @click.native="toggleMobileMenuView"
         >
-          <os-button variant="danger" appearance="ghost" circle class="mobile-nav-icon-button">
+          <os-button variant="danger" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
             <template #icon>
               <os-icon :icon="icons.signOut" />
             </template>
@@ -818,6 +818,15 @@ export default {
     pointer-events: none; // Parent handles click
   }
 
+  // Consistent icon column width across all menu items
+  .mobile-icon-col {
+    min-width: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
   .mobile-nav-items {
     padding: 0;
   }
@@ -932,7 +941,7 @@ export default {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 2px 0 2px 20px;
+    padding: 2px 0;
     min-height: 32px;
     color: $text-color-base;
 
@@ -969,7 +978,7 @@ export default {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 2px 0 2px 20px;
+    padding: 2px 0;
     min-height: 32px;
     color: $text-color-base;
 
@@ -994,7 +1003,7 @@ export default {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 2px 0 2px 20px;
+    padding: 2px 0;
     min-height: 32px;
     color: $text-color-base;
 
