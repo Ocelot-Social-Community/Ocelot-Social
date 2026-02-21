@@ -104,8 +104,9 @@ export default {
       try {
         source = JSON.parse(event.dataTransfer.getData('application/json'))
       } catch {
-        // ignore
+        return
       }
+      if (!source) return
       this.$emit('badge-drop', { source, targetIndex: index, targetBadge: badge })
     },
     resetSelection() {
