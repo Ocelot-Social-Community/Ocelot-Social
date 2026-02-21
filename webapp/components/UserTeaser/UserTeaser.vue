@@ -109,6 +109,12 @@ export default {
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
+
+    > a,
+    > button,
+    > span:not(.group-info) {
+      display: contents;
+    }
   }
 
   .flex-direction-row {
