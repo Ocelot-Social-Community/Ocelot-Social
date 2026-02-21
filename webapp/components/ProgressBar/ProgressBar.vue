@@ -35,6 +35,7 @@ export default {
   },
   computed: {
     progressBarWidth() {
+      if (!this.goal) return 'width: 0%;'
       return `width: ${(this.progress / this.goal) * 100}%;`
     },
     progressBarColorClass() {
