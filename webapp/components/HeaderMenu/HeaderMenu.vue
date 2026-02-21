@@ -565,26 +565,6 @@ export default {
           icon: this.icons.user,
         },
         {
-          name: this.$t('header.avatarMenu.groups'),
-          path: '/groups',
-          icon: this.icons.users,
-        },
-        {
-          name: this.$t('header.avatarMenu.map'),
-          path: '/map',
-          icon: this.icons.globe,
-        },
-        {
-          name: this.$t('header.avatarMenu.chats'),
-          path: '/chat',
-          icon: this.icons.chatBubble,
-        },
-        {
-          name: this.$t('header.avatarMenu.notifications'),
-          path: '/notifications',
-          icon: this.icons.bell,
-        },
-        {
           name: this.$t('settings.name'),
           path: '/settings',
           icon: this.icons.cogs,
