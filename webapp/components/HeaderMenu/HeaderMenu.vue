@@ -258,66 +258,73 @@
           </div>
         </div>
 
-        <!-- Zeile 2: Shortcuts (only when open) -->
-        <div v-if="toggleMobileMenu" class="mobile-shortcuts-row">
-          <client-only>
-            <chat-notification-menu />
-            <notification-menu no-menu />
-          </client-only>
-          <locale-switch
-            class="topbar-locale-switch topbar-locale-switch-mobile"
-            placement="top"
-            offset="8"
-          />
-          <client-only v-if="inviteRegistration">
-            <invite-button placement="top" />
-          </client-only>
-          <client-only v-if="SHOW_GROUP_BUTTON_IN_HEADER">
-            <div @click="toggleMobileMenuView">
-              <os-button
-                as="nuxt-link"
-                to="/groups"
-                variant="primary"
-                appearance="ghost"
-                circle
-                :aria-label="$t('header.groups.tooltip')"
-                v-tooltip="{
-                  content: $t('header.groups.tooltip'),
-                  placement: 'bottom-start',
-                }"
-              >
-                <template #icon>
-                  <os-icon :icon="icons.users" />
-                </template>
-              </os-button>
-            </div>
-          </client-only>
-          <client-only v-if="!isEmpty(this.$env.MAPBOX_TOKEN)">
-            <div @click="toggleMobileMenuView">
-              <os-button
-                as="nuxt-link"
-                to="/map"
-                class="map-button"
-                variant="primary"
-                appearance="ghost"
-                circle
-                :aria-label="$t('header.map.tooltip')"
-                v-tooltip="{
-                  content: $t('header.map.tooltip'),
-                  placement: 'bottom-start',
-                }"
-              >
-                <template #icon>
-                  <os-icon :icon="icons.globeDetailed" size="xl" />
-                </template>
-              </os-button>
-            </div>
-          </client-only>
-          <client-only v-if="!isEmpty(customButton)">
-            <div @click="toggleMobileMenuView">
+        <!-- Mobile nav items (only when open + logged in) -->
+        <div v-if="toggleMobileMenu && isLoggedIn" class="mobile-nav-items">
+          <nuxt-link to="/chat" class="mobile-nav-item" @click.native="toggleMobileMenuView">
+            <client-only>
+              <chat-notification-menu />
+            </client-only>
+            <span>{{ $t('header.chats.tooltip') }}</span>
+          </nuxt-link>
+          <nuxt-link
+            to="/notifications"
+            class="mobile-nav-item"
+            @click.native="toggleMobileMenuView"
+          >
+            <client-only>
+              <notification-menu no-menu />
+            </client-only>
+            <span>{{ $t('header.notifications.tooltip') }}</span>
+          </nuxt-link>
+          <nuxt-link
+            v-if="!isEmpty(this.$env.MAPBOX_TOKEN)"
+            to="/map"
+            class="mobile-nav-item"
+            @click.native="toggleMobileMenuView"
+          >
+            <os-button
+              variant="primary"
+              appearance="ghost"
+              circle
+              class="mobile-nav-icon-button map-button"
+            >
+              <template #icon>
+                <os-icon :icon="icons.globeDetailed" size="xl" />
+              </template>
+            </os-button>
+            <span>{{ $t('header.map.tooltip') }}</span>
+          </nuxt-link>
+          <nuxt-link
+            v-if="SHOW_GROUP_BUTTON_IN_HEADER"
+            to="/groups"
+            class="mobile-nav-item"
+            @click.native="toggleMobileMenuView"
+          >
+            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button">
+              <template #icon>
+                <os-icon :icon="icons.users" />
+              </template>
+            </os-button>
+            <span>{{ $t('header.groups.tooltip') }}</span>
+          </nuxt-link>
+          <nuxt-link
+            v-if="inviteRegistration"
+            to="/settings/invites"
+            class="mobile-nav-item"
+            @click.native="toggleMobileMenuView"
+          >
+            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button">
+              <template #icon>
+                <os-icon :icon="icons.userPlus" />
+              </template>
+            </os-button>
+            <span>{{ $t('invite-codes.button.tooltip') }}</span>
+          </nuxt-link>
+          <template v-if="!isEmpty(customButton)">
+            <div class="mobile-nav-item" @click="toggleMobileMenuView">
               <custom-button :settings="customButton" />
             </div>
-          </client-only>
+          </template>
         </div>
 
         <!-- filter menu (only when open + logged in) -->
@@ -374,6 +381,15 @@
             >
               {{ $t(pageParams.internalPage.footerIdent) }}
             </page-params-link>
+            <hr />
+            <!-- locale switch -->
+            <div class="mobile-more-item">
+              <locale-switch
+                class="topbar-locale-switch"
+                placement="top"
+                offset="8"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -569,9 +585,6 @@ export default {
   align-self: center;
   display: inline-flex;
 }
-.topbar-locale-switch-mobile {
-  margin-top: $space-xx-small;
-}
 .main-navigation-flex {
   display: flex;
   align-items: center;
@@ -644,12 +657,62 @@ export default {
     height: 1.5em;
   }
 
-  .mobile-shortcuts-row {
+  .mobile-nav-items {
+    padding: 5px 0;
+  }
+
+  .mobile-nav-item {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     gap: 10px;
-    padding: 10px 0;
+    padding: 8px 0;
+    color: $text-color-base;
+    font-weight: bold;
+
+    &:hover {
+      color: $text-color-link;
+    }
+
+    // Flatten embedded component buttons to plain icons
+    .chat-notification-menu,
+    .notifications-menu,
+    .mobile-nav-icon-button {
+      margin: 0;
+      display: inline-flex;
+      padding: 0;
+      border: none;
+      background: none;
+      box-shadow: none;
+      min-width: auto;
+      min-height: auto;
+      width: auto;
+      height: auto;
+      pointer-events: none; // Let parent nuxt-link handle navigation
+
+      &:hover,
+      &:focus {
+        background: none;
+        box-shadow: none;
+      }
+
+      .os-button {
+        padding: 0;
+        border: none;
+        background: none;
+        box-shadow: none;
+        min-width: auto;
+        min-height: auto;
+        width: auto;
+        height: auto;
+        pointer-events: none;
+
+        &:hover,
+        &:focus {
+          background: none;
+          box-shadow: none;
+        }
+      }
+    }
   }
 
   .mobile-user-info {
