@@ -14,6 +14,7 @@
 <script>
 export default {
   name: 'ResponsiveImage',
+  emits: ['loaded'],
   props: {
     image: {
       type: Object,
@@ -47,7 +48,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .responsive-image {
   opacity: 0;
   transition: opacity 0.3s ease;
