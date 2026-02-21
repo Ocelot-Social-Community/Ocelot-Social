@@ -358,6 +358,7 @@ export const updateUserMutation = () => {
       $termsAndConditionsAgreedVersion: String
       $avatar: ImageInput
       $locationName: String # empty string '' sets it to null
+      $locale: String
     ) {
       UpdateUser(
         id: $id
@@ -370,6 +371,7 @@ export const updateUserMutation = () => {
         termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
         avatar: $avatar
         locationName: $locationName
+        locale: $locale
       ) {
         id
         slug

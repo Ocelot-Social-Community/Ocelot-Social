@@ -3,23 +3,40 @@ import gql from 'graphql-tag'
 export const UpdateUser = gql`
   mutation (
     $id: ID!
+    $slug: String
     $name: String
-    $termsAndConditionsAgreedVersion: String
-    $locationName: String # empty string '' sets it to null
+    $about: String
+    $allowEmbedIframes: Boolean
+    $showShoutsPublicly: Boolean
     $emailNotificationSettings: [EmailNotificationSettingsInput]
+    $termsAndConditionsAgreedVersion: String
+    $avatar: ImageInput
+    $locationName: String # empty string '' sets it to null
+    $locale: String
   ) {
     UpdateUser(
       id: $id
+      slug: $slug
       name: $name
-      termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
-      locationName: $locationName
+      about: $about
+      allowEmbedIframes: $allowEmbedIframes
+      showShoutsPublicly: $showShoutsPublicly
       emailNotificationSettings: $emailNotificationSettings
+      termsAndConditionsAgreedVersion: $termsAndConditionsAgreedVersion
+      avatar: $avatar
+      locationName: $locationName
+      locale: $locale
     ) {
       id
+      slug
       name
+      about
+      allowEmbedIframes
+      showShoutsPublicly
       termsAndConditionsAgreedVersion
       termsAndConditionsAgreedAt
       locationName
+      locale
       location {
         name
         nameDE
@@ -32,6 +49,18 @@ export const UpdateUser = gql`
           name
           value
         }
+      }
+      avatar {
+        url
+        alt
+        sensitive
+        aspectRatio
+        type
+      }
+      badgeVerification {
+        id
+        description
+        icon
       }
     }
   }

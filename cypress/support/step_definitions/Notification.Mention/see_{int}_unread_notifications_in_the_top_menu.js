@@ -1,6 +1,7 @@
 import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('see {int} unread notifications in the top menu', count => {
-  cy.get('.notifications-menu')
+  cy.get('.notifications-menu:visible')
+    .first()
     .should('contain', count)
 })

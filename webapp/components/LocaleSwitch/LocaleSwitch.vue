@@ -2,18 +2,22 @@
   <client-only>
     <dropdown ref="menu" :placement="placement" :offset="offset">
       <template #default="{ toggleMenu }">
-        <a
+        <os-button
           class="locale-menu"
-          href="#"
+          variant="primary"
+          appearance="ghost"
+          circle
+          :aria-label="$t('localeSwitch.tooltip')"
           v-tooltip="{
             content: $t('localeSwitch.tooltip'),
             placement: 'bottom-start',
           }"
           @click.prevent="toggleMenu()"
         >
-          <span class="label">{{ current.code.toUpperCase() }}</span>
-          <os-icon class="dropdown-arrow" :icon="icons.angleDown" />
-        </a>
+          <template #icon>
+            <os-icon :icon="icons.language" />
+          </template>
+        </os-button>
       </template>
       <template #popover="{ toggleMenu }">
         <ds-menu class="locale-menu-popover" :matcher="matcher" :routes="routes">
@@ -24,6 +28,7 @@
               :parents="item.parents"
               @click.stop.prevent="changeLanguage(item.route.path, toggleMenu)"
             >
+              <span class="locale-flag">{{ item.route.flag }}</span>
               {{ item.route.name }}
             </ds-menu-item>
           </template>
@@ -34,18 +39,19 @@
 </template>
 
 <script>
-import { OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import gql from 'graphql-tag'
 import Dropdown from '~/components/Dropdown'
 import find from 'lodash/find'
 import orderBy from 'lodash/orderBy'
 import locales from '~/locales'
-import { mapGetters, mapMutations } from 'vuex'
+import localeUpdate from '~/mixins/localeUpdate.js'
 
 export default {
+  mixins: [localeUpdate],
   components: {
     Dropdown,
+    OsButton,
     OsIcon,
   },
   props: {
@@ -62,17 +68,12 @@ export default {
       return find(this.locales, { code: this.$i18n.locale() })
     },
     routes() {
-      const routes = this.locales.map((locale) => {
-        return {
-          name: locale.name,
-          path: locale.code,
-        }
-      })
-      return routes
+      return this.locales.map((locale) => ({
+        name: locale.name,
+        path: locale.code,
+        flag: locale.flag,
+      }))
     },
-    ...mapGetters({
-      currentUser: 'auth/user',
-    }),
   },
   created() {
     this.icons = iconRegistry
@@ -86,57 +87,11 @@ export default {
     matcher(locale) {
       return locale === this.$i18n.locale()
     },
-
-    ...mapMutations({
-      setCurrentUser: 'auth/SET_USER',
-    }),
-    async updateUserLocale() {
-      if (!this.currentUser || !this.currentUser.id) return null
-      try {
-        await this.$apollo.mutate({
-          mutation: gql`
-            mutation ($id: ID!, $locale: String) {
-              UpdateUser(id: $id, locale: $locale) {
-                id
-                locale
-              }
-            }
-          `,
-          variables: {
-            id: this.currentUser.id,
-            locale: this.$i18n.locale(),
-          },
-          update: (store, { data: { UpdateUser } }) => {
-            const { locale } = UpdateUser
-            this.setCurrentUser({
-              ...this.currentUser,
-              locale,
-            })
-          },
-        })
-        this.$toast.success(this.$t('contribution.success'))
-      } catch (err) {
-        this.$toast.error(err.message)
-      }
-    },
   },
 }
 </script>
 
 <style lang="scss">
-.locale-menu {
-  user-select: none;
-  display: flex;
-  align-items: center;
-  height: 100%;
-  padding: $space-xx-small;
-  color: $color-locale-menu;
-
-  > .label {
-    margin: 0 $space-xx-small;
-  }
-}
-
 nav.locale-menu-popover {
   margin-left: -$space-small !important;
   margin-right: -$space-small !important;
@@ -145,5 +100,11 @@ nav.locale-menu-popover {
     padding: $space-x-small $space-small;
     padding-right: $space-base;
   }
+}
+
+.locale-flag {
+  margin-right: $space-xx-small;
+  font-size: 1.2em;
+  line-height: 1;
 }
 </style>

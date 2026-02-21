@@ -6,11 +6,11 @@ import Vuex from 'vuex'
 const localVue = global.localVue
 
 const stubs = {
-  'client-only': true,
+  'client-only': { template: '<div><slot /></div>' },
 }
 
 describe('LocaleSwitch.vue', () => {
-  let wrapper, mocks, computed, deutschLanguageItem, getters
+  let wrapper, mocks, computed, getters
 
   beforeEach(() => {
     mocks = {
@@ -48,10 +48,12 @@ describe('LocaleSwitch.vue', () => {
           {
             name: 'English',
             path: 'en',
+            flag: '🇬🇧',
           },
           {
             name: 'Deutsch',
             path: 'de',
+            flag: '🇩🇪',
           },
         ]
       },
@@ -71,37 +73,61 @@ describe('LocaleSwitch.vue', () => {
   }
 
   describe('with current user', () => {
-    beforeEach(() => {
+    let toggleMenu
+
+    beforeEach(async () => {
+      toggleMenu = jest.fn()
       wrapper = Wrapper()
-      wrapper.find('.locale-menu').trigger('click')
-      deutschLanguageItem = wrapper.findAll('li').at(1)
-      deutschLanguageItem.trigger('click')
+      await wrapper.vm.changeLanguage('de', toggleMenu)
     })
 
     it("sets a user's locale", () => {
-      expect(mocks.$i18n.set).toHaveBeenCalledTimes(1)
+      expect(mocks.$i18n.set).toHaveBeenCalledWith('de')
     })
 
     it("updates the user's locale in the database", () => {
       expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
     })
+
+    it('closes the menu', () => {
+      expect(toggleMenu).toHaveBeenCalled()
+    })
+  })
+
+  describe('when apollo mutation fails', () => {
+    beforeEach(async () => {
+      wrapper = Wrapper()
+      // First call succeeds (consumes mockResolvedValueOnce)
+      await wrapper.vm.changeLanguage('de', jest.fn())
+      // Second call fails (consumes mockRejectedValueOnce)
+      await wrapper.vm.changeLanguage('en', jest.fn())
+    })
+
+    it('shows an error toast', () => {
+      expect(mocks.$toast.error).toHaveBeenCalledWith('Please log in!')
+    })
   })
 
   describe('no current user', () => {
-    beforeEach(() => {
+    let toggleMenu
+
+    beforeEach(async () => {
+      toggleMenu = jest.fn()
       getters = {
         'auth/user': () => {
           return null
         },
       }
       wrapper = Wrapper()
-      wrapper.find('.locale-menu').trigger('click')
-      deutschLanguageItem = wrapper.findAll('li').at(1)
-      deutschLanguageItem.trigger('click')
+      await wrapper.vm.changeLanguage('de', toggleMenu)
     })
 
     it('does not send a UpdateUser mutation', () => {
       expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+    })
+
+    it('still closes the menu', () => {
+      expect(toggleMenu).toHaveBeenCalled()
     })
   })
 })
