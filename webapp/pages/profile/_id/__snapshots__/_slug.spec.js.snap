@@ -445,7 +445,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
       >
         <div
           class="ds-grid"
-          style="grid-auto-rows: 2px; row-gap: 2px;"
+          style="grid-auto-rows: 20px; row-gap: 16px;"
         >
           <div
             class="tab-navigation"
@@ -1168,7 +1168,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
       >
         <div
           class="ds-grid"
-          style="grid-auto-rows: 2px; row-gap: 2px;"
+          style="grid-auto-rows: 20px; row-gap: 16px;"
         >
           <div
             class="tab-navigation"
@@ -1715,7 +1715,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
       >
         <div
           class="ds-grid"
-          style="grid-auto-rows: 2px; row-gap: 2px;"
+          style="grid-auto-rows: 20px; row-gap: 16px;"
         >
           <div
             class="tab-navigation"
@@ -2341,7 +2341,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
       >
         <div
           class="ds-grid"
-          style="grid-auto-rows: 2px; row-gap: 2px;"
+          style="grid-auto-rows: 20px; row-gap: 16px;"
         >
           <div
             class="tab-navigation"
