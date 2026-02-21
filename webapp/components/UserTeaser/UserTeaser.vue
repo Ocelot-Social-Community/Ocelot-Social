@@ -84,6 +84,8 @@ export default {
   }
 
   .info {
+    flex: 1;
+    min-width: 0;
     padding-left: 10px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -136,6 +138,7 @@ export default {
 
   .group-info {
     display: flex;
+    align-self: stretch;
     align-items: baseline;
     gap: 4px;
     min-width: 0;
