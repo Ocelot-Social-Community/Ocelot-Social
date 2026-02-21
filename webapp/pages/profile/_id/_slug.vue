@@ -505,6 +505,7 @@ export default {
 .profile-layout__main {
   flex: 0 0 100%;
   width: 100%;
+  min-width: 0;
 }
 @media #{$media-query-small} {
   .profile-layout__sidebar {

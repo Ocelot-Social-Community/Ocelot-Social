@@ -657,6 +657,7 @@ export default {
 .group-layout__main {
   flex: 0 0 100%;
   width: 100%;
+  min-width: 0;
 }
 @media #{$media-query-small} {
   .group-layout__sidebar {
