@@ -369,6 +369,7 @@
                   class="mobile-more-item"
                   @click="toggleMobileMenuView"
                 >
+                  <os-icon :icon="icons.link" />
                   {{ $t(item.nameIdent) }}
                 </a>
                 <nuxt-link
@@ -378,6 +379,7 @@
                   class="mobile-more-item"
                   @click.native="toggleMobileMenuView"
                 >
+                  <os-icon :icon="icons.link" />
                   {{ $t(item.nameIdent) }}
                 </nuxt-link>
               </template>
@@ -391,6 +393,7 @@
               class="mobile-more-item"
               @click.native="toggleMobileMenuView"
             >
+              <os-icon :icon="moreItemIcon(pageParams.name)" />
               {{ $t(pageParams.internalPage.footerIdent) }}
             </page-params-link>
           </div>
@@ -428,6 +431,7 @@
               :class="{ '--active': locale.code === $i18n.locale() }"
               @click.prevent="changeLocale(locale.code)"
             >
+              <span class="mobile-locale-flag">{{ localeFlags[locale.code] }}</span>
               {{ locale.name }}
             </a>
           </div>
@@ -518,6 +522,17 @@ export default {
       mobileMoreMenuOpen: false,
       mobileLocaleMenuOpen: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
+      localeFlags: {
+        en: '🇬🇧',
+        de: '🇩🇪',
+        nl: '🇳🇱',
+        fr: '🇫🇷',
+        it: '🇮🇹',
+        es: '🇪🇸',
+        pt: '🇵🇹',
+        pl: '🇵🇱',
+        ru: '🇷🇺',
+      },
     }
   },
   computed: {
@@ -631,6 +646,19 @@ export default {
     ...mapMutations({
       setCurrentUser: 'auth/SET_USER',
     }),
+    moreItemIcon(name) {
+      const iconMap = {
+        'organization': this.icons.home,
+        'terms-and-conditions': this.icons.book,
+        'code-of-conduct': this.icons.handPointer,
+        'data-privacy': this.icons.lock,
+        'faq': this.icons.questionCircle,
+        'donate': this.icons.heartO,
+        'support': this.icons.comments,
+        'imprint': this.icons.balanceScale,
+      }
+      return iconMap[name] || this.icons.link
+    },
     changeLocale(code) {
       this.$i18n.set(code)
       this.mobileLocaleMenuOpen = false
@@ -938,10 +966,11 @@ export default {
   }
 
   .mobile-more-item {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     padding: 2px 0 2px 20px;
     min-height: 32px;
-    line-height: 32px;
     color: $text-color-base;
 
     &:hover {
@@ -962,10 +991,11 @@ export default {
   }
 
   .mobile-locale-item {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     padding: 2px 0 2px 20px;
     min-height: 32px;
-    line-height: 32px;
     color: $text-color-base;
 
     &:hover {
@@ -976,6 +1006,11 @@ export default {
       font-weight: bold;
       color: $text-color-link;
     }
+  }
+
+  .mobile-locale-flag {
+    font-size: 1.2em;
+    line-height: 1;
   }
 }
 .map-button {
