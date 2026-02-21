@@ -12,7 +12,9 @@
       :highlight="isPinned"
     >
       <template v-if="post.image" #heroImage>
-        <responsive-image :image="post.image" sizes="640px" class="image" />
+        <div class="image-placeholder" :style="{ aspectRatio: post.image.aspectRatio }">
+          <responsive-image :image="post.image" sizes="640px" class="image" />
+        </div>
       </template>
       <client-only>
         <div class="post-user-row">
@@ -23,6 +25,17 @@
             :typ="post.postType[0]"
           />
         </div>
+        <template #placeholder>
+          <div class="post-user-row">
+            <div class="user-teaser-placeholder">
+              <div class="placeholder-avatar" />
+              <div class="placeholder-text">
+                <div class="placeholder-line placeholder-line--name" />
+                <div class="placeholder-line placeholder-line--date" />
+              </div>
+            </div>
+          </div>
+        </template>
       </client-only>
       <h2 class="title hyphenate-text">{{ post.title }}</h2>
       <client-only>
@@ -133,6 +146,11 @@
             <slot name="dateTime"></slot>
           </span>
         </div>
+        <template v-if="post.createdAt" #placeholder>
+          <div class="date-row">
+            <span class="placeholder-line placeholder-line--date-footer" />
+          </div>
+        </template>
       </client-only>
     </os-card>
   </nuxt-link>
@@ -188,16 +206,6 @@ export default {
       type: Boolean,
       default: false,
     },
-  },
-  mounted() {
-    const { image } = this.post
-    if (!image) return
-    const width = this.$el.offsetWidth
-    const height = Math.min(width / image.aspectRatio, 2000)
-    const imageElement = this.$el.querySelector('.os-card__hero-image')
-    if (imageElement) {
-      imageElement.style.height = `${height}px`
-    }
   },
   computed: {
     ...mapGetters({
@@ -289,6 +297,10 @@ export default {
   height: 100%;
   color: $text-color-base;
   padding-top: 16px;
+
+  @media (max-width: 810px) {
+    padding-top: 8px;
+  }
 }
 
 .post-user-row {
@@ -315,11 +327,22 @@ export default {
   flex-direction: column;
   overflow: visible;
   height: 100%;
-  padding-bottom: $space-x-small;
 
   > .os-card__hero-image {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
+  }
+
+  .image-placeholder {
+    width: 100%;
+    background-color: $color-neutral-80;
+
+    > .image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   }
 
   &.--blur-image > .os-card__hero-image .image {
@@ -332,6 +355,8 @@ export default {
     flex-grow: 1;
     padding-bottom: 0 !important;
   }
+
+  padding-bottom: $space-x-small !important;
 
   .content {
     flex-grow: 1;
@@ -368,10 +393,55 @@ export default {
     margin-bottom: $space-small;
   }
 
+  .user-teaser-placeholder {
+    display: flex;
+    align-items: center;
+    margin-bottom: $space-small;
+
+    .placeholder-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.15;
+      flex-shrink: 0;
+    }
+
+    .placeholder-text {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-left: 10px;
+      flex: 1;
+    }
+
+    .placeholder-line {
+      height: 10px;
+      border-radius: 5px;
+      background: currentColor;
+      opacity: 0.15;
+
+      &--name {
+        width: 120px;
+      }
+      &--date {
+        width: 80px;
+      }
+    }
+  }
+
   .date-row {
     display: flex;
     justify-content: flex-end;
     margin-top: $space-small;
+
+    > .placeholder-line--date-footer {
+      width: 100px;
+      height: 10px;
+      border-radius: 5px;
+      background: currentColor;
+      opacity: 0.15;
+    }
     > .text {
       overflow: hidden;
       white-space: nowrap;

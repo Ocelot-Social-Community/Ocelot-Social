@@ -35,6 +35,7 @@ export default {
   },
   computed: {
     progressBarWidth() {
+      if (!this.goal) return 'width: 0%;'
       return `width: ${(this.progress / this.goal) * 100}%;`
     },
     progressBarColorClass() {
@@ -59,7 +60,6 @@ export default {
   position: relative;
   height: 100%;
   flex: 1;
-  margin-right: $space-x-small;
 }
 
 .progress-bar__goal {
@@ -108,7 +108,6 @@ export default {
 
 .progress-bar__label {
   position: relative;
-  float: right;
 
   @media (max-width: 350px) {
     font-size: $font-size-small;
@@ -117,7 +116,7 @@ export default {
 
 .progress-bar-button {
   position: relative;
-  float: right;
+  margin-left: $space-x-small;
 
   @media (max-width: 810px) {
     display: none;
