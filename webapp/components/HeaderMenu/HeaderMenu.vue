@@ -184,7 +184,7 @@
             <!-- hamburger button -->
             <os-button
               variant="primary"
-              :appearance="toggleMobileMenu ? 'filled' : 'outline'"
+              :appearance="toggleMobileMenu ? 'filled' : 'ghost'"
               circle
               class="hamburger-button"
               :aria-label="$t('site.navigation')"
