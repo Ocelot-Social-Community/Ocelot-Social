@@ -199,287 +199,305 @@
 
         <!-- Scrollable menu content (only when open) -->
         <div v-if="toggleMobileMenu" class="mobile-menu-scroll">
-
-        <!-- User info with collapsible menu (only when open + logged in) -->
-        <div v-if="toggleMobileMenu && isLoggedIn" class="mobile-user-info">
-          <div
-            class="mobile-user-header"
-            role="button"
-            tabindex="0"
-            :aria-expanded="String(mobileAvatarMenuOpen)"
-            @click="mobileAvatarMenuOpen = !mobileAvatarMenuOpen"
-            @keydown.enter.prevent="mobileAvatarMenuOpen = !mobileAvatarMenuOpen"
-            @keydown.space.prevent="mobileAvatarMenuOpen = !mobileAvatarMenuOpen"
-          >
-            <profile-avatar :profile="user" size="small" class="mobile-avatar" />
-            <div class="mobile-user-details">
-              <b>{{ userName }}</b>
-              <span v-if="user.role !== 'user'" class="mobile-user-role">
-                {{ user.role | camelCase }}
-              </span>
+          <!-- User info with collapsible menu (only when open + logged in) -->
+          <div v-if="toggleMobileMenu && isLoggedIn" class="mobile-user-info">
+            <div
+              class="mobile-user-header"
+              role="button"
+              tabindex="0"
+              :aria-expanded="String(mobileAvatarMenuOpen)"
+              @click="mobileAvatarMenuOpen = !mobileAvatarMenuOpen"
+              @keydown.enter.prevent="mobileAvatarMenuOpen = !mobileAvatarMenuOpen"
+              @keydown.space.prevent="mobileAvatarMenuOpen = !mobileAvatarMenuOpen"
+            >
+              <profile-avatar :profile="user" size="small" class="mobile-avatar" />
+              <div class="mobile-user-details">
+                <b>{{ userName }}</b>
+                <span v-if="user.role !== 'user'" class="mobile-user-role">
+                  {{ user.role | camelCase }}
+                </span>
+              </div>
+              <os-button
+                variant="primary"
+                appearance="ghost"
+                circle
+                class="mobile-collapse-toggle"
+                :aria-label="$t('header.avatarMenu.button.tooltip')"
+              >
+                <template #icon>
+                  <os-icon :icon="mobileAvatarMenuOpen ? icons.angleUp : icons.angleDown" />
+                </template>
+              </os-button>
             </div>
-            <os-button
-              variant="primary"
-              appearance="ghost"
-              circle
-              class="mobile-collapse-toggle"
-              :aria-label="$t('header.avatarMenu.button.tooltip')"
-            >
-              <template #icon>
-                <os-icon :icon="mobileAvatarMenuOpen ? icons.angleUp : icons.angleDown" />
-              </template>
-            </os-button>
+            <div v-if="mobileAvatarMenuOpen" class="mobile-avatar-menu-items">
+              <nuxt-link
+                v-for="route in mobileAvatarRoutes"
+                :key="route.path"
+                :to="route.path"
+                class="mobile-avatar-menu-item"
+                @click.native="toggleMobileMenuView"
+              >
+                <os-icon :icon="route.icon" class="mobile-icon-col" />
+                {{ route.name }}
+              </nuxt-link>
+            </div>
           </div>
-          <div v-if="mobileAvatarMenuOpen" class="mobile-avatar-menu-items">
-            <nuxt-link
-              v-for="route in mobileAvatarRoutes"
-              :key="route.path"
-              :to="route.path"
-              class="mobile-avatar-menu-item"
-              @click.native="toggleMobileMenuView"
-            >
-              <os-icon :icon="route.icon" class="mobile-icon-col" />
-              {{ route.name }}
+
+          <!-- Mobile nav items (only when open + logged in) -->
+          <div v-if="toggleMobileMenu && isLoggedIn" class="mobile-nav-items">
+            <nuxt-link to="/chat" class="mobile-nav-item" @click.native="toggleMobileMenuView">
+              <client-only>
+                <chat-notification-menu class="mobile-icon-col" />
+              </client-only>
+              <span>{{ $t('header.chats.tooltip') }}</span>
             </nuxt-link>
-          </div>
-        </div>
-
-        <!-- Mobile nav items (only when open + logged in) -->
-        <div v-if="toggleMobileMenu && isLoggedIn" class="mobile-nav-items">
-          <nuxt-link to="/chat" class="mobile-nav-item" @click.native="toggleMobileMenuView">
-            <client-only>
-              <chat-notification-menu class="mobile-icon-col" />
-            </client-only>
-            <span>{{ $t('header.chats.tooltip') }}</span>
-          </nuxt-link>
-          <nuxt-link
-            to="/notifications"
-            class="mobile-nav-item"
-            @click.native="toggleMobileMenuView"
-          >
-            <client-only>
-              <notification-menu no-menu class="mobile-icon-col" />
-            </client-only>
-            <span>{{ $t('header.notifications.tooltip') }}</span>
-          </nuxt-link>
-          <nuxt-link
-            v-if="!isEmpty(this.$env.MAPBOX_TOKEN)"
-            to="/map"
-            class="mobile-nav-item"
-            @click.native="toggleMobileMenuView"
-          >
-            <os-button
-              variant="primary"
-              appearance="ghost"
-              circle
-              class="mobile-nav-icon-button mobile-icon-col map-button"
-            >
-              <template #icon>
-                <os-icon :icon="icons.globeDetailed" size="xl" />
-              </template>
-            </os-button>
-            <span>{{ $t('header.map.tooltip') }}</span>
-          </nuxt-link>
-          <nuxt-link
-            v-if="SHOW_GROUP_BUTTON_IN_HEADER"
-            to="/groups"
-            class="mobile-nav-item"
-            @click.native="toggleMobileMenuView"
-          >
-            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
-              <template #icon>
-                <os-icon :icon="icons.users" />
-              </template>
-            </os-button>
-            <span>{{ $t('header.groups.tooltip') }}</span>
-          </nuxt-link>
-          <nuxt-link
-            v-if="inviteRegistration"
-            to="/settings/invites"
-            class="mobile-nav-item"
-            @click.native="toggleMobileMenuView"
-          >
-            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
-              <template #icon>
-                <os-icon :icon="icons.userPlus" />
-              </template>
-            </os-button>
-            <span>{{ $t('invite-codes.button.tooltip') }}</span>
-          </nuxt-link>
-          <template v-if="!isEmpty(customButton)">
-            <div class="mobile-nav-item" @click="toggleMobileMenuView">
-              <custom-button :settings="customButton" />
-            </div>
-          </template>
-        </div>
-
-        <!-- filter menu (only when open + logged in + on index page) -->
-        <div
-          v-if="isLoggedIn && toggleMobileMenu && SHOW_CONTENT_FILTER_HEADER_MENU"
-          class="mobile-filter-section"
-        >
-          <div
-            class="mobile-nav-item"
-            role="button"
-            tabindex="0"
-            :aria-expanded="String(mobileFilterMenuOpen)"
-            @click="mobileFilterMenuOpen = !mobileFilterMenuOpen"
-            @keydown.enter.prevent="mobileFilterMenuOpen = !mobileFilterMenuOpen"
-            @keydown.space.prevent="mobileFilterMenuOpen = !mobileFilterMenuOpen"
-          >
-            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
-              <template #icon>
-                <os-icon :icon="icons.filter" />
-              </template>
-            </os-button>
-            <span>{{ $t('common.filter') }}</span>
-            <os-button
-              variant="primary"
-              appearance="ghost"
-              circle
-              class="mobile-collapse-toggle"
-            >
-              <template #icon>
-                <os-icon :icon="mobileFilterMenuOpen ? icons.angleUp : icons.angleDown" />
-              </template>
-            </os-button>
-          </div>
-          <div v-if="mobileFilterMenuOpen" class="mobile-filter-items" @click="toggleMobileMenuView">
-            <client-only>
-              <filter-menu-component />
-            </client-only>
-          </div>
-        </div>
-
-        <!-- Locale switch collapsible (only when open) -->
-        <div v-if="toggleMobileMenu" class="mobile-locale-section">
-          <div
-            class="mobile-nav-item"
-            role="button"
-            tabindex="0"
-            :aria-expanded="String(mobileLocaleMenuOpen)"
-            @click="mobileLocaleMenuOpen = !mobileLocaleMenuOpen"
-            @keydown.enter.prevent="mobileLocaleMenuOpen = !mobileLocaleMenuOpen"
-            @keydown.space.prevent="mobileLocaleMenuOpen = !mobileLocaleMenuOpen"
-          >
-            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
-              <template #icon>
-                <os-icon :icon="icons.language" />
-              </template>
-            </os-button>
-            <span>{{ $t('localeSwitch.tooltip') }} ({{ currentLocale.code.toUpperCase() }})</span>
-            <os-button
-              variant="primary"
-              appearance="ghost"
-              circle
-              class="mobile-collapse-toggle"
-            >
-              <template #icon>
-                <os-icon :icon="mobileLocaleMenuOpen ? icons.angleUp : icons.angleDown" />
-              </template>
-            </os-button>
-          </div>
-          <div v-if="mobileLocaleMenuOpen" class="mobile-locale-items">
-            <a
-              v-for="locale in sortedLocales"
-              :key="locale.code"
-              href="#"
-              class="mobile-locale-item"
-              :class="{ '--active': locale.code === $i18n.locale() }"
-              @click.prevent="changeLocale(locale.code)"
-            >
-              <span class="mobile-locale-flag mobile-icon-col">{{ locale.flag }}</span>
-              {{ locale.name }}
-            </a>
-          </div>
-        </div>
-
-        <!-- "More" collapsible section (only when open) -->
-        <div v-if="toggleMobileMenu" class="mobile-more-section">
-          <div
-            class="mobile-more-header"
-            role="button"
-            tabindex="0"
-            :aria-expanded="String(mobileMoreMenuOpen)"
-            @click="mobileMoreMenuOpen = !mobileMoreMenuOpen"
-            @keydown.enter.prevent="mobileMoreMenuOpen = !mobileMoreMenuOpen"
-            @keydown.space.prevent="mobileMoreMenuOpen = !mobileMoreMenuOpen"
-          >
-            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
-              <template #icon>
-                <os-icon :icon="icons.questionCircle" />
-              </template>
-            </os-button>
-            <span>{{ $t('header.more') }}</span>
-            <os-button
-              variant="primary"
-              appearance="ghost"
-              circle
-              class="mobile-collapse-toggle"
-            >
-              <template #icon>
-                <os-icon :icon="mobileMoreMenuOpen ? icons.angleUp : icons.angleDown" />
-              </template>
-            </os-button>
-          </div>
-          <div v-if="mobileMoreMenuOpen" class="mobile-more-items">
-            <!-- dynamic branding menus -->
-            <template v-if="isHeaderMenu">
-              <template v-for="item in menu">
-                <a
-                  v-if="item.url"
-                  :key="item.name"
-                  :href="item.url"
-                  :target="item.target"
-                  class="mobile-more-item"
-                  @click="toggleMobileMenuView"
-                >
-                  <os-icon :icon="icons.link" class="mobile-icon-col" />
-                  {{ $t(item.nameIdent) }}
-                </a>
-                <nuxt-link
-                  v-else
-                  :key="item.name"
-                  :to="item.path"
-                  class="mobile-more-item"
-                  @click.native="toggleMobileMenuView"
-                >
-                  <os-icon :icon="icons.link" class="mobile-icon-col" />
-                  {{ $t(item.nameIdent) }}
-                </nuxt-link>
-              </template>
-              <hr />
-            </template>
-            <!-- dynamic footer links -->
-            <page-params-link
-              v-for="pageParams in links.FOOTER_LINK_LIST"
-              :key="pageParams.name"
-              :pageParams="pageParams"
-              class="mobile-more-item"
+            <nuxt-link
+              to="/notifications"
+              class="mobile-nav-item"
               @click.native="toggleMobileMenuView"
             >
-              <os-icon :icon="moreItemIcon(pageParams.name)" class="mobile-icon-col" />
-              {{ $t(pageParams.internalPage.footerIdent) }}
-            </page-params-link>
-          </div>
-        </div>
-
-        <!-- Logout (only when open + logged in) -->
-        <nuxt-link
-          v-if="toggleMobileMenu && isLoggedIn"
-          :to="{ name: 'logout' }"
-          class="mobile-nav-item mobile-logout-item"
-          @click.native="toggleMobileMenuView"
-        >
-          <os-button variant="danger" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
-            <template #icon>
-              <os-icon :icon="icons.signOut" />
+              <client-only>
+                <notification-menu no-menu class="mobile-icon-col" />
+              </client-only>
+              <span>{{ $t('header.notifications.tooltip') }}</span>
+            </nuxt-link>
+            <nuxt-link
+              v-if="!isEmpty(this.$env.MAPBOX_TOKEN)"
+              to="/map"
+              class="mobile-nav-item"
+              @click.native="toggleMobileMenuView"
+            >
+              <os-button
+                variant="primary"
+                appearance="ghost"
+                circle
+                class="mobile-nav-icon-button mobile-icon-col map-button"
+              >
+                <template #icon>
+                  <os-icon :icon="icons.globeDetailed" size="xl" />
+                </template>
+              </os-button>
+              <span>{{ $t('header.map.tooltip') }}</span>
+            </nuxt-link>
+            <nuxt-link
+              v-if="SHOW_GROUP_BUTTON_IN_HEADER"
+              to="/groups"
+              class="mobile-nav-item"
+              @click.native="toggleMobileMenuView"
+            >
+              <os-button
+                variant="primary"
+                appearance="ghost"
+                circle
+                class="mobile-nav-icon-button mobile-icon-col"
+              >
+                <template #icon>
+                  <os-icon :icon="icons.users" />
+                </template>
+              </os-button>
+              <span>{{ $t('header.groups.tooltip') }}</span>
+            </nuxt-link>
+            <nuxt-link
+              v-if="inviteRegistration"
+              to="/settings/invites"
+              class="mobile-nav-item"
+              @click.native="toggleMobileMenuView"
+            >
+              <os-button
+                variant="primary"
+                appearance="ghost"
+                circle
+                class="mobile-nav-icon-button mobile-icon-col"
+              >
+                <template #icon>
+                  <os-icon :icon="icons.userPlus" />
+                </template>
+              </os-button>
+              <span>{{ $t('invite-codes.button.tooltip') }}</span>
+            </nuxt-link>
+            <template v-if="!isEmpty(customButton)">
+              <div class="mobile-nav-item" @click="toggleMobileMenuView">
+                <custom-button :settings="customButton" />
+              </div>
             </template>
-          </os-button>
-          <span>{{ $t('login.logout') }}</span>
-        </nuxt-link>
+          </div>
 
-        </div><!-- /mobile-menu-scroll -->
+          <!-- filter menu (only when open + logged in + on index page) -->
+          <div
+            v-if="isLoggedIn && toggleMobileMenu && SHOW_CONTENT_FILTER_HEADER_MENU"
+            class="mobile-filter-section"
+          >
+            <div
+              class="mobile-nav-item"
+              role="button"
+              tabindex="0"
+              :aria-expanded="String(mobileFilterMenuOpen)"
+              @click="mobileFilterMenuOpen = !mobileFilterMenuOpen"
+              @keydown.enter.prevent="mobileFilterMenuOpen = !mobileFilterMenuOpen"
+              @keydown.space.prevent="mobileFilterMenuOpen = !mobileFilterMenuOpen"
+            >
+              <os-button
+                variant="primary"
+                appearance="ghost"
+                circle
+                class="mobile-nav-icon-button mobile-icon-col"
+              >
+                <template #icon>
+                  <os-icon :icon="icons.filter" />
+                </template>
+              </os-button>
+              <span>{{ $t('common.filter') }}</span>
+              <os-button variant="primary" appearance="ghost" circle class="mobile-collapse-toggle">
+                <template #icon>
+                  <os-icon :icon="mobileFilterMenuOpen ? icons.angleUp : icons.angleDown" />
+                </template>
+              </os-button>
+            </div>
+            <div
+              v-if="mobileFilterMenuOpen"
+              class="mobile-filter-items"
+              @click="toggleMobileMenuView"
+            >
+              <client-only>
+                <filter-menu-component />
+              </client-only>
+            </div>
+          </div>
+
+          <!-- Locale switch collapsible (only when open) -->
+          <div v-if="toggleMobileMenu" class="mobile-locale-section">
+            <div
+              class="mobile-nav-item"
+              role="button"
+              tabindex="0"
+              :aria-expanded="String(mobileLocaleMenuOpen)"
+              @click="mobileLocaleMenuOpen = !mobileLocaleMenuOpen"
+              @keydown.enter.prevent="mobileLocaleMenuOpen = !mobileLocaleMenuOpen"
+              @keydown.space.prevent="mobileLocaleMenuOpen = !mobileLocaleMenuOpen"
+            >
+              <os-button
+                variant="primary"
+                appearance="ghost"
+                circle
+                class="mobile-nav-icon-button mobile-icon-col"
+              >
+                <template #icon>
+                  <os-icon :icon="icons.language" />
+                </template>
+              </os-button>
+              <span>{{ $t('localeSwitch.tooltip') }} ({{ currentLocale.code.toUpperCase() }})</span>
+              <os-button variant="primary" appearance="ghost" circle class="mobile-collapse-toggle">
+                <template #icon>
+                  <os-icon :icon="mobileLocaleMenuOpen ? icons.angleUp : icons.angleDown" />
+                </template>
+              </os-button>
+            </div>
+            <div v-if="mobileLocaleMenuOpen" class="mobile-locale-items">
+              <a
+                v-for="locale in sortedLocales"
+                :key="locale.code"
+                href="#"
+                class="mobile-locale-item"
+                :class="{ '--active': locale.code === $i18n.locale() }"
+                @click.prevent="changeLocale(locale.code)"
+              >
+                <span class="mobile-locale-flag mobile-icon-col">{{ locale.flag }}</span>
+                {{ locale.name }}
+              </a>
+            </div>
+          </div>
+
+          <!-- "More" collapsible section (only when open) -->
+          <div v-if="toggleMobileMenu" class="mobile-more-section">
+            <div
+              class="mobile-more-header"
+              role="button"
+              tabindex="0"
+              :aria-expanded="String(mobileMoreMenuOpen)"
+              @click="mobileMoreMenuOpen = !mobileMoreMenuOpen"
+              @keydown.enter.prevent="mobileMoreMenuOpen = !mobileMoreMenuOpen"
+              @keydown.space.prevent="mobileMoreMenuOpen = !mobileMoreMenuOpen"
+            >
+              <os-button
+                variant="primary"
+                appearance="ghost"
+                circle
+                class="mobile-nav-icon-button mobile-icon-col"
+              >
+                <template #icon>
+                  <os-icon :icon="icons.questionCircle" />
+                </template>
+              </os-button>
+              <span>{{ $t('header.more') }}</span>
+              <os-button variant="primary" appearance="ghost" circle class="mobile-collapse-toggle">
+                <template #icon>
+                  <os-icon :icon="mobileMoreMenuOpen ? icons.angleUp : icons.angleDown" />
+                </template>
+              </os-button>
+            </div>
+            <div v-if="mobileMoreMenuOpen" class="mobile-more-items">
+              <!-- dynamic branding menus -->
+              <template v-if="isHeaderMenu">
+                <template v-for="item in menu">
+                  <a
+                    v-if="item.url"
+                    :key="item.name"
+                    :href="item.url"
+                    :target="item.target"
+                    class="mobile-more-item"
+                    @click="toggleMobileMenuView"
+                  >
+                    <os-icon :icon="icons.link" class="mobile-icon-col" />
+                    {{ $t(item.nameIdent) }}
+                  </a>
+                  <nuxt-link
+                    v-else
+                    :key="item.name"
+                    :to="item.path"
+                    class="mobile-more-item"
+                    @click.native="toggleMobileMenuView"
+                  >
+                    <os-icon :icon="icons.link" class="mobile-icon-col" />
+                    {{ $t(item.nameIdent) }}
+                  </nuxt-link>
+                </template>
+                <hr />
+              </template>
+              <!-- dynamic footer links -->
+              <page-params-link
+                v-for="pageParams in links.FOOTER_LINK_LIST"
+                :key="pageParams.name"
+                :pageParams="pageParams"
+                class="mobile-more-item"
+                @click.native="toggleMobileMenuView"
+              >
+                <os-icon :icon="moreItemIcon(pageParams.name)" class="mobile-icon-col" />
+                {{ $t(pageParams.internalPage.footerIdent) }}
+              </page-params-link>
+            </div>
+          </div>
+
+          <!-- Logout (only when open + logged in) -->
+          <nuxt-link
+            v-if="toggleMobileMenu && isLoggedIn"
+            :to="{ name: 'logout' }"
+            class="mobile-nav-item mobile-logout-item"
+            @click.native="toggleMobileMenuView"
+          >
+            <os-button
+              variant="danger"
+              appearance="ghost"
+              circle
+              class="mobile-nav-icon-button mobile-icon-col"
+            >
+              <template #icon>
+                <os-icon :icon="icons.signOut" />
+              </template>
+            </os-button>
+            <span>{{ $t('login.logout') }}</span>
+          </nuxt-link>
+        </div>
+        <!-- /mobile-menu-scroll -->
       </div>
     </div>
   </div>
@@ -659,7 +677,11 @@ export default {
       }
     },
     handleClickOutside(event) {
-      if (this.toggleMobileMenu && this.$refs.mobileMenu && !this.$refs.mobileMenu.contains(event.target)) {
+      if (
+        this.toggleMobileMenu &&
+        this.$refs.mobileMenu &&
+        !this.$refs.mobileMenu.contains(event.target)
+      ) {
         this.toggleMobileMenuView()
       }
     },
@@ -678,14 +700,14 @@ export default {
     },
     moreItemIcon(name) {
       const iconMap = {
-        'organization': this.icons.home,
+        organization: this.icons.home,
         'terms-and-conditions': this.icons.book,
         'code-of-conduct': this.icons.handPointer,
         'data-privacy': this.icons.lock,
-        'faq': this.icons.questionCircle,
-        'donate': this.icons.heartO,
-        'support': this.icons.comments,
-        'imprint': this.icons.balanceScale,
+        faq: this.icons.questionCircle,
+        donate: this.icons.heartO,
+        support: this.icons.comments,
+        imprint: this.icons.balanceScale,
       }
       return iconMap[name] || this.icons.link
     },
