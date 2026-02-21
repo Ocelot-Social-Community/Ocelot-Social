@@ -4,13 +4,13 @@
       <os-button
         variant="primary"
         :appearance="filterActive ? 'filled' : 'ghost'"
+        circle
         :aria-label="$t('common.filter')"
         @click.prevent="toggleMenu()"
       >
         <template #icon>
           <os-icon :icon="icons.filter" />
         </template>
-        <os-icon class="dropdown-arrow" :icon="icons.angleDown" />
       </os-button>
     </template>
     <template #popover>
