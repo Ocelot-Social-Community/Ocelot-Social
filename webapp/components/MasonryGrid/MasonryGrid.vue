@@ -28,8 +28,8 @@ export default {
   computed: {
     gridStyle() {
       return {
-        gridAutoRows: '2px',
-        rowGap: '2px',
+        gridAutoRows: `${ROW_HEIGHT}px`,
+        rowGap: `${ROW_GAP}px`,
         ...(this.singleColumn ? { gridTemplateColumns: '1fr' } : {}),
       }
     },
