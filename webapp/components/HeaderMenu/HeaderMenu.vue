@@ -221,8 +221,9 @@
                 variant="primary"
                 appearance="ghost"
                 circle
+                tabindex="-1"
+                aria-hidden="true"
                 class="mobile-collapse-toggle"
-                :aria-label="$t('header.avatarMenu.button.tooltip')"
               >
                 <template #icon>
                   <os-icon :icon="mobileAvatarMenuOpen ? icons.angleUp : icons.angleDown" />
@@ -344,7 +345,7 @@
                 </template>
               </os-button>
               <span>{{ $t('common.filter') }}</span>
-              <os-button variant="primary" appearance="ghost" circle class="mobile-collapse-toggle">
+              <os-button variant="primary" appearance="ghost" circle tabindex="-1" aria-hidden="true" class="mobile-collapse-toggle">
                 <template #icon>
                   <os-icon :icon="mobileFilterMenuOpen ? icons.angleUp : icons.angleDown" />
                 </template>
@@ -383,7 +384,7 @@
                 </template>
               </os-button>
               <span>{{ $t('localeSwitch.tooltip') }} ({{ currentLocale.code.toUpperCase() }})</span>
-              <os-button variant="primary" appearance="ghost" circle class="mobile-collapse-toggle">
+              <os-button variant="primary" appearance="ghost" circle tabindex="-1" aria-hidden="true" class="mobile-collapse-toggle">
                 <template #icon>
                   <os-icon :icon="mobileLocaleMenuOpen ? icons.angleUp : icons.angleDown" />
                 </template>
@@ -426,7 +427,7 @@
                 </template>
               </os-button>
               <span>{{ $t('header.more') }}</span>
-              <os-button variant="primary" appearance="ghost" circle class="mobile-collapse-toggle">
+              <os-button variant="primary" appearance="ghost" circle tabindex="-1" aria-hidden="true" class="mobile-collapse-toggle">
                 <template #icon>
                   <os-icon :icon="mobileMoreMenuOpen ? icons.angleUp : icons.angleDown" />
                 </template>
