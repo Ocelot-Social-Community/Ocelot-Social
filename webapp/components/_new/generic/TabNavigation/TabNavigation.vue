@@ -95,10 +95,12 @@ export default {
   top: var(--header-height, 53px);
   z-index: 2;
   transition: top 0.15s ease;
+  container-type: scroll-state;
 }
 .ds-tab-nav.os-card {
   padding: 0 !important;
   border-radius: $border-radius-x-large $border-radius-x-large 0 0 !important;
+  transition: border-radius 0.15s ease;
 
   .ds-tab-nav-item {
     &.ds-tab-nav-item-active {
@@ -110,6 +112,11 @@ export default {
         border-bottom-right-radius: $border-radius-x-large;
       }
     }
+  }
+}
+@container scroll-state(stuck: top) {
+  .ds-tab-nav.os-card {
+    border-radius: 0 !important;
   }
 }
 </style>
