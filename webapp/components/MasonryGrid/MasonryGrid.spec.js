@@ -51,6 +51,24 @@ describe('MasonryGrid', () => {
     expect(wrapper.vm.measuring).toBe(false)
   })
 
+  it('recalculates when child count changes in updated()', async () => {
+    const Parent = {
+      template: '<MasonryGrid><GridChild v-for="n in count" :key="n" /></MasonryGrid>',
+      components: { MasonryGrid, GridChild },
+      data() {
+        return { count: 1 }
+      },
+    }
+    wrapper = mount(Parent, { localVue })
+    await Vue.nextTick()
+    expect(wrapper.vm.$children[0].childCount).toBe(1)
+
+    wrapper.setData({ count: 2 })
+    await Vue.nextTick()
+    await Vue.nextTick()
+    expect(wrapper.vm.$children[0].childCount).toBe(2)
+  })
+
   it('skips children without rowSpan', async () => {
     const NoRowSpan = { template: '<div>no rowSpan</div>' }
     wrapper = mount(MasonryGrid, {
