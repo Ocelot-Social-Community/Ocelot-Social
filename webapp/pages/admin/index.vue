@@ -14,11 +14,7 @@
             class="admin-stats__item"
           >
             <div class="ds-my-small">
-              <ds-number :count="0" :label="$t('admin.dashboard.' + name)" size="x-large" uppercase>
-                <client-only slot="count">
-                  <hc-count-to :end-val="value" />
-                </client-only>
-              </ds-number>
+              <os-number :count="value" :label="$t('admin.dashboard.' + name)" :animated="true" />
             </div>
           </div>
         </div>
@@ -38,15 +34,14 @@
 </template>
 
 <script>
-import { OsCard, OsSpinner } from '@ocelot-social/ui'
-import HcCountTo from '~/components/CountTo.vue'
+import { OsCard, OsNumber, OsSpinner } from '@ocelot-social/ui'
 import { Statistics } from '~/graphql/admin/Statistics'
 
 export default {
   components: {
     OsCard,
+    OsNumber,
     OsSpinner,
-    HcCountTo,
   },
   data() {
     return {
@@ -75,6 +70,10 @@ export default {
 .admin-stats__item {
   flex: 0 0 100%;
   width: 100%;
+
+  .os-number-label {
+    text-transform: uppercase;
+  }
 }
 @media #{$media-query-small} {
   .admin-stats__item {

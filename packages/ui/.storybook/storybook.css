@@ -52,4 +52,7 @@
   /* Disabled (Payne's Grey - muted watercolor grey) */
   --color-disabled: #c4bdb5;
   --color-disabled-contrast: #5a4f45;
+
+  /* Text */
+  --color-text-soft: #6b5e7b;
 }

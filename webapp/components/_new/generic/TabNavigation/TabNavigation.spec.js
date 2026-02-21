@@ -49,32 +49,27 @@ describe('TabNavigation', () => {
     })
 
     describe('displays', () => {
-      // we couldn't get it running with "jest.runAllTimers()" and so we used "setTimeout"
-      // time is a bit more then 3000 milisec see "webapp/components/CountTo.vue"
-      const counterTimeout = 3000 + 10
+      beforeEach(() => {
+        jest.useFakeTimers()
+        // Re-mount with fake timers so requestAnimationFrame is captured
+        wrapper = Wrapper()
+        jest.advanceTimersByTime(1600)
+      })
 
-      it('shows a total of 17 results', () => {
-        setTimeout(() => {
-          expect(wrapper.find('.total-search-results').text()).toContain('17')
-        }, counterTimeout)
+      afterEach(() => {
+        jest.useRealTimers()
       })
 
       it('shows tab with 12 posts', () => {
-        setTimeout(() => {
-          expect(wrapper.find('[data-test="Post-tab"]').text()).toContain('12')
-        }, counterTimeout)
+        expect(wrapper.find('[data-test="Post-tab"]').text()).toContain('12')
       })
 
       it('shows tab with 9 users', () => {
-        setTimeout(() => {
-          expect(wrapper.find('[data-test="User-tab"]').text()).toContain('9')
-        }, counterTimeout)
+        expect(wrapper.find('[data-test="User-tab"]').text()).toContain('9')
       })
 
       it('shows tab with 0 hashtags', () => {
-        setTimeout(() => {
-          expect(wrapper.find('[data-test="Hashtag-tab"]').text()).toContain('0')
-        }, counterTimeout)
+        expect(wrapper.find('[data-test="Hashtag-tab"]').text()).toContain('0')
       })
 
       describe('basic props setting', () => {

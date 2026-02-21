@@ -54,4 +54,7 @@
   // Disabled state
   --color-disabled: #{$color-neutral-60}; // rgb(177, 171, 186)
   --color-disabled-contrast: #{$color-neutral-100}; // weiß
+
+  // Text
+  --color-text-soft: #{$text-color-soft}; // rgb(112, 103, 126)
 }

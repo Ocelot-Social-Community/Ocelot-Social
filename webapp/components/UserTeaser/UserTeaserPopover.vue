@@ -10,18 +10,19 @@
       :is-owner="userId === $store.getters['auth/user'].id"
       class="location-info"
     />
+    <!-- No :animated on OsNumber — popover appears on hover, animation would be distracting -->
     <ul class="statistics">
       <li>
-        <ds-number :count="user.followedByCount" :label="$t('profile.followers')" />
+        <os-number :count="user.followedByCount" :label="$t('profile.followers')" />
       </li>
       <li>
-        <ds-number
+        <os-number
           :count="user.contributionsCount"
           :label="$t('common.post', null, user.contributionsCount)"
         />
       </li>
       <li>
-        <ds-number
+        <os-number
           :count="user.commentedCount"
           :label="$t('common.comment', null, user.commentedCount)"
         />
@@ -40,7 +41,7 @@
 </template>
 
 <script>
-import { OsButton } from '@ocelot-social/ui'
+import { OsButton, OsNumber } from '@ocelot-social/ui'
 import Badges from '~/components/Badges.vue'
 import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
 import { isTouchDevice } from '~/components/utils/isTouchDevice'
@@ -52,6 +53,7 @@ export default {
     Badges,
     LocationInfo,
     OsButton,
+    OsNumber,
   },
   props: {
     userId: { type: String },

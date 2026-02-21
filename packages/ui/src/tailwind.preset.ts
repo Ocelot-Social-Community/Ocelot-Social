@@ -62,6 +62,8 @@ export const requiredCssVariables: string[] = [
   // Disabled
   '--color-disabled',
   '--color-disabled-contrast',
+  // Text
+  '--color-text-soft',
 ]
 
 /**

@@ -27,3 +27,4 @@ export {
   type BadgeVariant,
   type BadgeVariants,
 } from './OsBadge'
+export { OsNumber, numberVariants, type NumberVariants } from './OsNumber'
