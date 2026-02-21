@@ -418,10 +418,8 @@ export default {
     margin-top: 4px;
   }
 
-  &.newsfeed-controls--no-filter {
-    .top-info-bar {
-      padding-right: 70px;
-    }
+  .top-info-bar {
+    padding-right: 70px;
   }
 }
 .main-container .grid-column-helper {
