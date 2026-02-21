@@ -22,6 +22,15 @@ export default {
       return { gridAutoRows: size, rowGap: size }
     },
   },
+  watch: {
+    isMobile() {
+      this.$nextTick(() => {
+        this.$children.forEach((child) => {
+          if (child.calculateItemHeight) child.calculateItemHeight()
+        })
+      })
+    },
+  },
   created() {
     this.$on('calculating-item-height', this.startCalculation)
     this.$on('finished-calculating-item-height', this.endCalculation)
@@ -43,6 +52,12 @@ export default {
   },
   mounted() {
     this.checkMobile()
+    // Children mount before parent — recalculate their spans with correct grid values
+    this.$nextTick(() => {
+      this.$children.forEach((child) => {
+        if (child.calculateItemHeight) child.calculateItemHeight()
+      })
+    })
     window.addEventListener('resize', this.checkMobile)
   },
   beforeDestroy() {
