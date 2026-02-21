@@ -99,7 +99,7 @@ export default {
   display: inline-flex;
   gap: 4px;
   align-items: center;
-  transition: opacity 0.3s ease;
+
 }
 
 .layout-toggle--hidden {
