@@ -75,7 +75,7 @@
             placement: 'left',
           }"
           class="post-add-button"
-          :class="{ 'post-add-button-bottom': !POST_ADD_BUTTON_POSITION_TOP, 'hide-filter': hideByScroll }"
+          :class="{ 'hide-filter': hideByScroll }"
           variant="primary"
           appearance="filled"
           circle
@@ -371,21 +371,16 @@ export default {
 }
 
 .post-add-button {
-  flex-shrink: 0;
   height: 54px !important;
   width: 54px !important;
   min-height: 54px !important;
   min-width: 54px !important;
   font-size: 26px !important;
   box-shadow: $box-shadow-x-large !important;
-}
-
-.post-add-button-bottom {
   z-index: $z-index-sticky-float !important;
   position: fixed !important;
-  bottom: -5px !important;
-  left: 98vw !important;
-  transform: translate(-120%, -120%) !important;
+  right: max(20px, calc((100vw - 1200px) / 2 + 48px)) !important;
+  top: 91px !important;
 }
 
 .top-info-bar {
