@@ -85,6 +85,20 @@ describe('LocaleSwitch.vue', () => {
     })
   })
 
+  describe('when apollo mutation fails', () => {
+    beforeEach(async () => {
+      wrapper = Wrapper()
+      // First call succeeds (consumes mockResolvedValueOnce)
+      await wrapper.vm.changeLanguage('de', jest.fn())
+      // Second call fails (consumes mockRejectedValueOnce)
+      await wrapper.vm.changeLanguage('en', jest.fn())
+    })
+
+    it('shows an error toast', () => {
+      expect(mocks.$toast.error).toHaveBeenCalledWith('Please log in!')
+    })
+  })
+
   describe('no current user', () => {
     beforeEach(() => {
       getters = {
