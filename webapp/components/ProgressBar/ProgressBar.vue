@@ -59,7 +59,6 @@ export default {
   position: relative;
   height: 100%;
   flex: 1;
-  margin-right: $space-x-small;
 }
 
 .progress-bar__goal {
@@ -118,6 +117,7 @@ export default {
 .progress-bar-button {
   position: relative;
   float: right;
+  margin-left: $space-x-small;
 
   @media (max-width: 810px) {
     display: none;
