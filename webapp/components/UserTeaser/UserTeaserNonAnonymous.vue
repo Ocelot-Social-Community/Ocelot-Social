@@ -29,7 +29,7 @@
           <span v-if="wide">&nbsp;</span>
           <span v-if="group" class="group-info">
             <span class="text">{{ $t('group.in') }}</span>
-            <nuxt-link :to="groupLink" class="group-link" :title="groupSlug">
+            <nuxt-link :to="groupLink" class="group-link" :title="groupName">
               {{ groupNameTruncated }}
             </nuxt-link>
           </span>
