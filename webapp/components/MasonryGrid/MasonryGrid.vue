@@ -1,42 +1,56 @@
 <template>
-  <div class="ds-grid" :style="gridStyle" :class="[itemsCalculating ? 'reset-grid-height' : '']">
+  <div
+    class="ds-grid"
+    :style="{ gridAutoRows: '20px', rowGap: '16px', columnGap: '16px' }"
+    :class="[measuring ? 'reset-grid-height' : '']"
+  >
     <slot></slot>
   </div>
 </template>
 
 <script>
+const ROW_HEIGHT = 20
+const ROW_GAP = 16
+
 export default {
   data() {
     return {
-      itemsCalculating: 0,
-      isMobile: false,
+      measuring: false,
+      childCount: 0,
     }
   },
-  computed: {
-    gridStyle() {
-      const size = this.isMobile ? '1px' : '2px'
-      return { gridAutoRows: size, rowGap: size }
-    },
+  mounted() {
+    this.$nextTick(() => this.batchRecalculate())
   },
-  watch: {
-    isMobile() {
-      this.$nextTick(() => {
-        this.$children.forEach((child) => {
-          if (child.calculateItemHeight) child.calculateItemHeight()
-        })
-      })
-    },
-  },
-  created() {
-    this.$on('calculating-item-height', this.startCalculation)
-    this.$on('finished-calculating-item-height', this.endCalculation)
+  updated() {
+    const count = this.$children.length
+    if (count !== this.childCount) {
+      this.batchRecalculate()
+    }
   },
   methods: {
-    startCalculation() {
-      this.itemsCalculating += 1
-    },
-    endCalculation() {
-      this.itemsCalculating -= 1
+    batchRecalculate() {
+      this.childCount = this.$children.length
+      // Switch to auto-height so items take their natural height
+      this.measuring = true
+
+      this.$nextTick(() => {
+        // Read pass: measure all children in one go (single reflow)
+        const measurements = this.$children.map((child) => ({
+          child,
+          height: child.$el.clientHeight,
+        }))
+
+        // Write pass: set all rowSpans (no interleaved reads)
+        measurements.forEach(({ child, height }) => {
+          if (child.rowSpan !== undefined) {
+            child.rowSpan = Math.ceil((height + ROW_GAP) / (ROW_HEIGHT + ROW_GAP))
+          }
+        })
+
+        // Switch back to fixed row grid
+        this.measuring = false
+      })
     },
     checkMobile() {
       this.isMobile = window.innerWidth <= 810

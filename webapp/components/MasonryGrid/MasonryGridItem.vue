@@ -27,24 +27,5 @@ export default {
       rowSpan: this.imageAspectRatio ? getRowSpan(this.imageAspectRatio) : 69,
     }
   },
-  methods: {
-    calculateItemHeight() {
-      this.$parent.$emit('calculating-item-height')
-
-      this.$nextTick(() => {
-        const gridStyle = this.$parent.$el.style
-        const rowHeight = parseInt(gridStyle.gridAutoRows)
-        const rowGapValue = gridStyle.rowGap || gridStyle.gridRowGap
-        const rowGap = parseInt(rowGapValue)
-        const itemHeight = this.$el.clientHeight
-
-        this.rowSpan = Math.ceil((itemHeight + rowGap) / (rowHeight + rowGap))
-        this.$parent.$emit('finished-calculating-item-height')
-      })
-    },
-  },
-  mounted() {
-    this.calculateItemHeight()
-  },
 }
 </script>
