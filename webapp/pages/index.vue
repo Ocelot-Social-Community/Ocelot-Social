@@ -64,13 +64,13 @@
           :titleRemove="$t('filter-menu.deleteFilter')"
           :clickRemove="resetByGroups"
         />
+        <layout-toggle v-model="singleColumn" />
         <div id="my-filter" v-if="showFilter">
           <div @mouseleave="mouseLeaveFilterMenu">
             <filter-menu-component @showFilterMenu="showFilterMenu" />
           </div>
         </div>
       </div>
-      <layout-toggle v-model="singleColumn" />
       <client-only>
         <os-button
           as="nuxt-link"

@@ -683,6 +683,9 @@ export default {
     flex: 3 0 0;
   }
 }
+.layout-toggle-row {
+  margin-bottom: $space-x-small;
+}
 .profile-post-add-button {
   box-shadow: $box-shadow-x-large;
 }

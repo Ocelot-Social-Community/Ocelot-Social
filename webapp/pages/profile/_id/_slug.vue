@@ -535,6 +535,9 @@ export default {
     flex: 3 0 0;
   }
 }
+.layout-toggle-row {
+  margin-bottom: $space-x-small;
+}
 .profile-post-add-button-container {
   display: flex;
   justify-content: center;
