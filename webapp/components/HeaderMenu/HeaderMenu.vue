@@ -324,7 +324,7 @@
 
           <!-- filter menu (only when open + logged in + on index page) -->
           <div
-            v-if="isLoggedIn && toggleMobileMenu && SHOW_CONTENT_FILTER_HEADER_MENU"
+            v-if="isLoggedIn && SHOW_CONTENT_FILTER_HEADER_MENU"
             class="mobile-filter-section"
           >
             <div
