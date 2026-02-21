@@ -200,7 +200,7 @@
         <!-- Scrollable menu content (only when open) -->
         <div v-if="toggleMobileMenu" class="mobile-menu-scroll">
           <!-- User info with collapsible menu (only when open + logged in) -->
-          <div v-if="toggleMobileMenu && isLoggedIn" class="mobile-user-info">
+          <div v-if="isLoggedIn" class="mobile-user-info">
             <div
               class="mobile-user-header"
               role="button"
@@ -244,7 +244,7 @@
           </div>
 
           <!-- Mobile nav items (only when open + logged in) -->
-          <div v-if="toggleMobileMenu && isLoggedIn" class="mobile-nav-items">
+          <div v-if="isLoggedIn" class="mobile-nav-items">
             <nuxt-link to="/chat" class="mobile-nav-item" @click.native="toggleMobileMenuView">
               <client-only>
                 <chat-notification-menu class="mobile-icon-col" />
@@ -365,7 +365,7 @@
           </div>
 
           <!-- Locale switch collapsible (only when open) -->
-          <div v-if="toggleMobileMenu" class="mobile-locale-section">
+          <div class="mobile-locale-section">
             <div
               class="mobile-nav-item"
               role="button"
@@ -408,7 +408,7 @@
           </div>
 
           <!-- "More" collapsible section (only when open) -->
-          <div v-if="toggleMobileMenu" class="mobile-more-section">
+          <div class="mobile-more-section">
             <div
               class="mobile-more-header"
               role="button"
@@ -479,7 +479,7 @@
 
           <!-- Logout (only when open + logged in) -->
           <nuxt-link
-            v-if="toggleMobileMenu && isLoggedIn"
+            v-if="isLoggedIn"
             :to="{ name: 'logout' }"
             class="mobile-nav-item mobile-logout-item"
             @click.native="toggleMobileMenuView"
