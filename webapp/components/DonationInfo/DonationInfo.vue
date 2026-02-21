@@ -56,5 +56,6 @@ export default {
   margin-bottom: $space-x-small;
   margin-top: 16px;
   cursor: pointer;
+  color: $text-color-base;
 }
 </style>
