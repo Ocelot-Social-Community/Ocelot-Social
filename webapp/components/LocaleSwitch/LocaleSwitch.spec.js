@@ -48,10 +48,12 @@ describe('LocaleSwitch.vue', () => {
           {
             name: 'English',
             path: 'en',
+            flag: '🇬🇧',
           },
           {
             name: 'Deutsch',
             path: 'de',
+            flag: '🇩🇪',
           },
         ]
       },
