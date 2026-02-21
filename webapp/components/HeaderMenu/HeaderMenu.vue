@@ -223,7 +223,7 @@
 
         <!-- User info with collapsible menu (only when open + logged in) -->
         <div v-if="toggleMobileMenu && isLoggedIn" class="mobile-user-info">
-          <div class="mobile-user-header">
+          <div class="mobile-user-header" @click="mobileAvatarMenuOpen = !mobileAvatarMenuOpen">
             <profile-avatar :profile="user" size="small" />
             <div class="mobile-user-details">
               <b>{{ userName }}</b>
@@ -235,8 +235,8 @@
               variant="primary"
               appearance="ghost"
               circle
+              class="mobile-collapse-toggle"
               :aria-label="$t('header.avatarMenu.button.tooltip')"
-              @click="mobileAvatarMenuOpen = !mobileAvatarMenuOpen"
             >
               <template #icon>
                 <os-icon :icon="mobileAvatarMenuOpen ? icons.angleUp : icons.angleDown" />
@@ -346,7 +346,16 @@
               </template>
             </os-button>
             <span>{{ $t('header.more') }}</span>
-            <os-icon :icon="mobileMoreMenuOpen ? icons.angleUp : icons.angleDown" />
+            <os-button
+              variant="primary"
+              appearance="ghost"
+              circle
+              class="mobile-collapse-toggle"
+            >
+              <template #icon>
+                <os-icon :icon="mobileMoreMenuOpen ? icons.angleUp : icons.angleDown" />
+              </template>
+            </os-button>
           </div>
           <div v-if="mobileMoreMenuOpen" class="mobile-more-items">
             <!-- dynamic branding menus -->
@@ -399,7 +408,16 @@
               </template>
             </os-button>
             <span>{{ $t('localeSwitch.tooltip') }} ({{ currentLocale.code.toUpperCase() }})</span>
-            <os-icon :icon="mobileLocaleMenuOpen ? icons.angleUp : icons.angleDown" />
+            <os-button
+              variant="primary"
+              appearance="ghost"
+              circle
+              class="mobile-collapse-toggle"
+            >
+              <template #icon>
+                <os-icon :icon="mobileLocaleMenuOpen ? icons.angleUp : icons.angleDown" />
+              </template>
+            </os-button>
           </div>
           <div v-if="mobileLocaleMenuOpen" class="mobile-locale-items">
             <a
@@ -766,6 +784,12 @@ export default {
     height: 1.5em;
   }
 
+  .mobile-collapse-toggle {
+    margin-left: auto;
+    flex-shrink: 0;
+    pointer-events: none; // Parent handles click
+  }
+
   .mobile-nav-items {
     padding: 5px 0;
   }
@@ -844,6 +868,7 @@ export default {
     display: flex;
     align-items: center;
     gap: 10px;
+    cursor: pointer;
   }
 
   .mobile-user-details {
@@ -899,10 +924,6 @@ export default {
     cursor: pointer;
     padding: 8px 0;
     font-weight: bold;
-
-    > .os-icon:last-child {
-      margin-left: auto;
-    }
   }
 
   .mobile-more-items {
@@ -930,10 +951,6 @@ export default {
 
     > .mobile-nav-item {
       cursor: pointer;
-
-      > .os-icon:last-child {
-        margin-left: auto;
-      }
     }
   }
 
