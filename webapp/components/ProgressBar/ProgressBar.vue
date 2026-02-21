@@ -108,7 +108,6 @@ export default {
 
 .progress-bar__label {
   position: relative;
-  float: right;
 
   @media (max-width: 350px) {
     font-size: $font-size-small;
@@ -117,7 +116,6 @@ export default {
 
 .progress-bar-button {
   position: relative;
-  float: right;
   margin-left: $space-x-small;
 
   @media (max-width: 810px) {
