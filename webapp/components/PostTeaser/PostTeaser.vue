@@ -12,10 +12,7 @@
       :highlight="isPinned"
     >
       <template v-if="post.image" #heroImage>
-        <div
-          class="image-placeholder"
-          :style="{ aspectRatio: post.image.aspectRatio }"
-        >
+        <div class="image-placeholder" :style="{ aspectRatio: post.image.aspectRatio }">
           <responsive-image :image="post.image" sizes="640px" class="image" />
         </div>
       </template>

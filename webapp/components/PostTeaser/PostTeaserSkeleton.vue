@@ -33,9 +33,15 @@ export default {
 
 <style lang="scss">
 @keyframes skeleton-pulse {
-  0% { opacity: 0.15; }
-  50% { opacity: 0.3; }
-  100% { opacity: 0.15; }
+  0% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.15;
+  }
 }
 
 .post-teaser-skeleton {
@@ -105,9 +111,17 @@ export default {
   animation: skeleton-pulse 1.5s ease-in-out infinite;
   width: 100%;
 
-  &--xshort { width: 25%; }
-  &--short { width: 40%; }
-  &--medium { width: 65%; }
-  &--long { width: 85%; }
+  &--xshort {
+    width: 25%;
+  }
+  &--short {
+    width: 40%;
+  }
+  &--medium {
+    width: 65%;
+  }
+  &--long {
+    width: 85%;
+  }
 }
 </style>

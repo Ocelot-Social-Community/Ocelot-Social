@@ -1,9 +1,5 @@
 <template>
-  <div
-    class="ds-grid"
-    :style="gridStyle"
-    :class="[itemsCalculating ? 'reset-grid-height' : '']"
-  >
+  <div class="ds-grid" :style="gridStyle" :class="[itemsCalculating ? 'reset-grid-height' : '']">
     <slot></slot>
   </div>
 </template>
