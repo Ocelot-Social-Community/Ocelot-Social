@@ -25,6 +25,12 @@
   </div>
 </template>
 
+<script>
+export default {
+  name: 'PostTeaserSkeleton',
+}
+</script>
+
 <style lang="scss">
 @keyframes skeleton-pulse {
   0% { opacity: 0.15; }
