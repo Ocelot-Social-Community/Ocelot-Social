@@ -4,6 +4,13 @@ import MasonryGrid from './MasonryGrid'
 
 const localVue = global.localVue
 
+const GridChild = {
+  template: '<div>child</div>',
+  data() {
+    return { rowSpan: 0 }
+  },
+}
+
 describe('MasonryGrid', () => {
   let wrapper
 
@@ -26,5 +33,35 @@ describe('MasonryGrid', () => {
   it('sets inline grid styles', () => {
     expect(wrapper.element.style.gridAutoRows).toBe('20px')
     expect(wrapper.element.style.rowGap).toBe('16px')
+  })
+
+  it('calculates rowSpan for children via batchRecalculate', async () => {
+    wrapper = mount(MasonryGrid, {
+      localVue,
+      slots: { default: GridChild },
+    })
+
+    const child = wrapper.vm.$children[0]
+    Object.defineProperty(child.$el, 'clientHeight', { value: 100, configurable: true })
+
+    wrapper.vm.batchRecalculate()
+    await Vue.nextTick()
+
+    // Math.ceil((100 + 16) / (20 + 16)) = Math.ceil(3.222) = 4
+    expect(child.rowSpan).toBe(4)
+    expect(wrapper.vm.measuring).toBe(false)
+  })
+
+  it('skips children without rowSpan', async () => {
+    const NoRowSpan = { template: '<div>no rowSpan</div>' }
+    wrapper = mount(MasonryGrid, {
+      localVue,
+      slots: { default: NoRowSpan },
+    })
+
+    wrapper.vm.batchRecalculate()
+    await Vue.nextTick()
+
+    expect(wrapper.vm.measuring).toBe(false)
   })
 })
