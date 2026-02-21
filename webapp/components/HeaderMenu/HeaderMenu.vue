@@ -510,6 +510,7 @@ import { mapGetters } from 'vuex'
 import find from 'lodash/find'
 import isEmpty from 'lodash/isEmpty'
 import orderBy from 'lodash/orderBy'
+import throttle from 'lodash/throttle'
 import locales from '~/locales'
 import { SHOW_GROUP_BUTTON_IN_HEADER } from '~/constants/groups.js'
 import { SHOW_CONTENT_FILTER_HEADER_MENU } from '~/constants/filter.js'
@@ -656,6 +657,7 @@ export default {
   },
   created() {
     this.icons = iconRegistry
+    this.throttledMouseMove = throttle(this.handleMouseMove, 100)
   },
   methods: {
     handleScroll() {
@@ -687,13 +689,10 @@ export default {
         this.hideNavbar = false
         this.navbarRevealedByHover = true
       } else if (this.navbarRevealedByHover && !this.hideNavbar) {
-        const navbar = document.getElementById('navbar')
-        if (navbar) {
-          const rect = navbar.getBoundingClientRect()
-          if (event.clientY > rect.bottom + 50) {
-            this.hideNavbar = true
-            this.navbarRevealedByHover = false
-          }
+        const rect = this.$el.getBoundingClientRect()
+        if (event.clientY > rect.bottom + 50) {
+          this.hideNavbar = true
+          this.navbarRevealedByHover = false
         }
       }
     },
@@ -742,13 +741,14 @@ export default {
   mounted() {
     this.$nextTick(() => this.updateHeaderOffset())
     window.addEventListener('scroll', this.handleScroll)
-    document.addEventListener('mousemove', this.handleMouseMove)
+    document.addEventListener('mousemove', this.throttledMouseMove)
     document.addEventListener('click', this.handleClickOutside)
   },
   beforeDestroy() {
     document.body.style.overflow = ''
     window.removeEventListener('scroll', this.handleScroll)
-    document.removeEventListener('mousemove', this.handleMouseMove)
+    document.removeEventListener('mousemove', this.throttledMouseMove)
+    this.throttledMouseMove.cancel()
     document.removeEventListener('click', this.handleClickOutside)
   },
 }
