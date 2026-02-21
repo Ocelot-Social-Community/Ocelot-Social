@@ -8,7 +8,7 @@
         <nuxt />
       </div>
     </div>
-    <page-footer v-if="!isMobile" />
+    <page-footer class="desktop-footer" />
     <div id="overlay" />
     <client-only>
       <modal />
@@ -64,6 +64,12 @@ export default {
 .main-container {
   padding-top: 6rem;
   padding-bottom: 8rem;
+}
+
+.desktop-footer {
+  @media (max-width: 810px) {
+    display: none;
+  }
 }
 
 .chat-modul {

@@ -5,8 +5,8 @@
     id="navbar"
   >
     <div>
-      <!-- header menu -->
-      <div v-if="!showMobileMenu" class="ds-flex main-navigation-flex">
+      <!-- header menu (desktop) -->
+      <div class="ds-flex main-navigation-flex desktop-menu">
         <!-- logo -->
         <div class="ds-flex-item logo-wrapper" style="flex: 0 0 auto">
           <a
@@ -136,8 +136,7 @@
 
       <!-- mobile header menu -->
       <div
-        v-else
-        class="mobil-header-box"
+        class="mobil-header-box mobile-menu"
         :class="{ 'mobil-header-box--open': toggleMobileMenu }"
         ref="mobileMenu"
       >
@@ -692,6 +691,22 @@ export default {
 <style lang="scss">
 #navbar {
   padding: 10px 10px;
+
+  // Show correct layout immediately via CSS (no FOUC)
+  .desktop-menu {
+    display: flex;
+  }
+  .mobile-menu {
+    display: none;
+  }
+  @media (max-width: 810px) {
+    .desktop-menu {
+      display: none !important;
+    }
+    .mobile-menu {
+      display: block;
+    }
+  }
 }
 .hide-navbar {
   display: none;
