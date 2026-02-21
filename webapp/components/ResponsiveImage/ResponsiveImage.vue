@@ -1,5 +1,5 @@
 <template>
-  <img :src="image.url" :sizes="sizes" :srcset="srcset" />
+  <img :src="image.url" :sizes="sizes" :srcset="srcset" loading="lazy" fetchpriority="low" />
 </template>
 
 <script>
