@@ -40,11 +40,17 @@ export default {
   },
   methods: {
     async batchRecalculate() {
+      this._recalcId = (this._recalcId || 0) + 1
+      const id = this._recalcId
+
       this.childCount = this.$children.length
       // Switch to auto-height so items take their natural height
       this.measuring = true
 
       await this.$nextTick()
+
+      // A newer call has started — let it handle the measurement
+      if (id !== this._recalcId) return
 
       // Read pass: measure all children in one go (single reflow)
       const measurements = this.$children.map((child) => ({
