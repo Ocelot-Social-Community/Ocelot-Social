@@ -446,6 +446,7 @@ export default {
     },
     toggleMobileMenuView() {
       this.toggleMobileMenu = !this.toggleMobileMenu
+      this.$nextTick(() => this.updateHeaderOffset())
     },
   },
   mounted() {
