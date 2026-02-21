@@ -335,7 +335,7 @@ export default {
 
   .image-placeholder {
     width: 100%;
-    background-color: #e5e5e5;
+    background-color: $color-neutral-80;
 
     > .image {
       display: block;
