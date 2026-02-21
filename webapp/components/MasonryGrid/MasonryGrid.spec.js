@@ -11,29 +11,21 @@ describe('MasonryGrid', () => {
     wrapper = mount(MasonryGrid, { localVue })
   })
 
-  it('adds the "reset-grid-height" class when itemsCalculating is more than 0', async () => {
-    wrapper.setData({ itemsCalculating: 1 })
+  it('adds the "reset-grid-height" class when measuring is true', async () => {
+    wrapper.setData({ measuring: true })
     await Vue.nextTick()
     expect(wrapper.classes()).toContain('reset-grid-height')
   })
 
-  it('removes the "reset-grid-height" class when itemsCalculating is 0', async () => {
-    wrapper.setData({ itemsCalculating: 0 })
+  it('removes the "reset-grid-height" class when measuring is false', async () => {
+    wrapper.setData({ measuring: false })
     await Vue.nextTick()
     expect(wrapper.classes()).not.toContain('reset-grid-height')
   })
 
-  it('adds 1 to itemsCalculating when "calculating-item-height" is emitted', async () => {
-    wrapper.setData({ itemsCalculating: 0 })
-    wrapper.vm.$emit('calculating-item-height')
-    await Vue.nextTick()
-    expect(wrapper.vm.itemsCalculating).toBe(1)
-  })
-
-  it('subtracts 1 from itemsCalculating when "finished-calculating-item-height" is emitted', async () => {
-    wrapper.setData({ itemsCalculating: 2 })
-    wrapper.vm.$emit('finished-calculating-item-height')
-    await Vue.nextTick()
-    expect(wrapper.vm.itemsCalculating).toBe(1)
+  it('sets inline grid styles', () => {
+    expect(wrapper.element.style.gridAutoRows).toBe('20px')
+    expect(wrapper.element.style.rowGap).toBe('16px')
+    expect(wrapper.element.style.columnGap).toBe('16px')
   })
 })
