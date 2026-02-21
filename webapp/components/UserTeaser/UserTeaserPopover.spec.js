@@ -45,7 +45,7 @@ const userLink = {
 }
 
 describe('UserTeaserPopover', () => {
-  const Wrapper = ({ badgesEnabled = true, withUserLink = true, onTouchScreen = false }) => {
+  const Wrapper = ({ badgesEnabled = true, withUserLink = true, onTouchScreen = false, userData = user }) => {
     const mockIsTouchDevice = onTouchScreen
     jest.mock('../utils/isTouchDevice', () => ({
       isTouchDevice: jest.fn(() => mockIsTouchDevice),
@@ -57,7 +57,7 @@ describe('UserTeaserPopover', () => {
         userLink: withUserLink ? userLink : null,
       },
       data: () => ({
-        User: [user],
+        User: [userData],
       }),
       stubs: {
         NuxtLink: RouterLinkStub,
@@ -97,6 +97,17 @@ describe('UserTeaserPopover', () => {
 
   it('does not show badges when disabled', () => {
     const wrapper = Wrapper({ badgesEnabled: false })
+    expect(wrapper.container).toMatchSnapshot()
+  })
+
+  it('renders correctly for a fresh user with zero counts', () => {
+    const freshUser = {
+      ...user,
+      followedByCount: 0,
+      contributionsCount: 0,
+      commentedCount: 0,
+    }
+    const wrapper = Wrapper({ userData: freshUser })
     expect(wrapper.container).toMatchSnapshot()
   })
 })

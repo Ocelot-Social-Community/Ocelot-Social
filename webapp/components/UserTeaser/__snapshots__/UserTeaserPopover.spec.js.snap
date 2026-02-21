@@ -405,6 +405,117 @@ exports[`UserTeaserPopover given a touch device shows button when userLink is pr
 </div>
 `;
 
+exports[`UserTeaserPopover renders correctly for a fresh user with zero counts 1`] = `
+<div>
+  <div
+    class="user-teaser-popover"
+  >
+    <div
+      class="hc-badges"
+    >
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/verified"
+          title="Verified"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/trophy1"
+          title="Trophy 1"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/trophy2"
+          title="Trophy 2"
+        />
+      </div>
+      <div
+        class="hc-badge-container"
+      >
+        <img
+          class="hc-badge"
+          src="/api/icons/empty"
+          title="Empty"
+        />
+      </div>
+    </div>
+     
+    <!---->
+     
+    <ul
+      class="statistics"
+    >
+      <li>
+        <div
+          class="os-number flex flex-col items-center text-center"
+        >
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
+          >
+            0
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
+          >
+            profile.followers
+          </span>
+        </div>
+      </li>
+       
+      <li>
+        <div
+          class="os-number flex flex-col items-center text-center"
+        >
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
+          >
+            0
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
+          >
+            common.post
+          </span>
+        </div>
+      </li>
+       
+      <li>
+        <div
+          class="os-number flex flex-col items-center text-center"
+        >
+          <span
+            class="os-number-count font-bold text-[1.5rem] tabular-nums text-center inline-block"
+            style="min-width: 1ch;"
+          >
+            0
+          </span>
+          <span
+            class="os-number-label text-[12px] text-[var(--color-text-soft)]"
+          >
+            common.comment
+          </span>
+        </div>
+      </li>
+    </ul>
+     
+    <!---->
+  </div>
+</div>
+`;
+
 exports[`UserTeaserPopover shows badges when enabled 1`] = `
 <div>
   <div
