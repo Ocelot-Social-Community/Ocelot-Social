@@ -51,20 +51,13 @@
         >
           <search-field />
         </div>
-        <!-- filter menu -->
-        <div
-          v-if="isLoggedIn && SHOW_CONTENT_FILTER_HEADER_MENU"
-          v-show="showFilterMenuDropdown"
-          class="ds-flex-item"
-          style="flex-grow: 0; flex-basis: auto"
-        >
-          <client-only>
-            <filter-menu />
-          </client-only>
-        </div>
         <!-- right symbols -->
         <div class="ds-flex-item" style="flex: none">
           <div class="main-navigation-right" style="flex-basis: auto">
+            <!-- filter menu -->
+            <client-only v-if="isLoggedIn && SHOW_CONTENT_FILTER_HEADER_MENU">
+              <filter-menu v-show="showFilterMenuDropdown" />
+            </client-only>
             <!-- locale switch -->
             <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
             <template v-if="isLoggedIn">
