@@ -750,7 +750,7 @@ export default {
   .mobile-header-search {
     flex: 1 1 auto;
     min-width: 0;
-    padding: 0 10px;
+    padding: 0 10px 0 0;
   }
 
   .mobile-hamburger-menu {
