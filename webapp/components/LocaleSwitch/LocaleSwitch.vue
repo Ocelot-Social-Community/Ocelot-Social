@@ -130,7 +130,20 @@ export default {
   align-items: center;
   height: 100%;
   padding: $space-xx-small;
-  color: $color-locale-menu;
+  color: var(--color-primary);
+  border-radius: 4px;
+  transition: color 80ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    background-color 80ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  &:hover {
+    background-color: var(--color-primary);
+    color: var(--color-primary-contrast);
+  }
+
+  &:active {
+    background-color: var(--color-primary-active);
+    color: var(--color-primary-contrast);
+  }
 
   > .label {
     margin: 0 $space-xx-small;
