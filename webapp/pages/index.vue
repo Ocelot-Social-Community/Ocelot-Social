@@ -88,7 +88,11 @@
       </client-only>
     </div>
 
-    <div v-if="hashtag || showDonations" class="newsfeed-controls">
+    <div
+      v-if="hashtag || showDonations"
+      class="newsfeed-controls"
+      :class="{ 'newsfeed-controls--no-filter': !SHOW_CONTENT_FILTER_MASONRY_GRID }"
+    >
       <div v-if="hashtag">
         <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
       </div>
@@ -394,6 +398,15 @@ export default {
 }
 .newsfeed-controls {
   margin-top: 8px;
+
+  &.newsfeed-controls--no-filter {
+    margin-top: -16px;
+    margin-bottom: 16px;
+
+    .top-info-bar {
+      padding-right: 70px;
+    }
+  }
 }
 .main-container .grid-column-helper {
   grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 357px)) !important;
