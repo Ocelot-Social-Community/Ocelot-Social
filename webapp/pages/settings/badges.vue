@@ -109,10 +109,10 @@ export default {
     },
     dragSupported() {
       if (typeof window === 'undefined') return false
-      if (window.matchMedia) {
-        return window.matchMedia('(pointer: fine)').matches
-      }
-      return !('ontouchstart' in window)
+      if (!window.matchMedia) return !('ontouchstart' in window)
+      const hasFinePointer = window.matchMedia('(pointer: fine)').matches
+      const isWideScreen = window.matchMedia('(min-width: 640px)').matches
+      return hasFinePointer && isWideScreen
     },
   },
   created() {
