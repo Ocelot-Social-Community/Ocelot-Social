@@ -66,7 +66,7 @@ import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import { mapGetters } from 'vuex'
 import { profileUserQuery, mapUserQuery } from '~/graphql/User'
 import { groupQuery } from '~/graphql/groups'
-import { filterPosts } from '~/graphql/PostQuery.js'
+import { filterMapPosts } from '~/graphql/PostQuery.js'
 import mobile from '~/mixins/mobile'
 import Empty from '~/components/Empty/Empty'
 import MapStylesButtons from '~/components/Map/MapStylesButtons'
@@ -542,7 +542,7 @@ export default {
     },
     Post: {
       query() {
-        return filterPosts(this.$i18n)
+        return filterMapPosts(this.$i18n)
       },
       variables() {
         return {

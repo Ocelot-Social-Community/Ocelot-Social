@@ -45,6 +45,7 @@ export default {
   watch: {
     isPopoverOpen: {
       handler(isOpen) {
+        if (typeof document === 'undefined') return
         if (isOpen) {
           document.body.classList.add('dropdown-open')
         } else {
@@ -58,7 +59,9 @@ export default {
     clearTimeout(mouseLeaveTimer)
     if (this.isPopoverOpen) {
       this.isPopoverOpen = false
-      document.body.classList.remove('dropdown-open')
+      if (typeof document !== 'undefined') {
+        document.body.classList.remove('dropdown-open')
+      }
     }
   },
   methods: {

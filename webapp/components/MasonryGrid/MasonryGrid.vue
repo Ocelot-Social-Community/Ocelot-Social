@@ -1,61 +1,73 @@
 <template>
-  <div class="ds-grid" :style="gridStyle" :class="[itemsCalculating ? 'reset-grid-height' : '']">
+  <div
+    class="ds-grid"
+    :style="{ gridAutoRows: '2px', rowGap: '2px' }"
+    :class="[measuring ? 'reset-grid-height' : '']"
+  >
     <slot></slot>
   </div>
 </template>
 
 <script>
+const ROW_HEIGHT = 2
+const ROW_GAP = 2
+
 export default {
   data() {
     return {
-      itemsCalculating: 0,
-      isMobile: false,
+      measuring: false,
+      childCount: 0,
     }
   },
-  computed: {
-    gridStyle() {
-      const size = this.isMobile ? '1px' : '2px'
-      return { gridAutoRows: size, rowGap: size }
-    },
-  },
-  watch: {
-    isMobile() {
-      this.$nextTick(() => {
-        this.$children.forEach((child) => {
-          if (child.calculateItemHeight) child.calculateItemHeight()
-        })
-      })
-    },
-  },
-  created() {
-    this.$on('calculating-item-height', this.startCalculation)
-    this.$on('finished-calculating-item-height', this.endCalculation)
-  },
-  methods: {
-    startCalculation() {
-      this.itemsCalculating += 1
-    },
-    endCalculation() {
-      this.itemsCalculating -= 1
-    },
-    checkMobile() {
-      this.isMobile = window.innerWidth <= 810
-    },
-  },
   mounted() {
-    this.checkMobile()
-    // Children mount before parent — recalculate their spans with correct grid values
-    this.$nextTick(() => {
-      this.$children.forEach((child) => {
-        if (child.calculateItemHeight) child.calculateItemHeight()
-      })
-    })
-    window.addEventListener('resize', this.checkMobile)
+    this.$nextTick(() => this.batchRecalculate())
+    this._resizeTimer = null
+    this._onResize = () => {
+      clearTimeout(this._resizeTimer)
+      this._resizeTimer = setTimeout(() => this.batchRecalculate(), 150)
+    }
+    window.addEventListener('resize', this._onResize)
   },
   beforeDestroy() {
-    this.$off('calculating-item-height', this.startCalculation)
-    this.$off('finished-calculating-item-height', this.endCalculation)
-    window.removeEventListener('resize', this.checkMobile)
+    clearTimeout(this._resizeTimer)
+    window.removeEventListener('resize', this._onResize)
+  },
+  updated() {
+    const count = this.$children.length
+    if (count !== this.childCount) {
+      this.batchRecalculate()
+    }
+  },
+  methods: {
+    async batchRecalculate() {
+      this._recalcId = (this._recalcId || 0) + 1
+      const id = this._recalcId
+
+      this.childCount = this.$children.length
+      // Switch to auto-height so items take their natural height
+      this.measuring = true
+
+      await this.$nextTick()
+
+      // A newer call has started — let it handle the measurement
+      if (id !== this._recalcId) return
+
+      // Read pass: measure all children in one go (single reflow)
+      const measurements = this.$children.map((child) => ({
+        child,
+        height: child.$el.clientHeight,
+      }))
+
+      // Write pass: set all rowSpans (no interleaved reads)
+      measurements.forEach(({ child, height }) => {
+        if (child.rowSpan !== undefined) {
+          child.rowSpan = Math.ceil((height + ROW_GAP) / (ROW_HEIGHT + ROW_GAP))
+        }
+      })
+
+      // Switch back to fixed row grid
+      this.measuring = false
+    },
   },
 }
 </script>

@@ -52,7 +52,30 @@ export default (i18n) => {
   `
 }
 
-export const filterPosts = (i18n) => {
+export const filterPosts = () => {
+  return gql`
+    ${user}
+    ${post}
+    ${postCounts}
+    ${tagsCategoriesAndPinned}
+
+    query Post($filter: _PostFilter, $first: Int, $offset: Int, $orderBy: [_PostOrdering]) {
+      Post(filter: $filter, first: $first, offset: $offset, orderBy: $orderBy) {
+        postType
+        eventStart
+        eventEnd
+        eventVenue
+        eventLocationName
+        eventIsOnline
+        ...post
+        ...postCounts
+        ...tagsCategoriesAndPinned
+      }
+    }
+  `
+}
+
+export const filterMapPosts = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
     ${user}

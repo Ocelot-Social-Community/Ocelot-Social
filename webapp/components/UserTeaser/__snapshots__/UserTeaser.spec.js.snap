@@ -190,7 +190,9 @@ exports[`UserTeaser given an user user is disabled current user is a moderator r
              
             <img
               alt="Tilda Swinton"
-              class="image"
+              class="responsive-image image"
+              fetchpriority="low"
+              loading="lazy"
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
@@ -321,7 +323,9 @@ exports[`UserTeaser given an user with linkToProfile, on desktop renders 1`] = `
              
             <img
               alt="Tilda Swinton"
-              class="image"
+              class="responsive-image image"
+              fetchpriority="low"
+              loading="lazy"
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
@@ -411,7 +415,9 @@ exports[`UserTeaser given an user with linkToProfile, on desktop when hovering t
              
             <img
               alt="Tilda Swinton"
-              class="image"
+              class="responsive-image image"
+              fetchpriority="low"
+              loading="lazy"
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
@@ -501,7 +507,9 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen renders 1`
              
             <img
               alt="Tilda Swinton"
-              class="image"
+              class="responsive-image image"
+              fetchpriority="low"
+              loading="lazy"
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
@@ -592,7 +600,9 @@ exports[`UserTeaser given an user with linkToProfile, on touch screen when click
              
             <img
               alt="Tilda Swinton"
-              class="image"
+              class="responsive-image image"
+              fetchpriority="low"
+              loading="lazy"
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
@@ -687,7 +697,9 @@ exports[`UserTeaser given an user without linkToProfile, on desktop renders 1`] 
              
             <img
               alt="Tilda Swinton"
-              class="image"
+              class="responsive-image image"
+              fetchpriority="low"
+              loading="lazy"
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
@@ -777,7 +789,9 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
              
             <img
               alt="Tilda Swinton"
-              class="image"
+              class="responsive-image image"
+              fetchpriority="low"
+              loading="lazy"
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
@@ -867,7 +881,9 @@ exports[`UserTeaser given an user without linkToProfile, on desktop when hoverin
              
             <img
               alt="Tilda Swinton"
-              class="image"
+              class="responsive-image image"
+              fetchpriority="low"
+              loading="lazy"
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
@@ -957,7 +973,9 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen renders
              
             <img
               alt="Tilda Swinton"
-              class="image"
+              class="responsive-image image"
+              fetchpriority="low"
+              loading="lazy"
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
@@ -1048,7 +1066,9 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
              
             <img
               alt="Tilda Swinton"
-              class="image"
+              class="responsive-image image"
+              fetchpriority="low"
+              loading="lazy"
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"
@@ -1143,7 +1163,9 @@ exports[`UserTeaser given an user without linkToProfile, on touch screen when cl
              
             <img
               alt="Tilda Swinton"
-              class="image"
+              class="responsive-image image"
+              fetchpriority="low"
+              loading="lazy"
               sizes="320px"
               src="/avatars/tilda-swinton"
               srcset="/avatars/tilda-swinton-w320 320w, /avatars/tilda-swinton-w640 640w, /avatars/tilda-swinton-w1024 1024w"

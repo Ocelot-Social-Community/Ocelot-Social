@@ -239,6 +239,12 @@ export default {
   },
 
   manifest,
+
+  render: {
+    // Generate preload hints for critical JS/CSS/font assets
+    resourceHints: true,
+  },
+
   /*
    ** Build configuration
    */

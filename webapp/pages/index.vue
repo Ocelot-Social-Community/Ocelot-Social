@@ -344,7 +344,7 @@ export default {
     },
     Post: {
       query() {
-        return filterPosts(this.$i18n)
+        return filterPosts()
       },
       variables() {
         return {
