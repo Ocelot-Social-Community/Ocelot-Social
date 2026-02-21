@@ -341,7 +341,11 @@
         <!-- "More" collapsible section (only when open) -->
         <div v-if="toggleMobileMenu" class="mobile-more-section">
           <div class="mobile-more-header" @click="mobileMoreMenuOpen = !mobileMoreMenuOpen">
-            <os-icon :icon="icons.ellipsisV" />
+            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button">
+              <template #icon>
+                <os-icon :icon="icons.ellipsisV" />
+              </template>
+            </os-button>
             <span>{{ $t('header.more') }}</span>
             <os-icon :icon="mobileMoreMenuOpen ? icons.angleUp : icons.angleDown" />
           </div>
