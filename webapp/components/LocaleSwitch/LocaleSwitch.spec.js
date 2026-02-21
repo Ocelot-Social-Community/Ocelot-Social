@@ -73,10 +73,10 @@ describe('LocaleSwitch.vue', () => {
   describe('with current user', () => {
     let toggleMenu
 
-    beforeEach(() => {
+    beforeEach(async () => {
       toggleMenu = jest.fn()
       wrapper = Wrapper()
-      wrapper.vm.changeLanguage('de', toggleMenu)
+      await wrapper.vm.changeLanguage('de', toggleMenu)
     })
 
     it("sets a user's locale", () => {
@@ -109,7 +109,7 @@ describe('LocaleSwitch.vue', () => {
   describe('no current user', () => {
     let toggleMenu
 
-    beforeEach(() => {
+    beforeEach(async () => {
       toggleMenu = jest.fn()
       getters = {
         'auth/user': () => {
@@ -117,7 +117,7 @@ describe('LocaleSwitch.vue', () => {
         },
       }
       wrapper = Wrapper()
-      wrapper.vm.changeLanguage('de', toggleMenu)
+      await wrapper.vm.changeLanguage('de', toggleMenu)
     })
 
     it('does not send a UpdateUser mutation', () => {
