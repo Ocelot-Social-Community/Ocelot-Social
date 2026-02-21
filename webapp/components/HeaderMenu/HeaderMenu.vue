@@ -202,7 +202,15 @@
 
         <!-- User info with collapsible menu (only when open + logged in) -->
         <div v-if="toggleMobileMenu && isLoggedIn" class="mobile-user-info">
-          <div class="mobile-user-header" @click="mobileAvatarMenuOpen = !mobileAvatarMenuOpen">
+          <div
+            class="mobile-user-header"
+            role="button"
+            tabindex="0"
+            :aria-expanded="String(mobileAvatarMenuOpen)"
+            @click="mobileAvatarMenuOpen = !mobileAvatarMenuOpen"
+            @keydown.enter.prevent="mobileAvatarMenuOpen = !mobileAvatarMenuOpen"
+            @keydown.space.prevent="mobileAvatarMenuOpen = !mobileAvatarMenuOpen"
+          >
             <profile-avatar :profile="user" size="small" class="mobile-avatar" />
             <div class="mobile-user-details">
               <b>{{ userName }}</b>
@@ -310,7 +318,15 @@
           v-if="isLoggedIn && toggleMobileMenu && SHOW_CONTENT_FILTER_HEADER_MENU"
           class="mobile-filter-section"
         >
-          <div class="mobile-nav-item" @click="mobileFilterMenuOpen = !mobileFilterMenuOpen">
+          <div
+            class="mobile-nav-item"
+            role="button"
+            tabindex="0"
+            :aria-expanded="String(mobileFilterMenuOpen)"
+            @click="mobileFilterMenuOpen = !mobileFilterMenuOpen"
+            @keydown.enter.prevent="mobileFilterMenuOpen = !mobileFilterMenuOpen"
+            @keydown.space.prevent="mobileFilterMenuOpen = !mobileFilterMenuOpen"
+          >
             <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
               <template #icon>
                 <os-icon :icon="icons.filter" />
@@ -339,7 +355,12 @@
         <div v-if="toggleMobileMenu" class="mobile-locale-section">
           <div
             class="mobile-nav-item"
+            role="button"
+            tabindex="0"
+            :aria-expanded="String(mobileLocaleMenuOpen)"
             @click="mobileLocaleMenuOpen = !mobileLocaleMenuOpen"
+            @keydown.enter.prevent="mobileLocaleMenuOpen = !mobileLocaleMenuOpen"
+            @keydown.space.prevent="mobileLocaleMenuOpen = !mobileLocaleMenuOpen"
           >
             <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
               <template #icon>
@@ -375,7 +396,15 @@
 
         <!-- "More" collapsible section (only when open) -->
         <div v-if="toggleMobileMenu" class="mobile-more-section">
-          <div class="mobile-more-header" @click="mobileMoreMenuOpen = !mobileMoreMenuOpen">
+          <div
+            class="mobile-more-header"
+            role="button"
+            tabindex="0"
+            :aria-expanded="String(mobileMoreMenuOpen)"
+            @click="mobileMoreMenuOpen = !mobileMoreMenuOpen"
+            @keydown.enter.prevent="mobileMoreMenuOpen = !mobileMoreMenuOpen"
+            @keydown.space.prevent="mobileMoreMenuOpen = !mobileMoreMenuOpen"
+          >
             <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
               <template #icon>
                 <os-icon :icon="icons.questionCircle" />
