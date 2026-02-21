@@ -37,7 +37,7 @@ export default {
     },
   },
   mounted() {
-    if (this.$el.complete) this.onLoad()
+    if (this.$el.complete && this.$el.naturalWidth > 0) this.onLoad()
   },
   methods: {
     onLoad() {
