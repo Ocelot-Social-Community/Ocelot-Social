@@ -35,6 +35,9 @@ export default {
       return `${w320} 320w, ${w640} 640w, ${w1024} 1024w`
     },
   },
+  mounted() {
+    if (this.$el.complete) this.onLoad()
+  },
   methods: {
     onLoad() {
       this.loaded = true
