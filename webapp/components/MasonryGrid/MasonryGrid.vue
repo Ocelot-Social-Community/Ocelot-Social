@@ -21,10 +21,15 @@ export default {
   },
   mounted() {
     this.$nextTick(() => this.batchRecalculate())
-    this._onResize = () => this.batchRecalculate()
+    this._resizeTimer = null
+    this._onResize = () => {
+      clearTimeout(this._resizeTimer)
+      this._resizeTimer = setTimeout(() => this.batchRecalculate(), 150)
+    }
     window.addEventListener('resize', this._onResize)
   },
   beforeDestroy() {
+    clearTimeout(this._resizeTimer)
     window.removeEventListener('resize', this._onResize)
   },
   updated() {
