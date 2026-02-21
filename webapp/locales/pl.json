@@ -698,15 +698,15 @@
     "redeemed-count": null,
     "redeemed-count-0": null
   },
-  "localeSwitch": {
-    "tooltip": null
-  },
   "layout": {
     "toggle": {
       "label": "Układ",
       "multiColumn": "Wiele kolumn",
       "singleColumn": "Jedna kolumna"
     }
+  },
+  "localeSwitch": {
+    "tooltip": null
   },
   "location": {
     "distance": null
