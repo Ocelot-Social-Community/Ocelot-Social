@@ -342,7 +342,7 @@
           <div class="mobile-more-header" @click="mobileMoreMenuOpen = !mobileMoreMenuOpen">
             <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button">
               <template #icon>
-                <os-icon :icon="icons.ellipsisV" />
+                <os-icon :icon="icons.questionCircle" />
               </template>
             </os-button>
             <span>{{ $t('header.more') }}</span>
