@@ -2,7 +2,8 @@
   <div
     class="badge-selection"
     :class="{ 'reserve-drag-over': reserveDragOver }"
-    @dragover.prevent="handleContainerDragOver"
+    @dragover.prevent
+    @dragenter="handleContainerDragEnter"
     @dragleave="handleContainerDragLeave"
     @drop.prevent="handleContainerDrop"
   >
@@ -45,6 +46,7 @@ export default {
       selectedIndex: null,
       draggingIndex: null,
       reserveDragOver: false,
+      dragEnterCount: 0,
     }
   },
   methods: {
@@ -67,13 +69,19 @@ export default {
     handleItemDragEnd() {
       this.draggingIndex = null
     },
-    handleContainerDragOver() {
+    handleContainerDragEnter() {
+      this.dragEnterCount++
       this.reserveDragOver = true
     },
     handleContainerDragLeave() {
-      this.reserveDragOver = false
+      this.dragEnterCount--
+      if (this.dragEnterCount <= 0) {
+        this.dragEnterCount = 0
+        this.reserveDragOver = false
+      }
     },
     handleContainerDrop(event) {
+      this.dragEnterCount = 0
       this.reserveDragOver = false
       try {
         const data = JSON.parse(event.dataTransfer.getData('application/json'))
