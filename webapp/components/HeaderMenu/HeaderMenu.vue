@@ -837,7 +837,7 @@ export default {
   &.mobil-header-box--open {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 20px);
+    height: calc(100dvh - 20px);
     margin: 0 -10px; // extend to screen edge
     background-color: #fff;
 
