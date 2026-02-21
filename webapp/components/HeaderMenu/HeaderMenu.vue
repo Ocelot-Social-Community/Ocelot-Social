@@ -799,7 +799,7 @@ export default {
     flex-flow: row nowrap;
     align-items: center;
     justify-content: flex-end;
-    gap: 10px;
+    gap: 5px;
 
     > div {
       flex-shrink: 0;
