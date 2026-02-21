@@ -639,6 +639,13 @@ export default {
       return routes
     },
   },
+  watch: {
+    $route() {
+      if (this.toggleMobileMenu) {
+        this.toggleMobileMenuView()
+      }
+    },
+  },
   created() {
     this.icons = iconRegistry
   },
