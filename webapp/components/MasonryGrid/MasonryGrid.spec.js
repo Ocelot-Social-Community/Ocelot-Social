@@ -31,8 +31,8 @@ describe('MasonryGrid', () => {
   })
 
   it('sets inline grid styles', () => {
-    expect(wrapper.element.style.gridAutoRows).toBe('20px')
-    expect(wrapper.element.style.rowGap).toBe('16px')
+    expect(wrapper.element.style.gridAutoRows).toBe('2px')
+    expect(wrapper.element.style.rowGap).toBe('2px')
   })
 
   it('calculates rowSpan for children via batchRecalculate', async () => {
@@ -47,8 +47,8 @@ describe('MasonryGrid', () => {
     wrapper.vm.batchRecalculate()
     await Vue.nextTick()
 
-    // Math.ceil((100 + 16) / (20 + 16)) = Math.ceil(3.222) = 4
-    expect(child.rowSpan).toBe(4)
+    // Math.ceil((100 + 2) / (2 + 2)) = Math.ceil(25.5) = 26
+    expect(child.rowSpan).toBe(26)
     expect(wrapper.vm.measuring).toBe(false)
   })
 

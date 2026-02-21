@@ -1,7 +1,7 @@
 <template>
   <div
     class="ds-grid"
-    :style="{ gridAutoRows: '20px', rowGap: '16px' }"
+    :style="{ gridAutoRows: '2px', rowGap: '2px' }"
     :class="[measuring ? 'reset-grid-height' : '']"
   >
     <slot></slot>
@@ -9,8 +9,8 @@
 </template>
 
 <script>
-const ROW_HEIGHT = 20
-const ROW_GAP = 16
+const ROW_HEIGHT = 2
+const ROW_GAP = 2
 
 export default {
   data() {
@@ -21,6 +21,11 @@ export default {
   },
   mounted() {
     this.$nextTick(() => this.batchRecalculate())
+    this._onResize = () => this.batchRecalculate()
+    window.addEventListener('resize', this._onResize)
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this._onResize)
   },
   updated() {
     const count = this.$children.length
