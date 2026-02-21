@@ -71,6 +71,7 @@
           </div>
         </div>
       </div>
+      <layout-toggle v-if="!SHOW_CONTENT_FILTER_MASONRY_GRID" v-model="singleColumn" />
       <client-only>
         <os-button
           as="nuxt-link"
@@ -375,9 +376,9 @@ export default {
 
 .feed-top-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 16px;
-  margin-top: 0px;
+  margin-top: -10px;
 }
 
 .filterButtonMenu {
@@ -411,12 +412,13 @@ export default {
   align-items: center;
 }
 .newsfeed-controls {
-  margin-top: 8px;
+  margin-top: 0;
+
+  .donation-info {
+    margin-top: 4px;
+  }
 
   &.newsfeed-controls--no-filter {
-    margin-top: -16px;
-    margin-bottom: 16px;
-
     .top-info-bar {
       padding-right: 70px;
     }
@@ -436,7 +438,7 @@ export default {
   z-index: $z-index-page-submenu;
 }
 .grid-margin-top {
-  margin-top: 8px;
+  margin-top: 4px;
 }
 @media screen and (min-height: 401px) {
   #my-filter {
