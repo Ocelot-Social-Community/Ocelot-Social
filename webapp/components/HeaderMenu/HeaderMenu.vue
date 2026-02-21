@@ -52,14 +52,14 @@
           <search-field />
         </div>
         <!-- filter menu -->
-        <!-- TODO: Filter is only visible on index -->
         <div
           v-if="isLoggedIn && SHOW_CONTENT_FILTER_HEADER_MENU"
+          v-show="showFilterMenuDropdown"
           class="ds-flex-item"
           style="flex-grow: 0; flex-basis: auto"
         >
           <client-only>
-            <filter-menu v-show="showFilterMenuDropdown" />
+            <filter-menu />
           </client-only>
         </div>
         <!-- right symbols -->
@@ -721,7 +721,7 @@ export default {
   white-space: nowrap;
 }
 .topbar-locale-switch {
-  margin-right: $space-xx-small;
+  margin-right: 0;
   align-self: center;
   display: inline-flex;
 }
