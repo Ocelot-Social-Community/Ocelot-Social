@@ -448,7 +448,7 @@ export default {
 }
 @media screen and (max-width: 650px) {
   .newsfeed-controls {
-    margin-top: 32px;
+    margin-top: 8px;
   }
 }
 </style>
