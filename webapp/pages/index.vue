@@ -110,8 +110,14 @@
         !isMobile && posts.length <= 2 ? 'grid-column-helper' : '',
       ]"
     >
+      <!-- skeleton placeholders while loading -->
+      <template v-if="$apollo.loading && posts.length === 0">
+        <masonry-grid-item v-for="n in 6" :key="'skeleton-' + n" :imageAspectRatio="1.5">
+          <post-teaser-skeleton />
+        </masonry-grid-item>
+      </template>
       <!-- news feed -->
-      <template v-if="hasResults">
+      <template v-else-if="hasResults">
         <masonry-grid-item
           v-for="post in posts"
           :key="post.id"
@@ -160,6 +166,7 @@ import DonationInfo from '~/components/DonationInfo/DonationInfo.vue'
 import HashtagsFilter from '~/components/HashtagsFilter/HashtagsFilter.vue'
 import HcEmpty from '~/components/Empty/Empty'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
+import PostTeaserSkeleton from '~/components/PostTeaser/PostTeaserSkeleton.vue'
 import MasonryGrid from '~/components/MasonryGrid/MasonryGrid.vue'
 import MasonryGridItem from '~/components/MasonryGrid/MasonryGridItem.vue'
 import HeaderButton from '~/components/FilterMenu/HeaderButton'
@@ -179,6 +186,7 @@ export default {
     OsIcon,
     OsSpinner,
     PostTeaser,
+    PostTeaserSkeleton,
     HcEmpty,
     MasonryGrid,
     MasonryGridItem,
