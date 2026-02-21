@@ -314,7 +314,9 @@ export default {
   border-radius: 12px;
   text-align: center;
   color: #888;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .empty-reserve-drop-zone.reserve-drag-over {

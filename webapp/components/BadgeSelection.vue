@@ -66,10 +66,7 @@ export default {
       }
       this.draggingIndex = index
       event.dataTransfer.effectAllowed = 'move'
-      event.dataTransfer.setData(
-        'application/json',
-        JSON.stringify({ source: 'reserve', badge }),
-      )
+      event.dataTransfer.setData('application/json', JSON.stringify({ source: 'reserve', badge }))
     },
     handleItemDragEnd() {
       this.draggingIndex = null
@@ -105,7 +102,9 @@ export default {
   margin: 0 auto;
   border: 2px solid transparent;
   border-radius: 12px;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 
   &.reserve-drag-over {
     border-color: #4caf50;

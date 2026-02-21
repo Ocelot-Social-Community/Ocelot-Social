@@ -89,7 +89,9 @@ describe('Badges.vue', () => {
 
       describe('dragstart on an item', () => {
         it('sets dataTransfer data', async () => {
-          const item = within(wrapper.container).getByText(badges[0].description).closest('.badge-selection-item')
+          const item = within(wrapper.container)
+            .getByText(badges[0].description)
+            .closest('.badge-selection-item')
           const setData = jest.fn()
           await fireEvent.dragStart(item, {
             dataTransfer: { setData, effectAllowed: '' },

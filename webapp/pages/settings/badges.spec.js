@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
+import { render, screen, fireEvent } from '@testing-library/vue'
 import '@testing-library/jest-dom'
 import badges from './badges.vue'
 
@@ -206,8 +206,7 @@ describe('badge settings', () => {
                 id: 'u23',
                 badgeTrophiesSelected:
                   removedResponseData.setTrophyBadgeSelected.badgeTrophiesSelected,
-                badgeTrophiesUnused:
-                  removedResponseData.setTrophyBadgeSelected.badgeTrophiesUnused,
+                badgeTrophiesUnused: removedResponseData.setTrophyBadgeSelected.badgeTrophiesUnused,
               }),
             )
           })
@@ -411,10 +410,7 @@ describe('badge settings', () => {
               badgeTrophiesSelected[1],
               badgeTrophiesSelected[2],
             ],
-            badgeTrophiesUnused: [
-              badgeTrophiesSelected[0],
-              ...badgeTrophiesUnused,
-            ],
+            badgeTrophiesUnused: [badgeTrophiesSelected[0], ...badgeTrophiesUnused],
           },
         }
 
@@ -472,10 +468,7 @@ describe('badge settings', () => {
                 description: 'Empty',
               },
             ],
-            badgeTrophiesUnused: [
-              badgeTrophiesSelected[0],
-              ...badgeTrophiesUnused,
-            ],
+            badgeTrophiesUnused: [badgeTrophiesSelected[0], ...badgeTrophiesUnused],
           },
         }
 
@@ -575,7 +568,7 @@ describe('badge settings', () => {
               if (update) update(null, result)
               return Promise.resolve(result)
             }
-            return Promise.reject({ message: 'Server error' })
+            return Promise.reject(new Error('Server error'))
           })
 
           const targetBadge = screen.getByTitle(badgeTrophiesSelected[2].description)
@@ -591,9 +584,7 @@ describe('badge settings', () => {
         })
 
         it('shows swap partial error', () => {
-          expect(mocks.$toast.error).toHaveBeenCalledWith(
-            'settings.badges.swap-partial-error',
-          )
+          expect(mocks.$toast.error).toHaveBeenCalledWith('settings.badges.swap-partial-error')
         })
       })
     })
