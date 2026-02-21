@@ -17,7 +17,12 @@
           :class="{ 'image-placeholder--loaded': imageLoaded }"
           :style="{ aspectRatio: post.image.aspectRatio }"
         >
-          <responsive-image :image="post.image" sizes="640px" class="image" @loaded="imageLoaded = true" />
+          <responsive-image
+            :image="post.image"
+            sizes="640px"
+            class="image"
+            @loaded="imageLoaded = true"
+          />
         </div>
       </template>
       <client-only>
