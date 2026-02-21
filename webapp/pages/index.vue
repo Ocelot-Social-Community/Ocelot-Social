@@ -262,6 +262,14 @@ export default {
     this.icons = iconRegistry
   },
   mounted() {
+    try {
+      const stored = localStorage.getItem('ocelot-layout-single-column')
+      if (stored !== null) {
+        this.singleColumn = stored === 'true'
+      }
+    } catch (e) {
+      // localStorage not available
+    }
     if (this.categoryId) {
       this.resetCategories()
       this.toggleCategory(this.categoryId)
