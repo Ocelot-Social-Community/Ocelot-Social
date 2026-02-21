@@ -26,10 +26,6 @@
           {{ $t('contribution.filterMasonryGrid.noFilter') }}
         </os-button>
 
-        <div v-if="showDonations" class="donation-mobile-only">
-          <donation-info :goal="goal" :progress="progress" />
-        </div>
-
         <header-button
           v-if="filteredPostTypes.includes('Article')"
           :title="$t('contribution.filterMasonryGrid.onlyArticles')"
@@ -77,6 +73,9 @@
         </div>
       </div>
       <layout-toggle v-if="!SHOW_CONTENT_FILTER_MASONRY_GRID" v-model="singleColumn" />
+      <div v-if="showDonations" class="donation-mobile-only">
+        <donation-info :goal="goal" :progress="progress" />
+      </div>
       <client-only>
         <os-button
           as="nuxt-link"
