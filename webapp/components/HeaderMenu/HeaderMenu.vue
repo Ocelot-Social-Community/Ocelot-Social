@@ -337,6 +337,44 @@
           </client-only>
         </div>
 
+        <!-- Locale switch collapsible (only when open) -->
+        <div v-if="toggleMobileMenu" class="mobile-locale-section">
+          <div
+            class="mobile-nav-item"
+            @click="mobileLocaleMenuOpen = !mobileLocaleMenuOpen"
+          >
+            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
+              <template #icon>
+                <os-icon :icon="icons.globe" />
+              </template>
+            </os-button>
+            <span>{{ $t('localeSwitch.tooltip') }} ({{ currentLocale.code.toUpperCase() }})</span>
+            <os-button
+              variant="primary"
+              appearance="ghost"
+              circle
+              class="mobile-collapse-toggle"
+            >
+              <template #icon>
+                <os-icon :icon="mobileLocaleMenuOpen ? icons.angleUp : icons.angleDown" />
+              </template>
+            </os-button>
+          </div>
+          <div v-if="mobileLocaleMenuOpen" class="mobile-locale-items">
+            <a
+              v-for="locale in sortedLocales"
+              :key="locale.code"
+              href="#"
+              class="mobile-locale-item"
+              :class="{ '--active': locale.code === $i18n.locale() }"
+              @click.prevent="changeLocale(locale.code)"
+            >
+              <span class="mobile-locale-flag mobile-icon-col">{{ localeFlags[locale.code] }}</span>
+              {{ locale.name }}
+            </a>
+          </div>
+        </div>
+
         <!-- "More" collapsible section (only when open) -->
         <div v-if="toggleMobileMenu" class="mobile-more-section">
           <div class="mobile-more-header" @click="mobileMoreMenuOpen = !mobileMoreMenuOpen">
@@ -396,44 +434,6 @@
               <os-icon :icon="moreItemIcon(pageParams.name)" class="mobile-icon-col" />
               {{ $t(pageParams.internalPage.footerIdent) }}
             </page-params-link>
-          </div>
-        </div>
-
-        <!-- Locale switch collapsible (only when open) -->
-        <div v-if="toggleMobileMenu" class="mobile-locale-section">
-          <div
-            class="mobile-nav-item"
-            @click="mobileLocaleMenuOpen = !mobileLocaleMenuOpen"
-          >
-            <os-button variant="primary" appearance="ghost" circle class="mobile-nav-icon-button mobile-icon-col">
-              <template #icon>
-                <os-icon :icon="icons.globe" />
-              </template>
-            </os-button>
-            <span>{{ $t('localeSwitch.tooltip') }} ({{ currentLocale.code.toUpperCase() }})</span>
-            <os-button
-              variant="primary"
-              appearance="ghost"
-              circle
-              class="mobile-collapse-toggle"
-            >
-              <template #icon>
-                <os-icon :icon="mobileLocaleMenuOpen ? icons.angleUp : icons.angleDown" />
-              </template>
-            </os-button>
-          </div>
-          <div v-if="mobileLocaleMenuOpen" class="mobile-locale-items">
-            <a
-              v-for="locale in sortedLocales"
-              :key="locale.code"
-              href="#"
-              class="mobile-locale-item"
-              :class="{ '--active': locale.code === $i18n.locale() }"
-              @click.prevent="changeLocale(locale.code)"
-            >
-              <span class="mobile-locale-flag mobile-icon-col">{{ localeFlags[locale.code] }}</span>
-              {{ locale.name }}
-            </a>
           </div>
         </div>
 
