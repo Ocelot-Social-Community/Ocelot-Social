@@ -331,43 +331,50 @@
           </client-only>
         </div>
 
-        <!-- footer (only when open) -->
-        <div v-if="toggleMobileMenu" class="mobile-menu footer-mobile">
-          <!-- dynamic branding menus -->
-          <ul v-if="isHeaderMenu" class="dynamic-branding-mobil">
-            <li v-for="item in menu" :key="item.name">
-              <a
-                v-if="item.url"
-                :href="item.url"
-                :target="item.target"
-                @click="toggleMobileMenuView"
-              >
-                <p class="ds-text ds-text-size-large ds-text-bold">
+        <!-- "More" collapsible section (only when open) -->
+        <div v-if="toggleMobileMenu" class="mobile-more-section">
+          <div class="mobile-more-header" @click="mobileMoreMenuOpen = !mobileMoreMenuOpen">
+            <os-icon :icon="icons.ellipsisV" />
+            <span>{{ $t('header.more') }}</span>
+            <os-icon :icon="mobileMoreMenuOpen ? icons.angleUp : icons.angleDown" />
+          </div>
+          <div v-if="mobileMoreMenuOpen" class="mobile-more-items">
+            <!-- dynamic branding menus -->
+            <template v-if="isHeaderMenu">
+              <template v-for="item in menu">
+                <a
+                  v-if="item.url"
+                  :key="item.name"
+                  :href="item.url"
+                  :target="item.target"
+                  class="mobile-more-item"
+                  @click="toggleMobileMenuView"
+                >
                   {{ $t(item.nameIdent) }}
-                </p>
-              </a>
-              <nuxt-link v-else :to="item.path">
-                <div @click="toggleMobileMenuView">
-                  <p class="ds-text ds-text-size-large ds-text-bold">
-                    {{ $t(item.nameIdent) }}
-                  </p>
-                </div>
-              </nuxt-link>
-            </li>
-          </ul>
-          <hr />
-          <!-- dynamic footer menu in header -->
-          <ul class="dynamic-footer-mobil">
-            <li
+                </a>
+                <nuxt-link
+                  v-else
+                  :key="item.name"
+                  :to="item.path"
+                  class="mobile-more-item"
+                  @click.native="toggleMobileMenuView"
+                >
+                  {{ $t(item.nameIdent) }}
+                </nuxt-link>
+              </template>
+              <hr />
+            </template>
+            <!-- dynamic footer links -->
+            <page-params-link
               v-for="pageParams in links.FOOTER_LINK_LIST"
               :key="pageParams.name"
-              @click="toggleMobileMenuView"
+              :pageParams="pageParams"
+              class="mobile-more-item"
+              @click.native="toggleMobileMenuView"
             >
-              <page-params-link :pageParams="pageParams">
-                {{ $t(pageParams.internalPage.footerIdent) }}
-              </page-params-link>
-            </li>
-          </ul>
+              {{ $t(pageParams.internalPage.footerIdent) }}
+            </page-params-link>
+          </div>
         </div>
       </div>
     </div>
@@ -431,6 +438,7 @@ export default {
       menu: headerMenuBranded.MENU,
       toggleMobileMenu: false,
       mobileAvatarMenuOpen: false,
+      mobileMoreMenuOpen: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
     }
   },
@@ -527,6 +535,7 @@ export default {
       this.$nextTick(() => this.updateHeaderOffset())
       if (!this.toggleMobileMenu) {
         this.mobileAvatarMenuOpen = false
+        this.mobileMoreMenuOpen = false
       }
     },
   },
@@ -701,14 +710,44 @@ export default {
       }
     }
   }
-}
-.dynamic-branding-mobil,
-.dynamic-footer-mobil {
-  line-height: 30px;
-  font-size: large;
-}
-.dynamic-branding-mobil li {
-  margin: 17px 0;
+
+  .mobile-more-section {
+    padding: 10px 0;
+    border-top: 1px solid $color-neutral-90;
+  }
+
+  .mobile-more-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 8px 0;
+    font-weight: bold;
+
+    > .os-icon:last-child {
+      margin-left: auto;
+    }
+  }
+
+  .mobile-more-items {
+    padding: 5px 0 0 0;
+
+    hr {
+      color: $color-neutral-90;
+      background-color: $color-neutral-90;
+      margin: 5px 0;
+    }
+  }
+
+  .mobile-more-item {
+    display: block;
+    padding: 8px 0;
+    color: $text-color-base;
+
+    &:hover {
+      color: $text-color-link;
+    }
+  }
 }
 .map-button {
   margin-left: 3px;

@@ -661,6 +661,7 @@
     "map": {
       "tooltip": "Map"
     },
+    "more": "More",
     "notifications": {
       "tooltip": "Notifications"
     }
