@@ -118,5 +118,9 @@ export default {
 .progress-bar-button {
   position: relative;
   float: right;
+
+  @media (max-width: 810px) {
+    display: none;
+  }
 }
 </style>
