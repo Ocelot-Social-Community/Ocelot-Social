@@ -51,22 +51,18 @@
           </div>
           <div class="ds-flex">
             <div class="ds-flex-item">
-              <client-only>
-                <ds-number :label="$t('profile.followers')">
-                  <hc-count-to
-                    slot="count"
-                    :start-val="followedByCountStartValue"
-                    :end-val="user.followedByCount"
-                  />
-                </ds-number>
-              </client-only>
+              <os-number
+                :count="user.followedByCount"
+                :label="$t('profile.followers')"
+                :animated="true"
+              />
             </div>
             <div class="ds-flex-item">
-              <client-only>
-                <ds-number :label="$t('profile.following')">
-                  <hc-count-to slot="count" :end-val="user.followingCount" />
-                </ds-number>
-              </client-only>
+              <os-number
+                :count="user.followingCount"
+                :label="$t('profile.following')"
+                :animated="true"
+              />
             </div>
           </div>
           <div v-if="!myProfile" class="action-buttons">
@@ -212,14 +208,13 @@
 </template>
 
 <script>
-import { OsButton, OsCard, OsIcon, OsSpinner } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon, OsNumber, OsSpinner } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import uniqBy from 'lodash/uniqBy'
 import { mapGetters, mapMutations } from 'vuex'
 import postListActions from '~/mixins/postListActions'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import HcFollowButton from '~/components/Button/FollowButton'
-import HcCountTo from '~/components/CountTo.vue'
 import HcBadges from '~/components/Badges.vue'
 import FollowList, { followListVisibleCount } from '~/components/features/ProfileList/FollowList'
 import HcEmpty from '~/components/Empty/Empty'
@@ -250,11 +245,11 @@ export default {
     OsCard,
     OsButton,
     OsIcon,
+    OsNumber,
     OsSpinner,
     SocialMedia,
     PostTeaser,
     HcFollowButton,
-    HcCountTo,
     HcBadges,
     HcEmpty,
     ProfileAvatar,
@@ -289,7 +284,6 @@ export default {
       pageSize: 6,
       tabActive: 'post',
       filter,
-      followedByCountStartValue: 0,
       followedByCount: followListVisibleCount,
       followingCount: followListVisibleCount,
       updateUserMutation,
@@ -428,10 +422,6 @@ export default {
       })
     },
     optimisticFollow({ followedByCurrentUser }) {
-      /*
-       * Note: followedByCountStartValue is updated to avoid counting from 0 when follow/unfollow
-       */
-      this.followedByCountStartValue = this.user.followedByCount
       const currentUser = this.$store.getters['auth/user']
       if (followedByCurrentUser) {
         this.user.followedByCount++
@@ -443,7 +433,6 @@ export default {
       this.user.followedByCurrentUser = followedByCurrentUser
     },
     updateFollow({ followedByCurrentUser, followedBy, followedByCount }) {
-      this.followedByCountStartValue = this.user.followedByCount
       this.user.followedByCount = followedByCount
       this.user.followedByCurrentUser = followedByCurrentUser
       this.user.followedBy = followedBy

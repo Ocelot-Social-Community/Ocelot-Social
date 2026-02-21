@@ -118,6 +118,7 @@ describe('GroupProfileSlug', () => {
       locationName: null,
       location: null,
       isMutedByMe: false,
+      membersCount: 4,
       // myRole: 'usual',
     }
     schoolForCitizens = {
@@ -152,6 +153,7 @@ describe('GroupProfileSlug', () => {
         nameEN: 'Paris',
       },
       isMutedByMe: true,
+      membersCount: 0,
       // myRole: 'usual',
     }
     investigativeJournalism = {
@@ -195,6 +197,7 @@ describe('GroupProfileSlug', () => {
         nameEN: 'Hamburg',
       },
       isMutedByMe: false,
+      membersCount: 0,
       // myRole: 'usual',
     }
     peterLustig = {

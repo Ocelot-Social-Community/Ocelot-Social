@@ -95,6 +95,8 @@ describe('ProfileSlug', () => {
             contributionsCount: 6,
             shoutedCount: 7,
             commentedCount: 8,
+            followedByCount: 0,
+            followingCount: 0,
             location: {
               name: 'Berlin',
               distanceToMe: '877 km',
@@ -157,6 +159,8 @@ describe('ProfileSlug', () => {
             contributionsCount: 6,
             shoutedCount: 7,
             commentedCount: 8,
+            followedByCount: 0,
+            followingCount: 0,
             location: {
               name: 'Paris',
               distanceToMe: '0 km',

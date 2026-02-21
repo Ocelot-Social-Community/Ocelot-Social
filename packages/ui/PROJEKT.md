@@ -81,10 +81,10 @@ Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
 Phase 3: ██████████ 100% (24/24 Aufgaben) ✅ - Webapp-Integration komplett
-Phase 4: ██████░░░░  59% (16/27 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅ | Tier B (rest), Tier 2-3 ausstehend
+Phase 4: ██████░░░░  63% (17/27 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅, OsNumber ✅ | Tier B (rest), Tier 2-3 ausstehend
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████████░░  81% (78/96 Aufgaben)
+Gesamt:  ████████░░  82% (79/96 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -186,8 +186,19 @@ Tier A ds-* → Plain HTML + CSS: ✅
 ├─ ds-flex/ds-flex-item: JavaScript window.innerWidth → CSS @media Queries
 │  (kein Layout-Shift bei SSR, bessere Performance)
 ├─ system.css bleibt geladen — bestehende CSS-Klassen funktionieren weiter
-├─ Verbleibend: 9 ds-* Komponenten (Tier B Rest: 2 einfache, Tier C: 6 komplexe → UI-Library)
+├─ Verbleibend: 8 ds-* Komponenten (Tier B Rest: 1 einfache, Tier C: 6 komplexe → UI-Library)
 └─ 0 Tier-A ds-* Komponenten-Tags verbleibend
+
+ds-number → OsNumber (UI-Library): ✅
+├─ OsNumber Komponente: h() Render-Function, requestAnimationFrame Animation, inheritAttrs: false
+├─ Props: count (required), label (optional), animated (optional)
+├─ Animation: 1500ms ease-out, watch(count) re-animiert, SSR-safe (onMounted)
+├─ Styling: tabular-nums + min-width für stabile Breite, --color-text-soft Label-Farbe
+├─ ds-number + CountTo: 5 Dateien → <os-number> (UserTeaserPopover, TabNavigation, admin, profile, groups)
+├─ vue-count-to Dependency entfernt, CountTo.vue gelöscht
+├─ CSS-Variable: --color-text-soft in requiredCssVariables + ocelot-ui-variables.scss
+├─ 11 Unit-Tests, 5 Stories, 5 Visual Tests + 1 Keyboard Test
+└─ 0 ds-number/CountTo Nutzungen verbleibend
 
 ds-chip + ds-tag → OsBadge (UI-Library): ✅
 ├─ OsBadge Komponente: CVA-Varianten, h() Render-Function, inheritAttrs: false
@@ -205,20 +216,27 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-20 (Session 31)
+**Letzte Aktualisierung:** 2026-02-20 (Session 32)
 
-**Aktuelle Phase:** Phase 4 - Tier 1 ✅, Tier A ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅ | Tier B (rest), Tier 2-3 ausstehend
+**Aktuelle Phase:** Phase 4 - Tier 1 ✅, Tier A ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅, OsNumber ✅ | Tier B (rest), Tier 2-3 ausstehend
 
-**Zuletzt abgeschlossen (Session 31 - ds-table → Plain HTML):**
+**Zuletzt abgeschlossen (Session 32 - OsNumber: ds-number + CountTo → OsNumber):**
+- [x] OsNumber Komponente in packages/ui erstellt (h() Render-Function, requestAnimationFrame Animation)
+- [x] Props: count (required), label (optional), animated (optional, 1500ms ease-out)
+- [x] Animation: requestAnimationFrame-Loop, watch(count) re-animiert von oldVal→newVal
+- [x] Stabile Breite: `tabular-nums` + `min-width: Nch` basierend auf Zielwert-Ziffernanzahl
+- [x] CSS-Variable `--color-text-soft` in tailwind.preset.ts (requiredCssVariables), Storybook-Theme, ocelot-ui-variables.scss
+- [x] 5 Webapp-Dateien migriert: UserTeaserPopover (statisch), TabNavigation (animated), admin/index (animated), profile/_slug (animated), groups/_slug (animated)
+- [x] CountTo.vue gelöscht, `vue-count-to` Dependency aus package.json entfernt
+- [x] `followedByCountStartValue` / `membersCountStartValue` Pattern entfernt (OsNumber watch-basiert)
+- [x] ds-number CSS aus `_ds-compat.scss` entfernt
+- [x] Admin-Dashboard: `.os-number-label { text-transform: uppercase }` per CSS (kein neuer Prop)
+- [x] Test-Fixes: Fehlende Count-Properties in Mock-Daten (followedByCount, contributionsCount, membersCount etc.)
+- [x] 11 Unit-Tests, 5 Stories, 5 Visual + A11y Tests
+
+**Zuvor abgeschlossen (Session 31 - ds-table → Plain HTML):**
 - [x] ds-table (7 Nutzungen) → native `<table>` + CSS-Klassen (kein OsTable nötig)
 - [x] Table-CSS in `_ds-compat.scss`: .ds-table-wrap, .ds-table, .ds-table-col, .ds-table-head-col, .ds-table-bordered, .ds-table-condensed, Alignment-Klassen
-- [x] `pages/admin/hashtags.vue`: 4 Spalten (index, id-Link, taggedCountUnique, taggedCount)
-- [x] `pages/admin/categories.vue`: 3 Spalten (icon, name, postCount)
-- [x] `pages/admin/users/index.vue`: 9-10 Spalten (conditional badges), komplexeste Tabelle
-- [x] `pages/settings/blocked-users.vue`: 4 Spalten, unblockUser() auf direktes User-Objekt umgestellt
-- [x] `pages/settings/muted-users.vue`: 4 Spalten, unmuteUser() auf direktes User-Objekt umgestellt
-- [x] `components/Group/GroupMember.vue`: 5 Spalten (avatar, name, slug, roleInGroup, edit)
-- [x] `components/features/FiledReportsTable/FiledReportsTable.vue`: 4 Spalten mit colgroup widths
 - [x] `fields()` / `tableFields()` Computed Properties aus allen 7 Dateien entfernt (Labels direkt in `<th>`)
 - [x] Alle 16 Tests bestanden (3 Test-Suites: admin/users Snapshots aktualisiert, FiledReportsTable ✅, ReportsTable ✅)
 
@@ -261,8 +279,8 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 - [x] Test-Fix: Empty.spec.js `attributes().margin` → `classes().toContain('ds-my-xxx-small')`
 - [x] 0 Tier-A `ds-*` Komponenten-Tags verbleibend
 
-**Verbleibende ds-* Komponenten (8 Typen):**
-- Tier B Rest (→ Plain HTML): ds-number (5), ds-radio (1)
+**Verbleibende ds-* Komponenten (7 Typen):**
+- Tier B Rest (→ Plain HTML): ds-radio (1)
 - Tier C (→ UI-Library): ds-input (23), ds-form (18), ds-modal (7), ds-menu/ds-menu-item (17), ds-select (3)
 
 **Zuvor abgeschlossen (Session 26 - CodeRabbit Review Fixes):**
@@ -385,11 +403,12 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 - [x] OsCard Komponente + BaseCard → OsCard Webapp-Migration ✅
 - [x] Tier A: 10 triviale ds-* Wrapper → Plain HTML + CSS ✅
 - [x] OsBadge Komponente + ds-chip/ds-tag → OsBadge Webapp-Migration ✅
-- [ ] Tier B (Rest): ds-number, ds-grid/ds-grid-item, ds-radio → Plain HTML
+- [x] OsNumber Komponente + ds-number/CountTo → OsNumber Webapp-Migration ✅
+- [ ] Tier B (Rest): ds-radio → Plain HTML
 - [ ] Weitere Tier 2 Komponenten (OsModal, OsDropdown, OsAvatar, OsInput)
 - [ ] ds-form + ds-input → OsForm + OsInput (stark gekoppelt, 18+23 Dateien)
 - [ ] ds-menu / ds-menu-item → OsMenu / OsMenuItem
-- [ ] ds-table → OsTable, ds-select → OsSelect
+- [ ] ds-select → OsSelect
 - [ ] Browser-Fehler untersuchen: `TypeError: Cannot read properties of undefined (reading 'heartO')` (ocelotIcons undefined im Browser trotz korrekter Webpack-Aliase)
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
@@ -656,7 +675,7 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 **Tier B: Einfache ds-* → Plain HTML / UI-Library**
 - [x] ds-chip (5 Dateien) → OsBadge (UI-Library) ✅
 - [x] ds-tag (3 Dateien) → OsBadge shape="square" (UI-Library) ✅
-- [ ] ds-number (5 Dateien) → `<div class="ds-number">`
+- [x] ds-number (5 Dateien) → OsNumber (UI-Library) ✅ + CountTo.vue gelöscht, vue-count-to entfernt
 - [x] ds-grid / ds-grid-item (10 Dateien) → CSS Grid ✅
 - [ ] ds-radio (1 Datei) → native `<input type="radio">`
 
@@ -1806,6 +1825,12 @@ Bei der Migration werden:
 | 2026-02-20 | **Table-CSS** | _ds-compat.scss erweitert: .ds-table-wrap, .ds-table, .ds-table-col, .ds-table-head-col, bordered, condensed, alignment |
 | 2026-02-20 | **fields() entfernt** | Computed Properties `fields()`/`tableFields()` aus 7 Dateien entfernt — Labels direkt in `<th>` |
 | 2026-02-20 | **Scope-Objekte entfernt** | `scope.row` Zugriffe → direkte Iteration-Variable (user, tag, member, report) |
+| 2026-02-20 | **OsNumber Komponente (Session 32)** | Neue Komponente: h() Render-Function, requestAnimationFrame Animation (1500ms ease-out), count (required), label, animated Props |
+| 2026-02-20 | **ds-number + CountTo → OsNumber** | 5 Dateien: UserTeaserPopover, TabNavigation, admin/index, profile/_slug, groups/_slug |
+| 2026-02-20 | **Animation-Stabilität** | `tabular-nums` + `min-width: Nch` für stabile Breite während Count-up Animation |
+| 2026-02-20 | **CountTo.vue gelöscht** | vue-count-to Dependency entfernt, followedByCountStartValue/membersCountStartValue Pattern entfernt |
+| 2026-02-20 | **CSS-Variable --color-text-soft** | Neuer Contract-Eintrag in tailwind.preset.ts + ocelot-ui-variables.scss (Label-Farbe) |
+| 2026-02-20 | **Admin-Label uppercase** | `.admin-stats__item .os-number-label { text-transform: uppercase }` per CSS statt neuem Prop |
 
 ---
 
@@ -1823,10 +1848,10 @@ Bei der Migration werden:
 **Styleguide-Migration:**
 | Status | Komponenten |
 |--------|------------|
-| ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard, OsBadge (5) |
+| ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard, OsBadge, OsNumber (6) |
 | ✅ → Plain HTML | Section, Placeholder, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem, Grid, GridItem, Table (13) — Tier A/B |
-| ✅ → UI-Library | Chip, Tag → OsBadge (2) — Tier B |
-| ⬜ → Plain HTML | Number, Radio (2) — Tier B |
+| ✅ → UI-Library | Chip, Tag → OsBadge (2), Number → OsNumber (1) — Tier B |
+| ⬜ → Plain HTML | Radio (1) — Tier B |
 | ⬜ → UI-Library | Modal, Input, Menu, MenuItem, Select (5) — Tier 2-3 |
 | ⬜ Nicht genutzt | Code, CopyField, FormItem, InputError, InputLabel, Page, PageTitle, Logo, Avatar, TableCol, TableHeadCol (11) |
 | ⬜ Offen | Form (18 Dateien — HTML `<form>` oder OsForm?) |
