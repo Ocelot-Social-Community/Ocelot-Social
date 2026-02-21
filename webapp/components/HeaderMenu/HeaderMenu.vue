@@ -135,7 +135,7 @@
       </div>
 
       <!-- mobile header menu -->
-      <div v-else class="mobil-header-box">
+      <div v-else class="mobil-header-box" ref="mobileMenu">
         <!-- Zeile 1: Logo + Search + Burger -->
         <div class="ds-flex" style="align-items: center">
           <!-- logo: icon when open, full logo when closed -->
@@ -586,6 +586,11 @@ export default {
         document.documentElement.style.setProperty('--header-height', `${height}px`)
       }
     },
+    handleClickOutside(event) {
+      if (this.toggleMobileMenu && this.$refs.mobileMenu && !this.$refs.mobileMenu.contains(event.target)) {
+        this.toggleMobileMenuView()
+      }
+    },
     toggleMobileMenuView() {
       this.toggleMobileMenu = !this.toggleMobileMenu
       this.$nextTick(() => this.updateHeaderOffset())
@@ -634,9 +639,11 @@ export default {
   mounted() {
     window.addEventListener('scroll', this.handleScroll)
     this.$nextTick(() => this.updateHeaderOffset())
+    document.addEventListener('click', this.handleClickOutside)
   },
   beforeDestroy() {
     window.removeEventListener('scroll', this.handleScroll)
+    document.removeEventListener('click', this.handleClickOutside)
   },
 }
 </script>
