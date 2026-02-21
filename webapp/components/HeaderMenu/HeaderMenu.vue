@@ -585,7 +585,7 @@ export default {
       return name || this.$t('profile.userAnonym')
     },
     currentLocale() {
-      return find(locales, { code: this.$i18n.locale() }) || { code: 'en', name: 'English' }
+      return find(locales, { code: this.$i18n.locale() }) || locales[0]
     },
     sortedLocales() {
       return orderBy(locales, 'name')
