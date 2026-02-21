@@ -167,7 +167,7 @@ export default {
     }
 
     &.drag-over {
-      filter: drop-shadow(0 0 4px #4caf50);
+      filter: drop-shadow(0 0 4px $color-success);
       transform: scale(1.15);
       transition: transform 0.15s ease;
     }

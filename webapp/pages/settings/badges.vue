@@ -320,8 +320,8 @@ export default {
 }
 
 .empty-reserve-drop-zone.reserve-drag-over {
-  border-color: #4caf50;
-  background-color: rgba(76, 175, 80, 0.05);
-  color: #4caf50;
+  border-color: $color-success;
+  background-color: rgba($color-success, 0.05);
+  color: $color-success;
 }
 </style>

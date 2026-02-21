@@ -107,9 +107,9 @@ export default {
     background-color 0.2s ease;
 
   &.reserve-drag-over {
-    border-color: #4caf50;
+    border-color: $color-success;
     border-style: dashed;
-    background-color: rgba(76, 175, 80, 0.05);
+    background-color: rgba($color-success, 0.05);
   }
 
   .badge-selection-item {
