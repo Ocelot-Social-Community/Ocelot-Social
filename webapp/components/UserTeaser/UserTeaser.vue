@@ -127,5 +127,25 @@ export default {
       display: inline;
     }
   }
+
+  .group-info {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    min-width: 0;
+    overflow: hidden;
+
+    > .text {
+      flex-shrink: 0;
+    }
+  }
+
+  .group-link {
+    color: $color-primary;
+    font-size: $font-size-base;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 }
 </style>

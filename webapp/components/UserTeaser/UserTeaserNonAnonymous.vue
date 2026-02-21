@@ -27,15 +27,10 @@
             <span class="name">{{ userName }}</span>
           </user-teaser-helper>
           <span v-if="wide">&nbsp;</span>
-          <span v-if="group">
-            <span class="text">
-              {{ $t('group.in') }}
-            </span>
-            <nuxt-link :to="groupLink">
-              <span class="text">
-                <span class="slug">{{ groupSlug }}</span>
-                <span v-if="!userOnly" class="name">{{ groupName }}</span>
-              </span>
+          <span v-if="group" class="group-info">
+            <span class="text">{{ $t('group.in') }}</span>
+            <nuxt-link :to="groupLink" class="group-link" :title="groupSlug">
+              {{ groupName }}
             </nuxt-link>
           </span>
           <!-- eslint-disable-next-line prettier/prettier -->
