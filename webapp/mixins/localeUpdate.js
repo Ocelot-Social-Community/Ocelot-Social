@@ -20,7 +20,7 @@ export default {
             id: this.currentUser.id,
             locale: this.$i18n.locale(),
           },
-          update: (store, { data: { UpdateUser } }) => {
+          update: (_store, { data: { UpdateUser } }) => {
             this.setCurrentUser({
               ...this.currentUser,
               locale: UpdateUser.locale,
