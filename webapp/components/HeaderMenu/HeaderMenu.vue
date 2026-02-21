@@ -207,7 +207,7 @@
         <!-- User info with collapsible menu (only when open + logged in) -->
         <div v-if="toggleMobileMenu && isLoggedIn" class="mobile-user-info">
           <div class="mobile-user-header" @click="mobileAvatarMenuOpen = !mobileAvatarMenuOpen">
-            <profile-avatar :profile="user" size="small" />
+            <profile-avatar :profile="user" size="small" class="mobile-avatar" />
             <div class="mobile-user-details">
               <b>{{ userName }}</b>
               <span v-if="user.role !== 'user'" class="mobile-user-role">
@@ -767,6 +767,10 @@ export default {
     > .mobile-header-row {
       padding: 0 10px; // compensate negative margin
     }
+
+    .mobile-user-header {
+      min-height: 46.5px;
+    }
   }
 
   .mobile-header-row {
@@ -920,6 +924,11 @@ export default {
   .mobile-user-info {
     padding: 6px 0;
     border-bottom: 1px solid $color-neutral-90;
+  }
+
+  .mobile-avatar.profile-avatar {
+    width: 42px;
+    height: 42px;
   }
 
   .mobile-user-header {
