@@ -14,6 +14,13 @@ describe('MasonryGridItem', () => {
       expect(wrapper.vm.rowSpan).toBe(114)
     })
 
+    it('sets the initial rowSpan to 114 when the ratio is exactly 1.3', () => {
+      const propsData = { imageAspectRatio: 1.3 }
+      wrapper = mount(MasonryGridItem, { localVue, propsData })
+
+      expect(wrapper.vm.rowSpan).toBe(114)
+    })
+
     it('sets the initial rowSpan to 132 when the ratio is between 1.3 and 1', () => {
       const propsData = { imageAspectRatio: 1.1 }
       wrapper = mount(MasonryGridItem, { localVue, propsData })
@@ -21,7 +28,21 @@ describe('MasonryGridItem', () => {
       expect(wrapper.vm.rowSpan).toBe(132)
     })
 
+    it('sets the initial rowSpan to 132 when the ratio is exactly 1', () => {
+      const propsData = { imageAspectRatio: 1.0 }
+      wrapper = mount(MasonryGridItem, { localVue, propsData })
+
+      expect(wrapper.vm.rowSpan).toBe(132)
+    })
+
     it('sets the initial rowSpan to 159 when the ratio is between 1 and 0.7', () => {
+      const propsData = { imageAspectRatio: 0.8 }
+      wrapper = mount(MasonryGridItem, { localVue, propsData })
+
+      expect(wrapper.vm.rowSpan).toBe(159)
+    })
+
+    it('sets the initial rowSpan to 159 when the ratio is exactly 0.7', () => {
       const propsData = { imageAspectRatio: 0.7 }
       wrapper = mount(MasonryGridItem, { localVue, propsData })
 
@@ -33,12 +54,12 @@ describe('MasonryGridItem', () => {
       wrapper = mount(MasonryGridItem, { localVue, propsData })
       expect(wrapper.vm.rowSpan).toBe(222)
     })
+  })
 
-    describe('given no aspect ratio', () => {
-      it('sets the initial rowSpan to 69 when not given an imageAspectRatio', () => {
-        wrapper = mount(MasonryGridItem, { localVue })
-        expect(wrapper.vm.rowSpan).toBe(69)
-      })
+  describe('given no aspect ratio', () => {
+    it('sets the initial rowSpan to 69', () => {
+      wrapper = mount(MasonryGridItem, { localVue })
+      expect(wrapper.vm.rowSpan).toBe(69)
     })
   })
 })
