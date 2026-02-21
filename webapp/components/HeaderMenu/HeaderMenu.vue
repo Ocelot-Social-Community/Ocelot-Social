@@ -609,7 +609,7 @@ export default {
       },
     },
     mobileAvatarRoutes() {
-      if (!this.user.slug) return []
+      if (!this.user || !this.user.slug) return []
       const routes = [
         {
           name: this.$t('header.avatarMenu.myProfile'),
