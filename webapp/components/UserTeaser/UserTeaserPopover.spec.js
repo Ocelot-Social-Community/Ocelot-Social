@@ -45,7 +45,12 @@ const userLink = {
 }
 
 describe('UserTeaserPopover', () => {
-  const Wrapper = ({ badgesEnabled = true, withUserLink = true, onTouchScreen = false, userData = user }) => {
+  const Wrapper = ({
+    badgesEnabled = true,
+    withUserLink = true,
+    onTouchScreen = false,
+    userData = user,
+  }) => {
     const mockIsTouchDevice = onTouchScreen
     jest.mock('../utils/isTouchDevice', () => ({
       isTouchDevice: jest.fn(() => mockIsTouchDevice),
