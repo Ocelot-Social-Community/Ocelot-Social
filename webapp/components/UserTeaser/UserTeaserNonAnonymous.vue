@@ -30,7 +30,7 @@
           <span v-if="group" class="group-info">
             <span class="text">{{ $t('group.in') }}</span>
             <nuxt-link :to="groupLink" class="group-link" :title="groupSlug">
-              {{ groupName }}
+              {{ groupNameTruncated }}
             </nuxt-link>
           </span>
           <!-- eslint-disable-next-line prettier/prettier -->
@@ -88,6 +88,11 @@ export default {
     injectedDate: { type: Boolean, default: false },
     hoverDelay: { type: Number, default: 500 },
   },
+  data() {
+    return {
+      maxGroupChars: 50,
+    }
+  },
   computed: {
     ...mapGetters({
       isModerator: 'auth/isModerator',
@@ -125,11 +130,46 @@ export default {
       const { name } = this.group || {}
       return name || this.$t('profile.userAnonym')
     },
+    groupNameTruncated() {
+      const name = this.groupName
+      return name.length > this.maxGroupChars
+        ? name.slice(0, this.maxGroupChars) + '...'
+        : name
+    },
   },
   created() {
     this.icons = iconRegistry
   },
+  mounted() {
+    this.calcMaxGroupChars()
+    window.addEventListener('resize', this.calcMaxGroupChars)
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.calcMaxGroupChars)
+  },
   methods: {
+    calcMaxGroupChars() {
+      this.$nextTick(() => {
+        if (!this.group) return
+        const teaserEl = this.$el
+        if (!teaserEl) return
+        // Available width = teaser width - avatar(36px) - padding-left(10px)
+        const availableWidth = teaserEl.clientWidth - 46
+        const style = getComputedStyle(teaserEl)
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        ctx.font = `${style.fontSize} ${style.fontFamily}`
+        const inTextWidth = ctx.measureText(this.$t('group.in') + ' ').width
+        const dotsWidth = ctx.measureText('...').width
+        const space = availableWidth - inTextWidth - dotsWidth
+        if (space <= 0) {
+          this.maxGroupChars = 3
+          return
+        }
+        const avgCharWidth = ctx.measureText('abcdefghijklmnopqrstuvwxyz').width / 26
+        this.maxGroupChars = Math.max(3, Math.floor(space / avgCharWidth))
+      })
+    },
     async loadPopover(openMenu) {
       // Load user data if not already loaded, to avoid flickering
       await this.$apollo.query({
