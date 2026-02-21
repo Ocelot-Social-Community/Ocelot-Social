@@ -44,8 +44,7 @@ describe('MasonryGrid', () => {
     const child = wrapper.vm.$children[0]
     Object.defineProperty(child.$el, 'clientHeight', { value: 100, configurable: true })
 
-    wrapper.vm.batchRecalculate()
-    await Vue.nextTick()
+    await wrapper.vm.batchRecalculate()
 
     // Math.ceil((100 + 2) / (2 + 2)) = Math.ceil(25.5) = 26
     expect(child.rowSpan).toBe(26)
@@ -59,8 +58,7 @@ describe('MasonryGrid', () => {
       slots: { default: NoRowSpan },
     })
 
-    wrapper.vm.batchRecalculate()
-    await Vue.nextTick()
+    await wrapper.vm.batchRecalculate()
 
     expect(wrapper.vm.measuring).toBe(false)
   })

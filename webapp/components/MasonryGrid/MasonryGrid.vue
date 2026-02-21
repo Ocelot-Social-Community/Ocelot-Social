@@ -34,28 +34,28 @@ export default {
     }
   },
   methods: {
-    batchRecalculate() {
+    async batchRecalculate() {
       this.childCount = this.$children.length
       // Switch to auto-height so items take their natural height
       this.measuring = true
 
-      this.$nextTick(() => {
-        // Read pass: measure all children in one go (single reflow)
-        const measurements = this.$children.map((child) => ({
-          child,
-          height: child.$el.clientHeight,
-        }))
+      await this.$nextTick()
 
-        // Write pass: set all rowSpans (no interleaved reads)
-        measurements.forEach(({ child, height }) => {
-          if (child.rowSpan !== undefined) {
-            child.rowSpan = Math.ceil((height + ROW_GAP) / (ROW_HEIGHT + ROW_GAP))
-          }
-        })
+      // Read pass: measure all children in one go (single reflow)
+      const measurements = this.$children.map((child) => ({
+        child,
+        height: child.$el.clientHeight,
+      }))
 
-        // Switch back to fixed row grid
-        this.measuring = false
+      // Write pass: set all rowSpans (no interleaved reads)
+      measurements.forEach(({ child, height }) => {
+        if (child.rowSpan !== undefined) {
+          child.rowSpan = Math.ceil((height + ROW_GAP) / (ROW_HEIGHT + ROW_GAP))
+        }
       })
+
+      // Switch back to fixed row grid
+      this.measuring = false
     },
   },
 }
