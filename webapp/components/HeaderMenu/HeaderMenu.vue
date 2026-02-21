@@ -427,15 +427,14 @@ export default {
   methods: {
     handleScroll() {
       const currentScrollPos = window.pageYOffset
+      const wasHidden = this.hideNavbar
       if (this.prevScrollpos > 50) {
-        if (this.prevScrollpos > currentScrollPos) {
-          this.hideNavbar = false
-        } else {
-          this.hideNavbar = true
-        }
+        this.hideNavbar = this.prevScrollpos <= currentScrollPos
       }
       this.prevScrollpos = currentScrollPos
-      this.$nextTick(() => this.updateHeaderOffset())
+      if (wasHidden !== this.hideNavbar) {
+        this.$nextTick(() => this.updateHeaderOffset())
+      }
     },
     updateHeaderOffset() {
       const el = this.$el
