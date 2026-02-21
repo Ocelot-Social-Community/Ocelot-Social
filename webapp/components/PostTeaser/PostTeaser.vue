@@ -330,7 +330,6 @@ export default {
   flex-direction: column;
   overflow: visible;
   height: 100%;
-  padding-bottom: $space-x-small;
 
   > .os-card__hero-image {
     border-top-left-radius: 5px;
