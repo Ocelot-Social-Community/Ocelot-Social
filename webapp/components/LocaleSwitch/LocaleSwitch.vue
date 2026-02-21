@@ -24,6 +24,7 @@
               :parents="item.parents"
               @click.stop.prevent="changeLanguage(item.route.path, toggleMenu)"
             >
+              <span class="locale-flag">{{ item.route.flag }}</span>
               {{ item.route.name }}
             </ds-menu-item>
           </template>
@@ -62,13 +63,11 @@ export default {
       return find(this.locales, { code: this.$i18n.locale() })
     },
     routes() {
-      const routes = this.locales.map((locale) => {
-        return {
-          name: locale.name,
-          path: locale.code,
-        }
-      })
-      return routes
+      return this.locales.map((locale) => ({
+        name: locale.name,
+        path: locale.code,
+        flag: locale.flag,
+      }))
     },
   },
   created() {
@@ -122,5 +121,11 @@ nav.locale-menu-popover {
     padding: $space-x-small $space-small;
     padding-right: $space-base;
   }
+}
+
+.locale-flag {
+  margin-right: $space-xx-small;
+  font-size: 1.2em;
+  line-height: 1;
 }
 </style>

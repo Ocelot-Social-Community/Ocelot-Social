@@ -388,7 +388,7 @@
               :class="{ '--active': locale.code === $i18n.locale() }"
               @click.prevent="changeLocale(locale.code)"
             >
-              <span class="mobile-locale-flag mobile-icon-col">{{ localeFlags[locale.code] }}</span>
+              <span class="mobile-locale-flag mobile-icon-col">{{ locale.flag }}</span>
               {{ locale.name }}
             </a>
           </div>
@@ -552,17 +552,6 @@ export default {
       mobileFilterMenuOpen: false,
       mobileLocaleMenuOpen: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
-      localeFlags: {
-        en: '🇬🇧',
-        de: '🇩🇪',
-        nl: '🇳🇱',
-        fr: '🇫🇷',
-        it: '🇮🇹',
-        es: '🇪🇸',
-        pt: '🇵🇹',
-        pl: '🇵🇱',
-        ru: '🇷🇺',
-      },
     }
   },
   computed: {
