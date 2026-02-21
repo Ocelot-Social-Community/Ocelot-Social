@@ -550,9 +550,6 @@ export default {
     ProfileAvatar,
     SearchField,
   },
-  props: {
-    showMobileMenu: { type: Boolean, default: false },
-  },
   data() {
     return {
       hideNavbar: false,

@@ -1,7 +1,7 @@
 <template>
   <div class="layout-default">
     <div class="main-navigation">
-      <header-menu :showMobileMenu="isMobile" />
+      <header-menu />
     </div>
     <div class="ds-container ds-container-x-large">
       <div class="main-container">
