@@ -6,7 +6,7 @@ import { sentry } from 'graphql-middleware-sentry'
 
 import CONFIG from '@config/index'
 
-// eslint-disable-next-line import/no-mutable-exports, @typescript-eslint/no-explicit-any
+// eslint-disable-next-line import-x/no-mutable-exports, @typescript-eslint/no-explicit-any
 let sentryMiddleware: any = (resolve, root, args, context, resolveInfo) =>
   resolve(root, args, context, resolveInfo)
 

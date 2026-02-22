@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { UserInputError } from 'apollo-server'
-// eslint-disable-next-line import/extensions
+// eslint-disable-next-line import-x/extensions
 import Validator from 'neode/build/Services/Validator.js'
 
 import existingEmailAddress from './helpers/existingEmailAddress'

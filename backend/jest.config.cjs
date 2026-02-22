@@ -1,4 +1,4 @@
-/* eslint-disable import/no-commonjs */
+/* eslint-disable import-x/no-commonjs */
 const requireJSON5 = require('require-json5')
 const { pathsToModuleNameMapper } = require('ts-jest')
 

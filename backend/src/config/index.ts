@@ -3,7 +3,7 @@
 
 /* eslint-disable n/no-process-env */
 import { config } from 'dotenv'
-// eslint-disable-next-line import/no-namespace
+// eslint-disable-next-line import-x/no-namespace
 import * as SMTPTransport from 'nodemailer/lib/smtp-pool'
 
 import emails from './emails'

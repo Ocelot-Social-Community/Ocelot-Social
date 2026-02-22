@@ -2,7 +2,7 @@ import CONFIG from '@config/index'
 
 CONFIG.SUPPORT_EMAIL = 'devops@ocelot.social'
 
-// eslint-disable-next-line import/first
+// eslint-disable-next-line import-x/first
 import { sendWrongEmail } from './sendEmail'
 
 describe('sendWrongEmail', () => {
