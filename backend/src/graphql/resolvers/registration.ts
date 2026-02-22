@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { UserInputError } from 'apollo-server'
+import { UserInputError } from '@graphql/errors'
 import { hash } from 'bcryptjs'
 
 import { getNeode } from '@db/neo4j'

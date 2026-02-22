@@ -31,7 +31,7 @@ const getAllPasswordResets = async () => {
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup()
+  const apolloSetup = await createApolloTestSetup()
   mutate = apolloSetup.mutate
   database = apolloSetup.database
   server = apolloSetup.server

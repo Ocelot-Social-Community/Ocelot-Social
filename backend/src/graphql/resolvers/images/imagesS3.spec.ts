@@ -8,7 +8,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
-import { UserInputError } from 'apollo-server'
+import { UserInputError } from '@graphql/errors'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'

@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { UserInputError } from 'apollo-server'
+import { UserInputError } from '@graphql/errors'
 
 import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
 

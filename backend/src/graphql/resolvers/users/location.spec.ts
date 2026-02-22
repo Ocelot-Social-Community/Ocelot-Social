@@ -70,7 +70,7 @@ const newlyCreatedNodesWithLocales = [
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({
+  const apolloSetup = await createApolloTestSetup({
     context,
   })
   mutate = apolloSetup.mutate

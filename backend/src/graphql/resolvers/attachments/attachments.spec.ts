@@ -8,7 +8,7 @@ import { Readable } from 'node:stream'
 
 import { S3Client } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
-import { UserInputError } from 'apollo-server'
+import { UserInputError } from '@graphql/errors'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { CreateMessage } from '@graphql/queries/CreateMessage'
@@ -57,7 +57,7 @@ let server: ApolloTestSetup['server']
 beforeAll(async () => {
   await cleanDatabase()
 
-  const apolloSetup = createApolloTestSetup({ context })
+  const apolloSetup = await createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   database = apolloSetup.database
   server = apolloSetup.server

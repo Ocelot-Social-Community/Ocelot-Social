@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { UserInputError } from 'apollo-server'
+import { UserInputError } from '@graphql/errors'
 import { v4 as uuid } from 'uuid'
 
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'

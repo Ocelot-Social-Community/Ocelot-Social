@@ -2,7 +2,8 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import path from 'node:path'
 
-import { UserInputError } from 'apollo-server'
+import { UserInputError } from '@graphql/errors'
+import { FileUpload } from 'graphql-upload'
 import slug from 'slugify'
 import { v4 as uuid } from 'uuid'
 

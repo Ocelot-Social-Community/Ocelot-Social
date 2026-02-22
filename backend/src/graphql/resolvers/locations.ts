@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/return-await */
-import { UserInputError } from 'apollo-server'
+import { UserInputError } from '@graphql/errors'
 
 import Resolver from './helpers/Resolver'
 import { queryLocations } from './users/location'

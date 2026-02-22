@@ -41,7 +41,7 @@ let config: Partial<Context['config']>
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ context })
+  const apolloSetup = await createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database

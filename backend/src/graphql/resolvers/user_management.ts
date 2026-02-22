@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { AuthenticationError } from 'apollo-server'
+import { AuthenticationError } from '@graphql/errors'
 import bcrypt from 'bcryptjs'
 
 import { getNeode } from '@db/neo4j'

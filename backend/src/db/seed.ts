@@ -42,7 +42,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     authenticatedUser,
     config: CONFIG,
   })
-  const apolloSetup = createApolloTestSetup({ context })
+  const apolloSetup = await createApolloTestSetup({ context })
   const { mutate, server, database } = apolloSetup
   const { neode } = database
 

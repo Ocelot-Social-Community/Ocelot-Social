@@ -65,7 +65,7 @@ beforeAll(async () => {
     )
     return { authenticatedUser, config }
   }
-  const apolloSetup = createApolloTestSetup({ context })
+  const apolloSetup = await createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database
