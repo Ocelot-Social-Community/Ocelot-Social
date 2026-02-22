@@ -1,13 +1,11 @@
-/* eslint-disable n/no-unpublished-import */
-import { createTestClient } from 'apollo-server-testing'
-
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import databaseContext from '@context/database'
 import { getContext } from '@src/context'
 import createServer from '@src/server'
 
-import type CONFIG from '@src/config'
-import type { Context } from '@src/context'
-import type { ApolloServerExpressConfig } from 'apollo-server-express'
+import type { ApolloServerPlugin } from '@apollo/server'
+import type { DocumentNode } from 'graphql'
 
 export const TEST_CONFIG = {
   NODE_ENV: 'test',
@@ -71,14 +69,14 @@ interface OverwritableContextParams {
 }
 interface CreateTestServerOptions {
   context: () => OverwritableContextParams | Promise<OverwritableContextParams>
-  plugins?: ApolloServerExpressConfig['plugins']
+  plugins?: ApolloServerPlugin[]
 }
 
-export const createApolloTestSetup = (opts?: CreateTestServerOptions) => {
+export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
   const defaultOpts: CreateTestServerOptions = { context: () => ({ authenticatedUser: null }) }
   const { context: testContext, plugins } = opts ?? defaultOpts
   const database = databaseContext()
-  const context = async (req: { headers: { authorization?: string } }) => {
+  const contextFn = async (req: { headers: { authorization?: string } }) => {
     const { authenticatedUser, config = {}, pubsub } = await testContext()
     return getContext({
       authenticatedUser,
@@ -88,11 +86,28 @@ export const createApolloTestSetup = (opts?: CreateTestServerOptions) => {
     })(req)
   }
 
-  const server = createServer({
-    context,
+  const { server } = await createServer({
+    context: contextFn,
     plugins,
-  }).server
-  const { mutate, query } = createTestClient(server)
+  })
+
+  const query = async (queryOpts: { query: DocumentNode | string; variables?: any }) => {
+    const result = await server.executeOperation(
+      { query: queryOpts.query, variables: queryOpts.variables },
+      { contextValue: await contextFn({ headers: {} }) },
+    )
+    if (result.body.kind === 'single') {
+      return {
+        data: (result.body.singleResult.data ?? null) as any,
+        errors: result.body.singleResult.errors,
+      }
+    }
+    return { data: null as any, errors: undefined }
+  }
+
+  const mutate = (mutateOpts: { mutation: DocumentNode | string; variables?: any }) =>
+    query({ query: mutateOpts.mutation, variables: mutateOpts.variables })
+
   return {
     server,
     query,
@@ -101,4 +116,4 @@ export const createApolloTestSetup = (opts?: CreateTestServerOptions) => {
   }
 }
 
-export type ApolloTestSetup = ReturnType<typeof createApolloTestSetup>
+export type ApolloTestSetup = Awaited<ReturnType<typeof createApolloTestSetup>>

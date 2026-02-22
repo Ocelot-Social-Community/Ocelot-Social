@@ -3,8 +3,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { createTestClient } from 'apollo-server-testing'
-
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
 import { CreateSocialMedia } from '@graphql/queries/CreateSocialMedia'
@@ -61,20 +59,21 @@ describe('SocialMedia', () => {
     owner = await ownerNode.toJson()
 
     socialMediaAction = async (user, mutation, variables) => {
-      const { server } = createServer({
-        context: () => {
-          return {
-            user,
-            driver,
-          }
-        },
+      const contextFn = () => ({
+        user,
+        driver,
       })
-      const { mutate } = createTestClient(server)
-
-      return mutate({
-        mutation,
-        variables,
+      const { server } = await createServer({
+        context: async () => contextFn(),
       })
+      const result = await server.executeOperation(
+        { query: mutation, variables },
+        { contextValue: contextFn() as any },
+      )
+      if (result.body.kind === 'single') {
+        return { data: (result.body.singleResult.data ?? null) as any, errors: result.body.singleResult.errors }
+      }
+      return { data: null as any, errors: undefined }
     }
   })
 

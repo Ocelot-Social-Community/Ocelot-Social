@@ -2,8 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createTestClient } from 'apollo-server-testing'
-
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import { Post } from '@graphql/queries/Post'
@@ -15,6 +13,15 @@ let mutate, query, authenticatedUser, variables
 const instance = getNeode()
 const driver = getDriver()
 
+const contextFn = () => ({
+  driver,
+  neode: instance,
+  user: authenticatedUser,
+  cypherParams: {
+    currentUserId: authenticatedUser ? authenticatedUser.id : null,
+  },
+})
+
 describe('shout and unshout posts', () => {
   let currentUser, postAuthor
 
@@ -22,20 +29,20 @@ describe('shout and unshout posts', () => {
     await cleanDatabase()
 
     authenticatedUser = undefined
-    const { server } = createServer({
-      context: () => {
-        return {
-          driver,
-          neode: instance,
-          user: authenticatedUser,
-          cypherParams: {
-            currentUserId: authenticatedUser ? authenticatedUser.id : null,
-          },
-        }
-      },
+    const { server } = await createServer({
+      context: async () => contextFn(),
     })
-    mutate = createTestClient(server).mutate
-    query = createTestClient(server).query
+    query = async (opts) => {
+      const result = await server.executeOperation(
+        { query: opts.query, variables: opts.variables },
+        { contextValue: await contextFn() as any },
+      )
+      if (result.body.kind === 'single') {
+        return { data: (result.body.singleResult.data ?? null) as any, errors: result.body.singleResult.errors }
+      }
+      return { data: null as any, errors: undefined }
+    }
+    mutate = (opts) => query({ query: opts.mutation, variables: opts.variables })
   })
 
   afterAll(async () => {

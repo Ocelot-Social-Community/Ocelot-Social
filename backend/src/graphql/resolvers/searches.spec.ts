@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createTestClient } from 'apollo-server-testing'
-
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import { searchPosts } from '@graphql/queries/searchPosts'
@@ -14,19 +12,28 @@ let query, authenticatedUser, user
 const driver = getDriver()
 const neode = getNeode()
 
+const contextFn = () => ({
+  driver,
+  neode,
+  user: authenticatedUser,
+})
+
 beforeAll(async () => {
   await cleanDatabase()
 
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode,
-        user: authenticatedUser,
-      }
-    },
+  const { server } = await createServer({
+    context: async () => contextFn(),
   })
-  query = createTestClient(server).query
+  query = async (opts) => {
+    const result = await server.executeOperation(
+      { query: opts.query, variables: opts.variables },
+      { contextValue: await contextFn() as any },
+    )
+    if (result.body.kind === 'single') {
+      return { data: (result.body.singleResult.data ?? null) as any, errors: result.body.singleResult.errors }
+    }
+    return { data: null as any, errors: undefined }
+  }
 })
 
 afterAll(async () => {

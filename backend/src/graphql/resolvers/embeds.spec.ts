@@ -5,7 +5,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { createTestClient } from 'apollo-server-testing'
 import fetch from 'node-fetch'
 
 import { embed } from '@graphql/queries/embed'
@@ -61,11 +60,18 @@ describe('Query', () => {
 
     beforeEach(() => {
       embedAction = async (variables) => {
-        const { server } = createServer({
-          context: () => {},
+        const contextFn = async () => ({})
+        const { server } = await createServer({
+          context: contextFn,
         })
-        const { query } = createTestClient(server)
-        return query({ query: embed, variables })
+        const result = await server.executeOperation(
+          { query: embed, variables },
+          { contextValue: await contextFn() as any },
+        )
+        if (result.body.kind === 'single') {
+          return { data: (result.body.singleResult.data ?? null) as any, errors: result.body.singleResult.errors }
+        }
+        return { data: null as any, errors: undefined }
       }
     })
 

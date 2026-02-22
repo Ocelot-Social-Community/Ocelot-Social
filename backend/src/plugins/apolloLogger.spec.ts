@@ -7,11 +7,7 @@ import { login } from '@src/graphql/queries/login'
 import ocelotLogger from '@src/logger'
 import { loggerPlugin } from '@src/plugins/apolloLogger'
 
-import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
-import type { ApolloServer } from 'apollo-server-express'
-
-let server: ApolloServer
+let server: ApolloTestSetup['server']
 
 const authenticatedUser: Context['user'] = null
 let mutate: ApolloTestSetup['mutate']
@@ -20,7 +16,7 @@ const context = () => ({ authenticatedUser })
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ context, plugins: [loggerPlugin] })
+  const apolloSetup = await createApolloTestSetup({ context, plugins: [loggerPlugin] })
   mutate = apolloSetup.mutate
   database = apolloSetup.database
   server = apolloSetup.server

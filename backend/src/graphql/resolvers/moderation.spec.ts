@@ -2,8 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createTestClient } from 'apollo-server-testing'
-
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import { review } from '@graphql/queries/review'
@@ -20,21 +18,31 @@ let mutate,
   nonModerator,
   closeReportVariables
 
+const contextFn = () => ({
+  driver,
+  neode,
+  user: authenticatedUser,
+})
+
 describe('moderate resources', () => {
   beforeAll(async () => {
     await cleanDatabase()
 
     authenticatedUser = undefined
-    const { server } = createServer({
-      context: () => {
-        return {
-          driver,
-          neode,
-          user: authenticatedUser,
-        }
-      },
+    const { server } = await createServer({
+      context: async () => contextFn(),
     })
-    mutate = createTestClient(server).mutate
+    const query = async (opts) => {
+      const result = await server.executeOperation(
+        { query: opts.query, variables: opts.variables },
+        { contextValue: await contextFn() as any },
+      )
+      if (result.body.kind === 'single') {
+        return { data: (result.body.singleResult.data ?? null) as any, errors: result.body.singleResult.errors }
+      }
+      return { data: null as any, errors: undefined }
+    }
+    mutate = (opts) => query({ query: opts.mutation, variables: opts.variables })
   })
 
   afterAll(async () => {

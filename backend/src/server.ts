@@ -8,46 +8,77 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import http from 'node:http'
 
-import { ApolloServer } from 'apollo-server-express'
+import { ApolloServer } from '@apollo/server'
+import { expressMiddleware } from '@apollo/server/express4'
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
 import bodyParser from 'body-parser'
 import express from 'express'
 import { graphqlUploadExpress } from 'graphql-upload'
+import { useServer } from 'graphql-ws/lib/use/ws'
 import helmet from 'helmet'
+import { WebSocketServer } from 'ws'
 
 import CONFIG from './config'
-import { context, getContext } from './context'
+import { getContext } from './context'
 import schema from './graphql/schema'
 import logger from './logger'
 import middleware from './middleware'
 
-import type { ApolloServerExpressConfig } from 'apollo-server-express'
+import type { ApolloServerPlugin, BaseContext } from '@apollo/server'
 
-const createServer = (options?: ApolloServerExpressConfig) => {
-  const defaults: ApolloServerExpressConfig = {
-    context,
-    schema: middleware(schema),
-    subscriptions: {
-      keepAlive: 10000,
-      onConnect: async (connectionParams) =>
-        getContext()(connectionParams as { headers: { authorization?: string } }),
+interface CreateServerOptions {
+  context?: (req: { headers: { authorization?: string } }) => Promise<any>
+  plugins?: ApolloServerPlugin<BaseContext>[]
+}
+
+const createServer = async (options?: CreateServerOptions) => {
+  const app = express()
+  const httpServer = http.createServer(app)
+  const appliedSchema = middleware(schema)
+
+  // WebSocket server for subscriptions
+  const wsServer = new WebSocketServer({ server: httpServer, path: '/' })
+  const serverCleanup = useServer(
+    {
+      schema: appliedSchema,
+      context: async (ctx) =>
+        getContext()(ctx.connectionParams as { headers: { authorization?: string } }),
       onDisconnect: () => {
         logger.debug('WebSocket client disconnected')
       },
     },
-    debug: !!CONFIG.DEBUG,
-    uploads: false,
-    tracing: !!CONFIG.DEBUG,
-    formatError: (error) => {
-      // console.log(error.originalError)
-      if (error.message === 'ERROR_VALIDATION') {
-        return new Error((error.originalError as any).details.map((d) => d.message))
-      }
-      return error
-    },
-  }
-  const server = new ApolloServer(Object.assign(defaults, options))
+    wsServer,
+  )
 
-  const app = express()
+  const server = new ApolloServer({
+    schema: appliedSchema,
+    formatError: (formattedError, error) => {
+      if (formattedError.message === 'ERROR_VALIDATION') {
+        return {
+          ...formattedError,
+          message: String(
+            ((error as any).originalError as any)?.details?.map((d) => d.message) ?? formattedError.message,
+          ),
+        }
+      }
+      return formattedError
+    },
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              await serverCleanup.dispose()
+            },
+          }
+        },
+      },
+      ...(options?.plugins ?? []),
+    ],
+  })
+
+  await server.start()
 
   // TODO: this exception is required for the graphql playground, since the playground loads external resources
   // See: https://github.com/graphql/graphql-playground/issues/1283
@@ -57,12 +88,20 @@ const createServer = (options?: ApolloServerExpressConfig) => {
     ) as any,
   )
   app.use(express.static('public'))
-  app.use(bodyParser.json({ limit: '10mb' }) as any)
-  app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }) as any)
   app.use(graphqlUploadExpress())
-  server.applyMiddleware({ app, path: '/' })
-  const httpServer = http.createServer(app)
-  server.installSubscriptionHandlers(httpServer)
+  app.use(
+    '/',
+    bodyParser.json({ limit: '10mb' }) as any,
+    bodyParser.urlencoded({ limit: '10mb', extended: true }) as any,
+    expressMiddleware(server, {
+      context: async ({ req }) => {
+        if (options?.context) {
+          return options.context(req)
+        }
+        return getContext()(req)
+      },
+    }),
+  )
 
   return { server, httpServer, app }
 }

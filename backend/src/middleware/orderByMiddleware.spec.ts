@@ -1,5 +1,3 @@
-import { createTestClient } from 'apollo-server-testing'
-
 import { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import { Post } from '@graphql/queries/Post'
@@ -8,22 +6,33 @@ import createServer from '@src/server'
 const neode = getNeode()
 const driver = getDriver()
 
-const { server } = createServer({
-  context: () => {
-    return {
-      user: null,
-      neode,
-      driver,
-      cypherParams: {
-        currentUserId: null,
-      },
-    }
+let query
+
+const contextFn = () => ({
+  user: null,
+  neode,
+  driver,
+  cypherParams: {
+    currentUserId: null,
   },
 })
-const { query } = createTestClient(server)
 
 beforeAll(async () => {
   await cleanDatabase()
+
+  const { server } = await createServer({
+    context: async () => contextFn(),
+  })
+  query = async (opts) => {
+    const result = await server.executeOperation(
+      { query: opts.query, variables: opts.variables },
+      { contextValue: await contextFn() as any },
+    )
+    if (result.body.kind === 'single') {
+      return { data: (result.body.singleResult.data ?? null) as any, errors: result.body.singleResult.errors }
+    }
+    return { data: null as any, errors: undefined }
+  }
 })
 
 afterAll(async () => {

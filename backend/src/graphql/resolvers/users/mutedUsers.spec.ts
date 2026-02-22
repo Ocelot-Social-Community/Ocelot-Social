@@ -2,9 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable jest/expect-expect */
-import { createTestClient } from 'apollo-server-testing'
-
 import { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import { mutedUsers } from '@graphql/queries/mutedUsers'
@@ -20,7 +17,17 @@ const neode = getNeode()
 let currentUser
 let mutedUser
 let authenticatedUser
-let server
+let serverQuery
+let serverMutate
+
+const contextFn = () => ({
+  user: authenticatedUser,
+  driver,
+  neode,
+  cypherParams: {
+    currentUserId: authenticatedUser ? authenticatedUser.id : null,
+  },
+})
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -31,20 +38,22 @@ afterAll(async () => {
   await driver.close()
 })
 
-beforeEach(() => {
+beforeEach(async () => {
   authenticatedUser = undefined
-  ;({ server } = createServer({
-    context: () => {
-      return {
-        user: authenticatedUser,
-        driver,
-        neode,
-        cypherParams: {
-          currentUserId: authenticatedUser ? authenticatedUser.id : null,
-        },
-      }
-    },
-  }))
+  const { server } = await createServer({
+    context: async () => contextFn(),
+  })
+  serverQuery = async (opts) => {
+    const result = await server.executeOperation(
+      { query: opts.query, variables: opts.variables },
+      { contextValue: await contextFn() as any },
+    )
+    if (result.body.kind === 'single') {
+      return { data: (result.body.singleResult.data ?? null) as any, errors: result.body.singleResult.errors }
+    }
+    return { data: null as any, errors: undefined }
+  }
+  serverMutate = (opts) => serverQuery({ query: opts.mutation, variables: opts.variables })
 })
 
 // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
@@ -54,8 +63,7 @@ afterEach(async () => {
 
 describe('mutedUsers', () => {
   it('throws permission error', async () => {
-    const { query } = createTestClient(server)
-    const result = await query({ query: mutedUsers })
+    const result = await serverQuery({ query: mutedUsers })
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
   })
@@ -75,8 +83,7 @@ describe('mutedUsers', () => {
     })
 
     it('returns a list of muted users', async () => {
-      const { query } = createTestClient(server)
-      await expect(query({ query: mutedUsers })).resolves.toEqual(
+      await expect(serverQuery({ query: mutedUsers })).resolves.toEqual(
         expect.objectContaining({
           data: {
             mutedUsers: [
@@ -98,9 +105,8 @@ describe('muteUser', () => {
 
   beforeEach(() => {
     currentUser = undefined
-    muteAction = async (variables) => {
-      const { mutate } = createTestClient(server)
-      return mutate({ mutation: muteUser, variables })
+    muteAction = (variables) => {
+      return serverMutate({ mutation: muteUser, variables })
     }
   })
 
@@ -154,8 +160,7 @@ describe('muteUser', () => {
 
       it('unfollows the user', async () => {
         await currentUser.relateTo(mutedUser, 'following')
-        const { query } = createTestClient(server)
-        await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
+        await expect(serverQuery({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
           data: {
             User: expect.arrayContaining([
               expect.objectContaining({ id: 'u2', isMuted: false, followedByCurrentUser: true }),
@@ -163,7 +168,7 @@ describe('muteUser', () => {
           },
         })
         await muteAction({ id: 'u2' })
-        await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
+        await expect(serverQuery({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
           data: {
             User: expect.arrayContaining([
               expect.objectContaining({ id: 'u2', isMuted: true, followedByCurrentUser: false }),
@@ -191,9 +196,8 @@ describe('muteUser', () => {
         })
 
         const bothPostsAreInTheNewsfeed = async () => {
-          const { query } = createTestClient(server)
           await expect(
-            query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+            serverQuery({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
           ).resolves.toMatchObject({
             data: {
               Post: expect.arrayContaining([
@@ -227,9 +231,8 @@ describe('muteUser', () => {
             })
 
             it("the muted user's post won't show up in the newsfeed of the current user", async () => {
-              const { query } = createTestClient(server)
               await expect(
-                query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+                serverQuery({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
               ).resolves.toMatchObject({
                 data: {
                   Post: [
@@ -244,8 +247,7 @@ describe('muteUser', () => {
             })
 
             it("the muted user's post is still accessible by direct id lookup", async () => {
-              const { query } = createTestClient(server)
-              await expect(query({ query: Post, variables: { id: 'p23' } })).resolves.toMatchObject(
+              await expect(serverQuery({ query: Post, variables: { id: 'p23' } })).resolves.toMatchObject(
                 {
                   data: {
                     Post: [
@@ -271,9 +273,8 @@ describe('muteUser', () => {
               })
 
               it('the pinned post still shows up in the post list', async () => {
-                const { query } = createTestClient(server)
                 await expect(
-                  query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+                  serverQuery({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
                 ).resolves.toMatchObject({
                   data: {
                     Post: expect.arrayContaining([
@@ -288,9 +289,8 @@ describe('muteUser', () => {
               })
 
               it('the pinned post is accessible by id', async () => {
-                const { query } = createTestClient(server)
                 await expect(
-                  query({ query: Post, variables: { id: 'p-pinned' } }),
+                  serverQuery({ query: Post, variables: { id: 'p-pinned' } }),
                 ).resolves.toMatchObject({
                   data: {
                     Post: [
@@ -305,8 +305,7 @@ describe('muteUser', () => {
               })
 
               it('the non-pinned post from the muted user is still hidden in the feed', async () => {
-                const { query } = createTestClient(server)
-                const result = await query({
+                const result = await serverQuery({
                   query: Post,
                   variables: { orderBy: 'createdAt_asc' },
                 })
@@ -330,9 +329,8 @@ describe('muteUser', () => {
             })
 
             it("the current user's post will show up in the newsfeed of the muted user", async () => {
-              const { query } = createTestClient(server)
               await expect(
-                query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+                serverQuery({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
               ).resolves.toMatchObject({
                 data: {
                   Post: expect.arrayContaining([
@@ -362,9 +360,8 @@ describe('unmuteUser', () => {
 
   beforeEach(() => {
     currentUser = undefined
-    unmuteAction = async (variables) => {
-      const { mutate } = createTestClient(server)
-      return mutate({ mutation: unmuteUser, variables })
+    unmuteAction = (variables) => {
+      return serverMutate({ mutation: unmuteUser, variables })
     }
   })
 

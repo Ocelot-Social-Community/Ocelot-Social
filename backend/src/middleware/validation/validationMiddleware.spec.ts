@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createTestClient } from 'apollo-server-testing'
-
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
 import { CreateComment } from '@graphql/queries/CreateComment'
@@ -24,19 +22,28 @@ let authenticatedUser,
   moderatingUser,
   commentingUser
 
+const contextFn = () => ({
+  user: authenticatedUser,
+  neode,
+  driver,
+})
+
 beforeAll(async () => {
   await cleanDatabase()
 
-  const { server } = createServer({
-    context: () => {
-      return {
-        user: authenticatedUser,
-        neode,
-        driver,
-      }
-    },
+  const { server } = await createServer({
+    context: async () => contextFn(),
   })
-  mutate = createTestClient(server).mutate
+  mutate = async (opts) => {
+    const result = await server.executeOperation(
+      { query: opts.mutation, variables: opts.variables },
+      { contextValue: await contextFn() as any },
+    )
+    if (result.body.kind === 'single') {
+      return { data: (result.body.singleResult.data ?? null) as any, errors: result.body.singleResult.errors }
+    }
+    return { data: null as any, errors: undefined }
+  }
 })
 
 afterAll(async () => {
