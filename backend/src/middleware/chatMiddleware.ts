@@ -4,6 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { isArray } from 'lodash'
 
+import type { IMiddlewareResolver } from 'graphql-middleware'
+
 const setRoomProps = (room) => {
   if (room.users) {
     room.users.forEach((user) => {
@@ -22,7 +24,7 @@ const setMessageProps = (message, context) => {
   }
 }
 
-const roomProperties = async (resolve, root, args, context, info) => {
+const roomProperties: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   const resolved = await resolve(root, args, context, info)
   if (resolved) {
     if (isArray(resolved)) {
@@ -36,7 +38,7 @@ const roomProperties = async (resolve, root, args, context, info) => {
   return resolved
 }
 
-const messageProperties = async (resolve, root, args, context, info) => {
+const messageProperties: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   const resolved = await resolve(root, args, context, info)
   if (resolved) {
     if (isArray(resolved)) {

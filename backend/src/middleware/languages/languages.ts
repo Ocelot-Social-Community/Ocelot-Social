@@ -8,6 +8,8 @@ import LanguageDetect from 'languagedetect'
 
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 
+import type { IMiddlewareResolver } from 'graphql-middleware'
+
 const setPostLanguage = (text, defaultLanguage) => {
   const lngDetector = new LanguageDetect()
   lngDetector.setLanguageType('iso2')
@@ -18,15 +20,19 @@ const setPostLanguage = (text, defaultLanguage) => {
   return languages[0][0]
 }
 
+const createPost: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+  args.language = await setPostLanguage(args.content, context.user.locale)
+  return resolve(root, args, context, info)
+}
+
+const updatePost: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+  args.language = await setPostLanguage(args.content, context.user.locale)
+  return resolve(root, args, context, info)
+}
+
 export default {
   Mutation: {
-    CreatePost: async (resolve, root, args, context, info) => {
-      args.language = await setPostLanguage(args.content, context.user.locale)
-      return resolve(root, args, context, info)
-    },
-    UpdatePost: async (resolve, root, args, context, info) => {
-      args.language = await setPostLanguage(args.content, context.user.locale)
-      return resolve(root, args, context, info)
-    },
+    CreatePost: createPost,
+    UpdatePost: updatePost,
   },
 }

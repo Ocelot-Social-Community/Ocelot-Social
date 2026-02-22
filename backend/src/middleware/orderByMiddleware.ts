@@ -4,7 +4,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import cloneDeep from 'lodash/cloneDeep'
 
-const defaultOrderBy = (resolve, root, args, context, resolveInfo) => {
+import type { IMiddlewareResolver } from 'graphql-middleware'
+
+const defaultOrderBy: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
   const copy = cloneDeep(resolveInfo)
   const [fieldNode] = copy.fieldNodes
   if (fieldNode) {

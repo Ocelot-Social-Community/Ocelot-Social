@@ -16,6 +16,8 @@ import { sendNotificationMail, sendChatMessageMail } from '@src/emails/sendEmail
 
 import extractMentionedUsers from './mentions/extractMentionedUsers'
 
+import type { IMiddlewareResolver } from 'graphql-middleware'
+
 const publishNotifications = async (
   context,
   notificationsPromise,
@@ -38,7 +40,7 @@ const publishNotifications = async (
   return emailsSent
 }
 
-const handleJoinGroup = async (resolve, root, args, context, resolveInfo) => {
+const handleJoinGroup: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
@@ -51,7 +53,7 @@ const handleJoinGroup = async (resolve, root, args, context, resolveInfo) => {
   return user
 }
 
-const handleLeaveGroup = async (resolve, root, args, context, resolveInfo) => {
+const handleLeaveGroup: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
@@ -64,7 +66,7 @@ const handleLeaveGroup = async (resolve, root, args, context, resolveInfo) => {
   return user
 }
 
-const handleChangeGroupMemberRole = async (resolve, root, args, context, resolveInfo) => {
+const handleChangeGroupMemberRole: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
@@ -77,7 +79,7 @@ const handleChangeGroupMemberRole = async (resolve, root, args, context, resolve
   return user
 }
 
-const handleRemoveUserFromGroup = async (resolve, root, args, context, resolveInfo) => {
+const handleRemoveUserFromGroup: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
@@ -90,7 +92,7 @@ const handleRemoveUserFromGroup = async (resolve, root, args, context, resolveIn
   return user
 }
 
-const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo) => {
+const handleContentDataOfPost: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
   const { groupId } = args
   const idsOfUsers = extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
@@ -118,7 +120,7 @@ const handleContentDataOfPost = async (resolve, root, args, context, resolveInfo
   return post
 }
 
-const handleContentDataOfComment = async (resolve, root, args, context, resolveInfo) => {
+const handleContentDataOfComment: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
   const { content } = args
   let idsOfMentionedUsers = extractMentionedUsers(content)
   const comment = await resolve(root, args, context, resolveInfo)
@@ -419,7 +421,7 @@ const notifyUsersOfComment = async (label, commentId, reason, context) => {
   }
 }
 
-const handleCreateMessage = async (resolve, root, args, context, resolveInfo) => {
+const handleCreateMessage: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
   // Execute resolver
   const message = await resolve(root, args, context, resolveInfo)
 
