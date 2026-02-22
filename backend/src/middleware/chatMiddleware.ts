@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { isArray } from 'lodash'
 
-import type { IMiddlewareResolver } from 'graphql-middleware'
+import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
 
 const setRoomProps = (room) => {
   if (room.users) {

@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import type { IMiddlewareResolver } from 'graphql-middleware'
+import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
 
 const createRelatedCypher = (relation) => `
 MATCH (user:User { id: $currentUser})

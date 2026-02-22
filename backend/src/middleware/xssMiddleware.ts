@@ -8,7 +8,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { cleanHtml } from './helpers/cleanHtml'
 
-import type { IMiddlewareResolver } from 'graphql-middleware'
+import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
 
 /**
  * iterate through all fields and replace it with the callback result

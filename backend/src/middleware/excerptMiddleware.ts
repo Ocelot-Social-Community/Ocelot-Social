@@ -7,7 +7,7 @@ import trunc from 'trunc-html'
 
 import { DESCRIPTION_EXCERPT_HTML_LENGTH } from '@constants/groups'
 
-import type { IMiddlewareResolver } from 'graphql-middleware'
+import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
 
 const createGroup: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   args.descriptionExcerpt = trunc(args.description, DESCRIPTION_EXCERPT_HTML_LENGTH).html

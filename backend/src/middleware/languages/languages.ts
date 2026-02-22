@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/await-thenable */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -8,7 +7,7 @@ import LanguageDetect from 'languagedetect'
 
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 
-import type { IMiddlewareResolver } from 'graphql-middleware'
+import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
 
 const setPostLanguage = (text, defaultLanguage) => {
   const lngDetector = new LanguageDetect()
