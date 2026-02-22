@@ -61,7 +61,7 @@ const createServer = async (options?: CreateServerOptions) => {
       schema: appliedSchema,
       execute,
       subscribe,
-      onConnect: (connectionParams: Record<string, unknown>) => {
+      onConnect: async (connectionParams: Record<string, unknown>) => {
         return getContext()(connectionParams as { headers: { authorization?: string } })
       },
       onDisconnect: () => {
