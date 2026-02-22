@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+import { print } from 'graphql'
 import { makeAugmentedSchema } from 'neo4j-graphql-js'
 
 import typeDefs from '@graphql/types/index'
@@ -6,7 +7,7 @@ import typeDefs from '@graphql/types/index'
 import resolvers from './resolvers'
 
 export default makeAugmentedSchema({
-  typeDefs,
+  typeDefs: print(typeDefs),
   resolvers,
   config: {
     query: {
