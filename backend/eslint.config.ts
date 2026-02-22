@@ -74,6 +74,8 @@ export default [
       '@typescript-eslint/no-unnecessary-condition': 'off',
       // Allow string.match(regex) instead of regex.exec(string)
       '@typescript-eslint/prefer-regexp-exec': 'off',
+      // TODO: gradually add return types to exported functions, then remove this override
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
       // Allow @/* path aliases in relative parent imports
       'import-x/no-relative-parent-imports': ['error', { ignore: ['@/*'] }],
     },
