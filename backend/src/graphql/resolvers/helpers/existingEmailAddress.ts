@@ -21,7 +21,8 @@ export default async function alreadyExistingMail({ args, context }) {
       return existingEmailAddressTransactionResponse.records.map((record) => {
         return {
           alreadyExistingEmail: record.get('email').properties,
-          user: record.get('user')?.properties,
+          // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
+          user: record.get('user') && record.get('user').properties,
         }
       })
     })
