@@ -10,9 +10,9 @@ async function main() {
   const url = new URL(CONFIG.GRAPHQL_URI)
   httpServer.listen({ port: url.port }, () => {
     /* eslint-disable-next-line no-console */
-    console.log(`Server ready at http://localhost:${url.port}/`)
+    console.log(`🚀 Server ready at http://localhost:${url.port}/`)
     /* eslint-disable-next-line no-console */
-    console.log(`Subscriptions ready at ws://localhost:${url.port}/`)
+    console.log(`🚀 Subscriptions ready at ws://localhost:${url.port}/`)
   })
 
   if (CONFIG.PROXY_S3) {
