@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -10,7 +9,7 @@ import path from 'node:path'
 import fetch from 'node-fetch'
 
 import { embed } from '@graphql/queries/embed'
-import createServer from '@src/server'
+import { createApolloTestSetup } from '@root/test/helpers'
 
 jest.mock('node-fetch')
 const mockedFetch = jest.mocked(fetch)
@@ -62,21 +61,8 @@ describe('Query', () => {
 
     beforeEach(() => {
       embedAction = async (variables) => {
-        const contextFn = async () => ({})
-        const { server } = await createServer({
-          context: contextFn,
-        })
-        const result = await server.executeOperation(
-          { query: embed, variables },
-          { contextValue: (await contextFn()) as any },
-        )
-        if (result.body.kind === 'single') {
-          return {
-            data: (result.body.singleResult.data ?? null) as any,
-            errors: result.body.singleResult.errors,
-          }
-        }
-        return { data: null as any, errors: undefined }
+        const { query } = await createApolloTestSetup({ context: () => ({}) })
+        return query({ query: embed, variables })
       }
     })
 

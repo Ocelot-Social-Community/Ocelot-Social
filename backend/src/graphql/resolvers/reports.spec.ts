@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/await-thenable */
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -7,10 +5,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver, getNeode } from '@db/neo4j'
+import { createApolloTestSetup } from '@root/test/helpers'
 import { fileReport } from '@graphql/queries/fileReport'
 import { reports } from '@graphql/queries/reports'
 import { review } from '@graphql/queries/review'
-import createServer from '@src/server'
 
 const instance = getNeode()
 const driver = getDriver()
@@ -25,31 +23,12 @@ describe('reports', () => {
   }
 
   const contextFn = () => ({
-    driver,
-    neode: instance,
-    user: authenticatedUser,
+    authenticatedUser,
   })
 
   beforeAll(async () => {
     await cleanDatabase()
-
-    const { server } = await createServer({
-      context: async () => contextFn(),
-    })
-    query = async (opts) => {
-      const result = await server.executeOperation(
-        { query: opts.query, variables: opts.variables },
-        { contextValue: (await contextFn()) as any },
-      )
-      if (result.body.kind === 'single') {
-        return {
-          data: (result.body.singleResult.data ?? null) as any,
-          errors: result.body.singleResult.errors,
-        }
-      }
-      return { data: null as any, errors: undefined }
-    }
-    mutate = (opts) => query({ query: opts.mutation, variables: opts.variables })
+    ;({ query, mutate } = await createApolloTestSetup({ context: contextFn }))
   })
 
   afterAll(async () => {

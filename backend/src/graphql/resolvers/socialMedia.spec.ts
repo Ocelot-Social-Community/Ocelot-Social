@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -6,10 +5,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
+import { createApolloTestSetup } from '@root/test/helpers'
 import { CreateSocialMedia } from '@graphql/queries/CreateSocialMedia'
 import { DeleteSocialMedia } from '@graphql/queries/DeleteSocialMedia'
 import { UpdateSocialMedia } from '@graphql/queries/UpdateSocialMedia'
-import createServer from '@src/server'
 
 const driver = getDriver()
 
@@ -60,24 +59,8 @@ describe('SocialMedia', () => {
     owner = await ownerNode.toJson()
 
     socialMediaAction = async (user, mutation, variables) => {
-      const contextFn = () => ({
-        user,
-        driver,
-      })
-      const { server } = await createServer({
-        context: async () => contextFn(),
-      })
-      const result = await server.executeOperation(
-        { query: mutation, variables },
-        { contextValue: contextFn() as any },
-      )
-      if (result.body.kind === 'single') {
-        return {
-          data: (result.body.singleResult.data ?? null) as any,
-          errors: result.body.singleResult.errors,
-        }
-      }
-      return { data: null as any, errors: undefined }
+      const { query } = await createApolloTestSetup({ context: () => ({ authenticatedUser: user }) })
+      return query({ query: mutation, variables })
     }
   })
 
