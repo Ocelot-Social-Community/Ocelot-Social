@@ -166,7 +166,7 @@ describe('delete Attachment', () => {
             throw new Error('Ouch!')
           })
           // eslint-disable-next-line no-catch-all/no-catch-all
-        } catch (_err) {
+        } catch {
           // nothing has been deleted
           await expect(database.neode.all('File')).resolves.toHaveLength(1)
           // all good
@@ -307,7 +307,7 @@ describe('add Attachment', () => {
               return transaction.run('Ooops invalid cypher!', { file })
             })
             // eslint-disable-next-line no-catch-all/no-catch-all
-          } catch (_err) {
+          } catch {
             // nothing has been created
             await expect(database.neode.all('File')).resolves.toHaveLength(0)
             // all good
