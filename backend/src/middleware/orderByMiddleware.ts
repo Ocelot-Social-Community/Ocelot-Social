@@ -9,15 +9,18 @@ const defaultOrderBy: IMiddlewareResolver = (resolve, root, args, context, resol
   const copy = cloneDeep(resolveInfo)
   const [fieldNode] = copy.fieldNodes
   if (fieldNode) {
+    // @ts-expect-error cloneDeep returns mutable copy, but TS sees readonly type
     const orderByArg = fieldNode.arguments.find((arg) => arg.name.value === 'orderBy')
 
     if (!orderByArg) {
+      // @ts-expect-error cloneDeep returns mutable copy, but TS sees readonly type
       fieldNode.arguments.push({
         kind: 'Argument',
         name: { kind: 'Name', value: 'orderBy' },
         value: { kind: 'EnumValue', value: 'sortDate_desc' },
       })
     } else if (args.orderBy === undefined) {
+      // @ts-expect-error cloneDeep returns mutable copy, but TS sees readonly type
       orderByArg.value = { kind: 'EnumValue', value: 'sortDate_desc' }
     }
   }
