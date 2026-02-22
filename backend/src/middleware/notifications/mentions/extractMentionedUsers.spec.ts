@@ -24,7 +24,7 @@ describe('extractMentionedUsers', () => {
     expect(extractMentionedUsers(contentWithDuplicateIds)).toEqual(['you'])
   })
 
-  describe('given a link with .mention class and `data-mention-id` attribute ', () => {
+  describe('given a link with .mention class and `data-mention-id` attribute', () => {
     it('extracts ids', () => {
       expect(extractMentionedUsers(contentWithMentions)).toEqual(['u3'])
     })

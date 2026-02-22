@@ -4,17 +4,21 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import { UserInputError } from 'apollo-server'
 import { v4 as uuid } from 'uuid'
 
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '@constants/groups'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
-import type { Context } from '@src/context'
 
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
+
+import type { Context } from '@src/context'
 
 export default {
   Query: {
@@ -211,7 +215,7 @@ export default {
           if (!context.user) {
             throw new Error('Missing authenticated user.')
           }
-          if (config.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
+          if (config.CATEGORIES_ACTIVE && categoryIds?.length) {
             await transaction.run(
               `
                 MATCH (group:Group {id: $groupId})-[previousRelations:CATEGORIZED]->(:Category)
@@ -226,7 +230,7 @@ export default {
             SET group.updatedAt = toString(datetime())
             WITH group
           `
-          if (config.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
+          if (config.CATEGORIES_ACTIVE && categoryIds?.length) {
             updateGroupCypher += `
               UNWIND $categoryIds AS categoryId
               MATCH (category:Category {id: categoryId})

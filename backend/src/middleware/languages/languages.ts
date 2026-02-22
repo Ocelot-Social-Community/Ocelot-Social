@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/await-thenable */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -7,6 +6,8 @@
 import LanguageDetect from 'languagedetect'
 
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
+
+import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
 
 const setPostLanguage = (text, defaultLanguage) => {
   const lngDetector = new LanguageDetect()
@@ -18,15 +19,19 @@ const setPostLanguage = (text, defaultLanguage) => {
   return languages[0][0]
 }
 
+const createPost: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+  args.language = await setPostLanguage(args.content, context.user.locale)
+  return resolve(root, args, context, info)
+}
+
+const updatePost: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+  args.language = await setPostLanguage(args.content, context.user.locale)
+  return resolve(root, args, context, info)
+}
+
 export default {
   Mutation: {
-    CreatePost: async (resolve, root, args, context, info) => {
-      args.language = await setPostLanguage(args.content, context.user.locale)
-      return resolve(root, args, context, info)
-    },
-    UpdatePost: async (resolve, root, args, context, info) => {
-      args.language = await setPostLanguage(args.content, context.user.locale)
-      return resolve(root, args, context, info)
-    },
+    CreatePost: createPost,
+    UpdatePost: updatePost,
   },
 }

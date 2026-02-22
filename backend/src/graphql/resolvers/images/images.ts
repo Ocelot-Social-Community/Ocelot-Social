@@ -1,8 +1,7 @@
-import type { Context } from '@src/context'
-import type { FileDeleteCallback, FileUploadCallback } from '@src/uploads/types'
-
 import { images as imagesS3 } from './imagesS3'
 
+import type { Context } from '@src/context'
+import type { FileDeleteCallback, FileUploadCallback } from '@src/uploads/types'
 import type { FileUpload } from 'graphql-upload'
 import type { Transaction } from 'neo4j-driver'
 

@@ -3,6 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import { Readable } from 'node:stream'
 
 import { Upload } from 'graphql-upload/public/index'
@@ -14,8 +16,9 @@ import { CreateRoom } from '@graphql/queries/CreateRoom'
 import { MarkMessagesAsSeen } from '@graphql/queries/MarkMessagesAsSeen'
 import { Message } from '@graphql/queries/Message'
 import { Room } from '@graphql/queries/Room'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 let authenticatedUser: Context['user']

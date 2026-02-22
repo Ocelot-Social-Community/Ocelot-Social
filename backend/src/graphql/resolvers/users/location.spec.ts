@@ -4,8 +4,9 @@
 import Factory, { cleanDatabase } from '@db/factories'
 import { queryLocations } from '@graphql/queries/queryLocations'
 import { UpdateUser } from '@graphql/queries/UpdateUser'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 let variables

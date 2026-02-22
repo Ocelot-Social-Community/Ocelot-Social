@@ -3,6 +3,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable jest/no-commented-out-tests */
 import Factory, { cleanDatabase } from '@db/factories'
 import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
 import { CreateGroup } from '@graphql/queries/CreateGroup'
@@ -12,8 +15,9 @@ import { JoinGroup } from '@graphql/queries/JoinGroup'
 import { LeaveGroup } from '@graphql/queries/LeaveGroup'
 import { RemoveUserFromGroup } from '@graphql/queries/RemoveUserFromGroup'
 import { UpdateGroup } from '@graphql/queries/UpdateGroup'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 // import CONFIG from '@src/config'
 
@@ -2982,7 +2986,7 @@ describe('in mode', () => {
                 })
               })
 
-              describe('"locationName" is empty string – shall change location "Hamburg" to unset location ', () => {
+              describe('"locationName" is empty string – shall change location "Hamburg" to unset location', () => {
                 it('has updated the location to unset', async () => {
                   await expect(
                     mutate({

@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { UserInputError } from 'apollo-server'
-// eslint-disable-next-line import/extensions
+// eslint-disable-next-line import-x/extensions
 import Validator from 'neode/build/Services/Validator.js'
 
 import existingEmailAddress from './helpers/existingEmailAddress'
@@ -38,7 +38,7 @@ export default {
       try {
         const { neode } = context
         await new Validator(neode, neode.model('UnverifiedEmailAddress'), args)
-      } catch (e) {
+      } catch {
         throw new UserInputError('must be a valid email')
       }
 

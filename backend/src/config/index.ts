@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable import-x/no-namespace */
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 
 /* eslint-disable n/no-process-env */
 import { config } from 'dotenv'
-// eslint-disable-next-line import/no-namespace
-import * as SMTPTransport from 'nodemailer/lib/smtp-pool'
 
 import emails from './emails'
 import metadata from './metadata'
+
+import type * as SMTPTransport from 'nodemailer/lib/smtp-pool'
 
 // Load env file
 config()

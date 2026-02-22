@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import normalizeEmail from './normalizeEmail'
 
 export default async function alreadyExistingMail({ args, context }) {
@@ -20,6 +21,7 @@ export default async function alreadyExistingMail({ args, context }) {
       return existingEmailAddressTransactionResponse.records.map((record) => {
         return {
           alreadyExistingEmail: record.get('email').properties,
+          // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
           user: record.get('user') && record.get('user').properties,
         }
       })

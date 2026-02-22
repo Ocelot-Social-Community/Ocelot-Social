@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
 import Factory, { cleanDatabase } from '@db/factories'
 import { revokeBadge } from '@graphql/queries/revokeBadge'
@@ -8,8 +9,9 @@ import { rewardTrophyBadge } from '@graphql/queries/rewardTrophyBadge'
 import { setTrophyBadgeSelected } from '@graphql/queries/setTrophyBadgeSelected'
 import { setVerificationBadge } from '@graphql/queries/setVerificationBadge'
 import { User } from '@graphql/queries/User'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 let regularUser, administrator, moderator, badge, verification

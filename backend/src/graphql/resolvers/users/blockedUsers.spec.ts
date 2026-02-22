@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable jest/expect-expect */
 import { cleanDatabase } from '@db/factories'
 import { blockedUsers } from '@graphql/queries/blockedUsers'
 import { blockUser } from '@graphql/queries/blockUser'
@@ -9,6 +10,7 @@ import { Post } from '@graphql/queries/Post'
 import { unblockUser } from '@graphql/queries/unblockUser'
 import { User } from '@graphql/queries/User'
 import { createApolloTestSetup } from '@root/test/helpers'
+
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 

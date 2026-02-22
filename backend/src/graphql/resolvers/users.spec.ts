@@ -3,10 +3,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { categories } from '@constants/categories'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
-import User from '@db/models/User'
 import { DeleteUser } from '@graphql/queries/DeleteUser'
 import { resetTrophyBadgesSelected } from '@graphql/queries/resetTrophyBadgesSelected'
 import { saveCategorySettings } from '@graphql/queries/saveCategorySettings'
@@ -15,8 +16,10 @@ import { switchUserRole } from '@graphql/queries/switchUserRole'
 import { updateOnlineStatus } from '@graphql/queries/updateOnlineStatus'
 import { UpdateUser } from '@graphql/queries/UpdateUser'
 import { UserEmailNotificationSettings, User as userQuery } from '@graphql/queries/User'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type User from '@db/models/User'
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 import type { DecodedUser } from '@src/jwt/decode'
 // import CONFIG from '@src/config'

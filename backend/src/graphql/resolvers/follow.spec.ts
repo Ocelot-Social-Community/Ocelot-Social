@@ -7,6 +7,7 @@ import { followUser } from '@graphql/queries/followUser'
 import { unfollowUser } from '@graphql/queries/unfollowUser'
 import { User } from '@graphql/queries/User'
 import { createApolloTestSetup } from '@root/test/helpers'
+
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 

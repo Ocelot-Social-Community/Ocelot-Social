@@ -3,11 +3,11 @@
 import databaseContext from '@context/database'
 import pubsubContext from '@context/pubsub'
 import CONFIG from '@src/config'
-import type { DecodedUser } from '@src/jwt/decode'
 import { decode } from '@src/jwt/decode'
 import ocelotLogger from '@src/logger'
-import type OcelotLogger from '@src/logger'
 
+import type { DecodedUser } from '@src/jwt/decode'
+import type OcelotLogger from '@src/logger'
 import type { ApolloServerExpressConfig } from 'apollo-server-express'
 
 const serverDatabase = databaseContext()
@@ -25,7 +25,7 @@ export const getContext =
     const {
       database = serverDatabase,
       pubsub = serverPubsub,
-      authenticatedUser = undefined,
+      authenticatedUser,
       logger = ocelotLogger,
       config = CONFIG,
     } = opts ?? {}

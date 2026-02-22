@@ -9,7 +9,7 @@ export const wrapTransactionDeleteImage = async (
 ): ReturnType<Images['deleteImage']> => {
   const session = getDriver().session()
   try {
-    const result = await session.writeTransaction((transaction) => {
+    const result = await session.writeTransaction(async (transaction) => {
       return wrappedCallback(...args, { ...opts, transaction })
     })
     return result
@@ -29,7 +29,7 @@ export const wrapTransactionMergeImage = async (
 ): ReturnType<Images['mergeImage']> => {
   const session = getDriver().session()
   try {
-    const result = await session.writeTransaction((transaction) => {
+    const result = await session.writeTransaction(async (transaction) => {
       return wrappedCallback(...args, { ...opts, transaction })
     })
     return result

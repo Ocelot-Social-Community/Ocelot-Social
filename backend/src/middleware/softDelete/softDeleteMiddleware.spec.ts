@@ -6,8 +6,9 @@
 import Factory, { cleanDatabase } from '@db/factories'
 import { Post } from '@graphql/queries/Post'
 import { User } from '@graphql/queries/User'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 const categoryIds = ['cat9']
@@ -223,10 +224,15 @@ describe('softDeleteMiddleware', () => {
       describe('User', () => {
         beforeEach(beforeUser)
 
-        it('displays name', () => expect(subject.name).toEqual('Offensive Name'))
-        it('displays slug', () => expect(subject.slug).toEqual('offensive-name'))
-        it('displays about', () =>
-          expect(subject.about).toEqual('This self description is very offensive'))
+        it('displays name', () => {
+          expect(subject.name).toEqual('Offensive Name')
+        })
+        it('displays slug', () => {
+          expect(subject.slug).toEqual('offensive-name')
+        })
+        it('displays about', () => {
+          expect(subject.about).toEqual('This self description is very offensive')
+        })
         it('displays avatar', async () => {
           expect(subject.avatar).toEqual({
             url: expect.stringMatching('http://localhost/some/offensive/avatar.jpg'),
@@ -237,24 +243,34 @@ describe('softDeleteMiddleware', () => {
       describe('Post', () => {
         beforeEach(beforePost)
 
-        it('displays title', () => expect(subject.title).toEqual('Disabled post'))
-        it('displays slug', () => expect(subject.slug).toEqual('disabled-post'))
-        it('displays content', () =>
-          expect(subject.content).toEqual('This is an offensive post content'))
-        it('displays contentExcerpt', () =>
-          expect(subject.contentExcerpt).toEqual('This is an offensive post content'))
-        it('displays image', () =>
+        it('displays title', () => {
+          expect(subject.title).toEqual('Disabled post')
+        })
+        it('displays slug', () => {
+          expect(subject.slug).toEqual('disabled-post')
+        })
+        it('displays content', () => {
+          expect(subject.content).toEqual('This is an offensive post content')
+        })
+        it('displays contentExcerpt', () => {
+          expect(subject.contentExcerpt).toEqual('This is an offensive post content')
+        })
+        it('displays image', () => {
           expect(subject.image).toEqual({
             url: expect.stringMatching('http://localhost/some/offensive/image.jpg'),
-          }))
+          })
+        })
       })
 
       describe('Comment', () => {
         beforeEach(beforeComment)
 
-        it('displays content', () => expect(subject.content).toEqual('Disabled comment'))
-        it('displays contentExcerpt', () =>
-          expect(subject.contentExcerpt).toEqual('Disabled comment'))
+        it('displays content', () => {
+          expect(subject.content).toEqual('Disabled comment')
+        })
+        it('displays contentExcerpt', () => {
+          expect(subject.contentExcerpt).toEqual('Disabled comment')
+        })
       })
     })
 
@@ -266,27 +282,49 @@ describe('softDeleteMiddleware', () => {
       describe('User', () => {
         beforeEach(beforeUser)
 
-        it('obfuscates name', () => expect(subject.name).toEqual('UNAVAILABLE'))
-        it('obfuscates slug', () => expect(subject.slug).toEqual('UNAVAILABLE'))
-        it('obfuscates about', () => expect(subject.about).toEqual('UNAVAILABLE'))
-        it('obfuscates avatar', () => expect(subject.avatar).toEqual(null))
+        it('obfuscates name', () => {
+          expect(subject.name).toEqual('UNAVAILABLE')
+        })
+        it('obfuscates slug', () => {
+          expect(subject.slug).toEqual('UNAVAILABLE')
+        })
+        it('obfuscates about', () => {
+          expect(subject.about).toEqual('UNAVAILABLE')
+        })
+        it('obfuscates avatar', () => {
+          expect(subject.avatar).toEqual(null)
+        })
       })
 
       describe('Post', () => {
         beforeEach(beforePost)
 
-        it('obfuscates title', () => expect(subject.title).toEqual('UNAVAILABLE'))
-        it('obfuscates slug', () => expect(subject.slug).toEqual('UNAVAILABLE'))
-        it('obfuscates content', () => expect(subject.content).toEqual('UNAVAILABLE'))
-        it('obfuscates contentExcerpt', () => expect(subject.contentExcerpt).toEqual('UNAVAILABLE'))
-        it('obfuscates image', () => expect(subject.image).toEqual(null))
+        it('obfuscates title', () => {
+          expect(subject.title).toEqual('UNAVAILABLE')
+        })
+        it('obfuscates slug', () => {
+          expect(subject.slug).toEqual('UNAVAILABLE')
+        })
+        it('obfuscates content', () => {
+          expect(subject.content).toEqual('UNAVAILABLE')
+        })
+        it('obfuscates contentExcerpt', () => {
+          expect(subject.contentExcerpt).toEqual('UNAVAILABLE')
+        })
+        it('obfuscates image', () => {
+          expect(subject.image).toEqual(null)
+        })
       })
 
       describe('Comment', () => {
         beforeEach(beforeComment)
 
-        it('obfuscates content', () => expect(subject.content).toEqual('UNAVAILABLE'))
-        it('obfuscates contentExcerpt', () => expect(subject.contentExcerpt).toEqual('UNAVAILABLE'))
+        it('obfuscates content', () => {
+          expect(subject.content).toEqual('UNAVAILABLE')
+        })
+        it('obfuscates contentExcerpt', () => {
+          expect(subject.contentExcerpt).toEqual('UNAVAILABLE')
+        })
       })
     })
   })

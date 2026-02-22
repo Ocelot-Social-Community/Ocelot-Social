@@ -1,9 +1,9 @@
+/* eslint-disable promise/prefer-await-to-callbacks */
 import { Upload } from '@aws-sdk/lib-storage'
-
-import type { S3Config } from '@config/index'
 
 import { s3Service } from './s3Service'
 
+import type { S3Config } from '@config/index'
 import type { FileUpload } from 'graphql-upload'
 
 jest.mock('@aws-sdk/client-s3', () => {
@@ -27,7 +27,9 @@ const uploadMock = Upload as unknown as jest.Mock
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const createReadStream: FileUpload['createReadStream'] = (() => ({
   pipe: () => ({
-    on: (_: unknown, callback: () => void) => callback(), // eslint-disable-line promise/prefer-await-to-callbacks
+    on: (_: unknown, callback: () => void) => {
+      callback()
+    },
   }),
 })) as unknown as FileUpload['createReadStream']
 const input = {
@@ -52,7 +54,8 @@ describe('s3Service', () => {
     describe('if the S3 service returns a valid URL as a `Location`', () => {
       beforeEach(() => {
         uploadMock.mockImplementation(({ params: { Key } }: { params: { Key: string } }) => ({
-          done: () => Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
+          done: async () =>
+            Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
         }))
       })
 
@@ -67,7 +70,7 @@ describe('s3Service', () => {
     describe('but if for some reason, the S3 service returns a `Location` wich is not a valid URL and misses the protocol part', () => {
       beforeEach(() => {
         uploadMock.mockImplementation(({ params: { Key } }: { params: { Key: string } }) => ({
-          done: () => Promise.resolve({ Location: `your-objectstorage.com/bucket/${Key}` }),
+          done: async () => Promise.resolve({ Location: `your-objectstorage.com/bucket/${Key}` }),
         }))
       })
 

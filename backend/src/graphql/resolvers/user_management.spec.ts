@@ -6,6 +6,9 @@
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable jest/unbound-method */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable jest/expect-expect */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { verify } from 'jsonwebtoken'
 
 import { categories } from '@constants/categories'
@@ -16,8 +19,9 @@ import { login } from '@graphql/queries/login'
 import { saveCategorySettings } from '@graphql/queries/saveCategorySettings'
 import { decode } from '@jwt/decode'
 import { encode } from '@jwt/encode'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup, TEST_CONFIG } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 
 const jwt = { verify }
 let variables, req, user
@@ -265,7 +269,7 @@ describe('login', () => {
       })
 
       describe('normalization', () => {
-        describe('email address is a gmail address ', () => {
+        describe('email address is a gmail address', () => {
           beforeEach(async () => {
             const email = await database.neode.first(
               'EmailAddress',

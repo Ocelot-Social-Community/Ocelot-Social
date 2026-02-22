@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
@@ -7,10 +6,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { UserInputError } from 'apollo-server'
 
+import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
+
 const COMMENT_MIN_LENGTH = 1
 const NO_POST_ERR_MESSAGE = 'Comment cannot be created without a post!'
 const USERNAME_MIN_LENGTH = 3
-const validateCreateComment = async (resolve, root, args, context, info) => {
+const validateCreateComment: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   const content = args.content.replace(/<(?:.|\n)*?>/gm, '').trim()
   const { postId } = args
 
@@ -42,7 +43,7 @@ const validateCreateComment = async (resolve, root, args, context, info) => {
   }
 }
 
-const validateUpdateComment = async (resolve, root, args, context, info) => {
+const validateUpdateComment: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   const content = args.content.replace(/<(?:.|\n)*?>/gm, '').trim()
   if (!args.content || content.length < COMMENT_MIN_LENGTH) {
     throw new UserInputError(`Comment must be at least ${COMMENT_MIN_LENGTH} character long!`)
@@ -51,14 +52,14 @@ const validateUpdateComment = async (resolve, root, args, context, info) => {
   return resolve(root, args, context, info)
 }
 
-const validateReport = async (resolve, root, args, context, info) => {
+const validateReport: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   const { resourceId } = args
   const { user } = context
   if (resourceId === user.id) throw new Error('You cannot report yourself!')
   return resolve(root, args, context, info)
 }
 
-const validateReview = async (resolve, root, args, context, info) => {
+const validateReview: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   const { resourceId } = args
   let existingReportedResource
   const { user, driver } = context
@@ -106,7 +107,7 @@ const validateReview = async (resolve, root, args, context, info) => {
   return resolve(root, args, context, info)
 }
 
-export const validateNotifyUsers = async (label, reason) => {
+export const validateNotifyUsers = async (label: string, reason: string): Promise<void> => {
   const reasonsAllowed = [
     'mentioned_in_post',
     'mentioned_in_comment',
@@ -123,7 +124,7 @@ export const validateNotifyUsers = async (label, reason) => {
   }
 }
 
-const validateUpdateUser = async (resolve, root, params, context, info) => {
+const validateUpdateUser: IMiddlewareResolver = async (resolve, root, params, context, info) => {
   const { name } = params
   if (typeof name === 'string' && name.trim().length < USERNAME_MIN_LENGTH)
     throw new UserInputError(`Username must be at least ${USERNAME_MIN_LENGTH} character long!`)

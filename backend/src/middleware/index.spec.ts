@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable n/global-require */
+/* eslint-disable @typescript-eslint/no-require-imports */
 
 // Unit tests for addMiddleware – testing append, prepend, before, after, and error cases.
 // Each test uses jest.isolateModules + jest.doMock to get a fresh ocelotMiddlewares array.
@@ -55,7 +55,7 @@ const loadModule = (
     },
   }))
   setupMocks(options)
-  // eslint-disable-next-line n/no-missing-require
+
   const mod = require('./index') as MiddlewareModule
   return {
     mod,
@@ -77,7 +77,7 @@ describe('default', () => {
   it('calls brandingMiddlewares', () => {
     jest.isolateModules(() => {
       const { mod } = loadModule()
-      // eslint-disable-next-line n/no-missing-require
+
       const brandingMiddlewares = require('./branding/brandingMiddlewares') as jest.Mock
       mod.default({})
       expect(brandingMiddlewares).toHaveBeenCalledTimes(1)
@@ -197,26 +197,26 @@ describe('addMiddleware', () => {
     it('throws when "before" anchor does not exist', () => {
       jest.isolateModules(() => {
         const { mod } = loadModule()
-        expect(() =>
+        expect(() => {
           mod.addMiddleware({
             name: 'failure',
             middleware: {},
             position: { before: 'nonexistent' },
-          }),
-        ).toThrow('Could not find middleware "nonexistent" to append the middleware "failure"')
+          })
+        }).toThrow('Could not find middleware "nonexistent" to append the middleware "failure"')
       })
     })
 
     it('throws when "after" anchor does not exist', () => {
       jest.isolateModules(() => {
         const { mod } = loadModule()
-        expect(() =>
+        expect(() => {
           mod.addMiddleware({
             name: 'failure',
             middleware: {},
             position: { after: 'nonexistent' },
-          }),
-        ).toThrow('Could not find middleware "nonexistent" to append the middleware "failure"')
+          })
+        }).toThrow('Could not find middleware "nonexistent" to append the middleware "failure"')
       })
     })
   })

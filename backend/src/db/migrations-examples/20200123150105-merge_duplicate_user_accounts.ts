@@ -4,8 +4,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable import-x/no-extraneous-dependencies */
 /* eslint-disable promise/prefer-await-to-callbacks */
+/* eslint-disable import-x/no-deprecated */
 import { throwError, concat } from 'rxjs'
 import { flatMap, mergeMap, map, catchError, filter } from 'rxjs/operators'
 
@@ -71,7 +72,7 @@ export function up(next) {
       ),
     )
     .subscribe({
-      next: ({ user, email, _oldUser, oldEmail }) =>
+      next: ({ user, email, _oldUser, oldEmail }) => {
         // eslint-disable-next-line no-console
         console.log(`
           Merged:
@@ -79,7 +80,8 @@ export function up(next) {
           userId: ${user.id}
           email: ${oldEmail} => ${email.email}
           =============================
-        `),
+        `)
+      },
       complete: () => {
         // eslint-disable-next-line no-console
         console.log('Merging of duplicate users completed')

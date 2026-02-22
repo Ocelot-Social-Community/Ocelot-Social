@@ -6,7 +6,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable n/no-unsupported-features/node-builtins */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+/* eslint-disable @typescript-eslint/no-loop-func */
+
 import { UserInputError } from 'apollo-server'
 
 import type { Context } from '@src/context'

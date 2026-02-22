@@ -7,8 +7,9 @@ import { CreateGroup } from '@graphql/queries/CreateGroup'
 import { CreatePost } from '@graphql/queries/CreatePost'
 import { SignupVerification } from '@graphql/queries/SignupVerification'
 import { UpdateGroup } from '@graphql/queries/UpdateGroup'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 let variables

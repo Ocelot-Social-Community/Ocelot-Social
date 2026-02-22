@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
-import { ApolloServer } from 'apollo-server-express'
-
 import Factory, { cleanDatabase } from '@db/factories'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
 import { login } from '@src/graphql/queries/login'
 import ocelotLogger from '@src/logger'
 import { loggerPlugin } from '@src/plugins/apolloLogger'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
+import type { ApolloServer } from 'apollo-server-express'
 
 let server: ApolloServer
 

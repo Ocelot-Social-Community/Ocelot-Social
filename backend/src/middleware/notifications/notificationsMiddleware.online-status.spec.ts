@@ -4,13 +4,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import Factory, { cleanDatabase } from '@db/factories'
 import { CreatePost } from '@graphql/queries/CreatePost'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 const sendNotificationMailMock: (notification) => void = jest.fn()
 jest.mock('@src/emails/sendEmail', () => ({
-  sendNotificationMail: (notification) => sendNotificationMailMock(notification),
+  sendNotificationMail: (notification) => {
+    sendNotificationMailMock(notification)
+  },
 }))
 
 let isUserOnlineMock = jest.fn().mockReturnValue(false)

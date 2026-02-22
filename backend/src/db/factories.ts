@@ -4,6 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable n/no-unpublished-import */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { faker } from '@faker-js/faker'
 import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'
@@ -13,9 +15,10 @@ import { v4 as uuid } from 'uuid'
 import { generateInviteCode } from '@graphql/resolvers/inviteCodes'
 import { isUniqueFor } from '@middleware/sluggifyMiddleware'
 import uniqueSlug from '@middleware/slugify/uniqueSlug'
-import { Context } from '@src/context'
 
 import { getDriver, getNeode } from './neo4j'
+
+import type { Context } from '@src/context'
 
 const neode = getNeode()
 
@@ -49,14 +52,14 @@ Factory.define('category')
   .attr('id', uuid)
   .attr('icon', 'globe')
   .attr('name', 'Global Peace & Nonviolence')
-  .after((buildObject, _options) => {
+  .after(async (buildObject, _options) => {
     return neode.create('Category', buildObject)
   })
 
 Factory.define('badge')
   .attr('type', 'crowdfunding')
   .attr('status', 'permanent')
-  .after((buildObject, _options) => {
+  .after(async (buildObject, _options) => {
     return neode.create('Badge', buildObject)
   })
 
@@ -67,7 +70,7 @@ Factory.define('image')
   .attr('alt', faker.lorem.sentence)
   .attr('type', 'image/jpeg')
   .attr('url', null)
-  .after((buildObject, _options) => {
+  .after(async (buildObject, _options) => {
     if (!buildObject.url) {
       buildObject.url = faker.image.urlPicsumPhotos({
         width: buildObject.width,
@@ -84,7 +87,7 @@ Factory.define('file')
   .attr('name', faker.lorem.slug)
   .attr('type', 'image/jpeg')
   .attr('url', null)
-  .after((buildObject, _options) => {
+  .after(async (buildObject, _options) => {
     if (!buildObject.url) {
       buildObject.url = faker.image.urlPicsumPhotos()
     }
@@ -171,8 +174,8 @@ Factory.define('post')
     return Promise.all([Factory.build('category')])
   }) */
   .option('tagIds', [])
-  .option('tags', ['tagIds'], (tagIds) => {
-    return Promise.all(tagIds.map((id) => neode.find('Tag', id)))
+  .option('tags', ['tagIds'], async (tagIds) => {
+    return Promise.all(tagIds.map(async (id) => neode.find('Tag', id)))
   })
   .option('authorId', null)
   .option('author', ['authorId'], (authorId) => {
@@ -264,7 +267,7 @@ Factory.define('donations')
   .attr('showDonations', true)
   .attr('goal', 15000)
   .attr('progress', 7000)
-  .after((buildObject, _options) => {
+  .after(async (buildObject, _options) => {
     return neode.create('Donations', buildObject)
   })
 
@@ -275,13 +278,13 @@ const emailDefaults = {
 
 Factory.define('emailAddress')
   .attrs(emailDefaults)
-  .after((buildObject, _options) => {
+  .after(async (buildObject, _options) => {
     return neode.create('EmailAddress', buildObject)
   })
 
 Factory.define('unverifiedEmailAddress')
   .attr(emailDefaults)
-  .after((buildObject, _options) => {
+  .after(async (buildObject, _options) => {
     return neode.create('UnverifiedEmailAddress', buildObject)
   })
 
@@ -294,7 +297,7 @@ const inviteCodeDefaults = {
 Factory.define('inviteCode')
   .attrs(inviteCodeDefaults)
   .option('groupId', null)
-  .option('group', ['groupId'], (groupId) => {
+  .option('group', ['groupId'], async (groupId) => {
     if (groupId) {
       return neode.find('Group', groupId)
     }
@@ -331,11 +334,11 @@ Factory.define('location')
     id: 'country.10743216036480410',
     type: 'country',
   })
-  .after((buildObject, _options) => {
+  .after(async (buildObject, _options) => {
     return neode.create('Location', buildObject)
   })
 
-Factory.define('report').after((buildObject, _options) => {
+Factory.define('report').after(async (buildObject, _options) => {
   return neode.create('Report', buildObject)
 })
 
@@ -343,7 +346,7 @@ Factory.define('tag')
   .attrs({
     name: '#human-connection',
   })
-  .after((buildObject, _options) => {
+  .after(async (buildObject, _options) => {
     return neode.create('Tag', buildObject)
   })
 
@@ -351,7 +354,7 @@ Factory.define('socialMedia')
   .attrs({
     url: 'https://mastodon.social/@Gargron',
   })
-  .after((buildObject, _options) => {
+  .after(async (buildObject, _options) => {
     return neode.create('SocialMedia', buildObject)
   })
 

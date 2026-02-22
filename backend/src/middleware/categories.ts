@@ -1,6 +1,5 @@
-import { GraphQLResolveInfo } from 'graphql'
-
 import type { Context } from '@src/context'
+import type { GraphQLResolveInfo } from 'graphql'
 
 type Resolver = (
   root: unknown,

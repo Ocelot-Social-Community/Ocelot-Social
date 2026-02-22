@@ -1,13 +1,14 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import path from 'node:path'
 
 import { UserInputError } from 'apollo-server-express'
 import slug from 'slugify'
 import { v4 as uuid } from 'uuid'
 
-import type { S3Config } from '@config/index'
 import { getDriver } from '@db/neo4j'
 import { s3Service } from '@src/uploads/s3Service'
 
+import type { S3Config } from '@config/index'
 import type { FileUpload } from 'graphql-upload'
 import type { Transaction } from 'neo4j-driver'
 
@@ -59,7 +60,7 @@ const wrapTransactionDeleteAttachment = async (
 ): ReturnType<Attachments['del']> => {
   const session = getDriver().session()
   try {
-    const result = await session.writeTransaction((transaction) => {
+    const result = await session.writeTransaction(async (transaction) => {
       return wrappedCallback(...args, { ...opts, transaction })
     })
     return result
@@ -80,7 +81,7 @@ const wrapTransactionMergeAttachment = async (
 ): ReturnType<Attachments['add']> => {
   const session = getDriver().session()
   try {
-    const result = await session.writeTransaction((transaction) => {
+    const result = await session.writeTransaction(async (transaction) => {
       return wrappedCallback(...args, { ...opts, transaction })
     })
     return result

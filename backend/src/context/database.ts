@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import { getDriver, getNeode } from '@db/neo4j'
 
 import type { Driver } from 'neo4j-driver'

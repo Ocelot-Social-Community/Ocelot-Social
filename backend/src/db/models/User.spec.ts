@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable jest/valid-title */
 
 import { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
@@ -65,8 +66,8 @@ describe('slug', () => {
   })
 
   describe('characters', () => {
-    const createUser = (attrs) => {
-      return neode.create('User', attrs).then((user) => user.toJson())
+    const createUser = async (attrs) => {
+      return neode.create('User', attrs).then(async (user) => user.toJson())
     }
 
     it('-', async () => {
@@ -81,7 +82,7 @@ describe('slug', () => {
       })
     })
 
-    it(' ', async () => {
+    it('', async () => {
       await expect(createUser({ slug: 'matt rider' })).rejects.toThrow('ERROR_VALIDATION')
     })
 

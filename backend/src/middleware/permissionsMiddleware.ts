@@ -4,12 +4,15 @@
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unnecessary-type-conversion */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { rule, shield, deny, allow, or, and } from 'graphql-shield'
 
 import CONFIG from '@config/index'
-import SocialMedia from '@db/models/SocialMedia'
 import { getNeode } from '@db/neo4j'
 import { validateInviteCode } from '@graphql/resolvers/inviteCodes'
+
+import type SocialMedia from '@db/models/SocialMedia'
 import type { Context } from '@src/context'
 
 const debug = !!CONFIG.DEBUG
@@ -28,7 +31,7 @@ const isModerator = rule()(async (_parent, _args, { user }: Context, _info) => {
 })
 
 const isAdmin = rule()(async (_parent, _args, { user }: Context, _info) => {
-  return !!(user && user.role === 'admin')
+  return !!(user?.role === 'admin')
 })
 
 const onlyYourself = rule({

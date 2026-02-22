@@ -1,9 +1,11 @@
-/* eslint-disable import/no-named-as-default-member */
-import neo4j, { Driver } from 'neo4j-driver'
+/* eslint-disable import-x/no-named-as-default-member */
+import neo4j from 'neo4j-driver'
 import Neode from 'neode'
 
 import CONFIG from '@config/index'
 import models from '@db/models/index'
+
+import type { Driver } from 'neo4j-driver'
 
 let driver: Driver
 const defaultOptions = {

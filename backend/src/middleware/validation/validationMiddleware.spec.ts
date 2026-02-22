@@ -249,7 +249,7 @@ describe('validateReview', () => {
     })
   })
 
-  describe('moderate a resource that is not a (Comment|Post|User) ', () => {
+  describe('moderate a resource that is not a (Comment|Post|User)', () => {
     beforeEach(async () => {
       await Promise.all([Factory.build('tag', { id: 'tag-id' })])
     })

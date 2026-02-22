@@ -4,11 +4,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable n/no-extraneous-require */
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
 /* eslint-disable n/global-require */
-/* eslint-disable import/no-commonjs */
-/* eslint-disable import/no-named-as-default */
+/* eslint-disable import-x/no-commonjs */
+/* eslint-disable import-x/no-named-as-default */
 
 import { ApolloError } from 'apollo-server'
 import isArray from 'lodash/isArray'
@@ -19,7 +20,7 @@ import fetch from 'node-fetch'
 
 import findProvider from './findProvider'
 
-// eslint-disable-next-line import/no-extraneous-dependencies
+// eslint-disable-next-line import-x/no-extraneous-dependencies
 const error = require('debug')('embed:error')
 
 const metascraper = Metascraper([

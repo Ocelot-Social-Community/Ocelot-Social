@@ -7,13 +7,14 @@ import { UserInputError } from 'apollo-server'
 import { hash } from 'bcryptjs'
 
 import { getNeode } from '@db/neo4j'
-import { Context } from '@src/context'
 
 import existingEmailAddress from './helpers/existingEmailAddress'
 import generateNonce from './helpers/generateNonce'
 import normalizeEmail from './helpers/normalizeEmail'
 import { redeemInviteCode } from './inviteCodes'
 import { createOrUpdateLocations } from './users/location'
+
+import type { Context } from '@src/context'
 
 const neode = getNeode()
 

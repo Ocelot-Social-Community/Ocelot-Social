@@ -1,16 +1,18 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable @typescript-eslint/no-shadow */
 import path from 'node:path'
 
 import { UserInputError } from 'apollo-server'
-import { FileUpload } from 'graphql-upload'
 import slug from 'slugify'
 import { v4 as uuid } from 'uuid'
 
-import type { S3Config } from '@config/index'
 import { s3Service } from '@src/uploads/s3Service'
 
 import { wrapTransactionDeleteImage, wrapTransactionMergeImage } from './wrapTransaction'
 
 import type { Image, Images } from './images'
+import type { S3Config } from '@config/index'
+import type { FileUpload } from 'graphql-upload'
 
 export const images = (config: S3Config) => {
   const s3 = s3Service(config, 'original')

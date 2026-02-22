@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { v4 as uuid } from 'uuid'
 
 import Resolver from './helpers/Resolver'

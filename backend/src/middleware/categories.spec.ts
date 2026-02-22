@@ -2,9 +2,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import Factory, { cleanDatabase } from '@db/factories'
 import { Category } from '@graphql/queries/Category'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 import { categories } from '@src/constants/categories'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 let config: Partial<Context['config']>

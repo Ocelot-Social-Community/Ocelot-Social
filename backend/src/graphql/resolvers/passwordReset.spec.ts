@@ -6,10 +6,11 @@ import Factory, { cleanDatabase } from '@db/factories'
 import { login } from '@graphql/queries/login'
 import { requestPasswordReset } from '@graphql/queries/requestPasswordReset'
 import { resetPassword } from '@graphql/queries/resetPassword'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import createPasswordReset from './helpers/createPasswordReset'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 
 let variables
 

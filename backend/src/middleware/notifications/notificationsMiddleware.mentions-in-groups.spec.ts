@@ -9,13 +9,16 @@ import { CreatePost } from '@graphql/queries/CreatePost'
 import { JoinGroup } from '@graphql/queries/JoinGroup'
 import { markAllAsRead } from '@graphql/queries/markAllAsRead'
 import { notifications } from '@graphql/queries/notifications'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 const sendNotificationMailMock: (notification) => void = jest.fn()
 jest.mock('@src/emails/sendEmail', () => ({
-  sendNotificationMail: (notification) => sendNotificationMailMock(notification),
+  sendNotificationMail: (notification) => {
+    sendNotificationMailMock(notification)
+  },
 }))
 
 let authenticatedUser: Context['user']

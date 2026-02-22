@@ -2,7 +2,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable n/no-process-exit */
+/* eslint-disable n/no-unpublished-import */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-confusing-void-expression */
+
 import { faker } from '@faker-js/faker'
 import sample from 'lodash/sample'
 

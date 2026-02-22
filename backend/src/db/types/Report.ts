@@ -1,4 +1,4 @@
-import { Integer, Node } from 'neo4j-driver'
+import type { Integer, Node } from 'neo4j-driver'
 
 export interface ReportDbProperties {
   closed: boolean

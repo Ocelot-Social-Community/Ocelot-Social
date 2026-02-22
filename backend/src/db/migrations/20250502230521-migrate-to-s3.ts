@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/await-thenable */
 
 import { open } from 'node:fs/promises'
 import path from 'node:path'

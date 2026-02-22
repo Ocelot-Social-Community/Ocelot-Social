@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-shadow */
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -61,7 +62,6 @@ describe('Query', () => {
     beforeEach(() => {
       embedAction = async (variables) => {
         const { server } = createServer({
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
           context: () => {},
         })
         const { query } = createTestClient(server)

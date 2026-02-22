@@ -8,6 +8,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { cleanHtml } from './helpers/cleanHtml'
 
+import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
+
 /**
  * iterate through all fields and replace it with the callback result
  * @property data Array
@@ -45,13 +47,17 @@ const fields = [
   { field: 'descriptionExcerpt' },
 ]
 
+const mutationXss: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+  args = walkRecursive(args, fields, info.fieldName, cleanHtml)
+  return resolve(root, args, context, info)
+}
+
+const queryXss: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+  const result = await resolve(root, args, context, info)
+  return walkRecursive(result, fields, info.fieldName, cleanHtml)
+}
+
 export default {
-  Mutation: async (resolve, root, args, context, info) => {
-    args = walkRecursive(args, fields, info.fieldName, cleanHtml)
-    return resolve(root, args, context, info)
-  },
-  Query: async (resolve, root, args, context, info) => {
-    const result = await resolve(root, args, context, info)
-    return walkRecursive(result, fields, info.fieldName, cleanHtml)
-  },
+  Mutation: mutationXss,
+  Query: queryXss,
 }

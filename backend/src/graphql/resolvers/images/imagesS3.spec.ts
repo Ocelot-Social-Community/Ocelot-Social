@@ -2,17 +2,21 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable jest/no-conditional-expect */
+/* eslint-disable promise/prefer-await-to-callbacks */
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-shadow */
 import { DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import { UserInputError } from 'apollo-server'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import type { S3Config } from '@src/config'
 
 import { images } from './imagesS3'
 
 import type { ImageInput } from './images'
+import type { S3Config } from '@src/config'
 import type { FileUpload } from 'graphql-upload'
 
 jest.mock('@aws-sdk/client-s3', () => {
@@ -28,7 +32,8 @@ jest.mock('@aws-sdk/client-s3', () => {
 jest.mock('@aws-sdk/lib-storage', () => {
   return {
     Upload: jest.fn().mockImplementation(({ params: { Key } }: { params: { Key: string } }) => ({
-      done: () => Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
+      done: async () =>
+        Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
     })),
   }
 })
@@ -125,7 +130,7 @@ describe('deleteImage', () => {
             throw new Error('Ouch!')
           })
           // eslint-disable-next-line no-catch-all/no-catch-all
-        } catch (err) {
+        } catch {
           // nothing has been deleted
           await expect(neode.all('Image')).resolves.toHaveLength(1)
           // all good
@@ -151,7 +156,9 @@ describe('mergeImage', () => {
     beforeEach(() => {
       const createReadStream: FileUpload['createReadStream'] = (() => ({
         pipe: () => ({
-          on: (_: unknown, callback: () => void) => callback(), // eslint-disable-line promise/prefer-await-to-callbacks
+          on: (_: unknown, callback: () => void) => {
+            callback()
+          },
         }),
       })) as unknown as FileUpload['createReadStream']
       imageInput = {
@@ -272,7 +279,7 @@ describe('mergeImage', () => {
               return transaction.run('Ooops invalid cypher!', { image })
             })
             // eslint-disable-next-line no-catch-all/no-catch-all
-          } catch (err) {
+          } catch {
             // nothing has been created
             await expect(neode.all('Image')).resolves.toHaveLength(0)
             // all good

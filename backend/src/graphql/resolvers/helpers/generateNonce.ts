@@ -4,6 +4,7 @@ import registrationConstants from '@constants/registrationBranded'
 export default function generateNonce() {
   return Array.from(
     { length: registrationConstants.NONCE_LENGTH },
+    // eslint-disable-next-line @typescript-eslint/no-useless-default-assignment
     (n: number = Math.floor(Math.random() * 10)) => {
       return String.fromCharCode(n + 48)
     },

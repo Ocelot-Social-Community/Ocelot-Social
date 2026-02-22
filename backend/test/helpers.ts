@@ -1,11 +1,12 @@
+/* eslint-disable n/no-unpublished-import */
 import { createTestClient } from 'apollo-server-testing'
 
 import databaseContext from '@context/database'
-import type CONFIG from '@src/config'
-import type { Context } from '@src/context'
 import { getContext } from '@src/context'
 import createServer from '@src/server'
 
+import type CONFIG from '@src/config'
+import type { Context } from '@src/context'
 import type { ApolloServerExpressConfig } from 'apollo-server-express'
 
 export const TEST_CONFIG = {

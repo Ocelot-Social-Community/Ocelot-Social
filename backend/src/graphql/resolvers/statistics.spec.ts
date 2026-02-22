@@ -4,8 +4,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
 import { statistics } from '@graphql/queries/statistics'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 let currentUser
@@ -49,7 +50,7 @@ describe('statistics', () => {
     })
   })
 
-  describe('authenticated as user ', () => {
+  describe('authenticated as user', () => {
     beforeEach(async () => {
       currentUser = await database.neode.create('User', {
         name: 'Current User',
@@ -66,7 +67,7 @@ describe('statistics', () => {
     })
   })
 
-  describe('authenticated as moderator ', () => {
+  describe('authenticated as moderator', () => {
     beforeEach(async () => {
       currentUser = await database.neode.create('User', {
         name: 'Current User',
@@ -84,7 +85,7 @@ describe('statistics', () => {
     })
   })
 
-  describe('authenticated as admin ', () => {
+  describe('authenticated as admin', () => {
     beforeEach(async () => {
       currentUser = await database.neode.create('User', {
         name: 'Current User',

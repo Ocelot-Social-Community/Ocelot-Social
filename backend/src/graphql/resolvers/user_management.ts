@@ -7,9 +7,10 @@ import bcrypt from 'bcryptjs'
 
 import { getNeode } from '@db/neo4j'
 import { encode } from '@jwt/encode'
-import type { Context } from '@src/context'
 
 import normalizeEmail from './helpers/normalizeEmail'
+
+import type { Context } from '@src/context'
 
 const neode = getNeode()
 

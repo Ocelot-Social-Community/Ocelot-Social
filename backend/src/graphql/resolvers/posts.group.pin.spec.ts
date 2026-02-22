@@ -8,8 +8,9 @@ import { CreatePost } from '@graphql/queries/CreatePost'
 import { pinGroupPost } from '@graphql/queries/pinGroupPost'
 import { profilePagePosts } from '@graphql/queries/profilePagePosts'
 import { unpinGroupPost } from '@graphql/queries/unpinGroupPost'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 const defaultConfig = {

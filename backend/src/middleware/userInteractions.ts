@@ -3,6 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
+import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
+
 const createRelatedCypher = (relation) => `
 MATCH (user:User { id: $currentUser})
 MATCH (post:Post { id: $postId})
@@ -35,7 +37,7 @@ const setPostCounter = async (postId, relation, context) => {
   }
 }
 
-const userClickedPost = async (resolve, root, args, context, info) => {
+const userClickedPost: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   if (args.id && context.user) {
     await setPostCounter(args.id, 'CLICKED', context)
   }

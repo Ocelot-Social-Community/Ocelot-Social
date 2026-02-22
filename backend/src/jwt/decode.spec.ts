@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable jest/expect-expect */
+/* eslint-disable @typescript-eslint/no-shadow */
 import Factory, { cleanDatabase } from '@db/factories'
-import User from '@db/models/User'
 import { getDriver, getNeode } from '@db/neo4j'
 import { TEST_CONFIG } from '@root/test/helpers'
 
 import { decode } from './decode'
 import { encode } from './encode'
+
+import type User from '@db/models/User'
 
 const driver = getDriver()
 const neode = getNeode()

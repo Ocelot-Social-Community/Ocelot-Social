@@ -1,6 +1,5 @@
-import { Integer, Node } from 'neo4j-driver'
-
-import { PostDbProperties } from './Post'
+import type { PostDbProperties } from './Post'
+import type { Integer, Node } from 'neo4j-driver'
 
 export interface EventDbProperties extends PostDbProperties {
   eventIsOnline: boolean

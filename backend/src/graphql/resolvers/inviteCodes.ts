@@ -2,14 +2,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import registrationConstants from '@constants/registrationBranded'
-import { Context } from '@src/context'
 
 import Resolver from './helpers/Resolver'
+
+import type { Context } from '@src/context'
 
 export const generateInviteCode = () => {
   // 6 random numbers in [ 0, 35 ] are 36 possible numbers (10 [0-9] + 26 [A-Z])
   return Array.from(
     { length: registrationConstants.INVITE_CODE_LENGTH },
+    // eslint-disable-next-line @typescript-eslint/no-useless-default-assignment
     (n: number = Math.floor(Math.random() * 36)) => {
       // n > 9: it is a letter (ASCII 65 is A) -> 10 + 55 = 65
       // else: it is a number (ASCII 48 is 0) -> 0 + 48 = 48

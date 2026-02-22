@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable jest/expect-expect */
 import { createTestClient } from 'apollo-server-testing'
 
 import { cleanDatabase } from '@db/factories'
@@ -97,7 +98,7 @@ describe('muteUser', () => {
 
   beforeEach(() => {
     currentUser = undefined
-    muteAction = (variables) => {
+    muteAction = async (variables) => {
       const { mutate } = createTestClient(server)
       return mutate({ mutation: muteUser, variables })
     }
@@ -361,7 +362,7 @@ describe('unmuteUser', () => {
 
   beforeEach(() => {
     currentUser = undefined
-    unmuteAction = (variables) => {
+    unmuteAction = async (variables) => {
       const { mutate } = createTestClient(server)
       return mutate({ mutation: unmuteUser, variables })
     }

@@ -3,7 +3,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable import/no-named-as-default-member */
+/* eslint-disable import-x/no-named-as-default-member */
+/* eslint-disable import-x/no-deprecated */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import http from 'node:http'
 
 import { ApolloServer } from 'apollo-server-express'
@@ -26,7 +28,7 @@ const createServer = (options?: ApolloServerExpressConfig) => {
     schema: middleware(schema),
     subscriptions: {
       keepAlive: 10000,
-      onConnect: (connectionParams) =>
+      onConnect: async (connectionParams) =>
         getContext()(connectionParams as { headers: { authorization?: string } }),
       onDisconnect: () => {
         logger.debug('WebSocket client disconnected')
