@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import { gql } from 'graphql-tag'
 
 export const Message = gql`
   query ($roomId: ID!, $first: Int, $offset: Int) {

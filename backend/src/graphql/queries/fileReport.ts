@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import { gql } from 'graphql-tag'
 
 export const fileReport = gql`
   mutation ($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {

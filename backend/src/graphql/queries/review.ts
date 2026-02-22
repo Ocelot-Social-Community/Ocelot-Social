@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import { gql } from 'graphql-tag'
 
 export const review = gql`
   mutation ($resourceId: ID!, $disable: Boolean, $closed: Boolean) {

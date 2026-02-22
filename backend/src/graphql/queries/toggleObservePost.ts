@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import { gql } from 'graphql-tag'
 
 export const toggleObservePost = gql`
   mutation ($id: ID!, $value: Boolean!) {

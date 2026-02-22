@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import { gql } from 'graphql-tag'
 
 export const CreateComment = gql`
   mutation ($id: ID, $postId: ID!, $content: String!) {

@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import { gql } from 'graphql-tag'
 
 export const AddPostEmotions = gql`
   mutation ($to: _PostInput!, $data: _EMOTEDInput!) {
