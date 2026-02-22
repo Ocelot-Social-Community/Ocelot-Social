@@ -883,7 +883,7 @@ describe('notifications', () => {
           userId: 'chatReceiver',
         },
       })
-      roomId = (room.data as any).CreateRoom.id // eslint-disable-line @typescript-eslint/no-explicit-any
+      roomId = room.data.CreateRoom.id
     })
 
     describe('if the chatReceiver is online', () => {

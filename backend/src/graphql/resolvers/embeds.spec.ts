@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 /* eslint-disable @typescript-eslint/no-shadow */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -66,10 +66,13 @@ describe('Query', () => {
         })
         const result = await server.executeOperation(
           { query: embed, variables },
-          { contextValue: await contextFn() as any },
+          { contextValue: (await contextFn()) as any },
         )
         if (result.body.kind === 'single') {
-          return { data: (result.body.singleResult.data ?? null) as any, errors: result.body.singleResult.errors }
+          return {
+            data: (result.body.singleResult.data ?? null) as any,
+            errors: result.body.singleResult.errors,
+          }
         }
         return { data: null as any, errors: undefined }
       }

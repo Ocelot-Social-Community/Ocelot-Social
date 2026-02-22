@@ -33,10 +33,13 @@ beforeAll(async () => {
   query = async (opts) => {
     const result = await server.executeOperation(
       { query: opts.query, variables: opts.variables },
-      { contextValue: await contextFn() as any },
+      { contextValue: (await contextFn()) as any },
     )
     if (result.body.kind === 'single') {
-      return { data: (result.body.singleResult.data ?? null) as any, errors: result.body.singleResult.errors }
+      return {
+        data: (result.body.singleResult.data ?? null) as any,
+        errors: result.body.singleResult.errors,
+      }
     }
     return { data: null as any, errors: undefined }
   }

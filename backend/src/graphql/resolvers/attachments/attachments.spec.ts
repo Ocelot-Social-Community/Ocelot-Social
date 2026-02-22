@@ -8,9 +8,9 @@ import { Readable } from 'node:stream'
 
 import { S3Client } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
-import { UserInputError } from '@graphql/errors'
 
 import Factory, { cleanDatabase } from '@db/factories'
+import { UserInputError } from '@graphql/errors'
 import { CreateMessage } from '@graphql/queries/CreateMessage'
 import { CreateRoom } from '@graphql/queries/CreateRoom'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -115,7 +115,7 @@ describe('delete Attachment', () => {
         },
       })
 
-      message = (m.data as any).CreateMessage // eslint-disable-line @typescript-eslint/no-explicit-any
+      message = m.data.CreateMessage
 
       await database.write({
         query: `

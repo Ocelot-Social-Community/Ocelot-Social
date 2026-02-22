@@ -46,10 +46,13 @@ beforeEach(async () => {
   serverQuery = async (opts) => {
     const result = await server.executeOperation(
       { query: opts.query, variables: opts.variables },
-      { contextValue: await contextFn() as any },
+      { contextValue: (await contextFn()) as any },
     )
     if (result.body.kind === 'single') {
-      return { data: (result.body.singleResult.data ?? null) as any, errors: result.body.singleResult.errors }
+      return {
+        data: (result.body.singleResult.data ?? null) as any,
+        errors: result.body.singleResult.errors,
+      }
     }
     return { data: null as any, errors: undefined }
   }
@@ -247,18 +250,18 @@ describe('muteUser', () => {
             })
 
             it("the muted user's post is still accessible by direct id lookup", async () => {
-              await expect(serverQuery({ query: Post, variables: { id: 'p23' } })).resolves.toMatchObject(
-                {
-                  data: {
-                    Post: [
-                      expect.objectContaining({
-                        id: 'p23',
-                        title: 'A post written by the muted user',
-                      }),
-                    ],
-                  },
+              await expect(
+                serverQuery({ query: Post, variables: { id: 'p23' } }),
+              ).resolves.toMatchObject({
+                data: {
+                  Post: [
+                    expect.objectContaining({
+                      id: 'p23',
+                      title: 'A post written by the muted user',
+                    }),
+                  ],
                 },
-              )
+              })
             })
 
             describe('but the muted user has a pinned post', () => {

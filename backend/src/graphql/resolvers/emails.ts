@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { UserInputError } from '@graphql/errors'
-// eslint-disable-next-line import-x/extensions
 import Validator from 'neode/build/Services/Validator.js'
+
+import { UserInputError } from '@graphql/errors'
 
 import existingEmailAddress from './helpers/existingEmailAddress'
 import generateNonce from './helpers/generateNonce'

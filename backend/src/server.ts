@@ -28,7 +28,7 @@ import type { ApolloServerPlugin, BaseContext } from '@apollo/server'
 
 interface CreateServerOptions {
   context?: (req: { headers: { authorization?: string } }) => Promise<any>
-  plugins?: ApolloServerPlugin<BaseContext>[]
+  plugins?: ApolloServerPlugin[]
 }
 
 const createServer = async (options?: CreateServerOptions) => {
@@ -57,7 +57,7 @@ const createServer = async (options?: CreateServerOptions) => {
         return {
           ...formattedError,
           message: String(
-            ((error as any).originalError as any)?.details?.map((d) => d.message) ?? formattedError.message,
+            (error as any).originalError?.details?.map((d) => d.message) ?? formattedError.message,
           ),
         }
       }

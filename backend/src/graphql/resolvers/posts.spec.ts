@@ -635,7 +635,7 @@ describe('UpdatePost', () => {
         categoryIds,
       },
     })
-    newlyCreatedPost = (data as any).CreatePost // eslint-disable-line @typescript-eslint/no-explicit-any
+    newlyCreatedPost = data.CreatePost
     variables = {
       id: newlyCreatedPost.id,
       title: 'New title',

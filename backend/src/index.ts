@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-
 import CONFIG from './config'
 import { loggerPlugin } from './plugins/apolloLogger'
 import createProxy from './proxy'

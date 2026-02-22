@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import databaseContext from '@context/database'
-import { Context, getContext } from '@src/context'
+import { getContext } from '@src/context'
 import createServer from '@src/server'
 
 import type { ApolloServerPlugin } from '@apollo/server'
+import type CONFIG from '@config/index'
+import type { Context } from '@src/context'
 import type { DocumentNode } from 'graphql'
-import CONFIG from '@config/index'
 
 export const TEST_CONFIG = {
   NODE_ENV: 'test',
@@ -106,7 +107,7 @@ export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
     return { data: null as any, errors: undefined }
   }
 
-  const mutate = (mutateOpts: { mutation: DocumentNode | string; variables?: any }) =>
+  const mutate = async (mutateOpts: { mutation: DocumentNode | string; variables?: any }) =>
     query({ query: mutateOpts.mutation, variables: mutateOpts.variables })
 
   return {

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import * as Sentry from '@sentry/node'
+import { init, withScope, captureException } from '@sentry/node'
 
 import CONFIG from '@config/index'
 
@@ -11,7 +11,7 @@ let sentryMiddleware: any = (resolve, root, args, context, resolveInfo) =>
   resolve(root, args, context, resolveInfo)
 
 if (CONFIG.SENTRY_DSN_BACKEND) {
-  Sentry.init({
+  init({
     dsn: CONFIG.SENTRY_DSN_BACKEND,
     release: CONFIG.COMMIT,
     environment: CONFIG.NODE_ENV,
@@ -21,16 +21,15 @@ if (CONFIG.SENTRY_DSN_BACKEND) {
   sentryMiddleware = async (resolve, root, args, context: any, resolveInfo) => {
     try {
       return await resolve(root, args, context, resolveInfo)
-      // eslint-disable-next-line no-catch-all/no-catch-all
     } catch (error) {
-      Sentry.withScope((scope) => {
+      withScope((scope) => {
         scope.setUser({
           id: context.user?.id,
         })
         scope.setExtra('body', context.req?.body)
         scope.setExtra('origin', context.req?.headers?.origin)
         scope.setExtra('user-agent', context.req?.headers?.['user-agent'])
-        Sentry.captureException(error)
+        captureException(error)
       })
       throw error
     }

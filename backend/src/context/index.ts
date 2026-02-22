@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-
 import databaseContext from '@context/database'
 import pubsubContext from '@context/pubsub'
 import CONFIG from '@src/config'
-import { decode, DecodedUser } from '@src/jwt/decode'
+import { decode } from '@src/jwt/decode'
 import ocelotLogger from '@src/logger'
+
+import type { DecodedUser } from '@src/jwt/decode'
 
 const serverDatabase = databaseContext()
 const serverPubsub = pubsubContext()

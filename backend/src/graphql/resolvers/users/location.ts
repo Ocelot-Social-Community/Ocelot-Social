@@ -8,7 +8,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-loop-func */
-/* eslint-disable n/no-unsupported-features/node-builtins */
+
 import { UserInputError } from '@graphql/errors'
 
 import type { Context } from '@src/context'
