@@ -6,7 +6,7 @@ import cloneDeep from 'lodash/cloneDeep'
 
 import type { IMiddlewareResolver } from 'graphql-middleware'
 
-const defaultOrderBy: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
+const defaultOrderBy: IMiddlewareResolver = (resolve, root, args, context, resolveInfo) => {
   const copy = cloneDeep(resolveInfo)
   const [fieldNode] = copy.fieldNodes
   if (fieldNode) {

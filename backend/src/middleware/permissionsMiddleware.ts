@@ -4,6 +4,8 @@
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unnecessary-type-conversion */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { rule, shield, deny, allow, or, and } from 'graphql-shield'
 
 import CONFIG from '@config/index'

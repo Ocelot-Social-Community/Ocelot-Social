@@ -4,6 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 
 /* eslint-disable n/global-require */
 /* eslint-disable import-x/no-commonjs */

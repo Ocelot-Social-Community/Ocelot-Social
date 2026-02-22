@@ -6,6 +6,9 @@
 /* eslint-disable promise/prefer-await-to-callbacks */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable jest/unbound-method */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable jest/expect-expect */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { verify } from 'jsonwebtoken'
 
 import { categories } from '@constants/categories'

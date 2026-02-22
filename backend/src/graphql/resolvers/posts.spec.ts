@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable jest/no-commented-out-tests */
 import Factory, { cleanDatabase } from '@db/factories'
 import { AddPostEmotions } from '@graphql/queries/AddPostEmotions'
 import { CreateGroup } from '@graphql/queries/CreateGroup'

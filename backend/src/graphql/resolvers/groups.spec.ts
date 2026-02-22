@@ -3,6 +3,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable jest/no-commented-out-tests */
 import Factory, { cleanDatabase } from '@db/factories'
 import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
 import { CreateGroup } from '@graphql/queries/CreateGroup'

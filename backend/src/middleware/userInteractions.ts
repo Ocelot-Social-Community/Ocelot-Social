@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import type { IMiddlewareResolver } from 'graphql-middleware'
+
 const createRelatedCypher = (relation) => `
 MATCH (user:User { id: $currentUser})
 MATCH (post:Post { id: $postId})

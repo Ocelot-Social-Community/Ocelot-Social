@@ -1,3 +1,4 @@
+/* eslint-disable n/no-unpublished-import */
 import { createTestClient } from 'apollo-server-testing'
 
 import databaseContext from '@context/database'

@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-loop-func */
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'

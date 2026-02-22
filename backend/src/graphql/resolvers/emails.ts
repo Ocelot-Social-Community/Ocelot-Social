@@ -38,7 +38,7 @@ export default {
       try {
         const { neode } = context
         await new Validator(neode, neode.model('UnverifiedEmailAddress'), args)
-      } catch (e) {
+      } catch (_e) {
         throw new UserInputError('must be a valid email')
       }
 

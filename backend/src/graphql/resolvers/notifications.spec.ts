@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import Factory, { cleanDatabase } from '@db/factories'
 import { DeletePost } from '@graphql/queries/DeletePost'
 import { markAllAsRead } from '@graphql/queries/markAllAsRead'

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import { TEST_CONFIG } from '@root/test/helpers'
 
 import ImageResolver from './images'

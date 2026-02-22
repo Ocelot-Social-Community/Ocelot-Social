@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-shadow */
 import { cleanDatabase } from '@db/factories'
 import { CreatePost } from '@graphql/queries/CreatePost'
 import { Post } from '@graphql/queries/Post'

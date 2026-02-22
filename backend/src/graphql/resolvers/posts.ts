@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { UserInputError } from 'apollo-server'
 import { isEmpty } from 'lodash'
 import { neo4jgraphql } from 'neo4j-graphql-js'

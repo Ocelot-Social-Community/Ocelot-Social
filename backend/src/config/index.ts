@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable import-x/no-namespace */
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 
 /* eslint-disable n/no-process-env */
 import { config } from 'dotenv'

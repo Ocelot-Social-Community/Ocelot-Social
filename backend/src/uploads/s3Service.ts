@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import { S3Client, DeleteObjectCommand, ObjectCannedACL } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 

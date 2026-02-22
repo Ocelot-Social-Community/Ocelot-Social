@@ -2,6 +2,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable jest/no-conditional-expect */
+/* eslint-disable promise/prefer-await-to-callbacks */
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-shadow */
 import { DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import { UserInputError } from 'apollo-server'
@@ -126,7 +130,7 @@ describe('deleteImage', () => {
             throw new Error('Ouch!')
           })
           // eslint-disable-next-line no-catch-all/no-catch-all
-        } catch (err) {
+        } catch (_err) {
           // nothing has been deleted
           await expect(neode.all('Image')).resolves.toHaveLength(1)
           // all good
@@ -275,7 +279,7 @@ describe('mergeImage', () => {
               return transaction.run('Ooops invalid cypher!', { image })
             })
             // eslint-disable-next-line no-catch-all/no-catch-all
-          } catch (err) {
+          } catch (_err) {
             // nothing has been created
             await expect(neode.all('Image')).resolves.toHaveLength(0)
             // all good

@@ -6,6 +6,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable import-x/no-extraneous-dependencies */
 /* eslint-disable promise/prefer-await-to-callbacks */
+/* eslint-disable import-x/no-deprecated */
 import { throwError, concat } from 'rxjs'
 import { flatMap, mergeMap, map, catchError } from 'rxjs/operators'
 

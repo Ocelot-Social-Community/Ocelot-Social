@@ -25,7 +25,7 @@ export const decode =
       const decoded = jwt.verify(token, context.config.JWT_SECRET) as JwtPayload
       id = decoded.sub ?? null
       // eslint-disable-next-line no-catch-all/no-catch-all
-    } catch (err) {
+    } catch (_err) {
       return null
     }
     const session = context.driver.session()

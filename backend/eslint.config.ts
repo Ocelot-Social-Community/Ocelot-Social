@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import comments from 'eslint-config-it4c/modules/comments'
 import eslint from 'eslint-config-it4c/modules/eslint'
 import importX from 'eslint-config-it4c/modules/import-x'

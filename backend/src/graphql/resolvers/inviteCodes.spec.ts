@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable jest/expect-expect */
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { CreateGroup } from '@graphql/queries/CreateGroup'

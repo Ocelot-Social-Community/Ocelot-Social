@@ -1,4 +1,5 @@
 /* eslint-disable n/global-require */
+/* eslint-disable @typescript-eslint/no-require-imports */
 
 // Unit tests for addMiddleware – testing append, prepend, before, after, and error cases.
 // Each test uses jest.isolateModules + jest.doMock to get a fresh ocelotMiddlewares array.

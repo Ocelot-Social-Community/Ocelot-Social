@@ -4,6 +4,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable security/detect-object-injection */
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
 import {
   NOTIFICATION_ADDED,
   ROOM_COUNT_UPDATED,
@@ -66,7 +69,13 @@ const handleLeaveGroup: IMiddlewareResolver = async (resolve, root, args, contex
   return user
 }
 
-const handleChangeGroupMemberRole: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
+const handleChangeGroupMemberRole: IMiddlewareResolver = async (
+  resolve,
+  root,
+  args,
+  context,
+  resolveInfo,
+) => {
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
@@ -79,7 +88,13 @@ const handleChangeGroupMemberRole: IMiddlewareResolver = async (resolve, root, a
   return user
 }
 
-const handleRemoveUserFromGroup: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
+const handleRemoveUserFromGroup: IMiddlewareResolver = async (
+  resolve,
+  root,
+  args,
+  context,
+  resolveInfo,
+) => {
   const { groupId, userId } = args
   const user = await resolve(root, args, context, resolveInfo)
   if (user) {
@@ -92,7 +107,13 @@ const handleRemoveUserFromGroup: IMiddlewareResolver = async (resolve, root, arg
   return user
 }
 
-const handleContentDataOfPost: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
+const handleContentDataOfPost: IMiddlewareResolver = async (
+  resolve,
+  root,
+  args,
+  context,
+  resolveInfo,
+) => {
   const { groupId } = args
   const idsOfUsers = extractMentionedUsers(args.content)
   const post = await resolve(root, args, context, resolveInfo)
@@ -120,7 +141,13 @@ const handleContentDataOfPost: IMiddlewareResolver = async (resolve, root, args,
   return post
 }
 
-const handleContentDataOfComment: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
+const handleContentDataOfComment: IMiddlewareResolver = async (
+  resolve,
+  root,
+  args,
+  context,
+  resolveInfo,
+) => {
   const { content } = args
   let idsOfMentionedUsers = extractMentionedUsers(content)
   const comment = await resolve(root, args, context, resolveInfo)
@@ -421,7 +448,13 @@ const notifyUsersOfComment = async (label, commentId, reason, context) => {
   }
 }
 
-const handleCreateMessage: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
+const handleCreateMessage: IMiddlewareResolver = async (
+  resolve,
+  root,
+  args,
+  context,
+  resolveInfo,
+) => {
   // Execute resolver
   const message = await resolve(root, args, context, resolveInfo)
 

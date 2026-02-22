@@ -4,6 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable import-x/no-named-as-default-member */
+/* eslint-disable import-x/no-deprecated */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import http from 'node:http'
 
 import { ApolloServer } from 'apollo-server-express'

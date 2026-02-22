@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable jest/no-conditional-expect */
 import { Readable } from 'node:stream'
 
 import { S3Client } from '@aws-sdk/client-s3'
@@ -165,7 +166,7 @@ describe('delete Attachment', () => {
             throw new Error('Ouch!')
           })
           // eslint-disable-next-line no-catch-all/no-catch-all
-        } catch (err) {
+        } catch (_err) {
           // nothing has been deleted
           await expect(database.neode.all('File')).resolves.toHaveLength(1)
           // all good
@@ -306,7 +307,7 @@ describe('add Attachment', () => {
               return transaction.run('Ooops invalid cypher!', { file })
             })
             // eslint-disable-next-line no-catch-all/no-catch-all
-          } catch (err) {
+          } catch (_err) {
             // nothing has been created
             await expect(database.neode.all('File')).resolves.toHaveLength(0)
             // all good

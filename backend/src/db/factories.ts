@@ -4,6 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable n/no-unpublished-import */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { faker } from '@faker-js/faker'
 import { hashSync } from 'bcryptjs'
 import { Factory } from 'rosie'

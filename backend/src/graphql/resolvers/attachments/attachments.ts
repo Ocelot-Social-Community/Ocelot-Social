@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import path from 'node:path'
 
 import { UserInputError } from 'apollo-server-express'

@@ -1,3 +1,4 @@
+/* eslint-disable promise/prefer-await-to-callbacks */
 import { Upload } from '@aws-sdk/lib-storage'
 
 import { s3Service } from './s3Service'

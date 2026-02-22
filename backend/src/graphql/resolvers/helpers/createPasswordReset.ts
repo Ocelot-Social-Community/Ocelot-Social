@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-shadow */
 import normalizeEmail from './normalizeEmail'
 
 import type { Context } from '@src/context'

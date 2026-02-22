@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import crypto from 'node:crypto'
 import { join as joinPath } from 'node:path/posix'
 
