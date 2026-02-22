@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.990.0",
-    "@aws-sdk/lib-storage": "^3.985.0",
+    "@aws-sdk/lib-storage": "^3.990.0",
     "@sentry/node": "^5.30.0",
     "@types/mime-types": "^3.0.1",
     "apollo-server": "~2.14.2",
@@ -86,7 +86,7 @@
     "nodemailer-html-to-text": "^3.2.0",
     "preview-email": "^3.1.1",
     "pug": "^3.0.3",
-    "sanitize-html": "~2.17.0",
+    "sanitize-html": "~2.17.1",
     "slugify": "^1.6.6",
     "trunc-html": "~1.1.2",
     "tslog": "^4.10.2",

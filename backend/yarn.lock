@@ -411,14 +411,14 @@
     "@smithy/types" "^4.12.0"
     tslib "^2.6.2"
 
-"@aws-sdk/lib-storage@^3.985.0":
-  version "3.985.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/lib-storage/-/lib-storage-3.985.0.tgz#742b4e61f57947c70f71d81dfa5a7bfb0d911cde"
-  integrity sha512-EnqXf2E+5+7e5zuz8mPl+3Dk/DI0ObSL8s7Tsf6H8FL/p2BJw2LhgtxPnFZUmpanpoMO0hC9/qjXNd+aGPV0/w==
+"@aws-sdk/lib-storage@^3.990.0":
+  version "3.990.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/lib-storage/-/lib-storage-3.990.0.tgz#d5b19c4531b5267f1c06078874c789c67971cce3"
+  integrity sha512-SHog6kMWXwLBTeVwFAd+EHwr1874Ei5ob1DTL5mLmJDwbmkFog2VDKN+9BmI4di0yxY057Ps2vhhWLhKy89wuA==
   dependencies:
     "@smithy/abort-controller" "^4.2.8"
-    "@smithy/middleware-endpoint" "^4.4.13"
-    "@smithy/smithy-client" "^4.11.2"
+    "@smithy/middleware-endpoint" "^4.4.14"
+    "@smithy/smithy-client" "^4.11.3"
     buffer "5.6.0"
     events "3.3.0"
     stream-browserify "3.0.0"
@@ -2473,7 +2473,7 @@
     "@smithy/types" "^4.12.0"
     tslib "^2.6.2"
 
-"@smithy/middleware-endpoint@^4.4.13", "@smithy/middleware-endpoint@^4.4.14":
+"@smithy/middleware-endpoint@^4.4.14":
   version "4.4.14"
   resolved "https://registry.yarnpkg.com/@smithy/middleware-endpoint/-/middleware-endpoint-4.4.14.tgz#df8aca71af70366f39305eeaf18ffd650f764219"
   integrity sha512-FUFNE5KVeaY6U/GL0nzAAHkaCHzXLZcY1EhtQnsAqhD8Du13oPKtMB9/0WK4/LK6a/T5OZ24wPoSShff5iI6Ag==
@@ -2602,7 +2602,7 @@
     "@smithy/util-utf8" "^4.2.0"
     tslib "^2.6.2"
 
-"@smithy/smithy-client@^4.11.2", "@smithy/smithy-client@^4.11.3":
+"@smithy/smithy-client@^4.11.3":
   version "4.11.3"
   resolved "https://registry.yarnpkg.com/@smithy/smithy-client/-/smithy-client-4.11.3.tgz#94d1083d5bc3b09e510f680ad7f82395765badf3"
   integrity sha512-Q7kY5sDau8OoE6Y9zJoRGgje8P4/UY0WzH8R2ok0PDh+iJ+ZnEKowhjEqYafVcubkbYxQVaqwm3iufktzhprGg==
@@ -9652,10 +9652,10 @@ safe-regex@^2.1.1:
   resolved "https://registry.yarnpkg.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
 
-sanitize-html@~2.17.0:
-  version "2.17.0"
-  resolved "https://registry.yarnpkg.com/sanitize-html/-/sanitize-html-2.17.0.tgz#a8f66420a6be981d8fe412e3397cc753782598e4"
-  integrity sha512-dLAADUSS8rBwhaevT12yCezvioCA+bmUTPH/u57xKPT8d++voeYE6HeluA/bPbQ15TwDBG2ii+QZIEmYx8VdxA==
+sanitize-html@~2.17.1:
+  version "2.17.1"
+  resolved "https://registry.yarnpkg.com/sanitize-html/-/sanitize-html-2.17.1.tgz#3b8073f9b2bf5b47bed045e09a0e428b1fe38bf3"
+  integrity sha512-ehFCW+q1a4CSOWRAdX97BX/6/PDEkCqw7/0JXZAGQV57FQB3YOkTa/rrzHPeJ+Aghy4vZAFfWMYyfxIiB7F/gw==
   dependencies:
     deepmerge "^4.2.2"
     escape-string-regexp "^4.0.0"
