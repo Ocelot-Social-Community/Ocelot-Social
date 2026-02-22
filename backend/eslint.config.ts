@@ -66,7 +66,9 @@ export default [
     files: ['**/*.ts'],
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        projectService: {
+          allowDefaultProject: ['eslint.config.ts'],
+        },
         tsconfigRootDir: import.meta.dirname,
       },
     },
