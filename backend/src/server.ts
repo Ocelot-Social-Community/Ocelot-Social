@@ -13,9 +13,11 @@ import { expressMiddleware } from '@apollo/server/express4'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
 import bodyParser from 'body-parser'
 import express from 'express'
+import { execute, subscribe } from 'graphql'
 import { graphqlUploadExpress } from 'graphql-upload'
 import { useServer } from 'graphql-ws/lib/use/ws'
 import helmet from 'helmet'
+import { SubscriptionServer } from 'subscriptions-transport-ws'
 import { WebSocketServer } from 'ws'
 
 import CONFIG from './config'
@@ -36,8 +38,11 @@ const createServer = async (options?: CreateServerOptions) => {
   const httpServer = http.createServer(app)
   const appliedSchema = middleware(schema)
 
-  // WebSocket server for subscriptions
-  const wsServer = new WebSocketServer({ server: httpServer, path: '/' })
+  // Two WebSocket servers for dual protocol support (noServer mode)
+  const wsServer = new WebSocketServer({ noServer: true })
+  const legacyWsServer = new WebSocketServer({ noServer: true })
+
+  // New protocol: graphql-ws (subprotocol: graphql-transport-ws)
   const serverCleanup = useServer(
     {
       schema: appliedSchema,
@@ -49,6 +54,32 @@ const createServer = async (options?: CreateServerOptions) => {
     },
     wsServer,
   )
+
+  // Legacy protocol: subscriptions-transport-ws (subprotocol: graphql-ws)
+  const legacyServerCleanup = SubscriptionServer.create(
+    {
+      schema: appliedSchema,
+      execute,
+      subscribe,
+      onConnect: (connectionParams: Record<string, unknown>) => {
+        return getContext()(connectionParams as { headers: { authorization?: string } })
+      },
+      onDisconnect: () => {
+        logger.debug('Legacy WebSocket client disconnected')
+      },
+    },
+    legacyWsServer,
+  )
+
+  // Route WebSocket upgrade requests based on subprotocol
+  httpServer.on('upgrade', (req, socket, head) => {
+    const protocol = req.headers['sec-websocket-protocol']
+    const isLegacy = protocol === 'graphql-ws' || !protocol
+    const targetServer = isLegacy ? legacyWsServer : wsServer
+    targetServer.handleUpgrade(req, socket, head, (ws) => {
+      targetServer.emit('connection', ws, req)
+    })
+  })
 
   const server = new ApolloServer({
     schema: appliedSchema,
@@ -71,6 +102,7 @@ const createServer = async (options?: CreateServerOptions) => {
           return {
             async drainServer() {
               await serverCleanup.dispose()
+              legacyServerCleanup.close()
             },
           }
         },

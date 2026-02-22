@@ -92,6 +92,7 @@
     "tslog": "^4.10.2",
     "uuid": "~9.0.1",
     "validator": "^13.15.26",
+    "subscriptions-transport-ws": "^0.11.0",
     "ws": "^8.18.2",
     "xregexp": "^5.1.2"
   },
