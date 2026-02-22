@@ -18,11 +18,7 @@ import createServer from '@src/server'
 const driver = getDriver()
 const neode = getNeode()
 
-let currentUser
-let mutedUser
-let authenticatedUser
-let serverQuery
-let serverMutate
+let mutate, query, currentUser, mutedUser, authenticatedUser
 
 const contextFn = () => ({
   user: authenticatedUser,
@@ -35,19 +31,12 @@ const contextFn = () => ({
 
 beforeAll(async () => {
   await cleanDatabase()
-})
 
-afterAll(async () => {
-  await cleanDatabase()
-  await driver.close()
-})
-
-beforeEach(async () => {
   authenticatedUser = undefined
   const { server } = await createServer({
     context: async () => contextFn(),
   })
-  serverQuery = async (opts) => {
+  query = async (opts) => {
     const result = await server.executeOperation(
       { query: opts.query, variables: opts.variables },
       { contextValue: (await contextFn()) as any },
@@ -60,7 +49,12 @@ beforeEach(async () => {
     }
     return { data: null as any, errors: undefined }
   }
-  serverMutate = (opts) => serverQuery({ query: opts.mutation, variables: opts.variables })
+  mutate = (opts) => query({ query: opts.mutation, variables: opts.variables })
+})
+
+afterAll(async () => {
+  await cleanDatabase()
+  await driver.close()
 })
 
 // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
@@ -70,7 +64,7 @@ afterEach(async () => {
 
 describe('mutedUsers', () => {
   it('throws permission error', async () => {
-    const result = await serverQuery({ query: mutedUsers })
+    const result = await query({ query: mutedUsers })
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
   })
@@ -90,7 +84,7 @@ describe('mutedUsers', () => {
     })
 
     it('returns a list of muted users', async () => {
-      await expect(serverQuery({ query: mutedUsers })).resolves.toEqual(
+      await expect(query({ query: mutedUsers })).resolves.toEqual(
         expect.objectContaining({
           data: {
             mutedUsers: [
@@ -113,7 +107,7 @@ describe('muteUser', () => {
   beforeEach(() => {
     currentUser = undefined
     muteAction = (variables) => {
-      return serverMutate({ mutation: muteUser, variables })
+      return mutate({ mutation: muteUser, variables })
     }
   })
 
@@ -167,7 +161,7 @@ describe('muteUser', () => {
 
       it('unfollows the user', async () => {
         await currentUser.relateTo(mutedUser, 'following')
-        await expect(serverQuery({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
+        await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
           data: {
             User: expect.arrayContaining([
               expect.objectContaining({ id: 'u2', isMuted: false, followedByCurrentUser: true }),
@@ -175,7 +169,7 @@ describe('muteUser', () => {
           },
         })
         await muteAction({ id: 'u2' })
-        await expect(serverQuery({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
+        await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
           data: {
             User: expect.arrayContaining([
               expect.objectContaining({ id: 'u2', isMuted: true, followedByCurrentUser: false }),
@@ -204,7 +198,7 @@ describe('muteUser', () => {
 
         const bothPostsAreInTheNewsfeed = async () => {
           await expect(
-            serverQuery({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+            query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
           ).resolves.toMatchObject({
             data: {
               Post: expect.arrayContaining([
@@ -240,7 +234,7 @@ describe('muteUser', () => {
 
             it("the muted user's post won't show up in the newsfeed of the current user", async () => {
               await expect(
-                serverQuery({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+                query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
               ).resolves.toMatchObject({
                 data: {
                   Post: [
@@ -256,7 +250,7 @@ describe('muteUser', () => {
 
             it("the muted user's post is still accessible by direct id lookup", async () => {
               await expect(
-                serverQuery({ query: Post, variables: { id: 'p23' } }),
+                query({ query: Post, variables: { id: 'p23' } }),
               ).resolves.toMatchObject({
                 data: {
                   Post: [
@@ -282,7 +276,7 @@ describe('muteUser', () => {
 
               it('the pinned post still shows up in the post list', async () => {
                 await expect(
-                  serverQuery({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+                  query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
                 ).resolves.toMatchObject({
                   data: {
                     Post: expect.arrayContaining([
@@ -298,7 +292,7 @@ describe('muteUser', () => {
 
               it('the pinned post is accessible by id', async () => {
                 await expect(
-                  serverQuery({ query: Post, variables: { id: 'p-pinned' } }),
+                  query({ query: Post, variables: { id: 'p-pinned' } }),
                 ).resolves.toMatchObject({
                   data: {
                     Post: [
@@ -313,7 +307,7 @@ describe('muteUser', () => {
               })
 
               it('the non-pinned post from the muted user is still hidden in the feed', async () => {
-                const result = await serverQuery({
+                const result = await query({
                   query: Post,
                   variables: { orderBy: 'createdAt_asc' },
                 })
@@ -338,7 +332,7 @@ describe('muteUser', () => {
 
             it("the current user's post will show up in the newsfeed of the muted user", async () => {
               await expect(
-                serverQuery({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
+                query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
               ).resolves.toMatchObject({
                 data: {
                   Post: expect.arrayContaining([
@@ -369,7 +363,7 @@ describe('unmuteUser', () => {
   beforeEach(() => {
     currentUser = undefined
     unmuteAction = (variables) => {
-      return serverMutate({ mutation: unmuteUser, variables })
+      return mutate({ mutation: unmuteUser, variables })
     }
   })
 
