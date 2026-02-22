@@ -2,12 +2,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import EmailAddress from '@db/models/EmailAddress'
-import User from '@db/models/User'
 import { Signup } from '@graphql/queries/Signup'
 import { SignupVerification } from '@graphql/queries/SignupVerification'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type EmailAddress from '@db/models/EmailAddress'
+import type User from '@db/models/User'
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 let variables

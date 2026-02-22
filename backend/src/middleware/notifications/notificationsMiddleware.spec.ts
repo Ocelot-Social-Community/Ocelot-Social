@@ -18,16 +18,21 @@ import { markAsRead } from '@graphql/queries/markAsRead'
 import { notifications } from '@graphql/queries/notifications'
 import { RemoveUserFromGroup } from '@graphql/queries/RemoveUserFromGroup'
 import { UpdatePost } from '@graphql/queries/UpdatePost'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 import type { DecodedUser } from '@src/jwt/decode'
 
 const sendChatMessageMailMock: (notification) => void = jest.fn()
 const sendNotificationMailMock: (notification) => void = jest.fn()
 jest.mock('@src/emails/sendEmail', () => ({
-  sendChatMessageMail: (notification) => sendChatMessageMailMock(notification),
-  sendNotificationMail: (notification) => sendNotificationMailMock(notification),
+  sendChatMessageMail: (notification) => {
+    sendChatMessageMailMock(notification)
+  },
+  sendNotificationMail: (notification) => {
+    sendNotificationMailMock(notification)
+  },
 }))
 
 let isUserOnlineMock = jest.fn()

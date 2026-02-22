@@ -3,7 +3,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import Image from '@db/models/Image'
 import { AddPostEmotions } from '@graphql/queries/AddPostEmotions'
 import { CreateGroup } from '@graphql/queries/CreateGroup'
 import { CreatePost } from '@graphql/queries/CreatePost'
@@ -17,8 +16,10 @@ import { RemovePostEmotions } from '@graphql/queries/RemovePostEmotions'
 import { unpinPost } from '@graphql/queries/unpinPost'
 import { unpushPost } from '@graphql/queries/unpushPost'
 import { UpdatePost } from '@graphql/queries/UpdatePost'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type Image from '@db/models/Image'
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 let user

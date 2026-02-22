@@ -71,15 +71,15 @@ export function up(next) {
       ),
     )
     .subscribe({
-      next: ({ user, email, _oldUser, oldEmail }) =>
-        // eslint-disable-next-line no-console
+      next: ({ user, email, _oldUser, oldEmail }) => {
         console.log(`
           Merged:
           =============================
           userId: ${user.id}
           email: ${oldEmail} => ${email.email}
           =============================
-        `),
+        `)
+      },
       complete: () => {
         // eslint-disable-next-line no-console
         console.log('Merging of duplicate users completed')

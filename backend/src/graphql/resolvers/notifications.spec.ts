@@ -8,8 +8,9 @@ import { DeletePost } from '@graphql/queries/DeletePost'
 import { markAllAsRead } from '@graphql/queries/markAllAsRead'
 import { markAsRead } from '@graphql/queries/markAsRead'
 import { notifications } from '@graphql/queries/notifications'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 let user

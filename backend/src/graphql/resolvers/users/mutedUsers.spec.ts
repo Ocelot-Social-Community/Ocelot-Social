@@ -97,7 +97,7 @@ describe('muteUser', () => {
 
   beforeEach(() => {
     currentUser = undefined
-    muteAction = (variables) => {
+    muteAction = async (variables) => {
       const { mutate } = createTestClient(server)
       return mutate({ mutation: muteUser, variables })
     }
@@ -361,7 +361,7 @@ describe('unmuteUser', () => {
 
   beforeEach(() => {
     currentUser = undefined
-    unmuteAction = (variables) => {
+    unmuteAction = async (variables) => {
       const { mutate } = createTestClient(server)
       return mutate({ mutation: unmuteUser, variables })
     }

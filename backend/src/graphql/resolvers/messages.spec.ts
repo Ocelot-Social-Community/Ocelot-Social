@@ -14,8 +14,9 @@ import { CreateRoom } from '@graphql/queries/CreateRoom'
 import { MarkMessagesAsSeen } from '@graphql/queries/MarkMessagesAsSeen'
 import { Message } from '@graphql/queries/Message'
 import { Room } from '@graphql/queries/Room'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 let authenticatedUser: Context['user']

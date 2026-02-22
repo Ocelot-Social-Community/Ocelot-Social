@@ -3,7 +3,6 @@
 import { verify } from 'jsonwebtoken'
 
 import type CONFIG from '@src/config'
-
 import type { JwtPayload } from 'jsonwebtoken'
 import type { Driver } from 'neo4j-driver'
 

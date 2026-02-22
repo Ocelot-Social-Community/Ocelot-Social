@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { applyMiddleware, IMiddleware, IMiddlewareGenerator } from 'graphql-middleware'
+import { applyMiddleware } from 'graphql-middleware'
 
 import CONFIG from '@config/index'
 
@@ -22,6 +22,8 @@ import softDelete from './softDelete/softDeleteMiddleware'
 import userInteractions from './userInteractions'
 import validation from './validation/validationMiddleware'
 import xss from './xssMiddleware'
+
+import type { IMiddleware, IMiddlewareGenerator } from 'graphql-middleware'
 
 export interface MiddlewareOrder {
   position: 'prepend' | 'append' | { before: string } | { after: string }

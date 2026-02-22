@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import type { Context } from '@src/context'
-
 import uniqueSlug from './slugify/uniqueSlug'
+
+import type { Context } from '@src/context'
 
 export const isUniqueFor = (context: Context, type: string) => {
   return async (slug: string) => {

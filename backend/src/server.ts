@@ -26,7 +26,7 @@ const createServer = (options?: ApolloServerExpressConfig) => {
     schema: middleware(schema),
     subscriptions: {
       keepAlive: 10000,
-      onConnect: (connectionParams) =>
+      onConnect: async (connectionParams) =>
         getContext()(connectionParams as { headers: { authorization?: string } }),
       onDisconnect: () => {
         logger.debug('WebSocket client disconnected')

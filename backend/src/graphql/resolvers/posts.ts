@@ -9,8 +9,6 @@ import { isEmpty } from 'lodash'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 import { v4 as uuid } from 'uuid'
 
-import { Context } from '@src/context'
-
 import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
@@ -18,6 +16,8 @@ import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
+
+import type { Context } from '@src/context'
 
 const maintainPinnedPosts = (params) => {
   const pinnedPostFilter = { pinned: true }
@@ -235,7 +235,7 @@ export default {
         WITH post
       `
 
-      if (config.CATEGORIES_ACTIVE && categoryIds && categoryIds.length) {
+      if (config.CATEGORIES_ACTIVE && categoryIds?.length) {
         const cypherDeletePreviousRelations = `
           MATCH (post:Post { id: $params.id })-[previousRelations:CATEGORIZED]->(category:Category)
           DELETE previousRelations

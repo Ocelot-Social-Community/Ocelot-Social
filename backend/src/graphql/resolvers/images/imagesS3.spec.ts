@@ -8,11 +8,11 @@ import { UserInputError } from 'apollo-server'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import type { S3Config } from '@src/config'
 
 import { images } from './imagesS3'
 
 import type { ImageInput } from './images'
+import type { S3Config } from '@src/config'
 import type { FileUpload } from 'graphql-upload'
 
 jest.mock('@aws-sdk/client-s3', () => {
@@ -28,7 +28,8 @@ jest.mock('@aws-sdk/client-s3', () => {
 jest.mock('@aws-sdk/lib-storage', () => {
   return {
     Upload: jest.fn().mockImplementation(({ params: { Key } }: { params: { Key: string } }) => ({
-      done: () => Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
+      done: async () =>
+        Promise.resolve({ Location: `http://your-objectstorage.com/bucket/${Key}` }),
     })),
   }
 })
@@ -151,7 +152,9 @@ describe('mergeImage', () => {
     beforeEach(() => {
       const createReadStream: FileUpload['createReadStream'] = (() => ({
         pipe: () => ({
-          on: (_: unknown, callback: () => void) => callback(), // eslint-disable-line promise/prefer-await-to-callbacks
+          on: (_: unknown, callback: () => void) => {
+            callback()
+          },
         }),
       })) as unknown as FileUpload['createReadStream']
       imageInput = {

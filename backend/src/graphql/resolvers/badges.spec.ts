@@ -8,8 +8,9 @@ import { rewardTrophyBadge } from '@graphql/queries/rewardTrophyBadge'
 import { setTrophyBadgeSelected } from '@graphql/queries/setTrophyBadgeSelected'
 import { setVerificationBadge } from '@graphql/queries/setVerificationBadge'
 import { User } from '@graphql/queries/User'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 let regularUser, administrator, moderator, badge, verification

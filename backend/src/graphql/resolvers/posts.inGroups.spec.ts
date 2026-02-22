@@ -12,8 +12,9 @@ import { Post } from '@graphql/queries/Post'
 import { profilePagePosts } from '@graphql/queries/profilePagePosts'
 import { searchPosts } from '@graphql/queries/searchPosts'
 import { SignupVerification } from '@graphql/queries/SignupVerification'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 jest.mock('@constants/groups', () => {

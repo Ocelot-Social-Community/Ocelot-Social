@@ -9,13 +9,14 @@ import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
 import { getNeode } from '@db/neo4j'
-import { Context } from '@src/context'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import normalizeEmail from './helpers/normalizeEmail'
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
+
+import type { Context } from '@src/context'
 
 const neode = getNeode()
 
@@ -235,7 +236,7 @@ export default {
                 return Promise.all(
                   txResult.records
                     .map((record) => record.get('resource'))
-                    .map((resource) =>
+                    .map(async (resource) =>
                       images(context.config).deleteImage(resource, 'HERO_IMAGE', { transaction }),
                     ),
                 )

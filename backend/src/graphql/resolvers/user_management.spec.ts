@@ -16,8 +16,9 @@ import { login } from '@graphql/queries/login'
 import { saveCategorySettings } from '@graphql/queries/saveCategorySettings'
 import { decode } from '@jwt/decode'
 import { encode } from '@jwt/encode'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup, TEST_CONFIG } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 
 const jwt = { verify }
 let variables, req, user
@@ -265,7 +266,7 @@ describe('login', () => {
       })
 
       describe('normalization', () => {
-        describe('email address is a gmail address ', () => {
+        describe('email address is a gmail address', () => {
           beforeEach(async () => {
             const email = await database.neode.first(
               'EmailAddress',

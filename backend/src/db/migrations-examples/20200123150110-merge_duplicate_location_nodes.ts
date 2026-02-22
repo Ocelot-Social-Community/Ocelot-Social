@@ -65,15 +65,15 @@ export function up(next) {
       ),
     )
     .subscribe({
-      next: ({ updatedLocation, location }) =>
-        // eslint-disable-next-line no-console
+      next: ({ updatedLocation, location }) => {
         console.log(`
           Merged:
           =============================
           locationId: ${location.id}
           updatedLocation: ${location.id} => ${updatedLocation.id}
           =============================
-        `),
+        `)
+      },
       complete: () => {
         // eslint-disable-next-line no-console
         console.log('Merging of duplicate locations completed')

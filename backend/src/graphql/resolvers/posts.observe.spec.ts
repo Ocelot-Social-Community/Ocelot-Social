@@ -6,8 +6,9 @@ import { CreateComment } from '@graphql/queries/CreateComment'
 import { CreatePost } from '@graphql/queries/CreatePost'
 import { Post } from '@graphql/queries/Post'
 import { toggleObservePost } from '@graphql/queries/toggleObservePost'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 let user

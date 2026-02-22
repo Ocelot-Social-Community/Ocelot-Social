@@ -1,6 +1,8 @@
-import { ILogObj, Logger } from 'tslog'
+import { Logger } from 'tslog'
 
 import CONFIG from './config'
+
+import type { ILogObj } from 'tslog'
 
 const { LOG_LEVEL } = CONFIG
 
@@ -39,7 +41,7 @@ class LoggerSingleton {
    * The Singleton's constructor should always be private to prevent direct
    * construction calls with the `new` operator.
    */
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+
   private constructor() {}
 
   /**

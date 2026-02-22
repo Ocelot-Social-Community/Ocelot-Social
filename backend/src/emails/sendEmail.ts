@@ -12,7 +12,8 @@ import { createTransport } from 'nodemailer'
 import CONFIG, { nodemailerTransportOptions } from '@config/index'
 import logosWebapp from '@config/logosBranded'
 import metadata from '@config/metadata'
-import { UserDbProperties } from '@db/types/User'
+
+import type { UserDbProperties } from '@db/types/User'
 
 const welcomeImageUrl = new URL(logosWebapp.LOGO_WELCOME_PATH, CONFIG.CLIENT_URI)
 const settingsUrl = new URL('/settings/notifications', CONFIG.CLIENT_URI)

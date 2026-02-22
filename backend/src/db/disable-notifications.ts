@@ -6,7 +6,7 @@ const run = async () => {
   if (args.length !== 1) {
     // eslint-disable-next-line no-console
     console.error('Usage: yarn run db:func:disable-notifications <email>')
-    // eslint-disable-next-line n/no-process-exit
+
     process.exit(1)
   }
 
@@ -16,7 +16,7 @@ const run = async () => {
   if (!emailRegex.test(email)) {
     // eslint-disable-next-line no-console
     console.error('Error: Invalid email address format')
-    // eslint-disable-next-line n/no-process-exit
+
     process.exit(1)
   }
 
@@ -46,13 +46,13 @@ const run = async () => {
   if (result !== '1') {
     // eslint-disable-next-line no-console
     console.error(`User with email address ${email} not found`)
-    // eslint-disable-next-line n/no-process-exit
+
     process.exit(1)
   }
 
   // eslint-disable-next-line no-console
   console.log(`Notifications for User with email address ${email} disabled`)
-  // eslint-disable-next-line n/no-process-exit
+
   process.exit(0)
 }
 

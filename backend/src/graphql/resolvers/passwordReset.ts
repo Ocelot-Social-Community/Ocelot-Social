@@ -8,10 +8,11 @@ import bcrypt from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
 
 import registrationConstants from '@constants/registrationBranded'
-import type { Context } from '@src/context'
 
 import createPasswordReset from './helpers/createPasswordReset'
 import normalizeEmail from './helpers/normalizeEmail'
+
+import type { Context } from '@src/context'
 
 export default {
   Mutation: {

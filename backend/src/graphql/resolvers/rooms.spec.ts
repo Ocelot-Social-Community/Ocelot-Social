@@ -7,8 +7,9 @@ import { CreateMessage } from '@graphql/queries/CreateMessage'
 import { CreateRoom } from '@graphql/queries/CreateRoom'
 import { Room } from '@graphql/queries/Room'
 import { UnreadRooms } from '@graphql/queries/UnreadRooms'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 let chattingUser, otherChattingUser, notChattingUser

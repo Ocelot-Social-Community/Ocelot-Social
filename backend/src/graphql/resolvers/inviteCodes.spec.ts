@@ -16,8 +16,9 @@ import {
   authenticatedValidateInviteCode,
   unauthenticatedValidateInviteCode,
 } from '@graphql/queries/validateInviteCode'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup, TEST_CONFIG } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 let authenticatedUser: Context['user']
@@ -326,7 +327,7 @@ describe('validateInviteCode', () => {
       })
     })
 
-    // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
+    // eslint-disable-next-line jest/no-disabled-tests
     it.skip('throws no authorization error when querying extended hidden group fields as member', async () => {})
   })
 })
@@ -495,7 +496,7 @@ describe('generatePersonalInviteCode', () => {
       })
     })
 
-    // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
+    // eslint-disable-next-line jest/no-disabled-tests
     it.skip('returns a new invite code when colliding with an existing one', () => {})
   })
 })
@@ -763,7 +764,7 @@ describe('generateGroupInviteCode', () => {
       })
     })
 
-    // eslint-disable-next-line jest/no-disabled-tests, @typescript-eslint/no-empty-function
+    // eslint-disable-next-line jest/no-disabled-tests
     it.skip('returns a new group invite code when colliding with an existing one', () => {})
   })
 

@@ -83,7 +83,7 @@ class Store {
     const driver = getDriver()
     const session = driver.session()
     const { migrations } = set
-    const writeTxResultPromise = session.writeTransaction((txc) => {
+    const writeTxResultPromise = session.writeTransaction(async (txc) => {
       return Promise.all(
         migrations.map(async (migration) => {
           const { title, description, timestamp } = migration

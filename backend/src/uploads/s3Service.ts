@@ -1,9 +1,8 @@
 import { S3Client, DeleteObjectCommand, ObjectCannedACL } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 
+import type { FileUploadCallback, FileDeleteCallback } from './types'
 import type { S3Config } from '@config/index'
-
-import { FileUploadCallback, FileDeleteCallback } from './types'
 
 let cachedClient: S3Client | null = null
 let cachedConfig: S3Config | null = null

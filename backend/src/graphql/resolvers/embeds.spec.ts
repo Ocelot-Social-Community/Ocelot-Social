@@ -61,7 +61,6 @@ describe('Query', () => {
     beforeEach(() => {
       embedAction = async (variables) => {
         const { server } = createServer({
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
           context: () => {},
         })
         const { query } = createTestClient(server)

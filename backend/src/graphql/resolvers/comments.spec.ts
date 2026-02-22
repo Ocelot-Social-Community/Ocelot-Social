@@ -6,8 +6,9 @@ import Factory, { cleanDatabase } from '@db/factories'
 import { CreateComment } from '@graphql/queries/CreateComment'
 import { DeleteComment } from '@graphql/queries/DeleteComment'
 import { UpdateComment as updateComment } from '@graphql/queries/UpdateComment'
-import type { ApolloTestSetup } from '@root/test/helpers'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
 let variables, commentAuthor, newlyCreatedComment

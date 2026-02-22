@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import type { Context } from '@src/context'
-
 import normalizeEmail from './normalizeEmail'
+
+import type { Context } from '@src/context'
 
 export default async function createPasswordReset(options: {
   driver: Context['driver']
