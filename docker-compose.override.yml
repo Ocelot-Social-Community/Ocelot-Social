@@ -90,6 +90,7 @@ services:
       S3_STORAGE_BUCKET: ocelot # enable S3 storage by specifying bucket
       S3_RESULT_STORAGE_BUCKET: ocelot # enable S3 result storage by specifying bucket
       HTTP_LOADER_BASE_URL: http://minio:9000
+      IMAGOR_CACHE_HEADER_TTL: 168h # 7 days
 
   ui:
     image: ghcr.io/ocelot-social-community/ocelot-social/ui:local-development
