@@ -83,6 +83,11 @@ const createServer = async (options?: CreateServerOptions) => {
 
   const server = new ApolloServer({
     schema: appliedSchema,
+    // TODO: Re-enable CSRF prevention once the webapp sends the 'apollo-require-preflight' header.
+    // Currently disabled because the Nuxt 2 webapp uses apollo-upload-client for multipart/form-data
+    // file uploads, which Apollo Server 4 blocks by default as a CSRF vector. The webapp relies on
+    // JWT/cookie authentication and CORS configuration for request validation instead.
+    csrfPrevention: false,
     formatError: (formattedError, error) => {
       if (formattedError.message === 'ERROR_VALIDATION') {
         return {
