@@ -3,7 +3,7 @@
 import databaseContext from '@context/database'
 import pubsubContext from '@context/pubsub'
 import CONFIG from '@src/config'
-import { decode } from '@src/jwt/decode'
+import { decode, DecodedUser } from '@src/jwt/decode'
 import ocelotLogger from '@src/logger'
 
 const serverDatabase = databaseContext()
@@ -14,7 +14,7 @@ export const getContext =
     database?: ReturnType<typeof databaseContext>
     pubsub?: ReturnType<typeof pubsubContext>
     authenticatedUser: DecodedUser | null | undefined
-    logger?: typeof OcelotLogger
+    logger?: typeof ocelotLogger
     config: typeof CONFIG
   }) =>
   async (req: { headers: { authorization?: string } }) => {

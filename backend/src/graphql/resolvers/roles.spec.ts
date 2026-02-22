@@ -6,8 +6,6 @@ import { getDriver, getNeode } from '@db/neo4j'
 import { availableRoles } from '@graphql/queries/availableRoles'
 import createServer from '@src/server'
 
-import type { ApolloServerTestClient } from 'apollo-server-testing'
-
 const instance = getNeode()
 const driver = getDriver()
 

@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import databaseContext from '@context/database'
-import { getContext } from '@src/context'
+import { Context, getContext } from '@src/context'
 import createServer from '@src/server'
 
 import type { ApolloServerPlugin } from '@apollo/server'
 import type { DocumentNode } from 'graphql'
+import CONFIG from '@config/index'
 
 export const TEST_CONFIG = {
   NODE_ENV: 'test',
