@@ -24,7 +24,7 @@ import schema from './graphql/schema'
 import logger from './logger'
 import middleware from './middleware'
 
-import type { ApolloServerPlugin, BaseContext } from '@apollo/server'
+import type { ApolloServerPlugin } from '@apollo/server'
 
 interface CreateServerOptions {
   context?: (req: { headers: { authorization?: string } }) => Promise<any>
@@ -66,6 +66,7 @@ const createServer = async (options?: CreateServerOptions) => {
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
       {
+        // eslint-disable-next-line @typescript-eslint/require-await
         async serverWillStart() {
           return {
             async drainServer() {

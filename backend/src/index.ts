@@ -33,6 +33,7 @@ async function main() {
   }
 }
 
+// eslint-disable-next-line promise/prefer-await-to-callbacks, @typescript-eslint/use-unknown-in-catch-callback-variable
 main().catch((err) => {
   /* eslint-disable-next-line no-console */
   console.error('Failed to start server:', err)

@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/await-thenable */
+/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -227,6 +230,7 @@ describe('muteUser', () => {
         }
 
         describe('from the perspective of the current user', () => {
+          // eslint-disable-next-line jest/expect-expect
           it('both posts are in the newsfeed', bothPostsAreInTheNewsfeed)
 
           describe('but if the current user mutes the other user', () => {
@@ -326,6 +330,7 @@ describe('muteUser', () => {
             authenticatedUser = await mutedUser.toJson()
           })
 
+          // eslint-disable-next-line jest/expect-expect
           it('both posts are in the newsfeed', bothPostsAreInTheNewsfeed)
           describe('but if the current user mutes the other user', () => {
             beforeEach(async () => {
