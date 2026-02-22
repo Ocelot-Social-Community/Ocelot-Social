@@ -67,6 +67,7 @@ export function up(next) {
     )
     .subscribe({
       next: ({ updatedLocation, location }) => {
+        // eslint-disable-next-line no-console
         console.log(`
           Merged:
           =============================

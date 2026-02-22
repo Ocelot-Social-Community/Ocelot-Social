@@ -73,6 +73,7 @@ export function up(next) {
     )
     .subscribe({
       next: ({ user, email, _oldUser, oldEmail }) => {
+        // eslint-disable-next-line no-console
         console.log(`
           Merged:
           =============================
