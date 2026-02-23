@@ -30,11 +30,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.1.7
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Neo4J | Build 'community' image
-        run: |
-          docker compose -f docker-compose.yml -f docker-compose.test.yml build neo4j
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" > /tmp/neo4j.tar
-      
+        uses: docker/build-push-action@v6
+        with:
+          context: neo4j
+          file: neo4j/Dockerfile
+          target: community
+          load: true
+          tags: ghcr.io/ocelot-social-community/ocelot-social/neo4j:community
+          cache-from: type=gha,scope=neo4j
+          cache-to: type=gha,mode=max,scope=neo4j
+
+      - name: Save image for test job
+        run: docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" > /tmp/neo4j.tar
+
       - name: Cache docker images
         id: cache-neo4j
         uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v4.0.2
@@ -51,11 +63,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.1.7
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: backend | Build 'test' image
-        run: |
-          docker compose -f docker-compose.yml -f docker-compose.test.yml build backend
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" > /tmp/backend.tar
-      
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          file: backend/Dockerfile
+          target: test
+          load: true
+          tags: ghcr.io/ocelot-social-community/ocelot-social/backend:test
+          cache-from: type=gha,scope=backend-test
+          cache-to: type=gha,mode=max,scope=backend-test
+
+      - name: Save image for test job
+        run: docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" > /tmp/backend.tar
+
       - name: Cache docker images
         id: cache-backend
         uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v4.0.2
