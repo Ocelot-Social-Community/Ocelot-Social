@@ -211,7 +211,14 @@ jobs:
           docker load < /tmp/mailserver.tar
           docker load < /tmp/webapp.tar
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
-          sleep 90s
+
+          echo "Waiting for backend (max 120s)..."
+          timeout 120 bash -c 'until curl -sf -X POST -H "Content-Type: application/json" -d "{\"query\":\"{__typename}\"}" http://localhost:4000 > /dev/null 2>&1; do sleep 5; done'
+          echo "Backend is ready."
+
+          echo "Waiting for webapp (max 120s)..."
+          timeout 120 bash -c 'until curl -sf http://localhost:3000 > /dev/null 2>&1; do sleep 5; done'
+          echo "Webapp is ready."
 
       - name: Full stack tests | run tests
         id: e2e-tests
