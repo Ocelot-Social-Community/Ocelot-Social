@@ -16,7 +16,7 @@
     "test": "cross-env NODE_ENV=test NODE_OPTIONS=--max-old-space-size=8192 jest --runInBand --coverage --forceExit --detectOpenHandles",
     "db:reset": "tsx src/db/reset.ts",
     "db:reset:withmigrations": "tsx src/db/reset-with-migrations.ts",
-    "db:seed": "tsx src/db/seed.ts",
+    "db:seed": "tsx --require ./src/graphql/gql-register.ts src/db/seed.ts",
     "db:data:admin": "tsx src/db/admin.ts",
     "db:data:badges": "tsx src/db/badges.ts",
     "db:data:branding": "tsx src/db/data-branding.ts",
