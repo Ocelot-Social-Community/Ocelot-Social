@@ -124,7 +124,7 @@ describe('notify group members of new posts in group', () => {
       mutation: JoinGroup,
       variables: {
         groupId: 'g-1',
-        userId: 'group-member',
+        userId: 'email-less-member',
       },
     })
     authenticatedUser = await postAuthor.toJson()

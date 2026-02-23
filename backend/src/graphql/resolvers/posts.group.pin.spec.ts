@@ -98,14 +98,6 @@ beforeEach(async () => {
       roleInGroup: 'admin',
     },
   })
-  await mutate({
-    mutation: ChangeGroupMemberRole,
-    variables: {
-      groupId: 'closed-group',
-      userId: 'all-groups-user',
-      roleInGroup: 'usual',
-    },
-  })
   authenticatedUser = await anyUser.toJson()
   await mutate({
     mutation: CreatePost,
