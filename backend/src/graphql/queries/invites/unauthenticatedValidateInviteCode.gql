@@ -1,0 +1,22 @@
+query unauthenticatedValidateInviteCode($code: String!) {
+  validateInviteCode(code: $code) {
+    code
+    # eslint-disable-next-line @graphql-eslint/require-selections
+    invitedTo {
+      groupType
+      name
+      about
+      avatar {
+        url
+      }
+    }
+    # eslint-disable-next-line @graphql-eslint/require-selections
+    generatedBy {
+      name
+      avatar {
+        url
+      }
+    }
+    isValid
+  }
+}

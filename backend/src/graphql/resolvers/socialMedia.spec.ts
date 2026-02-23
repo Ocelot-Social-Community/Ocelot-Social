@@ -5,9 +5,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { CreateSocialMedia } from '@graphql/queries/CreateSocialMedia'
-import { DeleteSocialMedia } from '@graphql/queries/DeleteSocialMedia'
-import { UpdateSocialMedia } from '@graphql/queries/UpdateSocialMedia'
+import CreateSocialMedia from '@graphql/queries/users/CreateSocialMedia.gql'
+import DeleteSocialMedia from '@graphql/queries/users/DeleteSocialMedia.gql'
+import UpdateSocialMedia from '@graphql/queries/users/UpdateSocialMedia.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

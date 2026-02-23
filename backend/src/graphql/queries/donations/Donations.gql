@@ -1,0 +1,8 @@
+query Donations {
+  Donations {
+    id
+    showDonations
+    goal
+    progress
+  }
+}

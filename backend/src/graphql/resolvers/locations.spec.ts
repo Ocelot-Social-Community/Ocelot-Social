@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import { UpdateUser } from '@graphql/queries/UpdateUser'
-import { User } from '@graphql/queries/User'
+import UpdateUser from '@graphql/queries/users/UpdateUser.gql'
+import User from '@graphql/queries/users/User.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -174,9 +174,9 @@ describe('distanceToMe', () => {
           data: {
             User: [
               expect.objectContaining({
-                location: {
+                location: expect.objectContaining({
                   distanceToMe: 0,
-                },
+                }),
               }),
             ],
           },
@@ -195,9 +195,9 @@ describe('distanceToMe', () => {
           data: {
             User: [
               expect.objectContaining({
-                location: {
+                location: expect.objectContaining({
                   distanceToMe: 0,
-                },
+                }),
               }),
             ],
           },
@@ -216,9 +216,9 @@ describe('distanceToMe', () => {
           data: {
             User: [
               expect.objectContaining({
-                location: {
+                location: expect.objectContaining({
                   distanceToMe: 746,
-                },
+                }),
               }),
             ],
           },
@@ -237,9 +237,9 @@ describe('distanceToMe', () => {
           data: {
             User: [
               expect.objectContaining({
-                location: {
+                location: expect.objectContaining({
                   distanceToMe: null,
-                },
+                }),
               }),
             ],
           },

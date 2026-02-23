@@ -4,19 +4,17 @@
 /* eslint-disable jest/expect-expect */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { CreateGroup } from '@graphql/queries/CreateGroup'
-import { currentUser } from '@graphql/queries/currentUser'
-import { generateGroupInviteCode } from '@graphql/queries/generateGroupInviteCode'
-import { generatePersonalInviteCode } from '@graphql/queries/generatePersonalInviteCode'
-import { Group } from '@graphql/queries/Group'
-import { GroupMembers } from '@graphql/queries/GroupMembers'
-import { invalidateInviteCode } from '@graphql/queries/invalidateInviteCode'
-import { JoinGroup } from '@graphql/queries/JoinGroup'
-import { redeemInviteCode } from '@graphql/queries/redeemInviteCode'
-import {
-  authenticatedValidateInviteCode,
-  unauthenticatedValidateInviteCode,
-} from '@graphql/queries/validateInviteCode'
+import currentUser from '@graphql/queries/auth/currentUser.gql'
+import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
+import Group from '@graphql/queries/groups/Group.gql'
+import GroupMembers from '@graphql/queries/groups/GroupMembers.gql'
+import JoinGroup from '@graphql/queries/groups/JoinGroup.gql'
+import authenticatedValidateInviteCode from '@graphql/queries/invites/authenticatedValidateInviteCode.gql'
+import generateGroupInviteCode from '@graphql/queries/invites/generateGroupInviteCode.gql'
+import generatePersonalInviteCode from '@graphql/queries/invites/generatePersonalInviteCode.gql'
+import invalidateInviteCode from '@graphql/queries/invites/invalidateInviteCode.gql'
+import redeemInviteCode from '@graphql/queries/invites/redeemInviteCode.gql'
+import unauthenticatedValidateInviteCode from '@graphql/queries/invites/unauthenticatedValidateInviteCode.gql'
 import { createApolloTestSetup, TEST_CONFIG } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -158,7 +156,7 @@ describe('validateInviteCode', () => {
       )
     })
 
-    it('returns the inviteCode when the code exists and hs not expired', async () => {
+    it('returns the inviteCode when the code exists and has not expired', async () => {
       await expect(
         query({ query: unauthenticatedValidateInviteCode, variables: { code: 'PERSNL' } }),
       ).resolves.toEqual(

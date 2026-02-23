@@ -8,14 +8,15 @@
 import { categories } from '@constants/categories'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
-import { DeleteUser } from '@graphql/queries/DeleteUser'
-import { resetTrophyBadgesSelected } from '@graphql/queries/resetTrophyBadgesSelected'
-import { saveCategorySettings } from '@graphql/queries/saveCategorySettings'
-import { setTrophyBadgeSelected } from '@graphql/queries/setTrophyBadgeSelected'
-import { switchUserRole } from '@graphql/queries/switchUserRole'
-import { updateOnlineStatus } from '@graphql/queries/updateOnlineStatus'
-import { UpdateUser } from '@graphql/queries/UpdateUser'
-import { UserEmailNotificationSettings, User as userQuery } from '@graphql/queries/User'
+import resetTrophyBadgesSelected from '@graphql/queries/badges/resetTrophyBadgesSelected.gql'
+import setTrophyBadgeSelected from '@graphql/queries/badges/setTrophyBadgeSelected.gql'
+import saveCategorySettings from '@graphql/queries/saveCategorySettings.gql'
+import DeleteUser from '@graphql/queries/users/DeleteUser.gql'
+import switchUserRole from '@graphql/queries/users/switchUserRole.gql'
+import updateOnlineStatus from '@graphql/queries/users/updateOnlineStatus.gql'
+import UpdateUser from '@graphql/queries/users/UpdateUser.gql'
+import userQuery from '@graphql/queries/users/User.gql'
+import UserEmailNotificationSettings from '@graphql/queries/users/UserEmailNotificationSettings.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type User from '@db/models/User'
@@ -1103,6 +1104,7 @@ describe('setTrophyBadgeSelected', () => {
         expect.objectContaining({
           data: {
             setTrophyBadgeSelected: {
+              id: expect.any(String),
               badgeTrophiesCount: 2,
               badgeTrophiesSelected: [
                 {
@@ -1161,6 +1163,7 @@ describe('setTrophyBadgeSelected', () => {
         expect.objectContaining({
           data: {
             setTrophyBadgeSelected: {
+              id: expect.any(String),
               badgeTrophiesCount: 2,
               badgeTrophiesSelected: [
                 {
@@ -1230,6 +1233,7 @@ describe('setTrophyBadgeSelected', () => {
           expect.objectContaining({
             data: {
               setTrophyBadgeSelected: {
+                id: expect.any(String),
                 badgeTrophiesCount: 2,
                 badgeTrophiesSelected: [
                   {
@@ -1291,6 +1295,7 @@ describe('setTrophyBadgeSelected', () => {
           expect.objectContaining({
             data: {
               setTrophyBadgeSelected: {
+                id: expect.any(String),
                 badgeTrophiesCount: 2,
                 badgeTrophiesSelected: [
                   {
@@ -1406,6 +1411,7 @@ describe('resetTrophyBadgesSelected', () => {
         expect.objectContaining({
           data: {
             resetTrophyBadgesSelected: {
+              id: expect.any(String),
               badgeTrophiesCount: 2,
               badgeTrophiesSelected: [
                 {

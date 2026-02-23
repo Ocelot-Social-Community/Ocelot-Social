@@ -3,9 +3,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { AddEmailAddress } from '@graphql/queries/AddEmailAddress'
-import { VerifyEmailAddress } from '@graphql/queries/VerifyEmailAddress'
-import { VerifyNonce } from '@graphql/queries/VerifyNonce'
+import VerifyNonce from '@graphql/queries/auth/VerifyNonce.gql'
+import AddEmailAddress from '@graphql/queries/users/AddEmailAddress.gql'
+import VerifyEmailAddress from '@graphql/queries/users/VerifyEmailAddress.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

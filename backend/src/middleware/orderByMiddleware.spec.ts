@@ -1,5 +1,5 @@
 import { cleanDatabase } from '@db/factories'
-import { Post } from '@graphql/queries/Post'
+import Post from '@graphql/queries/posts/Post.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

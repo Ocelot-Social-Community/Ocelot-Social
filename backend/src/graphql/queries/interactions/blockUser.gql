@@ -1,0 +1,7 @@
+mutation blockUser($id: ID!) {
+  blockUser(id: $id) {
+    id
+    name
+    isBlocked
+  }
+}

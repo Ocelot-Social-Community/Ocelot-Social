@@ -1,0 +1,22 @@
+mutation unpinGroupPost($id: ID!) {
+  unpinGroupPost(id: $id) {
+    id
+    title
+    content
+    author {
+      id
+      name
+      slug
+    }
+    pinnedBy {
+      id
+      name
+      role
+    }
+    createdAt
+    updatedAt
+    pinned
+    pinnedAt
+    groupPinned
+  }
+}

@@ -1,0 +1,22 @@
+query userData($id: ID!) {
+  userData(id: $id) {
+    user {
+      id
+      name
+      slug
+    }
+    posts {
+      id
+      title
+      content
+      comments {
+        id
+        content
+        author {
+          id
+          slug
+        }
+      }
+    }
+  }
+}

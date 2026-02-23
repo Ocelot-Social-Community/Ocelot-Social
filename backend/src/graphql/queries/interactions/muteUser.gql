@@ -1,0 +1,7 @@
+mutation muteUser($id: ID!) {
+  muteUser(id: $id) {
+    id
+    name
+    isMuted
+  }
+}

@@ -1,0 +1,3 @@
+query VerifyNonce($email: String!, $nonce: String!) {
+  VerifyNonce(email: $email, nonce: $nonce)
+}

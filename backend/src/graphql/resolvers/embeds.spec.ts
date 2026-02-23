@@ -8,7 +8,7 @@ import path from 'node:path'
 
 import fetch from 'node-fetch'
 
-import { embed } from '@graphql/queries/embed'
+import embed from '@graphql/queries/embed.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

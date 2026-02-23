@@ -1,0 +1,18 @@
+mutation markAsRead($id: ID!) {
+  markAsRead(id: $id) {
+    id
+    from {
+      __typename
+      ... on Post {
+        id
+        content
+      }
+      ... on Comment {
+        id
+        content
+      }
+    }
+    read
+    createdAt
+  }
+}

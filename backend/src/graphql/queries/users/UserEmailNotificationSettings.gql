@@ -1,0 +1,60 @@
+query UserEmailNotificationSettings($id: ID, $name: String, $email: String) {
+  User(id: $id, name: $name, email: $email) {
+    id
+    name
+    badgeTrophiesCount
+    badgeTrophies {
+      id
+    }
+    badgeVerification {
+      id
+      isDefault
+    }
+    badgeTrophiesSelected {
+      id
+      isDefault
+    }
+    followedBy {
+      id
+    }
+    followedByCurrentUser
+    following {
+      id
+      name
+      slug
+      about
+      avatar {
+        url
+      }
+      comments {
+        id
+        content
+        contentExcerpt
+      }
+      contributions {
+        id
+        title
+        slug
+        image {
+          url
+        }
+        content
+        contentExcerpt
+      }
+    }
+    isMuted
+    isBlocked
+    location {
+      id
+      distanceToMe
+    }
+    emailNotificationSettings {
+      type
+      settings {
+        name
+        value
+      }
+    }
+    activeCategories
+  }
+}

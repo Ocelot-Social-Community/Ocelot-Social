@@ -2,13 +2,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
-import { CreateComment } from '@graphql/queries/CreateComment'
-import { CreateGroup } from '@graphql/queries/CreateGroup'
-import { CreatePost } from '@graphql/queries/CreatePost'
-import { JoinGroup } from '@graphql/queries/JoinGroup'
-import { markAllAsRead } from '@graphql/queries/markAllAsRead'
-import { notifications } from '@graphql/queries/notifications'
+import CreateComment from '@graphql/queries/comments/CreateComment.gql'
+import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
+import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
+import JoinGroup from '@graphql/queries/groups/JoinGroup.gql'
+import markAllAsRead from '@graphql/queries/notifications/markAllAsRead.gql'
+import notifications from '@graphql/queries/notifications/notifications.gql'
+import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -306,6 +306,7 @@ describe('mentions in groups', () => {
         data: {
           notifications: expect.arrayContaining([
             {
+              id: expect.any(String),
               createdAt: expect.any(String),
               from: {
                 __typename: 'Post',
@@ -318,6 +319,7 @@ describe('mentions in groups', () => {
               relatedUser: null,
             },
             {
+              id: expect.any(String),
               createdAt: expect.any(String),
               from: {
                 __typename: 'Post',
@@ -423,6 +425,7 @@ describe('mentions in groups', () => {
         data: {
           notifications: expect.arrayContaining([
             {
+              id: expect.any(String),
               createdAt: expect.any(String),
               from: {
                 __typename: 'Post',
@@ -435,6 +438,7 @@ describe('mentions in groups', () => {
               relatedUser: null,
             },
             {
+              id: expect.any(String),
               createdAt: expect.any(String),
               from: {
                 __typename: 'Post',
@@ -528,6 +532,7 @@ describe('mentions in groups', () => {
         data: {
           notifications: expect.arrayContaining([
             {
+              id: expect.any(String),
               createdAt: expect.any(String),
               from: {
                 __typename: 'Post',
@@ -540,6 +545,7 @@ describe('mentions in groups', () => {
               relatedUser: null,
             },
             {
+              id: expect.any(String),
               createdAt: expect.any(String),
               from: {
                 __typename: 'Post',

@@ -1,0 +1,18 @@
+mutation markAllAsRead {
+  markAllAsRead {
+    id
+    from {
+      __typename
+      ... on Post {
+        id
+        content
+      }
+      ... on Comment {
+        id
+        content
+      }
+    }
+    read
+    createdAt
+  }
+}

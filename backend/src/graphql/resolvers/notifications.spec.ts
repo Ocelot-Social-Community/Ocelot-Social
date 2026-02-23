@@ -5,10 +5,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import Factory, { cleanDatabase } from '@db/factories'
-import { DeletePost } from '@graphql/queries/DeletePost'
-import { markAllAsRead } from '@graphql/queries/markAllAsRead'
-import { markAsRead } from '@graphql/queries/markAsRead'
-import { notifications } from '@graphql/queries/notifications'
+import markAllAsRead from '@graphql/queries/notifications/markAllAsRead.gql'
+import markAsRead from '@graphql/queries/notifications/markAsRead.gql'
+import notifications from '@graphql/queries/notifications/notifications.gql'
+import DeletePost from '@graphql/queries/posts/DeletePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -319,8 +319,10 @@ describe('given some notifications', () => {
             const { data } = await mutate({ mutation: markAsRead, variables })
             expect(data).toEqual({
               markAsRead: {
+                id: expect.any(String),
                 from: {
                   __typename: 'Post',
+                  id: 'p3',
                   content: 'You have been mentioned in a post',
                 },
                 read: true,
@@ -356,8 +358,10 @@ describe('given some notifications', () => {
             const { data } = await mutate({ mutation: markAsRead, variables })
             expect(data).toEqual({
               markAsRead: {
+                id: expect.any(String),
                 from: {
                   __typename: 'Comment',
+                  id: 'c2',
                   content: 'You have been mentioned in a comment',
                 },
                 read: true,
@@ -398,13 +402,21 @@ describe('given some notifications', () => {
             expect.arrayContaining([
               {
                 createdAt: '2019-08-30T19:33:48.651Z',
-                from: { __typename: 'Comment', content: 'You have been mentioned in a comment' },
+                from: {
+                  __typename: 'Comment',
+                  id: 'c2',
+                  content: 'You have been mentioned in a comment',
+                },
                 id: 'mentioned_in_comment/c2/you',
                 read: true,
               },
               {
                 createdAt: '2019-08-31T17:33:48.651Z',
-                from: { __typename: 'Post', content: 'You have been mentioned in a post' },
+                from: {
+                  __typename: 'Post',
+                  id: 'p3',
+                  content: 'You have been mentioned in a post',
+                },
                 id: 'mentioned_in_post/p3/you',
                 read: true,
               },

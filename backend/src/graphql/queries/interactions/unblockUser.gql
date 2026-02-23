@@ -1,0 +1,7 @@
+mutation unblockUser($id: ID!) {
+  unblockUser(id: $id) {
+    id
+    name
+    isBlocked
+  }
+}

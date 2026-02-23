@@ -3,9 +3,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import { CreateComment } from '@graphql/queries/CreateComment'
-import { DeleteComment } from '@graphql/queries/DeleteComment'
-import { UpdateComment as updateComment } from '@graphql/queries/UpdateComment'
+import CreateComment from '@graphql/queries/comments/CreateComment.gql'
+import DeleteComment from '@graphql/queries/comments/DeleteComment.gql'
+import updateComment from '@graphql/queries/comments/UpdateComment.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

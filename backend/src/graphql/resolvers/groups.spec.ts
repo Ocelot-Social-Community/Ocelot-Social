@@ -7,14 +7,14 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable jest/no-commented-out-tests */
 import Factory, { cleanDatabase } from '@db/factories'
-import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
-import { CreateGroup } from '@graphql/queries/CreateGroup'
-import { Group as groupQuery } from '@graphql/queries/Group'
-import { GroupMembers as groupMembersQuery } from '@graphql/queries/GroupMembers'
-import { JoinGroup } from '@graphql/queries/JoinGroup'
-import { LeaveGroup } from '@graphql/queries/LeaveGroup'
-import { RemoveUserFromGroup } from '@graphql/queries/RemoveUserFromGroup'
-import { UpdateGroup } from '@graphql/queries/UpdateGroup'
+import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
+import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
+import groupQuery from '@graphql/queries/groups/Group.gql'
+import groupMembersQuery from '@graphql/queries/groups/GroupMembers.gql'
+import JoinGroup from '@graphql/queries/groups/JoinGroup.gql'
+import LeaveGroup from '@graphql/queries/groups/LeaveGroup.gql'
+import RemoveUserFromGroup from '@graphql/queries/groups/RemoveUserFromGroup.gql'
+import UpdateGroup from '@graphql/queries/groups/UpdateGroup.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

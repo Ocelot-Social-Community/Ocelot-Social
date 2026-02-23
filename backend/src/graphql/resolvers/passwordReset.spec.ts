@@ -3,9 +3,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import registrationConstants from '@constants/registrationBranded'
 import Factory, { cleanDatabase } from '@db/factories'
-import { login } from '@graphql/queries/login'
-import { requestPasswordReset } from '@graphql/queries/requestPasswordReset'
-import { resetPassword } from '@graphql/queries/resetPassword'
+import login from '@graphql/queries/auth/login.gql'
+import requestPasswordReset from '@graphql/queries/auth/requestPasswordReset.gql'
+import resetPassword from '@graphql/queries/auth/resetPassword.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import createPasswordReset from './helpers/createPasswordReset'

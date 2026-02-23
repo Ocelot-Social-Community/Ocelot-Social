@@ -1,0 +1,6 @@
+mutation unmuteGroup($groupId: ID!) {
+  unmuteGroup(groupId: $groupId) {
+    id
+    isMutedByMe
+  }
+}

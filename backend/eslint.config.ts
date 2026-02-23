@@ -1,73 +1,62 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import comments from 'eslint-config-it4c/modules/comments'
-import eslint from 'eslint-config-it4c/modules/eslint'
-import importX from 'eslint-config-it4c/modules/import-x'
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+import config from 'eslint-config-it4c'
+import graphql from 'eslint-config-it4c/modules/graphql'
 import jest from 'eslint-config-it4c/modules/jest'
-import json from 'eslint-config-it4c/modules/json'
-import node from 'eslint-config-it4c/modules/node'
-import prettier from 'eslint-config-it4c/modules/prettier'
-import promise from 'eslint-config-it4c/modules/promise'
-import security from 'eslint-config-it4c/modules/security'
-import typescript from 'eslint-config-it4c/modules/typescript'
-import yaml from 'eslint-config-it4c/modules/yaml'
-
-// TODO: GraphQL linting is disabled because @graphql-eslint/eslint-plugin v4
-// (bundled with eslint-config-it4c) requires graphql@^16, but the backend
-// uses graphql@^14 (required by apollo-server v2). Re-enable when upgrading graphql.
-// import graphql from 'eslint-config-it4c/modules/graphql'
-//
-// ...graphql.map((c) => ({
-//   ...c,
-//   files: ['**/*.graphql', '**/*.gql'],
-// })),
-// {
-//   files: ['**/*.graphql', '**/*.gql'],
-//   languageOptions: {
-//     parserOptions: {
-//       schema: './src/graphql/types/**/*.gql',
-//       assumeValid: true,
-//     },
-//   },
-//   rules: {
-//     '@graphql-eslint/require-description': 'off',
-//     '@graphql-eslint/naming-convention': 'off',
-//     '@graphql-eslint/strict-id-in-types': 'off',
-//     '@graphql-eslint/no-typename-prefix': 'off',
-//     '@graphql-eslint/known-directives': 'off',
-//     '@graphql-eslint/known-argument-names': 'off',
-//     '@graphql-eslint/known-type-names': 'off',
-//     '@graphql-eslint/lone-schema-definition': 'off',
-//     '@graphql-eslint/provided-required-arguments': 'off',
-//     '@graphql-eslint/unique-directive-names': 'off',
-//     '@graphql-eslint/unique-directive-names-per-location': 'off',
-//     '@graphql-eslint/unique-field-definition-names': 'off',
-//     '@graphql-eslint/unique-operation-types': 'off',
-//     '@graphql-eslint/unique-type-names': 'off',
-//   },
-// },
 
 export default [
   {
     ignores: ['node_modules/', 'build/', 'coverage/'],
   },
-  ...eslint,
-  ...typescript,
-  ...importX,
-  ...node,
-  ...promise,
-  ...security,
-  ...comments,
-  ...json,
-  ...yaml,
-  ...prettier,
+  ...config,
   ...jest,
+  // GraphQL schema linting (extend file pattern to include .gql)
+  ...graphql.map((c) => ({
+    ...c,
+    files: ['**/*.graphql', '**/*.gql'],
+  })),
+  {
+    files: ['**/*.graphql', '**/*.gql'],
+    // TODO: Parser must be set explicitly because the it4c module only provides
+    // plugins and rules, not languageOptions. Without this, ESLint uses the JS
+    // parser for .gql files. Remove when fixed in eslint-config-it4c.
+    languageOptions: {
+      parser: graphql[0].plugins['@graphql-eslint'].parser,
+      parserOptions: {
+        graphQLConfig: {
+          schema: './src/graphql/types/**/*.gql',
+          documents: './src/graphql/queries/**/*.gql',
+        },
+      },
+    },
+    rules: {
+      // Would require descriptions on every type/field/input — too noisy for now
+      '@graphql-eslint/require-description': 'off',
+      // camelCase operation names and _id/_ne underscores conflict with existing schema
+      '@graphql-eslint/naming-convention': 'off',
+      // Many types (Image, File, InviteCode, etc.) intentionally lack id: ID!
+      '@graphql-eslint/strict-id-in-types': 'off',
+      // Fields like groupType, queryLocations match parent type name by coincidence
+      '@graphql-eslint/no-typename-prefix': 'off',
+      // neo4j-graphql-js adds arguments (first, offset) at runtime not present in static schema
+      '@graphql-eslint/known-argument-names': 'off',
+      // TODO: operations-recommended rules must be disabled because the it4c
+      // graphql module bundles both schema and operations configs together.
+      // Remove when eslint-config-it4c exports them separately (e.g. graphql/schema).
+      '@graphql-eslint/executable-definitions': 'off',
+      // neo4j-graphql-js adds fields at runtime (_id, relations) not present in static schema
+      '@graphql-eslint/fields-on-correct-type': 'off',
+    },
+  },
   {
     // Backend-specific TypeScript overrides
     files: ['**/*.ts'],
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['eslint.config.ts'],
+          allowDefaultProject: ['eslint.config.ts', 'jest.config.ts', 'prettier.config.ts'],
         },
         tsconfigRootDir: import.meta.dirname,
       },

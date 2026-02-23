@@ -1,0 +1,7 @@
+mutation toggleObservePost($id: ID!, $value: Boolean!) {
+  toggleObservePost(id: $id, value: $value) {
+    id
+    isObservedByMe
+    observingUsersCount
+  }
+}

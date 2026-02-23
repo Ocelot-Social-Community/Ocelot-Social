@@ -1,0 +1,12 @@
+mutation JoinGroup($groupId: ID!, $userId: ID!) {
+  JoinGroup(groupId: $groupId, userId: $userId) {
+    user {
+      id
+      name
+      slug
+    }
+    membership {
+      role
+    }
+  }
+}

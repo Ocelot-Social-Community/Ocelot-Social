@@ -1,0 +1,42 @@
+mutation UpdatePost(
+  $id: ID!
+  $title: String!
+  $content: String!
+  $image: ImageInput
+  $categoryIds: [ID]
+  $postType: PostType
+  $eventInput: _EventInput
+) {
+  UpdatePost(
+    id: $id
+    title: $title
+    content: $content
+    image: $image
+    categoryIds: $categoryIds
+    postType: $postType
+    eventInput: $eventInput
+  ) {
+    id
+    title
+    content
+    author {
+      id
+      name
+      slug
+    }
+    createdAt
+    updatedAt
+    categories {
+      id
+    }
+    postType
+    eventStart
+    eventLocationName
+    eventVenue
+    eventLocation {
+      id
+      lng
+      lat
+    }
+  }
+}

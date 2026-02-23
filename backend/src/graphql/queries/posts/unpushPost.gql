@@ -1,0 +1,5 @@
+mutation unpushPost($id: ID!) {
+  unpushPost(id: $id) {
+    id
+  }
+}

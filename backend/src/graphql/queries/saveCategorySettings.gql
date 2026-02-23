@@ -1,0 +1,3 @@
+mutation saveCategorySettings($activeCategories: [String]) {
+  saveCategorySettings(activeCategories: $activeCategories)
+}

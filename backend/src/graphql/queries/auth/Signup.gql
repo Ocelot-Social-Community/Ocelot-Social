@@ -1,0 +1,5 @@
+mutation Signup($email: String!, $locale: String!, $inviteCode: String) {
+  Signup(email: $email, locale: $locale, inviteCode: $inviteCode) {
+    email
+  }
+}

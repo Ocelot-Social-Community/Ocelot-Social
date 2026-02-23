@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
 import Factory, { cleanDatabase } from '@db/factories'
+import login from '@graphql/queries/auth/login.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { login } from '@src/graphql/queries/login'
 import ocelotLogger from '@src/logger'
 import { loggerPlugin } from '@src/plugins/apolloLogger'
 
@@ -69,7 +69,7 @@ describe('apollo logger', () => {
       expect(loggerSpy).toHaveBeenCalledWith(
         'Apollo Request',
         expect.any(String),
-        '"mutation ($email: String!, $password: String!) {\\n  login(email: $email, password: $password)\\n}"',
+        '"mutation login($email: String!, $password: String!) {\\n  login(email: $email, password: $password)\\n}"',
         JSON.stringify({
           email: 'test@example.org',
           password: '***',
