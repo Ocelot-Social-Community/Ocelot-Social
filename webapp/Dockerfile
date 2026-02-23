@@ -3,18 +3,20 @@ FROM node:25.6.1-alpine AS styleguide
 RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
-COPY styleguide .
+COPY styleguide/package.json styleguide/yarn.lock ./
 RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
+COPY styleguide/. .
 RUN yarn run build:lib
 
 FROM node:25.6.1-alpine AS ui-library
 RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
-COPY packages/ui .
+COPY packages/ui/package.json packages/ui/package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm,sharing=locked \
     npm ci
+COPY packages/ui/. .
 RUN npm run build
 
 FROM node:25.6.1-alpine AS base
@@ -55,10 +57,11 @@ ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
 
 FROM base AS test_build
 ENV NODE_ENV=test
-COPY webapp/. .
-RUN tools/merge-locales.sh
+COPY webapp/package.json webapp/yarn.lock ./
 RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
+COPY webapp/. .
+RUN tools/merge-locales.sh
 RUN yarn run build
 RUN mkdir /build && \
     cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./package.json ./yarn.lock ./scripts /build
