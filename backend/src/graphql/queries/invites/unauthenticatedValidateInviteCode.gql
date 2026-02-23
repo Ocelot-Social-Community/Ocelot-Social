@@ -1,8 +1,8 @@
 query unauthenticatedValidateInviteCode($code: String!) {
   validateInviteCode(code: $code) {
     code
+    # eslint-disable-next-line @graphql-eslint/require-selections
     invitedTo {
-      id
       groupType
       name
       about
@@ -10,8 +10,8 @@ query unauthenticatedValidateInviteCode($code: String!) {
         url
       }
     }
+    # eslint-disable-next-line @graphql-eslint/require-selections
     generatedBy {
-      id
       name
       avatar {
         url

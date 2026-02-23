@@ -306,6 +306,7 @@ describe('mentions in groups', () => {
         data: {
           notifications: expect.arrayContaining([
             {
+              id: expect.any(String),
               createdAt: expect.any(String),
               from: {
                 __typename: 'Post',
@@ -318,6 +319,7 @@ describe('mentions in groups', () => {
               relatedUser: null,
             },
             {
+              id: expect.any(String),
               createdAt: expect.any(String),
               from: {
                 __typename: 'Post',
@@ -423,6 +425,7 @@ describe('mentions in groups', () => {
         data: {
           notifications: expect.arrayContaining([
             {
+              id: expect.any(String),
               createdAt: expect.any(String),
               from: {
                 __typename: 'Post',
@@ -435,6 +438,7 @@ describe('mentions in groups', () => {
               relatedUser: null,
             },
             {
+              id: expect.any(String),
               createdAt: expect.any(String),
               from: {
                 __typename: 'Post',
@@ -528,6 +532,7 @@ describe('mentions in groups', () => {
         data: {
           notifications: expect.arrayContaining([
             {
+              id: expect.any(String),
               createdAt: expect.any(String),
               from: {
                 __typename: 'Post',
@@ -540,6 +545,7 @@ describe('mentions in groups', () => {
               relatedUser: null,
             },
             {
+              id: expect.any(String),
               createdAt: expect.any(String),
               from: {
                 __typename: 'Post',

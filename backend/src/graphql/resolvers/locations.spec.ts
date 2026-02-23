@@ -174,9 +174,9 @@ describe('distanceToMe', () => {
           data: {
             User: [
               expect.objectContaining({
-                location: {
+                location: expect.objectContaining({
                   distanceToMe: 0,
-                },
+                }),
               }),
             ],
           },
@@ -195,9 +195,9 @@ describe('distanceToMe', () => {
           data: {
             User: [
               expect.objectContaining({
-                location: {
+                location: expect.objectContaining({
                   distanceToMe: 0,
-                },
+                }),
               }),
             ],
           },
@@ -216,9 +216,9 @@ describe('distanceToMe', () => {
           data: {
             User: [
               expect.objectContaining({
-                location: {
+                location: expect.objectContaining({
                   distanceToMe: 746,
-                },
+                }),
               }),
             ],
           },
@@ -237,9 +237,9 @@ describe('distanceToMe', () => {
           data: {
             User: [
               expect.objectContaining({
-                location: {
+                location: expect.objectContaining({
                   distanceToMe: null,
-                },
+                }),
               }),
             ],
           },

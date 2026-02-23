@@ -367,8 +367,8 @@ describe('softDeleteMiddleware', () => {
 
           it('conceals disabled comments', async () => {
             const expected = [
-              { content: 'Enabled comment on public post' },
-              { content: 'UNAVAILABLE' },
+              { id: expect.any(String), content: 'Enabled comment on public post' },
+              { id: expect.any(String), content: 'UNAVAILABLE' },
             ]
             const { data } = await query({ query: Post, variables: { id: 'p3' } })
             const {
@@ -385,8 +385,8 @@ describe('softDeleteMiddleware', () => {
 
           it('shows disabled comments', async () => {
             const expected = [
-              { content: 'Enabled comment on public post' },
-              { content: 'Disabled comment' },
+              { id: expect.any(String), content: 'Enabled comment on public post' },
+              { id: expect.any(String), content: 'Disabled comment' },
             ]
             const { data } = await query({ query: Post, variables: { id: 'p3' } })
             const {

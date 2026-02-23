@@ -69,7 +69,7 @@ describe('apollo logger', () => {
       expect(loggerSpy).toHaveBeenCalledWith(
         'Apollo Request',
         expect.any(String),
-        '"mutation ($email: String!, $password: String!) {\\n  login(email: $email, password: $password)\\n}"',
+        '"mutation login($email: String!, $password: String!) {\\n  login(email: $email, password: $password)\\n}"',
         JSON.stringify({
           email: 'test@example.org',
           password: '***',

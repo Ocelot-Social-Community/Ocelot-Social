@@ -1104,6 +1104,7 @@ describe('setTrophyBadgeSelected', () => {
         expect.objectContaining({
           data: {
             setTrophyBadgeSelected: {
+              id: expect.any(String),
               badgeTrophiesCount: 2,
               badgeTrophiesSelected: [
                 {
@@ -1162,6 +1163,7 @@ describe('setTrophyBadgeSelected', () => {
         expect.objectContaining({
           data: {
             setTrophyBadgeSelected: {
+              id: expect.any(String),
               badgeTrophiesCount: 2,
               badgeTrophiesSelected: [
                 {
@@ -1231,6 +1233,7 @@ describe('setTrophyBadgeSelected', () => {
           expect.objectContaining({
             data: {
               setTrophyBadgeSelected: {
+                id: expect.any(String),
                 badgeTrophiesCount: 2,
                 badgeTrophiesSelected: [
                   {
@@ -1292,6 +1295,7 @@ describe('setTrophyBadgeSelected', () => {
           expect.objectContaining({
             data: {
               setTrophyBadgeSelected: {
+                id: expect.any(String),
                 badgeTrophiesCount: 2,
                 badgeTrophiesSelected: [
                   {
@@ -1407,6 +1411,7 @@ describe('resetTrophyBadgesSelected', () => {
         expect.objectContaining({
           data: {
             resetTrophyBadgesSelected: {
+              id: expect.any(String),
               badgeTrophiesCount: 2,
               badgeTrophiesSelected: [
                 {

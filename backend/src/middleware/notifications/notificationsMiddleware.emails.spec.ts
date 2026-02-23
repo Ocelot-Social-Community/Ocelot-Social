@@ -162,6 +162,7 @@ describe('emails sent for notifications', () => {
             data: {
               notifications: expect.arrayContaining([
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Post',
@@ -174,6 +175,7 @@ describe('emails sent for notifications', () => {
                   relatedUser: null,
                 },
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Post',
@@ -186,6 +188,7 @@ describe('emails sent for notifications', () => {
                   relatedUser: null,
                 },
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Post',
@@ -241,6 +244,7 @@ describe('emails sent for notifications', () => {
             data: {
               notifications: expect.arrayContaining([
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Post',
@@ -253,6 +257,7 @@ describe('emails sent for notifications', () => {
                   relatedUser: null,
                 },
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Post',
@@ -265,6 +270,7 @@ describe('emails sent for notifications', () => {
                   relatedUser: null,
                 },
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Post',
@@ -321,6 +327,7 @@ describe('emails sent for notifications', () => {
             data: {
               notifications: expect.arrayContaining([
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Post',
@@ -333,6 +340,7 @@ describe('emails sent for notifications', () => {
                   relatedUser: null,
                 },
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Post',
@@ -345,6 +353,7 @@ describe('emails sent for notifications', () => {
                   relatedUser: null,
                 },
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Post',
@@ -396,6 +405,7 @@ describe('emails sent for notifications', () => {
             data: {
               notifications: expect.arrayContaining([
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Post',
@@ -408,6 +418,7 @@ describe('emails sent for notifications', () => {
                   relatedUser: null,
                 },
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Post',
@@ -420,6 +431,7 @@ describe('emails sent for notifications', () => {
                   relatedUser: null,
                 },
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Post',
@@ -502,6 +514,7 @@ describe('emails sent for notifications', () => {
             data: {
               notifications: expect.arrayContaining([
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Comment',
@@ -514,6 +527,7 @@ describe('emails sent for notifications', () => {
                   relatedUser: null,
                 },
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Comment',
@@ -593,6 +607,7 @@ describe('emails sent for notifications', () => {
             data: {
               notifications: expect.arrayContaining([
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Comment',
@@ -605,6 +620,7 @@ describe('emails sent for notifications', () => {
                   relatedUser: null,
                 },
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Comment',
@@ -679,6 +695,7 @@ describe('emails sent for notifications', () => {
             data: {
               notifications: expect.arrayContaining([
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Comment',
@@ -691,6 +708,7 @@ describe('emails sent for notifications', () => {
                   relatedUser: null,
                 },
                 {
+                  id: expect.any(String),
                   createdAt: expect.any(String),
                   from: {
                     __typename: 'Comment',

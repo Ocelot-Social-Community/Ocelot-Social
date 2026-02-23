@@ -176,6 +176,7 @@ describe('notifications', () => {
                 data: {
                   notifications: [
                     {
+                      id: expect.any(String),
                       read: false,
                       createdAt: expect.any(String),
                       reason: 'commented_on_post',
@@ -218,6 +219,7 @@ describe('notifications', () => {
                   data: {
                     notifications: [
                       {
+                        id: expect.any(String),
                         read: false,
                         createdAt: expect.any(String),
                         reason: 'commented_on_post',
@@ -345,6 +347,7 @@ describe('notifications', () => {
             data: {
               notifications: [
                 {
+                  id: expect.any(String),
                   read: false,
                   createdAt: expect.any(String),
                   reason: 'mentioned_in_post',
@@ -387,6 +390,7 @@ describe('notifications', () => {
               data: {
                 notifications: [
                   {
+                    id: expect.any(String),
                     read: false,
                     createdAt: expect.any(String),
                     reason: 'mentioned_in_post',
@@ -459,6 +463,7 @@ describe('notifications', () => {
               data: {
                 notifications: [
                   {
+                    id: expect.any(String),
                     read: false,
                     createdAt: expect.any(String),
                     reason: 'mentioned_in_post',
@@ -588,6 +593,7 @@ describe('notifications', () => {
               data: {
                 notifications: [
                   {
+                    id: expect.any(String),
                     createdAt: expect.any(String),
                     from: {
                       __typename: 'Post',
@@ -664,6 +670,7 @@ describe('notifications', () => {
               data: {
                 notifications: [
                   {
+                    id: expect.any(String),
                     read: false,
                     createdAt: expect.any(String),
                     reason: 'mentioned_in_comment',
@@ -700,6 +707,7 @@ describe('notifications', () => {
               data: {
                 notifications: [
                   {
+                    id: expect.any(String),
                     read: false,
                     createdAt: expect.any(String),
                     reason: 'commented_on_post',
@@ -811,6 +819,7 @@ describe('notifications', () => {
               data: {
                 notifications: [
                   {
+                    id: expect.any(String),
                     createdAt: expect.any(String),
                     from: {
                       __typename: 'Comment',
@@ -1108,6 +1117,7 @@ describe('notifications', () => {
           data: {
             notifications: [
               {
+                id: expect.any(String),
                 read: false,
                 reason: 'user_joined_group',
                 createdAt: expect.any(String),
@@ -1150,6 +1160,7 @@ describe('notifications', () => {
             data: {
               notifications: [
                 {
+                  id: expect.any(String),
                   read: false,
                   reason: 'user_joined_group',
                   createdAt: expect.any(String),
@@ -1211,6 +1222,7 @@ describe('notifications', () => {
           data: {
             notifications: expect.arrayContaining([
               {
+                id: expect.any(String),
                 read: false,
                 reason: 'user_left_group',
                 createdAt: expect.any(String),
@@ -1223,6 +1235,7 @@ describe('notifications', () => {
                 },
               },
               {
+                id: expect.any(String),
                 read: false,
                 reason: 'user_joined_group',
                 createdAt: expect.any(String),
@@ -1271,6 +1284,7 @@ describe('notifications', () => {
             data: {
               notifications: expect.arrayContaining([
                 {
+                  id: expect.any(String),
                   read: false,
                   reason: 'user_left_group',
                   createdAt: expect.any(String),
@@ -1283,6 +1297,7 @@ describe('notifications', () => {
                   },
                 },
                 {
+                  id: expect.any(String),
                   read: false,
                   reason: 'user_joined_group',
                   createdAt: expect.any(String),
@@ -1346,6 +1361,7 @@ describe('notifications', () => {
           data: {
             notifications: [
               {
+                id: expect.any(String),
                 read: false,
                 reason: 'changed_group_member_role',
                 createdAt: expect.any(String),
@@ -1388,6 +1404,7 @@ describe('notifications', () => {
             data: {
               notifications: [
                 {
+                  id: expect.any(String),
                   read: false,
                   reason: 'changed_group_member_role',
                   createdAt: expect.any(String),
@@ -1450,6 +1467,7 @@ describe('notifications', () => {
           data: {
             notifications: [
               {
+                id: expect.any(String),
                 read: false,
                 reason: 'removed_user_from_group',
                 createdAt: expect.any(String),
@@ -1492,6 +1510,7 @@ describe('notifications', () => {
             data: {
               notifications: [
                 {
+                  id: expect.any(String),
                   read: false,
                   reason: 'removed_user_from_group',
                   createdAt: expect.any(String),
