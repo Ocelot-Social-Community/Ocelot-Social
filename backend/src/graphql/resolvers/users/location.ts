@@ -144,7 +144,7 @@ export const createOrUpdateLocations = async (
   await session.writeTransaction((transaction) => {
     return transaction.run(
       `
-        MATCH (node:${String(nodeLabel)} {id: $nodeId})
+        MATCH (node:${nodeLabel} {id: $nodeId})
         OPTIONAL MATCH (node)-[relationship:IS_IN]->(:Location)
         DELETE relationship
         WITH node
