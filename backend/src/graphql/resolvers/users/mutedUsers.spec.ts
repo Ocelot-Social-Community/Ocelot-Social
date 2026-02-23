@@ -97,7 +97,7 @@ describe('muteUser', () => {
   describe('unauthenticated', () => {
     beforeEach(() => {
       authenticatedUser = null
-      muteAction = (variables) => {
+      muteAction = async (variables) => {
         return mutate({ mutation: muteUser, variables })
       }
     })
@@ -115,7 +115,7 @@ describe('muteUser', () => {
         id: 'u1',
       })
       authenticatedUser = await currentUser.toJson()
-      muteAction = (variables) => {
+      muteAction = async (variables) => {
         return mutate({ mutation: muteUser, variables })
       }
     })
@@ -358,7 +358,7 @@ describe('unmuteUser', () => {
   describe('unauthenticated', () => {
     beforeEach(() => {
       authenticatedUser = null
-      unmuteAction = (variables) => {
+      unmuteAction = async (variables) => {
         return mutate({ mutation: unmuteUser, variables })
       }
     })
@@ -376,7 +376,7 @@ describe('unmuteUser', () => {
         id: 'u1',
       })
       authenticatedUser = await currentUser.toJson()
-      unmuteAction = (variables) => {
+      unmuteAction = async (variables) => {
         return mutate({ mutation: unmuteUser, variables })
       }
     })

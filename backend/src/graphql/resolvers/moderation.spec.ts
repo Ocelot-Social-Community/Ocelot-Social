@@ -14,11 +14,7 @@ let authenticatedUser: Context['user']
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
-let disableVariables,
-  enableVariables,
-  moderator,
-  nonModerator,
-  closeReportVariables
+let disableVariables, enableVariables, moderator, nonModerator, closeReportVariables
 
 const contextFn = () => ({
   authenticatedUser,

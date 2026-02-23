@@ -29,7 +29,7 @@ beforeAll(async () => {
   server = apolloSetup.server
 })
 
-afterAll(async () => {
+afterAll(() => {
   void server.stop()
   void database.driver.close()
   database.neode.close()

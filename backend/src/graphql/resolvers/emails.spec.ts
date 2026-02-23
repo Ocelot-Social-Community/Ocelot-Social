@@ -109,7 +109,11 @@ describe('AddEmailAddress', () => {
       `,
           {},
         )
-        const email = database.neode.hydrateFirst(result, 'e', database.neode.model('UnverifiedEmailAddress'))
+        const email = database.neode.hydrateFirst(
+          result,
+          'e',
+          database.neode.model('UnverifiedEmailAddress'),
+        )
         await expect(email.toJson()).resolves.toMatchObject({
           email: 'new-email@example.org',
           nonce: expect.any(String),
@@ -252,7 +256,11 @@ describe('VerifyEmailAddress', () => {
           `,
               {},
             )
-            const email = database.neode.hydrateFirst(result, 'e', database.neode.model('EmailAddress'))
+            const email = database.neode.hydrateFirst(
+              result,
+              'e',
+              database.neode.model('EmailAddress'),
+            )
             await expect(email.toJson()).resolves.toMatchObject({
               email: 'to-be-verified@example.org',
             })
@@ -264,7 +272,11 @@ describe('VerifyEmailAddress', () => {
             RETURN e
           `
             let result = await database.neode.cypher(cypherStatement, {})
-            let email = database.neode.hydrateFirst(result, 'e', database.neode.model('EmailAddress'))
+            let email = database.neode.hydrateFirst(
+              result,
+              'e',
+              database.neode.model('EmailAddress'),
+            )
             await expect(email.toJson()).resolves.toMatchObject({
               email: 'user@example.org',
             })
@@ -280,7 +292,11 @@ describe('VerifyEmailAddress', () => {
             RETURN e
           `
             let result = await database.neode.cypher(cypherStatement, {})
-            let email = database.neode.hydrateFirst(result, 'e', database.neode.model('EmailAddress'))
+            let email = database.neode.hydrateFirst(
+              result,
+              'e',
+              database.neode.model('EmailAddress'),
+            )
             await expect(email.toJson()).resolves.toMatchObject({
               email: 'user@example.org',
             })
@@ -319,7 +335,11 @@ describe('VerifyEmailAddress', () => {
               `,
                 {},
               )
-              const email = database.neode.hydrateFirst(result, 'e', database.neode.model('EmailAddress'))
+              const email = database.neode.hydrateFirst(
+                result,
+                'e',
+                database.neode.model('EmailAddress'),
+              )
               await expect(email.toJson()).resolves.toMatchObject({
                 email: 'to-be-verified@example.org',
               })

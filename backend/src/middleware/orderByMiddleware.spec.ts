@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { cleanDatabase } from '@db/factories'
 import { Post } from '@graphql/queries/Post'
 import { createApolloTestSetup } from '@root/test/helpers'
