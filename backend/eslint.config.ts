@@ -32,21 +32,16 @@ export default [
       },
     },
     rules: {
-      // Disabled rules for this project
+      // Would require descriptions on every type/field/input — too noisy for now
       '@graphql-eslint/require-description': 'off',
+      // camelCase operation names and _id/_ne underscores conflict with existing schema
       '@graphql-eslint/naming-convention': 'off',
+      // Many types (Image, File, InviteCode, etc.) intentionally lack id: ID!
       '@graphql-eslint/strict-id-in-types': 'off',
+      // Fields like groupType, queryLocations match parent type name by coincidence
       '@graphql-eslint/no-typename-prefix': 'off',
-      '@graphql-eslint/known-directives': 'off',
+      // neo4j-graphql-js adds arguments (first, offset) at runtime not present in static schema
       '@graphql-eslint/known-argument-names': 'off',
-      '@graphql-eslint/known-type-names': 'off',
-      '@graphql-eslint/lone-schema-definition': 'off',
-      '@graphql-eslint/provided-required-arguments': 'off',
-      '@graphql-eslint/unique-directive-names': 'off',
-      '@graphql-eslint/unique-directive-names-per-location': 'off',
-      '@graphql-eslint/unique-field-definition-names': 'off',
-      '@graphql-eslint/unique-operation-types': 'off',
-      '@graphql-eslint/unique-type-names': 'off',
       // TODO: operations-recommended rules must be disabled because the it4c
       // graphql module bundles both schema and operations configs together.
       // Remove when eslint-config-it4c exports them separately (e.g. graphql/schema).
