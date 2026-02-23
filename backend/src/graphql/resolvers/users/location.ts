@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -77,9 +77,9 @@ export const createOrUpdateLocations = async (
     const response: any = await fetch(
       `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
         String(locationName),
-      )}.json?access_token=${
-        String(context.config.MAPBOX_TOKEN)
-      }&types=region,place,country,address&language=${locales.join(',')}`,
+      )}.json?access_token=${String(
+        context.config.MAPBOX_TOKEN,
+      )}&types=region,place,country,address&language=${locales.join(',')}`,
       {
         signal: AbortSignal.timeout(REQUEST_TIMEOUT),
       },

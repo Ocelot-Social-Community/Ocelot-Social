@@ -375,7 +375,7 @@ const publicRegistration = rule()(
   (_parent, _args, context: Context) => context.config.PUBLIC_REGISTRATION,
 )
 
-const inviteRegistration = rule()((_parent, args, context: Context) => {
+const inviteRegistration = rule()(async (_parent, args, context: Context) => {
   if (!context.config.INVITE_REGISTRATION) return false
   const { inviteCode } = args
   return validateInviteCode(context, inviteCode)

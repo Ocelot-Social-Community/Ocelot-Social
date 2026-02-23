@@ -14,7 +14,9 @@ const validateCreateComment: IMiddlewareResolver = async (resolve, root, args, c
   const { postId } = args
 
   if (!args.content || content.length < COMMENT_MIN_LENGTH) {
-    throw new UserInputError(`Comment must be at least ${String(COMMENT_MIN_LENGTH)} character long!`)
+    throw new UserInputError(
+      `Comment must be at least ${String(COMMENT_MIN_LENGTH)} character long!`,
+    )
   }
   const session = context.driver.session()
   try {
@@ -44,7 +46,9 @@ const validateCreateComment: IMiddlewareResolver = async (resolve, root, args, c
 const validateUpdateComment: IMiddlewareResolver = (resolve, root, args, context, info) => {
   const content = args.content.replace(/<(?:.|\n)*?>/gm, '').trim()
   if (!args.content || content.length < COMMENT_MIN_LENGTH) {
-    throw new UserInputError(`Comment must be at least ${String(COMMENT_MIN_LENGTH)} character long!`)
+    throw new UserInputError(
+      `Comment must be at least ${String(COMMENT_MIN_LENGTH)} character long!`,
+    )
   }
 
   return resolve(root, args, context, info)
@@ -125,7 +129,9 @@ export const validateNotifyUsers = (label: string, reason: string): void => {
 const validateUpdateUser: IMiddlewareResolver = (resolve, root, params, context, info) => {
   const { name } = params
   if (typeof name === 'string' && name.trim().length < USERNAME_MIN_LENGTH)
-    throw new UserInputError(`Username must be at least ${String(USERNAME_MIN_LENGTH)} character long!`)
+    throw new UserInputError(
+      `Username must be at least ${String(USERNAME_MIN_LENGTH)} character long!`,
+    )
   return resolve(root, params, context, info)
 }
 

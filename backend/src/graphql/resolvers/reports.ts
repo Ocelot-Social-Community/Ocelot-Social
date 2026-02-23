@@ -80,7 +80,8 @@ export default {
 
       const offset =
         params.offset && typeof params.offset === 'number' ? `SKIP ${String(params.offset)}` : ''
-      const limit = params.first && typeof params.first === 'number' ? `LIMIT ${String(params.first)}` : ''
+      const limit =
+        params.first && typeof params.first === 'number' ? `LIMIT ${String(params.first)}` : ''
 
       const reportsReadTxPromise = session.readTransaction(async (transaction) => {
         const reportsTransactionResponse = await transaction.run(

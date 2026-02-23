@@ -5,7 +5,7 @@ import { undefinedToNullResolver } from './helpers/Resolver'
 
 export default {
   Query: {
-    embed: (_object, { url }, _context, _resolveInfo) => {
+    embed: async (_object, { url }, _context, _resolveInfo) => {
       return scrape(url)
     },
   },

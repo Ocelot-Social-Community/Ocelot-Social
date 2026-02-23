@@ -43,8 +43,10 @@ export default {
         default:
           orderByClause = ''
       }
-      const offset = args.offset && typeof args.offset === 'number' ? `SKIP ${String(args.offset)}` : ''
-      const limit = args.first && typeof args.first === 'number' ? `LIMIT ${String(args.first)}` : ''
+      const offset =
+        args.offset && typeof args.offset === 'number' ? `SKIP ${String(args.offset)}` : ''
+      const limit =
+        args.first && typeof args.first === 'number' ? `LIMIT ${String(args.first)}` : ''
 
       const readTxResultPromise = session.readTransaction(async (transaction) => {
         const notificationsTransactionResponse = await transaction.run(

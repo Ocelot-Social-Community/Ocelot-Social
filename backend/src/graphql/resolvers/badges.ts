@@ -28,8 +28,7 @@ export const defaultVerificationBadge = {
 
 export default {
   Query: {
-    Badge: (object, args, context, resolveInfo) =>
-      neo4jgraphql(object, args, context, resolveInfo),
+    Badge: (object, args, context, resolveInfo) => neo4jgraphql(object, args, context, resolveInfo),
   },
 
   Mutation: {
