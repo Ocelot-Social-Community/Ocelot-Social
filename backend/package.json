@@ -44,7 +44,7 @@
     "cross-env": "~10.1.0",
     "dotenv": "~17.0.1",
     "email-templates": "^13.0.1",
-    "express": "^4.22.1",
+    "express": "^5.2.1",
     "graphql": "^16.11.0",
     "graphql-middleware": "~6.1.35",
     "graphql-redis-subscriptions": "^2.7.0",
