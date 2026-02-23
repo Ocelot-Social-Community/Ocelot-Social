@@ -1,0 +1,20 @@
+mutation ($id: ID!) {
+  pinPost(id: $id) {
+    id
+    title
+    content
+    author {
+      name
+      slug
+    }
+    pinnedBy {
+      id
+      name
+      role
+    }
+    createdAt
+    updatedAt
+    pinnedAt
+    pinned
+  }
+}

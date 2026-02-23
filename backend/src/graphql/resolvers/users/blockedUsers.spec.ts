@@ -4,11 +4,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable jest/expect-expect */
 import { cleanDatabase } from '@db/factories'
-import { blockedUsers } from '@graphql/queries/blockedUsers'
-import { blockUser } from '@graphql/queries/blockUser'
-import { Post } from '@graphql/queries/Post'
-import { unblockUser } from '@graphql/queries/unblockUser'
-import { User } from '@graphql/queries/User'
+import blockedUsers from '@graphql/queries/blockedUsers.gql'
+import blockUser from '@graphql/queries/blockUser.gql'
+import Post from '@graphql/queries/Post.gql'
+import unblockUser from '@graphql/queries/unblockUser.gql'
+import User from '@graphql/queries/User.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

@@ -4,19 +4,17 @@
 /* eslint-disable jest/expect-expect */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { CreateGroup } from '@graphql/queries/CreateGroup'
-import { currentUser } from '@graphql/queries/currentUser'
-import { generateGroupInviteCode } from '@graphql/queries/generateGroupInviteCode'
-import { generatePersonalInviteCode } from '@graphql/queries/generatePersonalInviteCode'
-import { Group } from '@graphql/queries/Group'
-import { GroupMembers } from '@graphql/queries/GroupMembers'
-import { invalidateInviteCode } from '@graphql/queries/invalidateInviteCode'
-import { JoinGroup } from '@graphql/queries/JoinGroup'
-import { redeemInviteCode } from '@graphql/queries/redeemInviteCode'
-import {
-  authenticatedValidateInviteCode,
-  unauthenticatedValidateInviteCode,
-} from '@graphql/queries/validateInviteCode'
+import CreateGroup from '@graphql/queries/CreateGroup.gql'
+import currentUser from '@graphql/queries/currentUser.gql'
+import generateGroupInviteCode from '@graphql/queries/generateGroupInviteCode.gql'
+import generatePersonalInviteCode from '@graphql/queries/generatePersonalInviteCode.gql'
+import Group from '@graphql/queries/Group.gql'
+import GroupMembers from '@graphql/queries/GroupMembers.gql'
+import invalidateInviteCode from '@graphql/queries/invalidateInviteCode.gql'
+import JoinGroup from '@graphql/queries/JoinGroup.gql'
+import redeemInviteCode from '@graphql/queries/redeemInviteCode.gql'
+import authenticatedValidateInviteCode from '@graphql/queries/authenticatedValidateInviteCode.gql'
+import unauthenticatedValidateInviteCode from '@graphql/queries/unauthenticatedValidateInviteCode.gql'
 import { createApolloTestSetup, TEST_CONFIG } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

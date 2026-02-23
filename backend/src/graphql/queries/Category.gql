@@ -1,0 +1,8 @@
+query {
+  Category {
+    id
+    slug
+    name
+    icon
+  }
+}

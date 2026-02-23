@@ -1,0 +1,3 @@
+query ($postId: ID!, $data: _EMOTEDInput!) {
+  PostsEmotionsCountByEmotion(postId: $postId, data: $data)
+}

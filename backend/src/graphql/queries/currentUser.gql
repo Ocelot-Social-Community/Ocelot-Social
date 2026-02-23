@@ -1,0 +1,20 @@
+query currentUser {
+  currentUser {
+    id
+    slug
+    name
+    avatar {
+      url
+    }
+    email
+    role
+    activeCategories
+    following {
+      name
+    }
+    inviteCodes {
+      code
+      redeemedByCount
+    }
+  }
+}

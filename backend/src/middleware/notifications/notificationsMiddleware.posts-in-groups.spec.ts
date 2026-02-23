@@ -2,14 +2,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import { ChangeGroupMemberRole } from '@graphql/queries/ChangeGroupMemberRole'
-import { CreateGroup } from '@graphql/queries/CreateGroup'
-import { CreatePost } from '@graphql/queries/CreatePost'
-import { JoinGroup } from '@graphql/queries/JoinGroup'
-import { markAllAsRead } from '@graphql/queries/markAllAsRead'
-import { muteGroup } from '@graphql/queries/muteGroup'
-import { notifications } from '@graphql/queries/notifications'
-import { unmuteGroup } from '@graphql/queries/unmuteGroup'
+import ChangeGroupMemberRole from '@graphql/queries/ChangeGroupMemberRole.gql'
+import CreateGroup from '@graphql/queries/CreateGroup.gql'
+import CreatePost from '@graphql/queries/CreatePost.gql'
+import JoinGroup from '@graphql/queries/JoinGroup.gql'
+import markAllAsRead from '@graphql/queries/markAllAsRead.gql'
+import muteGroup from '@graphql/queries/muteGroup.gql'
+import notifications from '@graphql/queries/notifications.gql'
+import unmuteGroup from '@graphql/queries/unmuteGroup.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

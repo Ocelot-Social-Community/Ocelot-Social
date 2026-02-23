@@ -1,0 +1,3 @@
+query ($postId: ID!) {
+  PostsEmotionsByCurrentUser(postId: $postId)
+}

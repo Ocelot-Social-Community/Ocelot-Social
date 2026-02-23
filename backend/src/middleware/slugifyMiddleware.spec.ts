@@ -3,10 +3,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import { CreateGroup } from '@graphql/queries/CreateGroup'
-import { CreatePost } from '@graphql/queries/CreatePost'
-import { SignupVerification } from '@graphql/queries/SignupVerification'
-import { UpdateGroup } from '@graphql/queries/UpdateGroup'
+import CreateGroup from '@graphql/queries/CreateGroup.gql'
+import CreatePost from '@graphql/queries/CreatePost.gql'
+import SignupVerification from '@graphql/queries/SignupVerification.gql'
+import UpdateGroup from '@graphql/queries/UpdateGroup.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

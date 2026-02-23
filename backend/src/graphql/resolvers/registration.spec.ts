@@ -3,8 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import Factory, { cleanDatabase } from '@db/factories'
-import { Signup } from '@graphql/queries/Signup'
-import { SignupVerification } from '@graphql/queries/SignupVerification'
+import Signup from '@graphql/queries/Signup.gql'
+import SignupVerification from '@graphql/queries/SignupVerification.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type EmailAddress from '@db/models/EmailAddress'

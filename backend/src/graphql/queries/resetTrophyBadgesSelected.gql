@@ -1,0 +1,13 @@
+mutation {
+  resetTrophyBadgesSelected {
+    badgeTrophiesCount
+    badgeTrophiesSelected {
+      id
+      isDefault
+    }
+    badgeTrophiesUnused {
+      id
+    }
+    badgeTrophiesUnusedCount
+  }
+}

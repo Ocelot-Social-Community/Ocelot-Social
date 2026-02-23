@@ -1,0 +1,3 @@
+mutation redeemInviteCode($code: String!) {
+  redeemInviteCode(code: $code)
+}

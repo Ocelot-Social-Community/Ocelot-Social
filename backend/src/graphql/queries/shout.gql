@@ -1,0 +1,3 @@
+mutation ($id: ID!) {
+  shout(id: $id, type: Post)
+}

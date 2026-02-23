@@ -1,0 +1,5 @@
+mutation pushPost($id: ID!) {
+  pushPost(id: $id) {
+    id
+  }
+}

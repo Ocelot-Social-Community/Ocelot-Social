@@ -11,8 +11,8 @@ import { Upload } from '@aws-sdk/lib-storage'
 
 import Factory, { cleanDatabase } from '@db/factories'
 import { UserInputError } from '@graphql/errors'
-import { CreateMessage } from '@graphql/queries/CreateMessage'
-import { CreateRoom } from '@graphql/queries/CreateRoom'
+import CreateMessage from '@graphql/queries/CreateMessage.gql'
+import CreateRoom from '@graphql/queries/CreateRoom.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import { attachments } from './attachments'

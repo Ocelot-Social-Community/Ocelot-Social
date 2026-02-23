@@ -1,0 +1,16 @@
+mutation ($id: ID!) {
+  DeletePost(id: $id) {
+    id
+    deleted
+    content
+    contentExcerpt
+    image {
+      url
+    }
+    comments {
+      deleted
+      content
+      contentExcerpt
+    }
+  }
+}

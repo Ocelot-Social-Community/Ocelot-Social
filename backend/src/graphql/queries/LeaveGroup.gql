@@ -1,0 +1,12 @@
+mutation ($groupId: ID!, $userId: ID!) {
+  LeaveGroup(groupId: $groupId, userId: $userId) {
+    user {
+      id
+      name
+      slug
+    }
+    membership {
+      role
+    }
+  }
+}

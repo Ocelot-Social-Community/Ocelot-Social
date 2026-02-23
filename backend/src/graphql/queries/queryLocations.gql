@@ -1,0 +1,6 @@
+query ($place: String!, $lang: String!) {
+  queryLocations(place: $place, lang: $lang) {
+    place_name
+    id
+  }
+}

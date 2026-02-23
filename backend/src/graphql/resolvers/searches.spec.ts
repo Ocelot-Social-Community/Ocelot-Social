@@ -3,8 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { searchPosts } from '@graphql/queries/searchPosts'
-import { searchResults } from '@graphql/queries/searchResults'
+import searchPosts from '@graphql/queries/searchPosts.gql'
+import searchResults from '@graphql/queries/searchResults.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

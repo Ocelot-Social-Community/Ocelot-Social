@@ -1,0 +1,22 @@
+query validateInviteCode($code: String!) {
+  validateInviteCode(code: $code) {
+    code
+    invitedTo {
+      id
+      groupType
+      name
+      about
+      avatar {
+        url
+      }
+    }
+    generatedBy {
+      id
+      name
+      avatar {
+        url
+      }
+    }
+    isValid
+  }
+}

@@ -1,0 +1,7 @@
+query {
+  blockedUsers {
+    id
+    name
+    isBlocked
+  }
+}

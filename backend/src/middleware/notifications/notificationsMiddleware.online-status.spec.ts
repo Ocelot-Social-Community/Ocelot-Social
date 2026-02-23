@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import Factory, { cleanDatabase } from '@db/factories'
-import { CreatePost } from '@graphql/queries/CreatePost'
+import CreatePost from '@graphql/queries/CreatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

@@ -1,0 +1,3 @@
+mutation ($messageIds: [String!]) {
+  MarkMessagesAsSeen(messageIds: $messageIds)
+}

@@ -1,0 +1,3 @@
+mutation ($status: OnlineStatus!) {
+  updateOnlineStatus(status: $status)
+}

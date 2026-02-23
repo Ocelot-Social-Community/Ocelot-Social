@@ -1,0 +1,10 @@
+mutation ($id: ID!) {
+  unfollowUser(id: $id) {
+    name
+    followedBy {
+      id
+      name
+    }
+    followedByCurrentUser
+  }
+}

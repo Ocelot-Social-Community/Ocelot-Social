@@ -1,0 +1,11 @@
+query ($query: String!, $firstPosts: Int, $postsOffset: Int) {
+  searchPosts(query: $query, firstPosts: $firstPosts, postsOffset: $postsOffset) {
+    postCount
+    posts {
+      __typename
+      id
+      title
+      content
+    }
+  }
+}

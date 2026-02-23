@@ -2,11 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import { CreateComment } from '@graphql/queries/CreateComment'
-import { fileReport } from '@graphql/queries/fileReport'
-import { review } from '@graphql/queries/review'
-import { UpdateComment } from '@graphql/queries/UpdateComment'
-import { UpdateUser } from '@graphql/queries/UpdateUser'
+import CreateComment from '@graphql/queries/CreateComment.gql'
+import fileReport from '@graphql/queries/fileReport.gql'
+import review from '@graphql/queries/review.gql'
+import UpdateComment from '@graphql/queries/UpdateComment.gql'
+import UpdateUser from '@graphql/queries/UpdateUser.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

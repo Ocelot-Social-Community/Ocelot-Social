@@ -1,0 +1,7 @@
+mutation ($email: String!) {
+  AddEmailAddress(email: $email) {
+    email
+    verifiedAt
+    createdAt
+  }
+}

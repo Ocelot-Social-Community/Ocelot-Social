@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import Factory, { cleanDatabase } from '@db/factories'
-import { Category } from '@graphql/queries/Category'
+import Category from '@graphql/queries/Category.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 import { categories } from '@src/constants/categories'
 

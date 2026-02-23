@@ -5,9 +5,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { fileReport } from '@graphql/queries/fileReport'
-import { reports } from '@graphql/queries/reports'
-import { review } from '@graphql/queries/review'
+import fileReport from '@graphql/queries/fileReport.gql'
+import reports from '@graphql/queries/reports.gql'
+import review from '@graphql/queries/review.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

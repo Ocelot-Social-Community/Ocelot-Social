@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import Factory, { cleanDatabase } from '@db/factories'
-import { queryLocations } from '@graphql/queries/queryLocations'
-import { UpdateUser } from '@graphql/queries/UpdateUser'
+import queryLocations from '@graphql/queries/queryLocations.gql'
+import UpdateUser from '@graphql/queries/UpdateUser.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
