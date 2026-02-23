@@ -82,8 +82,8 @@ afterEach(async () => {
 describe('delete Attachment', () => {
   const { del: deleteAttachment } = attachments(config)
   describe('given a resource with an attachment', () => {
-    let user: { id: string }
-    let chatPartner: { id: string }
+    let user
+    let chatPartner
     let file: { id: string }
     let message: { id: string }
     beforeEach(async () => {
