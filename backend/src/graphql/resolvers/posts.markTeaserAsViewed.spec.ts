@@ -3,14 +3,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getDriver } from '@db/neo4j'
 import { markTeaserAsViewed } from '@graphql/queries/markTeaserAsViewed'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-const driver = getDriver()
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-let mutate
-let authenticatedUser
+let authenticatedUser: Context['user']
+let mutate: ApolloTestSetup['mutate']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 let variables
 
 const contextFn = () => ({
@@ -19,12 +21,17 @@ const contextFn = () => ({
 
 beforeAll(async () => {
   await cleanDatabase()
-  ;({ mutate } = await createApolloTestSetup({ context: contextFn }))
+  const apolloSetup = await createApolloTestSetup({ context: contextFn })
+  mutate = apolloSetup.mutate
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('count post teaser views', () => {

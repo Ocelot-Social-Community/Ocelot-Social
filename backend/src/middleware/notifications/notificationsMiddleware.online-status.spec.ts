@@ -41,7 +41,8 @@ beforeAll(async () => {
 afterAll(async () => {
   await cleanDatabase()
   void server.stop()
-  await database.driver.close()
+  void database.driver.close()
+  database.neode.close()
 })
 
 afterEach(async () => {

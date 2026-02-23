@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import { getDriver } from '@db/neo4j'
 import { CreateComment } from '@graphql/queries/CreateComment'
 import { fileReport } from '@graphql/queries/fileReport'
 import { review } from '@graphql/queries/review'
@@ -10,10 +9,14 @@ import { UpdateComment } from '@graphql/queries/UpdateComment'
 import { UpdateUser } from '@graphql/queries/UpdateUser'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-const driver = getDriver()
-let authenticatedUser,
-  mutate,
-  users,
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
+
+let authenticatedUser: Context['user']
+let mutate: ApolloTestSetup['mutate']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+let users,
   offensivePost,
   reportVariables,
   disableVariables,
@@ -27,12 +30,17 @@ const contextFn = () => ({
 
 beforeAll(async () => {
   await cleanDatabase()
-  ;({ mutate } = await createApolloTestSetup({ context: contextFn }))
+  const apolloSetup = await createApolloTestSetup({ context: contextFn })
+  mutate = apolloSetup.mutate
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 beforeEach(async () => {

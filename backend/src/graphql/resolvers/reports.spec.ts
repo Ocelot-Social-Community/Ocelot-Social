@@ -4,17 +4,22 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getDriver, getNeode } from '@db/neo4j'
 import { fileReport } from '@graphql/queries/fileReport'
 import { reports } from '@graphql/queries/reports'
 import { review } from '@graphql/queries/review'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-const instance = getNeode()
-const driver = getDriver()
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
+
+let authenticatedUser: Context['user']
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 describe('reports', () => {
-  let authenticatedUser, currentUser, mutate, query, moderator, abusiveUser, otherReportingUser
+  let currentUser, moderator, abusiveUser, otherReportingUser
   const categoryIds = ['cat9']
   const variables = {
     resourceId: 'invalid',
@@ -28,12 +33,18 @@ describe('reports', () => {
 
   beforeAll(async () => {
     await cleanDatabase()
-    ;({ query, mutate } = await createApolloTestSetup({ context: contextFn }))
+    const apolloSetup = await createApolloTestSetup({ context: contextFn })
+    query = apolloSetup.query
+    mutate = apolloSetup.mutate
+    database = apolloSetup.database
+    server = apolloSetup.server
   })
 
   afterAll(async () => {
     await cleanDatabase()
-    await driver.close()
+    void server.stop()
+    void database.driver.close()
+    database.neode.close()
   })
 
   // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
@@ -98,7 +109,7 @@ describe('reports', () => {
             email: 'abusive-user@example.org',
           },
         )
-        await instance.create('Category', {
+        await database.neode.create('Category', {
           id: 'cat9',
           name: 'Democracy & Politics',
           icon: 'university',
@@ -163,7 +174,7 @@ describe('reports', () => {
                 variables: { ...variables, resourceId: 'abusive-user-id' },
               })
 
-              const reportsCypherQueryResponse = await instance.cypher(reportsCypherQuery, {
+              const reportsCypherQueryResponse = await database.neode.cypher(reportsCypherQuery, {
                 resourceId: 'abusive-user-id',
                 currentUserId: authenticatedUser.id,
               })
@@ -181,7 +192,7 @@ describe('reports', () => {
                   variables: { ...variables, resourceId: 'abusive-user-id' },
                 })
 
-                const reportsCypherQueryResponse = await instance.cypher(reportsCypherQuery, {
+                const reportsCypherQueryResponse = await database.neode.cypher(reportsCypherQuery, {
                   resourceId: 'abusive-user-id',
                   currentUserId: authenticatedUser.id,
                 })
@@ -214,7 +225,7 @@ describe('reports', () => {
                   variables: { ...variables, resourceId: 'abusive-user-id' },
                 })
 
-                const reportsCypherQueryResponse = await instance.cypher(reportsCypherQuery, {
+                const reportsCypherQueryResponse = await database.neode.cypher(reportsCypherQuery, {
                   resourceId: 'abusive-user-id',
                   currentUserId: authenticatedUser.id,
                 })
@@ -559,7 +570,7 @@ describe('reports', () => {
           email: 'abusive-user@example.org',
         },
       )
-      await instance.create('Category', {
+      await database.neode.create('Category', {
         id: 'cat9',
         name: 'Democracy & Politics',
         icon: 'university',

@@ -11,15 +11,33 @@ import fetch from 'node-fetch'
 import { embed } from '@graphql/queries/embed'
 import { createApolloTestSetup } from '@root/test/helpers'
 
+import type { ApolloTestSetup } from '@root/test/helpers'
+
 jest.mock('node-fetch')
 const mockedFetch = jest.mocked(fetch)
 const { Response } = jest.requireActual('node-fetch')
 
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+let variables = {}
+
+beforeAll(async () => {
+  const apolloSetup = await createApolloTestSetup({ context: () => ({}) })
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
+})
+
+afterAll(async () => {
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
+})
+
 afterEach(() => {
   mockedFetch.mockRestore()
 })
-
-let variables = {}
 
 // eslint-disable-next-line n/no-sync
 const HumanConnectionOrg = fs.readFileSync(
@@ -61,7 +79,6 @@ describe('Query', () => {
 
     beforeEach(() => {
       embedAction = async (variables) => {
-        const { query } = await createApolloTestSetup({ context: () => ({}) })
         return query({ query: embed, variables })
       }
     })

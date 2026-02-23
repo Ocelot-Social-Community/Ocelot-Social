@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { Post } from '@graphql/queries/Post'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-const neode = getNeode()
-const driver = getDriver()
+import type { ApolloTestSetup } from '@root/test/helpers'
 
-let query
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 const contextFn = () => ({
   authenticatedUser: null,
@@ -15,19 +15,24 @@ const contextFn = () => ({
 
 beforeAll(async () => {
   await cleanDatabase()
-  ;({ query } = await createApolloTestSetup({ context: contextFn }))
+  const apolloSetup = await createApolloTestSetup({ context: contextFn })
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 beforeEach(async () => {
-  await neode.create('Post', { title: 'first', content: 'content' })
-  await neode.create('Post', { title: 'second', content: 'content' })
-  await neode.create('Post', { title: 'third', content: 'content' })
-  await neode.create('Post', { title: 'last', content: 'content' })
+  await database.neode.create('Post', { title: 'first', content: 'content' })
+  await database.neode.create('Post', { title: 'second', content: 'content' })
+  await database.neode.create('Post', { title: 'third', content: 'content' })
+  await database.neode.create('Post', { title: 'last', content: 'content' })
 })
 
 // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543

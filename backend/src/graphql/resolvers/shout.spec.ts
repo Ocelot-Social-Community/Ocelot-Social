@@ -4,15 +4,20 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { Post } from '@graphql/queries/Post'
 import { shout } from '@graphql/queries/shout'
 import { unshout } from '@graphql/queries/unshout'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-let mutate, query, authenticatedUser, variables
-const instance = getNeode()
-const driver = getDriver()
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
+
+let authenticatedUser: Context['user']
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+let variables
 
 const contextFn = () => ({
   authenticatedUser,
@@ -25,12 +30,18 @@ describe('shout and unshout posts', () => {
     await cleanDatabase()
 
     authenticatedUser = undefined
-    ;({ query, mutate } = await createApolloTestSetup({ context: contextFn }))
+    const apolloSetup = await createApolloTestSetup({ context: contextFn })
+    query = apolloSetup.query
+    mutate = apolloSetup.mutate
+    database = apolloSetup.database
+    server = apolloSetup.server
   })
 
   afterAll(async () => {
     await cleanDatabase()
-    await driver.close()
+    void server.stop()
+    void database.driver.close()
+    database.neode.close()
   })
 
   beforeEach(async () => {
@@ -114,7 +125,7 @@ describe('shout and unshout posts', () => {
       it('adds `createdAt` to `SHOUT` relationship', async () => {
         variables = { id: 'another-user-post-id' }
         await mutate({ mutation: shout, variables })
-        const relation = await instance.cypher(
+        const relation = await database.neode.cypher(
           'MATCH (user:User {id: $userId1})-[relationship:SHOUTED]->(node {id: $userId2}) WHERE relationship.createdAt IS NOT NULL RETURN relationship',
           {
             userId1: 'current-user-id',

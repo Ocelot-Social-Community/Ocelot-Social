@@ -4,21 +4,28 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getDriver } from '@db/neo4j'
 import { CreateSocialMedia } from '@graphql/queries/CreateSocialMedia'
 import { DeleteSocialMedia } from '@graphql/queries/DeleteSocialMedia'
 import { UpdateSocialMedia } from '@graphql/queries/UpdateSocialMedia'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-const driver = getDriver()
+import type { ApolloTestSetup } from '@root/test/helpers'
+
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 beforeAll(async () => {
   await cleanDatabase()
+  const apolloSetup = await createApolloTestSetup({ context: () => ({ authenticatedUser: null }) })
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('SocialMedia', () => {

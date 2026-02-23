@@ -3,15 +3,18 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { searchPosts } from '@graphql/queries/searchPosts'
 import { searchResults } from '@graphql/queries/searchResults'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-let query, authenticatedUser, user
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-const driver = getDriver()
-const neode = getNeode()
+let authenticatedUser: Context['user']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+let user
 
 const contextFn = () => ({
   authenticatedUser,
@@ -19,13 +22,17 @@ const contextFn = () => ({
 
 beforeAll(async () => {
   await cleanDatabase()
-  ;({ query } = await createApolloTestSetup({ context: contextFn }))
+  const apolloSetup = await createApolloTestSetup({ context: contextFn })
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
-  neode.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('resolvers/searches', () => {

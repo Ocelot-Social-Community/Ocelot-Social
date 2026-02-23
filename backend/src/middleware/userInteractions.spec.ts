@@ -3,13 +3,17 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getDriver } from '@db/neo4j'
 import { Post } from '@graphql/queries/Post'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-let query, aUser, bUser, post, authenticatedUser, variables
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-const driver = getDriver()
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+let authenticatedUser: Context['user']
+let aUser, bUser, post, variables
 
 const contextFn = () => ({
   authenticatedUser,
@@ -26,12 +30,17 @@ beforeAll(async () => {
   })
   post = await Factory.build('post')
   authenticatedUser = await aUser.toJson()
-  ;({ query } = await createApolloTestSetup({ context: contextFn }))
+  const apolloSetup = await createApolloTestSetup({ context: contextFn })
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('middleware/userInteractions', () => {

@@ -3,28 +3,35 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getDriver } from '@db/neo4j'
 import { availableRoles } from '@graphql/queries/availableRoles'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-const driver = getDriver()
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
+
+let authenticatedUser: Context['user']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+
+const contextFn = () => ({
+  authenticatedUser,
+})
 
 describe('availableRoles', () => {
-  let authenticatedUser
-  let query
-
-  const contextFn = () => ({
-    authenticatedUser,
-  })
-
   beforeAll(async () => {
     await cleanDatabase()
-    ;({ query } = await createApolloTestSetup({ context: contextFn }))
+    const apolloSetup = await createApolloTestSetup({ context: contextFn })
+    query = apolloSetup.query
+    database = apolloSetup.database
+    server = apolloSetup.server
   })
 
   afterAll(async () => {
     await cleanDatabase()
-    await driver.close()
+    void server.stop()
+    void database.driver.close()
+    database.neode.close()
   })
 
   afterEach(async () => {

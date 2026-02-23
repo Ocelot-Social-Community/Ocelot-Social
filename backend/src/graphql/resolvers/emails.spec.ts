@@ -3,17 +3,19 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getDriver, getNeode } from '@db/neo4j'
 import { AddEmailAddress } from '@graphql/queries/AddEmailAddress'
 import { VerifyEmailAddress } from '@graphql/queries/VerifyEmailAddress'
 import { VerifyNonce } from '@graphql/queries/VerifyNonce'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-const neode = getNeode()
-const driver = getDriver()
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-let mutate, query
-let authenticatedUser
+let authenticatedUser: Context['user']
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 let user
 let variables
 
@@ -23,12 +25,18 @@ const contextFn = () => ({
 
 beforeAll(async () => {
   await cleanDatabase()
-  ;({ query, mutate } = await createApolloTestSetup({ context: contextFn }))
+  const apolloSetup = await createApolloTestSetup({ context: contextFn })
+  query = apolloSetup.query
+  mutate = apolloSetup.mutate
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 beforeEach(() => {
@@ -93,7 +101,7 @@ describe('AddEmailAddress', () => {
 
       it('connects `UnverifiedEmailAddress` to the authenticated user', async () => {
         await mutate({ mutation: AddEmailAddress, variables })
-        const result = await neode.cypher(
+        const result = await database.neode.cypher(
           `
         MATCH(u:User)-[:PRIMARY_EMAIL]->(:EmailAddress {email: "user@example.org"})
         MATCH(u:User)<-[:BELONGS_TO]-(e:UnverifiedEmailAddress {email: "new-email@example.org"})
@@ -101,7 +109,7 @@ describe('AddEmailAddress', () => {
       `,
           {},
         )
-        const email = neode.hydrateFirst(result, 'e', neode.model('UnverifiedEmailAddress'))
+        const email = database.neode.hydrateFirst(result, 'e', database.neode.model('UnverifiedEmailAddress'))
         await expect(email.toJson()).resolves.toMatchObject({
           email: 'new-email@example.org',
           nonce: expect.any(String),
@@ -237,14 +245,14 @@ describe('VerifyEmailAddress', () => {
 
           it('connects the new `EmailAddress` as PRIMARY', async () => {
             await mutate({ mutation: VerifyEmailAddress, variables })
-            const result = await neode.cypher(
+            const result = await database.neode.cypher(
               `
             MATCH(u:User {id: "567"})-[:PRIMARY_EMAIL]->(e:EmailAddress {email: "to-be-verified@example.org"})
             RETURN e
           `,
               {},
             )
-            const email = neode.hydrateFirst(result, 'e', neode.model('EmailAddress'))
+            const email = database.neode.hydrateFirst(result, 'e', database.neode.model('EmailAddress'))
             await expect(email.toJson()).resolves.toMatchObject({
               email: 'to-be-verified@example.org',
             })
@@ -255,14 +263,14 @@ describe('VerifyEmailAddress', () => {
             MATCH(u:User {id: "567"})-[:PRIMARY_EMAIL]->(e:EmailAddress {email: "user@example.org"})
             RETURN e
           `
-            let result = await neode.cypher(cypherStatement, {})
-            let email = neode.hydrateFirst(result, 'e', neode.model('EmailAddress'))
+            let result = await database.neode.cypher(cypherStatement, {})
+            let email = database.neode.hydrateFirst(result, 'e', database.neode.model('EmailAddress'))
             await expect(email.toJson()).resolves.toMatchObject({
               email: 'user@example.org',
             })
             await mutate({ mutation: VerifyEmailAddress, variables })
-            result = await neode.cypher(cypherStatement, {})
-            email = neode.hydrateFirst(result, 'e', neode.model('EmailAddress'))
+            result = await database.neode.cypher(cypherStatement, {})
+            email = database.neode.hydrateFirst(result, 'e', database.neode.model('EmailAddress'))
             expect(email).toBe(false)
           })
 
@@ -271,14 +279,14 @@ describe('VerifyEmailAddress', () => {
             MATCH(u:User {id: "567"})<-[:BELONGS_TO]-(e:EmailAddress {email: "user@example.org"})
             RETURN e
           `
-            let result = await neode.cypher(cypherStatement, {})
-            let email = neode.hydrateFirst(result, 'e', neode.model('EmailAddress'))
+            let result = await database.neode.cypher(cypherStatement, {})
+            let email = database.neode.hydrateFirst(result, 'e', database.neode.model('EmailAddress'))
             await expect(email.toJson()).resolves.toMatchObject({
               email: 'user@example.org',
             })
             await mutate({ mutation: VerifyEmailAddress, variables })
-            result = await neode.cypher(cypherStatement, {})
-            email = neode.hydrateFirst(result, 'e', neode.model('EmailAddress'))
+            result = await database.neode.cypher(cypherStatement, {})
+            email = database.neode.hydrateFirst(result, 'e', database.neode.model('EmailAddress'))
             expect(email).toBe(false)
           })
 
@@ -304,14 +312,14 @@ describe('VerifyEmailAddress', () => {
 
             it('connects the new `EmailAddress` as PRIMARY', async () => {
               await mutate({ mutation: VerifyEmailAddress, variables })
-              const result = await neode.cypher(
+              const result = await database.neode.cypher(
                 `
                 MATCH(u:User {id: "567"})-[:PRIMARY_EMAIL]->(e:EmailAddress {email: "to-be-verified@example.org"})
                 RETURN e
               `,
                 {},
               )
-              const email = neode.hydrateFirst(result, 'e', neode.model('EmailAddress'))
+              const email = database.neode.hydrateFirst(result, 'e', database.neode.model('EmailAddress'))
               await expect(email.toJson()).resolves.toMatchObject({
                 email: 'to-be-verified@example.org',
               })

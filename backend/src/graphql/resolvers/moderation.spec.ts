@@ -4,16 +4,17 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { review } from '@graphql/queries/review'
 import { createApolloTestSetup } from '@root/test/helpers'
 
-const neode = getNeode()
-const driver = getDriver()
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-let mutate,
-  authenticatedUser,
-  disableVariables,
+let authenticatedUser: Context['user']
+let mutate: ApolloTestSetup['mutate']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+let disableVariables,
   enableVariables,
   moderator,
   nonModerator,
@@ -28,12 +29,17 @@ describe('moderate resources', () => {
     await cleanDatabase()
 
     authenticatedUser = undefined
-    ;({ mutate } = await createApolloTestSetup({ context: contextFn }))
+    const apolloSetup = await createApolloTestSetup({ context: contextFn })
+    mutate = apolloSetup.mutate
+    database = apolloSetup.database
+    server = apolloSetup.server
   })
 
   afterAll(async () => {
     await cleanDatabase()
-    await driver.close()
+    void server.stop()
+    void database.driver.close()
+    database.neode.close()
   })
 
   beforeEach(async () => {
@@ -152,7 +158,7 @@ describe('moderate resources', () => {
         ])
         const cypher =
           'MATCH (:Report)<-[review:REVIEWED]-(moderator:User {id: "moderator-id"}) RETURN review'
-        const reviews = await neode.cypher(cypher, {})
+        const reviews = await database.neode.cypher(cypher, {})
         expect(reviews.records).toHaveLength(1)
       })
 
