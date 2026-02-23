@@ -3,15 +3,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
+import SignupVerification from '@graphql/queries/auth/SignupVerification.gql'
 import CreateComment from '@graphql/queries/comments/CreateComment.gql'
+import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
-import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import LeaveGroup from '@graphql/queries/groups/LeaveGroup.gql'
+import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import Post from '@graphql/queries/posts/Post.gql'
 import profilePagePosts from '@graphql/queries/posts/profilePagePosts.gql'
 import searchPosts from '@graphql/queries/posts/searchPosts.gql'
-import SignupVerification from '@graphql/queries/auth/SignupVerification.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

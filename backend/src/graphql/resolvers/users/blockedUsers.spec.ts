@@ -6,8 +6,8 @@
 import { cleanDatabase } from '@db/factories'
 import blockedUsers from '@graphql/queries/interactions/blockedUsers.gql'
 import blockUser from '@graphql/queries/interactions/blockUser.gql'
-import Post from '@graphql/queries/posts/Post.gql'
 import unblockUser from '@graphql/queries/interactions/unblockUser.gql'
+import Post from '@graphql/queries/posts/Post.gql'
 import User from '@graphql/queries/users/User.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 

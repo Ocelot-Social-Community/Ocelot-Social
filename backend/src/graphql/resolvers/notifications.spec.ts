@@ -5,10 +5,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import Factory, { cleanDatabase } from '@db/factories'
-import DeletePost from '@graphql/queries/posts/DeletePost.gql'
 import markAllAsRead from '@graphql/queries/notifications/markAllAsRead.gql'
 import markAsRead from '@graphql/queries/notifications/markAsRead.gql'
 import notifications from '@graphql/queries/notifications/notifications.gql'
+import DeletePost from '@graphql/queries/posts/DeletePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

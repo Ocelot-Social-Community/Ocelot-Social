@@ -7,8 +7,8 @@
 import { cleanDatabase } from '@db/factories'
 import mutedUsers from '@graphql/queries/interactions/mutedUsers.gql'
 import muteUser from '@graphql/queries/interactions/muteUser.gql'
-import Post from '@graphql/queries/posts/Post.gql'
 import unmuteUser from '@graphql/queries/interactions/unmuteUser.gql'
+import Post from '@graphql/queries/posts/Post.gql'
 import User from '@graphql/queries/users/User.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 

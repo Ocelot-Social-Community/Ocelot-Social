@@ -3,8 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateComment from '@graphql/queries/comments/CreateComment.gql'
-import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import notifications from '@graphql/queries/notifications/notifications.gql'
+import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import toggleObservePost from '@graphql/queries/posts/toggleObservePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
