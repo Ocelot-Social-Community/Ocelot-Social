@@ -147,7 +147,11 @@ const multiSearchMap = [
 export default {
   Query: {
     searchPosts: (_parent, args, context, _resolveInfo) => {
-      const { query, postsOffset, firstPosts } = args as { query: string; postsOffset: number; firstPosts: number }
+      const { query, postsOffset, firstPosts } = args as {
+        query: string
+        postsOffset: number
+        firstPosts: number
+      }
       let userId = null
       if (context.user) userId = context.user.id
       return {
@@ -170,7 +174,11 @@ export default {
       }
     },
     searchUsers: (_parent, args, context, _resolveInfo) => {
-      const { query, usersOffset, firstUsers } = args as { query: string; usersOffset: number; firstUsers: number }
+      const { query, usersOffset, firstUsers } = args as {
+        query: string
+        usersOffset: number
+        firstUsers: number
+      }
       return {
         userCount: getSearchResults(
           context,
@@ -189,7 +197,11 @@ export default {
       }
     },
     searchHashtags: (_parent, args, context, _resolveInfo) => {
-      const { query, hashtagsOffset, firstHashtags } = args as { query: string; hashtagsOffset: number; firstHashtags: number }
+      const { query, hashtagsOffset, firstHashtags } = args as {
+        query: string
+        hashtagsOffset: number
+        firstHashtags: number
+      }
       return {
         hashtagCount: getSearchResults(
           context,
@@ -208,7 +220,11 @@ export default {
       }
     },
     searchGroups: (_parent, args, context, _resolveInfo) => {
-      const { query, groupsOffset, firstGroups } = args as { query: string; groupsOffset: number; firstGroups: number }
+      const { query, groupsOffset, firstGroups } = args as {
+        query: string
+        groupsOffset: number
+        firstGroups: number
+      }
       let userId = null
       if (context.user) userId = context.user.id
       return {

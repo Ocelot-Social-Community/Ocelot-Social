@@ -157,7 +157,10 @@ export const createOrUpdateLocations = async (
   })
 }
 
-export const queryLocations = async ({ place, lang }: { place: string; lang: string }, context: Context) => {
+export const queryLocations = async (
+  { place, lang }: { place: string; lang: string },
+  context: Context,
+) => {
   const res: any = await fetch(
     `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${context.config.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`,
     {
