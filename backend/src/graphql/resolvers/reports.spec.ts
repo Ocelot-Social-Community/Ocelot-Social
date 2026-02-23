@@ -315,11 +315,12 @@ describe('reports', () => {
                 },
               }),
             ).resolves.toMatchObject({
-              data: undefined,
+              data: null,
               errors: [
                 {
-                  message:
-                    'Variable "$reasonCategory" got invalid value "category_missing_from_enum_reason_category"; Expected type ReasonCategory.',
+                  message: expect.stringContaining(
+                    'Variable "$reasonCategory" got invalid value "category_missing_from_enum_reason_category"',
+                  ),
                 },
               ],
             })

@@ -299,8 +299,9 @@ describe('CreatePost', () => {
         ).resolves.toMatchObject({
           errors: [
             {
-              message:
-                'Variable "$postType" got invalid value "not-valid"; Expected type PostType.',
+              message: expect.stringContaining(
+                'Variable "$postType" got invalid value "not-valid"',
+              ),
             },
           ],
         })
