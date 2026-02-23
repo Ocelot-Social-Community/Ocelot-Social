@@ -2,13 +2,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { createApolloTestSetup } from '@root/test/helpers'
 import { Post } from '@graphql/queries/Post'
 import { shout } from '@graphql/queries/shout'
 import { unshout } from '@graphql/queries/unshout'
+import { createApolloTestSetup } from '@root/test/helpers'
 
 let mutate, query, authenticatedUser, variables
 const instance = getNeode()

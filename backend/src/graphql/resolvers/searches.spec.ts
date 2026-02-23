@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import Factory, { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { createApolloTestSetup } from '@root/test/helpers'
 import { searchPosts } from '@graphql/queries/searchPosts'
 import { searchResults } from '@graphql/queries/searchResults'
+import { createApolloTestSetup } from '@root/test/helpers'
 
 let query, authenticatedUser, user
 

@@ -2,13 +2,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
-import { createApolloTestSetup } from '@root/test/helpers'
 import { CreateSocialMedia } from '@graphql/queries/CreateSocialMedia'
 import { DeleteSocialMedia } from '@graphql/queries/DeleteSocialMedia'
 import { UpdateSocialMedia } from '@graphql/queries/UpdateSocialMedia'
+import { createApolloTestSetup } from '@root/test/helpers'
 
 const driver = getDriver()
 
@@ -59,7 +59,9 @@ describe('SocialMedia', () => {
     owner = await ownerNode.toJson()
 
     socialMediaAction = async (user, mutation, variables) => {
-      const { query } = await createApolloTestSetup({ context: () => ({ authenticatedUser: user }) })
+      const { query } = await createApolloTestSetup({
+        context: () => ({ authenticatedUser: user }),
+      })
       return query({ query: mutation, variables })
     }
   })
@@ -217,7 +219,7 @@ describe('SocialMedia', () => {
     describe('authenticated as owner', () => {
       let user
 
-      beforeEach(async () => {
+      beforeEach(() => {
         user = owner
       })
 

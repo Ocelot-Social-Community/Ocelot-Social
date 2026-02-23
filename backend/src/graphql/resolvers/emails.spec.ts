@@ -1,14 +1,13 @@
-/* eslint-disable @typescript-eslint/no-confusing-void-expression */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver, getNeode } from '@db/neo4j'
-import { createApolloTestSetup } from '@root/test/helpers'
 import { AddEmailAddress } from '@graphql/queries/AddEmailAddress'
 import { VerifyEmailAddress } from '@graphql/queries/VerifyEmailAddress'
 import { VerifyNonce } from '@graphql/queries/VerifyNonce'
+import { createApolloTestSetup } from '@root/test/helpers'
 
 const neode = getNeode()
 const driver = getDriver()
@@ -24,7 +23,6 @@ const contextFn = () => ({
 
 beforeAll(async () => {
   await cleanDatabase()
-
   ;({ query, mutate } = await createApolloTestSetup({ context: contextFn }))
 })
 
@@ -33,7 +31,7 @@ afterAll(async () => {
   await driver.close()
 })
 
-beforeEach(async () => {
+beforeEach(() => {
   variables = {}
 })
 
@@ -265,7 +263,7 @@ describe('VerifyEmailAddress', () => {
             await mutate({ mutation: VerifyEmailAddress, variables })
             result = await neode.cypher(cypherStatement, {})
             email = neode.hydrateFirst(result, 'e', neode.model('EmailAddress'))
-            await expect(email).toBe(false)
+            expect(email).toBe(false)
           })
 
           it('removes previous `EmailAddress` node', async () => {
@@ -281,7 +279,7 @@ describe('VerifyEmailAddress', () => {
             await mutate({ mutation: VerifyEmailAddress, variables })
             result = await neode.cypher(cypherStatement, {})
             email = neode.hydrateFirst(result, 'e', neode.model('EmailAddress'))
-            await expect(email).toBe(false)
+            expect(email).toBe(false)
           })
 
           describe('Edge case: In the meantime someone created an `EmailAddress` node with the given email belonging to a user', () => {

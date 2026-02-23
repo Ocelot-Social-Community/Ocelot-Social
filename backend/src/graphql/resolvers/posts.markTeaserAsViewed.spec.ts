@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import Factory, { cleanDatabase } from '@db/factories'
 import { getDriver } from '@db/neo4j'
-import { createApolloTestSetup } from '@root/test/helpers'
 import { markTeaserAsViewed } from '@graphql/queries/markTeaserAsViewed'
+import { createApolloTestSetup } from '@root/test/helpers'
 
 const driver = getDriver()
 

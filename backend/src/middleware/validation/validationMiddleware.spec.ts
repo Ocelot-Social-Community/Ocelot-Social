@@ -1,17 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
-import { createApolloTestSetup } from '@root/test/helpers'
+import { getDriver } from '@db/neo4j'
 import { CreateComment } from '@graphql/queries/CreateComment'
 import { fileReport } from '@graphql/queries/fileReport'
 import { review } from '@graphql/queries/review'
 import { UpdateComment } from '@graphql/queries/UpdateComment'
 import { UpdateUser } from '@graphql/queries/UpdateUser'
+import { createApolloTestSetup } from '@root/test/helpers'
 
-const neode = getNeode()
 const driver = getDriver()
 let authenticatedUser,
   mutate,
@@ -29,7 +27,6 @@ const contextFn = () => ({
 
 beforeAll(async () => {
   await cleanDatabase()
-
   ;({ mutate } = await createApolloTestSetup({ context: contextFn }))
 })
 

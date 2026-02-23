@@ -3,15 +3,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { createApolloTestSetup } from '@root/test/helpers'
 import { mutedUsers } from '@graphql/queries/mutedUsers'
 import { muteUser } from '@graphql/queries/muteUser'
 import { Post } from '@graphql/queries/Post'
 import { unmuteUser } from '@graphql/queries/unmuteUser'
 import { User } from '@graphql/queries/User'
+import { createApolloTestSetup } from '@root/test/helpers'
 
 const driver = getDriver()
 const neode = getNeode()
@@ -226,18 +226,18 @@ describe('muteUser', () => {
             })
 
             it("the muted user's post is still accessible by direct id lookup", async () => {
-              await expect(
-                query({ query: Post, variables: { id: 'p23' } }),
-              ).resolves.toMatchObject({
-                data: {
-                  Post: [
-                    expect.objectContaining({
-                      id: 'p23',
-                      title: 'A post written by the muted user',
-                    }),
-                  ],
+              await expect(query({ query: Post, variables: { id: 'p23' } })).resolves.toMatchObject(
+                {
+                  data: {
+                    Post: [
+                      expect.objectContaining({
+                        id: 'p23',
+                        title: 'A post written by the muted user',
+                      }),
+                    ],
+                  },
                 },
-              })
+              )
             })
 
             describe('but the muted user has a pinned post', () => {

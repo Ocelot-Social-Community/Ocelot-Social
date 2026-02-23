@@ -1,11 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { cleanDatabase } from '@db/factories'
 import { getNeode, getDriver } from '@db/neo4j'
-import { createApolloTestSetup } from '@root/test/helpers'
 import { Post } from '@graphql/queries/Post'
+import { createApolloTestSetup } from '@root/test/helpers'
 
 const neode = getNeode()
 const driver = getDriver()
@@ -18,7 +15,6 @@ const contextFn = () => ({
 
 beforeAll(async () => {
   await cleanDatabase()
-
   ;({ query } = await createApolloTestSetup({ context: contextFn }))
 })
 
