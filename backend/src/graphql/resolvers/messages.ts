@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -16,7 +15,7 @@ import Resolver from './helpers/Resolver'
 
 import type { File } from './attachments/attachments'
 
-const setMessagesAsDistributed = async (undistributedMessagesIds, session) => {
+const setMessagesAsDistributed = (undistributedMessagesIds, session) => {
   return session.writeTransaction(async (transaction) => {
     const setDistributedCypher = `
       MATCH (m:Message) WHERE m.id IN $undistributedMessagesIds

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -45,8 +43,8 @@ export default {
         default:
           orderByClause = ''
       }
-      const offset = args.offset && typeof args.offset === 'number' ? `SKIP ${args.offset}` : ''
-      const limit = args.first && typeof args.first === 'number' ? `LIMIT ${args.first}` : ''
+      const offset = args.offset && typeof args.offset === 'number' ? `SKIP ${String(args.offset)}` : ''
+      const limit = args.first && typeof args.first === 'number' ? `LIMIT ${String(args.first)}` : ''
 
       const readTxResultPromise = session.readTransaction(async (transaction) => {
         const notificationsTransactionResponse = await transaction.run(
@@ -145,9 +143,9 @@ export default {
     },
   },
   NOTIFIED: {
-    id: async (parent) => {
+    id: (parent) => {
       // serialize an ID to help the client update the cache
-      return `${parent.reason}/${parent.from.id}/${parent.to.id}`
+      return `${String(parent.reason)}/${String(parent.from.id)}/${String(parent.to.id)}`
     },
   },
 }

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -80,8 +79,8 @@ export default {
       const filterClause = filterClauses.join(' ')
 
       const offset =
-        params.offset && typeof params.offset === 'number' ? `SKIP ${params.offset}` : ''
-      const limit = params.first && typeof params.first === 'number' ? `LIMIT ${params.first}` : ''
+        params.offset && typeof params.offset === 'number' ? `SKIP ${String(params.offset)}` : ''
+      const limit = params.first && typeof params.first === 'number' ? `LIMIT ${String(params.first)}` : ''
 
       const reportsReadTxPromise = session.readTransaction(async (transaction) => {
         const reportsTransactionResponse = await transaction.run(

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
@@ -53,7 +52,7 @@ const fetchEmbed = async (url) => {
     json = await response.json()
     // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err) {
-    error(`Error fetching embed data: ${err.message}`)
+    error(`Error fetching embed data: ${String(err.message)}`)
     return {}
   }
 

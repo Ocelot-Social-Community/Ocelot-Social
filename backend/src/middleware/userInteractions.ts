@@ -2,16 +2,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
 
 const createRelatedCypher = (relation) => `
 MATCH (user:User { id: $currentUser})
 MATCH (post:Post { id: $postId})
-OPTIONAL MATCH (post)<-[r:${relation}]-(u:User)
+OPTIONAL MATCH (post)<-[r:${String(relation)}]-(u:User)
 WHERE NOT u.disabled AND NOT u.deleted
 WITH user, post, count(DISTINCT u) AS count
-MERGE (user)-[relation:${relation} { }]->(post)
+MERGE (user)-[relation:${String(relation)} { }]->(post)
 ON CREATE
 SET relation.count = 1,
 relation.createdAt = toString(datetime()),

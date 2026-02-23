@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unnecessary-type-conversion */
@@ -22,27 +21,27 @@ const neode = getNeode()
 
 const isAuthenticated = rule({
   cache: 'contextual',
-})(async (_parent, _args, ctx, _info) => {
+})((_parent, _args, ctx, _info) => {
   return !!ctx?.user?.id
 })
 
-const isModerator = rule()(async (_parent, _args, { user }: Context, _info) => {
+const isModerator = rule()((_parent, _args, { user }: Context, _info) => {
   return !!(user && (user.role === 'moderator' || user.role === 'admin'))
 })
 
-const isAdmin = rule()(async (_parent, _args, { user }: Context, _info) => {
+const isAdmin = rule()((_parent, _args, { user }: Context, _info) => {
   return !!(user?.role === 'admin')
 })
 
 const onlyYourself = rule({
   cache: 'no_cache',
-})(async (_parent, args, context: Context, _info) => {
+})((_parent, args, context: Context, _info) => {
   return context.user?.id === args.id
 })
 
 const isMyOwn = rule({
   cache: 'no_cache',
-})(async (parent, _args, { user }: Context, _info) => {
+})((parent, _args, { user }: Context, _info) => {
   return !!(user && user.id === parent.id)
 })
 
@@ -362,21 +361,21 @@ const isAuthor = rule({
 
 const isDeletingOwnAccount = rule({
   cache: 'no_cache',
-})(async (_parent, args, context: Context, _info) => {
+})((_parent, args, context: Context, _info) => {
   return context.user?.id === args.id
 })
 
 const noEmailFilter = rule({
   cache: 'no_cache',
-})(async (_, args) => {
+})((_, args) => {
   return !('email' in args)
 })
 
 const publicRegistration = rule()(
-  async (_parent, _args, context: Context) => context.config.PUBLIC_REGISTRATION,
+  (_parent, _args, context: Context) => context.config.PUBLIC_REGISTRATION,
 )
 
-const inviteRegistration = rule()(async (_parent, args, context: Context) => {
+const inviteRegistration = rule()((_parent, args, context: Context) => {
   if (!context.config.INVITE_REGISTRATION) return false
   const { inviteCode } = args
   return validateInviteCode(context, inviteCode)

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
@@ -38,10 +37,10 @@ const swap = async function (next) {
   }
 }
 
-export async function up(next) {
+export function up(next) {
   swap(next)
 }
 
-export async function down(next) {
+export function down(next) {
   swap(next)
 }

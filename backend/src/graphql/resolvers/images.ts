@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import crypto from 'node:crypto'
 import { join as joinPath } from 'node:path/posix'
 
@@ -14,6 +12,16 @@ type UrlResolver = (
     config: { IMAGOR_PUBLIC_URL },
   }: Pick<Context, 'config'>,
 ) => string
+
+const chain: (...methods: UrlResolver[]) => UrlResolver = (...methods) => {
+  return (parent, args, context) => {
+    let { url } = parent
+    for (const method of methods) {
+      url = method({ url }, args, context)
+    }
+    return url
+  }
+}
 
 const pointUrlToImagor: (opts: { transformations: UrlResolver[] }) => UrlResolver =
   ({ transformations }) =>
@@ -59,20 +67,10 @@ const resize: UrlResolver = ({ url }, { height, width }) => {
   if (!(height || width)) {
     return url
   }
-  const window = `/fit-in/${width ?? FALLBACK_MAXIMUM_LENGTH}x${height ?? FALLBACK_MAXIMUM_LENGTH}`
+  const window = `/fit-in/${String(width ?? FALLBACK_MAXIMUM_LENGTH)}x${String(height ?? FALLBACK_MAXIMUM_LENGTH)}`
   const newUrl = new URL(url)
   newUrl.pathname = window + newUrl.pathname
   return newUrl.href
-}
-
-const chain: (...methods: UrlResolver[]) => UrlResolver = (...methods) => {
-  return (parent, args, context) => {
-    let { url } = parent
-    for (const method of methods) {
-      url = method({ url }, args, context)
-    }
-    return url
-  }
 }
 
 export default {

@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { queryString } from './searches/queryString'
@@ -10,16 +8,16 @@ import { queryString } from './searches/queryString'
 // see http://lucene.apache.org/core/8_3_1/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package.description
 
 const cypherTemplate = (setup) => `
-  CALL db.index.fulltext.queryNodes('${setup.fulltextIndex}', $query)
+  CALL db.index.fulltext.queryNodes('${String(setup.fulltextIndex)}', $query)
   YIELD node AS resource, score
-  ${setup.match}
-  ${setup.whereClause}
-  ${setup.withClause}
-  RETURN 
-  ${setup.returnClause}
+  ${String(setup.match)}
+  ${String(setup.whereClause)}
+  ${String(setup.withClause)}
+  RETURN
+  ${String(setup.returnClause)}
   AS result
   SKIP toInteger($skip)
-  ${setup.limit}
+  ${String(setup.limit)}
 `
 
 const simpleWhereClause =
@@ -148,7 +146,7 @@ const multiSearchMap = [
 
 export default {
   Query: {
-    searchPosts: async (_parent, args, context, _resolveInfo) => {
+    searchPosts: (_parent, args, context, _resolveInfo) => {
       const { query, postsOffset, firstPosts } = args
       let userId = null
       if (context.user) userId = context.user.id
@@ -171,7 +169,7 @@ export default {
         }),
       }
     },
-    searchUsers: async (_parent, args, context, _resolveInfo) => {
+    searchUsers: (_parent, args, context, _resolveInfo) => {
       const { query, usersOffset, firstUsers } = args
       return {
         userCount: getSearchResults(
@@ -190,7 +188,7 @@ export default {
         }),
       }
     },
-    searchHashtags: async (_parent, args, context, _resolveInfo) => {
+    searchHashtags: (_parent, args, context, _resolveInfo) => {
       const { query, hashtagsOffset, firstHashtags } = args
       return {
         hashtagCount: getSearchResults(
@@ -209,7 +207,7 @@ export default {
         }),
       }
     },
-    searchGroups: async (_parent, args, context, _resolveInfo) => {
+    searchGroups: (_parent, args, context, _resolveInfo) => {
       const { query, groupsOffset, firstGroups } = args
       let userId = null
       if (context.user) userId = context.user.id

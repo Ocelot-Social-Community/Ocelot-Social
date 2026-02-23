@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-dynamic-delete */
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -11,7 +9,7 @@
 export const undefinedToNullResolver = (list) => {
   const resolvers = {}
   list.forEach((key) => {
-    resolvers[key] = async (parent) => {
+    resolvers[key] = (parent) => {
       return typeof parent[key] === 'undefined' ? null : parent[key]
     }
   })
@@ -37,7 +35,7 @@ export default function Resolver(type, options: any = {}) {
       try {
         let response = await session.readTransaction(async (txc) => {
           const cypher = `
-          MATCH(:${type} {${idAttribute}: $id})${connection}
+          MATCH(:${String(type)} {${String(idAttribute)}: $id})${String(connection)}
           RETURN related {.*} as related
           `
           const result = await txc.run(cypher, { id, cypherParams })
@@ -62,7 +60,7 @@ export default function Resolver(type, options: any = {}) {
         try {
           return await session.readTransaction(async (txc) => {
             const nodeCondition = condition.replace('this', 'this {id: $id}')
-            const cypher = `${nodeCondition} as ${key}`
+            const cypher = `${String(nodeCondition)} as ${key}`
             const result = await txc.run(cypher, { id, cypherParams })
             const [response] = result.records.map((r) => r.get(key))
             return response
@@ -85,7 +83,7 @@ export default function Resolver(type, options: any = {}) {
           return await session.readTransaction(async (txc) => {
             const id = parent[idAttribute]
             const cypher = `
-              MATCH(u:${type} {${idAttribute}: $id})${connection}
+              MATCH(u:${String(type)} {${String(idAttribute)}: $id})${String(connection)}
               RETURN COUNT(DISTINCT(related)) as count
             `
             const result = await txc.run(cypher, { id, cypherParams })
@@ -141,7 +139,7 @@ export const convertObjectToCypherMapLiteral = (params, addSpaceInfrontIfMapIsNo
   let mapLiteral = ''
   paramsEntries.forEach((ele, index) => {
     mapLiteral += index === 0 ? '{' : ''
-    mapLiteral += `${ele[0]}: "${ele[1]}"`
+    mapLiteral += `${ele[0]}: "${String(ele[1])}"`
     mapLiteral += index < paramsEntries.length - 1 ? ', ' : '}'
   })
   mapLiteral = (addSpaceInfrontIfMapIsNotEmpty && mapLiteral.length > 0 ? ' ' : '') + mapLiteral

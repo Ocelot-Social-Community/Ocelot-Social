@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -29,7 +28,7 @@ export const defaultVerificationBadge = {
 
 export default {
   Query: {
-    Badge: async (object, args, context, resolveInfo) =>
+    Badge: (object, args, context, resolveInfo) =>
       neo4jgraphql(object, args, context, resolveInfo),
   },
 
@@ -172,7 +171,7 @@ export default {
     },
   },
   Badge: {
-    isDefault: async (parent, _params, _context, _resolveInfo) =>
+    isDefault: (parent, _params, _context, _resolveInfo) =>
       [defaultTrophyBadge.id, defaultVerificationBadge.id].includes(parent.id),
   },
 }

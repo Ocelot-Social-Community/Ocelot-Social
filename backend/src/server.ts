@@ -102,8 +102,7 @@ const createServer = async (options?: CreateServerOptions) => {
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
       {
-        // eslint-disable-next-line @typescript-eslint/require-await
-        async serverWillStart() {
+        serverWillStart() {
           return {
             async drainServer() {
               await serverCleanup.dispose()

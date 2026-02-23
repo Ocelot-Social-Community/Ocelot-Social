@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
@@ -65,6 +64,6 @@ export async function up(next) {
   }
 }
 
-export async function down() {
+export function down() {
   throw new Error('Irreversible migration')
 }

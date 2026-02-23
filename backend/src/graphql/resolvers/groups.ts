@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -6,7 +5,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable @typescript-eslint/no-use-before-define */
 import { v4 as uuid } from 'uuid'
 
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'
@@ -19,6 +17,35 @@ import { images } from './images/images'
 import { createOrUpdateLocations } from './users/location'
 
 import type { Context } from '@src/context'
+
+const removeUserFromGroupWriteTxResultPromise = async (session, groupId, userId) => {
+  return session.writeTransaction(async (transaction) => {
+    const removeUserFromGroupCypher = `
+      MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
+      DELETE membership
+      WITH user, group
+      OPTIONAL MATCH (author:User)-[:WROTE]->(p:Post)-[:IN]->(group)
+      WHERE NOT group.groupType = 'public'
+        AND NOT author.id = $userId
+      WITH user, collect(p) AS posts
+      FOREACH (post IN posts |
+        MERGE (user)-[:CANNOT_SEE]->(post))
+      RETURN user {.*}, NULL as membership
+    `
+
+    const transactionResponse = await transaction.run(removeUserFromGroupCypher, {
+      groupId,
+      userId,
+    })
+    const [result] = transactionResponse.records.map((record) => {
+      return { user: record.get('user'), membership: record.get('membership') }
+    })
+    if (!result) {
+      throw new UserInputError('User is not a member of this group')
+    }
+    return result
+  })
+}
 
 export default {
   Query: {
@@ -488,46 +515,17 @@ export default {
         membersCount: '<-[:MEMBER_OF]-(related:User)',
       },
     }),
-    name: async (parent, _args, context: Context, _resolveInfo) => {
+    name: (parent, _args, context: Context, _resolveInfo) => {
       if (!context.user) {
         return parent.groupType === 'hidden' ? '' : parent.name
       }
       return parent.name
     },
-    about: async (parent, _args, context: Context, _resolveInfo) => {
+    about: (parent, _args, context: Context, _resolveInfo) => {
       if (!context.user) {
         return parent.groupType === 'hidden' ? '' : parent.about
       }
       return parent.about
     },
   },
-}
-
-const removeUserFromGroupWriteTxResultPromise = async (session, groupId, userId) => {
-  return session.writeTransaction(async (transaction) => {
-    const removeUserFromGroupCypher = `
-      MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})
-      DELETE membership
-      WITH user, group
-      OPTIONAL MATCH (author:User)-[:WROTE]->(p:Post)-[:IN]->(group)
-      WHERE NOT group.groupType = 'public' 
-        AND NOT author.id = $userId
-      WITH user, collect(p) AS posts
-      FOREACH (post IN posts |
-        MERGE (user)-[:CANNOT_SEE]->(post))
-      RETURN user {.*}, NULL as membership
-    `
-
-    const transactionResponse = await transaction.run(removeUserFromGroupCypher, {
-      groupId,
-      userId,
-    })
-    const [result] = transactionResponse.records.map((record) => {
-      return { user: record.get('user'), membership: record.get('membership') }
-    })
-    if (!result) {
-      throw new UserInputError('User is not a member of this group')
-    }
-    return result
-  })
 }

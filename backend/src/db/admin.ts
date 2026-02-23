@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/require-await */
 
 import { hashSync } from 'bcryptjs'
 import { v4 as uuid } from 'uuid'
@@ -18,7 +17,7 @@ const defaultAdmin = {
 const createDefaultAdminUser = async () => {
   const driver = getDriver()
   const session = driver.session()
-  const createAdminTxResultPromise = session.writeTransaction(async (txc) => {
+  const createAdminTxResultPromise = session.writeTransaction((txc) => {
     txc.run(
       `MERGE (e:EmailAddress {
         email: "${defaultAdmin.email}",

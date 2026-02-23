@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -9,33 +8,33 @@ import { DESCRIPTION_EXCERPT_HTML_LENGTH } from '@constants/groups'
 
 import type { IMiddlewareResolver } from 'graphql-middleware/dist/types'
 
-const createGroup: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+const createGroup: IMiddlewareResolver = (resolve, root, args, context, info) => {
   args.descriptionExcerpt = trunc(args.description, DESCRIPTION_EXCERPT_HTML_LENGTH).html
   return resolve(root, args, context, info)
 }
 
-const updateGroup: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+const updateGroup: IMiddlewareResolver = (resolve, root, args, context, info) => {
   if (args.description)
     args.descriptionExcerpt = trunc(args.description, DESCRIPTION_EXCERPT_HTML_LENGTH).html
   return resolve(root, args, context, info)
 }
 
-const createPost: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+const createPost: IMiddlewareResolver = (resolve, root, args, context, info) => {
   args.contentExcerpt = trunc(args.content, 120).html
   return resolve(root, args, context, info)
 }
 
-const updatePost: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+const updatePost: IMiddlewareResolver = (resolve, root, args, context, info) => {
   args.contentExcerpt = trunc(args.content, 120).html
   return resolve(root, args, context, info)
 }
 
-const createComment: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+const createComment: IMiddlewareResolver = (resolve, root, args, context, info) => {
   args.contentExcerpt = trunc(args.content, 180).html
   return resolve(root, args, context, info)
 }
 
-const updateComment: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+const updateComment: IMiddlewareResolver = (resolve, root, args, context, info) => {
   args.contentExcerpt = trunc(args.content, 180).html
   return resolve(root, args, context, info)
 }

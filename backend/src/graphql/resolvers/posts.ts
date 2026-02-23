@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -186,7 +185,7 @@ export default {
             SET post.sortDate = toString(datetime())
             SET post.clickedCount = 0
             SET post.viewedTeaserCount = 0
-            SET post:${params.postType}
+            SET post:${String(params.postType)}
             WITH post
             MATCH (author:User {id: $userId})
             MERGE (post)<-[:WROTE]-(author)
@@ -260,7 +259,7 @@ export default {
         updatePostCypher += `
           REMOVE post:Article
           REMOVE post:Event
-          SET post:${params.postType}
+          SET post:${String(params.postType)}
           WITH post
         `
       }

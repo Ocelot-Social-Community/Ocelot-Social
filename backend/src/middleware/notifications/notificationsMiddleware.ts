@@ -4,7 +4,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable security/detect-object-injection */
-/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 import {
@@ -41,136 +40,6 @@ const publishNotifications = async (
     }
   })
   return emailsSent
-}
-
-const handleJoinGroup: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
-  const { groupId, userId } = args
-  const user = await resolve(root, args, context, resolveInfo)
-  if (user) {
-    await publishNotifications(
-      context,
-      notifyOwnersOfGroup(groupId, userId, 'user_joined_group', context),
-      'emailNotificationsGroupMemberJoined',
-    )
-  }
-  return user
-}
-
-const handleLeaveGroup: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
-  const { groupId, userId } = args
-  const user = await resolve(root, args, context, resolveInfo)
-  if (user) {
-    await publishNotifications(
-      context,
-      notifyOwnersOfGroup(groupId, userId, 'user_left_group', context),
-      'emailNotificationsGroupMemberLeft',
-    )
-  }
-  return user
-}
-
-const handleChangeGroupMemberRole: IMiddlewareResolver = async (
-  resolve,
-  root,
-  args,
-  context,
-  resolveInfo,
-) => {
-  const { groupId, userId } = args
-  const user = await resolve(root, args, context, resolveInfo)
-  if (user) {
-    await publishNotifications(
-      context,
-      notifyMemberOfGroup(groupId, userId, 'changed_group_member_role', context),
-      'emailNotificationsGroupMemberRoleChanged',
-    )
-  }
-  return user
-}
-
-const handleRemoveUserFromGroup: IMiddlewareResolver = async (
-  resolve,
-  root,
-  args,
-  context,
-  resolveInfo,
-) => {
-  const { groupId, userId } = args
-  const user = await resolve(root, args, context, resolveInfo)
-  if (user) {
-    await publishNotifications(
-      context,
-      notifyMemberOfGroup(groupId, userId, 'removed_user_from_group', context),
-      'emailNotificationsGroupMemberRemoved',
-    )
-  }
-  return user
-}
-
-const handleContentDataOfPost: IMiddlewareResolver = async (
-  resolve,
-  root,
-  args,
-  context,
-  resolveInfo,
-) => {
-  const { groupId } = args
-  const idsOfUsers = extractMentionedUsers(args.content)
-  const post = await resolve(root, args, context, resolveInfo)
-  if (post) {
-    const sentEmails: string[] = await publishNotifications(
-      context,
-      notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context),
-      'emailNotificationsMention',
-    )
-    sentEmails.concat(
-      await publishNotifications(
-        context,
-        notifyFollowingUsers(post.id, groupId, context),
-        'emailNotificationsFollowingUsers',
-        sentEmails,
-      ),
-    )
-    await publishNotifications(
-      context,
-      notifyGroupMembersOfNewPost(post.id, groupId, context),
-      'emailNotificationsPostInGroup',
-      sentEmails,
-    )
-  }
-  return post
-}
-
-const handleContentDataOfComment: IMiddlewareResolver = async (
-  resolve,
-  root,
-  args,
-  context,
-  resolveInfo,
-) => {
-  const { content } = args
-  let idsOfMentionedUsers = extractMentionedUsers(content)
-  const comment = await resolve(root, args, context, resolveInfo)
-  const [postAuthor] = await postAuthorOfComment(comment.id, { context })
-  idsOfMentionedUsers = idsOfMentionedUsers.filter((id) => id !== postAuthor.id)
-  const sentEmails: string[] = await publishNotifications(
-    context,
-    notifyUsersOfMention(
-      'Comment',
-      comment.id,
-      idsOfMentionedUsers,
-      'mentioned_in_comment',
-      context,
-    ),
-    'emailNotificationsMention',
-  )
-  await publishNotifications(
-    context,
-    notifyUsersOfComment('Comment', comment.id, 'commented_on_post', context),
-    'emailNotificationsCommentOnObservedPost',
-    sentEmails,
-  )
-  return comment
 }
 
 const postAuthorOfComment = async (commentId, { context }) => {
@@ -446,6 +315,136 @@ const notifyUsersOfComment = async (label, commentId, reason, context) => {
   } finally {
     await session.close()
   }
+}
+
+const handleJoinGroup: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
+  const { groupId, userId } = args
+  const user = await resolve(root, args, context, resolveInfo)
+  if (user) {
+    await publishNotifications(
+      context,
+      notifyOwnersOfGroup(groupId, userId, 'user_joined_group', context),
+      'emailNotificationsGroupMemberJoined',
+    )
+  }
+  return user
+}
+
+const handleLeaveGroup: IMiddlewareResolver = async (resolve, root, args, context, resolveInfo) => {
+  const { groupId, userId } = args
+  const user = await resolve(root, args, context, resolveInfo)
+  if (user) {
+    await publishNotifications(
+      context,
+      notifyOwnersOfGroup(groupId, userId, 'user_left_group', context),
+      'emailNotificationsGroupMemberLeft',
+    )
+  }
+  return user
+}
+
+const handleChangeGroupMemberRole: IMiddlewareResolver = async (
+  resolve,
+  root,
+  args,
+  context,
+  resolveInfo,
+) => {
+  const { groupId, userId } = args
+  const user = await resolve(root, args, context, resolveInfo)
+  if (user) {
+    await publishNotifications(
+      context,
+      notifyMemberOfGroup(groupId, userId, 'changed_group_member_role', context),
+      'emailNotificationsGroupMemberRoleChanged',
+    )
+  }
+  return user
+}
+
+const handleRemoveUserFromGroup: IMiddlewareResolver = async (
+  resolve,
+  root,
+  args,
+  context,
+  resolveInfo,
+) => {
+  const { groupId, userId } = args
+  const user = await resolve(root, args, context, resolveInfo)
+  if (user) {
+    await publishNotifications(
+      context,
+      notifyMemberOfGroup(groupId, userId, 'removed_user_from_group', context),
+      'emailNotificationsGroupMemberRemoved',
+    )
+  }
+  return user
+}
+
+const handleContentDataOfPost: IMiddlewareResolver = async (
+  resolve,
+  root,
+  args,
+  context,
+  resolveInfo,
+) => {
+  const { groupId } = args
+  const idsOfUsers = extractMentionedUsers(args.content)
+  const post = await resolve(root, args, context, resolveInfo)
+  if (post) {
+    const sentEmails: string[] = await publishNotifications(
+      context,
+      notifyUsersOfMention('Post', post.id, idsOfUsers, 'mentioned_in_post', context),
+      'emailNotificationsMention',
+    )
+    sentEmails.concat(
+      await publishNotifications(
+        context,
+        notifyFollowingUsers(post.id, groupId, context),
+        'emailNotificationsFollowingUsers',
+        sentEmails,
+      ),
+    )
+    await publishNotifications(
+      context,
+      notifyGroupMembersOfNewPost(post.id, groupId, context),
+      'emailNotificationsPostInGroup',
+      sentEmails,
+    )
+  }
+  return post
+}
+
+const handleContentDataOfComment: IMiddlewareResolver = async (
+  resolve,
+  root,
+  args,
+  context,
+  resolveInfo,
+) => {
+  const { content } = args
+  let idsOfMentionedUsers = extractMentionedUsers(content)
+  const comment = await resolve(root, args, context, resolveInfo)
+  const [postAuthor] = await postAuthorOfComment(comment.id, { context })
+  idsOfMentionedUsers = idsOfMentionedUsers.filter((id) => id !== postAuthor.id)
+  const sentEmails: string[] = await publishNotifications(
+    context,
+    notifyUsersOfMention(
+      'Comment',
+      comment.id,
+      idsOfMentionedUsers,
+      'mentioned_in_comment',
+      context,
+    ),
+    'emailNotificationsMention',
+  )
+  await publishNotifications(
+    context,
+    notifyUsersOfComment('Comment', comment.id, 'commented_on_post', context),
+    'emailNotificationsCommentOnObservedPost',
+    sentEmails,
+  )
+  return comment
 }
 
 const handleCreateMessage: IMiddlewareResolver = async (

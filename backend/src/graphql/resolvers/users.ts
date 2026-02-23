@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -215,11 +214,11 @@ export default {
             await Promise.all(
               resource.map(async (node) => {
                 if (!allowedLabels.includes(node)) {
-                  throw new UserInputError(`Invalid resource type: ${node}`)
+                  throw new UserInputError(`Invalid resource type: ${String(node)}`)
                 }
                 const txResult = await transaction.run(
                   `
-                  MATCH (resource:${node})<-[:WROTE]-(author:User {id: $userId})
+                  MATCH (resource:${String(node)})<-[:WROTE]-(author:User {id: $userId})
                   OPTIONAL MATCH (resource)<-[:COMMENTS]-(comment:Comment)
                   SET resource.deleted = true
                   SET resource.content = 'UNAVAILABLE'
@@ -371,7 +370,7 @@ export default {
 
       if (slot >= TROPHY_BADGES_SELECTED_MAX || slot < 0) {
         throw new Error(
-          `Invalid slot! There is only ${TROPHY_BADGES_SELECTED_MAX} badge-slots to fill`,
+          `Invalid slot! There is only ${String(TROPHY_BADGES_SELECTED_MAX)} badge-slots to fill`,
         )
       }
 

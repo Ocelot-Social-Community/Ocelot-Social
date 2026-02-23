@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/no-shadow */
 import path from 'node:path'
 
@@ -39,6 +38,17 @@ export const images = (config: S3Config) => {
       await s3.deleteFile(image.url)
     }
     return image
+  }
+
+  const uploadImageFile = async (uploadPromise: Promise<FileUpload> | undefined) => {
+    if (!uploadPromise) return undefined
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const upload = await uploadPromise
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+    const { name, ext } = path.parse(upload.filename)
+    const uniqueFilename = `${uuid()}-${slug(name)}${ext}`
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    return await s3.uploadFile({ ...upload, uniqueFilename })
   }
 
   const mergeImage: Images['mergeImage'] = async (
@@ -82,17 +92,6 @@ export const images = (config: S3Config) => {
     )
     const [mergedImage] = txResult.records.map((record) => record.get('image') as Image)
     return mergedImage
-  }
-
-  const uploadImageFile = async (uploadPromise: Promise<FileUpload> | undefined) => {
-    if (!uploadPromise) return undefined
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const upload = await uploadPromise
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-    const { name, ext } = path.parse(upload.filename)
-    const uniqueFilename = `${uuid()}-${slug(name)}${ext}`
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    return await s3.uploadFile({ ...upload, uniqueFilename })
   }
 
   const images = {

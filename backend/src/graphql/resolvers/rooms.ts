@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -38,7 +37,7 @@ export default {
     },
   },
   Query: {
-    Room: async (object, params, context, resolveInfo) => {
+    Room: (object, params, context, resolveInfo) => {
       if (!params.filter) params.filter = {}
       params.filter.users_some = {
         id: context.user.id,

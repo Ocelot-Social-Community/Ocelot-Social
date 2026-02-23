@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -16,7 +14,7 @@ const validateCreateComment: IMiddlewareResolver = async (resolve, root, args, c
   const { postId } = args
 
   if (!args.content || content.length < COMMENT_MIN_LENGTH) {
-    throw new UserInputError(`Comment must be at least ${COMMENT_MIN_LENGTH} character long!`)
+    throw new UserInputError(`Comment must be at least ${String(COMMENT_MIN_LENGTH)} character long!`)
   }
   const session = context.driver.session()
   try {
@@ -43,16 +41,16 @@ const validateCreateComment: IMiddlewareResolver = async (resolve, root, args, c
   }
 }
 
-const validateUpdateComment: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+const validateUpdateComment: IMiddlewareResolver = (resolve, root, args, context, info) => {
   const content = args.content.replace(/<(?:.|\n)*?>/gm, '').trim()
   if (!args.content || content.length < COMMENT_MIN_LENGTH) {
-    throw new UserInputError(`Comment must be at least ${COMMENT_MIN_LENGTH} character long!`)
+    throw new UserInputError(`Comment must be at least ${String(COMMENT_MIN_LENGTH)} character long!`)
   }
 
   return resolve(root, args, context, info)
 }
 
-const validateReport: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+const validateReport: IMiddlewareResolver = (resolve, root, args, context, info) => {
   const { resourceId } = args
   const { user } = context
   if (resourceId === user.id) throw new Error('You cannot report yourself!')
@@ -92,14 +90,14 @@ const validateReview: IMiddlewareResolver = async (resolve, root, args, context,
     existingReportedResource = existingReportedResource[0]
     if (!existingReportedResource.filed)
       throw new Error(
-        `Before starting the review process, please report the ${existingReportedResource.label}!`,
+        `Before starting the review process, please report the ${String(existingReportedResource.label)}!`,
       )
     const authorId =
       existingReportedResource.label !== 'User' && existingReportedResource.author
         ? existingReportedResource.author.properties.id
         : null
     if (authorId && authorId === user.id)
-      throw new Error(`You cannot review your own ${existingReportedResource.label}!`)
+      throw new Error(`You cannot review your own ${String(existingReportedResource.label)}!`)
   } finally {
     await session.close()
   }
@@ -107,7 +105,7 @@ const validateReview: IMiddlewareResolver = async (resolve, root, args, context,
   return resolve(root, args, context, info)
 }
 
-export const validateNotifyUsers = async (label: string, reason: string): Promise<void> => {
+export const validateNotifyUsers = (label: string, reason: string): void => {
   const reasonsAllowed = [
     'mentioned_in_post',
     'mentioned_in_comment',
@@ -124,10 +122,10 @@ export const validateNotifyUsers = async (label: string, reason: string): Promis
   }
 }
 
-const validateUpdateUser: IMiddlewareResolver = async (resolve, root, params, context, info) => {
+const validateUpdateUser: IMiddlewareResolver = (resolve, root, params, context, info) => {
   const { name } = params
   if (typeof name === 'string' && name.trim().length < USERNAME_MIN_LENGTH)
-    throw new UserInputError(`Username must be at least ${USERNAME_MIN_LENGTH} character long!`)
+    throw new UserInputError(`Username must be at least ${String(USERNAME_MIN_LENGTH)} character long!`)
   return resolve(root, params, context, info)
 }
 

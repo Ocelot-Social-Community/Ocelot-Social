@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -44,7 +43,7 @@ export async function up(next) {
   }
 }
 
-export async function down(next) {
+export function down(next) {
   // eslint-disable-next-line no-console
   console.log('Irreversible migration')
   next()

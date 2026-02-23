@@ -1,7 +1,6 @@
 /* eslint-disable security/detect-object-injection */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable promise/prefer-await-to-callbacks */
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -47,7 +46,7 @@ const fields = [
   { field: 'descriptionExcerpt' },
 ]
 
-const mutationXss: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+const mutationXss: IMiddlewareResolver = (resolve, root, args, context, info) => {
   args = walkRecursive(args, fields, info.fieldName, cleanHtml)
   return resolve(root, args, context, info)
 }

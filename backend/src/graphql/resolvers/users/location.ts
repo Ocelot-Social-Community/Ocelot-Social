@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -19,7 +18,7 @@ const REQUEST_TIMEOUT = 3000
 
 const createLocation = async (session, mapboxData) => {
   const data = {
-    id: mapboxData.id + (mapboxData.address ? `-${mapboxData.address}` : ''),
+    id: mapboxData.id + (mapboxData.address ? `-${String(mapboxData.address)}` : ''),
     nameEN: mapboxData.text_en,
     nameDE: mapboxData.text_de,
     nameFR: mapboxData.text_fr,
@@ -77,9 +76,9 @@ export const createOrUpdateLocations = async (
   if (locationName !== null) {
     const response: any = await fetch(
       `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-        locationName,
+        String(locationName),
       )}.json?access_token=${
-        context.config.MAPBOX_TOKEN
+        String(context.config.MAPBOX_TOKEN)
       }&types=region,place,country,address&language=${locales.join(',')}`,
       {
         signal: AbortSignal.timeout(REQUEST_TIMEOUT),
@@ -115,7 +114,7 @@ export const createOrUpdateLocations = async (
     let parent = data
 
     if (parent.address) {
-      parent.id += `-${parent.address}`
+      parent.id += `-${String(parent.address)}`
     }
 
     if (data.context) {
@@ -147,7 +146,7 @@ export const createOrUpdateLocations = async (
   await session.writeTransaction((transaction) => {
     return transaction.run(
       `
-        MATCH (node:${nodeLabel} {id: $nodeId})
+        MATCH (node:${String(nodeLabel)} {id: $nodeId})
         OPTIONAL MATCH (node)-[relationship:IS_IN]->(:Location)
         DELETE relationship
         WITH node
@@ -162,7 +161,7 @@ export const createOrUpdateLocations = async (
 
 export const queryLocations = async ({ place, lang }, context: Context) => {
   const res: any = await fetch(
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${context.config.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`,
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${String(place)}.json?access_token=${String(context.config.MAPBOX_TOKEN)}&types=region,place,country&language=${String(lang)}`,
     {
       signal: AbortSignal.timeout(REQUEST_TIMEOUT),
     },

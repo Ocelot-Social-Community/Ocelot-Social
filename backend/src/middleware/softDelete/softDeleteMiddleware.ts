@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
@@ -8,7 +7,7 @@ const isModerator = ({ user }) => {
   return user && (user.role === 'moderator' || user.role === 'admin')
 }
 
-const setDefaultFilters: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+const setDefaultFilters: IMiddlewareResolver = (resolve, root, args, context, info) => {
   args.deleted = false
 
   if (!isModerator(context)) {
@@ -17,7 +16,7 @@ const setDefaultFilters: IMiddlewareResolver = async (resolve, root, args, conte
   return resolve(root, args, context, info)
 }
 
-const obfuscate: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+const obfuscate: IMiddlewareResolver = (resolve, root, args, context, info) => {
   if (root.deleted || (!isModerator(context) && root.disabled)) {
     root.content = 'UNAVAILABLE'
     root.contentExcerpt = 'UNAVAILABLE'
@@ -31,7 +30,7 @@ const obfuscate: IMiddlewareResolver = async (resolve, root, args, context, info
   return resolve(root, args, context, info)
 }
 
-const mutationDefaults: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+const mutationDefaults: IMiddlewareResolver = (resolve, root, args, context, info) => {
   args.disabled = false
   // TODO: remove as soon as our factories don't need this anymore
   if (typeof args.deleted !== 'boolean') {

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-base-to-string */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 import { getDriver } from '@db/neo4j'
 
@@ -31,9 +30,9 @@ export async function up(_next) {
         eventEnd = date.toISOString()
       }
       await transaction.run(`
-        MATCH (e:Event { id: '${id}' })
-        SET e.eventStart = '${eventStart}'
-        SET (CASE WHEN exists(e.eventEnd) THEN e END).eventEnd = '${eventEnd}'
+        MATCH (e:Event { id: '${String(id)}' })
+        SET e.eventStart = '${String(eventStart)}'
+        SET (CASE WHEN exists(e.eventEnd) THEN e END).eventEnd = '${String(eventEnd)}'
         RETURN e
       `)
     }

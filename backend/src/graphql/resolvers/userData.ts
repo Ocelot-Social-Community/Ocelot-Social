@@ -2,7 +2,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-use-before-define */
+
+const byCreationDate = (a, b) => {
+  if (a.createdAt < b.createdAt) return -1
+  if (a.createdAt > b.createdAt) return 1
+  return 0
+}
+
 export default {
   Query: {
     userData: async (_object, _args, context, _resolveInfo) => {
@@ -52,10 +58,4 @@ export default {
       }
     },
   },
-}
-
-const byCreationDate = (a, b) => {
-  if (a.createdAt < b.createdAt) return -1
-  if (a.createdAt > b.createdAt) return 1
-  return 0
 }
