@@ -5,7 +5,6 @@ export const CreateSocialMedia = gql`
     CreateSocialMedia(url: $url) {
       id
       url
-      url
       ownedBy {
         name
       }

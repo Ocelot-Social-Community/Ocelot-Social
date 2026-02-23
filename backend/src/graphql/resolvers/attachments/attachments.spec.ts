@@ -21,6 +21,7 @@ import type { FileInput } from './attachments'
 import type File from '@db/models/File'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { S3Config } from '@src/config'
+import type { Context } from '@src/context'
 import type { ReadStream } from 'node:fs'
 
 const s3SendMock = jest.fn()
@@ -48,7 +49,7 @@ const config: S3Config = {
   IMAGOR_PUBLIC_URL: 'IMAGOR_PUBLIC_URL',
 }
 
-let authenticatedUser
+let authenticatedUser: Context['user']
 const context = () => ({ authenticatedUser, config })
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
