@@ -13,7 +13,8 @@ RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
 COPY packages/ui .
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+    npm ci
 RUN npm run build
 
 FROM node:25.6.1-alpine AS base
@@ -47,18 +48,8 @@ ONBUILD RUN tools/merge-locales.sh
 ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 ONBUILD RUN yarn run build
-ONBUILD RUN mkdir /build
-ONBUILD RUN cp -r ./.nuxt /build
-ONBUILD RUN cp -r ./nuxt.config.js /build
-# Copy static files
-# TODO - this seems not be needed anymore for the new rebranding
-# TODO - this should be one Folder containing all stuff needed to be copied
-ONBUILD RUN cp -r ./config/ /build
-ONBUILD RUN cp -r ./constants /build
-ONBUILD RUN cp -r ./static /build
-ONBUILD RUN cp -r ./locales /build
-ONBUILD RUN cp -r ./package.json ./yarn.lock /build
-ONBUILD RUN cp -r ./scripts /build
+ONBUILD RUN mkdir /build && \
+    cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./package.json ./yarn.lock ./scripts /build
 ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --production=true --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 
@@ -69,15 +60,8 @@ RUN tools/merge-locales.sh
 RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 RUN yarn run build
-RUN mkdir /build
-RUN cp -r ./.nuxt /build
-RUN cp -r ./nuxt.config.js /build
-RUN cp -r ./config/ /build
-RUN cp -r ./constants /build
-RUN cp -r ./static /build
-RUN cp -r ./locales /build
-RUN cp -r ./package.json ./yarn.lock /build
-RUN cp -r ./scripts /build
+RUN mkdir /build && \
+    cp -r ./.nuxt ./nuxt.config.js ./config ./constants ./static ./locales ./package.json ./yarn.lock ./scripts /build
 RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     cd /build && yarn install --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 
