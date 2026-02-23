@@ -24,5 +24,9 @@ module.exports = {
   },
   testMatch: ['**/src/**/?(*.)+(spec|test).ts?(x)'],
   setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
+  transform: {
+    '\\.gql$': '<rootDir>/test/graphqlTransform.ts',
+    '\\.tsx?$': 'ts-jest',
+  },
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
 }
