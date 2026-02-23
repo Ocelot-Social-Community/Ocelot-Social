@@ -43,7 +43,7 @@ jobs:
   build_test_webapp:
     name: Docker Build Test - Webapp
     if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true'
-    needs: [files-changed, prepare]
+    needs: files-changed
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -85,9 +85,11 @@ jobs:
         uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v4.0.3
         with:
           node-version-file: 'webapp/.nvmrc'
+          cache: 'yarn'
+          cache-dependency-path: 'webapp/yarn.lock'
 
       - name: webapp | Lint
-        run: cd webapp && yarn && yarn run lint
+        run: cd webapp && yarn --frozen-lockfile && yarn run lint
 
   unit_test_webapp:
     name: Unit Tests - Webapp

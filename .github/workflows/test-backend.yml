@@ -100,9 +100,11 @@ jobs:
         uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v4.0.3
         with:
           node-version-file: 'backend/.nvmrc'
+          cache: 'yarn'
+          cache-dependency-path: 'backend/yarn.lock'
 
       - name: backend | Lint
-        run: cd backend && yarn && yarn run lint
+        run: cd backend && yarn --frozen-lockfile && yarn run lint
 
   unit_test_backend:
     name: Unit tests - Backend
