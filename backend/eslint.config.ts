@@ -61,7 +61,7 @@ export default [
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['eslint.config.ts'],
+          allowDefaultProject: ['eslint.config.ts', 'jest.config.ts', 'prettier.config.ts'],
         },
         tsconfigRootDir: import.meta.dirname,
       },
