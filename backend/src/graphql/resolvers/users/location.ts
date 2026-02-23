@@ -160,7 +160,7 @@ export const createOrUpdateLocations = async (
       )
     })
   } catch (error) {
-    throw new Error(error)
+    throw error
   }
 }
 
@@ -179,6 +179,6 @@ export const queryLocations = async ({ place, lang }, context: Context) => {
     }
     return response.features
   } catch (error) {
-    throw new Error(error)
+    throw error
   }
 }
