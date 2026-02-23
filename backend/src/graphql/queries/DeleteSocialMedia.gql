@@ -1,4 +1,4 @@
-mutation ($id: ID!) {
+mutation DeleteSocialMedia($id: ID!) {
   DeleteSocialMedia(id: $id) {
     id
     url

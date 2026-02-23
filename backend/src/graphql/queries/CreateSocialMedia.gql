@@ -1,8 +1,9 @@
-mutation ($url: String!) {
+mutation CreateSocialMedia($url: String!) {
   CreateSocialMedia(url: $url) {
     id
     url
     ownedBy {
+      id
       name
     }
   }

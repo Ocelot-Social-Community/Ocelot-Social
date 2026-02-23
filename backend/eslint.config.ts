@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import config from 'eslint-config-it4c'
 import graphql from 'eslint-config-it4c/modules/graphql'
 import jest from 'eslint-config-it4c/modules/jest'
