@@ -39,7 +39,7 @@
     "@sentry/node": "^5.30.0",
     "@types/mime-types": "^3.0.1",
     "bcryptjs": "~3.0.3",
-    "body-parser": "^1.20.3",
+    "body-parser": "^2.2.2",
     "cheerio": "~1.2.0",
     "cross-env": "~10.1.0",
     "dotenv": "~17.0.1",
