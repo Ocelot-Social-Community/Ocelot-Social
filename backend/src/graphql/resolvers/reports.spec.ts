@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -176,7 +177,7 @@ describe('reports', () => {
 
               const reportsCypherQueryResponse = await database.neode.cypher(reportsCypherQuery, {
                 resourceId: 'abusive-user-id',
-                currentUserId: authenticatedUser.id,
+                currentUserId: authenticatedUser!.id,
               })
               expect(reportsCypherQueryResponse.records).toHaveLength(1)
               const [reportProperties] = reportsCypherQueryResponse.records.map(
@@ -194,7 +195,7 @@ describe('reports', () => {
 
                 const reportsCypherQueryResponse = await database.neode.cypher(reportsCypherQuery, {
                   resourceId: 'abusive-user-id',
-                  currentUserId: authenticatedUser.id,
+                  currentUserId: authenticatedUser!.id,
                 })
                 expect(reportsCypherQueryResponse.records).toHaveLength(1)
                 const [reportProperties] = reportsCypherQueryResponse.records.map(
@@ -227,7 +228,7 @@ describe('reports', () => {
 
                 const reportsCypherQueryResponse = await database.neode.cypher(reportsCypherQuery, {
                   resourceId: 'abusive-user-id',
-                  currentUserId: authenticatedUser.id,
+                  currentUserId: authenticatedUser!.id,
                 })
                 expect(reportsCypherQueryResponse.records).toHaveLength(1)
                 const [reportProperties] = reportsCypherQueryResponse.records.map(

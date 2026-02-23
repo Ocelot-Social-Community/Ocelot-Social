@@ -37,7 +37,7 @@ describe('donations', () => {
   let currentUser, newlyCreatedDonations
   beforeAll(async () => {
     await cleanDatabase()
-    authenticatedUser = undefined
+    authenticatedUser = null
     const apolloSetup = await createApolloTestSetup({ context: contextFn })
     query = apolloSetup.query
     mutate = apolloSetup.mutate
@@ -58,7 +58,7 @@ describe('donations', () => {
   describe('query for donations', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
-        authenticatedUser = undefined
+        authenticatedUser = null
         await expect(query({ query: Donations, variables })).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
@@ -90,7 +90,7 @@ describe('donations', () => {
 
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
-        authenticatedUser = undefined
+        authenticatedUser = null
         await expect(mutate({ mutation: updateDonations, variables })).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })

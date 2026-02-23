@@ -29,7 +29,7 @@ describe('shout and unshout posts', () => {
   beforeAll(async () => {
     await cleanDatabase()
 
-    authenticatedUser = undefined
+    authenticatedUser = null
     const apolloSetup = await createApolloTestSetup({ context: contextFn })
     query = apolloSetup.query
     mutate = apolloSetup.mutate
@@ -79,7 +79,7 @@ describe('shout and unshout posts', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
         variables = { id: 'post-to-shout-id' }
-        authenticatedUser = undefined
+        authenticatedUser = null
         await expect(mutate({ mutation: shout, variables })).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
@@ -153,7 +153,7 @@ describe('shout and unshout posts', () => {
   describe('unshout', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
-        authenticatedUser = undefined
+        authenticatedUser = null
         variables = { id: 'post-to-shout-id' }
         await expect(mutate({ mutation: unshout, variables })).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],

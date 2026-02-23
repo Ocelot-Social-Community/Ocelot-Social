@@ -24,7 +24,7 @@ describe('moderate resources', () => {
   beforeAll(async () => {
     await cleanDatabase()
 
-    authenticatedUser = undefined
+    authenticatedUser = null
     const apolloSetup = await createApolloTestSetup({ context: contextFn })
     mutate = apolloSetup.mutate
     database = apolloSetup.database
