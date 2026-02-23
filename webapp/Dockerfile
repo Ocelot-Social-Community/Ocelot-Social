@@ -58,6 +58,7 @@ ONBUILD RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
 FROM base AS test_build
 ENV NODE_ENV=test
 COPY webapp/package.json webapp/yarn.lock ./
+COPY webapp/scripts ./scripts/
 RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
     yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
 COPY webapp/. .
