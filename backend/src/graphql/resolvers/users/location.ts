@@ -63,9 +63,9 @@ const createLocation = async (session, mapboxData) => {
 }
 
 export const createOrUpdateLocations = async (
-  nodeLabel,
-  nodeId,
-  locationName,
+  nodeLabel: string,
+  nodeId: string,
+  locationName: string | null | undefined,
   session,
   context: Context,
 ) => {
@@ -157,7 +157,7 @@ export const createOrUpdateLocations = async (
   })
 }
 
-export const queryLocations = async ({ place, lang }, context: Context) => {
+export const queryLocations = async ({ place, lang }: { place: string; lang: string }, context: Context) => {
   const res: any = await fetch(
     `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${context.config.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`,
     {
