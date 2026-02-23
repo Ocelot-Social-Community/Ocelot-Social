@@ -22,6 +22,8 @@ export default {
     '!**/src/**/?(*.)+(spec|test).ts?(x)',
     '!**/src/db/**',
     '!*.config.ts',
+    '!**/*.d.ts',
+    '!**/gql-register.ts',
   ],
   coverageThreshold: {
     global: {
