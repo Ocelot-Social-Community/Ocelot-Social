@@ -7,11 +7,11 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { UserInputError } from 'apollo-server'
 import { v4 as uuid } from 'uuid'
 
 import { CATEGORIES_MIN, CATEGORIES_MAX } from '@constants/categories'
 import { DESCRIPTION_WITHOUT_HTML_LENGTH_MIN } from '@constants/groups'
+import { UserInputError } from '@graphql/errors'
 import { removeHtmlTags } from '@middleware/helpers/cleanHtml'
 
 import Resolver from './helpers/Resolver'

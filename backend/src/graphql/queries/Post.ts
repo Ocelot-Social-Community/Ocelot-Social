@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import { gql } from 'graphql-tag'
 
 export const Post = gql`
   query ($id: ID, $filter: _PostFilter, $first: Int, $offset: Int, $orderBy: [_PostOrdering]) {

@@ -15,6 +15,7 @@ module.exports = {
     '!**/build/**',
     '!**/src/**/?(*.)+(spec|test).ts?(x)',
     '!**/src/db/**',
+    '!eslint.config.ts',
   ],
   coverageThreshold: {
     global: {

@@ -41,7 +41,7 @@ let config: Partial<Context['config']>
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ context })
+  const apolloSetup = await createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database
@@ -299,8 +299,9 @@ describe('CreatePost', () => {
         ).resolves.toMatchObject({
           errors: [
             {
-              message:
-                'Variable "$postType" got invalid value "not-valid"; Expected type PostType.',
+              message: expect.stringContaining(
+                'Variable "$postType" got invalid value "not-valid"',
+              ),
             },
           ],
         })
@@ -635,7 +636,7 @@ describe('UpdatePost', () => {
         categoryIds,
       },
     })
-    newlyCreatedPost = (data as any).CreatePost // eslint-disable-line @typescript-eslint/no-explicit-any
+    newlyCreatedPost = data.CreatePost
     variables = {
       id: newlyCreatedPost.id,
       title: 'New title',

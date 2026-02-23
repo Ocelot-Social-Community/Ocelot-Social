@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import { gql } from 'graphql-tag'
 
 export const ChangeGroupMemberRole = gql`
   mutation ($groupId: ID!, $userId: ID!, $roleInGroup: GroupMemberRole!) {

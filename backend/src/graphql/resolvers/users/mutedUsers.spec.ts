@@ -1,50 +1,44 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable jest/expect-expect */
-import { createTestClient } from 'apollo-server-testing'
 
 import { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { mutedUsers } from '@graphql/queries/mutedUsers'
 import { muteUser } from '@graphql/queries/muteUser'
 import { Post } from '@graphql/queries/Post'
 import { unmuteUser } from '@graphql/queries/unmuteUser'
 import { User } from '@graphql/queries/User'
-import createServer from '@src/server'
+import { createApolloTestSetup } from '@root/test/helpers'
 
-const driver = getDriver()
-const neode = getNeode()
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
 let currentUser
 let mutedUser
-let authenticatedUser
-let server
+
+let authenticatedUser: Context['user']
+const context = () => ({ authenticatedUser })
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 
 beforeAll(async () => {
   await cleanDatabase()
+  const apolloSetup = await createApolloTestSetup({ context })
+  mutate = apolloSetup.mutate
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
-})
-
-beforeEach(() => {
-  authenticatedUser = undefined
-  ;({ server } = createServer({
-    context: () => {
-      return {
-        user: authenticatedUser,
-        driver,
-        neode,
-        cypherParams: {
-          currentUserId: authenticatedUser ? authenticatedUser.id : null,
-        },
-      }
-    },
-  }))
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
@@ -53,20 +47,25 @@ afterEach(async () => {
 })
 
 describe('mutedUsers', () => {
-  it('throws permission error', async () => {
-    const { query } = createTestClient(server)
-    const result = await query({ query: mutedUsers })
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
+  describe('unauthenticated', () => {
+    beforeEach(() => {
+      authenticatedUser = null
+    })
+
+    it('throws permission error', async () => {
+      const result = await query({ query: mutedUsers })
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
+    })
   })
 
   describe('authenticated and given a muted user', () => {
     beforeEach(async () => {
-      currentUser = await neode.create('User', {
+      currentUser = await database.neode.create('User', {
         name: 'Current User',
         id: 'u1',
       })
-      mutedUser = await neode.create('User', {
+      mutedUser = await database.neode.create('User', {
         name: 'Muted User',
         id: 'u2',
       })
@@ -75,7 +74,6 @@ describe('mutedUsers', () => {
     })
 
     it('returns a list of muted users', async () => {
-      const { query } = createTestClient(server)
       await expect(query({ query: mutedUsers })).resolves.toEqual(
         expect.objectContaining({
           data: {
@@ -96,26 +94,30 @@ describe('mutedUsers', () => {
 describe('muteUser', () => {
   let muteAction
 
-  beforeEach(() => {
-    currentUser = undefined
-    muteAction = async (variables) => {
-      const { mutate } = createTestClient(server)
-      return mutate({ mutation: muteUser, variables })
-    }
-  })
+  describe('unauthenticated', () => {
+    beforeEach(() => {
+      authenticatedUser = null
+      muteAction = async (variables) => {
+        return mutate({ mutation: muteUser, variables })
+      }
+    })
 
-  it('throws permission error', async () => {
-    const result = await muteAction({ id: 'u2' })
-    expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
+    it('throws permission error', async () => {
+      const result = await muteAction({ id: 'u2' })
+      expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
+    })
   })
 
   describe('authenticated', () => {
     beforeEach(async () => {
-      currentUser = await neode.create('User', {
+      currentUser = await database.neode.create('User', {
         name: 'Current User',
         id: 'u1',
       })
       authenticatedUser = await currentUser.toJson()
+      muteAction = async (variables) => {
+        return mutate({ mutation: muteUser, variables })
+      }
     })
 
     describe('mute yourself', () => {
@@ -136,7 +138,7 @@ describe('muteUser', () => {
 
     describe('given a to-be-muted user', () => {
       beforeEach(async () => {
-        mutedUser = await neode.create('User', {
+        mutedUser = await database.neode.create('User', {
           name: 'Muted User',
           id: 'u2',
         })
@@ -154,7 +156,6 @@ describe('muteUser', () => {
 
       it('unfollows the user', async () => {
         await currentUser.relateTo(mutedUser, 'following')
-        const { query } = createTestClient(server)
         await expect(query({ query: User, variables: { id: 'u2' } })).resolves.toMatchObject({
           data: {
             User: expect.arrayContaining([
@@ -174,12 +175,12 @@ describe('muteUser', () => {
 
       describe('given both the current user and the to-be-muted user write a post', () => {
         beforeEach(async () => {
-          const post1 = await neode.create('Post', {
+          const post1 = await database.neode.create('Post', {
             id: 'p12',
             title: 'A post written by the current user',
             content: 'content',
           })
-          const post2 = await neode.create('Post', {
+          const post2 = await database.neode.create('Post', {
             id: 'p23',
             title: 'A post written by the muted user',
             content: 'content',
@@ -191,7 +192,6 @@ describe('muteUser', () => {
         })
 
         const bothPostsAreInTheNewsfeed = async () => {
-          const { query } = createTestClient(server)
           await expect(
             query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
           ).resolves.toMatchObject({
@@ -219,6 +219,7 @@ describe('muteUser', () => {
         }
 
         describe('from the perspective of the current user', () => {
+          // eslint-disable-next-line jest/expect-expect
           it('both posts are in the newsfeed', bothPostsAreInTheNewsfeed)
 
           describe('but if the current user mutes the other user', () => {
@@ -227,7 +228,6 @@ describe('muteUser', () => {
             })
 
             it("the muted user's post won't show up in the newsfeed of the current user", async () => {
-              const { query } = createTestClient(server)
               await expect(
                 query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
               ).resolves.toMatchObject({
@@ -244,7 +244,6 @@ describe('muteUser', () => {
             })
 
             it("the muted user's post is still accessible by direct id lookup", async () => {
-              const { query } = createTestClient(server)
               await expect(query({ query: Post, variables: { id: 'p23' } })).resolves.toMatchObject(
                 {
                   data: {
@@ -261,7 +260,7 @@ describe('muteUser', () => {
 
             describe('but the muted user has a pinned post', () => {
               beforeEach(async () => {
-                const pinnedPost = await neode.create('Post', {
+                const pinnedPost = await database.neode.create('Post', {
                   id: 'p-pinned',
                   title: 'A pinned post by the muted user',
                   content: 'pinned content',
@@ -271,7 +270,6 @@ describe('muteUser', () => {
               })
 
               it('the pinned post still shows up in the post list', async () => {
-                const { query } = createTestClient(server)
                 await expect(
                   query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
                 ).resolves.toMatchObject({
@@ -288,7 +286,6 @@ describe('muteUser', () => {
               })
 
               it('the pinned post is accessible by id', async () => {
-                const { query } = createTestClient(server)
                 await expect(
                   query({ query: Post, variables: { id: 'p-pinned' } }),
                 ).resolves.toMatchObject({
@@ -305,12 +302,10 @@ describe('muteUser', () => {
               })
 
               it('the non-pinned post from the muted user is still hidden in the feed', async () => {
-                const { query } = createTestClient(server)
                 const result = await query({
                   query: Post,
                   variables: { orderBy: 'createdAt_asc' },
                 })
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 const postIds = result.data?.Post.map((p) => p.id)
                 expect(postIds).not.toContain('p23')
               })
@@ -323,6 +318,7 @@ describe('muteUser', () => {
             authenticatedUser = await mutedUser.toJson()
           })
 
+          // eslint-disable-next-line jest/expect-expect
           it('both posts are in the newsfeed', bothPostsAreInTheNewsfeed)
           describe('but if the current user mutes the other user', () => {
             beforeEach(async () => {
@@ -330,7 +326,6 @@ describe('muteUser', () => {
             })
 
             it("the current user's post will show up in the newsfeed of the muted user", async () => {
-              const { query } = createTestClient(server)
               await expect(
                 query({ query: Post, variables: { orderBy: 'createdAt_asc' } }),
               ).resolves.toMatchObject({
@@ -360,26 +355,30 @@ describe('muteUser', () => {
 describe('unmuteUser', () => {
   let unmuteAction
 
-  beforeEach(() => {
-    currentUser = undefined
-    unmuteAction = async (variables) => {
-      const { mutate } = createTestClient(server)
-      return mutate({ mutation: unmuteUser, variables })
-    }
-  })
+  describe('unauthenticated', () => {
+    beforeEach(() => {
+      authenticatedUser = null
+      unmuteAction = async (variables) => {
+        return mutate({ mutation: unmuteUser, variables })
+      }
+    })
 
-  it('throws permission error', async () => {
-    const result = await unmuteAction({ id: 'u2' })
-    expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
+    it('throws permission error', async () => {
+      const result = await unmuteAction({ id: 'u2' })
+      expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
+    })
   })
 
   describe('authenticated', () => {
     beforeEach(async () => {
-      currentUser = await neode.create('User', {
+      currentUser = await database.neode.create('User', {
         name: 'Current User',
         id: 'u1',
       })
       authenticatedUser = await currentUser.toJson()
+      unmuteAction = async (variables) => {
+        return mutate({ mutation: unmuteUser, variables })
+      }
     })
 
     describe('unmute yourself', () => {
@@ -400,7 +399,7 @@ describe('unmuteUser', () => {
 
     describe('given another user', () => {
       beforeEach(async () => {
-        mutedUser = await neode.create('User', {
+        mutedUser = await database.neode.create('User', {
           name: 'Muted User',
           id: 'u2',
         })

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
 import { Post } from '@graphql/queries/Post'
@@ -23,7 +23,7 @@ let server: ApolloTestSetup['server']
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ context })
+  const apolloSetup = await createApolloTestSetup({ context })
   query = apolloSetup.query
   database = apolloSetup.database
   server = apolloSetup.server
@@ -205,15 +205,15 @@ describe('softDeleteMiddleware', () => {
     let subject
     const beforeComment = async () => {
       const { data } = await query({ query: User, variables: { id: 'u1' } })
-      subject = (data as any).User[0].following[0].comments[0]
+      subject = data.User[0].following[0].comments[0]
     }
     const beforeUser = async () => {
       const { data } = await query({ query: User, variables: { id: 'u1' } })
-      subject = (data as any).User[0].following[0]
+      subject = data.User[0].following[0]
     }
     const beforePost = async () => {
       const { data } = await query({ query: User, variables: { id: 'u1' } })
-      subject = (data as any).User[0].following[0].contributions[0]
+      subject = data.User[0].following[0].contributions[0]
     }
 
     describe('as moderator', () => {
@@ -349,7 +349,7 @@ describe('softDeleteMiddleware', () => {
 
         it('shows disabled but hides deleted posts', async () => {
           const { data } = await query({ query: Post })
-          const { Post: PostData } = data as any
+          const { Post: PostData } = data
           expect(PostData).toEqual(
             expect.arrayContaining([
               expect.objectContaining({ title: 'Disabled post' }),
@@ -373,7 +373,7 @@ describe('softDeleteMiddleware', () => {
             const { data } = await query({ query: Post, variables: { id: 'p3' } })
             const {
               Post: [{ comments }],
-            } = data as any
+            } = data
             expect(comments).toEqual(expect.arrayContaining(expected))
           })
         })
@@ -391,7 +391,7 @@ describe('softDeleteMiddleware', () => {
             const { data } = await query({ query: Post, variables: { id: 'p3' } })
             const {
               Post: [{ comments }],
-            } = data as any
+            } = data
             expect(comments).toEqual(expect.arrayContaining(expected))
           })
         })

@@ -34,7 +34,7 @@ const pubsubSpy = jest.spyOn(pubsub, 'publish')
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ context })
+  const apolloSetup = await createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database
@@ -131,7 +131,7 @@ describe('Message', () => {
               userId: 'other-chatting-user',
             },
           })
-          roomId = (room.data as any).CreateRoom.id // eslint-disable-line @typescript-eslint/no-explicit-any
+          roomId = room.data.CreateRoom.id
         })
 
         describe('user chats in room', () => {
@@ -413,7 +413,7 @@ describe('Message', () => {
               userId: 'other-chatting-user',
             },
           })
-          roomId = (room.data as any).CreateRoom.id // eslint-disable-line @typescript-eslint/no-explicit-any
+          roomId = room.data.CreateRoom.id
 
           await mutate({
             mutation: CreateMessage,
@@ -645,7 +645,7 @@ describe('Message', () => {
             userId: 'other-chatting-user',
           },
         })
-        roomId = (room.data as any).CreateRoom.id // eslint-disable-line @typescript-eslint/no-explicit-any
+        roomId = room.data.CreateRoom.id
         await mutate({
           mutation: CreateMessage,
           variables: {

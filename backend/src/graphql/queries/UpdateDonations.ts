@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import { gql } from 'graphql-tag'
 
 export const UpdateDonations = gql`
   mutation ($showDonations: Boolean, $goal: Int, $progress: Int) {

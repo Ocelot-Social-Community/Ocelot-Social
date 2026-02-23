@@ -11,7 +11,7 @@
 /* eslint-disable import-x/no-commonjs */
 /* eslint-disable import-x/no-named-as-default */
 
-import { ApolloError } from 'apollo-server'
+import { GraphQLError } from 'graphql'
 import isArray from 'lodash/isArray'
 import isEmpty from 'lodash/isEmpty'
 import mergeWith from 'lodash/mergeWith'
@@ -85,7 +85,7 @@ export default async function scrape(url) {
   })
 
   if (isEmpty(output)) {
-    throw new ApolloError('Not found', 'NOT_FOUND')
+    throw new GraphQLError('Not found', { extensions: { code: 'NOT_FOUND' } })
   }
 
   if (!output.type) {

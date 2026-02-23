@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createTestClient } from 'apollo-server-testing'
-
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { CreateComment } from '@graphql/queries/CreateComment'
 import { fileReport } from '@graphql/queries/fileReport'
 import { review } from '@graphql/queries/review'
 import { UpdateComment } from '@graphql/queries/UpdateComment'
 import { UpdateUser } from '@graphql/queries/UpdateUser'
-import createServer from '@src/server'
+import { createApolloTestSetup } from '@root/test/helpers'
 
-const neode = getNeode()
-const driver = getDriver()
-let authenticatedUser,
-  mutate,
-  users,
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
+
+let authenticatedUser: Context['user']
+let mutate: ApolloTestSetup['mutate']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+let users,
   offensivePost,
   reportVariables,
   disableVariables,
@@ -24,24 +24,23 @@ let authenticatedUser,
   moderatingUser,
   commentingUser
 
+const contextFn = () => ({
+  authenticatedUser,
+})
+
 beforeAll(async () => {
   await cleanDatabase()
-
-  const { server } = createServer({
-    context: () => {
-      return {
-        user: authenticatedUser,
-        neode,
-        driver,
-      }
-    },
-  })
-  mutate = createTestClient(server).mutate
+  const apolloSetup = await createApolloTestSetup({ context: contextFn })
+  mutate = apolloSetup.mutate
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 beforeEach(async () => {

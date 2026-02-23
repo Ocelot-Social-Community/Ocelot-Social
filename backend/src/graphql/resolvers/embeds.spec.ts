@@ -1,25 +1,43 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 /* eslint-disable @typescript-eslint/no-shadow */
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { createTestClient } from 'apollo-server-testing'
 import fetch from 'node-fetch'
 
 import { embed } from '@graphql/queries/embed'
-import createServer from '@src/server'
+import { createApolloTestSetup } from '@root/test/helpers'
+
+import type { ApolloTestSetup } from '@root/test/helpers'
 
 jest.mock('node-fetch')
 const mockedFetch = jest.mocked(fetch)
 const { Response } = jest.requireActual('node-fetch')
 
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+let variables = {}
+
+beforeAll(async () => {
+  const apolloSetup = await createApolloTestSetup({ context: () => ({}) })
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
+})
+
+afterAll(() => {
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
+})
+
 afterEach(() => {
   mockedFetch.mockRestore()
 })
-
-let variables = {}
 
 // eslint-disable-next-line n/no-sync
 const HumanConnectionOrg = fs.readFileSync(
@@ -61,10 +79,6 @@ describe('Query', () => {
 
     beforeEach(() => {
       embedAction = async (variables) => {
-        const { server } = createServer({
-          context: () => {},
-        })
-        const { query } = createTestClient(server)
         return query({ query: embed, variables })
       }
     })

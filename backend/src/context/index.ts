@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-
 import databaseContext from '@context/database'
 import pubsubContext from '@context/pubsub'
 import CONFIG from '@src/config'
@@ -7,8 +5,6 @@ import { decode } from '@src/jwt/decode'
 import ocelotLogger from '@src/logger'
 
 import type { DecodedUser } from '@src/jwt/decode'
-import type OcelotLogger from '@src/logger'
-import type { ApolloServerExpressConfig } from 'apollo-server-express'
 
 const serverDatabase = databaseContext()
 const serverPubsub = pubsubContext()
@@ -18,7 +14,7 @@ export const getContext =
     database?: ReturnType<typeof databaseContext>
     pubsub?: ReturnType<typeof pubsubContext>
     authenticatedUser: DecodedUser | null | undefined
-    logger?: typeof OcelotLogger
+    logger?: typeof ocelotLogger
     config: typeof CONFIG
   }) =>
   async (req: { headers: { authorization?: string } }) => {
@@ -50,12 +46,4 @@ export const getContext =
     return result
   }
 
-export const context: ApolloServerExpressConfig['context'] = async (options) => {
-  const { connection, req } = options
-  if (connection) {
-    return connection.context
-  } else {
-    return getContext()(req)
-  }
-}
 export type Context = Awaited<ReturnType<ReturnType<typeof getContext>>>

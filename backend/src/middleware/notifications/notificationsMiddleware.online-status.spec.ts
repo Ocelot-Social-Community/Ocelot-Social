@@ -32,7 +32,7 @@ let postAuthor
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ context })
+  const apolloSetup = await createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   database = apolloSetup.database
   server = apolloSetup.server
@@ -41,7 +41,8 @@ beforeAll(async () => {
 afterAll(async () => {
   await cleanDatabase()
   void server.stop()
-  await database.driver.close()
+  void database.driver.close()
+  database.neode.close()
 })
 
 afterEach(async () => {

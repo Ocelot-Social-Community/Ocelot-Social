@@ -1,30 +1,42 @@
-/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { createTestClient } from 'apollo-server-testing'
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getDriver } from '@db/neo4j'
 import { CreateSocialMedia } from '@graphql/queries/CreateSocialMedia'
 import { DeleteSocialMedia } from '@graphql/queries/DeleteSocialMedia'
 import { UpdateSocialMedia } from '@graphql/queries/UpdateSocialMedia'
-import createServer from '@src/server'
+import { createApolloTestSetup } from '@root/test/helpers'
 
-const driver = getDriver()
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
+
+let authenticatedUser: Context['user']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+
+const context = () => ({ authenticatedUser })
 
 beforeAll(async () => {
   await cleanDatabase()
+  const apolloSetup = await createApolloTestSetup({ context })
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('SocialMedia', () => {
-  let socialMediaAction, someUser, ownerNode, owner
+  let someUser, ownerNode, owner
 
   const url = 'https://twitter.com/pippi-langstrumpf'
   const newUrl = 'https://twitter.com/bullerby'
@@ -33,6 +45,11 @@ describe('SocialMedia', () => {
     const socialMediaNode = await Factory.build('socialMedia', { url })
     await socialMediaNode.relateTo(ownerNode, 'ownedBy')
     return socialMediaNode.toJson()
+  }
+
+  const socialMediaAction = async (user, mutation, variables) => {
+    authenticatedUser = user
+    return query({ query: mutation, variables })
   }
 
   beforeEach(async () => {
@@ -59,23 +76,6 @@ describe('SocialMedia', () => {
       },
     )
     owner = await ownerNode.toJson()
-
-    socialMediaAction = async (user, mutation, variables) => {
-      const { server } = createServer({
-        context: () => {
-          return {
-            user,
-            driver,
-          }
-        },
-      })
-      const { mutate } = createTestClient(server)
-
-      return mutate({
-        mutation,
-        variables,
-      })
-    }
   })
 
   // TODO: avoid database clean after each test in the future if possible for performance and flakyness reasons by filling the database step by step, see issue https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/4543
@@ -95,7 +95,7 @@ describe('SocialMedia', () => {
         const user = null
         const result = await socialMediaAction(user, CreateSocialMedia, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
+        expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -121,7 +121,7 @@ describe('SocialMedia', () => {
         variables = { url: '' }
         const result = await socialMediaAction(user, CreateSocialMedia, variables)
 
-        expect(result.errors[0].message).toEqual(
+        expect(result.errors![0].message).toEqual(
           expect.stringContaining('"url" is not allowed to be empty'),
         )
       })
@@ -130,7 +130,7 @@ describe('SocialMedia', () => {
         variables = { url: 'not-a-url' }
         const result = await socialMediaAction(user, CreateSocialMedia, variables)
 
-        expect(result.errors[0].message).toEqual(
+        expect(result.errors![0].message).toEqual(
           expect.stringContaining('"url" must be a valid uri'),
         )
       })
@@ -161,7 +161,7 @@ describe('SocialMedia', () => {
         const user = null
         const result = await socialMediaAction(user, UpdateSocialMedia, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
+        expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -170,7 +170,7 @@ describe('SocialMedia', () => {
         const user = someUser
         const result = await socialMediaAction(user, UpdateSocialMedia, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
+        expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -197,7 +197,7 @@ describe('SocialMedia', () => {
         variables.id = 'some-id'
         const result = await socialMediaAction(user, UpdateSocialMedia, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
+        expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
   })
@@ -215,7 +215,7 @@ describe('SocialMedia', () => {
         const user = null
         const result = await socialMediaAction(user, DeleteSocialMedia, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
+        expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
@@ -224,14 +224,14 @@ describe('SocialMedia', () => {
         const user = someUser
         const result = await socialMediaAction(user, DeleteSocialMedia, variables)
 
-        expect(result.errors[0]).toHaveProperty('message', 'Not Authorized!')
+        expect(result.errors![0]).toHaveProperty('message', 'Not Authorized!')
       })
     })
 
     describe('authenticated as owner', () => {
       let user
 
-      beforeEach(async () => {
+      beforeEach(() => {
         user = owner
       })
 

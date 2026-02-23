@@ -2,17 +2,25 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createTestClient } from 'apollo-server-testing'
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { Donations } from '@graphql/queries/Donations'
 import { UpdateDonations as updateDonations } from '@graphql/queries/UpdateDonations'
-import createServer from '@src/server'
+import { createApolloTestSetup } from '@root/test/helpers'
 
-let mutate, query, authenticatedUser, variables
-const instance = getNeode()
-const driver = getDriver()
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
+
+let authenticatedUser: Context['user']
+let mutate: ApolloTestSetup['mutate']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+let variables
+
+const contextFn = () => ({
+  authenticatedUser,
+})
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -20,25 +28,21 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('donations', () => {
   let currentUser, newlyCreatedDonations
   beforeAll(async () => {
     await cleanDatabase()
-    authenticatedUser = undefined
-    const { server } = createServer({
-      context: () => {
-        return {
-          driver,
-          neode: instance,
-          user: authenticatedUser,
-        }
-      },
-    })
-    mutate = createTestClient(server).mutate
-    query = createTestClient(server).query
+    authenticatedUser = null
+    const apolloSetup = await createApolloTestSetup({ context: contextFn })
+    query = apolloSetup.query
+    mutate = apolloSetup.mutate
+    database = apolloSetup.database
+    server = apolloSetup.server
   })
 
   beforeEach(async () => {
@@ -54,7 +58,7 @@ describe('donations', () => {
   describe('query for donations', () => {
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
-        authenticatedUser = undefined
+        authenticatedUser = null
         await expect(query({ query: Donations, variables })).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })
@@ -86,7 +90,7 @@ describe('donations', () => {
 
     describe('unauthenticated', () => {
       it('throws authorization error', async () => {
-        authenticatedUser = undefined
+        authenticatedUser = null
         await expect(mutate({ mutation: updateDonations, variables })).resolves.toMatchObject({
           errors: [{ message: 'Not Authorized!' }],
         })

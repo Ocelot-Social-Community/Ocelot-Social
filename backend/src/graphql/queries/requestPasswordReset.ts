@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import { gql } from 'graphql-tag'
 
 export const requestPasswordReset = gql`
   mutation ($email: String!, $locale: String!) {

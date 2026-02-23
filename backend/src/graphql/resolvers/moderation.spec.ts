@@ -2,44 +2,40 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createTestClient } from 'apollo-server-testing'
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { review } from '@graphql/queries/review'
-import createServer from '@src/server'
+import { createApolloTestSetup } from '@root/test/helpers'
 
-const neode = getNeode()
-const driver = getDriver()
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-let mutate,
+let authenticatedUser: Context['user']
+let mutate: ApolloTestSetup['mutate']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+let disableVariables, enableVariables, moderator, nonModerator, closeReportVariables
+
+const contextFn = () => ({
   authenticatedUser,
-  disableVariables,
-  enableVariables,
-  moderator,
-  nonModerator,
-  closeReportVariables
+})
 
 describe('moderate resources', () => {
   beforeAll(async () => {
     await cleanDatabase()
 
-    authenticatedUser = undefined
-    const { server } = createServer({
-      context: () => {
-        return {
-          driver,
-          neode,
-          user: authenticatedUser,
-        }
-      },
-    })
-    mutate = createTestClient(server).mutate
+    authenticatedUser = null
+    const apolloSetup = await createApolloTestSetup({ context: contextFn })
+    mutate = apolloSetup.mutate
+    database = apolloSetup.database
+    server = apolloSetup.server
   })
 
   afterAll(async () => {
     await cleanDatabase()
-    await driver.close()
+    void server.stop()
+    void database.driver.close()
+    database.neode.close()
   })
 
   beforeEach(async () => {
@@ -158,7 +154,7 @@ describe('moderate resources', () => {
         ])
         const cypher =
           'MATCH (:Report)<-[review:REVIEWED]-(moderator:User {id: "moderator-id"}) RETURN review'
-        const reviews = await neode.cypher(cypher, {})
+        const reviews = await database.neode.cypher(cypher, {})
         expect(reviews.records).toHaveLength(1)
       })
 

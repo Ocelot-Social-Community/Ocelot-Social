@@ -15,7 +15,7 @@ const context = () => ({
   authenticatedUser,
 })
 let mutate: ApolloTestSetup['mutate']
-let query: any // eslint-disable-line @typescript-eslint/no-explicit-any
+let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
@@ -70,7 +70,7 @@ const newlyCreatedNodesWithLocales = [
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({
+  const apolloSetup = await createApolloTestSetup({
     context,
   })
   mutate = apolloSetup.mutate

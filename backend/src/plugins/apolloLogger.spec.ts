@@ -7,11 +7,10 @@ import { login } from '@src/graphql/queries/login'
 import ocelotLogger from '@src/logger'
 import { loggerPlugin } from '@src/plugins/apolloLogger'
 
+import type { Context } from '@context/index'
 import type { ApolloTestSetup } from '@root/test/helpers'
-import type { Context } from '@src/context'
-import type { ApolloServer } from 'apollo-server-express'
 
-let server: ApolloServer
+let server: ApolloTestSetup['server']
 
 const authenticatedUser: Context['user'] = null
 let mutate: ApolloTestSetup['mutate']
@@ -20,7 +19,7 @@ const context = () => ({ authenticatedUser })
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ context, plugins: [loggerPlugin] })
+  const apolloSetup = await createApolloTestSetup({ context, plugins: [loggerPlugin] })
   mutate = apolloSetup.mutate
   database = apolloSetup.database
   server = apolloSetup.server
@@ -70,7 +69,7 @@ describe('apollo logger', () => {
       expect(loggerSpy).toHaveBeenCalledWith(
         'Apollo Request',
         expect.any(String),
-        '"mutation ($email: String!, $password: String!) {\\n  login(email: $email, password: $password)\\n}\\n"',
+        '"mutation ($email: String!, $password: String!) {\\n  login(email: $email, password: $password)\\n}"',
         JSON.stringify({
           email: 'test@example.org',
           password: '***',

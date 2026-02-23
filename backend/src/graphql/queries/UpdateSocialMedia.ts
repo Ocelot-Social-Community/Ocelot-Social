@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import { gql } from 'graphql-tag'
 
 export const UpdateSocialMedia = gql`
   mutation ($id: ID!, $url: String!) {

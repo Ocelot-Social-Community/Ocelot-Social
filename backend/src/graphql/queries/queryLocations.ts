@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import { gql } from 'graphql-tag'
 
 export const queryLocations = gql`
   query ($place: String!, $lang: String!) {

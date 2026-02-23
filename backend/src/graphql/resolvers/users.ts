@@ -5,11 +5,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-shadow */
-import { UserInputError, ForbiddenError } from 'apollo-server'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
 import { getNeode } from '@db/neo4j'
+import { UserInputError, ForbiddenError } from '@graphql/errors'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import normalizeEmail from './helpers/normalizeEmail'

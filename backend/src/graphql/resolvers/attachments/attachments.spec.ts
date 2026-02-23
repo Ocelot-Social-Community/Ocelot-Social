@@ -8,9 +8,9 @@ import { Readable } from 'node:stream'
 
 import { S3Client } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
-import { UserInputError } from 'apollo-server'
 
 import Factory, { cleanDatabase } from '@db/factories'
+import { UserInputError } from '@graphql/errors'
 import { CreateMessage } from '@graphql/queries/CreateMessage'
 import { CreateRoom } from '@graphql/queries/CreateRoom'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -21,6 +21,7 @@ import type { FileInput } from './attachments'
 import type File from '@db/models/File'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { S3Config } from '@src/config'
+import type { Context } from '@src/context'
 import type { ReadStream } from 'node:fs'
 
 const s3SendMock = jest.fn()
@@ -48,7 +49,7 @@ const config: S3Config = {
   IMAGOR_PUBLIC_URL: 'IMAGOR_PUBLIC_URL',
 }
 
-let authenticatedUser
+let authenticatedUser: Context['user']
 const context = () => ({ authenticatedUser, config })
 let mutate: ApolloTestSetup['mutate']
 let database: ApolloTestSetup['database']
@@ -57,7 +58,7 @@ let server: ApolloTestSetup['server']
 beforeAll(async () => {
   await cleanDatabase()
 
-  const apolloSetup = createApolloTestSetup({ context })
+  const apolloSetup = await createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   database = apolloSetup.database
   server = apolloSetup.server
@@ -81,8 +82,8 @@ afterEach(async () => {
 describe('delete Attachment', () => {
   const { del: deleteAttachment } = attachments(config)
   describe('given a resource with an attachment', () => {
-    let user: { id: string }
-    let chatPartner: { id: string }
+    let user
+    let chatPartner
     let file: { id: string }
     let message: { id: string }
     beforeEach(async () => {
@@ -115,7 +116,7 @@ describe('delete Attachment', () => {
         },
       })
 
-      message = (m.data as any).CreateMessage // eslint-disable-line @typescript-eslint/no-explicit-any
+      message = m.data.CreateMessage
 
       await database.write({
         query: `

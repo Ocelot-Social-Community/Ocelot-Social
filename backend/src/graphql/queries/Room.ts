@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import { gql } from 'graphql-tag'
 
 export const Room = gql`
   query Room($first: Int, $offset: Int, $id: ID) {

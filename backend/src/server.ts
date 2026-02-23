@@ -8,46 +8,115 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import http from 'node:http'
 
-import { ApolloServer } from 'apollo-server-express'
+import { ApolloServer } from '@apollo/server'
+import { expressMiddleware } from '@apollo/server/express4'
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
 import bodyParser from 'body-parser'
 import express from 'express'
+import { execute, subscribe } from 'graphql'
 import { graphqlUploadExpress } from 'graphql-upload'
+import { useServer } from 'graphql-ws/lib/use/ws'
 import helmet from 'helmet'
+import { SubscriptionServer } from 'subscriptions-transport-ws'
+import { WebSocketServer } from 'ws'
 
 import CONFIG from './config'
-import { context, getContext } from './context'
+import { getContext } from './context'
 import schema from './graphql/schema'
 import logger from './logger'
 import middleware from './middleware'
 
-import type { ApolloServerExpressConfig } from 'apollo-server-express'
+import type { ApolloServerPlugin } from '@apollo/server'
 
-const createServer = (options?: ApolloServerExpressConfig) => {
-  const defaults: ApolloServerExpressConfig = {
-    context,
-    schema: middleware(schema),
-    subscriptions: {
-      keepAlive: 10000,
-      onConnect: async (connectionParams) =>
-        getContext()(connectionParams as { headers: { authorization?: string } }),
+interface CreateServerOptions {
+  context?: (req: { headers: { authorization?: string } }) => Promise<any>
+  plugins?: ApolloServerPlugin[]
+}
+
+const createServer = async (options?: CreateServerOptions) => {
+  const app = express()
+  const httpServer = http.createServer(app)
+  const appliedSchema = middleware(schema)
+
+  // Two WebSocket servers for dual protocol support (noServer mode)
+  const wsServer = new WebSocketServer({ noServer: true })
+  const legacyWsServer = new WebSocketServer({ noServer: true })
+
+  // New protocol: graphql-ws (subprotocol: graphql-transport-ws)
+  const serverCleanup = useServer(
+    {
+      schema: appliedSchema,
+      context: async (ctx) =>
+        getContext()(ctx.connectionParams as { headers: { authorization?: string } }),
       onDisconnect: () => {
         logger.debug('WebSocket client disconnected')
       },
     },
-    debug: !!CONFIG.DEBUG,
-    uploads: false,
-    tracing: !!CONFIG.DEBUG,
-    formatError: (error) => {
-      // console.log(error.originalError)
-      if (error.message === 'ERROR_VALIDATION') {
-        return new Error((error.originalError as any).details.map((d) => d.message))
-      }
-      return error
-    },
-  }
-  const server = new ApolloServer(Object.assign(defaults, options))
+    wsServer,
+  )
 
-  const app = express()
+  // Legacy protocol: subscriptions-transport-ws (subprotocol: graphql-ws)
+  const legacyServerCleanup = SubscriptionServer.create(
+    {
+      schema: appliedSchema,
+      execute,
+      subscribe,
+      onConnect: async (connectionParams: Record<string, unknown>) => {
+        return getContext()(connectionParams as { headers: { authorization?: string } })
+      },
+      onDisconnect: () => {
+        logger.debug('Legacy WebSocket client disconnected')
+      },
+    },
+    legacyWsServer,
+  )
+
+  // Route WebSocket upgrade requests based on subprotocol
+  httpServer.on('upgrade', (req, socket, head) => {
+    const protocol = req.headers['sec-websocket-protocol']
+    const isLegacy = protocol === 'graphql-ws' || !protocol
+    const targetServer = isLegacy ? legacyWsServer : wsServer
+    targetServer.handleUpgrade(req, socket, head, (ws) => {
+      targetServer.emit('connection', ws, req)
+    })
+  })
+
+  const server = new ApolloServer({
+    schema: appliedSchema,
+    // TODO: Re-enable CSRF prevention once the webapp sends the 'apollo-require-preflight' header.
+    // Currently disabled because the Nuxt 2 webapp uses apollo-upload-client for multipart/form-data
+    // file uploads, which Apollo Server 4 blocks by default as a CSRF vector. The webapp relies on
+    // JWT/cookie authentication and CORS configuration for request validation instead.
+    csrfPrevention: false,
+    formatError: (formattedError, error) => {
+      if (formattedError.message === 'ERROR_VALIDATION') {
+        return {
+          ...formattedError,
+          message: String(
+            (error as any).originalError?.details?.map((d) => d.message) ?? formattedError.message,
+          ),
+        }
+      }
+      return formattedError
+    },
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      {
+        // eslint-disable-next-line @typescript-eslint/require-await
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              await serverCleanup.dispose()
+              legacyServerCleanup.close()
+            },
+          }
+        },
+      },
+      ...(options?.plugins ?? []),
+    ],
+  })
+
+  await server.start()
 
   // TODO: this exception is required for the graphql playground, since the playground loads external resources
   // See: https://github.com/graphql/graphql-playground/issues/1283
@@ -57,12 +126,20 @@ const createServer = (options?: ApolloServerExpressConfig) => {
     ) as any,
   )
   app.use(express.static('public'))
-  app.use(bodyParser.json({ limit: '10mb' }) as any)
-  app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }) as any)
   app.use(graphqlUploadExpress())
-  server.applyMiddleware({ app, path: '/' })
-  const httpServer = http.createServer(app)
-  server.installSubscriptionHandlers(httpServer)
+  app.use(
+    '/',
+    bodyParser.json({ limit: '10mb' }) as any,
+    bodyParser.urlencoded({ limit: '10mb', extended: true }) as any,
+    expressMiddleware(server, {
+      context: async ({ req }) => {
+        if (options?.context) {
+          return options.context(req)
+        }
+        return getContext()(req)
+      },
+    }),
+  )
 
   return { server, httpServer, app }
 }

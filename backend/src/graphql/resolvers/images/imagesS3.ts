@@ -2,10 +2,10 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import path from 'node:path'
 
-import { UserInputError } from 'apollo-server'
 import slug from 'slugify'
 import { v4 as uuid } from 'uuid'
 
+import { UserInputError } from '@graphql/errors'
 import { s3Service } from '@src/uploads/s3Service'
 
 import { wrapTransactionDeleteImage, wrapTransactionMergeImage } from './wrapTransaction'

@@ -1,45 +1,44 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createTestClient } from 'apollo-server-testing'
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { markTeaserAsViewed } from '@graphql/queries/markTeaserAsViewed'
-import createServer from '@src/server'
+import { createApolloTestSetup } from '@root/test/helpers'
 
-const driver = getDriver()
-const neode = getNeode()
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-let mutate
-let authenticatedUser
+let authenticatedUser: Context['user']
+let mutate: ApolloTestSetup['mutate']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
 let variables
+
+const contextFn = () => ({
+  authenticatedUser,
+})
 
 beforeAll(async () => {
   await cleanDatabase()
-
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode,
-        user: authenticatedUser,
-      }
-    },
-  })
-  mutate = createTestClient(server).mutate
+  const apolloSetup = await createApolloTestSetup({ context: contextFn })
+  mutate = apolloSetup.mutate
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('count post teaser views', () => {
   let aUser, bUser
 
   beforeAll(async () => {
-    Factory.build('post', { id: 'post-to-be-viewed' })
+    await Factory.build('post', { id: 'post-to-be-viewed' })
     aUser = await Factory.build('user', { id: 'a-user' })
     bUser = await Factory.build('user', { id: 'b-user' })
     variables = {

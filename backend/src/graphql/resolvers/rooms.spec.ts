@@ -22,7 +22,7 @@ let server: ApolloTestSetup['server']
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ context })
+  const apolloSetup = await createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database
@@ -130,13 +130,13 @@ describe('Room', () => {
               userId: 'other-chatting-user',
             },
           })
-          roomId = (result.data as any).CreateRoom.id
+          roomId = result.data.CreateRoom.id
           expect(result).toMatchObject({
             errors: undefined,
             data: {
               CreateRoom: {
                 id: expect.any(String),
-                roomId: (result.data as any).CreateRoom.id,
+                roomId: result.data.CreateRoom.id,
                 roomName: 'Other Chatting User',
                 unreadCount: 0,
                 users: expect.arrayContaining([
@@ -212,7 +212,7 @@ describe('Room', () => {
               Room: [
                 {
                   id: expect.any(String),
-                  roomId: (result.data as any).Room[0].id,
+                  roomId: result.data.Room[0].id,
                   roomName: 'Other Chatting User',
                   users: expect.arrayContaining([
                     {
@@ -252,7 +252,7 @@ describe('Room', () => {
               Room: [
                 {
                   id: expect.any(String),
-                  roomId: (result.data as any).Room[0].id,
+                  roomId: result.data.Room[0].id,
                   roomName: 'Chatting User',
                   unreadCount: 0,
                   users: expect.arrayContaining([
@@ -322,7 +322,7 @@ describe('Room', () => {
             userId: 'not-chatting-user',
           },
         })
-        otherRoomId = (result.data as any).CreateRoom.roomId
+        otherRoomId = result.data.CreateRoom.roomId
         await mutate({
           mutation: CreateMessage,
           variables: {
@@ -351,7 +351,7 @@ describe('Room', () => {
             userId: 'not-chatting-user',
           },
         })
-        otherRoomId = (result2.data as any).CreateRoom.roomId
+        otherRoomId = result2.data.CreateRoom.roomId
         await mutate({
           mutation: CreateMessage,
           variables: {

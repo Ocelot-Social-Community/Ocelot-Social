@@ -9,7 +9,8 @@ import cloneDeep from 'lodash/cloneDeep'
 import ocelotLogger from '@src/logger'
 
 export const loggerPlugin = {
-  requestDidStart(requestContext) {
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async requestDidStart(requestContext) {
     const isIntrospectionQuery = requestContext.request.operationName === 'IntrospectionQuery'
     const qID = randomBytes(4).toString('hex')
     if (!isIntrospectionQuery) {
@@ -27,17 +28,18 @@ export const loggerPlugin = {
       async willSendResponse(requestContext) {
         if (!isIntrospectionQuery) {
           const logResponse = ['Apollo Response', qID]
-          if (requestContext.errors) {
-            ocelotLogger.error(...logResponse, JSON.stringify(requestContext.errors))
+          const errors = requestContext.response.body?.singleResult?.errors
+          if (errors?.length) {
+            ocelotLogger.error(...logResponse, JSON.stringify(errors))
             return
           }
-          if (requestContext.response.data.login) {
+          if (requestContext.response.body?.singleResult?.data?.login) {
             // mask the token
-            const data = cloneDeep(requestContext.response.data)
+            const data = cloneDeep(requestContext.response.body.singleResult.data)
             data.login = 'token'
             logResponse.push(JSON.stringify(data))
-          } else {
-            logResponse.push(JSON.stringify(requestContext.response.data))
+          } else if (requestContext.response.body?.singleResult?.data) {
+            logResponse.push(JSON.stringify(requestContext.response.body.singleResult.data))
           }
           ocelotLogger.debug(...logResponse)
         }

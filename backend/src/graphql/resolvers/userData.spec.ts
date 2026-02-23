@@ -1,17 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { createTestClient } from 'apollo-server-testing'
 
 import Factory, { cleanDatabase } from '@db/factories'
-import { getNeode, getDriver } from '@db/neo4j'
 import { userData } from '@graphql/queries/userData'
-import createServer from '@src/server'
+import { createApolloTestSetup } from '@root/test/helpers'
 
-let query, authenticatedUser
+import type { ApolloTestSetup } from '@root/test/helpers'
+import type { Context } from '@src/context'
 
-const driver = getDriver()
-const neode = getNeode()
+let authenticatedUser: Context['user']
+let query: ApolloTestSetup['query']
+let database: ApolloTestSetup['database']
+let server: ApolloTestSetup['server']
+
+const contextFn = () => ({
+  authenticatedUser,
+})
 
 beforeAll(async () => {
   await cleanDatabase()
@@ -27,21 +32,17 @@ beforeAll(async () => {
     slug: 'unauthenticated-user',
   })
   authenticatedUser = await user.toJson()
-  const { server } = createServer({
-    context: () => {
-      return {
-        driver,
-        neode,
-        user: authenticatedUser,
-      }
-    },
-  })
-  query = createTestClient(server).query
+  const apolloSetup = await createApolloTestSetup({ context: contextFn })
+  query = apolloSetup.query
+  database = apolloSetup.database
+  server = apolloSetup.server
 })
 
 afterAll(async () => {
   await cleanDatabase()
-  await driver.close()
+  void server.stop()
+  void database.driver.close()
+  database.neode.close()
 })
 
 describe('resolvers/userData', () => {

@@ -56,7 +56,7 @@ const categoryIds = ['cat9']
 
 beforeAll(async () => {
   await cleanDatabase()
-  const apolloSetup = createApolloTestSetup({ context })
+  const apolloSetup = await createApolloTestSetup({ context })
   mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database
@@ -883,7 +883,7 @@ describe('notifications', () => {
           userId: 'chatReceiver',
         },
       })
-      roomId = (room.data as any).CreateRoom.id // eslint-disable-line @typescript-eslint/no-explicit-any
+      roomId = room.data.CreateRoom.id
     })
 
     describe('if the chatReceiver is online', () => {

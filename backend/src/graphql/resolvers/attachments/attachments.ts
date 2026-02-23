@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import path from 'node:path'
 
-import { UserInputError } from 'apollo-server-express'
 import slug from 'slugify'
 import { v4 as uuid } from 'uuid'
 
 import { getDriver } from '@db/neo4j'
+import { UserInputError } from '@graphql/errors'
 import { s3Service } from '@src/uploads/s3Service'
 
 import type { S3Config } from '@config/index'
