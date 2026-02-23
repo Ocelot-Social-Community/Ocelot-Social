@@ -4,9 +4,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import Post from '@graphql/queries/Post.gql'
-import shout from '@graphql/queries/shout.gql'
-import unshout from '@graphql/queries/unshout.gql'
+import Post from '@graphql/queries/posts/Post.gql'
+import shout from '@graphql/queries/emotions/shout.gql'
+import unshout from '@graphql/queries/emotions/unshout.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

@@ -3,9 +3,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { cleanDatabase } from '@db/factories'
-import CreatePost from '@graphql/queries/CreatePost.gql'
-import Post from '@graphql/queries/Post.gql'
-import UpdatePost from '@graphql/queries/UpdatePost.gql'
+import CreatePost from '@graphql/queries/posts/CreatePost.gql'
+import Post from '@graphql/queries/posts/Post.gql'
+import UpdatePost from '@graphql/queries/posts/UpdatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

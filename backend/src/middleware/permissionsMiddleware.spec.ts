@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import Signup from '@graphql/queries/Signup.gql'
-import User from '@graphql/queries/User.gql'
-import UserEmail from '@graphql/queries/UserEmail.gql'
+import Signup from '@graphql/queries/auth/Signup.gql'
+import User from '@graphql/queries/users/User.gql'
+import UserEmail from '@graphql/queries/users/UserEmail.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

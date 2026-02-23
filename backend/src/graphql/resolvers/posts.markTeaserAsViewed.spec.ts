@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import markTeaserAsViewed from '@graphql/queries/markTeaserAsViewed.gql'
+import markTeaserAsViewed from '@graphql/queries/notifications/markTeaserAsViewed.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

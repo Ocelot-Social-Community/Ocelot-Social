@@ -4,8 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import Factory, { cleanDatabase } from '@db/factories'
-import Donations from '@graphql/queries/Donations.gql'
-import updateDonations from '@graphql/queries/UpdateDonations.gql'
+import Donations from '@graphql/queries/donations/Donations.gql'
+import updateDonations from '@graphql/queries/donations/UpdateDonations.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

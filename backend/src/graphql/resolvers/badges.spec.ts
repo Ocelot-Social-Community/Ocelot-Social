@@ -4,11 +4,11 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { TROPHY_BADGES_SELECTED_MAX } from '@constants/badges'
 import Factory, { cleanDatabase } from '@db/factories'
-import revokeBadge from '@graphql/queries/revokeBadge.gql'
-import rewardTrophyBadge from '@graphql/queries/rewardTrophyBadge.gql'
-import setTrophyBadgeSelected from '@graphql/queries/setTrophyBadgeSelected.gql'
-import setVerificationBadge from '@graphql/queries/setVerificationBadge.gql'
-import User from '@graphql/queries/User.gql'
+import revokeBadge from '@graphql/queries/badges/revokeBadge.gql'
+import rewardTrophyBadge from '@graphql/queries/badges/rewardTrophyBadge.gql'
+import setTrophyBadgeSelected from '@graphql/queries/badges/setTrophyBadgeSelected.gql'
+import setVerificationBadge from '@graphql/queries/badges/setVerificationBadge.gql'
+import User from '@graphql/queries/users/User.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

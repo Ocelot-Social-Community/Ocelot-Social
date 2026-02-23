@@ -5,11 +5,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
 import { cleanDatabase } from '@db/factories'
-import mutedUsers from '@graphql/queries/mutedUsers.gql'
-import muteUser from '@graphql/queries/muteUser.gql'
-import Post from '@graphql/queries/Post.gql'
-import unmuteUser from '@graphql/queries/unmuteUser.gql'
-import User from '@graphql/queries/User.gql'
+import mutedUsers from '@graphql/queries/interactions/mutedUsers.gql'
+import muteUser from '@graphql/queries/interactions/muteUser.gql'
+import Post from '@graphql/queries/posts/Post.gql'
+import unmuteUser from '@graphql/queries/interactions/unmuteUser.gql'
+import User from '@graphql/queries/users/User.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

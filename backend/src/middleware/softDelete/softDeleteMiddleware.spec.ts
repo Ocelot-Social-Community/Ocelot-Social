@@ -4,8 +4,8 @@
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import Post from '@graphql/queries/Post.gql'
-import User from '@graphql/queries/User.gql'
+import Post from '@graphql/queries/posts/Post.gql'
+import User from '@graphql/queries/users/User.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

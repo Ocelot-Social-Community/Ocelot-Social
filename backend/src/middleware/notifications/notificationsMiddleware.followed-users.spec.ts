@@ -2,10 +2,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import CreateGroup from '@graphql/queries/CreateGroup.gql'
-import CreatePost from '@graphql/queries/CreatePost.gql'
-import followUser from '@graphql/queries/followUser.gql'
-import notifications from '@graphql/queries/notifications.gql'
+import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
+import CreatePost from '@graphql/queries/posts/CreatePost.gql'
+import followUser from '@graphql/queries/interactions/followUser.gql'
+import notifications from '@graphql/queries/notifications/notifications.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'

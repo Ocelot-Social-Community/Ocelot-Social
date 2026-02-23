@@ -3,10 +3,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Factory, { cleanDatabase } from '@db/factories'
-import CreateMessage from '@graphql/queries/CreateMessage.gql'
-import CreateRoom from '@graphql/queries/CreateRoom.gql'
-import Room from '@graphql/queries/Room.gql'
-import UnreadRooms from '@graphql/queries/UnreadRooms.gql'
+import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
+import CreateRoom from '@graphql/queries/messaging/CreateRoom.gql'
+import Room from '@graphql/queries/messaging/Room.gql'
+import UnreadRooms from '@graphql/queries/messaging/UnreadRooms.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
