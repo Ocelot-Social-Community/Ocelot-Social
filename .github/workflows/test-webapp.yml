@@ -11,7 +11,7 @@ jobs:
       docker: ${{ steps.changes.outputs.docker }}
       webapp: ${{ steps.changes.outputs.webapp }}
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.1.7
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Check for frontend file changes
         uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
@@ -28,10 +28,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.1.7
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v4.0.3
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
           node-version-file: 'webapp/.nvmrc'
 
@@ -43,16 +43,28 @@ jobs:
   build_test_webapp:
     name: Docker Build Test - Webapp
     if: needs.files-changed.outputs.docker == 'true' || needs.files-changed.outputs.webapp == 'true'
-    needs: [files-changed, prepare]
+    needs: files-changed
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.1.7
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
       - name: Webapp | Build 'test' image
-        run: |
-          docker build --target test -f webapp/Dockerfile -t "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" .
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" > /tmp/webapp.tar
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          file: webapp/Dockerfile
+          target: test
+          load: true
+          tags: ghcr.io/ocelot-social-community/ocelot-social/webapp:test
+          cache-from: type=gha,scope=webapp-test
+          cache-to: type=gha,mode=max,scope=webapp-test
+
+      - name: Save image for test job
+        run: docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" > /tmp/webapp.tar
 
       - name: Cache docker image
         uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v4.0.2
@@ -67,15 +79,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.1.7
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v4.0.3
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
           node-version-file: 'webapp/.nvmrc'
+          cache: 'yarn'
+          cache-dependency-path: 'webapp/yarn.lock'
 
       - name: webapp | Lint
-        run: cd webapp && yarn && yarn run lint
+        run: cd webapp && yarn --frozen-lockfile && yarn run lint
 
   unit_test_webapp:
     name: Unit Tests - Webapp
@@ -86,7 +100,7 @@ jobs:
       checks: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.1.7
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Restore webapp cache
         uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v4.0.2

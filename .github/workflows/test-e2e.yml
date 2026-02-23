@@ -8,28 +8,52 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
       - name: Copy backend env file
         run: |
           cp backend/.env.test_e2e backend/.env
           cp webapp/.env.template webapp/.env
 
-      - name: Build backend and dependencies
+      - name: Neo4J | Build image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: neo4j
+          file: neo4j/Dockerfile
+          target: community
+          load: true
+          tags: ghcr.io/ocelot-social-community/ocelot-social/neo4j:community
+          cache-from: type=gha,scope=neo4j
+          cache-to: type=gha,mode=max,scope=neo4j
+
+      - name: Backend | Build image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: backend
+          file: backend/Dockerfile
+          target: test
+          load: true
+          tags: ghcr.io/ocelot-social-community/ocelot-social/backend:test
+          cache-from: type=gha,scope=backend-test
+          cache-to: type=gha,mode=max,scope=backend-test
+
+      - name: Pull third-party images
         run: |
-          # Build and start all required images for backend
-          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach neo4j backend --build
-          
-          # Save the build images
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" > /tmp/backend.tar          
+          docker pull quay.io/minio/minio:latest
+          docker pull quay.io/minio/mc:latest
+          docker pull maildev/maildev:latest
+
+      - name: Save all images
+        run: |
+          docker save "ghcr.io/ocelot-social-community/ocelot-social/backend:test" > /tmp/backend.tar
           docker save "ghcr.io/ocelot-social-community/ocelot-social/neo4j:community" > /tmp/neo4j.tar
           docker save "quay.io/minio/minio:latest" > /tmp/minio.tar
           docker save "quay.io/minio/mc:latest" > /tmp/minio-mc.tar
           docker save "maildev/maildev:latest" > /tmp/mailserver.tar
-          
-          # Stop the containers
-          docker compose -f docker-compose.yml -f docker-compose.test.yml down
-      
+
       - name: Cache docker images
         uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v4.0.2
         with:
@@ -46,19 +70,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Copy backend env file
-        run: |
-          cp backend/.env.test_e2e backend/.env
-          cp webapp/.env.template webapp/.env
-      
-      - name: Build docker image
-        run: |
-          docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach webapp --build --no-deps
-          docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" > /tmp/webapp.tar
-      
-      - name: Cache docker image        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Webapp | Build 'test' image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          file: webapp/Dockerfile
+          target: test
+          load: true
+          tags: ghcr.io/ocelot-social-community/ocelot-social/webapp:test
+          cache-from: type=gha,scope=webapp-test
+          cache-to: type=gha,mode=max,scope=webapp-test
+
+      - name: Save image for test jobs
+        run: docker save "ghcr.io/ocelot-social-community/ocelot-social/webapp:test" > /tmp/webapp.tar
+
+      - name: Cache docker image
         uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v4.0.2
         with:
           path: /tmp/webapp.tar
@@ -72,10 +103,10 @@ jobs:
         run: rm -rf /opt/hostedtoolcache
 
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v4.4.0
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
           node-version-file: 'backend/.nvmrc'
           cache: 'yarn'
@@ -112,7 +143,7 @@ jobs:
       features: ${{ steps.list.outputs.features }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: List feature files
         id: list
@@ -134,10 +165,10 @@ jobs:
         run: rm -rf /opt/hostedtoolcache
 
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v4.4.0
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
           node-version-file: 'backend/.nvmrc'
           cache: 'yarn'
@@ -180,7 +211,14 @@ jobs:
           docker load < /tmp/mailserver.tar
           docker load < /tmp/webapp.tar
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
-          sleep 90s
+
+          echo "Waiting for backend (max 120s)..."
+          timeout 120 bash -c 'until curl -sf -X POST -H "Content-Type: application/json" -d "{\"query\":\"{__typename}\"}" http://localhost:4000 > /dev/null 2>&1; do sleep 5; done'
+          echo "Backend is ready."
+
+          echo "Waiting for webapp (max 120s)..."
+          timeout 120 bash -c 'until curl -sf http://localhost:3000 > /dev/null 2>&1; do sleep 5; done'
+          echo "Webapp is ready."
 
       - name: Full stack tests | run tests
         id: e2e-tests
