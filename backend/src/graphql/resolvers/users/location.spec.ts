@@ -15,7 +15,7 @@ const context = () => ({
   authenticatedUser,
 })
 let mutate: ApolloTestSetup['mutate']
-let query: any // eslint-disable-line @typescript-eslint/no-explicit-any
+let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
