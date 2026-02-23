@@ -156,7 +156,7 @@ describe('validateInviteCode', () => {
       )
     })
 
-    it('returns the inviteCode when the code exists and hs not expired', async () => {
+    it('returns the inviteCode when the code exists and has not expired', async () => {
       await expect(
         query({ query: unauthenticatedValidateInviteCode, variables: { code: 'PERSNL' } }),
       ).resolves.toEqual(
