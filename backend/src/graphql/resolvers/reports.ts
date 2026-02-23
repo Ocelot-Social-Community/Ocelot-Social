@@ -45,7 +45,7 @@ export default {
     reports: async (_parent, params, context, _resolveInfo) => {
       const { driver } = context
       const session = driver.session()
-      let orderByClause
+      let orderByClause: string
       const filterClauses: string[] = []
       switch (params.orderBy) {
         case 'createdAt_asc':

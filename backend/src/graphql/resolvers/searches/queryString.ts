@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-export function normalizeWhitespace(str) {
+export function normalizeWhitespace(str: string) {
   // delete the first character if it is !, @ or #
   return str
     .replace(/^([!@#])/, '')
@@ -12,32 +12,32 @@ export function normalizeWhitespace(str) {
     .trim()
 }
 
-export function escapeSpecialCharacters(str) {
+export function escapeSpecialCharacters(str: string) {
   return str.replace(/(["[\]&|\\{}+!()^~*?:/-])/g, '\\$1')
 }
 
-const matchWholeText = (str, boost = 8) => {
-  return `"${String(str)}"^${String(boost)}`
+const matchWholeText = (str: string, boost = 8) => {
+  return `"${str}"^${String(boost)}`
 }
 
-const matchEachWordExactly = (str, boost = 4) => {
+const matchEachWordExactly = (str: string, boost = 4) => {
   if (!str.includes(' ')) return ''
   const tmp = str
     .split(' ')
-    .map((s, i) => (i === 0 ? `"${String(s)}"` : `AND "${String(s)}"`))
+    .map((s, i) => (i === 0 ? `"${s}"` : `AND "${s}"`))
     .join(' ')
   return `(${tmp})^${String(boost)}`
 }
 
-const matchSomeWordsExactly = (str, boost = 2) => {
+const matchSomeWordsExactly = (str: string, boost = 2) => {
   if (!str.includes(' ')) return ''
   return str
     .split(' ')
-    .map((s) => `"${String(s)}"^${String(boost)}`)
+    .map((s) => `"${s}"^${String(boost)}`)
     .join(' ')
 }
 
-const matchBeginningOfWords = (str) => {
+const matchBeginningOfWords = (str: string) => {
   return str
     .split(' ')
     .filter((s) => s.length >= 2)
@@ -45,7 +45,7 @@ const matchBeginningOfWords = (str) => {
     .join(' ')
 }
 
-export function queryString(str) {
+export function queryString(str: string) {
   const normalizedString = normalizeWhitespace(str)
   const escapedString = escapeSpecialCharacters(normalizedString)
   return `

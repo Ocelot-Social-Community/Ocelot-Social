@@ -1235,7 +1235,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     // Jenny users
     for (let i = 0; i < 30; i++) {
-      await Factory.build('user', { name: `Jenny${i}` })
+      await Factory.build('user', { name: `Jenny${String(i)}` })
     }
 
     // Jenny posts

@@ -11,7 +11,7 @@ import { ROOM_COUNT_UPDATED } from '@constants/subscriptions'
 
 import Resolver from './helpers/Resolver'
 
-export const getUnreadRoomsCount = async (userId, session) => {
+export const getUnreadRoomsCount = (userId, session) => {
   return session.readTransaction(async (transaction) => {
     const unreadRoomsCypher = `
       MATCH (user:User { id: $userId })-[:CHATS_IN]->(room:Room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)

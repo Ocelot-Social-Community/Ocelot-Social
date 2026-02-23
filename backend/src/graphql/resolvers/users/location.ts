@@ -76,10 +76,8 @@ export const createOrUpdateLocations = async (
   if (locationName !== null) {
     const response: any = await fetch(
       `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-        String(locationName),
-      )}.json?access_token=${String(
-        context.config.MAPBOX_TOKEN,
-      )}&types=region,place,country,address&language=${locales.join(',')}`,
+        locationName,
+      )}.json?access_token=${context.config.MAPBOX_TOKEN}&types=region,place,country,address&language=${locales.join(',')}`,
       {
         signal: AbortSignal.timeout(REQUEST_TIMEOUT),
       },
@@ -161,7 +159,7 @@ export const createOrUpdateLocations = async (
 
 export const queryLocations = async ({ place, lang }, context: Context) => {
   const res: any = await fetch(
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${String(place)}.json?access_token=${String(context.config.MAPBOX_TOKEN)}&types=region,place,country&language=${String(lang)}`,
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?access_token=${context.config.MAPBOX_TOKEN}&types=region,place,country&language=${lang}`,
     {
       signal: AbortSignal.timeout(REQUEST_TIMEOUT),
     },

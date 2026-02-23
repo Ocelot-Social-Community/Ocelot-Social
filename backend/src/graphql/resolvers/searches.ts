@@ -107,8 +107,8 @@ const countGroupsSetup = {
   ...countSetup,
 }
 
-const searchResultPromise = async (session, setup, params) => {
-  return session.readTransaction(async (transaction) => {
+const searchResultPromise = (session, setup, params) => {
+  return session.readTransaction((transaction) => {
     return transaction.run(cypherTemplate(setup), params)
   })
 }

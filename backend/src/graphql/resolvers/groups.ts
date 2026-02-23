@@ -18,7 +18,7 @@ import { createOrUpdateLocations } from './users/location'
 
 import type { Context } from '@src/context'
 
-const removeUserFromGroupWriteTxResultPromise = async (session, groupId, userId) => {
+const removeUserFromGroupWriteTxResultPromise = (session, groupId, userId) => {
   return session.writeTransaction(async (transaction) => {
     const removeUserFromGroupCypher = `
       MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(group:Group {id: $groupId})

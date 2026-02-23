@@ -21,7 +21,7 @@ export default {
     notifications: async (_parent, args, context, _resolveInfo) => {
       const { user: currentUser } = context
       const session = context.driver.session()
-      let whereClause, orderByClause
+      let whereClause: string, orderByClause: string
 
       switch (args.read) {
         case true:

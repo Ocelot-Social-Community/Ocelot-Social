@@ -210,7 +210,7 @@ const notifyMemberOfGroup = async (groupId, userId, reason, context) => {
 
 const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
   if (!idsOfUsers?.length) return []
-  await validateNotifyUsers(label, reason)
+  validateNotifyUsers(label, reason)
   let mentionedCypher
   switch (reason) {
     case 'mentioned_in_post': {
@@ -277,7 +277,7 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
 }
 
 const notifyUsersOfComment = async (label, commentId, reason, context) => {
-  await validateNotifyUsers(label, reason)
+  validateNotifyUsers(label, reason)
   const session = context.driver.session()
   try {
     return await session.writeTransaction(async (transaction) => {
