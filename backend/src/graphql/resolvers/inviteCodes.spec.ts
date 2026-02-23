@@ -4,6 +4,7 @@
 /* eslint-disable jest/expect-expect */
 
 import Factory, { cleanDatabase } from '@db/factories'
+import authenticatedValidateInviteCode from '@graphql/queries/authenticatedValidateInviteCode.gql'
 import CreateGroup from '@graphql/queries/CreateGroup.gql'
 import currentUser from '@graphql/queries/currentUser.gql'
 import generateGroupInviteCode from '@graphql/queries/generateGroupInviteCode.gql'
@@ -13,7 +14,6 @@ import GroupMembers from '@graphql/queries/GroupMembers.gql'
 import invalidateInviteCode from '@graphql/queries/invalidateInviteCode.gql'
 import JoinGroup from '@graphql/queries/JoinGroup.gql'
 import redeemInviteCode from '@graphql/queries/redeemInviteCode.gql'
-import authenticatedValidateInviteCode from '@graphql/queries/authenticatedValidateInviteCode.gql'
 import unauthenticatedValidateInviteCode from '@graphql/queries/unauthenticatedValidateInviteCode.gql'
 import { createApolloTestSetup, TEST_CONFIG } from '@root/test/helpers'
 

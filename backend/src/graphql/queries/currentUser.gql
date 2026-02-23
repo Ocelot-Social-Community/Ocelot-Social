@@ -10,6 +10,7 @@ query currentUser {
     role
     activeCategories
     following {
+      id
       name
     }
     inviteCodes {

@@ -1,4 +1,4 @@
-query ($roomId: ID!, $first: Int, $offset: Int) {
+query Message($roomId: ID!, $first: Int, $offset: Int) {
   Message(roomId: $roomId, first: $first, offset: $offset, orderBy: indexId_desc) {
     _id
     id

@@ -1,4 +1,4 @@
-mutation (
+mutation UpdatePost(
   $id: ID!
   $title: String!
   $content: String!
@@ -20,6 +20,7 @@ mutation (
     title
     content
     author {
+      id
       name
       slug
     }
@@ -33,6 +34,7 @@ mutation (
     eventLocationName
     eventVenue
     eventLocation {
+      id
       lng
       lat
     }

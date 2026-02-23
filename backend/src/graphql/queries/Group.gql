@@ -23,6 +23,7 @@ query Group($isMember: Boolean, $id: ID, $slug: String) {
     }
     locationName
     location {
+      id
       name
       nameDE
       nameEN

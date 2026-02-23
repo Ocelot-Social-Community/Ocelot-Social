@@ -1,4 +1,4 @@
-mutation ($id: ID!, $resource: [Deletable]) {
+mutation DeleteUser($id: ID!, $resource: [Deletable]) {
   DeleteUser(id: $id, resource: $resource) {
     id
     name

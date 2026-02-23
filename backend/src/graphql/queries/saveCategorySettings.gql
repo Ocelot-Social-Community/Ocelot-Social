@@ -1,3 +1,3 @@
-mutation ($activeCategories: [String]) {
+mutation saveCategorySettings($activeCategories: [String]) {
   saveCategorySettings(activeCategories: $activeCategories)
 }

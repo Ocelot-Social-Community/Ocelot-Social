@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
 import Factory, { cleanDatabase } from '@db/factories'
+import login from '@graphql/queries/login.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
-import { login } from '@src/graphql/queries/login'
 import ocelotLogger from '@src/logger'
 import { loggerPlugin } from '@src/plugins/apolloLogger'
 

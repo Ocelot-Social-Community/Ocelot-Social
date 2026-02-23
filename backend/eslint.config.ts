@@ -51,6 +51,8 @@ export default [
       // graphql module bundles both schema and operations configs together.
       // Remove when eslint-config-it4c exports them separately (e.g. graphql/schema).
       '@graphql-eslint/executable-definitions': 'off',
+      // neo4j-graphql-js adds fields at runtime (_id, relations) not present in static schema
+      '@graphql-eslint/fields-on-correct-type': 'off',
     },
   },
   {

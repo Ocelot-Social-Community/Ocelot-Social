@@ -1,5 +1,6 @@
 mutation setTrophyBadgeSelected($slot: Int!, $badgeId: ID) {
   setTrophyBadgeSelected(slot: $slot, badgeId: $badgeId) {
+    id
     badgeTrophiesCount
     badgeTrophiesSelected {
       id

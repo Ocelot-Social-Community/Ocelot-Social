@@ -1,5 +1,6 @@
-mutation {
+mutation resetTrophyBadgesSelected {
   resetTrophyBadgesSelected {
+    id
     badgeTrophiesCount
     badgeTrophiesSelected {
       id

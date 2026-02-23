@@ -1,4 +1,4 @@
-mutation ($badgeId: ID!, $userId: ID!) {
+mutation setVerificationBadge($badgeId: ID!, $userId: ID!) {
   setVerificationBadge(badgeId: $badgeId, userId: $userId) {
     id
     badgeVerification {

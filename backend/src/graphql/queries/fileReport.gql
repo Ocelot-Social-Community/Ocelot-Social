@@ -1,4 +1,4 @@
-mutation ($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
+mutation fileReport($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription: String!) {
   fileReport(
     resourceId: $resourceId
     reasonCategory: $reasonCategory
@@ -11,12 +11,15 @@ mutation ($resourceId: ID!, $reasonCategory: ReasonCategory!, $reasonDescription
     resource {
       __typename
       ... on User {
+        id
         name
       }
       ... on Post {
+        id
         title
       }
       ... on Comment {
+        id
         content
       }
     }

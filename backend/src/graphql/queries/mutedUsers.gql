@@ -1,4 +1,4 @@
-query {
+query mutedUsers {
   mutedUsers {
     id
     name

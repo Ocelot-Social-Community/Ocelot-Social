@@ -1,4 +1,4 @@
-query ($id: ID, $filter: _PostFilter, $first: Int, $offset: Int, $orderBy: [_PostOrdering]) {
+query Post($id: ID, $filter: _PostFilter, $first: Int, $offset: Int, $orderBy: [_PostOrdering]) {
   Post(id: $id, filter: $filter, first: $first, offset: $offset, orderBy: $orderBy) {
     id
     title
@@ -29,6 +29,7 @@ query ($id: ID, $filter: _PostFilter, $first: Int, $offset: Int, $orderBy: [_Pos
       id
     }
     comments {
+      id
       content
     }
   }

@@ -1,4 +1,4 @@
-query ($url: String!) {
+query embed($url: String!) {
   embed(url: $url) {
     type
     title

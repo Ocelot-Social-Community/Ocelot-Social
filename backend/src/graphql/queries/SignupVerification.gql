@@ -1,4 +1,4 @@
-mutation (
+mutation SignupVerification(
   $password: String!
   $email: String!
   $name: String!

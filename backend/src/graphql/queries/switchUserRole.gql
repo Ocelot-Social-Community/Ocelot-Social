@@ -1,4 +1,4 @@
-mutation ($role: UserRole!, $id: ID!) {
+mutation switchUserRole($role: UserRole!, $id: ID!) {
   switchUserRole(role: $role, id: $id) {
     name
     role

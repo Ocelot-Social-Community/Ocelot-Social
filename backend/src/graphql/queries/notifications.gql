@@ -1,5 +1,6 @@
-query ($read: Boolean, $orderBy: NotificationOrdering) {
+query notifications($read: Boolean, $orderBy: NotificationOrdering) {
   notifications(read: $read, orderBy: $orderBy) {
+    id
     reason
     relatedUser {
       id

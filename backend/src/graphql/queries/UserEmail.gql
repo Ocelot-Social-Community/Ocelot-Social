@@ -1,4 +1,4 @@
-query ($id: ID, $name: String, $email: String) {
+query UserEmail($id: ID, $name: String, $email: String) {
   User(id: $id, name: $name, email: $email) {
     id
     name
@@ -20,6 +20,7 @@ query ($id: ID, $name: String, $email: String) {
     }
     followedByCurrentUser
     following {
+      id
       name
       slug
       about
@@ -27,10 +28,12 @@ query ($id: ID, $name: String, $email: String) {
         url
       }
       comments {
+        id
         content
         contentExcerpt
       }
       contributions {
+        id
         title
         slug
         image {
@@ -43,6 +46,7 @@ query ($id: ID, $name: String, $email: String) {
     isMuted
     isBlocked
     location {
+      id
       distanceToMe
     }
     activeCategories

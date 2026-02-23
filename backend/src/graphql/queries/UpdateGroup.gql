@@ -1,4 +1,4 @@
-mutation (
+mutation UpdateGroup(
   $id: ID!
   $name: String
   $slug: String
@@ -41,6 +41,7 @@ mutation (
     # avatar # test this as result
     locationName
     location {
+      id
       name
       nameDE
       nameEN

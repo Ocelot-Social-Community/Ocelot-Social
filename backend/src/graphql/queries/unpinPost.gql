@@ -1,9 +1,10 @@
-mutation ($id: ID!) {
+mutation unpinPost($id: ID!) {
   unpinPost(id: $id) {
     id
     title
     content
     author {
+      id
       name
       slug
     }

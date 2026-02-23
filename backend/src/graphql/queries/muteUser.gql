@@ -1,4 +1,4 @@
-mutation ($id: ID!) {
+mutation muteUser($id: ID!) {
   muteUser(id: $id) {
     id
     name

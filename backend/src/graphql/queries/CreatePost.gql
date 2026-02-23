@@ -1,4 +1,4 @@
-mutation (
+mutation CreatePost(
   $id: ID
   $title: String!
   $slug: String
@@ -26,6 +26,7 @@ mutation (
     deleted
     postType
     author {
+      id
       name
     }
     categories {
@@ -37,6 +38,7 @@ mutation (
     eventVenue
     eventIsOnline
     eventLocation {
+      id
       lng
       lat
     }

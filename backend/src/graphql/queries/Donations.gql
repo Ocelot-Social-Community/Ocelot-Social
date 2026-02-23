@@ -1,4 +1,4 @@
-query {
+query Donations {
   Donations {
     id
     showDonations

@@ -1,4 +1,4 @@
-mutation ($badgeId: ID!, $userId: ID!) {
+mutation revokeBadge($badgeId: ID!, $userId: ID!) {
   revokeBadge(badgeId: $badgeId, userId: $userId) {
     id
     badgeTrophies {

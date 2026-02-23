@@ -1,4 +1,4 @@
-query validateInviteCode($code: String!) {
+query authenticatedValidateInviteCode($code: String!) {
   validateInviteCode(code: $code) {
     code
     invitedTo {

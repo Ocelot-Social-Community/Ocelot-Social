@@ -1,4 +1,4 @@
-query ($id: ID!) {
+query userData($id: ID!) {
   userData(id: $id) {
     user {
       id
@@ -10,8 +10,10 @@ query ($id: ID!) {
       title
       content
       comments {
+        id
         content
         author {
+          id
           slug
         }
       }

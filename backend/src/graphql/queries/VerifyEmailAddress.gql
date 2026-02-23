@@ -1,4 +1,4 @@
-mutation ($email: String!, $nonce: String!) {
+mutation VerifyEmailAddress($email: String!, $nonce: String!) {
   VerifyEmailAddress(email: $email, nonce: $nonce) {
     email
     createdAt

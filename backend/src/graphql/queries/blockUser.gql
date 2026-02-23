@@ -1,4 +1,4 @@
-mutation ($id: ID!) {
+mutation blockUser($id: ID!) {
   blockUser(id: $id) {
     id
     name

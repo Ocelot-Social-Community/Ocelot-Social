@@ -1,4 +1,4 @@
-mutation ($roomId: ID!, $content: String!, $files: [FileInput]) {
+mutation CreateMessage($roomId: ID!, $content: String!, $files: [FileInput]) {
   CreateMessage(roomId: $roomId, content: $content, files: $files) {
     id
     content

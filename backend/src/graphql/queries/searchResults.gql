@@ -1,4 +1,4 @@
-query ($query: String!) {
+query searchResults($query: String!) {
   searchResults(query: $query, limit: 5) {
     __typename
     ... on Post {

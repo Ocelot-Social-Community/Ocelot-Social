@@ -1,4 +1,4 @@
-mutation ($userId: ID!) {
+mutation CreateRoom($userId: ID!) {
   CreateRoom(userId: $userId) {
     id
     roomId

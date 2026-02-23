@@ -1,4 +1,4 @@
-mutation ($id: ID!) {
+mutation DeleteComment($id: ID!) {
   DeleteComment(id: $id) {
     id
     content

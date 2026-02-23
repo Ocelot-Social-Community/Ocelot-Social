@@ -1,4 +1,4 @@
-mutation ($email: String!) {
+mutation AddEmailAddress($email: String!) {
   AddEmailAddress(email: $email) {
     email
     verifiedAt

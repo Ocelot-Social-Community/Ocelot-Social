@@ -1,4 +1,4 @@
-mutation ($groupId: ID!, $userId: ID!) {
+mutation LeaveGroup($groupId: ID!, $userId: ID!) {
   LeaveGroup(groupId: $groupId, userId: $userId) {
     user {
       id

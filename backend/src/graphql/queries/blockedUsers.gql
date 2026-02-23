@@ -1,4 +1,4 @@
-query {
+query blockedUsers {
   blockedUsers {
     id
     name
