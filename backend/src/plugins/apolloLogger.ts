@@ -28,8 +28,9 @@ export const loggerPlugin = {
       async willSendResponse(requestContext) {
         if (!isIntrospectionQuery) {
           const logResponse = ['Apollo Response', qID]
-          if (requestContext.errors) {
-            ocelotLogger.error(...logResponse, JSON.stringify(requestContext.errors))
+          const errors = requestContext.response.body?.singleResult?.errors
+          if (errors?.length) {
+            ocelotLogger.error(...logResponse, JSON.stringify(errors))
             return
           }
           if (requestContext.response.body?.singleResult?.data?.login) {
