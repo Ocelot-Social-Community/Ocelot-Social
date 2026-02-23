@@ -99,7 +99,9 @@ export const createApolloTestSetup = async (opts?: CreateTestServerOptions) => {
       { contextValue: await contextFn({ headers: {} }) },
     )
     if (result.body.kind !== 'single') {
-      throw new Error(`Unexpected incremental response (kind: "${result.body.kind}"). Test helper only supports single responses.`)
+      throw new Error(
+        `Unexpected incremental response (kind: "${result.body.kind}"). Test helper only supports single responses.`,
+      )
     }
     return {
       data: (result.body.singleResult.data ?? null) as any,
