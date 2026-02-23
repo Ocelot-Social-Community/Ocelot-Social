@@ -38,7 +38,7 @@ describe('count post teaser views', () => {
   let aUser, bUser
 
   beforeAll(async () => {
-    Factory.build('post', { id: 'post-to-be-viewed' })
+    await Factory.build('post', { id: 'post-to-be-viewed' })
     aUser = await Factory.build('user', { id: 'a-user' })
     bUser = await Factory.build('user', { id: 'b-user' })
     variables = {
