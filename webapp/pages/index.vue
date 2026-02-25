@@ -135,6 +135,7 @@
         >
           <post-teaser
             :post="post"
+            :single-column="singleColumn"
             :postsFilter="postsFilter['categories_some']"
             @removePostFromList="posts = removePostFromList(post, posts)"
             @pinPost="pinPost(post, refetchPostList)"

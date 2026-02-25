@@ -1,6 +1,7 @@
 <template>
   <nuxt-link
     class="post-teaser"
+    :class="{ 'post-teaser--horizontal': singleColumn && post.image }"
     :to="{ name: 'post-id-slug', params: { id: post.id, slug: post.slug } }"
   >
     <os-card
@@ -212,6 +213,10 @@ export default {
       default: () => {},
     },
     showGroupPinned: {
+      type: Boolean,
+      default: false,
+    },
+    singleColumn: {
       type: Boolean,
       default: false,
     },
@@ -488,6 +493,34 @@ export default {
       > .ds-text {
         display: inline;
       }
+    }
+  }
+}
+
+.post-teaser--horizontal > .os-card {
+  @media (min-width: 640px) {
+    flex-direction: row;
+
+    > .os-card__hero-image {
+      flex: 0 0 40%;
+      max-width: 40%;
+      border-top-right-radius: 0;
+      border-bottom-left-radius: 5px;
+    }
+
+    .image-placeholder {
+      height: 100%;
+      aspect-ratio: unset !important;
+
+      > .image {
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    > .os-card__content {
+      flex: 1;
+      min-width: 0;
     }
   }
 }
