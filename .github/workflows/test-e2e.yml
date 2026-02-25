@@ -200,10 +200,16 @@ jobs:
           path: /tmp/webapp.tar
           key: ${{ github.run_id }}-e2e-webapp-cache
           
+      - name: Ensure cucumber-json-formatter exists
+        run: |
+          if [ ! -f /opt/cucumber-json-formatter ]; then
+            sudo wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
+          fi
+          sudo chmod +x /opt/cucumber-json-formatter
+          sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
+
       - name: Boot up test system | docker compose
         run: |
-          chmod +x /opt/cucumber-json-formatter
-          sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
           docker load < /tmp/neo4j.tar
           docker load < /tmp/backend.tar
           docker load < /tmp/minio.tar
