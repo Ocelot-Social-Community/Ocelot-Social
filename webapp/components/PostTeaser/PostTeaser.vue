@@ -339,16 +339,12 @@ export default {
 
   > .post-ribbon-w-img {
     position: absolute;
-    // 14px (~height of ribbon element) + 24px(=margin of hero image)
-    top: -38px;
-    // 7px+24px(=padding of parent) - 1px adjustment
+    top: -36px;
     right: -29px;
   }
   > .post-ribbon {
     position: absolute;
-    // 14px (~height of ribbon element) + 24px(=margin of hero image)
-    top: -24px;
-    // 7px(=offset)+24px(=margin of parent) - 2px adjustment
+    top: -16px;
     right: -29px;
   }
 }
@@ -521,6 +517,10 @@ export default {
     > .os-card__content {
       flex: 1;
       min-width: 0;
+    }
+
+    .post-ribbon-w-img {
+      top: -16px;
     }
   }
 }
