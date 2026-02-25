@@ -496,6 +496,7 @@ export default {
 .post-teaser--horizontal > .os-card {
   @media (min-width: 640px) {
     flex-direction: row;
+    padding-bottom: 0 !important;
 
     > .os-card__hero-image {
       flex: 0 0 40%;
@@ -517,6 +518,7 @@ export default {
     > .os-card__content {
       flex: 1;
       min-width: 0;
+      padding-bottom: $space-x-small !important;
     }
 
     .post-ribbon-w-img {
