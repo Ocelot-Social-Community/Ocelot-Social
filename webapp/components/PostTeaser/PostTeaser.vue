@@ -1,6 +1,7 @@
 <template>
   <nuxt-link
     class="post-teaser"
+    :class="{ 'post-teaser--horizontal': singleColumn && post.image }"
     :to="{ name: 'post-id-slug', params: { id: post.id, slug: post.slug } }"
   >
     <os-card
@@ -215,6 +216,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    singleColumn: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -334,16 +339,12 @@ export default {
 
   > .post-ribbon-w-img {
     position: absolute;
-    // 14px (~height of ribbon element) + 24px(=margin of hero image)
-    top: -38px;
-    // 7px+24px(=padding of parent) - 1px adjustment
+    top: -36px;
     right: -29px;
   }
   > .post-ribbon {
     position: absolute;
-    // 14px (~height of ribbon element) + 24px(=margin of hero image)
-    top: -24px;
-    // 7px(=offset)+24px(=margin of parent) - 2px adjustment
+    top: -16px;
     right: -29px;
   }
 }
@@ -488,6 +489,38 @@ export default {
       > .ds-text {
         display: inline;
       }
+    }
+  }
+}
+
+.post-teaser--horizontal > .os-card {
+  @media (min-width: 640px) {
+    flex-direction: row;
+
+    > .os-card__hero-image {
+      flex: 0 0 40%;
+      max-width: 40%;
+      border-top-right-radius: 0;
+      border-bottom-left-radius: 5px;
+    }
+
+    .image-placeholder {
+      height: 100%;
+      aspect-ratio: unset !important;
+
+      > .image {
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    > .os-card__content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .post-ribbon-w-img {
+      top: -16px;
     }
   }
 }
