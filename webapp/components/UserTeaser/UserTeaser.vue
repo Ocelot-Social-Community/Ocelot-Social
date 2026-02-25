@@ -114,7 +114,7 @@ export default {
 
     > a,
     > button,
-    > span:not(.group-info) {
+    > span:not(.group-info):not(.text) {
       display: contents;
     }
   }
