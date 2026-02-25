@@ -269,7 +269,7 @@ export default {
 
 .ProseMirror[contenteditable='false'] {
   .close-button {
-    display: none;
+    display: none !important;
   }
 }
 </style>
