@@ -118,7 +118,7 @@ jobs:
 
       - name: Install cypress requirements
         run: |
-          sudo wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
+          sudo wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-amd64"
           sudo chmod +x /opt/cucumber-json-formatter
           cd backend
           yarn install
@@ -203,7 +203,7 @@ jobs:
       - name: Ensure cucumber-json-formatter exists
         run: |
           if [ ! -f /opt/cucumber-json-formatter ]; then
-            sudo wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-386"
+            sudo wget --no-verbose -O /opt/cucumber-json-formatter "https://github.com/cucumber/json-formatter/releases/download/v19.0.0/cucumber-json-formatter-linux-amd64"
           fi
           sudo chmod +x /opt/cucumber-json-formatter
           sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
