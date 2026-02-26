@@ -249,7 +249,7 @@
         "form": {
           "click-next": "Clique em Continuar.",
           "description": "Abra a sua caixa de entrada e digite o código que lhe enviamos.",
-          "next": "Continue",
+          "next": "Continuar",
           "nonce": "Digite seu código",
           "validations": {
             "error": "Código de verificação inválido <b>{nonce}</b> para o e-mail <b>{email}</b>!",
@@ -300,7 +300,7 @@
     "amount-shouts": "{amount} Recomendações",
     "amount-views": "{amount} Visualizações",
     "categories": {
-      "infoSelectedNoOfMaxCategories": "{chosen} of {max} categorias selecionadas"
+      "infoSelectedNoOfMaxCategories": "{chosen} de {max} categorias selecionadas"
     },
     "category": {
       "description": {
@@ -954,7 +954,7 @@
     },
     "shouted": "Aclamou",
     "socialMedia": "Onde mais posso encontrar",
-    "userAnonym": "Anonymous"
+    "userAnonym": "Anônimo"
   },
   "quotes": {
     "african": {

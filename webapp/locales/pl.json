@@ -175,7 +175,7 @@
     "loading": "załadunek",
     "loadMore": "Obciążenie więcej",
     "name": "Nazwa",
-    "organization": "Organization ::: Organizations",
+    "organization": "Organizacja ::: Organizacje",
     "post": "Poczta ::: Posty",
     "project": "Projekt ::: Projekty",
     "reportContent": "Sprawozdanie",
@@ -954,7 +954,7 @@
     },
     "shouted": "Krzyknij",
     "socialMedia": "Gdzie jeszcze mogę znaleźć",
-    "userAnonym": "Anonymous"
+    "userAnonym": "Anonimowy"
   },
   "quotes": {
     "african": {
@@ -1198,7 +1198,7 @@
       "uncheckAll": "Odznacz wszystko"
     },
     "organizations": {
-      "name": "My Organizations"
+      "name": "Moje organizacje"
     },
     "privacy": {
       "make-shouts-public": "Udostępniaj artykuły, które poleciłem/am, na moim publicznym profilu",
