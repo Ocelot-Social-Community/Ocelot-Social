@@ -9,8 +9,9 @@ Feature: Chat notification badge
       | alice   | alice@example.org  | 1234     | alice  | Alice         | 0.0.4                          |
       | bob     | bob@example.org    | 4321     | bob    | Bob           | 0.0.4                          |
 
-  Scenario: Receive chat message and see unread badge via websocket
-    Given "alice" sends a chat message "Hello Bob!" to "bob"
-    And I am logged in as "bob"
-    When I navigate to page "/"
+  Scenario: Receive chat notification live via websocket
+    Given I am logged in as "bob"
+    And I navigate to page "/"
+    And I see no unread chat messages in the header
+    When "alice" sends a chat message "Hello Bob!" to "bob"
     Then I see 1 unread chat message in the header
