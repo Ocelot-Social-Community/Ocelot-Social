@@ -3,39 +3,39 @@
     "cancel": "Annuleren",
     "clear": "Wissen",
     "close": "Sluiten",
-    "create": null,
-    "delete": null,
-    "edit": null,
-    "loading": null,
-    "loadMore": null,
+    "create": "Aanmaken",
+    "delete": "Verwijderen",
+    "edit": "Bewerken",
+    "loading": "laden",
+    "loadMore": "meer laden",
     "menu": "Menu openen",
-    "save": null,
-    "saveCategories": null,
+    "save": "Opslaan",
+    "saveCategories": "Onderwerpen opslaan",
     "search": "Zoeken"
   },
   "admin": {
     "badges": {
-      "description": null,
-      "noBadges": null,
+      "description": "Configureer de beschikbare badges voor deze gebruiker",
+      "noBadges": "Er zijn geen badges beschikbaar",
       "revokeTrophy": {
-        "error": null,
-        "success": null
+        "error": "Trofee kon niet worden ingetrokken!",
+        "success": "Trofee succesvol ingetrokken!"
       },
       "revokeVerification": {
-        "error": null,
-        "success": null
+        "error": "Verificatie kon niet worden ingetrokken!",
+        "success": "Verificatie succesvol ingetrokken"
       },
       "rewardTrophy": {
-        "error": null,
-        "success": null
+        "error": "Trofee kon niet worden toegekend!",
+        "success": "Trofee succesvol toegekend!"
       },
       "setVerification": {
-        "error": null,
-        "success": null
+        "error": "Verificatie kon niet worden ingesteld!",
+        "success": "Verificatie succesvol ingesteld!"
       },
-      "title": null,
-      "trophyBadges": null,
-      "verificationBadges": null
+      "title": "Badges",
+      "trophyBadges": "Trofeeën",
+      "verificationBadges": "Verificaties"
     },
     "categories": {
       "categoryName": "Naam",
@@ -44,47 +44,47 @@
       "postCount": "Berichten"
     },
     "dashboard": {
-      "badgesDisplayed": null,
-      "badgesRewarded": null,
-      "chatMessages": null,
-      "chatRooms": null,
+      "badgesDisplayed": "Weergegeven badges",
+      "badgesRewarded": "Toegekende badges",
+      "chatMessages": "Chatberichten",
+      "chatRooms": "Chatruimtes",
       "comments": "Opmerkingen",
-      "emails": null,
+      "emails": "E-mails",
       "follows": "Volgt",
-      "groups": null,
-      "inviteCodes": null,
-      "inviteCodesExpired": null,
-      "inviteCodesRedeemed": null,
+      "groups": "Groepen",
+      "inviteCodes": "Uitnodigingscodes",
+      "inviteCodesExpired": "Verlopen uitnodigingscodes",
+      "inviteCodesRedeemed": "Ingewisselde uitnodigingscodes",
       "invites": "Uitnodigingen",
-      "locations": null,
+      "locations": "Locaties",
       "name": "Dashboard",
       "notifications": "Meldingen",
       "posts": "Berichten",
-      "reports": null,
+      "reports": "Meldingen",
       "shouts": "Shouts",
-      "tags": null,
+      "tags": "Tags",
       "users": "Gebruikers",
-      "usersDeleted": null,
-      "usersVerified": null
+      "usersDeleted": "Verwijderde gebruikers",
+      "usersVerified": "Geverifieerde gebruikers"
     },
     "donations": {
-      "goal": null,
-      "name": null,
-      "progress": null,
-      "showDonationsCheckboxLabel": null,
-      "successfulUpdate": null
+      "goal": "Maandelijks benodigde donaties",
+      "name": "Donatie-informatie",
+      "progress": "Tot nu toe verzamelde donaties",
+      "showDonationsCheckboxLabel": "Toon donatie-voortgangsbalk",
+      "successfulUpdate": "Donatie-informatie succesvol bijgewerkt!"
     },
     "hashtags": {
-      "name": null,
-      "nameOfHashtag": null,
-      "number": null,
-      "tagCount": null,
-      "tagCountUnique": null
+      "name": "Hashtags",
+      "nameOfHashtag": "Naam",
+      "number": "Nr.",
+      "tagCount": "Berichten",
+      "tagCountUnique": "Gebruikers"
     },
     "invites": {
-      "description": null,
-      "name": null,
-      "title": null
+      "description": "Uitnodigingen zijn een geweldige manier om je vrienden in je netwerk te hebben …",
+      "name": "Gebruikers uitnodigen",
+      "title": "Mensen uitnodigen"
     },
     "name": "Admin",
     "notifications": {
@@ -100,12 +100,12 @@
       "name": "Instellingen"
     },
     "users": {
-      "empty": null,
+      "empty": "Geen gebruikers gevonden",
       "form": {
-        "placeholder": null
+        "placeholder": "e-mail, naam of beschrijving"
       },
       "name": "Gebruikers",
-      "roleChanged": null,
+      "roleChanged": "Rol succesvol gewijzigd!",
       "table": {
         "columns": {
           "badges": "Badges",
@@ -123,54 +123,54 @@
     }
   },
   "chat": {
-    "addRoomHeadline": null,
-    "cancelSelectMessage": null,
+    "addRoomHeadline": "Zoek gebruiker voor nieuwe chat",
+    "cancelSelectMessage": "Annuleren",
     "closeChat": "Chat sluiten",
-    "conversationStarted": null,
+    "conversationStarted": "Gesprek gestart op:",
     "expandChat": "Chat uitvouwen",
-    "isOnline": null,
-    "isTyping": null,
-    "lastSeen": null,
-    "messageDeleted": null,
-    "messagesEmpty": null,
-    "newMessages": null,
+    "isOnline": "is online",
+    "isTyping": "is aan het typen...",
+    "lastSeen": "laatst gezien ",
+    "messageDeleted": "Dit bericht is verwijderd",
+    "messagesEmpty": "Geen berichten",
+    "newMessages": "Nieuwe berichten",
     "page": {
-      "headline": null
+      "headline": "Chat"
     },
-    "roomEmpty": null,
-    "roomsEmpty": null,
-    "search": null,
-    "transmitting": null,
-    "typeMessage": null,
+    "roomEmpty": "Geen ruimte geselecteerd",
+    "roomsEmpty": "Geen ruimtes",
+    "search": "Chatruimtes filteren",
+    "transmitting": "Bericht verzenden …",
+    "typeMessage": "Typ een bericht",
     "userProfileButton": {
-      "label": null,
-      "tooltip": null
+      "label": "Chat",
+      "tooltip": "Chat met “{name}”"
     }
   },
   "client-only": {
-    "loading": null
+    "loading": "Laden …"
   },
   "code-of-conduct": {
-    "subheader": null
+    "subheader": "voor het sociale netwerk van {ORGANIZATION_NAME}"
   },
   "comment": {
     "content": {
-      "unavailable-placeholder": null
+      "unavailable-placeholder": "… deze reactie is niet meer beschikbaar"
     },
-    "edited": null,
+    "edited": "bewerkt",
     "menu": {
-      "delete": null,
-      "edit": null
+      "delete": "Reactie verwijderen",
+      "edit": "Reactie bewerken"
     },
     "show": {
-      "less": null,
-      "more": null
+      "less": "minder tonen",
+      "more": "meer tonen"
     }
   },
   "common": {
     "category": "Categorie ::: Categorieën",
     "comment": "Opmerking ::: Opmerkingen",
-    "filter": null,
+    "filter": "Filteren …",
     "letsTalk": "Laten we praten",
     "loading": "inlading",
     "loadMore": "meer laden",
@@ -184,13 +184,13 @@
     "takeAction": "Onderneem actie",
     "user": "Gebruiker ::: Gebruikers",
     "validations": {
-      "categories": null,
-      "email": null,
-      "eventLocationNameLength": null,
-      "eventLocationNameNotEmpty": null,
-      "eventVenueLength": null,
-      "eventVenueNotEmpty": null,
-      "url": null
+      "categories": "er moet minstens één en maximaal drie onderwerpen geselecteerd zijn",
+      "email": "moet een geldig e-mailadres zijn",
+      "eventLocationNameLength": "minimaal {min} of maximaal {max} tekens",
+      "eventLocationNameNotEmpty": "alleen lege tekens zijn niet toegestaan",
+      "eventVenueLength": "minimaal {min} of maximaal {max} tekens",
+      "eventVenueNotEmpty": "alleen lege tekens zijn niet toegestaan",
+      "url": "moet een geldige URL zijn"
     },
     "versus": "Versus"
   },
@@ -199,334 +199,334 @@
   },
   "components": {
     "dateTimeRange": {
-      "hourMinute": null,
-      "monthDay": null,
-      "yearMonthDay": null
+      "hourMinute": "HH:mm",
+      "monthDay": "dd-MM-",
+      "yearMonthDay": "dd-MM-yyyy"
     },
     "password-reset": {
       "change-password": {
-        "error": null,
-        "help": null,
-        "success": null
+        "error": "Het wijzigen van je wachtwoord is mislukt. Misschien was de beveiligingscode niet correct?",
+        "help": "Bij problemen kun je ons om hulp vragen door een e-mail te sturen naar:",
+        "success": "Je wachtwoord is succesvol gewijzigd!"
       },
       "request": {
         "form": {
-          "description": null,
-          "submit": null,
-          "submitted": null
+          "description": "Er wordt een e-mail voor het opnieuw instellen van je wachtwoord gestuurd naar het opgegeven e-mailadres.",
+          "submit": "E-mail aanvragen",
+          "submitted": "Er is een e-mail met verdere instructies gestuurd naar <b>{email}</b>"
         },
-        "title": null
+        "title": "Wachtwoord opnieuw instellen"
       }
     },
     "registration": {
       "create-user-account": {
-        "buttonTitle": null,
-        "error": null,
-        "help": null,
-        "receiveCommunicationAsEmailsEtcConfirmed": null,
-        "success": null,
-        "termsAndCondsEtcConfirmed": null,
-        "title": null
+        "buttonTitle": "Aanmaken",
+        "error": "Er kon geen gebruikersaccount worden aangemaakt!",
+        "help": " Misschien was de bevestiging ongeldig? Bij problemen kun je ons om hulp vragen door een e-mail te sturen naar:",
+        "receiveCommunicationAsEmailsEtcConfirmed": "Ik ga ook akkoord met het ontvangen van e-mails en andere vormen van communicatie (bijv. pushmeldingen).",
+        "success": "Je account is aangemaakt!",
+        "termsAndCondsEtcConfirmed": "Ik heb het volgende gelezen, begrepen en ga ermee akkoord:",
+        "title": "Gebruikersaccount aanmaken"
       },
       "email": {
         "buttonTitle": {
-          "resend": null,
-          "send": null,
-          "skipResend": null
+          "resend": "E-mail opnieuw verzenden",
+          "send": "E-mail verzenden",
+          "skipResend": "Opnieuw verzenden overslaan"
         },
         "form": {
-          "sendEmailAgain": null,
-          "success": null
+          "sendEmailAgain": "E-mail opnieuw verzenden",
+          "success": "Verificatie-e-mail verzonden naar <b>{email}</b>!"
         },
-        "title": null
+        "title": "E-mail"
       },
       "email-display": {
-        "warningFormat": null,
-        "warningUndef": null
+        "warningFormat": "⚠️ E-mail heeft een verkeerd formaat!",
+        "warningUndef": "⚠️ Geen e-mail gedefinieerd!"
       },
       "email-nonce": {
-        "buttonTitle": null,
+        "buttonTitle": "Doorgaan",
         "form": {
-          "click-next": null,
-          "description": null,
-          "next": null,
-          "nonce": null,
+          "click-next": "Klik op Doorgaan.",
+          "description": "Open je e-mail inbox en voer de code in die we je hebben gestuurd.",
+          "next": "Doorgaan",
+          "nonce": "E-mailcode: 32143",
           "validations": {
-            "error": null,
-            "length": null,
-            "success": null
+            "error": "Ongeldige verificatiecode <b>{nonce}</b> voor e-mail <b>{email}</b>!",
+            "length": "moet {nonceLength} tekens lang zijn",
+            "success": "Geldige verificatiecode <b>{nonce}</b> voor e-mail <b>{email}</b>!"
           }
         },
-        "title": null
+        "title": "E-mailbevestiging"
       },
       "invite-code": {
-        "buttonTitle": null,
+        "buttonTitle": "Volgende",
         "form": {
-          "description": null,
-          "invite-code": null,
-          "next": null,
+          "description": "Voer de uitnodigingscode in die je hebt ontvangen.",
+          "invite-code": "Uitnodigingscode: ACJERB",
+          "next": "Doorgaan",
           "validations": {
-            "error": null,
-            "length": null,
-            "success": null
+            "error": "Ongeldige uitnodigingscode <b>{inviteCode}</b>!",
+            "length": "moet {inviteCodeLength} tekens lang zijn",
+            "success": "Geldige uitnodigingscode <b>{inviteCode}</b>!"
           }
         },
-        "invited-by": null,
-        "invited-by-and-to": null,
-        "invited-to-hidden-group": null
+        "invited-by": "Uitgenodigd door {invitedBy}.",
+        "invited-by-and-to": "Uitgenodigd door {invitedBy} voor groep {invitedTo}.",
+        "invited-to-hidden-group": "Uitgenodigd door {invitedBy} voor een verborgen groep."
       },
       "no-public-registrstion": {
-        "title": null
+        "title": "Geen openbare registratie"
       },
       "signup": {
         "form": {
-          "data-privacy": null,
-          "description": null,
+          "data-privacy": "Ik heb de privacyverklaring gelezen en begrepen.",
+          "description": "Om te beginnen kun je je hier gratis registreren:",
           "errors": {
-            "email-exists": null
+            "email-exists": "Er bestaat al een gebruikersaccount met dit e-mailadres!"
           },
-          "submit": null,
-          "success": null,
-          "terms-and-condition": null
+          "submit": "Account aanmaken",
+          "success": "Er is een e-mail met een link om je registratie te voltooien gestuurd naar <b>{email}</b>",
+          "terms-and-condition": "Ik ga akkoord met de <a href=\"/terms-and-conditions\" target=\"_blank\"><ds-text bold color=\"primary\">Algemene voorwaarden</ds-text></a>."
         },
-        "title": null,
-        "unavailable": null
+        "title": "Word lid van {APPLICATION_NAME}!",
+        "unavailable": "Helaas is openbare registratie van gebruikersaccounts op dit moment niet beschikbaar op deze server."
       }
     }
   },
   "contribution": {
-    "amount-clicks": null,
-    "amount-comments": null,
-    "amount-shouts": null,
-    "amount-views": null,
+    "amount-clicks": "{amount} klikken",
+    "amount-comments": "{amount} reacties",
+    "amount-shouts": "{amount} aanbevelingen",
+    "amount-views": "{amount} weergaven",
     "categories": {
-      "infoSelectedNoOfMaxCategories": null
+      "infoSelectedNoOfMaxCategories": "{chosen} van {max} onderwerpen geselecteerd"
     },
     "category": {
       "description": {
-        "body-and-excercise": null,
-        "children": null,
-        "culture": null,
-        "economy": null,
-        "energy": null,
-        "finance": null,
-        "health": null,
-        "home": null,
-        "it-and-media": null,
-        "law": null,
-        "miscellaneous": null,
-        "mobility": null,
-        "nature": null,
-        "networking": null,
-        "peace": null,
-        "politics": null,
-        "psyche": null,
-        "science": null,
-        "spirituality": null
+        "body-and-excercise": "Sport, yoga, massage, ontspanning",
+        "children": "Familie, opvoeding, school, vorming",
+        "culture": "Kunst, theater, muziek, fotografie, film",
+        "economy": "Handel, consumptie, marketing, toeleveringsketens",
+        "energy": "Olie, gas, kolen, wind, waterkracht, biogas, atoomenergie",
+        "finance": "Geld, financieel systeem, alternatieve valuta",
+        "health": "Geneeskunde, voeding, WHO, vaccinatie, schadelijke stoffen",
+        "home": "Bouw, gemeenschappen, tiny houses, moestuin",
+        "it-and-media": "Nieuws, manipulatie, privacy, controle, dataverzamelaars, AI, software, apps",
+        "law": "Mensenrechten, wetten, decreten",
+        "miscellaneous": "Diversen",
+        "mobility": "Reizen, verkeer, elektrisch vervoer",
+        "nature": "Dieren, planten, landbouw, ecologie, biodiversiteit",
+        "networking": "Samenwerking, actiecoalities, solidariteit, hulp",
+        "peace": "Oorlog, leger, sociale verdediging, wapens, cyberaanvallen",
+        "politics": "Democratie, participatie, verkiezingen, corruptie, partijen",
+        "psyche": "Ziel, gevoelens, geluk",
+        "science": "Onderwijs, universiteit, publicaties",
+        "spirituality": "Religie, waarden, ethiek"
       },
       "name": {
-        "body-and-excercise": null,
-        "children": null,
-        "culture": null,
-        "economy": null,
-        "energy": null,
-        "finance": null,
-        "health": null,
-        "home": null,
-        "it-and-media": null,
-        "law": null,
-        "miscellaneous": null,
-        "mobility": null,
-        "nature": null,
-        "networking": null,
-        "peace": null,
-        "politics": null,
-        "psyche": null,
-        "science": null,
-        "spirituality": null
+        "body-and-excercise": "Lichaam & Beweging",
+        "children": "Kinderen",
+        "culture": "Cultuur",
+        "economy": "Economie",
+        "energy": "Energie",
+        "finance": "Financiën",
+        "health": "Gezondheid",
+        "home": "Thuis",
+        "it-and-media": "IT & Media",
+        "law": "Recht",
+        "miscellaneous": "Diversen",
+        "mobility": "Mobiliteit",
+        "nature": "Natuur",
+        "networking": "Netwerken",
+        "peace": "Vrede",
+        "politics": "Politiek",
+        "psyche": "Psyche",
+        "science": "Wetenschap",
+        "spirituality": "Spiritualiteit"
       }
     },
     "comment": {
       "commenting-disabled": {
         "blocked-author": {
-          "button-label": null,
-          "call-to-action": null,
-          "reason": null
+          "button-label": "Bezoek “{name}”",
+          "call-to-action": "Als je een reactie wilt achterlaten, deblokkeer hen dan in hun profiel.",
+          "reason": "Je blokkeert de auteur van het bericht."
         },
         "no-group-member": {
-          "call-to-action": null,
-          "reason": null
+          "call-to-action": "Als je wilt reageren, word dan lid van de groep.",
+          "reason": "Je bent geen lid van de groep:"
         }
       }
     },
     "emotions-label": {
-      "angry": null,
-      "cry": null,
-      "funny": null,
-      "happy": null,
-      "surprised": null
+      "angry": "Boos",
+      "cry": "Huilen",
+      "funny": "Grappig",
+      "happy": "Blij",
+      "surprised": "Verrast"
     },
-    "filterFollow": null,
+    "filterFollow": "Gebruikers die ik volg",
     "filterMasonryGrid": {
-      "myFriends": null,
-      "myGroups": null,
-      "myTopics": null,
-      "noFilter": null,
-      "onlyArticles": null,
-      "onlyEvents": null
+      "myFriends": "Gebruikers die ik volg",
+      "myGroups": "Van mijn groepen",
+      "myTopics": "Mijn onderwerpen",
+      "noFilter": "Inhoud filteren",
+      "onlyArticles": "Artikelen",
+      "onlyEvents": "Evenementen"
     },
-    "filterMyGroups": null,
-    "inappropriatePicture": null,
-    "languageSelectLabel": null,
-    "languageSelectText": null,
-    "newEvent": null,
-    "newPost": null,
-    "success": null,
+    "filterMyGroups": "Mijn groepen",
+    "inappropriatePicture": "Deze afbeelding kan voor sommige mensen ongepast zijn.",
+    "languageSelectLabel": "Taal van je bijdrage",
+    "languageSelectText": "Selecteer taal",
+    "newEvent": "Maak een nieuw evenement aan",
+    "newPost": "Maak een nieuw bericht aan",
+    "success": "Opgeslagen!",
     "teaserImage": {
-      "cropImage": null,
+      "cropImage": "Afbeelding bijsnijden",
       "cropperConfirm": "Bevestigen",
       "errors": {
-        "aspect-ratio-too-small": null,
-        "unSupported-file-format": null
+        "aspect-ratio-too-small": "Deze afbeelding is te hoog.",
+        "unSupported-file-format": "Upload alstublieft een afbeelding in het formaat: JPG, JPEG, PNG of GIF!"
       },
       "supportedFormats": "Voeg een afbeelding in met het bestandsformaat JPG, PNG of GIF!"
     },
-    "title": null,
-    "visibleOnlyForMembersOfGroup": null
+    "title": "Titel",
+    "visibleOnlyForMembersOfGroup": "Dit bericht is alleen zichtbaar voor leden van de groep “<b>{name}</b>”."
   },
   "delete": {
-    "cancel": null,
+    "cancel": "Annuleren",
     "comment": {
-      "message": null,
-      "success": null,
-      "title": null,
-      "type": null
+      "message": "Wil je de reactie “<b>{name}</b>” echt verwijderen?",
+      "success": "Reactie succesvol verwijderd!",
+      "title": "Reactie verwijderen",
+      "type": "Reactie"
     },
     "contribution": {
-      "message": null,
-      "success": null,
-      "title": null,
-      "type": null
+      "message": "Wil je het bericht “<b>{name}</b>” echt verwijderen?",
+      "success": "Bericht succesvol verwijderd!",
+      "title": "Bericht verwijderen",
+      "type": "Bijdrage"
     },
-    "submit": null
+    "submit": "Verwijderen"
   },
   "disable": {
-    "cancel": null,
+    "cancel": "Annuleren",
     "comment": {
       "message": "Wilt u de reactie van \" <b> {name} </b> \" echt uitschakelen ?",
       "title": "Commentaar uitschakelen",
       "type": "Melding"
     },
     "contribution": {
-      "message": null,
-      "title": null,
-      "type": null
+      "message": "Wil je de bijdrage “<b>{name}</b>” echt deactiveren?",
+      "title": "Bijdrage deactiveren",
+      "type": "Bijdrage"
     },
-    "submit": null,
-    "success": null,
+    "submit": "Deactiveren",
+    "success": "Succesvol gedeactiveerd!",
     "user": {
-      "message": null,
-      "title": null,
-      "type": null
+      "message": "Wil je de gebruiker “<b>{name}</b>” echt deactiveren?",
+      "title": "Gebruiker deactiveren",
+      "type": "Gebruiker"
     }
   },
   "donations": {
-    "amount-of-total": null,
-    "donate-now": null
+    "amount-of-total": "{amount} van {total} € verzameld",
+    "donate-now": "Doneer nu"
   },
   "editor": {
     "embed": {
-      "always_allow": null,
-      "data_privacy_info": null,
-      "data_privacy_warning": null,
-      "play_now": null
+      "always_allow": "Altijd ingesloten inhoud van externe providers toestaan (deze instelling kan op elk moment worden gewijzigd)",
+      "data_privacy_info": "Je gegevens zijn nog niet gedeeld met externe providers. Als je doorgaat met het afspelen van deze inhoud, zal de volgende provider waarschijnlijk gebruikersgegevens verzamelen:",
+      "data_privacy_warning": "Privacywaarschuwing!",
+      "play_now": "Doorgaan"
     },
     "hashtag": {
-      "addHashtag": null,
-      "addLetter": null,
-      "noHashtagsFound": null
+      "addHashtag": "Nieuwe hashtag",
+      "addLetter": "Typ een letter",
+      "noHashtagsFound": "Geen hashtags gevonden"
     },
     "legend": {
-      "bold": null,
-      "heading3": null,
-      "heading4": null,
-      "italic": null,
-      "legendTitle": null,
-      "link": null,
-      "orderedList": null,
-      "paragraph": null,
-      "quote": null,
-      "ruler": null,
-      "underline": null,
-      "unorderedList": null
+      "bold": "Vet",
+      "heading3": "Kop 3",
+      "heading4": "Kop 4",
+      "italic": "Cursief",
+      "legendTitle": "Sneltoetsen en markdown-code",
+      "link": "Link",
+      "orderedList": "Genummerde lijst",
+      "paragraph": "Alinea",
+      "quote": "Citaat",
+      "ruler": "Lijn",
+      "underline": "Onderstreept",
+      "unorderedList": "Ongenummerde lijst"
     },
     "mention": {
-      "noUsersFound": null
+      "noUsersFound": "Geen gebruikers gevonden"
     },
-    "placeholder": null
+    "placeholder": "Laat je inspirerende gedachten achter …"
   },
   "error-pages": {
-    "403-default": null,
-    "404-default": null,
-    "500-default": null,
-    "503-default": null,
-    "back-to-index": null,
-    "cannot-edit-post": null,
-    "default": null,
-    "group-not-found": null,
-    "post-not-found": null,
-    "profile-not-found": null
+    "403-default": "Niet geautoriseerd voor deze pagina!",
+    "404-default": "Deze pagina kon niet worden gevonden!",
+    "500-default": "Interne serverfout!",
+    "503-default": "Dienst niet beschikbaar!",
+    "back-to-index": "Terug naar de startpagina!",
+    "cannot-edit-post": "Dit bericht kan niet worden bewerkt!",
+    "default": "Er is een fout opgetreden!",
+    "group-not-found": "Dit groepsprofiel kon niet worden gevonden!",
+    "post-not-found": "Dit bericht kon niet worden gevonden!",
+    "profile-not-found": "Dit profiel kon niet worden gevonden!"
   },
   "filter-menu": {
-    "all": null,
-    "article": null,
-    "categories": null,
-    "creationDate": null,
-    "deleteFilter": null,
-    "emotions": null,
+    "all": "Alles",
+    "article": "Artikel",
+    "categories": "Onderwerpen",
+    "creationDate": "Aanmaakdatum",
+    "deleteFilter": "Filter verwijderen",
+    "emotions": "Emoties",
     "ended": {
       "all": {
-        "hint": null,
-        "label": null
+        "hint": "Alles tonen, ook beëindigde",
+        "label": "Alles"
       },
       "onlyEnded": {
-        "hint": null,
-        "label": null
+        "hint": "Alleen niet beëindigde tonen",
+        "label": "Niet beëindigd"
       }
     },
-    "event": null,
-    "eventsBy": null,
-    "eventsEnded": null,
-    "filter-by": null,
-    "following": null,
-    "following-title": null,
-    "languages": null,
-    "my-groups": null,
+    "event": "Evenement",
+    "eventsBy": "Evenementen – toon ...",
+    "eventsEnded": "Beëindigd",
+    "filter-by": "Filteren op ...",
+    "following": "Gebruikers die ik volg",
+    "following-title": "Bronnen",
+    "languages": "Talen",
+    "my-groups": "Mijn groepen",
     "order": {
       "last": {
-        "hint": null,
-        "label": null
+        "hint": "Berichten sorteren op laatst eerst",
+        "label": "Laatst eerst"
       },
       "newest": {
-        "hint": null,
-        "label": null
+        "hint": "Berichten sorteren op nieuwste eerst",
+        "label": "Nieuwste eerst"
       },
       "next": {
-        "hint": null,
-        "label": null
+        "hint": "Berichten sorteren op volgende eerst",
+        "label": "Volgende eerst"
       },
       "oldest": {
-        "hint": null,
-        "label": null
+        "hint": "Berichten sorteren op oudste eerst",
+        "label": "Oudste eerst"
       }
     },
-    "order-by": null,
-    "post-type": null,
+    "order-by": "Sorteren op ...",
+    "post-type": "Inhoudstype",
     "save": {
-      "error": null,
-      "success": null
+      "error": "Opslaan van onderwerpinstellingen mislukt!",
+      "success": "Onderwerpen opgeslagen!"
     },
-    "startDate": null
+    "startDate": "Startdatum"
   },
   "followButton": {
     "follow": "Volgen",
@@ -534,122 +534,122 @@
   },
   "group": {
     "actionRadii": {
-      "continental": null,
-      "global": null,
-      "interplanetary": null,
-      "national": null,
-      "regional": null
+      "continental": "Continentaal",
+      "global": "Globaal of alleen virtueel",
+      "interplanetary": "Interplanetair",
+      "national": "Nationaal",
+      "regional": "Regionaal"
     },
-    "actionRadius": null,
-    "addMemberToGroup": null,
-    "addMemberToGroupSuccess": null,
-    "addUser": null,
-    "addUserNoOptions": null,
-    "addUserPlaceholder": null,
-    "allGroups": null,
-    "categories": null,
-    "categoriesTitle": null,
-    "changeMemberRole": null,
+    "actionRadius": "Actieradius van de groep",
+    "addMemberToGroup": "Toevoegen aan groep",
+    "addMemberToGroupSuccess": "“{name}” is toegevoegd aan de groep met de rol “{role}”!",
+    "addUser": "Gebruiker toevoegen",
+    "addUserNoOptions": "Geen gebruikers gevonden!",
+    "addUserPlaceholder": "Gebruikersnaam",
+    "allGroups": "Alle groepen",
+    "categories": "Onderwerp ::: Onderwerpen",
+    "categoriesTitle": "Onderwerpen van de groep",
+    "changeMemberRole": "De rol is gewijzigd naar “{role}”!",
     "contentMenu": {
-      "inviteLinks": null,
+      "inviteLinks": "Uitnodigingslinks",
       "menuButton": "Groepsmenu",
-      "muteGroup": null,
-      "unmuteGroup": null,
-      "visitGroupPage": null
+      "muteGroup": "Groep dempen",
+      "unmuteGroup": "Groep niet meer dempen",
+      "visitGroupPage": "Groep bekijken"
     },
     "createNewGroup": {
-      "title": null,
-      "tooltip": null
+      "title": "Een nieuwe groep aanmaken",
+      "tooltip": "Maak een nieuwe groep aan"
     },
-    "description": null,
+    "description": "Beschrijving",
     "editGroupSettings": {
-      "groupTitle": null,
-      "title": null
+      "groupTitle": "Instellingen van ",
+      "title": "Mijn groep bewerken"
     },
     "errors": {
-      "userAlreadyMember": null
+      "userAlreadyMember": "Gebruiker “{name}” is al lid!"
     },
-    "follow": null,
-    "foundation": null,
-    "general": null,
-    "goal": null,
-    "groupCreated": null,
-    "in": null,
-    "invite-links": null,
+    "follow": "Volgen",
+    "foundation": "Oprichting",
+    "general": "Algemeen",
+    "goal": "Doel van de groep",
+    "groupCreated": "De groep is aangemaakt!",
+    "in": "in",
+    "invite-links": "Uitnodigingslinks",
     "joinLeaveButton": {
-      "iAmMember": null,
-      "join": null,
-      "leave": null,
-      "pendingMember": null,
-      "tooltip": null
+      "iAmMember": "Ik ben lid",
+      "join": "Lid worden",
+      "leave": "Verlaten",
+      "pendingMember": "In afwachting",
+      "tooltip": "De groepseigenaar moet je nog bevestigen."
     },
-    "labelSlug": null,
+    "labelSlug": "Unieke groepsnaam",
     "leaveModal": {
-      "confirmButton": null,
-      "message": null,
-      "title": null
+      "confirmButton": "Verlaten",
+      "message": "Een groep verlaten kan onomkeerbaar zijn!<br>Groep <b>“{name}”</b> verlaten!",
+      "title": "Wil je de groep echt verlaten?"
     },
-    "memberRemoved": null,
-    "members": null,
+    "memberRemoved": "Gebruiker “{name}” is uit de groep verwijderd!",
+    "members": "Leden",
     "membersAdministrationList": {
-      "avatar": null,
-      "name": null,
-      "roleInGroup": null,
-      "slug": null
+      "avatar": "Avatar",
+      "name": "Naam",
+      "roleInGroup": "Rol",
+      "slug": "Unieke naam"
     },
-    "membersCount": null,
-    "membersListTitle": null,
-    "membersListTitleNotAllowedSeeingGroupMembers": null,
+    "membersCount": "Lid ::: Leden",
+    "membersListTitle": "Groepsleden",
+    "membersListTitleNotAllowedSeeingGroupMembers": "Groepsleden onzichtbaar",
     "modal": {
-      "cancel": null,
-      "confirm": null,
-      "confirmAddGroupMemberText": null,
-      "confirmAddGroupMemberTitle": null
+      "cancel": "Annuleren",
+      "confirm": "Bevestigen",
+      "confirmAddGroupMemberText": "Gebruiker “{name}” toevoegen aan groep?",
+      "confirmAddGroupMemberTitle": "Bevestigen"
     },
-    "muted": null,
-    "myGroups": null,
-    "name": null,
-    "radius": null,
-    "removeMember": null,
-    "removeMemberButton": null,
-    "role": null,
+    "muted": "Groep gedempt",
+    "myGroups": "Mijn groepen",
+    "name": "Groepsnaam",
+    "radius": "Radius",
+    "removeMember": "Lid verwijderen",
+    "removeMemberButton": "Verwijderen",
+    "role": "Jouw rol in de groep",
     "roles": {
-      "admin": null,
-      "owner": null,
-      "pending": null,
-      "usual": null
+      "admin": "Beheerder",
+      "owner": "Eigenaar",
+      "pending": "In afwachting",
+      "usual": "Lid"
     },
-    "save": null,
-    "type": null,
+    "save": "Nieuwe groep aanmaken",
+    "type": "Zichtbaarheid van de groep",
     "types": {
-      "closed": null,
-      "hidden": null,
-      "public": null
+      "closed": "Gesloten",
+      "hidden": "Geheim",
+      "public": "Openbaar"
     },
     "typesOptions": {
-      "closed": null,
-      "hidden": null,
-      "public": null
+      "closed": "Gesloten — Alle berichten alleen zichtbaar voor groepsleden",
+      "hidden": "Geheim — Groep (inclusief de naam) is volledig onzichtbaar",
+      "public": "Openbaar — Groep en alle berichten zijn zichtbaar voor alle geregistreerde gebruikers"
     },
-    "unmute": null,
-    "unmuted": null,
-    "update": null,
-    "updatedGroup": null
+    "unmute": "Groep niet meer dempen",
+    "unmuted": "Groep niet meer gedempt",
+    "update": "Wijziging opslaan",
+    "updatedGroup": "De groepsgegevens zijn gewijzigd."
   },
   "hashtags-filter": {
-    "clearSearch": null,
-    "hashtag-search": null,
-    "title": null
+    "clearSearch": "Zoekopdracht wissen",
+    "hashtag-search": "Zoeken naar #{hashtag}",
+    "title": "Jouw filterbubbel"
   },
   "header": {
     "avatarMenu": {
       "button": {
-        "tooltip": null
+        "tooltip": "Mijn profiel"
       },
       "chats": "Chats",
       "groups": "Groepen",
-      "map": null,
-      "myProfile": null,
+      "map": "Kaart",
+      "myProfile": "Mijn profiel",
       "notifications": "Notificaties"
     },
     "chats": {
@@ -659,7 +659,7 @@
       "tooltip": "Groepen"
     },
     "map": {
-      "tooltip": null
+      "tooltip": "Kaart"
     },
     "more": "Meer",
     "notifications": {
@@ -667,36 +667,36 @@
     }
   },
   "index": {
-    "change-filter-settings": null,
-    "no-results": null
+    "change-filter-settings": "Wijzig je filterinstellingen om meer resultaten te krijgen.",
+    "no-results": "Geen bijdragen gevonden."
   },
   "invite-codes": {
     "button": {
-      "tooltip": null
+      "tooltip": "Vrienden uitnodigen"
     },
-    "comment-placeholder": null,
-    "copy-code": null,
-    "copy-success": null,
-    "create-error": null,
-    "create-success": null,
+    "comment-placeholder": "Opmerking (optioneel)",
+    "copy-code": "Uitnodigingslink kopiëren",
+    "copy-success": "Uitnodigingscode gekopieerd naar klembord",
+    "create-error": "Het aanmaken van een nieuwe uitnodigingslink is mislukt! Fout: {error}",
+    "create-success": "Uitnodigingslink succesvol aangemaakt!",
     "delete-modal": {
-      "message": null,
-      "title": null
+      "message": "Wil je deze uitnodigingslink echt ongeldig maken?",
+      "title": "Link ongeldig maken?"
     },
-    "generate-code": null,
-    "generate-code-explanation": null,
-    "group-invite-links": null,
-    "invalidate": null,
-    "invalidate-error": null,
-    "invalidate-success": null,
-    "invite-link-message-group": null,
-    "invite-link-message-hidden-group": null,
-    "invite-link-message-personal": null,
-    "limit-reached": null,
-    "my-invite-links": null,
-    "no-links": null,
-    "redeemed-count": null,
-    "redeemed-count-0": null
+    "generate-code": "Nieuwe link aanmaken",
+    "generate-code-explanation": "Maak een nieuwe link aan. Je kunt een opmerking toevoegen als je wilt (alleen zichtbaar voor jou).",
+    "group-invite-links": "Groep-uitnodigingslinks",
+    "invalidate": "Link ongeldig maken",
+    "invalidate-error": "Het ongeldig maken van de uitnodigingslink is mislukt! Fout: {error}",
+    "invalidate-success": "Uitnodigingslink succesvol ongeldig gemaakt!",
+    "invite-link-message-group": "Je bent uitgenodigd om lid te worden van de groep “{groupName}” op {network}.",
+    "invite-link-message-hidden-group": "Je bent uitgenodigd om lid te worden van een verborgen groep op {network}.",
+    "invite-link-message-personal": "Je bent uitgenodigd om lid te worden van {network}.",
+    "limit-reached": "Je hebt het maximale aantal uitnodigingslinks bereikt.",
+    "my-invite-links": "Mijn uitnodigingslinks",
+    "no-links": "Nog geen uitnodigingslinks aangemaakt.",
+    "redeemed-count": "Deze code is {count} keer gebruikt.",
+    "redeemed-count-0": "Niemand heeft deze code nog gebruikt."
   },
   "layout": {
     "toggle": {
@@ -706,157 +706,157 @@
     }
   },
   "localeSwitch": {
-    "tooltip": null
+    "tooltip": "Kies taal"
   },
   "location": {
-    "distance": null
+    "distance": "{distance} km van mij vandaan"
   },
   "login": {
     "email": "Uw E-mail",
-    "failure": null,
-    "forgotPassword": null,
+    "failure": "Onjuist e-mailadres of wachtwoord.",
+    "forgotPassword": "Wachtwoord vergeten?",
     "hello": "Hallo",
     "loggingOut": "Uitloggen …",
     "login": "Inloggen",
     "logout": "Uitloggen",
     "moreInfo": "Wat is {APPLICATION_NAME}?",
-    "moreInfoHint": null,
-    "no-account": null,
-    "no-cookie": null,
+    "moreInfoHint": "naar de presentatiepagina",
+    "no-account": "Heb je nog geen account?",
+    "no-cookie": "Er kan geen cookie worden ingesteld. Je moet cookies accepteren.",
     "password": "Uw Wachtwoord",
-    "register": null,
-    "success": null
+    "register": "Registreren",
+    "success": "Je bent ingelogd!"
   },
   "maintenance": {
-    "explanation": null,
-    "questions": null,
-    "title": null
+    "explanation": "Op dit moment zijn we bezig met gepland onderhoud. Probeer het later opnieuw.",
+    "questions": "Vragen of opmerkingen? Stuur een e-mail naar",
+    "title": "{APPLICATION_NAME} is in onderhoud"
   },
   "map": {
-    "alertMessage": null,
+    "alertMessage": "De kaart is niet toegankelijk: het Mapbox-token is niet ingesteld op de server!",
     "legend": {
-      "event": null,
-      "group": null,
-      "theUser": null,
-      "user": null
+      "event": "Evenement",
+      "group": "Groep",
+      "theUser": "Mijn positie",
+      "user": "Gebruiker"
     },
     "markerTypes": {
-      "event": null,
-      "group": null,
-      "theUser": null,
-      "user": null
+      "event": "evenement",
+      "group": "groep",
+      "theUser": "mijn positie",
+      "user": "gebruiker"
     },
-    "pageTitle": null,
+    "pageTitle": "Kaart",
     "styles": {
-      "dark": null,
-      "outdoors": null,
-      "satellite": null,
-      "streets": null
+      "dark": "Donker",
+      "outdoors": "Buiten",
+      "satellite": "Satelliet",
+      "streets": "Straten"
     }
   },
   "modals": {
     "deleteUser": {
-      "created": null
+      "created": "Aangemaakt"
     }
   },
   "moderation": {
-    "name": null,
+    "name": "Moderatie",
     "reports": {
-      "author": null,
-      "content": null,
-      "decideButton": null,
-      "decided": null,
+      "author": "Auteur",
+      "content": "Inhoud",
+      "decideButton": "Bevestigen",
+      "decided": "Besloten",
       "decideModal": {
-        "cancel": null,
+        "cancel": "Annuleren",
         "Comment": {
           "disable": {
-            "message": null,
-            "title": null
+            "message": "Wil je echt dat de reactie “<b>{name}</b>” <b>gedeactiveerd</b> blijft?",
+            "title": "Reactie definitief deactiveren"
           },
           "enable": {
-            "message": null,
-            "title": null
+            "message": "Wil je echt dat de reactie “<b>{name}</b>” <b>geactiveerd</b> blijft?",
+            "title": "Reactie definitief activeren"
           }
         },
         "Post": {
           "disable": {
-            "message": null,
-            "title": null
+            "message": "Wil je echt dat het bericht “<b>{name}</b>” <b>gedeactiveerd</b> blijft?",
+            "title": "Bericht definitief deactiveren"
           },
           "enable": {
-            "message": null,
-            "title": null
+            "message": "Wil je echt dat het bericht “<b>{name}</b>” <b>geactiveerd</b> blijft?",
+            "title": "Bericht definitief activeren"
           }
         },
-        "submit": null,
+        "submit": "Beslissing bevestigen",
         "User": {
           "disable": {
-            "message": null,
-            "title": null
+            "message": "Wil je echt dat de gebruiker “<b>{name}</b>” <b>gedeactiveerd</b> blijft?",
+            "title": "Gebruiker definitief deactiveren"
           },
           "enable": {
-            "message": null,
-            "title": null
+            "message": "Wil je echt dat de gebruiker “<b>{name}</b>” <b>geactiveerd</b> blijft?",
+            "title": "Gebruiker definitief activeren"
           }
         }
       },
-      "decision": null,
-      "DecisionSuccess": null,
-      "disabled": null,
-      "disabledAt": null,
-      "disabledBy": null,
-      "empty": null,
-      "enabled": null,
-      "enabledAt": null,
-      "enabledBy": null,
+      "decision": "Beslissing",
+      "DecisionSuccess": "Succesvol besloten!",
+      "disabled": "Gedeactiveerd",
+      "disabledAt": "Gedeactiveerd op",
+      "disabledBy": "Gedeactiveerd door",
+      "empty": "Gefeliciteerd, er is niets te modereren.",
+      "enabled": "Geactiveerd",
+      "enabledAt": "Geactiveerd op",
+      "enabledBy": "Geactiveerd door",
       "filterLabel": {
-        "all": null,
-        "closed": null,
-        "reviewed": null,
-        "unreviewed": null
+        "all": "Alles",
+        "closed": "Gesloten",
+        "reviewed": "Beoordeeld",
+        "unreviewed": "Niet beoordeeld"
       },
-      "moreDetails": null,
-      "name": null,
-      "noDecision": null,
-      "numberOfUsers": null,
-      "previousDecision": null,
-      "reasonCategory": null,
-      "reasonDescription": null,
-      "reportedOn": null,
-      "status": null,
-      "submitter": null
+      "moreDetails": "Details bekijken",
+      "name": "Meldingen",
+      "noDecision": "Geen beslissing!",
+      "numberOfUsers": "{count} gebruikers",
+      "previousDecision": "Vorige beslissing:",
+      "reasonCategory": "Onderwerp",
+      "reasonDescription": "Beschrijving",
+      "reportedOn": "Datum",
+      "status": "Huidige status",
+      "submitter": "Gemeld door"
     }
   },
   "notifications": {
-    "comment": null,
-    "content": null,
-    "empty": null,
+    "comment": "Reactie",
+    "content": "Inhoud of beschrijving",
+    "empty": "Sorry, je hebt op dit moment geen meldingen.",
     "filterLabel": {
-      "all": null,
-      "read": null,
-      "unread": null
+      "all": "Alles",
+      "read": "Gelezen",
+      "unread": "Ongelezen"
     },
-    "group": null,
+    "group": "Beschrijving",
     "markAllAsRead": "Markeer alles als gelezen",
     "pageLink": "Alle notificaties",
-    "post": null,
+    "post": "Bericht of groep",
     "reason": {
-      "changed_group_member_role": null,
-      "commented_on_post": null,
-      "followed_user_posted": null,
-      "mentioned_in_comment": null,
-      "mentioned_in_post": null,
-      "on_date": null,
-      "post_in_group": null,
-      "removed_user_from_group": null,
-      "user_joined_group": null,
-      "user_left_group": null
+      "changed_group_member_role": "Heeft je rol in de groep gewijzigd",
+      "commented_on_post": "Heeft gereageerd op een bericht dat je observeert",
+      "followed_user_posted": "Heeft een nieuw bericht geschreven",
+      "mentioned_in_comment": "Heeft je genoemd in een reactie",
+      "mentioned_in_post": "Heeft je genoemd in een bericht",
+      "on_date": "op",
+      "post_in_group": "Heeft gepost in een groep",
+      "removed_user_from_group": "Heeft je uit de groep verwijderd",
+      "user_joined_group": "Is lid geworden van je groep",
+      "user_left_group": "Heeft je groep verlaten"
     },
-    "title": null,
-    "user": null
+    "title": "Meldingen",
+    "user": "Gebruiker"
   },
   "observeButton": {
-    "observed": null
+    "observed": "geobserveerd"
   },
   "pagination": {
     "next": "Volgende",
@@ -864,50 +864,50 @@
   },
   "post": {
     "comment": {
-      "joinGroup": null,
-      "reply": null,
-      "submit": null,
-      "submitted": null,
-      "updated": null
+      "joinGroup": "Lid geworden van groep „<b>{name}</b>“",
+      "reply": "Antwoorden",
+      "submit": "Reageren",
+      "submitted": "Reactie geplaatst!",
+      "updated": "Wijzigingen opgeslagen!"
     },
     "createNewArticle": {
-      "title": null
+      "title": "Een artikel maken"
     },
     "createNewEvent": {
-      "title": null
+      "title": "Een evenement maken"
     },
-    "edited": null,
+    "edited": "bewerkt",
     "editPost": {
-      "event": null,
+      "event": "Je evenement bewerken",
       "forGroup": {
-        "title": null
+        "title": "Voor de groep "
       },
-      "title": null
+      "title": "Je bericht bewerken"
     },
-    "event": null,
+    "event": "Evenement",
     "menu": {
-      "delete": null,
-      "edit": null,
-      "groupPin": null,
-      "groupPinnedSuccessfully": null,
-      "groupUnpin": null,
-      "groupUnpinnedSuccessfully": null,
-      "observe": null,
-      "observedSuccessfully": null,
-      "pin": null,
-      "pinnedSuccessfully": null,
-      "push": null,
+      "delete": "Bericht verwijderen",
+      "edit": "Bericht bewerken",
+      "groupPin": "Bericht vastpinnen (Groep)",
+      "groupPinnedSuccessfully": "Bericht succesvol vastgepind!",
+      "groupUnpin": "Bericht losmaken (Groep)",
+      "groupUnpinnedSuccessfully": "Bericht succesvol losgemaakt!",
+      "observe": "Bericht observeren",
+      "observedSuccessfully": "Je observeert nu dit bericht!",
+      "pin": "Bericht vastpinnen",
+      "pinnedSuccessfully": "Bericht succesvol vastgepind!",
+      "push": "Naar boven duwen",
       "pushed": "Naar boven geduwd",
-      "pushedSuccessfully": null,
-      "unobserve": null,
-      "unobservedSuccessfully": null,
-      "unpin": null,
-      "unpinnedSuccessfully": null,
-      "unpush": null,
-      "unpushedSuccessfully": null
+      "pushedSuccessfully": "Bericht succesvol naar boven geduwd!",
+      "unobserve": "Bericht niet meer observeren",
+      "unobservedSuccessfully": "Je observeert dit bericht niet meer!",
+      "unpin": "Bericht losmaken",
+      "unpinnedSuccessfully": "Bericht succesvol losgemaakt!",
+      "unpush": "Naar boven duwen annuleren",
+      "unpushedSuccessfully": "Naar boven duwen is geannuleerd!"
     },
     "name": "Post",
-    "pinned": null,
+    "pinned": "Aankondiging",
     "sensitiveContent": {
       "hide": "Gevoelige inhoud verbergen",
       "show": "Gevoelige inhoud tonen"
@@ -916,45 +916,45 @@
       "name": "Onderneem actie"
     },
     "viewEvent": {
-      "eventEnd": null,
-      "eventIsOnline": null,
-      "eventLocationName": null,
-      "eventStart": null,
-      "eventVenue": null,
-      "title": null
+      "eventEnd": "Einde",
+      "eventIsOnline": "Online",
+      "eventLocationName": "Adres voor navigatie — bijv. Voorbeeldstraat 1, 1234 AB Stad",
+      "eventStart": "Start",
+      "eventVenue": "Locatiebeschrijving — bijv. achtertuin, 1e verdieping, …",
+      "title": "Evenement"
     },
     "viewPost": {
       "forGroup": {
-        "title": null
+        "title": "In de groep "
       },
-      "title": null
+      "title": "Bericht"
     }
   },
   "profile": {
     "avatar": {
-      "submitted": null
+      "submitted": "Upload geslaagd!"
     },
-    "commented": null,
+    "commented": "Gereageerd",
     "follow": "Volgen",
     "followers": "Volgelingen",
     "following": "Volgt",
     "invites": {
-      "description": null,
-      "emailPlaceholder": null,
-      "title": null
+      "description": "Voer hun e-mailadres in voor de uitnodiging.",
+      "emailPlaceholder": "E-mail om uit te nodigen",
+      "title": "Nodig iemand uit voor {APPLICATION_NAME}!"
     },
     "memberSince": "Lid sinds",
     "network": {
-      "andMore": null,
-      "followedBy": null,
-      "followedByNobody": null,
-      "following": null,
-      "followingNobody": null,
-      "title": null
+      "andMore": "en {number} meer …",
+      "followedBy": "wordt gevolgd door:",
+      "followedByNobody": "wordt door niemand gevolgd.",
+      "following": "volgt:",
+      "followingNobody": "volgt niemand.",
+      "title": "Netwerk"
     },
-    "shouted": null,
-    "socialMedia": null,
-    "userAnonym": null
+    "shouted": "Geshout",
+    "socialMedia": "Waar vind ik nog meer",
+    "userAnonym": "Anoniem"
   },
   "quotes": {
     "african": {
@@ -963,67 +963,67 @@
     }
   },
   "release": {
-    "cancel": null,
+    "cancel": "Annuleren",
     "comment": {
-      "error": null,
-      "message": null,
-      "title": null,
-      "type": null
+      "error": "Je hebt de reactie al gemeld!",
+      "message": "Wil je de reactie van “<b>{name}</b>” echt vrijgeven?",
+      "title": "Reactie vrijgeven",
+      "type": "Reactie"
     },
     "contribution": {
-      "error": null,
-      "message": null,
-      "title": null,
-      "type": null
+      "error": "Je hebt de bijdrage al gemeld!",
+      "message": "Wil je de bijdrage “<b>{name}</b>” echt vrijgeven?",
+      "title": "Bijdrage vrijgeven",
+      "type": "Bijdrage"
     },
-    "submit": null,
-    "success": null,
+    "submit": "Vrijgeven",
+    "success": "Succesvol vrijgegeven!",
     "user": {
-      "error": null,
-      "message": null,
-      "title": null,
-      "type": null
+      "error": "Je hebt de gebruiker al gemeld!",
+      "message": "Wil je de gebruiker “<b>{name}</b>” echt vrijgeven?",
+      "title": "Gebruiker vrijgeven",
+      "type": "Gebruiker"
     }
   },
   "report": {
     "cancel": "Annuleren",
     "comment": {
-      "error": null,
+      "error": "Je hebt de reactie al gemeld!",
       "message": "Wilt u echt het commentaar van \"<b>{name}</b>\" melden?",
       "title": "Reactie melden",
       "type": "Melding"
     },
     "contribution": {
-      "error": null,
+      "error": "Je hebt de bijdrage al gemeld!",
       "message": "Wilt u echt het commentaar van \"<b>{name}</b>\" melden?",
       "title": "Bijdrage melden",
       "type": "Bijdrage"
     },
     "reason": {
       "category": {
-        "invalid": null,
-        "label": null,
+        "invalid": "Selecteer een geldig onderwerp",
+        "label": "Selecteer een onderwerp:",
         "options": {
-          "advert_products_services_commercial": null,
-          "criminal_behavior_violation_german_law": null,
-          "discrimination_etc": null,
-          "doxing": null,
-          "glorific_trivia_of_cruel_inhuman_acts": null,
-          "intentional_intimidation_stalking_persecution": null,
-          "other": null,
-          "pornographic_content_links": null
+          "advert_products_services_commercial": "Reclame voor producten en diensten met commerciële bedoelingen.",
+          "criminal_behavior_violation_german_law": "Crimineel gedrag of overtreding van de Duitse wet.",
+          "discrimination_etc": "Discriminerende berichten, reacties, uitspraken of beledigingen.",
+          "doxing": "Het openbaar maken van persoonlijke informatie van anderen zonder hun toestemming of de dreiging daarvan (“doxing”).",
+          "glorific_trivia_of_cruel_inhuman_acts": "Verheerlijking of bagatellisering van wrede of onmenselijke geweldsdaden.",
+          "intentional_intimidation_stalking_persecution": "Opzettelijke intimidatie, stalking of vervolging.",
+          "other": "Anders …",
+          "pornographic_content_links": "Plaatsen van of verwijzen naar duidelijk pornografisch materiaal."
         },
-        "placeholder": null
+        "placeholder": "Onderwerp …"
       },
       "description": {
-        "label": null,
-        "placeholder": null
+        "label": "Leg uit: waarom wil je dit melden?",
+        "placeholder": "Aanvullende informatie …"
       }
     },
     "submit": "Verzenden",
-    "success": null,
+    "success": "Bedankt voor het melden!",
     "user": {
-      "error": null,
+      "error": "Je hebt de gebruiker al gemeld!",
       "message": "Wilt u echt het commentaar van \"<b>{name}</b>\" melden?",
       "title": "Gebruiker melden",
       "type": "Gebruiker"
@@ -1031,19 +1031,19 @@
   },
   "search": {
     "failed": "Niets gevonden",
-    "for": null,
+    "for": "Zoeken naar ",
     "heading": {
-      "Group": null,
-      "Post": null,
-      "Tag": null,
-      "User": null
+      "Group": "Groep ::: Groepen",
+      "Post": "Bericht ::: Berichten",
+      "Tag": "Hashtag ::: Hashtags",
+      "User": "Gebruiker ::: Gebruikers"
     },
     "hint": "Waar zoekt u naar? Gebruik !... voor berichten, @... voor gebruikers, #... voor hashtags.",
-    "no-results": null,
-    "page": null,
+    "no-results": "Geen resultaten gevonden voor “{search}”. Probeer een andere zoekterm!",
+    "page": "Pagina",
     "placeholder": "Zoeken",
-    "results": null,
-    "title": null
+    "results": "resultaat gevonden ::: resultaten gevonden",
+    "title": "Zoekresultaten"
   },
   "settings": {
     "badges": {
@@ -1062,93 +1062,93 @@
       "verification": "Dit is je verificatiebadge en kan niet worden gewijzigd."
     },
     "blocked-users": {
-      "block": null,
+      "block": "Gebruiker blokkeren",
       "columns": {
-        "name": null,
-        "slug": null,
-        "unblock": null
+        "name": "Naam",
+        "slug": "Slug",
+        "unblock": "Deblokkeren"
       },
-      "empty": null,
+      "empty": "Je hebt tot nu toe niemand geblokkeerd.",
       "explanation": {
-        "closing": null,
-        "commenting-disabled": null,
-        "intro": null,
-        "notifications": null,
-        "their-perspective": null,
-        "your-perspective": null
+        "closing": "Dit zou voor nu voldoende moeten zijn zodat geblokkeerde gebruikers je niet meer kunnen lastigvallen.",
+        "commenting-disabled": "Je kunt op dit moment niet reageren op dit bericht.",
+        "intro": "Als een andere gebruiker door jou is geblokkeerd, gebeurt het volgende:",
+        "notifications": "Geblokkeerde gebruikers ontvangen geen meldingen meer als ze elkaar noemen.",
+        "their-perspective": "Omgekeerd: de geblokkeerde persoon kan ook niet meer interacteren met jouw bijdragen.",
+        "your-perspective": "Je kunt niet meer interacteren met hun bijdragen."
       },
-      "how-to": null,
-      "name": null,
-      "unblock": null,
-      "unblocked": null
+      "how-to": "Je kunt andere gebruikers blokkeren op hun profielpagina via het inhoudsmenu.",
+      "name": "Geblokkeerde gebruikers",
+      "unblock": "Gebruiker deblokkeren",
+      "unblocked": "{name} is weer gedeblokkeerd"
     },
     "data": {
-      "givenName": null,
-      "givenNamePlaceholder": null,
-      "labelBio": null,
-      "labelCity": null,
-      "labelCityHint": null,
-      "labelName": null,
-      "labelSlug": null,
+      "givenName": "Je voornaam",
+      "givenNamePlaceholder": "Femanon",
+      "labelBio": "Over jou",
+      "labelCity": "Je stad of regio",
+      "labelCityHint": "(toont geschatte positie op de kaart)",
+      "labelName": "Je naam",
+      "labelSlug": "Je unieke gebruikersnaam",
       "name": "Uw gegevens",
-      "namePlaceholder": null,
-      "realNamePlease": null,
-      "success": null,
-      "surName": null,
-      "surNamePlaceholder": null
+      "namePlaceholder": "Femanon Funny",
+      "realNamePlease": "Voer alstublieft je echte naam in",
+      "success": "Je gegevens zijn succesvol bijgewerkt!",
+      "surName": "Je achternaam",
+      "surNamePlaceholder": "Funny"
     },
     "deleteUserAccount": {
-      "accountDescription": null,
-      "accountWarning": null,
-      "accountWarningAdmin": null,
-      "accountWarningIsAdmin": null,
-      "commentedCount": null,
-      "confirmDeleting": null,
-      "contributionsCount": null,
-      "infoAdmin": null,
-      "name": null,
-      "pleaseConfirm": null,
-      "success": null
+      "accountDescription": "Wees je ervan bewust dat je berichten en reacties belangrijk zijn voor onze community. Als je er toch voor kiest ze te verwijderen, moet je ze hieronder markeren.",
+      "accountWarning": "Je kunt je account, berichten of reacties NIET BEHEREN en NIET HERSTELLEN na het verwijderen van je account!",
+      "accountWarningAdmin": "Het account, de bijdragen of reacties kunnen NA VERWIJDERING NIET WORDEN BEHEERD OF HERSTELD!",
+      "accountWarningIsAdmin": "Let op! Je staat op het punt een gebruikersaccount te verwijderen!",
+      "commentedCount": "Mijn {count} reactie verwijderen ::: Mijn {count} reacties verwijderen",
+      "confirmDeleting": "Gebruikersaccount nu verwijderen",
+      "contributionsCount": "Mijn {count} bericht verwijderen ::: Mijn {count} berichten verwijderen",
+      "infoAdmin": "Alle bijdragen en reacties van de gebruiker worden ook verwijderd!",
+      "name": "Gebruikersaccount verwijderen",
+      "pleaseConfirm": "Destructieve actie! Typ “{confirm}” ter bevestiging.",
+      "success": "Account succesvol verwijderd!"
     },
     "download": {
-      "description": null,
-      "json": null,
+      "description": "Klik op de knop hierboven om de inhoud van je berichten en reacties te downloaden. Om de afbeeldingen van je berichten te downloaden, klik je op de bijbehorende link hieronder.",
+      "json": "als JSON",
       "name": "Gegevens downloaden"
     },
     "email": {
-      "change-successful": null,
-      "labelEmail": null,
-      "labelNewEmail": null,
-      "labelNonce": null,
-      "name": null,
-      "submitted": null,
-      "success": null,
+      "change-successful": "Je e-mailadres is succesvol gewijzigd.",
+      "labelEmail": "Wijzig je e-mailadres",
+      "labelNewEmail": "Nieuw e-mailadres",
+      "labelNonce": "Voer je code in",
+      "name": "Je e-mail",
+      "submitted": "Er is een e-mail ter verificatie van je adres gestuurd naar <b>{email}</b>.",
+      "success": "Er is een nieuw e-mailadres geregistreerd.",
       "validation": {
-        "same-email": null
+        "same-email": "Dit is je huidige e-mailadres"
       },
       "verification-error": {
-        "explanation": null,
-        "message": null,
+        "explanation": "Dit kan verschillende oorzaken hebben:",
+        "message": "Je e-mailadres kon niet worden gewijzigd.",
         "reason": {
-          "invalid-nonce": null,
-          "no-email-request": null
+          "invalid-nonce": "Is de bevestigingscode ongeldig?",
+          "no-email-request": "Weet je zeker dat je een wijziging van je e-mailadres hebt aangevraagd?"
         },
-        "support": null
+        "support": "Als het probleem aanhoudt, neem dan contact met ons op per e-mail op"
       }
     },
     "embeds": {
-      "info-description": null,
-      "name": null,
+      "info-description": "Hier is de lijst van externe providers wiens inhoud kan worden weergegeven als externe code, bijv. in de vorm van ingesloten video's.",
+      "name": "Externe providers",
       "status": {
         "change": {
-          "allow": null,
-          "deny": null,
-          "question": null
+          "allow": "Zeker",
+          "deny": "Nee, bedankt",
+          "question": "Moet ingesloten broncode van externe partijen altijd aan je worden getoond?"
         },
-        "description": null,
+        "description": "Standaard is ingesloten code van externe providers voor jou",
         "disabled": {
-          "off": null,
-          "on": null
+          "off": "in eerste instantie niet weergegeven",
+          "on": "direct weergegeven"
         }
       }
     },
@@ -1160,21 +1160,21 @@
     },
     "muted-users": {
       "columns": {
-        "name": null,
-        "slug": null,
-        "unmute": null
+        "name": "Naam",
+        "slug": "Slug",
+        "unmute": "Niet meer dempen"
       },
-      "empty": null,
+      "empty": "Je hebt tot nu toe niemand gedempt.",
       "explanation": {
-        "intro": null,
-        "search": null,
-        "your-perspective": null
+        "intro": "Als een andere gebruiker door jou is gedempt, gebeurt het volgende:",
+        "search": "Berichten van gedempte personen verdwijnen uit je zoekresultaten.",
+        "your-perspective": "De berichten van de gedempte persoon verschijnen niet meer in je nieuwsfeed."
       },
-      "how-to": null,
-      "mute": null,
-      "name": null,
-      "unmute": null,
-      "unmuted": null
+      "how-to": "Je kunt andere gebruikers dempen op hun profielpagina via het inhoudsmenu.",
+      "mute": "Gebruiker dempen",
+      "name": "Gedempte gebruikers",
+      "unmute": "Gebruiker niet meer dempen",
+      "unmuted": "{name} is niet meer gedempt"
     },
     "name": "Instellingen",
     "notifications": {
@@ -1182,7 +1182,7 @@
       "chatMessage": "Bericht ontvangen tijdens afwezigheid",
       "checkAll": "Vink alles aan",
       "commentOnObservedPost": "Geef commentaar op een bijdrage die ik volg",
-      "followingUsers": null,
+      "followingUsers": "Een gebruiker die ik volg heeft een nieuw bericht gepubliceerd.",
       "group": "Groepen",
       "groupMemberJoined": "Een nieuw lid is lid geworden van een groep van mij",
       "groupMemberLeft": "Een lid heeft een groep van mij verlaten",
@@ -1201,49 +1201,49 @@
       "name": "Mijn Organisaties"
     },
     "privacy": {
-      "make-shouts-public": null,
-      "name": null,
-      "success-update": null
+      "make-shouts-public": "Artikelen die ik heb geshout delen op mijn openbare profiel",
+      "name": "Privacy",
+      "success-update": "Privacy-instellingen opgeslagen!"
     },
     "security": {
       "change-password": {
-        "button": null,
-        "label-new-password": null,
-        "label-new-password-confirm": null,
-        "label-old-password": null,
-        "message-new-password-confirm-required": null,
-        "message-new-password-missmatch": null,
-        "message-new-password-required": null,
-        "message-old-password-required": null,
-        "passwordSecurity": null,
-        "passwordStrength0": null,
-        "passwordStrength1": null,
-        "passwordStrength2": null,
-        "passwordStrength3": null,
-        "passwordStrength4": null,
-        "success": null
+        "button": "Wachtwoord wijzigen",
+        "label-new-password": "Je nieuwe wachtwoord",
+        "label-new-password-confirm": "Bevestig nieuw wachtwoord",
+        "label-old-password": "Je oude wachtwoord",
+        "message-new-password-confirm-required": "Bevestig je nieuwe wachtwoord",
+        "message-new-password-missmatch": "Typ hetzelfde wachtwoord opnieuw",
+        "message-new-password-required": "Voer een nieuw wachtwoord in",
+        "message-old-password-required": "Voer je oude wachtwoord in",
+        "passwordSecurity": "Wachtwoordbeveiliging",
+        "passwordStrength0": "Zeer onveilig wachtwoord",
+        "passwordStrength1": "Onveilig wachtwoord",
+        "passwordStrength2": "Matig wachtwoord",
+        "passwordStrength3": "Sterk wachtwoord",
+        "passwordStrength4": "Zeer sterk wachtwoord",
+        "success": "Wachtwoord succesvol gewijzigd!"
       },
       "name": "Veiligheid"
     },
     "social-media": {
-      "add-new-link": null,
+      "add-new-link": "Nieuwe link toevoegen",
       "delete-modal": {
-        "confirm-button": null,
-        "message": null,
-        "title": null
+        "confirm-button": "Verwijderen",
+        "message": "Verwijder “{name}”.",
+        "title": "Wil je je link echt verwijderen?"
       },
-      "edit-link": null,
-      "name": null,
-      "placeholder": null,
-      "requireUnique": null,
-      "submit": null,
-      "successAdd": null,
-      "successDelete": null
+      "edit-link": "Link bewerken",
+      "name": "Sociale media",
+      "placeholder": "Je sociale media url",
+      "requireUnique": "Je hebt deze url al toegevoegd",
+      "submit": "Link toevoegen",
+      "successAdd": "Sociale media toegevoegd. Gebruikersprofiel bijgewerkt!",
+      "successDelete": "Sociale media verwijderd. Gebruikersprofiel bijgewerkt!"
     },
     "validation": {
       "slug": {
-        "alreadyTaken": null,
-        "regex": null
+        "alreadyTaken": "Deze gebruikersnaam is al in gebruik.",
+        "regex": "Toegestane tekens zijn alleen kleine letters, cijfers, underscores en koppeltekens."
       }
     }
   },
@@ -1251,31 +1251,31 @@
     "shouted": "uitgeroepen"
   },
   "site": {
-    "back-to-login": null,
+    "back-to-login": "Terug naar de inlogpagina",
     "bank": "bankrekening",
-    "code-of-conduct": null,
+    "code-of-conduct": "Gedragscode",
     "contact": "contact",
     "data-privacy": "gegevensbescherming",
-    "donate": null,
-    "error-occurred": null,
-    "faq": null,
+    "donate": "Doneren",
+    "error-occurred": "Er is een fout opgetreden.",
+    "faq": "FAQ",
     "germany": "Duitsland",
     "imprint": "Afdruk",
     "made": "Met ❤️ gemaakt",
     "navigation": "Navigatie",
     "register": "inschrijfnummer",
-    "support": null,
-    "termsAndConditions": null,
-    "thanks": null
+    "support": "Ondersteuning",
+    "termsAndConditions": "Algemene voorwaarden",
+    "thanks": "Bedankt!"
   },
   "termsAndConditions": {
-    "newTermsAndConditions": null,
-    "termsAndConditionsNewConfirm": null,
-    "termsAndConditionsNewConfirmText": null
+    "newTermsAndConditions": "Nieuwe algemene voorwaarden",
+    "termsAndConditionsNewConfirm": "Ik heb de nieuwe algemene voorwaarden gelezen en ga ermee akkoord.",
+    "termsAndConditionsNewConfirmText": "Lees nu de nieuwe gebruiksvoorwaarden!"
   },
   "user-teaser": {
     "popover": {
-      "open-profile": null
+      "open-profile": "Profiel openen"
     }
   }
 }
