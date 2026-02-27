@@ -201,6 +201,11 @@ jobs:
           path: /tmp/webapp.tar
           key: ${{ github.run_id }}-e2e-webapp-cache
           
+      - name: Copy env files
+        run: |
+          cp webapp/.env.template webapp/.env
+          cp backend/.env.test_e2e backend/.env
+
       - name: Ensure cucumber-json-formatter exists
         run: |
           if [ ! -f /opt/cucumber-json-formatter ]; then
