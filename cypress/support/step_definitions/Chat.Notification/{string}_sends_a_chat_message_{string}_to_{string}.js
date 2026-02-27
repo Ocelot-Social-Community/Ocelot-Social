@@ -31,12 +31,14 @@ defineStep(
         )
       })
       .then((result) => {
+        expect(result.records).to.have.length.greaterThan(0,
+          `No users found for sender "${senderSlug}" or recipient "${recipientSlug}"`)
         const senderEmail = result.records[0].get('senderEmail')
         const recipientId = result.records[0].get('recipientId')
-        cy.authenticateAs({ email: senderEmail, password: '1234' }).then((client) => {
-          client.request(createRoomMutation, { userId: recipientId }).then((roomData) => {
+        return cy.authenticateAs({ email: senderEmail, password: '1234' }).then((client) => {
+          return client.request(createRoomMutation, { userId: recipientId }).then((roomData) => {
             const roomId = roomData.CreateRoom.id
-            client.request(createMessageMutation, { roomId, content: message })
+            return client.request(createMessageMutation, { roomId, content: message })
           })
         })
       })
