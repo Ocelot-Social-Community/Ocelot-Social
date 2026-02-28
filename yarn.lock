@@ -2398,7 +2398,7 @@
   resolved "https://registry.yarnpkg.com/@vue/shared/-/shared-3.5.27.tgz#33a63143d8fb9ca1b3efbc7ecf9bd0ab05f7e06e"
   integrity sha512-dXr/3CgqXsJkZ0n9F3I4elY8wM9jMJpP3pvRG52r6m0tu/MsAFIe6JpXVGeNMd/D9F4hQynWT8Rfuj0bdm9kFQ==
 
-"@vuepress/bundler-vite@^2.0.0-rc.18":
+"@vuepress/bundler-vite@^2.0.0-rc.26":
   version "2.0.0-rc.26"
   resolved "https://registry.yarnpkg.com/@vuepress/bundler-vite/-/bundler-vite-2.0.0-rc.26.tgz#99e0a3fe47dcc5d01036117307fd20d3c065187b"
   integrity sha512-4+YfKs2iOxuVSMW+L2tFzu2+X2HiGAREpo1DbkkYVDa5GyyPR+YsSueXNZMroTdzWDk5kAUz2Z1Tz1lIu7TO2g==
@@ -8673,7 +8673,7 @@ vuepress-shared@2.0.0-rc.99:
     "@vueuse/core" "^14.1.0"
     vue "^3.5.25"
 
-vuepress-theme-hope@^2.0.0-rc.59:
+vuepress-theme-hope@^2.0.0-rc.102:
   version "2.0.0-rc.102"
   resolved "https://registry.yarnpkg.com/vuepress-theme-hope/-/vuepress-theme-hope-2.0.0-rc.102.tgz#d738213bae8b436d2f215ddfae8e15af2dc9ca27"
   integrity sha512-VrUdxNGdXD34RRmAvaQybf+TNdD7uXr/71tZLNHQID607sj9IlMfz77/ySBnNrFTQIteGyWfVHvsuj1tU2XxGg==
@@ -8718,7 +8718,7 @@ vuepress-theme-hope@^2.0.0-rc.59:
     vuepress-plugin-md-enhance "2.0.0-rc.102"
     vuepress-shared "2.0.0-rc.99"
 
-vuepress@^2.0.0-rc.18:
+vuepress@^2.0.0-rc.26:
   version "2.0.0-rc.26"
   resolved "https://registry.yarnpkg.com/vuepress/-/vuepress-2.0.0-rc.26.tgz#c1eb7c2cf58f2c1c6d932fc0006c2d52c116c281"
   integrity sha512-ztTS3m6Q2MAb6D26vM2UyU5nOuxIhIk37SSD3jTcKI00x4ha0FcwY3Cm0MAt6w58REBmkwNLPxN5iiulatHtbw==
