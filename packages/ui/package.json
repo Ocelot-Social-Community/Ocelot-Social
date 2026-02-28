@@ -99,7 +99,7 @@
     "eslint-config-it4c": "^0.11.2",
     "eslint-plugin-jsdoc": "^62.7.0",
     "eslint-plugin-playwright": "^2.7.0",
-    "eslint-plugin-storybook": "^10.2.10",
+    "eslint-plugin-storybook": "^10.2.13",
     "eslint-plugin-vuejs-accessibility": "^2.5.0",
     "glob": "^13.0.6",
     "jsdom": "^28.1.0",
