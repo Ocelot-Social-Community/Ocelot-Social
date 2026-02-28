@@ -36,7 +36,7 @@
     "@aws-sdk/lib-storage": "^3.990.0",
     "@graphql-tools/load-files": "^7.0.0",
     "@graphql-tools/merge": "^9.0.0",
-    "@sentry/node": "^5.30.0",
+    "@sentry/node": "^10.40.0",
     "@types/mime-types": "^3.0.1",
     "bcryptjs": "~3.0.3",
     "body-parser": "^2.2.2",
