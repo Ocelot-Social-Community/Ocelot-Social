@@ -5,7 +5,7 @@ export const location = (type, lang) => gql`
     locationName
     location {
       id
-      name: name${lang}
+      name(lang: "${lang}")
       lng
       lat
       distanceToMe

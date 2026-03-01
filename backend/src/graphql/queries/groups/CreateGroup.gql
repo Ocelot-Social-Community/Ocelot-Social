@@ -42,8 +42,6 @@ mutation CreateGroup(
     location {
       id
       name
-      nameDE
-      nameEN
     }
     myRole
   }

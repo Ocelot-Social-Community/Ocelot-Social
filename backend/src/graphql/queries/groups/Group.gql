@@ -25,8 +25,6 @@ query Group($isMember: Boolean, $id: ID, $slug: String) {
     location {
       id
       name
-      nameDE
-      nameEN
     }
     myRole
     inviteCodes {

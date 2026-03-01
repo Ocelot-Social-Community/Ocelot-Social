@@ -13,6 +13,7 @@ export default {
   nameNL: { type: 'string' },
   namePL: { type: 'string' },
   nameRU: { type: 'string' },
+  nameSQ: { type: 'string' },
   isIn: {
     type: 'relationship',
     relationship: 'IS_IN',

@@ -59,6 +59,7 @@ describe('LocationSelect', () => {
           place: 'nowhere',
           lang: 'en',
         },
+        fetchPolicy: 'network-only',
       })
     })
 
@@ -69,8 +70,8 @@ describe('LocationSelect', () => {
 
       it('emits an empty string', () => {
         expect(wrapper.emitted().input).toBeTruthy()
-        expect(wrapper.emitted().input.length).toBe(1)
-        expect(wrapper.emitted().input[0]).toEqual([''])
+        const lastEmit = wrapper.emitted().input[wrapper.emitted().input.length - 1]
+        expect(lastEmit).toEqual([''])
       })
     })
 

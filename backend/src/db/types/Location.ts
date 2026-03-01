@@ -14,6 +14,7 @@ export interface LocationDbProperties {
   namePL: string
   namePT: string
   nameRU: string
+  nameSQ: string
   type: string
 }
 

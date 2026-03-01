@@ -13,7 +13,7 @@ import { UserInputError } from '@graphql/errors'
 
 import type { Context } from '@src/context'
 
-const locales = ['en', 'de', 'fr', 'nl', 'it', 'es', 'pt', 'pl', 'ru']
+const locales = ['en', 'de', 'fr', 'nl', 'it', 'es', 'pt', 'pl', 'ru', 'sq']
 
 const REQUEST_TIMEOUT = 3000
 
@@ -29,6 +29,7 @@ const createLocation = async (session, mapboxData) => {
     namePT: mapboxData.text_pt,
     namePL: mapboxData.text_pl,
     nameRU: mapboxData.text_ru,
+    nameSQ: mapboxData.text_sq,
     type: mapboxData.id.split('.')[0].toLowerCase(),
     address: mapboxData.address,
     lng: mapboxData.center?.length ? mapboxData.center[0] : null,
@@ -47,6 +48,7 @@ const createLocation = async (session, mapboxData) => {
     'l.namePT = $namePT, ' +
     'l.namePL = $namePL, ' +
     'l.nameRU = $nameRU, ' +
+    'l.nameSQ = $nameSQ, ' +
     'l.type = $type'
 
   if (data.lat && data.lng) {
