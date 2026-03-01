@@ -1,10 +1,10 @@
 type Location {
   id: ID!
-  name(lang: String): String!
+  name(lang: String = ""): String!
     @cypher(
       statement: """
       RETURN COALESCE(
-        CASE WHEN $lang IS NOT NULL THEN this['name' + toUpper($lang)] END,
+        CASE WHEN $lang <> '' THEN this['name' + toUpper($lang)] END,
         this['name' + $cypherParams.languageDefault],
         this.name,
         this.nameEN,

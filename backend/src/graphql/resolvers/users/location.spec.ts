@@ -34,6 +34,7 @@ const newlyCreatedNodesWithLocales = [
       nameRU: 'Вельцхайм',
       nameNL: 'Welzheim',
       namePL: 'Welzheim',
+      nameSQ: 'Welzheim',
       lng: 9.634301,
       lat: 48.874393,
     },
@@ -50,6 +51,7 @@ const newlyCreatedNodesWithLocales = [
       namePL: 'Badenia-Wirtembergia',
       namePT: 'Baden-Württemberg',
       nameRU: 'Баден-Вюртемберг',
+      nameSQ: 'Baden-Vyrtemberg',
     },
     country: {
       id: expect.stringContaining('country'),
@@ -64,6 +66,7 @@ const newlyCreatedNodesWithLocales = [
       namePL: 'Niemcy',
       namePT: 'Alemanha',
       nameRU: 'Германия',
+      nameSQ: 'Gjermania',
     },
   },
 ]
