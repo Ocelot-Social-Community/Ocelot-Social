@@ -2,16 +2,27 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
-import UpdateUser from '@graphql/queries/users/UpdateUser.gql'
 import User from '@graphql/queries/users/User.gql'
+import { parse } from 'graphql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
 
+const UserLocationName = parse(`
+  query User($id: ID, $lang: String) {
+    User(id: $id) {
+      id
+      location {
+        id
+        name(lang: $lang)
+      }
+    }
+  }
+`)
+
 let authenticatedUser: Context['user']
 const context = () => ({ authenticatedUser })
-let mutate: ApolloTestSetup['mutate']
 let query: ApolloTestSetup['query']
 let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
@@ -19,7 +30,6 @@ let server: ApolloTestSetup['server']
 beforeAll(async () => {
   await cleanDatabase()
   const apolloSetup = await createApolloTestSetup({ context })
-  mutate = apolloSetup.mutate
   query = apolloSetup.query
   database = apolloSetup.database
   server = apolloSetup.server
@@ -39,40 +49,84 @@ afterEach(async () => {
 
 describe('resolvers', () => {
   describe('Location', () => {
-    describe('custom mutation, not handled by neo4j-graphql-js', () => {
-      let variables
-
+    describe('name(lang)', () => {
       beforeEach(async () => {
-        variables = {
-          id: 'u47',
-          name: 'John Doughnut',
-        }
-        const Paris = await Factory.build('location', {
-          id: 'region.9397217726497330',
-          name: 'Paris',
+        const Hamburg = await Factory.build('location', {
+          id: 'region.5127278006398860',
+          name: 'Hamburg',
           type: 'region',
-          lng: 2.35183,
-          lat: 48.85658,
-          nameEN: 'Paris',
+          lng: 10.0,
+          lat: 53.55,
+          nameEN: 'Hamburg',
+          nameDE: 'Hamburg',
+          nameIT: 'Amburgo',
+          nameRU: 'Гамбург',
+          nameFR: 'Hambourg',
+          nameES: 'Hamburgo',
         })
-
         const user = await Factory.build('user', {
           id: 'u47',
           name: 'John Doe',
         })
-        await user.relateTo(Paris, 'isIn')
+        await user.relateTo(Hamburg, 'isIn')
         authenticatedUser = await user.toJson()
       })
 
-      it('returns the default name when no lang-specific translation exists', async () => {
-        await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
+      it('returns the name in the requested language', async () => {
+        await expect(
+          query({ query: UserLocationName, variables: { id: 'u47', lang: 'RU' } }),
+        ).resolves.toMatchObject({
           data: {
-            UpdateUser: {
-              name: 'John Doughnut',
-              location: {
-                name: 'Paris',
-              },
-            },
+            User: [
+              expect.objectContaining({
+                location: expect.objectContaining({ name: 'Гамбург' }),
+              }),
+            ],
+          },
+          errors: undefined,
+        })
+      })
+
+      it('returns a different name for a different language', async () => {
+        await expect(
+          query({ query: UserLocationName, variables: { id: 'u47', lang: 'IT' } }),
+        ).resolves.toMatchObject({
+          data: {
+            User: [
+              expect.objectContaining({
+                location: expect.objectContaining({ name: 'Amburgo' }),
+              }),
+            ],
+          },
+          errors: undefined,
+        })
+      })
+
+      it('returns the default name when no lang is provided', async () => {
+        await expect(
+          query({ query: UserLocationName, variables: { id: 'u47' } }),
+        ).resolves.toMatchObject({
+          data: {
+            User: [
+              expect.objectContaining({
+                location: expect.objectContaining({ name: 'Hamburg' }),
+              }),
+            ],
+          },
+          errors: undefined,
+        })
+      })
+
+      it('falls back to default when the requested translation does not exist', async () => {
+        await expect(
+          query({ query: UserLocationName, variables: { id: 'u47', lang: 'SQ' } }),
+        ).resolves.toMatchObject({
+          data: {
+            User: [
+              expect.objectContaining({
+                location: expect.objectContaining({ name: 'Hamburg' }),
+              }),
+            ],
           },
           errors: undefined,
         })
