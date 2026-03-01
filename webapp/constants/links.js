@@ -5,7 +5,7 @@ import { defaultPageParamsPages } from '~/components/utils/InternalPages.js'
 const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
   // if defined it's dominating
   externalLink: {
-    url: 'https://ocelot.social',
+    url: 'https://dioscurides.com',
     target: '_blank',
   },
 
@@ -16,13 +16,14 @@ const ORGANIZATION = defaultPageParamsPages.ORGANIZATION.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const DONATE = defaultPageParamsPages.DONATE.overwrite({
   // if defined it's dominating
   externalLink: {
-    url: 'https://ocelot.social/en/donate/',
+    // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
+    url: 'https://busfaktor.org/en/spenden',
     target: '_blank',
   },
 
@@ -33,12 +34,14 @@ const DONATE = defaultPageParamsPages.DONATE.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
+  // if defined it's dominating
   externalLink: {
-    url: 'https://ocelot.social/en/imprint/',
+    // we use 'ocelot-social.herokuapp.com' at the moment, because redirections of 'ocelot.social' subpages are not working correctly
+    url: 'https://dioscurides.com',
     target: '_blank',
   },
 
@@ -49,7 +52,7 @@ const IMPRINT = defaultPageParamsPages.IMPRINT.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwrite({
@@ -62,7 +65,7 @@ const TERMS_AND_CONDITIONS = defaultPageParamsPages.TERMS_AND_CONDITIONS.overwri
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
@@ -75,7 +78,7 @@ const CODE_OF_CONDUCT = defaultPageParamsPages.CODE_OF_CONDUCT.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
@@ -88,7 +91,7 @@ const DATA_PRIVACY = defaultPageParamsPages.DATA_PRIVACY.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const FAQ = defaultPageParamsPages.FAQ.overwrite({
@@ -101,7 +104,7 @@ const FAQ = defaultPageParamsPages.FAQ.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
@@ -118,7 +121,7 @@ const SUPPORT = defaultPageParamsPages.SUPPORT.overwrite({
     hasContainer: true,
     hasBaseCard: true,
     hasLoginInHeader: true,
-    // in case internal page content is here 'webapp/locales/html/'
+    // in case internal page content is here 'branding/locales/html/'
   },
 })
 
@@ -143,7 +146,7 @@ export default {
     DATA_PRIVACY,
     FAQ,
     DONATE,
-    SUPPORT,
     IMPRINT,
+    SUPPORT,
   ],
 }
