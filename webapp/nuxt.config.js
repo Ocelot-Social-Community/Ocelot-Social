@@ -60,46 +60,16 @@ export default {
         name: 'description',
         content: CONFIG.DESCRIPTION,
       },
-      {
-        hid: 'og:title',
-        property: 'og:title',
-        content: manifest.name,
-      },
-      {
-        hid: 'og:description',
-        property: 'og:description',
-        content: CONFIG.DESCRIPTION,
-      },
-      {
-        hid: 'og:image',
-        property: 'og:image',
-        content: metadata.OG_IMAGE,
-      },
-      {
-        hid: 'og:image:alt',
-        property: 'og:image:alt',
-        content: metadata.OG_IMAGE_ALT,
-      },
-      {
-        hid: 'og:image:width',
-        property: 'og:image:width',
-        content: metadata.OG_IMAGE_WIDTH,
-      },
-      {
-        hid: 'og:image:height',
-        property: 'og:image:height',
-        content: metadata.OG_IMAGE_HEIGHT,
-      },
-      {
-        hid: 'og:image:type',
-        property: 'og:image:type',
-        content: metadata.OG_IMAGE_TYPE,
-      },
-      {
-        hid: 'og:type',
-        property: 'og:type',
-        content: 'website',
-      },
+      ...[
+        { hid: 'og:title', property: 'og:title', content: manifest.name },
+        { hid: 'og:description', property: 'og:description', content: CONFIG.DESCRIPTION },
+        { hid: 'og:image', property: 'og:image', content: metadata.OG_IMAGE },
+        { hid: 'og:image:alt', property: 'og:image:alt', content: metadata.OG_IMAGE_ALT },
+        { hid: 'og:image:width', property: 'og:image:width', content: metadata.OG_IMAGE_WIDTH },
+        { hid: 'og:image:height', property: 'og:image:height', content: metadata.OG_IMAGE_HEIGHT },
+        { hid: 'og:image:type', property: 'og:image:type', content: metadata.OG_IMAGE_TYPE },
+        { hid: 'og:type', property: 'og:type', content: 'website' },
+      ].filter((tag) => tag.content),
     ],
     link: [
       {
