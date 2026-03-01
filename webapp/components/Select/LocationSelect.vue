@@ -73,7 +73,7 @@ export default {
       return this.locationName !== '' && this.showPreviousLocation ? ' — ' + this.locationName : ''
     },
     currentLocale() {
-      return this.$store.state.i18n.locale
+      return this.$store && this.$store.state.i18n && this.$store.state.i18n.locale
     },
   },
   watch: {
