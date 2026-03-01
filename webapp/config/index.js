@@ -5,6 +5,7 @@ dotenv.config() // we want to synchronize @nuxt-dotenv and nuxt-env
 
 // Load Package Details for some default values
 const pkg = require('../package')
+const metadata = require('../constants/metadata.js')
 
 // Build version from git describe (e.g. "3.14.0-12-gabcdef" → "3.14.0+12")
 const BUILD_VERSION = (() => {
@@ -42,7 +43,10 @@ const sentry = {
 
 const options = {
   VERSION: process.env.VERSION || BUILD_VERSION || pkg.version,
-  DESCRIPTION: process.env.DESCRIPTION || pkg.description,
+  DESCRIPTION:
+    process.env.DESCRIPTION ||
+    (metadata.default || metadata).APPLICATION_DESCRIPTION ||
+    pkg.description,
   MAPBOX_TOKEN: process.env.MAPBOX_TOKEN,
   PUBLIC_REGISTRATION: process.env.PUBLIC_REGISTRATION === 'true' || false,
   INVITE_REGISTRATION: process.env.INVITE_REGISTRATION !== 'false', // default = true
