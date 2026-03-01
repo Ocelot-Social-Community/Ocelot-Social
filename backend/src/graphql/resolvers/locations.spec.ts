@@ -120,7 +120,7 @@ describe('resolvers', () => {
 
       it('falls back to default when the requested translation does not exist', async () => {
         await expect(
-          query({ query: UserLocationName, variables: { id: 'u47', lang: 'SQ' } }),
+          query({ query: UserLocationName, variables: { id: 'u47', lang: 'ZZ' } }),
         ).resolves.toMatchObject({
           data: {
             User: [
