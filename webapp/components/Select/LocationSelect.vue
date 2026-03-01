@@ -55,10 +55,7 @@ export default {
   },
   async created() {
     this.icons = iconRegistry
-    const result = await this.requestGeoData(this.locationName)
-    this.$nextTick(() => {
-      this.currentValue = result || this.locationName
-    })
+    await this.resolveLocalizedLocation()
   },
   data() {
     return {
@@ -74,6 +71,9 @@ export default {
     locationNameLabelAddOnOldName() {
       return this.locationName !== '' && this.showPreviousLocation ? ' — ' + this.locationName : ''
     },
+    currentLocale() {
+      return this.$store.state.i18n.locale
+    },
   },
   watch: {
     currentValue() {
@@ -81,10 +81,19 @@ export default {
         this.$emit('input', this.currentValue)
       }
     },
-    value() {
-      if (this.value !== this.currentValue) {
-        this.currentValue = this.value
+    value(newVal, oldVal) {
+      if (newVal !== this.currentValue) {
+        this.currentValue = newVal
       }
+      // resolve when value is set after initial mount (e.g. settings page)
+      const newName = typeof newVal === 'object' ? newVal.value : newVal
+      const oldName = typeof oldVal === 'object' ? oldVal.value : oldVal
+      if (newName && newName !== oldName) {
+        this.resolveLocalizedLocation()
+      }
+    },
+    currentLocale() {
+      this.resolveLocalizedLocation()
     },
   },
   methods: {
@@ -124,7 +133,11 @@ export default {
 
         const {
           data: { queryLocations: result },
-        } = await this.$apollo.query({ query: queryLocations(), variables: { place, lang } })
+        } = await this.$apollo.query({
+          query: queryLocations(),
+          variables: { place, lang },
+          fetchPolicy: 'network-only',
+        })
 
         this.cities = this.processLocationsResult(result)
         this.loadingGeo = false
@@ -135,6 +148,13 @@ export default {
       } finally {
         this.loadingGeo = false
       }
+    },
+    async resolveLocalizedLocation() {
+      if (!this.locationName) return
+      const result = await this.requestGeoData(this.locationName)
+      this.$nextTick(() => {
+        this.currentValue = result || (this.cities.length ? this.cities[0] : this.locationName)
+      })
     },
     clearLocationName() {
       this.currentValue = ''
