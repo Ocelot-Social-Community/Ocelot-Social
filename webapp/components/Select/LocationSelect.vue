@@ -40,6 +40,7 @@ export default {
   components: { OsButton, OsIcon },
   props: {
     value: {
+      type: [String, Object],
       required: true,
     },
     canBeCleared: {
