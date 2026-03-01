@@ -40,6 +40,7 @@ export const getContext =
       req,
       cypherParams: {
         currentUserId: user ? user.id : null,
+        languageDefault: config.LANGUAGE_DEFAULT.toUpperCase(),
       },
       config,
     }

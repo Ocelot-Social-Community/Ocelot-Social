@@ -5,23 +5,12 @@
 /* eslint-disable @typescript-eslint/return-await */
 import { UserInputError } from '@graphql/errors'
 
-import CONFIG from '@src/config'
-
 import { queryLocations } from './users/location'
 
 import type { Context } from '@src/context'
 
 export default {
   Location: {
-    name: (parent, { lang }) => {
-      if (lang) {
-        const field = `name${lang.toUpperCase()}`
-        if (parent[field]) return parent[field]
-      }
-      const defaultField = `name${CONFIG.LANGUAGE_DEFAULT.toUpperCase()}`
-      if (parent[defaultField]) return parent[defaultField]
-      return parent.name || parent.nameEN || parent.id
-    },
     distanceToMe: async (parent, _params, context: Context, _resolveInfo) => {
       if (!parent.id) {
         throw new Error('Can not identify selected Location!')
