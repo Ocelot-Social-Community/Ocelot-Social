@@ -2,8 +2,19 @@ import path from 'path'
 import fs from 'fs'
 import manifest from './constants/manifest.js'
 import metadata from './constants/metadata.js'
+import locales from './locales/index.js'
 
 const CONFIG = require('./config').default // we need to use require since this is only evaluated at compile time.
+
+// Map language code (e.g. 'de') to Open Graph locale (e.g. 'de_DE') using existing locales definition
+const toOgLocale = (code) => {
+  const locale = locales.find((l) => l.code === code)
+  return locale ? locale.iso.replace('-', '_') : null
+}
+const ogLocale = toOgLocale(CONFIG.LANGUAGE_DEFAULT)
+const ogLocaleAlternates = locales
+  .filter((l) => l.enabled && l.code !== CONFIG.LANGUAGE_DEFAULT)
+  .map((l) => l.iso.replace('-', '_'))
 
 const styleguidePath = '../styleguide'
 const styleguideStyles = [
@@ -63,12 +74,19 @@ export default {
       ...[
         { hid: 'og:title', property: 'og:title', content: manifest.name },
         { hid: 'og:description', property: 'og:description', content: CONFIG.DESCRIPTION },
+        { hid: 'og:site_name', property: 'og:site_name', content: manifest.name },
         { hid: 'og:image', property: 'og:image', content: metadata.OG_IMAGE },
         { hid: 'og:image:alt', property: 'og:image:alt', content: metadata.OG_IMAGE_ALT },
         { hid: 'og:image:width', property: 'og:image:width', content: metadata.OG_IMAGE_WIDTH },
         { hid: 'og:image:height', property: 'og:image:height', content: metadata.OG_IMAGE_HEIGHT },
         { hid: 'og:image:type', property: 'og:image:type', content: metadata.OG_IMAGE_TYPE },
         { hid: 'og:type', property: 'og:type', content: 'website' },
+        { hid: 'og:locale', property: 'og:locale', content: ogLocale },
+        ...ogLocaleAlternates.map((alt) => ({
+          property: 'og:locale:alternate',
+          content: alt,
+        })),
+        { hid: 'twitter:card', name: 'twitter:card', content: 'summary_large_image' },
       ].filter((tag) => tag.content),
     ],
     link: [
