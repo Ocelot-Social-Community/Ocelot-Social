@@ -1,15 +1,6 @@
 type Location {
   id: ID!
-  name: String!
-  nameEN: String
-  nameDE: String
-  nameFR: String
-  nameNL: String
-  nameIT: String
-  nameES: String
-  namePT: String
-  namePL: String
-  nameRU: String
+  name(lang: String): String!
   type: String!
   lat: Float
   lng: Float

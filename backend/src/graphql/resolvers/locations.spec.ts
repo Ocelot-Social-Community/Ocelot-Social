@@ -64,14 +64,13 @@ describe('resolvers', () => {
         authenticatedUser = await user.toJson()
       })
 
-      it('returns `null` if location translation is not available', async () => {
+      it('returns the default name when no lang-specific translation exists', async () => {
         await expect(mutate({ mutation: UpdateUser, variables })).resolves.toMatchObject({
           data: {
             UpdateUser: {
               name: 'John Doughnut',
               location: {
-                nameRU: null,
-                nameEN: 'Paris',
+                name: 'Paris',
               },
             },
           },

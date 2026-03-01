@@ -302,8 +302,6 @@ describe('in mode', () => {
                 locationName: 'Hamburg, Germany',
                 location: expect.objectContaining({
                   name: 'Hamburg',
-                  nameDE: 'Hamburg',
-                  nameEN: 'Hamburg',
                 }),
               },
             },
@@ -551,8 +549,6 @@ describe('in mode', () => {
                         locationName: 'Hamburg, Germany',
                         location: expect.objectContaining({
                           name: 'Hamburg',
-                          nameDE: 'Hamburg',
-                          nameEN: 'Hamburg',
                         }),
                         myRole: 'owner',
                       }),
@@ -2895,8 +2891,6 @@ describe('in mode', () => {
                         locationName: 'Berlin, Germany',
                         location: expect.objectContaining({
                           name: 'Berlin',
-                          nameDE: 'Berlin',
-                          nameEN: 'Berlin',
                         }),
                         myRole: 'owner',
                       },
@@ -2947,8 +2941,6 @@ describe('in mode', () => {
                         locationName: 'Paris, France',
                         location: expect.objectContaining({
                           name: 'Paris',
-                          nameDE: 'Paris',
-                          nameEN: 'Paris',
                         }),
                         myRole: 'owner',
                       },
@@ -2975,8 +2967,6 @@ describe('in mode', () => {
                         locationName: 'Hamburg, Germany',
                         location: expect.objectContaining({
                           name: 'Hamburg',
-                          nameDE: 'Hamburg',
-                          nameEN: 'Hamburg',
                         }),
                         myRole: 'owner',
                       },

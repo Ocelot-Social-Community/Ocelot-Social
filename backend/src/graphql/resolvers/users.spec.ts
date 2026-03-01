@@ -245,8 +245,6 @@ describe('UpdateUser', () => {
                 locationName: 'Hamburg, New Jersey, United States',
                 location: expect.objectContaining({
                   name: 'Hamburg',
-                  nameDE: 'Hamburg',
-                  nameEN: 'Hamburg',
                 }),
               },
             },

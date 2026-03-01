@@ -43,8 +43,6 @@ mutation UpdateGroup(
     location {
       id
       name
-      nameDE
-      nameEN
     }
     myRole
   }
