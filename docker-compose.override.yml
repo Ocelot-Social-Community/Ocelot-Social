@@ -10,6 +10,8 @@ services:
       - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
     volumes:
       - ./webapp:/app
+      - ./styleguide:/styleguide
+      - ./packages/ui:/packages/ui
 
   backend:
     image: ghcr.io/ocelot-social-community/ocelot-social/backend:local-development
