@@ -28,7 +28,6 @@
               :parents="item.parents"
               @click.stop.prevent="changeLanguage(item.route.path, toggleMenu)"
             >
-              <span class="locale-flag">{{ item.route.flag }}</span>
               {{ item.route.name }}
             </ds-menu-item>
           </template>

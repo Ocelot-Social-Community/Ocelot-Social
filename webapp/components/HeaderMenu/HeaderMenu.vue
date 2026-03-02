@@ -413,7 +413,7 @@
                 :class="{ '--active': locale.code === $i18n.locale() }"
                 @click.prevent="changeLocale(locale.code)"
               >
-                <span class="mobile-locale-flag mobile-icon-col">{{ locale.flag }}</span>
+                <span class="mobile-locale-flag mobile-icon-col"></span>
                 {{ locale.name }}
               </a>
             </div>
@@ -1183,8 +1183,7 @@ export default {
   }
 
   .mobile-locale-flag {
-    font-size: 1.2em;
-    line-height: 1;
+    margin-left: $space-xxx-small;
   }
 }
 .map-button {
