@@ -1183,9 +1183,7 @@ export default {
   }
 
   .mobile-locale-flag {
-    font-size: 1.2em;
-    margin-left: $space-small;
-    line-height: 1;
+    margin-left: $space-xxx-small;
   }
 }
 .map-button {
