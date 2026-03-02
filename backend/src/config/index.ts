@@ -54,6 +54,7 @@ const SMTP_DKIM_KEYSELECTOR = env.SMTP_DKIM_KEYSELECTOR
 const SMTP_DKIM_PRIVATEKEY = env.SMTP_DKIM_PRIVATEKEY?.replace(/\\n/g, '\n') // replace all "\n" in .env string by real line break
 const SMTP_MAX_CONNECTIONS = (env.SMTP_MAX_CONNECTIONS && parseInt(env.SMTP_MAX_CONNECTIONS)) || 5
 const SMTP_MAX_MESSAGES = (env.SMTP_MAX_MESSAGES && parseInt(env.SMTP_MAX_MESSAGES)) || 100
+const SMTP_REJECT_UNAUTHORIZED = env.SMTP_REJECT_UNAUTHORIZED !== 'false' // default = true
 
 const nodemailerTransportOptions: SMTPTransport.Options = {
   host: SMTP_HOST,
@@ -63,6 +64,9 @@ const nodemailerTransportOptions: SMTPTransport.Options = {
   pool: true,
   maxConnections: SMTP_MAX_CONNECTIONS,
   maxMessages: SMTP_MAX_MESSAGES,
+  tls: {
+    rejectUnauthorized: SMTP_REJECT_UNAUTHORIZED,
+  },
 }
 if (SMTP_USERNAME && SMTP_PASSWORD) {
   nodemailerTransportOptions.auth = {
