@@ -126,11 +126,15 @@ const createServer = async (options?: CreateServerOptions) => {
     ) as any,
   )
   app.use(express.static('public'))
+  app.use(bodyParser.json({ limit: '10mb' }) as any)
+  app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }) as any)
   app.use(graphqlUploadExpress())
+  app.use((req, _res, next) => {
+    if (!req.body) req.body = {}
+    next()
+  })
   app.use(
     '/',
-    bodyParser.json({ limit: '10mb' }) as any,
-    bodyParser.urlencoded({ limit: '10mb', extended: true }) as any,
     expressMiddleware(server, {
       context: async ({ req }) => {
         if (options?.context) {
