@@ -1,15 +1,17 @@
 type Location {
   id: ID!
-  name: String!
-  nameEN: String
-  nameDE: String
-  nameFR: String
-  nameNL: String
-  nameIT: String
-  nameES: String
-  namePT: String
-  namePL: String
-  nameRU: String
+  name(lang: String = ""): String!
+    @cypher(
+      statement: """
+      RETURN COALESCE(
+        CASE WHEN $lang <> '' THEN this['name' + toUpper($lang)] END,
+        this['name' + $cypherParams.languageDefault],
+        this.name,
+        this.nameEN,
+        this.id
+      )
+      """
+    )
   type: String!
   lat: Float
   lng: Float

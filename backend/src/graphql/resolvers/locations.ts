@@ -5,26 +5,12 @@
 /* eslint-disable @typescript-eslint/return-await */
 import { UserInputError } from '@graphql/errors'
 
-import Resolver from './helpers/Resolver'
 import { queryLocations } from './users/location'
 
 import type { Context } from '@src/context'
 
 export default {
   Location: {
-    ...Resolver('Location', {
-      undefinedToNull: [
-        'nameEN',
-        'nameDE',
-        'nameFR',
-        'nameNL',
-        'nameIT',
-        'nameES',
-        'namePT',
-        'namePL',
-        'nameRU',
-      ],
-    }),
     distanceToMe: async (parent, _params, context: Context, _resolveInfo) => {
       if (!parent.id) {
         throw new Error('Can not identify selected Location!')

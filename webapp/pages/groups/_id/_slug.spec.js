@@ -149,8 +149,6 @@ describe('GroupProfileSlug', () => {
       locationName: 'France',
       location: {
         name: 'Paris',
-        nameDE: 'Paris',
-        nameEN: 'Paris',
       },
       isMutedByMe: true,
       membersCount: 0,
@@ -193,8 +191,6 @@ describe('GroupProfileSlug', () => {
       locationName: 'Hamburg, Germany',
       location: {
         name: 'Hamburg',
-        nameDE: 'Hamburg',
-        nameEN: 'Hamburg',
       },
       isMutedByMe: false,
       membersCount: 0,

@@ -37,9 +37,6 @@ mutation UpdateUser(
     location {
       id
       name
-      nameDE
-      nameEN
-      nameRU
     }
     emailNotificationSettings {
       type

@@ -268,6 +268,15 @@ export default {
 
   manifest,
 
+  pwa: {
+    meta: {
+      // Prevent @nuxtjs/pwa from auto-generating description from package.json;
+      // we set description and og:description manually in head.meta above.
+      description: CONFIG.DESCRIPTION,
+      ogHost: false,
+    },
+  },
+
   render: {
     // Generate preload hints for critical JS/CSS/font assets
     resourceHints: true,
