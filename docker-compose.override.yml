@@ -98,8 +98,6 @@ services:
     image: ghcr.io/ocelot-social-community/ocelot-social/ui:local-development
     build:
       target: development
-    ports:
-      - 6006:6006
     volumes:
       - ./packages/ui:/app
       - /app/node_modules
