@@ -11,7 +11,9 @@ services:
     volumes:
       - ./webapp:/app
       - ./styleguide:/styleguide
+      - /styleguide/node_modules
       - ./packages/ui:/packages/ui
+      - /packages/ui/node_modules
 
   backend:
     image: ghcr.io/ocelot-social-community/ocelot-social/backend:local-development
