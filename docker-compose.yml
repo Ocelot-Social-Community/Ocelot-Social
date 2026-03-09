@@ -89,7 +89,7 @@ services:
       context: ./packages/ui
       target: production
     ports:
-      - 6006:80
+      - 6006:6006
 
 volumes:
   neo4j_data:
