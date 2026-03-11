@@ -306,7 +306,11 @@ export default {
     }
   },
   async mounted() {
-    await import(`vue2-datepicker/locale/${this.currentUser.locale}`)
+    try {
+      await import(`vue2-datepicker/locale/${this.currentUser.locale}`)
+    } catch {
+      await import('vue2-datepicker/locale/en')
+    }
   },
   computed: {
     ...mapGetters({
