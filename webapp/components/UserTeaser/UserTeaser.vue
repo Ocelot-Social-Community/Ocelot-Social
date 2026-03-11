@@ -150,7 +150,7 @@ export default {
   }
 
   .group-link {
-    color: $color-primary;
+    color: $text-color-soft;
     font-size: $font-size-base;
     overflow: hidden;
     white-space: nowrap;
