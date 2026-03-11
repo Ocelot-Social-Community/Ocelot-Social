@@ -16,24 +16,3 @@
 @source "../ocelot/**/*.vue";
 @source "../**/*.ts";
 
-/*
- * Disabled state overrides
- * These rules have higher specificity than :active/:hover to ensure
- * disabled buttons immediately show disabled styling, even when clicked.
- */
-
-/* Filled buttons: gray background when disabled, regardless of hover/active */
-button[data-appearance="filled"]:disabled:hover,
-button[data-appearance="filled"]:disabled:active {
-  background-color: var(--color-disabled) !important;
-  border-color: var(--color-disabled) !important;
-  color: var(--color-disabled-contrast) !important;
-}
-
-/* Outline buttons: transparent background when disabled, regardless of hover/active */
-button[data-appearance="outline"]:disabled:hover,
-button[data-appearance="outline"]:disabled:active {
-  background-color: transparent !important;
-  border-color: var(--color-disabled) !important;
-  color: var(--color-disabled) !important;
-}
