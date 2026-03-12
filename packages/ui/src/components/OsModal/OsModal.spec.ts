@@ -57,20 +57,12 @@ describe('osModal', () => {
       expect(wrapper.find('.os-modal__content').text()).toBe('Modal body')
     })
 
-    it('renders close button when not forced', () => {
+    it('renders close button', () => {
       const wrapper = mount(OsModal, {
         props: { open: true },
       })
 
       expect(wrapper.find('[data-testid="os-modal-close"]').exists()).toBe(true)
-    })
-
-    it('hides close button when force is true', () => {
-      const wrapper = mount(OsModal, {
-        props: { open: true, force: true },
-      })
-
-      expect(wrapper.find('[data-testid="os-modal-close"]').exists()).toBe(false)
     })
   })
 
@@ -232,36 +224,6 @@ describe('osModal', () => {
       await wrapper.setProps({ open: true })
 
       expect(wrapper.emitted('opened')).toHaveLength(1)
-    })
-  })
-
-  describe('force mode', () => {
-    it('does not close on backdrop click when force is true', async () => {
-      const wrapper = mount(OsModal, {
-        props: { open: true, force: true },
-      })
-
-      await wrapper.find('.os-modal__overlay').trigger('click')
-
-      expect(wrapper.emitted('cancel')).toBeUndefined()
-    })
-
-    it('does not close on ESC when force is true', async () => {
-      const wrapper = mount(OsModal, {
-        props: { open: true, force: true },
-      })
-
-      await wrapper.trigger('keydown', { key: 'Escape' })
-
-      expect(wrapper.emitted('cancel')).toBeUndefined()
-    })
-
-    it('does not render close button when force is true', () => {
-      const wrapper = mount(OsModal, {
-        props: { open: true, force: true },
-      })
-
-      expect(wrapper.find('[data-testid="os-modal-close"]').exists()).toBe(false)
     })
   })
 

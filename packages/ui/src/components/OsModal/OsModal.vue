@@ -35,11 +35,6 @@
         type: String,
         default: null,
       },
-      /** Disable ESC, backdrop click, and close button */
-      force: {
-        type: Boolean,
-        default: false,
-      },
       /** Label for the built-in cancel button */
       cancelLabel: {
         type: String,
@@ -121,7 +116,7 @@
 
       // --- ESC key handler ---
       function onKeydown(e: KeyboardEvent) {
-        if (props.open && !props.force && e.key === 'Escape') {
+        if (props.open && e.key === 'Escape') {
           cancel('backdrop')
         }
       }
@@ -182,19 +177,17 @@
         }
 
         // --- Close button (native <button> for Vue 2/3 compatibility) ---
-        const closeBtn = !props.force
-          ? h(
-              'button',
-              {
-                class: 'os-modal__close absolute top-3 right-3 flex items-center justify-center w-[26px] h-[26px] rounded-full bg-transparent border-0 cursor-pointer p-0 hover:bg-[var(--color-default-hover)] text-[var(--color-default-contrast)]',
-                type: 'button',
-                'aria-label': 'Close',
-                'data-testid': 'os-modal-close',
-                ...eventProps({ click: () => cancel('close') }),
-              },
-              [h('span', { class: 'w-4 h-4 fill-current inline-flex', 'aria-hidden': 'true' }, [IconClose(createElement, isVue2)])],
-            )
-          : null
+        const closeBtn = h(
+          'button',
+          {
+            class: 'os-modal__close absolute top-3 right-3 flex items-center justify-center w-[26px] h-[26px] rounded-full bg-transparent border-0 cursor-pointer p-0 hover:bg-[var(--color-default-hover)] text-[var(--color-default-contrast)]',
+            type: 'button',
+            'aria-label': 'Close',
+            'data-testid': 'os-modal-close',
+            ...eventProps({ click: () => cancel('close') }),
+          },
+          [h('span', { class: 'w-4 h-4 fill-current inline-flex', 'aria-hidden': 'true' }, [IconClose(createElement, isVue2)])],
+        )
 
         // --- Header ---
         const headerChildren: ReturnType<typeof h>[] = []
@@ -203,7 +196,7 @@
             h('h2', { class: 'os-modal__title text-[1.5rem] font-semibold m-0', id: titleId }, props.title),
           )
         }
-        if (closeBtn) headerChildren.push(closeBtn)
+        headerChildren.push(closeBtn)
 
         // Top fade: only visible when content is scrolled down
         if (isScrolled.value) {
@@ -327,9 +320,7 @@
         const overlayProps: Record<string, unknown> = {
           class: 'os-modal__overlay fixed inset-0 z-[9999] flex items-center justify-center',
           ...eventProps({
-            click: () => {
-              if (!props.force) cancel('backdrop')
-            },
+            click: () => cancel('backdrop'),
           }),
         }
 

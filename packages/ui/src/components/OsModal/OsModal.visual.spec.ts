@@ -47,14 +47,6 @@ test.describe('OsModal keyboard accessibility', () => {
     await expect(confirmBtn).toBeFocused()
   })
 
-  test('force mode has no close button to focus', async ({ page }) => {
-    await page.goto(`${STORY_URL}--force-mode&viewMode=story`)
-    const root = page.locator(STORY_ROOT)
-    await root.waitFor()
-
-    const closeBtn = root.locator('[data-testid="os-modal-close"]')
-    await expect(closeBtn).toHaveCount(0)
-  })
 })
 
 test.describe('OsModal visual regression', () => {
@@ -78,17 +70,6 @@ test.describe('OsModal visual regression', () => {
     await expect(root.locator('[data-testid="custom-footer"]')).toHaveScreenshot(
       'custom-footer.png',
     )
-
-    await checkA11y(page)
-  })
-
-  test('force mode', async ({ page }) => {
-    await page.goto(`${STORY_URL}--force-mode&viewMode=story`)
-    const root = page.locator(STORY_ROOT)
-    await root.waitFor()
-    await waitForReady(page)
-
-    await expect(root.locator('[data-testid="force-mode"]')).toHaveScreenshot('force-mode.png')
 
     await checkA11y(page)
   })

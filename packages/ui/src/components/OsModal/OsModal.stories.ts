@@ -18,7 +18,6 @@ type Story = StoryObj<typeof OsModal>
 interface PlaygroundArgs {
   open: boolean
   title: string
-  force: boolean
   cancelLabel: string
   confirmLabel: string
   content: string
@@ -28,7 +27,6 @@ export const Playground: StoryObj<PlaygroundArgs> = {
   argTypes: {
     open: { control: 'boolean' },
     title: { control: 'text' },
-    force: { control: 'boolean' },
     cancelLabel: { control: 'text' },
     confirmLabel: { control: 'text' },
     content: { control: 'text' },
@@ -36,7 +34,6 @@ export const Playground: StoryObj<PlaygroundArgs> = {
   args: {
     open: true,
     title: 'Modal Title',
-    force: false,
     cancelLabel: 'Cancel',
     confirmLabel: 'Confirm',
     content: 'This is the modal body content.',
@@ -47,7 +44,6 @@ export const Playground: StoryObj<PlaygroundArgs> = {
       const modalProps = computed(() => ({
         open: args.open,
         title: args.title,
-        force: args.force,
         cancelLabel: args.cancelLabel,
         confirmLabel: args.confirmLabel,
       }))
@@ -83,26 +79,6 @@ export const CustomFooter: Story = {
             <OsButton variant="danger" appearance="outline" @click="cancel">Delete</OsButton>
             <OsButton variant="primary" @click="confirm">Save Changes</OsButton>
           </template>
-        </OsModal>
-      </div>
-    `,
-  }),
-}
-
-export const ForceMode: Story = {
-  render: () => ({
-    components: { OsModal },
-    template: `
-      <div data-testid="force-mode">
-        <OsModal
-          :open="true"
-          title="Force Mode"
-          :force="true"
-          confirm-label="I Understand"
-          cancel-label="Go Back"
-        >
-          <p>This modal cannot be closed via ESC, backdrop click, or the close button.</p>
-          <p>The user must use the footer buttons to proceed.</p>
         </OsModal>
       </div>
     `,
