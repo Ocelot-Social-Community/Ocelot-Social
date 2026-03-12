@@ -66,8 +66,8 @@ exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
               class="ds-menu-list"
             >
               
-          
-          
+            
+            
               <li
                 class="ds-menu-item ds-menu-item-level-0"
               >
@@ -91,14 +91,14 @@ exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
                     </svg>
                   </span>
                   
-            group.contentMenu.muteGroup
-          
+              group.contentMenu.muteGroup
+            
                 </a>
                 <!---->
               </li>
               
-          
-          
+            
+            
               <li
                 class="ds-menu-item ds-menu-item-level-0"
               >
@@ -121,14 +121,14 @@ exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
                     </svg>
                   </span>
                   
-            admin.settings.name
-          
+              admin.settings.name
+            
                 </a>
                 <!---->
               </li>
               
-          
-          
+            
+            
               <li
                 class="ds-menu-item ds-menu-item-level-0"
               >
@@ -151,8 +151,8 @@ exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
                     </svg>
                   </span>
                   
-            group.contentMenu.inviteLinks
-          
+              group.contentMenu.inviteLinks
+            
                 </a>
                 <!---->
               </li>
@@ -231,8 +231,8 @@ exports[`GroupContentMenu renders as groupProfile, muted 1`] = `
               class="ds-menu-list"
             >
               
-          
-          
+            
+            
               <li
                 class="ds-menu-item ds-menu-item-level-0"
               >
@@ -256,8 +256,8 @@ exports[`GroupContentMenu renders as groupProfile, muted 1`] = `
                     </svg>
                   </span>
                   
-            group.contentMenu.unmuteGroup
-          
+              group.contentMenu.unmuteGroup
+            
                 </a>
                 <!---->
               </li>
@@ -336,8 +336,8 @@ exports[`GroupContentMenu renders as groupProfile, not muted 1`] = `
               class="ds-menu-list"
             >
               
-          
-          
+            
+            
               <li
                 class="ds-menu-item ds-menu-item-level-0"
               >
@@ -361,8 +361,8 @@ exports[`GroupContentMenu renders as groupProfile, not muted 1`] = `
                     </svg>
                   </span>
                   
-            group.contentMenu.muteGroup
-          
+              group.contentMenu.muteGroup
+            
                 </a>
                 <!---->
               </li>
@@ -441,8 +441,8 @@ exports[`GroupContentMenu renders as groupTeaser 1`] = `
               class="ds-menu-list"
             >
               
-          
-          
+            
+            
               <li
                 class="ds-menu-item ds-menu-item-level-0"
               >
@@ -465,8 +465,8 @@ exports[`GroupContentMenu renders as groupTeaser 1`] = `
                     </svg>
                   </span>
                   
-            group.contentMenu.visitGroupPage
-          
+              group.contentMenu.visitGroupPage
+            
                 </a>
                 <!---->
               </li>

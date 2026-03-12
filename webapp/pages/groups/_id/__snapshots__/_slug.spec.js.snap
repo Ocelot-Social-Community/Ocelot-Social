@@ -126,8 +126,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                         class="ds-menu-list"
                       >
                         
-          
-          
+            
+            
                         <li
                           class="ds-menu-item ds-menu-item-level-0"
                         >
@@ -151,14 +151,14 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                               </svg>
                             </span>
                             
-            group.contentMenu.unmuteGroup
-          
+              group.contentMenu.unmuteGroup
+            
                           </router-link-stub>
                           <!---->
                         </li>
                         
-          
-          
+            
+            
                         <li
                           class="ds-menu-item ds-menu-item-level-0"
                         >
@@ -181,14 +181,14 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                               </svg>
                             </span>
                             
-            admin.settings.name
-          
+              admin.settings.name
+            
                           </router-link-stub>
                           <!---->
                         </li>
                         
-          
-          
+            
+            
                         <li
                           class="ds-menu-item ds-menu-item-level-0"
                         >
@@ -211,8 +211,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                               </svg>
                             </span>
                             
-            group.contentMenu.inviteLinks
-          
+              group.contentMenu.inviteLinks
+            
                           </router-link-stub>
                           <!---->
                         </li>
@@ -2247,8 +2247,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                         class="ds-menu-list"
                       >
                         
-          
-          
+            
+            
                         <li
                           class="ds-menu-item ds-menu-item-level-0"
                         >
@@ -2272,8 +2272,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                               </svg>
                             </span>
                             
-            group.contentMenu.unmuteGroup
-          
+              group.contentMenu.unmuteGroup
+            
                           </router-link-stub>
                           <!---->
                         </li>
@@ -3298,8 +3298,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         class="ds-menu-list"
                       >
                         
-          
-          
+            
+            
                         <li
                           class="ds-menu-item ds-menu-item-level-0"
                         >
@@ -3323,14 +3323,14 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                               </svg>
                             </span>
                             
-            group.contentMenu.muteGroup
-          
+              group.contentMenu.muteGroup
+            
                           </router-link-stub>
                           <!---->
                         </li>
                         
-          
-          
+            
+            
                         <li
                           class="ds-menu-item ds-menu-item-level-0"
                         >
@@ -3353,14 +3353,14 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                               </svg>
                             </span>
                             
-            admin.settings.name
-          
+              admin.settings.name
+            
                           </router-link-stub>
                           <!---->
                         </li>
                         
-          
-          
+            
+            
                         <li
                           class="ds-menu-item ds-menu-item-level-0"
                         >
@@ -3383,8 +3383,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                               </svg>
                             </span>
                             
-            group.contentMenu.inviteLinks
-          
+              group.contentMenu.inviteLinks
+            
                           </router-link-stub>
                           <!---->
                         </li>
@@ -5939,8 +5939,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                         class="ds-menu-list"
                       >
                         
-          
-          
+            
+            
                         <li
                           class="ds-menu-item ds-menu-item-level-0"
                         >
@@ -5964,8 +5964,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                               </svg>
                             </span>
                             
-            group.contentMenu.muteGroup
-          
+              group.contentMenu.muteGroup
+            
                           </router-link-stub>
                           <!---->
                         </li>
@@ -6922,8 +6922,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                         class="ds-menu-list"
                       >
                         
-          
-          
+            
+            
                         <li
                           class="ds-menu-item ds-menu-item-level-0"
                         >
@@ -6947,14 +6947,14 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                               </svg>
                             </span>
                             
-            group.contentMenu.muteGroup
-          
+              group.contentMenu.muteGroup
+            
                           </router-link-stub>
                           <!---->
                         </li>
                         
-          
-          
+            
+            
                         <li
                           class="ds-menu-item ds-menu-item-level-0"
                         >
@@ -6977,14 +6977,14 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                               </svg>
                             </span>
                             
-            admin.settings.name
-          
+              admin.settings.name
+            
                           </router-link-stub>
                           <!---->
                         </li>
                         
-          
-          
+            
+            
                         <li
                           class="ds-menu-item ds-menu-item-level-0"
                         >
@@ -7007,8 +7007,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                               </svg>
                             </span>
                             
-            group.contentMenu.inviteLinks
-          
+              group.contentMenu.inviteLinks
+            
                           </router-link-stub>
                           <!---->
                         </li>
@@ -8034,8 +8034,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                         class="ds-menu-list"
                       >
                         
-          
-          
+            
+            
                         <li
                           class="ds-menu-item ds-menu-item-level-0"
                         >
@@ -8059,8 +8059,8 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                               </svg>
                             </span>
                             
-            group.contentMenu.muteGroup
-          
+              group.contentMenu.muteGroup
+            
                           </router-link-stub>
                           <!---->
                         </li>
