@@ -613,6 +613,8 @@
     "radius": "Rayon",
     "removeMember": "Retirer le membre",
     "removeMemberButton": "Retirer",
+    "removeMemberConfirmText": "Retirer l'utilisateur « {name} » du groupe ?",
+    "removeMemberTitle": "Retirer le membre",
     "role": "Ton rôle dans le groupe",
     "roles": {
       "admin": "Administrateur",

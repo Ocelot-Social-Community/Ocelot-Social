@@ -613,6 +613,8 @@
     "radius": "Radio",
     "removeMember": "Eliminar miembro",
     "removeMemberButton": "Eliminar",
+    "removeMemberConfirmText": "¿Eliminar al usuario \"{name}\" del grupo?",
+    "removeMemberTitle": "Eliminar miembro",
     "role": "Tu rol en el grupo",
     "roles": {
       "admin": "Administrador",

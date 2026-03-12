@@ -613,6 +613,8 @@
     "radius": "Радиус",
     "removeMember": "Удалить участника",
     "removeMemberButton": "Удалить",
+    "removeMemberConfirmText": "Удалить пользователя «{name}» из группы?",
+    "removeMemberTitle": "Удалить участника",
     "role": "Твоя роль в группе",
     "roles": {
       "admin": "Администратор",

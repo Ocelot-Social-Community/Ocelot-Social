@@ -80,6 +80,7 @@
                 @click="
                   isOpen = true
                   userId = member.user.id
+                  userName = member.user.name
                 "
               >
                 <template #icon>
@@ -95,17 +96,19 @@
     <os-modal
       v-if="isOpen"
       :open.sync="isOpen"
-      :title="`${$t('group.removeMember')}`"
+      :title="$t('group.removeMemberTitle')"
       force
-      size="extended"
       @confirm="removeUser()"
     >
+      <p class="ds-text ds-text-size-large">
+        {{ $t('group.removeMemberConfirmText', { name: userName }) }}
+      </p>
       <template #footer="{ confirm, cancel }">
         <os-button appearance="outline" data-testid="os-modal-cancel" @click="cancel">
           <template #icon><os-icon :icon="icons.close" /></template>
           {{ $t('actions.cancel') }}
         </os-button>
-        <os-button variant="primary" data-testid="os-modal-confirm" @click="confirm">
+        <os-button variant="danger" data-testid="os-modal-confirm" @click="confirm">
           <template #icon><os-icon :icon="icons.check" /></template>
           {{ $t('group.removeMember') }}
         </os-button>
@@ -153,6 +156,7 @@ export default {
       user: {},
       isOpen: false,
       userId: null,
+      userName: null,
     }
   },
   methods: {
