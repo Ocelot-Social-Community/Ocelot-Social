@@ -250,7 +250,7 @@
 
         const footer = h(
           'footer',
-          { class: 'os-modal__footer bg-[#f5f5f5] px-6 py-3 flex justify-end gap-2 rounded-b-lg' },
+          { class: 'os-modal__footer bg-[#f5f5f5] px-3 py-3 flex justify-end gap-2 rounded-b-lg' },
           footerContent,
         )
 
