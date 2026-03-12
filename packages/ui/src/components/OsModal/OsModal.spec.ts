@@ -312,6 +312,20 @@ describe('osModal', () => {
 
       expect(document.body.style.overflow).toBe('')
     })
+
+    it('restores previous body overflow value when closed', async () => {
+      document.body.style.overflow = 'auto'
+
+      const wrapper = mount(OsModal, {
+        props: { open: true },
+      })
+
+      expect(document.body.style.overflow).toBe('hidden')
+
+      await wrapper.setProps({ open: false })
+
+      expect(document.body.style.overflow).toBe('auto')
+    })
   })
 
   describe('aria attributes', () => {

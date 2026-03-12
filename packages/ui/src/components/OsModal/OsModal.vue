@@ -66,6 +66,7 @@
 
       const modalRef = ref<HTMLElement | null>(null)
       const isScrolled = ref(false)
+      let previousOverflow = ''
       const titleId = `os-modal-title-${Math.random().toString(36).slice(2, 7)}`
 
       /* v8 ignore start -- Vue 2 only */
@@ -121,10 +122,11 @@
           if (typeof document === 'undefined') return
           /* v8 ignore stop */
           if (show) {
+            previousOverflow = document.body.style.overflow
             document.body.style.overflow = 'hidden'
             emit('opened')
           } else {
-            document.body.style.overflow = ''
+            document.body.style.overflow = previousOverflow
           }
         },
         { immediate: true },
@@ -145,7 +147,7 @@
         document.removeEventListener('keydown', onKeydown)
         /* v8 ignore start -- cleanup guard */
         if (typeof document !== 'undefined') {
-          document.body.style.overflow = ''
+          document.body.style.overflow = previousOverflow
         }
         /* v8 ignore stop */
       })
