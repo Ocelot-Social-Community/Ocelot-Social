@@ -6,7 +6,7 @@
       </div>
     </transition>
     <div>
-      <section class="ds-section">
+      <section>
         <div class="ds-flex">
           <div style="flex: 0 0 50%; width: 50%">
             <user-teaser :user="userdata" />
