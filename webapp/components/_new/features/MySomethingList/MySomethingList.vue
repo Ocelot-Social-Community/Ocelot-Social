@@ -79,7 +79,7 @@
     <confirm-modal
       v-if="showConfirmModal"
       :modalData="currentModalData"
-      @close="showConfirmModal = false"
+      @close="showConfirmModal = false; currentModalData = null"
     />
   </ds-form>
 </template>
