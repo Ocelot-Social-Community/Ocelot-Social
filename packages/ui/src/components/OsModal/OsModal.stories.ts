@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 import OsButton from '#src/components/OsButton/OsButton.vue'
 

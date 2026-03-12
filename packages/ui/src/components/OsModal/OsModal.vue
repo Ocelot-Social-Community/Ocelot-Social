@@ -186,7 +186,7 @@
             'data-testid': 'os-modal-close',
             ...eventProps({ click: () => cancel('close') }),
           },
-          [h('span', { class: 'w-4 h-4 fill-current inline-flex', 'aria-hidden': 'true' }, [IconClose(createElement, isVue2)])],
+          [h('span', { class: 'w-4 h-4 fill-current inline-flex', 'aria-hidden': 'true' }, [createElement(IconClose)])],
         )
 
         // --- Header ---
@@ -239,7 +239,7 @@
                 on: { click: () => cancel('cancel') },
               },
               [
-                h('template', { slot: 'icon' }, [IconClose(createElement, true)]),
+                h('template', { slot: 'icon' }, [createElement(IconClose)]),
                 props.cancelLabel,
               ],
             ),
@@ -251,7 +251,7 @@
                 on: { click: () => confirm() },
               },
               [
-                h('template', { slot: 'icon' }, [IconCheck(createElement, true)]),
+                h('template', { slot: 'icon' }, [createElement(IconCheck)]),
                 props.confirmLabel,
               ],
             ),
@@ -267,7 +267,7 @@
                 onClick: () => cancel('cancel'),
               },
               {
-                icon: () => [IconClose(createElement, false)],
+                icon: () => [h(IconClose)],
                 default: () => [props.cancelLabel],
               },
             ),
@@ -279,7 +279,7 @@
                 onClick: () => confirm(),
               },
               {
-                icon: () => [IconCheck(createElement, false)],
+                icon: () => [h(IconCheck)],
                 default: () => [props.confirmLabel],
               },
             ),
