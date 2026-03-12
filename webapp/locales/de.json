@@ -979,7 +979,7 @@
       "title": "Beitrag freigeben",
       "type": "Beitrag"
     },
-    "submit": "freigeben",
+    "submit": "Freigeben",
     "success": "Erfolgreich freigegeben!",
     "user": {
       "error": "Den Nutzer hast du schon gemeldet!",
