@@ -10,9 +10,6 @@
     </div>
     <page-footer class="desktop-footer" />
     <div id="overlay" />
-    <client-only>
-      <modal />
-    </client-only>
     <div v-if="getShowChat.showChat" class="chat-modul">
       <client-only>
         <chat singleRoom :roomId="getShowChat.roomID" @close-single-room="closeSingleRoom" />
@@ -26,14 +23,12 @@ import { mapGetters, mapMutations } from 'vuex'
 import seo from '~/mixins/seo'
 import mobile from '~/mixins/mobile'
 import HeaderMenu from '~/components/HeaderMenu/HeaderMenu'
-import Modal from '~/components/Modal'
 import PageFooter from '~/components/PageFooter/PageFooter'
 import Chat from '~/components/Chat/Chat.vue'
 
 export default {
   components: {
     HeaderMenu,
-    Modal,
     PageFooter,
     Chat,
   },

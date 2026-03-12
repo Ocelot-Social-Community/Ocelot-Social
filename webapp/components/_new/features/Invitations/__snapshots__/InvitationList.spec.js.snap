@@ -106,6 +106,8 @@ exports[`InvitationList.vue renders 1`] = `
               </span>
             </button>
           </div>
+           
+          <!---->
         </li>
         <li
           class="invitation"
@@ -206,6 +208,8 @@ exports[`InvitationList.vue renders 1`] = `
               </span>
             </button>
           </div>
+           
+          <!---->
         </li>
       </client-only-stub>
     </ul>

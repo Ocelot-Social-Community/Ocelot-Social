@@ -1,54 +1,72 @@
 <template>
-  <dropdown class="content-menu" :placement="placement" offset="5">
-    <template #default="{ toggleMenu }">
-      <slot name="button" :toggleMenu="toggleMenu">
-        <os-button
-          data-test="content-menu-button"
-          variant="primary"
-          appearance="outline"
-          size="sm"
-          circle
-          :aria-label="$t('actions.menu')"
-          @click.prevent="toggleMenu()"
-        >
-          <template #icon>
-            <os-icon :icon="icons.ellipsisV" />
-          </template>
-        </os-button>
-      </slot>
-    </template>
-    <template #popover="{ toggleMenu }">
-      <div class="content-menu-popover">
-        <ds-menu :routes="routes">
-          <template #menuitem="item">
-            <ds-menu-item
-              :route="item.route"
-              :parents="item.parents"
-              @click.stop.prevent="openItem(item.route, toggleMenu)"
-            >
-              <os-icon :icon="item.route.icon" />
-              {{ item.route.label }}
-            </ds-menu-item>
-          </template>
-        </ds-menu>
-      </div>
-    </template>
-  </dropdown>
+  <div class="content-menu">
+    <dropdown :placement="placement" offset="5">
+      <template #default="{ toggleMenu }">
+        <slot name="button" :toggleMenu="toggleMenu">
+          <os-button
+            data-test="content-menu-button"
+            variant="primary"
+            appearance="outline"
+            size="sm"
+            circle
+            :aria-label="$t('actions.menu')"
+            @click.prevent="toggleMenu()"
+          >
+            <template #icon>
+              <os-icon :icon="icons.ellipsisV" />
+            </template>
+          </os-button>
+        </slot>
+      </template>
+      <template #popover="{ toggleMenu }">
+        <div class="content-menu-popover">
+          <ds-menu :routes="routes">
+            <template #menuitem="item">
+              <ds-menu-item
+                :route="item.route"
+                :parents="item.parents"
+                @click.stop.prevent="openItem(item.route, toggleMenu)"
+              >
+                <os-icon :icon="item.route.icon" />
+                {{ item.route.label }}
+              </ds-menu-item>
+            </template>
+          </ds-menu>
+        </div>
+      </template>
+    </dropdown>
+    <confirm-modal
+      v-if="showConfirmModal"
+      :modalData="currentModalData"
+      @close="showConfirmModal = false"
+    />
+    <report-modal
+      v-if="showReportModal"
+      :name="getResourceName()"
+      :type="resourceType"
+      :id="resource.id"
+      @close="showReportModal = false"
+    />
+  </div>
 </template>
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Dropdown from '~/components/Dropdown'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
+import ReportModal from '~/components/Modal/ReportModal'
 import { reviewMutation } from '~/graphql/Moderation.js'
 import PinnedPostsMixin from '~/mixins/pinnedPosts'
 
 export default {
   name: 'ContentMenu',
   components: {
+    ConfirmModal,
     Dropdown,
     OsButton,
     OsIcon,
+    ReportModal,
   },
   mixins: [PinnedPostsMixin],
   props: {
@@ -69,6 +87,13 @@ export default {
         return {}
       },
     },
+  },
+  data() {
+    return {
+      showConfirmModal: false,
+      showReportModal: false,
+      currentModalData: null,
+    }
   },
   created() {
     this.icons = iconRegistry
@@ -309,22 +334,20 @@ export default {
       toggleMenu()
     },
     openModal(dialog, modalDataName = null) {
+      if (dialog === 'report') {
+        this.showReportModal = true
+        return
+      }
       let modalData = {}
       if (modalDataName) {
         if (modalDataName === 'disable' || modalDataName === 'release') {
           modalData = this.reviewModalData(modalDataName)
         } else {
-          modalData = this.modalsData[modalDataName]
+          modalData = this.modalsData[modalDataName] || {}
         }
       }
-      this.$store.commit('modal/SET_OPEN', {
-        name: dialog,
-        data: {
-          type: this.resourceType,
-          resource: this.resource,
-          modalData,
-        },
-      })
+      this.currentModalData = modalData
+      this.showConfirmModal = true
     },
     reviewModalData(action) {
       const disable = action === 'disable'

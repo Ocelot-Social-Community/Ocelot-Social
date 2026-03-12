@@ -121,6 +121,8 @@ exports[`invites.vue renders 1`] = `
                   </span>
                 </button>
               </div>
+               
+              <!---->
             </li>
           </client-only-stub>
         </ul>

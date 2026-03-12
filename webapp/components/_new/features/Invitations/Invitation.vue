@@ -42,17 +42,23 @@
         </template>
       </os-button>
     </div>
+    <confirm-modal
+      v-if="showConfirmModal"
+      :modalData="deleteModalData"
+      @close="showConfirmModal = false"
+    />
   </li>
 </template>
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import { mapMutations } from 'vuex'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
 
 export default {
   name: 'Invitation',
   components: {
+    ConfirmModal,
     OsButton,
     OsIcon,
   },
@@ -67,6 +73,27 @@ export default {
     },
   },
   computed: {
+    deleteModalData() {
+      return {
+        titleIdent: this.$t('invite-codes.delete-modal.title'),
+        messageIdent: this.$t('invite-codes.delete-modal.message'),
+        buttons: {
+          confirm: {
+            danger: true,
+            icon: this.icons.trash,
+            textIdent: 'actions.delete',
+            callback: () => {
+              this.$emit('invalidate-invite-code', this.inviteCode.code)
+            },
+          },
+          cancel: {
+            icon: this.icons.close,
+            textIdent: 'actions.cancel',
+            callback: () => {},
+          },
+        },
+      }
+    },
     inviteLink() {
       return `${window.location.origin}/registration?method=invite-code&inviteCode=${this.inviteCode.code}`
     },
@@ -77,6 +104,7 @@ export default {
   data() {
     return {
       canCopy: false,
+      showConfirmModal: false,
     }
   },
   created() {
@@ -84,40 +112,12 @@ export default {
     this.canCopy = !!navigator.clipboard
   },
   methods: {
-    ...mapMutations({
-      commitModalData: 'modal/SET_OPEN',
-    }),
     async copyInviteCode() {
       await navigator.clipboard.writeText(this.inviteMessageAndLink)
       this.$toast.success(this.$t('invite-codes.copy-success'))
     },
     openDeleteModal() {
-      this.commitModalData({
-        name: 'confirm',
-        data: {
-          type: '',
-          resource: { id: '' },
-          modalData: {
-            titleIdent: this.$t('invite-codes.delete-modal.title'),
-            messageIdent: this.$t('invite-codes.delete-modal.message'),
-            buttons: {
-              confirm: {
-                danger: true,
-                icon: this.icons.trash,
-                textIdent: 'actions.delete',
-                callback: () => {
-                  this.$emit('invalidate-invite-code', this.inviteCode.code)
-                },
-              },
-              cancel: {
-                icon: this.icons.close,
-                textIdent: 'actions.cancel',
-                callback: () => {},
-              },
-            },
-          },
-        },
-      })
+      this.showConfirmModal = true
     },
   },
 }

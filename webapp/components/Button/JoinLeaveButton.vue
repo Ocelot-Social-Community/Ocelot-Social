@@ -1,32 +1,39 @@
 <template>
-  <os-button
-    data-test="join-leave-btn"
-    :variant="isMember && hovered ? 'danger' : 'primary'"
-    :appearance="filled || (isMember && !hovered) ? 'filled' : 'outline'"
-    :disabled="disabled"
-    :loading="localLoading"
-    full-width
-    v-tooltip="tooltip"
-    @mouseenter="onHover"
-    @mouseleave="hovered = false"
-    @click.prevent="toggle"
-  >
-    <template #icon>
-      <os-icon :icon="icon" />
-    </template>
-    {{ label }}
-  </os-button>
+  <div>
+    <os-button
+      data-test="join-leave-btn"
+      :variant="isMember && hovered ? 'danger' : 'primary'"
+      :appearance="filled || (isMember && !hovered) ? 'filled' : 'outline'"
+      :disabled="disabled"
+      :loading="localLoading"
+      full-width
+      v-tooltip="tooltip"
+      @mouseenter="onHover"
+      @mouseleave="hovered = false"
+      @click.prevent="toggle"
+    >
+      <template #icon>
+        <os-icon :icon="icon" />
+      </template>
+      {{ label }}
+    </os-button>
+    <confirm-modal
+      v-if="showConfirmModal"
+      :modalData="leaveModalData"
+      @close="showConfirmModal = false"
+    />
+  </div>
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
 import { joinGroupMutation, leaveGroupMutation } from '~/graphql/groups'
 
 export default {
   name: 'JoinLeaveButton',
-  components: { OsButton, OsIcon },
+  components: { ConfirmModal, OsButton, OsIcon },
   props: {
     group: { type: Object, required: true },
     userId: { type: String, required: true },
@@ -40,9 +47,32 @@ export default {
     return {
       localLoading: this.loading,
       hovered: false,
+      showConfirmModal: false,
     }
   },
   computed: {
+    leaveModalData() {
+      return {
+        titleIdent: 'group.leaveModal.title',
+        messageIdent: 'group.leaveModal.message',
+        messageParams: {
+          name: this.group.name,
+        },
+        buttons: {
+          confirm: {
+            danger: true,
+            icon: this.icons.signOut,
+            textIdent: 'group.leaveModal.confirmButton',
+            callback: this.joinLeave,
+          },
+          cancel: {
+            icon: this.icons.close,
+            textIdent: 'actions.cancel',
+            callback: () => {},
+          },
+        },
+      }
+    },
     icon() {
       if (this.isMember) {
         if (this.isNonePendingMember) {
@@ -87,9 +117,6 @@ export default {
     this.icons = iconRegistry
   },
   methods: {
-    ...mapMutations({
-      commitModalData: 'modal/SET_OPEN',
-    }),
     onHover() {
       if (!this.disabled && !this.localLoading) {
         this.hovered = true
@@ -103,36 +130,7 @@ export default {
       }
     },
     openLeaveModal() {
-      this.commitModalData(this.leaveModalData())
-    },
-    leaveModalData() {
-      return {
-        name: 'confirm',
-        data: {
-          type: '',
-          resource: { id: '' },
-          modalData: {
-            titleIdent: 'group.leaveModal.title',
-            messageIdent: 'group.leaveModal.message',
-            messageParams: {
-              name: this.group.name,
-            },
-            buttons: {
-              confirm: {
-                danger: true,
-                icon: this.icons.signOut,
-                textIdent: 'group.leaveModal.confirmButton',
-                callback: this.joinLeave,
-              },
-              cancel: {
-                icon: this.icons.close,
-                textIdent: 'actions.cancel',
-                callback: () => {},
-              },
-            },
-          },
-        },
-      }
+      this.showConfirmModal = true
     },
     async joinLeave() {
       const join = !this.isMember

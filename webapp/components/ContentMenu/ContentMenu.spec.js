@@ -14,9 +14,11 @@ const stubs = {
   'router-link': {
     template: '<span><slot /></span>',
   },
+  'confirm-modal': { template: '<div class="confirm-modal-stub" />' },
+  'report-modal': { template: '<div class="report-modal-stub" />' },
 }
 
-let getters, mutations, actions, mocks, menuToggle, openModalSpy
+let getters, actions, mocks, menuToggle, openModalSpy
 
 const maxPinnedPostsMock = jest.fn()
 const currentlyPinnedPostsMock = jest.fn()
@@ -35,9 +37,6 @@ describe('ContentMenu.vue', () => {
   })
 
   describe('mount', () => {
-    mutations = {
-      'modal/SET_OPEN': jest.fn(),
-    }
     getters = {
       'auth/isModerator': () => false,
       'auth/isAdmin': () => false,
@@ -49,7 +48,7 @@ describe('ContentMenu.vue', () => {
     }
 
     const openContentMenu = async (values = {}) => {
-      const store = new Vuex.Store({ mutations, getters, actions })
+      const store = new Vuex.Store({ getters, actions })
       const wrapper = mount(ContentMenu, {
         propsData: {
           ...values,
