@@ -1,0 +1,71 @@
+{
+  "notification": "Notificación",
+  "subjects": {
+    "changedGroupMemberRole": "Rol en el grupo cambiado",
+    "chatMessage": "Nuevo mensaje de chat",
+    "commentedOnPost": "Nuevo comentario en una publicación",
+    "followedUserPosted": "Nueva publicación de un usuario seguido",
+    "mentionedInComment": "Mencionado en un comentario",
+    "mentionedInPost": "Mencionado en una publicación",
+    "newEmail": "Nueva dirección de correo electrónico",
+    "removedUserFromGroup": "Eliminado del grupo",
+    "postInGroup": "Nueva publicación en el grupo",
+    "resetPassword": "Restablecer contraseña",
+    "userJoinedGroup": "Un usuario se unió al grupo",
+    "userLeftGroup": "Un usuario abandonó el grupo",
+    "wrongEmail": "¿Correo electrónico incorrecto?"
+  },
+  "registration": {
+    "introduction": "Gracias por registrarte – nos alegra tenerte con nosotros. Solo falta un pequeño paso antes de que podamos cambiar el mundo juntos … Por favor, confirma tu dirección de correo electrónico haciendo clic en el botón de abajo:",
+    "codeHint": "Si el botón de arriba no funciona, también puedes copiar el siguiente código en la ventana de tu navegador: ",
+    "codeHintException": "Sin embargo, esto solo funciona si te has registrado a través de nuestro sitio web.",
+    "notYouStart": "Si no te has registrado en ",
+    "notYouEnd": " te recomendamos que lo visites. Es una red social de personas para personas que quieren conectarse y cambiar el mundo juntas.",
+    "ps": "PD: Si ignoras este correo electrónico, no crearemos una cuenta para ti. ;)"
+  },
+  "emailVerification": {
+    "codeHint": "Si el botón de arriba no funciona, también puedes copiar el siguiente código en la ventana de tu navegador: ",
+    "introduction": "¿Quieres cambiar tu dirección de correo electrónico? ¡No hay problema! Simplemente haz clic en el botón de abajo para verificar tu nueva dirección:",
+    "doNotChange": "Si no quieres cambiar tu dirección de correo electrónico, simplemente ignora este mensaje. "
+  },
+  "support": "Si tienes preguntas o problemas, no dudes en contactar con nuestro soporte: ",
+  "buttons": {
+    "confirmEmail": "Confirma tu dirección de correo electrónico",
+    "resetPassword": "Restablecer contraseña",
+    "tryAgain": "Probar con otro correo electrónico",
+    "verifyEmail": "Verificar dirección de correo electrónico",
+    "viewChat": "Ver chat",
+    "viewComment": "Ver comentario",
+    "viewGroup": "Ver grupo",
+    "viewPost": "Ver publicación"
+  },
+  "general": {
+    "greeting": "Hola",
+    "seeYou": "¡Hasta pronto en ",
+    "yourTeam": "– El equipo de {team}",
+    "settingsHint": "PD: Si no quieres recibir más correos electrónicos, cambia tu ",
+    "settingsName": "configuración de notificaciones",
+    "welcome": "Bienvenido a"
+  },
+  "resetPassword": {
+    "codeHint": "Si el botón de arriba no funciona, también puedes copiar el siguiente código en la ventana de tu navegador: ",
+    "ignore": "Si no has solicitado una nueva contraseña, simplemente ignora este correo electrónico.",
+    "introduction": "¿Has olvidado tu contraseña? ¡No hay problema! Simplemente haz clic en el botón de abajo para restablecerla en las próximas 24 horas:"
+  },
+  "wrongEmail": {
+    "ignoreEnd": " o si no querías restablecer tu contraseña, simplemente ignora este correo electrónico.",
+    "ignoreStart": "Si no tienes una cuenta en ",
+    "introduction": "Has solicitado un restablecimiento de contraseña, pero lamentablemente no hemos encontrado ninguna cuenta asociada a tu dirección de correo electrónico. ¿Te registraste quizás con otra dirección?"
+  },
+  "changedGroupMemberRole": "tu rol en el grupo «{groupName}» ha sido cambiado. Haz clic en el botón para ver este grupo:",
+  "chatMessageStart": "has recibido un nuevo mensaje de chat de ",
+  "chatMessageEnd": ".",
+  "commentedOnPost": " ha comentado en una publicación que sigues con el título «{postTitle}». Haz clic en el botón para ver este comentario:",
+  "followedUserPosted": ", un usuario al que sigues, ha escrito una nueva publicación con el título «{postTitle}». Haz clic en el botón para ver esta publicación:",
+  "mentionedInComment": " te ha mencionado en un comentario de la publicación con el título «{postTitle}». Haz clic en el botón para ver este comentario:",
+  "mentionedInPost": " te ha mencionado en una publicación con el título «{postTitle}». Haz clic en el botón para ver esta publicación:",
+  "removedUserFromGroup": "has sido eliminado del grupo «{groupName}».",
+  "postInGroup": "alguien ha escrito una nueva publicación con el título «{postTitle}» en uno de tus grupos. Haz clic en el botón para ver esta publicación:",
+  "userJoinedGroup": " se ha unido al grupo «{groupName}». Haz clic en el botón para ver este grupo:",
+  "userLeftGroup": " ha abandonado el grupo «{groupName}». Haz clic en el botón para ver este grupo:"
+}

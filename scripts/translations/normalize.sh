@@ -3,7 +3,7 @@
 ROOT_DIR=$(dirname "$0")/../..
 tmp=$(mktemp)
 
-locale_list=("es.json" "fr.json" "it.json" "nl.json" "pl.json" "pt.json" "ru.json")
+locale_list=("es.json" "fr.json" "it.json" "nl.json" "pl.json" "pt.json" "ru.json" "uk.json")
 
 for locale_file in "${locale_list[@]}"
 do
