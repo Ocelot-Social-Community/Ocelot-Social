@@ -412,7 +412,6 @@ export default {
 
     > .content-menu {
       position: relative;
-      z-index: $z-index-post-teaser-link;
     }
 
     .os-badge {
