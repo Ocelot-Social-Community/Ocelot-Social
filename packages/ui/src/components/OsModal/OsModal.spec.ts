@@ -342,14 +342,25 @@ describe('osModal', () => {
       expect(panel.attributes('aria-labelledby')).toBe(titleEl.attributes('id'))
     })
 
-    it('does not have aria-labelledby when no title', () => {
+    it('has aria-label fallback when no title', () => {
       const wrapper = mount(OsModal, {
         props: { open: true },
       })
 
-      expect(
-        wrapper.find('[data-testid="os-modal-panel"]').attributes('aria-labelledby'),
-      ).toBeUndefined()
+      const panel = wrapper.find('[data-testid="os-modal-panel"]')
+
+      expect(panel.attributes('aria-labelledby')).toBeUndefined()
+      expect(panel.attributes('aria-label')).toBe('Dialog')
+    })
+
+    it('uses custom ariaLabel when no title', () => {
+      const wrapper = mount(OsModal, {
+        props: { open: true, ariaLabel: 'Confirm deletion' },
+      })
+
+      expect(wrapper.find('[data-testid="os-modal-panel"]').attributes('aria-label')).toBe(
+        'Confirm deletion',
+      )
     })
   })
 

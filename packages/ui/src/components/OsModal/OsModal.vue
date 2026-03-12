@@ -44,6 +44,11 @@
         type: String,
         default: null,
       },
+      /** Accessible label for the dialog when no visible title is provided */
+      ariaLabel: {
+        type: String,
+        default: 'Dialog',
+      },
       /** Label for the built-in cancel button */
       cancelLabel: {
         type: String,
@@ -340,6 +345,8 @@
         }
         if (props.title) {
           panelProps['aria-labelledby'] = titleId
+        } else {
+          panelProps['aria-label'] = props.ariaLabel
         }
 
         const panel = h('div', panelProps, [header, content, footer])
