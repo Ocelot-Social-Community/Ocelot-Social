@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag'
+import gql from 'graphql-tag'
 import { imageUrls } from './fragments/imageUrls'
 
 export default () => {

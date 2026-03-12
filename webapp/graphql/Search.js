@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag'
+import gql from 'graphql-tag'
 import { user } from './fragments/user'
 import { post } from './fragments/post'
 import { group } from './fragments/group'
