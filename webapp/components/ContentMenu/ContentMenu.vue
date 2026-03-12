@@ -368,6 +368,7 @@ export default {
                   variables: { resourceId: this.resource.id, disable, closed: false },
                 })
                 this.$toast.success(this.$t(`${action}.success`))
+                this.$set(this.resource, 'disabled', disable)
               } catch (err) {
                 this.$toast.error(err.message)
                 throw err
