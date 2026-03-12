@@ -40,6 +40,7 @@
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Dropdown from '~/components/Dropdown'
+import { reviewMutation } from '~/graphql/Moderation.js'
 import PinnedPostsMixin from '~/mixins/pinnedPosts'
 
 export default {
@@ -188,7 +189,7 @@ export default {
           routes.push({
             label: this.$t(`disable.${this.resourceType}.title`),
             callback: () => {
-              this.openModal('disable')
+              this.openModal('confirm', 'disable')
             },
             icon: this.icons.eyeSlash,
           })
@@ -196,7 +197,7 @@ export default {
           routes.push({
             label: this.$t(`release.${this.resourceType}.title`),
             callback: () => {
-              this.openModal('release')
+              this.openModal('confirm', 'release')
             },
             icon: this.icons.eye,
           })
@@ -308,14 +309,68 @@ export default {
       toggleMenu()
     },
     openModal(dialog, modalDataName = null) {
+      let modalData = {}
+      if (modalDataName) {
+        if (modalDataName === 'disable' || modalDataName === 'release') {
+          modalData = this.reviewModalData(modalDataName)
+        } else {
+          modalData = this.modalsData[modalDataName]
+        }
+      }
       this.$store.commit('modal/SET_OPEN', {
         name: dialog,
         data: {
           type: this.resourceType,
           resource: this.resource,
-          modalData: modalDataName ? this.modalsData[modalDataName] : {},
+          modalData,
         },
       })
+    },
+    reviewModalData(action) {
+      const disable = action === 'disable'
+      const name = this.getResourceName()
+      return {
+        titleIdent: `${action}.${this.resourceType}.title`,
+        messageIdent: `${action}.${this.resourceType}.message`,
+        messageParams: { name: this.$filters.truncate(name, 30) },
+        buttons: {
+          confirm: {
+            danger: true,
+            icon: this.icons.exclamationCircle,
+            textIdent: `${action}.submit`,
+            callback: async () => {
+              try {
+                await this.$apollo.mutate({
+                  mutation: reviewMutation(),
+                  variables: { resourceId: this.resource.id, disable, closed: false },
+                })
+                this.$toast.success(this.$t(`${action}.success`))
+              } catch (err) {
+                this.$toast.error(err.message)
+                throw err
+              }
+            },
+          },
+          cancel: {
+            icon: this.icons.close,
+            textIdent: `${action}.cancel`,
+            callback: () => {},
+          },
+        },
+      }
+    },
+    getResourceName() {
+      switch (this.resourceType) {
+        case 'user':
+        case 'organization':
+          return this.resource.name || ''
+        case 'contribution':
+          return this.resource.title || ''
+        case 'comment':
+          return this.resource.author?.name || ''
+        default:
+          return ''
+      }
     },
   },
 }

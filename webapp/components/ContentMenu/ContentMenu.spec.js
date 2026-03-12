@@ -614,7 +614,7 @@ describe('ContentMenu.vue', () => {
           .filter((item) => item.text() === 'disable.contribution.title')
           .at(0)
           .trigger('click')
-        expect(openModalSpy).toHaveBeenCalledWith('disable')
+        expect(openModalSpy).toHaveBeenCalledWith('confirm', 'disable')
       })
 
       it('can disable comments', async () => {
@@ -632,7 +632,7 @@ describe('ContentMenu.vue', () => {
           .filter((item) => item.text() === 'disable.comment.title')
           .at(0)
           .trigger('click')
-        expect(openModalSpy).toHaveBeenCalledWith('disable')
+        expect(openModalSpy).toHaveBeenCalledWith('confirm', 'disable')
       })
 
       it('can disable users', async () => {
@@ -650,7 +650,7 @@ describe('ContentMenu.vue', () => {
           .filter((item) => item.text() === 'disable.user.title')
           .at(0)
           .trigger('click')
-        expect(openModalSpy).toHaveBeenCalledWith('disable')
+        expect(openModalSpy).toHaveBeenCalledWith('confirm', 'disable')
       })
 
       it('can disable organizations', async () => {
@@ -668,7 +668,7 @@ describe('ContentMenu.vue', () => {
           .filter((item) => item.text() === 'disable.organization.title')
           .at(0)
           .trigger('click')
-        expect(openModalSpy).toHaveBeenCalledWith('disable')
+        expect(openModalSpy).toHaveBeenCalledWith('confirm', 'disable')
       })
 
       it('can release posts', async () => {
@@ -686,7 +686,7 @@ describe('ContentMenu.vue', () => {
           .filter((item) => item.text() === 'release.contribution.title')
           .at(0)
           .trigger('click')
-        expect(openModalSpy).toHaveBeenCalledWith('release')
+        expect(openModalSpy).toHaveBeenCalledWith('confirm', 'release')
       })
 
       it('can release comments', async () => {
@@ -704,7 +704,7 @@ describe('ContentMenu.vue', () => {
           .filter((item) => item.text() === 'release.comment.title')
           .at(0)
           .trigger('click')
-        expect(openModalSpy).toHaveBeenCalledWith('release')
+        expect(openModalSpy).toHaveBeenCalledWith('confirm', 'release')
       })
 
       it('can release users', async () => {
@@ -722,7 +722,7 @@ describe('ContentMenu.vue', () => {
           .filter((item) => item.text() === 'release.user.title')
           .at(0)
           .trigger('click')
-        expect(openModalSpy).toHaveBeenCalledWith('release')
+        expect(openModalSpy).toHaveBeenCalledWith('confirm', 'release')
       })
 
       it('can release organizations', async () => {
@@ -740,7 +740,7 @@ describe('ContentMenu.vue', () => {
           .filter((item) => item.text() === 'release.organization.title')
           .at(0)
           .trigger('click')
-        expect(openModalSpy).toHaveBeenCalledWith('release')
+        expect(openModalSpy).toHaveBeenCalledWith('confirm', 'release')
       })
     })
 
