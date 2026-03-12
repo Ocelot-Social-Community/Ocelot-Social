@@ -1,0 +1,71 @@
+{
+  "notification": "Njoftim",
+  "subjects": {
+    "changedGroupMemberRole": "Roli në grup u ndryshua",
+    "chatMessage": "Mesazh i ri në chat",
+    "commentedOnPost": "Koment i ri në postim",
+    "followedUserPosted": "Postim i ri nga një përdorues i ndjekur",
+    "mentionedInComment": "U përmend në koment",
+    "mentionedInPost": "U përmend në postim",
+    "newEmail": "Adresë e re e-mail",
+    "removedUserFromGroup": "U hoq nga grupi",
+    "postInGroup": "Postim i ri në grup",
+    "resetPassword": "Rivendos fjalëkalimin",
+    "userJoinedGroup": "Një përdorues u bashkua me grupin",
+    "userLeftGroup": "Një përdorues u largua nga grupi",
+    "wrongEmail": "E-mail e gabuar?"
+  },
+  "registration": {
+    "introduction": "Faleminderit që u regjistruat – jemi të lumtur që jeni me ne. Mbetet vetëm një hap i vogël përpara se të ndryshojmë botën së bashku … Ju lutemi konfirmoni adresën tuaj të e-mailit duke klikuar butonin më poshtë:",
+    "codeHint": "Nëse butoni më sipër nuk funksionon, mund të kopjoni kodin e mëposhtëm në dritaren e shfletuesit tuaj: ",
+    "codeHintException": "Megjithatë, kjo funksionon vetëm nëse jeni regjistruar përmes faqes sonë të internetit.",
+    "notYouStart": "Nëse nuk jeni regjistruar në ",
+    "notYouEnd": " ju rekomandojmë ta shikoni! Është një rrjet social nga njerëz për njerëz që duan të lidhen dhe të ndryshojnë botën së bashku.",
+    "ps": "PS: Nëse e injoroni këtë e-mail, nuk do të krijojmë një llogari për ju. ;)"
+  },
+  "emailVerification": {
+    "codeHint": "Nëse butoni më sipër nuk funksionon, mund të kopjoni kodin e mëposhtëm në dritaren e shfletuesit tuaj: ",
+    "introduction": "Dëshironi të ndryshoni adresën tuaj të e-mailit? Asnjë problem! Thjesht klikoni butonin më poshtë për të verifikuar adresën tuaj të re:",
+    "doNotChange": "Nëse nuk dëshironi të ndryshoni adresën tuaj të e-mailit, thjesht injoroni këtë mesazh. "
+  },
+  "support": "Nëse keni pyetje ose probleme, mos hezitoni të kontaktoni mbështetjen tonë: ",
+  "buttons": {
+    "confirmEmail": "Konfirmoni adresën tuaj të e-mailit",
+    "resetPassword": "Rivendos fjalëkalimin",
+    "tryAgain": "Provoni me një e-mail tjetër",
+    "verifyEmail": "Verifiko adresën e e-mailit",
+    "viewChat": "Shiko chatin",
+    "viewComment": "Shiko komentin",
+    "viewGroup": "Shiko grupin",
+    "viewPost": "Shiko postimin"
+  },
+  "general": {
+    "greeting": "Përshëndetje",
+    "seeYou": "Shihemi së shpejti në ",
+    "yourTeam": "– Ekipi {team}",
+    "settingsHint": "PS: Nëse nuk dëshironi të merrni më e-mail, ndryshoni ",
+    "settingsName": "cilësimet e njoftimeve",
+    "welcome": "Mirë se vini në"
+  },
+  "resetPassword": {
+    "codeHint": "Nëse butoni më sipër nuk funksionon, mund të kopjoni kodin e mëposhtëm në dritaren e shfletuesit tuaj: ",
+    "ignore": "Nëse nuk keni kërkuar një fjalëkalim të ri, thjesht injoroni këtë e-mail.",
+    "introduction": "Keni harruar fjalëkalimin? Asnjë problem! Thjesht klikoni butonin më poshtë për ta rivendosur brenda 24 orëve të ardhshme:"
+  },
+  "wrongEmail": {
+    "ignoreEnd": " ose nëse nuk dëshironit të rivendosnit fjalëkalimin, ju lutemi injoroni këtë e-mail.",
+    "ignoreStart": "Nëse nuk keni një llogari në ",
+    "introduction": "Ju kërkuat një rivendosje të fjalëkalimit, por fatkeqësisht nuk gjetëm asnjë llogari të lidhur me adresën tuaj të e-mailit. A mund të jeni regjistruar me një adresë tjetër?"
+  },
+  "changedGroupMemberRole": "roli juaj në grupin \u201e{groupName}\u201c u ndryshua. Klikoni butonin për të parë këtë grup:",
+  "chatMessageStart": "keni marrë një mesazh të ri në chat nga ",
+  "chatMessageEnd": ".",
+  "commentedOnPost": " komentoi në një postim që po ndiqni me titullin \u201e{postTitle}\u201c. Klikoni butonin për të parë këtë koment:",
+  "followedUserPosted": ", një përdorues që ndiqni, shkroi një postim të ri me titullin \u201e{postTitle}\u201c. Klikoni butonin për të parë këtë postim:",
+  "mentionedInComment": " ju përmendi në një koment te postimi me titullin \u201e{postTitle}\u201c. Klikoni butonin për të parë këtë koment:",
+  "mentionedInPost": " ju përmendi në një postim me titullin \u201e{postTitle}\u201c. Klikoni butonin për të parë këtë postim:",
+  "removedUserFromGroup": "jeni hequr nga grupi \u201e{groupName}\u201c.",
+  "postInGroup": "dikush shkroi një postim të ri me titullin \u201e{postTitle}\u201c në një nga grupet tuaja. Klikoni butonin për të parë këtë postim:",
+  "userJoinedGroup": " u bashkua me grupin \u201e{groupName}\u201c. Klikoni butonin për të parë këtë grup:",
+  "userLeftGroup": " u largua nga grupi \u201e{groupName}\u201c. Klikoni butonin për të parë këtë grup:"
+}

@@ -1,0 +1,71 @@
+{
+  "notification": "Powiadomienie",
+  "subjects": {
+    "changedGroupMemberRole": "Zmieniono rolę w grupie",
+    "chatMessage": "Nowa wiadomość na czacie",
+    "commentedOnPost": "Nowy komentarz do wpisu",
+    "followedUserPosted": "Nowy wpis obserwowanego użytkownika",
+    "mentionedInComment": "Wspomniano w komentarzu",
+    "mentionedInPost": "Wspomniano we wpisie",
+    "newEmail": "Nowy adres e-mail",
+    "removedUserFromGroup": "Usunięto z grupy",
+    "postInGroup": "Nowy wpis w grupie",
+    "resetPassword": "Zresetuj hasło",
+    "userJoinedGroup": "Użytkownik dołączył do grupy",
+    "userLeftGroup": "Użytkownik opuścił grupę",
+    "wrongEmail": "Nieprawidłowy e-mail?"
+  },
+  "registration": {
+    "introduction": "Dziękujemy za rejestrację – cieszymy się, że jesteś z nami. Został jeszcze tylko jeden mały krok, zanim razem zaczniemy zmieniać świat … Potwierdź swój adres e-mail, klikając poniższy przycisk:",
+    "codeHint": "Jeśli powyższy przycisk nie działa, możesz też skopiować następujący kod do okna przeglądarki: ",
+    "codeHintException": "Działa to jednak tylko wtedy, gdy zarejestrowałeś się przez naszą stronę internetową.",
+    "notYouStart": "Jeśli nie rejestrowałeś się w ",
+    "notYouEnd": " polecamy zajrzeć! To sieć społecznościowa ludzi dla ludzi, którzy chcą się łączyć i wspólnie zmieniać świat.",
+    "ps": "PS: Jeśli zignorujesz tego e-maila, nie utworzymy dla Ciebie konta. ;)"
+  },
+  "emailVerification": {
+    "codeHint": "Jeśli powyższy przycisk nie działa, możesz też skopiować następujący kod do okna przeglądarki: ",
+    "introduction": "Chcesz zmienić swój adres e-mail? Żaden problem! Po prostu kliknij poniższy przycisk, aby zweryfikować nowy adres:",
+    "doNotChange": "Jeśli nie chcesz zmieniać swojego adresu e-mail, po prostu zignoruj tę wiadomość. "
+  },
+  "support": "Jeśli masz pytania lub problemy, skontaktuj się z naszym wsparciem: ",
+  "buttons": {
+    "confirmEmail": "Potwierdź swój adres e-mail",
+    "resetPassword": "Zresetuj hasło",
+    "tryAgain": "Spróbuj z innym adresem e-mail",
+    "verifyEmail": "Zweryfikuj adres e-mail",
+    "viewChat": "Zobacz czat",
+    "viewComment": "Zobacz komentarz",
+    "viewGroup": "Zobacz grupę",
+    "viewPost": "Zobacz wpis"
+  },
+  "general": {
+    "greeting": "Cześć",
+    "seeYou": "Do zobaczenia wkrótce na ",
+    "yourTeam": "– Zespół {team}",
+    "settingsHint": "PS: Jeśli nie chcesz już otrzymywać e-maili, zmień swoje ",
+    "settingsName": "ustawienia powiadomień",
+    "welcome": "Witamy w"
+  },
+  "resetPassword": {
+    "codeHint": "Jeśli powyższy przycisk nie działa, możesz też skopiować następujący kod do okna przeglądarki: ",
+    "ignore": "Jeśli nie prosiłeś o nowe hasło, po prostu zignoruj tego e-maila.",
+    "introduction": "Zapomniałeś hasła? Żaden problem! Po prostu kliknij poniższy przycisk, aby je zresetować w ciągu najbliższych 24 godzin:"
+  },
+  "wrongEmail": {
+    "ignoreEnd": " lub jeśli nie chciałeś resetować hasła, po prostu zignoruj tego e-maila.",
+    "ignoreStart": "Jeśli nie masz konta w ",
+    "introduction": "Poprosiłeś o zresetowanie hasła, ale niestety nie znaleźliśmy konta powiązanego z Twoim adresem e-mail. Czy może zarejestrowałeś się z innym adresem?"
+  },
+  "changedGroupMemberRole": "Twoja rola w grupie „{groupName}“ została zmieniona. Kliknij przycisk, aby zobaczyć tę grupę:",
+  "chatMessageStart": "otrzymałeś nową wiadomość na czacie od ",
+  "chatMessageEnd": ".",
+  "commentedOnPost": " skomentował wpis, który obserwujesz, o tytule „{postTitle}“. Kliknij przycisk, aby zobaczyć ten komentarz:",
+  "followedUserPosted": ", użytkownik, którego obserwujesz, napisał nowy wpis o tytule „{postTitle}“. Kliknij przycisk, aby zobaczyć ten wpis:",
+  "mentionedInComment": " wspomniał o Tobie w komentarzu do wpisu o tytule „{postTitle}“. Kliknij przycisk, aby zobaczyć ten komentarz:",
+  "mentionedInPost": " wspomniał o Tobie we wpisie o tytule „{postTitle}“. Kliknij przycisk, aby zobaczyć ten wpis:",
+  "removedUserFromGroup": "zostałeś usunięty z grupy „{groupName}“.",
+  "postInGroup": "ktoś napisał nowy wpis o tytule „{postTitle}“ w jednej z Twoich grup. Kliknij przycisk, aby zobaczyć ten wpis:",
+  "userJoinedGroup": " dołączył do grupy „{groupName}“. Kliknij przycisk, aby zobaczyć tę grupę:",
+  "userLeftGroup": " opuścił grupę „{groupName}“. Kliknij przycisk, aby zobaczyć tę grupę:"
+}

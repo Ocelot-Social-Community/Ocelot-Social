@@ -39,7 +39,7 @@ const email = new Email({
   },
   transport,
   i18n: {
-    locales: ['en', 'de'],
+    locales: ['en', 'de', 'nl', 'fr', 'it', 'es', 'pt', 'pl', 'ru', 'sq', 'uk'],
     defaultLocale: CONFIG.LANGUAGE_DEFAULT,
     retryInDefaultLocale: false,
     directory: path.join(__dirname, 'locales'),
