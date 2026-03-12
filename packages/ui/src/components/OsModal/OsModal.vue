@@ -69,6 +69,9 @@
 
       /* v8 ignore start -- Vue 2 only */
       const instance = isVue2 ? getCurrentInstance() : null
+      // In Vue 2, global h() needs currentInstance; use $createElement for icon render fns
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const createElement = isVue2 ? (instance?.proxy as any)?.$createElement : h
       /* v8 ignore stop */
 
       // --- Actions ---
@@ -166,20 +169,18 @@
           return h('div', { class: cn('os-modal-wrapper', (closedAttrClass as string) || '') })
         }
 
-        // --- Close button ---
+        // --- Close button (native <button> for Vue 2/3 compatibility) ---
         const closeBtn = !props.force
           ? h(
-              OsButton,
+              'button',
               {
-                class: 'os-modal__close absolute top-3 right-3',
-                appearance: 'ghost',
-                size: 'sm',
-                circle: true,
+                class: 'os-modal__close absolute top-3 right-3 flex items-center justify-center w-[26px] h-[26px] rounded-full bg-transparent border-0 cursor-pointer p-0 hover:bg-[var(--color-default-hover)] text-[var(--color-default-contrast)]',
+                type: 'button',
                 'aria-label': 'Close',
                 'data-testid': 'os-modal-close',
                 onClick: () => cancel('close'),
               },
-              { icon: () => [h(IconClose)] },
+              [h('span', { class: 'w-4 h-4 fill-current inline-flex', 'aria-hidden': 'true' }, [IconClose(createElement, isVue2)])],
             )
           : null
 
@@ -187,21 +188,21 @@
         const headerChildren: ReturnType<typeof h>[] = []
         if (props.title) {
           headerChildren.push(
-            h('h2', { class: 'os-modal__title text-lg font-semibold m-0', id: titleId }, props.title),
+            h('h2', { class: 'os-modal__title text-[1.5rem] font-semibold m-0', id: titleId }, props.title),
           )
         }
         if (closeBtn) headerChildren.push(closeBtn)
 
         const header = h(
           'div',
-          { class: 'os-modal__header relative px-6 pt-5 pb-2' },
+          { class: 'os-modal__header relative px-6 pt-5 pb-2 pr-12' },
           headerChildren,
         )
 
         // --- Content ---
         const content = h(
           'div',
-          { class: 'os-modal__content px-6 py-2 overflow-y-auto max-h-[50vh]' },
+          { class: 'os-modal__content px-6 pt-4 pb-6 overflow-y-auto max-h-[50vh]' },
           slots.default?.(),
         )
 
@@ -219,7 +220,7 @@
                 'data-testid': 'os-modal-cancel',
                 onClick: () => cancel('cancel'),
               },
-              { default: () => [props.cancelLabel] },
+              isVue2 ? [props.cancelLabel] : { default: () => [props.cancelLabel] },
             ),
             h(
               OsButton,
@@ -228,7 +229,7 @@
                 'data-testid': 'os-modal-confirm',
                 onClick: () => confirm(),
               },
-              { default: () => [props.confirmLabel] },
+              isVue2 ? [props.confirmLabel] : { default: () => [props.confirmLabel] },
             ),
           ]
         }
