@@ -201,9 +201,9 @@ describe('osModal', () => {
 
       await wrapper.find('[data-testid="os-modal-cancel"]').trigger('click')
 
-      expect(wrapper.emitted('update:open')).toEqual([[false]])
+      expect(wrapper.emitted('update:open')).toStrictEqual([[false]])
       expect(wrapper.emitted('cancel')).toHaveLength(1)
-      expect(wrapper.emitted('close')).toEqual([['cancel']])
+      expect(wrapper.emitted('close')).toStrictEqual([['cancel']])
     })
 
     it('emits update:open false and close on confirm button click', async () => {
@@ -213,9 +213,9 @@ describe('osModal', () => {
 
       await wrapper.find('[data-testid="os-modal-confirm"]').trigger('click')
 
-      expect(wrapper.emitted('update:open')).toEqual([[false]])
+      expect(wrapper.emitted('update:open')).toStrictEqual([[false]])
       expect(wrapper.emitted('confirm')).toHaveLength(1)
-      expect(wrapper.emitted('close')).toEqual([['confirm']])
+      expect(wrapper.emitted('close')).toStrictEqual([['confirm']])
     })
 
     it('emits cancel on close button click with type "close"', async () => {
@@ -226,7 +226,7 @@ describe('osModal', () => {
       await wrapper.find('[data-testid="os-modal-close"]').trigger('click')
 
       expect(wrapper.emitted('cancel')).toHaveLength(1)
-      expect(wrapper.emitted('close')).toEqual([['close']])
+      expect(wrapper.emitted('close')).toStrictEqual([['close']])
     })
 
     it('emits cancel on backdrop click', async () => {
@@ -237,7 +237,7 @@ describe('osModal', () => {
       await wrapper.find('.os-modal__overlay').trigger('click')
 
       expect(wrapper.emitted('cancel')).toHaveLength(1)
-      expect(wrapper.emitted('close')).toEqual([['backdrop']])
+      expect(wrapper.emitted('close')).toStrictEqual([['backdrop']])
     })
 
     it('emits opened when open becomes true', async () => {
@@ -251,8 +251,8 @@ describe('osModal', () => {
     })
   })
 
-  describe('ESC key', () => {
-    it('closes modal on ESC key press', async () => {
+  describe('esc key', () => {
+    it('closes modal on ESC key press', () => {
       const wrapper = mount(OsModal, {
         props: { open: true },
         attachTo: document.body,
@@ -262,12 +262,12 @@ describe('osModal', () => {
       document.dispatchEvent(event)
 
       expect(wrapper.emitted('cancel')).toHaveLength(1)
-      expect(wrapper.emitted('close')).toEqual([['backdrop']])
+      expect(wrapper.emitted('close')).toStrictEqual([['backdrop']])
 
       wrapper.unmount()
     })
 
-    it('does not close on ESC when closed', async () => {
+    it('does not close on ESC when closed', () => {
       const wrapper = mount(OsModal, {
         props: { open: false },
         attachTo: document.body,

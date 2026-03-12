@@ -46,7 +46,6 @@ test.describe('OsModal keyboard accessibility', () => {
     await page.keyboard.press('Tab') // confirm
     await expect(confirmBtn).toBeFocused()
   })
-
 })
 
 test.describe('OsModal visual regression', () => {

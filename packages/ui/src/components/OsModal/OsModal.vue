@@ -1,12 +1,21 @@
 <script lang="ts">
-  import { computed, defineComponent, getCurrentInstance, h, isVue2, onBeforeUnmount, onMounted, ref, watch } from 'vue-demi'
+  import {
+    computed,
+    defineComponent,
+    getCurrentInstance,
+    h,
+    isVue2,
+    onBeforeUnmount,
+    onMounted,
+    ref,
+    watch,
+  } from 'vue-demi'
 
   import OsButton from '#src/components/OsButton/OsButton.vue'
   import { IconCheck, IconClose } from '#src/components/OsIcon'
   import { cn } from '#src/utils'
 
   import { modalPanelVariants } from './modal.variants'
-
 
   /**
    * Modal dialog component with backdrop, focus trap, and body scroll lock.
@@ -62,7 +71,9 @@
       /* v8 ignore stop */
 
       // Vue 2's h() does NOT convert onClick → on.click. Helper to build event props.
-      function eventProps(events: Record<string, (...args: unknown[]) => void>): Record<string, unknown> {
+      function eventProps(
+        events: Record<string, (...args: unknown[]) => void>,
+      ): Record<string, unknown> {
         /* v8 ignore start -- Vue 2 branch */
         if (isVue2) {
           return { on: events }
@@ -182,20 +193,29 @@
         const closeBtn = h(
           'button',
           {
-            class: 'os-modal__close absolute top-3 right-3 flex items-center justify-center w-[26px] h-[26px] rounded-full bg-transparent border-0 cursor-pointer p-0 hover:bg-[var(--color-default-hover)] text-[var(--color-default-contrast)]',
+            class:
+              'os-modal__close absolute top-3 right-3 flex items-center justify-center w-[26px] h-[26px] rounded-full bg-transparent border-0 cursor-pointer p-0 hover:bg-[var(--color-default-hover)] text-[var(--color-default-contrast)]',
             type: 'button',
             'aria-label': 'Close',
             'data-testid': 'os-modal-close',
             ...eventProps({ click: () => cancel('close') }),
           },
-          [h('span', { class: 'w-4 h-4 fill-current inline-flex', 'aria-hidden': 'true' }, [IconClose(createElement, isVue2)])],
+          [
+            h('span', { class: 'w-4 h-4 fill-current inline-flex', 'aria-hidden': 'true' }, [
+              IconClose(createElement, isVue2),
+            ]),
+          ],
         )
 
         // --- Header ---
         const headerChildren: ReturnType<typeof h>[] = []
         if (props.title) {
           headerChildren.push(
-            h('h2', { class: 'os-modal__title text-[1.5rem] font-semibold m-0', id: titleId }, props.title),
+            h(
+              'h2',
+              { class: 'os-modal__title text-[1.5rem] font-semibold m-0', id: titleId },
+              props.title,
+            ),
           )
         }
         headerChildren.push(closeBtn)
@@ -204,7 +224,8 @@
         if (isScrolled.value) {
           headerChildren.push(
             h('div', {
-              class: 'absolute bottom-0 left-0 w-[calc(100%-10px)] h-[30px] translate-y-full bg-gradient-to-b from-white to-transparent pointer-events-none z-10',
+              class:
+                'absolute bottom-0 left-0 w-[calc(100%-10px)] h-[30px] translate-y-full bg-gradient-to-b from-white to-transparent pointer-events-none z-10',
             }),
           )
         }
@@ -292,7 +313,10 @@
 
         const footer = h(
           'footer',
-          { class: 'os-modal__footer bg-[#f5f5f5] px-3 py-3 flex justify-end gap-2 rounded-b-lg shadow-[0_-20px_15px_-10px_rgba(255,255,255,0.9)]' },
+          {
+            class:
+              'os-modal__footer bg-[#f5f5f5] px-3 py-3 flex justify-end gap-2 rounded-b-lg shadow-[0_-20px_15px_-10px_rgba(255,255,255,0.9)]',
+          },
           footerContent,
         )
 
