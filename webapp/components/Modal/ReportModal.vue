@@ -8,6 +8,7 @@
 
     <!-- eslint-disable-next-line vue/no-v-html -->
     <p v-html="message" />
+    <div class="ds-mb-small"></div>
     <ds-radio
       v-model="form.reasonCategory"
       :schema="formSchema.reasonCategory"
