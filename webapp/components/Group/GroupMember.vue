@@ -97,7 +97,6 @@
       v-if="isOpen"
       :open.sync="isOpen"
       :title="$t('group.removeMemberTitle')"
-      force
       @confirm="removeUser()"
     >
       <p class="ds-text ds-text-size-large">

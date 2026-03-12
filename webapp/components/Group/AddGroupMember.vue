@@ -6,7 +6,6 @@
       <select-user-search :id="id" ref="selectUserSearch" @select-user="selectUser" />
       <os-modal
         v-if="isOpen"
-        force
         :title="$t('group.addMember')"
         :open.sync="isOpen"
         @close="closeModal"
