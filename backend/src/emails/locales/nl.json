@@ -1,0 +1,71 @@
+{
+  "notification": "Melding",
+  "subjects": {
+    "changedGroupMemberRole": "Rol in groep gewijzigd",
+    "chatMessage": "Nieuw chatbericht",
+    "commentedOnPost": "Nieuwe reactie op bericht",
+    "followedUserPosted": "Nieuw bericht van gevolgde gebruiker",
+    "mentionedInComment": "Vermeld in reactie",
+    "mentionedInPost": "Vermeld in bericht",
+    "newEmail": "Nieuw e-mailadres",
+    "removedUserFromGroup": "Uit groep verwijderd",
+    "postInGroup": "Nieuw bericht in groep",
+    "resetPassword": "Wachtwoord herstellen",
+    "userJoinedGroup": "Gebruiker is lid geworden van groep",
+    "userLeftGroup": "Gebruiker heeft groep verlaten",
+    "wrongEmail": "Verkeerd e-mailadres?"
+  },
+  "registration": {
+    "introduction": "Bedankt voor je aanmelding – fijn dat je erbij bent. Er is nog maar één klein stapje nodig voordat we samen de wereld kunnen verbeteren … Bevestig je e-mailadres door op de onderstaande knop te klikken:",
+    "codeHint": "Als de bovenstaande knop niet werkt, kun je ook de volgende code in je browservenster kopiëren: ",
+    "codeHintException": "Dit werkt echter alleen als je je via onze website hebt geregistreerd.",
+    "notYouStart": "Als je je niet hebt aangemeld bij ",
+    "notYouEnd": " raden we je aan om een kijkje te nemen! Het is een sociaal netwerk van mensen voor mensen die samen de wereld willen veranderen.",
+    "ps": "PS: Als je deze e-mail negeert, maken we geen account voor je aan. ;)"
+  },
+  "emailVerification": {
+    "codeHint": "Als de bovenstaande knop niet werkt, kun je ook de volgende code in je browservenster kopiëren: ",
+    "introduction": "Wil je je e-mailadres wijzigen? Geen probleem! Klik op de onderstaande knop om je nieuwe adres te verifiëren:",
+    "doNotChange": "Als je je e-mailadres niet wilt wijzigen, kun je dit bericht gewoon negeren. "
+  },
+  "support": "Als je vragen of problemen hebt, neem dan gerust contact op met onze ondersteuning: ",
+  "buttons": {
+    "confirmEmail": "Bevestig je e-mailadres",
+    "resetPassword": "Wachtwoord herstellen",
+    "tryAgain": "Probeer een ander e-mailadres",
+    "verifyEmail": "E-mailadres verifiëren",
+    "viewChat": "Chat bekijken",
+    "viewComment": "Reactie bekijken",
+    "viewGroup": "Groep bekijken",
+    "viewPost": "Bericht bekijken"
+  },
+  "general": {
+    "greeting": "Hallo",
+    "seeYou": "Tot snel bij ",
+    "yourTeam": "– Het {team} Team",
+    "settingsHint": "PS: Als je geen e-mails meer wilt ontvangen, wijzig dan je ",
+    "settingsName": "meldingsinstellingen",
+    "welcome": "Welkom bij"
+  },
+  "resetPassword": {
+    "codeHint": "Als de bovenstaande knop niet werkt, kun je ook de volgende code in je browservenster kopiëren: ",
+    "ignore": "Als je geen nieuw wachtwoord hebt aangevraagd, kun je deze e-mail gewoon negeren.",
+    "introduction": "Wachtwoord vergeten? Geen probleem! Klik op de onderstaande knop om het binnen 24 uur te herstellen:"
+  },
+  "wrongEmail": {
+    "ignoreEnd": " hebt of als je je wachtwoord niet wilde herstellen, kun je deze e-mail gewoon negeren.",
+    "ignoreStart": "Als je geen account hebt bij ",
+    "introduction": "Je hebt een wachtwoordherstel aangevraagd, maar we konden helaas geen account vinden dat aan je e-mailadres is gekoppeld. Heb je je misschien met een ander adres aangemeld?"
+  },
+  "changedGroupMemberRole": "je rol in de groep \u201e{groupName}\u201c is gewijzigd. Klik op de knop om deze groep te bekijken:",
+  "chatMessageStart": "je hebt een nieuw chatbericht ontvangen van ",
+  "chatMessageEnd": ".",
+  "commentedOnPost": " heeft gereageerd op een bericht dat je volgt met de titel \u201e{postTitle}\u201c. Klik op de knop om deze reactie te bekijken:",
+  "followedUserPosted": ", een gebruiker die je volgt, heeft een nieuw bericht geschreven met de titel \u201e{postTitle}\u201c. Klik op de knop om dit bericht te bekijken:",
+  "mentionedInComment": " heeft je vermeld in een reactie op het bericht met de titel \u201e{postTitle}\u201c. Klik op de knop om deze reactie te bekijken:",
+  "mentionedInPost": " heeft je vermeld in een bericht met de titel \u201e{postTitle}\u201c. Klik op de knop om dit bericht te bekijken:",
+  "removedUserFromGroup": "je bent verwijderd uit de groep \u201e{groupName}\u201c.",
+  "postInGroup": "iemand heeft een nieuw bericht geschreven met de titel \u201e{postTitle}\u201c in een van je groepen. Klik op de knop om dit bericht te bekijken:",
+  "userJoinedGroup": " is lid geworden van de groep \u201e{groupName}\u201c. Klik op de knop om deze groep te bekijken:",
+  "userLeftGroup": " heeft de groep \u201e{groupName}\u201c verlaten. Klik op de knop om deze groep te bekijken:"
+}
