@@ -101,8 +101,6 @@ exports[`Invitation.vue when the invite code was not redeemed renders 1`] = `
         </span>
       </button>
     </div>
-     
-    <!---->
   </li>
 </div>
 `;
@@ -208,8 +206,6 @@ exports[`Invitation.vue when the invite code was redeemed renders 1`] = `
         </span>
       </button>
     </div>
-     
-    <!---->
   </li>
 </div>
 `;

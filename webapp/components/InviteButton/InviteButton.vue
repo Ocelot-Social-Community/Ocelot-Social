@@ -1,5 +1,6 @@
 <template>
-  <dropdown class="invite-button" offset="8" :placement="placement" noMouseLeaveClosing>
+  <div class="invite-button">
+  <dropdown ref="dropdown" offset="8" :placement="placement" noMouseLeaveClosing>
     <template #default="{ toggleMenu }">
       <os-button
         variant="primary"
@@ -23,6 +24,7 @@
         <invitation-list
           @generate-invite-code="generatePersonalInviteCode"
           @invalidate-invite-code="invalidateInviteCode"
+          @open-delete-modal="openDeleteModal"
           :inviteCodes="user.inviteCodes"
           :copy-message="
             $t('invite-codes.invite-link-message-personal', {
@@ -33,11 +35,18 @@
       </div>
     </template>
   </dropdown>
+    <confirm-modal
+      v-if="showConfirmModal"
+      :modalData="currentModalData"
+      @close="showConfirmModal = false"
+    />
+  </div>
 </template>
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
 import Dropdown from '~/components/Dropdown'
 import { mapGetters, mapMutations } from 'vuex'
 import InvitationList from '~/components/_new/features/Invitations/InvitationList.vue'
@@ -45,6 +54,7 @@ import { generatePersonalInviteCode, invalidateInviteCode } from '~/graphql/Invi
 
 export default {
   components: {
+    ConfirmModal,
     OsButton,
     OsIcon,
     Dropdown,
@@ -52,6 +62,12 @@ export default {
   },
   props: {
     placement: { type: String, default: 'top-end' },
+  },
+  data() {
+    return {
+      showConfirmModal: false,
+      currentModalData: null,
+    }
   },
   computed: {
     ...mapGetters({
@@ -68,6 +84,11 @@ export default {
     ...mapMutations({
       setCurrentUser: 'auth/SET_USER_PARTIAL',
     }),
+    openDeleteModal(modalData) {
+      this.$refs.dropdown.isPopoverOpen = false
+      this.currentModalData = modalData
+      this.showConfirmModal = true
+    },
     async generatePersonalInviteCode(comment) {
       try {
         await this.$apollo.mutate({

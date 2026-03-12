@@ -6,6 +6,7 @@
       <invitation-list
         @generate-invite-code="generateGroupInviteCode"
         @invalidate-invite-code="invalidateInviteCode"
+        @open-delete-modal="openDeleteModal"
         :inviteCodes="group.inviteCodes"
         :copy-message="
           group.groupType === 'hidden'
@@ -19,18 +20,31 @@
         "
       />
     </os-card>
+    <confirm-modal
+      v-if="showConfirmModal"
+      :modalData="currentModalData"
+      @close="showConfirmModal = false"
+    />
   </div>
 </template>
 
 <script>
 import { OsCard } from '@ocelot-social/ui'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
 import InvitationList from '~/components/_new/features/Invitations/InvitationList.vue'
 import { generateGroupInviteCode, invalidateInviteCode } from '~/graphql/InviteCode'
 
 export default {
   components: {
+    ConfirmModal,
     OsCard,
     InvitationList,
+  },
+  data() {
+    return {
+      showConfirmModal: false,
+      currentModalData: null,
+    }
   },
   props: {
     group: {
@@ -39,6 +53,10 @@ export default {
     },
   },
   methods: {
+    openDeleteModal(modalData) {
+      this.currentModalData = modalData
+      this.showConfirmModal = true
+    },
     async generateGroupInviteCode(comment) {
       try {
         await this.$apollo.mutate({

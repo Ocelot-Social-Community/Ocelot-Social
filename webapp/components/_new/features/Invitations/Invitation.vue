@@ -42,23 +42,15 @@
         </template>
       </os-button>
     </div>
-    <confirm-modal
-      v-if="showConfirmModal"
-      :modalData="deleteModalData"
-      @close="showConfirmModal = false"
-    />
   </li>
 </template>
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import ConfirmModal from '~/components/Modal/ConfirmModal'
-
 export default {
   name: 'Invitation',
   components: {
-    ConfirmModal,
     OsButton,
     OsIcon,
   },
@@ -104,7 +96,6 @@ export default {
   data() {
     return {
       canCopy: false,
-      showConfirmModal: false,
     }
   },
   created() {
@@ -117,7 +108,7 @@ export default {
       this.$toast.success(this.$t('invite-codes.copy-success'))
     },
     openDeleteModal() {
-      this.showConfirmModal = true
+      this.$emit('open-delete-modal', this.deleteModalData)
     },
   },
 }

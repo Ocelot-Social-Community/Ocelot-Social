@@ -109,10 +109,11 @@ describe('Invitation.vue', () => {
       wrapper = Wrapper({ wasRedeemed: false })
     })
 
-    it('opens the delete modal', async () => {
+    it('emits open-delete-modal with modal data', async () => {
       const deleteButton = screen.getByLabelText('invite-codes.invalidate')
       await fireEvent.click(deleteButton)
-      expect(wrapper.container.querySelector('[data-test="confirm-modal"]')).toBeInTheDocument()
+      expect(wrapper.emitted()['open-delete-modal']).toBeTruthy()
+      expect(wrapper.emitted()['open-delete-modal'][0][0]).toHaveProperty('buttons')
     })
   })
 })
