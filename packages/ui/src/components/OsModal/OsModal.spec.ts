@@ -66,6 +66,30 @@ describe('osModal', () => {
     })
   })
 
+  describe('scroll fade', () => {
+    it('does not show top fade when content is not scrolled', () => {
+      const wrapper = mount(OsModal, {
+        props: { open: true },
+        slots: { default: '<div style="height: 2000px">tall content</div>' },
+      })
+
+      expect(wrapper.find('.os-modal__header .bg-gradient-to-b').exists()).toBe(false)
+    })
+
+    it('shows top fade after content is scrolled down', async () => {
+      const wrapper = mount(OsModal, {
+        props: { open: true },
+        slots: { default: '<div style="height: 2000px">tall content</div>' },
+      })
+
+      const content = wrapper.find('.os-modal__content')
+      Object.defineProperty(content.element, 'scrollTop', { value: 50, writable: true })
+      await content.trigger('scroll')
+
+      expect(wrapper.find('.os-modal__header .bg-gradient-to-b').exists()).toBe(true)
+    })
+  })
+
   describe('css', () => {
     it('has os-modal-wrapper class on root', () => {
       const wrapper = mount(OsModal)

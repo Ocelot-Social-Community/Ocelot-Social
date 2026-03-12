@@ -135,6 +135,7 @@
       })
 
       // --- Focus trap ---
+      /* v8 ignore start -- focus wrapping requires real browser (tested in visual tests) */
       function onFocusTrap(e: KeyboardEvent) {
         if (e.key !== 'Tab' || !modalRef.value) return
 
@@ -158,6 +159,7 @@
           }
         }
       }
+      /* v8 ignore stop */
 
       return () => {
         if (!props.open) {
@@ -186,7 +188,7 @@
             'data-testid': 'os-modal-close',
             ...eventProps({ click: () => cancel('close') }),
           },
-          [h('span', { class: 'w-4 h-4 fill-current inline-flex', 'aria-hidden': 'true' }, [createElement(IconClose)])],
+          [h('span', { class: 'w-4 h-4 fill-current inline-flex', 'aria-hidden': 'true' }, [IconClose(createElement, isVue2)])],
         )
 
         // --- Header ---
@@ -228,62 +230,64 @@
 
         if (slots.footer) {
           footerContent = slots.footer({ confirm, cancel })
-        } else if (isVue2) {
-          /* v8 ignore start -- Vue 2 branch: must use VNode data format for component props */
-          footerContent = [
-            h(
-              OsButton,
-              {
-                props: { appearance: 'ghost' },
-                attrs: { 'data-testid': 'os-modal-cancel' },
-                on: { click: () => cancel('cancel') },
-              },
-              [
-                h('template', { slot: 'icon' }, [createElement(IconClose)]),
-                props.cancelLabel,
-              ],
-            ),
-            h(
-              OsButton,
-              {
-                props: { variant: 'primary' },
-                attrs: { 'data-testid': 'os-modal-confirm' },
-                on: { click: () => confirm() },
-              },
-              [
-                h('template', { slot: 'icon' }, [createElement(IconCheck)]),
-                props.confirmLabel,
-              ],
-            ),
-          ]
-          /* v8 ignore stop */
         } else {
-          footerContent = [
-            h(
-              OsButton,
-              {
-                appearance: 'ghost',
-                'data-testid': 'os-modal-cancel',
-                onClick: () => cancel('cancel'),
-              },
-              {
-                icon: () => [h(IconClose)],
-                default: () => [props.cancelLabel],
-              },
-            ),
-            h(
-              OsButton,
-              {
-                variant: 'primary',
-                'data-testid': 'os-modal-confirm',
-                onClick: () => confirm(),
-              },
-              {
-                icon: () => [h(IconCheck)],
-                default: () => [props.confirmLabel],
-              },
-            ),
-          ]
+          /* v8 ignore start -- Vue 2 branch: must use VNode data format for component props */
+          if (isVue2) {
+            footerContent = [
+              h(
+                OsButton,
+                {
+                  props: { appearance: 'ghost' },
+                  attrs: { 'data-testid': 'os-modal-cancel' },
+                  on: { click: () => cancel('cancel') },
+                },
+                [
+                  h('template', { slot: 'icon' }, [IconClose(createElement, true)]),
+                  props.cancelLabel,
+                ],
+              ),
+              h(
+                OsButton,
+                {
+                  props: { variant: 'primary' },
+                  attrs: { 'data-testid': 'os-modal-confirm' },
+                  on: { click: () => confirm() },
+                },
+                [
+                  h('template', { slot: 'icon' }, [IconCheck(createElement, true)]),
+                  props.confirmLabel,
+                ],
+              ),
+            ]
+          } else {
+            /* v8 ignore stop */
+            footerContent = [
+              h(
+                OsButton,
+                {
+                  appearance: 'ghost',
+                  'data-testid': 'os-modal-cancel',
+                  onClick: () => cancel('cancel'),
+                },
+                {
+                  icon: () => [IconClose(createElement, false)],
+                  default: () => [props.cancelLabel],
+                },
+              ),
+              h(
+                OsButton,
+                {
+                  variant: 'primary',
+                  'data-testid': 'os-modal-confirm',
+                  onClick: () => confirm(),
+                },
+                {
+                  icon: () => [IconCheck(createElement, false)],
+                  default: () => [props.confirmLabel],
+                },
+              ),
+            ]
+          }
         }
 
         const footer = h(
