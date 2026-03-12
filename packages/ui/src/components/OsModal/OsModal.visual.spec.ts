@@ -30,7 +30,7 @@ test.describe('OsModal keyboard accessibility', () => {
   })
 
   test('footer buttons are focusable via Tab', async ({ page }) => {
-    await page.goto(`${STORY_URL}--built-in-buttons&viewMode=story`)
+    await page.goto(`${STORY_URL}--default-size&viewMode=story`)
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
 
