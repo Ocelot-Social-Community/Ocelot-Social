@@ -201,7 +201,7 @@ export default {
         const {
           data: { DeleteComment },
         } = await this.$apollo.mutate({
-          mutation: CommentMutations(this.$i18n).DeleteComment,
+          mutation: CommentMutations().DeleteComment,
           variables: { id: this.comment.id },
         })
         this.$toast.success(this.$t(`delete.comment.success`))

@@ -1,8 +1,7 @@
 import gql from 'graphql-tag'
 import { imageUrls } from './fragments/imageUrls'
 
-export default (i18n) => {
-  const lang = i18n.locale().toUpperCase()
+export default () => {
   return {
     CreateComment: gql`
       ${imageUrls}
@@ -90,10 +89,7 @@ export default (i18n) => {
             commentedCount
             followedByCount
             followedByCurrentUser
-            location {
-              name: name${lang}
-            }
-            badges {
+            badgeTrophies {
               id
               icon
             }

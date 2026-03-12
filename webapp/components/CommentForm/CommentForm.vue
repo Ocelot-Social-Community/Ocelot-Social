@@ -101,14 +101,14 @@ export default {
     async handleSubmit() {
       const mutateParams = !this.update
         ? {
-            mutation: CommentMutations(this.$i18n).CreateComment,
+            mutation: CommentMutations().CreateComment,
             variables: {
               postId: this.post.id,
               content: this.form.content,
             },
           }
         : {
-            mutation: CommentMutations(this.$i18n).UpdateComment,
+            mutation: CommentMutations().UpdateComment,
             variables: {
               id: this.comment.id,
               content: this.form.content,
