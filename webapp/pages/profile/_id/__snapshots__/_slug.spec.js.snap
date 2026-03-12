@@ -683,6 +683,8 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
         </client-only-stub>
       </div>
     </div>
+     
+    <!---->
   </div>
 </div>
 `;
@@ -1409,6 +1411,8 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
         </client-only-stub>
       </div>
     </div>
+     
+    <!---->
   </div>
 </div>
 `;
@@ -1990,6 +1994,8 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         </client-only-stub>
       </div>
     </div>
+     
+    <!---->
   </div>
 </div>
 `;
@@ -2615,6 +2621,8 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
         </client-only-stub>
       </div>
     </div>
+     
+    <!---->
   </div>
 </div>
 `;
