@@ -95,19 +95,6 @@ test.describe('OsModal visual regression', () => {
     await checkA11y(page)
   })
 
-  test('built-in buttons', async ({ page }) => {
-    await page.goto(`${STORY_URL}--built-in-buttons&viewMode=story`)
-    const root = page.locator(STORY_ROOT)
-    await root.waitFor()
-    await waitForReady(page)
-
-    await expect(root.locator('[data-testid="built-in-buttons"]')).toHaveScreenshot(
-      'built-in-buttons.png',
-    )
-
-    await checkA11y(page)
-  })
-
   test('force mode', async ({ page }) => {
     await page.goto(`${STORY_URL}--force-mode&viewMode=story`)
     const root = page.locator(STORY_ROOT)

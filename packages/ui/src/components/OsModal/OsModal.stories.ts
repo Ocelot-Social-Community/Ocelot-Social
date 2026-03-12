@@ -108,24 +108,6 @@ export const CustomFooter: Story = {
   }),
 }
 
-export const BuiltInButtons: Story = {
-  render: () => ({
-    components: { OsModal },
-    template: `
-      <div data-testid="built-in-buttons">
-        <OsModal
-          :open="true"
-          title="Built-in Buttons"
-          cancel-label="Abbrechen"
-          confirm-label="Bestätigen"
-        >
-          <p>This modal uses the built-in cancel and confirm buttons with custom labels.</p>
-        </OsModal>
-      </div>
-    `,
-  }),
-}
-
 export const ForceMode: Story = {
   render: () => ({
     components: { OsModal },
