@@ -541,9 +541,9 @@
       "regional": "Rajonal"
     },
     "actionRadius": "Rrezja e veprimit të grupit",
+    "addMember": "Shto anëtar",
     "addMemberToGroup": "Shto në grup",
     "addMemberToGroupSuccess": "“{name}” u shtua në grup me rolin “{role}”!",
-    "addMember": "Shto anëtar",
     "addUser": "Shto përdorues",
     "addUserNoOptions": "Nuk u gjetën përdorues!",
     "addUserPlaceholder": "Emri i përdoruesit",

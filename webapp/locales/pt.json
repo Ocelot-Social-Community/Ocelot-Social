@@ -541,9 +541,9 @@
       "regional": "Regional"
     },
     "actionRadius": "Raio de ação do grupo",
+    "addMember": "Adicionar membro",
     "addMemberToGroup": "Adicionar ao grupo",
     "addMemberToGroupSuccess": "“{name}” foi adicionado ao grupo com o papel “{role}”!",
-    "addMember": "Adicionar membro",
     "addUser": "Adicionar usuário",
     "addUserNoOptions": "Nenhum usuário encontrado!",
     "addUserPlaceholder": "Nome de usuário",

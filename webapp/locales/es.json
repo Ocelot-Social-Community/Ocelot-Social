@@ -541,9 +541,9 @@
       "regional": "Regional"
     },
     "actionRadius": "Radio de acción del grupo",
+    "addMember": "Añadir miembro",
     "addMemberToGroup": "Añadir al grupo",
     "addMemberToGroupSuccess": "¡“{name}” fue añadido al grupo con el rol “{role}”!",
-    "addMember": "Añadir miembro",
     "addUser": "Añadir usuario",
     "addUserNoOptions": "¡No se encontraron usuarios!",
     "addUserPlaceholder": "Nombre de usuario",

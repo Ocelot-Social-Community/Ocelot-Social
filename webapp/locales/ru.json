@@ -541,9 +541,9 @@
       "regional": "Региональный"
     },
     "actionRadius": "Радиус действия группы",
+    "addMember": "Добавить участника",
     "addMemberToGroup": "Добавить в группу",
     "addMemberToGroupSuccess": "“{name}” добавлен в группу с ролью “{role}”!",
-    "addMember": "Добавить участника",
     "addUser": "Добавить пользователя",
     "addUserNoOptions": "Пользователи не найдены!",
     "addUserPlaceholder": "Имя пользователя",
