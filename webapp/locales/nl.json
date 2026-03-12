@@ -543,6 +543,7 @@
     "actionRadius": "Actieradius van de groep",
     "addMemberToGroup": "Toevoegen aan groep",
     "addMemberToGroupSuccess": "“{name}” is toegevoegd aan de groep met de rol “{role}”!",
+    "addMember": "Lid toevoegen",
     "addUser": "Gebruiker toevoegen",
     "addUserNoOptions": "Geen gebruikers gevonden!",
     "addUserPlaceholder": "Gebruikersnaam",

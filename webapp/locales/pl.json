@@ -543,6 +543,7 @@
     "actionRadius": "Zasięg działania grupy",
     "addMemberToGroup": "Dodaj do grupy",
     "addMemberToGroupSuccess": "“{name}” został/a dodany/a do grupy z rolą “{role}”!",
+    "addMember": "Dodaj członka",
     "addUser": "Dodaj użytkownika",
     "addUserNoOptions": "Nie znaleziono użytkowników!",
     "addUserPlaceholder": "Nazwa użytkownika",

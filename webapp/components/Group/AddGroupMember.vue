@@ -7,8 +7,7 @@
       <os-modal
         v-if="isOpen"
         force
-        size="extended"
-        :title="$t('group.modal.confirmAddGroupMemberTitle')"
+        :title="$t('group.addMember')"
         :open.sync="isOpen"
         @close="closeModal"
         @confirm="confirmModal"

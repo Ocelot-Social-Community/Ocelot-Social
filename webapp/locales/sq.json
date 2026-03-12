@@ -543,6 +543,7 @@
     "actionRadius": "Rrezja e veprimit të grupit",
     "addMemberToGroup": "Shto në grup",
     "addMemberToGroupSuccess": "“{name}” u shtua në grup me rolin “{role}”!",
+    "addMember": "Shto anëtar",
     "addUser": "Shto përdorues",
     "addUserNoOptions": "Nuk u gjetën përdorues!",
     "addUserPlaceholder": "Emri i përdoruesit",
