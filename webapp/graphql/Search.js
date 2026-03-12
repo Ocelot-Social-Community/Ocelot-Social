@@ -96,7 +96,7 @@ export const searchGroups = () => {
             slug
             name
             icon
-         }
+          }
           avatar {
             ...imageUrls
           }

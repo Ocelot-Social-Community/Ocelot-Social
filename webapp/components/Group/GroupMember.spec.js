@@ -150,7 +150,10 @@ describe('GroupMember', () => {
 
       describe('click on cancel', () => {
         beforeEach(() => {
-          wrapper.find('div.os-modal-wrapper').find('[data-testid="os-modal-cancel"]').trigger('click')
+          wrapper
+            .find('div.os-modal-wrapper')
+            .find('[data-testid="os-modal-cancel"]')
+            .trigger('click')
         })
 
         it('closes the modal', () => {
@@ -160,7 +163,10 @@ describe('GroupMember', () => {
 
       describe('click on confirm with server error', () => {
         beforeEach(() => {
-          wrapper.find('div.os-modal-wrapper').find('[data-testid="os-modal-confirm"]').trigger('click')
+          wrapper
+            .find('div.os-modal-wrapper')
+            .find('[data-testid="os-modal-confirm"]')
+            .trigger('click')
         })
 
         it('toasts an error message', () => {
@@ -175,7 +181,10 @@ describe('GroupMember', () => {
       describe('click on confirm with success', () => {
         beforeEach(() => {
           jest.clearAllMocks()
-          wrapper.find('div.os-modal-wrapper').find('[data-testid="os-modal-confirm"]').trigger('click')
+          wrapper
+            .find('div.os-modal-wrapper')
+            .find('[data-testid="os-modal-confirm"]')
+            .trigger('click')
         })
 
         it('calls the API', () => {

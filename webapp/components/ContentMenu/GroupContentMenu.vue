@@ -1,41 +1,41 @@
 <template>
   <div class="content-menu" @click.stop.prevent>
-  <dropdown class="group-content-menu" :placement="placement" offset="5">
-    <template #default="{ toggleMenu }">
-      <slot name="button" :toggleMenu="toggleMenu">
-        <os-button
-          variant="primary"
-          appearance="outline"
-          size="sm"
-          circle
-          :aria-label="$t('group.contentMenu.menuButton')"
-          data-test="group-menu-button"
-          @click.prevent="toggleMenu()"
-        >
-          <template #icon>
-            <os-icon :icon="icons.ellipsisV" />
-          </template>
-        </os-button>
-      </slot>
-    </template>
-    <template #popover="{ toggleMenu }">
-      <div class="group-menu-popover">
-        <ds-menu :routes="routes">
-          <template #menuitem="item">
-            {{ item.parents }}
-            <ds-menu-item
-              :route="item.route"
-              :parents="item.parents"
-              @click.stop.prevent="openItem(item.route, toggleMenu)"
-            >
-              <os-icon :icon="item.route.icon" />
-              {{ item.route.label }}
-            </ds-menu-item>
-          </template>
-        </ds-menu>
-      </div>
-    </template>
-  </dropdown>
+    <dropdown class="group-content-menu" :placement="placement" offset="5">
+      <template #default="{ toggleMenu }">
+        <slot name="button" :toggleMenu="toggleMenu">
+          <os-button
+            variant="primary"
+            appearance="outline"
+            size="sm"
+            circle
+            :aria-label="$t('group.contentMenu.menuButton')"
+            data-test="group-menu-button"
+            @click.prevent="toggleMenu()"
+          >
+            <template #icon>
+              <os-icon :icon="icons.ellipsisV" />
+            </template>
+          </os-button>
+        </slot>
+      </template>
+      <template #popover="{ toggleMenu }">
+        <div class="group-menu-popover">
+          <ds-menu :routes="routes">
+            <template #menuitem="item">
+              {{ item.parents }}
+              <ds-menu-item
+                :route="item.route"
+                :parents="item.parents"
+                @click.stop.prevent="openItem(item.route, toggleMenu)"
+              >
+                <os-icon :icon="item.route.icon" />
+                {{ item.route.label }}
+              </ds-menu-item>
+            </template>
+          </ds-menu>
+        </div>
+      </template>
+    </dropdown>
   </div>
 </template>
 

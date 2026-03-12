@@ -1,40 +1,40 @@
 <template>
   <div class="invite-button">
-  <dropdown ref="dropdown" offset="8" :placement="placement" noMouseLeaveClosing>
-    <template #default="{ toggleMenu }">
-      <os-button
-        variant="primary"
-        appearance="ghost"
-        circle
-        :aria-label="$t('invite-codes.button.tooltip')"
-        v-tooltip="{
-          content: $t('invite-codes.button.tooltip'),
-          placement: 'bottom-start',
-        }"
-        @click.prevent="toggleMenu"
-      >
-        <template #icon>
-          <os-icon :icon="icons.userPlus" />
-        </template>
-      </os-button>
-    </template>
-    <template #popover>
-      <div class="invite-list">
-        <h2>{{ $t('invite-codes.my-invite-links') }}</h2>
-        <invitation-list
-          @generate-invite-code="generatePersonalInviteCode"
-          @invalidate-invite-code="invalidateInviteCode"
-          @open-delete-modal="openDeleteModal"
-          :inviteCodes="user.inviteCodes"
-          :copy-message="
-            $t('invite-codes.invite-link-message-personal', {
-              network: $env.NETWORK_NAME,
-            })
-          "
-        />
-      </div>
-    </template>
-  </dropdown>
+    <dropdown ref="dropdown" offset="8" :placement="placement" noMouseLeaveClosing>
+      <template #default="{ toggleMenu }">
+        <os-button
+          variant="primary"
+          appearance="ghost"
+          circle
+          :aria-label="$t('invite-codes.button.tooltip')"
+          v-tooltip="{
+            content: $t('invite-codes.button.tooltip'),
+            placement: 'bottom-start',
+          }"
+          @click.prevent="toggleMenu"
+        >
+          <template #icon>
+            <os-icon :icon="icons.userPlus" />
+          </template>
+        </os-button>
+      </template>
+      <template #popover>
+        <div class="invite-list">
+          <h2>{{ $t('invite-codes.my-invite-links') }}</h2>
+          <invitation-list
+            @generate-invite-code="generatePersonalInviteCode"
+            @invalidate-invite-code="invalidateInviteCode"
+            @open-delete-modal="openDeleteModal"
+            :inviteCodes="user.inviteCodes"
+            :copy-message="
+              $t('invite-codes.invite-link-message-personal', {
+                network: $env.NETWORK_NAME,
+              })
+            "
+          />
+        </div>
+      </template>
+    </dropdown>
     <confirm-modal
       v-if="showConfirmModal"
       :modalData="currentModalData"

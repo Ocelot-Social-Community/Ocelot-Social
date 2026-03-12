@@ -67,7 +67,7 @@ export default () => {
     DeleteComment: gql`
       ${imageUrls}
 
-      mutation($id: ID!) {
+      mutation ($id: ID!) {
         DeleteComment(id: $id) {
           id
           contentExcerpt

@@ -87,10 +87,7 @@ export default {
             name:
               report.resource.name ||
               this.$filters.truncate(report.resource.title, 30) ||
-              this.$filters.truncate(
-                this.$filters.removeHtml(report.resource.contentExcerpt),
-                30,
-              ),
+              this.$filters.truncate(this.$filters.removeHtml(report.resource.contentExcerpt), 30),
           },
           buttons: {
             confirm: {
