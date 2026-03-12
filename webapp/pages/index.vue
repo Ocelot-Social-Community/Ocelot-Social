@@ -162,7 +162,7 @@
     <!-- infinite loading -->
     <client-only>
       <infinite-loading v-if="hasMore" @infinite="showMoreContributions">
-        <os-spinner slot="spinner" size="lg" />
+        <os-spinner slot="spinner" size="lg" class="ds-mt-large" />
       </infinite-loading>
     </client-only>
   </div>
