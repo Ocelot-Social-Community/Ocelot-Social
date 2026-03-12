@@ -28,7 +28,6 @@
     <small class="smallTag">
       {{ form.reasonDescription.length }}/{{ formSchema.reasonDescription.max }}
     </small>
-    <div class="ds-mb-large"></div>
     <template #footer>
       <os-button class="cancel" variant="primary" appearance="outline" @click="cancel">
         <template #icon>
