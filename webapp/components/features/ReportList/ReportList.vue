@@ -94,9 +94,7 @@ export default {
               danger: true,
               icon: report.resource.disabled ? this.icons.eyeSlash : this.icons.eye,
               textIdent: 'moderation.reports.decideModal.submit',
-              callback: () => {
-                this.confirmCallback(report.resource)
-              },
+              callback: () => this.confirmCallback(report.resource),
             },
             cancel: {
               icon: this.icons.close,
@@ -123,16 +121,17 @@ export default {
     },
     async confirmCallback(resource) {
       const { disabled: disable, id: resourceId } = resource
-      this.$apollo
-        .mutate({
+      try {
+        await this.$apollo.mutate({
           mutation: reviewMutation(),
           variables: { disable, resourceId, closed: true },
         })
-        .then(() => {
-          this.$toast.success(this.$t('moderation.reports.DecisionSuccess'))
-          this.$apollo.queries.reportsList.refetch()
-        })
-        .catch((error) => this.$toast.error(error.message))
+        this.$toast.success(this.$t('moderation.reports.DecisionSuccess'))
+        this.$apollo.queries.reportsList.refetch()
+      } catch (error) {
+        this.$toast.error(error.message)
+        throw error
+      }
     },
     openModal(report) {
       this.currentModalData = this.modalData(report)
