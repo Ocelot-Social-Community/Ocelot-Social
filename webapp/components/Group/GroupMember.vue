@@ -92,12 +92,12 @@
         </tbody>
       </table>
     </div>
-    <ds-modal
+    <os-modal
       v-if="isOpen"
-      v-model="isOpen"
+      :open.sync="isOpen"
       :title="`${$t('group.removeMember')}`"
       force
-      extended
+      size="extended"
       :confirm-label="$t('group.removeMember')"
       :cancel-label="$t('actions.cancel')"
       @confirm="removeUser()"
@@ -105,7 +105,7 @@
   </div>
 </template>
 <script>
-import { OsBadge, OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsBadge, OsButton, OsIcon, OsModal } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { changeGroupMemberRoleMutation, removeUserFromGroupMutation } from '~/graphql/groups.js'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
@@ -118,6 +118,7 @@ export default {
     OsBadge,
     OsButton,
     OsIcon,
+    OsModal,
     ProfileAvatar,
   },
   props: {

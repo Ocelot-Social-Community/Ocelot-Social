@@ -1,5 +1,5 @@
 <template>
-  <ds-modal class="report-modal" :title="title" :is-open="isOpen" @cancel="cancel">
+  <os-modal class="report-modal" :title="title" :open="isOpen" @cancel="cancel">
     <transition name="ds-transition-fade">
       <div v-if="success" class="ds-flex ds-flex-centered hc-modal-success">
         <sweetalert-icon icon="success" />
@@ -50,11 +50,11 @@
         {{ $t('report.submit') }}
       </os-button>
     </template>
-  </ds-modal>
+  </os-modal>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsModal } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import { reportMutation } from '~/graphql/Moderation.js'
@@ -66,6 +66,7 @@ export default {
   components: {
     OsButton,
     OsIcon,
+    OsModal,
     SweetalertIcon,
   },
   props: {
@@ -169,7 +170,7 @@ export default {
 </script>
 
 <style lang="scss">
-.report-modal.ds-modal {
+.report-modal.os-modal {
   width: 700px !important;
   max-width: 700px !important;
 }

@@ -1,5 +1,5 @@
 <template>
-  <ds-modal class="delete-user-modal" :title="title" :is-open="isOpen" @cancel="cancel">
+  <os-modal class="delete-user-modal" :title="title" :open="isOpen" @cancel="cancel">
     <transition name="ds-transition-fade">
       <div v-if="success" class="ds-flex ds-flex-centered hc-modal-success">
         <sweetalert-icon icon="success" />
@@ -51,11 +51,11 @@
         {{ $t('settings.deleteUserAccount.name') }}
       </os-button>
     </template>
-  </ds-modal>
+  </os-modal>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsModal } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import gql from 'graphql-tag'
 import { mapMutations } from 'vuex'
@@ -69,6 +69,7 @@ export default {
     DateTime,
     OsButton,
     OsIcon,
+    OsModal,
     SweetalertIcon,
     UserTeaser,
   },
@@ -174,7 +175,7 @@ export default {
 </script>
 
 <style lang="scss">
-.delete-user-modal.ds-modal {
+.delete-user-modal.os-modal {
   max-width: 700px !important;
 }
 .delete-user-modal .hc-modal-success {

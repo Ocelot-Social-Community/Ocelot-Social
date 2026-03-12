@@ -87,7 +87,7 @@ describe('GroupMember', () => {
     })
 
     it('has no modal', () => {
-      expect(wrapper.find('div.ds-modal-wrapper').exists()).toBe(false)
+      expect(wrapper.find('div.os-modal-wrapper').exists()).toBe(false)
     })
 
     describe('change user role', () => {
@@ -145,22 +145,22 @@ describe('GroupMember', () => {
       })
 
       it('opens the modal', () => {
-        expect(wrapper.find('div.ds-modal-wrapper').isVisible()).toBe(true)
+        expect(wrapper.find('div.os-modal-wrapper').isVisible()).toBe(true)
       })
 
       describe('click on cancel', () => {
         beforeEach(() => {
-          wrapper.find('div.ds-modal-wrapper').find('button.ds-button-ghost').trigger('click')
+          wrapper.find('div.os-modal-wrapper').find('[data-testid="os-modal-cancel"]').trigger('click')
         })
 
         it('closes the modal', () => {
-          expect(wrapper.find('div.ds-modal-wrapper').exists()).toBe(false)
+          expect(wrapper.find('div.os-modal-wrapper').exists()).toBe(false)
         })
       })
 
       describe('click on confirm with server error', () => {
         beforeEach(() => {
-          wrapper.find('div.ds-modal-wrapper').find('button.ds-button-primary').trigger('click')
+          wrapper.find('div.os-modal-wrapper').find('[data-testid="os-modal-confirm"]').trigger('click')
         })
 
         it('toasts an error message', () => {
@@ -168,14 +168,14 @@ describe('GroupMember', () => {
         })
 
         it('closes the modal', () => {
-          expect(wrapper.find('div.ds-modal-wrapper').exists()).toBe(false)
+          expect(wrapper.find('div.os-modal-wrapper').exists()).toBe(false)
         })
       })
 
       describe('click on confirm with success', () => {
         beforeEach(() => {
           jest.clearAllMocks()
-          wrapper.find('div.ds-modal-wrapper').find('button.ds-button-primary').trigger('click')
+          wrapper.find('div.os-modal-wrapper').find('[data-testid="os-modal-confirm"]').trigger('click')
         })
 
         it('calls the API', () => {
@@ -194,7 +194,7 @@ describe('GroupMember', () => {
         })
 
         it('closes the modal', () => {
-          expect(wrapper.find('div.ds-modal-wrapper').exists()).toBe(false)
+          expect(wrapper.find('div.os-modal-wrapper').exists()).toBe(false)
         })
       })
     })

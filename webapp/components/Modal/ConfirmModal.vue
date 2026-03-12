@@ -1,5 +1,5 @@
 <template>
-  <ds-modal :title="title" :is-open="isOpen" @cancel="cancel" data-test="confirm-modal">
+  <os-modal :title="title" :open="isOpen" @cancel="cancel" data-test="confirm-modal">
     <transition name="ds-transition-fade">
       <div v-if="success" class="ds-flex ds-flex-centered hc-modal-success">
         <sweetalert-icon icon="success" />
@@ -37,11 +37,11 @@
         {{ $t(modalData.buttons.confirm.textIdent) }}
       </os-button>
     </template>
-  </ds-modal>
+  </os-modal>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsModal } from '@ocelot-social/ui'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 
 export default {
@@ -49,6 +49,7 @@ export default {
   components: {
     OsButton,
     OsIcon,
+    OsModal,
     SweetalertIcon,
   },
   emits: ['close'],

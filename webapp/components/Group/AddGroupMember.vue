@@ -4,14 +4,14 @@
     <div class="ds-mb-small"></div>
     <div class="ds-mb-large">
       <select-user-search :id="id" ref="selectUserSearch" @select-user="selectUser" />
-      <ds-modal
+      <os-modal
         v-if="isOpen"
         force
-        extended
+        size="extended"
         :confirm-label="$t('group.modal.confirm')"
         :cancel-label="$t('group.modal.cancel')"
         :title="$t('group.modal.confirmAddGroupMemberTitle')"
-        v-model="isOpen"
+        :open.sync="isOpen"
         @close="closeModal"
         @confirm="confirmModal"
         @cancel="cancelModal"
@@ -19,18 +19,20 @@
         <p class="ds-text ds-text-size-large">
           {{ $t('group.modal.confirmAddGroupMemberText', { name: user.name }) }}
         </p>
-      </ds-modal>
+      </os-modal>
     </div>
   </div>
 </template>
 
 <script>
+import { OsModal } from '@ocelot-social/ui'
 import { changeGroupMemberRoleMutation } from '~/graphql/groups.js'
 import SelectUserSearch from '~/components/generic/SelectUserSearch/SelectUserSearch'
 
 export default {
   name: 'AddGroupMember',
   components: {
+    OsModal,
     SelectUserSearch,
   },
   props: {

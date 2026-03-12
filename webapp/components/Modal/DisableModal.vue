@@ -1,5 +1,5 @@
 <template>
-  <ds-modal :title="title" :is-open="isOpen" @cancel="cancel">
+  <os-modal :title="title" :open="isOpen" @cancel="cancel">
     <!-- eslint-disable-next-line vue/no-v-html -->
     <p v-html="message" />
 
@@ -18,17 +18,17 @@
         {{ $t('disable.submit') }}
       </os-button>
     </template>
-  </ds-modal>
+  </os-modal>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsModal } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import gql from 'graphql-tag'
 
 export default {
   name: 'DisableModal',
-  components: { OsButton, OsIcon },
+  components: { OsButton, OsIcon, OsModal },
   props: {
     name: { type: String, default: '' },
     type: { type: String, required: true },
