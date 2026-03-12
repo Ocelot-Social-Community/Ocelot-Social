@@ -389,7 +389,7 @@ export default {
     },
     searchGroups: {
       query() {
-        return searchGroups
+        return searchGroups(this.$i18n)
       },
       variables() {
         const { firstGroups, groupsOffset, search } = this
