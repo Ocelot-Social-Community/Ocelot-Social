@@ -4,9 +4,11 @@ import { isEmpty, find } from 'lodash'
 import locales from '~/locales'
 import htmlTranslations from '~/locales/html/'
 
+let fallbackLocale
+
 const registerTranslation = ({ Vue, locale }) => {
   const translation = require(`~/locales/${locale}.json`)
-  translation.html = htmlTranslations[locale]
+  translation.html = htmlTranslations[locale] || htmlTranslations[fallbackLocale]
   Vue.i18n.add(locale, translation)
 }
 
@@ -15,6 +17,7 @@ const registerTranslation = ({ Vue, locale }) => {
  * and implement the user preference logic
  */
 export default ({ app, req, cookie, store }) => {
+  fallbackLocale = app.$env.LANGUAGE_FALLBACK
   const debug = app.$env && app.$env.NODE_ENV !== 'production'
   const key = 'locale'
 
@@ -45,7 +48,7 @@ export default ({ app, req, cookie, store }) => {
     if (!app.$i18n.localeExists(localeInStore)) {
       import(`~/locales/${localeInStore}.json`).then((res) => {
         const translation = res.default
-        translation.html = htmlTranslations[localeInStore]
+        translation.html = htmlTranslations[localeInStore] || htmlTranslations[fallbackLocale]
         app.$i18n.add(localeInStore, translation)
       })
     }
