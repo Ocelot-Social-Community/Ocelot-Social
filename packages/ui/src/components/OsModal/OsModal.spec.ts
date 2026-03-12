@@ -91,21 +91,13 @@ describe('osModal', () => {
     })
   })
 
-  describe('size prop', () => {
-    it('applies default size (max-w-[500px])', () => {
+  describe('panel width', () => {
+    it('applies max-w-[500px]', () => {
       const wrapper = mount(OsModal, {
         props: { open: true },
       })
 
       expect(wrapper.find('.os-modal').classes()).toContain('max-w-[500px]')
-    })
-
-    it('applies extended size (max-w-[800px])', () => {
-      const wrapper = mount(OsModal, {
-        props: { open: true, size: 'extended' },
-      })
-
-      expect(wrapper.find('.os-modal').classes()).toContain('max-w-[800px]')
     })
   })
 

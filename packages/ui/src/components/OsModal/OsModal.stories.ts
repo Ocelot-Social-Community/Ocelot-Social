@@ -4,7 +4,6 @@ import OsButton from '#src/components/OsButton/OsButton.vue'
 
 import OsModal from './OsModal.vue'
 
-import type { ModalSize } from './modal.variants'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 const meta: Meta<typeof OsModal> = {
@@ -20,7 +19,6 @@ interface PlaygroundArgs {
   open: boolean
   title: string
   force: boolean
-  size: ModalSize
   cancelLabel: string
   confirmLabel: string
   content: string
@@ -31,7 +29,6 @@ export const Playground: StoryObj<PlaygroundArgs> = {
     open: { control: 'boolean' },
     title: { control: 'text' },
     force: { control: 'boolean' },
-    size: { control: 'select', options: ['default', 'extended'] },
     cancelLabel: { control: 'text' },
     confirmLabel: { control: 'text' },
     content: { control: 'text' },
@@ -40,7 +37,6 @@ export const Playground: StoryObj<PlaygroundArgs> = {
     open: true,
     title: 'Modal Title',
     force: false,
-    size: 'default',
     cancelLabel: 'Cancel',
     confirmLabel: 'Confirm',
     content: 'This is the modal body content.',
@@ -52,7 +48,6 @@ export const Playground: StoryObj<PlaygroundArgs> = {
         open: args.open,
         title: args.title,
         force: args.force,
-        size: args.size,
         cancelLabel: args.cancelLabel,
         confirmLabel: args.confirmLabel,
       }))
@@ -71,20 +66,6 @@ export const DefaultSize: Story = {
         <OsModal :open="true" title="Default Size Modal">
           <p>This is a modal with default size (max-width: 500px).</p>
           <p>It contains the standard cancel and confirm buttons.</p>
-        </OsModal>
-      </div>
-    `,
-  }),
-}
-
-export const ExtendedSize: Story = {
-  render: () => ({
-    components: { OsModal },
-    template: `
-      <div data-testid="extended-size">
-        <OsModal :open="true" title="Extended Size Modal" size="extended">
-          <p>This is a modal with extended size (max-width: 800px).</p>
-          <p>It is wider and suitable for more complex content.</p>
         </OsModal>
       </div>
     `,

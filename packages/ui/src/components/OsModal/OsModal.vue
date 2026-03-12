@@ -7,8 +7,6 @@
 
   import { modalPanelVariants } from './modal.variants'
 
-  import type { ModalSize } from './modal.variants'
-  import type { PropType } from 'vue-demi'
 
   /**
    * Modal dialog component with backdrop, focus trap, and body scroll lock.
@@ -42,11 +40,6 @@
         type: Boolean,
         default: false,
       },
-      /** Panel width: 'default' (500px) or 'extended' (800px) */
-      size: {
-        type: String as PropType<ModalSize>,
-        default: 'default',
-      },
       /** Label for the built-in cancel button */
       cancelLabel: {
         type: String,
@@ -60,9 +53,7 @@
     },
     emits: ['update:open', 'confirm', 'cancel', 'close', 'opened'],
     setup(props, { slots, attrs, emit }) {
-      const panelClasses = computed(() =>
-        modalPanelVariants({ size: props.size }),
-      )
+      const panelClasses = computed(() => modalPanelVariants())
 
       const modalRef = ref<HTMLElement | null>(null)
       const isScrolled = ref(false)

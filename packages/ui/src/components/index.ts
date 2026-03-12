@@ -28,4 +28,4 @@ export {
   type BadgeVariants,
 } from './OsBadge'
 export { OsNumber, numberVariants, type NumberVariants } from './OsNumber'
-export { OsModal, modalPanelVariants, type ModalSize, type ModalVariants } from './OsModal'
+export { OsModal, modalPanelVariants } from './OsModal'

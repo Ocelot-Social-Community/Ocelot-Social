@@ -69,19 +69,6 @@ test.describe('OsModal visual regression', () => {
     await checkA11y(page)
   })
 
-  test('extended size', async ({ page }) => {
-    await page.goto(`${STORY_URL}--extended-size&viewMode=story`)
-    const root = page.locator(STORY_ROOT)
-    await root.waitFor()
-    await waitForReady(page)
-
-    await expect(root.locator('[data-testid="extended-size"]')).toHaveScreenshot(
-      'extended-size.png',
-    )
-
-    await checkA11y(page)
-  })
-
   test('custom footer', async ({ page }) => {
     await page.goto(`${STORY_URL}--custom-footer&viewMode=story`)
     const root = page.locator(STORY_ROOT)
