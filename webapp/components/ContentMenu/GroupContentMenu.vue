@@ -1,4 +1,5 @@
 <template>
+  <div class="content-menu" @click.stop.prevent>
   <dropdown class="group-content-menu" :placement="placement" offset="5">
     <template #default="{ toggleMenu }">
       <slot name="button" :toggleMenu="toggleMenu">
@@ -35,6 +36,7 @@
       </div>
     </template>
   </dropdown>
+  </div>
 </template>
 
 <script>

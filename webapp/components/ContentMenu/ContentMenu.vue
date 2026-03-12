@@ -1,5 +1,5 @@
 <template>
-  <div class="content-menu">
+  <div class="content-menu" @click.stop.prevent>
     <dropdown :placement="placement" offset="5">
       <template #default="{ toggleMenu }">
         <slot name="button" :toggleMenu="toggleMenu">

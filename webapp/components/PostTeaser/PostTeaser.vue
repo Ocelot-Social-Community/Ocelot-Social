@@ -3,6 +3,7 @@
     class="post-teaser"
     :class="{ 'post-teaser--horizontal': singleColumn && post.image }"
     :to="{ name: 'post-id-slug', params: { id: post.id, slug: post.slug } }"
+    @click.native.capture="guardNavigation"
   >
     <os-card
       :lang="post.language"
@@ -259,6 +260,11 @@ export default {
     this.icons = iconRegistry
   },
   methods: {
+    guardNavigation(event) {
+      if (event.target.closest('.content-menu')) {
+        event.preventDefault()
+      }
+    },
     async deletePostCallback() {
       try {
         const {
