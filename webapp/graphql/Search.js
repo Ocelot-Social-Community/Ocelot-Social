@@ -70,46 +70,44 @@ export const searchPosts = gql`
   }
 `
 
-export const searchGroups = () => {
-  return gql`
-    ${imageUrls}
+export const searchGroups = gql`
+  ${imageUrls}
 
-    query ($query: String!, $firstGroups: Int, $groupsOffset: Int) {
-      searchGroups(query: $query, firstGroups: $firstGroups, groupsOffset: $groupsOffset) {
-        groupCount
-        groups {
-          __typename
+  query ($query: String!, $firstGroups: Int, $groupsOffset: Int) {
+    searchGroups(query: $query, firstGroups: $firstGroups, groupsOffset: $groupsOffset) {
+      groupCount
+      groups {
+        __typename
+        id
+        groupName: name
+        slug
+        createdAt
+        updatedAt
+        disabled
+        deleted
+        about
+        description
+        descriptionExcerpt
+        groupType
+        actionRadius
+        categories {
           id
-          groupName: name
           slug
-          createdAt
-          updatedAt
-          disabled
-          deleted
-          about
-          description
-          descriptionExcerpt
-          groupType
-          actionRadius
-          categories {
-            id
-            slug
-            name
-            icon
-          }
-          avatar {
-            ...imageUrls
-          }
-          locationName
-          location {
-            name
-          }
-          myRole
+          name
+          icon
         }
+        avatar {
+          ...imageUrls
+        }
+        locationName
+        location {
+          name
+        }
+        myRole
       }
     }
-  `
-}
+  }
+`
 
 export const searchUsers = gql`
   ${user}
