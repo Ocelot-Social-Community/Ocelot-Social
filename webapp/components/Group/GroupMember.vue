@@ -98,10 +98,19 @@
       :title="`${$t('group.removeMember')}`"
       force
       size="extended"
-      :confirm-label="$t('group.removeMember')"
-      :cancel-label="$t('actions.cancel')"
       @confirm="removeUser()"
-    />
+    >
+      <template #footer="{ confirm, cancel }">
+        <os-button appearance="outline" data-testid="os-modal-cancel" @click="cancel">
+          <template #icon><os-icon :icon="icons.close" /></template>
+          {{ $t('actions.cancel') }}
+        </os-button>
+        <os-button variant="primary" data-testid="os-modal-confirm" @click="confirm">
+          <template #icon><os-icon :icon="icons.check" /></template>
+          {{ $t('group.removeMember') }}
+        </os-button>
+      </template>
+    </os-modal>
   </div>
 </template>
 <script>

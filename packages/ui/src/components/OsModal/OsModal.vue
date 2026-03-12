@@ -2,7 +2,7 @@
   import { computed, defineComponent, getCurrentInstance, h, isVue2, onBeforeUnmount, onMounted, ref, watch } from 'vue-demi'
 
   import OsButton from '#src/components/OsButton/OsButton.vue'
-  import { IconClose } from '#src/components/OsIcon'
+  import { IconCheck, IconClose } from '#src/components/OsIcon'
   import { cn } from '#src/utils'
 
   import { modalPanelVariants } from './modal.variants'
@@ -244,6 +244,35 @@
 
         if (slots.footer) {
           footerContent = slots.footer({ confirm, cancel })
+        } else if (isVue2) {
+          /* v8 ignore start -- Vue 2 branch: must use VNode data format for component props */
+          footerContent = [
+            h(
+              OsButton,
+              {
+                props: { appearance: 'ghost' },
+                attrs: { 'data-testid': 'os-modal-cancel' },
+                on: { click: () => cancel('cancel') },
+              },
+              [
+                h('template', { slot: 'icon' }, [IconClose(createElement, true)]),
+                props.cancelLabel,
+              ],
+            ),
+            h(
+              OsButton,
+              {
+                props: { variant: 'primary' },
+                attrs: { 'data-testid': 'os-modal-confirm' },
+                on: { click: () => confirm() },
+              },
+              [
+                h('template', { slot: 'icon' }, [IconCheck(createElement, true)]),
+                props.confirmLabel,
+              ],
+            ),
+          ]
+          /* v8 ignore stop */
         } else {
           footerContent = [
             h(
@@ -251,18 +280,24 @@
               {
                 appearance: 'ghost',
                 'data-testid': 'os-modal-cancel',
-                ...eventProps({ click: () => cancel('cancel') }),
+                onClick: () => cancel('cancel'),
               },
-              isVue2 ? [props.cancelLabel] : { default: () => [props.cancelLabel] },
+              {
+                icon: () => [IconClose(createElement, false)],
+                default: () => [props.cancelLabel],
+              },
             ),
             h(
               OsButton,
               {
                 variant: 'primary',
                 'data-testid': 'os-modal-confirm',
-                ...eventProps({ click: () => confirm() }),
+                onClick: () => confirm(),
               },
-              isVue2 ? [props.confirmLabel] : { default: () => [props.confirmLabel] },
+              {
+                icon: () => [IconCheck(createElement, false)],
+                default: () => [props.confirmLabel],
+              },
             ),
           ]
         }

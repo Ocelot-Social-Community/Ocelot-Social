@@ -8,8 +8,6 @@
         v-if="isOpen"
         force
         size="extended"
-        :confirm-label="$t('group.modal.confirm')"
-        :cancel-label="$t('group.modal.cancel')"
         :title="$t('group.modal.confirmAddGroupMemberTitle')"
         :open.sync="isOpen"
         @close="closeModal"
@@ -19,19 +17,32 @@
         <p class="ds-text ds-text-size-large">
           {{ $t('group.modal.confirmAddGroupMemberText', { name: user.name }) }}
         </p>
+        <template #footer="{ confirm, cancel }">
+          <os-button appearance="outline" @click="cancel">
+            <template #icon><os-icon :icon="icons.close" /></template>
+            {{ $t('group.modal.cancel') }}
+          </os-button>
+          <os-button variant="primary" @click="confirm">
+            <template #icon><os-icon :icon="icons.check" /></template>
+            {{ $t('group.modal.confirm') }}
+          </os-button>
+        </template>
       </os-modal>
     </div>
   </div>
 </template>
 
 <script>
-import { OsModal } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsModal } from '@ocelot-social/ui'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { changeGroupMemberRoleMutation } from '~/graphql/groups.js'
 import SelectUserSearch from '~/components/generic/SelectUserSearch/SelectUserSearch'
 
 export default {
   name: 'AddGroupMember',
   components: {
+    OsButton,
+    OsIcon,
     OsModal,
     SelectUserSearch,
   },
@@ -44,6 +55,9 @@ export default {
       type: Array,
       required: false,
     },
+  },
+  created() {
+    this.icons = iconRegistry
   },
   data() {
     return {
