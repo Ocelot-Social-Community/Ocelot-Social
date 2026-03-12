@@ -65,6 +65,7 @@
       )
 
       const modalRef = ref<HTMLElement | null>(null)
+      const isScrolled = ref(false)
       const titleId = `os-modal-title-${Math.random().toString(36).slice(2, 7)}`
 
       /* v8 ignore start -- Vue 2 only */
@@ -86,6 +87,12 @@
           result[`on${name.charAt(0).toUpperCase()}${name.slice(1)}`] = fn
         }
         return result
+      }
+
+      // --- Scroll tracking for top fade ---
+      function onContentScroll(e: Event) {
+        const target = e.target as HTMLElement
+        isScrolled.value = target.scrollTop > 0
       }
 
       // --- Actions ---
@@ -207,6 +214,15 @@
         }
         if (closeBtn) headerChildren.push(closeBtn)
 
+        // Top fade: only visible when content is scrolled down
+        if (isScrolled.value) {
+          headerChildren.push(
+            h('div', {
+              class: 'absolute bottom-0 left-0 w-[calc(100%-10px)] h-[30px] translate-y-full bg-gradient-to-b from-white to-transparent pointer-events-none z-10',
+            }),
+          )
+        }
+
         const header = h(
           'div',
           { class: 'os-modal__header relative px-6 pt-5 pb-2 pr-12' },
@@ -216,7 +232,10 @@
         // --- Content ---
         const content = h(
           'div',
-          { class: 'os-modal__content px-6 pt-4 pb-6 overflow-y-auto max-h-[50vh]' },
+          {
+            class: 'os-modal__content px-6 pt-4 pb-6 overflow-y-auto max-h-[50vh]',
+            ...eventProps({ scroll: onContentScroll as (...args: unknown[]) => void }),
+          },
           slots.default?.(),
         )
 
@@ -250,7 +269,7 @@
 
         const footer = h(
           'footer',
-          { class: 'os-modal__footer bg-[#f5f5f5] px-3 py-3 flex justify-end gap-2 rounded-b-lg' },
+          { class: 'os-modal__footer bg-[#f5f5f5] px-3 py-3 flex justify-end gap-2 rounded-b-lg shadow-[0_-20px_15px_-10px_rgba(255,255,255,0.9)]' },
           footerContent,
         )
 
