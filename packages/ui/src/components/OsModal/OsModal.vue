@@ -74,6 +74,20 @@
       const createElement = isVue2 ? (instance?.proxy as any)?.$createElement : h
       /* v8 ignore stop */
 
+      // Vue 2's h() does NOT convert onClick → on.click. Helper to build event props.
+      function eventProps(events: Record<string, (...args: unknown[]) => void>): Record<string, unknown> {
+        /* v8 ignore start -- Vue 2 branch */
+        if (isVue2) {
+          return { on: events }
+        }
+        /* v8 ignore stop */
+        const result: Record<string, unknown> = {}
+        for (const [name, fn] of Object.entries(events)) {
+          result[`on${name.charAt(0).toUpperCase()}${name.slice(1)}`] = fn
+        }
+        return result
+      }
+
       // --- Actions ---
       function close(type: string) {
         emit('update:open', false)
@@ -178,7 +192,7 @@
                 type: 'button',
                 'aria-label': 'Close',
                 'data-testid': 'os-modal-close',
-                onClick: () => cancel('close'),
+                ...eventProps({ click: () => cancel('close') }),
               },
               [h('span', { class: 'w-4 h-4 fill-current inline-flex', 'aria-hidden': 'true' }, [IconClose(createElement, isVue2)])],
             )
@@ -218,7 +232,7 @@
               {
                 appearance: 'ghost',
                 'data-testid': 'os-modal-cancel',
-                onClick: () => cancel('cancel'),
+                ...eventProps({ click: () => cancel('cancel') }),
               },
               isVue2 ? [props.cancelLabel] : { default: () => [props.cancelLabel] },
             ),
@@ -227,7 +241,7 @@
               {
                 variant: 'primary',
                 'data-testid': 'os-modal-confirm',
-                onClick: () => confirm(),
+                ...eventProps({ click: () => confirm() }),
               },
               isVue2 ? [props.confirmLabel] : { default: () => [props.confirmLabel] },
             ),
@@ -240,22 +254,22 @@
           footerContent,
         )
 
-        // --- Backdrop ---
+        // --- Backdrop (click-to-close is handled on the overlay wrapper below) ---
         const backdrop = h('div', {
           class: 'os-modal__backdrop fixed inset-0 bg-black/70 z-[9998]',
           'data-testid': 'os-modal-backdrop',
-          onClick: () => {
-            if (!props.force) cancel('backdrop')
-          },
         })
 
-        // --- Panel ---
+        // --- Panel (stops click propagation so overlay click only fires on backdrop area) ---
         const panelProps: Record<string, unknown> = {
           class: panelClasses.value,
           role: 'dialog',
           'aria-modal': 'true',
           'data-testid': 'os-modal-panel',
-          onKeydown: onFocusTrap,
+          ...eventProps({
+            keydown: onFocusTrap as (...args: unknown[]) => void,
+            click: (e: unknown) => (e as Event).stopPropagation(),
+          }),
           ref: modalRef,
         }
         if (props.title) {
@@ -263,6 +277,18 @@
         }
 
         const panel = h('div', panelProps, [header, content, footer])
+
+        // --- Overlay: captures clicks outside the panel to close ---
+        const overlayProps: Record<string, unknown> = {
+          class: 'os-modal__overlay fixed inset-0 z-[9999] flex items-center justify-center',
+          ...eventProps({
+            click: () => {
+              if (!props.force) cancel('backdrop')
+            },
+          }),
+        }
+
+        const overlay = h('div', overlayProps, [panel])
 
         // --- Root wrapper ---
         /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
@@ -282,7 +308,7 @@
                 keydown: onFocusTrap,
               },
             },
-            [backdrop, panel],
+            [backdrop, overlay],
           )
         }
         /* v8 ignore stop */
@@ -294,7 +320,7 @@
             class: cn('os-modal-wrapper', (attrClass as string) || ''),
             ...restAttrs,
           },
-          [backdrop, panel],
+          [backdrop, overlay],
         )
       }
     },

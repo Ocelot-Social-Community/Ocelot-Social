@@ -226,7 +226,7 @@ describe('osModal', () => {
         props: { open: true },
       })
 
-      await wrapper.find('[data-testid="os-modal-backdrop"]').trigger('click')
+      await wrapper.find('.os-modal__overlay').trigger('click')
 
       expect(wrapper.emitted('cancel')).toHaveLength(1)
       expect(wrapper.emitted('close')).toEqual([['backdrop']])
@@ -249,7 +249,7 @@ describe('osModal', () => {
         props: { open: true, force: true },
       })
 
-      await wrapper.find('[data-testid="os-modal-backdrop"]').trigger('click')
+      await wrapper.find('.os-modal__overlay').trigger('click')
 
       expect(wrapper.emitted('cancel')).toBeUndefined()
     })
