@@ -1,0 +1,71 @@
+{
+  "notification": "Notification",
+  "subjects": {
+    "changedGroupMemberRole": "Rôle dans le groupe modifié",
+    "chatMessage": "Nouveau message de chat",
+    "commentedOnPost": "Nouveau commentaire sur une publication",
+    "followedUserPosted": "Nouvelle publication d'un utilisateur suivi",
+    "mentionedInComment": "Mentionné dans un commentaire",
+    "mentionedInPost": "Mentionné dans une publication",
+    "newEmail": "Nouvelle adresse e-mail",
+    "removedUserFromGroup": "Retiré du groupe",
+    "postInGroup": "Nouvelle publication dans le groupe",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "userJoinedGroup": "Un utilisateur a rejoint le groupe",
+    "userLeftGroup": "Un utilisateur a quitté le groupe",
+    "wrongEmail": "Mauvaise adresse e-mail ?"
+  },
+  "registration": {
+    "introduction": "Merci de nous avoir rejoints – nous sommes ravis de vous compter parmi nous. Il ne reste plus qu'une petite étape avant de pouvoir changer le monde ensemble … Veuillez confirmer votre adresse e-mail en cliquant sur le bouton ci-dessous :",
+    "codeHint": "Si le bouton ci-dessus ne fonctionne pas, vous pouvez aussi copier le code suivant dans votre navigateur : ",
+    "codeHintException": "Cependant, cela ne fonctionne que si vous vous êtes inscrit via notre site web.",
+    "notYouStart": "Si vous ne vous êtes pas inscrit sur ",
+    "notYouEnd": " nous vous recommandons d'y jeter un œil ! C'est un réseau social de personnes pour des personnes qui veulent se connecter et changer le monde ensemble.",
+    "ps": "PS : Si vous ignorez cet e-mail, nous ne créerons pas de compte pour vous. ;)"
+  },
+  "emailVerification": {
+    "codeHint": "Si le bouton ci-dessus ne fonctionne pas, vous pouvez aussi copier le code suivant dans votre navigateur : ",
+    "introduction": "Vous souhaitez changer votre adresse e-mail ? Pas de problème ! Cliquez simplement sur le bouton ci-dessous pour vérifier votre nouvelle adresse :",
+    "doNotChange": "Si vous ne souhaitez pas changer votre adresse e-mail, n'hésitez pas à ignorer ce message. "
+  },
+  "support": "Si vous avez des questions ou des problèmes, n'hésitez pas à contacter notre support : ",
+  "buttons": {
+    "confirmEmail": "Confirmer votre adresse e-mail",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "tryAgain": "Essayer une autre adresse e-mail",
+    "verifyEmail": "Vérifier l'adresse e-mail",
+    "viewChat": "Voir le chat",
+    "viewComment": "Voir le commentaire",
+    "viewGroup": "Voir le groupe",
+    "viewPost": "Voir la publication"
+  },
+  "general": {
+    "greeting": "Bonjour",
+    "seeYou": "À bientôt sur ",
+    "yourTeam": "– L'équipe {team}",
+    "settingsHint": "PS : Si vous ne souhaitez plus recevoir d'e-mails, modifiez vos ",
+    "settingsName": "paramètres de notification",
+    "welcome": "Bienvenue sur"
+  },
+  "resetPassword": {
+    "codeHint": "Si le bouton ci-dessus ne fonctionne pas, vous pouvez aussi copier le code suivant dans votre navigateur : ",
+    "ignore": "Si vous n'avez pas demandé de nouveau mot de passe, n'hésitez pas à ignorer cet e-mail.",
+    "introduction": "Vous avez oublié votre mot de passe ? Pas de problème ! Cliquez simplement sur le bouton ci-dessous pour le réinitialiser dans les 24 prochaines heures :"
+  },
+  "wrongEmail": {
+    "ignoreEnd": " ou si vous ne souhaitiez pas réinitialiser votre mot de passe, veuillez ignorer cet e-mail.",
+    "ignoreStart": "Si vous n'avez pas de compte sur ",
+    "introduction": "Vous avez demandé une réinitialisation de mot de passe, mais malheureusement nous n'avons trouvé aucun compte associé à votre adresse e-mail. Vous êtes-vous peut-être inscrit avec une autre adresse ?"
+  },
+  "changedGroupMemberRole": "votre rôle dans le groupe « {groupName} » a été modifié. Cliquez sur le bouton pour voir ce groupe :",
+  "chatMessageStart": "vous avez reçu un nouveau message de chat de ",
+  "chatMessageEnd": ".",
+  "commentedOnPost": " a commenté une publication que vous suivez avec le titre « {postTitle} ». Cliquez sur le bouton pour voir ce commentaire :",
+  "followedUserPosted": ", un utilisateur que vous suivez, a écrit une nouvelle publication avec le titre « {postTitle} ». Cliquez sur le bouton pour voir cette publication :",
+  "mentionedInComment": " vous a mentionné dans un commentaire sur la publication avec le titre « {postTitle} ». Cliquez sur le bouton pour voir ce commentaire :",
+  "mentionedInPost": " vous a mentionné dans une publication avec le titre « {postTitle} ». Cliquez sur le bouton pour voir cette publication :",
+  "removedUserFromGroup": "vous avez été retiré du groupe « {groupName} ».",
+  "postInGroup": "quelqu'un a écrit une nouvelle publication avec le titre « {postTitle} » dans l'un de vos groupes. Cliquez sur le bouton pour voir cette publication :",
+  "userJoinedGroup": " a rejoint le groupe « {groupName} ». Cliquez sur le bouton pour voir ce groupe :",
+  "userLeftGroup": " a quitté le groupe « {groupName} ». Cliquez sur le bouton pour voir ce groupe :"
+}

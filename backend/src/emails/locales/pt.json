@@ -1,0 +1,71 @@
+{
+  "notification": "Notificação",
+  "subjects": {
+    "changedGroupMemberRole": "Função no grupo alterada",
+    "chatMessage": "Nova mensagem no chat",
+    "commentedOnPost": "Novo comentário numa publicação",
+    "followedUserPosted": "Nova publicação de um utilizador seguido",
+    "mentionedInComment": "Mencionado num comentário",
+    "mentionedInPost": "Mencionado numa publicação",
+    "newEmail": "Novo endereço de e-mail",
+    "removedUserFromGroup": "Removido do grupo",
+    "postInGroup": "Nova publicação no grupo",
+    "resetPassword": "Redefinir palavra-passe",
+    "userJoinedGroup": "Um utilizador juntou-se ao grupo",
+    "userLeftGroup": "Um utilizador saiu do grupo",
+    "wrongEmail": "E-mail errado?"
+  },
+  "registration": {
+    "introduction": "Obrigado por te registares – é ótimo ter-te connosco. Falta apenas um pequeno passo antes de podermos mudar o mundo juntos … Por favor, confirma o teu endereço de e-mail clicando no botão abaixo:",
+    "codeHint": "Se o botão acima não funcionar, também podes copiar o seguinte código na janela do teu navegador: ",
+    "codeHintException": "No entanto, isto só funciona se te registaste através do nosso site.",
+    "notYouStart": "Se não te registaste em ",
+    "notYouEnd": " recomendamos que dês uma olhada! É uma rede social de pessoas para pessoas que querem conectar-se e mudar o mundo juntas.",
+    "ps": "PS: Se ignorares este e-mail, não criaremos uma conta para ti. ;)"
+  },
+  "emailVerification": {
+    "codeHint": "Se o botão acima não funcionar, também podes copiar o seguinte código na janela do teu navegador: ",
+    "introduction": "Queres alterar o teu endereço de e-mail? Sem problema! Basta clicar no botão abaixo para verificar o teu novo endereço:",
+    "doNotChange": "Se não quiseres alterar o teu endereço de e-mail, podes simplesmente ignorar esta mensagem. "
+  },
+  "support": "Se tiveres dúvidas ou problemas, não hesites em contactar o nosso suporte: ",
+  "buttons": {
+    "confirmEmail": "Confirma o teu endereço de e-mail",
+    "resetPassword": "Redefinir palavra-passe",
+    "tryAgain": "Tentar outro endereço de e-mail",
+    "verifyEmail": "Verificar endereço de e-mail",
+    "viewChat": "Ver chat",
+    "viewComment": "Ver comentário",
+    "viewGroup": "Ver grupo",
+    "viewPost": "Ver publicação"
+  },
+  "general": {
+    "greeting": "Olá",
+    "seeYou": "Até breve em ",
+    "yourTeam": "– A equipa {team}",
+    "settingsHint": "PS: Se não quiseres receber mais e-mails, altera as tuas ",
+    "settingsName": "definições de notificação",
+    "welcome": "Bem-vindo a"
+  },
+  "resetPassword": {
+    "codeHint": "Se o botão acima não funcionar, também podes copiar o seguinte código na janela do teu navegador: ",
+    "ignore": "Se não solicitaste uma nova palavra-passe, podes simplesmente ignorar este e-mail.",
+    "introduction": "Esqueceste a tua palavra-passe? Sem problema! Basta clicar no botão abaixo para a redefinir nas próximas 24 horas:"
+  },
+  "wrongEmail": {
+    "ignoreEnd": " ou se não querias redefinir a tua palavra-passe, podes simplesmente ignorar este e-mail.",
+    "ignoreStart": "Se não tens uma conta em ",
+    "introduction": "Solicitaste uma redefinição de palavra-passe, mas infelizmente não encontrámos nenhuma conta associada ao teu endereço de e-mail. Será que te registaste com outro endereço?"
+  },
+  "changedGroupMemberRole": "a tua função no grupo \u201e{groupName}\u201c foi alterada. Clica no botão para ver este grupo:",
+  "chatMessageStart": "recebeste uma nova mensagem no chat de ",
+  "chatMessageEnd": ".",
+  "commentedOnPost": " comentou numa publicação que estás a seguir com o título \u201e{postTitle}\u201c. Clica no botão para ver este comentário:",
+  "followedUserPosted": ", um utilizador que segues, escreveu uma nova publicação com o título \u201e{postTitle}\u201c. Clica no botão para ver esta publicação:",
+  "mentionedInComment": " mencionou-te num comentário na publicação com o título \u201e{postTitle}\u201c. Clica no botão para ver este comentário:",
+  "mentionedInPost": " mencionou-te numa publicação com o título \u201e{postTitle}\u201c. Clica no botão para ver esta publicação:",
+  "removedUserFromGroup": "foste removido do grupo \u201e{groupName}\u201c.",
+  "postInGroup": "alguém escreveu uma nova publicação com o título \u201e{postTitle}\u201c num dos teus grupos. Clica no botão para ver esta publicação:",
+  "userJoinedGroup": " juntou-se ao grupo \u201e{groupName}\u201c. Clica no botão para ver este grupo:",
+  "userLeftGroup": " saiu do grupo \u201e{groupName}\u201c. Clica no botão para ver este grupo:"
+}

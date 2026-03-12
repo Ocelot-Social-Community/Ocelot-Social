@@ -1,0 +1,71 @@
+{
+  "notification": "Notifica",
+  "subjects": {
+    "changedGroupMemberRole": "Ruolo nel gruppo modificato",
+    "chatMessage": "Nuovo messaggio in chat",
+    "commentedOnPost": "Nuovo commento su un post",
+    "followedUserPosted": "Nuovo post di un utente seguito",
+    "mentionedInComment": "Menzionato in un commento",
+    "mentionedInPost": "Menzionato in un post",
+    "newEmail": "Nuovo indirizzo e-mail",
+    "removedUserFromGroup": "Rimosso dal gruppo",
+    "postInGroup": "Nuovo post nel gruppo",
+    "resetPassword": "Reimposta la password",
+    "userJoinedGroup": "Un utente si è unito al gruppo",
+    "userLeftGroup": "Un utente ha lasciato il gruppo",
+    "wrongEmail": "E-mail sbagliata?"
+  },
+  "registration": {
+    "introduction": "Grazie per esserti registrato – siamo felici di averti con noi. Manca solo un piccolo passo prima di poter cambiare il mondo insieme … Per favore, conferma il tuo indirizzo e-mail cliccando sul pulsante qui sotto:",
+    "codeHint": "Se il pulsante qui sopra non funziona, puoi anche copiare il seguente codice nella finestra del tuo browser: ",
+    "codeHintException": "Tuttavia, questo funziona solo se ti sei registrato tramite il nostro sito web.",
+    "notYouStart": "Se non ti sei registrato su ",
+    "notYouEnd": " ti consigliamo di dargli un'occhiata! È un social network di persone per persone che vogliono connettersi e cambiare il mondo insieme.",
+    "ps": "PS: Se ignori questa e-mail, non creeremo un account per te. ;)"
+  },
+  "emailVerification": {
+    "codeHint": "Se il pulsante qui sopra non funziona, puoi anche copiare il seguente codice nella finestra del tuo browser: ",
+    "introduction": "Vuoi cambiare il tuo indirizzo e-mail? Nessun problema! Clicca semplicemente sul pulsante qui sotto per verificare il tuo nuovo indirizzo:",
+    "doNotChange": "Se non vuoi cambiare il tuo indirizzo e-mail, puoi semplicemente ignorare questo messaggio. "
+  },
+  "support": "Se hai domande o problemi, non esitare a contattare il nostro supporto: ",
+  "buttons": {
+    "confirmEmail": "Conferma il tuo indirizzo e-mail",
+    "resetPassword": "Reimposta la password",
+    "tryAgain": "Prova con un altro indirizzo e-mail",
+    "verifyEmail": "Verifica l'indirizzo e-mail",
+    "viewChat": "Visualizza la chat",
+    "viewComment": "Visualizza il commento",
+    "viewGroup": "Visualizza il gruppo",
+    "viewPost": "Visualizza il post"
+  },
+  "general": {
+    "greeting": "Ciao",
+    "seeYou": "A presto su ",
+    "yourTeam": "– Il team {team}",
+    "settingsHint": "PS: Se non vuoi più ricevere e-mail, modifica le tue ",
+    "settingsName": "impostazioni di notifica",
+    "welcome": "Benvenuto su"
+  },
+  "resetPassword": {
+    "codeHint": "Se il pulsante qui sopra non funziona, puoi anche copiare il seguente codice nella finestra del tuo browser: ",
+    "ignore": "Se non hai richiesto una nuova password, puoi semplicemente ignorare questa e-mail.",
+    "introduction": "Hai dimenticato la tua password? Nessun problema! Clicca semplicemente sul pulsante qui sotto per reimpostarla entro le prossime 24 ore:"
+  },
+  "wrongEmail": {
+    "ignoreEnd": " o se non volevi reimpostare la tua password, puoi semplicemente ignorare questa e-mail.",
+    "ignoreStart": "Se non hai un account su ",
+    "introduction": "Hai richiesto un ripristino della password, ma purtroppo non abbiamo trovato un account associato al tuo indirizzo e-mail. Ti sei forse registrato con un altro indirizzo?"
+  },
+  "changedGroupMemberRole": "il tuo ruolo nel gruppo \u201e{groupName}\u201c è stato modificato. Clicca sul pulsante per visualizzare questo gruppo:",
+  "chatMessageStart": "hai ricevuto un nuovo messaggio in chat da ",
+  "chatMessageEnd": ".",
+  "commentedOnPost": " ha commentato un post che stai seguendo con il titolo \u201e{postTitle}\u201c. Clicca sul pulsante per visualizzare questo commento:",
+  "followedUserPosted": ", un utente che segui, ha scritto un nuovo post con il titolo \u201e{postTitle}\u201c. Clicca sul pulsante per visualizzare questo post:",
+  "mentionedInComment": " ti ha menzionato in un commento al post con il titolo \u201e{postTitle}\u201c. Clicca sul pulsante per visualizzare questo commento:",
+  "mentionedInPost": " ti ha menzionato in un post con il titolo \u201e{postTitle}\u201c. Clicca sul pulsante per visualizzare questo post:",
+  "removedUserFromGroup": "sei stato rimosso dal gruppo \u201e{groupName}\u201c.",
+  "postInGroup": "qualcuno ha scritto un nuovo post con il titolo \u201e{postTitle}\u201c in uno dei tuoi gruppi. Clicca sul pulsante per visualizzare questo post:",
+  "userJoinedGroup": " si è unito al gruppo \u201e{groupName}\u201c. Clicca sul pulsante per visualizzare questo gruppo:",
+  "userLeftGroup": " ha lasciato il gruppo \u201e{groupName}\u201c. Clicca sul pulsante per visualizzare questo gruppo:"
+}
