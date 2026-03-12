@@ -67,8 +67,8 @@ export default {
   computed: {
     deleteModalData() {
       return {
-        titleIdent: this.$t('invite-codes.delete-modal.title'),
-        messageIdent: this.$t('invite-codes.delete-modal.message'),
+        titleIdent: 'invite-codes.delete-modal.title',
+        messageIdent: 'invite-codes.delete-modal.message',
         buttons: {
           confirm: {
             danger: true,
