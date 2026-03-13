@@ -19,10 +19,10 @@ async function checkA11y(page: Page) {
 test.describe('OsModal keyboard accessibility', () => {
   test('close button is focusable via Tab', async ({ page }) => {
     await page.goto(`${STORY_URL}--default-size&viewMode=story`)
-    const root = page.locator(STORY_ROOT)
-    await root.waitFor()
+    const modal = page.locator('.os-modal')
+    await modal.waitFor()
 
-    const closeBtn = root.locator('[data-testid="os-modal-close"]')
+    const closeBtn = page.locator('[data-testid="os-modal-close"]')
     await expect(closeBtn).toBeVisible()
 
     await page.keyboard.press('Tab')
@@ -31,16 +31,17 @@ test.describe('OsModal keyboard accessibility', () => {
 
   test('footer buttons are focusable via Tab', async ({ page }) => {
     await page.goto(`${STORY_URL}--default-size&viewMode=story`)
-    const root = page.locator(STORY_ROOT)
-    await root.waitFor()
+    const modal = page.locator('.os-modal')
+    await modal.waitFor()
 
-    const cancelBtn = root.locator('[data-testid="os-modal-cancel"]')
-    const confirmBtn = root.locator('[data-testid="os-modal-confirm"]')
+    const cancelBtn = page.locator('[data-testid="os-modal-cancel"]')
+    const confirmBtn = page.locator('[data-testid="os-modal-confirm"]')
     await expect(cancelBtn).toBeVisible()
     await expect(confirmBtn).toBeVisible()
 
     // Tab through to find the buttons
     await page.keyboard.press('Tab') // close button
+    await page.keyboard.press('Tab') // content area
     await page.keyboard.press('Tab') // cancel
     await expect(cancelBtn).toBeFocused()
     await page.keyboard.press('Tab') // confirm
@@ -51,37 +52,33 @@ test.describe('OsModal keyboard accessibility', () => {
 test.describe('OsModal visual regression', () => {
   test('default size', async ({ page }) => {
     await page.goto(`${STORY_URL}--default-size&viewMode=story`)
-    const root = page.locator(STORY_ROOT)
-    await root.waitFor()
+    const panel = page.locator('[data-testid="os-modal-panel"]')
+    await panel.waitFor()
     await waitForReady(page)
 
-    await expect(root.locator('[data-testid="default-size"]')).toHaveScreenshot('default-size.png')
+    await expect(panel).toHaveScreenshot('default-size.png')
 
     await checkA11y(page)
   })
 
   test('custom footer', async ({ page }) => {
     await page.goto(`${STORY_URL}--custom-footer&viewMode=story`)
-    const root = page.locator(STORY_ROOT)
-    await root.waitFor()
+    const panel = page.locator('[data-testid="os-modal-panel"]')
+    await panel.waitFor()
     await waitForReady(page)
 
-    await expect(root.locator('[data-testid="custom-footer"]')).toHaveScreenshot(
-      'custom-footer.png',
-    )
+    await expect(panel).toHaveScreenshot('custom-footer.png')
 
     await checkA11y(page)
   })
 
   test('scrollable content', async ({ page }) => {
     await page.goto(`${STORY_URL}--scrollable-content&viewMode=story`)
-    const root = page.locator(STORY_ROOT)
-    await root.waitFor()
+    const panel = page.locator('[data-testid="os-modal-panel"]')
+    await panel.waitFor()
     await waitForReady(page)
 
-    await expect(root.locator('[data-testid="scrollable-content"]')).toHaveScreenshot(
-      'scrollable-content.png',
-    )
+    await expect(panel).toHaveScreenshot('scrollable-content.png')
 
     await checkA11y(page)
   })

@@ -248,6 +248,7 @@
           'div',
           {
             class: 'os-modal__content px-6 pt-4 pb-6 overflow-y-auto max-h-[50vh]',
+            tabindex: '0',
             ...eventProps({ scroll: onContentScroll as (...args: unknown[]) => void }),
           },
           slots.default?.(),
