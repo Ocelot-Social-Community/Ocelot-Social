@@ -465,32 +465,32 @@ export default {
 }
 
 .search-results-empty {
-  padding-top: 16px;
+  padding-top: $space-small;
 
   @media (max-width: 810px) {
-    padding-top: 8px;
+    padding-top: $space-x-small;
   }
 }
 
 .search-results-pagination {
-  padding: 16px 0;
+  padding: $space-small 0;
   display: flex;
   justify-content: center;
 
   @media (max-width: 810px) {
-    padding: 8px 0;
+    padding: $space-x-small 0;
   }
 }
 
 .search-results-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
-  gap: 16px;
-  padding-top: 16px;
+  gap: $space-small;
+  padding-top: $space-small;
 
   @media (max-width: 810px) {
-    gap: 8px;
-    padding-top: 8px;
+    gap: $space-x-small;
+    padding-top: $space-x-small;
   }
 }
 </style>
