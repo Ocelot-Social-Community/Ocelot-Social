@@ -76,11 +76,7 @@
         {{ $t('actions.cancel') }}
       </os-button>
     </div>
-    <confirm-modal
-      v-if="showConfirmModal"
-      :modalData="currentModalData"
-      @close="closeModal"
-    />
+    <confirm-modal v-if="showConfirmModal" :modalData="currentModalData" @close="closeModal" />
   </ds-form>
 </template>
 
