@@ -81,10 +81,10 @@ Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
 Phase 3: ██████████ 100% (24/24 Aufgaben) ✅ - Webapp-Integration komplett
-Phase 4: ██████░░░░  63% (17/27 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅, OsNumber ✅ | Tier B (rest), Tier 2-3 ausstehend
+Phase 4: ███████░░░  67% (18/27 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅, OsNumber ✅, OsModal ✅ | Tier B (rest), Tier 2-3 ausstehend
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████████░░  82% (79/96 Aufgaben)
+Gesamt:  ████████░░  83% (80/96 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -405,7 +405,8 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 - [x] OsBadge Komponente + ds-chip/ds-tag → OsBadge Webapp-Migration ✅
 - [x] OsNumber Komponente + ds-number/CountTo → OsNumber Webapp-Migration ✅
 - [ ] Tier B (Rest): ds-radio → Plain HTML
-- [ ] Weitere Tier 2 Komponenten (OsModal, OsDropdown, OsAvatar, OsInput)
+- [x] OsModal Komponente + DsModal/ConfirmModal/ReportModal → OsModal Webapp-Integration ✅
+- [ ] Weitere Tier 2 Komponenten (OsDropdown, OsAvatar, OsInput)
 - [ ] ds-form + ds-input → OsForm + OsInput (stark gekoppelt, 18+23 Dateien)
 - [ ] ds-menu / ds-menu-item → OsMenu / OsMenuItem
 - [ ] ds-select → OsSelect
@@ -680,7 +681,7 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 - [ ] ds-radio (1 Datei) → native `<input type="radio">`
 
 **Tier 2: Layout & Feedback (UI-Library)**
-- [ ] OsModal (Basis: DsModal, 7 Dateien)
+- [x] OsModal (Basis: DsModal → h() Render-Function, Vue 2/3 Compat, Focus-Trap, Scroll-Lock, A11y) ✅
 - [ ] OsDropdown (Basis: Webapp Dropdown)
 - [ ] OsAvatar (vereint DsAvatar + ProfileAvatar)
 - [ ] OsInput (Basis: DsInput, 23 Dateien — gekoppelt mit ds-form)
@@ -1831,6 +1832,13 @@ Bei der Migration werden:
 | 2026-02-20 | **CountTo.vue gelöscht** | vue-count-to Dependency entfernt, followedByCountStartValue/membersCountStartValue Pattern entfernt |
 | 2026-02-20 | **CSS-Variable --color-text-soft** | Neuer Contract-Eintrag in tailwind.preset.ts + ocelot-ui-variables.scss (Label-Farbe) |
 | 2026-02-20 | **Admin-Label uppercase** | `.admin-stats__item .os-number-label { text-transform: uppercase }` per CSS statt neuem Prop |
+| 2026-03-13 | **OsModal Komponente** | Neue Tier 2 Komponente: h() Render-Function, Vue 2/3 via vue-demi, Focus-Trap, Body Scroll-Lock, ESC-Key, Backdrop-Click, A11y (role=dialog, aria-modal, aria-labelledby/aria-label), 37 Unit-Tests, 5 Visual Tests, 100% Coverage |
+| 2026-03-13 | **OsModal Features** | open Prop (v-model:open), title, cancelLabel/confirmLabel, ariaLabel Fallback, footer Scoped-Slot ({confirm, cancel}), Scroll-Fade (top gradient), tabindex=0 auf scrollbarem Content |
+| 2026-03-13 | **OsModal Events** | update:open, confirm, cancel, close (mit Typ: 'confirm'/'cancel'/'close'/'backdrop'), opened |
+| 2026-03-13 | **OsModal Vue 2 Compat** | attrs Forwarding in beiden Vue 2 Branches (closed + open), eventProps() Helper, $listeners Forwarding, $createElement für Icons |
+| 2026-03-13 | **Modal Webapp-Integration** | ConfirmModal + ReportModal nutzen OsModal; Vuex Modal Store entfernt; Modals inline gerendert |
+| 2026-03-13 | **Modal Bugfixes** | z-index Stacking Context Fix (PostTeaser/GroupTeaser), Callback-Promise Propagation (ReportList, MySomethingList), Group Leave Authorization Fix ($nextTick), Cypress .ds-modal → .os-modal |
+| 2026-03-13 | **Modal A11y** | scrollable-region-focusable Fix (tabindex=0), aria-label Fallback wenn kein Title, body overflow save/restore |
 
 ---
 
@@ -1848,11 +1856,11 @@ Bei der Migration werden:
 **Styleguide-Migration:**
 | Status | Komponenten |
 |--------|------------|
-| ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard, OsBadge, OsNumber (6) |
+| ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard, OsBadge, OsNumber, OsModal (7) |
 | ✅ → Plain HTML | Section, Placeholder, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem, Grid, GridItem, Table (13) — Tier A/B |
 | ✅ → UI-Library | Chip, Tag → OsBadge (2), Number → OsNumber (1) — Tier B |
 | ⬜ → Plain HTML | Radio (1) — Tier B |
-| ⬜ → UI-Library | Modal, Input, Menu, MenuItem, Select (5) — Tier 2-3 |
+| ⬜ → UI-Library | Input, Menu, MenuItem, Select (4) — Tier 2-3 |
 | ⬜ Nicht genutzt | Code, CopyField, FormItem, InputError, InputLabel, Page, PageTitle, Logo, Avatar, TableCol, TableHeadCol (11) |
 | ⬜ Offen | Form (18 Dateien — HTML `<form>` oder OsForm?) |
 
@@ -2932,7 +2940,7 @@ Jede Komponente durchläuft:
 | OsSpinner | Niedrig | Nur Animation + Größen |
 | OsButton | Hoch | Viele Varianten, Link-Support, States |
 | OsCard | Niedrig | Einfaches Layout |
-| OsModal | Hoch | Teleport, Focus-Trap, Animations, A11y |
+| OsModal | Hoch ✅ | Focus-Trap, Scroll-Lock, Body Overflow Save/Restore, Vue 2/3 h() Compat, A11y (dialog, aria-modal, aria-labelledby), ESC-Key, Backdrop-Click, Scrollable Content tabindex |
 | OsDropdown | Hoch | Positioning, Click-Outside, Hover-States |
 | OsInput | Mittel | Validierung, States, Icons |
 | OsAvatar | Niedrig | Bild + Fallback |

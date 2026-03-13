@@ -3,6 +3,7 @@ import flushPromises from 'flush-promises'
 import MySocialMedia from './my-social-media.vue'
 import Vuex from 'vuex'
 import Vue from 'vue'
+import MySomethingList from '~/components/_new/features/MySomethingList/MySomethingList'
 
 const localVue = global.localVue
 
@@ -10,7 +11,6 @@ describe('my-social-media.vue', () => {
   let wrapper
   let mocks
   let getters
-  let mutations
   const socialMediaUrl = 'https://freeradical.zone/@mattwr18'
   const newSocialMediaUrl = 'https://twitter.com/mattwr18'
   const faviconUrl = 'https://freeradical.zone/favicon.ico'
@@ -31,9 +31,6 @@ describe('my-social-media.vue', () => {
         return {}
       },
     }
-    mutations = {
-      'modal/SET_OPEN': jest.fn(),
-    }
   })
 
   describe('mount', () => {
@@ -41,9 +38,15 @@ describe('my-social-media.vue', () => {
     const Wrapper = () => {
       const store = new Vuex.Store({
         getters,
-        mutations,
       })
-      return mount(MySocialMedia, { store, mocks, localVue })
+      return mount(MySocialMedia, {
+        store,
+        mocks,
+        localVue,
+        stubs: {
+          'confirm-modal': { template: '<div class="confirm-modal-stub" />' },
+        },
+      })
     }
 
     describe('adding social media link', () => {
@@ -158,13 +161,7 @@ describe('my-social-media.vue', () => {
         })
 
         it('opens the confirmation modal', () => {
-          expect(mutations['modal/SET_OPEN']).toHaveBeenCalledTimes(1)
-          expect(mutations['modal/SET_OPEN']).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.objectContaining({
-              name: 'confirm',
-            }),
-          )
+          expect(wrapper.find('.confirm-modal-stub').exists()).toBe(true)
         })
 
         describe('when user confirms deletion', () => {
@@ -172,8 +169,8 @@ describe('my-social-media.vue', () => {
             mocks.$apollo.mutate.mockResolvedValue({
               data: { DeleteSocialMedia: { id: 's1' } },
             })
-            const modalCall = mutations['modal/SET_OPEN'].mock.calls[0][1]
-            modalCall.data.modalData.buttons.confirm.callback()
+            const mySomethingList = wrapper.findComponent(MySomethingList)
+            mySomethingList.vm.currentModalData.buttons.confirm.callback()
             await flushPromises()
           })
 
@@ -193,8 +190,8 @@ describe('my-social-media.vue', () => {
         describe('when deletion fails', () => {
           beforeEach(async () => {
             mocks.$apollo.mutate.mockRejectedValue(new Error('Network error'))
-            const modalCall = mutations['modal/SET_OPEN'].mock.calls[0][1]
-            modalCall.data.modalData.buttons.confirm.callback()
+            const mySomethingList = wrapper.findComponent(MySomethingList)
+            mySomethingList.vm.currentModalData.buttons.confirm.callback()
             await flushPromises()
           })
 

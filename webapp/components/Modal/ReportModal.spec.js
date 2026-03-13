@@ -6,6 +6,9 @@ const localVue = global.localVue
 
 const stubs = {
   'sweetalert-icon': true,
+  'os-modal': {
+    template: '<div><slot /><slot name="footer" /></div>',
+  },
 }
 
 describe('ReportModal.vue', () => {

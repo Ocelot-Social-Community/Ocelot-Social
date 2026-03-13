@@ -11,7 +11,6 @@ describe('MySomethingList.vue', () => {
   let propsData
   let data
   let mocks
-  let mutations
 
   beforeEach(() => {
     propsData = {
@@ -43,9 +42,6 @@ describe('MySomethingList.vue', () => {
         success: jest.fn(),
       },
     }
-    mutations = {
-      'modal/SET_OPEN': jest.fn().mockResolvedValueOnce(),
-    }
   })
 
   describe('mount', () => {
@@ -55,9 +51,7 @@ describe('MySomethingList.vue', () => {
         'list-item': '<div class="list-item"></div>',
         'edit-item': '<div class="edit-item"></div>',
       }
-      const store = new Vuex.Store({
-        mutations,
-      })
+      const store = new Vuex.Store({})
       return mount(MySomethingList, {
         propsData,
         data,
@@ -65,6 +59,9 @@ describe('MySomethingList.vue', () => {
         localVue,
         slots,
         store,
+        stubs: {
+          'confirm-modal': { template: '<div class="confirm-modal-stub" />' },
+        },
       })
     }
 
@@ -134,42 +131,11 @@ describe('MySomethingList.vue', () => {
           )
         })
 
-        it('calls delete by committing "modal/SET_OPEN"', async () => {
+        it('shows ConfirmModal when delete is clicked', async () => {
           const deleteButton = wrapper.find('button[data-test="delete-button"]')
           deleteButton.trigger('click')
           await Vue.nextTick()
-          const expectedModalData = expect.objectContaining({
-            name: 'confirm',
-            data: {
-              type: '',
-              resource: { id: '' },
-              modalData: {
-                titleIdent: 'delete-modal.title',
-                messageIdent: 'delete-modal.message',
-                messageParams: {
-                  name: 'dummy',
-                },
-                buttons: {
-                  confirm: {
-                    danger: true,
-                    icon: ocelotIcons.trash,
-                    textIdent: 'delete-modal.confirm-button',
-                    callback: expect.any(Function),
-                  },
-                  cancel: {
-                    icon: ocelotIcons.close,
-                    textIdent: 'actions.cancel',
-                    callback: expect.any(Function),
-                  },
-                },
-              },
-            },
-          })
-          expect(mutations['modal/SET_OPEN']).toHaveBeenCalledTimes(1)
-          expect(mutations['modal/SET_OPEN']).toHaveBeenCalledWith(
-            expect.any(Object),
-            expectedModalData,
-          )
+          expect(wrapper.find('.confirm-modal-stub').exists()).toBe(true)
         })
       })
     })

@@ -541,6 +541,7 @@
       "regional": "Regionaal"
     },
     "actionRadius": "Actieradius van de groep",
+    "addMember": "Lid toevoegen",
     "addMemberToGroup": "Toevoegen aan groep",
     "addMemberToGroupSuccess": "“{name}” is toegevoegd aan de groep met de rol “{role}”!",
     "addUser": "Gebruiker toevoegen",
@@ -612,6 +613,8 @@
     "radius": "Radius",
     "removeMember": "Lid verwijderen",
     "removeMemberButton": "Verwijderen",
+    "removeMemberConfirmText": "Gebruiker \"{name}\" uit de groep verwijderen?",
+    "removeMemberTitle": "Lid verwijderen",
     "role": "Jouw rol in de groep",
     "roles": {
       "admin": "Beheerder",

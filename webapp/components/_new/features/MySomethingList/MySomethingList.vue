@@ -76,17 +76,18 @@
         {{ $t('actions.cancel') }}
       </os-button>
     </div>
+    <confirm-modal v-if="showConfirmModal" :modalData="currentModalData" @close="closeModal" />
   </ds-form>
 </template>
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import { mapMutations } from 'vuex'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
 
 export default {
   name: 'MySomethingList',
-  components: { OsButton, OsIcon },
+  components: { ConfirmModal, OsButton, OsIcon },
   props: {
     useFormData: { type: Object, default: () => ({}) },
     useFormSchema: { type: Object, default: () => ({}) },
@@ -116,6 +117,8 @@ export default {
       disabled: true,
       loading: false,
       editingItem: null,
+      showConfirmModal: false,
+      currentModalData: null,
     }
   },
   computed: {
@@ -136,9 +139,6 @@ export default {
     this.icons = iconRegistry
   },
   methods: {
-    ...mapMutations({
-      commitModalData: 'modal/SET_OPEN',
-    }),
     handleInput(data) {
       this.callbacks.handleInput(this, data)
       this.disabled = true
@@ -170,35 +170,31 @@ export default {
       this.openModal(item)
     },
     openModal(item) {
-      this.commitModalData(this.modalData(item))
+      this.currentModalData = this.modalData(item)
+      this.showConfirmModal = true
+    },
+    closeModal() {
+      this.showConfirmModal = false
+      this.currentModalData = null
     },
     modalData(item) {
       return {
-        name: 'confirm',
-        data: {
-          type: '',
-          resource: { id: '' },
-          modalData: {
-            titleIdent: this.texts.deleteModal.titleIdent,
-            messageIdent: this.texts.deleteModal.messageIdent,
-            messageParams: {
-              name: item[this.namePropertyKey],
-            },
-            buttons: {
-              confirm: {
-                danger: true,
-                icon: this.texts.deleteModal.confirm.icon,
-                textIdent: this.texts.deleteModal.confirm.buttonTextIdent,
-                callback: () => {
-                  this.callbacks.delete(this, item)
-                },
-              },
-              cancel: {
-                icon: this.icons.close,
-                textIdent: 'actions.cancel',
-                callback: () => {},
-              },
-            },
+        titleIdent: this.texts.deleteModal.titleIdent,
+        messageIdent: this.texts.deleteModal.messageIdent,
+        messageParams: {
+          name: item[this.namePropertyKey],
+        },
+        buttons: {
+          confirm: {
+            danger: true,
+            icon: this.texts.deleteModal.confirm.icon,
+            textIdent: this.texts.deleteModal.confirm.buttonTextIdent,
+            callback: () => this.callbacks.delete(this, item),
+          },
+          cancel: {
+            icon: this.icons.close,
+            textIdent: 'actions.cancel',
+            callback: () => {},
           },
         },
       }

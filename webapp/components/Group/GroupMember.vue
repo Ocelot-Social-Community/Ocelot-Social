@@ -80,6 +80,7 @@
                 @click="
                   isOpen = true
                   userId = member.user.id
+                  userName = member.user.name
                 "
               >
                 <template #icon>
@@ -92,20 +93,30 @@
         </tbody>
       </table>
     </div>
-    <ds-modal
+    <os-modal
       v-if="isOpen"
-      v-model="isOpen"
-      :title="`${$t('group.removeMember')}`"
-      force
-      extended
-      :confirm-label="$t('group.removeMember')"
-      :cancel-label="$t('actions.cancel')"
+      :open.sync="isOpen"
+      :title="$t('group.removeMemberTitle')"
       @confirm="removeUser()"
-    />
+    >
+      <p class="ds-text ds-text-size-large">
+        {{ $t('group.removeMemberConfirmText', { name: userName }) }}
+      </p>
+      <template #footer="{ confirm, cancel }">
+        <os-button appearance="outline" data-testid="os-modal-cancel" @click="cancel">
+          <template #icon><os-icon :icon="icons.close" /></template>
+          {{ $t('actions.cancel') }}
+        </os-button>
+        <os-button variant="danger" data-testid="os-modal-confirm" @click="confirm">
+          <template #icon><os-icon :icon="icons.check" /></template>
+          {{ $t('group.removeMember') }}
+        </os-button>
+      </template>
+    </os-modal>
   </div>
 </template>
 <script>
-import { OsBadge, OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsBadge, OsButton, OsIcon, OsModal } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { changeGroupMemberRoleMutation, removeUserFromGroupMutation } from '~/graphql/groups.js'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
@@ -118,6 +129,7 @@ export default {
     OsBadge,
     OsButton,
     OsIcon,
+    OsModal,
     ProfileAvatar,
   },
   props: {
@@ -143,6 +155,7 @@ export default {
       user: {},
       isOpen: false,
       userId: null,
+      userName: null,
     }
   },
   methods: {

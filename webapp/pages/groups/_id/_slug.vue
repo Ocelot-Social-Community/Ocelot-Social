@@ -569,12 +569,14 @@ export default {
     //   this.user.followedByCurrentUser = followedByCurrentUser
     //   this.user.followedBy = followedBy
     // },
-    updateJoinLeave() {
-      this.$apollo.queries.Group.refetch()
-      if (this.isAllowedSeeingGroupMembers) {
+    async updateJoinLeave() {
+      this.loadGroupMembers = false
+      this.GroupMembers = []
+      await this.$apollo.queries.Group.refetch()
+      await this.$nextTick()
+      this.loadGroupMembers = this.isAllowedSeeingGroupMembers
+      if (this.loadGroupMembers) {
         this.$apollo.queries.GroupMembers.refetch()
-      } else {
-        this.GroupMembers = []
       }
     },
     fetchAllMembers() {

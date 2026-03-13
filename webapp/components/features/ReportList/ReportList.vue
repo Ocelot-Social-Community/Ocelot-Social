@@ -8,13 +8,21 @@
     </div>
     <reports-table :reports="reports" @confirm="openModal" />
     <pagination-buttons :hasNext="hasNext" :hasPrevious="hasPrevious" @back="back" @next="next" />
+    <confirm-modal
+      v-if="showConfirmModal"
+      :modalData="currentModalData"
+      @close="
+        showConfirmModal = false
+        currentModalData = null
+      "
+    />
   </os-card>
 </template>
 
 <script>
 import { OsCard } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import { mapMutations } from 'vuex'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
 import DropdownFilter from '~/components/DropdownFilter/DropdownFilter'
 import ReportsTable from '~/components/features/ReportsTable/ReportsTable'
 import { reportsListQuery, reviewMutation } from '~/graphql/Moderation.js'
@@ -22,6 +30,7 @@ import PaginationButtons from '~/components/_new/generic/PaginationButtons/Pagin
 
 export default {
   components: {
+    ConfirmModal,
     OsCard,
     DropdownFilter,
     ReportsTable,
@@ -42,6 +51,8 @@ export default {
       closed: null,
       hasNext: false,
       selected: this.$t('moderation.reports.filterLabel.all'),
+      showConfirmModal: false,
+      currentModalData: null,
     }
   },
   computed: {
@@ -73,37 +84,25 @@ export default {
           '.' +
           (report.resource.disabled ? 'disable' : 'enable')
         return {
-          name: 'confirm',
-          data: {
-            type: report.resource.__typename,
-            resource: report.resource,
-            modalData: {
-              titleIdent: identStart + '.title',
-              messageIdent: identStart + '.message',
-              messageParams: {
-                name:
-                  report.resource.name ||
-                  this.$filters.truncate(report.resource.title, 30) ||
-                  this.$filters.truncate(
-                    this.$filters.removeHtml(report.resource.contentExcerpt),
-                    30,
-                  ),
-              },
-              buttons: {
-                confirm: {
-                  danger: true,
-                  icon: report.resource.disabled ? this.icons.eyeSlash : this.icons.eye,
-                  textIdent: 'moderation.reports.decideModal.submit',
-                  callback: () => {
-                    this.confirmCallback(report.resource)
-                  },
-                },
-                cancel: {
-                  icon: this.icons.close,
-                  textIdent: 'moderation.reports.decideModal.cancel',
-                  callback: () => {},
-                },
-              },
+          titleIdent: identStart + '.title',
+          messageIdent: identStart + '.message',
+          messageParams: {
+            name:
+              report.resource.name ||
+              this.$filters.truncate(report.resource.title, 30) ||
+              this.$filters.truncate(this.$filters.removeHtml(report.resource.contentExcerpt), 30),
+          },
+          buttons: {
+            confirm: {
+              danger: true,
+              icon: report.resource.disabled ? this.icons.eyeSlash : this.icons.eye,
+              textIdent: 'moderation.reports.decideModal.submit',
+              callback: () => this.confirmCallback(report.resource),
+            },
+            cancel: {
+              icon: this.icons.close,
+              textIdent: 'moderation.reports.decideModal.cancel',
+              callback: () => {},
             },
           },
         }
@@ -117,9 +116,6 @@ export default {
     this.icons = iconRegistry
   },
   methods: {
-    ...mapMutations({
-      commitModalData: 'modal/SET_OPEN',
-    }),
     filter(option) {
       this.selected = option.label
       this.offset = 0
@@ -128,19 +124,21 @@ export default {
     },
     async confirmCallback(resource) {
       const { disabled: disable, id: resourceId } = resource
-      this.$apollo
-        .mutate({
+      try {
+        await this.$apollo.mutate({
           mutation: reviewMutation(),
           variables: { disable, resourceId, closed: true },
         })
-        .then(() => {
-          this.$toast.success(this.$t('moderation.reports.DecisionSuccess'))
-          this.$apollo.queries.reportsList.refetch()
-        })
-        .catch((error) => this.$toast.error(error.message))
+        this.$toast.success(this.$t('moderation.reports.DecisionSuccess'))
+        await this.$apollo.queries.reportsList.refetch()
+      } catch (error) {
+        this.$toast.error(error.message)
+        throw error
+      }
     },
     openModal(report) {
-      this.commitModalData(this.modalData(report))
+      this.currentModalData = this.modalData(report)
+      this.showConfirmModal = true
     },
     back() {
       this.offset = Math.max(this.offset - this.pageSize, 0)

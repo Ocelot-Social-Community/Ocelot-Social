@@ -34,9 +34,6 @@ describe('ContentMenu.vue - Group', () => {
     },
   }
 
-  const mutations = {
-    'modal/SET_OPEN': jest.fn(),
-  }
   const getters = {
     'auth/isModerator': () => false,
     'auth/isAdmin': () => false,
@@ -48,7 +45,7 @@ describe('ContentMenu.vue - Group', () => {
   }
 
   const openContentMenu = async (values = {}) => {
-    const store = new Vuex.Store({ mutations, getters, actions })
+    const store = new Vuex.Store({ getters, actions })
     const wrapper = mount(ContentMenu, {
       propsData: {
         ...values,

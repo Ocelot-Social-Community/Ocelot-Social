@@ -14,7 +14,7 @@ Phase 3: OsButton      ██████████ 100% (133/133 Buttons) ✅
 Phase 4: Tier 1        ██████████ 100% (OsButton, OsIcon, OsSpinner, OsCard) ✅
 Phase 4: Tier A → HTML ██████████ 100% (10 ds-* Wrapper → Plain HTML) ✅
 Phase 4: Tier B        ████████░░  80% (ds-chip→OsBadge✅, ds-tag→OsBadge✅, ds-grid✅, ds-number→OsNumber✅, ds-radio⬜)
-Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) | Tier 2-3 ausstehend (OsModal, OsInput, OsMenu, OsSelect)
+Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) | Tier 2 begonnen (OsModal✅) | Rest ausstehend (OsInput, OsMenu, OsSelect)
 ```
 
 ### Statistiken
@@ -87,7 +87,7 @@ Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) 
 | 24 | FlexItem | ✅ → HTML | Tier A: Plain HTML + CSS @media Queries |
 | 25 | Grid | ✅ → HTML | 2 Dateien → CSS Grid (class="ds-grid") |
 | 26 | GridItem | ✅ → HTML | 8 Dateien → CSS Grid |
-| 27 | Modal | ⬜ Tier 2 | 7 Dateien → OsModal |
+| 27 | Modal | ✅ Tier 2 | → OsModal (h() Render, Focus-Trap, Scroll-Lock, A11y; ConfirmModal + ReportModal nutzen OsModal) |
 | 28 | Page | ⬜ Nicht genutzt | Nicht direkt in Webapp verwendet |
 | 29 | PageTitle | ⬜ Nicht genutzt | Nicht direkt in Webapp verwendet |
 | 30 | Section | ✅ → HTML | Tier A: `<section class="ds-section">` |
@@ -303,7 +303,7 @@ Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) 
 | Webapp | Styleguide | Aktion | Status |
 |--------|------------|--------|--------|
 | Logo | Logo | Konsolidieren zu OsLogo | ⬜ Ausstehend |
-| Modal | Modal | Konsolidieren zu OsModal | ⬜ Ausstehend |
+| Modal | Modal | Konsolidieren zu OsModal | ✅ Erledigt |
 | ~~BaseCard~~ | Card | → OsCard | ✅ Erledigt (BaseCard gelöscht) |
 | ~~BaseIcon~~ | Icon | → OsIcon | ✅ Erledigt (BaseIcon gelöscht) |
 | ~~LoadingSpinner~~ | Spinner | → OsSpinner | ✅ Erledigt (LoadingSpinner gelöscht) |
@@ -330,16 +330,16 @@ Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) 
 | CtaJoinLeaveGroup | ✅ Nutzt OsButton | Feature-spezifisch |
 | CtaUnblockAuthor | ✅ Nutzt OsButton | Feature-spezifisch |
 
-### Modal-Familie (zur Konsolidierung)
-| Komponente | Beschreibung | Ziel |
-|------------|--------------|------|
-| Modal (Styleguide) | Basis-Modal | OsModal |
-| Modal (Webapp) | Basis-Modal | → OsModal |
-| ConfirmModal | Bestätigungs-Dialog | → OsModal type="confirm" |
-| DeleteUserModal | Löschen-Dialog | → OsModal type="confirm" |
-| DisableModal | Deaktivieren-Dialog | → OsModal type="confirm" |
-| ReleaseModal | Release-Dialog | Feature-spezifisch |
-| ReportModal | Report-Dialog | Feature-spezifisch |
+### Modal-Familie ✅ (alle nutzen OsModal)
+| Komponente | Status | Notizen |
+|------------|--------|---------|
+| ~~Modal (Styleguide)~~ | ✅ Ersetzt | → OsModal |
+| ~~Modal (Webapp)~~ | ✅ Ersetzt | → OsModal |
+| ConfirmModal | ✅ Nutzt OsModal | Generischer Confirm-Dialog mit Callbacks |
+| ~~DeleteUserModal~~ | ✅ Gelöscht | → ConfirmModal |
+| ~~DisableModal~~ | ✅ Gelöscht | → ConfirmModal |
+| ~~ReleaseModal~~ | ✅ Gelöscht | → ConfirmModal |
+| ReportModal | ✅ Nutzt OsModal | Feature-spezifisch |
 
 ### Menu-Familie (zur Konsolidierung)
 | Komponente | Beschreibung | Ziel |
@@ -365,7 +365,7 @@ Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) 
 - ~~Spinner → OsSpinner~~ ✅
 
 ### Basis-Komponenten — UI-Library (ausstehend)
-- Modal → OsModal
+- Modal → OsModal ✅
 - Input → OsInput
 - Select → OsSelect
 - Avatar → OsAvatar (falls benötigt)
@@ -441,8 +441,8 @@ Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) 
 17. [ ] ds-number (5 Dateien) → `<div class="ds-number">`
 18. [ ] ds-radio (1 Datei) → native `<input type="radio">`
 
-### Phase 4: Tier 2-4 — UI-Library (ausstehend)
-18. [ ] OsModal (7 Dateien)
+### Phase 4: Tier 2-4 — UI-Library
+18. [x] OsModal (h() Render, Focus-Trap, Scroll-Lock, A11y; ConfirmModal + ReportModal nutzen OsModal; DeleteUserModal/DisableModal/ReleaseModal gelöscht) ✅
 19. [ ] OsInput (23 Dateien, gekoppelt mit ds-form)
 20. [ ] OsMenu / OsMenuItem (17 Dateien)
 21. [ ] OsSelect (3 Dateien), OsTable (7 Dateien)
@@ -450,7 +450,7 @@ Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) 
 
 ---
 
-**✅ Phase 0-3 abgeschlossen. Phase 4: Tier 1 + Tier A ✅, Tier B 60% (Chip→OsBadge, Tag→OsBadge, Grid→HTML), Tier 2-4 ausstehend.**
+**✅ Phase 0-3 abgeschlossen. Phase 4: Tier 1 + Tier A ✅, Tier B 80% (Chip→OsBadge, Tag→OsBadge, Grid→HTML, Number→OsNumber, Table→HTML), Tier 2: OsModal ✅, Rest ausstehend.**
 
 ---
 
@@ -684,36 +684,29 @@ interface OsButtonProps {
 
 ---
 
-### Feature-Modals (nutzen DsModal)
+### Feature-Modals ✅ (nutzen OsModal)
 
-| Modal | Business-Logik | Migration |
-|-------|----------------|-----------|
-| **ConfirmModal** | Generischer Confirm-Dialog mit Callbacks | Bleibt, nutzt OsModal |
-| **DisableModal** | GraphQL Mutation für Disable | Bleibt, nutzt OsModal |
-| **ReportModal** | Report-Logik | Bleibt, nutzt OsModal |
-| **DeleteUserModal** | User-Lösch-Logik | Bleibt, nutzt OsModal |
-| **ReleaseModal** | Release-Logik | Bleibt, nutzt OsModal |
+| Modal | Status | Notizen |
+|-------|--------|---------|
+| **ConfirmModal** | ✅ Nutzt OsModal | Generischer Confirm-Dialog mit Callbacks, Success-Animation |
+| ~~**DisableModal**~~ | ✅ Gelöscht | → ConfirmModal (inline modalData) |
+| **ReportModal** | ✅ Nutzt OsModal | Report-Logik mit Radio-Auswahl |
+| ~~**DeleteUserModal**~~ | ✅ Gelöscht | → ConfirmModal (inline modalData) |
+| ~~**ReleaseModal**~~ | ✅ Gelöscht | → ConfirmModal (inline modalData) |
 
-**Erkenntnis:** Alle Feature-Modals nutzen bereits DsModal als Basis und fügen nur spezifische Business-Logik hinzu. Dies ist das gewünschte Pattern!
-
----
-
-### Webapp Modal.vue (Modal-Manager)
-
-**Pfad:** `webapp/components/Modal.vue`
-
-**Funktion:** Kein UI-Modal, sondern ein **State-basierter Modal-Router**:
-- Liest `modal/open` und `modal/data` aus Vuex
-- Rendert das passende Feature-Modal basierend auf State
-- Leitet Props an Feature-Modals weiter
-
-**Mögliche Migration:**
-- Als `OsModalManager` beibehalten oder
-- Durch Vue 3 `<Teleport>` + Composable ersetzen
+**Ergebnis:** DsModal vollständig durch OsModal ersetzt. Vuex Modal Store entfernt — Modals werden inline gerendert (v-if + showConfirmModal). DeleteUserModal, DisableModal, ReleaseModal wurden in ConfirmModal konsolidiert.
 
 ---
 
-### Konsolidierungsvorschlag: OsModal
+### ~~Webapp Modal.vue (Modal-Manager)~~ ✅ Gelöscht
+
+**Vuex Modal Store (`store/modal.js`) und Modal-Router (`components/Modal.vue`) wurden entfernt.**
+
+Modals werden jetzt inline gerendert: Jede Komponente hat eigenes `showConfirmModal`/`currentModalData` State und rendert `<confirm-modal v-if="showConfirmModal">` direkt.
+
+---
+
+### ~~Konsolidierungsvorschlag~~ OsModal ✅ (implementiert)
 
 ```typescript
 interface OsModalProps {
@@ -964,14 +957,14 @@ interface OsDropdownProps {
 | — | ds-number | 5 | `<div class="ds-number">` | ⬜ |
 | — | ds-radio | 1 | native `<input type="radio">` | ⬜ |
 
-### Tier 2: Layout & Feedback (ausstehend)
+### Tier 2: Layout & Feedback
 
-| # | Komponente | Dateien | Abhängigkeiten |
-|---|------------|---------|----------------|
-| 5 | **OsModal** | 7 | OsButton, OsCard |
-| 6 | **OsDropdown** | — | OsButton |
-| 7 | **OsAvatar** | — | - |
-| 8 | **OsInput** | 23 | gekoppelt mit ds-form (18 Dateien) |
+| # | Komponente | Dateien | Abhängigkeiten | Status |
+|---|------------|---------|----------------|--------|
+| 5 | **OsModal** | 7 | OsButton | ✅ |
+| 6 | **OsDropdown** | — | OsButton | ⬜ |
+| 7 | **OsAvatar** | — | - | ⬜ |
+| 8 | **OsInput** | 23 | gekoppelt mit ds-form (18 Dateien) | ⬜ |
 
 ### Tier 3: Navigation (ausstehend)
 

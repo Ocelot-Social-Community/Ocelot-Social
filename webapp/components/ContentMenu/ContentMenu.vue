@@ -1,53 +1,72 @@
 <template>
-  <dropdown class="content-menu" :placement="placement" offset="5">
-    <template #default="{ toggleMenu }">
-      <slot name="button" :toggleMenu="toggleMenu">
-        <os-button
-          data-test="content-menu-button"
-          variant="primary"
-          appearance="outline"
-          size="sm"
-          circle
-          :aria-label="$t('actions.menu')"
-          @click.prevent="toggleMenu()"
-        >
-          <template #icon>
-            <os-icon :icon="icons.ellipsisV" />
-          </template>
-        </os-button>
-      </slot>
-    </template>
-    <template #popover="{ toggleMenu }">
-      <div class="content-menu-popover">
-        <ds-menu :routes="routes">
-          <template #menuitem="item">
-            <ds-menu-item
-              :route="item.route"
-              :parents="item.parents"
-              @click.stop.prevent="openItem(item.route, toggleMenu)"
-            >
-              <os-icon :icon="item.route.icon" />
-              {{ item.route.label }}
-            </ds-menu-item>
-          </template>
-        </ds-menu>
-      </div>
-    </template>
-  </dropdown>
+  <div class="content-menu" @click.stop.prevent>
+    <dropdown :placement="placement" offset="5">
+      <template #default="{ toggleMenu }">
+        <slot name="button" :toggleMenu="toggleMenu">
+          <os-button
+            data-test="content-menu-button"
+            variant="primary"
+            appearance="outline"
+            size="sm"
+            circle
+            :aria-label="$t('actions.menu')"
+            @click.prevent="toggleMenu()"
+          >
+            <template #icon>
+              <os-icon :icon="icons.ellipsisV" />
+            </template>
+          </os-button>
+        </slot>
+      </template>
+      <template #popover="{ toggleMenu }">
+        <div class="content-menu-popover">
+          <ds-menu :routes="routes">
+            <template #menuitem="item">
+              <ds-menu-item
+                :route="item.route"
+                :parents="item.parents"
+                @click.stop.prevent="openItem(item.route, toggleMenu)"
+              >
+                <os-icon :icon="item.route.icon" />
+                {{ item.route.label }}
+              </ds-menu-item>
+            </template>
+          </ds-menu>
+        </div>
+      </template>
+    </dropdown>
+    <confirm-modal
+      v-if="showConfirmModal"
+      :modalData="currentModalData"
+      @close="showConfirmModal = false"
+    />
+    <report-modal
+      v-if="showReportModal"
+      :name="getResourceName()"
+      :type="resourceType"
+      :id="resource.id"
+      @close="showReportModal = false"
+    />
+  </div>
 </template>
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Dropdown from '~/components/Dropdown'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
+import ReportModal from '~/components/Modal/ReportModal'
+import { reviewMutation } from '~/graphql/Moderation.js'
 import PinnedPostsMixin from '~/mixins/pinnedPosts'
 
 export default {
   name: 'ContentMenu',
   components: {
+    ConfirmModal,
     Dropdown,
     OsButton,
     OsIcon,
+    ReportModal,
   },
   mixins: [PinnedPostsMixin],
   props: {
@@ -68,6 +87,13 @@ export default {
         return {}
       },
     },
+  },
+  data() {
+    return {
+      showConfirmModal: false,
+      showReportModal: false,
+      currentModalData: null,
+    }
   },
   created() {
     this.icons = iconRegistry
@@ -188,7 +214,7 @@ export default {
           routes.push({
             label: this.$t(`disable.${this.resourceType}.title`),
             callback: () => {
-              this.openModal('disable')
+              this.openModal('confirm', 'disable')
             },
             icon: this.icons.eyeSlash,
           })
@@ -196,7 +222,7 @@ export default {
           routes.push({
             label: this.$t(`release.${this.resourceType}.title`),
             callback: () => {
-              this.openModal('release')
+              this.openModal('confirm', 'release')
             },
             icon: this.icons.eye,
           })
@@ -308,14 +334,67 @@ export default {
       toggleMenu()
     },
     openModal(dialog, modalDataName = null) {
-      this.$store.commit('modal/SET_OPEN', {
-        name: dialog,
-        data: {
-          type: this.resourceType,
-          resource: this.resource,
-          modalData: modalDataName ? this.modalsData[modalDataName] : {},
+      if (dialog === 'report') {
+        this.showReportModal = true
+        return
+      }
+      let modalData = {}
+      if (modalDataName) {
+        if (modalDataName === 'disable' || modalDataName === 'release') {
+          modalData = this.reviewModalData(modalDataName)
+        } else {
+          modalData = this.modalsData[modalDataName] || {}
+        }
+      }
+      this.currentModalData = modalData
+      this.showConfirmModal = true
+    },
+    reviewModalData(action) {
+      const disable = action === 'disable'
+      const name = this.getResourceName()
+      return {
+        titleIdent: `${action}.${this.resourceType}.title`,
+        messageIdent: `${action}.${this.resourceType}.message`,
+        messageParams: { name: this.$filters.truncate(name, 30) },
+        buttons: {
+          confirm: {
+            danger: true,
+            icon: this.icons.exclamationCircle,
+            textIdent: `${action}.submit`,
+            callback: async () => {
+              try {
+                await this.$apollo.mutate({
+                  mutation: reviewMutation(),
+                  variables: { resourceId: this.resource.id, disable, closed: false },
+                })
+                this.$toast.success(this.$t(`${action}.success`))
+                this.$set(this.resource, 'disabled', disable)
+              } catch (err) {
+                this.$toast.error(err.message)
+                throw err
+              }
+            },
+          },
+          cancel: {
+            icon: this.icons.close,
+            textIdent: `${action}.cancel`,
+            callback: () => {},
+          },
         },
-      })
+      }
+    },
+    getResourceName() {
+      switch (this.resourceType) {
+        case 'user':
+        case 'organization':
+          return this.resource.name || ''
+        case 'contribution':
+          return this.resource.title || ''
+        case 'comment':
+          return this.resource.author?.name || ''
+        default:
+          return ''
+      }
     },
   },
 }

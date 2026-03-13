@@ -205,12 +205,63 @@
         </client-only>
       </div>
     </div>
+
+    <os-modal
+      v-if="deleteUserData"
+      :open="showDeleteModal"
+      :title="$t('settings.deleteUserAccount.accountWarningIsAdmin')"
+      @cancel="cancelDeleteUser"
+    >
+      <p>{{ $t('settings.deleteUserAccount.infoAdmin') }}</p>
+      <div class="ds-flex" style="margin-top: 0.75rem">
+        <div style="flex: 0 0 50%; width: 50%">
+          <user-teaser :user="deleteUserData" :link-to-profile="false" :show-popover="false" />
+        </div>
+        <div style="flex: 0 0 20%; width: 20%">
+          <p class="ds-text ds-text-size-small">
+            <strong>{{ $t('modals.deleteUser.created') }}</strong>
+            <br />
+            <date-time :date-time="deleteUserData.createdAt" />
+          </p>
+        </div>
+        <div style="flex: 0 0 15%; width: 15%">
+          <p class="ds-text ds-text-size-small">
+            <strong>{{ $t('common.post', null, deleteUserData.contributionsCount) }}</strong>
+            <br />
+            {{ deleteUserData.contributionsCount }}
+          </p>
+        </div>
+        <div style="flex: 0 0 15%; width: 15%">
+          <p class="ds-text ds-text-size-small">
+            <strong>{{ $t('common.comment', null, deleteUserData.commentedCount) }}</strong>
+            <br />
+            {{ deleteUserData.commentedCount }}
+          </p>
+        </div>
+      </div>
+
+      <template #footer="{ cancel }">
+        <os-button variant="primary" appearance="outline" @click="cancel">
+          {{ $t('actions.cancel') }}
+        </os-button>
+        <os-button
+          variant="danger"
+          appearance="filled"
+          :loading="deleteLoading"
+          @click="confirmDeleteUser"
+        >
+          <template #icon><os-icon :icon="icons.exclamationCircle" /></template>
+          {{ $t('settings.deleteUserAccount.name') }}
+        </os-button>
+      </template>
+    </os-modal>
   </div>
 </template>
 
 <script>
-import { OsButton, OsCard, OsIcon, OsNumber, OsSpinner } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon, OsModal, OsNumber, OsSpinner } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
+import gql from 'graphql-tag'
 import uniqBy from 'lodash/uniqBy'
 import { mapGetters, mapMutations } from 'vuex'
 import postListActions from '~/mixins/postListActions'
@@ -231,6 +282,8 @@ import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
 import UpdateQuery from '~/components/utils/UpdateQuery'
 import SocialMedia from '~/components/SocialMedia/SocialMedia'
+import DateTime from '~/components/DateTime'
+import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
 
 const tabToFilterMapping = ({ tab, id }) => {
@@ -246,6 +299,7 @@ export default {
     OsCard,
     OsButton,
     OsIcon,
+    OsModal,
     OsNumber,
     OsSpinner,
     SocialMedia,
@@ -256,6 +310,8 @@ export default {
     ProfileAvatar,
     ContentMenu,
     AvatarUploader,
+    DateTime,
+    UserTeaser,
     MasonryGrid,
     MasonryGridItem,
     FollowList,
@@ -288,6 +344,9 @@ export default {
       followedByCount: followListVisibleCount,
       followingCount: followListVisibleCount,
       updateUserMutation,
+      showDeleteModal: false,
+      deleteUserData: null,
+      deleteLoading: false,
     }
   },
   computed: {
@@ -337,7 +396,6 @@ export default {
   },
   methods: {
     ...mapMutations({
-      commitModalData: 'modal/SET_OPEN',
       showChat: 'chat/SET_OPEN_CHAT',
     }),
     handleTab(tab) {
@@ -414,13 +472,36 @@ export default {
         this.$apollo.queries.User.refetch()
       }
     },
-    async deleteUser(userdata) {
-      this.commitModalData({
-        name: 'delete',
-        data: {
-          userdata: userdata,
-        },
-      })
+    deleteUser(userdata) {
+      this.deleteUserData = userdata
+      this.showDeleteModal = true
+    },
+    cancelDeleteUser() {
+      this.showDeleteModal = false
+      this.deleteUserData = null
+    },
+    async confirmDeleteUser() {
+      this.deleteLoading = true
+      try {
+        await this.$apollo.mutate({
+          mutation: gql`
+            mutation ($id: ID!, $resource: [Deletable]) {
+              DeleteUser(id: $id, resource: $resource) {
+                id
+              }
+            }
+          `,
+          variables: { id: this.deleteUserData.id, resource: ['Post', 'Comment'] },
+        })
+        this.$toast.success(this.$t('settings.deleteUserAccount.success'))
+        this.showDeleteModal = false
+        this.$router.replace('/')
+      } catch (err) {
+        this.$toast.error(err.message)
+        this.showDeleteModal = false
+      } finally {
+        this.deleteLoading = false
+      }
     },
     optimisticFollow({ followedByCurrentUser }) {
       const currentUser = this.$store.getters['auth/user']

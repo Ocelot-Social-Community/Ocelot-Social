@@ -541,6 +541,7 @@
       "regional": "Rajonal"
     },
     "actionRadius": "Rrezja e veprimit të grupit",
+    "addMember": "Shto anëtar",
     "addMemberToGroup": "Shto në grup",
     "addMemberToGroupSuccess": "“{name}” u shtua në grup me rolin “{role}”!",
     "addUser": "Shto përdorues",
@@ -612,6 +613,8 @@
     "radius": "Rrezja",
     "removeMember": "Hiq anëtarin",
     "removeMemberButton": "Hiq",
+    "removeMemberConfirmText": "Hiq përdoruesin \"{name}\" nga grupi?",
+    "removeMemberTitle": "Hiq anëtarin",
     "role": "Roli yt në grup",
     "roles": {
       "admin": "Administrator",

@@ -541,6 +541,7 @@
       "regional": "Регіональний"
     },
     "actionRadius": "Радіус дії групи",
+    "addMember": "Додати учасника",
     "addMemberToGroup": "Додати до групи",
     "addMemberToGroupSuccess": "«{name}» додано до групи з роллю «{role}»!",
     "addUser": "Додати користувача",
@@ -612,6 +613,8 @@
     "radius": "Радіус",
     "removeMember": "Видалити учасника",
     "removeMemberButton": "Видалити",
+    "removeMemberConfirmText": "Видалити користувача «{name}» з групи?",
+    "removeMemberTitle": "Видалити учасника",
     "role": "Ваша роль у групі",
     "roles": {
       "admin": "Адміністратор",

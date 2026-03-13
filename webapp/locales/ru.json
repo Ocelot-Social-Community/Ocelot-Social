@@ -541,6 +541,7 @@
       "regional": "Региональный"
     },
     "actionRadius": "Радиус действия группы",
+    "addMember": "Добавить участника",
     "addMemberToGroup": "Добавить в группу",
     "addMemberToGroupSuccess": "“{name}” добавлен в группу с ролью “{role}”!",
     "addUser": "Добавить пользователя",
@@ -612,6 +613,8 @@
     "radius": "Радиус",
     "removeMember": "Удалить участника",
     "removeMemberButton": "Удалить",
+    "removeMemberConfirmText": "Удалить пользователя «{name}» из группы?",
+    "removeMemberTitle": "Удалить участника",
     "role": "Твоя роль в группе",
     "roles": {
       "admin": "Администратор",

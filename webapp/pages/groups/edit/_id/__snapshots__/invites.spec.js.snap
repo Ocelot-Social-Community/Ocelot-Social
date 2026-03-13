@@ -207,6 +207,8 @@ exports[`invites.vue renders 1`] = `
         </div>
       </div>
     </div>
+     
+    <!---->
   </div>
 </div>
 `;

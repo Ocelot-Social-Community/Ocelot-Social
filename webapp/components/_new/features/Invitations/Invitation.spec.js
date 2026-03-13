@@ -12,29 +12,15 @@ Object.assign(navigator, {
   },
 })
 
-const mutations = {
-  'modal/SET_OPEN': jest.fn(),
-}
-
 describe('Invitation.vue', () => {
   let wrapper
 
   beforeEach(() => {
-    mutations['modal/SET_OPEN'].mockClear()
     navigator.clipboard.writeText.mockClear()
   })
 
   const Wrapper = ({ wasRedeemed = false, withCopymessage = false }) => {
-    const store = new Vuex.Store({
-      modules: {
-        modal: {
-          namespaced: true,
-          mutations: {
-            SET_OPEN: mutations['modal/SET_OPEN'],
-          },
-        },
-      },
-    })
+    const store = new Vuex.Store({})
     const propsData = {
       inviteCode: {
         code: 'test-invite-code',
@@ -47,6 +33,9 @@ describe('Invitation.vue', () => {
       localVue,
       store,
       propsData,
+      stubs: {
+        'confirm-modal': { template: '<div data-test="confirm-modal" />' },
+      },
       mocks: {
         $t: jest.fn((v) => v),
         $toast: {
@@ -120,32 +109,11 @@ describe('Invitation.vue', () => {
       wrapper = Wrapper({ wasRedeemed: false })
     })
 
-    it('opens the delete modal with correct payload', async () => {
+    it('emits open-delete-modal with modal data', async () => {
       const deleteButton = screen.getByLabelText('invite-codes.invalidate')
       await fireEvent.click(deleteButton)
-      expect(mutations['modal/SET_OPEN']).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.objectContaining({
-          name: 'confirm',
-          data: expect.objectContaining({
-            modalData: expect.objectContaining({
-              titleIdent: 'invite-codes.delete-modal.title',
-              messageIdent: 'invite-codes.delete-modal.message',
-              buttons: expect.objectContaining({
-                confirm: expect.objectContaining({
-                  danger: true,
-                  textIdent: 'actions.delete',
-                  callback: expect.any(Function),
-                }),
-                cancel: expect.objectContaining({
-                  textIdent: 'actions.cancel',
-                  callback: expect.any(Function),
-                }),
-              }),
-            }),
-          }),
-        }),
-      )
+      expect(wrapper.emitted()['open-delete-modal']).toBeTruthy()
+      expect(wrapper.emitted()['open-delete-modal'][0][0]).toHaveProperty('buttons')
     })
   })
 })

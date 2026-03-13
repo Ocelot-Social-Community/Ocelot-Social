@@ -10,10 +10,11 @@ const localVue = global.localVue
 const stubs = {
   'client-only': true,
   'nuxt-link': true,
+  'confirm-modal': { template: '<div class="confirm-modal-stub" />' },
 }
 
 describe('ReportList', () => {
-  let mocks, mutations, getters, wrapper
+  let mocks, getters, wrapper
 
   beforeEach(() => {
     mocks = {
@@ -30,9 +31,6 @@ describe('ReportList', () => {
         error: jest.fn((message) => message),
       },
     }
-    mutations = {
-      'modal/SET_OPEN': jest.fn().mockResolvedValueOnce(),
-    }
     getters = {
       'auth/user': () => {
         return { slug: 'awesome-user' }
@@ -44,7 +42,6 @@ describe('ReportList', () => {
   describe('mount', () => {
     const Wrapper = () => {
       const store = new Vuex.Store({
-        mutations,
         getters,
       })
       return mount(ReportList, { mocks, localVue, store, stubs })
@@ -71,8 +68,8 @@ describe('ReportList', () => {
         wrapper.findComponent(ReportsTable).vm.$emit('confirm', reports[0])
       })
 
-      it('calls modal/SET_OPEN', () => {
-        expect(mutations['modal/SET_OPEN']).toHaveBeenCalledTimes(1)
+      it('shows ConfirmModal', () => {
+        expect(wrapper.find('.confirm-modal-stub').exists()).toBe(true)
       })
     })
   })

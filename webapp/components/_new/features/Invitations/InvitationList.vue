@@ -8,6 +8,7 @@
           :invite-code="inviteCode"
           :copy-message="copyMessage"
           @invalidate-invite-code="invalidateInviteCode"
+          @open-delete-modal="$emit('open-delete-modal', $event)"
         />
       </client-only>
     </ul>

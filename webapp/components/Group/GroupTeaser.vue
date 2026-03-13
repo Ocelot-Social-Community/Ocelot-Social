@@ -2,6 +2,7 @@
   <nuxt-link
     class="group-teaser"
     :to="{ name: 'groups-id-slug', params: { id: group.id, slug: group.slug } }"
+    @click.native.capture="guardNavigation"
   >
     <os-card
       :class="{
@@ -108,6 +109,13 @@ export default {
   created() {
     this.icons = iconRegistry
   },
+  methods: {
+    guardNavigation(event) {
+      if (event.target.closest('.content-menu')) {
+        event.preventDefault()
+      }
+    },
+  },
   computed: {
     descriptionExcerpt() {
       return this.$filters.removeLinks(this.group.descriptionExcerpt)
@@ -174,7 +182,6 @@ export default {
 
     > .content-menu {
       position: relative;
-      z-index: $z-index-post-teaser-link;
     }
   }
 

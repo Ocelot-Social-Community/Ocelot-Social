@@ -48,8 +48,6 @@
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import { mapMutations } from 'vuex'
-
 export default {
   name: 'Invitation',
   components: {
@@ -67,6 +65,27 @@ export default {
     },
   },
   computed: {
+    deleteModalData() {
+      return {
+        titleIdent: 'invite-codes.delete-modal.title',
+        messageIdent: 'invite-codes.delete-modal.message',
+        buttons: {
+          confirm: {
+            danger: true,
+            icon: this.icons.trash,
+            textIdent: 'actions.delete',
+            callback: () => {
+              this.$emit('invalidate-invite-code', this.inviteCode.code)
+            },
+          },
+          cancel: {
+            icon: this.icons.close,
+            textIdent: 'actions.cancel',
+            callback: () => {},
+          },
+        },
+      }
+    },
     inviteLink() {
       return `${window.location.origin}/registration?method=invite-code&inviteCode=${this.inviteCode.code}`
     },
@@ -84,40 +103,12 @@ export default {
     this.canCopy = !!navigator.clipboard
   },
   methods: {
-    ...mapMutations({
-      commitModalData: 'modal/SET_OPEN',
-    }),
     async copyInviteCode() {
       await navigator.clipboard.writeText(this.inviteMessageAndLink)
       this.$toast.success(this.$t('invite-codes.copy-success'))
     },
     openDeleteModal() {
-      this.commitModalData({
-        name: 'confirm',
-        data: {
-          type: '',
-          resource: { id: '' },
-          modalData: {
-            titleIdent: this.$t('invite-codes.delete-modal.title'),
-            messageIdent: this.$t('invite-codes.delete-modal.message'),
-            buttons: {
-              confirm: {
-                danger: true,
-                icon: this.icons.trash,
-                textIdent: 'actions.delete',
-                callback: () => {
-                  this.$emit('invalidate-invite-code', this.inviteCode.code)
-                },
-              },
-              cancel: {
-                icon: this.icons.close,
-                textIdent: 'actions.cancel',
-                callback: () => {},
-              },
-            },
-          },
-        },
-      })
+      this.$emit('open-delete-modal', this.deleteModalData)
     },
   },
 }

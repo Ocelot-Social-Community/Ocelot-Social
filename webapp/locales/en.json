@@ -541,6 +541,7 @@
       "regional": "Regional"
     },
     "actionRadius": "Action radius of the group",
+    "addMember": "Add Member",
     "addMemberToGroup": "Add to group",
     "addMemberToGroupSuccess": "“{name}” was added to the group with the role “{role}”!",
     "addUser": "Add User",
@@ -612,6 +613,8 @@
     "radius": "Radius",
     "removeMember": "Remove member",
     "removeMemberButton": "Remove",
+    "removeMemberConfirmText": "Remove user \"{name}\" from the group?",
+    "removeMemberTitle": "Remove Member",
     "role": "Your role in the group",
     "roles": {
       "admin": "Administrator",

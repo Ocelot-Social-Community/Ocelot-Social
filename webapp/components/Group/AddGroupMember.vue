@@ -4,14 +4,10 @@
     <div class="ds-mb-small"></div>
     <div class="ds-mb-large">
       <select-user-search :id="id" ref="selectUserSearch" @select-user="selectUser" />
-      <ds-modal
+      <os-modal
         v-if="isOpen"
-        force
-        extended
-        :confirm-label="$t('group.modal.confirm')"
-        :cancel-label="$t('group.modal.cancel')"
-        :title="$t('group.modal.confirmAddGroupMemberTitle')"
-        v-model="isOpen"
+        :title="$t('group.addMember')"
+        :open.sync="isOpen"
         @close="closeModal"
         @confirm="confirmModal"
         @cancel="cancelModal"
@@ -19,18 +15,33 @@
         <p class="ds-text ds-text-size-large">
           {{ $t('group.modal.confirmAddGroupMemberText', { name: user.name }) }}
         </p>
-      </ds-modal>
+        <template #footer="{ confirm, cancel }">
+          <os-button appearance="outline" @click="cancel">
+            <template #icon><os-icon :icon="icons.close" /></template>
+            {{ $t('group.modal.cancel') }}
+          </os-button>
+          <os-button variant="primary" @click="confirm">
+            <template #icon><os-icon :icon="icons.check" /></template>
+            {{ $t('group.modal.confirm') }}
+          </os-button>
+        </template>
+      </os-modal>
     </div>
   </div>
 </template>
 
 <script>
+import { OsButton, OsIcon, OsModal } from '@ocelot-social/ui'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { changeGroupMemberRoleMutation } from '~/graphql/groups.js'
 import SelectUserSearch from '~/components/generic/SelectUserSearch/SelectUserSearch'
 
 export default {
   name: 'AddGroupMember',
   components: {
+    OsButton,
+    OsIcon,
+    OsModal,
     SelectUserSearch,
   },
   props: {
@@ -42,6 +53,9 @@ export default {
       type: Array,
       required: false,
     },
+  },
+  created() {
+    this.icons = iconRegistry
   },
   data() {
     return {

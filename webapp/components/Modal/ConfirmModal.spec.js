@@ -7,6 +7,9 @@ const localVue = global.localVue
 
 const stubs = {
   'sweetalert-icon': true,
+  'os-modal': {
+    template: '<div><slot /><slot name="footer" /></div>',
+  },
 }
 
 describe('ConfirmModal.vue', () => {
@@ -20,9 +23,6 @@ describe('ConfirmModal.vue', () => {
 
   beforeEach(() => {
     propsData = {
-      type: 'contribution',
-      id: 'p23',
-      name: postName,
       modalData: postMenuModalsData(postName, confirmCallback, cancelCallback).delete,
     }
     mocks = {
@@ -63,12 +63,6 @@ describe('ConfirmModal.vue', () => {
 
     describe('given a post', () => {
       beforeEach(() => {
-        propsData = {
-          ...propsData,
-          type: 'contribution',
-          id: 'p23',
-          name: postName,
-        }
         wrapper = Wrapper()
       })
 
