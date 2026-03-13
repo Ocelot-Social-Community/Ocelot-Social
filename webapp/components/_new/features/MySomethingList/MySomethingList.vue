@@ -192,9 +192,7 @@ export default {
             danger: true,
             icon: this.texts.deleteModal.confirm.icon,
             textIdent: this.texts.deleteModal.confirm.buttonTextIdent,
-            callback: () => {
-              this.callbacks.delete(this, item)
-            },
+            callback: () => this.callbacks.delete(this, item),
           },
           cancel: {
             icon: this.icons.close,
