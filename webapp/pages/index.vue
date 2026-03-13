@@ -255,8 +255,11 @@ export default {
       return this.$route.query && this.$route.query.categoryId ? this.$route.query.categoryId : null
     },
   },
-  watchQuery: ['hashtag'],
   watch: {
+    '$route.query.hashtag'(value) {
+      this.hashtag = value || null
+      this.resetPostList()
+    },
     postsFilter() {
       this.resetPostList()
     },
@@ -319,8 +322,10 @@ export default {
       this.prevScrollpos = currentScrollPos
     },
     clearSearch() {
-      this.$router.push({ path: '/' })
       this.hashtag = null
+      const query = { ...this.$route.query }
+      delete query.hashtag
+      this.$router.replace({ query })
     },
     href(post) {
       return this.$router.resolve({
