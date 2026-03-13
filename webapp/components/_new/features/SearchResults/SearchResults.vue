@@ -473,12 +473,12 @@ export default {
 }
 
 .search-results-pagination {
-  padding: $space-small 0;
+  padding-top: $space-small;
   display: flex;
   justify-content: center;
 
   @media (max-width: 810px) {
-    padding: $space-x-small 0;
+    padding-top: $space-x-small;
   }
 }
 
