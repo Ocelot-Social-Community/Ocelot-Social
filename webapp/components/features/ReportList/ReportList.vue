@@ -130,7 +130,7 @@ export default {
           variables: { disable, resourceId, closed: true },
         })
         this.$toast.success(this.$t('moderation.reports.DecisionSuccess'))
-        this.$apollo.queries.reportsList.refetch()
+        await this.$apollo.queries.reportsList.refetch()
       } catch (error) {
         this.$toast.error(error.message)
         throw error
