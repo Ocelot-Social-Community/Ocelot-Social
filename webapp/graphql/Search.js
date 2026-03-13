@@ -71,7 +71,7 @@ export const searchPosts = gql`
 `
 
 export const searchGroups = (i18n) => {
-  const lang = i18n ? i18n.locale().toUpperCase() : 'EN'
+  const lang = i18n ? i18n.locale() : 'en'
   return gql`
     ${imageUrls}
 
@@ -103,7 +103,7 @@ export const searchGroups = (i18n) => {
           }
           locationName
           location {
-            name: name${lang}
+            name(lang: "${lang}")
           }
           myRole
         }

@@ -452,7 +452,6 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
       >
         <div
           class="tab-navigation ds-mb-large"
-          style="grid-row-end: span 3; grid-column: 1 / -1;"
         >
           <div
             class="ds-tab-nav os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
@@ -1187,7 +1186,6 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
       >
         <div
           class="tab-navigation ds-mb-large"
-          style="grid-row-end: span 3; grid-column: 1 / -1;"
         >
           <div
             class="ds-tab-nav os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
@@ -1743,7 +1741,6 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
       >
         <div
           class="tab-navigation ds-mb-large"
-          style="grid-row-end: span 3; grid-column: 1 / -1;"
         >
           <div
             class="ds-tab-nav os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"
@@ -2377,7 +2374,6 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
       >
         <div
           class="tab-navigation ds-mb-large"
-          style="grid-row-end: span 3; grid-column: 1 / -1;"
         >
           <div
             class="ds-tab-nav os-card relative rounded-[5px] break-words bg-white shadow-[0px_12px_26px_-4px_rgba(0,0,0,0.1)] p-6 ds-tab-nav"

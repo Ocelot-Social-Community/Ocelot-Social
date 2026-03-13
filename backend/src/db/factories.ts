@@ -230,6 +230,55 @@ Factory.define('post')
     return post
   })
 
+Factory.define('group')
+  .option('ownerId', null)
+  .option('owner', ['ownerId'], (ownerId) => {
+    if (ownerId) return neode.find('User', ownerId)
+    return Factory.build('user')
+  })
+  .attrs({
+    id: uuid,
+    name: faker.company.name,
+    about: faker.lorem.sentence,
+    description: faker.lorem.paragraphs,
+    groupType: 'public',
+    actionRadius: 'regional',
+    deleted: false,
+    disabled: false,
+  })
+  .attr('slug', ['slug', 'name'], (slug, name) => {
+    return slug || slugify(name, { lower: true })
+  })
+  .attr(
+    'descriptionExcerpt',
+    ['descriptionExcerpt', 'description'],
+    (descriptionExcerpt, description) => {
+      return descriptionExcerpt || description
+    },
+  )
+  .after(async (buildObject, options) => {
+    const [group, owner] = await Promise.all([neode.create('Group', buildObject), options.owner])
+    const session = driver.session()
+    try {
+      await session.writeTransaction((txc) =>
+        txc.run(
+          `
+          MATCH (owner:User {id: $ownerId}), (group:Group {id: $groupId})
+          MERGE (owner)-[:CREATED]->(group)
+          MERGE (owner)-[membership:MEMBER_OF]->(group)
+          SET membership.createdAt = toString(datetime()),
+              membership.updatedAt = toString(datetime()),
+              membership.role = 'owner'
+          `,
+          { ownerId: owner.get('id'), groupId: buildObject.id },
+        ),
+      )
+    } finally {
+      await session.close()
+    }
+    return group
+  })
+
 Factory.define('comment')
   .option('postId', null)
   .option('post', ['postId'], (postId) => {

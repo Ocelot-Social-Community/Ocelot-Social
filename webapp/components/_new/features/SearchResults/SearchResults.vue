@@ -1,121 +1,110 @@
 <template>
   <div id="search-results" class="search-results">
     <div class="search-results__content">
-      <masonry-grid>
-        <!-- search text -->
-        <div class="grid-total-search-results" style="grid-row-end: span 1; grid-column: 1 / -1">
-          <div class="ds-mb-xxx-small ds-mt-xxx-small ds-space-centered">
-            <p class="ds-text total-search-results">
-              {{ $t('search.for') }}
-              <strong>{{ '"' + (search || '') + '"' }}</strong>
-            </p>
+      <!-- search text -->
+      <div class="grid-total-search-results">
+        <div class="ds-mb-xxx-small ds-mt-xxx-small ds-space-centered">
+          <p class="ds-text total-search-results">
+            {{ $t('search.for') }}
+            <strong>{{ '"' + (search || '') + '"' }}</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- tabs -->
+      <tab-navigation :tabs="tabOptions" :activeTab="activeTab" @switch-tab="switchTab" />
+
+      <!-- search results -->
+      <div v-if="!(!activeResourceCount || searchCount === 0)" class="search-results-body">
+        <!-- pagination buttons -->
+        <div v-if="activeResourceCount > pageSize" class="search-results-pagination">
+          <pagination-buttons
+            :hasNext="hasNext"
+            :showPageCounter="true"
+            :hasPrevious="hasPrevious"
+            :activePage="activePage"
+            :activeResourceCount="activeResourceCount"
+            :key="'Top'"
+            :pageSize="pageSize"
+            @back="previousResults"
+            @next="nextResults"
+          />
+        </div>
+
+        <!-- posts -->
+        <masonry-grid v-if="activeTab === 'Post'">
+          <masonry-grid-item
+            v-for="post in activeResources"
+            :key="post.id"
+            :imageAspectRatio="post.image && post.image.aspectRatio"
+          >
+            <post-teaser
+              :post="post"
+              :width="{ base: '100%', md: '100%', xl: '50%' }"
+              :showGroupPinned="true"
+              @removePostFromList="posts = removePostFromList(post, posts)"
+              @pinPost="pinPost(post, refetchPostList)"
+              @unpinPost="unpinPost(post, refetchPostList)"
+              @pinGroupPost="pinGroupPost(post, refetchPostList)"
+              @unpinGroupPost="unpinGroupPost(post, refetchPostList)"
+              @pushPost="pushPost(post, refetchPostList)"
+              @unpushPost="unpushPost(post, refetchPostList)"
+              @toggleObservePost="
+                (postId, value) => toggleObservePost(postId, value, refetchPostList)
+              "
+            />
+          </masonry-grid-item>
+        </masonry-grid>
+        <!-- users -->
+        <div v-if="activeTab === 'User'" class="search-results-list">
+          <div v-for="user in activeResources" :key="user.id" class="search-results-list__item">
+            <os-card>
+              <user-teaser :user="user" />
+            </os-card>
+          </div>
+        </div>
+        <!-- groups -->
+        <div v-if="activeTab === 'Group'" class="search-results-list">
+          <div v-for="group in activeResources" :key="group.id" class="search-results-list__item">
+            <group-teaser :group="{ ...group, name: group.groupName }" />
+          </div>
+        </div>
+        <!-- hashtags -->
+        <div v-if="activeTab === 'Hashtag'" class="search-results-list">
+          <div
+            v-for="hashtag in activeResources"
+            :key="hashtag.id"
+            class="search-results-list__item"
+          >
+            <os-card>
+              <hc-hashtag :id="hashtag.id" />
+            </os-card>
           </div>
         </div>
 
-        <!-- tabs -->
-        <tab-navigation :tabs="tabOptions" :activeTab="activeTab" @switch-tab="switchTab" />
-
-        <!-- search results -->
-
-        <template v-if="!(!activeResourceCount || searchCount === 0)">
-          <!-- pagination buttons -->
-          <div
-            v-if="activeResourceCount > pageSize"
-            style="grid-row-end: span 2; grid-column: 1 / -1"
-          >
-            <div class="ds-mb-large ds-space-centered">
-              <pagination-buttons
-                :hasNext="hasNext"
-                :showPageCounter="true"
-                :hasPrevious="hasPrevious"
-                :activePage="activePage"
-                :activeResourceCount="activeResourceCount"
-                :key="'Top'"
-                :pageSize="pageSize"
-                @back="previousResults"
-                @next="nextResults"
-              />
-            </div>
-          </div>
-
-          <!-- posts -->
-          <template v-if="activeTab === 'Post'">
-            <masonry-grid-item
-              v-for="post in activeResources"
-              :key="post.id"
-              :imageAspectRatio="post.image && post.image.aspectRatio"
-            >
-              <post-teaser
-                :post="post"
-                :width="{ base: '100%', md: '100%', xl: '50%' }"
-                :showGroupPinned="true"
-                @removePostFromList="posts = removePostFromList(post, posts)"
-                @pinPost="pinPost(post, refetchPostList)"
-                @unpinPost="unpinPost(post, refetchPostList)"
-                @pinGroupPost="pinGroupPost(post, refetchPostList)"
-                @unpinGroupPost="unpinGroupPost(post, refetchPostList)"
-                @pushPost="pushPost(post, refetchPostList)"
-                @unpushPost="unpushPost(post, refetchPostList)"
-                @toggleObservePost="
-                  (postId, value) => toggleObservePost(postId, value, refetchPostList)
-                "
-              />
-            </masonry-grid-item>
-          </template>
-          <!-- users -->
-          <template v-if="activeTab === 'User'">
-            <div v-for="user in activeResources" :key="user.id" style="grid-row-end: span 2">
-              <os-card>
-                <user-teaser :user="user" />
-              </os-card>
-            </div>
-          </template>
-          <!-- groups -->
-          <template v-if="activeTab === 'Group'">
-            <div v-for="group in activeResources" :key="group.id" style="grid-row-end: span 2">
-              <os-card class="group-teaser-card-wrapper">
-                <group-teaser :group="{ ...group, name: group.groupName }" />
-              </os-card>
-            </div>
-          </template>
-          <!-- hashtags -->
-          <template v-if="activeTab === 'Hashtag'">
-            <div v-for="hashtag in activeResources" :key="hashtag.id" style="grid-row-end: span 2">
-              <os-card>
-                <hc-hashtag :id="hashtag.id" />
-              </os-card>
-            </div>
-          </template>
-
-          <!-- pagination buttons -->
-          <div
-            v-if="activeResourceCount > pageSize"
-            style="grid-row-end: span 2; grid-column: 1 / -1"
-          >
-            <div class="ds-mb-large ds-space-centered">
-              <pagination-buttons
-                :hasNext="hasNext"
-                :hasPrevious="hasPrevious"
-                :activePage="activePage"
-                :showPageCounter="true"
-                :activeResourceCount="activeResourceCount"
-                :key="'Bottom'"
-                :pageSize="pageSize"
-                :srollTo="'#search-results'"
-                @back="previousResults"
-                @next="nextResults"
-              />
-            </div>
-          </div>
-        </template>
-
-        <!-- no results -->
-        <div v-else style="grid-row-end: span 7; grid-column: 1 / -1">
-          <div class="ds-mb-large ds-space-centered">
-            <hc-empty icon="tasks" :message="$t('search.no-results', { search })" />
-          </div>
+        <!-- pagination buttons -->
+        <div v-if="activeResourceCount > pageSize" class="search-results-pagination">
+          <pagination-buttons
+            :hasNext="hasNext"
+            :hasPrevious="hasPrevious"
+            :activePage="activePage"
+            :showPageCounter="true"
+            :activeResourceCount="activeResourceCount"
+            :key="'Bottom'"
+            :pageSize="pageSize"
+            :srollTo="'#search-results'"
+            @back="previousResults"
+            @next="nextResults"
+          />
         </div>
-      </masonry-grid>
+      </div>
+
+      <!-- no results -->
+      <div v-else class="search-results-empty">
+        <div class="ds-space-centered">
+          <hc-empty icon="tasks" :message="$t('search.no-results', { search })" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -473,5 +462,35 @@ export default {
 .grid-total-search-results {
   padding: 0;
   margin: 0;
+}
+
+.search-results-empty {
+  padding-top: $space-small;
+
+  @media (max-width: 810px) {
+    padding-top: $space-x-small;
+  }
+}
+
+.search-results-pagination {
+  padding-top: $space-small;
+  display: flex;
+  justify-content: center;
+
+  @media (max-width: 810px) {
+    padding-top: $space-x-small;
+  }
+}
+
+.search-results-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: $space-small;
+  padding-top: $space-small;
+
+  @media (max-width: 810px) {
+    gap: $space-x-small;
+    padding-top: $space-x-small;
+  }
 }
 </style>

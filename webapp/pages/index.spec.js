@@ -59,6 +59,7 @@ describe('PostIndex', () => {
           push: jest.fn(),
         },
         push: jest.fn(),
+        replace: jest.fn(),
       },
       $toast: {
         success: jest.fn(),

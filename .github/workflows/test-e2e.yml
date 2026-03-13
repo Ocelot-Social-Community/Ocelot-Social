@@ -233,6 +233,12 @@ jobs:
           timeout 120 bash -c 'until curl -sf http://localhost:3000 > /dev/null 2>&1; do sleep 5; done'
           echo "Webapp is ready."
 
+      - name: Initialize database
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend yarn db:migrate init
+
+      - name: Migrate database
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend yarn db:migrate up
+
       - name: Full stack tests | run tests
         id: e2e-tests
         run: yarn run cypress:run --spec "cypress/e2e/${{ matrix.feature }}"

@@ -19,7 +19,7 @@ async function setupNodeEvents(on, config) {
     webpackPreprocessor({
       webpackOptions: {
         mode: 'development',
-        devtool: 'source-map',
+        devtool: 'eval-source-map',
         resolve: {
           extensions: ['.js', '.json'],
           fallback: {

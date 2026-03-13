@@ -32,6 +32,15 @@ defineStep('the following {string} are in the database:', (table,data) => {
         cy.factory().build('tag', entry, entry)
       })
       break
+    case 'groups':
+      data.hashes().forEach( entry => {
+        cy.factory().build('group', {
+          ...entry,
+          deleted: Boolean(entry.deleted),
+          disabled: Boolean(entry.disabled),
+        }, entry)
+      })
+      break
     case 'donations':
       data.hashes().forEach( entry => {
         cy.factory().build('donations', entry, entry)

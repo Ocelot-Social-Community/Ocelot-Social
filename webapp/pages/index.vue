@@ -1,5 +1,10 @@
 <template>
   <div>
+    <!-- hashtag filter -->
+    <div v-if="hashtag" class="hashtag-filter-bar">
+      <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
+    </div>
+
     <!-- feed top row: filter (left) + create post (right) -->
     <div class="feed-top-row">
       <div
@@ -101,14 +106,11 @@
     </div>
 
     <div
-      v-if="hashtag || showDonations"
+      v-if="showDonations"
       class="newsfeed-controls"
       :class="{ 'newsfeed-controls--no-filter': !SHOW_CONTENT_FILTER_MASONRY_GRID }"
     >
-      <div v-if="hashtag">
-        <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
-      </div>
-      <div v-if="showDonations" class="top-info-bar donation-desktop-only">
+      <div class="top-info-bar donation-desktop-only">
         <donation-info :goal="goal" :progress="progress" />
       </div>
     </div>
@@ -116,7 +118,7 @@
     <masonry-grid
       :single-column="singleColumn"
       :class="[
-        !hashtag && !showDonations ? 'grid-margin-top' : '',
+        !showDonations ? 'grid-margin-top' : '',
         !isMobile && !singleColumn && posts.length <= 2 ? 'grid-column-helper' : '',
       ]"
     >
@@ -253,8 +255,11 @@ export default {
       return this.$route.query && this.$route.query.categoryId ? this.$route.query.categoryId : null
     },
   },
-  watchQuery: ['hashtag'],
   watch: {
+    '$route.query.hashtag'(value) {
+      this.hashtag = value || null
+      this.resetPostList()
+    },
     postsFilter() {
       this.resetPostList()
     },
@@ -317,8 +322,10 @@ export default {
       this.prevScrollpos = currentScrollPos
     },
     clearSearch() {
-      this.$router.push({ path: '/' })
       this.hashtag = null
+      const query = { ...this.$route.query }
+      delete query.hashtag
+      this.$router.replace({ query })
     },
     href(post) {
       return this.$router.resolve({
@@ -390,6 +397,11 @@ export default {
   display: none;
 }
 
+.hashtag-filter-bar {
+  margin-top: -$space-x-small;
+  margin-bottom: $space-small;
+}
+
 .feed-top-row {
   display: flex;
   align-items: center;
@@ -417,6 +429,10 @@ export default {
   right: max(20px, calc((100vw - $container-max-width-x-large) / 2 + 52px)) !important;
   top: 88px !important;
   transition: top 0.3s ease !important;
+}
+
+.hashtag-filter-bar + .feed-top-row .post-add-button {
+  top: 146px !important;
 }
 
 .main-navigation:has(.hide-navbar) ~ .ds-container .post-add-button {
@@ -517,6 +533,10 @@ export default {
 
   .post-add-button {
     top: 67px !important;
+  }
+
+  .hashtag-filter-bar + .feed-top-row .post-add-button {
+    top: 125px !important;
   }
 
   .newsfeed-controls {
