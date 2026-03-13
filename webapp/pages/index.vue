@@ -110,7 +110,7 @@
       class="newsfeed-controls"
       :class="{ 'newsfeed-controls--no-filter': !SHOW_CONTENT_FILTER_MASONRY_GRID }"
     >
-      <div v-if="showDonations" class="top-info-bar donation-desktop-only">
+      <div class="top-info-bar donation-desktop-only">
         <donation-info :goal="goal" :progress="progress" />
       </div>
     </div>
