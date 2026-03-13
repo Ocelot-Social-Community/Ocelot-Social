@@ -15,22 +15,20 @@
       <tab-navigation :tabs="tabOptions" :activeTab="activeTab" @switch-tab="switchTab" />
 
       <!-- search results -->
-      <template v-if="!(!activeResourceCount || searchCount === 0)">
+      <div v-if="!(!activeResourceCount || searchCount === 0)" class="search-results-body">
         <!-- pagination buttons -->
-        <div v-if="activeResourceCount > pageSize">
-          <div class="ds-mb-large ds-space-centered">
-            <pagination-buttons
-              :hasNext="hasNext"
-              :showPageCounter="true"
-              :hasPrevious="hasPrevious"
-              :activePage="activePage"
-              :activeResourceCount="activeResourceCount"
-              :key="'Top'"
-              :pageSize="pageSize"
-              @back="previousResults"
-              @next="nextResults"
-            />
-          </div>
+        <div v-if="activeResourceCount > pageSize" class="search-results-pagination">
+          <pagination-buttons
+            :hasNext="hasNext"
+            :showPageCounter="true"
+            :hasPrevious="hasPrevious"
+            :activePage="activePage"
+            :activeResourceCount="activeResourceCount"
+            :key="'Top'"
+            :pageSize="pageSize"
+            @back="previousResults"
+            @next="nextResults"
+          />
         </div>
 
         <!-- posts -->
@@ -85,27 +83,25 @@
         </div>
 
         <!-- pagination buttons -->
-        <div v-if="activeResourceCount > pageSize">
-          <div class="ds-mb-large ds-space-centered">
-            <pagination-buttons
-              :hasNext="hasNext"
-              :hasPrevious="hasPrevious"
-              :activePage="activePage"
-              :showPageCounter="true"
-              :activeResourceCount="activeResourceCount"
-              :key="'Bottom'"
-              :pageSize="pageSize"
-              :srollTo="'#search-results'"
-              @back="previousResults"
-              @next="nextResults"
-            />
-          </div>
+        <div v-if="activeResourceCount > pageSize" class="search-results-pagination">
+          <pagination-buttons
+            :hasNext="hasNext"
+            :hasPrevious="hasPrevious"
+            :activePage="activePage"
+            :showPageCounter="true"
+            :activeResourceCount="activeResourceCount"
+            :key="'Bottom'"
+            :pageSize="pageSize"
+            :srollTo="'#search-results'"
+            @back="previousResults"
+            @next="nextResults"
+          />
         </div>
-      </template>
+      </div>
 
       <!-- no results -->
-      <div v-else>
-        <div class="ds-mb-large ds-space-centered">
+      <div v-else class="search-results-empty">
+        <div class="ds-space-centered">
           <hc-empty icon="tasks" :message="$t('search.no-results', { search })" />
         </div>
       </div>
@@ -468,13 +464,33 @@ export default {
   margin: 0;
 }
 
+.search-results-empty {
+  padding-top: 16px;
+
+  @media (max-width: 810px) {
+    padding-top: 8px;
+  }
+}
+
+.search-results-pagination {
+  padding: 16px 0;
+  display: flex;
+  justify-content: center;
+
+  @media (max-width: 810px) {
+    padding: 8px 0;
+  }
+}
+
 .search-results-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
   gap: 16px;
+  padding-top: 16px;
 
   @media (max-width: 810px) {
     gap: 8px;
+    padding-top: 8px;
   }
 }
 </style>
