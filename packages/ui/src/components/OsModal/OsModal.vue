@@ -189,6 +189,7 @@
             const parentDynClass = proxy?.$vnode?.data?.class
             return h('div', {
               class: ['os-modal-wrapper', parentClass, parentDynClass].filter(Boolean),
+              attrs,
             })
           }
           /* v8 ignore stop */
@@ -377,6 +378,7 @@
             'div',
             {
               class: ['os-modal-wrapper', parentClass, parentDynClass].filter(Boolean),
+              attrs,
               on: {
                 ...listeners,
                 keydown: onFocusTrap,
