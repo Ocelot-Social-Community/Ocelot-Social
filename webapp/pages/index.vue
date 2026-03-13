@@ -426,6 +426,10 @@ export default {
   transition: top 0.3s ease !important;
 }
 
+.hashtag-filter-bar + .feed-top-row .post-add-button {
+  top: 146px !important;
+}
+
 .main-navigation:has(.hide-navbar) ~ .ds-container .post-add-button {
   top: 20px !important;
 }
@@ -524,6 +528,10 @@ export default {
 
   .post-add-button {
     top: 67px !important;
+  }
+
+  .hashtag-filter-bar + .feed-top-row .post-add-button {
+    top: 125px !important;
   }
 
   .newsfeed-controls {
