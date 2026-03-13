@@ -249,9 +249,13 @@ Factory.define('group')
   .attr('slug', ['slug', 'name'], (slug, name) => {
     return slug || slugify(name, { lower: true })
   })
-  .attr('descriptionExcerpt', ['descriptionExcerpt', 'description'], (descriptionExcerpt, description) => {
-    return descriptionExcerpt || description
-  })
+  .attr(
+    'descriptionExcerpt',
+    ['descriptionExcerpt', 'description'],
+    (descriptionExcerpt, description) => {
+      return descriptionExcerpt || description
+    },
+  )
   .after(async (buildObject, options) => {
     const [group, owner] = await Promise.all([neode.create('Group', buildObject), options.owner])
     const session = driver.session()
