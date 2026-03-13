@@ -79,10 +79,7 @@
     <confirm-modal
       v-if="showConfirmModal"
       :modalData="currentModalData"
-      @close="
-        showConfirmModal = false
-        currentModalData = null
-      "
+      @close="closeModal"
     />
   </ds-form>
 </template>
@@ -179,6 +176,10 @@ export default {
     openModal(item) {
       this.currentModalData = this.modalData(item)
       this.showConfirmModal = true
+    },
+    closeModal() {
+      this.showConfirmModal = false
+      this.currentModalData = null
     },
     modalData(item) {
       return {
