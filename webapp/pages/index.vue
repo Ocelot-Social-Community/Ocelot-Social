@@ -1,5 +1,10 @@
 <template>
   <div>
+    <!-- hashtag filter -->
+    <div v-if="hashtag" class="hashtag-filter-bar">
+      <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
+    </div>
+
     <!-- feed top row: filter (left) + create post (right) -->
     <div class="feed-top-row">
       <div
@@ -101,13 +106,10 @@
     </div>
 
     <div
-      v-if="hashtag || showDonations"
+      v-if="showDonations"
       class="newsfeed-controls"
       :class="{ 'newsfeed-controls--no-filter': !SHOW_CONTENT_FILTER_MASONRY_GRID }"
     >
-      <div v-if="hashtag">
-        <hashtags-filter :hashtag="hashtag" @clearSearch="clearSearch" />
-      </div>
       <div v-if="showDonations" class="top-info-bar donation-desktop-only">
         <donation-info :goal="goal" :progress="progress" />
       </div>
@@ -116,7 +118,7 @@
     <masonry-grid
       :single-column="singleColumn"
       :class="[
-        !hashtag && !showDonations ? 'grid-margin-top' : '',
+        !showDonations ? 'grid-margin-top' : '',
         !isMobile && !singleColumn && posts.length <= 2 ? 'grid-column-helper' : '',
       ]"
     >
@@ -388,6 +390,11 @@ export default {
 <style lang="scss">
 .hide-filter {
   display: none;
+}
+
+.hashtag-filter-bar {
+  margin-top: -$space-x-small;
+  margin-bottom: $space-small;
 }
 
 .feed-top-row {
