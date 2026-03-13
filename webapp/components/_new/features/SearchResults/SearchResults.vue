@@ -68,9 +68,7 @@
         <!-- groups -->
         <div v-if="activeTab === 'Group'" class="search-results-list">
           <div v-for="group in activeResources" :key="group.id" class="search-results-list__item">
-            <os-card class="group-teaser-card-wrapper">
-              <group-teaser :group="{ ...group, name: group.groupName }" />
-            </os-card>
+            <group-teaser :group="{ ...group, name: group.groupName }" />
           </div>
         </div>
         <!-- hashtags -->
