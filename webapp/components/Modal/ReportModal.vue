@@ -9,14 +9,21 @@
     <!-- eslint-disable-next-line vue/no-v-html -->
     <p v-html="message" />
     <div class="ds-mb-small"></div>
-    <fieldset class="report-radio-group" data-test="report-radio-group">
+    <fieldset class="report-radio-group" data-test="report-radio-group" role="radiogroup">
       <legend>{{ $t('report.reason.category.label') }}</legend>
       <div
-        v-for="option in form.reasonCategoryOptions"
+        v-for="(option, index) in form.reasonCategoryOptions"
         :key="option.value"
         class="report-radio-option"
         :class="{ 'report-radio-option-selected': form.reasonCategory === option }"
+        role="radio"
+        :aria-checked="String(form.reasonCategory === option)"
+        :tabindex="form.reasonCategory === option || (!form.reasonCategory && index === 0) ? 0 : -1"
         @click="selectReasonCategory(option)"
+        @keydown.space.prevent="selectReasonCategory(option)"
+        @keydown.enter.prevent="selectReasonCategory(option)"
+        @keydown.down.prevent="focusRadioOption(index + 1)"
+        @keydown.up.prevent="focusRadioOption(index - 1)"
       >
         <span class="report-radio-option-mark" />
         <span class="report-radio-option-label">{{ option.label }}</span>
@@ -127,6 +134,15 @@ export default {
     },
     selectReasonCategory(option) {
       this.form.reasonCategory = option
+      this.$nextTick(() => {
+        const selected = this.$el.querySelector('.report-radio-option[aria-checked="true"]')
+        if (selected) selected.focus()
+      })
+    },
+    focusRadioOption(index) {
+      const options = this.form.reasonCategoryOptions
+      const wrappedIndex = (index + options.length) % options.length
+      this.selectReasonCategory(options[wrappedIndex])
     },
     async confirm() {
       const { reasonCategory, reasonDescription } = this.form
