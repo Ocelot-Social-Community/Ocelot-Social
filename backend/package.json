@@ -108,7 +108,7 @@
     "@types/ws": "^8.18.1",
     "eslint": "^9.27.0",
     "eslint-config-it4c": "^0.12.0",
-    "jest": "^30.2.0",
+    "jest": "^30.3.0",
     "nodemon": "~3.1.14",
     "prettier": "^3.8.1",
     "rosie": "^2.1.1",
