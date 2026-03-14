@@ -81,10 +81,10 @@ Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
 Phase 3: ██████████ 100% (24/24 Aufgaben) ✅ - Webapp-Integration komplett
-Phase 4: ███████░░░  67% (18/27 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅, OsNumber ✅, OsModal ✅ | Tier B (rest), Tier 2-3 ausstehend
+Phase 4: ███████░░░  70% (19/27 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅, OsNumber ✅, OsModal ✅, ds-radio→HTML ✅ | Tier B ✅, Tier 2-3 ausstehend
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████████░░  83% (80/96 Aufgaben)
+Gesamt:  ████████░░  84% (81/96 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -216,11 +216,20 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-02-20 (Session 32)
+**Letzte Aktualisierung:** 2026-03-14 (Session 33)
 
-**Aktuelle Phase:** Phase 4 - Tier 1 ✅, Tier A ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅, OsNumber ✅ | Tier B (rest), Tier 2-3 ausstehend
+**Aktuelle Phase:** Phase 4 - Tier 1 ✅, Tier A ✅, Tier B ✅, OsModal ✅ | Tier 2-3 ausstehend
 
-**Zuletzt abgeschlossen (Session 32 - OsNumber: ds-number + CountTo → OsNumber):**
+**Zuletzt abgeschlossen (Session 33 - ds-radio → native HTML):**
+- [x] `<ds-radio>` in ReportModal.vue → native `<fieldset>` + `<input type="radio">` + `<label>`
+- [x] Accessible Radio-Group: `<fieldset>` mit `<legend>` für Screen-Reader
+- [x] CSS: `.report-radio-group`, `.report-radio-option`, `.report-radio-option-label` (in ReportModal `<style>`)
+- [x] ReportModal.spec.js: `.ds-radio-option-label` → `input[type="radio"]` Selektor
+- [x] Cypress E2E: `.ds-radio-option-label` → `input[type="radio"]` Selektor
+- [x] 14/14 Unit-Tests bestanden
+- [x] 0 ds-radio Nutzungen verbleibend
+
+**Zuvor abgeschlossen (Session 32 - OsNumber: ds-number + CountTo → OsNumber):**
 - [x] OsNumber Komponente in packages/ui erstellt (h() Render-Function, requestAnimationFrame Animation)
 - [x] Props: count (required), label (optional), animated (optional, 1500ms ease-out)
 - [x] Animation: requestAnimationFrame-Loop, watch(count) re-animiert von oldVal→newVal
@@ -279,8 +288,7 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 - [x] Test-Fix: Empty.spec.js `attributes().margin` → `classes().toContain('ds-my-xxx-small')`
 - [x] 0 Tier-A `ds-*` Komponenten-Tags verbleibend
 
-**Verbleibende ds-* Komponenten (7 Typen):**
-- Tier B Rest (→ Plain HTML): ds-radio (1)
+**Verbleibende ds-* Komponenten (6 Typen):**
 - Tier C (→ UI-Library): ds-input (23), ds-form (18), ds-modal (7), ds-menu/ds-menu-item (17), ds-select (3)
 
 **Zuvor abgeschlossen (Session 26 - CodeRabbit Review Fixes):**

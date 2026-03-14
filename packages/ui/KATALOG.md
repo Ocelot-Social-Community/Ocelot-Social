@@ -13,7 +13,7 @@ Phase 0: Analyse       ██████████ 100% (8/8 Schritte) ✅
 Phase 3: OsButton      ██████████ 100% (133/133 Buttons) ✅
 Phase 4: Tier 1        ██████████ 100% (OsButton, OsIcon, OsSpinner, OsCard) ✅
 Phase 4: Tier A → HTML ██████████ 100% (10 ds-* Wrapper → Plain HTML) ✅
-Phase 4: Tier B        ████████░░  80% (ds-chip→OsBadge✅, ds-tag→OsBadge✅, ds-grid✅, ds-number→OsNumber✅, ds-radio⬜)
+Phase 4: Tier B        ██████████ 100% (ds-chip→OsBadge✅, ds-tag→OsBadge✅, ds-grid✅, ds-number→OsNumber✅, ds-radio→HTML✅)
 Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) | Tier 2 begonnen (OsModal✅) | Rest ausstehend (OsInput, OsMenu, OsSelect)
 ```
 
@@ -27,7 +27,7 @@ Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) 
 | ✅ → Plain HTML | Section, Placeholder, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem, Grid, GridItem, Table (13) |
 | ✅ → OsBadge | Chip (20 Nutzungen → OsBadge), Tag (3 → OsBadge shape="square") |
 | ✅ → OsNumber | Number (5 Nutzungen → OsNumber, CountTo.vue gelöscht, vue-count-to entfernt) |
-| ⬜ → Plain HTML | Radio (1) — Tier B Rest |
+| ✅ → Plain HTML | Radio (1 Datei → native `<input type="radio">` in ReportModal) |
 | ⬜ → UI-Library | Modal, Input, Menu, MenuItem, Select (5) — Tier 2-3 |
 | ⬜ Offen | Form (18 Dateien — HTML oder OsForm?) |
 | ⬜ Nicht in Webapp | Code, CopyField, FormItem, InputError, InputLabel, Page, PageTitle, Logo, Avatar, TableCol, TableHeadCol (11) |
@@ -76,7 +76,7 @@ Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) 
 | 17 | Input | ⬜ Tier 2 | 23 Dateien → OsInput (gekoppelt mit Form) |
 | 18 | InputError | ⬜ Nicht genutzt | Intern von Input genutzt |
 | 19 | InputLabel | ⬜ Nicht genutzt | Intern von Input genutzt |
-| 20 | Radio | ⬜ Tier B | 1 Datei → native `<input type="radio">` |
+| 20 | Radio | ✅ → HTML | 1 Datei → native `<input type="radio">` + `<fieldset>` (ReportModal) |
 | 21 | Select | ⬜ Tier 4 | 3 Dateien → OsSelect |
 
 ### Layout
@@ -439,7 +439,7 @@ Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) 
 15. [x] ds-tag (3 Dateien) → OsBadge shape="square" (UI-Library)
 16. [x] ds-grid / ds-grid-item (10 Dateien) → CSS Grid (Plain HTML)
 17. [ ] ds-number (5 Dateien) → `<div class="ds-number">`
-18. [ ] ds-radio (1 Datei) → native `<input type="radio">`
+18. [x] ds-radio (1 Datei) → native `<input type="radio">` + `<fieldset>` (ReportModal) ✅
 
 ### Phase 4: Tier 2-4 — UI-Library
 18. [x] OsModal (h() Render, Focus-Trap, Scroll-Lock, A11y; ConfirmModal + ReportModal nutzen OsModal; DeleteUserModal/DisableModal/ReleaseModal gelöscht) ✅

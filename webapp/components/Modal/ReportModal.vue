@@ -9,13 +9,22 @@
     <!-- eslint-disable-next-line vue/no-v-html -->
     <p v-html="message" />
     <div class="ds-mb-small"></div>
-    <ds-radio
-      v-model="form.reasonCategory"
-      :schema="formSchema.reasonCategory"
-      :label="$t('report.reason.category.label')"
-      :options="form.reasonCategoryOptions"
-      labelProp="label"
-    />
+    <fieldset class="report-radio-group" data-test="report-radio-group">
+      <legend>{{ $t('report.reason.category.label') }}</legend>
+      <label
+        v-for="option in form.reasonCategoryOptions"
+        :key="option.value"
+        class="report-radio-option"
+      >
+        <input
+          type="radio"
+          name="reasonCategory"
+          :checked="form.reasonCategory === option"
+          @change="form.reasonCategory = option"
+        />
+        <span class="report-radio-option-label">{{ option.label }}</span>
+      </label>
+    </fieldset>
     <ds-input
       class="reason-description"
       v-model="form.reasonDescription"
@@ -174,12 +183,29 @@ export default {
   width: 700px !important;
   max-width: 700px !important;
 }
-.report-modal .ds-radio-option {
-  width: 100% !important;
+.report-modal .report-radio-group {
+  border: none;
+  padding: 0;
+  margin: 0;
 }
-.report-modal .ds-radio-option-label {
-  margin: 5px 20px 5px 5px !important;
-  width: 100% !important;
+.report-modal .report-radio-group legend {
+  font-weight: bold;
+  margin-bottom: $space-xx-small;
+}
+.report-modal .report-radio-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  width: 100%;
+  padding: 4px 0;
+}
+.report-modal .report-radio-option input[type="radio"] {
+  margin: 0 8px 0 0;
+  cursor: pointer;
+}
+.report-modal .report-radio-option-label {
+  cursor: pointer;
 }
 .report-modal .reason-description {
   margin-top: $space-x-small !important;
