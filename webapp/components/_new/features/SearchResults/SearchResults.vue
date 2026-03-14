@@ -401,7 +401,12 @@ export default {
       update({ searchGroups }) {
         this.groups = searchGroups.groups
         this.groupCount = searchGroups.groupCount
-        if (this.activeTab === null && this.postCount === 0 && this.userCount === 0 && this.groupCount > 0)
+        if (
+          this.activeTab === null &&
+          this.postCount === 0 &&
+          this.userCount === 0 &&
+          this.groupCount > 0
+        )
           this.activeTab = 'Group'
       },
       fetchPolicy: 'cache-and-network',
