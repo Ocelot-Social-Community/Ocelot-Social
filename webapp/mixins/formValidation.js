@@ -6,39 +6,40 @@ Schema.warning = function () {}
 export default {
   provide() {
     return {
-      $parentForm: this._formProxy,
+      $parentForm: this.$formProxy,
     }
   },
   data() {
     return {
       formErrors: null,
-      _formSubscribers: [],
     }
   },
   beforeCreate() {
     const vm = this
-    this._formProxy = {
+    const subscribers = []
+    this.$formProxy = {
       subscribe(cb) {
         if (cb && typeof cb === 'function') {
           cb(cloneDeep(vm.formData))
-          vm._formSubscribers.push(cb)
+          subscribers.push(cb)
         }
       },
       unsubscribe(cb) {
-        const index = vm._formSubscribers.indexOf(cb)
+        const index = subscribers.indexOf(cb)
         if (index > -1) {
-          vm._formSubscribers.splice(index, 1)
+          subscribers.splice(index, 1)
         }
       },
       update(model, value) {
         vm.updateFormField(model, value)
       },
     }
+    this.$formSubscribers = subscribers
   },
   watch: {
     formData: {
       handler(value) {
-        this._notifySubscribers(value, this.formErrors)
+        this.$notifyFormSubscribers(value, this.formErrors)
       },
       deep: true,
     },
@@ -46,7 +47,7 @@ export default {
   methods: {
     updateFormField(model, value) {
       this.$set(this.formData, model, value)
-      this._validateForm(() => {
+      this.$validateForm(() => {
         if (typeof this.handleInputValid === 'function') {
           this.handleInputValid(cloneDeep(this.formData))
         }
@@ -56,17 +57,17 @@ export default {
       }
     },
     formSubmit(callback) {
-      this._validateForm(() => {
+      this.$validateForm(() => {
         if (callback && typeof callback === 'function') {
           callback(cloneDeep(this.formData))
         }
       })
     },
-    _validateForm(cb) {
+    $validateForm(cb) {
       const schema = this.formSchema
       if (!schema || Object.keys(schema).length === 0) {
         this.formErrors = null
-        this._notifySubscribers(this.formData, null)
+        this.$notifyFormSubscribers(this.formData, null)
         if (cb && typeof cb === 'function') {
           cb()
         }
@@ -83,14 +84,14 @@ export default {
         } else {
           this.formErrors = null
         }
-        this._notifySubscribers(this.formData, this.formErrors)
+        this.$notifyFormSubscribers(this.formData, this.formErrors)
         if (!errors && cb && typeof cb === 'function') {
           cb()
         }
       })
     },
-    _notifySubscribers(data, errors) {
-      this._formSubscribers.forEach((cb) => {
+    $notifyFormSubscribers(data, errors) {
+      this.$formSubscribers.forEach((cb) => {
         cb(cloneDeep(data), errors)
       })
     },
