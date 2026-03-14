@@ -14,8 +14,6 @@ exports[`Users given badges are disabled renders 1`] = `
     </h2>
      
     <form
-      autocomplete="off"
-      class="ds-form"
       novalidate="novalidate"
     >
       <div
@@ -465,8 +463,6 @@ exports[`Users given badges are enabled renders 1`] = `
     </h2>
      
     <form
-      autocomplete="off"
-      class="ds-form"
       novalidate="novalidate"
     >
       <div
