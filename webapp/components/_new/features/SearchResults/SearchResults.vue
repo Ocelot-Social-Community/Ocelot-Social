@@ -177,6 +177,11 @@ export default {
       hashtagsOffset: 0,
     }
   },
+  watch: {
+    search() {
+      this.activeTab = null
+    },
+  },
   computed: {
     activeResources() {
       if (this.activeTab === 'Post') return this.posts
@@ -323,6 +328,7 @@ export default {
         this.hashtags = searchHashtags.hashtags
         this.hashtagCount = searchHashtags.hashtagCount
         if (
+          this.activeTab === null &&
           this.postCount === 0 &&
           this.userCount === 0 &&
           this.groupCount === 0 &&
@@ -350,7 +356,8 @@ export default {
       update({ searchUsers }) {
         this.users = searchUsers.users
         this.userCount = searchUsers.userCount
-        if (this.postCount === 0 && this.userCount > 0) this.activeTab = 'User'
+        if (this.activeTab === null && this.postCount === 0 && this.userCount > 0)
+          this.activeTab = 'User'
       },
       fetchPolicy: 'cache-and-network',
     },
@@ -372,7 +379,7 @@ export default {
       update({ searchPosts }) {
         this.posts = searchPosts.posts
         this.postCount = searchPosts.postCount
-        if (this.postCount > 0) this.activeTab = 'Post'
+        if (this.activeTab === null && this.postCount > 0) this.activeTab = 'Post'
       },
       fetchPolicy: 'cache-and-network',
     },
@@ -394,7 +401,7 @@ export default {
       update({ searchGroups }) {
         this.groups = searchGroups.groups
         this.groupCount = searchGroups.groupCount
-        if (this.postCount === 0 && this.userCount === 0 && this.groupCount > 0)
+        if (this.activeTab === null && this.postCount === 0 && this.userCount === 0 && this.groupCount > 0)
           this.activeTab = 'Group'
       },
       fetchPolicy: 'cache-and-network',
