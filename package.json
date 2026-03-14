@@ -55,10 +55,10 @@
     "webpack": "^5.105.4"
   },
   "optionalDependencies": {
-    "@vuepress/bundler-vite": "^2.0.0-rc.18",
-    "vuepress": "^2.0.0-rc.18",
+    "@vuepress/bundler-vite": "^2.0.0-rc.27",
+    "vuepress": "^2.0.0-rc.27",
     "vuepress-plugin-search-pro": "^2.0.0-rc.59",
-    "vuepress-theme-hope": "^2.0.0-rc.59"
+    "vuepress-theme-hope": "^2.0.0-rc.103"
   },
   "resolutions": {
     "set-value": "^2.0.1",
