@@ -5,34 +5,32 @@
     </transition>
     <p class="ds-text" v-html="submitMessage" />
   </os-card>
-  <ds-form v-else v-model="form" :schema="formSchema" @submit="submit">
-    <template #default="{ errors }">
-      <os-card>
-        <h2 class="title">{{ $t('settings.email.name') }}</h2>
-        <ds-input
-          id="email"
-          model="email"
-          icon="envelope"
-          :label="$t('settings.email.labelEmail')"
-        />
-        <div class="ds-mb-large backendErrors" v-if="backendErrors">
-          <p class="ds-text ds-text-center ds-text-bold ds-text-danger">
-            {{ backendErrors.message }}
-          </p>
-        </div>
-        <os-button
-          :disabled="!!errors"
-          :loading="loadingData"
-          type="submit"
-          variant="primary"
-          appearance="filled"
-        >
-          <template #icon><os-icon :icon="icons.check" /></template>
-          {{ $t('actions.save') }}
-        </os-button>
-      </os-card>
-    </template>
-  </ds-form>
+  <form v-else @submit.prevent="onSubmit" novalidate>
+    <os-card>
+      <h2 class="title">{{ $t('settings.email.name') }}</h2>
+      <ds-input
+        id="email"
+        model="email"
+        icon="envelope"
+        :label="$t('settings.email.labelEmail')"
+      />
+      <div class="ds-mb-large backendErrors" v-if="backendErrors">
+        <p class="ds-text ds-text-center ds-text-bold ds-text-danger">
+          {{ backendErrors.message }}
+        </p>
+      </div>
+      <os-button
+        :disabled="!!formErrors"
+        :loading="loadingData"
+        type="submit"
+        variant="primary"
+        appearance="filled"
+      >
+        <template #icon><os-icon :icon="icons.check" /></template>
+        {{ $t('actions.save') }}
+      </os-button>
+    </os-card>
+  </form>
 </template>
 
 <script>
@@ -42,9 +40,10 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import { AddEmailAddressMutation } from '~/graphql/EmailAddress.js'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import scrollToContent from '../scroll-to-content.js'
+import formValidation from '~/mixins/formValidation'
 
 export default {
-  mixins: [scrollToContent],
+  mixins: [scrollToContent, formValidation],
   components: {
     OsButton,
     OsCard,
@@ -59,7 +58,13 @@ export default {
       backendErrors: null,
       data: null,
       loadingData: false,
+      formData: {
+        email: '',
+      },
     }
+  },
+  mounted() {
+    this.formData.email = this.currentUser.email || ''
   },
   computed: {
     submitMessage() {
@@ -69,15 +74,6 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
-    form: {
-      get: function () {
-        const { email } = this.currentUser
-        return { email }
-      },
-      set: function (formData) {
-        this.formData = formData
-      },
-    },
     formSchema() {
       const currentEmail = this.currentUser.email
       const sameEmailValidationError = this.$t('settings.email.validation.same-email')
@@ -98,6 +94,9 @@ export default {
     },
   },
   methods: {
+    onSubmit() {
+      this.formSubmit(this.submit)
+    },
     async submit() {
       this.loadingData = true
       const { email } = this.formData

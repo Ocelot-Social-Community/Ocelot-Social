@@ -1,7 +1,7 @@
 <template>
   <os-card>
     <h2 class="title">{{ $t('admin.donations.name') }}</h2>
-    <ds-form v-model="formData" @submit="submit">
+    <form @submit.prevent="submit" novalidate>
       <p class="ds-text show-donations-checkbox">
         <input id="showDonations" type="checkbox" v-model="showDonations" />
         <label for="showDonations">
@@ -31,15 +31,17 @@
       <os-button class="donations-info-button" variant="primary" appearance="filled" type="submit">
         {{ $t('actions.save') }}
       </os-button>
-    </ds-form>
+    </form>
   </os-card>
 </template>
 
 <script>
 import { OsButton, OsCard } from '@ocelot-social/ui'
 import { DonationsQuery, UpdateDonations } from '~/graphql/Donations'
+import formValidation from '~/mixins/formValidation'
 
 export default {
+  mixins: [formValidation],
   components: { OsButton, OsCard },
   data() {
     return {
