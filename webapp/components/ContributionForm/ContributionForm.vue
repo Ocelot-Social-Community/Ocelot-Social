@@ -1,13 +1,11 @@
 <template>
   <div>
-    <ds-form
+    <form
       class="contribution-form"
-      ref="contributionForm"
-      v-model="formData"
-      :schema="formSchema"
-      @submit="submit"
+      @submit.prevent="onSubmit"
+      novalidate
     >
-      <template #default="{ errors }">
+      <template>
         <os-card>
           <template #heroImage>
             <img
@@ -42,10 +40,10 @@
           <os-badge
             role="status"
             aria-live="polite"
-            :variant="errors && errors.title ? 'danger' : undefined"
+            :variant="formErrors && formErrors.title ? 'danger' : undefined"
           >
             {{ formData.title.length }}/{{ formSchema.title.max }}
-            <os-icon v-if="errors && errors.title" :icon="icons.warning" />
+            <os-icon v-if="formErrors && formErrors.title" :icon="icons.warning" />
           </os-badge>
           <editor
             :users="users"
@@ -56,10 +54,10 @@
           <os-badge
             role="status"
             aria-live="polite"
-            :variant="errors && errors.content ? 'danger' : undefined"
+            :variant="formErrors && formErrors.content ? 'danger' : undefined"
           >
             {{ contentLength }}
-            <os-icon v-if="errors && errors.content" :icon="icons.warning" />
+            <os-icon v-if="formErrors && formErrors.content" :icon="icons.warning" />
           </os-badge>
 
           <!-- Eventdata -->
@@ -86,13 +84,13 @@
                   ></date-picker>
                 </div>
                 <div
-                  v-if="errors && errors.eventStart"
+                  v-if="formErrors && formErrors.eventStart"
                   class="chipbox event-grid-item-margin-helper"
                 >
                   <os-badge
                     role="alert"
                     aria-live="assertive"
-                    :variant="errors && errors.eventStart ? 'danger' : undefined"
+                    :variant="formErrors && formErrors.eventStart ? 'danger' : undefined"
                   >
                     <os-icon :icon="icons.warning" />
                   </os-badge>
@@ -129,10 +127,10 @@
                   <os-badge
                     role="status"
                     aria-live="polite"
-                    :variant="errors && errors.eventVenue ? 'danger' : undefined"
+                    :variant="formErrors && formErrors.eventVenue ? 'danger' : undefined"
                   >
                     {{ formData.eventVenue.length }}/{{ formSchema.eventVenue.max }}
-                    <os-icon v-if="errors && errors.eventVenue" :icon="icons.warning" />
+                    <os-icon v-if="formErrors && formErrors.eventVenue" :icon="icons.warning" />
                   </os-badge>
                 </div>
               </div>
@@ -146,10 +144,10 @@
                   <os-badge
                     role="status"
                     aria-live="polite"
-                    :variant="errors && errors.eventLocationName ? 'danger' : undefined"
+                    :variant="formErrors && formErrors.eventLocationName ? 'danger' : undefined"
                   >
                     {{ formData.eventLocationName.length }}/{{ formSchema.eventLocationName.max }}
-                    <os-icon v-if="errors && errors.eventLocationName" :icon="icons.warning" />
+                    <os-icon v-if="formErrors && formErrors.eventLocationName" :icon="icons.warning" />
                   </os-badge>
                 </div>
               </div>
@@ -177,10 +175,10 @@
             v-if="categoriesActive"
             role="status"
             aria-live="polite"
-            :variant="errors && errors.categoryIds ? 'danger' : undefined"
+            :variant="formErrors && formErrors.categoryIds ? 'danger' : undefined"
           >
             {{ formData.categoryIds.length }} / 3
-            <os-icon v-if="errors && errors.categoryIds" :icon="icons.warning" />
+            <os-icon v-if="formErrors && formErrors.categoryIds" :icon="icons.warning" />
           </os-badge>
           <div class="ds-flex ds-flex-gap-xxx-small buttons-footer">
             <div style="flex: 3.5 0 0" class="buttons-footer-helper">
@@ -207,7 +205,7 @@
                 appearance="filled"
                 type="submit"
                 :loading="loading"
-                :disabled="!!errors"
+                :disabled="!!formErrors"
               >
                 <template #icon>
                   <os-icon :icon="icons.check" />
@@ -218,7 +216,7 @@
           </div>
         </os-card>
       </template>
-    </ds-form>
+    </form>
   </div>
 </template>
 <script>
@@ -235,9 +233,10 @@ import PageParamsLink from '~/components/_new/features/PageParamsLink/PageParams
 import DatePicker from 'vue2-datepicker'
 import 'vue2-datepicker/scss/index.scss'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
+import formValidation from '~/mixins/formValidation'
 
 export default {
-  mixins: [GetCategories],
+  mixins: [GetCategories, formValidation],
   components: {
     CategoriesSelect,
     DatePicker,
@@ -424,6 +423,9 @@ export default {
     notBeforeEvent(date) {
       return date <= new Date(this.formData.eventStart)
     },
+    onSubmit() {
+      this.formSubmit(this.submit)
+    },
     submit() {
       let image = null
 
@@ -470,16 +472,16 @@ export default {
         })
     },
     updateEditorContent(value) {
-      this.$refs.contributionForm.update('content', value)
+      this.updateFormField('content', value)
     },
     changeEventIsOnline(event) {
-      this.$refs.contributionForm.update('eventIsOnline', this.formData.eventIsOnline)
+      this.updateFormField('eventIsOnline', this.formData.eventIsOnline)
     },
     changeEventEnd(event) {
-      this.$refs.contributionForm.update('eventEnd', event)
+      this.updateFormField('eventEnd', event)
     },
     changeEventStart(event) {
-      this.$refs.contributionForm.update('eventStart', event)
+      this.updateFormField('eventStart', event)
     },
     addHeroImage(file) {
       this.formData.image = null

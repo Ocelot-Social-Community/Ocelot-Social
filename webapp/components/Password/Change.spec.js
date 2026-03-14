@@ -65,8 +65,7 @@ describe('ChangePassword.vue', () => {
           it('displays a validation error', async () => {
             await wrapper.find('form').trigger('submit')
             await wrapper.vm.$nextTick()
-            const dsForm = wrapper.findComponent({ name: 'DsForm' })
-            expect(dsForm.vm.errors).toHaveProperty('passwordConfirmation')
+            expect(wrapper.vm.formErrors).toHaveProperty('passwordConfirmation')
           })
         })
 

@@ -30,7 +30,7 @@ describe('enter-nonce.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.findAll('.ds-form')).toHaveLength(1)
+      expect(wrapper.findAll('form')).toHaveLength(1)
     })
   })
 })
