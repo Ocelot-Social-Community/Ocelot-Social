@@ -11,19 +11,16 @@
     <div class="ds-mb-small"></div>
     <fieldset class="report-radio-group" data-test="report-radio-group">
       <legend>{{ $t('report.reason.category.label') }}</legend>
-      <label
+      <div
         v-for="option in form.reasonCategoryOptions"
         :key="option.value"
         class="report-radio-option"
+        :class="{ 'report-radio-option-selected': form.reasonCategory === option }"
+        @click="selectReasonCategory(option)"
       >
-        <input
-          type="radio"
-          name="reasonCategory"
-          :checked="form.reasonCategory === option"
-          @change="form.reasonCategory = option"
-        />
+        <span class="report-radio-option-mark" />
         <span class="report-radio-option-label">{{ option.label }}</span>
-      </label>
+      </div>
     </fieldset>
     <ds-input
       class="reason-description"
@@ -128,6 +125,9 @@ export default {
         this.$emit('close')
       }, 1000)
     },
+    selectReasonCategory(option) {
+      this.form.reasonCategory = option
+    },
     async confirm() {
       const { reasonCategory, reasonDescription } = this.form
       this.loading = true
@@ -195,17 +195,42 @@ export default {
 .report-modal .report-radio-option {
   display: flex;
   align-items: center;
-  cursor: pointer;
-  user-select: none;
   width: 100%;
   padding: 4px 0;
-}
-.report-modal .report-radio-option input[type="radio"] {
-  margin: 0 8px 0 0;
   cursor: pointer;
+  user-select: none;
+}
+.report-modal .report-radio-option-mark {
+  display: inline-block;
+  position: relative;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  border: 2px solid $border-color-base;
+  background-color: $background-color-base;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+.report-modal .report-radio-option-mark::before {
+  position: absolute;
+  content: '';
+  top: 50%;
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%) scale(0);
+  opacity: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: $text-color-primary;
+  transition: all 0.1s ease-in;
+}
+.report-modal .report-radio-option-selected .report-radio-option-mark::before {
+  opacity: 1;
+  transform: translateY(-50%) translateX(-50%) scale(1);
 }
 .report-modal .report-radio-option-label {
   cursor: pointer;
+  flex: 1;
 }
 .report-modal .reason-description {
   margin-top: $space-x-small !important;

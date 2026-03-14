@@ -162,7 +162,7 @@ describe('ReportModal.vue', () => {
 
       describe('click confirm button', () => {
         beforeEach(async () => {
-          wrapper.find('input[type="radio"]').trigger('change')
+          wrapper.find('.report-radio-option').trigger('click')
           await Vue.nextTick()
           wrapper.find('button.confirm').trigger('click')
           await Vue.nextTick()
