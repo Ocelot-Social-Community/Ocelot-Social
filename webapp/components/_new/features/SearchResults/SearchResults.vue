@@ -182,6 +182,11 @@ export default {
     search() {
       this.activeTab = null
       this.tabManuallySet = false
+      this.clearPage()
+      this.postsOffset = 0
+      this.usersOffset = 0
+      this.groupsOffset = 0
+      this.hashtagsOffset = 0
     },
   },
   computed: {
