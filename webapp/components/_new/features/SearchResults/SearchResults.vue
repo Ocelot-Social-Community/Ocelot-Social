@@ -165,6 +165,7 @@ export default {
       hashtagPage: 0,
 
       activeTab: null,
+      tabManuallySet: false,
 
       firstPosts: this.pageSize,
       firstUsers: this.pageSize,
@@ -176,6 +177,25 @@ export default {
       groupsOffset: 0,
       hashtagsOffset: 0,
     }
+  },
+  watch: {
+    search() {
+      this.activeTab = null
+      this.tabManuallySet = false
+      this.clearPage()
+      this.postsOffset = 0
+      this.usersOffset = 0
+      this.groupsOffset = 0
+      this.hashtagsOffset = 0
+      this.postCount = 0
+      this.userCount = 0
+      this.groupCount = 0
+      this.hashtagCount = 0
+      this.posts = []
+      this.users = []
+      this.groups = []
+      this.hashtags = []
+    },
   },
   computed: {
     activeResources() {
@@ -256,6 +276,7 @@ export default {
     switchTab(tabType) {
       if (this.activeTab !== tabType) {
         this.activeTab = tabType
+        this.tabManuallySet = true
       }
     },
     previousResults() {
@@ -323,6 +344,7 @@ export default {
         this.hashtags = searchHashtags.hashtags
         this.hashtagCount = searchHashtags.hashtagCount
         if (
+          this.activeTab === null &&
           this.postCount === 0 &&
           this.userCount === 0 &&
           this.groupCount === 0 &&
@@ -350,7 +372,8 @@ export default {
       update({ searchUsers }) {
         this.users = searchUsers.users
         this.userCount = searchUsers.userCount
-        if (this.postCount === 0 && this.userCount > 0) this.activeTab = 'User'
+        if (this.activeTab === null && this.postCount === 0 && this.userCount > 0)
+          this.activeTab = 'User'
       },
       fetchPolicy: 'cache-and-network',
     },
@@ -372,7 +395,7 @@ export default {
       update({ searchPosts }) {
         this.posts = searchPosts.posts
         this.postCount = searchPosts.postCount
-        if (this.postCount > 0) this.activeTab = 'Post'
+        if (this.postCount > 0 && !this.tabManuallySet) this.activeTab = 'Post'
       },
       fetchPolicy: 'cache-and-network',
     },
@@ -394,7 +417,12 @@ export default {
       update({ searchGroups }) {
         this.groups = searchGroups.groups
         this.groupCount = searchGroups.groupCount
-        if (this.postCount === 0 && this.userCount === 0 && this.groupCount > 0)
+        if (
+          this.activeTab === null &&
+          this.postCount === 0 &&
+          this.userCount === 0 &&
+          this.groupCount > 0
+        )
           this.activeTab = 'Group'
       },
       fetchPolicy: 'cache-and-network',

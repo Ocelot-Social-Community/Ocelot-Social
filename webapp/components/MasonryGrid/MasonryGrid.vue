@@ -49,8 +49,11 @@ export default {
     window.removeEventListener('resize', this._onResize)
   },
   updated() {
-    const count = this.$children.length
-    if (count !== this.childCount) {
+    const childEls = this.$children.map((c) => c.$el)
+    const changed =
+      childEls.length !== (this._trackedEls || []).length ||
+      childEls.some((el, i) => el !== this._trackedEls[i])
+    if (changed) {
       this.batchRecalculate()
     }
   },
@@ -60,6 +63,7 @@ export default {
       const id = this._recalcId
 
       this.childCount = this.$children.length
+      this._trackedEls = this.$children.map((c) => c.$el)
       // Switch to auto-height so items take their natural height
       this.measuring = true
 
