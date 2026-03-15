@@ -165,6 +165,7 @@ export default {
       hashtagPage: 0,
 
       activeTab: null,
+      tabManuallySet: false,
 
       firstPosts: this.pageSize,
       firstUsers: this.pageSize,
@@ -180,6 +181,7 @@ export default {
   watch: {
     search() {
       this.activeTab = null
+      this.tabManuallySet = false
     },
   },
   computed: {
@@ -261,6 +263,7 @@ export default {
     switchTab(tabType) {
       if (this.activeTab !== tabType) {
         this.activeTab = tabType
+        this.tabManuallySet = true
       }
     },
     previousResults() {
@@ -379,7 +382,7 @@ export default {
       update({ searchPosts }) {
         this.posts = searchPosts.posts
         this.postCount = searchPosts.postCount
-        if (this.activeTab === null && this.postCount > 0) this.activeTab = 'Post'
+        if (this.postCount > 0 && !this.tabManuallySet) this.activeTab = 'Post'
       },
       fetchPolicy: 'cache-and-network',
     },
