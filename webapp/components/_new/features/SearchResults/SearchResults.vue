@@ -187,6 +187,14 @@ export default {
       this.usersOffset = 0
       this.groupsOffset = 0
       this.hashtagsOffset = 0
+      this.postCount = 0
+      this.userCount = 0
+      this.groupCount = 0
+      this.hashtagCount = 0
+      this.posts = []
+      this.users = []
+      this.groups = []
+      this.hashtags = []
     },
   },
   computed: {
