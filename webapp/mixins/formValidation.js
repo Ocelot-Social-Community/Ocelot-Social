@@ -1,7 +1,10 @@
 import Schema from 'async-validator'
-import cloneDeep from 'clone-deep'
 
 Schema.warning = function () {}
+
+function cloneDeep(obj) {
+  return JSON.parse(JSON.stringify(obj))
+}
 
 export default {
   provide() {
