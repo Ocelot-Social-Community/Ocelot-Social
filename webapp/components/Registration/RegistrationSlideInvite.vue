@@ -1,8 +1,5 @@
 <template>
-  <form
-    class="enter-invite"
-    novalidate
-  >
+  <form class="enter-invite" novalidate>
     <ds-input
       :placeholder="formSchema.inviteCode.placeholder"
       :minlength="formSchema.inviteCode.minLength"

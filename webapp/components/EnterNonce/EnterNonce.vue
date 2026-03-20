@@ -1,9 +1,5 @@
 <template>
-  <form
-    class="enter-nonce"
-    @submit.prevent="onSubmit"
-    novalidate
-  >
+  <form class="enter-nonce" @submit.prevent="onSubmit" novalidate>
     <ds-input
       :placeholder="$t('components.registration.email-nonce.form.nonce')"
       model="nonce"

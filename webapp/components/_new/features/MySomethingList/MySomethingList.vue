@@ -1,8 +1,5 @@
 <template>
-  <form
-    @submit.prevent="onSubmit"
-    novalidate
-  >
+  <form @submit.prevent="onSubmit" novalidate>
     <div v-if="isEditing">
       <div class="ds-my-base">
         <h5 class="ds-heading ds-heading-h5">

@@ -25,10 +25,7 @@
     <div class="ds-my-xxx-small"></div>
   </div>
   <div v-else class="create-account-card">
-    <form
-      class="create-user-account"
-      novalidate
-    >
+    <form class="create-user-account" novalidate>
       <template>
         <email-display-and-verify :email="sliderData.collectedInputData.email" />
 

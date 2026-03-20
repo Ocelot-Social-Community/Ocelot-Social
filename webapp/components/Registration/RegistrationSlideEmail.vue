@@ -1,8 +1,5 @@
 <template>
-  <form
-    class="enter-email"
-    novalidate
-  >
+  <form class="enter-email" novalidate>
     <p class="ds-text">
       {{ $t('components.registration.signup.form.description') }}
     </p>

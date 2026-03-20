@@ -1,10 +1,6 @@
 <template>
   <div>
-    <form
-      class="group-form"
-      @submit.prevent="onSubmit"
-      novalidate
-    >
+    <form class="group-form" @submit.prevent="onSubmit" novalidate>
       <template>
         <!-- group Name -->
         <ds-input
@@ -53,7 +49,9 @@
         <os-badge
           role="status"
           aria-live="polite"
-          :variant="formErrors && formErrors.groupType && formData.groupType === '' ? 'danger' : undefined"
+          :variant="
+            formErrors && formErrors.groupType && formData.groupType === '' ? 'danger' : undefined
+          "
         >
           {{ `${formData.groupType === '' ? 0 : 1} / 1` }}
           <os-icon
@@ -106,7 +104,9 @@
           role="status"
           aria-live="polite"
           :variant="
-            formErrors && formErrors.actionRadius && formData.actionRadius === '' ? 'danger' : undefined
+            formErrors && formErrors.actionRadius && formData.actionRadius === ''
+              ? 'danger'
+              : undefined
           "
         >
           {{ `${formData.actionRadius === '' ? 0 : 1} / 1` }}

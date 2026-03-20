@@ -1,10 +1,6 @@
 <template>
   <div>
-    <form
-      class="contribution-form"
-      @submit.prevent="onSubmit"
-      novalidate
-    >
+    <form class="contribution-form" @submit.prevent="onSubmit" novalidate>
       <template>
         <os-card>
           <template #heroImage>
@@ -147,7 +143,10 @@
                     :variant="formErrors && formErrors.eventLocationName ? 'danger' : undefined"
                   >
                     {{ formData.eventLocationName.length }}/{{ formSchema.eventLocationName.max }}
-                    <os-icon v-if="formErrors && formErrors.eventLocationName" :icon="icons.warning" />
+                    <os-icon
+                      v-if="formErrors && formErrors.eventLocationName"
+                      :icon="icons.warning"
+                    />
                   </os-badge>
                 </div>
               </div>

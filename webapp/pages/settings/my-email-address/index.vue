@@ -8,12 +8,7 @@
   <form v-else @submit.prevent="onSubmit" novalidate>
     <os-card>
       <h2 class="title">{{ $t('settings.email.name') }}</h2>
-      <ds-input
-        id="email"
-        model="email"
-        icon="envelope"
-        :label="$t('settings.email.labelEmail')"
-      />
+      <ds-input id="email" model="email" icon="envelope" :label="$t('settings.email.labelEmail')" />
       <div class="ds-mb-large backendErrors" v-if="backendErrors">
         <p class="ds-text ds-text-center ds-text-bold ds-text-danger">
           {{ backendErrors.message }}

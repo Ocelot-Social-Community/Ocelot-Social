@@ -1,9 +1,5 @@
 <template>
-  <form
-    v-if="!submitted"
-    @submit.prevent="onSubmit"
-    novalidate
-  >
+  <form v-if="!submitted" @submit.prevent="onSubmit" novalidate>
     <div class="ds-my-small">
       <ds-input
         :placeholder="$t('login.email')"
