@@ -47,14 +47,14 @@ export default {
   methods: {
     updateFormField(model, value) {
       this.$set(this.formData, model, value)
+      if (typeof this.handleInput === 'function') {
+        this.handleInput(cloneDeep(this.formData))
+      }
       this.$validateForm(() => {
         if (typeof this.handleInputValid === 'function') {
           this.handleInputValid(cloneDeep(this.formData))
         }
       })
-      if (typeof this.handleInput === 'function') {
-        this.handleInput(cloneDeep(this.formData))
-      }
     },
     formSubmit(callback) {
       this.$validateForm(() => {
