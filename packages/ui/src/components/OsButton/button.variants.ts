@@ -42,16 +42,29 @@ export const buttonVariants = cva(
           // Keep inset shadow to prevent layout shift
           'disabled:bg-[var(--color-disabled)] disabled:text-[var(--color-disabled-contrast)]',
           'disabled:border-[var(--color-disabled)] disabled:shadow-[inset_0_0_0_1px_transparent]',
+          // Override hover/active when disabled (hover persists until mouse leaves)
+          'disabled:hover:bg-[var(--color-disabled)] disabled:hover:text-[var(--color-disabled-contrast)]',
+          'disabled:hover:border-[var(--color-disabled)]',
+          'disabled:active:bg-[var(--color-disabled)] disabled:active:text-[var(--color-disabled-contrast)]',
+          'disabled:active:border-[var(--color-disabled)]',
         ],
         outline: [
           'bg-transparent shadow-none',
           // Disabled: light gray border and gray text
           'disabled:border-[var(--color-disabled)] disabled:text-[var(--color-disabled)]',
+          // Override hover/active when disabled
+          'disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)]',
+          'disabled:hover:border-[var(--color-disabled)]',
+          'disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)]',
+          'disabled:active:border-[var(--color-disabled)]',
         ],
         ghost: [
           'bg-transparent shadow-none',
           // Disabled: gray text
           'disabled:text-[var(--color-disabled)]',
+          // Override hover/active when disabled
+          'disabled:hover:bg-transparent disabled:hover:text-[var(--color-disabled)]',
+          'disabled:active:bg-transparent disabled:active:text-[var(--color-disabled)]',
         ],
       },
       size: {
