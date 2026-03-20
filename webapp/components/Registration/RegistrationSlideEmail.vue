@@ -1,5 +1,5 @@
 <template>
-  <form class="enter-email" novalidate>
+  <form class="enter-email" @submit.prevent novalidate>
     <p class="ds-text">
       {{ $t('components.registration.signup.form.description') }}
     </p>
