@@ -289,7 +289,8 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 - [x] 0 Tier-A `ds-*` Komponenten-Tags verbleibend
 
 **Verbleibende ds-* Komponenten (6 Typen):**
-- Tier C (→ UI-Library): ds-input (23), ds-form (18), ds-modal (7), ds-menu/ds-menu-item (17), ds-select (3)
+- Tier C (→ UI-Library): ds-input (23), ds-modal (7→✅ OsModal), ds-menu/ds-menu-item (17), ds-select (3)
+- ✅ ds-form (18 Dateien) → formValidation Mixin (async-validator), vuelidate entfernt
 
 **Zuvor abgeschlossen (Session 26 - CodeRabbit Review Fixes):**
 - [x] Cypress: `.os-card .title` → `.os-card > .title` (Kind-Kombinator statt Nachfahren)
@@ -415,7 +416,8 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 - [ ] Tier B (Rest): ds-radio → Plain HTML
 - [x] OsModal Komponente + DsModal/ConfirmModal/ReportModal → OsModal Webapp-Integration ✅
 - [ ] Weitere Tier 2 Komponenten (OsDropdown, OsAvatar, OsInput)
-- [ ] ds-form + ds-input → OsForm + OsInput (stark gekoppelt, 18+23 Dateien)
+- [x] ds-form → formValidation Mixin (async-validator), 18 Dateien migriert, vuelidate entfernt ✅
+- [ ] ds-input → OsInput (23 Dateien, ds-form Kopplung aufgelöst)
 - [ ] ds-menu / ds-menu-item → OsMenu / OsMenuItem
 - [ ] ds-select → OsSelect
 - [ ] Browser-Fehler untersuchen: `TypeError: Cannot read properties of undefined (reading 'heartO')` (ocelotIcons undefined im Browser trotz korrekter Webpack-Aliase)
@@ -686,13 +688,13 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 - [x] ds-tag (3 Dateien) → OsBadge shape="square" (UI-Library) ✅
 - [x] ds-number (5 Dateien) → OsNumber (UI-Library) ✅ + CountTo.vue gelöscht, vue-count-to entfernt
 - [x] ds-grid / ds-grid-item (10 Dateien) → CSS Grid ✅
-- [ ] ds-radio (1 Datei) → native `<input type="radio">`
+- [x] ds-radio (1 Datei) → native `<input type="radio">` ✅
 
 **Tier 2: Layout & Feedback (UI-Library)**
 - [x] OsModal (Basis: DsModal → h() Render-Function, Vue 2/3 Compat, Focus-Trap, Scroll-Lock, A11y) ✅
 - [ ] OsDropdown (Basis: Webapp Dropdown)
 - [ ] OsAvatar (vereint DsAvatar + ProfileAvatar)
-- [ ] OsInput (Basis: DsInput, 23 Dateien — gekoppelt mit ds-form)
+- [ ] OsInput (Basis: DsInput, 23 Dateien — ds-form Kopplung aufgelöst via formValidation Mixin)
 
 **Tier 3: Navigation (UI-Library)**
 - [ ] OsMenu (Basis: DsMenu, 11 Dateien)
@@ -701,7 +703,7 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 **Tier 4: Spezial-Komponenten**
 - [ ] OsSelect (3 Dateien)
 - [x] ds-table (7 Dateien) → Plain HTML `<table>` + CSS-Klassen ✅ (kein OsTable nötig)
-- [ ] ds-form → Plain HTML `<form>` oder OsForm (18 Dateien)
+- [x] ds-form → formValidation Mixin (async-validator), vuelidate entfernt ✅
 
 **Infrastruktur**
 - [x] System-Icons einrichten ✅ vite-svg-icon Plugin, 3 System-Icons, Ocelot-Icons Entry-Point
@@ -1703,11 +1705,11 @@ Bei der Migration werden:
 | 2026-02-11 | **Milestone 4b abgeschlossen** | icon ✅, circle ✅, loading ✅ — alle OsButton-Props implementiert |
 | 2026-02-11 | **Milestone 4c: 59 Buttons** | Chat (2), AddChatRoomByUserSearch (1), CommentCard (1), CommentForm (2), ComponentSlider (2), ContributionForm (1), DeleteData (1), EmbedComponent (1), FilterMenu (1), HeaderButton (2), CategoriesFilter (2), OrderByFilter (2), EventsByFilter (2), FollowingFilter (3), GroupButton (1), ConfirmModal (2), ReportModal (2), Password/Change (1), PasswordReset/Request (1), PasswordReset/ChangePassword (1), Registration/Signup (1), ReleaseModal (1), ImageUploader (2), CreateInvitation (1), Invitation (2), ProfileList (1), ReportRow (1), MySomethingList (3), ActionButton (1), pages/index (2), profile/add-post (1), post/blur-toggle (1), groups/slug (3), settings/index (1), admin/users (2), blocked-users (1), data-download (1), muted-users (1), groups/index (1), enter-nonce (1) |
 | 2026-02-11 | **type="submit" Pattern** | OsButton hat `type="button"` als Default; alle Form-Submit-Buttons brauchen explizit `type="submit"` |
-| 2026-02-11 | **!!errors Pattern** | DsForm `errors` ist ein Objekt, nicht Boolean; OsButton `disabled` Prop erwartet Boolean → `!!errors` nötig |
+| 2026-02-11 | **!!errors Pattern** | `formErrors` ist ein Objekt, nicht Boolean; OsButton `disabled` Prop erwartet Boolean → `!!formErrors` nötig |
 | 2026-02-11 | **CSS-Selector Pattern** | `.base-button` → `> button` oder `button`; Position/Dimensions brauchen `!important` für Tailwind-Override |
 | 2026-02-11 | **Disabled border-color** | Outline disabled border von `var(--color-disabled)` auf `var(--color-disabled-border,#e5e3e8)` mit Fallback |
 | 2026-02-11 | **Phase 3 abgeschlossen** | 132 `<os-button>` Tags in 78 Dateien, 0 `<base-button>` in Templates verbleibend |
-| 2026-02-11 | **Password/Change.vue Fix** | `!!errors` für disabled-Prop (DsForm errors ist Objekt) |
+| 2026-02-11 | **Password/Change.vue Fix** | `!!errors` für disabled-Prop (formErrors ist Objekt) |
 | 2026-02-11 | **CommentForm.vue Fix** | `type="submit"` fehlte + `!!errors` für disabled-Prop |
 | 2026-02-11 | **GroupForm.vue ds-button** | Letzter `<ds-button>` in Webapp → `<os-button>` mit `#icon` Slot migriert |
 | 2026-02-11 | **OsButton.spec.ts TS-Fix** | `size` aus `Object.entries` als Union Type gecastet (`as 'sm' | 'md' | 'lg' | 'xl'`) |
@@ -1847,6 +1849,9 @@ Bei der Migration werden:
 | 2026-03-13 | **Modal Webapp-Integration** | ConfirmModal + ReportModal nutzen OsModal; Vuex Modal Store entfernt; Modals inline gerendert |
 | 2026-03-13 | **Modal Bugfixes** | z-index Stacking Context Fix (PostTeaser/GroupTeaser), Callback-Promise Propagation (ReportList, MySomethingList), Group Leave Authorization Fix ($nextTick), Cypress .ds-modal → .os-modal |
 | 2026-03-13 | **Modal A11y** | scrollable-region-focusable Fix (tabindex=0), aria-label Fallback wenn kein Title, body overflow save/restore |
+| 2026-03-14 | **ds-form entkoppelt** | Neues `formValidation` Mixin (async-validator): provide/subscribe Pattern, formData/formSchema/formErrors, handleInput/handleInputValid Callbacks; vuelidate komplett entfernt |
+| 2026-03-14 | **18 Formulare migriert** | CommentForm, ContributionForm, EnterNonce, GroupForm, Password/Change, PasswordReset (2), Registration (5), Signup, MySomethingList, donations, admin/users, settings (3) |
+| 2026-03-20 | **formValidation Fix** | `handleInput()` vor `$validateForm()` aufrufen (Reihenfolge-Bug: handleInput überschrieb handleInputValid bei synchronem async-validator Callback) |
 
 ---
 
@@ -1865,12 +1870,11 @@ Bei der Migration werden:
 | Status | Komponenten |
 |--------|------------|
 | ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard, OsBadge, OsNumber, OsModal (7) |
-| ✅ → Plain HTML | Section, Placeholder, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem, Grid, GridItem, Table (13) — Tier A/B |
+| ✅ → Plain HTML | Section, Placeholder, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem, Grid, GridItem, Table, Radio (14) — Tier A/B |
 | ✅ → UI-Library | Chip, Tag → OsBadge (2), Number → OsNumber (1) — Tier B |
-| ⬜ → Plain HTML | Radio (1) — Tier B |
+| ✅ ds-form entkoppelt | Form-Validierung → formValidation Mixin (async-validator), vuelidate entfernt, ds-input/ds-select bleiben als UI-Komponenten |
 | ⬜ → UI-Library | Input, Menu, MenuItem, Select (4) — Tier 2-3 |
 | ⬜ Nicht genutzt | Code, CopyField, FormItem, InputError, InputLabel, Page, PageTitle, Logo, Avatar, TableCol, TableHeadCol (11) |
-| ⬜ Offen | Form (18 Dateien — HTML `<form>` oder OsForm?) |
 
 ---
 
