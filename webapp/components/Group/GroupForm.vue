@@ -1,14 +1,7 @@
 <template>
   <div>
-    <ds-form
-      class="group-form"
-      ref="groupForm"
-      v-model="formData"
-      :schema="formSchema"
-      @submit="submit"
-    >
-      <!-- "errors" is only working if you use a submit event on the form -->
-      <template #default="{ errors }">
+    <form class="group-form" @submit.prevent="onSubmit" novalidate>
+      <template>
         <!-- group Name -->
         <ds-input
           name="name"
@@ -20,10 +13,10 @@
         <os-badge
           role="status"
           aria-live="polite"
-          :variant="errors && errors.name ? 'danger' : undefined"
+          :variant="formErrors && formErrors.name ? 'danger' : undefined"
         >
           {{ `${formData.name.length} / ${formSchema.name.min}–${formSchema.name.max}` }}
-          <os-icon v-if="errors && errors.name" :icon="icons.warning" />
+          <os-icon v-if="formErrors && formErrors.name" :icon="icons.warning" />
         </os-badge>
 
         <!-- group Slug -->
@@ -56,11 +49,13 @@
         <os-badge
           role="status"
           aria-live="polite"
-          :variant="errors && errors.groupType && formData.groupType === '' ? 'danger' : undefined"
+          :variant="
+            formErrors && formErrors.groupType && formData.groupType === '' ? 'danger' : undefined
+          "
         >
           {{ `${formData.groupType === '' ? 0 : 1} / 1` }}
           <os-icon
-            v-if="errors && errors.groupType && formData.groupType === ''"
+            v-if="formErrors && formErrors.groupType && formData.groupType === ''"
             :icon="icons.warning"
           />
         </os-badge>
@@ -91,10 +86,10 @@
         <os-badge
           role="status"
           aria-live="polite"
-          :variant="errors && errors.description ? 'danger' : undefined"
+          :variant="formErrors && formErrors.description ? 'danger' : undefined"
         >
           {{ `${descriptionLength} / ${formSchema.description.min}` }}
-          <os-icon v-if="errors && errors.description" :icon="icons.warning" />
+          <os-icon v-if="formErrors && formErrors.description" :icon="icons.warning" />
         </os-badge>
 
         <!-- actionRadius -->
@@ -109,12 +104,14 @@
           role="status"
           aria-live="polite"
           :variant="
-            errors && errors.actionRadius && formData.actionRadius === '' ? 'danger' : undefined
+            formErrors && formErrors.actionRadius && formData.actionRadius === ''
+              ? 'danger'
+              : undefined
           "
         >
           {{ `${formData.actionRadius === '' ? 0 : 1} / 1` }}
           <os-icon
-            v-if="errors && errors.actionRadius && formData.actionRadius === ''"
+            v-if="formErrors && formErrors.actionRadius && formData.actionRadius === ''"
             :icon="icons.warning"
           />
         </os-badge>
@@ -138,10 +135,10 @@
           <os-badge
             role="status"
             aria-live="polite"
-            :variant="errors && errors.categoryIds ? 'danger' : undefined"
+            :variant="formErrors && formErrors.categoryIds ? 'danger' : undefined"
           >
             {{ formData.categoryIds.length }} / 3
-            <os-icon v-if="errors && errors.categoryIds" :icon="icons.warning" />
+            <os-icon v-if="formErrors && formErrors.categoryIds" :icon="icons.warning" />
           </os-badge>
         </div>
         <!-- submit -->
@@ -153,14 +150,14 @@
             variant="primary"
             appearance="filled"
             type="submit"
-            :disabled="checkFormError(errors)"
+            :disabled="checkFormError(formErrors)"
           >
             <template #icon><os-icon :icon="icons.save" /></template>
             {{ update ? $t('group.update') : $t('group.save') }}
           </os-button>
         </div>
       </template>
-    </ds-form>
+    </form>
   </div>
 </template>
 
@@ -178,10 +175,11 @@ import Editor from '~/components/Editor/Editor'
 import ActionRadiusSelect from '~/components/Select/ActionRadiusSelect'
 import LocationSelect from '~/components/Select/LocationSelect'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
+import formValidation from '~/mixins/formValidation'
 
 export default {
   name: 'GroupForm',
-  mixins: [GetCategories],
+  mixins: [GetCategories, formValidation],
   components: {
     CategoriesSelect,
     Editor,
@@ -308,16 +306,19 @@ export default {
       return false
     },
     changeGroupType(event) {
-      this.$refs.groupForm.update('groupType', event.target.value)
+      this.updateFormField('groupType', event.target.value)
     },
     changeActionRadius(event) {
-      this.$refs.groupForm.update('actionRadius', event.target.value)
+      this.updateFormField('actionRadius', event.target.value)
     },
     changeLocation(event) {
       this.formData.locationName = event.target.value
     },
     updateEditorDescription(value) {
-      this.$refs.groupForm.update('description', value)
+      this.updateFormField('description', value)
+    },
+    onSubmit() {
+      this.formSubmit(this.submit)
     },
     submit() {
       const { name, slug, about, description, groupType, actionRadius, categoryIds } = this.formData

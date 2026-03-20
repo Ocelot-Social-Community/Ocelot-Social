@@ -1,34 +1,32 @@
 <template>
-  <ds-form v-model="form" @submit="handleSubmit" class="comment-form">
-    <template #default="{ errors }">
-      <os-card>
-        <hc-editor ref="editor" :users="users" :value="form.content" @input="updateEditorContent" />
-        <div class="buttons">
-          <os-button
-            variant="primary"
-            appearance="outline"
-            :disabled="disabled && !update"
-            @click="handleCancel"
-            data-test="cancel-button"
-          >
-            {{ $t('actions.cancel') }}
-          </os-button>
-          <os-button
-            variant="primary"
-            appearance="filled"
-            type="submit"
-            :loading="loading"
-            :disabled="disabled || !!errors"
-          >
-            <template #icon>
-              <os-icon :icon="icons.comment" />
-            </template>
-            {{ $t('post.comment.submit') }}
-          </os-button>
-        </div>
-      </os-card>
-    </template>
-  </ds-form>
+  <form @submit.prevent="handleSubmit" class="comment-form" novalidate>
+    <os-card>
+      <hc-editor ref="editor" :users="users" :value="form.content" @input="updateEditorContent" />
+      <div class="buttons">
+        <os-button
+          variant="primary"
+          appearance="outline"
+          :disabled="disabled && !update"
+          @click="handleCancel"
+          data-test="cancel-button"
+        >
+          {{ $t('actions.cancel') }}
+        </os-button>
+        <os-button
+          variant="primary"
+          appearance="filled"
+          type="submit"
+          :loading="loading"
+          :disabled="disabled"
+        >
+          <template #icon>
+            <os-icon :icon="icons.comment" />
+          </template>
+          {{ $t('post.comment.submit') }}
+        </os-button>
+      </div>
+    </os-card>
+  </form>
 </template>
 
 <script>

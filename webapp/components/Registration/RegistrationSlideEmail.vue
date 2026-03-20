@@ -1,11 +1,5 @@
 <template>
-  <ds-form
-    class="enter-email"
-    v-model="formData"
-    :schema="formSchema"
-    @input="handleInput"
-    @input-valid="handleInputValid"
-  >
+  <form class="enter-email" @submit.prevent novalidate>
     <p class="ds-text">
       {{ $t('components.registration.signup.form.description') }}
     </p>
@@ -23,7 +17,7 @@
       </label>
     </p>
     <div class="ds-my-xxx-small"></div>
-  </ds-form>
+  </form>
 </template>
 
 <script>
@@ -31,6 +25,7 @@ import gql from 'graphql-tag'
 import metadata from '~/constants/metadata'
 import { isEmail } from 'validator'
 import translateErrorMessage from '~/components/utils/TranslateErrorMessage'
+import formValidation from '~/mixins/formValidation'
 
 export const SignupMutation = gql`
   mutation ($email: String!, $locale: String!, $inviteCode: String) {
@@ -41,6 +36,7 @@ export const SignupMutation = gql`
 `
 export default {
   name: 'RegistrationSlideEmail',
+  mixins: [formValidation],
   props: {
     sliderData: { type: Object, required: true },
   },

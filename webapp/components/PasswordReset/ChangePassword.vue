@@ -1,44 +1,41 @@
 <template>
   <div class="ds-mt-base ds-mb-xxx-small">
-    <ds-form
+    <form
       v-if="!changePasswordResult"
-      v-model="formData"
-      :schema="formSchema"
-      @submit="handleSubmitPassword"
+      @submit.prevent="onSubmit"
       class="change-password"
+      novalidate
     >
-      <template #default="{ errors }">
-        <ds-input
-          id="password"
-          model="password"
-          type="password"
-          autocomplete="off"
-          :label="$t('settings.security.change-password.label-new-password')"
-        />
-        <ds-input
-          id="passwordConfirmation"
-          model="passwordConfirmation"
-          type="password"
-          autocomplete="off"
-          :label="$t('settings.security.change-password.label-new-password-confirm')"
-        />
-        <password-strength :password="formData.password" />
-        <div class="ds-mt-base ds-mb-xxx-small">
-          <os-button
-            variant="primary"
-            appearance="filled"
-            :loading="$apollo.loading"
-            :disabled="!!errors"
-            type="submit"
-          >
-            <template #icon>
-              <os-icon :icon="icons.lock" />
-            </template>
-            {{ $t('settings.security.change-password.button') }}
-          </os-button>
-        </div>
-      </template>
-    </ds-form>
+      <ds-input
+        id="password"
+        model="password"
+        type="password"
+        autocomplete="off"
+        :label="$t('settings.security.change-password.label-new-password')"
+      />
+      <ds-input
+        id="passwordConfirmation"
+        model="passwordConfirmation"
+        type="password"
+        autocomplete="off"
+        :label="$t('settings.security.change-password.label-new-password-confirm')"
+      />
+      <password-strength :password="formData.password" />
+      <div class="ds-mt-base ds-mb-xxx-small">
+        <os-button
+          variant="primary"
+          appearance="filled"
+          :loading="$apollo.loading"
+          :disabled="!!formErrors"
+          type="submit"
+        >
+          <template #icon>
+            <os-icon :icon="icons.lock" />
+          </template>
+          {{ $t('settings.security.change-password.button') }}
+        </os-button>
+      </div>
+    </form>
     <div v-else class="ds-mb-large">
       <template v-if="changePasswordResult === 'success'">
         <transition name="ds-transition-fade">
@@ -75,8 +72,10 @@ import PasswordStrength from '../Password/Strength'
 import gql from 'graphql-tag'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
+import formValidation from '~/mixins/formValidation'
 
 export default {
+  mixins: [formValidation],
   components: {
     OsButton,
     OsIcon,
@@ -105,6 +104,9 @@ export default {
     }
   },
   methods: {
+    onSubmit() {
+      this.formSubmit(this.handleSubmitPassword)
+    },
     async handleSubmitPassword() {
       const mutation = gql`
         mutation ($nonce: String!, $email: String!, $password: String!) {

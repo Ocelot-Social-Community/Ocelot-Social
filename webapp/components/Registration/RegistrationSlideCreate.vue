@@ -25,15 +25,7 @@
     <div class="ds-my-xxx-small"></div>
   </div>
   <div v-else class="create-account-card">
-    <ds-form
-      class="create-user-account"
-      v-model="formData"
-      :schema="formSchema"
-      @input="handleInput"
-      @input-valid="handleInputValid"
-    >
-      <!-- leave this here in case the scoped variable is needed in the future nobody would remember this -->
-      <!-- <template v-slot="{ errors }"> -->
+    <form class="create-user-account" novalidate>
       <template>
         <email-display-and-verify :email="sliderData.collectedInputData.email" />
 
@@ -151,7 +143,7 @@
         </div>
       </template>
       <div class="ds-my-xxx-small"></div>
-    </ds-form>
+    </form>
   </div>
 </template>
 
@@ -168,11 +160,13 @@ import PasswordForm from '~/components/utils/PasswordFormHelper'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ShowPassword from '../ShowPassword/ShowPassword.vue'
 import LocationSelect from '~/components/Select/LocationSelect'
+import formValidation from '~/mixins/formValidation'
 
 const threePerEmSpace = ' ' // unicode u+2004;
 
 export default {
   name: 'RegistrationSlideCreate',
+  mixins: [formValidation],
   components: {
     EmailDisplayAndVerify,
     PageParamsLink,

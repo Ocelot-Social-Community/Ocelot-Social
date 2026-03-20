@@ -1,12 +1,5 @@
 <template>
-  <ds-form
-    v-if="!submitted"
-    @input="handleInput"
-    @input-valid="handleInputValid"
-    v-model="formData"
-    :schema="formSchema"
-    @submit="handleSubmit"
-  >
+  <form v-if="!submitted" @submit.prevent="onSubmit" novalidate>
     <div class="ds-my-small">
       <ds-input
         :placeholder="$t('login.email')"
@@ -32,7 +25,7 @@
       {{ $t('components.password-reset.request.form.submit') }}
     </os-button>
     <slot></slot>
-  </ds-form>
+  </form>
   <div v-else>
     <transition name="ds-transition-fade">
       <div class="ds-flex ds-flex-centered">
@@ -47,8 +40,10 @@
 import { OsButton } from '@ocelot-social/ui'
 import gql from 'graphql-tag'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
+import formValidation from '~/mixins/formValidation'
 
 export default {
+  mixins: [formValidation],
   components: {
     OsButton,
     SweetalertIcon,
@@ -81,6 +76,9 @@ export default {
     },
     handleInputValid() {
       this.disabled = false
+    },
+    onSubmit() {
+      this.formSubmit(this.handleSubmit)
     },
     async handleSubmit() {
       const mutation = gql`

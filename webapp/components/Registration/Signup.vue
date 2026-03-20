@@ -1,12 +1,6 @@
 <template>
   <div v-if="!data && !error" class="ds-my-large">
-    <ds-form
-      @input="handleInput"
-      @input-valid="handleInputValid"
-      v-model="formData"
-      :schema="formSchema"
-      @submit="handleSubmit"
-    >
+    <form @submit.prevent="onSubmit" novalidate>
       <h1>
         {{
           invitation
@@ -40,7 +34,7 @@
         {{ $t('components.registration.signup.form.submit') }}
       </os-button>
       <slot></slot>
-    </ds-form>
+    </form>
   </div>
   <div v-else class="ds-my-large">
     <template v-if="!error">
@@ -67,6 +61,7 @@ import gql from 'graphql-tag'
 import metadata from '~/constants/metadata'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import translateErrorMessage from '~/components/utils/TranslateErrorMessage'
+import formValidation from '~/mixins/formValidation'
 
 export const SignupMutation = gql`
   mutation ($email: String!, $locale: String!, $inviteCode: String) {
@@ -77,6 +72,7 @@ export const SignupMutation = gql`
 `
 export default {
   name: 'Signup',
+  mixins: [formValidation],
   components: {
     OsButton,
     SweetalertIcon,
@@ -114,6 +110,9 @@ export default {
     },
     handleInputValid() {
       this.disabled = false
+    },
+    onSubmit() {
+      this.formSubmit(this.handleSubmit)
     },
     async handleSubmit() {
       const { email } = this.formData

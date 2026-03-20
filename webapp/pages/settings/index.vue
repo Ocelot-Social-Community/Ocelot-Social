@@ -1,47 +1,45 @@
 <template>
-  <ds-form class="settings-form" v-model="formData" :schema="formSchema" @submit="submit">
-    <template #default="{ errors }">
-      <os-card>
-        <h2 class="title">{{ $t('settings.data.name') }}</h2>
-        <ds-input
-          id="name"
-          model="name"
-          icon="user"
-          :label="
-            $env.ASK_FOR_REAL_NAME
-              ? $t('settings.data.realNamePlease')
-              : $t('settings.data.labelName')
-          "
-          :placeholder="$t('settings.data.namePlaceholder')"
-        />
-        <ds-input id="slug" model="slug" icon="at" :label="$t('settings.data.labelSlug')" />
-        <location-select
-          class="location-selet"
-          v-model="formData.locationName"
-          :canBeCleared="!$env.REQUIRE_LOCATION"
-        />
-        <!-- eslint-enable vue/use-v-on-exact -->
-        <ds-input
-          id="about"
-          model="about"
-          type="textarea"
-          rows="3"
-          :label="$t('settings.data.labelBio')"
-          :placeholder="$t('settings.data.labelBio')"
-        />
-        <os-button
-          variant="primary"
-          appearance="filled"
-          type="submit"
-          :disabled="!!errors"
-          :loading="loadingData"
-        >
-          <template #icon><os-icon :icon="icons.check" /></template>
-          {{ $t('actions.save') }}
-        </os-button>
-      </os-card>
-    </template>
-  </ds-form>
+  <form class="settings-form" @submit.prevent="onSubmit" novalidate>
+    <os-card>
+      <h2 class="title">{{ $t('settings.data.name') }}</h2>
+      <ds-input
+        id="name"
+        model="name"
+        icon="user"
+        :label="
+          $env.ASK_FOR_REAL_NAME
+            ? $t('settings.data.realNamePlease')
+            : $t('settings.data.labelName')
+        "
+        :placeholder="$t('settings.data.namePlaceholder')"
+      />
+      <ds-input id="slug" model="slug" icon="at" :label="$t('settings.data.labelSlug')" />
+      <location-select
+        class="location-selet"
+        v-model="formData.locationName"
+        :canBeCleared="!$env.REQUIRE_LOCATION"
+      />
+      <!-- eslint-enable vue/use-v-on-exact -->
+      <ds-input
+        id="about"
+        model="about"
+        type="textarea"
+        rows="3"
+        :label="$t('settings.data.labelBio')"
+        :placeholder="$t('settings.data.labelBio')"
+      />
+      <os-button
+        variant="primary"
+        appearance="filled"
+        type="submit"
+        :disabled="!!formErrors"
+        :loading="loadingData"
+      >
+        <template #icon><os-icon :icon="icons.check" /></template>
+        {{ $t('actions.save') }}
+      </os-button>
+    </os-card>
+  </form>
 </template>
 
 <script>
@@ -52,9 +50,10 @@ import UniqueSlugForm from '~/components/utils/UniqueSlugForm'
 import LocationSelect from '~/components/Select/LocationSelect'
 import { updateUserMutation } from '~/graphql/User'
 import scrollToContent from './scroll-to-content.js'
+import formValidation from '~/mixins/formValidation'
 
 export default {
-  mixins: [scrollToContent],
+  mixins: [scrollToContent, formValidation],
   name: 'Settings',
   components: {
     OsButton,
@@ -105,6 +104,9 @@ export default {
     ...mapMutations({
       setCurrentUser: 'auth/SET_USER',
     }),
+    onSubmit() {
+      this.formSubmit(this.submit)
+    },
     async submit() {
       this.loadingData = true
       const { name, slug, about } = this.formData

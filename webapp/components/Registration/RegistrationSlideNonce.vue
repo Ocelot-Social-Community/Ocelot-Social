@@ -1,12 +1,5 @@
 <template>
-  <ds-form
-    class="enter-nonce"
-    v-model="formData"
-    :schema="formSchema"
-    @submit="handleSubmitVerify"
-    @input="handleInput"
-    @input-valid="handleInputValid"
-  >
+  <form class="enter-nonce" @submit.prevent="onSubmit" novalidate>
     <email-display-and-verify :email="sliderData.collectedInputData.email" />
     <ds-input
       :placeholder="$t('components.registration.email-nonce.form.nonce')"
@@ -19,13 +12,14 @@
     </p>
     <slot></slot>
     <div class="ds-my-xxx-small"></div>
-  </ds-form>
+  </form>
 </template>
 
 <script>
 import gql from 'graphql-tag'
 import { isEmail } from 'validator'
 import registrationConstants from '~/constants/registration'
+import formValidation from '~/mixins/formValidation'
 
 import EmailDisplayAndVerify from './EmailDisplayAndVerify'
 
@@ -36,6 +30,7 @@ export const verifyNonceQuery = gql`
 `
 export default {
   name: 'RegistrationSlideNonce',
+  mixins: [formValidation],
   components: {
     EmailDisplayAndVerify,
   },
@@ -100,6 +95,9 @@ export default {
     },
     async handleInputValid() {
       this.sendValidation()
+    },
+    onSubmit() {
+      this.formSubmit(this.handleSubmitVerify)
     },
     async handleSubmitVerify() {
       const { email, nonce } = this.sliderData.collectedInputData
