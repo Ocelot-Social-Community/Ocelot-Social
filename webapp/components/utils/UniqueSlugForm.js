@@ -42,9 +42,13 @@ export default function UniqueSlugForm({ translate, apollo, currentUser }) {
               pendingCallback()
             }
             pendingCallback = callback
-            debouncedSlugCheck(value, (...args) => {
+            debouncedSlugCheck(value, (error) => {
               pendingCallback = null
-              callback(...args)
+              if (error) {
+                callback(error)
+              } else {
+                callback()
+              }
             })
           },
         },
