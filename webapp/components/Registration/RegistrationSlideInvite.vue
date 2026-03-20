@@ -1,11 +1,5 @@
 <template>
-  <ds-form
-    class="enter-invite"
-    v-model="formData"
-    :schema="formSchema"
-    @input="handleInput"
-    @input-valid="handleInputValid"
-  >
+  <form class="enter-invite" @submit.prevent novalidate>
     <ds-input
       :placeholder="formSchema.inviteCode.placeholder"
       :minlength="formSchema.inviteCode.minLength"
@@ -40,16 +34,18 @@
     </div>
     <slot></slot>
     <div class="ds-my-xxx-small"></div>
-  </ds-form>
+  </form>
 </template>
 
 <script>
 import registrationConstants from '~/constants/registrationBranded.js'
 import { validateInviteCode } from '~/graphql/InviteCode'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import formValidation from '~/mixins/formValidation'
 
 export default {
   name: 'RegistrationSlideInvite',
+  mixins: [formValidation],
   props: {
     sliderData: { type: Object, required: true },
   },

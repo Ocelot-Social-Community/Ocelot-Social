@@ -1,11 +1,5 @@
 <template>
-  <ds-form
-    v-model="formData"
-    :schema="formSchema"
-    @input="handleInput"
-    @input-valid="handleInputValid"
-    @submit="handleSubmitItem"
-  >
+  <form @submit.prevent="onSubmit" novalidate>
     <div v-if="isEditing">
       <div class="ds-my-base">
         <h5 class="ds-heading ds-heading-h5">
@@ -77,16 +71,18 @@
       </os-button>
     </div>
     <confirm-modal v-if="showConfirmModal" :modalData="currentModalData" @close="closeModal" />
-  </ds-form>
+  </form>
 </template>
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
+import formValidation from '~/mixins/formValidation'
 
 export default {
   name: 'MySomethingList',
+  mixins: [formValidation],
   components: { ConfirmModal, OsButton, OsIcon },
   props: {
     useFormData: { type: Object, default: () => ({}) },
@@ -139,6 +135,9 @@ export default {
     this.icons = iconRegistry
   },
   methods: {
+    onSubmit() {
+      this.formSubmit(this.handleSubmitItem)
+    },
     handleInput(data) {
       this.callbacks.handleInput(this, data)
       this.disabled = true

@@ -33,7 +33,7 @@ describe('request.vue', () => {
     })
 
     it('renders', () => {
-      expect(wrapper.findAll('.ds-form')).toHaveLength(1)
+      expect(wrapper.findAll('form')).toHaveLength(1)
     })
 
     it('navigates to enter-nonce on handlePasswordResetRequested', () => {

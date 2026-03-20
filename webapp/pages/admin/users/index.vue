@@ -2,7 +2,7 @@
   <div class="admin-users">
     <os-card>
       <h2 class="title">{{ $t('admin.users.name') }}</h2>
-      <ds-form v-model="form" @submit="submit">
+      <form @submit.prevent="onSubmit" novalidate>
         <div class="ds-flex ds-flex-gap-small">
           <div style="flex: 0 0 90%; width: 90%">
             <ds-input
@@ -24,7 +24,7 @@
             </os-button>
           </div>
         </div>
-      </ds-form>
+      </form>
     </os-card>
     <os-card v-if="User && User.length">
       <div class="ds-table-wrap">
@@ -162,8 +162,10 @@ import { isEmail } from 'validator'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 import { adminUserQuery } from '~/graphql/User'
 import { FetchAllRoles, updateUserRole } from '~/graphql/admin/Roles'
+import formValidation from '~/mixins/formValidation'
 
 export default {
+  mixins: [formValidation],
   components: {
     OsButton,
     OsCard,
@@ -184,10 +186,8 @@ export default {
       email: null,
       filter: null,
       userRoles: [],
-      form: {
-        formData: {
-          query: '',
-        },
+      formData: {
+        query: '',
       },
     }
   },
@@ -234,9 +234,9 @@ export default {
     next() {
       this.offset += this.pageSize
     },
-    submit(formData) {
+    onSubmit() {
       this.offset = 0
-      const { query } = formData
+      const { query } = this.formData
       if (isEmail(query)) {
         this.email = query
         this.filter = null

@@ -1,12 +1,5 @@
 <template>
-  <ds-form
-    class="enter-nonce"
-    v-model="formData"
-    :schema="formSchema"
-    @submit="handleSubmitVerify"
-    @input="handleInput"
-    @input-valid="handleInputValid"
-  >
+  <form class="enter-nonce" @submit.prevent="onSubmit" novalidate>
     <ds-input
       :placeholder="$t('components.registration.email-nonce.form.nonce')"
       model="nonce"
@@ -30,15 +23,17 @@
       {{ $t('components.registration.email-nonce.form.next') }}
     </os-button>
     <slot></slot>
-  </ds-form>
+  </form>
 </template>
 
 <script>
 import { OsButton } from '@ocelot-social/ui'
 import registrationConstants from '~/constants/registration'
+import formValidation from '~/mixins/formValidation'
 
 export default {
   name: 'EnterNonce',
+  mixins: [formValidation],
   components: { OsButton },
   props: {
     email: { type: String, required: true },
@@ -68,6 +63,9 @@ export default {
     },
     async handleInputValid() {
       this.disabled = false
+    },
+    onSubmit() {
+      this.formSubmit(this.handleSubmitVerify)
     },
     handleSubmitVerify() {
       const { nonce } = this.formData

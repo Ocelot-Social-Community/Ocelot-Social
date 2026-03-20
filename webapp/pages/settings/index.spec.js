@@ -114,7 +114,7 @@ describe('index.vue', () => {
         const wrapper = Wrapper()
 
         wrapper.find('#name').setValue('Peter')
-        wrapper.find('.ds-form').trigger('submit')
+        wrapper.find('form').trigger('submit')
 
         expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
       })
@@ -130,7 +130,7 @@ describe('index.vue', () => {
           const wrapper = Wrapper()
 
           wrapper.find('#name').setValue('Peter')
-          wrapper.find('.ds-form').trigger('submit')
+          wrapper.find('form').trigger('submit')
 
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -147,7 +147,7 @@ describe('index.vue', () => {
           const wrapper = Wrapper()
 
           wrapper.find('#slug').setValue('peter-der-lustige')
-          wrapper.find('.ds-form').trigger('submit')
+          wrapper.find('form').trigger('submit')
 
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -163,7 +163,7 @@ describe('index.vue', () => {
         it('calls updateUser mutation', async () => {
           const wrapper = Wrapper()
           wrapper.findComponent(LocationSelect).vm.$emit('input', 'Berlin, Germany')
-          wrapper.find('.ds-form').trigger('submit')
+          wrapper.find('form').trigger('submit')
 
           await expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -180,7 +180,7 @@ describe('index.vue', () => {
           const wrapper = Wrapper()
 
           wrapper.find('#about').setValue('I am Peter!111elf')
-          wrapper.find('.ds-form').trigger('submit')
+          wrapper.find('form').trigger('submit')
 
           expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -199,7 +199,7 @@ describe('index.vue', () => {
           wrapper.find('#slug').setValue('peter-der-lustige')
           await wrapper.findComponent(LocationSelect).vm.$emit('input', 'Hamburg, Germany')
           wrapper.find('#about').setValue('I am Peter!111elf')
-          wrapper.find('.ds-form').trigger('submit')
+          wrapper.find('form').trigger('submit')
 
           await expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
             expect.objectContaining({

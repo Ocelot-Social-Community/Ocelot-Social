@@ -14,7 +14,8 @@ Phase 3: OsButton      ██████████ 100% (133/133 Buttons) ✅
 Phase 4: Tier 1        ██████████ 100% (OsButton, OsIcon, OsSpinner, OsCard) ✅
 Phase 4: Tier A → HTML ██████████ 100% (10 ds-* Wrapper → Plain HTML) ✅
 Phase 4: Tier B        ██████████ 100% (ds-chip→OsBadge✅, ds-tag→OsBadge✅, ds-grid✅, ds-number→OsNumber✅, ds-radio→HTML✅)
-Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) | Tier 2 begonnen (OsModal✅) | Rest ausstehend (OsInput, OsMenu, OsSelect)
+Phase 4: Tier B        ██████████ 100% (Chip→OsBadge, Tag→OsBadge, Grid→HTML, Number→OsNumber, Radio→HTML, Table→HTML) ✅
+Phase 4: Tier 2+       ██████░░░░  50% (OsModal✅, ds-form entkoppelt✅) | Rest ausstehend (OsInput, OsMenu, OsSelect, OsDropdown, OsAvatar)
 ```
 
 ### Statistiken
@@ -29,7 +30,7 @@ Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) 
 | ✅ → OsNumber | Number (5 Nutzungen → OsNumber, CountTo.vue gelöscht, vue-count-to entfernt) |
 | ✅ → Plain HTML | Radio (1 Datei → native `<input type="radio">` in ReportModal) |
 | ⬜ → UI-Library | Modal, Input, Menu, MenuItem, Select (5) — Tier 2-3 |
-| ⬜ Offen | Form (18 Dateien — HTML oder OsForm?) |
+| ✅ ds-form entkoppelt | Form-Validierung → formValidation Mixin (async-validator), ds-input/ds-select bleiben als UI-Komponenten |
 | ⬜ Nicht in Webapp | Code, CopyField, FormItem, InputError, InputLabel, Page, PageTitle, Logo, Avatar, TableCol, TableHeadCol (11) |
 
 ### OsButton Migration (Phase 3) ✅
@@ -38,7 +39,7 @@ Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) 
 
 **Erkenntnisse aus der Migration:**
 - `type="submit"` muss explizit gesetzt werden (OsButton Default: `type="button"`)
-- DsForm `errors` ist ein Objekt → `!!errors` für Boolean-Cast bei `:disabled`
+- `formErrors` ist ein Objekt → `!!formErrors` für Boolean-Cast bei `:disabled`
 - CSS `.base-button` Selektoren → `> button` oder `button`
 - Filter-Buttons nutzen `:appearance="condition ? 'filled' : 'outline'"` Pattern
 - Circle-Buttons mit Icon: `<template #icon><os-icon :icon="..." /></template>`
@@ -438,19 +439,19 @@ Phase 4: Tier B+       ████████░░  75% (ds-table→HTML✅) 
 14. [x] ds-chip (5 Dateien, 20 Nutzungen) → OsBadge (UI-Library)
 15. [x] ds-tag (3 Dateien) → OsBadge shape="square" (UI-Library)
 16. [x] ds-grid / ds-grid-item (10 Dateien) → CSS Grid (Plain HTML)
-17. [ ] ds-number (5 Dateien) → `<div class="ds-number">`
+17. [x] ds-number (5 Dateien) → OsNumber (UI-Library) ✅
 18. [x] ds-radio (1 Datei) → native `<input type="radio">` + `<fieldset>` (ReportModal) ✅
 
 ### Phase 4: Tier 2-4 — UI-Library
-18. [x] OsModal (h() Render, Focus-Trap, Scroll-Lock, A11y; ConfirmModal + ReportModal nutzen OsModal; DeleteUserModal/DisableModal/ReleaseModal gelöscht) ✅
-19. [ ] OsInput (23 Dateien, gekoppelt mit ds-form)
-20. [ ] OsMenu / OsMenuItem (17 Dateien)
-21. [ ] OsSelect (3 Dateien), OsTable (7 Dateien)
-22. [ ] ds-form → HTML `<form>` oder OsForm (18 Dateien)
+19. [x] OsModal (h() Render, Focus-Trap, Scroll-Lock, A11y; ConfirmModal + ReportModal nutzen OsModal; DeleteUserModal/DisableModal/ReleaseModal gelöscht) ✅
+20. [x] ds-form → formValidation Mixin (async-validator), 18 Dateien migriert, vuelidate entfernt ✅
+21. [ ] OsInput (23 Dateien)
+22. [ ] OsMenu / OsMenuItem (17 Dateien)
+23. [ ] OsSelect (3 Dateien), OsTable (7 Dateien)
 
 ---
 
-**✅ Phase 0-3 abgeschlossen. Phase 4: Tier 1 + Tier A ✅, Tier B 80% (Chip→OsBadge, Tag→OsBadge, Grid→HTML, Number→OsNumber, Table→HTML), Tier 2: OsModal ✅, Rest ausstehend.**
+**✅ Phase 0-3 abgeschlossen. Phase 4: Tier 1 + Tier A ✅, Tier B ✅ (Chip→OsBadge, Tag→OsBadge, Grid→HTML, Number→OsNumber, Radio→HTML, Table→HTML), Tier 2: OsModal ✅, ds-form entkoppelt ✅, Rest ausstehend (OsInput, OsMenu, OsSelect).**
 
 ---
 
@@ -948,14 +949,14 @@ interface OsDropdownProps {
 | — | ds-space | ✅ → div + Margin-Utility-Klassen |
 | — | ds-flex, ds-flex-item | ✅ → HTML + CSS @media Queries |
 
-### Tier B: Einfache ds-* Migration (60%)
+### Tier B: Einfache ds-* Migration ✅
 
 | # | Komponente | Dateien | Ziel | Status |
 |---|------------|---------|------|--------|
 | 5 | **OsBadge** | — | ds-chip (20 Nutzungen, 5 Dateien) + ds-tag (3 Dateien) | ✅ |
 | — | ds-grid / ds-grid-item | 10 | CSS Grid (Plain HTML) | ✅ |
-| — | ds-number | 5 | `<div class="ds-number">` | ⬜ |
-| — | ds-radio | 1 | native `<input type="radio">` | ⬜ |
+| — | ds-number | 5 | OsNumber (UI-Library) | ✅ |
+| — | ds-radio | 1 | native `<input type="radio">` | ✅ |
 
 ### Tier 2: Layout & Feedback
 
@@ -964,7 +965,7 @@ interface OsDropdownProps {
 | 5 | **OsModal** | 7 | OsButton | ✅ |
 | 6 | **OsDropdown** | — | OsButton | ⬜ |
 | 7 | **OsAvatar** | — | - | ⬜ |
-| 8 | **OsInput** | 23 | gekoppelt mit ds-form (18 Dateien) | ⬜ |
+| 8 | **OsInput** | 23 | ds-form Kopplung aufgelöst (formValidation Mixin) | ⬜ |
 
 ### Tier 3: Navigation (ausstehend)
 
@@ -979,7 +980,7 @@ interface OsDropdownProps {
 |---|------------|---------|
 | 11 | OsSelect | 3 |
 | 12 | OsTable | 7 |
-| 13 | ds-form → HTML `<form>` oder OsForm | 18 |
+| 13 | ~~ds-form~~ | — | ✅ entkoppelt via formValidation Mixin (async-validator) |
 
 > **Hinweis:** OsHeading, OsText, OsTag sind nicht mehr geplant — wurden zu Plain HTML migriert (Tier A).
 
@@ -1014,17 +1015,17 @@ ds-flex, ds-flex-item                                ✅ → HTML + CSS @media Q
 ds-chip → OsBadge (UI-Library)               ✅
 ds-tag  → OsBadge shape="square" (UI-Library) ✅
 ds-grid / ds-grid-item → CSS Grid (HTML)     ✅
-ds-number → Plain HTML                       ⬜ (5 Dateien)
-ds-radio  → native <input type="radio">      ⬜ (1 Datei)
+ds-number → OsNumber (UI-Library)             ✅
+ds-radio  → native <input type="radio">      ✅ (1 Datei)
 ```
 
-### Tier 2-4: UI-Library (ausstehend)
+### Tier 2-4: UI-Library
 
 ```
-5. OsModal    → Basis: DsModal, Feature-Modals bleiben in Webapp
+5. OsModal    → Basis: DsModal, Feature-Modals bleiben in Webapp  ✅
 6. OsDropdown → Basis: Dropdown (Webapp) — wichtiger als gedacht!
 7. OsAvatar   → Vereint: DsAvatar + ProfileAvatar
-8. OsInput    → Basis: DsInput, gekoppelt mit ds-form
+8. OsInput    → Basis: DsInput (ds-form Kopplung aufgelöst via formValidation Mixin)
 9. OsMenu     → Basis: DsMenu/DsMenuItem
 10. OsSelect  → Basis: DsSelect
 11. OsTable   → Basis: DsTable
@@ -1047,8 +1048,8 @@ ds-radio  → native <input type="radio">      ⬜ (1 Datei)
 
 ### Noch offen:
 1. **Logo** - Existiert doppelt (Webapp + Styleguide)
-2. **Modal** - Existiert doppelt (Webapp Modal.vue ist Modal-Router, DsModal ist UI)
-3. **ds-form Kopplung** - ds-input und ds-form sind stark gekoppelt (Schema-Validation)
+2. ~~**Modal** - Existiert doppelt~~ → OsModal migriert ✅
+3. ~~**ds-form Kopplung**~~ → aufgelöst via formValidation Mixin (async-validator), vuelidate entfernt ✅
 
 ---
 
