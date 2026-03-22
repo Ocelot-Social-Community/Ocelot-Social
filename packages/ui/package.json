@@ -107,7 +107,7 @@
     "size-limit": "^12.0.0",
     "storybook": "^10.2.16",
     "tailwind-csstree": "^0.1.4",
-    "tailwindcss": "^4.2.1",
+    "tailwindcss": "^4.2.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
