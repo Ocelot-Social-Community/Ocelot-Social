@@ -102,7 +102,7 @@
     "eslint-plugin-storybook": "^10.2.19",
     "eslint-plugin-vuejs-accessibility": "^2.5.0",
     "glob": "^13.0.6",
-    "jsdom": "^28.1.0",
+    "jsdom": "^29.0.1",
     "publint": "^0.3.18",
     "size-limit": "^12.0.0",
     "storybook": "^10.2.16",
