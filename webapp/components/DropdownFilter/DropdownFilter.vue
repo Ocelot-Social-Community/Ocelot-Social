@@ -14,7 +14,7 @@
       </a>
     </template>
     <template #popover="{ toggleMenu }">
-      <os-menu class="dropdown-menu-popover" :routes="filterOptions" link-tag="router-link">
+      <os-menu class="dropdown-menu-popover" :routes="filterOptions">
         <template #menuitem="item">
           <os-menu-item
             class="dropdown-menu-item"
