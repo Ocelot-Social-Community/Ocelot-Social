@@ -224,12 +224,15 @@
       }
       document.addEventListener('click', this.clickOutsideHandler, true)
     },
-    beforeUnmount() {
-      if (this.clickOutsideHandler) {
-        document.removeEventListener('click', this.clickOutsideHandler, true)
-      }
-    },
+    /* v8 ignore next 2 -- Vue 2 lifecycle hook */
+    beforeDestroy() { this.cleanup() },
+    beforeUnmount() { this.cleanup() },
     methods: {
+      cleanup() {
+        if (this.clickOutsideHandler) {
+          document.removeEventListener('click', this.clickOutsideHandler, true)
+        }
+      },
       handleClick(event: Event) {
         this.$emit('click', event, this.route)
         const menu = this.$parentMenu as Record<string, unknown> | null
