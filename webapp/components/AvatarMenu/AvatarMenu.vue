@@ -34,19 +34,19 @@
         </template>
         <hr />
         <os-menu dropdown :routes="routes" :matcher="matcher" link-tag="router-link">
-          <os-menu-item
-            slot="menuitem"
-            slot-scope="item"
-            :route="item.route"
-            :parents="item.parents"
-            @click.native="
-              closeMenu(false)
-              $emit('toggle-Mobile-Menu-view')
-            "
-          >
-            <os-icon :icon="item.route.icon" />
-            {{ item.route.name }}
-          </os-menu-item>
+          <template #menuitem="item">
+            <os-menu-item
+              :route="item.route"
+              :parents="item.parents"
+              @click.native="
+                closeMenu(false)
+                $emit('toggle-Mobile-Menu-view')
+              "
+            >
+              <os-icon :icon="item.route.icon" />
+              {{ item.route.name }}
+            </os-menu-item>
+          </template>
         </os-menu>
         <hr />
         <nuxt-link class="logout-link" :to="{ name: 'logout' }">
