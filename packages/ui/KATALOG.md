@@ -15,7 +15,7 @@ Phase 4: Tier 1        ██████████ 100% (OsButton, OsIcon, Os
 Phase 4: Tier A → HTML ██████████ 100% (10 ds-* Wrapper → Plain HTML) ✅
 Phase 4: Tier B        ██████████ 100% (ds-chip→OsBadge✅, ds-tag→OsBadge✅, ds-grid✅, ds-number→OsNumber✅, ds-radio→HTML✅)
 Phase 4: Tier B        ██████████ 100% (Chip→OsBadge, Tag→OsBadge, Grid→HTML, Number→OsNumber, Radio→HTML, Table→HTML) ✅
-Phase 4: Tier 2+       ██████░░░░  50% (OsModal✅, ds-form entkoppelt✅) | Rest ausstehend (OsInput, OsMenu, OsSelect, OsDropdown, OsAvatar)
+Phase 4: Tier 2+       ████████░░  60% (OsModal✅, ds-form entkoppelt✅, ds-input→OcelotInput✅) | Rest ausstehend (OsMenu, OsSelect, OsDropdown, OsAvatar)
 ```
 
 ### Statistiken
@@ -29,8 +29,10 @@ Phase 4: Tier 2+       ██████░░░░  50% (OsModal✅, ds-form 
 | ✅ → OsBadge | Chip (20 Nutzungen → OsBadge), Tag (3 → OsBadge shape="square") |
 | ✅ → OsNumber | Number (5 Nutzungen → OsNumber, CountTo.vue gelöscht, vue-count-to entfernt) |
 | ✅ → Plain HTML | Radio (1 Datei → native `<input type="radio">` in ReportModal) |
-| ⬜ → UI-Library | Modal, Input, Menu, MenuItem, Select (5) — Tier 2-3 |
-| ✅ ds-form entkoppelt | Form-Validierung → formValidation Mixin (async-validator), ds-input/ds-select bleiben als UI-Komponenten |
+| ✅ → OsModal | Modal (7 Nutzungen → OsModal, Focus-Trap, Scroll-Lock, A11y) |
+| ✅ ds-input → OcelotInput | Input (23 Dateien → OcelotInput Webapp-Komponente, lokale Imports, formValidation-kompatibel) |
+| ✅ ds-form entkoppelt | Form-Validierung → formValidation Mixin (async-validator), vuelidate entfernt |
+| ⬜ → UI-Library | Menu, MenuItem, Select (3) — Tier 2-3 |
 | ⬜ Nicht in Webapp | Code, CopyField, FormItem, InputError, InputLabel, Page, PageTitle, Logo, Avatar, TableCol, TableHeadCol (11) |
 
 ### OsButton Migration (Phase 3) ✅
@@ -74,9 +76,9 @@ Phase 4: Tier 2+       ██████░░░░  50% (OsModal✅, ds-form 
 | 14 | CopyField | ⬜ Nicht genutzt | Nicht in Webapp verwendet |
 | 15 | Form | ⬜ Offen | 18 Dateien — HTML `<form>` oder OsForm? |
 | 16 | FormItem | ⬜ Nicht genutzt | Nicht in Webapp verwendet |
-| 17 | Input | ⬜ Tier 2 | 23 Dateien → OsInput (gekoppelt mit Form) |
-| 18 | InputError | ⬜ Nicht genutzt | Intern von Input genutzt |
-| 19 | InputLabel | ⬜ Nicht genutzt | Intern von Input genutzt |
+| 17 | Input | ✅ → OcelotInput | 23 Dateien → OcelotInput (Webapp-Komponente, FormItem/Label/Error vereint) |
+| 18 | InputError | ✅ → OcelotInput | In OcelotInput integriert |
+| 19 | InputLabel | ✅ → OcelotInput | In OcelotInput integriert |
 | 20 | Radio | ✅ → HTML | 1 Datei → native `<input type="radio">` + `<fieldset>` (ReportModal) |
 | 21 | Select | ⬜ Tier 4 | 3 Dateien → OsSelect |
 
@@ -367,7 +369,7 @@ Phase 4: Tier 2+       ██████░░░░  50% (OsModal✅, ds-form 
 
 ### Basis-Komponenten — UI-Library (ausstehend)
 - Modal → OsModal ✅
-- Input → OsInput
+- Input → OcelotInput (Webapp-Komponente) ✅ — langfristig → OsInput in packages/ui
 - Select → OsSelect
 - Avatar → OsAvatar (falls benötigt)
 
@@ -409,6 +411,7 @@ Phase 4: Tier 2+       ██████░░░░  50% (OsModal✅, ds-form 
 | 2026-02-11→18 | Claude | **Sessions 12-26** | OsButton M4c abgeschlossen, OsIcon, OsSpinner, OsCard implementiert + Webapp-Migration, BaseButton/BaseCard/BaseIcon/LoadingSpinner gelöscht |
 | 2026-02-19 | Claude | **Tier A Migration** | 10 ds-* Vue-Wrapper → Plain HTML + CSS, _ds-compat.scss, ~450 Nutzungen in ~90 Dateien |
 | 2026-02-19 | Claude | **Katalog konsolidiert** | Styleguide- und Webapp-Tabellen aktualisiert, veraltete Status korrigiert |
+| 2026-03-23 | Claude | **ds-input → OcelotInput** | 23 Dateien migriert, Webapp-Komponente mit lokalen Imports (tree-shakeable), FormItem/Label/Error vereint |
 
 ---
 
@@ -445,13 +448,13 @@ Phase 4: Tier 2+       ██████░░░░  50% (OsModal✅, ds-form 
 ### Phase 4: Tier 2-4 — UI-Library
 19. [x] OsModal (h() Render, Focus-Trap, Scroll-Lock, A11y; ConfirmModal + ReportModal nutzen OsModal; DeleteUserModal/DisableModal/ReleaseModal gelöscht) ✅
 20. [x] ds-form → formValidation Mixin (async-validator), 18 Dateien migriert, vuelidate entfernt ✅
-21. [ ] OsInput (23 Dateien)
+21. [x] ds-input → OcelotInput (23 Dateien, Webapp-Komponente mit lokalen Imports, FormItem/Label/Error vereint, formValidation-kompatibel) ✅
 22. [ ] OsMenu / OsMenuItem (17 Dateien)
 23. [ ] OsSelect (3 Dateien), OsTable (7 Dateien)
 
 ---
 
-**✅ Phase 0-3 abgeschlossen. Phase 4: Tier 1 + Tier A ✅, Tier B ✅ (Chip→OsBadge, Tag→OsBadge, Grid→HTML, Number→OsNumber, Radio→HTML, Table→HTML), Tier 2: OsModal ✅, ds-form entkoppelt ✅, Rest ausstehend (OsInput, OsMenu, OsSelect).**
+**✅ Phase 0-3 abgeschlossen. Phase 4: Tier 1 + Tier A ✅, Tier B ✅ (Chip→OsBadge, Tag→OsBadge, Grid→HTML, Number→OsNumber, Radio→HTML, Table→HTML), Tier 2: OsModal ✅, ds-form entkoppelt ✅, ds-input → OcelotInput ✅, Rest ausstehend (OsMenu, OsSelect).**
 
 ---
 
