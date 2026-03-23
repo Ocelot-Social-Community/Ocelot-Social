@@ -176,7 +176,7 @@
           </os-card>
         </div>
         <div class="post-detail-layout__sidebar" style="flex: 0 0 200px; width: 200px">
-          <ds-menu :routes="routes" class="post-side-navigation" />
+          <os-menu :routes="routes" class="post-side-navigation" link-tag="router-link" />
         </div>
       </div>
     </div>
@@ -184,7 +184,7 @@
 </template>
 
 <script>
-import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon, OsMenu } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
@@ -224,6 +224,7 @@ export default {
     OsCard,
     OsButton,
     OsIcon,
+    OsMenu,
     CommentForm,
     CommentList,
     ContentMenu,

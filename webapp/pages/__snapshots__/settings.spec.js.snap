@@ -34,154 +34,99 @@ exports[`settings.vue given badges are disabled renders 1`] = `
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/my-email-address"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/my-email-address"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/security"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/security"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/privacy"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/privacy"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/my-social-media"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/my-social-media"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/muted-users"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/muted-users"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/blocked-users"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/blocked-users"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/embeds"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/embeds"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/notifications"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/notifications"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/data-download"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/data-download"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/delete-account"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/delete-account"
+              />
             </li>
           </ul>
         </nav>
@@ -237,168 +182,108 @@ exports[`settings.vue given badges are enabled renders 1`] = `
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/my-email-address"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/my-email-address"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/badges"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/badges"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/security"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/security"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/privacy"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/privacy"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/my-social-media"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/my-social-media"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/muted-users"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/muted-users"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/blocked-users"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/blocked-users"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/embeds"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/embeds"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/notifications"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/notifications"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/data-download"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/data-download"
+              />
             </li>
             <li
               class="ds-menu-item ds-menu-item-level-0"
             >
               <a
                 class="ds-menu-item-link"
-                exact="true"
                 href="/settings/delete-account"
-              >
-                
-      
-    
-              </a>
-              <!---->
+                to="/settings/delete-account"
+              />
             </li>
           </ul>
         </nav>

@@ -11,9 +11,6 @@ localVue.use(VTooltip)
 localVue.use(Vuex)
 
 const stubs = {
-  'router-link': {
-    template: '<span><slot /></span>',
-  },
   'confirm-modal': { template: '<div class="confirm-modal-stub" />' },
   'report-modal': { template: '<div class="report-modal-stub" />' },
 }
@@ -77,14 +74,12 @@ describe('ContentMenu.vue', () => {
       })
 
       it('can edit the contribution', () => {
-        expect(
-          wrapper
-            .findAll('.ds-menu-item')
-            .filter((item) => item.text() === 'post.menu.edit')
-            .at(0)
-            .find('span.ds-menu-item-link')
-            .attributes('to'),
-        ).toBe('/post-edit-id')
+        const editLink = wrapper
+          .findAll('.ds-menu-item')
+          .filter((item) => item.text() === 'post.menu.edit')
+          .at(0)
+          .find('.ds-menu-item-link')
+        expect(editLink.attributes('href')).toBe('/post-edit-id')
       })
 
       it('can delete the contribution', () => {
@@ -759,7 +754,7 @@ describe('ContentMenu.vue', () => {
             .findAll('.ds-menu-item')
             .filter((item) => item.text() === 'settings.name')
             .at(0)
-            .find('span.ds-menu-item-link')
+            .find('.ds-menu-item-link')
             .attributes('to'),
         ).toBe('/settings')
       })

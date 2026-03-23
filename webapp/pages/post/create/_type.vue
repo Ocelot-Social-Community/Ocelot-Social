@@ -14,16 +14,16 @@
     <div class="ds-my-large"></div>
     <div class="ds-flex ds-flex-gap-small post-create-layout">
       <div class="post-create-layout__sidebar">
-        <ds-menu :routes="routes">
-          <ds-menu-item
+        <os-menu :routes="routes" link-tag="router-link">
+          <os-menu-item
             @click.prevent="switchPostType($event, item)"
             slot="menuitem"
             slot-scope="item"
             :route="item.route"
           >
             {{ item.route.name }}
-          </ds-menu-item>
-        </ds-menu>
+          </os-menu-item>
+        </os-menu>
       </div>
       <div class="post-create-layout__main">
         <transition name="slide-up" appear>
@@ -35,12 +35,15 @@
 </template>
 
 <script>
+import { OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import { groupQuery } from '~/graphql/groups'
 import ContributionForm from '~/components/ContributionForm/ContributionForm'
 
 export default {
   components: {
     ContributionForm,
+    OsMenu,
+    OsMenuItem,
   },
   data() {
     const { groupId = null } = this.$route.query

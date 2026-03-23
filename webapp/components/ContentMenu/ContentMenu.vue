@@ -20,18 +20,18 @@
       </template>
       <template #popover="{ toggleMenu }">
         <div class="content-menu-popover">
-          <ds-menu :routes="routes">
+          <os-menu :routes="routes" link-tag="router-link">
             <template #menuitem="item">
-              <ds-menu-item
+              <os-menu-item
                 :route="item.route"
                 :parents="item.parents"
                 @click.stop.prevent="openItem(item.route, toggleMenu)"
               >
                 <os-icon :icon="item.route.icon" />
                 {{ item.route.label }}
-              </ds-menu-item>
+              </os-menu-item>
             </template>
-          </ds-menu>
+          </os-menu>
         </div>
       </template>
     </dropdown>
@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Dropdown from '~/components/Dropdown'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
@@ -66,6 +66,8 @@ export default {
     Dropdown,
     OsButton,
     OsIcon,
+    OsMenu,
+    OsMenuItem,
     ReportModal,
   },
   mixins: [PinnedPostsMixin],

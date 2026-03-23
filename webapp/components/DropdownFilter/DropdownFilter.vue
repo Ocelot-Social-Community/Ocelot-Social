@@ -14,23 +14,23 @@
       </a>
     </template>
     <template #popover="{ toggleMenu }">
-      <ds-menu class="dropdown-menu-popover" :routes="filterOptions">
+      <os-menu class="dropdown-menu-popover" :routes="filterOptions" link-tag="router-link">
         <template #menuitem="item">
-          <ds-menu-item
+          <os-menu-item
             class="dropdown-menu-item"
             :route="item.route"
             :parents="item.parents"
             @click.stop.prevent="filter(item.route, toggleMenu)"
           >
             {{ item.route.label }}
-          </ds-menu-item>
+          </os-menu-item>
         </template>
-      </ds-menu>
+      </os-menu>
     </template>
   </dropdown>
 </template>
 <script>
-import { OsIcon } from '@ocelot-social/ui'
+import { OsIcon, OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Dropdown from '~/components/Dropdown'
 
@@ -38,6 +38,8 @@ export default {
   components: {
     Dropdown,
     OsIcon,
+    OsMenu,
+    OsMenuItem,
   },
   setup() {
     return { icons: iconRegistry }

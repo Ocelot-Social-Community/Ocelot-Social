@@ -6,7 +6,7 @@
     <div class="ds-my-large"></div>
     <div class="ds-flex ds-flex-gap-small">
       <div class="menu-container">
-        <ds-menu :routes="routes" :is-exact="() => true" />
+        <os-menu :routes="routes" :is-exact="() => true" link-tag="router-link" />
       </div>
       <div class="settings-content" id="settings-content">
         <transition name="slide-up" appear>
@@ -18,7 +18,12 @@
 </template>
 
 <script>
+import { OsMenu } from '@ocelot-social/ui'
+
 export default {
+  components: {
+    OsMenu,
+  },
   computed: {
     routes() {
       const routes = [

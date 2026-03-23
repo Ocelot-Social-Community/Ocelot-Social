@@ -66,15 +66,14 @@ exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
               class="ds-menu-list"
             >
               
-            
+            []
             
               <li
                 class="ds-menu-item ds-menu-item-level-0"
               >
-                <a
+                <span
                   class="ds-menu-item-link"
-                  exact="true"
-                  href="/"
+                  to="/"
                 >
                   <span
                     aria-hidden="true"
@@ -93,18 +92,17 @@ exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
                   
               group.contentMenu.muteGroup
             
-                </a>
-                <!---->
+                </span>
               </li>
               
-            
+            []
             
               <li
                 class="ds-menu-item ds-menu-item-level-0"
               >
-                <a
+                <span
                   class="ds-menu-item-link"
-                  href="/groups/edit/groupid"
+                  to="/groups/edit/groupid"
                 >
                   <span
                     aria-hidden="true"
@@ -123,18 +121,17 @@ exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
                   
               admin.settings.name
             
-                </a>
-                <!---->
+                </span>
               </li>
               
-            
+            []
             
               <li
                 class="ds-menu-item ds-menu-item-level-0"
               >
-                <a
+                <span
                   class="ds-menu-item-link"
-                  href="/groups/edit/groupid/invites"
+                  to="/groups/edit/groupid/invites"
                 >
                   <span
                     aria-hidden="true"
@@ -153,8 +150,7 @@ exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
                   
               group.contentMenu.inviteLinks
             
-                </a>
-                <!---->
+                </span>
               </li>
             </ul>
           </nav>
@@ -231,15 +227,14 @@ exports[`GroupContentMenu renders as groupProfile, muted 1`] = `
               class="ds-menu-list"
             >
               
-            
+            []
             
               <li
                 class="ds-menu-item ds-menu-item-level-0"
               >
-                <a
+                <span
                   class="ds-menu-item-link"
-                  exact="true"
-                  href="/"
+                  to="/"
                 >
                   <span
                     aria-hidden="true"
@@ -258,8 +253,7 @@ exports[`GroupContentMenu renders as groupProfile, muted 1`] = `
                   
               group.contentMenu.unmuteGroup
             
-                </a>
-                <!---->
+                </span>
               </li>
             </ul>
           </nav>
@@ -336,15 +330,14 @@ exports[`GroupContentMenu renders as groupProfile, not muted 1`] = `
               class="ds-menu-list"
             >
               
-            
+            []
             
               <li
                 class="ds-menu-item ds-menu-item-level-0"
               >
-                <a
+                <span
                   class="ds-menu-item-link"
-                  exact="true"
-                  href="/"
+                  to="/"
                 >
                   <span
                     aria-hidden="true"
@@ -363,8 +356,7 @@ exports[`GroupContentMenu renders as groupProfile, not muted 1`] = `
                   
               group.contentMenu.muteGroup
             
-                </a>
-                <!---->
+                </span>
               </li>
             </ul>
           </nav>
@@ -441,14 +433,14 @@ exports[`GroupContentMenu renders as groupTeaser 1`] = `
               class="ds-menu-list"
             >
               
-            
+            []
             
               <li
                 class="ds-menu-item ds-menu-item-level-0"
               >
-                <a
+                <span
                   class="ds-menu-item-link"
-                  href="/groups/groupid"
+                  to="/groups/groupid"
                 >
                   <span
                     aria-hidden="true"
@@ -467,8 +459,7 @@ exports[`GroupContentMenu renders as groupTeaser 1`] = `
                   
               group.contentMenu.visitGroupPage
             
-                </a>
-                <!---->
+                </span>
               </li>
             </ul>
           </nav>
