@@ -52,6 +52,12 @@ ul.os-menu-list {
   color: var(--color-primary, #17b53f);
 }
 
+.os-menu-item-link:focus-visible {
+  color: var(--color-primary, #17b53f);
+  outline: 1px dashed var(--color-primary, #17b53f);
+  outline-offset: -1px;
+}
+
 /* Active state via vue-router */
 .os-menu-item-link.router-link-active {
   color: var(--color-primary, #17b53f);
