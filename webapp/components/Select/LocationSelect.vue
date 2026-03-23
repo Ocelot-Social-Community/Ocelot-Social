@@ -14,7 +14,7 @@
       @input.native="handleCityInput"
     />
     <os-button
-      v-if="(locationName !== '' && canBeCleared) || searchActive || loadingGeo"
+      v-if="(locationName !== '' && canBeCleared) || loadingGeo"
       data-test="clear-location-button"
       variant="primary"
       appearance="ghost"
@@ -65,7 +65,6 @@ export default {
     return {
       currentValue: this.value,
       loadingGeo: false,
-      searchActive: false,
       cities: [],
     }
   },
@@ -104,7 +103,6 @@ export default {
   methods: {
     handleCityInput(event) {
       const value = event.target ? event.target.value.trim() : ''
-      this.searchActive = value.length > 0
       clearTimeout(timeout)
       timeout = setTimeout(() => this.requestGeoData(value), 500)
     },
@@ -162,7 +160,6 @@ export default {
     },
     clearLocationName() {
       this.currentValue = ''
-      this.searchActive = false
     },
   },
 }
