@@ -104,7 +104,7 @@
         const listChildren = menuItems
           .flat(Infinity)
           .filter((item) => item != null && item !== '' && !(Array.isArray(item) && item.length === 0))
-        const list = h('ul', { class: 'ds-menu-list' }, listChildren)
+        const list = h('ul', { class: 'os-menu-list' }, listChildren)
 
         if (isVue2) {
           const proxy = instance?.proxy as Record<string, unknown> | undefined
@@ -117,7 +117,7 @@
           return h(
             'nav',
             {
-              class: [cn('ds-menu', parentClass as string), parentDynClass].filter(Boolean),
+              class: [cn('os-menu', parentClass as string), parentDynClass].filter(Boolean),
               attrs,
               on: { navigate: () => emit('navigate') },
             },
@@ -129,7 +129,7 @@
         return h(
           'nav',
           {
-            class: cn('ds-menu', (attrClass as string) || ''),
+            class: cn('os-menu', (attrClass as string) || ''),
             ...restAttrs,
           },
           [list],
@@ -139,3 +139,56 @@
     /* v8 ignore stop */
   })
 </script>
+
+<style>
+  .os-menu {
+    margin: 0;
+    padding: 0;
+  }
+
+  ul.os-menu-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .os-menu-item-link {
+    display: block;
+    color: var(--color-text-base, #4b4554);
+    text-decoration: none;
+    padding: 8px 16px;
+    border-left: 2px solid transparent;
+    transition: color 80ms ease-out, background-color 80ms ease-out, border-color 80ms ease-out;
+    cursor: pointer;
+  }
+
+  .os-menu-item-link:hover {
+    color: var(--color-primary, #17b53f);
+  }
+
+  .os-menu-item-link.os-menu-item--active {
+    color: var(--color-primary, #17b53f);
+  }
+
+  .os-menu-item-link.os-menu-item--active {
+    color: var(--color-primary, #17b53f);
+    background-color: var(--color-background-soft, #faf9fa);
+    border-left-color: var(--color-primary, #17b53f);
+  }
+
+  .os-menu-item-level-1 .os-menu-item-link {
+    font-size: 0.875rem;
+    padding-left: 24px;
+  }
+
+  .os-menu-item-level-2 .os-menu-item-link {
+    font-size: 0.875rem;
+    padding-left: 32px;
+  }
+
+  ul.os-menu-item-submenu {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

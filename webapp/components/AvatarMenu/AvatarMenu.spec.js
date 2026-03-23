@@ -87,34 +87,34 @@ describe('AvatarMenu.vue', () => {
       describe('role user', () => {
         it('displays a link to user profile', () => {
           const profileLink = wrapper
-            .findAll('.ds-menu-item span')
+            .findAll('.os-menu-item span')
             .at(wrapper.vm.routes.findIndex((route) => route.path === '/profile/u343/matt'))
           expect(profileLink.exists()).toBe(true)
         })
 
         it('displays a link to "Groups"', () => {
           const profileLink = wrapper
-            .findAll('.ds-menu-item span')
+            .findAll('.os-menu-item span')
             .at(wrapper.vm.routes.findIndex((route) => route.path === '/groups'))
           expect(profileLink.exists()).toBe(true)
         })
 
         it('displays a link to the notifications page', () => {
           const notificationsLink = wrapper
-            .findAll('.ds-menu-item span')
+            .findAll('.os-menu-item span')
             .at(wrapper.vm.routes.findIndex((route) => route.path === '/notifications'))
           expect(notificationsLink.exists()).toBe(true)
         })
 
         it('displays a link to the settings page', () => {
           const settingsLink = wrapper
-            .findAll('.ds-menu-item span')
+            .findAll('.os-menu-item span')
             .at(wrapper.vm.routes.findIndex((route) => route.path === '/settings'))
           expect(settingsLink.exists()).toBe(true)
         })
 
         it('displays a total of 6 links', () => {
-          const allLinks = wrapper.findAll('.ds-menu-item')
+          const allLinks = wrapper.findAll('.os-menu-item')
           expect(allLinks).toHaveLength(6)
         })
       })
@@ -134,13 +134,13 @@ describe('AvatarMenu.vue', () => {
 
         it('displays a link to moderation page', () => {
           const moderationLink = wrapper
-            .findAll('.ds-menu-item span')
+            .findAll('.os-menu-item span')
             .at(wrapper.vm.routes.findIndex((route) => route.path === '/moderation'))
           expect(moderationLink.exists()).toBe(true)
         })
 
         it('displays a total of 7 links', () => {
-          const allLinks = wrapper.findAll('.ds-menu-item')
+          const allLinks = wrapper.findAll('.os-menu-item')
           expect(allLinks).toHaveLength(7)
         })
       })
@@ -160,13 +160,13 @@ describe('AvatarMenu.vue', () => {
 
         it('displays a link to admin page', () => {
           const adminLink = wrapper
-            .findAll('.ds-menu-item span')
+            .findAll('.os-menu-item span')
             .at(wrapper.vm.routes.findIndex((route) => route.path === '/admin'))
           expect(adminLink.exists()).toBe(true)
         })
 
         it('displays a total of 8 links', () => {
-          const allLinks = wrapper.findAll('.ds-menu-item')
+          const allLinks = wrapper.findAll('.os-menu-item')
           expect(allLinks).toHaveLength(8)
         })
       })

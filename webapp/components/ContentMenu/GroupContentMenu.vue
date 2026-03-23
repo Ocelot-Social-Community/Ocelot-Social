@@ -137,7 +137,7 @@ export default {
     margin-right: -$space-x-small;
   }
 
-  .ds-menu-item-link:hover {
+  .os-menu-item-link:hover {
     border-left-color: $color-primary;
     background-color: $background-color-soft;
   }

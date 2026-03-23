@@ -24,106 +24,106 @@ exports[`settings.vue given badges are disabled renders 1`] = `
         class="menu-container"
       >
         <nav
-          class="ds-menu"
+          class="os-menu"
         >
           <ul
-            class="ds-menu-list"
+            class="os-menu-list"
           >
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings"
                 to="/settings"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/my-email-address"
                 to="/settings/my-email-address"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/security"
                 to="/settings/security"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/privacy"
                 to="/settings/privacy"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/my-social-media"
                 to="/settings/my-social-media"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/muted-users"
                 to="/settings/muted-users"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/blocked-users"
                 to="/settings/blocked-users"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/embeds"
                 to="/settings/embeds"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/notifications"
                 to="/settings/notifications"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/data-download"
                 to="/settings/data-download"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/delete-account"
                 to="/settings/delete-account"
               />
@@ -172,115 +172,115 @@ exports[`settings.vue given badges are enabled renders 1`] = `
         class="menu-container"
       >
         <nav
-          class="ds-menu"
+          class="os-menu"
         >
           <ul
-            class="ds-menu-list"
+            class="os-menu-list"
           >
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings"
                 to="/settings"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/my-email-address"
                 to="/settings/my-email-address"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/badges"
                 to="/settings/badges"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/security"
                 to="/settings/security"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/privacy"
                 to="/settings/privacy"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/my-social-media"
                 to="/settings/my-social-media"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/muted-users"
                 to="/settings/muted-users"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/blocked-users"
                 to="/settings/blocked-users"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/embeds"
                 to="/settings/embeds"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/notifications"
                 to="/settings/notifications"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/data-download"
                 to="/settings/data-download"
               />
             </li>
             <li
-              class="ds-menu-item ds-menu-item-level-0"
+              class="os-menu-item os-menu-item-level-0"
             >
               <a
-                class="ds-menu-item-link"
+                class="os-menu-item-link"
                 href="/settings/delete-account"
                 to="/settings/delete-account"
               />

@@ -60,20 +60,17 @@ exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
           class="group-menu-popover"
         >
           <nav
-            class="ds-menu"
+            class="os-menu"
           >
             <ul
-              class="ds-menu-list"
+              class="os-menu-list"
             >
-              
-            []
-            
               <li
-                class="ds-menu-item ds-menu-item-level-0"
+                class="os-menu-item os-menu-item-level-0"
               >
-                <span
-                  class="ds-menu-item-link"
-                  to="/"
+                <a
+                  class="os-menu-item-link"
+                  href="/"
                 >
                   <span
                     aria-hidden="true"
@@ -92,17 +89,14 @@ exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
                   
               group.contentMenu.muteGroup
             
-                </span>
+                </a>
               </li>
-              
-            []
-            
               <li
-                class="ds-menu-item ds-menu-item-level-0"
+                class="os-menu-item os-menu-item-level-0"
               >
-                <span
-                  class="ds-menu-item-link"
-                  to="/groups/edit/groupid"
+                <a
+                  class="os-menu-item-link"
+                  href="/groups/edit/groupid"
                 >
                   <span
                     aria-hidden="true"
@@ -121,17 +115,14 @@ exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
                   
               admin.settings.name
             
-                </span>
+                </a>
               </li>
-              
-            []
-            
               <li
-                class="ds-menu-item ds-menu-item-level-0"
+                class="os-menu-item os-menu-item-level-0"
               >
-                <span
-                  class="ds-menu-item-link"
-                  to="/groups/edit/groupid/invites"
+                <a
+                  class="os-menu-item-link"
+                  href="/groups/edit/groupid/invites"
                 >
                   <span
                     aria-hidden="true"
@@ -150,7 +141,7 @@ exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
                   
               group.contentMenu.inviteLinks
             
-                </span>
+                </a>
               </li>
             </ul>
           </nav>
@@ -221,20 +212,17 @@ exports[`GroupContentMenu renders as groupProfile, muted 1`] = `
           class="group-menu-popover"
         >
           <nav
-            class="ds-menu"
+            class="os-menu"
           >
             <ul
-              class="ds-menu-list"
+              class="os-menu-list"
             >
-              
-            []
-            
               <li
-                class="ds-menu-item ds-menu-item-level-0"
+                class="os-menu-item os-menu-item-level-0"
               >
-                <span
-                  class="ds-menu-item-link"
-                  to="/"
+                <a
+                  class="os-menu-item-link"
+                  href="/"
                 >
                   <span
                     aria-hidden="true"
@@ -253,7 +241,7 @@ exports[`GroupContentMenu renders as groupProfile, muted 1`] = `
                   
               group.contentMenu.unmuteGroup
             
-                </span>
+                </a>
               </li>
             </ul>
           </nav>
@@ -324,20 +312,17 @@ exports[`GroupContentMenu renders as groupProfile, not muted 1`] = `
           class="group-menu-popover"
         >
           <nav
-            class="ds-menu"
+            class="os-menu"
           >
             <ul
-              class="ds-menu-list"
+              class="os-menu-list"
             >
-              
-            []
-            
               <li
-                class="ds-menu-item ds-menu-item-level-0"
+                class="os-menu-item os-menu-item-level-0"
               >
-                <span
-                  class="ds-menu-item-link"
-                  to="/"
+                <a
+                  class="os-menu-item-link"
+                  href="/"
                 >
                   <span
                     aria-hidden="true"
@@ -356,7 +341,7 @@ exports[`GroupContentMenu renders as groupProfile, not muted 1`] = `
                   
               group.contentMenu.muteGroup
             
-                </span>
+                </a>
               </li>
             </ul>
           </nav>
@@ -427,20 +412,17 @@ exports[`GroupContentMenu renders as groupTeaser 1`] = `
           class="group-menu-popover"
         >
           <nav
-            class="ds-menu"
+            class="os-menu"
           >
             <ul
-              class="ds-menu-list"
+              class="os-menu-list"
             >
-              
-            []
-            
               <li
-                class="ds-menu-item ds-menu-item-level-0"
+                class="os-menu-item os-menu-item-level-0"
               >
-                <span
-                  class="ds-menu-item-link"
-                  to="/groups/groupid"
+                <a
+                  class="os-menu-item-link"
+                  href="/groups/groupid"
                 >
                   <span
                     aria-hidden="true"
@@ -459,7 +441,7 @@ exports[`GroupContentMenu renders as groupTeaser 1`] = `
                   
               group.contentMenu.visitGroupPage
             
-                </span>
+                </a>
               </li>
             </ul>
           </nav>

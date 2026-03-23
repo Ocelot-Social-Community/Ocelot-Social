@@ -22,7 +22,7 @@ test.describe('OsMenu keyboard accessibility', () => {
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
 
-    const links = root.locator('.ds-menu-item-link')
+    const links = root.locator('.os-menu-item-link')
     const count = await links.count()
 
     expect(count).toBeGreaterThan(0)
@@ -33,7 +33,7 @@ test.describe('OsMenu keyboard accessibility', () => {
       const focused = page.locator(':focus')
       const focusedClass = await focused.getAttribute('class')
 
-      expect(focusedClass).toContain('ds-menu-item-link')
+      expect(focusedClass).toContain('os-menu-item-link')
     }
   })
 })

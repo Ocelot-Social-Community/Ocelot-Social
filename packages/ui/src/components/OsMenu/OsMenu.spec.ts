@@ -23,28 +23,28 @@ const nestedRoutes = [
 ]
 
 describe('OsMenu', () => {
-  it('renders a nav element with ds-menu class', () => {
+  it('renders a nav element with os-menu class', () => {
     const wrapper = mount(OsMenu, { props: { routes } })
 
-    expect(wrapper.find('nav.ds-menu').exists()).toBe(true)
+    expect(wrapper.find('nav.os-menu').exists()).toBe(true)
   })
 
-  it('renders a ul.ds-menu-list', () => {
+  it('renders a ul.os-menu-list', () => {
     const wrapper = mount(OsMenu, { props: { routes } })
 
-    expect(wrapper.find('ul.ds-menu-list').exists()).toBe(true)
+    expect(wrapper.find('ul.os-menu-list').exists()).toBe(true)
   })
 
   it('renders menu items for each route', () => {
     const wrapper = mount(OsMenu, { props: { routes } })
-    const items = wrapper.findAll('.ds-menu-item')
+    const items = wrapper.findAll('.os-menu-item')
 
     expect(items).toHaveLength(3)
   })
 
   it('uses default linkTag "a"', () => {
     const wrapper = mount(OsMenu, { props: { routes } })
-    const links = wrapper.findAll('.ds-menu-item-link')
+    const links = wrapper.findAll('.os-menu-item-link')
 
     expect(links[0].element.tagName).toBe('A')
   })
@@ -53,7 +53,7 @@ describe('OsMenu', () => {
     const wrapper = mount(OsMenu, {
       props: { routes, linkTag: 'button' },
     })
-    const links = wrapper.findAll('.ds-menu-item-link')
+    const links = wrapper.findAll('.os-menu-item-link')
 
     expect(links[0].element.tagName).toBe('BUTTON')
   })
@@ -66,7 +66,7 @@ describe('OsMenu', () => {
       },
     })
 
-    expect(wrapper.find('.ds-menu-item-link').text()).toBe('Custom Name')
+    expect(wrapper.find('.os-menu-item-link').text()).toBe('Custom Name')
   })
 
   it('applies matcher for active state', () => {
@@ -76,10 +76,10 @@ describe('OsMenu', () => {
         matcher: (_url: string, route: Record<string, unknown>) => route.path === '/settings',
       },
     })
-    const items = wrapper.findAll('.ds-menu-item-link')
+    const items = wrapper.findAll('.os-menu-item-link')
     const settingsLink = items[1]
 
-    expect(settingsLink.classes()).toContain('router-link-exact-active')
+    expect(settingsLink.classes()).toContain('os-menu-item--active')
   })
 
   it('renders menuitem scoped slot', () => {
@@ -98,7 +98,7 @@ describe('OsMenu', () => {
   it('emits navigate on item click', async () => {
     const wrapper = mount(OsMenu, { props: { routes } })
 
-    await wrapper.find('.ds-menu-item-link').trigger('click')
+    await wrapper.find('.os-menu-item-link').trigger('click')
 
     expect(wrapper.emitted('navigate')).toBeTruthy()
   })
@@ -114,13 +114,13 @@ describe('OsMenuItem', () => {
     handleNavigate: () => {},
   }
 
-  it('renders an li with ds-menu-item class', () => {
+  it('renders an li with os-menu-item class', () => {
     const wrapper = mount(OsMenuItem, {
       props: { route: routes[0] },
       global: { provide: { $parentMenu: parentMenu } },
     })
 
-    expect(wrapper.find('li.ds-menu-item').exists()).toBe(true)
+    expect(wrapper.find('li.os-menu-item').exists()).toBe(true)
   })
 
   it('renders link with correct href', () => {
@@ -129,7 +129,7 @@ describe('OsMenuItem', () => {
       global: { provide: { $parentMenu: parentMenu } },
     })
 
-    expect(wrapper.find('.ds-menu-item-link').attributes('href')).toBe('/test')
+    expect(wrapper.find('.os-menu-item-link').attributes('href')).toBe('/test')
   })
 
   it('displays route name', () => {
@@ -138,7 +138,7 @@ describe('OsMenuItem', () => {
       global: { provide: { $parentMenu: parentMenu } },
     })
 
-    expect(wrapper.find('.ds-menu-item-link').text()).toBe('My Item')
+    expect(wrapper.find('.os-menu-item-link').text()).toBe('My Item')
   })
 
   it('applies level class based on parents', () => {
@@ -150,7 +150,7 @@ describe('OsMenuItem', () => {
       global: { provide: { $parentMenu: parentMenu } },
     })
 
-    expect(wrapper.find('.ds-menu-item').classes()).toContain('ds-menu-item-level-1')
+    expect(wrapper.find('.os-menu-item').classes()).toContain('os-menu-item-level-1')
   })
 
   it('emits click with route on click', async () => {
@@ -160,7 +160,7 @@ describe('OsMenuItem', () => {
       global: { provide: { $parentMenu: parentMenu } },
     })
 
-    await wrapper.find('.ds-menu-item-link').trigger('click')
+    await wrapper.find('.os-menu-item-link').trigger('click')
 
     expect(wrapper.emitted('click')).toBeTruthy()
     expect(wrapper.emitted('click')![0][1]).toEqual(route)
@@ -172,8 +172,8 @@ describe('OsMenuItem', () => {
       global: { provide: { $parentMenu: parentMenu } },
     })
 
-    expect(wrapper.find('.ds-menu-item-submenu').exists()).toBe(true)
-    expect(wrapper.findAll('.ds-menu-item-submenu .ds-menu-item')).toHaveLength(2)
+    expect(wrapper.find('.os-menu-item-submenu').exists()).toBe(true)
+    expect(wrapper.findAll('.os-menu-item-submenu .os-menu-item')).toHaveLength(2)
   })
 
   it('renders default slot content', () => {
@@ -183,7 +183,7 @@ describe('OsMenuItem', () => {
       slots: { default: '<strong>Custom</strong>' },
     })
 
-    expect(wrapper.find('.ds-menu-item-link strong').text()).toBe('Custom')
+    expect(wrapper.find('.os-menu-item-link strong').text()).toBe('Custom')
   })
 
   it('adds active class when matcher returns true', () => {
@@ -196,6 +196,6 @@ describe('OsMenuItem', () => {
       global: { provide: { $parentMenu: activeMenu } },
     })
 
-    expect(wrapper.find('.ds-menu-item-link').classes()).toContain('router-link-exact-active')
+    expect(wrapper.find('.os-menu-item-link').classes()).toContain('os-menu-item--active')
   })
 })

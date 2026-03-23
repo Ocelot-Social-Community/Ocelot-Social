@@ -146,8 +146,8 @@
 
         // Build link element
         const linkClass = cn(
-          'ds-menu-item-link',
-          matcherResult && 'router-link-exact-active',
+          'os-menu-item-link',
+          matcherResult && 'os-menu-item--active',
         )
 
         const defaultSlotContent = slots.default?.()
@@ -194,14 +194,14 @@
             }
             return h(OsMenuItemSelf, { key: child.name as string, ...childProps })
           })
-          children.push(h('ul', { class: 'ds-menu-item-submenu' }, submenuItems))
+          children.push(h('ul', { class: 'os-menu-item-submenu' }, submenuItems))
         }
 
         // Build li wrapper
         const liClass = cn(
-          'ds-menu-item',
-          `ds-menu-item-level-${String(level)}`,
-          showSubmenu && 'ds-menu-item-show-submenu',
+          'os-menu-item',
+          `os-menu-item-level-${String(level)}`,
+          showSubmenu && 'os-menu-item-show-submenu',
         )
 
         if (isVue2) {
