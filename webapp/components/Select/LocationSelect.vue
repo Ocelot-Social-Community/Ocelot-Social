@@ -3,7 +3,7 @@
     <label class="ds-input-label">
       {{ `${$t('settings.data.labelCity')}` + locationNameLabelAddOnOldName }}
     </label>
-    <ds-select
+    <ocelot-select
       id="city"
       v-model="currentValue"
       :options="cities"
@@ -30,6 +30,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import OcelotSelect from '~/components/OcelotSelect/OcelotSelect.vue'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { queryLocations } from '~/graphql/location'
 
@@ -37,7 +38,7 @@ let timeout
 
 export default {
   name: 'LocationSelect',
-  components: { OsButton, OsIcon },
+  components: { OsButton, OsIcon, OcelotSelect },
   props: {
     value: {
       type: [String, Object],
