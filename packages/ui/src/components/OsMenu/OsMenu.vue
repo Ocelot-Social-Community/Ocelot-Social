@@ -13,6 +13,8 @@
    * Use the `menuitem` scoped slot to customize how each item is rendered.
    * Pass `link-tag` to control which element renders links (e.g. `'nuxt-link'`).
    *
+   * Styles are defined in src/styles/index.css and included in the style.css build.
+   *
    * @slot default - Override entire menu content
    * @slot menuitem - Custom menu item template (scoped: { route, parents, name })
    */
@@ -136,82 +138,3 @@
     /* v8 ignore stop */
   })
 </script>
-
-<style>
-  /* OsMenu — Navigation menu styles using CSS custom properties */
-
-  .os-menu {
-    margin: 0;
-    padding: 0;
-    font-family: inherit;
-    font-size: inherit;
-    line-height: 1.3;
-    box-sizing: border-box;
-  }
-
-  ul.os-menu-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .os-menu-item {
-    list-style: none;
-  }
-
-  .os-menu-item-link {
-    display: block;
-    box-sizing: border-box;
-    color: var(--color-text-base, #4b4554);
-    font-family: inherit;
-    font-size: inherit;
-    line-height: 1.3;
-    text-decoration: none;
-    padding: 8px 16px;
-    border-left: 2px solid transparent;
-    transition: color 80ms ease-out,
-                background-color 80ms ease-out,
-                border-left-color 80ms ease-out;
-    cursor: pointer;
-  }
-
-  .os-menu-item-link:hover {
-    color: var(--color-primary, #17b53f);
-  }
-
-  /* Active state via vue-router (automatic) */
-  .os-menu-item-link.router-link-active {
-    color: var(--color-primary, #17b53f);
-  }
-
-  .os-menu-item-link.router-link-exact-active {
-    color: var(--color-primary, #17b53f);
-    background-color: var(--color-background-soft, #faf9fa);
-    border-left-color: var(--color-primary, #17b53f);
-  }
-
-  /* Active state via matcher prop (manual) */
-  .os-menu-item-link.os-menu-item--active {
-    color: var(--color-primary, #17b53f);
-    background-color: var(--color-background-soft, #faf9fa);
-    border-left-color: var(--color-primary, #17b53f);
-  }
-
-  /* Nesting levels */
-  .os-menu-item-level-1 .os-menu-item-link {
-    font-size: 0.875rem;
-    padding-left: 24px;
-  }
-
-  .os-menu-item-level-2 .os-menu-item-link {
-    font-size: 0.875rem;
-    padding-left: 32px;
-  }
-
-  /* Submenu list */
-  ul.os-menu-item-submenu {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-</style>

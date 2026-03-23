@@ -129,17 +129,7 @@ export default {
 </script>
 
 <style lang="scss">
-.group-menu-popover {
-  nav {
-    margin-top: -$space-xx-small;
-    margin-bottom: -$space-xx-small;
-    margin-left: -$space-x-small;
-    margin-right: -$space-x-small;
-  }
-
-  .os-menu-item-link:hover {
-    border-left-color: $color-primary;
-    background-color: $background-color-soft;
-  }
+.tooltip-inner.popover-inner .os-menu {
+  margin: (-$space-xx-small) (-$space-small) !important;
 }
 </style>
