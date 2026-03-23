@@ -154,19 +154,24 @@
 // Typography: Heading
 // ==========================================================
 .ds-heading {
-  margin-top: 0;
-  margin-bottom: $space-x-small;
+  margin: 2em 0 .6em;
+  padding: 0;
   font-family: $font-family-text;
   font-weight: $font-weight-bold;
-  line-height: $line-height-base;
-  color: $text-color-base;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
 }
-.ds-heading-h1 { font-size: $font-size-xxx-large; }
+.ds-heading:first-child { margin-top: 0; }
+.ds-heading:last-child { margin-bottom: 0; }
+.ds-heading-h1 { font-size: $font-size-xx-large; }
 .ds-heading-h2 { font-size: $font-size-xx-large; }
 .ds-heading-h3 { font-size: $font-size-x-large; }
 .ds-heading-h4 { font-size: $font-size-large; }
-.ds-heading-soft { color: $text-color-soft; }
-.ds-heading-no-margin { margin-bottom: 0; }
+@media #{$media-query-large} {
+  .ds-heading-h1 { font-size: $font-size-xxx-large; }
+}
+.ds-heading-soft { color: $text-color-softer; }
+.ds-heading-no-margin { margin: 0; }
 .ds-heading-align-center { text-align: center; }
 
 // ==========================================================
