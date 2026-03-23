@@ -24,7 +24,6 @@
         @focus="handleFocus"
         @blur="handleBlur"
         :rows="type === 'textarea' ? rows : null"
-        v-html="type === 'textarea' ? innerValue : null"
       />
       <div v-if="iconRight" class="ds-input-icon-right">
         <ds-icon :name="iconRight" />
