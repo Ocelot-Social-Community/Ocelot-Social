@@ -1,5 +1,74 @@
-* {
+// Fonts (previously loaded via styleguide system.css)
+@font-face {
+  font-family: LatoWeb;
+  src: url('/fonts/Lato-Regular.1f440a46.woff2') format('woff2'),
+       url('/fonts/Lato-Regular.ffb25090.woff') format('woff');
+  font-style: normal;
+  font-weight: 400;
+  text-rendering: optimizeLegibility;
+}
+@font-face {
+  font-family: LatoWeb;
+  src: url('/fonts/Lato-Italic.a6774e2c.woff2') format('woff2'),
+       url('/fonts/Lato-Italic.ff8877c4.woff') format('woff');
+  font-style: italic;
+  font-weight: 400;
+  text-rendering: optimizeLegibility;
+}
+@font-face {
+  font-family: LatoWeb;
+  src: url('/fonts/Lato-Bold.1e239003.woff2') format('woff2'),
+       url('/fonts/Lato-Bold.35be9fc3.woff') format('woff');
+  font-style: normal;
+  font-weight: 600;
+  text-rendering: optimizeLegibility;
+}
+@font-face {
+  font-family: LatoWeb;
+  src: url('/fonts/Lato-BoldItalic.4ef02877.woff2') format('woff2'),
+       url('/fonts/Lato-BoldItalic.5171ee7d.woff') format('woff');
+  font-style: italic;
+  font-weight: 600;
+  text-rendering: optimizeLegibility;
+}
+
+// Global resets
+*,
+::after,
+::before {
   box-sizing: border-box;
+}
+
+html {
+  font-family: sans-serif;
+  font-size: 15px;
+  line-height: 1.15;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  -ms-overflow-style: scrollbar;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+body {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.3;
+  font-family: $font-family-text;
+  font-variant-ligatures: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: $text-color-base;
+  background-color: $background-color-disabled;
+}
+
+a {
+  text-decoration: none !important;
+  color: $color-primary;
+}
+
+textarea {
+  overflow: auto;
+  resize: vertical;
 }
 
 button {

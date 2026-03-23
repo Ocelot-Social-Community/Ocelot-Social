@@ -1,75 +1,8 @@
 // ==========================================================
 // DS-COMPAT: Temporäre Utility-Klassen für ds-* Migration
 // TODO(tailwind): Durch Tailwind-Utilities ersetzen
-// Replaces styleguide system.css — global styles + ds-* classes
+// Global resets + fonts are in resets.scss (loaded first)
 // ==========================================================
-
-// Fonts (previously loaded via styleguide system.css)
-@font-face {
-  font-family: LatoWeb;
-  src: url('/fonts/Lato-Regular.1f440a46.woff2') format('woff2'),
-       url('/fonts/Lato-Regular.ffb25090.woff') format('woff');
-  font-style: normal;
-  font-weight: 400;
-  text-rendering: optimizeLegibility;
-}
-@font-face {
-  font-family: LatoWeb;
-  src: url('/fonts/Lato-Italic.a6774e2c.woff2') format('woff2'),
-       url('/fonts/Lato-Italic.ff8877c4.woff') format('woff');
-  font-style: italic;
-  font-weight: 400;
-  text-rendering: optimizeLegibility;
-}
-@font-face {
-  font-family: LatoWeb;
-  src: url('/fonts/Lato-Bold.1e239003.woff2') format('woff2'),
-       url('/fonts/Lato-Bold.35be9fc3.woff') format('woff');
-  font-style: normal;
-  font-weight: 600;
-  text-rendering: optimizeLegibility;
-}
-@font-face {
-  font-family: LatoWeb;
-  src: url('/fonts/Lato-BoldItalic.4ef02877.woff2') format('woff2'),
-       url('/fonts/Lato-BoldItalic.5171ee7d.woff') format('woff');
-  font-style: italic;
-  font-weight: 600;
-  text-rendering: optimizeLegibility;
-}
-
-// Global resets (previously from styleguide system.css)
-html {
-  font-family: sans-serif;
-  font-size: 15px;
-  line-height: 1.15;
-  -webkit-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
-  -ms-overflow-style: scrollbar;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-}
-
-body {
-  margin: 0;
-  font-size: 15px;
-  line-height: $line-height-base;
-  font-family: $font-family-text;
-  font-variant-ligatures: none;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: $text-color-base;
-  background-color: $background-color-disabled;
-}
-
-a {
-  text-decoration: none !important;
-  color: $color-primary;
-}
-
-textarea {
-  overflow: auto;
-  resize: vertical;
-}
 
 // ds-space Ersatz — Margin-Bottom
 .ds-mb-xxx-small { margin-bottom: $space-xxx-small; }
@@ -280,15 +213,7 @@ textarea {
   .ds-logo-desktop { display: block; }
 }
 
-// ==========================================================
-// Footer
-// ==========================================================
-.ds-footer {
-  padding: $space-base 0;
-  text-align: center;
-  color: $text-color-soft;
-  font-size: $font-size-small;
-}
+// Footer — styles are in PageFooter.vue (scoped), no global .ds-footer needed
 
 // ==========================================================
 // Form / Input (used by OcelotInput)
