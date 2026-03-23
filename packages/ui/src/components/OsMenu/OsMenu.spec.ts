@@ -69,6 +69,22 @@ describe('osMenu', () => {
     expect(wrapper.find('.os-menu-item-link').text()).toBe('Custom Name')
   })
 
+  it('default urlParser falls back to "/" when route has no path', () => {
+    const wrapper = mount(OsMenu, {
+      props: { routes: [{ name: 'No Path' }] },
+    })
+
+    expect(wrapper.find('.os-menu-item-link').attributes('href')).toBe('/')
+  })
+
+  it('default nameParser falls back to "" when route has no name', () => {
+    const wrapper = mount(OsMenu, {
+      props: { routes: [{ path: '/test' }] },
+    })
+
+    expect(wrapper.find('.os-menu-item-link').text()).toBe('')
+  })
+
   it('applies matcher for active state', () => {
     const wrapper = mount(OsMenu, {
       props: {
