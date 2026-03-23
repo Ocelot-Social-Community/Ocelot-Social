@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { computed, defineComponent, getCurrentInstance, h, isVue2 } from 'vue-demi'
+  import { defineComponent, getCurrentInstance, h, isVue2 } from 'vue-demi'
 
   import { cn } from '#src/utils'
 
@@ -39,6 +39,7 @@
     data() {
       return {
         showSubmenu: false,
+        _clickOutsideHandler: null as ((e: Event) => void) | null,
       }
     },
     computed: {
@@ -107,11 +108,15 @@
       document.addEventListener('click', this._clickOutsideHandler, true)
     },
     beforeDestroy() {
-      document.removeEventListener('click', this._clickOutsideHandler, true)
+      if (this._clickOutsideHandler) {
+        document.removeEventListener('click', this._clickOutsideHandler, true)
+      }
     },
-    /* v8 ignore next 3 -- Vue 3 alias */
+    /* v8 ignore next 5 -- Vue 3 alias */
     beforeUnmount() {
-      document.removeEventListener('click', this._clickOutsideHandler, true)
+      if (this._clickOutsideHandler) {
+        document.removeEventListener('click', this._clickOutsideHandler, true)
+      }
     },
     methods: {
       handleClick(event: Event) {
@@ -123,7 +128,7 @@
       },
     },
     /* v8 ignore start -- render function tested via unit + visual tests */
-    setup(props, { slots, attrs, emit }) {
+    setup(props, { slots, attrs }) {
       const instance = isVue2 ? getCurrentInstance() : null
 
       // We need access to component instance for inject, so use render in setup

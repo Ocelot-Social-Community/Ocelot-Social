@@ -78,20 +78,17 @@
 
       return () => {
         // Build menu items from routes
-        let menuItems: ReturnType<typeof h>[] = []
+        let menuItems: unknown[] = []
 
         if (slots.default) {
-          // Use default slot if provided (full override)
           const defaultContent = slots.default()
           menuItems = Array.isArray(defaultContent) ? defaultContent : [defaultContent]
         } else if (props.routes) {
           menuItems = props.routes.map((route, index) => {
-            // If menuitem scoped slot is provided, use it
             if (slots.menuitem) {
               const name = props.nameParser(route, [])
               return slots.menuitem({ route, parents: [], name })
             }
-            // Default: render OsMenuItem
             const key = (route.path as string) || index
 
             if (isVue2) {
@@ -103,7 +100,7 @@
 
         const listChildren = menuItems
           .flat(Infinity)
-          .filter((item) => item != null && item !== '' && !(Array.isArray(item) && item.length === 0))
+          .filter((item): item is ReturnType<typeof h> => item != null)
         const list = h('ul', { class: 'os-menu-list' }, listChildren)
 
         if (isVue2) {
@@ -141,9 +138,15 @@
 </script>
 
 <style>
+  /* OsMenu — Navigation menu styles using CSS custom properties */
+
   .os-menu {
     margin: 0;
     padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: 1.3;
+    box-sizing: border-box;
   }
 
   ul.os-menu-list {
@@ -152,13 +155,23 @@
     list-style: none;
   }
 
+  .os-menu-item {
+    list-style: none;
+  }
+
   .os-menu-item-link {
     display: block;
+    box-sizing: border-box;
     color: var(--color-text-base, #4b4554);
+    font-family: inherit;
+    font-size: inherit;
+    line-height: 1.3;
     text-decoration: none;
     padding: 8px 16px;
     border-left: 2px solid transparent;
-    transition: color 80ms ease-out, background-color 80ms ease-out, border-color 80ms ease-out;
+    transition: color 80ms ease-out,
+                background-color 80ms ease-out,
+                border-left-color 80ms ease-out;
     cursor: pointer;
   }
 
@@ -166,16 +179,25 @@
     color: var(--color-primary, #17b53f);
   }
 
-  .os-menu-item-link.os-menu-item--active {
+  /* Active state via vue-router (automatic) */
+  .os-menu-item-link.router-link-active {
     color: var(--color-primary, #17b53f);
   }
 
+  .os-menu-item-link.router-link-exact-active {
+    color: var(--color-primary, #17b53f);
+    background-color: var(--color-background-soft, #faf9fa);
+    border-left-color: var(--color-primary, #17b53f);
+  }
+
+  /* Active state via matcher prop (manual) */
   .os-menu-item-link.os-menu-item--active {
     color: var(--color-primary, #17b53f);
     background-color: var(--color-background-soft, #faf9fa);
     border-left-color: var(--color-primary, #17b53f);
   }
 
+  /* Nesting levels */
   .os-menu-item-level-1 .os-menu-item-link {
     font-size: 0.875rem;
     padding-left: 24px;
@@ -186,6 +208,7 @@
     padding-left: 32px;
   }
 
+  /* Submenu list */
   ul.os-menu-item-submenu {
     margin: 0;
     padding: 0;
