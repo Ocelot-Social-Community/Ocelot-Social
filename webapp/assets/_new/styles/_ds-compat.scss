@@ -104,7 +104,7 @@
 .ds-table-wrap { width: 100%; overflow: auto; }
 .ds-table { width: 100%; border-collapse: collapse; }
 .ds-table-col {
-  vertical-align: middle;
+  vertical-align: top;
   padding: $space-small $space-xx-small;
   &:last-child { padding-right: 0; }
 }
