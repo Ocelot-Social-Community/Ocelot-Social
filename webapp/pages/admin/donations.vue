@@ -8,7 +8,7 @@
           {{ $t('admin.donations.showDonationsCheckboxLabel') }}
         </label>
       </p>
-      <ds-input
+      <ocelot-input
         id="donations-goal"
         class="donations-data"
         model="goal"
@@ -18,7 +18,7 @@
         :disabled="!showDonations"
         data-test="donations-goal"
       />
-      <ds-input
+      <ocelot-input
         id="donations-progress"
         class="donations-data"
         model="progress"
@@ -39,10 +39,11 @@
 import { OsButton, OsCard } from '@ocelot-social/ui'
 import { DonationsQuery, UpdateDonations } from '~/graphql/Donations'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   mixins: [formValidation],
-  components: { OsButton, OsCard },
+  components: { OsButton, OsCard, OcelotInput },
   data() {
     return {
       formData: {

@@ -8,7 +8,13 @@
   <form v-else @submit.prevent="onSubmit" novalidate>
     <os-card>
       <h2 class="title">{{ $t('settings.email.name') }}</h2>
-      <ds-input id="email" model="email" icon="envelope" :label="$t('settings.email.labelEmail')" />
+      <ocelot-input
+        id="email"
+        model="email"
+        type="email"
+        icon="envelope"
+        :label="$t('settings.email.labelEmail')"
+      />
       <div class="ds-mb-large backendErrors" v-if="backendErrors">
         <p class="ds-text ds-text-center ds-text-bold ds-text-danger">
           {{ backendErrors.message }}
@@ -36,6 +42,7 @@ import { AddEmailAddressMutation } from '~/graphql/EmailAddress.js'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import scrollToContent from '../scroll-to-content.js'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   mixins: [scrollToContent, formValidation],
@@ -44,6 +51,7 @@ export default {
     OsCard,
     OsIcon,
     SweetalertIcon,
+    OcelotInput,
   },
   created() {
     this.icons = iconRegistry

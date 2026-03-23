@@ -5,7 +5,7 @@
       <form @submit.prevent="onSubmit" novalidate>
         <div class="ds-flex ds-flex-gap-small">
           <div style="flex: 0 0 90%; width: 90%">
-            <ds-input
+            <ocelot-input
               model="query"
               :placeholder="$t('admin.users.form.placeholder')"
               icon="search"
@@ -163,6 +163,7 @@ import PaginationButtons from '~/components/_new/generic/PaginationButtons/Pagin
 import { adminUserQuery } from '~/graphql/User'
 import { FetchAllRoles, updateUserRole } from '~/graphql/admin/Roles'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   mixins: [formValidation],
@@ -171,6 +172,7 @@ export default {
     OsCard,
     OsIcon,
     PaginationButtons,
+    OcelotInput,
   },
   created() {
     this.icons = iconRegistry

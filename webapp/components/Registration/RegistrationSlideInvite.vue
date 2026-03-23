@@ -1,6 +1,6 @@
 <template>
   <form class="enter-invite" @submit.prevent novalidate>
-    <ds-input
+    <ocelot-input
       :placeholder="formSchema.inviteCode.placeholder"
       :minlength="formSchema.inviteCode.minLength"
       :maxlength="formSchema.inviteCode.maxLength"
@@ -42,6 +42,7 @@ import registrationConstants from '~/constants/registrationBranded.js'
 import { validateInviteCode } from '~/graphql/InviteCode'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   name: 'RegistrationSlideInvite',
@@ -51,6 +52,7 @@ export default {
   },
   components: {
     ProfileAvatar,
+    OcelotInput,
   },
   data() {
     return {

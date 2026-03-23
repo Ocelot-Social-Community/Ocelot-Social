@@ -12,7 +12,7 @@
       :select-item="selectItem"
     />
     <div v-show="isLinkInputActive" ref="linkInput">
-      <ds-input
+      <ocelot-input
         id="linkInputId"
         v-model="linkUrl"
         class="editor-menu-link-input"
@@ -40,6 +40,7 @@ import Mention from './nodes/Mention'
 import MenuBar from './MenuBar'
 import ContextMenu from './ContextMenu'
 import SuggestionList from './SuggestionList'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 let throttleInputEvent
 
@@ -49,6 +50,7 @@ export default {
     EditorContent,
     MenuBar,
     SuggestionList,
+    OcelotInput,
   },
   props: {
     users: { type: Array, default: () => null }, // If 'null', than the Mention extention is not assigned.

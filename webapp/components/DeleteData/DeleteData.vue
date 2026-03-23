@@ -7,7 +7,7 @@
     <label>
       {{ $t('settings.deleteUserAccount.pleaseConfirm', { confirm: currentUser.name }) }}
     </label>
-    <ds-input v-model="enableDeletionValue" />
+    <ocelot-input v-model="enableDeletionValue" />
     <p v-show="enableDeletionValue" class="notice">
       {{ $t('settings.deleteUserAccount.accountDescription') }}
     </p>
@@ -64,10 +64,11 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import { mapActions, mapGetters } from 'vuex'
 import gql from 'graphql-tag'
 import { currentUserCountQuery } from '~/graphql/User'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   name: 'DeleteData',
-  components: { OsButton, OsCard, OsIcon },
+  components: { OsButton, OsCard, OsIcon, OcelotInput },
   data() {
     return {
       deleteContributions: false,

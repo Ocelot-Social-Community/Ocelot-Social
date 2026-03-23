@@ -2,7 +2,7 @@
   <div class="create-invitation">
     <div>{{ $t('invite-codes.generate-code-explanation') }}</div>
     <form @submit.prevent="generateInviteCode" class="generate-invite-code-form">
-      <ds-input
+      <ocelot-input
         name="comment"
         :placeholder="$t('invite-codes.comment-placeholder')"
         v-model="comment"
@@ -28,10 +28,11 @@
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   name: 'CreateInvitation',
-  components: { OsButton, OsIcon },
+  components: { OsButton, OsIcon, OcelotInput },
   props: {
     disabled: {
       type: Boolean,

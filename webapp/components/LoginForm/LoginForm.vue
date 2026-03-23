@@ -13,7 +13,7 @@
       <section class="content-column">
         <h2 class="title">{{ $t('login.login') }}</h2>
         <form :disabled="pending" @submit.prevent="onSubmit">
-          <ds-input
+          <ocelot-input
             v-model="form.email"
             :disabled="pending"
             :placeholder="$t('login.email')"
@@ -22,7 +22,7 @@
             icon="envelope"
           />
           <div class="password-wrapper">
-            <ds-input
+            <ocelot-input
               v-model="form.password"
               :disabled="pending"
               :placeholder="$t('login.password')"
@@ -71,6 +71,7 @@ import ShowPassword from '../ShowPassword/ShowPassword.vue'
 import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   components: {
@@ -81,6 +82,7 @@ export default {
     OsIcon,
     PageParamsLink,
     ShowPassword,
+    OcelotInput,
   },
   data() {
     return {

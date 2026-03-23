@@ -7,7 +7,6 @@ import Filters from '~/plugins/vue-filters'
 import InfiniteLoading from '~/plugins/vue-infinite-loading'
 import Directives from '~/plugins/vue-directives'
 import VueObserveVisibility from '~/plugins/vue-observe-visibility'
-
 require('intersection-observer')
 
 // Fail tests on Vue warnings

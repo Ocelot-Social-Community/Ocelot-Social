@@ -81,10 +81,10 @@ Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
 Phase 3: ██████████ 100% (24/24 Aufgaben) ✅ - Webapp-Integration komplett
-Phase 4: ███████░░░  70% (19/27 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅, OsNumber ✅, OsModal ✅, ds-radio→HTML ✅ | Tier B ✅, Tier 2-3 ausstehend
+Phase 4: ████████░░  74% (20/27 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅, OsNumber ✅, OsModal ✅, ds-radio→HTML ✅ | Tier B ✅, OcelotInput ✅, Tier 2-3 Rest ausstehend
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████████░░  84% (81/96 Aufgaben)
+Gesamt:  ████████░░  85% (82/96 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -289,7 +289,7 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 - [x] 0 Tier-A `ds-*` Komponenten-Tags verbleibend
 
 **Verbleibende ds-* Komponenten (6 Typen):**
-- Tier C (→ UI-Library): ds-input (23), ds-modal (7→✅ OsModal), ds-menu/ds-menu-item (17), ds-select (3)
+- Tier C (→ UI-Library): ds-modal (7→✅ OsModal), ds-input (23→✅ OcelotInput), ds-menu/ds-menu-item (17), ds-select (3)
 - ✅ ds-form (18 Dateien) → formValidation Mixin (async-validator), vuelidate entfernt
 
 **Zuvor abgeschlossen (Session 26 - CodeRabbit Review Fixes):**
@@ -415,9 +415,9 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 - [x] OsNumber Komponente + ds-number/CountTo → OsNumber Webapp-Migration ✅
 - [ ] Tier B (Rest): ds-radio → Plain HTML
 - [x] OsModal Komponente + DsModal/ConfirmModal/ReportModal → OsModal Webapp-Integration ✅
-- [ ] Weitere Tier 2 Komponenten (OsDropdown, OsAvatar, OsInput)
+- [ ] Weitere Tier 2 Komponenten (OsDropdown, OsAvatar)
 - [x] ds-form → formValidation Mixin (async-validator), 18 Dateien migriert, vuelidate entfernt ✅
-- [ ] ds-input → OsInput (23 Dateien, ds-form Kopplung aufgelöst)
+- [x] ds-input → OcelotInput (23 Dateien, Webapp-Komponente mit lokalen Imports, formValidation-kompatibel) ✅
 - [ ] ds-menu / ds-menu-item → OsMenu / OsMenuItem
 - [ ] ds-select → OsSelect
 - [ ] Browser-Fehler untersuchen: `TypeError: Cannot read properties of undefined (reading 'heartO')` (ocelotIcons undefined im Browser trotz korrekter Webpack-Aliase)
@@ -694,7 +694,7 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 - [x] OsModal (Basis: DsModal → h() Render-Function, Vue 2/3 Compat, Focus-Trap, Scroll-Lock, A11y) ✅
 - [ ] OsDropdown (Basis: Webapp Dropdown)
 - [ ] OsAvatar (vereint DsAvatar + ProfileAvatar)
-- [ ] OsInput (Basis: DsInput, 23 Dateien — ds-form Kopplung aufgelöst via formValidation Mixin)
+- [x] ds-input → OcelotInput (23 Dateien, Webapp-Komponente mit lokalen Imports, formValidation-kompatibel) ✅
 
 **Tier 3: Navigation (UI-Library)**
 - [ ] OsMenu (Basis: DsMenu, 11 Dateien)
@@ -1852,6 +1852,7 @@ Bei der Migration werden:
 | 2026-03-14 | **ds-form entkoppelt** | Neues `formValidation` Mixin (async-validator): provide/subscribe Pattern, formData/formSchema/formErrors, handleInput/handleInputValid Callbacks; vuelidate komplett entfernt |
 | 2026-03-14 | **18 Formulare migriert** | CommentForm, ContributionForm, EnterNonce, GroupForm, Password/Change, PasswordReset (2), Registration (5), Signup, MySomethingList, donations, admin/users, settings (3) |
 | 2026-03-20 | **formValidation Fix** | `handleInput()` vor `$validateForm()` aufrufen (Reihenfolge-Bug: handleInput überschrieb handleInputValid bei synchronem async-validator Callback) |
+| 2026-03-23 | **ds-input → OcelotInput** | Neue Webapp-Komponente `OcelotInput.vue`: vereint DsInput + FormItem + InputLabel + InputError in einer Datei. 23 Vue-Dateien migriert mit lokalen Imports (tree-shakeable). formValidation Mixin voll kompatibel. dot-prop Abhängigkeit durch inline `getNestedValue()` ersetzt. 28 Test-Suites, 210 Tests ✅, 7 Snapshots aktualisiert. |
 
 ---
 
@@ -1872,8 +1873,9 @@ Bei der Migration werden:
 | ✅ UI-Library | OsButton, OsIcon, OsSpinner, OsCard, OsBadge, OsNumber, OsModal (7) |
 | ✅ → Plain HTML | Section, Placeholder, List, ListItem, Container, Heading, Text, Space, Flex, FlexItem, Grid, GridItem, Table, Radio (14) — Tier A/B |
 | ✅ → UI-Library | Chip, Tag → OsBadge (2), Number → OsNumber (1) — Tier B |
-| ✅ ds-form entkoppelt | Form-Validierung → formValidation Mixin (async-validator), vuelidate entfernt, ds-input/ds-select bleiben als UI-Komponenten |
-| ⬜ → UI-Library | Input, Menu, MenuItem, Select (4) — Tier 2-3 |
+| ✅ ds-form entkoppelt | Form-Validierung → formValidation Mixin (async-validator), vuelidate entfernt |
+| ✅ ds-input → OcelotInput | Webapp-Komponente (23 Dateien), lokale Imports, FormItem/InputLabel/InputError vereint |
+| ⬜ → UI-Library | Menu, MenuItem, Select (3) — Tier 2-3 |
 | ⬜ Nicht genutzt | Code, CopyField, FormItem, InputError, InputLabel, Page, PageTitle, Logo, Avatar, TableCol, TableHeadCol (11) |
 
 ---

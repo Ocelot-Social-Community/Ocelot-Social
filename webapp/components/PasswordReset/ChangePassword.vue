@@ -6,14 +6,14 @@
       class="change-password"
       novalidate
     >
-      <ds-input
+      <ocelot-input
         id="password"
         model="password"
         type="password"
         autocomplete="off"
         :label="$t('settings.security.change-password.label-new-password')"
       />
-      <ds-input
+      <ocelot-input
         id="passwordConfirmation"
         model="passwordConfirmation"
         type="password"
@@ -73,6 +73,7 @@ import gql from 'graphql-tag'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   mixins: [formValidation],
@@ -81,6 +82,7 @@ export default {
     OsIcon,
     SweetalertIcon,
     PasswordStrength,
+    OcelotInput,
   },
   props: {
     email: { type: String, required: true },

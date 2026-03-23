@@ -2,14 +2,14 @@
   <form @submit.prevent="onSubmit" novalidate>
     <os-card>
       <h2 class="title">{{ $t('settings.email.name') }}</h2>
-      <ds-input
+      <ocelot-input
         id="email"
         model="email"
         icon="envelope"
         disabled
         :label="$t('settings.email.labelNewEmail')"
       />
-      <ds-input
+      <ocelot-input
         id="nonce"
         model="nonce"
         icon="question-circle"
@@ -27,10 +27,11 @@
 import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   mixins: [formValidation],
-  components: { OsButton, OsCard, OsIcon },
+  components: { OsButton, OsCard, OsIcon, OcelotInput },
   data() {
     return {
       formData: {
