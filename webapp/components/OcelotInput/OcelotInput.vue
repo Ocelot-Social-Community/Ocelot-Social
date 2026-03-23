@@ -4,12 +4,12 @@
       {{ label }}
     </label>
     <div class="ds-input-wrap">
-      <div v-if="icon" class="ds-input-icon">
+      <div v-if="resolvedIcon" class="ds-input-icon">
         <os-icon :icon="resolvedIcon" />
       </div>
       <component
         class="ds-input"
-        :class="[icon && 'ds-input-has-icon', iconRight && 'ds-input-has-icon-right']"
+        :class="[resolvedIcon && 'ds-input-has-icon', resolvedIconRight && 'ds-input-has-icon-right']"
         :id="id"
         :name="name ? name : model"
         :type="type"
@@ -25,7 +25,7 @@
         @blur="handleBlur"
         :rows="type === 'textarea' ? rows : null"
       />
-      <div v-if="iconRight" class="ds-input-icon-right">
+      <div v-if="resolvedIconRight" class="ds-input-icon-right">
         <os-icon :icon="resolvedIconRight" />
       </div>
     </div>
