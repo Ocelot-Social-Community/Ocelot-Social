@@ -12,7 +12,7 @@
     <div class="ds-my-large"></div>
     <div class="ds-flex ds-flex-gap-small group-edit-layout">
       <div class="group-edit-layout__sidebar">
-        <ds-menu :routes="routes" :is-exact="() => true" />
+        <os-menu :routes="routes" :is-exact="() => true" link-tag="router-link" />
       </div>
       <div class="group-edit-layout__main">
         <transition name="slide-up" appear>
@@ -24,10 +24,14 @@
 </template>
 
 <script>
+import { OsMenu } from '@ocelot-social/ui'
 import { groupQuery } from '~/graphql/groups.js'
 import { mapGetters } from 'vuex'
 
 export default {
+  components: {
+    OsMenu,
+  },
   data() {
     return {
       group: {},

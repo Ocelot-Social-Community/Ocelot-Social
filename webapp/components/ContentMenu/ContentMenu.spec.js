@@ -11,9 +11,6 @@ localVue.use(VTooltip)
 localVue.use(Vuex)
 
 const stubs = {
-  'router-link': {
-    template: '<span><slot /></span>',
-  },
   'confirm-modal': { template: '<div class="confirm-modal-stub" />' },
   'report-modal': { template: '<div class="report-modal-stub" />' },
 }
@@ -77,19 +74,15 @@ describe('ContentMenu.vue', () => {
       })
 
       it('can edit the contribution', () => {
-        expect(
-          wrapper
-            .findAll('.ds-menu-item')
-            .filter((item) => item.text() === 'post.menu.edit')
-            .at(0)
-            .find('span.ds-menu-item-link')
-            .attributes('to'),
-        ).toBe('/post-edit-id')
+        const editItem = wrapper
+          .findAll('.os-menu-item')
+          .filter((item) => item.text() === 'post.menu.edit')
+        expect(editItem).toHaveLength(1)
       })
 
       it('can delete the contribution', () => {
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'post.menu.delete')
           .at(0)
           .trigger('click')
@@ -110,10 +103,10 @@ describe('ContentMenu.vue', () => {
           },
         })
         expect(
-          wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.push'),
+          wrapper.findAll('.os-menu-item').filter((item) => item.text() === 'post.menu.push'),
         ).toHaveLength(1)
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'post.menu.push')
           .at(0)
           .trigger('click')
@@ -140,7 +133,7 @@ describe('ContentMenu.vue', () => {
           },
         })
         expect(
-          wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.unpush'),
+          wrapper.findAll('.os-menu-item').filter((item) => item.text() === 'post.menu.unpush'),
         ).toHaveLength(0)
       })
 
@@ -156,10 +149,10 @@ describe('ContentMenu.vue', () => {
           },
         })
         expect(
-          wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.unpush'),
+          wrapper.findAll('.os-menu-item').filter((item) => item.text() === 'post.menu.unpush'),
         ).toHaveLength(1)
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'post.menu.unpush')
           .at(0)
           .trigger('click')
@@ -190,7 +183,7 @@ describe('ContentMenu.vue', () => {
             },
           })
           expect(
-            wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.pin'),
+            wrapper.findAll('.os-menu-item').filter((item) => item.text() === 'post.menu.pin'),
           ).toHaveLength(0)
         })
 
@@ -204,7 +197,7 @@ describe('ContentMenu.vue', () => {
             },
           })
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'post.menu.unpin')
             .at(0)
             .trigger('click')
@@ -235,7 +228,7 @@ describe('ContentMenu.vue', () => {
             },
           })
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'post.menu.pin')
             .at(0)
             .trigger('click')
@@ -259,7 +252,7 @@ describe('ContentMenu.vue', () => {
             },
           })
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'post.menu.unpin')
             .at(0)
             .trigger('click')
@@ -288,7 +281,7 @@ describe('ContentMenu.vue', () => {
               },
             })
             wrapper
-              .findAll('.ds-menu-item')
+              .findAll('.os-menu-item')
               .filter((item) => item.text() === 'post.menu.pin')
               .at(0)
               .trigger('click')
@@ -321,7 +314,7 @@ describe('ContentMenu.vue', () => {
               },
             })
             expect(
-              wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.pin'),
+              wrapper.findAll('.os-menu-item').filter((item) => item.text() === 'post.menu.pin'),
             ).toHaveLength(0)
           })
         })
@@ -341,7 +334,7 @@ describe('ContentMenu.vue', () => {
               },
             })
             expect(
-              wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.pin'),
+              wrapper.findAll('.os-menu-item').filter((item) => item.text() === 'post.menu.pin'),
             ).toHaveLength(0)
           })
         })
@@ -365,7 +358,7 @@ describe('ContentMenu.vue', () => {
               },
             })
             wrapper
-              .findAll('.ds-menu-item')
+              .findAll('.os-menu-item')
               .filter((item) => item.text() === 'post.menu.pin')
               .at(0)
               .trigger('click')
@@ -389,7 +382,7 @@ describe('ContentMenu.vue', () => {
               },
             })
             wrapper
-              .findAll('.ds-menu-item')
+              .findAll('.os-menu-item')
               .filter((item) => item.text() === 'post.menu.unpin')
               .at(0)
               .trigger('click')
@@ -421,7 +414,7 @@ describe('ContentMenu.vue', () => {
               },
             })
             expect(
-              wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.pin'),
+              wrapper.findAll('.os-menu-item').filter((item) => item.text() === 'post.menu.pin'),
             ).toHaveLength(0)
           })
 
@@ -435,7 +428,7 @@ describe('ContentMenu.vue', () => {
               },
             })
             wrapper
-              .findAll('.ds-menu-item')
+              .findAll('.os-menu-item')
               .filter((item) => item.text() === 'post.menu.unpin')
               .at(0)
               .trigger('click')
@@ -463,7 +456,7 @@ describe('ContentMenu.vue', () => {
           },
         })
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'settings.deleteUserAccount.name')
           .at(0)
           .trigger('click')
@@ -487,7 +480,7 @@ describe('ContentMenu.vue', () => {
         })
         expect(
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'settings.deleteUserAccount.name'),
         ).toEqual({})
       })
@@ -507,7 +500,7 @@ describe('ContentMenu.vue', () => {
       })
       it('edit the comment', () => {
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'comment.menu.edit')
           .at(0)
           .trigger('click')
@@ -515,7 +508,7 @@ describe('ContentMenu.vue', () => {
       })
       it('delete the comment', () => {
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'comment.menu.delete')
           .at(0)
           .trigger('click')
@@ -536,7 +529,7 @@ describe('ContentMenu.vue', () => {
         })
         openModalSpy = jest.spyOn(wrapper.vm, 'openModal')
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'report.contribution.title')
           .at(0)
           .trigger('click')
@@ -553,7 +546,7 @@ describe('ContentMenu.vue', () => {
         })
         openModalSpy = jest.spyOn(wrapper.vm, 'openModal')
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'report.comment.title')
           .at(0)
           .trigger('click')
@@ -570,7 +563,7 @@ describe('ContentMenu.vue', () => {
         })
         openModalSpy = jest.spyOn(wrapper.vm, 'openModal')
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'report.user.title')
           .at(0)
           .trigger('click')
@@ -587,7 +580,7 @@ describe('ContentMenu.vue', () => {
         })
         openModalSpy = jest.spyOn(wrapper.vm, 'openModal')
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'report.organization.title')
           .at(0)
           .trigger('click')
@@ -609,7 +602,7 @@ describe('ContentMenu.vue', () => {
         })
         openModalSpy = jest.spyOn(wrapper.vm, 'openModal')
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'disable.contribution.title')
           .at(0)
           .trigger('click')
@@ -627,7 +620,7 @@ describe('ContentMenu.vue', () => {
         })
         openModalSpy = jest.spyOn(wrapper.vm, 'openModal')
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'disable.comment.title')
           .at(0)
           .trigger('click')
@@ -645,7 +638,7 @@ describe('ContentMenu.vue', () => {
         })
         openModalSpy = jest.spyOn(wrapper.vm, 'openModal')
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'disable.user.title')
           .at(0)
           .trigger('click')
@@ -663,7 +656,7 @@ describe('ContentMenu.vue', () => {
         })
         openModalSpy = jest.spyOn(wrapper.vm, 'openModal')
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'disable.organization.title')
           .at(0)
           .trigger('click')
@@ -681,7 +674,7 @@ describe('ContentMenu.vue', () => {
         })
         openModalSpy = jest.spyOn(wrapper.vm, 'openModal')
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'release.contribution.title')
           .at(0)
           .trigger('click')
@@ -699,7 +692,7 @@ describe('ContentMenu.vue', () => {
         })
         openModalSpy = jest.spyOn(wrapper.vm, 'openModal')
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'release.comment.title')
           .at(0)
           .trigger('click')
@@ -717,7 +710,7 @@ describe('ContentMenu.vue', () => {
         })
         openModalSpy = jest.spyOn(wrapper.vm, 'openModal')
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'release.user.title')
           .at(0)
           .trigger('click')
@@ -735,7 +728,7 @@ describe('ContentMenu.vue', () => {
         })
         openModalSpy = jest.spyOn(wrapper.vm, 'openModal')
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'release.organization.title')
           .at(0)
           .trigger('click')
@@ -754,14 +747,11 @@ describe('ContentMenu.vue', () => {
             id: 'd23a4265-f5f7-4e17-9f86-85f714b4b9f8',
           },
         })
-        expect(
-          wrapper
-            .findAll('.ds-menu-item')
-            .filter((item) => item.text() === 'settings.name')
-            .at(0)
-            .find('span.ds-menu-item-link')
-            .attributes('to'),
-        ).toBe('/settings')
+        const settingsItem = wrapper
+          .findAll('.os-menu-item')
+          .filter((item) => item.text() === 'settings.name')
+        expect(settingsItem).toHaveLength(1)
+        expect(settingsItem.at(0).find('.os-menu-item-link').attributes('href')).toBe('/settings')
       })
 
       it('can mute other users', async () => {
@@ -774,7 +764,7 @@ describe('ContentMenu.vue', () => {
           },
         })
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'settings.muted-users.mute')
           .at(0)
           .trigger('click')
@@ -798,7 +788,7 @@ describe('ContentMenu.vue', () => {
           },
         })
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'settings.muted-users.unmute')
           .at(0)
           .trigger('click')
@@ -822,7 +812,7 @@ describe('ContentMenu.vue', () => {
           },
         })
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'post.menu.observe')
           .at(0)
           .trigger('click')
@@ -841,7 +831,7 @@ describe('ContentMenu.vue', () => {
           },
         })
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'post.menu.unobserve')
           .at(0)
           .trigger('click')

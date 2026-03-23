@@ -5,7 +5,7 @@
     </h1>
     <div class="ds-flex ds-flex-gap-small moderation-layout">
       <div class="moderation-layout__sidebar">
-        <ds-menu :routes="routes" />
+        <os-menu :routes="routes" link-tag="router-link" />
       </div>
       <div class="moderation-layout__main">
         <transition name="slide-up" appear>
@@ -17,7 +17,12 @@
 </template>
 
 <script>
+import { OsMenu } from '@ocelot-social/ui'
+
 export default {
+  components: {
+    OsMenu,
+  },
   middleware: ['isModerator'],
   computed: {
     routes() {

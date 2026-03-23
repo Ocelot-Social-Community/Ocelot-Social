@@ -5,7 +5,7 @@ defineStep('I click on "Report Post" from the content menu of the post', () => {
     .find('[data-test="content-menu-button"]')
     .click()
   
-  cy.get('.popover .ds-menu-item-link')
+  cy.get('.popover .os-menu-item-link')
     .contains('Report Post')
     .click()
 })

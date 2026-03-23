@@ -3,7 +3,7 @@
     <h1 class="ds-heading ds-heading-h1">{{ $t('admin.name') }}</h1>
     <div class="ds-flex ds-flex-gap-small admin-layout">
       <div class="admin-layout__sidebar">
-        <ds-menu :routes="routes" :is-exact="() => true" />
+        <os-menu :routes="routes" :is-exact="() => true" link-tag="router-link" />
       </div>
       <div class="admin-layout__main">
         <transition name="slide-up" appear>
@@ -15,7 +15,12 @@
 </template>
 
 <script>
+import { OsMenu } from '@ocelot-social/ui'
+
 export default {
+  components: {
+    OsMenu,
+  },
   middleware: ['isAdmin'],
   computed: {
     routes() {

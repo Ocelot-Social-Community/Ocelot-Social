@@ -32,3 +32,20 @@ global.localVue.use(Filters)
 global.localVue.use(Directives)
 global.localVue.use(InfiniteLoading)
 global.localVue.use(VueObserveVisibility)
+
+// Register router-link stub globally (OsMenu/OsMenuItem render it via h())
+Vue.component('router-link', {
+  name: 'RouterLink',
+  props: { to: { type: [String, Object], default: '' }, exact: { type: Boolean, default: false } },
+  render(h) {
+    // Resolve href: string path or { name, params } object
+    let href = ''
+    const to = this.to
+    if (typeof to === 'string') {
+      href = to
+    } else if (to) {
+      href = to.path || `/${to.name || ''}`
+    }
+    return h('a', { attrs: { href, to: href }, class: this.$attrs.class }, this.$slots.default)
+  },
+})

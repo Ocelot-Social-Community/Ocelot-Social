@@ -120,21 +120,17 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                     class="group-menu-popover"
                   >
                     <nav
-                      class="ds-menu"
+                      class="os-menu os-menu--dropdown"
                     >
                       <ul
-                        class="ds-menu-list"
+                        class="os-menu-list"
                       >
-                        
-            
-            
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            exact="true"
-                            to="/"
+                          <a
+                            class="os-menu-item-link"
+                            href="/"
                           >
                             <span
                               aria-hidden="true"
@@ -153,18 +149,14 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                             
               group.contentMenu.unmuteGroup
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
-                        
-            
-            
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            to="/groups/edit/g1"
+                          <a
+                            class="os-menu-item-link"
+                            href="/groups/edit/g1"
                           >
                             <span
                               aria-hidden="true"
@@ -183,18 +175,14 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                             
               admin.settings.name
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
-                        
-            
-            
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            to="/groups/edit/g1/invites"
+                          <a
+                            class="os-menu-item-link"
+                            href="/groups/edit/g1/invites"
                           >
                             <span
                               aria-hidden="true"
@@ -213,8 +201,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                             
               group.contentMenu.inviteLinks
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
                       </ul>
                     </nav>
@@ -2241,21 +2228,17 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                     class="group-menu-popover"
                   >
                     <nav
-                      class="ds-menu"
+                      class="os-menu os-menu--dropdown"
                     >
                       <ul
-                        class="ds-menu-list"
+                        class="os-menu-list"
                       >
-                        
-            
-            
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            exact="true"
-                            to="/"
+                          <a
+                            class="os-menu-item-link"
+                            href="/"
                           >
                             <span
                               aria-hidden="true"
@@ -2274,8 +2257,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                             
               group.contentMenu.unmuteGroup
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
                       </ul>
                     </nav>
@@ -3292,21 +3274,17 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     class="group-menu-popover"
                   >
                     <nav
-                      class="ds-menu"
+                      class="os-menu os-menu--dropdown"
                     >
                       <ul
-                        class="ds-menu-list"
+                        class="os-menu-list"
                       >
-                        
-            
-            
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            exact="true"
-                            to="/"
+                          <a
+                            class="os-menu-item-link"
+                            href="/"
                           >
                             <span
                               aria-hidden="true"
@@ -3325,18 +3303,14 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                             
               group.contentMenu.muteGroup
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
-                        
-            
-            
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            to="/groups/edit/g2"
+                          <a
+                            class="os-menu-item-link"
+                            href="/groups/edit/g2"
                           >
                             <span
                               aria-hidden="true"
@@ -3355,18 +3329,14 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                             
               admin.settings.name
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
-                        
-            
-            
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            to="/groups/edit/g2/invites"
+                          <a
+                            class="os-menu-item-link"
+                            href="/groups/edit/g2/invites"
                           >
                             <span
                               aria-hidden="true"
@@ -3385,8 +3355,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                             
               group.contentMenu.inviteLinks
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
                       </ul>
                     </nav>
@@ -5933,21 +5902,17 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     class="group-menu-popover"
                   >
                     <nav
-                      class="ds-menu"
+                      class="os-menu os-menu--dropdown"
                     >
                       <ul
-                        class="ds-menu-list"
+                        class="os-menu-list"
                       >
-                        
-            
-            
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            exact="true"
-                            to="/"
+                          <a
+                            class="os-menu-item-link"
+                            href="/"
                           >
                             <span
                               aria-hidden="true"
@@ -5966,8 +5931,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                             
               group.contentMenu.muteGroup
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
                       </ul>
                     </nav>
@@ -6916,21 +6880,17 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                     class="group-menu-popover"
                   >
                     <nav
-                      class="ds-menu"
+                      class="os-menu os-menu--dropdown"
                     >
                       <ul
-                        class="ds-menu-list"
+                        class="os-menu-list"
                       >
-                        
-            
-            
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            exact="true"
-                            to="/"
+                          <a
+                            class="os-menu-item-link"
+                            href="/"
                           >
                             <span
                               aria-hidden="true"
@@ -6949,18 +6909,14 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                             
               group.contentMenu.muteGroup
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
-                        
-            
-            
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            to="/groups/edit/g0"
+                          <a
+                            class="os-menu-item-link"
+                            href="/groups/edit/g0"
                           >
                             <span
                               aria-hidden="true"
@@ -6979,18 +6935,14 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                             
               admin.settings.name
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
-                        
-            
-            
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            to="/groups/edit/g0/invites"
+                          <a
+                            class="os-menu-item-link"
+                            href="/groups/edit/g0/invites"
                           >
                             <span
                               aria-hidden="true"
@@ -7009,8 +6961,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                             
               group.contentMenu.inviteLinks
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
                       </ul>
                     </nav>
@@ -8028,21 +7979,17 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                     class="group-menu-popover"
                   >
                     <nav
-                      class="ds-menu"
+                      class="os-menu os-menu--dropdown"
                     >
                       <ul
-                        class="ds-menu-list"
+                        class="os-menu-list"
                       >
-                        
-            
-            
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            exact="true"
-                            to="/"
+                          <a
+                            class="os-menu-item-link"
+                            href="/"
                           >
                             <span
                               aria-hidden="true"
@@ -8061,8 +8008,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                             
               group.contentMenu.muteGroup
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
                       </ul>
                     </nav>

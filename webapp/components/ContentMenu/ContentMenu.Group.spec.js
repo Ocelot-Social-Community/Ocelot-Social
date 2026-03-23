@@ -83,7 +83,7 @@ describe('ContentMenu.vue - Group', () => {
           },
         })
         expect(
-          wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.groupPin'),
+          wrapper.findAll('.os-menu-item').filter((item) => item.text() === 'post.menu.groupPin'),
         ).toHaveLength(0)
       })
 
@@ -100,7 +100,7 @@ describe('ContentMenu.vue - Group', () => {
           },
         })
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'post.menu.groupUnpin')
           .at(0)
           .trigger('click')
@@ -142,7 +142,7 @@ describe('ContentMenu.vue - Group', () => {
             },
           })
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'post.menu.groupPin')
             .at(0)
             .trigger('click')
@@ -174,7 +174,7 @@ describe('ContentMenu.vue - Group', () => {
             },
           })
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'post.menu.groupUnpin')
             .at(0)
             .trigger('click')
@@ -210,7 +210,7 @@ describe('ContentMenu.vue - Group', () => {
             },
           })
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'post.menu.groupPin')
             .at(0)
             .trigger('click')
@@ -242,7 +242,7 @@ describe('ContentMenu.vue - Group', () => {
             },
           })
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'post.menu.groupUnpin')
             .at(0)
             .trigger('click')
@@ -286,7 +286,7 @@ describe('ContentMenu.vue - Group', () => {
             },
           })
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'post.menu.groupPin')
             .at(0)
             .trigger('click')
@@ -318,7 +318,7 @@ describe('ContentMenu.vue - Group', () => {
             },
           })
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'post.menu.groupUnpin')
             .at(0)
             .trigger('click')
@@ -354,7 +354,7 @@ describe('ContentMenu.vue - Group', () => {
             },
           })
           expect(
-            wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.groupPin')
+            wrapper.findAll('.os-menu-item').filter((item) => item.text() === 'post.menu.groupPin')
               .length,
           ).toEqual(0)
         })
@@ -373,7 +373,7 @@ describe('ContentMenu.vue - Group', () => {
             },
           })
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'post.menu.groupUnpin')
             .at(0)
             .trigger('click')
@@ -417,7 +417,7 @@ describe('ContentMenu.vue - Group', () => {
           },
         })
         expect(
-          wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.groupPin'),
+          wrapper.findAll('.os-menu-item').filter((item) => item.text() === 'post.menu.groupPin'),
         ).toHaveLength(0)
       })
 
@@ -434,7 +434,7 @@ describe('ContentMenu.vue - Group', () => {
           },
         })
         wrapper
-          .findAll('.ds-menu-item')
+          .findAll('.os-menu-item')
           .filter((item) => item.text() === 'post.menu.groupUnpin')
           .at(0)
           .trigger('click')
@@ -476,7 +476,7 @@ describe('ContentMenu.vue - Group', () => {
             },
           })
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'post.menu.groupPin')
             .at(0)
             .trigger('click')
@@ -508,7 +508,7 @@ describe('ContentMenu.vue - Group', () => {
             },
           })
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'post.menu.groupUnpin')
             .at(0)
             .trigger('click')
@@ -544,7 +544,7 @@ describe('ContentMenu.vue - Group', () => {
             },
           })
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'post.menu.groupPin')
             .at(0)
             .trigger('click')
@@ -576,7 +576,7 @@ describe('ContentMenu.vue - Group', () => {
             },
           })
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'post.menu.groupUnpin')
             .at(0)
             .trigger('click')
@@ -620,7 +620,7 @@ describe('ContentMenu.vue - Group', () => {
             },
           })
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'post.menu.groupPin')
             .at(0)
             .trigger('click')
@@ -652,7 +652,7 @@ describe('ContentMenu.vue - Group', () => {
             },
           })
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'post.menu.groupUnpin')
             .at(0)
             .trigger('click')
@@ -688,7 +688,7 @@ describe('ContentMenu.vue - Group', () => {
             },
           })
           expect(
-            wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.groupPin')
+            wrapper.findAll('.os-menu-item').filter((item) => item.text() === 'post.menu.groupPin')
               .length,
           ).toEqual(0)
         })
@@ -707,7 +707,7 @@ describe('ContentMenu.vue - Group', () => {
             },
           })
           wrapper
-            .findAll('.ds-menu-item')
+            .findAll('.os-menu-item')
             .filter((item) => item.text() === 'post.menu.groupUnpin')
             .at(0)
             .trigger('click')
@@ -751,7 +751,7 @@ describe('ContentMenu.vue - Group', () => {
           },
         })
         expect(
-          wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.groupPin'),
+          wrapper.findAll('.os-menu-item').filter((item) => item.text() === 'post.menu.groupPin'),
         ).toHaveLength(0)
       })
 
@@ -768,7 +768,7 @@ describe('ContentMenu.vue - Group', () => {
           },
         })
         expect(
-          wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.groupUnpin'),
+          wrapper.findAll('.os-menu-item').filter((item) => item.text() === 'post.menu.groupUnpin'),
         ).toHaveLength(0)
       })
     })
@@ -794,7 +794,7 @@ describe('ContentMenu.vue - Group', () => {
           },
         })
         expect(
-          wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.groupPin'),
+          wrapper.findAll('.os-menu-item').filter((item) => item.text() === 'post.menu.groupPin'),
         ).toHaveLength(0)
       })
 
@@ -812,7 +812,7 @@ describe('ContentMenu.vue - Group', () => {
           },
         })
         expect(
-          wrapper.findAll('.ds-menu-item').filter((item) => item.text() === 'post.menu.groupUnpin'),
+          wrapper.findAll('.os-menu-item').filter((item) => item.text() === 'post.menu.groupUnpin'),
         ).toHaveLength(0)
       })
     })

@@ -33,21 +33,21 @@
           </p>
         </template>
         <hr />
-        <ds-menu :routes="routes" :matcher="matcher">
-          <ds-menu-item
-            slot="menuitem"
-            slot-scope="item"
-            :route="item.route"
-            :parents="item.parents"
-            @click.native="
-              closeMenu(false)
-              $emit('toggle-Mobile-Menu-view')
-            "
-          >
-            <os-icon :icon="item.route.icon" />
-            {{ item.route.name }}
-          </ds-menu-item>
-        </ds-menu>
+        <os-menu dropdown :routes="routes" :matcher="matcher" link-tag="router-link">
+          <template #menuitem="item">
+            <os-menu-item
+              :route="item.route"
+              :parents="item.parents"
+              @click.native="
+                closeMenu(false)
+                $emit('toggle-Mobile-Menu-view')
+              "
+            >
+              <os-icon :icon="item.route.icon" />
+              {{ item.route.name }}
+            </os-menu-item>
+          </template>
+        </os-menu>
         <hr />
         <nuxt-link class="logout-link" :to="{ name: 'logout' }">
           <os-icon :icon="icons.signOut" />
@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { OsIcon } from '@ocelot-social/ui'
+import { OsIcon, OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import Dropdown from '~/components/Dropdown'
@@ -69,6 +69,8 @@ export default {
   components: {
     Dropdown,
     OsIcon,
+    OsMenu,
+    OsMenuItem,
     ProfileAvatar,
   },
   props: {

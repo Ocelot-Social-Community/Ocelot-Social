@@ -20,25 +20,25 @@
         </os-button>
       </template>
       <template #popover="{ toggleMenu }">
-        <ds-menu class="locale-menu-popover" :matcher="matcher" :routes="routes">
+        <os-menu dropdown class="locale-menu-popover" :matcher="matcher" :routes="routes">
           <template #menuitem="item">
-            <ds-menu-item
+            <os-menu-item
               class="locale-menu-item"
               :route="item.route"
               :parents="item.parents"
               @click.stop.prevent="changeLanguage(item.route.path, toggleMenu)"
             >
               {{ item.route.name }}
-            </ds-menu-item>
+            </os-menu-item>
           </template>
-        </ds-menu>
+        </os-menu>
       </template>
     </dropdown>
   </client-only>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Dropdown from '~/components/Dropdown'
 import find from 'lodash/find'
@@ -52,6 +52,8 @@ export default {
     Dropdown,
     OsButton,
     OsIcon,
+    OsMenu,
+    OsMenuItem,
   },
   props: {
     placement: { type: String, default: 'bottom-start' },

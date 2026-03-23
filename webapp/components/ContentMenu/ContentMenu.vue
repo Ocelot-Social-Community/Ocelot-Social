@@ -20,18 +20,18 @@
       </template>
       <template #popover="{ toggleMenu }">
         <div class="content-menu-popover">
-          <ds-menu :routes="routes">
+          <os-menu dropdown :routes="routes">
             <template #menuitem="item">
-              <ds-menu-item
+              <os-menu-item
                 :route="item.route"
                 :parents="item.parents"
                 @click.stop.prevent="openItem(item.route, toggleMenu)"
               >
                 <os-icon :icon="item.route.icon" />
                 {{ item.route.label }}
-              </ds-menu-item>
+              </os-menu-item>
             </template>
-          </ds-menu>
+          </os-menu>
         </div>
       </template>
     </dropdown>
@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Dropdown from '~/components/Dropdown'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
@@ -66,6 +66,8 @@ export default {
     Dropdown,
     OsButton,
     OsIcon,
+    OsMenu,
+    OsMenuItem,
     ReportModal,
   },
   mixins: [PinnedPostsMixin],
@@ -401,12 +403,7 @@ export default {
 </script>
 
 <style lang="scss">
-.content-menu-popover {
-  nav {
-    margin-top: -$space-xx-small;
-    margin-bottom: -$space-xx-small;
-    margin-left: -$space-x-small;
-    margin-right: -$space-x-small;
-  }
+.tooltip-inner.popover-inner .os-menu {
+  margin: (-$space-xx-small) (-$space-small) !important;
 }
 </style>

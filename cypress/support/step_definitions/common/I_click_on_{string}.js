@@ -10,7 +10,7 @@ defineStep('I click on {string}', element => {
     'comment button': 'button[type=submit]',
     'reply button': '.reply-button',
     'security menu': 'a[href="/settings/security"]',
-    'pin post': '.ds-menu-item:first-child',
+    'pin post': '.os-menu-item:first-child',
     'Moderation': 'a[href="/moderation"]',
   }
 
