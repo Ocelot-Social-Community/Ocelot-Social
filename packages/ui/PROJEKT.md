@@ -81,10 +81,10 @@ Phase 0: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
 Phase 3: ██████████ 100% (24/24 Aufgaben) ✅ - Webapp-Integration komplett
-Phase 4: ████████░░  78% (21/27 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅, OsNumber ✅, OsModal ✅, ds-radio→HTML ✅ | Tier B ✅, OcelotInput ✅, OcelotSelect ✅, Tier 2-3 Rest ausstehend
+Phase 4: █████████░  85% (23/27 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅, OsNumber ✅, OsModal ✅, ds-radio→HTML ✅ | Tier B ✅, OcelotInput ✅, OcelotSelect ✅, OsMenu ✅ | 0 ds-* Tags verbleibend
 Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
 ───────────────────────────────────────
-Gesamt:  ████████░░  86% (83/96 Aufgaben)
+Gesamt:  █████████░  89% (85/96 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -288,8 +288,8 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 - [x] Test-Fix: Empty.spec.js `attributes().margin` → `classes().toContain('ds-my-xxx-small')`
 - [x] 0 Tier-A `ds-*` Komponenten-Tags verbleibend
 
-**Verbleibende ds-* Komponenten (6 Typen):**
-- Tier C (→ UI-Library): ds-modal (7→✅ OsModal), ds-input (23→✅ OcelotInput), ds-select (3→✅ OcelotSelect), ds-menu/ds-menu-item (17)
+**Verbleibende ds-* Komponenten: ✅ ALLE MIGRIERT (0 ds-* Tags in Webapp)**
+- ✅ ds-modal (7→OsModal), ds-input (23→OcelotInput), ds-select (3→OcelotSelect), ds-menu/ds-menu-item (17→OsMenu/OsMenuItem)
 - ✅ ds-form (18 Dateien) → formValidation Mixin (async-validator), vuelidate entfernt
 
 **Zuvor abgeschlossen (Session 26 - CodeRabbit Review Fixes):**
@@ -418,7 +418,7 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 - [ ] Weitere Tier 2 Komponenten (OsDropdown, OsAvatar)
 - [x] ds-form → formValidation Mixin (async-validator), 18 Dateien migriert, vuelidate entfernt ✅
 - [x] ds-input → OcelotInput (23 Dateien, Webapp-Komponente mit lokalen Imports, formValidation-kompatibel) ✅
-- [ ] ds-menu / ds-menu-item → OsMenu / OsMenuItem
+- [x] ds-menu / ds-menu-item → OsMenu / OsMenuItem (packages/ui, 17 Nutzungen in 11 Dateien, dropdown Prop, eigene CSS in index.css) ✅
 - [x] ds-select → OcelotSelect (3 Dateien, Webapp-Komponente mit lokalen Imports, click-outside inline) ✅
 - [ ] Browser-Fehler untersuchen: `TypeError: Cannot read properties of undefined (reading 'heartO')` (ocelotIcons undefined im Browser trotz korrekter Webpack-Aliase)
 
@@ -697,8 +697,7 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 - [x] ds-input → OcelotInput (23 Dateien, Webapp-Komponente mit lokalen Imports, formValidation-kompatibel) ✅
 
 **Tier 3: Navigation (UI-Library)**
-- [ ] OsMenu (Basis: DsMenu, 11 Dateien)
-- [ ] OsMenuItem (Basis: DsMenuItem, 6 Dateien)
+- [x] OsMenu + OsMenuItem (packages/ui, h() Render, vue-demi, provide/inject, dropdown Prop, eigene CSS in index.css, 17 Nutzungen in 11 Dateien) ✅
 
 **Tier 4: Spezial-Komponenten**
 - [x] ds-select → OcelotSelect (3 Dateien, Webapp-Komponente, click-outside inline, DsChip→OsBadge, DsSpinner→OsSpinner) ✅
@@ -1855,6 +1854,7 @@ Bei der Migration werden:
 | 2026-03-23 | **ds-input → OcelotInput** | Neue Webapp-Komponente `OcelotInput.vue`: vereint DsInput + FormItem + InputLabel + InputError in einer Datei. 23 Vue-Dateien migriert mit lokalen Imports (tree-shakeable). formValidation Mixin voll kompatibel. dot-prop Abhängigkeit durch inline `getNestedValue()` ersetzt. 28 Test-Suites, 210 Tests ✅, 7 Snapshots aktualisiert. |
 | 2026-03-23 | **OcelotInput: ds-icon → os-icon** | DsIcon durch OsIcon + resolveIcon() ersetzt. at.svg, envelope.svg, paperclip.svg zu Ocelot-Icons hinzugefügt. Ocelot-Icons Visual Snapshot aktualisiert. |
 | 2026-03-23 | **ds-select → OcelotSelect** | Neue Webapp-Komponente `OcelotSelect.vue`: vereint DsSelect + inputMixin + multiinputMixin (~420 Zeilen). Form-Validation entfernt (von keinem Consumer genutzt). DsChip→OsBadge, DsSpinner→OsSpinner, DsIcon→OsIcon. vue-click-outside durch inline document.addEventListener ersetzt. 3 Dateien migriert, 16 Tests ✅. |
+| 2026-03-23 | **ds-menu → OsMenu/OsMenuItem** | Neue packages/ui Komponenten: h() Render, vue-demi, provide/inject, dropdown Prop für Popup-Variante. CSS in src/styles/index.css (integriert in style.css Build). 17 Nutzungen in 11 Dateien migriert. Action-Menüs nutzen link-tag default 'a' statt router-link. router-link Stub global in testSetup.js. Vite closeBundle Hook: ui.css in style.css gemergt. 273 UI-Tests, 108 Webapp-Tests ✅. **0 ds-* Komponenten-Tags verbleibend in Webapp.** |
 
 ---
 
@@ -1878,7 +1878,7 @@ Bei der Migration werden:
 | ✅ ds-form entkoppelt | Form-Validierung → formValidation Mixin (async-validator), vuelidate entfernt |
 | ✅ ds-input → OcelotInput | Webapp-Komponente (23 Dateien), lokale Imports, FormItem/InputLabel/InputError vereint |
 | ✅ ds-select → OcelotSelect | Webapp-Komponente (3 Dateien), lokale Imports, click-outside inline, DsChip→OsBadge |
-| ⬜ → UI-Library | Menu, MenuItem (2) — Tier 3 |
+| ✅ → OsMenu/OsMenuItem | Menu, MenuItem (17 Nutzungen → packages/ui, dropdown Prop, eigene CSS) |
 | ⬜ Nicht genutzt | Code, CopyField, FormItem, InputError, InputLabel, Page, PageTitle, Logo, Avatar, TableCol, TableHeadCol (11) |
 
 ---
