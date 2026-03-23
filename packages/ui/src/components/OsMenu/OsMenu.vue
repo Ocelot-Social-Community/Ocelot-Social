@@ -74,7 +74,7 @@
     },
     emits: ['navigate'],
     /* v8 ignore start -- render function tested via unit + visual tests */
-    setup(props, { slots, attrs, emit }) {
+    setup(props, { slots, attrs }) {
       const instance = isVue2 ? getCurrentInstance() : null
 
       return () => {
@@ -121,7 +121,6 @@
                 parentDynClass,
               ].filter(Boolean),
               attrs,
-              on: { navigate: () => emit('navigate') },
             },
             [list],
           )

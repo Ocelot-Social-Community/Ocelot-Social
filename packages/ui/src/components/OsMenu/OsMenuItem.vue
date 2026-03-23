@@ -224,9 +224,14 @@
       }
       document.addEventListener('click', this.clickOutsideHandler, true)
     },
-    /* v8 ignore next 2 -- Vue 2 lifecycle hook */
-    beforeDestroy() { this.cleanup() },
-    beforeUnmount() { this.cleanup() },
+    /* v8 ignore next 4 -- Vue 2 lifecycle hook */
+    // eslint-disable-next-line vue/no-deprecated-destroyed-lifecycle
+    beforeDestroy() {
+      this.cleanup()
+    },
+    beforeUnmount() {
+      this.cleanup()
+    },
     methods: {
       cleanup() {
         if (this.clickOutsideHandler) {
