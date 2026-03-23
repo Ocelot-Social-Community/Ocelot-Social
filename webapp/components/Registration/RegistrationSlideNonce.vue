@@ -1,7 +1,7 @@
 <template>
   <form class="enter-nonce" @submit.prevent="onSubmit" novalidate>
     <email-display-and-verify :email="sliderData.collectedInputData.email" />
-    <ds-input
+    <ocelot-input
       :placeholder="$t('components.registration.email-nonce.form.nonce')"
       model="nonce"
       name="nonce"

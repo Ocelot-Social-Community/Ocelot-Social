@@ -3,7 +3,7 @@
     <form class="group-form" @submit.prevent="onSubmit" novalidate>
       <template>
         <!-- group Name -->
-        <ds-input
+        <ocelot-input
           name="name"
           :label="$t('group.name')"
           model="name"
@@ -20,13 +20,13 @@
         </os-badge>
 
         <!-- group Slug -->
-        <ds-input
+        <ocelot-input
           v-if="update"
           :label="$t('group.labelSlug')"
           model="slug"
           icon="at"
           :placeholder="`${$t('group.labelSlug')} …`"
-        ></ds-input>
+        ></ocelot-input>
 
         <div v-if="update" class="ds-mt-small ds-mb-large"></div>
 
@@ -61,7 +61,7 @@
         </os-badge>
 
         <!-- goal -->
-        <ds-input
+        <ocelot-input
           name="about"
           :label="$t('group.goal')"
           v-model="formData.about"

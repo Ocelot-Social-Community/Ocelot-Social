@@ -8,7 +8,7 @@
           {{ $t('admin.donations.showDonationsCheckboxLabel') }}
         </label>
       </p>
-      <ds-input
+      <ocelot-input
         id="donations-goal"
         class="donations-data"
         model="goal"
@@ -18,7 +18,7 @@
         :disabled="!showDonations"
         data-test="donations-goal"
       />
-      <ds-input
+      <ocelot-input
         id="donations-progress"
         class="donations-data"
         model="progress"

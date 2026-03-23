@@ -17,7 +17,7 @@
           }}
         </p>
       </div>
-      <ds-input
+      <ocelot-input
         :placeholder="invitation ? $t('profile.invites.emailPlaceholder') : $t('login.email')"
         type="email"
         id="email"

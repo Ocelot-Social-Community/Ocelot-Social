@@ -1,7 +1,7 @@
 <template>
   <form v-if="!submitted" @submit.prevent="onSubmit" novalidate>
     <div class="ds-my-small">
-      <ds-input
+      <ocelot-input
         :placeholder="$t('login.email')"
         type="email"
         id="email"

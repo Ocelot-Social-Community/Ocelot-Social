@@ -2,7 +2,7 @@
   <div class="create-invitation">
     <div>{{ $t('invite-codes.generate-code-explanation') }}</div>
     <form @submit.prevent="generateInviteCode" class="generate-invite-code-form">
-      <ds-input
+      <ocelot-input
         name="comment"
         :placeholder="$t('invite-codes.comment-placeholder')"
         v-model="comment"

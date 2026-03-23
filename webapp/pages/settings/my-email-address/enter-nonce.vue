@@ -2,14 +2,14 @@
   <form @submit.prevent="onSubmit" novalidate>
     <os-card>
       <h2 class="title">{{ $t('settings.email.name') }}</h2>
-      <ds-input
+      <ocelot-input
         id="email"
         model="email"
         icon="envelope"
         disabled
         :label="$t('settings.email.labelNewEmail')"
       />
-      <ds-input
+      <ocelot-input
         id="nonce"
         model="nonce"
         icon="question-circle"

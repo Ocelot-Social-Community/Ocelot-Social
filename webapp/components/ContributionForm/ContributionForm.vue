@@ -26,7 +26,7 @@
             </page-params-link>
           </div>
           <div class="ds-mt-base ds-mb-large"></div>
-          <ds-input
+          <ocelot-input
             model="title"
             :placeholder="$t('contribution.title')"
             name="title"
@@ -114,7 +114,7 @@
             </div>
             <div class="ds-grid event-location-grid">
               <div class="event-grid-item">
-                <ds-input
+                <ocelot-input
                   model="eventVenue"
                   name="eventVenue"
                   :placeholder="$t('post.viewEvent.eventVenue')"
@@ -131,7 +131,7 @@
                 </div>
               </div>
               <div v-if="showEventLocationName" class="event-grid-item">
-                <ds-input
+                <ocelot-input
                   model="eventLocationName"
                   name="eventLocationName"
                   :placeholder="$t('post.viewEvent.eventLocationName')"

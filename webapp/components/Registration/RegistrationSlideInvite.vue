@@ -1,6 +1,6 @@
 <template>
   <form class="enter-invite" @submit.prevent novalidate>
-    <ds-input
+    <ocelot-input
       :placeholder="formSchema.inviteCode.placeholder"
       :minlength="formSchema.inviteCode.minLength"
       :maxlength="formSchema.inviteCode.maxLength"

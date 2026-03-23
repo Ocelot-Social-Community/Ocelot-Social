@@ -14,7 +14,7 @@
         <social-media-list-item :item="item" />
       </template>
       <template #edit-item>
-        <ds-input
+        <ocelot-input
           id="editSocialMedia"
           model="socialMediaUrl"
           type="text"

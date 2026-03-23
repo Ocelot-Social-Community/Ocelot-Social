@@ -143,13 +143,15 @@ exports[`invites.vue renders 1`] = `
                 style="display: none;"
               >
                 
+    
   
-
               </label>
+               
               <div
                 class="ds-input-wrap"
               >
                 <!---->
+                 
                 <input
                   class="ds-input"
                   name="comment"
@@ -157,8 +159,10 @@ exports[`invites.vue renders 1`] = `
                   tabindex="0"
                   type="text"
                 />
+                 
                 <!---->
               </div>
+               
               <transition-stub
                 name="ds-input-error"
               >
@@ -167,8 +171,8 @@ exports[`invites.vue renders 1`] = `
                   style="display: none;"
                 >
                   
+      
     
-  
                 </div>
               </transition-stub>
             </div>

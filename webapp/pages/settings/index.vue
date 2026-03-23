@@ -2,7 +2,7 @@
   <form class="settings-form" @submit.prevent="onSubmit" novalidate>
     <os-card>
       <h2 class="title">{{ $t('settings.data.name') }}</h2>
-      <ds-input
+      <ocelot-input
         id="name"
         model="name"
         icon="user"
@@ -13,14 +13,14 @@
         "
         :placeholder="$t('settings.data.namePlaceholder')"
       />
-      <ds-input id="slug" model="slug" icon="at" :label="$t('settings.data.labelSlug')" />
+      <ocelot-input id="slug" model="slug" icon="at" :label="$t('settings.data.labelSlug')" />
       <location-select
         class="location-selet"
         v-model="formData.locationName"
         :canBeCleared="!$env.REQUIRE_LOCATION"
       />
       <!-- eslint-enable vue/use-v-on-exact -->
-      <ds-input
+      <ocelot-input
         id="about"
         model="about"
         type="textarea"

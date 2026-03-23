@@ -7,7 +7,7 @@
     <label>
       {{ $t('settings.deleteUserAccount.pleaseConfirm', { confirm: currentUser.name }) }}
     </label>
-    <ds-input v-model="enableDeletionValue" />
+    <ocelot-input v-model="enableDeletionValue" />
     <p v-show="enableDeletionValue" class="notice">
       {{ $t('settings.deleteUserAccount.accountDescription') }}
     </p>

@@ -3,7 +3,7 @@
     <p class="ds-text">
       {{ $t('components.registration.signup.form.description') }}
     </p>
-    <ds-input :placeholder="$t('login.email')" type="email" id="email" model="email" name="email" />
+    <ocelot-input :placeholder="$t('login.email')" type="email" id="email" model="email" name="email" />
     <slot></slot>
     <p class="ds-text" v-if="sliderData.collectedInputData.emailSend">
       <input

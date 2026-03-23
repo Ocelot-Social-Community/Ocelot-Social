@@ -12,7 +12,7 @@
       :select-item="selectItem"
     />
     <div v-show="isLinkInputActive" ref="linkInput">
-      <ds-input
+      <ocelot-input
         id="linkInputId"
         v-model="linkUrl"
         class="editor-menu-link-input"

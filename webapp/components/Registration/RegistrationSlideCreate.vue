@@ -31,20 +31,20 @@
 
         <div v-if="askForRealName" class="full-name">
           <!-- <p>{{ $t('settings.data.realNamePlease') }}</p>-->
-          <ds-input
+          <ocelot-input
             id="givenName"
             model="givenName"
             :label="$t('settings.data.givenName')"
             :placeholder="$t('settings.data.givenNamePlaceholder')"
           />
-          <ds-input
+          <ocelot-input
             id="surName"
             model="surName"
             :label="$t('settings.data.surName')"
             :placeholder="$t('settings.data.surNamePlaceholder')"
           />
         </div>
-        <ds-input
+        <ocelot-input
           v-else
           id="name"
           model="name"
@@ -52,7 +52,7 @@
           :placeholder="$t('settings.data.namePlaceholder')"
         />
         <div class="password-wrapper">
-          <ds-input
+          <ocelot-input
             id="password"
             model="password"
             :type="showPassword ? 'text' : 'password'"
@@ -68,7 +68,7 @@
           />
         </div>
         <div class="password-wrapper">
-          <ds-input
+          <ocelot-input
             id="passwordConfirmation"
             model="passwordConfirmation"
             :type="showPasswordConfirm ? 'text' : 'password'"

@@ -30,9 +30,10 @@ exports[`Users given badges are disabled renders 1`] = `
               style="display: none;"
             >
               
+    
   
-
             </label>
+             
             <div
               class="ds-input-wrap"
             >
@@ -54,6 +55,7 @@ exports[`Users given badges are disabled renders 1`] = `
                   </svg>
                 </span>
               </div>
+               
               <input
                 class="ds-input ds-input-has-icon"
                 name="query"
@@ -61,8 +63,10 @@ exports[`Users given badges are disabled renders 1`] = `
                 tabindex="0"
                 type="text"
               />
+               
               <!---->
             </div>
+             
             <transition-stub
               name="ds-input-error"
             >
@@ -71,8 +75,8 @@ exports[`Users given badges are disabled renders 1`] = `
                 style="display: none;"
               >
                 
+      
     
-  
               </div>
             </transition-stub>
           </div>
@@ -479,9 +483,10 @@ exports[`Users given badges are enabled renders 1`] = `
               style="display: none;"
             >
               
+    
   
-
             </label>
+             
             <div
               class="ds-input-wrap"
             >
@@ -503,6 +508,7 @@ exports[`Users given badges are enabled renders 1`] = `
                   </svg>
                 </span>
               </div>
+               
               <input
                 class="ds-input ds-input-has-icon"
                 name="query"
@@ -510,8 +516,10 @@ exports[`Users given badges are enabled renders 1`] = `
                 tabindex="0"
                 type="text"
               />
+               
               <!---->
             </div>
+             
             <transition-stub
               name="ds-input-error"
             >
@@ -520,8 +528,8 @@ exports[`Users given badges are enabled renders 1`] = `
                 style="display: none;"
               >
                 
+      
     
-  
               </div>
             </transition-stub>
           </div>

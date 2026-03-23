@@ -1,20 +1,20 @@
 <template>
   <form @submit.prevent="onSubmit" novalidate>
-    <ds-input
+    <ocelot-input
       id="oldPassword"
       model="oldPassword"
       type="password"
       autocomplete="off"
       :label="$t('settings.security.change-password.label-old-password')"
     />
-    <ds-input
+    <ocelot-input
       id="password"
       model="password"
       type="password"
       autocomplete="off"
       :label="$t('settings.security.change-password.label-new-password')"
     />
-    <ds-input
+    <ocelot-input
       id="passwordConfirmation"
       model="passwordConfirmation"
       type="password"

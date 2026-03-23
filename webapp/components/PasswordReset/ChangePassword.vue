@@ -6,14 +6,14 @@
       class="change-password"
       novalidate
     >
-      <ds-input
+      <ocelot-input
         id="password"
         model="password"
         type="password"
         autocomplete="off"
         :label="$t('settings.security.change-password.label-new-password')"
       />
-      <ds-input
+      <ocelot-input
         id="passwordConfirmation"
         model="passwordConfirmation"
         type="password"

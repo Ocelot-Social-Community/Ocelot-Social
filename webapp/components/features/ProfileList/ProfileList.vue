@@ -31,7 +31,7 @@
         </li>
       </ul>
 
-      <ds-input
+      <ocelot-input
         v-if="isMoreAsVisible && !hasMore"
         :name="uniqueName"
         :placeholder="filterPlaceholder"

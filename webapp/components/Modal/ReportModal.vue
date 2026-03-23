@@ -29,7 +29,7 @@
         <span class="report-radio-option-label">{{ option.label }}</span>
       </div>
     </fieldset>
-    <ds-input
+    <ocelot-input
       class="reason-description"
       v-model="form.reasonDescription"
       :schema="formSchema.reasonDescription"

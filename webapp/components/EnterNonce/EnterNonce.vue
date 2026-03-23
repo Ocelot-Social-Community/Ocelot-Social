@@ -1,6 +1,6 @@
 <template>
   <form class="enter-nonce" @submit.prevent="onSubmit" novalidate>
-    <ds-input
+    <ocelot-input
       :placeholder="$t('components.registration.email-nonce.form.nonce')"
       model="nonce"
       name="nonce"
