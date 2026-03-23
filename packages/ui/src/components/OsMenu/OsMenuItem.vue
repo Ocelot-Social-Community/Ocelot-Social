@@ -13,12 +13,12 @@
    */
   export default defineComponent({
     name: 'OsMenuItem',
-    inheritAttrs: false,
     inject: {
       $parentMenu: {
         default: null,
       },
     },
+    inheritAttrs: false,
     props: {
       /** Route object with name, path, children, etc. */
       route: {
@@ -35,6 +35,122 @@
         type: [String, Object, Function] as PropType<string | Component>,
         default: null,
       },
+    },
+    /* v8 ignore start -- render function tested via unit + visual tests */
+    setup(props, { slots, attrs }) {
+      const instance = isVue2 ? getCurrentInstance() : null
+
+      // We need access to component instance for inject, so use render in setup
+      return () => {
+        // Access component instance for inject values
+        const proxy = instance?.proxy as Record<string, unknown> | undefined
+        const vm = (isVue2 ? proxy : getCurrentInstance()?.proxy) as Record<string, unknown>
+
+        if (!vm || !props.route) return null
+
+        const resolvedLinkTag = vm.resolvedLinkTag as string | Component
+        const matcherResult = vm.matcherResult as boolean
+        const isExact = vm.isExact as boolean
+        const name = vm.name as string
+        const level = vm.level as number
+        const bindings = vm.bindings as Record<string, unknown>
+        const hasSubmenu = vm.hasSubmenu as boolean
+        const showSubmenu = vm.showSubmenu as boolean
+        const handleClick = vm.handleClick as (e: Event) => void
+
+        // Build link element
+        const linkClass = cn('os-menu-item-link', matcherResult && 'os-menu-item--active')
+
+        const defaultSlotContent = slots.default?.()
+        const linkChildren = defaultSlotContent || [name]
+
+        let linkNode: ReturnType<typeof h>
+        if (isVue2) {
+          linkNode = h(
+            resolvedLinkTag,
+            {
+              class: linkClass,
+              props: { ...bindings, exact: isExact },
+              attrs: bindings,
+              on: { click: handleClick },
+              ref: 'link',
+            },
+            linkChildren,
+          )
+        } else {
+          linkNode = h(
+            resolvedLinkTag,
+            {
+              class: linkClass,
+              ...bindings,
+              exact: isExact,
+              onClick: handleClick,
+              ref: 'link',
+            },
+            linkChildren,
+          )
+        }
+
+        // Build submenu if children exist
+        const children: ReturnType<typeof h>[] = [linkNode]
+        if (hasSubmenu) {
+          const OsMenuItemSelf = vm.$options as Component
+          const submenuItems = (props.route.children as Record<string, unknown>[]).map((child) => {
+            const childProps = {
+              route: child,
+              parents: [...props.parents, props.route],
+            }
+            if (isVue2) {
+              return h(OsMenuItemSelf, { key: child.name as string, props: childProps })
+            }
+            return h(OsMenuItemSelf, { key: child.name as string, ...childProps })
+          })
+          children.push(h('ul', { class: 'os-menu-item-submenu' }, submenuItems))
+        }
+
+        // Build li wrapper
+        const liClass = cn(
+          'os-menu-item',
+          `os-menu-item-level-${String(level)}`,
+          showSubmenu && 'os-menu-item-show-submenu',
+        )
+
+        if (isVue2) {
+          const parentClass =
+            (proxy?.$vnode as Record<string, Record<string, unknown>> | undefined)?.data
+              ?.staticClass || ''
+          const parentDynClass = (
+            proxy?.$vnode as Record<string, Record<string, unknown>> | undefined
+          )?.data?.class
+          const listeners = (proxy as Record<string, unknown>)?.$listeners as
+            | Record<string, unknown>
+            | undefined
+
+          return h(
+            'li',
+            {
+              class: [cn(liClass, parentClass as string), parentDynClass].filter(Boolean),
+              attrs,
+              on: {
+                ...(listeners || {}),
+                click: handleClick,
+              },
+            },
+            children,
+          )
+        }
+
+        const { class: attrClass, ...restAttrs } = attrs as Record<string, unknown>
+        return h(
+          'li',
+          {
+            class: cn(liClass, (attrClass as string) || ''),
+            onClick: handleClick,
+            ...restAttrs,
+          },
+          children,
+        )
+      }
     },
     data() {
       return {
@@ -107,7 +223,7 @@
       }
       document.addEventListener('click', this._clickOutsideHandler, true)
     },
-    beforeDestroy() {
+    beforeUnmount() {
       if (this._clickOutsideHandler) {
         document.removeEventListener('click', this._clickOutsideHandler, true)
       }
@@ -126,124 +242,6 @@
           ;(menu.handleNavigate as () => void)()
         }
       },
-    },
-    /* v8 ignore start -- render function tested via unit + visual tests */
-    setup(props, { slots, attrs }) {
-      const instance = isVue2 ? getCurrentInstance() : null
-
-      // We need access to component instance for inject, so use render in setup
-      return () => {
-        // Access component instance for inject values
-        const proxy = instance?.proxy as Record<string, unknown> | undefined
-        const vm = (isVue2 ? proxy : getCurrentInstance()?.proxy) as Record<string, unknown>
-
-        if (!vm || !props.route) return null
-
-        const resolvedLinkTag = vm.resolvedLinkTag as string | Component
-        const matcherResult = vm.matcherResult as boolean
-        const isExact = vm.isExact as boolean
-        const name = vm.name as string
-        const level = vm.level as number
-        const bindings = vm.bindings as Record<string, unknown>
-        const hasSubmenu = vm.hasSubmenu as boolean
-        const showSubmenu = vm.showSubmenu as boolean
-        const handleClick = vm.handleClick as (e: Event) => void
-
-        // Build link element
-        const linkClass = cn(
-          'os-menu-item-link',
-          matcherResult && 'os-menu-item--active',
-        )
-
-        const defaultSlotContent = slots.default?.()
-        const linkChildren = defaultSlotContent || [name]
-
-        let linkNode: ReturnType<typeof h>
-        if (isVue2) {
-          linkNode = h(
-            resolvedLinkTag,
-            {
-              class: linkClass,
-              props: { ...bindings, exact: isExact },
-              attrs: bindings,
-              on: { click: handleClick },
-              ref: 'link',
-            },
-            linkChildren,
-          )
-        } else {
-          linkNode = h(
-            resolvedLinkTag,
-            {
-              class: linkClass,
-              ...bindings,
-              exact: isExact,
-              onClick: handleClick,
-              ref: 'link',
-            },
-            linkChildren,
-          )
-        }
-
-        // Build submenu if children exist
-        const children: ReturnType<typeof h>[] = [linkNode]
-        if (hasSubmenu) {
-          const OsMenuItemSelf = vm.$options as Component
-          const submenuItems = (props.route.children as Record<string, unknown>[]).map((child) => {
-            const childProps = {
-              route: child,
-              parents: [...props.parents, props.route],
-            }
-            if (isVue2) {
-              return h(OsMenuItemSelf, { key: child.name as string, props: childProps })
-            }
-            return h(OsMenuItemSelf, { key: child.name as string, ...childProps })
-          })
-          children.push(h('ul', { class: 'os-menu-item-submenu' }, submenuItems))
-        }
-
-        // Build li wrapper
-        const liClass = cn(
-          'os-menu-item',
-          `os-menu-item-level-${String(level)}`,
-          showSubmenu && 'os-menu-item-show-submenu',
-        )
-
-        if (isVue2) {
-          const parentClass =
-            (proxy?.$vnode as Record<string, Record<string, unknown>> | undefined)?.data
-              ?.staticClass || ''
-          const parentDynClass =
-            (proxy?.$vnode as Record<string, Record<string, unknown>> | undefined)?.data?.class
-          const listeners = (proxy as Record<string, unknown>)?.$listeners as
-            | Record<string, unknown>
-            | undefined
-
-          return h(
-            'li',
-            {
-              class: [cn(liClass, parentClass as string), parentDynClass].filter(Boolean),
-              attrs,
-              on: {
-                ...(listeners || {}),
-                click: handleClick,
-              },
-            },
-            children,
-          )
-        }
-
-        const { class: attrClass, ...restAttrs } = attrs as Record<string, unknown>
-        return h(
-          'li',
-          {
-            class: cn(liClass, (attrClass as string) || ''),
-            onClick: handleClick,
-            ...restAttrs,
-          },
-          children,
-        )
-      }
     },
     /* v8 ignore stop */
   })

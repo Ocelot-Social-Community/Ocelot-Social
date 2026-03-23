@@ -21,12 +21,12 @@
   export default defineComponent({
     name: 'OsMenu',
     components: { OsMenuItem },
-    inheritAttrs: false,
     provide() {
       return {
         $parentMenu: this,
       }
     },
+    inheritAttrs: false,
     props: {
       /** Array of route objects to display */
       routes: {
@@ -63,20 +63,13 @@
       },
       /** Custom matcher function for active state */
       matcher: {
-        type: Function as PropType<
-          (url: string, route: Record<string, unknown>) => boolean
-        >,
+        type: Function as PropType<(url: string, route: Record<string, unknown>) => boolean>,
         default: () => false,
       },
       /** Function to check if URL must match exactly */
       isExact: {
         type: Function as PropType<(url: string) => boolean>,
         default: (url: string) => url === '/',
-      },
-    },
-    methods: {
-      handleNavigate() {
-        this.$emit('navigate')
       },
     },
     /* v8 ignore start -- render function tested via unit + visual tests */
@@ -115,13 +108,17 @@
           const parentClass =
             (proxy?.$vnode as Record<string, Record<string, unknown>> | undefined)?.data
               ?.staticClass || ''
-          const parentDynClass =
-            (proxy?.$vnode as Record<string, Record<string, unknown>> | undefined)?.data?.class
+          const parentDynClass = (
+            proxy?.$vnode as Record<string, Record<string, unknown>> | undefined
+          )?.data?.class
 
           return h(
             'nav',
             {
-              class: [cn('os-menu', props.dropdown && 'os-menu--dropdown', parentClass as string), parentDynClass].filter(Boolean),
+              class: [
+                cn('os-menu', props.dropdown && 'os-menu--dropdown', parentClass as string),
+                parentDynClass,
+              ].filter(Boolean),
               attrs,
               on: { navigate: () => emit('navigate') },
             },
@@ -133,12 +130,21 @@
         return h(
           'nav',
           {
-            class: cn('os-menu', props.dropdown && 'os-menu--dropdown', (attrClass as string) || ''),
+            class: cn(
+              'os-menu',
+              props.dropdown && 'os-menu--dropdown',
+              (attrClass as string) || '',
+            ),
             ...restAttrs,
           },
           [list],
         )
       }
+    },
+    methods: {
+      handleNavigate() {
+        this.$emit('navigate')
+      },
     },
     /* v8 ignore stop */
   })

@@ -22,7 +22,7 @@ const nestedRoutes = [
   },
 ]
 
-describe('OsMenu', () => {
+describe('osMenu', () => {
   it('renders a nav element with os-menu class', () => {
     const wrapper = mount(OsMenu, { props: { routes } })
 
@@ -100,11 +100,11 @@ describe('OsMenu', () => {
 
     await wrapper.find('.os-menu-item-link').trigger('click')
 
-    expect(wrapper.emitted('navigate')).toBeTruthy()
+    expect(wrapper.emitted('navigate')).toBe(true)
   })
 })
 
-describe('OsMenuItem', () => {
+describe('osMenuItem', () => {
   const parentMenu = {
     linkTag: 'a',
     urlParser: (route: Record<string, unknown>) => (route.path as string) || '/',
@@ -162,7 +162,7 @@ describe('OsMenuItem', () => {
 
     await wrapper.find('.os-menu-item-link').trigger('click')
 
-    expect(wrapper.emitted('click')).toBeTruthy()
+    expect(wrapper.emitted('click')).toBe(true)
     expect(wrapper.emitted('click')![0][1]).toEqual(route)
   })
 
