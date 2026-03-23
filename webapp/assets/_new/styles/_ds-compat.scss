@@ -125,3 +125,358 @@
   &.ds-table-col-right, &.ds-table-head-col-right { text-align: right; }
   &.ds-table-col-center, &.ds-table-head-col-center { text-align: center; }
 }
+
+// ==========================================================
+// Layout: Container, Section, Placeholder
+// ==========================================================
+.ds-container {
+  margin: 0 auto;
+  padding: 0 $space-base;
+  max-width: $container-width-base;
+}
+.ds-container-small   { max-width: $container-width-small; }
+.ds-container-medium  { max-width: $container-width-medium; }
+.ds-container-x-large { max-width: $container-width-x-large; }
+
+.ds-section {
+  padding: $space-large 0;
+}
+
+.ds-placeholder {
+  color: $text-color-disabled;
+  font-style: italic;
+  text-align: center;
+  padding: $space-base;
+}
+
+// ==========================================================
+// Typography: Heading
+// ==========================================================
+.ds-heading {
+  margin-top: 0;
+  margin-bottom: $space-x-small;
+  font-family: $font-family-text;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-base;
+  color: $text-color-base;
+}
+.ds-heading-h1 { font-size: $font-size-xxx-large; }
+.ds-heading-h2 { font-size: $font-size-xx-large; }
+.ds-heading-h3 { font-size: $font-size-x-large; }
+.ds-heading-h4 { font-size: $font-size-large; }
+.ds-heading-soft { color: $text-color-soft; }
+.ds-heading-no-margin { margin-bottom: 0; }
+.ds-heading-align-center { text-align: center; }
+
+// ==========================================================
+// Navigation: Tab Nav
+// ==========================================================
+.ds-tab-nav {
+  display: flex;
+  border-bottom: 1px solid $border-color-softer;
+  margin-bottom: $space-base;
+}
+
+// ==========================================================
+// List
+// ==========================================================
+.ds-list {
+  margin: 0 0 1em;
+  padding: 0;
+  list-style: none;
+  line-height: $line-height-base;
+}
+.ds-list:last-child { margin-bottom: 0; }
+
+// ==========================================================
+// Logo
+// ==========================================================
+.ds-logo {
+  display: inline-block;
+}
+.ds-logo-svg {
+  display: block;
+  height: auto;
+}
+.ds-logo-mobile   { display: block; }
+.ds-logo-tablet   { display: none; }
+.ds-logo-desktop  { display: none; }
+.ds-logo-inverse  { display: none; }
+
+@media screen and (min-width: 600px) {
+  .ds-logo-mobile  { display: none; }
+  .ds-logo-tablet  { display: block; }
+}
+@media screen and (min-width: 960px) {
+  .ds-logo-tablet  { display: none; }
+  .ds-logo-desktop { display: block; }
+}
+
+// ==========================================================
+// Footer
+// ==========================================================
+.ds-footer {
+  padding: $space-base 0;
+  text-align: center;
+  color: $text-color-soft;
+  font-size: $font-size-small;
+}
+
+// ==========================================================
+// Form / Input (used by OcelotInput)
+// ==========================================================
+.ds-form-item {
+  position: relative;
+  margin-bottom: $space-small;
+}
+.ds-form-item:last-child { margin-bottom: 0; }
+
+.ds-input-label {
+  padding-bottom: $space-xx-small;
+  color: $text-color-soft;
+  font-size: $font-size-base;
+  display: block;
+}
+
+.ds-input-error {
+  color: $color-danger;
+  font-size: $font-size-x-small;
+  position: absolute;
+  top: 100%;
+}
+.ds-input-error-enter-active {
+  transition: opacity $duration-base $ease-out, transform $duration-base $ease-out;
+}
+.ds-input-error-enter, .ds-input-error-leave-to {
+  opacity: 0;
+  transform: translateY(-2px);
+}
+
+.ds-input-wrap { position: relative; }
+
+.ds-input {
+  appearance: none;
+  box-sizing: border-box;
+  font-size: $input-font-size-base;
+  line-height: $line-height-base;
+  font-family: $font-family-text;
+  width: 100%;
+  padding: $input-padding-vertical $space-x-small;
+  height: $input-height;
+  color: $text-color-base;
+  background: $background-color-soft;
+  border: $input-border-size solid $border-color-softer;
+  border-radius: $border-radius-base;
+  outline: none;
+  transition: all $duration-short $ease-out;
+}
+.ds-input::placeholder { color: $text-color-disabled; }
+.ds-input-has-focus .ds-input, .ds-input:focus {
+  border-color: $border-color-active;
+  background: $background-color-base;
+}
+.ds-input-is-disabled .ds-input, .ds-input:disabled {
+  color: $text-color-disabled;
+  opacity: $opacity-disabled;
+  pointer-events: none;
+  cursor: not-allowed;
+  background-color: $background-color-disabled;
+}
+.ds-input-is-readonly .ds-input { pointer-events: none; }
+.ds-input-has-error .ds-input { border-color: $border-color-danger; }
+
+.ds-input-size-small {
+  font-size: $font-size-small;
+  .ds-input { font-size: $input-font-size-small; height: $input-height-small; padding: $input-padding-vertical-small $space-x-small; }
+}
+.ds-input-size-large {
+  font-size: $font-size-large;
+  .ds-input { font-size: $input-font-size-large; height: $input-height-large; padding: $input-padding-vertical-large $space-x-small; }
+}
+
+textarea.ds-input { height: auto; min-height: $input-height; resize: none; }
+textarea.ds-input-size-small { min-height: $input-height-small; }
+textarea.ds-input-size-large { min-height: $input-height-large; }
+
+.ds-input-icon, .ds-input-icon-right {
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $input-height;
+  color: $text-color-softer;
+  transition: color $duration-short $ease-out;
+  pointer-events: none;
+}
+.ds-input-has-focus .ds-input-icon,
+.ds-input-has-focus .ds-input-icon-right { color: $text-color-base; }
+.ds-input-size-small .ds-input-icon,
+.ds-input-size-small .ds-input-icon-right { width: $input-height-small; }
+.ds-input-size-large .ds-input-icon,
+.ds-input-size-large .ds-input-icon-right { width: $input-height-large; }
+.ds-input-icon-right { right: 0; left: auto; }
+
+.ds-input-has-icon { padding-left: $input-height; }
+.ds-input-size-small .ds-input-has-icon { padding-left: $input-height-small; }
+.ds-input-size-large .ds-input-has-icon { padding-left: $input-height-large; }
+.ds-input-has-icon-right { padding-right: $input-height; }
+.ds-input-size-small .ds-input-has-icon-right { padding-right: $input-height-small; }
+.ds-input-size-large .ds-input-has-icon-right { padding-right: $input-height-large; }
+
+// ==========================================================
+// Select (used by OcelotSelect)
+// ==========================================================
+.ds-select-wrap { position: relative; }
+
+.ds-select {
+  appearance: none;
+  box-sizing: border-box;
+  font-size: $input-font-size-base;
+  line-height: $line-height-base;
+  font-family: $font-family-text;
+  width: 100%;
+  padding: $input-padding-vertical $space-x-small;
+  height: $input-height;
+  color: $text-color-base;
+  background: $background-color-soft;
+  border: $input-border-size solid $border-color-softer;
+  border-radius: $border-radius-base;
+  outline: none;
+  transition: all $duration-short $ease-out;
+  user-select: none;
+}
+.ds-select::placeholder { color: $text-color-disabled; }
+.ds-input-has-focus .ds-select, .ds-select:focus {
+  border-color: $border-color-active;
+  background: $background-color-base;
+}
+.ds-input-is-disabled .ds-select, .ds-select:disabled {
+  color: $text-color-disabled;
+  opacity: $opacity-disabled;
+  pointer-events: none;
+  cursor: not-allowed;
+  background-color: $background-color-disabled;
+}
+.ds-input-is-readonly .ds-select { pointer-events: none; }
+.ds-input-has-error .ds-select { border-color: $border-color-danger; }
+.ds-select-is-open .ds-select {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+}
+.ds-input-size-small .ds-select { font-size: $input-font-size-small; height: $input-height-small; padding: $input-padding-vertical-small $space-x-small; }
+.ds-input-size-large .ds-select { font-size: $input-font-size-large; height: $input-height-large; padding: $input-padding-vertical-large $space-x-small; }
+
+.ds-select-multiple {
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+}
+
+.ds-select-search, .ds-select-value {
+  box-sizing: border-box;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border: $input-border-size solid transparent;
+  padding: $input-padding-vertical $space-x-small;
+  line-height: $line-height-base;
+}
+.ds-input-size-small .ds-select-search,
+.ds-input-size-small .ds-select-value { padding: $input-padding-vertical-small $space-x-small; }
+.ds-input-size-large .ds-select-search,
+.ds-input-size-large .ds-select-value { padding: $input-padding-vertical-large $space-x-small; }
+
+.ds-select-has-icon .ds-select-search,
+.ds-select-has-icon .ds-select-value { padding-left: $input-height; }
+.ds-select-has-icon-right .ds-select-search,
+.ds-select-has-icon-right .ds-select-value { padding-right: $input-height; }
+
+.ds-select-search {
+  appearance: none;
+  font-size: inherit;
+  font-family: $font-family-text;
+  width: 100%;
+  background: transparent;
+  color: $text-color-base;
+  outline: none;
+  user-select: text;
+  opacity: 0;
+}
+.ds-select-search::placeholder { color: $text-color-disabled; }
+.ds-select-is-open .ds-select-search { opacity: 1; }
+.ds-select-multiple .ds-select-search {
+  position: relative;
+  display: inline-flex;
+  width: auto;
+  height: auto;
+  padding: 0;
+  opacity: 1;
+}
+
+.ds-select-placeholder, .ds-select-value { pointer-events: none; }
+.ds-select-is-open .ds-select-placeholder,
+.ds-select-is-open .ds-select-value { opacity: 0; }
+.ds-select-placeholder { color: $text-color-disabled; }
+
+.ds-selected-options { display: flex; max-width: 100%; overflow: hidden; }
+.ds-selected-option { display: inline-flex; align-items: center; margin-right: $space-xx-small; }
+
+.ds-select-dropdown {
+  position: absolute;
+  z-index: $z-index-dropdown;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: $background-color-base;
+  border: $input-border-size solid $border-color-active;
+  border-top: 0;
+  border-bottom-left-radius: $border-radius-base;
+  border-bottom-right-radius: $border-radius-base;
+  visibility: hidden;
+  opacity: 0;
+  transition: all $duration-short $ease-out, border-bottom 0ms;
+  max-height: 240px;
+  overflow: auto;
+}
+.ds-select-is-open .ds-select-dropdown { visibility: visible; opacity: 1; }
+
+.ds-select-dropdown-message {
+  padding: $input-padding-vertical $space-x-small;
+  color: $text-color-disabled;
+}
+
+.ds-select-options {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-select-option {
+  padding: $input-padding-vertical $space-x-small;
+  cursor: pointer;
+  transition: all $duration-short $ease-out;
+}
+.ds-select-option.ds-select-option-hover {
+  background-color: $background-color-softer;
+  color: $text-color-base;
+}
+.ds-select-option-is-selected {
+  background-color: $background-color-soft;
+  color: $text-color-primary;
+}
+
+.ds-select-icon, .ds-select-icon-right {
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $input-height;
+  color: $text-color-softer;
+  transition: color $duration-short $ease-out;
+  pointer-events: none;
+}
+.ds-input-has-focus .ds-select-icon,
+.ds-input-has-focus .ds-select-icon-right { color: $text-color-base; }
+.ds-select-icon-right { right: 0; left: auto; }
