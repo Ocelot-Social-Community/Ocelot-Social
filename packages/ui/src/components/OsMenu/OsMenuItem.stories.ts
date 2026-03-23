@@ -1,5 +1,3 @@
-import { computed } from 'vue'
-
 import OsMenu from './OsMenu.vue'
 import OsMenuItem from './OsMenuItem.vue'
 
@@ -13,15 +11,16 @@ const meta: Meta<typeof OsMenuItem> = {
 
 export default meta
 
+const routes = [
+  { name: 'Edit', path: '/edit', label: 'Edit Item' },
+  { name: 'Delete', path: '/delete', label: 'Delete Item' },
+  { name: 'Share', path: '/share', label: 'Share Item' },
+]
+
 export const InDropdown: StoryObj = {
   render: () => ({
     components: { OsMenu, OsMenuItem },
     setup() {
-      const routes = computed(() => [
-        { name: 'Edit', path: '/edit', label: 'Edit Item' },
-        { name: 'Delete', path: '/delete', label: 'Delete Item' },
-        { name: 'Share', path: '/share', label: 'Share Item' },
-      ])
       return { routes }
     },
     template: `
