@@ -9,7 +9,10 @@
       </div>
       <component
         class="ds-input"
-        :class="[resolvedIcon && 'ds-input-has-icon', resolvedIconRight && 'ds-input-has-icon-right']"
+        :class="[
+          resolvedIcon && 'ds-input-has-icon',
+          resolvedIconRight && 'ds-input-has-icon-right',
+        ]"
         :id="id"
         :name="name ? name : model"
         :type="type"
