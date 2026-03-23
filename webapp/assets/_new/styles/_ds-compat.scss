@@ -174,14 +174,7 @@
 .ds-heading-no-margin { margin: 0; }
 .ds-heading-align-center { text-align: center; }
 
-// ==========================================================
-// Navigation: Tab Nav
-// ==========================================================
-.ds-tab-nav {
-  display: flex;
-  border-bottom: 1px solid $border-color-softer;
-  margin-bottom: $space-base;
-}
+// Tab Nav — styles are in TabNavigation.vue (scoped), no global .ds-tab-nav needed
 
 // ==========================================================
 // List
