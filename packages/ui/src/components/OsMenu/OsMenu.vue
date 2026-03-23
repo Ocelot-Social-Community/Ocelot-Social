@@ -27,7 +27,6 @@
       }
     },
     inheritAttrs: false,
-    emits: ['navigate'],
     props: {
       /** Array of route objects to display */
       routes: {
@@ -73,6 +72,7 @@
         default: (url: string) => url === '/',
       },
     },
+    emits: ['navigate'],
     /* v8 ignore start -- render function tested via unit + visual tests */
     setup(props, { slots, attrs, emit }) {
       const instance = isVue2 ? getCurrentInstance() : null

@@ -19,7 +19,6 @@
       },
     },
     inheritAttrs: false,
-    emits: ['click'],
     props: {
       /** Route object with name, path, children, etc. */
       route: {
@@ -37,6 +36,7 @@
         default: null,
       },
     },
+    emits: ['click'],
     /* v8 ignore start -- render function tested via unit + visual tests */
     setup(props, { slots, attrs }) {
       const instance = isVue2 ? getCurrentInstance() : null

@@ -100,7 +100,7 @@ describe('osMenu', () => {
 
     await wrapper.find('.os-menu-item-link').trigger('click')
 
-    expect(wrapper.emitted('navigate')).toBeTruthy()
+    expect(wrapper.emitted('navigate')).toBe(true)
   })
 })
 
@@ -163,7 +163,8 @@ describe('osMenuItem', () => {
     await wrapper.find('.os-menu-item-link').trigger('click')
 
     const clicks = wrapper.emitted('click')
-    expect(clicks).toBeTruthy()
+
+    expect(clicks).toBe(true)
     expect(clicks?.[0]?.[1]).toStrictEqual(route)
   })
 
