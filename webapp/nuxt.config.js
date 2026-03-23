@@ -17,9 +17,7 @@ const ogLocaleAlternates = locales
   .map((l) => l.iso.replace('-', '_'))
 
 // Design tokens (SCSS variables) — originally from styleguide, now local
-const designTokenStyles = [
-  '~assets/_new/styles/_styleguide-tokens.scss',
-]
+const designTokenStyles = ['~assets/_new/styles/_styleguide-tokens.scss']
 
 export default {
   buildDir: CONFIG.NUXT_BUILD,
