@@ -7,8 +7,6 @@ import Filters from '~/plugins/vue-filters'
 import InfiniteLoading from '~/plugins/vue-infinite-loading'
 import Directives from '~/plugins/vue-directives'
 import VueObserveVisibility from '~/plugins/vue-observe-visibility'
-import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
-
 require('intersection-observer')
 
 // Fail tests on Vue warnings
@@ -34,6 +32,3 @@ global.localVue.use(Filters)
 global.localVue.use(Directives)
 global.localVue.use(InfiniteLoading)
 global.localVue.use(VueObserveVisibility)
-
-Vue.component('OcelotInput', OcelotInput)
-global.localVue.component('OcelotInput', OcelotInput)

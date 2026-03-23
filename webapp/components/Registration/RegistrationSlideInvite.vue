@@ -42,6 +42,7 @@ import registrationConstants from '~/constants/registrationBranded.js'
 import { validateInviteCode } from '~/graphql/InviteCode'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   name: 'RegistrationSlideInvite',
@@ -51,6 +52,7 @@ export default {
   },
   components: {
     ProfileAvatar,
+    OcelotInput,
   },
   data() {
     return {

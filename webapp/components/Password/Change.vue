@@ -46,6 +46,7 @@ import gql from 'graphql-tag'
 import PasswordStrength from './Strength'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   name: 'ChangePassword',
@@ -54,6 +55,7 @@ export default {
     OsButton,
     OsIcon,
     PasswordStrength,
+    OcelotInput,
   },
   created() {
     this.icons = iconRegistry

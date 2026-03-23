@@ -73,6 +73,7 @@ import { SweetalertIcon } from 'vue-sweetalert-icons'
 import { reportMutation } from '~/graphql/Moderation.js'
 import { valuesReasonCategoryOptions } from '~/constants/modals.js'
 import validReport from '~/components/utils/ReportModal'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   name: 'ReportModal',
@@ -81,6 +82,7 @@ export default {
     OsIcon,
     OsModal,
     SweetalertIcon,
+    OcelotInput,
   },
   props: {
     name: { type: String, default: '' },

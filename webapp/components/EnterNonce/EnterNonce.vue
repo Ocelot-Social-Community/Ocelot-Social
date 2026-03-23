@@ -30,11 +30,12 @@
 import { OsButton } from '@ocelot-social/ui'
 import registrationConstants from '~/constants/registration'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   name: 'EnterNonce',
   mixins: [formValidation],
-  components: { OsButton },
+  components: { OsButton, OcelotInput },
   props: {
     email: { type: String, required: true },
   },

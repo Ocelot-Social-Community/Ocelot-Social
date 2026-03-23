@@ -73,6 +73,7 @@ import gql from 'graphql-tag'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   mixins: [formValidation],
@@ -81,6 +82,7 @@ export default {
     OsIcon,
     SweetalertIcon,
     PasswordStrength,
+    OcelotInput,
   },
   props: {
     email: { type: String, required: true },

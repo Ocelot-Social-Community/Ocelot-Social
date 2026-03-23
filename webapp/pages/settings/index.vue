@@ -48,6 +48,7 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
 import UniqueSlugForm from '~/components/utils/UniqueSlugForm'
 import LocationSelect from '~/components/Select/LocationSelect'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 import { updateUserMutation } from '~/graphql/User'
 import scrollToContent from './scroll-to-content.js'
 import formValidation from '~/mixins/formValidation'
@@ -60,6 +61,7 @@ export default {
     OsCard,
     OsIcon,
     LocationSelect,
+    OcelotInput,
   },
   data() {
     return {

@@ -27,10 +27,11 @@
 import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   mixins: [formValidation],
-  components: { OsButton, OsCard, OsIcon },
+  components: { OsButton, OsCard, OsIcon, OcelotInput },
   data() {
     return {
       formData: {

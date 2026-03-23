@@ -70,6 +70,7 @@ import { escape } from 'xregexp/xregexp-all.js'
 import { RecycleScroller } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export const profileListVisibleCount = 6
 const VIRTUAL_SCROLL_THRESHOLD = 50
@@ -81,6 +82,7 @@ export default {
     OsCard,
     UserTeaser,
     RecycleScroller,
+    OcelotInput,
   },
   props: {
     uniqueName: { type: String, required: true },

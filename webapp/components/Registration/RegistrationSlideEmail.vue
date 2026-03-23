@@ -26,6 +26,7 @@ import metadata from '~/constants/metadata'
 import { isEmail } from 'validator'
 import translateErrorMessage from '~/components/utils/TranslateErrorMessage'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export const SignupMutation = gql`
   mutation ($email: String!, $locale: String!, $inviteCode: String) {
@@ -37,6 +38,9 @@ export const SignupMutation = gql`
 export default {
   name: 'RegistrationSlideEmail',
   mixins: [formValidation],
+  components: {
+    OcelotInput,
+  },
   props: {
     sliderData: { type: Object, required: true },
   },

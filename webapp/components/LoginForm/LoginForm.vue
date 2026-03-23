@@ -71,6 +71,7 @@ import ShowPassword from '../ShowPassword/ShowPassword.vue'
 import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   components: {
@@ -81,6 +82,7 @@ export default {
     OsIcon,
     PageParamsLink,
     ShowPassword,
+    OcelotInput,
   },
   data() {
     return {

@@ -41,12 +41,14 @@ import { OsButton } from '@ocelot-social/ui'
 import gql from 'graphql-tag'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   mixins: [formValidation],
   components: {
     OsButton,
     SweetalertIcon,
+    OcelotInput,
   },
   data() {
     return {

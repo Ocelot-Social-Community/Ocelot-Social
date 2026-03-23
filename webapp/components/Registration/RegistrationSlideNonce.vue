@@ -22,6 +22,7 @@ import registrationConstants from '~/constants/registration'
 import formValidation from '~/mixins/formValidation'
 
 import EmailDisplayAndVerify from './EmailDisplayAndVerify'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export const verifyNonceQuery = gql`
   query ($email: String!, $nonce: String!) {
@@ -33,6 +34,7 @@ export default {
   mixins: [formValidation],
   components: {
     EmailDisplayAndVerify,
+    OcelotInput,
   },
   props: {
     sliderData: { type: Object, required: true },

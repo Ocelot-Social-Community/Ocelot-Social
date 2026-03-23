@@ -39,10 +39,11 @@
 import { OsButton, OsCard } from '@ocelot-social/ui'
 import { DonationsQuery, UpdateDonations } from '~/graphql/Donations'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   mixins: [formValidation],
-  components: { OsButton, OsCard },
+  components: { OsButton, OsCard, OcelotInput },
   data() {
     return {
       formData: {

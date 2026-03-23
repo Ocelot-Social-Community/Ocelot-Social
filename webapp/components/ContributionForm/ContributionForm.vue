@@ -233,6 +233,7 @@ import DatePicker from 'vue2-datepicker'
 import 'vue2-datepicker/scss/index.scss'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   mixins: [GetCategories, formValidation],
@@ -246,6 +247,7 @@ export default {
     OsCard,
     OsIcon,
     PageParamsLink,
+    OcelotInput,
   },
   props: {
     contribution: {

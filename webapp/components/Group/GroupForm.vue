@@ -176,6 +176,7 @@ import ActionRadiusSelect from '~/components/Select/ActionRadiusSelect'
 import LocationSelect from '~/components/Select/LocationSelect'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   name: 'GroupForm',
@@ -188,6 +189,7 @@ export default {
     OsBadge,
     OsButton,
     OsIcon,
+    OcelotInput,
   },
   props: {
     update: {

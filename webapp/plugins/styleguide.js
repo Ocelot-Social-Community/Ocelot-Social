@@ -4,7 +4,4 @@ import '@@/system.css'
 // Load UI library CSS after styleguide to ensure correct specificity
 import '@ocelot-social/ui/style.css'
 
-import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
-
 Vue.use(Styleguide)
-Vue.component('OcelotInput', OcelotInput)

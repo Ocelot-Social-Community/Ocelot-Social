@@ -36,6 +36,7 @@ import { AddEmailAddressMutation } from '~/graphql/EmailAddress.js'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import scrollToContent from '../scroll-to-content.js'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
   mixins: [scrollToContent, formValidation],
@@ -44,6 +45,7 @@ export default {
     OsCard,
     OsIcon,
     SweetalertIcon,
+    OcelotInput,
   },
   created() {
     this.icons = iconRegistry

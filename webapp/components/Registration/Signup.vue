@@ -62,6 +62,7 @@ import metadata from '~/constants/metadata'
 import { SweetalertIcon } from 'vue-sweetalert-icons'
 import translateErrorMessage from '~/components/utils/TranslateErrorMessage'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export const SignupMutation = gql`
   mutation ($email: String!, $locale: String!, $inviteCode: String) {
@@ -76,6 +77,7 @@ export default {
   components: {
     OsButton,
     SweetalertIcon,
+    OcelotInput,
   },
   props: {
     invitation: { type: Boolean, default: false },

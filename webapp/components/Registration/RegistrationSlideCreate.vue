@@ -161,6 +161,7 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import ShowPassword from '../ShowPassword/ShowPassword.vue'
 import LocationSelect from '~/components/Select/LocationSelect'
 import formValidation from '~/mixins/formValidation'
+import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 const threePerEmSpace = ' ' // unicode u+2004;
 
@@ -174,6 +175,7 @@ export default {
     ShowPassword,
     SweetalertIcon,
     LocationSelect,
+    OcelotInput,
   },
   props: {
     sliderData: { type: Object, required: true },
