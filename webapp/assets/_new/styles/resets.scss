@@ -31,6 +31,22 @@
   font-weight: 600;
   text-rendering: optimizeLegibility;
 }
+@font-face {
+  font-family: 'Gentium Basic';
+  src: url('/fonts/GentiumBasic.aa23a915.woff2') format('woff2'),
+       url('/fonts/GentiumBasic.7775b109.woff') format('woff');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Gentium Basic';
+  src: url('/fonts/GentiumBasic-Italic.84c97b07.woff2') format('woff2'),
+       url('/fonts/GentiumBasic-Italic.b5afcc4e.woff') format('woff');
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
 
 // Global resets
 *,
