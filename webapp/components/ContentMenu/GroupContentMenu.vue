@@ -132,4 +132,8 @@ export default {
 .tooltip-inner.popover-inner .os-menu {
   margin: (-$space-xx-small) (-$space-small) !important;
 }
+
+.tooltip-inner.popover-inner .os-menu-item-link:hover {
+  border-left-color: $color-primary !important;
+}
 </style>
