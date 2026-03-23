@@ -15,7 +15,7 @@ Phase 4: Tier 1        ██████████ 100% (OsButton, OsIcon, Os
 Phase 4: Tier A → HTML ██████████ 100% (10 ds-* Wrapper → Plain HTML) ✅
 Phase 4: Tier B        ██████████ 100% (ds-chip→OsBadge✅, ds-tag→OsBadge✅, ds-grid✅, ds-number→OsNumber✅, ds-radio→HTML✅)
 Phase 4: Tier B        ██████████ 100% (Chip→OsBadge, Tag→OsBadge, Grid→HTML, Number→OsNumber, Radio→HTML, Table→HTML) ✅
-Phase 4: Tier 2+       ████████░░  60% (OsModal✅, ds-form entkoppelt✅, ds-input→OcelotInput✅) | Rest ausstehend (OsMenu, OsSelect, OsDropdown, OsAvatar)
+Phase 4: Tier 2+       ████████░░  70% (OsModal✅, ds-form entkoppelt✅, ds-input→OcelotInput✅, ds-select→OcelotSelect✅) | Rest ausstehend (OsMenu, OsDropdown, OsAvatar)
 ```
 
 ### Statistiken
@@ -32,7 +32,8 @@ Phase 4: Tier 2+       ████████░░  60% (OsModal✅, ds-form 
 | ✅ → OsModal | Modal (7 Nutzungen → OsModal, Focus-Trap, Scroll-Lock, A11y) |
 | ✅ ds-input → OcelotInput | Input (23 Dateien → OcelotInput Webapp-Komponente, lokale Imports, formValidation-kompatibel) |
 | ✅ ds-form entkoppelt | Form-Validierung → formValidation Mixin (async-validator), vuelidate entfernt |
-| ⬜ → UI-Library | Menu, MenuItem, Select (3) — Tier 2-3 |
+| ✅ ds-select → OcelotSelect | Select (3 Dateien → OcelotSelect Webapp-Komponente, lokale Imports, click-outside inline) |
+| ⬜ → UI-Library | Menu, MenuItem (2) — Tier 3 |
 | ⬜ Nicht in Webapp | Code, CopyField, FormItem, InputError, InputLabel, Page, PageTitle, Logo, Avatar, TableCol, TableHeadCol (11) |
 
 ### OsButton Migration (Phase 3) ✅
@@ -80,7 +81,7 @@ Phase 4: Tier 2+       ████████░░  60% (OsModal✅, ds-form 
 | 18 | InputError | ✅ → OcelotInput | In OcelotInput integriert |
 | 19 | InputLabel | ✅ → OcelotInput | In OcelotInput integriert |
 | 20 | Radio | ✅ → HTML | 1 Datei → native `<input type="radio">` + `<fieldset>` (ReportModal) |
-| 21 | Select | ⬜ Tier 4 | 3 Dateien → OsSelect |
+| 21 | Select | ✅ → OcelotSelect | 3 Dateien → OcelotSelect (Webapp-Komponente, click-outside inline) |
 
 ### Layout
 | # | Komponente | Status | Notizen |
@@ -370,7 +371,7 @@ Phase 4: Tier 2+       ████████░░  60% (OsModal✅, ds-form 
 ### Basis-Komponenten — UI-Library (ausstehend)
 - Modal → OsModal ✅
 - Input → OcelotInput (Webapp-Komponente) ✅ — langfristig → OsInput in packages/ui
-- Select → OsSelect
+- Select → OcelotSelect (Webapp-Komponente) ✅ — langfristig → OsSelect in packages/ui
 - Avatar → OsAvatar (falls benötigt)
 
 ### Layout & Typography — → Plain HTML ✅ (Tier A)
@@ -412,6 +413,7 @@ Phase 4: Tier 2+       ████████░░  60% (OsModal✅, ds-form 
 | 2026-02-19 | Claude | **Tier A Migration** | 10 ds-* Vue-Wrapper → Plain HTML + CSS, _ds-compat.scss, ~450 Nutzungen in ~90 Dateien |
 | 2026-02-19 | Claude | **Katalog konsolidiert** | Styleguide- und Webapp-Tabellen aktualisiert, veraltete Status korrigiert |
 | 2026-03-23 | Claude | **ds-input → OcelotInput** | 23 Dateien migriert, Webapp-Komponente mit lokalen Imports (tree-shakeable), FormItem/Label/Error vereint |
+| 2026-03-23 | Claude | **ds-select → OcelotSelect** | 3 Dateien migriert, Webapp-Komponente, DsSelect+inputMixin+multiinputMixin vereint, Form-Kopplung entfernt, DsChip→OsBadge, DsSpinner→OsSpinner, click-outside inline |
 
 ---
 
@@ -450,11 +452,11 @@ Phase 4: Tier 2+       ████████░░  60% (OsModal✅, ds-form 
 20. [x] ds-form → formValidation Mixin (async-validator), 18 Dateien migriert, vuelidate entfernt ✅
 21. [x] ds-input → OcelotInput (23 Dateien, Webapp-Komponente mit lokalen Imports, FormItem/Label/Error vereint, formValidation-kompatibel) ✅
 22. [ ] OsMenu / OsMenuItem (17 Dateien)
-23. [ ] OsSelect (3 Dateien), OsTable (7 Dateien)
+23. [x] ds-select → OcelotSelect (3 Dateien, Webapp-Komponente, click-outside inline, DsChip→OsBadge) ✅
 
 ---
 
-**✅ Phase 0-3 abgeschlossen. Phase 4: Tier 1 + Tier A ✅, Tier B ✅ (Chip→OsBadge, Tag→OsBadge, Grid→HTML, Number→OsNumber, Radio→HTML, Table→HTML), Tier 2: OsModal ✅, ds-form entkoppelt ✅, ds-input → OcelotInput ✅, Rest ausstehend (OsMenu, OsSelect).**
+**✅ Phase 0-3 abgeschlossen. Phase 4: Tier 1 + Tier A ✅, Tier B ✅ (Chip→OsBadge, Tag→OsBadge, Grid→HTML, Number→OsNumber, Radio→HTML, Table→HTML), Tier 2: OsModal ✅, ds-form entkoppelt ✅, ds-input → OcelotInput ✅, ds-select → OcelotSelect ✅, Rest ausstehend (OsMenu).**
 
 ---
 

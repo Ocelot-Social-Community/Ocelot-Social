@@ -3,7 +3,7 @@
     <label class="ds-input-label">
       {{ `${$t('settings.data.labelCity')}` + locationNameLabelAddOnOldName }}
     </label>
-    <ds-select
+    <ocelot-select
       id="city"
       v-model="currentValue"
       :options="cities"
@@ -14,13 +14,15 @@
       @input.native="handleCityInput"
     />
     <os-button
-      v-if="locationName !== '' && canBeCleared"
+      v-if="(locationName !== '' && canBeCleared) || loadingGeo"
       data-test="clear-location-button"
       variant="primary"
       appearance="ghost"
       size="sm"
+      circle
+      :loading="loadingGeo"
       :aria-label="$t('actions.clear')"
-      style="right: -94%; top: -48px"
+      style="position: relative; float: right; top: -48px; right: 4px"
       @click="clearLocationName"
     >
       <template #icon><os-icon :icon="icons.close" /></template>
@@ -30,14 +32,13 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import OcelotSelect from '~/components/OcelotSelect/OcelotSelect.vue'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { queryLocations } from '~/graphql/location'
 
-let timeout
-
 export default {
   name: 'LocationSelect',
-  components: { OsButton, OsIcon },
+  components: { OsButton, OsIcon, OcelotSelect },
   props: {
     value: {
       type: [String, Object],
@@ -62,6 +63,7 @@ export default {
     return {
       currentValue: this.value,
       loadingGeo: false,
+      debounceTimeout: null,
       cities: [],
     }
   },
@@ -99,11 +101,9 @@ export default {
   },
   methods: {
     handleCityInput(event) {
-      clearTimeout(timeout)
-      timeout = setTimeout(
-        () => this.requestGeoData(event.target ? event.target.value.trim() : ''),
-        500,
-      )
+      const value = event.target ? event.target.value.trim() : ''
+      clearTimeout(this.debounceTimeout)
+      this.debounceTimeout = setTimeout(() => this.requestGeoData(value), 500)
     },
     processLocationsResult(places) {
       if (!places.length) {

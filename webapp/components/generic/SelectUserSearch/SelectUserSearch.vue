@@ -1,5 +1,5 @@
 <template>
-  <ds-select
+  <ocelot-select
     class="select-user-search"
     type="search"
     icon="search"
@@ -26,18 +26,20 @@
         <user-teaser :user="option" :showPopover="false" :linkToProfile="false" />
       </p>
     </template>
-  </ds-select>
+  </ocelot-select>
 </template>
 
 <script>
 import { isEmpty } from 'lodash'
 import { searchUsers } from '~/graphql/Search.js'
 import UserTeaser from '~/components/UserTeaser/UserTeaser.vue'
+import OcelotSelect from '~/components/OcelotSelect/OcelotSelect.vue'
 
 export default {
   name: 'SelectUserSearch',
   components: {
     UserTeaser,
+    OcelotSelect,
   },
   props: {
     id: {

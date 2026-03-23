@@ -1,6 +1,6 @@
 <template>
   <div class="searchable-input" aria-label="search" role="search">
-    <ds-select
+    <ocelot-select
       ref="select"
       type="search"
       icon="search"
@@ -48,13 +48,14 @@
           <hc-hashtag :id="option.id" />
         </p>
       </template>
-    </ds-select>
+    </ocelot-select>
     <os-button
-      v-if="isActive"
+      v-if="isActive || loading"
       variant="primary"
       appearance="ghost"
       circle
       size="sm"
+      :loading="loading"
       :aria-label="$t('actions.clear')"
       @click="clear"
     >
@@ -67,6 +68,7 @@
 
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
+import OcelotSelect from '~/components/OcelotSelect/OcelotSelect.vue'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { isEmpty } from 'lodash'
 import SearchHeading from '~/components/generic/SearchHeading/SearchHeading.vue'
@@ -80,6 +82,7 @@ export default {
   components: {
     OsButton,
     OsIcon,
+    OcelotSelect,
     SearchHeading,
     SearchGroup,
     SearchPost,
