@@ -89,18 +89,18 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                     class="content-menu-popover"
                   >
                     <nav
-                      class="ds-menu"
+                      class="os-menu"
+                      dropdown=""
                     >
                       <ul
-                        class="ds-menu-list"
+                        class="os-menu-list"
                       >
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            exact="true"
-                            to="/"
+                          <a
+                            class="os-menu-item-link"
+                            href="/"
                           >
                             <span
                               aria-hidden="true"
@@ -119,16 +119,14 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                             
               report.user.title
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            exact="true"
-                            to="/"
+                          <a
+                            class="os-menu-item-link"
+                            href="/"
                           >
                             <span
                               aria-hidden="true"
@@ -147,16 +145,14 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                             
               disable.user.title
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            exact="true"
-                            to="/"
+                          <a
+                            class="os-menu-item-link"
+                            href="/"
                           >
                             <span
                               aria-hidden="true"
@@ -175,16 +171,14 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                             
               settings.muted-users.mute
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            exact="true"
-                            to="/"
+                          <a
+                            class="os-menu-item-link"
+                            href="/"
                           >
                             <span
                               aria-hidden="true"
@@ -203,8 +197,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                             
               settings.blocked-users.block
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
                       </ul>
                     </nav>
@@ -784,18 +777,18 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                     class="content-menu-popover"
                   >
                     <nav
-                      class="ds-menu"
+                      class="os-menu"
+                      dropdown=""
                     >
                       <ul
-                        class="ds-menu-list"
+                        class="os-menu-list"
                       >
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            exact="true"
-                            to="/"
+                          <a
+                            class="os-menu-item-link"
+                            href="/"
                           >
                             <span
                               aria-hidden="true"
@@ -814,16 +807,14 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                             
               report.user.title
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            exact="true"
-                            to="/"
+                          <a
+                            class="os-menu-item-link"
+                            href="/"
                           >
                             <span
                               aria-hidden="true"
@@ -842,16 +833,14 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                             
               disable.user.title
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            exact="true"
-                            to="/"
+                          <a
+                            class="os-menu-item-link"
+                            href="/"
                           >
                             <span
                               aria-hidden="true"
@@ -870,16 +859,14 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                             
               settings.muted-users.mute
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            exact="true"
-                            to="/"
+                          <a
+                            class="os-menu-item-link"
+                            href="/"
                           >
                             <span
                               aria-hidden="true"
@@ -898,8 +885,7 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                             
               settings.blocked-users.block
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
                       </ul>
                     </nav>
@@ -1546,17 +1532,18 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                     class="content-menu-popover"
                   >
                     <nav
-                      class="ds-menu"
+                      class="os-menu"
+                      dropdown=""
                     >
                       <ul
-                        class="ds-menu-list"
+                        class="os-menu-list"
                       >
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            to="/settings"
+                          <a
+                            class="os-menu-item-link"
+                            href="/settings"
                           >
                             <span
                               aria-hidden="true"
@@ -1575,8 +1562,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                             
               settings.name
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
                       </ul>
                     </nav>
@@ -2135,17 +2121,18 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                     class="content-menu-popover"
                   >
                     <nav
-                      class="ds-menu"
+                      class="os-menu"
+                      dropdown=""
                     >
                       <ul
-                        class="ds-menu-list"
+                        class="os-menu-list"
                       >
                         <li
-                          class="ds-menu-item ds-menu-item-level-0"
+                          class="os-menu-item os-menu-item-level-0"
                         >
-                          <router-link-stub
-                            class="ds-menu-item-link"
-                            to="/settings"
+                          <a
+                            class="os-menu-item-link"
+                            href="/settings"
                           >
                             <span
                               aria-hidden="true"
@@ -2164,8 +2151,7 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                             
               settings.name
             
-                          </router-link-stub>
-                          <!---->
+                          </a>
                         </li>
                       </ul>
                     </nav>

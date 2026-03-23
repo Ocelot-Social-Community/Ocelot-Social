@@ -61,6 +61,7 @@ exports[`GroupContentMenu renders as groupProfile when I am the owner 1`] = `
         >
           <nav
             class="os-menu"
+            dropdown=""
           >
             <ul
               class="os-menu-list"
@@ -213,6 +214,7 @@ exports[`GroupContentMenu renders as groupProfile, muted 1`] = `
         >
           <nav
             class="os-menu"
+            dropdown=""
           >
             <ul
               class="os-menu-list"
@@ -313,6 +315,7 @@ exports[`GroupContentMenu renders as groupProfile, not muted 1`] = `
         >
           <nav
             class="os-menu"
+            dropdown=""
           >
             <ul
               class="os-menu-list"
@@ -413,6 +416,7 @@ exports[`GroupContentMenu renders as groupTeaser 1`] = `
         >
           <nav
             class="os-menu"
+            dropdown=""
           >
             <ul
               class="os-menu-list"
