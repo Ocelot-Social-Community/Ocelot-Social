@@ -133,6 +133,10 @@ export default {
   margin: (-$space-xx-small) (-$space-small) !important;
 }
 
+.tooltip-inner.popover-inner .os-menu-item-link {
+  padding: 8px 12px !important;
+}
+
 .tooltip-inner.popover-inner .os-menu-item-link:hover {
   border-left-color: $color-primary !important;
 }
