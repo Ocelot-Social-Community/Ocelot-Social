@@ -162,8 +162,9 @@ describe('osMenuItem', () => {
 
     await wrapper.find('.os-menu-item-link').trigger('click')
 
-    expect(wrapper.emitted('click')).toBe(true)
-    expect(wrapper.emitted('click')![0][1]).toEqual(route)
+    const clicks = wrapper.emitted('click')
+    expect(clicks).toBeTruthy()
+    expect(clicks?.[0]?.[1]).toStrictEqual(route)
   })
 
   it('renders submenu for routes with children', () => {

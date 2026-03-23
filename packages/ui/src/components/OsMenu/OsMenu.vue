@@ -27,6 +27,7 @@
       }
     },
     inheritAttrs: false,
+    emits: ['navigate'],
     props: {
       /** Array of route objects to display */
       routes: {

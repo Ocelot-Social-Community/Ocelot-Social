@@ -19,6 +19,7 @@
       },
     },
     inheritAttrs: false,
+    emits: ['click'],
     props: {
       /** Route object with name, path, children, etc. */
       route: {
@@ -155,7 +156,7 @@
     data() {
       return {
         showSubmenu: false,
-        _clickOutsideHandler: null as ((e: Event) => void) | null,
+        clickOutsideHandler: null as ((e: Event) => void) | null,
       }
     },
     computed: {
@@ -216,22 +217,22 @@
       },
     },
     mounted() {
-      this._clickOutsideHandler = (e: Event) => {
+      this.clickOutsideHandler = (e: Event) => {
         if (this.showSubmenu && !this.$el.contains(e.target as Node)) {
           this.showSubmenu = false
         }
       }
-      document.addEventListener('click', this._clickOutsideHandler, true)
+      document.addEventListener('click', this.clickOutsideHandler, true)
     },
     beforeUnmount() {
-      if (this._clickOutsideHandler) {
-        document.removeEventListener('click', this._clickOutsideHandler, true)
+      if (this.clickOutsideHandler) {
+        document.removeEventListener('click', this.clickOutsideHandler, true)
       }
     },
     /* v8 ignore next 5 -- Vue 3 alias */
     beforeUnmount() {
-      if (this._clickOutsideHandler) {
-        document.removeEventListener('click', this._clickOutsideHandler, true)
+      if (this.clickOutsideHandler) {
+        document.removeEventListener('click', this.clickOutsideHandler, true)
       }
     },
     methods: {
