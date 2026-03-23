@@ -118,6 +118,18 @@ describe('osMenu', () => {
 
     expect(wrapper.emitted('navigate')?.length).toBeGreaterThan(0)
   })
+
+  describe('keyboard accessibility', () => {
+    it('menu items are rendered as focusable links', () => {
+      const wrapper = mount(OsMenu, { props: { routes } })
+      const links = wrapper.findAll('.os-menu-item-link')
+
+      expect(links.length).toBeGreaterThan(0)
+      links.forEach((link) => {
+        expect(link.element.tagName).toBe('A')
+      })
+    })
+  })
 })
 
 describe('osMenuItem', () => {
@@ -215,5 +227,17 @@ describe('osMenuItem', () => {
     })
 
     expect(wrapper.find('.os-menu-item-link').classes()).toContain('os-menu-item--active')
+  })
+
+  describe('keyboard accessibility', () => {
+    it('menu item links are focusable', () => {
+      const wrapper = mount(OsMenuItem, {
+        props: { route: { name: 'Test', path: '/test' } },
+        global: { provide: { $parentMenu: parentMenu } },
+      })
+      const link = wrapper.find('.os-menu-item-link')
+
+      expect(link.element.tagName).toBe('A')
+    })
   })
 })
