@@ -36,8 +36,6 @@ import OcelotSelect from '~/components/OcelotSelect/OcelotSelect.vue'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { queryLocations } from '~/graphql/location'
 
-let timeout
-
 export default {
   name: 'LocationSelect',
   components: { OsButton, OsIcon, OcelotSelect },
@@ -65,6 +63,7 @@ export default {
     return {
       currentValue: this.value,
       loadingGeo: false,
+      debounceTimeout: null,
       cities: [],
     }
   },
@@ -103,8 +102,8 @@ export default {
   methods: {
     handleCityInput(event) {
       const value = event.target ? event.target.value.trim() : ''
-      clearTimeout(timeout)
-      timeout = setTimeout(() => this.requestGeoData(value), 500)
+      clearTimeout(this.debounceTimeout)
+      this.debounceTimeout = setTimeout(() => this.requestGeoData(value), 500)
     },
     processLocationsResult(places) {
       if (!places.length) {
