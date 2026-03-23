@@ -11,6 +11,7 @@
       <ocelot-input
         id="email"
         model="email"
+        type="email"
         icon="envelope"
         :label="$t('settings.email.labelEmail')"
       />
