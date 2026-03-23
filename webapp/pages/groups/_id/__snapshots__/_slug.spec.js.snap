@@ -120,8 +120,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                     class="group-menu-popover"
                   >
                     <nav
-                      class="os-menu"
-                      dropdown=""
+                      class="os-menu os-menu--dropdown"
                     >
                       <ul
                         class="os-menu-list"
@@ -2229,8 +2228,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a close
                     class="group-menu-popover"
                   >
                     <nav
-                      class="os-menu"
-                      dropdown=""
+                      class="os-menu os-menu--dropdown"
                     >
                       <ul
                         class="os-menu-list"
@@ -3276,8 +3274,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     class="group-menu-popover"
                   >
                     <nav
-                      class="os-menu"
-                      dropdown=""
+                      class="os-menu os-menu--dropdown"
                     >
                       <ul
                         class="os-menu-list"
@@ -5905,8 +5902,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a curre
                     class="group-menu-popover"
                   >
                     <nav
-                      class="os-menu"
-                      dropdown=""
+                      class="os-menu os-menu--dropdown"
                     >
                       <ul
                         class="os-menu-list"
@@ -6884,8 +6880,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                     class="group-menu-popover"
                   >
                     <nav
-                      class="os-menu"
-                      dropdown=""
+                      class="os-menu os-menu--dropdown"
                     >
                       <ul
                         class="os-menu-list"
@@ -7984,8 +7979,7 @@ exports[`GroupProfileSlug given a puplic group – "yoga-practice" given a hidde
                     class="group-menu-popover"
                   >
                     <nav
-                      class="os-menu"
-                      dropdown=""
+                      class="os-menu os-menu--dropdown"
                     >
                       <ul
                         class="os-menu-list"
