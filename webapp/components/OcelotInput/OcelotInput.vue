@@ -5,7 +5,7 @@
     </label>
     <div class="ds-input-wrap">
       <div v-if="icon" class="ds-input-icon">
-        <ds-icon :name="icon" />
+        <os-icon :icon="resolvedIcon" />
       </div>
       <component
         class="ds-input"
@@ -26,7 +26,7 @@
         :rows="type === 'textarea' ? rows : null"
       />
       <div v-if="iconRight" class="ds-input-icon-right">
-        <ds-icon :name="iconRight" />
+        <os-icon :icon="resolvedIconRight" />
       </div>
     </div>
     <transition name="ds-input-error">
@@ -38,6 +38,8 @@
 </template>
 
 <script>
+import { OsIcon } from '@ocelot-social/ui'
+import { resolveIcon } from '~/utils/iconRegistry'
 import Schema from 'async-validator'
 
 Schema.warning = function () {}
@@ -48,6 +50,7 @@ function getNestedValue(obj, path) {
 
 export default {
   name: 'OcelotInput',
+  components: { OsIcon },
   inject: {
     $parentForm: {
       default: null,
@@ -134,6 +137,12 @@ export default {
         return 'textarea'
       }
       return 'input'
+    },
+    resolvedIcon() {
+      return resolveIcon(this.icon)
+    },
+    resolvedIconRight() {
+      return resolveIcon(this.iconRight)
     },
     stateClasses() {
       return [
