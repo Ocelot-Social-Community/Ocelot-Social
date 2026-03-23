@@ -92,7 +92,7 @@ export const CustomMenuItem: StoryObj = {
     },
     template: `
       <div style="width: 200px">
-        <OsMenu class="os-menu--dropdown" :routes="routes">
+        <OsMenu dropdown :routes="routes">
           <template #menuitem="{ route, parents, name }">
             <OsMenuItem :route="route" :parents="parents">
               <strong>{{ route.label }}</strong>
@@ -121,7 +121,7 @@ export const DropdownMenu: StoryObj = {
     },
     template: `
       <div style="width: 200px; background: white; border: 1px solid #ddd; border-radius: 4px; padding: 4px 0;">
-        <OsMenu class="os-menu--dropdown" :routes="routes">
+        <OsMenu dropdown :routes="routes">
           <template #menuitem="{ route, parents }">
             <OsMenuItem :route="route" :parents="parents" @click="handleClick">
               {{ route.label }}

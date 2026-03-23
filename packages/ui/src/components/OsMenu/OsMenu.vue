@@ -33,6 +33,11 @@
         type: Array as PropType<Record<string, unknown>[]>,
         default: null,
       },
+      /** Display as compact dropdown menu (smaller padding, hover border accent) */
+      dropdown: {
+        type: Boolean,
+        default: false,
+      },
       /** Component or tag used for links */
       linkTag: {
         type: [String, Object, Function] as PropType<string | Component>,
@@ -116,7 +121,7 @@
           return h(
             'nav',
             {
-              class: [cn('os-menu', parentClass as string), parentDynClass].filter(Boolean),
+              class: [cn('os-menu', props.dropdown && 'os-menu--dropdown', parentClass as string), parentDynClass].filter(Boolean),
               attrs,
               on: { navigate: () => emit('navigate') },
             },
@@ -128,7 +133,7 @@
         return h(
           'nav',
           {
-            class: cn('os-menu', (attrClass as string) || ''),
+            class: cn('os-menu', props.dropdown && 'os-menu--dropdown', (attrClass as string) || ''),
             ...restAttrs,
           },
           [list],

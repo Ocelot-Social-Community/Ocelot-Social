@@ -20,7 +20,7 @@
       </template>
       <template #popover="{ toggleMenu }">
         <div class="group-menu-popover">
-          <os-menu class="os-menu--dropdown" :routes="routes">
+          <os-menu dropdown :routes="routes">
             <template #menuitem="item">
               <os-menu-item
                 :route="item.route"
