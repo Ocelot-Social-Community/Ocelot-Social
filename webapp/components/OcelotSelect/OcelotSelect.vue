@@ -206,7 +206,7 @@ export default {
     filter: {
       type: Function,
       default: (option, searchString = '', labelProp) => {
-        const value = option[labelProp] || option
+        const value = String(option[labelProp] || option)
         const searchParts = typeof searchString === 'string' ? searchString.split(' ') : []
         return searchParts.every((part) => {
           if (!part) return true
