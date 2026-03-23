@@ -8,7 +8,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 const meta: Meta<typeof OsMenuItem> = {
   title: 'Components/OsMenuItem',
   component: OsMenuItem,
-  tags: ['autodocs'],
+  tags: ['!autodocs', '!dev'],
 }
 
 export default meta
