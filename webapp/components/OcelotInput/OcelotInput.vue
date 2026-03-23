@@ -1,25 +1,15 @@
 <template>
-  <div
-    class="ds-form-item"
-    :class="stateClasses">
-    <label
-      class="ds-input-label"
-      v-show="!!label"
-      :for="id">
+  <div class="ds-form-item" :class="stateClasses">
+    <label class="ds-input-label" v-show="!!label" :for="id">
       {{ label }}
     </label>
     <div class="ds-input-wrap">
-      <div
-        v-if="icon"
-        class="ds-input-icon">
-        <ds-icon :name="icon"/>
+      <div v-if="icon" class="ds-input-icon">
+        <ds-icon :name="icon" />
       </div>
       <component
         class="ds-input"
-        :class="[
-          icon && 'ds-input-has-icon',
-          iconRight && 'ds-input-has-icon-right'
-        ]"
+        :class="[icon && 'ds-input-has-icon', iconRight && 'ds-input-has-icon-right']"
         :id="id"
         :name="name ? name : model"
         :type="type"
@@ -34,17 +24,14 @@
         @focus="handleFocus"
         @blur="handleBlur"
         :rows="type === 'textarea' ? rows : null"
-        v-html="type === 'textarea' ? innerValue : null"/>
-      <div
-        v-if="iconRight"
-        class="ds-input-icon-right">
-        <ds-icon :name="iconRight"/>
+        v-html="type === 'textarea' ? innerValue : null"
+      />
+      <div v-if="iconRight" class="ds-input-icon-right">
+        <ds-icon :name="iconRight" />
       </div>
     </div>
     <transition name="ds-input-error">
-      <div
-        class="ds-input-error"
-        v-show="!!error">
+      <div class="ds-input-error" v-show="!!error">
         {{ error }}
       </div>
     </transition>
