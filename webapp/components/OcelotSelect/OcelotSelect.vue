@@ -287,6 +287,7 @@ export default {
   },
   beforeDestroy() {
     document.removeEventListener('click', this._clickOutsideHandler, true)
+    clearTimeout(this.hadKeyboardInput)
   },
   methods: {
     // --- Input / Value ---
