@@ -229,12 +229,6 @@
         document.removeEventListener('click', this.clickOutsideHandler, true)
       }
     },
-    /* v8 ignore next 5 -- Vue 3 alias */
-    beforeUnmount() {
-      if (this.clickOutsideHandler) {
-        document.removeEventListener('click', this.clickOutsideHandler, true)
-      }
-    },
     methods: {
       handleClick(event: Event) {
         this.$emit('click', event, this.route)

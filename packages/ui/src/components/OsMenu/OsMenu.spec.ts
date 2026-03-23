@@ -100,7 +100,7 @@ describe('osMenu', () => {
 
     await wrapper.find('.os-menu-item-link').trigger('click')
 
-    expect(wrapper.emitted('navigate')).toBe(true)
+    expect(wrapper.emitted('navigate')).toBeTruthy()
   })
 })
 
