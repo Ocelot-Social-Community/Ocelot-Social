@@ -76,6 +76,27 @@ img {
   vertical-align: middle;
 }
 
+button, input, optgroup, select, textarea {
+  margin: 0;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+button, input {
+  overflow: visible;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  box-sizing: border-box;
+  padding: 0;
+}
+
+[role="button"], a, area, button, input:not([type="range"]), label, select, summary, textarea {
+  touch-action: manipulation;
+}
+
 button {
   padding: 0;
   background: transparent;
