@@ -125,6 +125,7 @@ describe('osMenu', () => {
       const links = wrapper.findAll('.os-menu-item-link')
 
       expect(links.length).toBeGreaterThan(0)
+
       links.forEach((link) => {
         expect(link.element.tagName).toBe('A')
       })
