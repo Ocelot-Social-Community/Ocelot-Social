@@ -131,12 +131,13 @@
 // ==========================================================
 .ds-container {
   margin: 0 auto;
-  padding: 0 $space-base;
-  max-width: $container-width-base;
+  padding: 0 $space-small;
+  @media #{$media-query-medium} { padding: 0 $space-base; }
+  @media #{$media-query-large}  { padding: 0 $space-x-large; }
 }
-.ds-container-small   { max-width: $container-width-small; }
-.ds-container-medium  { max-width: $container-width-medium; }
-.ds-container-x-large { max-width: $container-width-x-large; }
+.ds-container-small   { max-width: #{$sm}px; }
+.ds-container-medium  { max-width: #{$md}px; }
+.ds-container-x-large { max-width: #{$xl}px; }
 
 .ds-section {
   padding: $space-large 0;
