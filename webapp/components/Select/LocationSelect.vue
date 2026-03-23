@@ -14,14 +14,15 @@
       @input.native="handleCityInput"
     />
     <os-button
-      v-if="locationName !== '' && canBeCleared"
+      v-if="(locationName !== '' && canBeCleared) || searchActive || loadingGeo"
       data-test="clear-location-button"
       variant="primary"
       appearance="ghost"
       size="sm"
+      circle
       :loading="loadingGeo"
       :aria-label="$t('actions.clear')"
-      style="right: -94%; top: -48px"
+      style="position: relative; float: right; top: -48px; right: 4px"
       @click="clearLocationName"
     >
       <template #icon><os-icon :icon="icons.close" /></template>
@@ -64,6 +65,7 @@ export default {
     return {
       currentValue: this.value,
       loadingGeo: false,
+      searchActive: false,
       cities: [],
     }
   },
@@ -101,11 +103,10 @@ export default {
   },
   methods: {
     handleCityInput(event) {
+      const value = event.target ? event.target.value.trim() : ''
+      this.searchActive = value.length > 0
       clearTimeout(timeout)
-      timeout = setTimeout(
-        () => this.requestGeoData(event.target ? event.target.value.trim() : ''),
-        500,
-      )
+      timeout = setTimeout(() => this.requestGeoData(value), 500)
     },
     processLocationsResult(places) {
       if (!places.length) {
@@ -161,7 +162,9 @@ export default {
     },
     clearLocationName() {
       this.currentValue = ''
+      this.searchActive = false
     },
   },
 }
 </script>
+
