@@ -20,7 +20,7 @@
         </os-button>
       </template>
       <template #popover="{ toggleMenu }">
-        <os-menu class="locale-menu-popover" :matcher="matcher" :routes="routes">
+        <os-menu class="locale-menu-popover os-menu--dropdown" :matcher="matcher" :routes="routes">
           <template #menuitem="item">
             <os-menu-item
               class="locale-menu-item"

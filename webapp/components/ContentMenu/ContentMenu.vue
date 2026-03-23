@@ -20,7 +20,7 @@
       </template>
       <template #popover="{ toggleMenu }">
         <div class="content-menu-popover">
-          <os-menu :routes="routes">
+          <os-menu class="os-menu--dropdown" :routes="routes">
             <template #menuitem="item">
               <os-menu-item
                 :route="item.route"
@@ -407,11 +407,4 @@ export default {
   margin: (-$space-xx-small) (-$space-small) !important;
 }
 
-.tooltip-inner.popover-inner .os-menu-item-link {
-  padding: 8px 12px !important;
-}
-
-.tooltip-inner.popover-inner .os-menu-item-link:hover {
-  border-left-color: $color-primary !important;
-}
 </style>

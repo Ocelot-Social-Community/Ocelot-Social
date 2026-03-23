@@ -74,6 +74,15 @@ ul.os-menu-list {
   border-left-color: var(--color-primary, #17b53f);
 }
 
+/* Dropdown variant — compact padding, hover with border accent */
+.os-menu--dropdown .os-menu-item-link {
+  padding: 8px 12px;
+}
+
+.os-menu--dropdown .os-menu-item-link:hover {
+  border-left-color: var(--color-primary, #17b53f);
+}
+
 /* Nesting levels */
 .os-menu-item-level-1 .os-menu-item-link {
   font-size: 0.8rem;

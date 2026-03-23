@@ -33,7 +33,7 @@
           </p>
         </template>
         <hr />
-        <os-menu :routes="routes" :matcher="matcher" link-tag="router-link">
+        <os-menu class="os-menu--dropdown" :routes="routes" :matcher="matcher" link-tag="router-link">
           <os-menu-item
             slot="menuitem"
             slot-scope="item"
