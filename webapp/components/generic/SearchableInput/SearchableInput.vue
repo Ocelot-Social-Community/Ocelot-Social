@@ -50,11 +50,12 @@
       </template>
     </ocelot-select>
     <os-button
-      v-if="isActive"
+      v-if="isActive || loading"
       variant="primary"
       appearance="ghost"
       circle
       size="sm"
+      :loading="loading"
       :aria-label="$t('actions.clear')"
       @click="clear"
     >

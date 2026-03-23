@@ -111,21 +111,20 @@
           </li>
         </ul>
       </div>
-      <div class="ds-select-icon-right">
-        <os-spinner v-if="loading" primary size="small" style="position: absolute" />
-        <os-icon v-if="resolvedIconRight" :icon="resolvedIconRight" />
+      <div v-if="resolvedIconRight" class="ocelot-select-icon-right">
+        <os-icon :icon="resolvedIconRight" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { OsIcon, OsBadge, OsSpinner } from '@ocelot-social/ui'
+import { OsIcon, OsBadge } from '@ocelot-social/ui'
 import { resolveIcon } from '~/utils/iconRegistry'
 
 export default {
   name: 'OcelotSelect',
-  components: { OsIcon, OsBadge, OsSpinner },
+  components: { OsIcon, OsBadge },
   props: {
     value: {
       type: [String, Object, Number, Array],
@@ -429,4 +428,14 @@ export default {
 <style lang="scss">
 /* Styles inherited from global styleguide CSS (ds-select, ds-form-item classes).
  * Once ds-select is fully removed from the styleguide, move the styles here. */
+
+.ocelot-select-icon-right {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 </style>

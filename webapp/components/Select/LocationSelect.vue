@@ -19,6 +19,7 @@
       variant="primary"
       appearance="ghost"
       size="sm"
+      :loading="loadingGeo"
       :aria-label="$t('actions.clear')"
       style="right: -94%; top: -48px"
       @click="clearLocationName"
