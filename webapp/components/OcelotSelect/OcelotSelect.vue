@@ -241,6 +241,9 @@ export default {
     resolvedIconRight() {
       return resolveIcon(this.iconRight)
     },
+    isInteractionBlocked() {
+      return this.disabled || this.readonly || this.loading
+    },
     stateClasses() {
       return [
         this.size && `ds-input-size-${this.size}`,
@@ -328,6 +331,7 @@ export default {
 
     // --- Select interaction ---
     handleSelect(option) {
+      if (this.isInteractionBlocked) return
       if (this.pointerMax < 0) return
       this.selectOption(option)
       if (this.autoResetSearch || this.multiple) this.resetSearch()
@@ -342,6 +346,7 @@ export default {
       this.searchString = ''
     },
     openAndFocus() {
+      if (this.isInteractionBlocked) return
       this.open()
       if (this.autoResetSearch) this.resetSearch()
       if (!this.focus || this.multiple) {
@@ -370,6 +375,7 @@ export default {
 
     // --- Keyboard navigation ---
     handleEnter(e) {
+      if (this.isInteractionBlocked) return
       if (this.pointer >= 0) {
         this.selectPointerOption()
       } else {
@@ -378,6 +384,7 @@ export default {
       }
     },
     handleKeyUp() {
+      if (this.isInteractionBlocked) return
       if (!this.isOpen) {
         this.open()
         return
@@ -385,6 +392,7 @@ export default {
       this.pointerPrev()
     },
     handleKeyDown() {
+      if (this.isInteractionBlocked) return
       if (!this.isOpen) {
         this.open()
         return
