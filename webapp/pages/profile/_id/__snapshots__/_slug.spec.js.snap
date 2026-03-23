@@ -89,7 +89,8 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                     class="content-menu-popover"
                   >
                     <nav
-                      class="os-menu os-menu--dropdown"
+                      class="os-menu"
+                      dropdown=""
                     >
                       <ul
                         class="os-menu-list"
@@ -776,7 +777,8 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                     class="content-menu-popover"
                   >
                     <nav
-                      class="os-menu os-menu--dropdown"
+                      class="os-menu"
+                      dropdown=""
                     >
                       <ul
                         class="os-menu-list"
@@ -1530,7 +1532,8 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                     class="content-menu-popover"
                   >
                     <nav
-                      class="os-menu os-menu--dropdown"
+                      class="os-menu"
+                      dropdown=""
                     >
                       <ul
                         class="os-menu-list"
@@ -2118,7 +2121,8 @@ exports[`ProfileSlug given an authenticated user given the logged in user as pro
                     class="content-menu-popover"
                   >
                     <nav
-                      class="os-menu os-menu--dropdown"
+                      class="os-menu"
+                      dropdown=""
                     >
                       <ul
                         class="os-menu-list"

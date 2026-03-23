@@ -1,12 +1,10 @@
 import { mount, createLocalVue } from '@vue/test-utils'
 import BlockedUsers from './blocked-users.vue'
-import Styleguide from '@@/'
 import Filters from '~/plugins/vue-filters'
 import { unblockUser } from '~/graphql/settings/BlockedUsers'
 
 const localVue = createLocalVue()
 
-localVue.use(Styleguide)
 localVue.use(Filters)
 
 const stubs = {

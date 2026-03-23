@@ -1,7 +1,2 @@
-import Vue from 'vue'
-import Styleguide from '@@/system.umd.min.js'
-import '@@/system.css'
-// Load UI library CSS after styleguide to ensure correct specificity
+// Load UI library CSS
 import '@ocelot-social/ui/style.css'
-
-Vue.use(Styleguide)

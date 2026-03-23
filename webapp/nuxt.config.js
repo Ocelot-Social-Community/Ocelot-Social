@@ -322,7 +322,6 @@ export default {
         config.devtool = ctx.isDev ? 'eval-source-map' : 'hidden-source-map'
       }
 
-      config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/dist`)
       // Vue 2.7 has built-in Composition API - redirect old imports
       config.resolve.alias['@vue/composition-api'] = 'vue'
       // Ensure vue-demi uses webapp's Vue 2.7 (not UI library's Vue 3)
@@ -335,11 +334,6 @@ export default {
       config.resolve.alias['@ocelot-social/ui$'] = path.join(uiLibraryPath, 'index.mjs')
       config.resolve.alias['@ocelot-social/ui/ocelot$'] = path.join(uiLibraryPath, 'ocelot.mjs')
       config.resolve.alias['@ocelot-social/ui/style.css$'] = path.join(uiLibraryPath, 'style.css')
-      config.module.rules.push({
-        resourceQuery: /blockType=docs/,
-        loader: require.resolve(`${styleguidePath}/src/loader/docs-trim-loader.js`),
-      })
-
       const svgRule = config.module.rules.find((rule) => rule.test.test('.svg'))
       svgRule.test = /\.(png|jpe?g|gif|webp)$/
       config.module.rules.push({
