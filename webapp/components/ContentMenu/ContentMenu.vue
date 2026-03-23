@@ -406,5 +406,4 @@ export default {
 .tooltip-inner.popover-inner .os-menu {
   margin: (-$space-xx-small) (-$space-small) !important;
 }
-
 </style>
