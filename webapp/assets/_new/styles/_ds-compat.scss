@@ -4,6 +4,40 @@
 // Replaces styleguide system.css — global styles + ds-* classes
 // ==========================================================
 
+// Fonts (previously loaded via styleguide system.css)
+@font-face {
+  font-family: LatoWeb;
+  src: url('/fonts/Lato-Regular.1f440a46.woff2') format('woff2'),
+       url('/fonts/Lato-Regular.ffb25090.woff') format('woff');
+  font-style: normal;
+  font-weight: 400;
+  text-rendering: optimizeLegibility;
+}
+@font-face {
+  font-family: LatoWeb;
+  src: url('/fonts/Lato-Italic.a6774e2c.woff2') format('woff2'),
+       url('/fonts/Lato-Italic.ff8877c4.woff') format('woff');
+  font-style: italic;
+  font-weight: 400;
+  text-rendering: optimizeLegibility;
+}
+@font-face {
+  font-family: LatoWeb;
+  src: url('/fonts/Lato-Bold.1e239003.woff2') format('woff2'),
+       url('/fonts/Lato-Bold.35be9fc3.woff') format('woff');
+  font-style: normal;
+  font-weight: 600;
+  text-rendering: optimizeLegibility;
+}
+@font-face {
+  font-family: LatoWeb;
+  src: url('/fonts/Lato-BoldItalic.4ef02877.woff2') format('woff2'),
+       url('/fonts/Lato-BoldItalic.5171ee7d.woff') format('woff');
+  font-style: italic;
+  font-weight: 600;
+  text-rendering: optimizeLegibility;
+}
+
 // Global resets (previously from styleguide system.css)
 html {
   font-family: sans-serif;
