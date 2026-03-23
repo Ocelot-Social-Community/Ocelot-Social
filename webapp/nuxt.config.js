@@ -335,7 +335,6 @@ export default {
       config.resolve.alias['@ocelot-social/ui$'] = path.join(uiLibraryPath, 'index.mjs')
       config.resolve.alias['@ocelot-social/ui/ocelot$'] = path.join(uiLibraryPath, 'ocelot.mjs')
       config.resolve.alias['@ocelot-social/ui/style.css$'] = path.join(uiLibraryPath, 'style.css')
-      config.resolve.alias['@ocelot-social/ui/ui.css$'] = path.join(uiLibraryPath, 'ui.css')
       config.module.rules.push({
         resourceQuery: /blockType=docs/,
         loader: require.resolve(`${styleguidePath}/src/loader/docs-trim-loader.js`),
