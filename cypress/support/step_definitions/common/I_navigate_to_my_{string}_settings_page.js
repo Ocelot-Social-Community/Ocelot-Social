@@ -6,5 +6,5 @@ defineStep('I navigate to my {string} settings page', settingsPage => {
     .find('a[href]')
     .contains('Settings')
     .click()
-  cy.contains('.ds-menu-item-link', settingsPage).click()
+  cy.contains('.os-menu-item-link', settingsPage).click()
 })
