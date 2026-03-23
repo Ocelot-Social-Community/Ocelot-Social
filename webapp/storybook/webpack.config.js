@@ -19,11 +19,7 @@ module.exports = async ({ config, mode }) => {
         loader: 'style-resources-loader',
         options: {
           patterns: [
-            path.resolve(
-              __dirname,
-              '../styleguide/src/system/styles/main.scss',
-              '../styleguide/src/system/styles/shared.scss',
-            ),
+            path.resolve(__dirname, '../assets/_new/styles/_styleguide-tokens.scss'),
             path.resolve(__dirname, '../assets/_new/styles/tokens.scss'),
           ],
           injector: 'prepend',

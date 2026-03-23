@@ -10,8 +10,6 @@ services:
       - NUXT_BUILD=/tmp/nuxt # avoid file permission issues when `rm -rf .nuxt/`
     volumes:
       - ./webapp:/app
-      - ./styleguide:/styleguide
-      - /styleguide/node_modules
       - ./packages/ui:/packages/ui
       - /packages/ui/node_modules
 

@@ -16,11 +16,9 @@ const ogLocaleAlternates = locales
   .filter((l) => l.enabled && l.code !== CONFIG.LANGUAGE_DEFAULT)
   .map((l) => l.iso.replace('-', '_'))
 
-const styleguidePath = '../styleguide'
-const styleguideStyles = [
-  // `${styleguidePath}/src/system/styles/main.scss`,
-  // `${styleguidePath}/src/system/styles/shared.scss`,
-  `${styleguidePath}/dist/shared.scss`,
+// Design tokens (SCSS variables) — originally from styleguide, now local
+const designTokenStyles = [
+  '~assets/_new/styles/_styleguide-tokens.scss',
 ]
 
 export default {
@@ -114,7 +112,7 @@ export default {
     '~assets/_new/styles/resets.scss',
     '~assets/styles/main.scss',
     '~assets/styles/imports/_branding.scss',
-    // @ocelot-social/ui CSS variables (loaded before styleguide)
+    // @ocelot-social/ui CSS variables
     '~assets/_new/styles/ocelot-ui-variables.scss',
     // Utility classes replacing ds-* Vue components
     '~assets/_new/styles/_ds-compat.scss',
@@ -128,7 +126,7 @@ export default {
   styleResources: {
     scss: [
       '~assets/_new/styles/uses.scss',
-      ...styleguideStyles,
+      ...designTokenStyles,
       '~assets/_new/styles/tokens.scss',
       '~assets/styles/imports/_branding.scss',
       '~assets/_new/styles/export.scss',
