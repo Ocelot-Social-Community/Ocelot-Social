@@ -22,7 +22,6 @@
         <div class="group-menu-popover">
           <os-menu :routes="routes" link-tag="router-link">
             <template #menuitem="item">
-              {{ item.parents }}
               <os-menu-item
                 :route="item.route"
                 :parents="item.parents"
