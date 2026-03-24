@@ -38,7 +38,6 @@ export default {
   styleResources,
 
   plugins: [
-    { src: `~/plugins/styleguide.js`, ssr: true },
     { src: '~/plugins/i18n.js', ssr: true },
     { src: '~/plugins/v-tooltip.js', ssr: false },
   ],

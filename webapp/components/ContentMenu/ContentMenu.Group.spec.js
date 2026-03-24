@@ -1,12 +1,10 @@
 import { mount, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import VTooltip from 'v-tooltip'
-import Styleguide from '@@/'
 import ContentMenu from './ContentMenu.vue'
 
 const localVue = createLocalVue()
 
-localVue.use(Styleguide)
 localVue.use(VTooltip)
 localVue.use(Vuex)
 

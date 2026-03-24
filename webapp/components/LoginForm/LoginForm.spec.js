@@ -1,14 +1,12 @@
 import Vue from 'vue'
 import LoginForm from './LoginForm.vue'
 import ShowPassword from '../ShowPassword/ShowPassword.vue'
-import Styleguide from '@@/'
 import Vuex from 'vuex'
 import { mount, createLocalVue } from '@vue/test-utils'
 import { ocelotIcons } from '@ocelot-social/ui/ocelot'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
-localVue.use(Styleguide)
 
 const stubs = {
   'nuxt-link': true,

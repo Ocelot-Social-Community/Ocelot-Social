@@ -1,14 +1,4 @@
 # syntax=docker/dockerfile:1
-FROM node:25.8.1-alpine AS styleguide
-RUN apk --no-cache add git python3 make g++
-RUN mkdir -p /app
-WORKDIR /app
-COPY styleguide/package.json styleguide/yarn.lock ./
-RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
-    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
-COPY styleguide/. .
-RUN yarn run build:lib
-
 FROM node:25.8.1-alpine AS ui-library
 RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
@@ -34,7 +24,6 @@ EXPOSE ${PORT}
 RUN apk --no-cache add git python3 make g++ bash jq
 RUN mkdir -p /app
 WORKDIR /app
-COPY --from=styleguide ./app/ /styleguide/
 COPY --from=ui-library ./app/ /packages/ui/
 CMD ["/bin/bash", "-c", "yarn run start"]
 

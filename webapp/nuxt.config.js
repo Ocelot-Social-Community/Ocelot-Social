@@ -16,12 +16,8 @@ const ogLocaleAlternates = locales
   .filter((l) => l.enabled && l.code !== CONFIG.LANGUAGE_DEFAULT)
   .map((l) => l.iso.replace('-', '_'))
 
-const styleguidePath = '../styleguide'
-const styleguideStyles = [
-  // `${styleguidePath}/src/system/styles/main.scss`,
-  // `${styleguidePath}/src/system/styles/shared.scss`,
-  `${styleguidePath}/dist/shared.scss`,
-]
+// Design tokens (SCSS variables) — originally from styleguide, now local
+const designTokenStyles = ['~assets/_new/styles/_styleguide-tokens.scss']
 
 export default {
   buildDir: CONFIG.NUXT_BUILD,
@@ -114,11 +110,12 @@ export default {
     '~assets/_new/styles/resets.scss',
     '~assets/styles/main.scss',
     '~assets/styles/imports/_branding.scss',
-    // @ocelot-social/ui CSS variables (loaded before styleguide)
+    // @ocelot-social/ui CSS variables
     '~assets/_new/styles/ocelot-ui-variables.scss',
     // Utility classes replacing ds-* Vue components
     '~assets/_new/styles/_ds-compat.scss',
-    // Note: @ocelot-social/ui/style.css is loaded via plugin after styleguide
+    // UI library component styles (Tailwind utilities + OsMenu CSS)
+    '@ocelot-social/ui/style.css',
   ],
 
   /*
@@ -127,7 +124,7 @@ export default {
   styleResources: {
     scss: [
       '~assets/_new/styles/uses.scss',
-      ...styleguideStyles,
+      ...designTokenStyles,
       '~assets/_new/styles/tokens.scss',
       '~assets/styles/imports/_branding.scss',
       '~assets/_new/styles/export.scss',
@@ -139,10 +136,6 @@ export default {
    ** Plugins to load before mounting the App
    */
   plugins: [
-    {
-      src: `~/plugins/styleguide.js`,
-      ssr: true,
-    },
     { src: '~/plugins/i18n.js', ssr: true },
     { src: '~/plugins/axios.js', ssr: false },
     { src: '~/plugins/keep-alive.js', ssr: false },
@@ -322,7 +315,6 @@ export default {
         config.devtool = ctx.isDev ? 'eval-source-map' : 'hidden-source-map'
       }
 
-      config.resolve.alias['@@'] = path.resolve(__dirname, `${styleguidePath}/dist`)
       // Vue 2.7 has built-in Composition API - redirect old imports
       config.resolve.alias['@vue/composition-api'] = 'vue'
       // Ensure vue-demi uses webapp's Vue 2.7 (not UI library's Vue 3)
@@ -335,11 +327,6 @@ export default {
       config.resolve.alias['@ocelot-social/ui$'] = path.join(uiLibraryPath, 'index.mjs')
       config.resolve.alias['@ocelot-social/ui/ocelot$'] = path.join(uiLibraryPath, 'ocelot.mjs')
       config.resolve.alias['@ocelot-social/ui/style.css$'] = path.join(uiLibraryPath, 'style.css')
-      config.module.rules.push({
-        resourceQuery: /blockType=docs/,
-        loader: require.resolve(`${styleguidePath}/src/loader/docs-trim-loader.js`),
-      })
-
       const svgRule = config.module.rules.find((rule) => rule.test.test('.svg'))
       svgRule.test = /\.(png|jpe?g|gif|webp)$/
       config.module.rules.push({
