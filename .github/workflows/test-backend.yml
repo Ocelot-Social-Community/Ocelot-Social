@@ -122,19 +122,40 @@ jobs:
         with:
           path: /tmp/neo4j.tar
           key: ${{ github.run_id }}-backend-neo4j-cache
-          fail-on-cache-miss: true
 
       - name: Restore Backend cache
         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v4.0.2
         with:
           path: /tmp/backend.tar
           key: ${{ github.run_id }}-backend-cache
-          fail-on-cache-miss: true
 
-      - name: Load Docker Images
+      - name: Set up Docker Buildx
+        if: ${{ !hashFiles('/tmp/neo4j.tar') || !hashFiles('/tmp/backend.tar') }}
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+
+      - name: Load or rebuild Neo4J image
         run: |
-          docker load < /tmp/neo4j.tar
-          docker load < /tmp/backend.tar
+          if [ -f /tmp/neo4j.tar ]; then
+            echo "Loading Neo4J image from cache..."
+            docker load < /tmp/neo4j.tar
+          else
+            echo "Cache miss — rebuilding Neo4J image..."
+            docker buildx build neo4j -f neo4j/Dockerfile --target community --load \
+              -t ghcr.io/ocelot-social-community/ocelot-social/neo4j:community \
+              --cache-from type=gha,scope=neo4j
+          fi
+
+      - name: Load or rebuild Backend image
+        run: |
+          if [ -f /tmp/backend.tar ]; then
+            echo "Loading Backend image from cache..."
+            docker load < /tmp/backend.tar
+          else
+            echo "Cache miss — rebuilding Backend image..."
+            docker buildx build backend -f backend/Dockerfile --target test --load \
+              -t ghcr.io/ocelot-social-community/ocelot-social/backend:test \
+              --cache-from type=gha,scope=backend-test
+          fi
 
       - name: backend | copy env files
         run: |
