@@ -14,9 +14,6 @@
       "@": [
         "*"
       ],
-      "@@/*": [
-        "../styleguide/dist/system.umd.min.js"
-      ],
     }
   }
 }

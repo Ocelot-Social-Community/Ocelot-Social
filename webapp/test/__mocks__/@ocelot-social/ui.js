@@ -75,8 +75,12 @@ Module._load = function (request, parent, isMain) {
   return originalLoad.apply(this, arguments)
 }
 
-// Load the UI library dist
-const uiDistPath = path.resolve(__dirname, '../../../node_modules/@ocelot-social/ui/dist/index.cjs')
+// Load the UI library dist directly from packages/ui (not from node_modules copy)
+// In Docker: /packages/ui/dist, locally: ../../../../packages/ui/dist
+const fs = require('fs')
+const dockerPath = '/packages/ui/dist/index.cjs'
+const localPath = path.resolve(__dirname, '../../../../packages/ui/dist/index.cjs')
+const uiDistPath = fs.existsSync(dockerPath) ? dockerPath : localPath
 const ui = require(uiDistPath)
 
 // Export everything from the UI library

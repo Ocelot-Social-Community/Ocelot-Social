@@ -9,15 +9,6 @@ LABEL org.label-schema.vendor="ocelot.social Community"
 LABEL org.label-schema.schema-version="1.0"
 LABEL maintainer="devops@ocelot.social"
 
-FROM node:25.8.1-alpine AS styleguide
-RUN apk --no-cache add git python3 make g++
-RUN mkdir -p /app
-WORKDIR /app
-COPY styleguide .
-RUN --mount=type=cache,target=/yarn-cache,sharing=locked \
-    yarn install --production=false --frozen-lockfile --non-interactive --cache-folder /yarn-cache
-RUN yarn run build:lib
-
 FROM node:25.8.1-alpine AS ui-library
 RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
@@ -29,7 +20,6 @@ RUN npm run build
 FROM node:25.8.1-alpine AS build
 ENV NODE_ENV="production"
 RUN apk --no-cache add git python3 make g++ bash jq
-COPY --from=styleguide ./app/ /styleguide/
 COPY --from=ui-library ./app/ /packages/ui/
 RUN mkdir -p /app
 WORKDIR /app
