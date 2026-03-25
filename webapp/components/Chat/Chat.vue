@@ -448,7 +448,7 @@ export default {
       const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
       if (roomIndex !== -1) {
         const changedRoom = { ...this.rooms[roomIndex] }
-        changedRoom.lastMessage.content = content || ''
+        changedRoom.lastMessage.content = (content || '').trim().substring(0, 30)
 
         // Move changed room to the top of the list
         changedRoom.index = changedRoom.lastMessage.date
