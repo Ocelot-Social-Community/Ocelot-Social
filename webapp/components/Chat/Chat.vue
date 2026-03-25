@@ -365,6 +365,7 @@ export default {
         const msgs = []
         ;[...this.messages, ...Message].forEach((m) => {
           if (m.senderId !== this.currentUser.id) m.seen = true
+          m.content = m.content || ''
           m.date = new Date(m.date).toDateString()
           m.avatar = m.avatar?.w320
           msgs[m.indexId] = m
@@ -385,7 +386,7 @@ export default {
       const roomIndex = this.rooms.findIndex((r) => r.id === data.chatMessageAdded.room.id)
       const changedRoom = { ...this.rooms[roomIndex] }
       changedRoom.lastMessage = data.chatMessageAdded
-      changedRoom.lastMessage.content = changedRoom.lastMessage.content.trim().substring(0, 30)
+      changedRoom.lastMessage.content = (changedRoom.lastMessage.content || '').trim().substring(0, 30)
       changedRoom.lastMessageAt = data.chatMessageAdded.date
       // Move changed room to the top of the list
       changedRoom.index = data.chatMessageAdded.date
@@ -445,7 +446,7 @@ export default {
       const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
       if (roomIndex !== -1) {
         const changedRoom = { ...this.rooms[roomIndex] }
-        changedRoom.lastMessage.content = content
+        changedRoom.lastMessage.content = content || ''
 
         // Move changed room to the top of the list
         changedRoom.index = changedRoom.lastMessage.date
@@ -461,7 +462,7 @@ export default {
 
         if (createdMessagePayload && roomIndex !== -1) {
           const changedRoom = { ...this.rooms[roomIndex] }
-          changedRoom.lastMessage.content = createdMessagePayload.content.trim().substring(0, 30)
+          changedRoom.lastMessage.content = (createdMessagePayload.content || '').trim().substring(0, 30)
           changedRoom.lastMessage.date = createdMessagePayload.date
         }
       } catch (error) {
@@ -492,9 +493,9 @@ export default {
         lastMessage: room.lastMessage
           ? {
               ...room.lastMessage,
-              content: room.lastMessage?.content?.trim().substring(0, 30),
+              content: (room.lastMessage?.content || '').trim().substring(0, 30),
             }
-          : {},
+          : { content: '' },
         users: room.users.map((u) => {
           return { ...u, username: u.name, avatar: u.avatar?.w320 }
         }),
