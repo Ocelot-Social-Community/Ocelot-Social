@@ -386,7 +386,9 @@ export default {
       const roomIndex = this.rooms.findIndex((r) => r.id === data.chatMessageAdded.room.id)
       const changedRoom = { ...this.rooms[roomIndex] }
       changedRoom.lastMessage = data.chatMessageAdded
-      changedRoom.lastMessage.content = (changedRoom.lastMessage.content || '').trim().substring(0, 30)
+      changedRoom.lastMessage.content = (changedRoom.lastMessage.content || '')
+        .trim()
+        .substring(0, 30)
       changedRoom.lastMessageAt = data.chatMessageAdded.date
       // Move changed room to the top of the list
       changedRoom.index = data.chatMessageAdded.date
@@ -462,7 +464,9 @@ export default {
 
         if (createdMessagePayload && roomIndex !== -1) {
           const changedRoom = { ...this.rooms[roomIndex] }
-          changedRoom.lastMessage.content = (createdMessagePayload.content || '').trim().substring(0, 30)
+          changedRoom.lastMessage.content = (createdMessagePayload.content || '')
+            .trim()
+            .substring(0, 30)
           changedRoom.lastMessage.date = createdMessagePayload.date
         }
       } catch (error) {
