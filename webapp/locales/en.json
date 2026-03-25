@@ -145,7 +145,14 @@
     "userProfileButton": {
       "label": "Chat",
       "tooltip": "Chat with “{name}”"
-    }
+    },
+    "groupChatButton": {
+      "label": "Group Chat",
+      "tooltip": "Chat with group “{name}”"
+    },
+    "addGroupRoomHeadline": "Search group for new chat",
+    "searchGroupPlaceholder": "Search group…",
+    "noGroupsFound": "No groups found"
   },
   "client-only": {
     "loading": "Loading …"

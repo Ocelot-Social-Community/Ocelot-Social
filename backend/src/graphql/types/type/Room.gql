@@ -18,19 +18,35 @@ type Room {
   updatedAt: String
 
   users: [User]! @relation(name: "CHATS_IN", direction: "IN")
+  group: Group @relation(name: "ROOM_FOR", direction: "OUT")
 
   roomId: String! @cypher(statement: "RETURN this.id")
+  isGroupRoom: Boolean!
+    @cypher(
+      statement: """
+      OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
+      RETURN g IS NOT NULL
+      """
+    )
   roomName: String!
     @cypher(
-      statement: "MATCH (this)<-[:CHATS_IN]-(user:User) WHERE NOT user.id = $cypherParams.currentUserId RETURN user.name"
+      statement: """
+      OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
+      WITH this, g
+      OPTIONAL MATCH (this)<-[:CHATS_IN]-(user:User)
+      WHERE g IS NULL AND NOT user.id = $cypherParams.currentUserId
+      RETURN COALESCE(g.name, user.name)
+      """
     )
   avatar: String
     @cypher(
       statement: """
-      MATCH (this)<-[:CHATS_IN]-(user:User)
-      WHERE NOT user.id = $cypherParams.currentUserId
-      OPTIONAL MATCH (user)-[:AVATAR_IMAGE]->(image:Image)
-      RETURN image.url
+      OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)-[:AVATAR_IMAGE]->(groupImg:Image)
+      WITH this, groupImg
+      OPTIONAL MATCH (this)<-[:CHATS_IN]-(user:User)
+      WHERE groupImg IS NULL AND NOT user.id = $cypherParams.currentUserId
+      OPTIONAL MATCH (user)-[:AVATAR_IMAGE]->(userImg:Image)
+      RETURN COALESCE(groupImg.url, userImg.url)
       """
     )
 
@@ -58,6 +74,7 @@ type Room {
 
 type Mutation {
   CreateRoom(userId: ID!): Room
+  CreateGroupRoom(groupId: ID!): Room
 }
 
 type Query {

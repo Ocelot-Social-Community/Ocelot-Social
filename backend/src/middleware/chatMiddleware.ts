@@ -59,6 +59,7 @@ export default {
   },
   Mutation: {
     CreateRoom: roomProperties,
+    CreateGroupRoom: roomProperties,
   },
   Subscription: {
     chatMessageAdded: messageProperties,

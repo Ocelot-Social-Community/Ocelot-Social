@@ -464,12 +464,12 @@ const handleCreateMessage: IMiddlewareResolver = async (
     user: { id: currentUserId },
   } = context
 
-  // Find Recipient
+  // Find Recipients (supports both DM and group rooms)
   const session = context.driver.session()
   try {
-    const { senderUser, recipientUser, email } = await session.readTransaction(
+    const { senderUser, recipients } = await session.readTransaction(
       async (transaction) => {
-        const messageRecipientCypher = `
+        const messageRecipientsCypher = `
           MATCH (senderUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
           MATCH (room)<-[:CHATS_IN]-(recipientUser:User)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
             WHERE NOT recipientUser.id = $currentUserId
@@ -477,20 +477,26 @@ const handleCreateMessage: IMiddlewareResolver = async (
             AND NOT (recipientUser)-[:MUTED]->(senderUser)
           RETURN senderUser {.*}, recipientUser {.*}, emailAddress {.email}
         `
-        const txResponse = await transaction.run(messageRecipientCypher, {
+        const txResponse = await transaction.run(messageRecipientsCypher, {
           currentUserId,
           roomId,
         })
 
         return {
           senderUser: txResponse.records.map((record) => record.get('senderUser'))[0],
-          recipientUser: txResponse.records.map((record) => record.get('recipientUser'))[0],
-          email: txResponse.records.map((record) => record.get('emailAddress'))[0]?.email,
+          recipients: txResponse.records.map((record) => ({
+            user: record.get('recipientUser'),
+            email: record.get('emailAddress')?.email,
+          })),
         }
       },
     )
 
-    if (recipientUser) {
+    // Send subscriptions and emails to all recipients
+    for (const recipient of recipients) {
+      const recipientUser = recipient.user
+      const { email } = recipient
+
       // send subscriptions
       const roomCountUpdated = await getUnreadRoomsCount(recipientUser.id, session)
 

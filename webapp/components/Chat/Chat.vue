@@ -107,7 +107,7 @@
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import { roomQuery, createRoom, unreadRoomsQuery } from '~/graphql/Rooms'
+import { roomQuery, createRoom, createGroupRoom, unreadRoomsQuery } from '~/graphql/Rooms'
 import {
   messageQuery,
   createMessageMutation,
@@ -130,6 +130,10 @@ export default {
       default: false,
     },
     roomId: {
+      type: String,
+      default: null,
+    },
+    groupId: {
       type: String,
       default: null,
     },
@@ -204,7 +208,9 @@ export default {
     this.icons = iconRegistry
   },
   mounted() {
-    if (this.singleRoom) {
+    if (this.singleRoom && this.groupId) {
+      this.newGroupRoom(this.groupId)
+    } else if (this.singleRoom) {
       this.newRoom(this.roomId)
     } else {
       this.fetchRooms()
@@ -491,10 +497,12 @@ export default {
 
     fixRoomObject(room) {
       // This fixes the room object which arrives from the backend
+      const isGroupRoom = room.isGroupRoom || !!room.group
       const fixedRoom = {
         ...room,
+        isGroupRoom,
         index: room.lastMessage ? room.lastMessage.date : room.createdAt,
-        avatar: room.avatar?.w320,
+        avatar: room.avatar?.w320 || room.avatar,
         lastMessage: room.lastMessage
           ? {
               ...room.lastMessage,
@@ -506,8 +514,13 @@ export default {
         }),
       }
       if (!fixedRoom.avatar) {
-        // as long as we cannot query avatar on CreateRoom
-        fixedRoom.avatar = fixedRoom.users.find((u) => u.id !== this.currentUser.id).avatar
+        if (isGroupRoom && room.group?.avatar) {
+          fixedRoom.avatar = room.group.avatar.w320 || room.group.avatar
+        } else if (!isGroupRoom) {
+          // as long as we cannot query avatar on CreateRoom
+          const otherUser = fixedRoom.users.find((u) => u.id !== this.currentUser.id)
+          fixedRoom.avatar = otherUser?.avatar
+        }
       }
       return fixedRoom
     },
@@ -535,6 +548,29 @@ export default {
         })
         .finally(() => {
           // this.loading = false
+        })
+    },
+
+    newGroupRoom(groupId) {
+      this.$apollo
+        .mutate({
+          mutation: createGroupRoom(),
+          variables: {
+            groupId,
+          },
+        })
+        .then(({ data: { CreateGroupRoom } }) => {
+          const roomIndex = this.rooms.findIndex((r) => r.id === CreateGroupRoom.roomId)
+          const room = this.fixRoomObject(CreateGroupRoom)
+
+          if (roomIndex === -1) {
+            this.rooms = [room, ...this.rooms]
+          }
+          this.fetchMessages({ room, options: { refetch: true } })
+          this.$emit('show-chat', CreateGroupRoom.id)
+        })
+        .catch((error) => {
+          this.$toast.error(error.message)
         })
     },
 

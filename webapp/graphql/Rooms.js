@@ -25,6 +25,39 @@ export const createRoom = () => gql`
   }
 `
 
+export const createGroupRoom = () => gql`
+  ${imageUrls}
+
+  mutation ($groupId: ID!) {
+    CreateGroupRoom(groupId: $groupId) {
+      id
+      roomId
+      roomName
+      avatar
+      isGroupRoom
+      lastMessageAt
+      createdAt
+      unreadCount
+      group {
+        id
+        name
+        slug
+        avatar {
+          ...imageUrls
+        }
+      }
+      users {
+        _id
+        id
+        name
+        avatar {
+          ...imageUrls
+        }
+      }
+    }
+  }
+`
+
 export const roomQuery = () => gql`
   ${imageUrls}
 
@@ -34,9 +67,18 @@ export const roomQuery = () => gql`
       roomId
       roomName
       avatar
+      isGroupRoom
       lastMessageAt
       createdAt
       unreadCount
+      group {
+        id
+        name
+        slug
+        avatar {
+          ...imageUrls
+        }
+      }
       lastMessage {
         _id
         id

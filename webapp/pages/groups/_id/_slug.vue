@@ -80,6 +80,21 @@
               :loading="$apollo.loading"
               @update="updateJoinLeave"
             />
+            <!-- Group chat -->
+            <os-button
+              v-if="isGroupMemberNonePending"
+              variant="primary"
+              appearance="outline"
+              full-width
+              v-tooltip="{
+                content: $t('chat.groupChatButton.tooltip', { name: groupName }),
+                placement: 'bottom-start',
+              }"
+              @click="showOrChangeGroupChat(group.id)"
+            >
+              <template #icon><os-icon :icon="icons.chatBubble" /></template>
+              {{ $t('chat.groupChatButton.label') }}
+            </os-button>
           </div>
           <hr />
           <div class="ds-mt-small ds-mb-small">
@@ -308,7 +323,7 @@ import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import ProfileList from '~/components/features/ProfileList/ProfileList'
 import SortCategories from '~/mixins/sortCategoriesMixin.js'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 // import SocialMedia from '~/components/SocialMedia/SocialMedia'
 // import TabNavigation from '~/components/_new/generic/TabNavigation/TabNavigation'
@@ -374,6 +389,7 @@ export default {
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
+      getShowChat: 'chat/showChat',
     }),
     groupName() {
       const { name } = this.group || {}
@@ -440,6 +456,15 @@ export default {
     },
   },
   methods: {
+    ...mapMutations({
+      showChat: 'chat/SET_OPEN_CHAT',
+    }),
+    async showOrChangeGroupChat(groupId) {
+      if (this.getShowChat.showChat) {
+        await this.showChat({ showChat: false, roomID: null, groupId: null })
+      }
+      await this.showChat({ showChat: true, roomID: null, groupId })
+    },
     // handleTab(tab) {
     //   if (this.tabActive !== tab) {
     //     this.tabActive = tab

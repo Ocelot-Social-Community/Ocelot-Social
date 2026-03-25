@@ -104,12 +104,62 @@ export default {
         await session.close()
       }
     },
+    CreateGroupRoom: async (_parent, params, context, _resolveInfo) => {
+      const { groupId } = params
+      const {
+        user: { id: currentUserId },
+      } = context
+      const session = context.driver.session()
+      try {
+        const room = await session.writeTransaction(async (transaction) => {
+          const createGroupRoomCypher = `
+            MATCH (currentUser:User { id: $currentUserId })-[membership:MEMBER_OF]->(group:Group { id: $groupId })
+            WHERE membership.role IN ['usual', 'admin', 'owner']
+            MERGE (room:Room)-[:ROOM_FOR]->(group)
+            ON CREATE SET
+              room.createdAt = toString(datetime()),
+              room.id = apoc.create.uuid()
+            MERGE (currentUser)-[:CHATS_IN]->(room)
+            WITH room, group, currentUser
+            OPTIONAL MATCH (room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
+            WHERE NOT sender.id = $currentUserId AND NOT message.seen
+            WITH room, group, currentUser, COUNT(DISTINCT message) AS unread
+            OPTIONAL MATCH (group)-[:AVATAR_IMAGE]->(groupImg:Image)
+            RETURN room {
+              .*,
+              roomName: group.name,
+              avatar: groupImg.url,
+              isGroupRoom: true,
+              group: properties(group),
+              users: [properties(currentUser)],
+              unreadCount: toString(unread)
+            }
+          `
+          const createGroupRoomTxResponse = await transaction.run(createGroupRoomCypher, {
+            groupId,
+            currentUserId,
+          })
+          const [room] = createGroupRoomTxResponse.records.map((record) => record.get('room'))
+          return room
+        })
+        if (!room) {
+          throw new Error('Could not create group room. User may not be a member of the group.')
+        }
+        room.roomId = room.id
+        return room
+      } finally {
+        await session.close()
+      }
+    },
   },
   Room: {
     ...Resolver('Room', {
       undefinedToNull: ['lastMessageAt'],
       hasMany: {
         users: '<-[:CHATS_IN]-(related:User)',
+      },
+      hasOne: {
+        group: '-[:ROOM_FOR]->(related:Group)',
       },
     }),
   },
