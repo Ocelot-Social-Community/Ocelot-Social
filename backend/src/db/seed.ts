@@ -16,6 +16,7 @@ import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
 import JoinGroup from '@graphql/queries/groups/JoinGroup.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
+import CreateGroupRoom from '@graphql/queries/messaging/CreateGroupRoom.gql'
 import CreateRoom from '@graphql/queries/messaging/CreateRoom.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -1612,6 +1613,66 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         })
       }
     }
+
+    // eslint-disable-next-line no-console
+    console.log('seed', 'group chat')
+
+    // Group g1 (School For Citizens) - active members: Jenny(creator), Peter(usual), Dewey(admin), Louie(owner)
+    // Create group room as Jenny (creator of g1)
+    authenticatedUser = await jennyRostock.toJson()
+    const { data: roomG1 } = await mutate({
+      mutation: CreateGroupRoom,
+      variables: { groupId: 'g1' },
+    })
+    const g1RoomId = roomG1?.CreateGroupRoom.id
+
+    // Members have a conversation
+    const g1Members = [
+      { user: jennyRostock, name: 'Jenny' },
+      { user: peterLustig, name: 'Peter' },
+      { user: dewey, name: 'Dewey' },
+      { user: louie, name: 'Louie' },
+    ]
+    for (let i = 0; i < 20; i++) {
+      const member = g1Members[i % g1Members.length]
+      authenticatedUser = await member.user.toJson()
+      await mutate({
+        mutation: CreateMessage,
+        variables: {
+          roomId: g1RoomId,
+          content: faker.lorem.sentence(),
+        },
+      })
+    }
+
+    // Group g2 (Yoga Practice) - active members: Bob(owner), Jenny(usual), Dewey(admin), Louie(usual), Dagobert(usual)
+    authenticatedUser = await bobDerBaumeister.toJson()
+    const { data: roomG2 } = await mutate({
+      mutation: CreateGroupRoom,
+      variables: { groupId: 'g2' },
+    })
+    const g2RoomId = roomG2?.CreateGroupRoom.id
+
+    const g2Members = [
+      { user: bobDerBaumeister, name: 'Bob' },
+      { user: jennyRostock, name: 'Jenny' },
+      { user: dewey, name: 'Dewey' },
+      { user: louie, name: 'Louie' },
+      { user: dagobert, name: 'Dagobert' },
+    ]
+    for (let i = 0; i < 25; i++) {
+      const member = g2Members[i % g2Members.length]
+      authenticatedUser = await member.user.toJson()
+      await mutate({
+        mutation: CreateMessage,
+        variables: {
+          roomId: g2RoomId,
+          content: faker.lorem.sentence(),
+        },
+      })
+    }
+
+    // Group g0 (Investigative Journalism) - intentionally NO chat seeded
   } catch (err) {
     /* eslint-disable-next-line no-console */
     console.error(err)

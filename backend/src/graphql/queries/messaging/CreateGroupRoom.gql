@@ -1,0 +1,15 @@
+mutation CreateGroupRoom($groupId: ID!) {
+  CreateGroupRoom(groupId: $groupId) {
+    id
+    roomId
+    roomName
+    isGroupRoom
+    lastMessageAt
+    unreadCount
+    users {
+      _id
+      id
+      name
+    }
+  }
+}
