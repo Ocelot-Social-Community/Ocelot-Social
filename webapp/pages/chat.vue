@@ -2,6 +2,7 @@
   <div>
     <add-chat-room-by-user-search
       v-if="showSearch"
+      ref="searchPanel"
       @add-chat-room="addChatRoom"
       @add-group-chat-room="addGroupChatRoom"
       @close-user-search="showSearch = false"
@@ -10,7 +11,7 @@
       <chat
         :roomId="getShowChat.showChat ? getShowChat.roomID : null"
         ref="chat"
-        @toggle-user-search="showSearch = !showSearch"
+        @toggle-user-search="toggleSearch"
         :show-room="showRoom"
       />
     </client-only>
@@ -44,6 +45,14 @@ export default {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
     }),
+    toggleSearch() {
+      this.showSearch = !this.showSearch
+      if (this.showSearch) {
+        this.$nextTick(() => {
+          this.$refs.searchPanel?.$el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        })
+      }
+    },
     addChatRoom(userID) {
       this.$refs.chat.newRoom(userID)
     },

@@ -165,6 +165,7 @@ export default {
 .add-chat-room-by-user-search {
   background-color: white;
   padding: $space-base;
+  scroll-margin-top: 7rem;
 }
 .ds-flex.headline {
   justify-content: space-between;
