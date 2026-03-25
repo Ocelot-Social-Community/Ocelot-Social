@@ -525,6 +525,7 @@ export default shield(
       saveCategorySettings: isAuthenticated,
       updateOnlineStatus: isAuthenticated,
       CreateRoom: isAuthenticated,
+      CreateGroupRoom: isAuthenticated,
       CreateMessage: isAuthenticated,
       MarkMessagesAsSeen: isAuthenticated,
       toggleObservePost: isAuthenticated,
