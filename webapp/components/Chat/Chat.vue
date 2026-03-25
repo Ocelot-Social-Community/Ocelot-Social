@@ -210,6 +210,7 @@ export default {
       roomPage: 0,
       roomPageSize: 10,
       selectedRoom: this.roomId,
+      activeRoomId: null,
       loadingRooms: true,
       messagesLoaded: false,
       messagePage: 0,
@@ -254,6 +255,10 @@ export default {
 
       if (!this.singleRoom) {
         roomId = this.roomId
+
+        if (this.activeRoomId) {
+          roomId = this.activeRoomId
+        }
 
         if (this.getStoreRoomId.roomId) {
           roomId = this.getStoreRoomId.roomId
@@ -560,6 +565,7 @@ export default {
           } else {
             room = this.rooms[roomIndex]
           }
+          this.activeRoomId = room.roomId
           this.fetchMessages({ room, options: { refetch: true } })
         })
         .catch((error) => {
@@ -585,6 +591,7 @@ export default {
           } else {
             room = this.rooms[roomIndex]
           }
+          this.activeRoomId = room.roomId
           this.fetchMessages({ room, options: { refetch: true } })
         })
         .catch((error) => {
