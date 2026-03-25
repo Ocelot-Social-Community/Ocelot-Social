@@ -9,7 +9,7 @@
         circle
         size="sm"
         :aria-label="$t('actions.close')"
-        @click="closeUserSearch"
+        @click="closeSearch"
       >
         <template #icon>
           <os-icon :icon="icons.close" />
@@ -20,6 +20,24 @@
     <div class="ds-mb-large">
       <select-user-search :id="id" ref="selectUserSearch" @select-user="selectUser" />
     </div>
+    <!-- My groups section -->
+    <div v-if="myGroups.length" class="chat-search-groups">
+      <h4 class="ds-heading ds-heading-h4 ds-mb-x-small">{{ $t('chat.addGroupRoomHeadline') }}</h4>
+      <div class="group-list">
+        <div
+          v-for="group in myGroups"
+          :key="group.id"
+          class="group-list-item"
+          @click="selectGroup(group)"
+        >
+          <profile-avatar :profile="group" size="small" />
+          <div class="group-list-item-info">
+            <span class="group-list-item-name">{{ group.name }}</span>
+            <span class="group-list-item-slug">&{{ group.slug }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -27,6 +45,8 @@
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import SelectUserSearch from '~/components/generic/SelectUserSearch/SelectUserSearch'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import { groupQuery } from '~/graphql/groups'
 
 export default {
   name: 'AddChatRoomByUserSearch',
@@ -34,38 +54,45 @@ export default {
     OsButton,
     OsIcon,
     SelectUserSearch,
-  },
-  props: {
-    // chatRooms: {
-    //   type: Array,
-    //   default: [],
-    // },
+    ProfileAvatar,
   },
   data() {
     return {
       id: 'search-user-to-add-to-group',
       user: {},
+      myGroups: [],
     }
   },
   created() {
     this.icons = iconRegistry
+    this.fetchMyGroups()
   },
   methods: {
+    async fetchMyGroups() {
+      try {
+        const {
+          data: { Group },
+        } = await this.$apollo.query({
+          query: groupQuery(this.$i18n),
+          variables: { isMember: true },
+          fetchPolicy: 'network-only',
+        })
+        this.myGroups = Group.filter((g) => g.myRole && g.myRole !== 'pending')
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
+    },
     selectUser(user) {
       this.user = user
-      // if (this.groupMembers.find((member) => member.id === this.user.id)) {
-      //   this.$toast.error(this.$t('group.errors.userAlreadyMember', { name: this.user.name }))
-      //   this.$refs.selectUserSearch.clear()
-      //   return
-      // }
       this.$refs.selectUserSearch.clear()
+      this.$emit('add-chat-room', this.user?.id)
       this.$emit('close-user-search')
-      this.addChatRoom(this.user?.id)
     },
-    async addChatRoom(userId) {
-      this.$emit('add-chat-room', userId)
+    selectGroup(group) {
+      this.$emit('add-group-chat-room', group.id)
+      this.$emit('close-user-search')
     },
-    closeUserSearch() {
+    closeSearch() {
       this.$emit('close-user-search')
     },
   },
@@ -82,5 +109,35 @@ export default {
 }
 .ds-flex.headline .close-button {
   margin-top: -2px;
+}
+.chat-search-groups {
+  border-top: 1px solid $background-color-softer;
+  padding-top: $space-small;
+}
+.group-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+.group-list-item {
+  display: flex;
+  align-items: center;
+  padding: $space-x-small;
+  cursor: pointer;
+  border-radius: $border-radius-base;
+  &:hover {
+    background-color: $background-color-softer;
+  }
+}
+.group-list-item-info {
+  margin-left: $space-x-small;
+  display: flex;
+  flex-direction: column;
+}
+.group-list-item-name {
+  font-weight: $font-weight-bold;
+}
+.group-list-item-slug {
+  font-size: $font-size-small;
+  color: $text-color-soft;
 }
 </style>

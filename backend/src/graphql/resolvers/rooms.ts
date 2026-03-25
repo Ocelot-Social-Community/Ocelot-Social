@@ -70,14 +70,25 @@ export default {
       const session = context.driver.session()
       try {
         const room = await session.writeTransaction(async (transaction) => {
+          // Find or create a DM room (excluding group rooms)
           const createRoomCypher = `
             MATCH (currentUser:User { id: $currentUserId })
             MATCH (user:User { id: $userId })
-            MERGE (currentUser)-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user)
-            ON CREATE SET
-              room.createdAt = toString(datetime()),
-              room.id = apoc.create.uuid()
-            WITH room, user, currentUser
+            OPTIONAL MATCH (currentUser)-[:CHATS_IN]->(existingRoom:Room)<-[:CHATS_IN]-(user)
+            WHERE NOT (existingRoom)-[:ROOM_FOR]->(:Group)
+            WITH currentUser, user, existingRoom
+            WITH currentUser, user,
+              CASE WHEN existingRoom IS NOT NULL THEN existingRoom
+              ELSE null END AS foundRoom
+            FOREACH (_ IN CASE WHEN foundRoom IS NULL THEN [1] ELSE [] END |
+              CREATE (currentUser)-[:CHATS_IN]->(newRoom:Room {
+                createdAt: toString(datetime()),
+                id: apoc.create.uuid()
+              })<-[:CHATS_IN]-(user)
+            )
+            WITH currentUser, user
+            MATCH (currentUser)-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user)
+            WHERE NOT (room)-[:ROOM_FOR]->(:Group)
             OPTIONAL MATCH (room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
             WHERE NOT sender.id = $currentUserId AND NOT message.seen
             WITH room, user, currentUser, message,
