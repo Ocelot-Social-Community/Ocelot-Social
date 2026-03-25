@@ -343,7 +343,6 @@ export default {
         this.messages = []
         this.messagePage = 0
         this.selectedRoom = room
-        this.activeRoomId = null
       }
       this.messagesLoaded = options.refetch ? this.messagesLoaded : false
       const offset = (options.refetch ? 0 : this.messagePage) * this.messagePageSize
@@ -548,6 +547,15 @@ export default {
       return fixedRoom
     },
 
+    selectRoom(room) {
+      this.activeRoomId = room.roomId
+      this.fetchMessages({ room, options: { refetch: true } })
+      // Clear activeRoomId after vue-advanced-chat has processed the selection
+      setTimeout(() => {
+        this.activeRoomId = null
+      }, 500)
+    },
+
     newRoom(userId) {
       this.$apollo
         .mutate({
@@ -566,8 +574,7 @@ export default {
           } else {
             room = this.rooms[roomIndex]
           }
-          this.activeRoomId = room.roomId
-          this.fetchMessages({ room, options: { refetch: true } })
+          this.selectRoom(room)
         })
         .catch((error) => {
           this.$toast.error(error.message)
@@ -592,8 +599,7 @@ export default {
           } else {
             room = this.rooms[roomIndex]
           }
-          this.activeRoomId = room.roomId
-          this.fetchMessages({ room, options: { refetch: true } })
+          this.selectRoom(room)
         })
         .catch((error) => {
           this.$toast.error(error.message)
