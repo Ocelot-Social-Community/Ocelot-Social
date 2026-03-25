@@ -343,6 +343,7 @@ export default {
         this.messages = []
         this.messagePage = 0
         this.selectedRoom = room
+        this.activeRoomId = null
       }
       this.messagesLoaded = options.refetch ? this.messagesLoaded : false
       const offset = (options.refetch ? 0 : this.messagePage) * this.messagePageSize

@@ -70,24 +70,34 @@ export default {
       const session = context.driver.session()
       try {
         const room = await session.writeTransaction(async (transaction) => {
-          // Find or create a DM room (excluding group rooms)
-          const createRoomCypher = `
-            MATCH (currentUser:User { id: $currentUserId })
-            MATCH (user:User { id: $userId })
-            OPTIONAL MATCH (currentUser)-[:CHATS_IN]->(existingRoom:Room)<-[:CHATS_IN]-(user)
-            WHERE NOT (existingRoom)-[:ROOM_FOR]->(:Group)
-            WITH currentUser, user, existingRoom
-            WITH currentUser, user,
-              CASE WHEN existingRoom IS NOT NULL THEN existingRoom
-              ELSE null END AS foundRoom
-            FOREACH (_ IN CASE WHEN foundRoom IS NULL THEN [1] ELSE [] END |
-              CREATE (currentUser)-[:CHATS_IN]->(newRoom:Room {
+          // Step 1: Find existing DM room (excluding group rooms)
+          const findRoomCypher = `
+            MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user:User { id: $userId })
+            WHERE NOT (room)-[:ROOM_FOR]->(:Group)
+            RETURN room.id AS roomId
+            LIMIT 1
+          `
+          const findResult = await transaction.run(findRoomCypher, { currentUserId, userId })
+          const existingRoomId = findResult.records[0]?.get('roomId')
+
+          // Step 2: Create DM room if none exists
+          if (!existingRoomId) {
+            await transaction.run(
+              `
+              MATCH (currentUser:User { id: $currentUserId })
+              MATCH (user:User { id: $userId })
+              CREATE (currentUser)-[:CHATS_IN]->(room:Room {
                 createdAt: toString(datetime()),
                 id: apoc.create.uuid()
               })<-[:CHATS_IN]-(user)
+              `,
+              { currentUserId, userId },
             )
-            WITH currentUser, user
-            MATCH (currentUser)-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user)
+          }
+
+          // Step 3: Return the DM room with unread count
+          const returnRoomCypher = `
+            MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user:User { id: $userId })
             WHERE NOT (room)-[:ROOM_FOR]->(:Group)
             OPTIONAL MATCH (room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
             WHERE NOT sender.id = $currentUserId AND NOT message.seen
@@ -100,11 +110,8 @@ export default {
               unreadCount: toString(COUNT(DISTINCT message))
             }
           `
-          const createRoomTxResponse = await transaction.run(createRoomCypher, {
-            userId,
-            currentUserId,
-          })
-          const [room] = createRoomTxResponse.records.map((record) => record.get('room'))
+          const returnResult = await transaction.run(returnRoomCypher, { currentUserId, userId })
+          const [room] = returnResult.records.map((record) => record.get('room'))
           return room
         })
         if (room) {
