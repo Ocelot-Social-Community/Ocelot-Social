@@ -137,3 +137,30 @@ export const searchHashtags = gql`
     }
   }
 `
+
+export const searchChatTargets = gql`
+  ${imageUrls}
+
+  query ($query: String!, $limit: Int) {
+    searchChatTargets(query: $query, limit: $limit) {
+      __typename
+      ... on User {
+        id
+        slug
+        name
+        avatar {
+          ...imageUrls
+        }
+      }
+      ... on Group {
+        id
+        slug
+        groupName: name
+        avatar {
+          ...imageUrls
+        }
+        myRole
+      }
+    }
+  }
+`

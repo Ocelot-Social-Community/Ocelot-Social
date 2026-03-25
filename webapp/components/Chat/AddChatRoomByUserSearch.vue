@@ -26,8 +26,8 @@
         :value="selectedItem"
         id="chat-search-combined"
         :icon-right="null"
-        :options="combinedResults"
-        :loading="searching"
+        :options="results"
+        :loading="$apollo.queries.searchChatTargets.loading"
         :filter="(item) => item"
         :no-options-available="$t('chat.searchPlaceholder')"
         :auto-reset-search="true"
@@ -45,11 +45,11 @@
             <div class="chat-search-result-info">
               <span class="chat-search-result-name">{{ option.name }}</span>
               <span class="chat-search-result-detail">
-                {{ option._type === 'group' ? `&${option.slug}` : `@${option.slug}` }}
+                {{ option.__typename === 'Group' ? `&${option.slug}` : `@${option.slug}` }}
               </span>
             </div>
             <os-badge size="sm" class="chat-search-result-badge">
-              {{ option._type === 'group' ? $t('chat.searchBadgeGroup') : $t('chat.searchBadgeUser') }}
+              {{ option.__typename === 'Group' ? $t('chat.searchBadgeGroup') : $t('chat.searchBadgeUser') }}
             </os-badge>
           </div>
         </template>
@@ -62,8 +62,7 @@
 import { OsButton, OsIcon, OsBadge } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { isEmpty } from 'lodash'
-import { searchUsers } from '~/graphql/Search.js'
-import { groupQuery } from '~/graphql/groups'
+import { searchChatTargets } from '~/graphql/Search.js'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import OcelotSelect from '~/components/OcelotSelect/OcelotSelect.vue'
 
@@ -80,36 +79,12 @@ export default {
     return {
       query: '',
       selectedItem: null,
-      users: [],
-      myGroups: [],
-      searching: false,
+      results: [],
     }
   },
   computed: {
     startSearch() {
       return this.query && this.query.length >= 3
-    },
-    filteredGroups() {
-      if (!this.query || this.query.length < 3) return []
-      const q = this.query.toLowerCase()
-      return this.myGroups.filter(
-        (g) => g.name.toLowerCase().includes(q) || g.slug.toLowerCase().includes(q),
-      )
-    },
-    combinedResults() {
-      const groups = this.filteredGroups.map((g) => ({
-        ...g,
-        _type: 'group',
-        id: `group-${g.id}`,
-        _originalId: g.id,
-      }))
-      const users = this.users.map((u) => ({
-        ...u,
-        _type: 'user',
-        id: `user-${u.id}`,
-        _originalId: u.id,
-      }))
-      return [...groups, ...users]
     },
   },
   beforeDestroy() {
@@ -117,28 +92,13 @@ export default {
   },
   created() {
     this.icons = iconRegistry
-    this.fetchMyGroups()
   },
   methods: {
-    async fetchMyGroups() {
-      try {
-        const {
-          data: { Group },
-        } = await this.$apollo.query({
-          query: groupQuery(this.$i18n),
-          variables: { isMember: true },
-          fetchPolicy: 'network-only',
-        })
-        this.myGroups = Group.filter((g) => g.myRole && g.myRole !== 'pending')
-      } catch (error) {
-        this.$toast.error(error.message)
-      }
-    },
     onFocus() {},
     onBlur() {
-      // Delay clearing so that click on dropdown item can fire first
       this.blurTimeout = setTimeout(() => {
         this.query = ''
+        this.results = []
       }, 200)
     },
     handleInput(event) {
@@ -154,17 +114,17 @@ export default {
     },
     clear() {
       this.query = ''
-      this.users = []
+      this.results = []
     },
     onSelect(item) {
       if (!item || typeof item === 'string') return
-      if (!item._type) return
+      if (!item.__typename) return
       clearTimeout(this.blurTimeout)
       this.selectedItem = item
-      if (item._type === 'group') {
-        this.$emit('add-group-chat-room', item._originalId)
+      if (item.__typename === 'Group') {
+        this.$emit('add-group-chat-room', item.id)
       } else {
-        this.$emit('add-chat-room', item._originalId)
+        this.$emit('add-chat-room', item.id)
       }
       this.$nextTick(() => {
         this.$emit('close-user-search')
@@ -175,24 +135,27 @@ export default {
     },
   },
   apollo: {
-    searchUsers: {
+    searchChatTargets: {
       query() {
-        return searchUsers
+        return searchChatTargets
       },
       variables() {
         return {
           query: this.query,
-          firstUsers: 5,
-          usersOffset: 0,
+          limit: 10,
         }
       },
       skip() {
         return !this.startSearch
       },
-      update({ searchUsers }) {
-        this.users = searchUsers.users
+      update({ searchChatTargets }) {
+        this.results = searchChatTargets.map((item) => ({
+          ...item,
+          // Normalize Group name field (groupName alias → name)
+          name: item.name || item.groupName,
+        }))
       },
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: 'no-cache',
     },
   },
 }

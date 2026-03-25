@@ -426,6 +426,7 @@ export default shield(
     Query: {
       '*': deny,
       searchResults: allow,
+      searchChatTargets: isAuthenticated,
       searchPosts: allow,
       searchUsers: allow,
       searchGroups: allow,

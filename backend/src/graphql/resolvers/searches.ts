@@ -87,6 +87,19 @@ const searchGroupsSetup = {
   limit: 'LIMIT toInteger($limit)',
 }
 
+const searchMyGroupsSetup = {
+  fulltextIndex: 'group_fulltext_search',
+  match: `MATCH (resource:Group)
+          MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(resource)
+          WITH user, resource, membership`,
+  whereClause: `WHERE score >= 0.0
+                AND NOT (resource.deleted = true OR resource.disabled = true)
+                AND membership.role IN ['usual', 'admin', 'owner']`,
+  withClause: 'WITH resource, membership',
+  returnClause: `resource { .*, myRole: membership.role, __typename: 'Group' }`,
+  limit: 'LIMIT toInteger($limit)',
+}
+
 const countSetup = {
   returnClause: 'toString(size(collect(resource)))',
   limit: '',
@@ -231,6 +244,20 @@ export default {
           userId,
         }),
       }
+    },
+    searchChatTargets: async (_parent, args, context, _resolveInfo) => {
+      const { query, limit } = args
+      const userId = context.user?.id || null
+      const params = {
+        query: queryString(query),
+        skip: 0,
+        limit,
+        userId,
+      }
+      return [
+        ...(await getSearchResults(context, searchUsersSetup, params)),
+        ...(await getSearchResults(context, searchMyGroupsSetup, params)),
+      ]
     },
     searchResults: async (_parent, args, context, _resolveInfo) => {
       const { query, limit } = args
