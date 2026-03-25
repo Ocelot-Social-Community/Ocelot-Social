@@ -18,50 +18,98 @@
     </div>
     <div class="ds-mb-small"></div>
     <div class="ds-mb-large">
-      <select-user-search :id="id" ref="selectUserSearch" @select-user="selectUser" />
-    </div>
-    <!-- My groups section -->
-    <div v-if="myGroups.length" class="chat-search-groups">
-      <h4 class="ds-heading ds-heading-h4 ds-mb-x-small">{{ $t('chat.addGroupRoomHeadline') }}</h4>
-      <div class="group-list">
-        <div
-          v-for="group in myGroups"
-          :key="group.id"
-          class="group-list-item"
-          @click="selectGroup(group)"
-        >
-          <profile-avatar :profile="group" size="small" />
-          <div class="group-list-item-info">
-            <span class="group-list-item-name">{{ group.name }}</span>
-            <span class="group-list-item-slug">&{{ group.slug }}</span>
+      <ocelot-select
+        class="chat-search-combined"
+        type="search"
+        icon="search"
+        label-prop="id"
+        v-model="query"
+        id="chat-search-combined"
+        :icon-right="null"
+        :options="combinedResults"
+        :loading="searching"
+        :filter="(item) => item"
+        :no-options-available="$t('chat.searchPlaceholder')"
+        :auto-reset-search="true"
+        :placeholder="$t('chat.searchPlaceholder')"
+        @focus.capture.native="onFocus"
+        @input.native="handleInput"
+        @keyup.delete.native="onDelete"
+        @keyup.esc.native="clear"
+        @blur.capture.native="onBlur"
+        @input.exact="onSelect"
+      >
+        <template #option="{ option }">
+          <div class="chat-search-result-item">
+            <profile-avatar :profile="option" size="small" />
+            <div class="chat-search-result-info">
+              <span class="chat-search-result-name">{{ option.name }}</span>
+              <span class="chat-search-result-detail">
+                {{ option._type === 'group' ? `&${option.slug}` : `@${option.slug}` }}
+              </span>
+            </div>
+            <os-badge variant="primary" size="small" class="chat-search-result-badge">
+              {{ option._type === 'group' ? $t('chat.searchBadgeGroup') : $t('chat.searchBadgeUser') }}
+            </os-badge>
           </div>
-        </div>
-      </div>
+        </template>
+      </ocelot-select>
     </div>
   </div>
 </template>
 
 <script>
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsBadge } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import SelectUserSearch from '~/components/generic/SelectUserSearch/SelectUserSearch'
-import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import { isEmpty } from 'lodash'
+import { searchUsers } from '~/graphql/Search.js'
 import { groupQuery } from '~/graphql/groups'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import OcelotSelect from '~/components/OcelotSelect/OcelotSelect.vue'
 
 export default {
   name: 'AddChatRoomByUserSearch',
   components: {
     OsButton,
     OsIcon,
-    SelectUserSearch,
+    OsBadge,
     ProfileAvatar,
+    OcelotSelect,
   },
   data() {
     return {
-      id: 'search-user-to-add-to-group',
-      user: {},
+      query: '',
+      users: [],
       myGroups: [],
+      searching: false,
     }
+  },
+  computed: {
+    startSearch() {
+      return this.query && this.query.length >= 3
+    },
+    filteredGroups() {
+      if (!this.query || this.query.length < 1) return this.myGroups
+      const q = this.query.toLowerCase()
+      return this.myGroups.filter(
+        (g) => g.name.toLowerCase().includes(q) || g.slug.toLowerCase().includes(q),
+      )
+    },
+    combinedResults() {
+      const groups = this.filteredGroups.map((g) => ({
+        ...g,
+        _type: 'group',
+        id: `group-${g.id}`,
+        _originalId: g.id,
+      }))
+      const users = this.users.map((u) => ({
+        ...u,
+        _type: 'user',
+        id: `user-${u.id}`,
+        _originalId: u.id,
+      }))
+      return [...groups, ...users]
+    },
   },
   created() {
     this.icons = iconRegistry
@@ -82,18 +130,57 @@ export default {
         this.$toast.error(error.message)
       }
     },
-    selectUser(user) {
-      this.user = user
-      this.$refs.selectUserSearch.clear()
-      this.$emit('add-chat-room', this.user?.id)
-      this.$emit('close-user-search')
+    onFocus() {},
+    onBlur() {
+      this.query = ''
     },
-    selectGroup(group) {
-      this.$emit('add-group-chat-room', group.id)
+    handleInput(event) {
+      this.query = event.target ? event.target.value.trim() : ''
+    },
+    onDelete(event) {
+      const value = event.target ? event.target.value.trim() : ''
+      if (isEmpty(value)) {
+        this.clear()
+      } else {
+        this.handleInput(event)
+      }
+    },
+    clear() {
+      this.query = ''
+      this.users = []
+    },
+    onSelect(item) {
+      if (!item) return
+      if (item._type === 'group') {
+        this.$emit('add-group-chat-room', item._originalId)
+      } else {
+        this.$emit('add-chat-room', item._originalId)
+      }
       this.$emit('close-user-search')
     },
     closeSearch() {
       this.$emit('close-user-search')
+    },
+  },
+  apollo: {
+    searchUsers: {
+      query() {
+        return searchUsers
+      },
+      variables() {
+        return {
+          query: this.query,
+          firstUsers: 5,
+          usersOffset: 0,
+        }
+      },
+      skip() {
+        return !this.startSearch
+      },
+      update({ searchUsers }) {
+        this.users = searchUsers.users
+      },
+      fetchPolicy: 'cache-and-network',
     },
   },
 }
@@ -110,34 +197,30 @@ export default {
 .ds-flex.headline .close-button {
   margin-top: -2px;
 }
-.chat-search-groups {
-  border-top: 1px solid $background-color-softer;
-  padding-top: $space-small;
-}
-.group-list {
-  max-height: 200px;
-  overflow-y: auto;
-}
-.group-list-item {
+.chat-search-result-item {
   display: flex;
   align-items: center;
-  padding: $space-x-small;
-  cursor: pointer;
-  border-radius: $border-radius-base;
-  &:hover {
-    background-color: $background-color-softer;
-  }
+  width: 100%;
 }
-.group-list-item-info {
+.chat-search-result-info {
   margin-left: $space-x-small;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-width: 0;
 }
-.group-list-item-name {
+.chat-search-result-name {
   font-weight: $font-weight-bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.group-list-item-slug {
+.chat-search-result-detail {
   font-size: $font-size-small;
   color: $text-color-soft;
+}
+.chat-search-result-badge {
+  margin-left: auto;
+  flex-shrink: 0;
 }
 </style>

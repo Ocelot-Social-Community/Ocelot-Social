@@ -152,7 +152,10 @@
     },
     "addGroupRoomHeadline": "Suche Gruppe für neuen Chat",
     "searchGroupPlaceholder": "Gruppe suchen …",
-    "noGroupsFound": "Keine Gruppen gefunden"
+    "noGroupsFound": "Keine Gruppen gefunden",
+    "searchPlaceholder": "Nutzer oder Gruppe suchen…",
+    "searchBadgeUser": "Nutzer",
+    "searchBadgeGroup": "Gruppe"
   },
   "client-only": {
     "loading": "Lade …"
