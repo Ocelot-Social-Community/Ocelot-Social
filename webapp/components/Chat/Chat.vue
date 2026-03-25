@@ -70,8 +70,14 @@
     </div>
 
     <div slot="room-header-avatar">
+      <profile-avatar
+        v-if="selectedRoom && selectedRoom.isGroupRoom"
+        :profile="selectedRoom.groupProfile"
+        class="vac-avatar-profile"
+        size="small"
+      />
       <div
-        v-if="selectedRoom && selectedRoom.avatar"
+        v-else-if="selectedRoom && selectedRoom.avatar"
         class="vac-avatar"
         :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
       />
@@ -92,8 +98,14 @@
     </div>
 
     <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
+      <profile-avatar
+        v-if="room.isGroupRoom"
+        :profile="room.groupProfile"
+        class="vac-avatar-profile"
+        size="small"
+      />
       <div
-        v-if="room.avatar"
+        v-else-if="room.avatar"
         class="vac-avatar"
         :style="{ 'background-image': `url('${room.avatar}')` }"
       />
@@ -107,6 +119,7 @@
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import { roomQuery, createRoom, createGroupRoom, unreadRoomsQuery } from '~/graphql/Rooms'
 import {
   messageQuery,
@@ -119,7 +132,7 @@ import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'Chat',
-  components: { OsButton, OsIcon },
+  components: { OsButton, OsIcon, ProfileAvatar },
   props: {
     theme: {
       type: String,
@@ -501,6 +514,10 @@ export default {
       const fixedRoom = {
         ...room,
         isGroupRoom,
+        // For group rooms: provide group profile data for ProfileAvatar component
+        groupProfile: isGroupRoom
+          ? { name: room.group?.name || room.roomName, avatar: room.group?.avatar }
+          : null,
         index: room.lastMessage ? room.lastMessage.date : room.createdAt,
         avatar: room.avatar?.w320 || room.avatar,
         lastMessage: room.lastMessage
@@ -514,9 +531,9 @@ export default {
         }),
       }
       if (!fixedRoom.avatar) {
-        if (isGroupRoom && room.group?.avatar) {
-          fixedRoom.avatar = room.group.avatar.w320 || room.group.avatar
-        } else if (!isGroupRoom) {
+        if (isGroupRoom) {
+          fixedRoom.avatar = room.group?.avatar?.w320 || room.group?.avatar || null
+        } else {
           // as long as we cannot query avatar on CreateRoom
           const otherUser = fixedRoom.users.find((u) => u.id !== this.currentUser.id)
           fixedRoom.avatar = otherUser?.avatar
@@ -632,6 +649,10 @@ export default {
     left: 50%;
     transform: translate(-50%, -50%);
   }
+}
+
+.vac-avatar-profile {
+  margin-right: 15px;
 }
 
 .ds-flex-item.single-chat-bubble {
