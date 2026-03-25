@@ -112,6 +112,7 @@ export default {
       const session = context.driver.session()
       try {
         const room = await session.writeTransaction(async (transaction) => {
+          // Step 1: Create/merge the room and add all active group members to it
           const createGroupRoomCypher = `
             MATCH (currentUser:User { id: $currentUserId })-[membership:MEMBER_OF]->(group:Group { id: $groupId })
             WHERE membership.role IN ['usual', 'admin', 'owner']
@@ -119,11 +120,14 @@ export default {
             ON CREATE SET
               room.createdAt = toString(datetime()),
               room.id = apoc.create.uuid()
-            MERGE (currentUser)-[:CHATS_IN]->(room)
-            WITH room, group, currentUser
+            WITH room, group
+            MATCH (member:User)-[m:MEMBER_OF]->(group)
+            WHERE m.role IN ['usual', 'admin', 'owner']
+            MERGE (member)-[:CHATS_IN]->(room)
+            WITH room, group, collect(properties(member)) AS members
             OPTIONAL MATCH (room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
             WHERE NOT sender.id = $currentUserId AND NOT message.seen
-            WITH room, group, currentUser, COUNT(DISTINCT message) AS unread
+            WITH room, group, members, COUNT(DISTINCT message) AS unread
             OPTIONAL MATCH (group)-[:AVATAR_IMAGE]->(groupImg:Image)
             RETURN room {
               .*,
@@ -131,7 +135,7 @@ export default {
               avatar: groupImg.url,
               isGroupRoom: true,
               group: properties(group),
-              users: [properties(currentUser)],
+              users: members,
               unreadCount: toString(unread)
             }
           `
