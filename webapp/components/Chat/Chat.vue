@@ -549,11 +549,6 @@ export default {
 
     selectRoom(room) {
       this.activeRoomId = room.roomId
-      this.fetchMessages({ room, options: { refetch: true } })
-      // Clear activeRoomId after vue-advanced-chat has processed the selection
-      setTimeout(() => {
-        this.activeRoomId = null
-      }, 500)
     },
 
     newRoom(userId) {
