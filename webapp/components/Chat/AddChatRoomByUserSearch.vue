@@ -48,7 +48,7 @@
                 {{ option._type === 'group' ? `&${option.slug}` : `@${option.slug}` }}
               </span>
             </div>
-            <os-badge variant="primary" size="small" class="chat-search-result-badge">
+            <os-badge size="sm" class="chat-search-result-badge">
               {{ option._type === 'group' ? $t('chat.searchBadgeGroup') : $t('chat.searchBadgeUser') }}
             </os-badge>
           </div>
@@ -222,5 +222,12 @@ export default {
 .chat-search-result-badge {
   margin-left: auto;
   flex-shrink: 0;
+  white-space: nowrap;
+  // Tailwind @layer utilities have lower specificity than unlayered CSS,
+  // so we need to explicitly set the badge styles here.
+  font-size: 0.75rem;
+  padding: 0.2em 0.8em;
+  border-radius: 2em;
+  line-height: 1.3;
 }
 </style>
