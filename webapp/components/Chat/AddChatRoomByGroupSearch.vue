@@ -123,7 +123,7 @@ export default {
 .group-search-input {
   width: 100%;
   padding: $space-x-small $space-small;
-  border: 1px solid $color-soft;
+  border: 1px solid $text-color-softer;
   border-radius: $border-radius-base;
   font-size: $font-size-base;
   &:focus {
