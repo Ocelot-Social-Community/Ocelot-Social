@@ -552,19 +552,18 @@ export default {
         })
         .then(({ data: { CreateRoom } }) => {
           const roomIndex = this.rooms.findIndex((r) => r.id === CreateRoom.roomId)
-          const room = this.fixRoomObject(CreateRoom)
+          let room
 
           if (roomIndex === -1) {
+            room = this.fixRoomObject(CreateRoom)
             this.rooms = [room, ...this.rooms]
+          } else {
+            room = this.rooms[roomIndex]
           }
           this.fetchMessages({ room, options: { refetch: true } })
-          this.$emit('show-chat', CreateRoom.id)
         })
         .catch((error) => {
           this.$toast.error(error.message)
-        })
-        .finally(() => {
-          // this.loading = false
         })
     },
 
@@ -578,13 +577,15 @@ export default {
         })
         .then(({ data: { CreateGroupRoom } }) => {
           const roomIndex = this.rooms.findIndex((r) => r.id === CreateGroupRoom.roomId)
-          const room = this.fixRoomObject(CreateGroupRoom)
+          let room
 
           if (roomIndex === -1) {
+            room = this.fixRoomObject(CreateGroupRoom)
             this.rooms = [room, ...this.rooms]
+          } else {
+            room = this.rooms[roomIndex]
           }
           this.fetchMessages({ room, options: { refetch: true } })
-          this.$emit('show-chat', CreateGroupRoom.id)
         })
         .catch((error) => {
           this.$toast.error(error.message)

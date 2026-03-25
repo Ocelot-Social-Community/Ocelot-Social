@@ -23,7 +23,7 @@
         type="search"
         icon="search"
         label-prop="id"
-        v-model="query"
+        :value="selectedItem"
         id="chat-search-combined"
         :icon-right="null"
         :options="combinedResults"
@@ -37,7 +37,7 @@
         @keyup.delete.native="onDelete"
         @keyup.esc.native="clear"
         @blur.capture.native="onBlur"
-        @input.exact="onSelect"
+        @input="onSelect"
       >
         <template #option="{ option }">
           <div class="chat-search-result-item">
@@ -79,6 +79,7 @@ export default {
   data() {
     return {
       query: '',
+      selectedItem: null,
       users: [],
       myGroups: [],
       searching: false,
@@ -89,7 +90,7 @@ export default {
       return this.query && this.query.length >= 3
     },
     filteredGroups() {
-      if (!this.query || this.query.length < 1) return this.myGroups
+      if (!this.query || this.query.length < 3) return []
       const q = this.query.toLowerCase()
       return this.myGroups.filter(
         (g) => g.name.toLowerCase().includes(q) || g.slug.toLowerCase().includes(q),
@@ -110,6 +111,9 @@ export default {
       }))
       return [...groups, ...users]
     },
+  },
+  beforeDestroy() {
+    clearTimeout(this.blurTimeout)
   },
   created() {
     this.icons = iconRegistry
@@ -132,7 +136,10 @@ export default {
     },
     onFocus() {},
     onBlur() {
-      this.query = ''
+      // Delay clearing so that click on dropdown item can fire first
+      this.blurTimeout = setTimeout(() => {
+        this.query = ''
+      }, 200)
     },
     handleInput(event) {
       this.query = event.target ? event.target.value.trim() : ''
@@ -150,13 +157,18 @@ export default {
       this.users = []
     },
     onSelect(item) {
-      if (!item) return
+      if (!item || typeof item === 'string') return
+      if (!item._type) return
+      clearTimeout(this.blurTimeout)
+      this.selectedItem = item
       if (item._type === 'group') {
         this.$emit('add-group-chat-room', item._originalId)
       } else {
         this.$emit('add-chat-room', item._originalId)
       }
-      this.$emit('close-user-search')
+      this.$nextTick(() => {
+        this.$emit('close-user-search')
+      })
     },
     closeSearch() {
       this.$emit('close-user-search')
