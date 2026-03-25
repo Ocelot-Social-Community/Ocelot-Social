@@ -569,7 +569,10 @@ export default {
           } else {
             room = this.rooms[roomIndex]
           }
-          this.selectRoom(room)
+          // Wait for vue-advanced-chat to process the updated rooms array
+          this.$nextTick(() => {
+            this.selectRoom(room)
+          })
         })
         .catch((error) => {
           this.$toast.error(error.message)
@@ -594,7 +597,10 @@ export default {
           } else {
             room = this.rooms[roomIndex]
           }
-          this.selectRoom(room)
+          // Wait for vue-advanced-chat to process the updated rooms array
+          this.$nextTick(() => {
+            this.selectRoom(room)
+          })
         })
         .catch((error) => {
           this.$toast.error(error.message)
