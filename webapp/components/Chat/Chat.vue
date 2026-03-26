@@ -579,6 +579,7 @@ export default {
       // Accept either a user object { id, name } or just a userId string
       const userId = typeof userOrId === 'string' ? userOrId : userOrId.id
       const userName = typeof userOrId === 'string' ? userOrId : userOrId.name
+      const userAvatar = typeof userOrId === 'string' ? null : userOrId.avatar?.w320 || userOrId.avatar?.url || null
 
       // Check if a DM room with this user already exists locally
       const existingRoom = this.rooms.find(
@@ -600,7 +601,7 @@ export default {
         roomName: userName,
         isGroupRoom: false,
         groupProfile: null,
-        avatar: null,
+        avatar: userAvatar,
         lastMessageAt: null,
         createdAt: new Date().toISOString(),
         unreadCount: 0,
@@ -608,7 +609,7 @@ export default {
         lastMessage: { content: '' },
         users: [
           { _id: this.currentUser.id, id: this.currentUser.id, username: this.currentUser.name },
-          { _id: userId, id: userId, username: userName },
+          { _id: userId, id: userId, username: userName, avatar: userAvatar },
         ],
         _virtualUserId: userId,
       }
