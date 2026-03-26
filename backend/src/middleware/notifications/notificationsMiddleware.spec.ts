@@ -893,6 +893,10 @@ describe('notifications', () => {
         },
       })
       roomId = result.data.CreateMessage.room.id
+
+      // Reset mocks after init message to avoid contamination
+      pubsubSpy.mockClear()
+      sendChatMessageMailMock.mockClear()
     })
 
     describe('if the chatReceiver is online', () => {
