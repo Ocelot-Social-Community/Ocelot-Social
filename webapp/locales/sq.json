@@ -123,23 +123,33 @@
     }
   },
   "chat": {
+    "addGroupRoomHeadline": "Kërko grup për bisedë të re",
     "addRoomHeadline": "Kërko përdorues për bisedë të re",
     "cancelSelectMessage": "Anulo",
     "closeChat": "Mbyll bisedën",
     "conversationStarted": "Biseda filloi më:",
     "expandChat": "Zgjero bisedën",
+    "groupChatButton": {
+      "label": "Bisedë grupi",
+      "tooltip": "Bisedo me grupin \"{name}\""
+    },
     "isOnline": "është online",
     "isTyping": "po shkruan...",
     "lastSeen": "parë për herë të fundit ",
     "messageDeleted": "Ky mesazh u fshi",
     "messagesEmpty": "Nuk ka mesazhe",
     "newMessages": "Mesazhe të reja",
+    "noGroupsFound": "Nuk u gjetën grupe",
     "page": {
       "headline": "Biseda"
     },
     "roomEmpty": "Asnjë dhomë e zgjedhur",
     "roomsEmpty": "Nuk ka dhoma",
     "search": "Filtro dhomat e bisedës",
+    "searchBadgeGroup": "Grup",
+    "searchBadgeUser": "Përdorues",
+    "searchGroupPlaceholder": "Kërko grup…",
+    "searchPlaceholder": "Kërko përdorues ose grup…",
     "transmitting": "Duke dërguar mesazhin …",
     "typeMessage": "Shkruaj mesazh",
     "userProfileButton": {

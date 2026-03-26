@@ -123,23 +123,33 @@
     }
   },
   "chat": {
+    "addGroupRoomHeadline": "Пошук групи для нового чату",
     "addRoomHeadline": "Пошук користувача для нового чату",
     "cancelSelectMessage": "Скасувати",
     "closeChat": "Закрити чат",
     "conversationStarted": "Розмову розпочато:",
     "expandChat": "Розгорнути чат",
+    "groupChatButton": {
+      "label": "Груповий чат",
+      "tooltip": "Чат з групою «{name}»"
+    },
     "isOnline": "в мережі",
     "isTyping": "пише...",
     "lastSeen": "останній раз ",
     "messageDeleted": "Це повідомлення було видалено",
     "messagesEmpty": "Немає повідомлень",
     "newMessages": "Нові повідомлення",
+    "noGroupsFound": "Групи не знайдено",
     "page": {
       "headline": "Чат"
     },
     "roomEmpty": "Кімнату не вибрано",
     "roomsEmpty": "Немає кімнат",
     "search": "Фільтрувати чат-кімнати",
+    "searchBadgeGroup": "Група",
+    "searchBadgeUser": "Користувач",
+    "searchGroupPlaceholder": "Шукати групу…",
+    "searchPlaceholder": "Шукати користувача або групу…",
     "transmitting": "Надсилання повідомлення ...",
     "typeMessage": "Написати повідомлення",
     "userProfileButton": {

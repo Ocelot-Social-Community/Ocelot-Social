@@ -123,39 +123,39 @@
     }
   },
   "chat": {
+    "addGroupRoomHeadline": "Suche Gruppe für neuen Chat",
     "addRoomHeadline": "Suche Nutzer für neuen Chat",
     "cancelSelectMessage": "Abbrechen",
     "closeChat": "Chat schließen",
     "conversationStarted": "Unterhaltung startete am:",
     "expandChat": "Chat erweitern",
+    "groupChatButton": {
+      "label": "Gruppenchat",
+      "tooltip": "Chatte mit der Gruppe „{name}“"
+    },
     "isOnline": "online",
     "isTyping": "tippt...",
     "lastSeen": "zuletzt gesehen ",
     "messageDeleted": "Diese Nachricht wurde gelöscht",
     "messagesEmpty": "Keine Nachrichten",
     "newMessages": "Neue Nachrichten",
+    "noGroupsFound": "Keine Gruppen gefunden",
     "page": {
       "headline": "Chat"
     },
     "roomEmpty": "Keinen Raum selektiert",
     "roomsEmpty": "Keine Räume",
     "search": "Chat-Räume filtern",
+    "searchBadgeGroup": "Gruppe",
+    "searchBadgeUser": "Nutzer",
+    "searchGroupPlaceholder": "Gruppe suchen …",
+    "searchPlaceholder": "Nutzer oder Gruppe suchen…",
     "transmitting": "Nachricht wird übertragen ...",
     "typeMessage": "Nachricht schreiben",
     "userProfileButton": {
       "label": "Chat",
       "tooltip": "Chatte mit „{name}“"
-    },
-    "groupChatButton": {
-      "label": "Gruppenchat",
-      "tooltip": "Chatte mit der Gruppe „{name}“"
-    },
-    "addGroupRoomHeadline": "Suche Gruppe für neuen Chat",
-    "searchGroupPlaceholder": "Gruppe suchen …",
-    "noGroupsFound": "Keine Gruppen gefunden",
-    "searchPlaceholder": "Nutzer oder Gruppe suchen…",
-    "searchBadgeUser": "Nutzer",
-    "searchBadgeGroup": "Gruppe"
+    }
   },
   "client-only": {
     "loading": "Lade …"
