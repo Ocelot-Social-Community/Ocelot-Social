@@ -1617,7 +1617,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     // eslint-disable-next-line no-console
     console.log('seed', 'group chat')
 
-    // Group g1 (School For Citizens) - active members: Jenny(creator), Peter(usual), Dewey(admin), Louie(owner)
+    // Group g1 (School For Citizens) - active members: Jenny(owner/creator), Peter(usual), Bob(usual), Dewey(admin), Louie(owner), Dagobert(usual)
     // Create group room as Jenny (creator of g1)
     authenticatedUser = await jennyRostock.toJson()
     const { data: roomG1 } = await mutate({
@@ -1645,7 +1645,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       })
     }
 
-    // Group g2 (Yoga Practice) - active members: Bob(owner), Jenny(usual), Dewey(admin), Louie(usual), Dagobert(usual)
+    // Group g2 (Yoga Practice) - active members: Bob(owner/creator), Jenny(usual), Dewey(admin), Louie(usual), Dagobert(usual) - Huey is pending
     authenticatedUser = await bobDerBaumeister.toJson()
     const { data: roomG2 } = await mutate({
       mutation: CreateGroupRoom,
