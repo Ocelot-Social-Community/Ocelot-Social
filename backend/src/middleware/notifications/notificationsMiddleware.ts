@@ -459,14 +459,26 @@ const handleCreateMessage: IMiddlewareResolver = async (
   const message = await resolve(root, args, context, resolveInfo)
 
   // Query Parameters
-  const { roomId } = args
+  const roomId = args.roomId || message?.room?.id
   const {
     user: { id: currentUserId },
   } = context
 
-  // Find Recipients (supports both DM and group rooms)
+  // For CreateRoomWithMessage, roomId is not in args — query it from the message
   const session = context.driver.session()
   try {
+    let resolvedRoomId = roomId
+    if (!resolvedRoomId && message?.id) {
+      const roomResult = await session.readTransaction((transaction) => {
+        return transaction.run(
+          `MATCH (m:Message { id: $messageId })-[:INSIDE]->(room:Room) RETURN room.id AS roomId`,
+          { messageId: message.id },
+        )
+      })
+      resolvedRoomId = roomResult.records[0]?.get('roomId')
+    }
+    if (!resolvedRoomId) return message
+
     const { senderUser, recipients } = await session.readTransaction(async (transaction) => {
       const messageRecipientsCypher = `
           MATCH (senderUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
@@ -478,7 +490,7 @@ const handleCreateMessage: IMiddlewareResolver = async (
         `
       const txResponse = await transaction.run(messageRecipientsCypher, {
         currentUserId,
-        roomId,
+        roomId: resolvedRoomId,
       })
 
       return {

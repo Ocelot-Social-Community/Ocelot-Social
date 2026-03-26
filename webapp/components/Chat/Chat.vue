@@ -120,7 +120,7 @@
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
-import { roomQuery, createRoom, createGroupRoom, unreadRoomsQuery } from '~/graphql/Rooms'
+import { roomQuery, createGroupRoom, unreadRoomsQuery } from '~/graphql/Rooms'
 import {
   messageQuery,
   createMessageMutation,
@@ -356,6 +356,11 @@ export default {
         this.messagePage = 0
         this.selectedRoom = room
       }
+      // Virtual rooms have no messages on the server yet
+      if (room.id?.startsWith('temp-')) {
+        this.messagesLoaded = true
+        return
+      }
       this.messagesLoaded = options.refetch ? this.messagesLoaded : false
       const offset = (options.refetch ? 0 : this.messagePage) * this.messagePageSize
       try {
@@ -439,6 +444,7 @@ export default {
 
     async sendMessage(messageDetails) {
       const { roomId, content, files } = messageDetails
+      const isVirtualRoom = roomId.startsWith('temp-')
 
       const hasFiles = files && files.length > 0
 
@@ -455,15 +461,6 @@ export default {
           }))
         : null
 
-      const mutationVariables = {
-        roomId,
-        content,
-      }
-
-      if (filesToUpload && filesToUpload.length > 0) {
-        mutationVariables.files = filesToUpload
-      }
-
       // Immediately add new message
       const localMessage = {
         ...messageDetails,
@@ -477,7 +474,6 @@ export default {
             ...file,
             url: URL.createObjectURL(new Blob([file.blob], { type: file.type })),
           })) ?? [],
-        // Custom property
         isUploading: true,
       }
       this.messages = [...this.messages, localMessage]
@@ -486,34 +482,56 @@ export default {
       if (roomIndex !== -1) {
         const changedRoom = { ...this.rooms[roomIndex] }
         changedRoom.lastMessage.content = (content || '').trim().substring(0, 30)
-
-        // Move changed room to the top of the list
         changedRoom.index = changedRoom.lastMessage.date
         this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== roomId)]
       }
 
       try {
+        // Build mutation variables — userId for virtual rooms, roomId for existing
+        const mutationVariables = { content }
+        if (isVirtualRoom) {
+          const virtualRoom = this.rooms.find((r) => r.id === roomId)
+          mutationVariables.userId = virtualRoom?._virtualUserId || roomId.replace('temp-', '')
+        } else {
+          mutationVariables.roomId = roomId
+        }
+        if (filesToUpload && filesToUpload.length > 0) {
+          mutationVariables.files = filesToUpload
+        }
+
         const { data } = await this.$apollo.mutate({
           mutation: createMessageMutation(),
           variables: mutationVariables,
         })
-        const createdMessagePayload = data.CreateMessage
+        const createdMessage = data.CreateMessage
 
-        if (createdMessagePayload && roomIndex !== -1) {
-          const changedRoom = { ...this.rooms[roomIndex] }
-          changedRoom.lastMessage.content = (createdMessagePayload.content || '')
-            .trim()
-            .substring(0, 30)
-          changedRoom.lastMessage.date = createdMessagePayload.date
+        if (isVirtualRoom && createdMessage?.room?.id) {
+          // Replace virtual room with real room
+          const realRoomId = createdMessage.room.id
+          this.rooms = this.rooms.filter((r) => r.id !== roomId)
+          await this.fetchRooms()
+          const realRoom = this.rooms.find((r) => r.id === realRoomId)
+          if (realRoom) {
+            this.$nextTick(() => {
+              this.selectRoom(realRoom)
+            })
+          }
+        } else if (createdMessage) {
+          if (roomIndex !== -1) {
+            const changedRoom = { ...this.rooms[roomIndex] }
+            changedRoom.lastMessage.content = (createdMessage.content || '')
+              .trim()
+              .substring(0, 30)
+            changedRoom.lastMessage.date = createdMessage.date
+          }
+          this.fetchMessages({
+            room: this.rooms.find((r) => r.roomId === messageDetails.roomId),
+            options: { refetch: true },
+          })
         }
       } catch (error) {
         this.$toast.error(error.message)
       }
-
-      this.fetchMessages({
-        room: this.rooms.find((r) => r.roomId === messageDetails.roomId),
-        options: { refetch: true },
-      })
     },
 
     getInitialsName(fullname) {
@@ -563,32 +581,45 @@ export default {
       this.activeRoomId = room.roomId
     },
 
-    newRoom(userId) {
-      this.$apollo
-        .mutate({
-          mutation: createRoom(),
-          variables: {
-            userId,
-          },
-        })
-        .then(({ data: { CreateRoom } }) => {
-          const roomIndex = this.rooms.findIndex((r) => r.id === CreateRoom.roomId)
-          let room
+    newRoom(userOrId) {
+      // Accept either a user object { id, name } or just a userId string
+      const userId = typeof userOrId === 'string' ? userOrId : userOrId.id
+      const userName = typeof userOrId === 'string' ? userOrId : userOrId.name
 
-          if (roomIndex === -1) {
-            room = this.fixRoomObject(CreateRoom)
-            this.rooms = [room, ...this.rooms]
-          } else {
-            room = this.rooms[roomIndex]
-          }
-          // Wait for vue-advanced-chat to process the updated rooms array
-          this.$nextTick(() => {
-            this.selectRoom(room)
-          })
+      // Check if a DM room with this user already exists locally
+      const existingRoom = this.rooms.find(
+        (r) => !r.isGroupRoom && r.users.some((u) => u.id === userId),
+      )
+      if (existingRoom) {
+        this.$nextTick(() => {
+          this.selectRoom(existingRoom)
         })
-        .catch((error) => {
-          this.$toast.error(error.message)
-        })
+        return
+      }
+
+      // Create a virtual room (no backend call — room is created on first message)
+      const virtualRoom = {
+        id: `temp-${userId}`,
+        roomId: `temp-${userId}`,
+        roomName: userName,
+        isGroupRoom: false,
+        groupProfile: null,
+        avatar: null,
+        lastMessageAt: null,
+        createdAt: new Date().toISOString(),
+        unreadCount: 0,
+        index: new Date().toISOString(),
+        lastMessage: { content: '' },
+        users: [
+          { _id: this.currentUser.id, id: this.currentUser.id, username: this.currentUser.name },
+          { _id: userId, id: userId, username: userName },
+        ],
+        _virtualUserId: userId,
+      }
+      this.rooms = [virtualRoom, ...this.rooms]
+      this.$nextTick(() => {
+        this.selectRoom(virtualRoom)
+      })
     },
 
     newGroupRoom(groupId) {

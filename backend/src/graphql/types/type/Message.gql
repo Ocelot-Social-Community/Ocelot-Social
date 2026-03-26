@@ -38,7 +38,7 @@ type Message {
 }
 
 type Mutation {
-  CreateMessage(roomId: ID!, content: String, files: [FileInput]): Message
+  CreateMessage(roomId: ID, userId: ID, content: String, files: [FileInput]): Message
 
   MarkMessagesAsSeen(messageIds: [String!]): Boolean
 }

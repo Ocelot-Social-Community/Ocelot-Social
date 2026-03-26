@@ -123,7 +123,7 @@ export default {
       if (item.__typename === 'Group') {
         this.$emit('add-group-chat-room', item.id)
       } else {
-        this.$emit('add-chat-room', item.id)
+        this.$emit('add-chat-room', { id: item.id, name: item.name, slug: item.slug })
       }
       this.$nextTick(() => {
         this.$emit('close-user-search')

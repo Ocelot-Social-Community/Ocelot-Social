@@ -53,8 +53,8 @@ export default {
         })
       }
     },
-    addChatRoom(userID) {
-      this.$refs.chat.newRoom(userID)
+    addChatRoom(user) {
+      this.$refs.chat.newRoom(user)
     },
     addGroupChatRoom(groupId) {
       this.$refs.chat.newGroupRoom(groupId)

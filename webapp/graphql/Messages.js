@@ -2,8 +2,8 @@ import gql from 'graphql-tag'
 
 export const createMessageMutation = () => {
   return gql`
-    mutation ($roomId: ID!, $content: String, $files: [FileInput]) {
-      CreateMessage(roomId: $roomId, content: $content, files: $files) {
+    mutation ($roomId: ID, $userId: ID, $content: String, $files: [FileInput]) {
+      CreateMessage(roomId: $roomId, userId: $userId, content: $content, files: $files) {
         #_id
         id
         indexId

@@ -75,17 +75,51 @@ export default {
   },
   Mutation: {
     CreateMessage: async (_parent, params, context, _resolveInfo) => {
-      const { roomId, content, files = [] } = params
+      const { roomId, userId, content, files = [] } = params
       const {
         user: { id: currentUserId },
       } = context
+
+      if (userId && userId === currentUserId) {
+        throw new Error('Cannot create a room with self')
+      }
+
+      if (!roomId && !userId) {
+        throw new Error('Either roomId or userId must be provided')
+      }
 
       const session = context.driver.session()
 
       try {
         return await session.writeTransaction(async (transaction) => {
+          // If userId is provided, find-or-create a DM room first
+          if (userId) {
+            await transaction.run(
+              `
+              MATCH (currentUser:User { id: $currentUserId })
+              MATCH (user:User { id: $userId })
+              OPTIONAL MATCH (currentUser)-[:CHATS_IN]->(existingRoom:Room)<-[:CHATS_IN]-(user)
+              WHERE NOT (existingRoom)-[:ROOM_FOR]->(:Group)
+              WITH currentUser, user, collect(existingRoom)[0] AS existingRoom
+              FOREACH (_ IN CASE WHEN existingRoom IS NULL THEN [1] ELSE [] END |
+                CREATE (currentUser)-[:CHATS_IN]->(:Room {
+                  createdAt: toString(datetime()),
+                  id: apoc.create.uuid()
+                })<-[:CHATS_IN]-(user)
+              )
+              `,
+              { currentUserId, userId },
+            )
+          }
+
+          // Resolve the room — either by roomId or by finding the DM room with userId
+          const matchRoom = roomId
+            ? `MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })`
+            : `MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user:User { id: $userId })
+               WHERE NOT (room)-[:ROOM_FOR]->(:Group)`
+
           const createMessageCypher = `
-            MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+            ${matchRoom}
             OPTIONAL MATCH (currentUser)-[:AVATAR_IMAGE]->(image:Image)
             OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
             WITH MAX(m.indexId) as maxIndex, room, currentUser, image
@@ -112,15 +146,15 @@ export default {
               date: message.createdAt
             }
           `
-          const createMessageTxResponse = await transaction.run(createMessageCypher, {
+          const txResponse = await transaction.run(createMessageCypher, {
             currentUserId,
             roomId,
+            userId,
             content,
           })
 
-          const [message] = createMessageTxResponse.records.map((record) => record.get('message'))
+          const [message] = txResponse.records.map((record) => record.get('message'))
 
-          // this is the case if the room doesn't exist - requires refactoring for implicit rooms
           if (!message) {
             return null
           }
