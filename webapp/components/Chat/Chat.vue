@@ -357,7 +357,7 @@ export default {
         this.selectedRoom = room
       }
       // Virtual rooms have no messages on the server yet
-      if (room.id?.startsWith('temp-')) {
+      if (!room.id || room.id.startsWith('temp-')) {
         this.messagesLoaded = true
         return
       }
