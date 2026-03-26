@@ -5,7 +5,7 @@ import './../../factories'
 const createGroupRoomMutation = `
   mutation ($groupId: ID!) {
     CreateGroupRoom(groupId: $groupId) {
-      id
+      roomId
     }
   }
 `
@@ -35,7 +35,7 @@ defineStep(
           return client
             .request(createGroupRoomMutation, { groupId })
             .then((roomData) => {
-              const roomId = roomData.CreateGroupRoom.id
+              const roomId = roomData.CreateGroupRoom.roomId
               return client.request(createMessageMutation, { roomId, content: message })
             })
         })
