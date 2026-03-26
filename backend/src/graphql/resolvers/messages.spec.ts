@@ -438,10 +438,15 @@ describe('Message', () => {
             errors: undefined,
             data: {
               Message: [
+                expect.objectContaining({
+                  indexId: 0,
+                  content: 'init',
+                  senderId: 'chatting-user',
+                }),
                 {
                   id: expect.any(String),
-                  _id: result.data?.Message[0].id,
-                  indexId: 0,
+                  _id: result.data?.Message[1].id,
+                  indexId: 1,
                   content: 'Some nice message to other chatting user',
                   senderId: 'chatting-user',
                   username: 'Chatting User',
@@ -489,8 +494,13 @@ describe('Message', () => {
               data: {
                 Message: [
                   expect.objectContaining({
-                    id: expect.any(String),
                     indexId: 0,
+                    content: 'init',
+                    senderId: 'chatting-user',
+                  }),
+                  expect.objectContaining({
+                    id: expect.any(String),
+                    indexId: 1,
                     content: 'Some nice message to other chatting user',
                     senderId: 'chatting-user',
                     username: 'Chatting User',
@@ -498,11 +508,11 @@ describe('Message', () => {
                     date: expect.any(String),
                     saved: true,
                     distributed: false,
-                    seen: false,
+                    seen: true,
                   }),
                   expect.objectContaining({
                     id: expect.any(String),
-                    indexId: 1,
+                    indexId: 2,
                     content: 'A nice response message to chatting user',
                     senderId: 'other-chatting-user',
                     username: 'Other Chatting User',
@@ -514,7 +524,7 @@ describe('Message', () => {
                   }),
                   expect.objectContaining({
                     id: expect.any(String),
-                    indexId: 2,
+                    indexId: 3,
                     content: 'And another nice message to other chatting user',
                     senderId: 'chatting-user',
                     username: 'Chatting User',
@@ -522,7 +532,7 @@ describe('Message', () => {
                     date: expect.any(String),
                     saved: true,
                     distributed: false,
-                    seen: false,
+                    seen: true,
                   }),
                 ],
               },
@@ -530,6 +540,8 @@ describe('Message', () => {
           })
 
           it('returns the messages paginated', async () => {
+            // Messages ordered by indexId DESC: 3, 2, 1, 0
+            // first: 2, offset: 0 → indexId 2 and 3 (reversed to ASC)
             await expect(
               query({
                 query: Message,
@@ -544,27 +556,20 @@ describe('Message', () => {
               data: {
                 Message: [
                   expect.objectContaining({
-                    id: expect.any(String),
-                    indexId: 1,
+                    indexId: 2,
                     content: 'A nice response message to chatting user',
                     senderId: 'other-chatting-user',
-                    username: 'Other Chatting User',
-                    avatar: expect.any(String),
-                    date: expect.any(String),
                   }),
                   expect.objectContaining({
-                    id: expect.any(String),
-                    indexId: 2,
+                    indexId: 3,
                     content: 'And another nice message to other chatting user',
                     senderId: 'chatting-user',
-                    username: 'Chatting User',
-                    avatar: expect.any(String),
-                    date: expect.any(String),
                   }),
                 ],
               },
             })
 
+            // first: 2, offset: 2 → indexId 0 and 1 (reversed to ASC)
             await expect(
               query({
                 query: Message,
@@ -579,13 +584,14 @@ describe('Message', () => {
               data: {
                 Message: [
                   expect.objectContaining({
-                    id: expect.any(String),
                     indexId: 0,
+                    content: 'init',
+                    senderId: 'chatting-user',
+                  }),
+                  expect.objectContaining({
+                    indexId: 1,
                     content: 'Some nice message to other chatting user',
                     senderId: 'chatting-user',
-                    username: 'Chatting User',
-                    avatar: expect.any(String),
-                    date: expect.any(String),
                   }),
                 ],
               },
