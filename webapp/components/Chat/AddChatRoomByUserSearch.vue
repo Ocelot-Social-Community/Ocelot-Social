@@ -107,6 +107,9 @@ export default {
     },
     handleInput(event) {
       this.query = event.target ? event.target.value.trim() : ''
+      if (!this.startSearch) {
+        this.results = []
+      }
     },
     onDelete(event) {
       const value = event.target ? event.target.value.trim() : ''
