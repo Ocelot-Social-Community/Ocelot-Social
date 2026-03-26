@@ -76,11 +76,11 @@ export default {
             ON CREATE SET
               room.createdAt = toString(datetime()),
               room.id = apoc.create.uuid()
-            WITH room, group
+            WITH room, group, currentUser
             MATCH (member:User)-[m:MEMBER_OF]->(group)
             WHERE m.role IN ['usual', 'admin', 'owner']
             MERGE (member)-[:CHATS_IN]->(room)
-            WITH room, group, collect(properties(member)) AS members
+            WITH room, group, currentUser, collect(properties(member)) AS members
             OPTIONAL MATCH (currentUser)-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(room)
             WITH room, group, members, COUNT(DISTINCT message) AS unread
             OPTIONAL MATCH (group)-[:AVATAR_IMAGE]->(groupImg:Image)
