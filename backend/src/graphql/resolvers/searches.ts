@@ -251,7 +251,7 @@ export default {
     },
     searchChatTargets: async (_parent, args, context, _resolveInfo) => {
       const { query } = args
-      const limit = Number(args.limit) || 10
+      const limit = Math.max(1, Math.min(Number(args.limit) || 10, 50))
       const userId = context.user?.id || null
       const params = {
         query: queryString(query),
