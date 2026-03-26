@@ -410,11 +410,25 @@ export default {
 
     async chatMessageAdded({ data }) {
       const msg = data.chatMessageAdded
-      const roomIndex = this.rooms.findIndex((r) => r.id === msg.room.id)
+      let roomIndex = this.rooms.findIndex((r) => r.id === msg.room.id)
       if (roomIndex === -1) {
-        // Room not in list yet — fetch it
-        this.fetchRooms({ options: { refetch: true } })
-        return
+        // Room not in list yet — fetch it specifically
+        try {
+          const { data: { Room } } = await this.$apollo.query({
+            query: roomQuery(),
+            variables: { id: msg.room.id },
+            fetchPolicy: 'no-cache',
+          })
+          if (Room?.length) {
+            const newRoom = this.fixRoomObject(Room[0])
+            this.rooms = [newRoom, ...this.rooms]
+            roomIndex = 0
+          } else {
+            return
+          }
+        } catch {
+          return
+        }
       }
       const changedRoom = { ...this.rooms[roomIndex] }
       changedRoom.lastMessage = {
