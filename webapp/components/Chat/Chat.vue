@@ -428,21 +428,25 @@ export default {
     },
 
     async chatMessageAdded({ data }) {
-      const roomIndex = this.rooms.findIndex((r) => r.id === data.chatMessageAdded.room.id)
-      const changedRoom = { ...this.rooms[roomIndex] }
-      changedRoom.lastMessage = data.chatMessageAdded
-      changedRoom.lastMessage.content = (changedRoom.lastMessage.content || '')
-        .trim()
-        .substring(0, 30)
-      changedRoom.lastMessageAt = data.chatMessageAdded.date
-      // Move changed room to the top of the list
-      changedRoom.index = data.chatMessageAdded.date
-      changedRoom.unreadCount++
-      this.rooms[roomIndex] = changedRoom
-      if (data.chatMessageAdded.room.id === this.selectedRoom?.id) {
-        this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
-      } else {
+      const msg = data.chatMessageAdded
+      const roomIndex = this.rooms.findIndex((r) => r.id === msg.room.id)
+      if (roomIndex === -1) {
+        // Room not in list yet — fetch it
         this.fetchRooms({ options: { refetch: true } })
+        return
+      }
+      const changedRoom = { ...this.rooms[roomIndex] }
+      changedRoom.lastMessage = {
+        ...msg,
+        content: (msg.content || '').trim().substring(0, 30),
+      }
+      changedRoom.lastMessageAt = msg.date
+      changedRoom.index = msg.date
+      changedRoom.unreadCount++
+      // Reassign array to trigger Vue reactivity and vue-advanced-chat re-sort
+      this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== msg.room.id)]
+      if (msg.room.id === this.selectedRoom?.id) {
+        this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
       }
     },
 
