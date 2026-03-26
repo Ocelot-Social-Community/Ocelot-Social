@@ -510,12 +510,19 @@ export default {
         const createdMessage = data.CreateMessage
 
         if (isVirtualRoom && createdMessage?.room?.id) {
-          // Replace virtual room with real room
+          // Replace virtual room with real room by fetching the specific room
           const realRoomId = createdMessage.room.id
           this.rooms = this.rooms.filter((r) => r.id !== roomId)
-          await this.fetchRooms()
-          const realRoom = this.rooms.find((r) => r.id === realRoomId)
-          if (realRoom) {
+          const {
+            data: { Room },
+          } = await this.$apollo.query({
+            query: roomQuery(),
+            variables: { id: realRoomId },
+            fetchPolicy: 'no-cache',
+          })
+          if (Room?.length) {
+            const realRoom = this.fixRoomObject(Room[0])
+            this.rooms = [realRoom, ...this.rooms.filter((r) => r.id !== realRoomId)]
             this.$nextTick(() => {
               this.selectRoom(realRoom)
             })
