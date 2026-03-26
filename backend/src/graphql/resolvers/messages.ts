@@ -143,7 +143,8 @@ export default {
               senderId: currentUser.id,
               username: currentUser.name,
               avatar: image.url,
-              date: message.createdAt
+              date: message.createdAt,
+              seen: false
             }
           `
           const txResponse = await transaction.run(createMessageCypher, {
