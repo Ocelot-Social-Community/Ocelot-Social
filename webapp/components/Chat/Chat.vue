@@ -414,7 +414,9 @@ export default {
       if (roomIndex === -1) {
         // Room not in list yet — fetch it specifically
         try {
-          const { data: { Room } } = await this.$apollo.query({
+          const {
+            data: { Room },
+          } = await this.$apollo.query({
             query: roomQuery(),
             variables: { id: msg.room.id },
             fetchPolicy: 'no-cache',
@@ -593,7 +595,8 @@ export default {
       // Accept either a user object { id, name } or just a userId string
       const userId = typeof userOrId === 'string' ? userOrId : userOrId.id
       const userName = typeof userOrId === 'string' ? userOrId : userOrId.name
-      const userAvatar = typeof userOrId === 'string' ? null : userOrId.avatar?.w320 || userOrId.avatar?.url || null
+      const userAvatar =
+        typeof userOrId === 'string' ? null : userOrId.avatar?.w320 || userOrId.avatar?.url || null
 
       // Check if a DM room with this user already exists locally
       const existingRoom = this.rooms.find(

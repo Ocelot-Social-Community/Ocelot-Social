@@ -329,9 +329,7 @@ describe('Message', () => {
             ).resolves.toMatchObject({
               errors: undefined,
               data: {
-                Message: [
-                  expect.objectContaining({ content: 'init' }),
-                ],
+                Message: [expect.objectContaining({ content: 'init' })],
               },
             })
           })
