@@ -896,7 +896,7 @@ describe('notifications', () => {
 
       // Reset mocks after init message to avoid contamination
       pubsubSpy.mockClear()
-      sendChatMessageMailMock.mockClear()
+      ;(sendChatMessageMailMock as jest.Mock).mockClear()
     })
 
     describe('if the chatReceiver is online', () => {
