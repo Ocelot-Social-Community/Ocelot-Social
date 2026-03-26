@@ -508,7 +508,11 @@ const handleCreateMessage: IMiddlewareResolver = async (
       })
 
       // Send EMail if we found a user(not blocked) and he is not considered online
-      if (recipientUser.emailNotificationsChatMessage !== false && !isUserOnline(recipientUser)) {
+      if (
+        email &&
+        recipientUser.emailNotificationsChatMessage !== false &&
+        !isUserOnline(recipientUser)
+      ) {
         void sendChatMessageMail({ email, senderUser, recipientUser })
       }
     }
