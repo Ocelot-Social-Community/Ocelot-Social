@@ -88,6 +88,10 @@ export default {
         throw new Error('Either roomId or userId must be provided')
       }
 
+      if (!content?.trim() && files.length === 0) {
+        throw new Error('Message must have content or files')
+      }
+
       const session = context.driver.session()
 
       try {
