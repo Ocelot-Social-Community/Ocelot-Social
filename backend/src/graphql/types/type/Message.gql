@@ -30,8 +30,7 @@ type Message {
   seen: Boolean
     @cypher(
       statement: """
-      MATCH (u:User { id: $cypherParams.currentUserId })
-      OPTIONAL MATCH (u)-[r:HAS_NOT_SEEN]->(this)
+      OPTIONAL MATCH ()-[r:HAS_NOT_SEEN]->(this)
       RETURN r IS NULL
       """
     )

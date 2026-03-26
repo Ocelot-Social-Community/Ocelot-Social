@@ -503,7 +503,7 @@ const handleCreateMessage: IMiddlewareResolver = async (
         userId: recipientUser.id,
       })
       void context.pubsub.publish(CHAT_MESSAGE_ADDED, {
-        chatMessageAdded: message,
+        chatMessageAdded: { ...message, seen: false },
         userId: recipientUser.id,
       })
 
