@@ -64,9 +64,7 @@ type Room {
   unreadCount: Int
     @cypher(
       statement: """
-      MATCH (this)<-[:INSIDE]-(message:Message)<-[:CREATED]-(user:User)
-      WHERE NOT user.id = $cypherParams.currentUserId
-        AND NOT message.seen
+      MATCH (u:User { id: $cypherParams.currentUserId })-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(this)
       RETURN count(message)
       """
     )

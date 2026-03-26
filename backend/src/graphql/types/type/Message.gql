@@ -28,6 +28,13 @@ type Message {
   saved: Boolean
   distributed: Boolean
   seen: Boolean
+    @cypher(
+      statement: """
+      MATCH (u:User { id: $cypherParams.currentUserId })
+      OPTIONAL MATCH (u)-[r:HAS_NOT_SEEN]->(this)
+      RETURN r IS NULL
+      """
+    )
   files: [File]! @relation(name: "ATTACHMENT", direction: "OUT")
 }
 

@@ -528,7 +528,7 @@ describe('Room', () => {
                 date: expect.any(String),
                 saved: true,
                 distributed: false,
-                seen: false,
+                seen: true,
               },
               users: expect.arrayContaining([
                 expect.objectContaining({

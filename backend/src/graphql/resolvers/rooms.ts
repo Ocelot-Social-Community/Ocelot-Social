@@ -15,10 +15,11 @@ import Resolver from './helpers/Resolver'
 export const getUnreadRoomsCount = async (userId, session) => {
   return session.readTransaction(async (transaction) => {
     const unreadRoomsCypher = `
-      MATCH (user:User { id: $userId })-[:CHATS_IN]->(room:Room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
-      WHERE NOT sender.id = $userId AND NOT message.seen
-      AND NOT (user)-[:BLOCKED]->(sender)
-      AND NOT (user)-[:MUTED]->(sender)
+      MATCH (user:User { id: $userId })-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(room:Room)<-[:CHATS_IN]-(user)
+      OPTIONAL MATCH (message)<-[:CREATED]-(sender:User)
+      WHERE (user)-[:BLOCKED]->(sender) OR (user)-[:MUTED]->(sender)
+      WITH room, message, sender
+      WHERE sender IS NULL
       RETURN toString(COUNT(DISTINCT room)) AS count
     `
     const unreadRoomsTxResponse = await transaction.run(unreadRoomsCypher, { userId })
@@ -99,8 +100,7 @@ export default {
           const returnRoomCypher = `
             MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user:User { id: $userId })
             WHERE NOT (room)-[:ROOM_FOR]->(:Group)
-            OPTIONAL MATCH (room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
-            WHERE NOT sender.id = $currentUserId AND NOT message.seen
+            OPTIONAL MATCH (currentUser)-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(room)
             WITH room, user, currentUser, message,
             user.name AS roomName
             RETURN room {
@@ -143,8 +143,7 @@ export default {
             WHERE m.role IN ['usual', 'admin', 'owner']
             MERGE (member)-[:CHATS_IN]->(room)
             WITH room, group, collect(properties(member)) AS members
-            OPTIONAL MATCH (room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
-            WHERE NOT sender.id = $currentUserId AND NOT message.seen
+            OPTIONAL MATCH (currentUser)-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(room)
             WITH room, group, members, COUNT(DISTINCT message) AS unread
             OPTIONAL MATCH (group)-[:AVATAR_IMAGE]->(groupImg:Image)
             RETURN room {

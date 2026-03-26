@@ -88,23 +88,24 @@ export default {
             MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
             OPTIONAL MATCH (currentUser)-[:AVATAR_IMAGE]->(image:Image)
             OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
-            OPTIONAL MATCH (room)<-[:CHATS_IN]-(recipientUser:User)
-              WHERE NOT recipientUser.id = $currentUserId
-            WITH MAX(m.indexId) as maxIndex, room, currentUser, image, recipientUser
+            WITH MAX(m.indexId) as maxIndex, room, currentUser, image
             CREATE (currentUser)-[:CREATED]->(message:Message {
               createdAt: toString(datetime()),
               id: apoc.create.uuid(),
               indexId: CASE WHEN maxIndex IS NOT NULL THEN maxIndex + 1 ELSE 0 END,
               content: LEFT($content,2000),
               saved: true,
-              distributed: false,
-              seen: false
+              distributed: false
             })-[:INSIDE]->(room)
             SET room.lastMessageAt = toString(datetime())
+            WITH message, currentUser, image, room
+            OPTIONAL MATCH (room)<-[:CHATS_IN]-(recipient:User)
+              WHERE NOT recipient.id = $currentUserId
+            WITH message, currentUser, image, collect(recipient) AS recipients
+            FOREACH (r IN recipients | CREATE (r)-[:HAS_NOT_SEEN]->(message))
             RETURN message {
               .*,
               indexId: toString(message.indexId),
-              recipientId: recipientUser.id,
               senderId: currentUser.id,
               username: currentUser.name,
               avatar: image.url,
@@ -151,17 +152,17 @@ export default {
       const session = context.driver.session()
       try {
         await session.writeTransaction(async (transaction) => {
-          const setSeenCypher = `
-            MATCH (m:Message)<-[:CREATED]-(user:User)
-            WHERE m.id IN $messageIds AND NOT user.id = $currentUserId
-            SET m.seen = true
+          const deleteHasNotSeenCypher = `
+            MATCH (user:User { id: $currentUserId })-[r:HAS_NOT_SEEN]->(m:Message)
+            WHERE m.id IN $messageIds
+            DELETE r
             RETURN m { .* }
           `
-          const setSeenTxResponse = await transaction.run(setSeenCypher, {
+          const txResponse = await transaction.run(deleteHasNotSeenCypher, {
             messageIds,
             currentUserId,
           })
-          return setSeenTxResponse.records.map((record) => record.get('m'))
+          return txResponse.records.map((record) => record.get('m'))
         })
         // send subscription to author to updated the messages
         return true

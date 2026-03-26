@@ -156,7 +156,7 @@ describe('Message', () => {
                   date: expect.any(String),
                   saved: true,
                   distributed: false,
-                  seen: false,
+                  seen: true,
                 },
               },
             })
@@ -192,7 +192,7 @@ describe('Message', () => {
                         date: expect.any(String),
                         saved: true,
                         distributed: false,
-                        seen: false,
+                        seen: true,
                       }),
                     }),
                   ],
@@ -275,7 +275,7 @@ describe('Message', () => {
                   date: expect.any(String),
                   saved: true,
                   distributed: false,
-                  seen: false,
+                  seen: true,
                   files: expect.arrayContaining([
                     { name: 'test1', type: 'application/json', url: expect.any(String) },
                     { name: 'test2', type: 'image/png', url: expect.any(String) },
@@ -446,7 +446,7 @@ describe('Message', () => {
                   date: expect.any(String),
                   saved: true,
                   distributed: false,
-                  seen: false,
+                  seen: true,
                 },
               ],
             },
@@ -495,7 +495,7 @@ describe('Message', () => {
                     date: expect.any(String),
                     saved: true,
                     distributed: false,
-                    seen: false,
+                    seen: true,
                   }),
                   expect.objectContaining({
                     id: expect.any(String),
@@ -519,7 +519,7 @@ describe('Message', () => {
                     date: expect.any(String),
                     saved: true,
                     distributed: false,
-                    seen: false,
+                    seen: true,
                   }),
                 ],
               },
@@ -713,7 +713,7 @@ describe('Message', () => {
           data: {
             Message: [
               expect.objectContaining({ seen: true }),
-              expect.objectContaining({ seen: false }),
+              expect.objectContaining({ seen: true }),
               expect.objectContaining({ seen: true }),
             ],
           },
