@@ -723,6 +723,7 @@ describe('Message', () => {
           data: {
             Message: [
               expect.objectContaining({ seen: true }),
+              expect.objectContaining({ seen: true }),
               expect.objectContaining({ seen: false }),
               expect.objectContaining({ seen: true }),
             ],
