@@ -79,6 +79,7 @@ export default {
       query: '',
       selectedItem: null,
       results: [],
+      blurTimeout: null,
     }
   },
   computed: {
