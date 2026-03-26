@@ -41,10 +41,11 @@ type Room {
   avatar: String
     @cypher(
       statement: """
-      OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)-[:AVATAR_IMAGE]->(groupImg:Image)
-      WITH this, groupImg
+      OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
+      OPTIONAL MATCH (g)-[:AVATAR_IMAGE]->(groupImg:Image)
+      WITH this, g, groupImg
       OPTIONAL MATCH (this)<-[:CHATS_IN]-(user:User)
-      WHERE groupImg IS NULL AND NOT user.id = $cypherParams.currentUserId
+      WHERE g IS NULL AND NOT user.id = $cypherParams.currentUserId
       OPTIONAL MATCH (user)-[:AVATAR_IMAGE]->(userImg:Image)
       RETURN COALESCE(groupImg.url, userImg.url)
       """
