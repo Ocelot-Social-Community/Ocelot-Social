@@ -32,7 +32,6 @@
         :no-options-available="$t('chat.searchPlaceholder')"
         :auto-reset-search="true"
         :placeholder="$t('chat.searchPlaceholder')"
-        @focus.capture.native="onFocus"
         @input.native="handleInput"
         @keyup.delete.native="onDelete"
         @keyup.esc.native="clear"
@@ -94,8 +93,8 @@ export default {
     this.icons = iconRegistry
   },
   methods: {
-    onFocus() {},
     onBlur() {
+      clearTimeout(this.blurTimeout)
       this.blurTimeout = setTimeout(() => {
         this.query = ''
         this.results = []
