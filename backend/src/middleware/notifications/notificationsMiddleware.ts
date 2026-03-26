@@ -467,9 +467,8 @@ const handleCreateMessage: IMiddlewareResolver = async (
   // Find Recipients (supports both DM and group rooms)
   const session = context.driver.session()
   try {
-    const { senderUser, recipients } = await session.readTransaction(
-      async (transaction) => {
-        const messageRecipientsCypher = `
+    const { senderUser, recipients } = await session.readTransaction(async (transaction) => {
+      const messageRecipientsCypher = `
           MATCH (senderUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
           MATCH (room)<-[:CHATS_IN]-(recipientUser:User)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
             WHERE NOT recipientUser.id = $currentUserId
@@ -477,20 +476,19 @@ const handleCreateMessage: IMiddlewareResolver = async (
             AND NOT (recipientUser)-[:MUTED]->(senderUser)
           RETURN senderUser {.*}, recipientUser {.*}, emailAddress {.email}
         `
-        const txResponse = await transaction.run(messageRecipientsCypher, {
-          currentUserId,
-          roomId,
-        })
+      const txResponse = await transaction.run(messageRecipientsCypher, {
+        currentUserId,
+        roomId,
+      })
 
-        return {
-          senderUser: txResponse.records.map((record) => record.get('senderUser'))[0],
-          recipients: txResponse.records.map((record) => ({
-            user: record.get('recipientUser'),
-            email: record.get('emailAddress')?.email,
-          })),
-        }
-      },
-    )
+      return {
+        senderUser: txResponse.records.map((record) => record.get('senderUser'))[0],
+        recipients: txResponse.records.map((record) => ({
+          user: record.get('recipientUser'),
+          email: record.get('emailAddress')?.email,
+        })),
+      }
+    })
 
     // Send subscriptions and emails to all recipients
     for (const recipient of recipients) {
