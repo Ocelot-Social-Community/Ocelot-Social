@@ -358,7 +358,11 @@ export default {
       }
       // Virtual rooms have no messages on the server yet
       if (!room.id || room.id.startsWith('temp-')) {
-        this.messagesLoaded = true
+        // Toggle messagesLoaded to ensure vue-advanced-chat's watcher fires
+        this.messagesLoaded = false
+        this.$nextTick(() => {
+          this.messagesLoaded = true
+        })
         return
       }
       this.messagesLoaded = options.refetch ? this.messagesLoaded : false
@@ -598,6 +602,8 @@ export default {
       }
 
       // Create a virtual room (no backend call — room is created on first message)
+      this.loadingRooms = false
+      this.roomsLoaded = true
       const virtualRoom = {
         id: `temp-${userId}`,
         roomId: `temp-${userId}`,
