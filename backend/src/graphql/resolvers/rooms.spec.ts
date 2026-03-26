@@ -300,18 +300,15 @@ describe('Room', () => {
     })
 
     describe('authenticated', () => {
-      let otherRoomId: string
-
       beforeAll(async () => {
         authenticatedUser = await chattingUser.toJson()
-        const result = await mutate({
+        await mutate({
           mutation: CreateMessage,
           variables: {
             userId: 'not-chatting-user',
             content: 'Message to not chatting user',
           },
         })
-        otherRoomId = result.data.CreateMessage.room.id
         await mutate({
           mutation: CreateMessage,
           variables: {
@@ -327,14 +324,13 @@ describe('Room', () => {
           },
         })
         authenticatedUser = await otherChattingUser.toJson()
-        const result2 = await mutate({
+        await mutate({
           mutation: CreateMessage,
           variables: {
             userId: 'not-chatting-user',
             content: 'Other message to not chatting user',
           },
         })
-        otherRoomId = result2.data.CreateMessage.room.id
       })
 
       describe('as chatting user', () => {

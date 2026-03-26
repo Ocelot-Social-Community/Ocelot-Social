@@ -2,7 +2,8 @@
 
 import { getDriver } from '@db/neo4j'
 
-export const description = 'Delete empty DM rooms (no messages) that were created by the old CreateRoom mutation'
+export const description =
+  'Delete empty DM rooms (no messages) that were created by the old CreateRoom mutation'
 
 export async function up(_next) {
   const driver = getDriver()
