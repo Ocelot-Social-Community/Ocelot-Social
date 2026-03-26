@@ -254,10 +254,12 @@ export default {
         limit,
         userId,
       }
-      return [
+      const results = [
         ...(await getSearchResults(context, searchUsersSetup, params)),
         ...(await getSearchResults(context, searchMyGroupsSetup, params)),
       ]
+      results.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+      return results.slice(0, limit)
     },
     searchResults: async (_parent, args, context, _resolveInfo) => {
       const { query, limit } = args
