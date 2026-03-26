@@ -202,7 +202,7 @@ describe('Message', () => {
           })
 
           describe('unread count for other user', () => {
-            it('has unread count = 1', async () => {
+            it('has unread count = 2', async () => {
               authenticatedUser = await otherChattingUser.toJson()
               await expect(query({ query: Room })).resolves.toMatchObject({
                 errors: undefined,
@@ -210,7 +210,7 @@ describe('Message', () => {
                   Room: [
                     expect.objectContaining({
                       lastMessageAt: expect.any(String),
-                      unreadCount: 1,
+                      unreadCount: 2,
                       lastMessage: expect.objectContaining({
                         _id: expect.any(String),
                         id: expect.any(String),
@@ -329,7 +329,9 @@ describe('Message', () => {
             ).resolves.toMatchObject({
               errors: undefined,
               data: {
-                Message: [],
+                Message: [
+                  expect.objectContaining({ content: 'init' }),
+                ],
               },
             })
           })
