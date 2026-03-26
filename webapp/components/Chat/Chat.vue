@@ -412,6 +412,7 @@ export default {
               [file.blob],
               // Captured audio already has the right extension in the name
               file.extension ? `${file.name}.${file.extension}` : file.name,
+              { type: file.type },
             ),
             name: file.name,
             type: file.type,
