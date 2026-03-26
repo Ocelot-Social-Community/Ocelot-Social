@@ -18,7 +18,7 @@ const cypherTemplate = (setup) => `
   ${setup.withClause}
   RETURN
   ${setup.returnClause}
-  AS result, score
+  AS result${setup.returnScore === false ? '' : ', score'}
   SKIP toInteger($skip)
   ${setup.limit}
 `
@@ -103,6 +103,7 @@ const searchMyGroupsSetup = {
 
 const countSetup = {
   returnClause: 'toString(size(collect(resource)))',
+  returnScore: false,
   limit: '',
 }
 
@@ -132,7 +133,7 @@ const searchResultPromise = async (session, setup, params) => {
 const searchResultCallback = (result) => {
   const response = result.records.map((r) => ({
     ...r.get('result'),
-    _score: r.get('score'),
+    _score: r.has('score') ? r.get('score') : 0,
   }))
   if (Array.isArray(response) && response.length && response[0].__typename === 'Post') {
     response.forEach((post) => {
