@@ -12,7 +12,12 @@
     <div id="overlay" />
     <div v-if="getShowChat.showChat" class="chat-modul">
       <client-only>
-        <chat singleRoom :roomId="getShowChat.roomID" :groupId="getShowChat.groupId" @close-single-room="closeSingleRoom" />
+        <chat
+          singleRoom
+          :roomId="getShowChat.roomID"
+          :groupId="getShowChat.groupId"
+          @close-single-room="closeSingleRoom"
+        />
       </client-only>
     </div>
   </div>

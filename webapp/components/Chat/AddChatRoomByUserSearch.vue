@@ -48,7 +48,11 @@
               </span>
             </div>
             <os-badge size="sm" class="chat-search-result-badge">
-              {{ option.__typename === 'Group' ? $t('chat.searchBadgeGroup') : $t('chat.searchBadgeUser') }}
+              {{
+                option.__typename === 'Group'
+                  ? $t('chat.searchBadgeGroup')
+                  : $t('chat.searchBadgeUser')
+              }}
             </os-badge>
           </div>
         </template>
