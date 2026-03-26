@@ -12,7 +12,6 @@ import { Upload } from 'graphql-upload/public/index'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
-import CreateRoom from '@graphql/queries/messaging/CreateRoom.gql'
 import MarkMessagesAsSeen from '@graphql/queries/messaging/MarkMessagesAsSeen.gql'
 import Message from '@graphql/queries/messaging/Message.gql'
 import Room from '@graphql/queries/messaging/Room.gql'
@@ -125,13 +124,14 @@ describe('Message', () => {
       describe('room exists', () => {
         beforeEach(async () => {
           authenticatedUser = await chattingUser.toJson()
-          const room = await mutate({
-            mutation: CreateRoom,
+          const result = await mutate({
+            mutation: CreateMessage,
             variables: {
               userId: 'other-chatting-user',
+              content: 'init',
             },
           })
-          roomId = room.data.CreateRoom.id
+          roomId = result.data.CreateMessage.room.id
         })
 
         describe('user chats in room', () => {
@@ -407,13 +407,14 @@ describe('Message', () => {
       describe('room exists with authenticated user chatting', () => {
         beforeEach(async () => {
           authenticatedUser = await chattingUser.toJson()
-          const room = await mutate({
-            mutation: CreateRoom,
+          const result = await mutate({
+            mutation: CreateMessage,
             variables: {
               userId: 'other-chatting-user',
+              content: 'init',
             },
           })
-          roomId = room.data.CreateRoom.id
+          roomId = result.data.CreateMessage.room.id
 
           await mutate({
             mutation: CreateMessage,
@@ -639,13 +640,14 @@ describe('Message', () => {
       const messageIds: string[] = []
       beforeEach(async () => {
         authenticatedUser = await chattingUser.toJson()
-        const room = await mutate({
-          mutation: CreateRoom,
+        const result = await mutate({
+          mutation: CreateMessage,
           variables: {
             userId: 'other-chatting-user',
+            content: 'init',
           },
         })
-        roomId = room.data.CreateRoom.id
+        roomId = result.data.CreateMessage.room.id
         await mutate({
           mutation: CreateMessage,
           variables: {

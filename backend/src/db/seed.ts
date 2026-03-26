@@ -17,7 +17,6 @@ import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
 import JoinGroup from '@graphql/queries/groups/JoinGroup.gql'
 import CreateGroupRoom from '@graphql/queries/messaging/CreateGroupRoom.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
-import CreateRoom from '@graphql/queries/messaging/CreateRoom.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
@@ -1532,84 +1531,76 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     // eslint-disable-next-line no-console
     console.log('seed', 'chat')
+    // DM chat: Huey <-> Peter (first message creates room via userId)
     authenticatedUser = await huey.toJson()
-    const { data: roomHueyPeter } = await mutate({
-      mutation: CreateRoom,
+    const { data: firstMsgHueyPeter } = await mutate({
+      mutation: CreateMessage,
       variables: {
         userId: (await peterLustig.toJson()).id,
+        content: faker.lorem.sentence(),
       },
     })
+    const roomIdHueyPeter = firstMsgHueyPeter?.CreateMessage.room.id
 
-    for (let i = 0; i < 30; i++) {
-      authenticatedUser = await huey.toJson()
-      await mutate({
-        mutation: CreateMessage,
-        variables: {
-          roomId: roomHueyPeter?.CreateRoom.id,
-          content: faker.lorem.sentence(),
-        },
-      })
+    for (let i = 0; i < 29; i++) {
       authenticatedUser = await peterLustig.toJson()
       await mutate({
         mutation: CreateMessage,
-        variables: {
-          roomId: roomHueyPeter?.CreateRoom.id,
-          content: faker.lorem.sentence(),
-        },
+        variables: { roomId: roomIdHueyPeter, content: faker.lorem.sentence() },
       })
-    }
-
-    authenticatedUser = await huey.toJson()
-    const { data: roomHueyJenny } = await mutate({
-      mutation: CreateRoom,
-      variables: {
-        userId: (await jennyRostock.toJson()).id,
-      },
-    })
-    for (let i = 0; i < 1000; i++) {
       authenticatedUser = await huey.toJson()
       await mutate({
         mutation: CreateMessage,
-        variables: {
-          roomId: roomHueyJenny?.CreateRoom.id,
-          content: faker.lorem.sentence(),
-        },
-      })
-      authenticatedUser = await jennyRostock.toJson()
-      await mutate({
-        mutation: CreateMessage,
-        variables: {
-          roomId: roomHueyJenny?.CreateRoom.id,
-          content: faker.lorem.sentence(),
-        },
+        variables: { roomId: roomIdHueyPeter, content: faker.lorem.sentence() },
       })
     }
 
+    // DM chat: Huey <-> Jenny (first message creates room via userId)
+    authenticatedUser = await huey.toJson()
+    const { data: firstMsgHueyJenny } = await mutate({
+      mutation: CreateMessage,
+      variables: {
+        userId: (await jennyRostock.toJson()).id,
+        content: faker.lorem.sentence(),
+      },
+    })
+    const roomIdHueyJenny = firstMsgHueyJenny?.CreateMessage.room.id
+
+    for (let i = 0; i < 999; i++) {
+      authenticatedUser = await jennyRostock.toJson()
+      await mutate({
+        mutation: CreateMessage,
+        variables: { roomId: roomIdHueyJenny, content: faker.lorem.sentence() },
+      })
+      authenticatedUser = await huey.toJson()
+      await mutate({
+        mutation: CreateMessage,
+        variables: { roomId: roomIdHueyJenny, content: faker.lorem.sentence() },
+      })
+    }
+
+    // DM chats: Jenny <-> additionalUsers
     for (const user of additionalUsers.slice(0, 99)) {
       authenticatedUser = await jennyRostock.toJson()
-      const { data: room } = await mutate({
-        mutation: CreateRoom,
+      const { data: firstMsg } = await mutate({
+        mutation: CreateMessage,
         variables: {
           userId: (await user.toJson()).id,
+          content: faker.lorem.sentence(),
         },
       })
+      const dmRoomId = firstMsg?.CreateMessage.room.id
 
-      for (let i = 0; i < 29; i++) {
-        authenticatedUser = await jennyRostock.toJson()
-        await mutate({
-          mutation: CreateMessage,
-          variables: {
-            roomId: room?.CreateRoom.id,
-            content: faker.lorem.sentence(),
-          },
-        })
+      for (let i = 0; i < 28; i++) {
         authenticatedUser = await user.toJson()
         await mutate({
           mutation: CreateMessage,
-          variables: {
-            roomId: room?.CreateRoom.id,
-            content: faker.lorem.sentence(),
-          },
+          variables: { roomId: dmRoomId, content: faker.lorem.sentence() },
+        })
+        authenticatedUser = await jennyRostock.toJson()
+        await mutate({
+          mutation: CreateMessage,
+          variables: { roomId: dmRoomId, content: faker.lorem.sentence() },
         })
       }
     }

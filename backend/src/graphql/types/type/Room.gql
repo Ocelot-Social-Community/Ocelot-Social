@@ -71,7 +71,6 @@ type Room {
 }
 
 type Mutation {
-  CreateRoom(userId: ID!): Room
   CreateGroupRoom(groupId: ID!): Room
 }
 

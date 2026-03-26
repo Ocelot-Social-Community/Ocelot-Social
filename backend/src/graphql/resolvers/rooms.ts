@@ -60,68 +60,6 @@ export default {
     },
   },
   Mutation: {
-    CreateRoom: async (_parent, params, context, _resolveInfo) => {
-      const { userId } = params
-      const {
-        user: { id: currentUserId },
-      } = context
-      if (userId === currentUserId) {
-        throw new Error('Cannot create a room with self')
-      }
-      const session = context.driver.session()
-      try {
-        const room = await session.writeTransaction(async (transaction) => {
-          // Step 1: Find existing DM room (excluding group rooms)
-          const findRoomCypher = `
-            MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user:User { id: $userId })
-            WHERE NOT (room)-[:ROOM_FOR]->(:Group)
-            RETURN room.id AS roomId
-            LIMIT 1
-          `
-          const findResult = await transaction.run(findRoomCypher, { currentUserId, userId })
-          const existingRoomId = findResult.records[0]?.get('roomId')
-
-          // Step 2: Create DM room if none exists
-          if (!existingRoomId) {
-            await transaction.run(
-              `
-              MATCH (currentUser:User { id: $currentUserId })
-              MATCH (user:User { id: $userId })
-              CREATE (currentUser)-[:CHATS_IN]->(room:Room {
-                createdAt: toString(datetime()),
-                id: apoc.create.uuid()
-              })<-[:CHATS_IN]-(user)
-              `,
-              { currentUserId, userId },
-            )
-          }
-
-          // Step 3: Return the DM room with unread count
-          const returnRoomCypher = `
-            MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user:User { id: $userId })
-            WHERE NOT (room)-[:ROOM_FOR]->(:Group)
-            OPTIONAL MATCH (currentUser)-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(room)
-            WITH room, user, currentUser, message,
-            user.name AS roomName
-            RETURN room {
-              .*,
-              users: [properties(currentUser), properties(user)],
-              roomName: roomName,
-              unreadCount: toString(COUNT(DISTINCT message))
-            }
-          `
-          const returnResult = await transaction.run(returnRoomCypher, { currentUserId, userId })
-          const [room] = returnResult.records.map((record) => record.get('room'))
-          return room
-        })
-        if (room) {
-          room.roomId = room.id
-        }
-        return room
-      } finally {
-        await session.close()
-      }
-    },
     CreateGroupRoom: async (_parent, params, context, _resolveInfo) => {
       const { groupId } = params
       const {

@@ -525,7 +525,6 @@ export default shield(
       markTeaserAsViewed: allow,
       saveCategorySettings: isAuthenticated,
       updateOnlineStatus: isAuthenticated,
-      CreateRoom: isAuthenticated,
       CreateGroupRoom: isAuthenticated,
       CreateMessage: isAuthenticated,
       MarkMessagesAsSeen: isAuthenticated,

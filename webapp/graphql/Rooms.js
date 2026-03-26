@@ -1,30 +1,6 @@
 import gql from 'graphql-tag'
 import { imageUrls } from './fragments/imageUrls'
 
-export const createRoom = () => gql`
-  ${imageUrls}
-
-  mutation ($userId: ID!) {
-    CreateRoom(userId: $userId) {
-      id
-      roomId
-      roomName
-      lastMessageAt
-      createdAt
-      unreadCount
-      #avatar
-      users {
-        _id
-        id
-        name
-        avatar {
-          ...imageUrls
-        }
-      }
-    }
-  }
-`
-
 export const createGroupRoom = () => gql`
   ${imageUrls}
 
