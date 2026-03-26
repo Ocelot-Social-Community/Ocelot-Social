@@ -142,7 +142,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    roomId: {
+    userId: {
       type: String,
       default: null,
     },
@@ -209,7 +209,7 @@ export default {
       roomsLoaded: false,
       roomPage: 0,
       roomPageSize: 10,
-      selectedRoom: this.roomId,
+      selectedRoom: null,
       activeRoomId: null,
       loadingRooms: true,
       messagesLoaded: false,
@@ -227,17 +227,17 @@ export default {
         this.newGroupRoom(newGroupId)
       }
     },
-    roomId(newRoomId) {
-      if (this.singleRoom && newRoomId) {
-        this.newRoom(newRoomId)
+    userId(newUserId) {
+      if (this.singleRoom && newUserId) {
+        this.newRoom(newUserId)
       }
     },
   },
   mounted() {
     if (this.singleRoom && this.groupId) {
       this.newGroupRoom(this.groupId)
-    } else if (this.singleRoom) {
-      this.newRoom(this.roomId)
+    } else if (this.singleRoom && this.userId) {
+      this.newRoom(this.userId)
     } else {
       this.fetchRooms()
     }
@@ -257,27 +257,12 @@ export default {
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
-      getStoreRoomId: 'chat/roomID',
     }),
     computedChatStyle() {
       return chatStyle.STYLE.light
     },
     computedRoomId() {
-      let roomId = null
-
-      if (!this.singleRoom) {
-        roomId = this.roomId
-
-        if (this.activeRoomId) {
-          roomId = this.activeRoomId
-        }
-
-        if (this.getStoreRoomId.roomId) {
-          roomId = this.getStoreRoomId.roomId
-        }
-      }
-
-      return roomId
+      return this.activeRoomId || null
     },
     isSafari() {
       return /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
@@ -302,7 +287,6 @@ export default {
   methods: {
     ...mapMutations({
       commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
-      commitRoomIdFromSingleRoom: 'chat/UPDATE_ROOM_ID',
     }),
 
     async fetchRooms({ room } = {}) {
@@ -337,10 +321,7 @@ export default {
         this.roomPage += 1
 
         if (this.singleRoom && this.rooms.length > 0) {
-          this.commitRoomIdFromSingleRoom(this.rooms[0].roomId)
-        } else if (this.getStoreRoomId.roomId) {
-          // reset store room id
-          this.commitRoomIdFromSingleRoom(null)
+          this.selectRoom(this.rooms[0])
         }
       } catch (error) {
         this.rooms = []

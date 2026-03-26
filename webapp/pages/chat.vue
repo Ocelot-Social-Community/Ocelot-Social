@@ -9,7 +9,7 @@
     />
     <client-only>
       <chat
-        :roomId="getShowChat.showChat ? getShowChat.roomID : null"
+        :userId="getShowChat.showChat ? getShowChat.chatUserId : null"
         ref="chat"
         @toggle-user-search="toggleSearch"
         :show-room="showRoom"
@@ -34,7 +34,7 @@ export default {
     }
   },
   mounted() {
-    this.showChat({ showChat: false, roomID: null, groupId: null })
+    this.showChat({ showChat: false, chatUserId: null, groupId: null })
   },
   computed: {
     ...mapGetters({
@@ -60,7 +60,7 @@ export default {
       this.$refs.chat.newGroupRoom(groupId)
     },
     showRoom(roomId) {
-      this.showChat({ showChat: true, roomID: roomId })
+      this.showChat({ showChat: true, chatUserId: roomId })
     },
   },
 }
