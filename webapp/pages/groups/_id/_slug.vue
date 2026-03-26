@@ -459,11 +459,8 @@ export default {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
     }),
-    async showOrChangeGroupChat(groupId) {
-      if (this.getShowChat.showChat) {
-        await this.showChat({ showChat: false, roomID: null, groupId: null })
-      }
-      await this.showChat({ showChat: true, roomID: null, groupId })
+    showOrChangeGroupChat(groupId) {
+      this.showChat({ showChat: true, roomID: null, groupId })
     },
     // handleTab(tab) {
     //   if (this.tabActive !== tab) {

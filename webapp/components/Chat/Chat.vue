@@ -221,6 +221,18 @@ export default {
   created() {
     this.icons = iconRegistry
   },
+  watch: {
+    groupId(newGroupId) {
+      if (this.singleRoom && newGroupId) {
+        this.newGroupRoom(newGroupId)
+      }
+    },
+    roomId(newRoomId) {
+      if (this.singleRoom && newRoomId) {
+        this.newRoom(newRoomId)
+      }
+    },
+  },
   mounted() {
     if (this.singleRoom && this.groupId) {
       this.newGroupRoom(this.groupId)
