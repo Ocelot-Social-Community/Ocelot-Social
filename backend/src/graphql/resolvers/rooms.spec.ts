@@ -438,9 +438,12 @@ describe('Room', () => {
               id: expect.any(String),
               roomId: expect.any(String),
               roomName: 'Third Chatting User',
-              lastMessageAt: null,
+              lastMessageAt: expect.any(String),
               unreadCount: 0,
-              lastMessage: null,
+              lastMessage: expect.objectContaining({
+                content: 'init',
+                senderId: 'chatting-user',
+              }),
               users: expect.arrayContaining([
                 expect.objectContaining({
                   _id: 'chatting-user',
@@ -464,9 +467,12 @@ describe('Room', () => {
               id: expect.any(String),
               roomId: expect.any(String),
               roomName: 'Second Chatting User',
-              lastMessageAt: null,
+              lastMessageAt: expect.any(String),
               unreadCount: 0,
-              lastMessage: null,
+              lastMessage: expect.objectContaining({
+                content: 'init',
+                senderId: 'chatting-user',
+              }),
               users: expect.arrayContaining([
                 expect.objectContaining({
                   _id: 'chatting-user',
