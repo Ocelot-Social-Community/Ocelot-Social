@@ -28,7 +28,7 @@
         </div>
       </template>
       <template v-else-if="singleColumn" #heroImage>
-        <div class="category-placeholder">
+        <div class="category-placeholder" :style="placeholderStyle">
           <os-icon
             v-for="category in (post.categories || []).slice(0, 3)"
             :key="category.id"
@@ -241,6 +241,20 @@ export default {
     ...mapGetters({
       user: 'auth/user',
     }),
+    placeholderStyle() {
+      const categories = this.post.categories || []
+      if (!categories.length) return { backgroundColor: '#e8e8e8' }
+      const hueFromString = (str) => {
+        let hash = 0
+        for (let i = 0; i < str.length; i++) {
+          hash = str.charCodeAt(i) + ((hash << 5) - hash)
+        }
+        return Math.abs(hash) % 360
+      }
+      const colors = categories.map((c) => `hsl(${hueFromString(c.slug)}, 40%, 85%)`)
+      if (colors.length === 1) return { backgroundColor: colors[0] }
+      return { background: `linear-gradient(135deg, ${colors.join(', ')})` }
+    },
     excerpt() {
       return this.$filters.removeLinks(this.post.contentExcerpt)
     },
@@ -400,7 +414,6 @@ export default {
     width: 100%;
     height: 100%;
     min-height: 120px;
-    background-color: $background-color-softer;
     display: flex;
     align-items: center;
     justify-content: center;
