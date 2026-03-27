@@ -90,7 +90,7 @@ export default ({ app = {} }) => {
         // replace linebreaks and block-level closing tags with spaces
         contentExcerpt = contentExcerpt
           .replace(/<\/(p|h[1-6]|li|div|blockquote)>/gim, ' ')
-          .replace(/<br>/gim, ' ')
+          .replace(/<br\s*\/?>/gim, ' ')
           .trim()
       }
       // remove the rest of the HTML
