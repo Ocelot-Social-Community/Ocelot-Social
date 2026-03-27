@@ -102,6 +102,7 @@ services:
       - "3002:3000"
     volumes:
       - ./maintenance/app:/app/app
+      - ./maintenance/nuxt.config.ts:/app/nuxt.config.ts
       - ./packages/ui:/packages/ui
       - /packages/ui/node_modules
 

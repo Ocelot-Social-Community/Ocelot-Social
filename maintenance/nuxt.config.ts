@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   devServer: { host: "0.0.0.0" },
   modules: ["@nuxt/eslint"],
-  css: ["~/assets/css/main.css", "@ocelot-social/ui/style.css"],
+  css: ["~/assets/css/branding.css", "~/assets/css/main.css", "@ocelot-social/ui/style.css"],
   vite: {
     plugins: [tailwindcss()],
     server: {
