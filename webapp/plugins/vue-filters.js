@@ -87,8 +87,11 @@ export default ({ app = {} }) => {
       if (!content) return ''
       let contentExcerpt = content
       if (replaceLinebreaks) {
-        // replace linebreaks with spaces first
-        contentExcerpt = contentExcerpt.replace(/<br>/gim, ' ').trim()
+        // replace linebreaks and block-level closing tags with spaces
+        contentExcerpt = contentExcerpt
+          .replace(/<\/(p|h[1-6]|li|div|blockquote)>/gim, ' ')
+          .replace(/<br>/gim, ' ')
+          .trim()
       }
       // remove the rest of the HTML
       contentExcerpt = contentExcerpt.replace(/<(?:.|\n)*?>/gm, '').trim()
