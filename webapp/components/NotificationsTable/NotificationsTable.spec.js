@@ -100,7 +100,7 @@ describe('NotificationsTable.vue', () => {
         it("renders the Post's content", () => {
           const boldTags = firstRowNotification.findAll('p')
           const content = boldTags.filter(
-            (element) => element.text() === postNotification.from.contentExcerpt,
+            (element) => element.text() === postNotification.from.content,
           )
           expect(content.exists()).toBe(true)
         })
@@ -133,7 +133,7 @@ describe('NotificationsTable.vue', () => {
         it("renders the Post's content", () => {
           const boldTags = secondRowNotification.findAll('p')
           const content = boldTags.filter(
-            (element) => element.text() === commentNotification.from.contentExcerpt,
+            (element) => element.text() === commentNotification.from.content,
           )
           expect(content.exists()).toBe(true)
         })
