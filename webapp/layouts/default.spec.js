@@ -37,7 +37,7 @@ describe('default.vue', () => {
       getters: {
         'auth/isLoggedIn': () => true,
         'chat/showChat': () => {
-          return { showChat: false, chatUserId: null }
+          return { showChat: false, chatUserId: null, groupId: null }
         },
       },
       mutations: {
