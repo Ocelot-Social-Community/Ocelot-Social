@@ -105,12 +105,12 @@ export default {
               OPTIONAL MATCH (currentUser)-[:CHATS_IN]->(existingRoom:Room)<-[:CHATS_IN]-(user)
               WHERE NOT (existingRoom)-[:ROOM_FOR]->(:Group)
               WITH currentUser, user, collect(existingRoom)[0] AS existingRoom
-              FOREACH (_ IN CASE WHEN existingRoom IS NULL THEN [1] ELSE [] END |
-                CREATE (currentUser)-[:CHATS_IN]->(:Room {
-                  createdAt: toString(datetime()),
-                  id: apoc.create.uuid()
-                })<-[:CHATS_IN]-(user)
-              )
+              WITH currentUser, user, existingRoom
+              WHERE existingRoom IS NULL
+              CREATE (currentUser)-[:CHATS_IN]->(:Room {
+                createdAt: toString(datetime()),
+                id: apoc.create.uuid()
+              })<-[:CHATS_IN]-(user)
               `,
               { currentUserId, userId },
             )
@@ -125,7 +125,13 @@ export default {
           const createMessageCypher = `
             ${matchRoom}
             OPTIONAL MATCH (currentUser)-[:AVATAR_IMAGE]->(image:Image)
-            SET room.messageCounter = COALESCE(room.messageCounter, 0) + 1,
+            OPTIONAL MATCH (existing:Message)-[:INSIDE]->(room)
+            WITH room, currentUser, image, MAX(existing.indexId) AS maxIndex
+            SET room.messageCounter = CASE
+                  WHEN room.messageCounter IS NOT NULL THEN room.messageCounter + 1
+                  WHEN maxIndex IS NOT NULL THEN maxIndex + 2
+                  ELSE 1
+                END,
                 room.lastMessageAt = toString(datetime())
             WITH room, currentUser, image
             CREATE (currentUser)-[:CREATED]->(message:Message {
