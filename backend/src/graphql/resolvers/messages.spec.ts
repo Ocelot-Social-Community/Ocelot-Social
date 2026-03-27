@@ -221,7 +221,7 @@ describe('Message', () => {
                         date: expect.any(String),
                         saved: true,
                         distributed: false,
-                        seen: true,
+                        seen: false,
                       }),
                     }),
                   ],
@@ -518,7 +518,7 @@ describe('Message', () => {
                     date: expect.any(String),
                     saved: true,
                     distributed: true,
-                    seen: true,
+                    seen: false,
                   }),
                   expect.objectContaining({
                     id: expect.any(String),
@@ -722,7 +722,7 @@ describe('Message', () => {
             Message: [
               expect.objectContaining({ seen: true }),
               expect.objectContaining({ seen: true }),
-              expect.objectContaining({ seen: false }),
+              expect.objectContaining({ seen: true }),
               expect.objectContaining({ seen: true }),
             ],
           },
