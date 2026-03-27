@@ -3,5 +3,8 @@
     "explanation": "W tej chwili przeprowadzamy planowaną konserwację. Spróbuj ponownie później.",
     "questions": "Pytania lub wątpliwości? Wyślij e-mail na adres",
     "title": "{APPLICATION_NAME} jest w trakcie konserwacji"
+  },
+  "localeSwitch": {
+    "tooltip": "Wybierz język"
   }
 }

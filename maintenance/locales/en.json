@@ -3,5 +3,8 @@
     "explanation": "At the moment we are doing some scheduled maintenance, please try again later.",
     "questions": "Any Questions or concerns, send an e-mail to",
     "title": "{APPLICATION_NAME} is under maintenance"
+  },
+  "localeSwitch": {
+    "tooltip": "Choose language"
   }
 }
