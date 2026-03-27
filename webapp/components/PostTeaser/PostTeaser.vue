@@ -1,7 +1,7 @@
 <template>
   <nuxt-link
     class="post-teaser"
-    :class="{ 'post-teaser--horizontal': singleColumn && post.image }"
+    :class="{ 'post-teaser--horizontal': singleColumn }"
     :to="{ name: 'post-id-slug', params: { id: post.id, slug: post.slug } }"
     @click.native.capture="guardNavigation"
   >
@@ -24,6 +24,16 @@
             sizes="640px"
             class="image"
             @loaded="imageLoaded = true"
+          />
+        </div>
+      </template>
+      <template v-else-if="singleColumn" #heroImage>
+        <div class="category-placeholder">
+          <os-icon
+            v-for="category in (post.categories || []).slice(0, 3)"
+            :key="category.id"
+            :icon="resolveIcon(category.icon)"
+            class="category-placeholder__icon"
           />
         </div>
       </template>
@@ -169,7 +179,7 @@
 
 <script>
 import { OsCard, OsIcon } from '@ocelot-social/ui'
-import { iconRegistry } from '~/utils/iconRegistry'
+import { iconRegistry, resolveIcon } from '~/utils/iconRegistry'
 import Category from '~/components/Category'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
@@ -260,6 +270,9 @@ export default {
     this.icons = iconRegistry
   },
   methods: {
+    resolveIcon(iconName) {
+      return resolveIcon(iconName)
+    },
     guardNavigation(event) {
       if (event.target.closest('.content-menu')) {
         event.preventDefault()
@@ -380,6 +393,22 @@ export default {
       width: 100%;
       height: 100%;
       object-fit: cover;
+    }
+  }
+
+  .category-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 120px;
+    background-color: $background-color-softer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-small;
+
+    &__icon {
+      font-size: 2rem;
+      opacity: 0.3;
     }
   }
 
