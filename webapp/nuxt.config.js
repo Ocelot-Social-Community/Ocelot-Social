@@ -115,7 +115,7 @@ export default {
     // Utility classes replacing ds-* Vue components
     '~assets/_new/styles/_ds-compat.scss',
     // UI library component styles (Tailwind utilities + OsMenu CSS)
-    '@ocelot-social/ui/style.css',
+    '../packages/ui/dist/style.css',
   ],
 
   /*
