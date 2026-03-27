@@ -529,11 +529,6 @@ export default {
             })
           }
         } else if (createdMessage) {
-          if (roomIndex !== -1) {
-            const changedRoom = { ...this.rooms[roomIndex] }
-            changedRoom.lastMessage.content = (createdMessage.content || '').trim().substring(0, 30)
-            changedRoom.lastMessage.date = createdMessage.date
-          }
           this.fetchMessages({
             room: this.rooms.find((r) => r.roomId === messageDetails.roomId),
             options: { refetch: true },
