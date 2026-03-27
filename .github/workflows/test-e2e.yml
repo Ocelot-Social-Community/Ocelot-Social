@@ -215,14 +215,64 @@ jobs:
           sudo chmod +x /opt/cucumber-json-formatter
           sudo ln -fs /opt/cucumber-json-formatter /usr/bin/cucumber-json-formatter
 
+      - name: Set up Docker Buildx
+        if: ${{ !hashFiles('/tmp/neo4j.tar') || !hashFiles('/tmp/backend.tar') || !hashFiles('/tmp/webapp.tar') }}
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+
       - name: Boot up test system | docker compose
         run: |
-          docker load < /tmp/neo4j.tar
-          docker load < /tmp/backend.tar
-          docker load < /tmp/minio.tar
-          docker load < /tmp/minio-mc.tar
-          docker load < /tmp/mailserver.tar
-          docker load < /tmp/webapp.tar
+          # Neo4J
+          if [ -f /tmp/neo4j.tar ]; then
+            docker load < /tmp/neo4j.tar
+          else
+            echo "Cache miss — rebuilding Neo4J image..."
+            docker buildx build neo4j -f neo4j/Dockerfile --target community --load \
+              -t ghcr.io/ocelot-social-community/ocelot-social/neo4j:community \
+              --cache-from type=gha,scope=neo4j
+          fi
+
+          # Backend
+          if [ -f /tmp/backend.tar ]; then
+            docker load < /tmp/backend.tar
+          else
+            echo "Cache miss — rebuilding Backend image..."
+            docker buildx build backend -f backend/Dockerfile --target test --load \
+              -t ghcr.io/ocelot-social-community/ocelot-social/backend:test \
+              --cache-from type=gha,scope=backend-test
+          fi
+
+          # Third-party images (pull if cache miss)
+          if [ -f /tmp/minio.tar ]; then
+            docker load < /tmp/minio.tar
+          else
+            echo "Cache miss — pulling minio image..."
+            docker pull quay.io/minio/minio:latest
+          fi
+
+          if [ -f /tmp/minio-mc.tar ]; then
+            docker load < /tmp/minio-mc.tar
+          else
+            echo "Cache miss — pulling minio-mc image..."
+            docker pull quay.io/minio/mc:latest
+          fi
+
+          if [ -f /tmp/mailserver.tar ]; then
+            docker load < /tmp/mailserver.tar
+          else
+            echo "Cache miss — pulling maildev image..."
+            docker pull maildev/maildev:latest
+          fi
+
+          # Webapp
+          if [ -f /tmp/webapp.tar ]; then
+            docker load < /tmp/webapp.tar
+          else
+            echo "Cache miss — rebuilding Webapp image..."
+            docker buildx build . -f webapp/Dockerfile --target test --load \
+              -t ghcr.io/ocelot-social-community/ocelot-social/webapp:test \
+              --cache-from type=gha,scope=webapp-test
+          fi
+
           docker compose -f docker-compose.yml -f docker-compose.test.yml up --detach backend mailserver webapp
 
           echo "Waiting for backend (max 120s)..."
