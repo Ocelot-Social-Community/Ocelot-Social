@@ -195,13 +195,12 @@ export default {
             MATCH (user:User { id: $currentUserId })-[r:HAS_NOT_SEEN]->(m:Message)
             WHERE m.id IN $messageIds
             DELETE r
-            RETURN m { .* }
+            RETURN count(r) AS deleted
           `
-          const txResponse = await transaction.run(deleteHasNotSeenCypher, {
+          await transaction.run(deleteHasNotSeenCypher, {
             messageIds,
             currentUserId,
           })
-          return txResponse.records.map((record) => record.get('m'))
         })
         // send subscription to author to updated the messages
         return true
