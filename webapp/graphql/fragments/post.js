@@ -8,7 +8,6 @@ export const post = gql`
     id
     title
     content
-    contentExcerpt
     createdAt
     updatedAt
     sortDate

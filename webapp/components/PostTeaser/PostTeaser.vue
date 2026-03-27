@@ -66,9 +66,7 @@
           />
         </div>
       </client-only>
-      <!-- TODO: replace editor content with tiptap render view -->
-      <!-- eslint-disable-next-line vue/no-v-html -->
-      <div class="content hyphenate-text" v-html="excerpt" />
+      <div class="content hyphenate-text">{{ excerpt }}</div>
       <footer
         class="footer"
         v-observe-visibility="(isVisible, entry) => visibilityChanged(isVisible, entry, post.id)"
@@ -232,7 +230,7 @@ export default {
       user: 'auth/user',
     }),
     excerpt() {
-      return this.$filters.removeLinks(this.post.contentExcerpt)
+      return this.$filters.removeHtml(this.post.content)
     },
     isAuthor() {
       const { author } = this.post
@@ -399,6 +397,10 @@ export default {
   .content {
     flex-grow: 1;
     margin-bottom: $space-small;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .footer {

@@ -87,11 +87,26 @@ export default ({ app = {} }) => {
       if (!content) return ''
       let contentExcerpt = content
       if (replaceLinebreaks) {
-        // replace linebreaks with spaces first
-        contentExcerpt = contentExcerpt.replace(/<br>/gim, ' ').trim()
+        // replace linebreaks and block-level closing tags with spaces
+        contentExcerpt = contentExcerpt
+          .replace(/<\/(p|h[1-6]|li|div|blockquote)>/gim, ' ')
+          .replace(/<br\s*\/?>/gim, ' ')
+          .trim()
       }
       // remove the rest of the HTML
       contentExcerpt = contentExcerpt.replace(/<(?:.|\n)*?>/gm, '').trim()
+      // normalize multiple spaces into one
+      contentExcerpt = contentExcerpt.replace(/ {2,}/g, ' ')
+      // decode common HTML entities
+      const entities = {
+        '&amp;': '&',
+        '&lt;': '<',
+        '&gt;': '>',
+        '&quot;': '"',
+        '&#39;': "'",
+        '&nbsp;': ' ',
+      }
+      contentExcerpt = contentExcerpt.replace(/&(?:amp|lt|gt|quot|#39|nbsp);/g, (m) => entities[m])
 
       return contentExcerpt
     },

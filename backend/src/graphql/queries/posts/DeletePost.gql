@@ -3,7 +3,6 @@ mutation DeletePost($id: ID!) {
     id
     deleted
     content
-    contentExcerpt
     image {
       url
     }
@@ -11,7 +10,6 @@ mutation DeletePost($id: ID!) {
       id
       deleted
       content
-      contentExcerpt
     }
   }
 }

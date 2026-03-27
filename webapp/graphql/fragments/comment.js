@@ -8,7 +8,6 @@ export const comment = gql`
     disabled
     deleted
     content
-    contentExcerpt
     isPostObservedByMe
     postObservingUsersCount
     shoutedByCurrentUser

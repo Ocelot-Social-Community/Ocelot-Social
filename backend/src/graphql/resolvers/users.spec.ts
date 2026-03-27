@@ -354,13 +354,11 @@ describe('Delete a User as admin', () => {
                   {
                     id: 'p139',
                     content: 'Post by user u343',
-                    contentExcerpt: 'Post by user u343',
                     deleted: false,
                     comments: [
                       {
                         id: 'c156',
                         content: "A comment by someone else on user u343's post",
-                        contentExcerpt: "A comment by someone else on user u343's post",
                         deleted: false,
                       },
                     ],
@@ -370,7 +368,6 @@ describe('Delete a User as admin', () => {
                   {
                     id: 'c155',
                     content: 'Comment by user u343',
-                    contentExcerpt: 'Comment by user u343',
                     deleted: false,
                   },
                 ],
@@ -400,13 +397,11 @@ describe('Delete a User as admin', () => {
                     {
                       id: 'p139',
                       content: 'UNAVAILABLE',
-                      contentExcerpt: 'UNAVAILABLE',
                       deleted: true,
                       comments: [
                         {
                           id: 'c156',
                           content: 'UNAVAILABLE',
-                          contentExcerpt: 'UNAVAILABLE',
                           deleted: true,
                         },
                       ],
@@ -416,7 +411,6 @@ describe('Delete a User as admin', () => {
                     {
                       id: 'c155',
                       content: 'UNAVAILABLE',
-                      contentExcerpt: 'UNAVAILABLE',
                       deleted: true,
                     },
                   ],

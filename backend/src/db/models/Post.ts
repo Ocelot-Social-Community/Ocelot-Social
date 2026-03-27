@@ -19,7 +19,6 @@ export default {
   title: { type: 'string', disallow: [null], min: 3 },
   slug: { type: 'string', allow: [null], unique: 'true' },
   content: { type: 'string', disallow: [null], required: true, min: 3 },
-  contentExcerpt: { type: 'string', allow: [null] },
   deleted: { type: 'boolean', default: false },
   disabled: { type: 'boolean', default: false },
   clickedCount: { type: 'int', default: 0 },

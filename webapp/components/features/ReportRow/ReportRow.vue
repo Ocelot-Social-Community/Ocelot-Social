@@ -153,9 +153,7 @@ export default {
       }
     },
     linkText() {
-      return (
-        this.report.resource.title || this.$filters.removeHtml(this.report.resource.contentExcerpt)
-      )
+      return this.report.resource.title || this.$filters.removeHtml(this.report.resource.content)
     },
     statusIconName() {
       return this.isDisabled ? this.icons.eyeSlash : this.icons.eye

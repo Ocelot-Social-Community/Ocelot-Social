@@ -83,7 +83,6 @@ export default {
             MATCH (comment:Comment {id: $commentId})
             SET comment.deleted        = TRUE
             SET comment.content        = 'UNAVAILABLE'
-            SET comment.contentExcerpt = 'UNAVAILABLE'
             RETURN comment
           `,
           { commentId: args.id },

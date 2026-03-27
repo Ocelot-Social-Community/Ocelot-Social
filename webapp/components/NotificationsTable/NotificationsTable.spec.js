@@ -100,7 +100,7 @@ describe('NotificationsTable.vue', () => {
         it("renders the Post's content", () => {
           const boldTags = firstRowNotification.findAll('p')
           const content = boldTags.filter(
-            (element) => element.text() === postNotification.from.contentExcerpt,
+            (element) => element.text() === postNotification.from.content,
           )
           expect(content.exists()).toBe(true)
         })
@@ -133,9 +133,31 @@ describe('NotificationsTable.vue', () => {
         it("renders the Post's content", () => {
           const boldTags = secondRowNotification.findAll('p')
           const content = boldTags.filter(
-            (element) => element.text() === commentNotification.from.contentExcerpt,
+            (element) => element.text() === commentNotification.from.content,
           )
           expect(content.exists()).toBe(true)
+        })
+      })
+
+      describe('fallback to descriptionExcerpt when content is empty', () => {
+        it('renders descriptionExcerpt if content is missing', () => {
+          const fallbackNotification = {
+            read: false,
+            reason: 'mentioned_in_post',
+            from: {
+              __typename: 'Post',
+              id: 'post-fallback',
+              title: 'fallback post',
+              slug: 'fallback-post',
+              content: '',
+              descriptionExcerpt: 'fallback description text',
+              author: { id: 'u1', slug: 'user', name: 'User' },
+            },
+          }
+          propsData.notifications = [fallbackNotification]
+          wrapper = Wrapper()
+          const description = wrapper.find('.notification-description')
+          expect(description.text()).toBe('fallback description text')
         })
       })
 

@@ -3,7 +3,6 @@ import type { Integer, Node } from 'neo4j-driver'
 export interface PostDbProperties {
   clickedCount: number
   content: string
-  contentExcerpt: string
   createdAt: string
   deleted: boolean
   disabled: boolean

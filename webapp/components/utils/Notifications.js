@@ -7,7 +7,7 @@ export const notifications = [
       id: 'post-1',
       title: 'some post title',
       slug: 'some-post-title',
-      contentExcerpt: 'this is a post content',
+      content: 'this is a post content',
       author: {
         id: 'john-1',
         slug: 'john-doe',
@@ -21,12 +21,12 @@ export const notifications = [
     from: {
       __typename: 'Comment',
       id: 'comment-2',
-      contentExcerpt: 'this is yet another post content',
+      content: 'this is yet another post content',
       post: {
         id: 'post-1',
         title: 'some post on a comment',
         slug: 'some-post-on-a-comment',
-        contentExcerpt: 'this is a post content',
+        content: 'this is a post content',
         author: {
           id: 'john-1',
           slug: 'john-doe',

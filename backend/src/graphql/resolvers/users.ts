@@ -223,7 +223,6 @@ export default {
                   OPTIONAL MATCH (resource)<-[:COMMENTS]-(comment:Comment)
                   SET resource.deleted = true
                   SET resource.content = 'UNAVAILABLE'
-                  SET resource.contentExcerpt = 'UNAVAILABLE'
                   SET resource.language = 'UNAVAILABLE'
                   SET resource.createdAt = 'UNAVAILABLE'
                   SET resource.updatedAt = 'UNAVAILABLE'

@@ -2000,7 +2000,6 @@ describe('DeletePost', () => {
             id: 'p4711',
             deleted: true,
             content: 'UNAVAILABLE',
-            contentExcerpt: 'UNAVAILABLE',
             image: null,
             comments: [],
           },
@@ -2015,7 +2014,6 @@ describe('DeletePost', () => {
           'comment',
           {
             content: 'to be deleted comment content',
-            contentExcerpt: 'to be deleted comment content',
           },
           {
             postId: 'p4711',
@@ -2030,14 +2028,12 @@ describe('DeletePost', () => {
               id: 'p4711',
               deleted: true,
               content: 'UNAVAILABLE',
-              contentExcerpt: 'UNAVAILABLE',
               image: null,
               comments: [
                 {
                   deleted: true,
                   // Should we black out the comment content in the database, too?
                   content: 'UNAVAILABLE',
-                  contentExcerpt: 'UNAVAILABLE',
                 },
               ],
             },

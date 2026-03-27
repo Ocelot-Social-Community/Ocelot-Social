@@ -10,7 +10,6 @@ export default {
     default: () => new Date().toISOString(),
   },
   content: { type: 'string', disallow: [null], min: 3 },
-  contentExcerpt: { type: 'string', allow: [null] },
   deleted: { type: 'boolean', default: false },
   disabled: { type: 'boolean', default: false },
   post: {

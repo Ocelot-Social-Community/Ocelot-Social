@@ -32,7 +32,7 @@ export default () => {
           slug
           title
           content
-          contentExcerpt
+
           language
           image {
             ...imageUrls
@@ -83,7 +83,7 @@ export default () => {
           title
           slug
           content
-          contentExcerpt
+
           language
           image {
             ...imageUrls
@@ -146,7 +146,7 @@ export default () => {
           title
           slug
           content
-          contentExcerpt
+
           language
           pinnedBy {
             id
@@ -163,7 +163,7 @@ export default () => {
           title
           slug
           content
-          contentExcerpt
+
           language
           pinnedBy {
             id
@@ -180,7 +180,7 @@ export default () => {
           title
           slug
           content
-          contentExcerpt
+
           language
           pinnedBy {
             id
@@ -197,7 +197,7 @@ export default () => {
           title
           slug
           content
-          contentExcerpt
+
           language
           pinnedBy {
             id
@@ -214,7 +214,7 @@ export default () => {
           title
           slug
           content
-          contentExcerpt
+
           language
           pinnedBy {
             id
@@ -231,7 +231,7 @@ export default () => {
           title
           slug
           content
-          contentExcerpt
+
           language
           pinnedBy {
             id

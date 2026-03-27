@@ -116,7 +116,6 @@ beforeAll(async () => {
         id: 'p2',
         title: 'Disabled post',
         content: 'This is an offensive post content',
-        contentExcerpt: 'This is an offensive post content',
         deleted: false,
       },
       {
@@ -132,7 +131,6 @@ beforeAll(async () => {
       {
         id: 'c1',
         content: 'Disabled comment',
-        contentExcerpt: 'Disabled comment',
       },
       {
         author: troll,
@@ -252,9 +250,6 @@ describe('softDeleteMiddleware', () => {
         it('displays content', () => {
           expect(subject.content).toEqual('This is an offensive post content')
         })
-        it('displays contentExcerpt', () => {
-          expect(subject.contentExcerpt).toEqual('This is an offensive post content')
-        })
         it('displays image', () => {
           expect(subject.image).toEqual({
             url: expect.stringMatching('http://localhost/some/offensive/image.jpg'),
@@ -267,9 +262,6 @@ describe('softDeleteMiddleware', () => {
 
         it('displays content', () => {
           expect(subject.content).toEqual('Disabled comment')
-        })
-        it('displays contentExcerpt', () => {
-          expect(subject.contentExcerpt).toEqual('Disabled comment')
         })
       })
     })
@@ -308,9 +300,6 @@ describe('softDeleteMiddleware', () => {
         it('obfuscates content', () => {
           expect(subject.content).toEqual('UNAVAILABLE')
         })
-        it('obfuscates contentExcerpt', () => {
-          expect(subject.contentExcerpt).toEqual('UNAVAILABLE')
-        })
         it('obfuscates image', () => {
           expect(subject.image).toEqual(null)
         })
@@ -321,9 +310,6 @@ describe('softDeleteMiddleware', () => {
 
         it('obfuscates content', () => {
           expect(subject.content).toEqual('UNAVAILABLE')
-        })
-        it('obfuscates contentExcerpt', () => {
-          expect(subject.contentExcerpt).toEqual('UNAVAILABLE')
         })
       })
     })

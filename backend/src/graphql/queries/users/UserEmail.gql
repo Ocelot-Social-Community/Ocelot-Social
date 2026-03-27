@@ -30,7 +30,6 @@ query UserEmail($id: ID, $name: String, $email: String) {
       comments {
         id
         content
-        contentExcerpt
       }
       contributions {
         id
@@ -40,7 +39,6 @@ query UserEmail($id: ID, $name: String, $email: String) {
           url
         }
         content
-        contentExcerpt
       }
     }
     isMuted

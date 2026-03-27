@@ -42,7 +42,7 @@ export const reportsListQuery = () => {
           }
           ... on Comment {
             id
-            contentExcerpt
+            content
             disabled
             deleted
             author {

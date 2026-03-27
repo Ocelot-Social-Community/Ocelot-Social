@@ -9,7 +9,7 @@ export default () => {
       mutation ($postId: ID!, $content: String!) {
         CreateComment(postId: $postId, content: $content) {
           id
-          contentExcerpt
+
           content
           createdAt
           updatedAt
@@ -45,7 +45,7 @@ export default () => {
       mutation ($content: String!, $id: ID!) {
         UpdateComment(content: $content, id: $id) {
           id
-          contentExcerpt
+
           content
           createdAt
           updatedAt
@@ -70,7 +70,7 @@ export default () => {
       mutation ($id: ID!) {
         DeleteComment(id: $id) {
           id
-          contentExcerpt
+
           content
           createdAt
           disabled

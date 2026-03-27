@@ -2,7 +2,6 @@ mutation DeleteComment($id: ID!) {
   DeleteComment(id: $id) {
     id
     content
-    contentExcerpt
     deleted
   }
 }

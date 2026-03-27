@@ -159,7 +159,7 @@ export default {
           titleIdent: 'delete.comment.title',
           messageIdent: 'delete.comment.message',
           messageParams: {
-            name: this.$filters.truncate(this.comment.contentExcerpt, 30),
+            name: this.$filters.truncate(this.$filters.removeHtml(this.comment.content), 30),
           },
           buttons: {
             confirm: {
