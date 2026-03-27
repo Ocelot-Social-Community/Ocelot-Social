@@ -216,11 +216,20 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-03-14 (Session 33)
+**Letzte Aktualisierung:** 2026-03-27 (Session 34)
 
-**Aktuelle Phase:** Phase 4 - Tier 1 ✅, Tier A ✅, Tier B ✅, OsModal ✅ | Tier 2-3 ausstehend
+**Aktuelle Phase:** Phase 4 komplett (0 ds-* Tags) | Phase 5 + Maintenance-Entkopplung ausstehend
 
-**Zuletzt abgeschlossen (Session 33 - ds-radio → native HTML):**
+**Zuletzt abgeschlossen (Session 34 - Architektur-Entscheidungen):**
+- [x] Styleguide-Ablösung evaluiert: system.css nicht mehr importiert, Styleguide kein Submodul
+- [x] Verbleibende ds-CSS-Klassen (~50 Nutzungen) über `_ds-compat.scss` abgedeckt
+- [x] Entscheidung: Keine `OsLocaleSwitch` in packages/ui — bricht Props-Only-Philosophie oder ist nur glorifiziertes OsMenu
+- [x] Entscheidung: Maintenance-App als eigenständiges Projekt entkoppeln
+  - Eigene schlanke LocaleSwitch basierend auf OsMenu/OsMenuItem + Cookie (statt Vuex/Apollo)
+  - Abhängigkeiten reduzieren auf: @ocelot-social/ui, vue-i18n, Locale-Dateien, Design-Tokens
+  - packages/ui bleibt i18n-frei (Props-Only)
+
+**Zuvor abgeschlossen (Session 33 - ds-radio → native HTML):**
 - [x] `<ds-radio>` in ReportModal.vue → native `<fieldset>` + `<input type="radio">` + `<label>`
 - [x] Accessible Radio-Group: `<fieldset>` mit `<legend>` für Screen-Reader
 - [x] CSS: `.report-radio-group`, `.report-radio-option`, `.report-radio-option-label` (in ReportModal `<style>`)
@@ -408,18 +417,13 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 - [x] Session 11: Wasserfarben-Farbschema, Stories konsolidiert, Keyboard A11y
 
 **Nächste Schritte:**
-- [x] OsSpinner Webapp-Migration (DsSpinner + LoadingSpinner → OsSpinner) ✅
-- [x] OsCard Komponente + BaseCard → OsCard Webapp-Migration ✅
-- [x] Tier A: 10 triviale ds-* Wrapper → Plain HTML + CSS ✅
-- [x] OsBadge Komponente + ds-chip/ds-tag → OsBadge Webapp-Migration ✅
-- [x] OsNumber Komponente + ds-number/CountTo → OsNumber Webapp-Migration ✅
-- [ ] Tier B (Rest): ds-radio → Plain HTML
-- [x] OsModal Komponente + DsModal/ConfirmModal/ReportModal → OsModal Webapp-Integration ✅
-- [ ] Weitere Tier 2 Komponenten (OsDropdown, OsAvatar)
-- [x] ds-form → formValidation Mixin (async-validator), 18 Dateien migriert, vuelidate entfernt ✅
-- [x] ds-input → OcelotInput (23 Dateien, Webapp-Komponente mit lokalen Imports, formValidation-kompatibel) ✅
-- [x] ds-menu / ds-menu-item → OsMenu / OsMenuItem (packages/ui, 17 Nutzungen in 11 Dateien, dropdown Prop, eigene CSS in index.css) ✅
-- [x] ds-select → OcelotSelect (3 Dateien, Webapp-Komponente mit lokalen Imports, click-outside inline) ✅
+- [ ] **Maintenance-App entkoppeln** (neues eigenständiges Projekt)
+  - [ ] Eigene LocaleSwitch: OsMenu/OsMenuItem + Cookie-basiert (kein Vuex/Apollo/v-tooltip)
+  - [ ] Eigenständige i18n-Konfiguration (vue-i18n + Locale-Dateien)
+  - [ ] Abhängigkeit nur auf @ocelot-social/ui + Design-Tokens
+  - [ ] Eigener Build (Nuxt generate → statisches HTML + nginx)
+- [ ] Verbleibende ds-CSS-Klassen ablösen (`_ds-compat.scss` → eigene Utility-Klassen oder Tailwind)
+- [ ] Weitere Tier 2 Komponenten bei Bedarf (OsDropdown, OsAvatar)
 - [ ] Browser-Fehler untersuchen: `TypeError: Cannot read properties of undefined (reading 'heartO')` (ocelotIcons undefined im Browser trotz korrekter Webpack-Aliase)
 
 **Manuelle Setup-Aufgaben (außerhalb Code):**
@@ -712,7 +716,11 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 > **Hinweis:** ds-heading, ds-text, ds-tag wurden zu Plain HTML migriert (Tier A).
 > OsHeading/OsText/OsTag als UI-Library-Komponenten sind daher nicht mehr geplant.
 
-### Phase 5: Finalisierung
+### Phase 5: Finalisierung & Entkopplung
+- [ ] **Maintenance-App als eigenständiges Projekt** (Erste Validierung der Library-Unabhängigkeit)
+  - [ ] Eigene LocaleSwitch (OsMenu + Cookie, kein Vuex/Apollo)
+  - [ ] Eigenständiger Build ohne Webapp-Abhängigkeiten
+  - [ ] Nur @ocelot-social/ui + vue-i18n + Design-Tokens
 - [ ] Alle Komponenten migriert und getestet
 - [ ] Alte Komponenten aus Vue 2 Projekt entfernt
 - [ ] Build als npm Library verifiziert
