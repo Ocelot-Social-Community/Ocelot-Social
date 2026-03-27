@@ -2028,13 +2028,13 @@ describe('DeletePost', () => {
               id: 'p4711',
               deleted: true,
               content: 'UNAVAILABLE',
-                image: null,
+              image: null,
               comments: [
                 {
                   deleted: true,
                   // Should we black out the comment content in the database, too?
                   content: 'UNAVAILABLE',
-                      },
+                },
               ],
             },
           },

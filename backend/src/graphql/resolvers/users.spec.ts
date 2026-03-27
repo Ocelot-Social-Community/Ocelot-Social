@@ -402,7 +402,7 @@ describe('Delete a User as admin', () => {
                         {
                           id: 'c156',
                           content: 'UNAVAILABLE',
-                              deleted: true,
+                          deleted: true,
                         },
                       ],
                     },
