@@ -95,6 +95,8 @@ export default ({ app = {} }) => {
       }
       // remove the rest of the HTML
       contentExcerpt = contentExcerpt.replace(/<(?:.|\n)*?>/gm, '').trim()
+      // normalize multiple spaces into one
+      contentExcerpt = contentExcerpt.replace(/ {2,}/g, ' ')
 
       return contentExcerpt
     },
