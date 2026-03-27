@@ -9,6 +9,9 @@ export default defineNuxtConfig({
   css: ["~/assets/css/branding.css", "~/assets/css/main.css", "@ocelot-social/ui/style.css"],
   vite: {
     plugins: [tailwindcss()],
+    optimizeDeps: {
+      include: ["@vue/devtools-core", "@vue/devtools-kit"],
+    },
     server: {
       fs: {
         allow: ["/packages/ui"],
