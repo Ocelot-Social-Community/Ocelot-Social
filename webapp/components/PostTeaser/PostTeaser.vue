@@ -230,13 +230,7 @@ export default {
       user: 'auth/user',
     }),
     excerpt() {
-      if (!this.post.content) return ''
-      return this.post.content
-        .replace(/<br\s*\/?>/gim, ' ')
-        .replace(/<\/(p|h[1-6]|li|div|blockquote)>/gim, ' ')
-        .replace(/<(?:.|\n)*?>/gm, '')
-        .replace(/\s{2,}/g, ' ')
-        .trim()
+      return this.$filters.removeHtml(this.post.content)
     },
     isAuthor() {
       const { author } = this.post
