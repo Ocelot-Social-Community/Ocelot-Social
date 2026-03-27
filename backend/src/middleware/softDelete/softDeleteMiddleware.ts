@@ -20,7 +20,6 @@ const setDefaultFilters: IMiddlewareResolver = async (resolve, root, args, conte
 const obfuscate: IMiddlewareResolver = async (resolve, root, args, context, info) => {
   if (root.deleted || (!isModerator(context) && root.disabled)) {
     root.content = 'UNAVAILABLE'
-    root.contentExcerpt = 'UNAVAILABLE'
     root.title = 'UNAVAILABLE'
     root.slug = 'UNAVAILABLE'
     root.avatar = null

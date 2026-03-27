@@ -41,7 +41,7 @@ const walkRecursive = (data, fields, fieldName, callback, _key?) => {
 // exclamation mark separates field names, that should not be sanitized
 const fields = [
   { field: 'content', excludes: ['CreateMessage', 'Message'] },
-  { field: 'contentExcerpt' },
+
   { field: 'reasonDescription' },
   { field: 'description', excludes: ['embed'] },
   { field: 'descriptionExcerpt' },

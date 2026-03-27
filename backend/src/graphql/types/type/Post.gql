@@ -129,7 +129,6 @@ type Post {
   title: String!
   slug: String!
   content: String!
-  contentExcerpt: String
   image: Image @relation(name: "HERO_IMAGE", direction: "OUT")
   visibility: Visibility
   deleted: Boolean
@@ -230,7 +229,6 @@ type Mutation {
     visibility: Visibility
     language: String
     categoryIds: [ID]
-    contentExcerpt: String
     groupId: ID
     postType: PostType = Article
     eventInput: _EventInput
@@ -240,7 +238,6 @@ type Mutation {
     title: String!
     slug: String
     content: String!
-    contentExcerpt: String
     image: ImageInput
     visibility: Visibility
     language: String

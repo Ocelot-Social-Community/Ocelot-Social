@@ -41,7 +41,6 @@ type Comment {
   activityId: String
   author: User @relation(name: "WROTE", direction: "IN")
   content: String!
-  contentExcerpt: String
   post: Post @relation(name: "COMMENTS", direction: "OUT")
   createdAt: String
   updatedAt: String
@@ -81,7 +80,7 @@ type Query {
 }
 
 type Mutation {
-  CreateComment(id: ID, postId: ID!, content: String!, contentExcerpt: String): Comment
-  UpdateComment(id: ID!, content: String!, contentExcerpt: String): Comment
+  CreateComment(id: ID, postId: ID!, content: String!): Comment
+  UpdateComment(id: ID!, content: String!): Comment
   DeleteComment(id: ID!): Comment
 }

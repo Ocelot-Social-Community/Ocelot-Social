@@ -7,19 +7,16 @@ mutation DeleteUser($id: ID!, $resource: [Deletable]) {
     contributions {
       id
       content
-      contentExcerpt
       deleted
       comments {
         id
         content
-        contentExcerpt
         deleted
       }
     }
     comments {
       id
       content
-      contentExcerpt
       deleted
     }
   }

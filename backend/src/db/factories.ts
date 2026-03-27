@@ -199,9 +199,6 @@ Factory.define('post')
     // Convert false to null
     return pinned || null
   })
-  .attr('contentExcerpt', ['contentExcerpt', 'content'], (contentExcerpt, content) => {
-    return contentExcerpt || content
-  })
   .attr('slug', ['slug', 'title'], (slug, title) => {
     return slug || slugify(title, { lower: true })
   })
@@ -293,9 +290,6 @@ Factory.define('comment')
   .attrs({
     id: uuid,
     content: faker.lorem.sentence,
-  })
-  .attr('contentExcerpt', ['contentExcerpt', 'content'], (contentExcerpt, content) => {
-    return contentExcerpt || content
   })
   .after(async (buildObject, options) => {
     const [comment, author, post] = await Promise.all([

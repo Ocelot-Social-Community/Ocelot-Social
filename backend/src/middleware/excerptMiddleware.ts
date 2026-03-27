@@ -20,33 +20,9 @@ const updateGroup: IMiddlewareResolver = async (resolve, root, args, context, in
   return resolve(root, args, context, info)
 }
 
-const createPost: IMiddlewareResolver = async (resolve, root, args, context, info) => {
-  args.contentExcerpt = trunc(args.content, 120).html
-  return resolve(root, args, context, info)
-}
-
-const updatePost: IMiddlewareResolver = async (resolve, root, args, context, info) => {
-  args.contentExcerpt = trunc(args.content, 120).html
-  return resolve(root, args, context, info)
-}
-
-const createComment: IMiddlewareResolver = async (resolve, root, args, context, info) => {
-  args.contentExcerpt = trunc(args.content, 180).html
-  return resolve(root, args, context, info)
-}
-
-const updateComment: IMiddlewareResolver = async (resolve, root, args, context, info) => {
-  args.contentExcerpt = trunc(args.content, 180).html
-  return resolve(root, args, context, info)
-}
-
 export default {
   Mutation: {
     CreateGroup: createGroup,
     UpdateGroup: updateGroup,
-    CreatePost: createPost,
-    UpdatePost: updatePost,
-    CreateComment: createComment,
-    UpdateComment: updateComment,
   },
 }

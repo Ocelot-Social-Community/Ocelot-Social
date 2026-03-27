@@ -296,7 +296,6 @@ export default {
             OPTIONAL MATCH (post)<-[:COMMENTS]-(comment:Comment)
             SET post.deleted        = TRUE
             SET post.content        = 'UNAVAILABLE'
-            SET post.contentExcerpt = 'UNAVAILABLE'
             SET post.title          = 'UNAVAILABLE'
             SET comment.deleted     = TRUE
             RETURN post {.*}

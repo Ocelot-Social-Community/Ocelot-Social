@@ -3,7 +3,6 @@ query Post($id: ID, $filter: _PostFilter, $first: Int, $offset: Int, $orderBy: [
     id
     title
     content
-    contentExcerpt
     eventStart
     pinned
     createdAt
