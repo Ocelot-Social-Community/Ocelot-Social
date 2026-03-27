@@ -139,6 +139,28 @@ describe('NotificationsTable.vue', () => {
         })
       })
 
+      describe('fallback to descriptionExcerpt when content is empty', () => {
+        it('renders descriptionExcerpt if content is missing', () => {
+          const fallbackNotification = {
+            read: false,
+            reason: 'mentioned_in_post',
+            from: {
+              __typename: 'Post',
+              id: 'post-fallback',
+              title: 'fallback post',
+              slug: 'fallback-post',
+              content: '',
+              descriptionExcerpt: 'fallback description text',
+              author: { id: 'u1', slug: 'user', name: 'User' },
+            },
+          }
+          propsData.notifications = [fallbackNotification]
+          wrapper = Wrapper()
+          const description = wrapper.find('.notification-description')
+          expect(description.text()).toBe('fallback description text')
+        })
+      })
+
       describe('unread status', () => {
         it('does not have class `notification-status`', () => {
           expect(wrapper.find('.notification-status').exists()).toBe(false)
