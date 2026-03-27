@@ -125,17 +125,17 @@ export default {
           const createMessageCypher = `
             ${matchRoom}
             OPTIONAL MATCH (currentUser)-[:AVATAR_IMAGE]->(image:Image)
-            OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
-            WITH MAX(m.indexId) as maxIndex, room, currentUser, image
+            SET room.messageCounter = COALESCE(room.messageCounter, 0) + 1,
+                room.lastMessageAt = toString(datetime())
+            WITH room, currentUser, image
             CREATE (currentUser)-[:CREATED]->(message:Message {
               createdAt: toString(datetime()),
               id: apoc.create.uuid(),
-              indexId: CASE WHEN maxIndex IS NOT NULL THEN maxIndex + 1 ELSE 0 END,
+              indexId: room.messageCounter - 1,
               content: LEFT($content,2000),
               saved: true,
               distributed: false
             })-[:INSIDE]->(room)
-            SET room.lastMessageAt = toString(datetime())
             WITH message, currentUser, image, room
             OPTIONAL MATCH (room)<-[:CHATS_IN]-(recipient:User)
               WHERE NOT recipient.id = $currentUserId
