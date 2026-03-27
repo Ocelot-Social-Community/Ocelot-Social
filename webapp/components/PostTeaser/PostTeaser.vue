@@ -27,9 +27,10 @@
           />
         </div>
       </template>
-      <template v-else-if="singleColumn" #heroImage>
+      <template v-else-if="singleColumn || categoriesActive" #heroImage>
         <div class="category-placeholder" :style="placeholderStyle">
           <os-icon
+            v-if="categoriesActive"
             v-for="category in (post.categories || []).slice(0, 3)"
             :key="category.id"
             :icon="resolveIcon(category.icon)"
