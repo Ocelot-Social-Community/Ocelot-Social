@@ -1,5 +1,8 @@
 import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I see the message {string} in the chat', (message) => {
-  cy.get('.vac-message-wrapper', { timeout: 15000 }).should('contain', message)
+  cy.get('vue-advanced-chat', { timeout: 15000 })
+    .shadow()
+    .find('.vac-message-wrapper')
+    .should('contain', message)
 })
