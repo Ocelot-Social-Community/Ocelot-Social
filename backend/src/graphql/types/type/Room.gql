@@ -62,14 +62,13 @@ type Room {
       """
     )
 
+  # Count unread messages, excluding those from blocked/muted senders
   unreadCount: Int
     @cypher(
       statement: """
       MATCH (u:User { id: $cypherParams.currentUserId })-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(this)
-      OPTIONAL MATCH (message)<-[:CREATED]-(sender:User)
-      WHERE (u)-[:BLOCKED]->(sender) OR (u)-[:MUTED]->(sender)
-      WITH message, sender
-      WHERE sender IS NULL
+      MATCH (message)<-[:CREATED]-(sender:User)
+      WHERE NOT (u)-[:BLOCKED]->(sender) AND NOT (u)-[:MUTED]->(sender)
       RETURN count(message)
       """
     )
