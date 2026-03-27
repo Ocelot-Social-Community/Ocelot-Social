@@ -3,6 +3,7 @@ import CategoryQuery from '~/graphql/CategoryQuery'
 export const state = () => {
   return {
     categories: [],
+    categoriesEnabled: true,
     isInitialized: false,
   }
 }
@@ -10,6 +11,9 @@ export const state = () => {
 export const mutations = {
   SET_CATEGORIES(state, categories) {
     state.categories = categories || []
+  },
+  SET_ENABLED(state, enabled) {
+    state.categoriesEnabled = enabled
   },
   SET_INIZIALIZED(state) {
     state.isInitialized = true
@@ -21,7 +25,7 @@ export const getters = {
     return state.categories
   },
   categoriesActive(state) {
-    return !!state.categories.length
+    return state.categoriesEnabled && !!state.categories.length
   },
   isInitialized(state) {
     return state.isInitialized
@@ -31,11 +35,15 @@ export const getters = {
 export const actions = {
   async init({ commit }) {
     try {
-      const client = this.app.apolloProvider.defaultClient
-      const {
-        data: { Category: categories },
-      } = await client.query({ query: CategoryQuery() })
-      commit('SET_CATEGORIES', categories)
+      const enabled = process.env.CATEGORIES_ACTIVE !== false && process.env.CATEGORIES_ACTIVE !== 'false'
+      commit('SET_ENABLED', enabled)
+      if (enabled) {
+        const client = this.app.apolloProvider.defaultClient
+        const {
+          data: { Category: categories },
+        } = await client.query({ query: CategoryQuery() })
+        commit('SET_CATEGORIES', categories)
+      }
       commit('SET_INIZIALIZED')
     } catch (err) {
       throw new Error('Could not query categories')
