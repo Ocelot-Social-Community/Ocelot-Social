@@ -28,7 +28,7 @@ export async function up(_next) {
   }
 }
 
-export async function down(_next) {
+export function down(_next) {
   throw new Error(
     'Irreversible migration: contentExcerpt was removed and cannot be restored without regenerating from content',
   )
