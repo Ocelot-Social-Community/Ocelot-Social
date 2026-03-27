@@ -72,8 +72,8 @@
                   :class="{ 'notification-status': notification.read }"
                 >
                   {{
-                    notification.from.contentExcerpt ||
-                    notification.from.descriptionExcerpt | removeHtml
+                    $filters.removeHtml(notification.from.content) ||
+                    $filters.removeHtml(notification.from.descriptionExcerpt)
                   }}
                 </p>
               </div>

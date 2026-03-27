@@ -154,7 +154,7 @@ export default {
     },
     linkText() {
       return (
-        this.report.resource.title || this.$filters.removeHtml(this.report.resource.contentExcerpt)
+        this.report.resource.title || this.$filters.removeHtml(this.report.resource.content)
       )
     },
     statusIconName() {

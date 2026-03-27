@@ -232,7 +232,7 @@ export default {
       user: 'auth/user',
     }),
     excerpt() {
-      return this.$filters.removeLinks(this.post.contentExcerpt)
+      return this.$filters.removeLinks(this.post.content)
     },
     isAuthor() {
       const { author } = this.post
@@ -399,6 +399,10 @@ export default {
   .content {
     flex-grow: 1;
     margin-bottom: $space-small;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .footer {

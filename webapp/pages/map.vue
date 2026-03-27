@@ -434,7 +434,7 @@ export default {
                 id: post.id,
                 slug: post.slug,
                 name: post.title,
-                description: post.contentExcerpt,
+                description: this.$filters.removeHtml(post.content),
               },
               geometry: {
                 type: 'Point',

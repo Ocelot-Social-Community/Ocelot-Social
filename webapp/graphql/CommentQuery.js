@@ -8,7 +8,7 @@ export default () => {
     query Comment($postId: ID) {
       Comment(postId: $postId) {
         id
-        contentExcerpt
+        content
         createdAt
         author {
           id
