@@ -32,7 +32,7 @@ const metadata = {
 };
 
 const supportEmail = "devops@ocelot.social";
-const logoUrl = "/img/logo-squared.svg";
+const logoUrl = "/img/custom/logo-squared.svg";
 </script>
 
 <style scoped>
