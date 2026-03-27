@@ -13,9 +13,13 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@nuxtjs/i18n": "^10.2.4",
     "@ocelot-social/ui": "file:../packages/ui",
+    "clsx": "^2.1.1",
     "nuxt": "^4.4.2",
+    "tailwind-merge": "^3.5.0",
     "vue": "^3.5.30",
+    "vue-demi": "^0.14.10",
     "vue-router": "^5.0.4"
   },
   "devDependencies": {

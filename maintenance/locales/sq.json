@@ -1,0 +1,7 @@
+{
+  "maintenance": {
+    "explanation": "Aktualisht po bëjmë mirëmbajtje të planifikuar. Ju lutem provoni përsëri më vonë.",
+    "questions": "Pyetje ose shqetësime? Dërgo një e-mail në",
+    "title": "{APPLICATION_NAME} është në mirëmbajtje"
+  }
+}
