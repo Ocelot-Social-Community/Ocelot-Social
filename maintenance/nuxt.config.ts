@@ -9,6 +9,11 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css", "@ocelot-social/ui/style.css"],
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      fs: {
+        allow: ["/packages/ui"],
+      },
+    },
     build: {
       rollupOptions: {
         // Exclude pre-bundled UI library from Rollup processing
