@@ -460,6 +460,9 @@ export default {
       showChat: 'chat/SET_OPEN_CHAT',
     }),
     showOrChangeGroupChat(groupId) {
+      if (this.getShowChat.showChat) {
+        this.showChat({ showChat: false, chatUserId: null, groupId: null })
+      }
       this.showChat({ showChat: true, chatUserId: null, groupId })
     },
     // handleTab(tab) {
