@@ -97,6 +97,9 @@ export default ({ app = {} }) => {
       contentExcerpt = contentExcerpt.replace(/<(?:.|\n)*?>/gm, '').trim()
       // normalize multiple spaces into one
       contentExcerpt = contentExcerpt.replace(/ {2,}/g, ' ')
+      // decode common HTML entities
+      const entities = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'", '&nbsp;': ' ' }
+      contentExcerpt = contentExcerpt.replace(/&(?:amp|lt|gt|quot|#39|nbsp);/g, (m) => entities[m])
 
       return contentExcerpt
     },
