@@ -242,7 +242,7 @@ describe('Room', () => {
                   id: expect.any(String),
                   roomId: result.data.Room[0].id,
                   roomName: 'Chatting User',
-                  unreadCount: 0,
+                  unreadCount: 2,
                   users: expect.arrayContaining([
                     {
                       _id: 'chatting-user',
@@ -508,7 +508,7 @@ describe('Room', () => {
                 date: expect.any(String),
                 saved: true,
                 distributed: false,
-                seen: false,
+                seen: true,
               },
               users: expect.arrayContaining([
                 expect.objectContaining({
