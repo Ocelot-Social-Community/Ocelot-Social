@@ -99,7 +99,7 @@ services:
     build:
       target: development
     ports:
-      - 3002:3000
+      - "3002:3000"
     volumes:
       - ./maintenance/app:/app/app
       - ./packages/ui:/packages/ui

@@ -31,7 +31,7 @@ RUN npx nuxt generate
 FROM build AS development
 ENV NODE_ENV=development
 EXPOSE 3000
-CMD ["npx", "nuxt", "dev", "--host", "0.0.0.0"]
+CMD ["npx", "nuxt", "dev"]
 
 # ==============================================================================
 # Stage 4: Production (static site served by nginx)

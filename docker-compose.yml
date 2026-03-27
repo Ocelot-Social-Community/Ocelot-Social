@@ -62,8 +62,6 @@ services:
       context: .
       dockerfile: ./maintenance/Dockerfile
       target: production
-    ports:
-      - 3002:80
 
   neo4j:
     image: ghcr.io/ocelot-social-community/ocelot-social/neo4j:community
