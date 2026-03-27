@@ -62,7 +62,7 @@ type Room {
       """
     )
 
-  # Count unread messages, excluding those from blocked/muted senders
+  "Count unread messages, excluding those from blocked/muted senders"
   unreadCount: Int
     @cypher(
       statement: """
