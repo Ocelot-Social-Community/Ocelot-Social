@@ -406,6 +406,7 @@ export default {
     justify-content: space-between;
     align-items: center;
 
+    > .categories,
     > .categories-placeholder {
       flex-grow: 1;
     }
