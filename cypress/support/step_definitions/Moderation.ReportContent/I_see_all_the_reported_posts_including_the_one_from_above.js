@@ -34,7 +34,7 @@ defineStep('I see all the reported posts including the one from above', () => {
       }
       ... on Comment {
         id
-        contentExcerpt
+        content
         disabled
         deleted
         author {
