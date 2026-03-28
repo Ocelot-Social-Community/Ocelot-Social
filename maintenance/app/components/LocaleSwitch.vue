@@ -64,7 +64,7 @@ async function switchLocale(code: string, hide: () => void) {
   border-left: 2px solid transparent;
   padding: 8px 24px 8px 12px;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: var(--color-text-base);
   text-align: left;
   line-height: 1.3;
