@@ -26,14 +26,12 @@
 <script setup lang="ts">
 import { OsCard } from "@ocelot-social/ui";
 import LocaleSwitch from "~/components/LocaleSwitch.vue";
+import emails from "~/constants/emails";
+import metadata from "~/constants/metadata";
 
 const { t } = useI18n();
 
-const metadata = {
-  APPLICATION_NAME: "ocelot.social",
-};
-
-const supportEmail = "devops@ocelot.social";
+const supportEmail = emails.SUPPORT_EMAIL;
 const logoUrl = "/img/custom/logo-squared.svg";
 </script>
 

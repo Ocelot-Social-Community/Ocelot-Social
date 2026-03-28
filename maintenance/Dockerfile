@@ -20,9 +20,14 @@ COPY --from=ui-library /packages/ui/ /packages/ui/
 COPY maintenance/package.json maintenance/package-lock.json ./
 RUN npm ci
 COPY maintenance/ .
-# branding is unified in /branding in branding repositories
-ONBUILD COPY brandin[g]/maintenance/ /app/app/
-ONBUILD RUN npm ci
+# Branding override points (all optional, unified in /branding in branding repositories):
+#   branding/maintenance/constants/   → app name, support email
+#   branding/maintenance/assets/css/  → colors, fonts (branding.css)
+#   branding/maintenance/public/      → logo, favicon
+#   branding/maintenance/locales/     → translations
+ONBUILD COPY brandin[g]/maintenance/app/ /app/app/
+ONBUILD COPY brandin[g]/maintenance/locales/ /app/locales/
+ONBUILD COPY brandin[g]/maintenance/public/ /app/public/
 RUN npx nuxt generate
 
 # ==============================================================================
