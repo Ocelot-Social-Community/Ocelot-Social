@@ -1,5 +1,5 @@
 <template>
-  <VDropdown :distance="8">
+  <VDropdown :distance="8" placement="bottom-start">
     <OsButton
       variant="primary"
       appearance="ghost"
