@@ -1,12 +1,73 @@
 /*
- * CSS Custom Properties for @ocelot-social/ui
+ * Default ocelot.social branding
  *
- * Default ocelot.social branding — resolved values from webapp SCSS tokens.
- * Source of truth: webapp/assets/_new/styles/ocelot-ui-variables.scss
+ * Resolved values from webapp SCSS tokens + styleguide design system.
+ * Source of truth: webapp/assets/_new/styles/
  *
- * Branding repositories can override these values.
+ * Branding repositories can override this file.
  */
 
+/* Fonts — same as webapp/assets/_new/styles/resets.scss */
+@font-face {
+  font-family: LatoWeb;
+  src:
+    url("/fonts/Lato-Regular.1f440a46.woff2") format("woff2"),
+    url("/fonts/Lato-Regular.ffb25090.woff") format("woff");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  text-rendering: optimizelegibility;
+}
+@font-face {
+  font-family: LatoWeb;
+  src:
+    url("/fonts/Lato-Italic.a6774e2c.woff2") format("woff2"),
+    url("/fonts/Lato-Italic.ff8877c4.woff") format("woff");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  text-rendering: optimizelegibility;
+}
+@font-face {
+  font-family: LatoWeb;
+  src:
+    url("/fonts/Lato-Bold.1e239003.woff2") format("woff2"),
+    url("/fonts/Lato-Bold.35be9fc3.woff") format("woff");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  text-rendering: optimizelegibility;
+}
+@font-face {
+  font-family: LatoWeb;
+  src:
+    url("/fonts/Lato-BoldItalic.4ef02877.woff2") format("woff2"),
+    url("/fonts/Lato-BoldItalic.5171ee7d.woff") format("woff");
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  text-rendering: optimizelegibility;
+}
+
+/* Base styles — same as webapp */
+html {
+  font-size: 15px;
+}
+
+body {
+  font-family: LatoWeb, sans-serif;
+  font-size: 15px;
+  line-height: 1.3;
+  margin: 0;
+  background-color: rgb(245, 244, 246); /* $color-neutral-90 */
+  color: rgb(75, 69, 84); /* $text-color-base */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: none;
+  font-variant-ligatures: none;
+}
+
+/* CSS Custom Properties for @ocelot-social/ui */
 :root {
   /* Default (grey) */
   --color-default: rgb(245, 244, 246);

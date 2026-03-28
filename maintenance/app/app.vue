@@ -70,19 +70,28 @@ const logoUrl = "/img/custom/logo-squared.svg";
 }
 
 .heading {
-  font-size: 1.25rem;
+  font-family: LatoWeb, sans-serif;
+  font-size: 1.5rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
   color: var(--color-text-base);
-  margin-bottom: 12px;
+  margin: 0;
 }
 
 .text {
+  font-family: LatoWeb, sans-serif;
   color: var(--color-text-base);
-  line-height: 1.5;
-  margin-bottom: 8px;
+  line-height: 1.3;
+  margin: 0 0 1em;
 }
 
 .text a {
   color: var(--color-primary);
+  text-decoration: none;
+}
+
+.text a:hover {
+  text-decoration: underline;
 }
 </style>
