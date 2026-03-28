@@ -35,7 +35,12 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
     optimizeDeps: {
       // Pre-bundle for dev server (avoids re-processing minified code)
-      include: ["@vue/devtools-core", "@vue/devtools-kit", "@ocelot-social/ui"],
+      include: [
+        "@vue/devtools-core",
+        "@vue/devtools-kit",
+        "@ocelot-social/ui",
+        "@ocelot-social/ui/ocelot",
+      ],
     },
     server: {
       fs: {
