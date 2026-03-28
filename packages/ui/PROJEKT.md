@@ -82,9 +82,9 @@ Phase 1: ██████████ 100% (6/6 Aufgaben) ✅
 Phase 2: ██████████ 100% (26/26 Aufgaben) ✅
 Phase 3: ██████████ 100% (24/24 Aufgaben) ✅ - Webapp-Integration komplett
 Phase 4: █████████░  85% (23/27 Aufgaben) - Tier 1 ✅, Tier A ✅, Infra ✅, OsBadge ✅, ds-grid ✅, ds-table→HTML ✅, OsNumber ✅, OsModal ✅, ds-radio→HTML ✅ | Tier B ✅, OcelotInput ✅, OcelotSelect ✅, OsMenu ✅ | 0 ds-* Tags verbleibend
-Phase 5: ░░░░░░░░░░   0% (0/7 Aufgaben)
+Phase 5: ███░░░░░░░  29% (2/7 Aufgaben) - Maintenance-App entkoppelt ✅
 ───────────────────────────────────────
-Gesamt:  █████████░  89% (85/96 Aufgaben)
+Gesamt:  █████████░  91% (87/96 Aufgaben)
 ```
 
 ### Katalogisierung (Details in KATALOG.md)
@@ -216,18 +216,32 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 
 ## Aktueller Stand
 
-**Letzte Aktualisierung:** 2026-03-27 (Session 34)
+**Letzte Aktualisierung:** 2026-03-28 (Session 35)
 
-**Aktuelle Phase:** Phase 4 komplett (0 ds-* Tags) | Phase 5 + Maintenance-Entkopplung ausstehend
+**Aktuelle Phase:** Phase 5 gestartet — Maintenance-App entkoppelt ✅ | Weitere Phase 5 Aufgaben ausstehend
 
-**Zuletzt abgeschlossen (Session 34 - Architektur-Entscheidungen):**
+**Zuletzt abgeschlossen (Session 35 - Maintenance-App Entkopplung):**
+- [x] Maintenance-App als eigenständiges Nuxt 4-Projekt unter `maintenance/` aufgesetzt
+  - Vue 3 + Nuxt 4 (ssr: false, statisches HTML via `nuxt generate`)
+  - `@ocelot-social/ui` als Dependency (OsButton, OsIcon, OsCard)
+  - `@nuxtjs/i18n` v10 mit 11 Sprachen (en, de, es, fr, it, nl, pl, pt, ru, sq, uk)
+  - `floating-vue` (VDropdown) für LocaleSwitch-Dropdown
+  - Tailwind CSS v4 mit `@tailwindcss/vite`
+  - Eigene LocaleSwitch-Komponente: OsButton (ghost/circle) + OsIcon (language) + VDropdown
+  - Eigene Locale-Dateien unter `maintenance/locales/`
+  - Eigene Branding/Design-Tokens unter `maintenance/app/assets/css/`
+  - Dockerfile für Docker-Build
+  - nginx-Konfiguration für statisches Hosting
+  - vitest + @nuxt/test-utils + @vue/test-utils für Tests
+  - ESLint mit eslint-config-it4c + @intlify/eslint-plugin-vue-i18n
+  - Kein Vuex, kein Apollo, kein v-tooltip — vollständig entkoppelt von Webapp
+- [x] packages/ui bleibt i18n-frei (Props-Only-Philosophie bestätigt)
+
+**Zuvor abgeschlossen (Session 34 - Architektur-Entscheidungen):**
 - [x] Styleguide-Ablösung evaluiert: system.css nicht mehr importiert, Styleguide kein Submodul
 - [x] Verbleibende ds-CSS-Klassen (~50 Nutzungen) über `_ds-compat.scss` abgedeckt
 - [x] Entscheidung: Keine `OsLocaleSwitch` in packages/ui — bricht Props-Only-Philosophie oder ist nur glorifiziertes OsMenu
 - [x] Entscheidung: Maintenance-App als eigenständiges Projekt entkoppeln
-  - Eigene schlanke LocaleSwitch basierend auf OsMenu/OsMenuItem + Cookie (statt Vuex/Apollo)
-  - Abhängigkeiten reduzieren auf: @ocelot-social/ui, vue-i18n, Locale-Dateien, Design-Tokens
-  - packages/ui bleibt i18n-frei (Props-Only)
 
 **Zuvor abgeschlossen (Session 33 - ds-radio → native HTML):**
 - [x] `<ds-radio>` in ReportModal.vue → native `<fieldset>` + `<input type="radio">` + `<label>`
@@ -417,11 +431,11 @@ ds-chip + ds-tag → OsBadge (UI-Library): ✅
 - [x] Session 11: Wasserfarben-Farbschema, Stories konsolidiert, Keyboard A11y
 
 **Nächste Schritte:**
-- [ ] **Maintenance-App entkoppeln** (neues eigenständiges Projekt)
-  - [ ] Eigene LocaleSwitch: OsMenu/OsMenuItem + Cookie-basiert (kein Vuex/Apollo/v-tooltip)
-  - [ ] Eigenständige i18n-Konfiguration (vue-i18n + Locale-Dateien)
-  - [ ] Abhängigkeit nur auf @ocelot-social/ui + Design-Tokens
-  - [ ] Eigener Build (Nuxt generate → statisches HTML + nginx)
+- [x] **Maintenance-App entkoppelt** ✅ (eigenständiges Nuxt 4-Projekt unter `maintenance/`)
+  - [x] Eigene LocaleSwitch: OsButton + OsIcon + floating-vue VDropdown (kein Vuex/Apollo/v-tooltip)
+  - [x] Eigenständige i18n-Konfiguration (@nuxtjs/i18n v10, 11 Sprachen)
+  - [x] Abhängigkeit nur auf @ocelot-social/ui + floating-vue + Design-Tokens
+  - [x] Eigener Build (Nuxt 4 generate → statisches HTML + nginx + Docker)
 - [ ] Verbleibende ds-CSS-Klassen ablösen (`_ds-compat.scss` → eigene Utility-Klassen oder Tailwind)
 - [ ] Weitere Tier 2 Komponenten bei Bedarf (OsDropdown, OsAvatar)
 - [ ] Browser-Fehler untersuchen: `TypeError: Cannot read properties of undefined (reading 'heartO')` (ocelotIcons undefined im Browser trotz korrekter Webpack-Aliase)
@@ -717,10 +731,10 @@ Jeder migrierte Button muss manuell geprüft werden: Normal, Hover, Focus, Activ
 > OsHeading/OsText/OsTag als UI-Library-Komponenten sind daher nicht mehr geplant.
 
 ### Phase 5: Finalisierung & Entkopplung
-- [ ] **Maintenance-App als eigenständiges Projekt** (Erste Validierung der Library-Unabhängigkeit)
-  - [ ] Eigene LocaleSwitch (OsMenu + Cookie, kein Vuex/Apollo)
-  - [ ] Eigenständiger Build ohne Webapp-Abhängigkeiten
-  - [ ] Nur @ocelot-social/ui + vue-i18n + Design-Tokens
+- [x] **Maintenance-App als eigenständiges Projekt** ✅ (Erste Validierung der Library-Unabhängigkeit)
+  - [x] Eigene LocaleSwitch (OsButton + OsIcon + floating-vue VDropdown, kein Vuex/Apollo)
+  - [x] Eigenständiger Build ohne Webapp-Abhängigkeiten (Nuxt 4 + Docker + nginx)
+  - [x] Nur @ocelot-social/ui + @nuxtjs/i18n + floating-vue + Design-Tokens
 - [ ] Alle Komponenten migriert und getestet
 - [ ] Alte Komponenten aus Vue 2 Projekt entfernt
 - [ ] Build als npm Library verifiziert
@@ -1863,6 +1877,7 @@ Bei der Migration werden:
 | 2026-03-23 | **OcelotInput: ds-icon → os-icon** | DsIcon durch OsIcon + resolveIcon() ersetzt. at.svg, envelope.svg, paperclip.svg zu Ocelot-Icons hinzugefügt. Ocelot-Icons Visual Snapshot aktualisiert. |
 | 2026-03-23 | **ds-select → OcelotSelect** | Neue Webapp-Komponente `OcelotSelect.vue`: vereint DsSelect + inputMixin + multiinputMixin (~420 Zeilen). Form-Validation entfernt (von keinem Consumer genutzt). DsChip→OsBadge, DsSpinner→OsSpinner, DsIcon→OsIcon. vue-click-outside durch inline document.addEventListener ersetzt. 3 Dateien migriert, 16 Tests ✅. |
 | 2026-03-23 | **ds-menu → OsMenu/OsMenuItem** | Neue packages/ui Komponenten: h() Render, vue-demi, provide/inject, dropdown Prop für Popup-Variante. CSS in src/styles/index.css (integriert in style.css Build). 17 Nutzungen in 11 Dateien migriert. Action-Menüs nutzen link-tag default 'a' statt router-link. router-link Stub global in testSetup.js. Vite closeBundle Hook: ui.css in style.css gemergt. 273 UI-Tests, 108 Webapp-Tests ✅. **0 ds-* Komponenten-Tags verbleibend in Webapp.** |
+| 2026-03-28 | **Maintenance-App entkoppelt (Session 35)** | Eigenständiges Nuxt 4-Projekt unter `maintenance/`. Vue 3, SSR off, `nuxt generate` → statisches HTML. Abhängigkeiten: @ocelot-social/ui (OsButton, OsIcon, OsCard), @nuxtjs/i18n v10 (11 Sprachen), floating-vue (VDropdown für LocaleSwitch), Tailwind CSS v4. Eigene LocaleSwitch-Komponente (OsButton ghost/circle + OsIcon language + VDropdown). Eigene Locale-Dateien, Branding-CSS, Docker + nginx. Tests: vitest + @nuxt/test-utils. Kein Vuex/Apollo/v-tooltip — **vollständig von Webapp entkoppelt. Validiert packages/ui als echten Shared Layer.** |
 
 ---
 
@@ -2299,86 +2314,53 @@ Vor dem Erstellen einer Komponente diese Fragen beantworten:
 
 ## 16a. Webapp ↔ Maintenance Code-Sharing
 
-### Problemstellung
+### Problemstellung (historisch)
 
-Die Webapp und Maintenance-App sind aktuell verschachtelt und sollen getrennt werden.
-Einige Business-Komponenten werden in beiden Apps benötigt, gehören aber nicht in die UI-Library.
+Die Webapp und Maintenance-App waren verschachtelt (`webapp/maintenance/`). Die Frage war, wie geteilte Business-Komponenten organisiert werden sollten.
 
-**Das DX-Problem:** "shared" hat kein logisches Kriterium außer "wird in beiden gebraucht".
+### Umgesetzte Lösung: Vollständige Entkopplung ✅ (Session 35, 2026-03-28)
 
-### Analysierte Optionen
-
-| Option | Beschreibung | Bewertung |
-|--------|--------------|-----------|
-| **A: Domain Packages** | `@ocelot-social/auth`, `@ocelot-social/posts`, etc. | Gut bei vielen Komponenten, aber Overhead |
-| **B: Core + Duplikation** | Composables teilen, Komponenten duplizieren | Gut wenn UI unterschiedlich |
-| **C: Webapp als Source** | Maintenance importiert aus Webapp | Einfachste Lösung |
-
-### Empfehlung: Option C (Webapp als Source of Truth)
+Die Maintenance-App ist eine rein statische Wartungsseite ohne Business-Logik. Daher wurde statt Option C (Webapp als Source) die einfachste Lösung gewählt: **Vollständige Entkopplung ohne Webapp-Imports.**
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  @ocelot-social/ui                                          │
 │  ─────────────────                                          │
-│  • OsButton, OsModal, OsCard, OsInput                       │
+│  • OsButton, OsIcon, OsCard, OsModal, OsBadge, OsNumber,   │
+│    OsSpinner, OsMenu, OsMenuItem                            │
 │  • Rein präsentational, keine Abhängigkeiten                │
 ├─────────────────────────────────────────────────────────────┤
 │  webapp/                                                    │
 │  ───────                                                    │
-│  • Alle Business-Komponenten (Source of Truth)              │
-│  • Composables in webapp/lib/composables/                   │
-│  • GraphQL in webapp/graphql/                               │
-│  • Ist die "Haupt-App"                                      │
+│  • Nuxt 2 (Vue 2.7), importiert @ocelot-social/ui          │
+│  • Alle Business-Komponenten + GraphQL + Vuex              │
+│  • OcelotInput, OcelotSelect (lokale Webapp-Komponenten)   │
 ├─────────────────────────────────────────────────────────────┤
-│  maintenance/                                               │
+│  maintenance/                    ← NEU: eigenständig        │
 │  ────────────                                               │
-│  • Importiert aus @ocelot-social/ui                         │
-│  • Importiert aus webapp/ via Alias                         │
-│  • Nur maintenance-spezifische Komponenten lokal            │
+│  • Nuxt 4 (Vue 3), importiert @ocelot-social/ui            │
+│  • Keine Imports aus webapp/ — vollständig unabhängig       │
+│  • Eigene LocaleSwitch (OsButton + OsIcon + floating-vue)  │
+│  • @nuxtjs/i18n v10, eigene Locale-Dateien                 │
+│  • Tailwind CSS v4, Docker + nginx                          │
 └─────────────────────────────────────────────────────────────┘
-```
-
-### Umsetzung
-
-**maintenance/nuxt.config.js:**
-```javascript
-export default {
-  alias: {
-    '@webapp': '../webapp',
-    '@ocelot-social/ui': '../packages/ui/dist'
-  }
-}
-```
-
-**Import in Maintenance:**
-```typescript
-// UI-Komponenten aus Library
-import { OsButton, OsModal } from '@ocelot-social/ui'
-
-// Business-Komponenten aus Webapp
-import FollowButton from '@webapp/components/FollowButton.vue'
-import PostTeaser from '@webapp/components/PostTeaser.vue'
-
-// Composables aus Webapp
-import { useAuth } from '@webapp/lib/composables/useAuth'
-import { useFollow } from '@webapp/lib/composables/useFollow'
 ```
 
 ### Kriterien für Entwickler
 
 | Frage | Antwort |
 |-------|---------|
-| Wo suche ich eine UI-Komponente? | `@ocelot-social/ui` |
+| Wo suche ich eine UI-Komponente? | `@ocelot-social/ui` (packages/ui) |
 | Wo suche ich eine Business-Komponente? | `webapp/components/` |
-| Wo erstelle ich eine neue geteilte Komponente? | `webapp/components/` |
-| Wo erstelle ich maintenance-spezifische Komponenten? | `maintenance/components/` |
+| Wo erstelle ich maintenance-spezifische Komponenten? | `maintenance/app/components/` |
+| Teilen Webapp und Maintenance Code? | Nein — nur @ocelot-social/ui als Shared Layer |
 
-### Vorteile
+### Vorteile der Entkopplung
 
-1. **Klare Regel:** Alles Business-bezogene ist in Webapp
-2. **Kein neues Package:** Weniger Overhead
-3. **Eine Source of Truth:** Keine Sync-Probleme
-4. **Einfache Migration:** Später ggf. Domain-Packages extrahieren
+1. **Keine Webapp-Abhängigkeit:** Maintenance kann unabhängig gebaut und deployed werden
+2. **Validiert packages/ui:** Erster externer Consumer — beweist Library-Unabhängigkeit
+3. **Moderner Stack:** Vue 3 + Nuxt 4 + Tailwind v4 (Webapp noch Vue 2.7 + Nuxt 2)
+4. **Einfacher Build:** `nuxt generate` → statisches HTML, keine API-Abhängigkeiten
 
 ### Spätere Evolution (optional)
 
