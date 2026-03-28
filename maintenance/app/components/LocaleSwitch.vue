@@ -39,12 +39,16 @@ const languageIcon = ocelotIcons.language;
 
 const sortedLocales = computed(() =>
   locales.value
-    .filter((l): l is { code: string; name: string } => typeof l !== "string")
+    .filter((l) => typeof l !== "string" && l.name)
+    .map((l) => ({
+      code: (l as { code: string }).code,
+      name: (l as { name: string }).name,
+    }))
     .sort((a, b) => a.name.localeCompare(b.name)),
 );
 
 async function switchLocale(code: string, hide: () => void) {
-  await setLocale(code);
+  await setLocale(code as "en");
   hide();
 }
 </script>
