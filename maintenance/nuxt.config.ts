@@ -40,6 +40,7 @@ export default defineNuxtConfig({
         "@vue/devtools-kit",
         "@ocelot-social/ui",
         "@ocelot-social/ui/ocelot",
+        "floating-vue",
       ],
     },
     server: {
