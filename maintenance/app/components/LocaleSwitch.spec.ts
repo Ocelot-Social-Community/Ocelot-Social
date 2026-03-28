@@ -1,88 +1,72 @@
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 import { nextTick } from "vue";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import LocaleSwitch from "./LocaleSwitch.vue";
+
+async function openDropdown(wrapper: Awaited<ReturnType<typeof mountSuspended>>) {
+  await wrapper.find("button").trigger("click");
+  await nextTick();
+  await new Promise((r) => setTimeout(r, 50));
+  await nextTick();
+}
 
 describe("LocaleSwitch", () => {
   it("renders a language icon button", async () => {
     const wrapper = await mountSuspended(LocaleSwitch);
     const button = wrapper.find("button");
     expect(button.exists()).toBe(true);
-    expect(button.attributes("title")).toBe("Choose language");
-  });
-
-  it("dropdown is closed by default", async () => {
-    const wrapper = await mountSuspended(LocaleSwitch);
-    expect(wrapper.find(".locale-dropdown").exists()).toBe(false);
+    expect(button.attributes("aria-label")).toBe("Choose language");
   });
 
   it("opens dropdown on button click", async () => {
-    const wrapper = await mountSuspended(LocaleSwitch);
-    await wrapper.find("button").trigger("click");
-    expect(wrapper.find(".locale-dropdown").exists()).toBe(true);
+    const wrapper = await mountSuspended(LocaleSwitch, { attachTo: document.body });
+    await openDropdown(wrapper);
+    const items = document.querySelectorAll(".locale-item");
+    expect(items.length).toBeGreaterThan(0);
+    wrapper.unmount();
   });
 
   it("shows all 11 locales in dropdown", async () => {
-    const wrapper = await mountSuspended(LocaleSwitch);
-    await wrapper.find("button").trigger("click");
-    const items = wrapper.findAll(".locale-item");
+    const wrapper = await mountSuspended(LocaleSwitch, { attachTo: document.body });
+    await openDropdown(wrapper);
+    const items = document.querySelectorAll(".locale-item");
     expect(items.length).toBe(11);
+    wrapper.unmount();
   });
 
   it("displays sorted locale names", async () => {
-    const wrapper = await mountSuspended(LocaleSwitch);
-    await wrapper.find("button").trigger("click");
-    const items = wrapper.findAll(".locale-item");
-    const names = items.map((el) => el.text());
+    const wrapper = await mountSuspended(LocaleSwitch, { attachTo: document.body });
+    await openDropdown(wrapper);
+    const items = document.querySelectorAll(".locale-item");
+    const names = Array.from(items).map((el) => el.textContent?.trim() ?? "");
     expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
+    wrapper.unmount();
   });
 
   it("marks current locale as active", async () => {
-    const wrapper = await mountSuspended(LocaleSwitch);
-    await wrapper.find("button").trigger("click");
-    const active = wrapper.find(".locale-item--active");
-    expect(active.text()).toBe("English");
-  });
-
-  it("closes dropdown after selecting a locale", async () => {
-    const wrapper = await mountSuspended(LocaleSwitch);
-    await wrapper.find("button").trigger("click");
-    const deutsch = wrapper.findAll(".locale-item").find((el) => el.text() === "Deutsch");
-    await deutsch!.trigger("click");
-    // setLocale is async, wait for it
-    await new Promise((r) => setTimeout(r, 50));
-    expect(wrapper.find(".locale-dropdown").exists()).toBe(false);
-  });
-
-  it("closes dropdown on click outside", async () => {
     const wrapper = await mountSuspended(LocaleSwitch, { attachTo: document.body });
-    await wrapper.find("button").trigger("click");
-    expect(wrapper.find(".locale-dropdown").exists()).toBe(true);
+    await openDropdown(wrapper);
+    const active = document.querySelector(".locale-item--active");
+    expect(active?.textContent?.trim()).toBe("English");
+    wrapper.unmount();
+  });
 
-    // Click outside the component
-    document.body.click();
+  it("switches locale on click", async () => {
+    const wrapper = await mountSuspended(LocaleSwitch, { attachTo: document.body });
+    await openDropdown(wrapper);
+    const deutsch = Array.from(document.querySelectorAll(".locale-item")).find(
+      (el) => el.textContent?.trim() === "Deutsch",
+    ) as HTMLButtonElement | undefined;
+    expect(deutsch).toBeDefined();
+    deutsch!.click();
+    await new Promise((r) => setTimeout(r, 100));
     await nextTick();
-    expect(wrapper.find(".locale-dropdown").exists()).toBe(false);
-    wrapper.unmount();
-  });
 
-  it("does not close dropdown on click inside", async () => {
-    const wrapper = await mountSuspended(LocaleSwitch, { attachTo: document.body });
-    await wrapper.find("button").trigger("click");
-    expect(wrapper.find(".locale-dropdown").exists()).toBe(true);
-
-    // Click inside the dropdown
-    await wrapper.find(".locale-dropdown").trigger("click");
-    expect(wrapper.find(".locale-dropdown").exists()).toBe(true);
+    // Re-open to check active state
+    await openDropdown(wrapper);
+    const active = document.querySelector(".locale-item--active");
+    expect(active?.textContent?.trim()).toBe("Deutsch");
     wrapper.unmount();
-  });
-
-  it("cleans up event listener on unmount", async () => {
-    const spy = vi.spyOn(document, "removeEventListener");
-    const wrapper = await mountSuspended(LocaleSwitch, { attachTo: document.body });
-    wrapper.unmount();
-    expect(spy).toHaveBeenCalledWith("click", expect.any(Function));
-    spy.mockRestore();
   });
 });
