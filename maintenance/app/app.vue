@@ -6,18 +6,22 @@
           <LocaleSwitch />
         </div>
         <div class="layout">
-        <div class="layout__image">
-          <img class="logo" :alt="t('maintenance.title', metadata)" :src="logoUrl" />
+          <div class="layout__image">
+            <img
+              class="logo"
+              :alt="t('maintenance.title', metadata)"
+              :src="logoUrl"
+            />
+          </div>
+          <div class="layout__content">
+            <h3 class="heading">{{ t("maintenance.title", metadata) }}</h3>
+            <p class="text">{{ t("maintenance.explanation") }}</p>
+            <p class="text">
+              {{ t("maintenance.questions") }}
+              <a :href="'mailto:' + supportEmail">{{ supportEmail }}</a>
+            </p>
+          </div>
         </div>
-        <div class="layout__content">
-          <h3 class="heading">{{ t("maintenance.title", metadata) }}</h3>
-          <p class="text">{{ t("maintenance.explanation") }}</p>
-          <p class="text">
-            {{ t("maintenance.questions") }}
-            <a :href="'mailto:' + supportEmail">{{ supportEmail }}</a>
-          </p>
-        </div>
-      </div>
       </div>
     </OsCard>
   </div>
@@ -25,6 +29,7 @@
 
 <script setup lang="ts">
 import { OsCard } from "@ocelot-social/ui";
+
 import LocaleSwitch from "~/components/LocaleSwitch.vue";
 import emails from "~/constants/emails";
 import metadata from "~/constants/metadata";

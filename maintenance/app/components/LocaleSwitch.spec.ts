@@ -1,10 +1,12 @@
 import { mountSuspended } from "@nuxt/test-utils/runtime";
-import { nextTick } from "vue";
 import { describe, expect, it } from "vitest";
+import { nextTick } from "vue";
 
 import LocaleSwitch from "./LocaleSwitch.vue";
 
-async function openDropdown(wrapper: Awaited<ReturnType<typeof mountSuspended>>) {
+async function openDropdown(
+  wrapper: Awaited<ReturnType<typeof mountSuspended>>,
+) {
   await wrapper.find("button").trigger("click");
   await nextTick();
   await new Promise((r) => setTimeout(r, 50));
@@ -20,7 +22,9 @@ describe("LocaleSwitch", () => {
   });
 
   it("opens dropdown on button click", async () => {
-    const wrapper = await mountSuspended(LocaleSwitch, { attachTo: document.body });
+    const wrapper = await mountSuspended(LocaleSwitch, {
+      attachTo: document.body,
+    });
     await openDropdown(wrapper);
     const items = document.querySelectorAll(".locale-item");
     expect(items.length).toBeGreaterThan(0);
@@ -28,7 +32,9 @@ describe("LocaleSwitch", () => {
   });
 
   it("shows all 11 locales in dropdown", async () => {
-    const wrapper = await mountSuspended(LocaleSwitch, { attachTo: document.body });
+    const wrapper = await mountSuspended(LocaleSwitch, {
+      attachTo: document.body,
+    });
     await openDropdown(wrapper);
     const items = document.querySelectorAll(".locale-item");
     expect(items.length).toBe(11);
@@ -36,7 +42,9 @@ describe("LocaleSwitch", () => {
   });
 
   it("displays sorted locale names", async () => {
-    const wrapper = await mountSuspended(LocaleSwitch, { attachTo: document.body });
+    const wrapper = await mountSuspended(LocaleSwitch, {
+      attachTo: document.body,
+    });
     await openDropdown(wrapper);
     const items = document.querySelectorAll(".locale-item");
     const names = Array.from(items).map((el) => el.textContent?.trim() ?? "");
@@ -45,7 +53,9 @@ describe("LocaleSwitch", () => {
   });
 
   it("marks current locale as active", async () => {
-    const wrapper = await mountSuspended(LocaleSwitch, { attachTo: document.body });
+    const wrapper = await mountSuspended(LocaleSwitch, {
+      attachTo: document.body,
+    });
     await openDropdown(wrapper);
     const active = document.querySelector(".locale-item--active");
     expect(active?.textContent?.trim()).toBe("English");
@@ -53,7 +63,9 @@ describe("LocaleSwitch", () => {
   });
 
   it("switches locale on click", async () => {
-    const wrapper = await mountSuspended(LocaleSwitch, { attachTo: document.body });
+    const wrapper = await mountSuspended(LocaleSwitch, {
+      attachTo: document.body,
+    });
     await openDropdown(wrapper);
     const deutsch = Array.from(document.querySelectorAll(".locale-item")).find(
       (el) => el.textContent?.trim() === "Deutsch",

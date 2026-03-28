@@ -52,7 +52,10 @@ describe("locales", () => {
   describe("no empty values", () => {
     for (const locale of maintenanceLocales) {
       it(`${locale}.json has no empty strings`, () => {
-        const content = readFileSync(resolve(LOCALES_DIR, `${locale}.json`), "utf-8");
+        const content = readFileSync(
+          resolve(LOCALES_DIR, `${locale}.json`),
+          "utf-8",
+        );
         expect(content).not.toMatch(/:\s*""\s*[,}]/);
       });
     }

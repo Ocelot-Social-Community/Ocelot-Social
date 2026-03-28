@@ -33,7 +33,7 @@ const it4cImportRules = Object.fromEntries(
 delete it4cTsRules['no-catch-all/no-catch-all']
 
 export default withNuxt(
-  { ignores: ['.nuxt/', '.claude/', 'eslint.config.ts'] },
+  { ignores: ['.nuxt/', '.claude/', '.output/', 'coverage/', 'eslint.config.ts', 'nuxt.config.ts', 'vitest.config.ts'] },
   // it4c ESLint-Basisregeln
   {
     files: ['**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,vue}'],
@@ -46,16 +46,16 @@ export default withNuxt(
       'no-console': ['error', { allow: ['warn', 'error'] }],
     },
   },
-  // it4c Vue3-Regeln (muss VOR TypeScript stehen)
+  // it4c Vue3-Regeln (nur vue/* Regeln, keine @typescript-eslint)
   {
-    files: ['**/*.vue', '**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
-    rules: it4cVue3Rules,
+    files: ['**/*.vue'],
+    rules: Object.fromEntries(
+      Object.entries(it4cVue3Rules).filter(([key]) => key.startsWith('vue/')),
+    ),
   },
-  // it4c TypeScript-Regeln (nur App-Dateien, nicht Root-Configs)
-  {
-    files: ['app/**/*.ts', 'app/**/*.tsx', 'server/**/*.ts', 'components/**/*.ts'],
-    rules: it4cTsRules,
-  },
+  // TypeScript type-checked rules are provided by @nuxt/eslint (strict: true)
+  // it4c TS rules are not used here because Nuxt's generated tsconfig scope
+  // doesn't cover all .ts files (plugins, constants, tests)
   // it4c Import-Regeln
   {
     files: ['**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,vue}'],
@@ -87,6 +87,22 @@ export default withNuxt(
   ...json,
   ...yaml,
   ...css,
+  {
+    files: ['**/*.css'],
+    rules: {
+      // text-rendering is valid in @font-face, @source is Tailwind v4
+      'css/no-invalid-at-rules': 'off',
+      // font-feature-settings: none is valid CSS
+      'css/no-invalid-properties': 'off',
+    },
+  },
+  {
+    files: ['**/*.spec.ts', '**/*.test.ts'],
+    rules: {
+      // Test helpers use dynamic file paths
+      'security/detect-non-literal-fs-filename': 'off',
+    },
+  },
 
   // Prettier (MUSS letztes sein)
   ...prettier,
