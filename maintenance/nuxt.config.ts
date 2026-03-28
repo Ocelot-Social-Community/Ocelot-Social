@@ -4,6 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
+  ssr: false,
   devServer: { host: "0.0.0.0" },
   modules: ["@nuxt/eslint", "@nuxtjs/i18n"],
   css: ["~/assets/css/branding.css", "~/assets/css/main.css", "@ocelot-social/ui/style.css"],
