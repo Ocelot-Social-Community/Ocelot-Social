@@ -26,8 +26,9 @@ ONBUILD COPY brandin[g]/static/ /app/public/
 # Constants — copy JS to TS (Nuxt 4 TypeScript)
 ONBUILD COPY brandin[g]/constants/metadata.j[s] /app/app/constants/metadata.ts
 ONBUILD COPY brandin[g]/constants/emails.j[s] /app/app/constants/emails.ts
-# Locales — override translations
-ONBUILD COPY brandin[g]/locales/*.jso[n] /app/locales/
+# Locales — merge branding translations into defaults (same mechanism as webapp)
+ONBUILD COPY brandin[g]/locales/*.jso[n] /app/locales/tmp/
+ONBUILD RUN if [ -d locales/tmp ]; then apk add --no-cache jq && tools/merge-locales.sh; fi
 RUN npx nuxt generate
 
 # ==============================================================================
