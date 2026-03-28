@@ -1,10 +1,11 @@
 <template>
   <div class="container">
     <OsCard>
-      <div class="locale-switch">
-        <LocaleSwitch />
-      </div>
-      <div class="layout">
+      <div class="card-inner">
+        <div class="locale-switch">
+          <LocaleSwitch />
+        </div>
+        <div class="layout">
         <div class="layout__image">
           <img class="logo" :alt="t('maintenance.title', metadata)" :src="logoUrl" />
         </div>
@@ -16,6 +17,7 @@
             <a :href="'mailto:' + supportEmail">{{ supportEmail }}</a>
           </p>
         </div>
+      </div>
       </div>
     </OsCard>
   </div>
@@ -37,35 +39,57 @@ const logoUrl = "/img/custom/logo-squared.svg";
 
 <style scoped>
 .container {
-  max-width: 600px;
+  max-width: 700px;
   margin: 80px auto;
   padding: 0 16px;
 }
 
+.card-inner {
+  position: relative;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+}
+
 .locale-switch {
-  margin-bottom: 24px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
 }
 
 .layout {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
   gap: 24px;
+  padding: 0 16px;
+  width: 100%;
 }
 
-.layout__image,
-.layout__content {
-  flex: 0 0 100%;
+.layout__image {
+  display: flex;
+  justify-content: center;
 }
 
 @media (min-width: 640px) {
-  .layout__image,
+  .layout {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .layout__image {
+    flex: 0 0 35%;
+  }
+
   .layout__content {
-    flex: 1 0 0;
+    flex: 1 1 0;
   }
 }
 
 .logo {
-  width: 75%;
+  width: 90%;
+  max-width: 200px;
   height: auto;
 }
 
@@ -76,7 +100,7 @@ const logoUrl = "/img/custom/logo-squared.svg";
   letter-spacing: -0.01em;
   line-height: 1.1;
   color: var(--color-text-base);
-  margin: 0;
+  margin: 0 0 1em;
 }
 
 .text {
