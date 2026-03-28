@@ -20,14 +20,14 @@ COPY --from=ui-library /packages/ui/ /packages/ui/
 COPY maintenance/package.json maintenance/package-lock.json ./
 RUN npm ci
 COPY maintenance/ .
-# Branding override points (all optional, unified in /branding in branding repositories):
-#   branding/maintenance/constants/   → app name, support email
-#   branding/maintenance/assets/css/  → colors, fonts (branding.css)
-#   branding/maintenance/public/      → logo, favicon
-#   branding/maintenance/locales/     → translations
-ONBUILD COPY brandin[g]/maintenance/app/ /app/app/
-ONBUILD COPY brandin[g]/maintenance/locales/ /app/locales/
-ONBUILD COPY brandin[g]/maintenance/public/ /app/public/
+# Branding: reuse existing branding repo structure
+# Static assets (logo, favicon) — Nuxt 4 uses public/ instead of static/
+ONBUILD COPY brandin[g]/static/ /app/public/
+# Constants — copy JS to TS (Nuxt 4 TypeScript)
+ONBUILD COPY brandin[g]/constants/metadata.j[s] /app/app/constants/metadata.ts
+ONBUILD COPY brandin[g]/constants/emails.j[s] /app/app/constants/emails.ts
+# Locales — override translations
+ONBUILD COPY brandin[g]/locales/*.jso[n] /app/locales/
 RUN npx nuxt generate
 
 # ==============================================================================
