@@ -127,6 +127,43 @@ updates:
     timezone: "Europe/Berlin"
     time: "03:00"
 
+# maintenance
+- package-ecosystem: docker
+  open-pull-requests-limit: 99
+  directory: "/maintenance"
+  rebase-strategy: "disabled"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
+- package-ecosystem: npm
+  open-pull-requests-limit: 99
+  directory: "/maintenance"
+  rebase-strategy: "disabled"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    timezone: "Europe/Berlin"
+    time: "03:00"
+  groups:
+    nuxt:
+      applies-to: version-updates
+      patterns:
+        - "nuxt*"
+        - "@nuxt*"
+        - "@nuxtjs*"
+    vitest:
+      applies-to: version-updates
+      patterns:
+        - "vitest*"
+        - "@vitest*"
+    tailwind:
+      applies-to: version-updates
+      patterns:
+        - "tailwindcss*"
+        - "@tailwindcss*"
+
 # ui library
 - package-ecosystem: npm
   open-pull-requests-limit: 99
