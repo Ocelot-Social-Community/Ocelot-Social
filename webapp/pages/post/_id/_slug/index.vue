@@ -137,6 +137,7 @@
                 :aria-label="$t('observeButton.observed')"
                 :filled="post.isObservedByMe"
                 :icon="icons.bell"
+                :loading="observeLoading"
                 @click="toggleObservePost(post.id, !post.isObservedByMe)"
               />
             </div>
@@ -268,6 +269,7 @@ export default {
       shoutedCount: 0,
       shouted: false,
       shoutLoading: false,
+      observeLoading: false,
     }
   },
   mounted() {
@@ -384,23 +386,23 @@ export default {
       this.post.isObservedByMe = comment.isPostObservedByMe
       this.post.observingUsersCount = comment.postObservingUsersCount
     },
-    toggleObservePost(postId, value) {
-      this.$apollo
-        .mutate({
+    async toggleObservePost(postId, value) {
+      this.observeLoading = true
+      try {
+        await this.$apollo.mutate({
           mutation: PostMutations().toggleObservePost,
-          variables: {
-            value,
-            id: postId,
-          },
+          variables: { value, id: postId },
         })
-        .then(() => {
-          const message = this.$t(
-            `post.menu.${value ? 'observedSuccessfully' : 'unobservedSuccessfully'}`,
-          )
-          this.$toast.success(message)
-          this.$apollo.queries.Post.refetch()
-        })
-        .catch((error) => this.$toast.error(error.message))
+        const message = this.$t(
+          `post.menu.${value ? 'observedSuccessfully' : 'unobservedSuccessfully'}`,
+        )
+        this.$toast.success(message)
+        await this.$apollo.queries.Post.refetch()
+      } catch (error) {
+        this.$toast.error(error.message)
+      } finally {
+        this.observeLoading = false
+      }
     },
     toggleNewCommentForm(showNewCommentForm) {
       this.showNewCommentForm = showNewCommentForm
