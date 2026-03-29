@@ -4,7 +4,14 @@ describe('useInviteCode', () => {
   let apollo, toast, t, store, generatePersonalInviteCode, invalidateInviteCode
 
   beforeEach(() => {
-    apollo = { mutate: jest.fn().mockResolvedValue({}) }
+    // Mock apollo.mutate to invoke the update callback (simulating Apollo's behavior)
+    apollo = {
+      mutate: jest.fn().mockImplementation(({ update }) => {
+        const data = { generatePersonalInviteCode: { code: 'new123' }, _invalidateInviteCode: true }
+        if (update) update(null, { data })
+        return Promise.resolve({ data })
+      }),
+    }
     toast = { success: jest.fn(), error: jest.fn() }
     t = jest.fn((key) => key)
     store = {
@@ -37,6 +44,13 @@ describe('useInviteCode', () => {
       expect(result).toEqual({ success: true })
     })
 
+    it('updates store with new invite code', async () => {
+      await generatePersonalInviteCode('Hello')
+      expect(store.commit).toHaveBeenCalledWith('auth/SET_USER_PARTIAL', {
+        inviteCodes: [{ code: 'abc', isValid: true }, { code: 'new123' }],
+      })
+    })
+
     it('shows error toast on failure', async () => {
       apollo.mutate.mockRejectedValue(new Error('Ouch'))
       await generatePersonalInviteCode('Hello')
@@ -55,6 +69,13 @@ describe('useInviteCode', () => {
     it('shows success toast', async () => {
       await invalidateInviteCode('abc')
       expect(toast.success).toHaveBeenCalledWith('invite-codes.invalidate-success')
+    })
+
+    it('updates store to mark code as invalid', async () => {
+      await invalidateInviteCode('abc')
+      expect(store.commit).toHaveBeenCalledWith('auth/SET_USER_PARTIAL', {
+        inviteCodes: [{ code: 'abc', isValid: false }],
+      })
     })
 
     it('shows error toast on failure', async () => {
