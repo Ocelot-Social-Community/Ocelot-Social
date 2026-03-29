@@ -9,7 +9,7 @@ LABEL org.label-schema.vendor="ocelot.social Community"
 LABEL org.label-schema.schema-version="1.0"
 LABEL maintainer="devops@ocelot.social"
 
-FROM node:25.8.1-alpine AS ui-library
+FROM node:25.8.2-alpine AS ui-library
 RUN apk --no-cache add git python3 make g++
 RUN mkdir -p /app
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY packages/ui .
 RUN npm ci
 RUN npm run build
 
-FROM node:25.8.1-alpine AS build
+FROM node:25.8.2-alpine AS build
 ENV NODE_ENV="production"
 RUN apk --no-cache add git python3 make g++ bash jq
 COPY --from=ui-library ./app/ /packages/ui/
