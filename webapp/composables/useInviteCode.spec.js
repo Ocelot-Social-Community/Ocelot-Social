@@ -83,5 +83,11 @@ describe('useInviteCode', () => {
       await invalidateInviteCode('abc')
       expect(toast.error).toHaveBeenCalled()
     })
+
+    it('returns success false on failure', async () => {
+      apollo.mutate.mockRejectedValue(new Error('Ouch'))
+      const result = await invalidateInviteCode('abc')
+      expect(result).toEqual({ success: false })
+    })
   })
 })
