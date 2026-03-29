@@ -30,10 +30,9 @@
     },
     setup(props, { slots, emit }) {
       return () => {
-        const iconSlot = slots.icon?.() || [h(OsIcon, isVue2
-          ? { props: { icon: props.icon } }
-          : { icon: props.icon },
-        )]
+        const iconSlot = slots.icon?.() || [
+          h(OsIcon, isVue2 ? { props: { icon: props.icon } } : { icon: props.icon }),
+        ]
 
         const button = h(
           OsButton,
