@@ -34,6 +34,7 @@ import { OsButton, OsIcon } from "@ocelot-social/ui";
 import { ocelotIcons } from "@ocelot-social/ui/ocelot";
 
 import type { GeneratedTypeConfig } from "@intlify/core-base";
+
 type LocaleCode = GeneratedTypeConfig["locale"];
 
 const { locale, locales, setLocale, t } = useI18n();

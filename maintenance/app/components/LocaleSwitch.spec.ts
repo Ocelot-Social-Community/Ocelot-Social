@@ -83,7 +83,10 @@ describe("LocaleSwitch", () => {
     const deutsch = Array.from(document.querySelectorAll(".locale-item")).find(
       (el) => el.textContent?.trim() === "Deutsch",
     ) as HTMLButtonElement | undefined;
-    expect(deutsch, 'Expected "Deutsch" locale item to exist in dropdown').toBeDefined();
+    expect(
+      deutsch,
+      'Expected "Deutsch" locale item to exist in dropdown',
+    ).toBeDefined();
     deutsch!.click();
     // floating-vue needs time to close and update after locale switch
     await new Promise((r) => setTimeout(r, 100));
