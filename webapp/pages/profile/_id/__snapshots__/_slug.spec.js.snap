@@ -364,8 +364,8 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                   </span>
                 </span>
                 
-  followButton.follow
-
+            followButton.follow
+          
               </span>
             </button>
              
@@ -1090,8 +1090,8 @@ exports[`ProfileSlug given an authenticated user given another profile user and 
                   </span>
                 </span>
                 
-  followButton.follow
-
+            followButton.follow
+          
               </span>
             </button>
              

@@ -84,13 +84,23 @@
             >
               {{ $t('settings.muted-users.unmute') }}
             </os-button>
-            <hc-follow-button
+            <os-button
               v-if="!user.isMuted && !user.isBlocked"
-              :follow-id="user.id"
-              :is-followed="user.followedByCurrentUser"
-              @optimistic="optimisticFollow"
-              @update="updateFollow"
-            />
+              data-test="follow-btn"
+              :variant="user.followedByCurrentUser && followHovered ? 'danger' : 'primary'"
+              :appearance="user.followedByCurrentUser && !followHovered ? 'filled' : 'outline'"
+              :disabled="!user.id"
+              :loading="followLoading"
+              full-width
+              @mouseenter="onFollowHover"
+              @mouseleave="followHovered = false"
+              @click.prevent="toggleFollow"
+            >
+              <template #icon>
+                <os-icon :icon="followIcon" />
+              </template>
+              {{ followLabel }}
+            </os-button>
             <os-button
               variant="primary"
               appearance="outline"
@@ -266,7 +276,7 @@ import uniqBy from 'lodash/uniqBy'
 import { mapGetters, mapMutations } from 'vuex'
 import postListActions from '~/mixins/postListActions'
 import PostTeaser from '~/components/PostTeaser/PostTeaser.vue'
-import HcFollowButton from '~/components/Button/FollowButton'
+import { useFollowUser } from '~/composables/useFollowUser'
 import HcBadges from '~/components/Badges.vue'
 import FollowList, { followListVisibleCount } from '~/components/features/ProfileList/FollowList'
 import HcEmpty from '~/components/Empty/Empty'
@@ -304,7 +314,6 @@ export default {
     OsSpinner,
     SocialMedia,
     PostTeaser,
-    HcFollowButton,
     HcBadges,
     HcEmpty,
     ProfileAvatar,
@@ -320,6 +329,8 @@ export default {
   },
   created() {
     this.icons = iconRegistry
+    const { toggleFollow } = useFollowUser({ apollo: this.$apollo, i18n: this.$i18n })
+    this._toggleFollow = toggleFollow
   },
   mixins: [postListActions],
   transition: {
@@ -347,6 +358,8 @@ export default {
       showDeleteModal: false,
       deleteUserData: null,
       deleteLoading: false,
+      followHovered: false,
+      followLoading: false,
     }
   },
   computed: {
@@ -355,6 +368,15 @@ export default {
     }),
     myProfile() {
       return this.$route.params.id === this.$store.getters['auth/user'].id
+    },
+    followIcon() {
+      if (this.user.followedByCurrentUser && this.followHovered) return this.icons.close
+      return this.user.followedByCurrentUser ? this.icons.check : this.icons.plus
+    },
+    followLabel() {
+      return this.user.followedByCurrentUser
+        ? this.$t('followButton.following')
+        : this.$t('followButton.follow')
     },
     user() {
       return this.User ? this.User[0] : {}
@@ -503,21 +525,45 @@ export default {
         this.deleteLoading = false
       }
     },
-    optimisticFollow({ followedByCurrentUser }) {
+    onFollowHover() {
+      if (!this.followLoading) this.followHovered = true
+    },
+    async toggleFollow() {
+      const follow = !this.user.followedByCurrentUser
+      this.followHovered = false
+
+      // optimistic update
       const currentUser = this.$store.getters['auth/user']
-      if (followedByCurrentUser) {
+      if (follow) {
         this.user.followedByCount++
         this.user.followedBy = [currentUser, ...this.user.followedBy]
       } else {
         this.user.followedByCount--
-        this.user.followedBy = this.user.followedBy.filter((user) => user.id !== currentUser.id)
+        this.user.followedBy = this.user.followedBy.filter((u) => u.id !== currentUser.id)
       }
-      this.user.followedByCurrentUser = followedByCurrentUser
-    },
-    updateFollow({ followedByCurrentUser, followedBy, followedByCount }) {
-      this.user.followedByCount = followedByCount
-      this.user.followedByCurrentUser = followedByCurrentUser
-      this.user.followedBy = followedBy
+      this.user.followedByCurrentUser = follow
+      this.followLoading = true
+
+      const { success, data } = await this._toggleFollow({
+        id: this.user.id,
+        isCurrentlyFollowed: !follow,
+      })
+      if (success) {
+        this.user.followedByCount = data.followedByCount
+        this.user.followedByCurrentUser = data.followedByCurrentUser
+        this.user.followedBy = data.followedBy
+      } else {
+        // rollback optimistic update
+        this.user.followedByCurrentUser = !follow
+        if (follow) {
+          this.user.followedByCount--
+          this.user.followedBy = this.user.followedBy.filter((u) => u.id !== currentUser.id)
+        } else {
+          this.user.followedByCount++
+          this.user.followedBy = [currentUser, ...this.user.followedBy]
+        }
+      }
+      this.followLoading = false
     },
     fetchAllConnections(type, count) {
       if (type === 'following') this.followingCount = count
