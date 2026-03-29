@@ -20,7 +20,7 @@ describe('ChangePassword ', () => {
         success: jest.fn(),
         error: jest.fn(),
       },
-      $t: jest.fn(),
+      $t: jest.fn((key) => key),
       $apollo: {
         loading: false,
         mutate: jest.fn().mockResolvedValue({ data: { resetPassword: true } }),

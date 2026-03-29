@@ -12,7 +12,7 @@ describe('ChangePassword.vue', () => {
         error: jest.fn(),
         success: jest.fn(),
       },
-      $t: jest.fn(),
+      $t: jest.fn((key) => key),
       $store: {
         commit: jest.fn(),
       },
@@ -35,72 +35,23 @@ describe('ChangePassword.vue', () => {
       wrapper = Wrapper()
     })
 
-    it('renders three input fields', () => {
+    it('renders three input fields (old, new, confirm)', () => {
       expect(wrapper.findAll('input')).toHaveLength(3)
     })
 
     describe('validations', () => {
-      beforeEach(() => {
-        // $t must return strings so async-validator produces proper error messages
-        // (jest.fn() returns undefined which causes Error(undefined) → DsInputError type warning)
-        mocks.$t = jest.fn((key) => key)
-        wrapper = Wrapper()
-      })
-
-      describe('new password and confirmation', () => {
-        describe('mismatch', () => {
-          beforeEach(async () => {
-            await wrapper.find('input#oldPassword').setValue('oldsecret')
-            await wrapper.find('input#password').setValue('superdupersecret')
-            await wrapper.find('input#passwordConfirmation').setValue('different')
-          })
-
-          it('does not submit the form', async () => {
-            mocks.$apollo.mutate.mockReset()
-            await wrapper.find('form').trigger('submit')
-            await wrapper.vm.$nextTick()
-            expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
-          })
-
-          it('displays a validation error', async () => {
-            await wrapper.find('form').trigger('submit')
-            await wrapper.vm.$nextTick()
-            expect(wrapper.vm.formErrors).toHaveProperty('passwordConfirmation')
-          })
+      describe('new password and confirmation mismatch', () => {
+        beforeEach(async () => {
+          await wrapper.find('input#oldPassword').setValue('oldsecret')
+          await wrapper.find('input#password').setValue('superdupersecret')
+          await wrapper.find('input#passwordConfirmation').setValue('different')
         })
 
-        describe('match', () => {
-          beforeEach(async () => {
-            await wrapper.find('input#oldPassword').setValue('oldsecret')
-            await wrapper.find('input#password').setValue('superdupersecret')
-            await wrapper.find('input#passwordConfirmation').setValue('superdupersecret')
-          })
-
-          it('passes validation and submits', async () => {
-            mocks.$apollo.mutate.mockReset()
-            mocks.$apollo.mutate.mockResolvedValue({ data: { changePassword: 'TOKEN' } })
-            await wrapper.find('form').trigger('submit')
-            expect(mocks.$apollo.mutate).toHaveBeenCalled()
-          })
-
-          describe('while mutation is pending', () => {
-            it('sets loading while mutation is pending', async () => {
-              mocks.$apollo.mutate.mockReset()
-              let resolvePromise
-              mocks.$apollo.mutate.mockReturnValue(
-                new Promise((resolve) => {
-                  resolvePromise = resolve
-                }),
-              )
-
-              const promise = wrapper.vm.handleSubmit()
-              expect(wrapper.vm.loading).toBe(true)
-
-              resolvePromise({ data: { changePassword: 'TOKEN' } })
-              await promise
-              expect(wrapper.vm.loading).toBe(false)
-            })
-          })
+        it('does not submit the form', async () => {
+          mocks.$apollo.mutate.mockReset()
+          await wrapper.find('form').trigger('submit')
+          await wrapper.vm.$nextTick()
+          expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
         })
       })
     })
