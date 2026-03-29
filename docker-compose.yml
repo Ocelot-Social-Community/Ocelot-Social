@@ -52,16 +52,10 @@ services:
     image: ghcr.io/ocelot-social-community/ocelot-social/maintenance:${OCELOT_VERSION:-latest}
     build:
       context: .
-      dockerfile: ./webapp/Dockerfile.maintenance
-    ports:
-      - 3001:80
-
-  maintenance-new:
-    image: ghcr.io/ocelot-social-community/ocelot-social/maintenance-new:${OCELOT_VERSION:-latest}
-    build:
-      context: .
       dockerfile: ./maintenance/Dockerfile
       target: production
+    ports:
+      - 3001:80
 
   neo4j:
     image: ghcr.io/ocelot-social-community/ocelot-social/neo4j:community

@@ -15,8 +15,8 @@ cd backend
 yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $VERSION_NEW
 cd $ROOT_DIR/webapp
 yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $VERSION_NEW
-cd $ROOT_DIR/webapp/maintenance/source
-yarn version --no-git-tag-version --no-commit-hooks --no-commit --new-version $VERSION_NEW
+cd $ROOT_DIR/maintenance
+npm version --no-git-tag-version $VERSION_NEW
 
 ## helm
 sed -i -e 's/appVersion: ".*"/appVersion: "'"$VERSION_NEW"'"/g' $ROOT_DIR/deployment/helm/charts/ocelot-neo4j/Chart.yaml
