@@ -1,6 +1,7 @@
 <template>
   <form @submit.prevent="onSubmit" novalidate>
     <ocelot-input
+      v-if="requireOldPassword"
       id="oldPassword"
       model="oldPassword"
       type="password"
@@ -42,14 +43,13 @@
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import gql from 'graphql-tag'
 import PasswordStrength from './Strength'
 import PasswordForm from '~/components/utils/PasswordFormHelper'
 import formValidation from '~/mixins/formValidation'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 export default {
-  name: 'ChangePassword',
+  name: 'PasswordForm',
   mixins: [formValidation],
   components: {
     OsButton,
@@ -57,24 +57,31 @@ export default {
     PasswordStrength,
     OcelotInput,
   },
+  props: {
+    /** Require old password field (for authenticated password change) */
+    requireOldPassword: {
+      type: Boolean,
+      default: false,
+    },
+  },
   created() {
     this.icons = iconRegistry
   },
   data() {
     const passwordForm = PasswordForm({ translate: this.$t })
+    const formData = { ...passwordForm.formData }
+    const formSchema = { ...passwordForm.formSchema }
+    if (this.requireOldPassword) {
+      formData.oldPassword = ''
+      formSchema.oldPassword = {
+        type: 'string',
+        required: true,
+        message: this.$t('settings.security.change-password.message-old-password-required'),
+      }
+    }
     return {
-      formData: {
-        oldPassword: '',
-        ...passwordForm.formData,
-      },
-      formSchema: {
-        oldPassword: {
-          type: 'string',
-          required: true,
-          message: this.$t('settings.security.change-password.message-old-password-required'),
-        },
-        ...passwordForm.formSchema,
-      },
+      formData,
+      formSchema,
       loading: false,
     }
   },
@@ -82,29 +89,20 @@ export default {
     onSubmit() {
       this.formSubmit(this.handleSubmit)
     },
-    async handleSubmit(data) {
+    handleSubmit() {
       this.loading = true
-      const mutation = gql`
-        mutation ($oldPassword: String!, $password: String!) {
-          changePassword(oldPassword: $oldPassword, newPassword: $password)
-        }
-      `
-      const variables = this.formData
-
-      try {
-        const { data } = await this.$apollo.mutate({ mutation, variables })
-        this.$store.commit('auth/SET_TOKEN', data.changePassword)
-        this.$toast.success(this.$t('settings.security.change-password.success'))
-        this.formData = {
-          oldPassword: '',
-          password: '',
-          passwordConfirmation: '',
-        }
-      } catch (err) {
-        this.$toast.error(err.message)
-      } finally {
-        this.loading = false
-      }
+      this.$emit('submit', { ...this.formData })
+    },
+    /** Called by parent after mutation completes */
+    done() {
+      this.loading = false
+      const resetData = { password: '', passwordConfirmation: '' }
+      if (this.requireOldPassword) resetData.oldPassword = ''
+      this.formData = resetData
+    },
+    /** Called by parent on mutation error */
+    fail() {
+      this.loading = false
     },
   },
 }
