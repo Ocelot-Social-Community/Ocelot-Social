@@ -23,7 +23,7 @@ const meta: Meta<typeof OcelotLabeledButton> = {
 export default meta
 type Story = StoryObj<typeof OcelotLabeledButton>
 
-export const Default: Story = {
+export const Playground: Story = {
   args: {
     icon: iconMap.plus,
     label: 'Add item',

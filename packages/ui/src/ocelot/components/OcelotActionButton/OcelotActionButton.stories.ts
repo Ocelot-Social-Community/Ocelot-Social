@@ -23,10 +23,10 @@ const meta: Meta<typeof OcelotActionButton> = {
 export default meta
 type Story = StoryObj<typeof OcelotActionButton>
 
-export const Default: Story = {
+export const Playground: Story = {
   args: {
     count: 5,
-    ariaLabel:'Like',
+    ariaLabel: 'Like',
     icon: iconMap.heartO,
     filled: false,
     disabled: false,
@@ -37,7 +37,7 @@ export const Default: Story = {
 export const Filled: Story = {
   args: {
     count: 12,
-    ariaLabel:'Liked',
+    ariaLabel: 'Liked',
     icon: iconMap.heartO,
     filled: true,
   },
@@ -46,7 +46,7 @@ export const Filled: Story = {
 export const Loading: Story = {
   args: {
     count: 3,
-    ariaLabel:'Loading',
+    ariaLabel: 'Loading',
     icon: iconMap.heartO,
     loading: true,
   },
@@ -55,7 +55,7 @@ export const Loading: Story = {
 export const Disabled: Story = {
   args: {
     count: 0,
-    ariaLabel:'Disabled',
+    ariaLabel: 'Disabled',
     icon: iconMap.heartO,
     disabled: true,
   },
