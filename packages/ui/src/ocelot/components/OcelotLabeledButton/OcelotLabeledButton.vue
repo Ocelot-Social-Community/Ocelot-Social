@@ -58,7 +58,7 @@
         )
 
         const label = h(
-          'label',
+          'span',
           { class: 'ocelot-labeled-button__label' },
           /* v8 ignore next -- Vue 2 */ isVue2 ? [props.label] : props.label,
         )
