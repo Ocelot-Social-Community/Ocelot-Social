@@ -91,9 +91,12 @@
               :appearance="user.followedByCurrentUser && !followHovered ? 'filled' : 'outline'"
               :disabled="!user.id"
               :loading="followLoading"
+              :aria-pressed="user.followedByCurrentUser"
               full-width
               @mouseenter="onFollowHover"
               @mouseleave="followHovered = false"
+              @focus="onFollowHover"
+              @blur="followHovered = false"
               @click.prevent="toggleFollow"
             >
               <template #icon>
