@@ -530,8 +530,8 @@
   },
   "followButton": {
     "error": "Akcja nie powiodła się. Spróbuj ponownie.",
-    "follow": "naśladować",
-    "following": "w skutek",
+    "follow": "Obserwuj",
+    "following": "Obserwujesz",
     "unfollow": "Przestań obserwować"
   },
   "group": {
