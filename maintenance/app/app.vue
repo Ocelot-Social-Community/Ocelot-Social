@@ -14,7 +14,7 @@
             />
           </div>
           <div class="layout__content">
-            <h3 class="heading">{{ t("maintenance.title", metadata) }}</h3>
+            <h1 class="heading">{{ t("maintenance.title", metadata) }}</h1>
             <p class="text">{{ t("maintenance.explanation") }}</p>
             <p class="text">
               {{ t("maintenance.questions") }}

@@ -6,7 +6,7 @@ import App from "./app.vue";
 describe("app", () => {
   it("renders maintenance heading", async () => {
     const wrapper = await mountSuspended(App);
-    expect(wrapper.find("h3").text()).toContain("is under maintenance");
+    expect(wrapper.find("h1").text()).toContain("is under maintenance");
   });
 
   it("renders explanation text", async () => {
