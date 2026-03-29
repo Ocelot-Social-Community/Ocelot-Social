@@ -53,6 +53,7 @@ async function switchLocale(code: string, hide: () => void) {
 }
 </script>
 
+<!-- Not scoped: VDropdown teleports the popper outside this component's DOM -->
 <style>
 .locale-list {
   list-style: none;
