@@ -374,6 +374,9 @@ export default {
       return this.user.followedByCurrentUser ? this.icons.check : this.icons.plus
     },
     followLabel() {
+      if (this.user.followedByCurrentUser && this.followHovered) {
+        return this.$t('followButton.unfollow')
+      }
       return this.user.followedByCurrentUser
         ? this.$t('followButton.following')
         : this.$t('followButton.follow')

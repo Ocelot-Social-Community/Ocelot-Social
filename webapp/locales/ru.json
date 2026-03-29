@@ -530,7 +530,8 @@
   },
   "followButton": {
     "follow": "Подписаться",
-    "following": "Вы подписаны"
+    "following": "Вы подписаны",
+    "unfollow": "Отписаться"
   },
   "group": {
     "actionRadii": {

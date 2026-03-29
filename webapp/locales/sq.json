@@ -530,7 +530,8 @@
   },
   "followButton": {
     "follow": "Ndiq",
-    "following": "Duke ndjekur"
+    "following": "Duke ndjekur",
+    "unfollow": "Mos ndiq"
   },
   "group": {
     "actionRadii": {

@@ -530,7 +530,8 @@
   },
   "followButton": {
     "follow": "Volgen",
-    "following": "Volgt"
+    "following": "Volgt",
+    "unfollow": "Ontvolgen"
   },
   "group": {
     "actionRadii": {

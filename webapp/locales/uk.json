@@ -530,7 +530,8 @@
   },
   "followButton": {
     "follow": "Підписатися",
-    "following": "Підписано"
+    "following": "Підписано",
+    "unfollow": "Відписатися"
   },
   "group": {
     "actionRadii": {

@@ -530,7 +530,8 @@
   },
   "followButton": {
     "follow": "Seguir",
-    "following": "Seguindo"
+    "following": "Seguindo",
+    "unfollow": "Deixar de seguir"
   },
   "group": {
     "actionRadii": {
