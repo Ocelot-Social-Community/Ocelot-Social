@@ -83,9 +83,9 @@
 
   .ocelot-action-button__count {
     user-select: none;
-    color: var(--color-primary);
-    background-color: var(--color-primary-contrast);
-    border: 1px solid var(--color-primary);
+    color: var(--ocelot-action-button-color, var(--color-primary));
+    background-color: var(--ocelot-action-button-bg, var(--color-primary-contrast));
+    border: 1px solid var(--ocelot-action-button-color, var(--color-primary));
     display: flex;
     align-items: center;
     justify-content: center;
