@@ -529,8 +529,10 @@ export default {
       if (!this.followLoading) this.followHovered = true
     },
     async toggleFollow() {
+      if (this.followLoading) return
       const follow = !this.user.followedByCurrentUser
       this.followHovered = false
+      this.followLoading = true
 
       // optimistic update
       const currentUser = this.$store.getters['auth/user']
@@ -542,7 +544,6 @@ export default {
         this.user.followedBy = this.user.followedBy.filter((u) => u.id !== currentUser.id)
       }
       this.user.followedByCurrentUser = follow
-      this.followLoading = true
 
       const { success, data } = await this._toggleFollow({
         id: this.user.id,
