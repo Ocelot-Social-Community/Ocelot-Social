@@ -43,6 +43,12 @@ describe('useShout', () => {
     expect(result).toEqual({ success: false })
   })
 
+  it('returns success false when resolved without data', async () => {
+    apollo.mutate.mockResolvedValue({})
+    const result = await toggleShout({ id: '1', type: 'Post', isCurrentlyShouted: false })
+    expect(result).toEqual({ success: false })
+  })
+
   it('returns success false on error', async () => {
     apollo.mutate.mockRejectedValue(new Error('Ouch'))
     const result = await toggleShout({ id: '1', type: 'Post', isCurrentlyShouted: false })
