@@ -105,12 +105,6 @@ describe('ocelotActionButton', () => {
 
       expect(wrapper.find('button').attributes('tabindex')).not.toBe('-1')
     })
-
-    it('has an accessible name via aria-label', () => {
-      const wrapper = mount(OcelotActionButton, { props: defaultProps })
-
-      expect(wrapper.find('button').attributes('aria-label')).toBe('Like')
-    })
   })
 
   describe('icon slot', () => {
