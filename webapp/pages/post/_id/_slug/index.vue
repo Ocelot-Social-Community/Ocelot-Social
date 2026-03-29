@@ -360,9 +360,7 @@ export default {
         type: 'Post',
         isCurrentlyShouted: !newShouted,
       })
-      if (success) {
-        this.$emit('update', newShouted)
-      } else {
+      if (!success) {
         this.shoutedCount = backup.shoutedCount
         this.shouted = backup.shouted
       }
