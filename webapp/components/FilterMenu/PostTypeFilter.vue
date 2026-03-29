@@ -68,11 +68,12 @@ export default {
 
 <style lang="scss">
 .post-type-filter {
-  & .filter-list {
-    display: flex;
-    flex-basis: 100%;
-    flex-grow: 1;
-    padding-left: $space-base;
+  & .item {
+    min-width: 80px;
+
+    &:first-child {
+      margin-left: calc(-1 * (80px - 36px) / 2);
+    }
   }
 }
 </style>
