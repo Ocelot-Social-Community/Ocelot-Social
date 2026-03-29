@@ -38,6 +38,17 @@ describe('useJoinLeaveGroup', () => {
     )
   })
 
+  it('returns success and data on leave', async () => {
+    apollo.mutate.mockResolvedValue({
+      data: { LeaveGroup: { user: { id: 'u1' }, membership: { role: 'none' } } },
+    })
+    const result = await joinLeaveGroup({ groupId: 'g1', userId: 'u1', isMember: true })
+    expect(result).toEqual({
+      success: true,
+      data: { user: { id: 'u1' }, membership: { role: 'none' } },
+    })
+  })
+
   it('shows toast error on failure', async () => {
     apollo.mutate.mockRejectedValue(new Error('Ouch'))
     await joinLeaveGroup({ groupId: 'g1', userId: 'u1', isMember: false })
