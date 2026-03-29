@@ -1,0 +1,10 @@
+{
+  "maintenance": {
+    "explanation": "At the moment we are doing some scheduled maintenance, please try again later.",
+    "questions": "If you have any questions or concerns, send an email to",
+    "title": "{APPLICATION_NAME} is under maintenance"
+  },
+  "localeSwitch": {
+    "tooltip": "Choose language"
+  }
+}

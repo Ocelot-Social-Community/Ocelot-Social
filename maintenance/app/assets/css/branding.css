@@ -1,0 +1,123 @@
+/*
+ * Default ocelot.social branding
+ *
+ * Resolved values from webapp SCSS tokens + styleguide design system.
+ * Source of truth: webapp/assets/_new/styles/
+ *
+ * Branding repositories can override this file.
+ */
+
+/* Fonts — same as webapp/assets/_new/styles/resets.scss */
+@font-face {
+  font-family: LatoWeb;
+  src:
+    url("/fonts/Lato-Regular.1f440a46.woff2") format("woff2"),
+    url("/fonts/Lato-Regular.ffb25090.woff") format("woff");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  text-rendering: optimizelegibility;
+}
+@font-face {
+  font-family: LatoWeb;
+  src:
+    url("/fonts/Lato-Italic.a6774e2c.woff2") format("woff2"),
+    url("/fonts/Lato-Italic.ff8877c4.woff") format("woff");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  text-rendering: optimizelegibility;
+}
+@font-face {
+  font-family: LatoWeb;
+  src:
+    url("/fonts/Lato-Bold.1e239003.woff2") format("woff2"),
+    url("/fonts/Lato-Bold.35be9fc3.woff") format("woff");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  text-rendering: optimizelegibility;
+}
+@font-face {
+  font-family: LatoWeb;
+  src:
+    url("/fonts/Lato-BoldItalic.4ef02877.woff2") format("woff2"),
+    url("/fonts/Lato-BoldItalic.5171ee7d.woff") format("woff");
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  text-rendering: optimizelegibility;
+}
+
+/* Base styles — same as webapp */
+html {
+  font-size: 15px;
+}
+
+body {
+  font-family: LatoWeb, sans-serif;
+  font-size: 15px;
+  line-height: 1.3;
+  margin: 0;
+  background-color: rgb(245, 244, 246); /* $color-neutral-90 */
+  color: rgb(75, 69, 84); /* $text-color-base */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: none;
+  font-variant-ligatures: none;
+}
+
+/* CSS Custom Properties for @ocelot-social/ui */
+:root {
+  /* Default (grey) */
+  --color-default: rgb(245, 244, 246);
+  --color-default-hover: rgb(203, 199, 209);
+  --color-default-active: rgb(177, 171, 186);
+  --color-default-contrast: rgb(75, 69, 84);
+  --color-default-contrast-inverse: rgb(255, 255, 255);
+
+  /* Primary (green) */
+  --color-primary: rgb(23, 181, 63);
+  --color-primary-hover: rgb(96, 214, 98);
+  --color-primary-active: rgb(25, 122, 49);
+  --color-primary-contrast: rgb(241, 253, 244);
+
+  /* Secondary (blue) */
+  --color-secondary: rgb(0, 142, 230);
+  --color-secondary-hover: rgb(10, 161, 255);
+  --color-secondary-active: rgb(0, 91, 166);
+  --color-secondary-contrast: rgb(240, 249, 255);
+
+  /* Danger (red) */
+  --color-danger: rgb(219, 57, 36);
+  --color-danger-hover: rgb(242, 97, 65);
+  --color-danger-active: rgb(158, 43, 28);
+  --color-danger-contrast: rgb(253, 243, 242);
+
+  /* Warning (orange) */
+  --color-warning: rgb(230, 121, 25);
+  --color-warning-hover: rgb(233, 137, 53);
+  --color-warning-active: rgb(172, 81, 0);
+  --color-warning-contrast: rgb(241, 253, 244);
+
+  /* Success (green) */
+  --color-success: rgb(23, 181, 63);
+  --color-success-hover: rgb(26, 203, 71);
+  --color-success-active: rgb(6, 131, 35);
+  --color-success-contrast: rgb(241, 253, 244);
+
+  /* Info (blue) */
+  --color-info: rgb(0, 142, 230);
+  --color-info-hover: rgb(10, 161, 255);
+  --color-info-active: rgb(0, 91, 166);
+  --color-info-contrast: rgb(240, 249, 255);
+
+  /* Disabled */
+  --color-disabled: rgb(177, 171, 186);
+  --color-disabled-contrast: rgb(255, 255, 255);
+
+  /* Text */
+  --color-text-base: rgb(75, 69, 84);
+  --color-text-soft: rgb(112, 103, 126);
+  --color-background-soft: rgb(250, 249, 250);
+}

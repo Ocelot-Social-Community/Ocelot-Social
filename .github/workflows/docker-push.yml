@@ -37,15 +37,15 @@ jobs:
             target: production
           - name: maintenance-base
             context: .
-            file: webapp/Dockerfile.maintenance
+            file: maintenance/Dockerfile
             target: base
           - name: maintenance-build
             context: .
-            file: webapp/Dockerfile.maintenance
+            file: maintenance/Dockerfile
             target: build
           - name: maintenance
             context: .
-            file: webapp/Dockerfile.maintenance
+            file: maintenance/Dockerfile
             target: production
     runs-on: ubuntu-latest
     env:

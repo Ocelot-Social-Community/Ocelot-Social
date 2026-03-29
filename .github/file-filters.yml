@@ -4,6 +4,11 @@ ui: &ui
   - '.github/workflows/ui-*.yml'
   - 'packages/ui/**/*'
 
+maintenance: &maintenance
+  - '.github/workflows/maintenance-*.yml'
+  - 'maintenance/**/*'
+  - *ui
+
 backend: &backend
   - '.github/workflows/test-backend.yml'
   - 'backend/**/*'

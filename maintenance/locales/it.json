@@ -1,0 +1,10 @@
+{
+  "maintenance": {
+    "explanation": "Al momento stiamo effettuando una manutenzione programmata, riprova più tardi.",
+    "questions": "Per domande o dubbi, invia un'email a",
+    "title": "{APPLICATION_NAME} è in manutenzione"
+  },
+  "localeSwitch": {
+    "tooltip": "Scegli lingua"
+  }
+}

@@ -15,6 +15,6 @@ services:
   maintenance:
     image: ghcr.io/ocelot-social-community/ocelot-social/maintenance-base:${OCELOT_VERSION:-latest}
     build:
-      target: base
-      context: webapp
-      dockerfile: ./Dockerfile.maintenance
+      target: build
+      context: .
+      dockerfile: ./maintenance/Dockerfile

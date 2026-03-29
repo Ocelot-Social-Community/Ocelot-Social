@@ -17,4 +17,4 @@ services:
     build:
       target: build
       context: .
-      dockerfile: ./Dockerfile.maintenance
+      dockerfile: ./maintenance/Dockerfile

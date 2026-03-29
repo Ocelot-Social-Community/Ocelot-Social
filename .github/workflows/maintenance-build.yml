@@ -1,0 +1,77 @@
+name: Maintenance Build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+defaults:
+  run:
+    working-directory: maintenance
+
+jobs:
+  files-changed:
+    name: Detect File Changes
+    runs-on: ubuntu-latest
+    outputs:
+      maintenance: ${{ steps.changes.outputs.maintenance }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Check for file changes
+        uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
+        id: changes
+        with:
+          token: ${{ github.token }}
+          filters: .github/file-filters.yml
+
+  build:
+    name: Build
+    if: needs.files-changed.outputs.maintenance == 'true'
+    needs: files-changed
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: 'maintenance/.tool-versions'
+          cache: 'npm'
+          cache-dependency-path: maintenance/package-lock.json
+
+      - name: Build UI library
+        working-directory: packages/ui
+        run: npm ci && npm run build
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate static site
+        run: npx nuxt generate
+
+      - name: Verify build output
+        run: |
+          if [ ! -d ".output/public" ]; then
+            echo "::error::.output/public directory not found"
+            exit 1
+          fi
+
+          if [ ! -f ".output/public/index.html" ]; then
+            echo "::error::index.html not found in build output"
+            exit 1
+          fi
+
+          echo "Build output verified!"
+          ls -la .output/public/
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: maintenance-site
+          path: maintenance/.output/public/
+          retention-days: 7

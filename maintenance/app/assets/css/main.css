@@ -1,0 +1,4 @@
+@import "tailwindcss";
+
+/* Scan UI library component classes */
+@source "../../../packages/ui/dist/*.mjs";

@@ -35,6 +35,28 @@ Phase 4: Tier 2+       ██████████ 100% (OsModal✅, ds-form�
 | ✅ ds-select → OcelotSelect | Select (3 Dateien → OcelotSelect Webapp-Komponente, lokale Imports, click-outside inline) |
 | ✅ → OsMenu/OsMenuItem | Menu, MenuItem (17 Nutzungen → packages/ui, dropdown Prop, eigene CSS) |
 | ⬜ Nicht in Webapp | Code, CopyField, FormItem, InputError, InputLabel, Page, PageTitle, Logo, Avatar, TableCol, TableHeadCol (11) |
+| ❌ Nicht geplant | OsLocaleSwitch — bricht Props-Only-Philosophie oder ist nur OsMenu-Wrapper (siehe Entscheidung unten) |
+| ✅ Maintenance entkoppelt | Eigenständiges Nuxt 4-Projekt unter `maintenance/` — nutzt OsButton, OsIcon, OsCard aus packages/ui |
+
+### Architektur-Entscheidungen
+
+**OsLocaleSwitch: Nicht in packages/ui** (Session 34, 2026-03-27)
+
+Evaluiert und abgelehnt. Eine LocaleSwitch-Komponente in der UI-Library würde entweder:
+1. Die Props-Only-Philosophie brechen (i18n-Logik, Sprachnamen, Cookie-Handling eingebaut)
+2. Oder nur ein triviales OsMenu-Wrapper sein (kein Mehrwert)
+
+Stattdessen: Jede App baut ihre eigene LocaleSwitch mit UI-Library-Komponenten + app-spezifischer Logik.
+
+**Maintenance-App: Entkopplung umgesetzt ✅** (Session 35, 2026-03-28)
+
+Die Maintenance-App ist jetzt ein eigenständiges Nuxt 4-Projekt unter `maintenance/`:
+- Eigene LocaleSwitch: OsButton (ghost/circle) + OsIcon (language) + floating-vue VDropdown
+- @nuxtjs/i18n v10 mit 11 Sprachen, eigene Locale-Dateien
+- Abhängigkeiten: @ocelot-social/ui, @nuxtjs/i18n, floating-vue, Tailwind CSS v4
+- Kein Vuex, kein Apollo, kein v-tooltip — **vollständig von Webapp entkoppelt**
+- Docker + nginx für statisches Hosting
+- **Validiert packages/ui als echten Shared Layer** (erster externer Consumer)
 
 ### OsButton Migration (Phase 3) ✅
 
