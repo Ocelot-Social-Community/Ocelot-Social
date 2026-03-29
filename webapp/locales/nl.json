@@ -531,7 +531,8 @@
   "followButton": {
     "follow": "Volgen",
     "following": "Volgt",
-    "unfollow": "Ontvolgen"
+    "unfollow": "Ontvolgen",
+    "error": "Actie mislukt. Probeer het opnieuw."
   },
   "group": {
     "actionRadii": {

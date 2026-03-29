@@ -558,6 +558,7 @@ export default {
         this.user.followedBy = data.followedBy
       } else {
         // rollback optimistic update
+        this.$toast.error(this.$t('followButton.error'))
         this.user.followedByCurrentUser = !follow
         if (follow) {
           this.user.followedByCount--

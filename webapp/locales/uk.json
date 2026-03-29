@@ -531,7 +531,8 @@
   "followButton": {
     "follow": "Підписатися",
     "following": "Підписано",
-    "unfollow": "Відписатися"
+    "unfollow": "Відписатися",
+    "error": "Дія не вдалася. Будь ласка, спробуйте ще раз."
   },
   "group": {
     "actionRadii": {

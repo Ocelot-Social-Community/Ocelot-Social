@@ -531,7 +531,8 @@
   "followButton": {
     "follow": "Ndiq",
     "following": "Duke ndjekur",
-    "unfollow": "Mos ndiq"
+    "unfollow": "Mos ndiq",
+    "error": "Veprimi dështoi. Ju lutemi provoni përsëri."
   },
   "group": {
     "actionRadii": {

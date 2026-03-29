@@ -531,7 +531,8 @@
   "followButton": {
     "follow": "naśladować",
     "following": "w skutek",
-    "unfollow": "Przestań obserwować"
+    "unfollow": "Przestań obserwować",
+    "error": "Akcja nie powiodła się. Spróbuj ponownie."
   },
   "group": {
     "actionRadii": {

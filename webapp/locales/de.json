@@ -531,7 +531,8 @@
   "followButton": {
     "follow": "Folgen",
     "following": "Folge Ich",
-    "unfollow": "Entfolgen"
+    "unfollow": "Entfolgen",
+    "error": "Aktion fehlgeschlagen. Bitte versuche es erneut."
   },
   "group": {
     "actionRadii": {

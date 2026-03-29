@@ -531,7 +531,8 @@
   "followButton": {
     "follow": "Seguir",
     "following": "Siguiendo",
-    "unfollow": "Dejar de seguir"
+    "unfollow": "Dejar de seguir",
+    "error": "Acción fallida. Por favor, inténtalo de nuevo."
   },
   "group": {
     "actionRadii": {
