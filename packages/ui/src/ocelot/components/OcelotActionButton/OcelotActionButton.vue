@@ -69,7 +69,10 @@
 
         const badge = h(
           'div',
-          { class: 'ocelot-action-button__count' },
+          {
+            class: 'ocelot-action-button__count',
+            'aria-hidden': 'true',
+          },
           /* v8 ignore next -- Vue 2 */ isVue2 ? [String(props.count)] : String(props.count),
         )
 

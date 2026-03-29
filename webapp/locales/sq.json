@@ -859,7 +859,7 @@
     "user": "Përdorues"
   },
   "observeButton": {
-    "observed": "i observuar"
+    "observed": "{count} i observuar"
   },
   "pagination": {
     "next": "Tjetër",
@@ -1251,7 +1251,7 @@
     }
   },
   "shoutButton": {
-    "shouted": "rekomanduar"
+    "shouted": "{count} rekomanduar"
   },
   "site": {
     "back-to-login": "Kthehu në faqen e hyrjes",

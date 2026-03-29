@@ -125,7 +125,7 @@
               <ocelot-action-button
                 :disabled="isAuthor"
                 :count="shoutedCount"
-                :aria-label="$t('shoutButton.shouted')"
+                :aria-label="$t('shoutButton.shouted', { count: shoutedCount })"
                 :filled="shouted"
                 :icon="icons.heartO"
                 :loading="shoutLoading"
@@ -134,7 +134,7 @@
               <!-- Follow Button -->
               <ocelot-action-button
                 :count="post.observingUsersCount"
-                :aria-label="$t('observeButton.observed')"
+                :aria-label="$t('observeButton.observed', { count: post.observingUsersCount })"
                 :filled="post.isObservedByMe"
                 :icon="icons.bell"
                 :loading="observeLoading"

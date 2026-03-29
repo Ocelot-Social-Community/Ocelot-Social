@@ -49,7 +49,7 @@
       <ocelot-action-button
         :disabled="isAuthor"
         :count="shoutedCount"
-        :aria-label="$t('shoutButton.shouted')"
+        :aria-label="$t('shoutButton.shouted', { count: shoutedCount })"
         :filled="shouted"
         :icon="icons.heartO"
         :loading="shoutLoading"
