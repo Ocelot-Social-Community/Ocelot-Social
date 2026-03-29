@@ -122,7 +122,7 @@
             </div>
             <div class="actions">
               <!-- Shout Button -->
-              <action-button
+              <ocelot-action-button
                 :disabled="isAuthor"
                 :count="shoutedCount"
                 :text="$t('shoutButton.shouted')"
@@ -132,7 +132,7 @@
                 @click="toggleShout"
               />
               <!-- Follow Button -->
-              <action-button
+              <ocelot-action-button
                 :count="post.observingUsersCount"
                 :text="$t('observeButton.observed')"
                 :filled="post.isObservedByMe"
@@ -200,7 +200,7 @@ import HcCategory from '~/components/Category'
 import HcEmpty from '~/components/Empty/Empty'
 import HcHashtag from '~/components/Hashtag/Hashtag'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
-import ActionButton from '~/components/ActionButton.vue'
+import { OcelotActionButton } from '@ocelot-social/ui'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 import { useShout } from '~/composables/useShout'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
@@ -239,7 +239,7 @@ export default {
     HcEmpty,
     HcHashtag,
     LocationTeaser,
-    ActionButton,
+    OcelotActionButton,
     ResponsiveImage,
     UserTeaser,
   },

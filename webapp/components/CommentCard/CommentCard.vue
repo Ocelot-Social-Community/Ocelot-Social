@@ -46,7 +46,7 @@
       </os-button>
     </template>
     <div class="actions">
-      <action-button
+      <ocelot-action-button
         :disabled="isAuthor"
         :count="shoutedCount"
         :text="$t('shoutButton.shouted')"
@@ -85,7 +85,7 @@ import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
 import CommentMutations from '~/graphql/CommentMutations'
-import ActionButton from '~/components/ActionButton.vue'
+import { OcelotActionButton } from '@ocelot-social/ui'
 import { useShout } from '~/composables/useShout'
 import scrollToAnchor from '~/mixins/scrollToAnchor.js'
 
@@ -98,7 +98,7 @@ export default {
     ContentMenu,
     ContentViewer,
     CommentForm,
-    ActionButton,
+    OcelotActionButton,
   },
   mixins: [scrollToAnchor],
   data() {

@@ -4,7 +4,7 @@
       <div class="filter-header">
         <h2 class="title">{{ $t('filter-menu.filter-by') }}</h2>
         <div v-if="categoriesActive" class="item-save-topics">
-          <labeled-button
+          <ocelot-labeled-button
             filled
             :label="$t('actions.saveCategories')"
             :icon="icons.save"
@@ -35,7 +35,7 @@ import PostTypeFilter from './PostTypeFilter'
 import FollowingFilter from './FollowingFilter'
 import OrderByFilter from './OrderByFilter'
 import CategoriesFilter from './CategoriesFilter'
-import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
+import { OcelotLabeledButton } from '@ocelot-social/ui'
 import SaveCategories from '~/graphql/SaveCategories.js'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 
@@ -47,7 +47,7 @@ export default {
     OrderByFilter,
     CategoriesFilter,
     PostTypeFilter,
-    LabeledButton,
+    OcelotLabeledButton,
   },
   computed: {
     ...mapGetters({
