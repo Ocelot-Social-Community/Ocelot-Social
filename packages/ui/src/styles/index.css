@@ -46,7 +46,6 @@ ul.os-menu-list {
   border: none;
   border-left: 2px solid transparent;
   background: none;
-  font-family: inherit;
   font-size: inherit;
   transition: color 80ms ease-out,
               background-color 80ms ease-out,
