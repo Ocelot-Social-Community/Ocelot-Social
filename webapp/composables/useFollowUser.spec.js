@@ -34,6 +34,17 @@ describe('useFollowUser', () => {
     expect(apollo.mutate).toHaveBeenCalledWith(expect.objectContaining({ variables: { id: 'u1' } }))
   })
 
+  it('returns success and data on unfollow', async () => {
+    apollo.mutate.mockResolvedValue({
+      data: { unfollowUser: { id: 'u1', followedByCurrentUser: false } },
+    })
+    const result = await toggleFollow({ id: 'u1', isCurrentlyFollowed: true })
+    expect(result).toEqual({
+      success: true,
+      data: { id: 'u1', followedByCurrentUser: false },
+    })
+  })
+
   it('returns success false on error', async () => {
     apollo.mutate.mockRejectedValue(new Error('Ouch'))
     const result = await toggleFollow({ id: 'u1', isCurrentlyFollowed: false })
