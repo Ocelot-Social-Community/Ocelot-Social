@@ -86,7 +86,7 @@ export default {
 .filter-header {
   display: flex;
   justify-content: space-between;
-  & .labeled-button {
+  & .ocelot-labeled-button {
     margin-right: 2em;
   }
 }
