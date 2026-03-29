@@ -529,10 +529,10 @@
     "startDate": "Data rozpoczęcia"
   },
   "followButton": {
+    "error": "Akcja nie powiodła się. Spróbuj ponownie.",
     "follow": "naśladować",
     "following": "w skutek",
-    "unfollow": "Przestań obserwować",
-    "error": "Akcja nie powiodła się. Spróbuj ponownie."
+    "unfollow": "Przestań obserwować"
   },
   "group": {
     "actionRadii": {

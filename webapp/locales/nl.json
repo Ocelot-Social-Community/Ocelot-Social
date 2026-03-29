@@ -529,10 +529,10 @@
     "startDate": "Startdatum"
   },
   "followButton": {
+    "error": "Actie mislukt. Probeer het opnieuw.",
     "follow": "Volgen",
     "following": "Volgt",
-    "unfollow": "Ontvolgen",
-    "error": "Actie mislukt. Probeer het opnieuw."
+    "unfollow": "Ontvolgen"
   },
   "group": {
     "actionRadii": {

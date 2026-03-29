@@ -529,10 +529,10 @@
     "startDate": "Date de début"
   },
   "followButton": {
+    "error": "Action échouée. Veuillez réessayer.",
     "follow": "Suivre",
     "following": "Je suis les",
-    "unfollow": "Ne plus suivre",
-    "error": "Action échouée. Veuillez réessayer."
+    "unfollow": "Ne plus suivre"
   },
   "group": {
     "actionRadii": {

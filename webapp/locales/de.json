@@ -529,10 +529,10 @@
     "startDate": "Anfangszeitpunkt"
   },
   "followButton": {
+    "error": "Aktion fehlgeschlagen. Bitte versuche es erneut.",
     "follow": "Folgen",
     "following": "Folge Ich",
-    "unfollow": "Entfolgen",
-    "error": "Aktion fehlgeschlagen. Bitte versuche es erneut."
+    "unfollow": "Entfolgen"
   },
   "group": {
     "actionRadii": {

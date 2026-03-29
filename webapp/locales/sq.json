@@ -529,10 +529,10 @@
     "startDate": "Data e fillimit"
   },
   "followButton": {
+    "error": "Veprimi dështoi. Ju lutemi provoni përsëri.",
     "follow": "Ndiq",
     "following": "Duke ndjekur",
-    "unfollow": "Mos ndiq",
-    "error": "Veprimi dështoi. Ju lutemi provoni përsëri."
+    "unfollow": "Mos ndiq"
   },
   "group": {
     "actionRadii": {

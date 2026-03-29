@@ -529,10 +529,10 @@
     "startDate": "Start date"
   },
   "followButton": {
+    "error": "Action failed. Please try again.",
     "follow": "Follow",
     "following": "Following",
-    "unfollow": "Unfollow",
-    "error": "Action failed. Please try again."
+    "unfollow": "Unfollow"
   },
   "group": {
     "actionRadii": {

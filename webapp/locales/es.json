@@ -529,10 +529,10 @@
     "startDate": "Fecha de inicio"
   },
   "followButton": {
+    "error": "Acción fallida. Por favor, inténtalo de nuevo.",
     "follow": "Seguir",
     "following": "Siguiendo",
-    "unfollow": "Dejar de seguir",
-    "error": "Acción fallida. Por favor, inténtalo de nuevo."
+    "unfollow": "Dejar de seguir"
   },
   "group": {
     "actionRadii": {
