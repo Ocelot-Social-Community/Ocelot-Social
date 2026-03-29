@@ -1,10 +1,6 @@
 <template>
   <div class="ds-mt-base ds-mb-xxx-small">
-    <password-form
-      v-if="!changePasswordResult"
-      ref="form"
-      @submit="handleSubmit"
-    />
+    <password-form v-if="!changePasswordResult" ref="form" @submit="handleSubmit" />
     <div v-else class="ds-mb-large">
       <template v-if="changePasswordResult === 'success'">
         <transition name="ds-transition-fade">
