@@ -17,8 +17,8 @@
     props: {
       /** Number displayed in the badge */
       count: { type: Number, required: true },
-      /** Accessible label for the button */
-      text: { type: String, required: true },
+      /** Accessible label for screen readers (icon-only button) */
+      ariaLabel: { type: String, required: true },
       /** Icon component or render function */
       icon: { type: [Object, Function] as PropType<Component>, required: true },
       /** Whether the button appears filled (active state) */
@@ -46,7 +46,7 @@
                   disabled: props.disabled,
                   circle: true,
                 },
-                attrs: { 'aria-label': props.text },
+                attrs: { 'aria-label': props.ariaLabel },
                 on: { click: () => emit('click') },
               }
             : {
@@ -55,7 +55,7 @@
                 loading: props.loading,
                 disabled: props.disabled,
                 circle: true,
-                'aria-label': props.text,
+                'aria-label': props.ariaLabel,
                 onClick: () => emit('click'),
               },
           isVue2 ? iconSlot : { icon: () => iconSlot },

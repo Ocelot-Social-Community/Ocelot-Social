@@ -125,7 +125,7 @@
               <ocelot-action-button
                 :disabled="isAuthor"
                 :count="shoutedCount"
-                :text="$t('shoutButton.shouted')"
+                :aria-label="$t('shoutButton.shouted')"
                 :filled="shouted"
                 :icon="icons.heartO"
                 :loading="shoutLoading"
@@ -134,7 +134,7 @@
               <!-- Follow Button -->
               <ocelot-action-button
                 :count="post.observingUsersCount"
-                :text="$t('observeButton.observed')"
+                :aria-label="$t('observeButton.observed')"
                 :filled="post.isObservedByMe"
                 :icon="icons.bell"
                 @click="toggleObservePost(post.id, !post.isObservedByMe)"
