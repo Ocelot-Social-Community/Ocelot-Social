@@ -1,7 +1,7 @@
 {
   "maintenance": {
     "explanation": "No momento estamos fazendo uma manutenção programada, por favor tente novamente mais tarde.",
-    "questions": "Dúvidas ou preocupações, envie um e-mail para",
+    "questions": "Se tiver dúvidas ou preocupações, envie um email para",
     "title": "{APPLICATION_NAME} está em manutenção"
   },
   "localeSwitch": {
