@@ -46,13 +46,15 @@
       </os-button>
     </template>
     <div class="actions">
-      <shout-button
+      <action-button
         :disabled="isAuthor"
-        :count="comment.shoutedCount"
-        :is-shouted="comment.shoutedByCurrentUser"
-        :node-id="comment.id"
+        :count="shoutedCount"
+        :text="$t('shoutButton.shouted')"
+        :filled="shouted"
+        :icon="icons.heartO"
+        :loading="shoutLoading"
         class="shout-button"
-        node-type="Comment"
+        @click="toggleShout"
       />
       <os-button
         :title="$t('post.comment.reply')"
@@ -83,7 +85,8 @@ import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
 import CommentMutations from '~/graphql/CommentMutations'
-import ShoutButton from '~/components/ShoutButton.vue'
+import ActionButton from '~/components/ActionButton.vue'
+import { useShout } from '~/composables/useShout'
 import scrollToAnchor from '~/mixins/scrollToAnchor.js'
 
 export default {
@@ -95,7 +98,7 @@ export default {
     ContentMenu,
     ContentViewer,
     CommentForm,
-    ShoutButton,
+    ActionButton,
   },
   mixins: [scrollToAnchor],
   data() {
@@ -107,6 +110,9 @@ export default {
       isTarget,
       isCollapsed: !isTarget,
       editingComment: false,
+      shoutedCount: this.comment.shoutedCount || 0,
+      shouted: this.comment.shoutedByCurrentUser || false,
+      shoutLoading: false,
     }
   },
   props: {
@@ -180,8 +186,27 @@ export default {
   },
   created() {
     this.icons = iconRegistry
+    const { toggleShout } = useShout({ apollo: this.$apollo })
+    this._toggleShout = toggleShout
   },
   methods: {
+    async toggleShout() {
+      const newShouted = !this.shouted
+      const backup = { shoutedCount: this.shoutedCount, shouted: this.shouted }
+      this.shouted = newShouted
+      this.shoutedCount += newShouted ? 1 : -1
+      this.shoutLoading = true
+      const { success } = await this._toggleShout({
+        id: this.comment.id,
+        type: 'Comment',
+        isCurrentlyShouted: !newShouted,
+      })
+      if (!success) {
+        this.shoutedCount = backup.shoutedCount
+        this.shouted = backup.shouted
+      }
+      this.shoutLoading = false
+    },
     checkAnchor(anchor) {
       return `#${this.anchor}` === anchor
     },
