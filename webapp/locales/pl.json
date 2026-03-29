@@ -861,7 +861,7 @@
     "user": "Użytkownik"
   },
   "observeButton": {
-    "observed": "{count} obserwowany"
+    "observed": "{count} obserwujących"
   },
   "pagination": {
     "next": "Następna",
@@ -1253,7 +1253,7 @@
     }
   },
   "shoutButton": {
-    "shouted": "{count} krzyczeć"
+    "shouted": "{count} rekomendacji"
   },
   "site": {
     "back-to-login": "Powrót do strony logowania",
