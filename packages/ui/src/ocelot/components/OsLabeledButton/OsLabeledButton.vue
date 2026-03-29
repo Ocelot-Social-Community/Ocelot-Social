@@ -13,7 +13,7 @@
    * @slot icon - Custom icon content (overrides the `icon` prop)
    */
   export default defineComponent({
-    name: 'OcelotLabeledButton',
+    name: 'OsLabeledButton',
     props: {
       /** Icon component or render function */
       icon: { type: [Object, Function] as PropType<Component>, required: true },
@@ -59,24 +59,24 @@
 
         const label = h(
           'span',
-          { class: 'ocelot-labeled-button__label' },
+          { class: 'os-labeled-button__label' },
           /* v8 ignore next -- Vue 2 */ isVue2 ? [props.label] : props.label,
         )
 
-        return h('div', { class: 'ocelot-labeled-button' }, [button, label])
+        return h('div', { class: 'os-labeled-button' }, [button, label])
       }
     },
   })
 </script>
 
 <style>
-  .ocelot-labeled-button {
+  .os-labeled-button {
     display: flex;
     flex-direction: column;
     align-items: center;
   }
 
-  .ocelot-labeled-button__label {
+  .os-labeled-button__label {
     margin-top: 8px;
     font-size: 0.875rem;
     text-align: center;

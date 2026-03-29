@@ -1,15 +1,15 @@
 import { ocelotIcons } from '#src/ocelot/icons'
 
-import OcelotActionButton from './OcelotActionButton.vue'
+import OsActionButton from './OsActionButton.vue'
 
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 const iconMap = ocelotIcons
 const iconNames = Object.keys(iconMap)
 
-const meta: Meta<typeof OcelotActionButton> = {
+const meta: Meta<typeof OsActionButton> = {
   title: 'Ocelot/ActionButton',
-  component: OcelotActionButton,
+  component: OsActionButton,
   tags: ['autodocs'],
   argTypes: {
     icon: {
@@ -21,7 +21,7 @@ const meta: Meta<typeof OcelotActionButton> = {
 }
 
 export default meta
-type Story = StoryObj<typeof OcelotActionButton>
+type Story = StoryObj<typeof OsActionButton>
 
 export const Playground: Story = {
   args: {

@@ -1,15 +1,15 @@
 import { ocelotIcons } from '#src/ocelot/icons'
 
-import OcelotLabeledButton from './OcelotLabeledButton.vue'
+import OsLabeledButton from './OsLabeledButton.vue'
 
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 const iconMap = ocelotIcons
 const iconNames = Object.keys(iconMap)
 
-const meta: Meta<typeof OcelotLabeledButton> = {
+const meta: Meta<typeof OsLabeledButton> = {
   title: 'Ocelot/LabeledButton',
-  component: OcelotLabeledButton,
+  component: OsLabeledButton,
   tags: ['autodocs'],
   argTypes: {
     icon: {
@@ -21,7 +21,7 @@ const meta: Meta<typeof OcelotLabeledButton> = {
 }
 
 export default meta
-type Story = StoryObj<typeof OcelotLabeledButton>
+type Story = StoryObj<typeof OsLabeledButton>
 
 export const Playground: Story = {
   args: {
@@ -41,15 +41,15 @@ export const Filled: Story = {
 
 export const MultipleButtons: Story = {
   render: () => ({
-    components: { OcelotLabeledButton },
+    components: { OsLabeledButton },
     setup() {
       return { icons: ocelotIcons }
     },
     template: `
       <div style="display: flex; gap: 24px;">
-        <OcelotLabeledButton :icon="icons.book" label="Articles" />
-        <OcelotLabeledButton :icon="icons.calendar" label="Events" :filled="true" />
-        <OcelotLabeledButton :icon="icons.users" label="Groups" />
+        <OsLabeledButton :icon="icons.book" label="Articles" />
+        <OsLabeledButton :icon="icons.calendar" label="Events" :filled="true" />
+        <OsLabeledButton :icon="icons.users" label="Groups" />
       </div>
     `,
   }),

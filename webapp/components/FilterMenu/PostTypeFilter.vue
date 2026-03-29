@@ -6,7 +6,7 @@
   >
     <template #filter-follower>
       <li class="item all-item">
-        <ocelot-labeled-button
+        <os-labeled-button
           :icon="icons.check"
           :label="$t('filter-menu.all')"
           :filled="filteredPostTypes.length === 0"
@@ -14,10 +14,10 @@
           @click="togglePostType(null)"
         >
           {{ $t('filter-menu.all') }}
-        </ocelot-labeled-button>
+        </os-labeled-button>
       </li>
       <li class="item article-item">
-        <ocelot-labeled-button
+        <os-labeled-button
           :icon="icons.book"
           :label="$t('filter-menu.article')"
           :filled="filteredPostTypes.includes('Article')"
@@ -26,7 +26,7 @@
         />
       </li>
       <li class="item event-item">
-        <ocelot-labeled-button
+        <os-labeled-button
           :icon="icons.calendar"
           :label="$t('filter-menu.event')"
           :filled="filteredPostTypes.includes('Event')"
@@ -42,13 +42,13 @@
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
-import { OcelotLabeledButton } from '@ocelot-social/ui'
+import { OsLabeledButton } from '@ocelot-social/ui'
 
 export default {
   name: 'PostTypeFilter',
   components: {
     FilterMenuSection,
-    OcelotLabeledButton,
+    OsLabeledButton,
   },
   computed: {
     ...mapGetters({

@@ -46,7 +46,7 @@
       </os-button>
     </template>
     <div class="actions">
-      <ocelot-action-button
+      <os-action-button
         :disabled="isAuthor"
         :count="shoutedCount"
         :aria-label="$t('shoutButton.shouted', { count: shoutedCount })"
@@ -76,7 +76,7 @@
 </template>
 
 <script>
-import { OsButton, OsCard, OsIcon, OcelotActionButton } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon, OsActionButton } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import { COMMENT_MAX_UNTRUNCATED_LENGTH, COMMENT_TRUNCATE_TO_LENGTH } from '~/constants/comment'
@@ -97,7 +97,7 @@ export default {
     ContentMenu,
     ContentViewer,
     CommentForm,
-    OcelotActionButton,
+    OsActionButton,
   },
   mixins: [scrollToAnchor],
   data() {

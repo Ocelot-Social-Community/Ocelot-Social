@@ -122,7 +122,7 @@
             </div>
             <div class="actions">
               <!-- Shout Button -->
-              <ocelot-action-button
+              <os-action-button
                 :disabled="isAuthor"
                 :count="shoutedCount"
                 :aria-label="$t('shoutButton.shouted', { count: shoutedCount })"
@@ -132,7 +132,7 @@
                 @click="toggleShout"
               />
               <!-- Follow Button -->
-              <ocelot-action-button
+              <os-action-button
                 :count="post.observingUsersCount"
                 :aria-label="$t('observeButton.observed', { count: post.observingUsersCount })"
                 :filled="post.isObservedByMe"
@@ -188,7 +188,7 @@
 </template>
 
 <script>
-import { OsButton, OsCard, OsIcon, OsMenu, OcelotActionButton } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon, OsMenu, OsActionButton } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
@@ -239,7 +239,7 @@ export default {
     HcEmpty,
     HcHashtag,
     LocationTeaser,
-    OcelotActionButton,
+    OsActionButton,
     ResponsiveImage,
     UserTeaser,
   },

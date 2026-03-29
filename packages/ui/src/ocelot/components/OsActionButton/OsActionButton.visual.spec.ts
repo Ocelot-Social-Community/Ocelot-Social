@@ -16,7 +16,7 @@ async function checkA11y(page: Page) {
   expect(results.violations).toEqual([])
 }
 
-test.describe('OcelotActionButton keyboard accessibility', () => {
+test.describe('OsActionButton keyboard accessibility', () => {
   test('button shows visible focus indicator', async ({ page }) => {
     await page.goto(`${STORY_URL}--playground&viewMode=story`)
     const root = page.locator(STORY_ROOT)
@@ -30,7 +30,7 @@ test.describe('OcelotActionButton keyboard accessibility', () => {
   })
 })
 
-test.describe('OcelotActionButton visual regression', () => {
+test.describe('OsActionButton visual regression', () => {
   test('playground', async ({ page }) => {
     await page.goto(`${STORY_URL}--playground&viewMode=story`)
     const root = page.locator(STORY_ROOT)

@@ -2,5 +2,5 @@
 export { ocelotIcons } from './icons'
 
 // Ocelot composite components — built from Os* primitives
-export { OcelotActionButton } from './components/OcelotActionButton'
-export { OcelotLabeledButton } from './components/OcelotLabeledButton'
+export { OsActionButton } from './components/OsActionButton'
+export { OsLabeledButton } from './components/OsLabeledButton'
