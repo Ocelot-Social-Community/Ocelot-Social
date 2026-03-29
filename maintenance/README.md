@@ -42,7 +42,7 @@ Build context must be the repo root so Docker can access `packages/ui/`:
 
 ```bash
 docker build -f maintenance/Dockerfile --target production -t maintenance .
-docker run -p 8080:80 maintenance
+docker run -p 8080:8080 maintenance
 ```
 
 ## Branding
@@ -60,7 +60,7 @@ The nginx config (`nginx/custom.conf`) returns **503** for all non-asset request
 
 ## Project Structure
 
-```
+```text
 maintenance/
 ├── app/              # Nuxt application source
 │   ├── assets/css/   # Tailwind & branding CSS
