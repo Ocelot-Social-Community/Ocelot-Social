@@ -280,7 +280,7 @@ export default {
    */
   build: {
     // Transpile ESM modules for SSR compatibility
-    // vue-demi and @ocelot-social/ui must be transpiled to ensure isVue2 is consistent
+    // vue-demi and @ocelot-social/ui must be transpiled to ensure module resolution works
     transpile: ['vue-demi', '@ocelot-social/ui'],
     // Invalidate cache between versions
     // https://www.reddit.com/r/Nuxt/comments/18i8hp2/comment/kdc1wa3/

@@ -59,6 +59,7 @@ export default defineConfig({
           vue: 'Vue',
           'vue-demi': 'VueDemi',
         },
+        chunkFileNames: '[name]-[hash].mjs',
         assetFileNames: '[name].[ext]',
       },
     },
