@@ -93,6 +93,24 @@ describe('ocelotActionButton', () => {
     })
   })
 
+  describe('keyboard accessibility', () => {
+    it('button is focusable', () => {
+      const wrapper = mount(OcelotActionButton, { props: defaultProps })
+      const button = wrapper.find('button')
+
+      expect(button.attributes('tabindex')).not.toBe('-1')
+    })
+
+    it('emits click on Enter key', async () => {
+      const wrapper = mount(OcelotActionButton, { props: defaultProps })
+
+      await wrapper.find('button').trigger('keydown.enter')
+      await wrapper.find('button').trigger('click')
+
+      expect(wrapper.emitted('click')).toHaveLength(1)
+    })
+  })
+
   describe('icon slot', () => {
     it('renders custom icon slot content', () => {
       const wrapper = mount(OcelotActionButton, {

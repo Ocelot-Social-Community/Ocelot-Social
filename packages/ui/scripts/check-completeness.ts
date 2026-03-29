@@ -175,12 +175,17 @@ for (const componentPath of components) {
   }
 }
 
-// --- Ocelot stories (no .vue files, story-driven checks) ---
+// --- Ocelot stories without .vue files (e.g. icon stories) ---
 const ocelotStories = await glob('src/ocelot/**/*.stories.ts')
+const componentDirs = new Set(components.map((c) => dirname(c)))
 
 for (const storyPath of ocelotStories) {
   const storyName = basename(storyPath, '.stories.ts')
   const storyDir = dirname(storyPath)
+
+  // Skip stories that already have a .vue component (checked in the component loop above)
+  if (componentDirs.has(storyDir)) continue
+
   const visualTestPath = join(storyDir, `${storyName}.visual.spec.ts`)
   const unitTestPath = join(storyDir, 'index.spec.ts')
 
