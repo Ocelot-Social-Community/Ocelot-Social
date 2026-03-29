@@ -109,7 +109,7 @@ describe('ocelotActionButton', () => {
     it('has an accessible name via aria-label', () => {
       const wrapper = mount(OcelotActionButton, { props: defaultProps })
 
-      expect(wrapper.find('button').attributes('aria-label')).toBe(true)
+      expect(wrapper.find('button').attributes('aria-label')).toBe('Like')
     })
   })
 
