@@ -124,6 +124,14 @@ export default {
       required: true,
     },
   },
+  watch: {
+    'comment.shoutedCount'(val) {
+      if (!this.shoutLoading) this.shoutedCount = val || 0
+    },
+    'comment.shoutedByCurrentUser'(val) {
+      if (!this.shoutLoading) this.shouted = !!val
+    },
+  },
   computed: {
     ...mapGetters({
       user: 'auth/user',
