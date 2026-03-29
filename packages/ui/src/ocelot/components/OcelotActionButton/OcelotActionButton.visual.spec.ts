@@ -22,11 +22,11 @@ test.describe('OcelotActionButton keyboard accessibility', () => {
     const root = page.locator(STORY_ROOT)
     await root.waitFor()
 
+    await page.keyboard.press('Tab')
     const button = root.locator('button').first()
-    await button.focus()
     const outline = await button.evaluate((el) => getComputedStyle(el).outlineStyle)
 
-    expect(outline, 'Button must have visible focus outline').not.toBe('none')
+    expect(outline, 'Button must have visible focus outline via Tab').not.toBe('none')
   })
 })
 
