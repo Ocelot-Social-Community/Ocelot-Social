@@ -3,7 +3,7 @@
 # ==============================================================================
 # Stage 1: Build UI library
 # ==============================================================================
-FROM node:25.8.1-alpine AS ui-library
+FROM node:25.8.2-alpine AS ui-library
 RUN apk --no-cache add git python3 make g++
 WORKDIR /packages/ui
 COPY packages/ui/ .
@@ -13,7 +13,7 @@ RUN npm run build
 # ==============================================================================
 # Stage 2: Install dependencies and copy sources
 # ==============================================================================
-FROM node:25.8.1-alpine AS base
+FROM node:25.8.2-alpine AS base
 RUN apk --no-cache add git python3 make g++
 WORKDIR /app
 COPY --from=ui-library /packages/ui/ /packages/ui/
