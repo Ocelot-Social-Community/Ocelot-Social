@@ -39,7 +39,7 @@ describe("LocaleSwitch", () => {
       attachTo: document.body,
     });
     await openDropdown(wrapper);
-    const items = document.querySelectorAll(".locale-item");
+    const items = document.querySelectorAll(".os-menu-item-link");
     expect(items.length).toBeGreaterThan(0);
     wrapper.unmount();
   });
@@ -49,7 +49,7 @@ describe("LocaleSwitch", () => {
       attachTo: document.body,
     });
     await openDropdown(wrapper);
-    const items = document.querySelectorAll(".locale-item");
+    const items = document.querySelectorAll(".os-menu-item-link");
     expect(items.length).toBe(LOCALE_COUNT);
     wrapper.unmount();
   });
@@ -59,7 +59,7 @@ describe("LocaleSwitch", () => {
       attachTo: document.body,
     });
     await openDropdown(wrapper);
-    const items = document.querySelectorAll(".locale-item");
+    const items = document.querySelectorAll(".os-menu-item-link");
     const names = Array.from(items).map((el) => el.textContent?.trim() ?? "");
     expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
     wrapper.unmount();
@@ -70,7 +70,7 @@ describe("LocaleSwitch", () => {
       attachTo: document.body,
     });
     await openDropdown(wrapper);
-    const active = document.querySelector(".locale-item--active");
+    const active = document.querySelector(".os-menu-item--active");
     expect(active?.textContent?.trim()).toBe("English");
     wrapper.unmount();
   });
@@ -80,9 +80,11 @@ describe("LocaleSwitch", () => {
       attachTo: document.body,
     });
     await openDropdown(wrapper);
-    const deutsch = Array.from(document.querySelectorAll(".locale-item")).find(
-      (el) => el.textContent?.trim() === "Deutsch",
-    ) as HTMLButtonElement | undefined;
+    const deutsch = Array.from(
+      document.querySelectorAll(".os-menu-item-link"),
+    ).find((el) => el.textContent?.trim() === "Deutsch") as
+      | HTMLButtonElement
+      | undefined;
     expect(
       deutsch,
       'Expected "Deutsch" locale item to exist in dropdown',
@@ -94,7 +96,7 @@ describe("LocaleSwitch", () => {
 
     // Re-open to check active state
     await openDropdown(wrapper);
-    const active = document.querySelector(".locale-item--active");
+    const active = document.querySelector(".os-menu-item--active");
     expect(active?.textContent?.trim()).toBe("Deutsch");
     wrapper.unmount();
   });

@@ -13,24 +13,32 @@
     </OsButton>
 
     <template #popper="{ hide }">
-      <ul class="locale-list">
-        <li v-for="loc in sortedLocales" :key="loc.code">
-          <button
-            class="locale-item"
-            :class="{ 'locale-item--active': loc.code === locale }"
-            type="button"
-            @click="switchLocale(loc.code, hide)"
-          >
-            {{ loc.name }}
-          </button>
-        </li>
-      </ul>
+      <OsMenu
+        dropdown
+        link-tag="button"
+        :routes="sortedLocales"
+        :name-parser="(r: Record<string, unknown>) => r.name as string"
+        :matcher="
+          (_url: string, r: Record<string, unknown>) => r.code === locale
+        "
+      >
+        <template #menuitem="{ route, parents }">
+          <OsMenuItem
+            :route="route"
+            :parents="parents"
+            @click="
+              (_e: Event, r: Record<string, unknown>) =>
+                switchLocale(r.code as LocaleCode, hide)
+            "
+          />
+        </template>
+      </OsMenu>
     </template>
   </VDropdown>
 </template>
 
 <script setup lang="ts">
-import { OsButton, OsIcon } from "@ocelot-social/ui";
+import { OsButton, OsIcon, OsMenu, OsMenuItem } from "@ocelot-social/ui";
 import { ocelotIcons } from "@ocelot-social/ui/ocelot";
 
 import type { GeneratedTypeConfig } from "@intlify/core-base";
@@ -56,41 +64,3 @@ async function switchLocale(code: LocaleCode, hide: () => void) {
   hide();
 }
 </script>
-
-<!-- Not scoped: VDropdown teleports the popper outside this component's DOM -->
-<style>
-.locale-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.locale-item {
-  display: block;
-  width: 100%;
-  background: none;
-  border: none;
-  border-left: 2px solid transparent;
-  padding: 8px 24px 8px 12px;
-  cursor: pointer;
-  font-size: 1rem;
-  color: var(--color-text-base);
-  text-align: left;
-  line-height: 1.3;
-  transition:
-    color 80ms ease-out,
-    border-left-color 80ms ease-out;
-}
-
-.locale-item:hover {
-  color: var(--color-primary);
-  border-left-color: var(--color-primary);
-}
-
-.locale-item--active {
-  color: var(--color-primary);
-  font-weight: 600;
-  border-left-color: var(--color-primary);
-  background-color: var(--color-background-soft);
-}
-</style>

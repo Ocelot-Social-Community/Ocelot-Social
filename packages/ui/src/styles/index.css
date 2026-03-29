@@ -36,12 +36,17 @@ ul.os-menu-list {
 
 .os-menu-item-link {
   display: block;
+  width: 100%;
   box-sizing: border-box;
   color: var(--color-text-base, #4b4554);
   line-height: 1.3;
   text-decoration: none;
+  text-align: start;
   padding: 8px 16px;
+  border: none;
   border-left: 2px solid transparent;
+  background: none;
+  font: inherit;
   transition: color 80ms ease-out,
               background-color 80ms ease-out,
               border-left-color 80ms ease-out;
