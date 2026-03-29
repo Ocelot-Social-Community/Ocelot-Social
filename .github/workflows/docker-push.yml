@@ -35,6 +35,10 @@ jobs:
             context: .
             file: webapp/Dockerfile
             target: production
+          - name: maintenance-base
+            context: .
+            file: maintenance/Dockerfile
+            target: base
           - name: maintenance-build
             context: .
             file: maintenance/Dockerfile

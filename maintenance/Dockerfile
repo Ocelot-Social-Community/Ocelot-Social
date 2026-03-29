@@ -11,15 +11,28 @@ RUN npm ci
 RUN npm run build
 
 # ==============================================================================
-# Stage 2: Install dependencies and build
+# Stage 2: Install dependencies and copy sources
 # ==============================================================================
-FROM node:25.8.1-alpine AS build
+FROM node:25.8.1-alpine AS base
 RUN apk --no-cache add git python3 make g++
 WORKDIR /app
 COPY --from=ui-library /packages/ui/ /packages/ui/
 COPY maintenance/package.json maintenance/package-lock.json ./
 RUN npm ci
 COPY maintenance/ .
+
+# ==============================================================================
+# Stage 3: Development (hot-reload with mounted sources)
+# ==============================================================================
+FROM base AS development
+ENV NODE_ENV=development
+EXPOSE 3000
+CMD ["npx", "nuxt", "dev"]
+
+# ==============================================================================
+# Stage 4: Generate static site
+# ==============================================================================
+FROM base AS build
 # Branding: reuse existing branding repo structure
 # Static assets (logo, favicon) — Nuxt 4 uses public/ instead of static/
 ONBUILD COPY brandin[g]/static/ /app/public/
@@ -29,18 +42,11 @@ ONBUILD COPY brandin[g]/constants/emails.j[s] /app/app/constants/emails.ts
 # Locales — merge branding translations into defaults (same mechanism as webapp)
 ONBUILD COPY brandin[g]/locales/*.jso[n] /app/locales/tmp/
 ONBUILD RUN if [ -d locales/tmp ]; then apk add --no-cache jq && tools/merge-locales.sh; fi
+ONBUILD RUN npx nuxt generate
 RUN npx nuxt generate
 
 # ==============================================================================
-# Stage 3: Development (hot-reload with mounted sources)
-# ==============================================================================
-FROM build AS development
-ENV NODE_ENV=development
-EXPOSE 3000
-CMD ["npx", "nuxt", "dev"]
-
-# ==============================================================================
-# Stage 4: Production (static site served by nginx)
+# Stage 5: Production (static site served by nginx)
 # ==============================================================================
 FROM nginx:1.29.6-alpine AS production
 LABEL org.label-schema.name="ocelot.social:maintenance"
