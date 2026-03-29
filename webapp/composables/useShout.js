@@ -8,7 +8,8 @@ export function useShout({ apollo }) {
         mutation,
         variables: { id, type },
       })
-      return { success: !!(res && res.data) }
+      const result = isCurrentlyShouted ? res?.data?.unshout : res?.data?.shout
+      return { success: !!result }
     } catch {
       return { success: false }
     }
