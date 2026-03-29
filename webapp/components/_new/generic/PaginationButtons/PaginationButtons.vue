@@ -1,29 +1,46 @@
 <template>
-  <ocelot-pagination
-    class="pagination-buttons"
-    :icon-previous="icons.arrowLeft"
-    :icon-next="icons.arrowRight"
-    :label-previous="$t('pagination.previous')"
-    :label-next="$t('pagination.next')"
-    :has-previous="hasPrevious"
-    :has-next="hasNext"
-    :active-page="activePage"
-    :page-size="pageSize"
-    :active-resource-count="activeResourceCount"
-    :show-page-counter="showPageCounter"
-    :page-label="$t('search.page')"
-    @back="$emit('back')"
-    @next="$emit('next')"
-  />
+  <div class="pagination-buttons">
+    <os-button
+      class="previous-button"
+      :disabled="!hasPrevious"
+      appearance="outline"
+      variant="primary"
+      circle
+      data-test="previous-button"
+      :aria-label="$t('pagination.previous')"
+      @click="$emit('back')"
+    >
+      <template #icon><os-icon :icon="icons.arrowLeft" /></template>
+    </os-button>
+
+    <span v-if="showPageCounter" class="pagination-pageCount" data-test="pagination-pageCount">
+      {{ $t('search.page') }} {{ activePage + 1 }} /
+      {{ Math.floor((activeResourceCount - 1) / pageSize) + 1 }}
+    </span>
+
+    <os-button
+      class="next-button"
+      :disabled="!hasNext"
+      appearance="outline"
+      variant="primary"
+      circle
+      data-test="next-button"
+      :aria-label="$t('pagination.next')"
+      @click="$emit('next')"
+    >
+      <template #icon><os-icon :icon="icons.arrowRight" /></template>
+    </os-button>
+  </div>
 </template>
 
 <script>
-import { OcelotPagination } from '@ocelot-social/ui'
+import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 
 export default {
   components: {
-    OcelotPagination,
+    OsButton,
+    OsIcon,
   },
   props: {
     pageSize: { type: Number, default: 24 },
@@ -42,7 +59,14 @@ export default {
 
 <style lang="scss">
 .pagination-buttons {
+  display: flex;
+  justify-content: space-around;
   width: $size-width-paginate;
   margin: $space-x-small auto;
+}
+
+.pagination-pageCount {
+  justify-content: space-around;
+  margin: 8px auto;
 }
 </style>
