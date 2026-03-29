@@ -1,19 +1,32 @@
+import { readdirSync } from "node:fs";
+import { resolve } from "node:path";
+
 import { mountSuspended } from "@nuxt/test-utils/runtime";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { nextTick } from "vue";
 
 import LocaleSwitch from "./LocaleSwitch.vue";
+
+const LOCALE_COUNT = readdirSync(resolve(__dirname, "../../locales")).filter(
+  (f) => f.endsWith(".json"),
+).length;
 
 async function openDropdown(
   wrapper: Awaited<ReturnType<typeof mountSuspended>>,
 ) {
   await wrapper.find("button").trigger("click");
   await nextTick();
+  // floating-vue needs time to complete its show transition
   await new Promise((r) => setTimeout(r, 50));
   await nextTick();
 }
 
 describe("LocaleSwitch", () => {
+  // Clean up floating-vue teleported popper elements between tests
+  afterEach(() => {
+    document.querySelectorAll(".v-popper__popper").forEach((el) => el.remove());
+  });
+
   it("renders a language icon button", async () => {
     const wrapper = await mountSuspended(LocaleSwitch);
     const button = wrapper.find("button");
@@ -31,13 +44,13 @@ describe("LocaleSwitch", () => {
     wrapper.unmount();
   });
 
-  it("shows all 11 locales in dropdown", async () => {
+  it("shows all configured locales in dropdown", async () => {
     const wrapper = await mountSuspended(LocaleSwitch, {
       attachTo: document.body,
     });
     await openDropdown(wrapper);
     const items = document.querySelectorAll(".locale-item");
-    expect(items.length).toBe(11);
+    expect(items.length).toBe(LOCALE_COUNT);
     wrapper.unmount();
   });
 
@@ -70,8 +83,9 @@ describe("LocaleSwitch", () => {
     const deutsch = Array.from(document.querySelectorAll(".locale-item")).find(
       (el) => el.textContent?.trim() === "Deutsch",
     ) as HTMLButtonElement | undefined;
-    expect(deutsch).toBeDefined();
+    expect(deutsch, 'Expected "Deutsch" locale item to exist in dropdown').toBeDefined();
     deutsch!.click();
+    // floating-vue needs time to close and update after locale switch
     await new Promise((r) => setTimeout(r, 100));
     await nextTick();
 
