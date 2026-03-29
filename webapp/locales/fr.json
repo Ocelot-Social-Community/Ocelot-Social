@@ -531,7 +531,7 @@
   "followButton": {
     "error": "Action échouée. Veuillez réessayer.",
     "follow": "Suivre",
-    "following": "Je suis les",
+    "following": "Abonné",
     "unfollow": "Ne plus suivre"
   },
   "group": {
