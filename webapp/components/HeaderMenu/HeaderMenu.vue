@@ -723,7 +723,7 @@ export default {
     const { generatePersonalInviteCode, invalidateInviteCode } = useInviteCode({
       apollo: this.$apollo,
       toast: this.$toast,
-      t: this.$t,
+      t: (key, ...args) => this.$t(key, ...args),
       store: this.$store,
     })
     this._generateInviteCode = generatePersonalInviteCode
