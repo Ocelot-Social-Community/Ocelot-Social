@@ -87,7 +87,6 @@ function checkStoryCoverage(
 }
 
 const results: CheckResult[] = []
-let hasErrors = false
 
 // Find all Vue components (excluding index files)
 const components = [
@@ -169,10 +168,6 @@ for (const componentPath of components) {
   if (result.errors.length > 0 || result.warnings.length > 0) {
     results.push(result)
   }
-
-  if (result.errors.length > 0) {
-    hasErrors = true
-  }
 }
 
 // --- Ocelot stories without .vue files (e.g. icon stories) ---
@@ -216,9 +211,6 @@ for (const storyPath of ocelotStories) {
     results.push(result)
   }
 
-  if (result.errors.length > 0 || result.warnings.length > 0) {
-    hasErrors = true
-  }
 }
 
 // Output results
