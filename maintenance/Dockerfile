@@ -60,3 +60,5 @@ LABEL maintainer="devops@ocelot.social"
 
 COPY --from=build /app/.output/public/ /usr/share/nginx/html/
 COPY maintenance/nginx/custom.conf /etc/nginx/conf.d/default.conf
+EXPOSE 8080
+USER nginx
