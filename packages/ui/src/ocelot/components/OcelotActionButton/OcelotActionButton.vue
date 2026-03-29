@@ -75,10 +75,9 @@
 
 <style>
   .ocelot-action-button {
-    display: flex;
+    display: inline-flex;
     justify-content: center;
     align-items: center;
-    gap: 4px;
     position: relative;
   }
 

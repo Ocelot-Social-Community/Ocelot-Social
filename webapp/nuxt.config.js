@@ -116,6 +116,8 @@ export default {
     '~assets/_new/styles/_ds-compat.scss',
     // UI library component styles (Tailwind utilities + OsMenu CSS)
     '../packages/ui/dist/style.css',
+    // Ocelot composite component styles (ActionButton, LabeledButton)
+    '../packages/ui/dist/ui.css',
   ],
 
   /*
@@ -327,6 +329,7 @@ export default {
       config.resolve.alias['@ocelot-social/ui$'] = path.join(uiLibraryPath, 'index.mjs')
       config.resolve.alias['@ocelot-social/ui/ocelot$'] = path.join(uiLibraryPath, 'ocelot.mjs')
       config.resolve.alias['@ocelot-social/ui/style.css$'] = path.join(uiLibraryPath, 'style.css')
+      config.resolve.alias['@ocelot-social/ui/ui.css$'] = path.join(uiLibraryPath, 'ui.css')
       const svgRule = config.module.rules.find((rule) => rule.test.test('.svg'))
       svgRule.test = /\.(png|jpe?g|gif|webp)$/
       config.module.rules.push({
