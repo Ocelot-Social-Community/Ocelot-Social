@@ -33,6 +33,9 @@
 import { OsButton, OsIcon } from "@ocelot-social/ui";
 import { ocelotIcons } from "@ocelot-social/ui/ocelot";
 
+import type { GeneratedTypeConfig } from "@intlify/core-base";
+type LocaleCode = GeneratedTypeConfig["locale"];
+
 const { locale, locales, setLocale, t } = useI18n();
 
 const languageIcon = ocelotIcons.language;
@@ -41,14 +44,14 @@ const sortedLocales = computed(() =>
   locales.value
     .filter((l) => typeof l !== "string" && l.name)
     .map((l) => ({
-      code: (l as { code: string }).code,
+      code: (l as { code: LocaleCode }).code,
       name: (l as { name: string }).name,
     }))
     .sort((a, b) => a.name.localeCompare(b.name)),
 );
 
-async function switchLocale(code: string, hide: () => void) {
-  await setLocale(code as "en");
+async function switchLocale(code: LocaleCode, hide: () => void) {
+  await setLocale(code);
   hide();
 }
 </script>
