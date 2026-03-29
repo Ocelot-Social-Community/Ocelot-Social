@@ -1,4 +1,5 @@
 import { useShout } from './useShout'
+import { shoutMutation, unshoutMutation } from '~/graphql/Shout'
 
 describe('useShout', () => {
   let apollo, toggleShout
@@ -10,21 +11,19 @@ describe('useShout', () => {
 
   it('calls shout mutation when not currently shouted', async () => {
     await toggleShout({ id: '1', type: 'Post', isCurrentlyShouted: false })
-    expect(apollo.mutate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        variables: { id: '1', type: 'Post' },
-      }),
-    )
+    expect(apollo.mutate).toHaveBeenCalledWith({
+      mutation: shoutMutation,
+      variables: { id: '1', type: 'Post' },
+    })
   })
 
   it('calls unshout mutation when currently shouted', async () => {
     apollo.mutate.mockResolvedValue({ data: { unshout: true } })
     await toggleShout({ id: '1', type: 'Post', isCurrentlyShouted: true })
-    expect(apollo.mutate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        variables: { id: '1', type: 'Post' },
-      }),
-    )
+    expect(apollo.mutate).toHaveBeenCalledWith({
+      mutation: unshoutMutation,
+      variables: { id: '1', type: 'Post' },
+    })
   })
 
   it('returns success true when shout succeeds', async () => {
