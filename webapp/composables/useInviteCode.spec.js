@@ -56,6 +56,12 @@ describe('useInviteCode', () => {
       await generatePersonalInviteCode('Hello')
       expect(toast.error).toHaveBeenCalled()
     })
+
+    it('returns success false on failure', async () => {
+      apollo.mutate.mockRejectedValue(new Error('Ouch'))
+      const result = await generatePersonalInviteCode('Hello')
+      expect(result).toEqual({ success: false })
+    })
   })
 
   describe('invalidateInviteCode', () => {
