@@ -210,7 +210,6 @@ for (const storyPath of ocelotStories) {
   if (result.errors.length > 0 || result.warnings.length > 0) {
     results.push(result)
   }
-
 }
 
 // Output results

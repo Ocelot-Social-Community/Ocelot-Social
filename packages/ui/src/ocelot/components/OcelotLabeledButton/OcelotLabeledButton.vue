@@ -14,7 +14,6 @@
    */
   export default defineComponent({
     name: 'OcelotLabeledButton',
-    emits: ['click'],
     props: {
       /** Icon component or render function */
       icon: { type: [Object, Function] as PropType<Component>, required: true },
@@ -23,10 +22,16 @@
       /** Whether the button appears filled (active state) */
       filled: { type: Boolean, default: false },
     },
+    emits: ['click'],
     setup(props, { slots, emit }) {
       return () => {
         const iconSlot = slots.icon?.() || [
-          h(OsIcon, /* v8 ignore next -- Vue 2 */ isVue2 ? { props: { icon: props.icon } } : { icon: props.icon }),
+          h(
+            OsIcon,
+            /* v8 ignore next -- Vue 2 */ isVue2
+              ? { props: { icon: props.icon } }
+              : { icon: props.icon },
+          ),
         ]
 
         const button = h(

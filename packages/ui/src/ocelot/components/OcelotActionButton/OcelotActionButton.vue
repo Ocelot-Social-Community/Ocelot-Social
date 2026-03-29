@@ -14,7 +14,6 @@
    */
   export default defineComponent({
     name: 'OcelotActionButton',
-    emits: ['click'],
     props: {
       /** Number displayed in the badge */
       count: { type: Number, required: true },
@@ -29,10 +28,16 @@
       /** Shows loading spinner */
       loading: { type: Boolean, default: false },
     },
+    emits: ['click'],
     setup(props, { slots, emit }) {
       return () => {
         const iconSlot = slots.icon?.() || [
-          h(OsIcon, /* v8 ignore next -- Vue 2 */ isVue2 ? { props: { icon: props.icon } } : { icon: props.icon }),
+          h(
+            OsIcon,
+            /* v8 ignore next -- Vue 2 */ isVue2
+              ? { props: { icon: props.icon } }
+              : { icon: props.icon },
+          ),
         ]
 
         const button = h(

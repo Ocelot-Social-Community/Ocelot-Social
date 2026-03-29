@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
-import { markRaw } from 'vue-demi'
 import { describe, expect, it } from 'vitest'
+import { markRaw } from 'vue-demi'
 
 import { IconCheck } from '#src/components/OsIcon'
 
@@ -109,7 +109,7 @@ describe('ocelotActionButton', () => {
     it('has an accessible name via aria-label', () => {
       const wrapper = mount(OcelotActionButton, { props: defaultProps })
 
-      expect(wrapper.find('button').attributes('aria-label')).toBeTruthy()
+      expect(wrapper.find('button').attributes('aria-label')).toBe(true)
     })
   })
 
