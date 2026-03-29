@@ -39,12 +39,14 @@
                   appearance: props.filled ? 'filled' : 'outline',
                   circle: true,
                 },
+                attrs: { 'aria-label': props.label },
                 on: { click: (e: Event) => emit('click', e) },
               }
             : /* v8 ignore stop */ {
                 variant: 'primary',
                 appearance: props.filled ? 'filled' : 'outline',
                 circle: true,
+                'aria-label': props.label,
                 onClick: (e: Event) => emit('click', e),
               },
           /* v8 ignore next -- Vue 2 */ isVue2 ? iconSlot : { icon: () => iconSlot },

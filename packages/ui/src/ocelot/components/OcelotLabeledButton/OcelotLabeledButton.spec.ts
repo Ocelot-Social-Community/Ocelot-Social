@@ -17,6 +17,12 @@ describe('ocelotLabeledButton', () => {
     expect(wrapper.find('.ocelot-labeled-button__label').text()).toBe('Filter')
   })
 
+  it('passes label as aria-label to the button', () => {
+    const wrapper = mount(OcelotLabeledButton, { props: defaultProps })
+
+    expect(wrapper.find('button').attributes('aria-label')).toBe('Filter')
+  })
+
   it('renders with wrapper class', () => {
     const wrapper = mount(OcelotLabeledButton, { props: defaultProps })
 

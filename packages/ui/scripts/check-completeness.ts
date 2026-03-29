@@ -216,7 +216,7 @@ for (const storyPath of ocelotStories) {
     results.push(result)
   }
 
-  if (result.errors.length > 0) {
+  if (result.errors.length > 0 || result.warnings.length > 0) {
     hasErrors = true
   }
 }
@@ -235,16 +235,12 @@ if (results.length === 0) {
     }
 
     for (const warning of result.warnings) {
-      console.log(`  ⚠ ${warning}`)
+      console.log(`  ✗ ${warning}`)
     }
 
     console.log('')
   }
 
-  if (hasErrors) {
-    console.log('Completeness check failed with errors.')
-    process.exit(1)
-  } else {
-    console.log('Completeness check passed with warnings.')
-  }
+  console.log('Completeness check failed.')
+  process.exit(1)
 }
