@@ -76,7 +76,7 @@
 </template>
 
 <script>
-import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon, OcelotActionButton } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import { COMMENT_MAX_UNTRUNCATED_LENGTH, COMMENT_TRUNCATE_TO_LENGTH } from '~/constants/comment'
@@ -85,7 +85,6 @@ import ContentMenu from '~/components/ContentMenu/ContentMenu'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
 import CommentMutations from '~/graphql/CommentMutations'
-import { OcelotActionButton } from '@ocelot-social/ui'
 import { useShout } from '~/composables/useShout'
 import scrollToAnchor from '~/mixins/scrollToAnchor.js'
 

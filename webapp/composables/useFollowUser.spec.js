@@ -15,9 +15,7 @@ describe('useFollowUser', () => {
 
   it('calls followUser mutation when not followed', async () => {
     await toggleFollow({ id: 'u1', isCurrentlyFollowed: false })
-    expect(apollo.mutate).toHaveBeenCalledWith(
-      expect.objectContaining({ variables: { id: 'u1' } }),
-    )
+    expect(apollo.mutate).toHaveBeenCalledWith(expect.objectContaining({ variables: { id: 'u1' } }))
   })
 
   it('returns success and data on follow', async () => {
@@ -33,9 +31,7 @@ describe('useFollowUser', () => {
       data: { unfollowUser: { id: 'u1', followedByCurrentUser: false } },
     })
     await toggleFollow({ id: 'u1', isCurrentlyFollowed: true })
-    expect(apollo.mutate).toHaveBeenCalledWith(
-      expect.objectContaining({ variables: { id: 'u1' } }),
-    )
+    expect(apollo.mutate).toHaveBeenCalledWith(expect.objectContaining({ variables: { id: 'u1' } }))
   })
 
   it('returns success false on error', async () => {

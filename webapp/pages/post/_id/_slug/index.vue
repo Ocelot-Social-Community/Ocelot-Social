@@ -188,7 +188,7 @@
 </template>
 
 <script>
-import { OsButton, OsCard, OsIcon, OsMenu } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon, OsMenu, OcelotActionButton } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
@@ -201,7 +201,6 @@ import HcCategory from '~/components/Category'
 import HcEmpty from '~/components/Empty/Empty'
 import HcHashtag from '~/components/Hashtag/Hashtag'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
-import { OcelotActionButton } from '@ocelot-social/ui'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
 import { useShout } from '~/composables/useShout'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
