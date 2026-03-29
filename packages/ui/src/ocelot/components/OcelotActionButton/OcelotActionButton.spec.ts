@@ -94,20 +94,22 @@ describe('ocelotActionButton', () => {
   })
 
   describe('keyboard accessibility', () => {
-    it('button is focusable', () => {
+    it('renders a native button element (inherits keyboard support)', () => {
       const wrapper = mount(OcelotActionButton, { props: defaultProps })
-      const button = wrapper.find('button')
 
-      expect(button.attributes('tabindex')).not.toBe('-1')
+      expect(wrapper.find('button').exists()).toBe(true)
     })
 
-    it('emits click on Enter key', async () => {
+    it('button is not excluded from tab order', () => {
       const wrapper = mount(OcelotActionButton, { props: defaultProps })
 
-      await wrapper.find('button').trigger('keydown.enter')
-      await wrapper.find('button').trigger('click')
+      expect(wrapper.find('button').attributes('tabindex')).not.toBe('-1')
+    })
 
-      expect(wrapper.emitted('click')).toHaveLength(1)
+    it('has an accessible name via aria-label', () => {
+      const wrapper = mount(OcelotActionButton, { props: defaultProps })
+
+      expect(wrapper.find('button').attributes('aria-label')).toBeTruthy()
     })
   })
 
