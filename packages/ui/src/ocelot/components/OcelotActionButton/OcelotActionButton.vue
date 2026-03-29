@@ -14,6 +14,7 @@
    */
   export default defineComponent({
     name: 'OcelotActionButton',
+    emits: ['click'],
     props: {
       /** Number displayed in the badge */
       count: { type: Number, required: true },

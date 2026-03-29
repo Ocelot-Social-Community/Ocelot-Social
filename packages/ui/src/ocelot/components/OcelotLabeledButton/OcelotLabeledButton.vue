@@ -14,6 +14,7 @@
    */
   export default defineComponent({
     name: 'OcelotLabeledButton',
+    emits: ['click'],
     props: {
       /** Icon component or render function */
       icon: { type: [Object, Function] as PropType<Component>, required: true },
