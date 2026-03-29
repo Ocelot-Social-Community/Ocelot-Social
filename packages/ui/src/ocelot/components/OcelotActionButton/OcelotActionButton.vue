@@ -32,11 +32,12 @@
     setup(props, { slots, emit }) {
       return () => {
         const iconSlot = slots.icon?.() || [
-          h(OsIcon, isVue2 ? { props: { icon: props.icon } } : { icon: props.icon }),
+          h(OsIcon, /* v8 ignore next -- Vue 2 */ isVue2 ? { props: { icon: props.icon } } : { icon: props.icon }),
         ]
 
         const button = h(
           OsButton,
+          /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
           isVue2
             ? {
                 props: {
@@ -49,7 +50,7 @@
                 attrs: { 'aria-label': props.ariaLabel },
                 on: { click: () => emit('click') },
               }
-            : {
+            : /* v8 ignore stop */ {
                 variant: 'primary',
                 appearance: props.filled ? 'filled' : 'outline',
                 loading: props.loading,
@@ -58,13 +59,13 @@
                 'aria-label': props.ariaLabel,
                 onClick: () => emit('click'),
               },
-          isVue2 ? iconSlot : { icon: () => iconSlot },
+          /* v8 ignore next -- Vue 2 */ isVue2 ? iconSlot : { icon: () => iconSlot },
         )
 
         const badge = h(
           'div',
           { class: 'ocelot-action-button__count' },
-          isVue2 ? [String(props.count)] : String(props.count),
+          /* v8 ignore next -- Vue 2 */ isVue2 ? [String(props.count)] : String(props.count),
         )
 
         return h('div', { class: 'ocelot-action-button' }, [button, badge])

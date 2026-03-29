@@ -26,11 +26,12 @@
     setup(props, { slots, emit }) {
       return () => {
         const iconSlot = slots.icon?.() || [
-          h(OsIcon, isVue2 ? { props: { icon: props.icon } } : { icon: props.icon }),
+          h(OsIcon, /* v8 ignore next -- Vue 2 */ isVue2 ? { props: { icon: props.icon } } : { icon: props.icon }),
         ]
 
         const button = h(
           OsButton,
+          /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
           isVue2
             ? {
                 props: {
@@ -40,19 +41,19 @@
                 },
                 on: { click: (e: Event) => emit('click', e) },
               }
-            : {
+            : /* v8 ignore stop */ {
                 variant: 'primary',
                 appearance: props.filled ? 'filled' : 'outline',
                 circle: true,
                 onClick: (e: Event) => emit('click', e),
               },
-          isVue2 ? iconSlot : { icon: () => iconSlot },
+          /* v8 ignore next -- Vue 2 */ isVue2 ? iconSlot : { icon: () => iconSlot },
         )
 
         const label = h(
           'label',
           { class: 'ocelot-labeled-button__label' },
-          isVue2 ? [props.label] : props.label,
+          /* v8 ignore next -- Vue 2 */ isVue2 ? [props.label] : props.label,
         )
 
         return h('div', { class: 'ocelot-labeled-button' }, [button, label])
