@@ -70,9 +70,48 @@
                 <notification-menu placement="top" />
               </client-only>
               <!-- invite button -->
-              <div v-if="inviteRegistration">
+              <div v-if="inviteRegistration" class="invite-button">
                 <client-only>
-                  <invite-button placement="top" />
+                  <dropdown ref="inviteDropdown" offset="8" placement="top" noMouseLeaveClosing>
+                    <template #default="{ toggleMenu }">
+                      <os-button
+                        variant="primary"
+                        appearance="ghost"
+                        circle
+                        :aria-label="$t('invite-codes.button.tooltip')"
+                        v-tooltip="{
+                          content: $t('invite-codes.button.tooltip'),
+                          placement: 'bottom-start',
+                        }"
+                        @click.prevent="toggleMenu"
+                      >
+                        <template #icon>
+                          <os-icon :icon="icons.userPlus" />
+                        </template>
+                      </os-button>
+                    </template>
+                    <template #popover>
+                      <div class="invite-list">
+                        <h2>{{ $t('invite-codes.my-invite-links') }}</h2>
+                        <invitation-list
+                          @generate-invite-code="generatePersonalInviteCode"
+                          @invalidate-invite-code="invalidateInviteCode"
+                          @open-delete-modal="openInviteDeleteModal"
+                          :inviteCodes="user.inviteCodes"
+                          :copy-message="
+                            $t('invite-codes.invite-link-message-personal', {
+                              network: $env.NETWORK_NAME,
+                            })
+                          "
+                        />
+                      </div>
+                    </template>
+                  </dropdown>
+                  <confirm-modal
+                    v-if="showInviteConfirmModal"
+                    :modalData="inviteModalData"
+                    @close="showInviteConfirmModal = false"
+                  />
                 </client-only>
               </div>
               <!-- group button -->
@@ -540,7 +579,10 @@ import CustomButton from '~/components/CustomButton/CustomButton'
 import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
 import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
 import headerMenuBranded from '~/constants/headerMenuBranded.js'
-import InviteButton from '~/components/InviteButton/InviteButton'
+import ConfirmModal from '~/components/Modal/ConfirmModal'
+import Dropdown from '~/components/Dropdown'
+import InvitationList from '~/components/_new/features/Invitations/InvitationList.vue'
+import { useInviteCode } from '~/composables/useInviteCode'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
 import SearchField from '~/components/features/SearchField/SearchField.vue'
@@ -561,7 +603,9 @@ export default {
     CustomButton,
     FilterMenu,
     FilterMenuComponent,
-    InviteButton,
+    ConfirmModal,
+    Dropdown,
+    InvitationList,
     LocaleSwitch,
     Logo,
     NotificationMenu,
@@ -588,6 +632,8 @@ export default {
       mobileFilterMenuOpen: false,
       mobileLocaleMenuOpen: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
+      showInviteConfirmModal: false,
+      inviteModalData: null,
     }
   },
   computed: {
@@ -674,8 +720,27 @@ export default {
   created() {
     this.icons = iconRegistry
     this.throttledMouseMove = throttle(this.handleMouseMove, 100)
+    const { generatePersonalInviteCode, invalidateInviteCode } = useInviteCode({
+      apollo: this.$apollo,
+      toast: this.$toast,
+      t: this.$t,
+      store: this.$store,
+    })
+    this._generateInviteCode = generatePersonalInviteCode
+    this._invalidateInviteCode = invalidateInviteCode
   },
   methods: {
+    async generatePersonalInviteCode(comment) {
+      await this._generateInviteCode(comment)
+    },
+    async invalidateInviteCode(code) {
+      await this._invalidateInviteCode(code)
+    },
+    openInviteDeleteModal(modalData) {
+      this.$refs.inviteDropdown.isPopoverOpen = false
+      this.inviteModalData = modalData
+      this.showInviteConfirmModal = true
+    },
     handleScroll() {
       if (this.toggleMobileMenu) return
       const currentScrollPos = window.pageYOffset
@@ -1193,5 +1258,15 @@ export default {
   .os-icon {
     margin: -4px;
   }
+}
+
+.invite-list {
+  max-width: min(400px, 90vw);
+  padding: $space-small;
+  margin-top: $space-base;
+  display: flex;
+  flex-flow: column;
+  gap: $space-small;
+  --invitation-column-max-width: 75%;
 }
 </style>
