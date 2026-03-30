@@ -52,12 +52,13 @@ type Query {
   Message(roomId: ID!, first: Int, offset: Int, orderBy: [_MessageOrdering]): [Message]
 }
 
-type ChatMessagesSeenPayload {
+type ChatMessageStatusPayload {
   roomId: ID!
   messageIds: [String!]!
+  status: String!
 }
 
 type Subscription {
   chatMessageAdded: Message
-  chatMessagesSeen: ChatMessagesSeenPayload
+  chatMessageStatusUpdated: ChatMessageStatusPayload
 }

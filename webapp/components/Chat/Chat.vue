@@ -153,7 +153,7 @@ import {
   messageQuery,
   createMessageMutation,
   chatMessageAdded,
-  chatMessagesSeen,
+  chatMessageStatusUpdated,
   markMessagesAsSeen,
 } from '~/graphql/Messages'
 import chatStyle from '~/constants/chat.js'
@@ -289,11 +289,11 @@ export default {
       },
     })
 
-    const seenObserver = this.$apollo.subscribe({
-      query: chatMessagesSeen(),
+    const statusObserver = this.$apollo.subscribe({
+      query: chatMessageStatusUpdated(),
     })
-    seenObserver.subscribe({
-      next: this.handleMessagesSeen,
+    statusObserver.subscribe({
+      next: this.handleMessageStatusUpdated,
     })
   },
   computed: {
@@ -529,13 +529,13 @@ export default {
       }
     },
 
-    async handleMessagesSeen({ data }) {
-      const { roomId } = data.chatMessagesSeen
-      // Refetch messages from server to get updated seen status
+    async handleMessageStatusUpdated({ data }) {
+      const { roomId, status } = data.chatMessageStatusUpdated
+      // Refetch messages from server to get updated status
       if (this.selectedRoom?.id === roomId) {
         this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
       }
-      // Refetch room to update lastMessage seen status in preview
+      // Refetch room to update lastMessage status in preview
       const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
       if (roomIndex !== -1) {
         try {

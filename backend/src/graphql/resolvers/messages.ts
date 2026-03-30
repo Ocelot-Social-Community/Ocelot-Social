@@ -9,7 +9,7 @@ import { withFilter } from 'graphql-subscriptions'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import CONFIG from '@config/index'
-import { CHAT_MESSAGE_ADDED, CHAT_MESSAGES_SEEN } from '@constants/subscriptions'
+import { CHAT_MESSAGE_ADDED, CHAT_MESSAGE_STATUS_UPDATED } from '@constants/subscriptions'
 
 import { attachments } from './attachments/attachments'
 import Resolver from './helpers/Resolver'
@@ -21,13 +21,19 @@ const setMessagesAsDistributed = async (undistributedMessagesIds, session) => {
     const setDistributedCypher = `
       MATCH (m:Message) WHERE m.id IN $undistributedMessagesIds
       SET m.distributed = true
-      RETURN m { .* }
+      WITH m
+      MATCH (m)-[:INSIDE]->(room:Room)
+      MATCH (m)<-[:CREATED]-(author:User)
+      RETURN DISTINCT room.id AS roomId, author.id AS authorId, collect(m.id) AS messageIds
     `
-    const setDistributedTxResponse = await transaction.run(setDistributedCypher, {
+    const result = await transaction.run(setDistributedCypher, {
       undistributedMessagesIds,
     })
-    const messages = await setDistributedTxResponse.records.map((record) => record.get('m'))
-    return messages
+    return result.records.map((record) => ({
+      roomId: record.get('roomId'),
+      authorId: record.get('authorId'),
+      messageIds: record.get('messageIds'),
+    }))
   })
 }
 
@@ -36,14 +42,32 @@ export default {
     chatMessageAdded: {
       subscribe: withFilter(
         (_, __, context) => context.pubsub.asyncIterator(CHAT_MESSAGE_ADDED),
-        (payload, variables, context) => {
-          return payload.userId === context.user?.id
+        async (payload, variables, context) => {
+          const isRecipient = payload.userId === context.user?.id
+          if (isRecipient && payload.chatMessageAdded?.id) {
+            const session = context.driver.session()
+            try {
+              const results = await setMessagesAsDistributed(
+                [payload.chatMessageAdded.id],
+                session,
+              )
+              for (const { roomId, authorId, messageIds } of results) {
+                void context.pubsub.publish(CHAT_MESSAGE_STATUS_UPDATED, {
+                  authorId,
+                  chatMessageStatusUpdated: { roomId, messageIds, status: 'distributed' },
+                })
+              }
+            } finally {
+              await session.close()
+            }
+          }
+          return isRecipient
         },
       ),
     },
-    chatMessagesSeen: {
+    chatMessageStatusUpdated: {
       subscribe: withFilter(
-        (_, __, context) => context.pubsub.asyncIterator(CHAT_MESSAGES_SEEN),
+        (_, __, context) => context.pubsub.asyncIterator(CHAT_MESSAGE_STATUS_UPDATED),
         (payload, variables, context) => {
           return payload.authorId === context.user?.id
         },
@@ -68,15 +92,20 @@ export default {
         const undistributedMessagesIds = resolved
           .filter((msg) => !msg.distributed && msg.senderId !== context.user.id)
           .map((msg) => msg.id)
-        const session = context.driver.session()
-        try {
-          if (undistributedMessagesIds.length > 0) {
-            await setMessagesAsDistributed(undistributedMessagesIds, session)
+        if (undistributedMessagesIds.length > 0) {
+          const session = context.driver.session()
+          try {
+            const results = await setMessagesAsDistributed(undistributedMessagesIds, session)
+            for (const { roomId, authorId, messageIds } of results) {
+              void context.pubsub.publish(CHAT_MESSAGE_STATUS_UPDATED, {
+                authorId,
+                chatMessageStatusUpdated: { roomId, messageIds, status: 'distributed' },
+              })
+            }
+          } finally {
+            await session.close()
           }
-        } finally {
-          await session.close()
         }
-        // send subscription to author to updated the messages
       }
       return resolved.reverse()
     },
@@ -223,9 +252,9 @@ export default {
         for (const record of result.records) {
           const roomId = record.get('roomId')
           const authorId = record.get('authorId')
-          void context.pubsub.publish(CHAT_MESSAGES_SEEN, {
+          void context.pubsub.publish(CHAT_MESSAGE_STATUS_UPDATED, {
             authorId,
-            chatMessagesSeen: { roomId, messageIds },
+            chatMessageStatusUpdated: { roomId, messageIds, status: 'seen' },
           })
         }
         return true

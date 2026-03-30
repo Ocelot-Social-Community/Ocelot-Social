@@ -103,12 +103,13 @@ export const chatMessageAdded = () => {
   `
 }
 
-export const chatMessagesSeen = () => {
+export const chatMessageStatusUpdated = () => {
   return gql`
-    subscription chatMessagesSeen {
-      chatMessagesSeen {
+    subscription chatMessageStatusUpdated {
+      chatMessageStatusUpdated {
         roomId
         messageIds
+        status
       }
     }
   `
