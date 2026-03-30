@@ -514,11 +514,15 @@ export default {
         content: (msg.content || '').trim().substring(0, 30),
       }
       changedRoom.lastMessageAt = msg.date
-      changedRoom.index = msg.date
-      changedRoom.unreadCount++
+      changedRoom.index = new Date().toISOString()
+      const isCurrentRoom = msg.room.id === this.selectedRoom?.id
+      const isOwnMessage = msg.senderId === this.currentUser.id
+      if (!isCurrentRoom && !isOwnMessage) {
+        changedRoom.unreadCount++
+      }
       // Reassign array to trigger Vue reactivity and vue-advanced-chat re-sort
       this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== msg.room.id)]
-      if (msg.room.id === this.selectedRoom?.id) {
+      if (isCurrentRoom) {
         this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
       }
     },
