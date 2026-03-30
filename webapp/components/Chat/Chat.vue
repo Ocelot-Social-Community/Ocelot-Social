@@ -373,7 +373,7 @@ export default {
 
         const rms = []
         const rmsIds = []
-        ;[...Room, ...this.rooms].forEach((r) => {
+        ;[...this.rooms, ...Room].forEach((r) => {
           if (!rmsIds.find((v) => v === r.id)) {
             rms.push(this.fixRoomObject(r))
             rmsIds.push(r.id)
@@ -679,7 +679,6 @@ export default {
 
       // Create a virtual room (no backend call — room is created on first message)
       this.loadingRooms = false
-      this.roomsLoaded = true
       const virtualRoom = {
         id: `temp-${userId}`,
         roomId: `temp-${userId}`,
