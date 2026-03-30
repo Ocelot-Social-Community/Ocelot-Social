@@ -147,6 +147,7 @@
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import locales from '~/locales/index.js'
 import { roomQuery, createGroupRoom, unreadRoomsQuery } from '~/graphql/Rooms'
 import {
   messageQuery,
@@ -294,6 +295,11 @@ export default {
     isSafari() {
       return /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
     },
+    currentLocaleIso() {
+      const code = this.$i18n.locale()
+      const locale = locales.find((l) => l.code === code)
+      return locale ? locale.iso : 'en-US'
+    },
     roomHeaderLink() {
       if (!this.selectedRoom) return null
       if (this.selectedRoom.isGroupRoom && this.selectedRoom.groupProfile?.id) {
@@ -432,7 +438,12 @@ export default {
         ;[...this.messages, ...Message].forEach((m) => {
           if (m.senderId !== this.currentUser.id) m.seen = true
           m.content = m.content || ''
-          m.date = new Date(m.date).toDateString()
+          m.date = new Date(m.date).toLocaleDateString(this.currentLocaleIso, {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })
           m.avatar = m.avatar?.w320
           msgs[m.indexId] = m
         })
@@ -512,7 +523,12 @@ export default {
         _id: 'new' + Math.random().toString(36).substring(2, 15),
         seen: false,
         saved: false,
-        date: new Date().toDateString(),
+        date: new Date().toLocaleDateString(this.currentLocaleIso, {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }),
         senderId: this.currentUser.id,
         files:
           messageDetails.files?.map((file) => ({
