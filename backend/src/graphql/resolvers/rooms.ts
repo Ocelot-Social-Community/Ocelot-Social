@@ -112,8 +112,8 @@ export default {
         }
         const rooms = await neo4jgraphql(object, roomParams, context, resolveInfo)
         // Preserve the sort order from the cursor query
-        const orderMap = new Map(roomIds.map((id, i) => [id, i]))
-        return (rooms || []).sort((a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0))
+        const orderMap = new Map<string, number>(roomIds.map((id, i) => [id, i]))
+        return (rooms || []).sort((a, b) => (orderMap.get(a.id) || 0) - (orderMap.get(b.id) || 0))
       } finally {
         await session.close()
       }
