@@ -235,7 +235,7 @@ export default {
       responsiveBreakpoint: 600,
       rooms: [],
       roomsLoaded: false,
-      roomPage: 0,
+      roomCursor: null,
       roomPageSize: 10,
       selectedRoom: null,
       activeRoomId: null,
@@ -357,17 +357,16 @@ export default {
 
     async fetchRooms({ room } = {}) {
       this.roomsLoaded = false
-      const offset = this.roomPage * this.roomPageSize
       try {
+        const variables = room?.id
+          ? { id: room.id }
+          : { first: this.roomPageSize, before: this.roomCursor }
+
         const {
           data: { Room },
         } = await this.$apollo.query({
           query: roomQuery(),
-          variables: {
-            id: room?.id,
-            first: this.roomPageSize,
-            offset,
-          },
+          variables,
           fetchPolicy: 'no-cache',
         })
 
@@ -381,10 +380,15 @@ export default {
         })
         this.rooms = rms
 
+        if (!room?.id && Room.length > 0) {
+          // Update cursor to the oldest room's sort date
+          const lastRoom = Room[Room.length - 1]
+          this.roomCursor = lastRoom.lastMessageAt || lastRoom.createdAt
+        }
+
         if (Room.length < this.roomPageSize) {
           this.roomsLoaded = true
         }
-        this.roomPage += 1
 
         if (this.singleRoom && this.rooms.length > 0) {
           this.selectRoom(this.rooms[0])
@@ -659,7 +663,7 @@ export default {
       this.activeRoomId = room.roomId
     },
 
-    newRoom(userOrId) {
+    async newRoom(userOrId) {
       // Accept either a user object { id, name } or just a userId string
       const userId = typeof userOrId === 'string' ? userOrId : userOrId.id
       const userName = typeof userOrId === 'string' ? userOrId : userOrId.name
@@ -671,10 +675,35 @@ export default {
         (r) => !r.isGroupRoom && r.users.some((u) => u.id === userId),
       )
       if (existingRoom) {
+        existingRoom.index = new Date().toISOString()
+        this.rooms = [existingRoom, ...this.rooms.filter((r) => r.id !== existingRoom.id)]
         this.$nextTick(() => {
           this.selectRoom(existingRoom)
         })
         return
+      }
+
+      // Check if a DM room with this user exists on the server (not yet loaded locally)
+      try {
+        const {
+          data: { Room },
+        } = await this.$apollo.query({
+          query: roomQuery(),
+          variables: { userId },
+          fetchPolicy: 'no-cache',
+        })
+        const serverRoom = Room?.[0]
+        if (serverRoom) {
+          const room = this.fixRoomObject(serverRoom)
+          room.index = new Date().toISOString()
+          this.rooms = [room, ...this.rooms.filter((r) => r.id !== room.id)]
+          this.$nextTick(() => {
+            this.selectRoom(room)
+          })
+          return
+        }
+      } catch {
+        // Fall through to virtual room creation
       }
 
       // Create a virtual room (no backend call — room is created on first message)
@@ -703,32 +732,56 @@ export default {
       })
     },
 
-    newGroupRoom(groupId) {
-      this.$apollo
-        .mutate({
-          mutation: createGroupRoom(),
-          variables: {
-            groupId,
-          },
+    async newGroupRoom(groupId) {
+      // Check if the group room already exists locally
+      const existingRoom = this.rooms.find(
+        (r) => r.isGroupRoom && r.groupProfile?.id === groupId,
+      )
+      if (existingRoom) {
+        existingRoom.index = new Date().toISOString()
+        this.rooms = [existingRoom, ...this.rooms.filter((r) => r.id !== existingRoom.id)]
+        this.$nextTick(() => {
+          this.selectRoom(existingRoom)
         })
-        .then(({ data: { CreateGroupRoom } }) => {
-          const roomIndex = this.rooms.findIndex((r) => r.id === CreateGroupRoom.roomId)
-          let room
+        return
+      }
 
-          if (roomIndex === -1) {
-            room = this.fixRoomObject(CreateGroupRoom)
-            this.rooms = [room, ...this.rooms]
-          } else {
-            room = this.rooms[roomIndex]
-          }
-          // Wait for vue-advanced-chat to process the updated rooms array
+      // Check if the group room exists on the server (not yet loaded locally)
+      try {
+        const {
+          data: { Room },
+        } = await this.$apollo.query({
+          query: roomQuery(),
+          variables: { groupId },
+          fetchPolicy: 'no-cache',
+        })
+        if (Room?.length) {
+          const room = this.fixRoomObject(Room[0])
+          room.index = new Date().toISOString()
+          this.rooms = [room, ...this.rooms.filter((r) => r.id !== room.id)]
           this.$nextTick(() => {
             this.selectRoom(room)
           })
+          return
+        }
+      } catch {
+        // Fall through to creation
+      }
+
+      // Room doesn't exist yet — create it
+      try {
+        const { data: { CreateGroupRoom } } = await this.$apollo.mutate({
+          mutation: createGroupRoom(),
+          variables: { groupId },
         })
-        .catch((error) => {
-          this.$toast.error(error.message)
+        const room = this.fixRoomObject(CreateGroupRoom)
+        this.rooms = [room, ...this.rooms]
+        this.$nextTick(() => {
+          this.selectRoom(room)
         })
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
     },
 
     openFile: async function (file) {

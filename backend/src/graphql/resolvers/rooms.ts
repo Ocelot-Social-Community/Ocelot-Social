@@ -40,11 +40,83 @@ export default {
   },
   Query: {
     Room: async (object, params, context, resolveInfo) => {
-      if (!params.filter) params.filter = {}
-      params.filter.users_some = {
-        id: context.user.id,
+      // Single room lookup by userId or groupId
+      if (params.userId || params.groupId) {
+        const session = context.driver.session()
+        try {
+          const cypher = params.groupId
+            ? `
+              MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)-[:ROOM_FOR]->(group:Group { id: $groupId })
+              RETURN room { .* } AS room
+            `
+            : `
+              MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user:User { id: $userId })
+              WHERE NOT (room)-[:ROOM_FOR]->(:Group)
+              RETURN room { .* } AS room
+            `
+          const result = await session.readTransaction(async (transaction) => {
+            return transaction.run(cypher, {
+              currentUserId: context.user.id,
+              userId: params.userId || null,
+              groupId: params.groupId || null,
+            })
+          })
+          const rooms = result.records.map((record) => record.get('room'))
+          if (rooms.length === 0) return []
+          // Re-query via neo4jgraphql to get all computed fields
+          delete params.userId
+          delete params.groupId
+          params.filter = { users_some: { id: context.user.id } }
+          params.id = rooms[0].id
+          return neo4jgraphql(object, params, context, resolveInfo)
+        } finally {
+          await session.close()
+        }
       }
-      return neo4jgraphql(object, params, context, resolveInfo)
+
+      // Single room lookup by id
+      if (params.id) {
+        if (!params.filter) params.filter = {}
+        params.filter.users_some = { id: context.user.id }
+        return neo4jgraphql(object, params, context, resolveInfo)
+      }
+
+      // Room list with cursor-based pagination sorted by latest activity
+      const session = context.driver.session()
+      try {
+        const first = params.first || 10
+        const before = params.before || null
+        const result = await session.readTransaction(async (transaction) => {
+          const cypher = `
+            MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)
+            WITH room, COALESCE(room.lastMessageAt, room.createdAt) AS sortDate
+            ${before ? 'WHERE sortDate < $before' : ''}
+            RETURN room.id AS id
+            ORDER BY sortDate DESC
+            LIMIT toInteger($first)
+          `
+          return transaction.run(cypher, {
+            currentUserId: context.user.id,
+            first,
+            before,
+          })
+        })
+        const roomIds = result.records.map((record) => record.get('id'))
+        if (roomIds.length === 0) return []
+        // Re-query via neo4jgraphql to get computed fields for each room
+        const rooms = []
+        for (const roomId of roomIds) {
+          const roomParams = {
+            id: roomId,
+            filter: { users_some: { id: context.user.id } },
+          }
+          const [room] = await neo4jgraphql(object, roomParams, context, resolveInfo)
+          if (room) rooms.push(room)
+        }
+        return rooms
+      } finally {
+        await session.close()
+      }
     },
     UnreadRooms: async (_object, _params, context, _resolveInfo) => {
       const {

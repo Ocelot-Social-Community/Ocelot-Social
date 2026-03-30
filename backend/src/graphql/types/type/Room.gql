@@ -79,7 +79,7 @@ type Mutation {
 }
 
 type Query {
-  Room(id: ID, orderBy: [_RoomOrdering]): [Room]
+  Room(id: ID, userId: ID, groupId: ID, first: Int, before: String, orderBy: [_RoomOrdering]): [Room]
   UnreadRooms: Int
 }
 

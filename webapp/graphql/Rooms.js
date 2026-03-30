@@ -37,8 +37,8 @@ export const createGroupRoom = () => gql`
 export const roomQuery = () => gql`
   ${imageUrls}
 
-  query Room($first: Int, $offset: Int, $id: ID) {
-    Room(first: $first, offset: $offset, id: $id, orderBy: [createdAt_desc, lastMessageAt_desc]) {
+  query Room($first: Int, $before: String, $id: ID, $userId: ID, $groupId: ID) {
+    Room(first: $first, before: $before, id: $id, userId: $userId, groupId: $groupId) {
       id
       roomId
       roomName
