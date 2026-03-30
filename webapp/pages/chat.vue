@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="chat-page">
     <add-chat-room-by-user-search
       v-if="showSearch"
       ref="searchPanel"
@@ -65,3 +65,35 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+@media (max-width: 768px) {
+  .layout-default:has(.chat-page) {
+    .ds-container {
+      max-width: 100% !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+    .main-container {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+    .chat-page {
+      padding-top: var(--header-height, 66px);
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+
+      > * {
+        flex-shrink: 0;
+      }
+
+      > :last-child {
+        flex: 1;
+        min-height: 0;
+      }
+    }
+  }
+}
+</style>

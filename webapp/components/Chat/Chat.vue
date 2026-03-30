@@ -17,7 +17,7 @@
     show-files="true"
     show-audio="true"
     capture-files="true"
-    :height="'calc(100dvh - 190px)'"
+    :height="chatHeight"
     :styles="JSON.stringify(computedChatStyle)"
     :show-footer="true"
     :responsive-breakpoint="responsiveBreakpoint"
@@ -298,6 +298,13 @@ export default {
     ...mapGetters({
       currentUser: 'auth/user',
     }),
+    chatHeight() {
+      if (this.singleRoom) return 'calc(100dvh - 190px)'
+      if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+        return '100%'
+      }
+      return 'calc(100dvh - 190px)'
+    },
     computedChatStyle() {
       return chatStyle.STYLE.light
     },
