@@ -756,6 +756,67 @@ describe('Message', () => {
     })
   })
 
+  describe('subscription filters', () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { chatMessageAddedFilter, chatMessageStatusUpdatedFilter } = require('./messages')
+
+    describe('chatMessageAddedFilter', () => {
+      it('returns true for recipient and marks as distributed', async () => {
+        const mockSession = {
+          writeTransaction: jest.fn().mockResolvedValue([
+            { roomId: 'r1', authorId: 'a1', messageIds: ['m1'] },
+          ]),
+          close: jest.fn(),
+        }
+        const context = {
+          user: { id: 'recipient' },
+          driver: { session: () => mockSession },
+          pubsub: { publish: jest.fn() },
+        }
+        const result = await chatMessageAddedFilter(
+          { userId: 'recipient', chatMessageAdded: { id: 'm1' } },
+          context,
+        )
+        expect(result).toBe(true)
+        expect(mockSession.writeTransaction).toHaveBeenCalled()
+        expect(context.pubsub.publish).toHaveBeenCalledWith(
+          'CHAT_MESSAGE_STATUS_UPDATED',
+          expect.objectContaining({
+            chatMessageStatusUpdated: { roomId: 'r1', messageIds: ['m1'], status: 'distributed' },
+          }),
+        )
+      })
+
+      it('returns false for non-recipient', async () => {
+        const result = await chatMessageAddedFilter(
+          { userId: 'other', chatMessageAdded: { id: 'm1' } },
+          { user: { id: 'me' } },
+        )
+        expect(result).toBe(false)
+      })
+
+      it('skips distributed marking when no message id', async () => {
+        const mockSession = { writeTransaction: jest.fn(), close: jest.fn() }
+        const result = await chatMessageAddedFilter(
+          { userId: 'me', chatMessageAdded: {} },
+          { user: { id: 'me' }, driver: { session: () => mockSession } },
+        )
+        expect(result).toBe(true)
+        expect(mockSession.writeTransaction).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('chatMessageStatusUpdatedFilter', () => {
+      it('returns true when authorId matches', () => {
+        expect(chatMessageStatusUpdatedFilter({ authorId: 'u1' }, { user: { id: 'u1' } })).toBe(true)
+      })
+
+      it('returns false when authorId does not match', () => {
+        expect(chatMessageStatusUpdatedFilter({ authorId: 'u1' }, { user: { id: 'u2' } })).toBe(false)
+      })
+    })
+  })
+
   describe('create message validation', () => {
     beforeAll(async () => {
       authenticatedUser = await chattingUser.toJson()

@@ -27,14 +27,16 @@ export const getUnreadRoomsCount = async (userId, session) => {
   })
 }
 
+export const roomCountUpdatedFilter = (payload, variables, context) => {
+  return payload.userId === context.user?.id
+}
+
 export default {
   Subscription: {
     roomCountUpdated: {
       subscribe: withFilter(
         (_, __, context) => context.pubsub.asyncIterator(ROOM_COUNT_UPDATED),
-        (payload, variables, context) => {
-          return payload.userId === context.user?.id
-        },
+        roomCountUpdatedFilter,
       ),
     },
   },

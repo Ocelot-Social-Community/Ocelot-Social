@@ -37,37 +37,41 @@ const setMessagesAsDistributed = async (undistributedMessagesIds, session) => {
   })
 }
 
+export const chatMessageAddedFilter = async (payload, context) => {
+  const isRecipient = payload.userId === context.user?.id
+  if (isRecipient && payload.chatMessageAdded?.id) {
+    const session = context.driver.session()
+    try {
+      const results = await setMessagesAsDistributed([payload.chatMessageAdded.id], session)
+      for (const { roomId, authorId, messageIds } of results) {
+        void context.pubsub.publish(CHAT_MESSAGE_STATUS_UPDATED, {
+          authorId,
+          chatMessageStatusUpdated: { roomId, messageIds, status: 'distributed' },
+        })
+      }
+    } finally {
+      await session.close()
+    }
+  }
+  return isRecipient
+}
+
+export const chatMessageStatusUpdatedFilter = (payload, context) => {
+  return payload.authorId === context.user?.id
+}
+
 export default {
   Subscription: {
     chatMessageAdded: {
       subscribe: withFilter(
         (_, __, context) => context.pubsub.asyncIterator(CHAT_MESSAGE_ADDED),
-        async (payload, variables, context) => {
-          const isRecipient = payload.userId === context.user?.id
-          if (isRecipient && payload.chatMessageAdded?.id) {
-            const session = context.driver.session()
-            try {
-              const results = await setMessagesAsDistributed([payload.chatMessageAdded.id], session)
-              for (const { roomId, authorId, messageIds } of results) {
-                void context.pubsub.publish(CHAT_MESSAGE_STATUS_UPDATED, {
-                  authorId,
-                  chatMessageStatusUpdated: { roomId, messageIds, status: 'distributed' },
-                })
-              }
-            } finally {
-              await session.close()
-            }
-          }
-          return isRecipient
-        },
+        (payload, variables, context) => chatMessageAddedFilter(payload, context),
       ),
     },
     chatMessageStatusUpdated: {
       subscribe: withFilter(
         (_, __, context) => context.pubsub.asyncIterator(CHAT_MESSAGE_STATUS_UPDATED),
-        (payload, variables, context) => {
-          return payload.authorId === context.user?.id
-        },
+        (payload, variables, context) => chatMessageStatusUpdatedFilter(payload, context),
       ),
     },
   },

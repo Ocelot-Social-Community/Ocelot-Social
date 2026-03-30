@@ -726,3 +726,20 @@ describe('Room', () => {
     })
   })
 })
+
+describe('roomCountUpdatedFilter', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { roomCountUpdatedFilter } = require('./rooms')
+
+  it('returns true when payload userId matches context user', () => {
+    expect(roomCountUpdatedFilter({ userId: 'u1' }, {}, { user: { id: 'u1' } })).toBe(true)
+  })
+
+  it('returns false when userId does not match', () => {
+    expect(roomCountUpdatedFilter({ userId: 'u1' }, {}, { user: { id: 'u2' } })).toBe(false)
+  })
+
+  it('returns false when context user is null', () => {
+    expect(roomCountUpdatedFilter({ userId: 'u1' }, {}, { user: null })).toBe(false)
+  })
+})
