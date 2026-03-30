@@ -260,6 +260,12 @@ export default {
         this.newRoom(newUserId)
       }
     },
+    currentLocaleIso() {
+      this.messages = this.messages.map((m) => {
+        this.formatMessageDate(m)
+        return { ...m }
+      })
+    },
   },
   mounted() {
     if (this.singleRoom && this.groupId) {
@@ -334,6 +340,20 @@ export default {
     ...mapMutations({
       commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
     }),
+
+    formatMessageDate(m) {
+      const dateObj = new Date(m._rawDate)
+      m.timestamp = dateObj.toLocaleTimeString(this.currentLocaleIso, {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+      m.date = dateObj.toLocaleDateString(this.currentLocaleIso, {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    },
 
     async fetchRooms({ room } = {}) {
       this.roomsLoaded = false
@@ -438,12 +458,8 @@ export default {
         ;[...this.messages, ...Message].forEach((m) => {
           if (m.senderId !== this.currentUser.id) m.seen = true
           m.content = m.content || ''
-          m.date = new Date(m.date).toLocaleDateString(this.currentLocaleIso, {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })
+          if (!m._rawDate) m._rawDate = m.date
+          this.formatMessageDate(m)
           m.avatar = m.avatar?.w320
           msgs[m.indexId] = m
         })
@@ -523,12 +539,7 @@ export default {
         _id: 'new' + Math.random().toString(36).substring(2, 15),
         seen: false,
         saved: false,
-        date: new Date().toLocaleDateString(this.currentLocaleIso, {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        }),
+        _rawDate: new Date().toISOString(),
         senderId: this.currentUser.id,
         files:
           messageDetails.files?.map((file) => ({
@@ -537,6 +548,7 @@ export default {
           })) ?? [],
         isUploading: true,
       }
+      this.formatMessageDate(localMessage)
       this.messages = [...this.messages, localMessage]
 
       const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
