@@ -43,34 +43,13 @@ export default {
     OsIcon,
   },
   props: {
-    pageSize: {
-      type: Number,
-      default: 24,
-    },
-    hasNext: {
-      type: Boolean,
-      default: false,
-    },
-    hasPrevious: {
-      type: Boolean,
-      default: false,
-    },
-    activePage: {
-      type: Number,
-      default: 0,
-    },
-    totalResultCount: {
-      type: Number,
-      default: 0,
-    },
-    activeResourceCount: {
-      type: Number,
-      default: 0,
-    },
-    showPageCounter: {
-      type: Boolean,
-      default: false,
-    },
+    pageSize: { type: Number, default: 24 },
+    hasNext: { type: Boolean, default: false },
+    hasPrevious: { type: Boolean, default: false },
+    activePage: { type: Number, default: 0 },
+    totalResultCount: { type: Number, default: 0 },
+    activeResourceCount: { type: Number, default: 0 },
+    showPageCounter: { type: Boolean, default: false },
   },
   created() {
     this.icons = iconRegistry
@@ -88,7 +67,6 @@ export default {
 
 .pagination-pageCount {
   justify-content: space-around;
-
   margin: 8px auto;
 }
 </style>

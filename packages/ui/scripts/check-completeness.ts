@@ -87,7 +87,6 @@ function checkStoryCoverage(
 }
 
 const results: CheckResult[] = []
-let hasErrors = false
 
 // Find all Vue components (excluding index files)
 const components = [
@@ -169,18 +168,19 @@ for (const componentPath of components) {
   if (result.errors.length > 0 || result.warnings.length > 0) {
     results.push(result)
   }
-
-  if (result.errors.length > 0) {
-    hasErrors = true
-  }
 }
 
-// --- Ocelot stories (no .vue files, story-driven checks) ---
+// --- Ocelot stories without .vue files (e.g. icon stories) ---
 const ocelotStories = await glob('src/ocelot/**/*.stories.ts')
+const componentDirs = new Set(components.map((c) => dirname(c)))
 
 for (const storyPath of ocelotStories) {
   const storyName = basename(storyPath, '.stories.ts')
   const storyDir = dirname(storyPath)
+
+  // Skip stories that already have a .vue component (checked in the component loop above)
+  if (componentDirs.has(storyDir)) continue
+
   const visualTestPath = join(storyDir, `${storyName}.visual.spec.ts`)
   const unitTestPath = join(storyDir, 'index.spec.ts')
 
@@ -210,10 +210,6 @@ for (const storyPath of ocelotStories) {
   if (result.errors.length > 0 || result.warnings.length > 0) {
     results.push(result)
   }
-
-  if (result.errors.length > 0) {
-    hasErrors = true
-  }
 }
 
 // Output results
@@ -230,16 +226,12 @@ if (results.length === 0) {
     }
 
     for (const warning of result.warnings) {
-      console.log(`  ⚠ ${warning}`)
+      console.log(`  ✗ ${warning}`)
     }
 
     console.log('')
   }
 
-  if (hasErrors) {
-    console.log('Completeness check failed with errors.')
-    process.exit(1)
-  } else {
-    console.log('Completeness check passed with warnings.')
-  }
+  console.log('Completeness check failed.')
+  process.exit(1)
 }

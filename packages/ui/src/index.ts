@@ -10,6 +10,9 @@
 // Re-export all components
 export * from './components'
 
+// Re-export Ocelot composite components
+export * from './ocelot'
+
 // Export Vue plugin for global registration
 export { default as OcelotUI } from './plugin'
 

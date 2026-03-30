@@ -529,8 +529,10 @@
     "startDate": "Дата начала"
   },
   "followButton": {
+    "error": "Действие не удалось. Пожалуйста, попробуйте снова.",
     "follow": "Подписаться",
-    "following": "Вы подписаны"
+    "following": "Вы подписаны",
+    "unfollow": "Отписаться"
   },
   "group": {
     "actionRadii": {
@@ -859,7 +861,7 @@
     "user": "Пользователь"
   },
   "observeButton": {
-    "observed": "наблюдаемый"
+    "observed": "{count} наблюдаемый"
   },
   "pagination": {
     "next": "Вперёд",
@@ -1251,7 +1253,7 @@
     }
   },
   "shoutButton": {
-    "shouted": "выкрикнули"
+    "shouted": "{count} выкрикнули"
   },
   "site": {
     "back-to-login": "Вернуться на страницу входа",

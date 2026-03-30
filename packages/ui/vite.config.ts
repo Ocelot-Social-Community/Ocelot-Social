@@ -49,18 +49,25 @@ export default defineConfig({
         'tailwind.preset': resolve(__dirname, 'src/tailwind.preset.ts'),
         ocelot: resolve(__dirname, 'src/ocelot/index.ts'),
       },
-      formats: ['es', 'cjs'],
-      fileName: (format, entryName) => `${entryName}.${format === 'es' ? 'mjs' : 'cjs'}`,
     },
     rollupOptions: {
       external: ['vue', 'vue-demi', 'tailwindcss'],
-      output: {
-        globals: {
-          vue: 'Vue',
-          'vue-demi': 'VueDemi',
+      output: [
+        {
+          format: 'es',
+          entryFileNames: '[name].mjs',
+          chunkFileNames: '[name]-[hash].mjs',
+          assetFileNames: '[name].[ext]',
+          globals: { vue: 'Vue', 'vue-demi': 'VueDemi' },
         },
-        assetFileNames: '[name].[ext]',
-      },
+        {
+          format: 'cjs',
+          entryFileNames: '[name].cjs',
+          chunkFileNames: '[name]-[hash].cjs',
+          assetFileNames: '[name].[ext]',
+          globals: { vue: 'Vue', 'vue-demi': 'VueDemi' },
+        },
+      ],
     },
     cssCodeSplit: false,
     sourcemap: true,

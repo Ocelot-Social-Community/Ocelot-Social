@@ -122,19 +122,23 @@
             </div>
             <div class="actions">
               <!-- Shout Button -->
-              <shout-button
+              <os-action-button
                 :disabled="isAuthor"
-                :count="post.shoutedCount"
-                :is-shouted="post.shoutedByCurrentUser"
-                :node-id="post.id"
-                node-type="Post"
+                :count="shoutedCount"
+                :aria-label="$t('shoutButton.shouted', { count: shoutedCount })"
+                :filled="shouted"
+                :icon="icons.heartO"
+                :loading="shoutLoading"
+                @click="toggleShout"
               />
               <!-- Follow Button -->
-              <observe-button
-                :is-observed="post.isObservedByMe"
+              <os-action-button
                 :count="post.observingUsersCount"
-                :post-id="post.id"
-                @toggleObservePost="toggleObservePost"
+                :aria-label="$t('observeButton.observed', { count: post.observingUsersCount })"
+                :filled="post.isObservedByMe"
+                :icon="icons.bell"
+                :loading="observeLoading"
+                @click="toggleObservePost(post.id, !post.isObservedByMe)"
               />
             </div>
             <!-- comments -->
@@ -184,7 +188,7 @@
 </template>
 
 <script>
-import { OsButton, OsCard, OsIcon, OsMenu } from '@ocelot-social/ui'
+import { OsButton, OsCard, OsIcon, OsMenu, OsActionButton } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ContentViewer from '~/components/Editor/ContentViewer'
 import CommentForm from '~/components/CommentForm/CommentForm'
@@ -197,9 +201,8 @@ import HcCategory from '~/components/Category'
 import HcEmpty from '~/components/Empty/Empty'
 import HcHashtag from '~/components/Hashtag/Hashtag'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
-import ObserveButton from '~/components/ObserveButton.vue'
 import ResponsiveImage from '~/components/ResponsiveImage/ResponsiveImage.vue'
-import ShoutButton from '~/components/ShoutButton.vue'
+import { useShout } from '~/composables/useShout'
 import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import {
   postMenuModalsData,
@@ -236,14 +239,15 @@ export default {
     HcEmpty,
     HcHashtag,
     LocationTeaser,
-    ObserveButton,
+    OsActionButton,
     ResponsiveImage,
-    ShoutButton,
     UserTeaser,
   },
   mixins: [GetCategories, postListActions, SortCategories],
   created() {
     this.icons = iconRegistry
+    const { toggleShout } = useShout({ apollo: this.$apollo })
+    this._toggleShout = toggleShout
   },
   head() {
     return {
@@ -261,6 +265,10 @@ export default {
       blocked: null,
       postAuthor: null,
       group: null,
+      shoutedCount: 0,
+      shouted: false,
+      shoutLoading: false,
+      observeLoading: false,
     }
   },
   mounted() {
@@ -341,6 +349,23 @@ export default {
     },
   },
   methods: {
+    async toggleShout() {
+      const newShouted = !this.shouted
+      const backup = { shoutedCount: this.shoutedCount, shouted: this.shouted }
+      this.shouted = newShouted
+      this.shoutedCount += newShouted ? 1 : -1
+      this.shoutLoading = true
+      const { success } = await this._toggleShout({
+        id: this.post.id,
+        type: 'Post',
+        isCurrentlyShouted: !newShouted,
+      })
+      if (!success) {
+        this.shoutedCount = backup.shoutedCount
+        this.shouted = backup.shouted
+      }
+      this.shoutLoading = false
+    },
     reply(message) {
       this.$refs.commentForm && this.$refs.commentForm.reply(message)
     },
@@ -358,23 +383,23 @@ export default {
       this.post.isObservedByMe = comment.isPostObservedByMe
       this.post.observingUsersCount = comment.postObservingUsersCount
     },
-    toggleObservePost(postId, value) {
-      this.$apollo
-        .mutate({
+    async toggleObservePost(postId, value) {
+      this.observeLoading = true
+      try {
+        await this.$apollo.mutate({
           mutation: PostMutations().toggleObservePost,
-          variables: {
-            value,
-            id: postId,
-          },
+          variables: { value, id: postId },
         })
-        .then(() => {
-          const message = this.$t(
-            `post.menu.${value ? 'observedSuccessfully' : 'unobservedSuccessfully'}`,
-          )
-          this.$toast.success(message)
-          this.$apollo.queries.Post.refetch()
-        })
-        .catch((error) => this.$toast.error(error.message))
+        const message = this.$t(
+          `post.menu.${value ? 'observedSuccessfully' : 'unobservedSuccessfully'}`,
+        )
+        this.$toast.success(message)
+        await this.$apollo.queries.Post.refetch()
+      } catch (error) {
+        this.$toast.error(error.message)
+      } finally {
+        this.observeLoading = false
+      }
     },
     toggleNewCommentForm(showNewCommentForm) {
       this.showNewCommentForm = showNewCommentForm
@@ -400,6 +425,8 @@ export default {
         const { image } = this.post
         this.postAuthor = this.post.author
         this.blurred = image && image.sensitive
+        this.shouted = !!this.post.shoutedByCurrentUser
+        this.shoutedCount = this.post.shoutedCount || 0
       },
       fetchPolicy: 'cache-and-network',
     },

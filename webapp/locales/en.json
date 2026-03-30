@@ -529,8 +529,10 @@
     "startDate": "Start date"
   },
   "followButton": {
+    "error": "Action failed. Please try again.",
     "follow": "Follow",
-    "following": "Following"
+    "following": "Following",
+    "unfollow": "Unfollow"
   },
   "group": {
     "actionRadii": {
@@ -859,7 +861,7 @@
     "user": "User"
   },
   "observeButton": {
-    "observed": "observed"
+    "observed": "{count} observed"
   },
   "pagination": {
     "next": "Next",
@@ -1251,7 +1253,7 @@
     }
   },
   "shoutButton": {
-    "shouted": "shouted"
+    "shouted": "{count} shouted"
   },
   "site": {
     "back-to-login": "Back to login page",

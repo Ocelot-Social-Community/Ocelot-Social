@@ -529,8 +529,10 @@
     "startDate": "Дата початку"
   },
   "followButton": {
+    "error": "Дія не вдалася. Будь ласка, спробуйте ще раз.",
     "follow": "Підписатися",
-    "following": "Підписано"
+    "following": "Підписано",
+    "unfollow": "Відписатися"
   },
   "group": {
     "actionRadii": {
@@ -859,7 +861,7 @@
     "user": "Користувач"
   },
   "observeButton": {
-    "observed": "спостерігається"
+    "observed": "{count} спостерігається"
   },
   "pagination": {
     "next": "Далі",
@@ -1251,7 +1253,7 @@
     }
   },
   "shoutButton": {
-    "shouted": "рекомендовано"
+    "shouted": "{count} рекомендовано"
   },
   "site": {
     "back-to-login": "Повернутися на сторінку входу",

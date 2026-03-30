@@ -1,0 +1,120 @@
+import { mount } from '@vue/test-utils'
+import { describe, expect, it } from 'vitest'
+import { markRaw } from 'vue-demi'
+
+import { IconCheck } from '#src/components/OsIcon'
+
+import OsActionButton from './OsActionButton.vue'
+
+const icon = markRaw(IconCheck)
+
+describe('osActionButton', () => {
+  const defaultProps = { count: 5, ariaLabel: 'Like', icon }
+
+  it('renders the count badge', () => {
+    const wrapper = mount(OsActionButton, { props: defaultProps })
+
+    expect(wrapper.find('.os-action-button__count').text()).toBe('5')
+  })
+
+  it('renders with wrapper class', () => {
+    const wrapper = mount(OsActionButton, { props: defaultProps })
+
+    expect(wrapper.classes()).toContain('os-action-button')
+  })
+
+  it('passes aria-label to the button', () => {
+    const wrapper = mount(OsActionButton, { props: defaultProps })
+
+    expect(wrapper.find('button').attributes('aria-label')).toBe('Like')
+  })
+
+  it('renders a circular OsButton', () => {
+    const wrapper = mount(OsActionButton, { props: defaultProps })
+
+    expect(wrapper.find('button').classes()).toContain('rounded-full')
+  })
+
+  describe('filled prop', () => {
+    it('renders outline appearance by default', () => {
+      const wrapper = mount(OsActionButton, { props: defaultProps })
+
+      expect(wrapper.find('button').attributes('data-appearance')).toBe('outline')
+    })
+
+    it('renders filled appearance when filled is true', () => {
+      const wrapper = mount(OsActionButton, {
+        props: { ...defaultProps, filled: true },
+      })
+
+      expect(wrapper.find('button').attributes('data-appearance')).toBe('filled')
+    })
+  })
+
+  describe('disabled prop', () => {
+    it('is not disabled by default', () => {
+      const wrapper = mount(OsActionButton, { props: defaultProps })
+
+      expect(wrapper.find('button').attributes('disabled')).toBeUndefined()
+    })
+
+    it('disables the button when disabled is true', () => {
+      const wrapper = mount(OsActionButton, {
+        props: { ...defaultProps, disabled: true },
+      })
+
+      expect(wrapper.find('button').attributes('disabled')).toBeDefined()
+    })
+  })
+
+  describe('loading prop', () => {
+    it('is not loading by default', () => {
+      const wrapper = mount(OsActionButton, { props: defaultProps })
+
+      expect(wrapper.find('button').attributes('aria-busy')).toBeUndefined()
+    })
+
+    it('shows loading state when loading is true', () => {
+      const wrapper = mount(OsActionButton, {
+        props: { ...defaultProps, loading: true },
+      })
+
+      expect(wrapper.find('button').attributes('aria-busy')).toBe('true')
+    })
+  })
+
+  describe('click event', () => {
+    it('emits click when button is clicked', async () => {
+      const wrapper = mount(OsActionButton, { props: defaultProps })
+
+      await wrapper.find('button').trigger('click')
+
+      expect(wrapper.emitted('click')).toHaveLength(1)
+    })
+  })
+
+  describe('keyboard accessibility', () => {
+    it('renders a native button element (inherits keyboard support)', () => {
+      const wrapper = mount(OsActionButton, { props: defaultProps })
+
+      expect(wrapper.find('button').exists()).toBe(true)
+    })
+
+    it('button is not excluded from tab order', () => {
+      const wrapper = mount(OsActionButton, { props: defaultProps })
+
+      expect(wrapper.find('button').attributes('tabindex')).not.toBe('-1')
+    })
+  })
+
+  describe('icon slot', () => {
+    it('renders custom icon slot content', () => {
+      const wrapper = mount(OsActionButton, {
+        props: defaultProps,
+        slots: { icon: '<span class="custom-icon">★</span>' },
+      })
+
+      expect(wrapper.find('.custom-icon').exists()).toBe(true)
+    })
+  })
+})

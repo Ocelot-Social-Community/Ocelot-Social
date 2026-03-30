@@ -529,8 +529,10 @@
     "startDate": "Startdatum"
   },
   "followButton": {
+    "error": "Actie mislukt. Probeer het opnieuw.",
     "follow": "Volgen",
-    "following": "Volgt"
+    "following": "Volgt",
+    "unfollow": "Ontvolgen"
   },
   "group": {
     "actionRadii": {
@@ -859,7 +861,7 @@
     "user": "Gebruiker"
   },
   "observeButton": {
-    "observed": "geobserveerd"
+    "observed": "{count} geobserveerd"
   },
   "pagination": {
     "next": "Volgende",
@@ -1251,7 +1253,7 @@
     }
   },
   "shoutButton": {
-    "shouted": "uitgeroepen"
+    "shouted": "{count} uitgeroepen"
   },
   "site": {
     "back-to-login": "Terug naar de inlogpagina",

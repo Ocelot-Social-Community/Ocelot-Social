@@ -529,8 +529,10 @@
     "startDate": "Data e fillimit"
   },
   "followButton": {
+    "error": "Veprimi dështoi. Ju lutemi provoni përsëri.",
     "follow": "Ndiq",
-    "following": "Duke ndjekur"
+    "following": "Duke ndjekur",
+    "unfollow": "Mos ndiq"
   },
   "group": {
     "actionRadii": {
@@ -859,7 +861,7 @@
     "user": "Përdorues"
   },
   "observeButton": {
-    "observed": "i observuar"
+    "observed": "{count} i observuar"
   },
   "pagination": {
     "next": "Tjetër",
@@ -1251,7 +1253,7 @@
     }
   },
   "shoutButton": {
-    "shouted": "rekomanduar"
+    "shouted": "{count} rekomanduar"
   },
   "site": {
     "back-to-login": "Kthehu në faqen e hyrjes",

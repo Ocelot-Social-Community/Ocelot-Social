@@ -20,6 +20,10 @@ describe('PostSlug', () => {
         id: '1',
         author,
         postType: ['Article'],
+        shoutedCount: 0,
+        shoutedByCurrentUser: false,
+        observingUsersCount: 0,
+        isObservedByMe: false,
         comments: [
           {
             id: 'comment134',
@@ -111,8 +115,12 @@ describe('PostSlug', () => {
           post: {
             id: '1',
             author: null,
-            comments: [],
             postType: ['Article'],
+            shoutedCount: 0,
+            shoutedByCurrentUser: false,
+            observingUsersCount: 0,
+            isObservedByMe: false,
+            comments: [],
           },
           ready: true,
         }

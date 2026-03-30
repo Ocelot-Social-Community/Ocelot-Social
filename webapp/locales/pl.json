@@ -529,8 +529,10 @@
     "startDate": "Data rozpoczęcia"
   },
   "followButton": {
-    "follow": "naśladować",
-    "following": "w skutek"
+    "error": "Akcja nie powiodła się. Spróbuj ponownie.",
+    "follow": "Obserwuj",
+    "following": "Obserwujesz",
+    "unfollow": "Przestań obserwować"
   },
   "group": {
     "actionRadii": {
@@ -859,7 +861,7 @@
     "user": "Użytkownik"
   },
   "observeButton": {
-    "observed": "obserwowany"
+    "observed": "{count} obserwujących"
   },
   "pagination": {
     "next": "Następna",
@@ -1251,7 +1253,7 @@
     }
   },
   "shoutButton": {
-    "shouted": "krzyczeć"
+    "shouted": "{count} rekomendacji"
   },
   "site": {
     "back-to-login": "Powrót do strony logowania",

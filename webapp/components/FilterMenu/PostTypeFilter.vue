@@ -6,7 +6,7 @@
   >
     <template #filter-follower>
       <li class="item all-item">
-        <labeled-button
+        <os-labeled-button
           :icon="icons.check"
           :label="$t('filter-menu.all')"
           :filled="filteredPostTypes.length === 0"
@@ -14,10 +14,10 @@
           @click="togglePostType(null)"
         >
           {{ $t('filter-menu.all') }}
-        </labeled-button>
+        </os-labeled-button>
       </li>
       <li class="item article-item">
-        <labeled-button
+        <os-labeled-button
           :icon="icons.book"
           :label="$t('filter-menu.article')"
           :filled="filteredPostTypes.includes('Article')"
@@ -26,7 +26,7 @@
         />
       </li>
       <li class="item event-item">
-        <labeled-button
+        <os-labeled-button
           :icon="icons.calendar"
           :label="$t('filter-menu.event')"
           :filled="filteredPostTypes.includes('Event')"
@@ -42,13 +42,13 @@
 import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
 import FilterMenuSection from '~/components/FilterMenu/FilterMenuSection'
-import LabeledButton from '~/components/_new/generic/LabeledButton/LabeledButton'
+import { OsLabeledButton } from '@ocelot-social/ui'
 
 export default {
   name: 'PostTypeFilter',
   components: {
     FilterMenuSection,
-    LabeledButton,
+    OsLabeledButton,
   },
   computed: {
     ...mapGetters({
@@ -68,11 +68,12 @@ export default {
 
 <style lang="scss">
 .post-type-filter {
-  & .filter-list {
-    display: flex;
-    flex-basis: 100%;
-    flex-grow: 1;
-    padding-left: $space-base;
+  & .item {
+    min-width: 80px;
+
+    &:first-child {
+      margin-left: calc(-1 * (80px - 36px) / 2);
+    }
   }
 }
 </style>

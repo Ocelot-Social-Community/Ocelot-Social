@@ -22,7 +22,7 @@ export default {
       apollo: this.$apollo,
       store: this.$store,
       toast: this.$toast,
-      t: this.$t,
+      t: (key, ...args) => this.$t(key, ...args),
     })
     this._changePassword = changePassword
   },

@@ -17,7 +17,30 @@
               <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
               <template v-if="!isLoggedIn">
                 <client-only>
-                  <login-button placement="top" />
+                  <dropdown class="login-button" offset="8" placement="top">
+                    <template #default="{ toggleMenu }">
+                      <os-button
+                        data-test="login-btn"
+                        variant="primary"
+                        appearance="ghost"
+                        circle
+                        :aria-label="$t('login.login')"
+                        @click.prevent="toggleMenu"
+                      >
+                        <template #icon>
+                          <os-icon :icon="icons.signIn" />
+                        </template>
+                      </os-button>
+                    </template>
+                    <template #popover>
+                      <div class="login-button-menu-popover">
+                        <nuxt-link class="login-link" :to="{ name: 'login' }">
+                          <os-icon :icon="icons.signIn" />
+                          {{ $t('login.login') }}
+                        </nuxt-link>
+                      </div>
+                    </template>
+                  </dropdown>
                 </client-only>
               </template>
             </div>
@@ -36,21 +59,28 @@
 </template>
 
 <script>
+import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import seo from '~/mixins/seo'
 import Logo from '~/components/Logo/Logo'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
-import LoginButton from '~/components/LoginButton/LoginButton'
+import Dropdown from '~/components/Dropdown'
 import PageFooter from '~/components/PageFooter/PageFooter'
 
 export default {
   components: {
+    OsButton,
+    OsIcon,
     Logo,
     LocaleSwitch,
-    LoginButton,
+    Dropdown,
     PageFooter,
   },
   mixins: [seo],
+  created() {
+    this.icons = iconRegistry
+  },
   computed: {
     ...mapGetters({
       isLoggedIn: 'auth/isLoggedIn',
@@ -80,6 +110,23 @@ export default {
   .layout-blank .content {
     padding-left: 0 !important;
     padding-right: 0 !important;
+  }
+}
+
+.login-button {
+  color: $color-secondary;
+}
+
+.login-button-menu-popover {
+  padding-top: $space-x-small;
+  padding-bottom: $space-x-small;
+
+  .login-link {
+    color: $text-color-link;
+    padding-top: $space-xx-small;
+    &:hover {
+      color: $text-color-link-active;
+    }
   }
 }
 </style>

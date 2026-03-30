@@ -529,8 +529,10 @@
     "startDate": "Anfangszeitpunkt"
   },
   "followButton": {
+    "error": "Aktion fehlgeschlagen. Bitte versuche es erneut.",
     "follow": "Folgen",
-    "following": "Folge Ich"
+    "following": "Folge Ich",
+    "unfollow": "Entfolgen"
   },
   "group": {
     "actionRadii": {
@@ -859,7 +861,7 @@
     "user": "Nutzer"
   },
   "observeButton": {
-    "observed": "beobachtet"
+    "observed": "{count} beobachtet"
   },
   "pagination": {
     "next": "Weiter",
@@ -1251,7 +1253,7 @@
     }
   },
   "shoutButton": {
-    "shouted": "empfohlen"
+    "shouted": "{count} empfohlen"
   },
   "site": {
     "back-to-login": "Zurück zur Anmeldung",

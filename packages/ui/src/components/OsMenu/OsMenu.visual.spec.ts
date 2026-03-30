@@ -82,4 +82,15 @@ test.describe('OsMenu visual regression', () => {
 
     await checkA11y(page)
   })
+
+  test('custom menu item', async ({ page }) => {
+    await page.goto(`${STORY_URL}--custom-menu-item&viewMode=story`)
+    const root = page.locator(STORY_ROOT)
+    await root.waitFor()
+    await waitForFonts(page)
+
+    await expect(root).toHaveScreenshot('custom-menu-item.png')
+
+    await checkA11y(page)
+  })
 })

@@ -29,7 +29,7 @@
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
-import { joinGroupMutation, leaveGroupMutation } from '~/graphql/groups'
+import { useJoinLeaveGroup } from '~/composables/useJoinLeaveGroup'
 
 export default {
   name: 'JoinLeaveButton',
@@ -115,6 +115,11 @@ export default {
   },
   created() {
     this.icons = iconRegistry
+    const { joinLeaveGroup } = useJoinLeaveGroup({
+      apollo: this.$apollo,
+      toast: this.$toast,
+    })
+    this._joinLeaveGroup = joinLeaveGroup
   },
   methods: {
     onHover() {
@@ -124,30 +129,21 @@ export default {
     },
     toggle() {
       if (this.isMember) {
-        this.openLeaveModal()
+        this.showConfirmModal = true
       } else {
         this.joinLeave()
       }
     },
-    openLeaveModal() {
-      this.showConfirmModal = true
-    },
     async joinLeave() {
-      const join = !this.isMember
-      const mutation = join ? joinGroupMutation() : leaveGroupMutation()
-
       this.hovered = false
-      this.$emit('prepare', join)
-
-      try {
-        const { data } = await this.$apollo.mutate({
-          mutation,
-          variables: { groupId: this.group.id, userId: this.userId },
-        })
-        const joinedLeftGroupResult = join ? data.JoinGroup : data.LeaveGroup
-        this.$emit('update', joinedLeftGroupResult)
-      } catch (error) {
-        this.$toast.error(error.message)
+      this.$emit('prepare', !this.isMember)
+      const { success, data } = await this._joinLeaveGroup({
+        groupId: this.group.id,
+        userId: this.userId,
+        isMember: this.isMember,
+      })
+      if (success) {
+        this.$emit('update', data)
       }
     },
   },
