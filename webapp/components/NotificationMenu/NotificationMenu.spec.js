@@ -39,7 +39,7 @@ describe('NotificationMenu.vue', () => {
     it('renders as link without counter', () => {
       wrapper = Wrapper()
       expect(wrapper.classes('notifications-menu')).toBe(true)
-      expect(() => wrapper.get('.count')).toThrow()
+      expect(wrapper.find('.os-counter-icon__count').exists()).toBe(false)
     })
 
     it('no dropdown is rendered', () => {
@@ -74,7 +74,7 @@ describe('NotificationMenu.vue', () => {
       it('renders as link without counter', () => {
         wrapper = Wrapper()
         expect(wrapper.classes('notifications-menu')).toBe(true)
-        expect(() => wrapper.get('.count')).toThrow()
+        expect(wrapper.find('.os-counter-icon__count').exists()).toBe(false)
       })
 
       it('no dropdown is rendered', () => {
@@ -161,12 +161,14 @@ describe('NotificationMenu.vue', () => {
 
       it('displays the number of unread notifications', () => {
         wrapper = Wrapper()
-        expect(wrapper.find('.count').text()).toEqual('2')
+        expect(wrapper.find('.os-counter-icon__count').text()).toEqual('2')
       })
 
       it('renders the counter in red', () => {
         wrapper = Wrapper()
-        expect(wrapper.find('.count').classes()).toContain('--danger')
+        expect(wrapper.find('.os-counter-icon__count').classes()).toContain(
+          'os-counter-icon__count--danger',
+        )
       })
     })
   })

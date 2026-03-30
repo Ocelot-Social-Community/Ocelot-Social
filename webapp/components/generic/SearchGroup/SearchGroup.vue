@@ -29,10 +29,6 @@ export default {
     align-items: flex-end;
     color: $text-color-softer;
     font-size: $font-size-small;
-
-    > .counts > .counter-icon {
-      margin: 0 $space-x-small;
-    }
   }
 }
 </style>

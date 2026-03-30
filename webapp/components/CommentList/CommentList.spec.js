@@ -89,7 +89,7 @@ describe('CommentList.vue', () => {
 
     it('displays a comments counter that ignores disabled and deleted comments', () => {
       wrapper = Wrapper()
-      expect(wrapper.find('.count').text()).toEqual('1')
+      expect(wrapper.find('.os-counter-icon__count').text()).toEqual('1')
     })
 
     describe('scrollToAnchor mixin', () => {

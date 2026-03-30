@@ -1,7 +1,7 @@
 <template>
   <div id="comments" class="comment-list">
     <h3 class="title">
-      <counter-icon :icon="icons.comments" :count="commentsCount" />
+      <os-counter-icon :icon="icons.comments" :count="commentsCount" />
       {{ $t('common.comment', null, 0) }}
     </h3>
     <div v-if="post.comments" class="comments">
@@ -19,15 +19,15 @@
   </div>
 </template>
 <script>
+import { OsCounterIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import CommentCard from '~/components/CommentCard/CommentCard'
 import scrollToAnchor from '~/mixins/scrollToAnchor'
 
 export default {
   mixins: [scrollToAnchor],
   components: {
-    CounterIcon,
+    OsCounterIcon,
     CommentCard,
   },
   props: {
@@ -73,7 +73,7 @@ export default {
   > .title {
     margin-top: 0;
 
-    > .counter-icon {
+    > .os-counter-icon {
       margin-right: $space-small;
     }
   }
