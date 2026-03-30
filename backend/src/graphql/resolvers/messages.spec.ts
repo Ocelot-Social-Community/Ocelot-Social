@@ -11,12 +11,13 @@ import { Upload } from 'graphql-upload/public/index'
 
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
-import { chatMessageAddedFilter, chatMessageStatusUpdatedFilter } from './messages'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
 import MarkMessagesAsSeen from '@graphql/queries/messaging/MarkMessagesAsSeen.gql'
 import Message from '@graphql/queries/messaging/Message.gql'
 import Room from '@graphql/queries/messaging/Room.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import { chatMessageAddedFilter, chatMessageStatusUpdatedFilter } from './messages'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
