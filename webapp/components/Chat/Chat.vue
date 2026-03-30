@@ -462,22 +462,27 @@ export default {
     },
 
     replaceLocalMessage(localId, serverMsg) {
-      const prepared = this.prepareMessage(serverMsg)
       const idx = this.messages.findIndex((m) => m._id === localId)
       if (idx !== -1) {
-        const current = this.messages[idx]
-        // Status only advances forward (false→true), preserve any updates
-        // that arrived via socket before the mutation response
-        if (current.distributed) prepared.distributed = true
-        if (current.seen) prepared.seen = true
-        // Apply any queued status updates that arrived before this replace
-        const pending = this.pendingStatusUpdates[prepared.id]
-        if (pending) {
-          Object.assign(prepared, pending)
-          delete this.pendingStatusUpdates[prepared.id]
+        const msg = this.messages[idx]
+        // Set server id for status update lookups, keep _id to avoid library re-keying
+        msg.id = serverMsg.id || serverMsg._id
+        msg.indexId = serverMsg.indexId
+        msg.saved = true
+        // Status only advances forward (false→true)
+        if (serverMsg.distributed || msg.distributed) msg.distributed = true
+        if (serverMsg.seen || msg.seen) msg.seen = true
+        // Update file URLs from server (uploads get final URLs)
+        if (serverMsg.files?.length) {
+          msg.files = serverMsg.files
         }
-        // Mutate in place to avoid triggering the library's messages watcher
-        Object.assign(current, prepared)
+        // Apply any queued status updates that arrived before mutation response
+        const pending = this.pendingStatusUpdates[msg.id]
+        if (pending) {
+          if (pending.distributed) msg.distributed = true
+          if (pending.seen) msg.seen = true
+          delete this.pendingStatusUpdates[msg.id]
+        }
       }
     },
 
