@@ -28,19 +28,37 @@ type Message {
   saved: Boolean
   distributed: Boolean
   seen: Boolean
+    @cypher(
+      statement: """
+      MATCH (this)<-[:CREATED]-(author:User)
+      OPTIONAL MATCH (unseer:User)-[:HAS_NOT_SEEN]->(this)
+      WHERE CASE
+        WHEN author.id = $cypherParams.currentUserId THEN true
+        ELSE unseer.id = $cypherParams.currentUserId
+      END
+      RETURN count(unseer) = 0
+      """
+    )
   files: [File]! @relation(name: "ATTACHMENT", direction: "OUT")
 }
 
 type Mutation {
-  CreateMessage(roomId: ID!, content: String, files: [FileInput]): Message
+  CreateMessage(roomId: ID, userId: ID, content: String, files: [FileInput]): Message
 
   MarkMessagesAsSeen(messageIds: [String!]): Boolean
 }
 
 type Query {
-  Message(roomId: ID!, first: Int, offset: Int, orderBy: [_MessageOrdering]): [Message]
+  Message(roomId: ID!, first: Int, offset: Int, beforeIndex: Int, orderBy: [_MessageOrdering]): [Message]
+}
+
+type ChatMessageStatusPayload {
+  roomId: ID!
+  messageIds: [String!]!
+  status: String!
 }
 
 type Subscription {
   chatMessageAdded: Message
+  chatMessageStatusUpdated: ChatMessageStatusPayload
 }

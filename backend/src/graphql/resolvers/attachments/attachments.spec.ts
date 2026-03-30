@@ -12,7 +12,6 @@ import { Upload } from '@aws-sdk/lib-storage'
 import Factory, { cleanDatabase } from '@db/factories'
 import { UserInputError } from '@graphql/errors'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
-import CreateRoom from '@graphql/queries/messaging/CreateRoom.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import { attachments } from './attachments'
@@ -94,12 +93,14 @@ describe('delete Attachment', () => {
       chatPartner = await u2.toJson()
 
       authenticatedUser = user
-      const { data: room } = await mutate({
-        mutation: CreateRoom,
+      const initResult = await mutate({
+        mutation: CreateMessage,
         variables: {
           userId: chatPartner.id,
+          content: 'init',
         },
       })
+      const roomId = initResult.data.CreateMessage.room.id
 
       const f = await Factory.build('file', {
         url: 'http://localhost/some/file/url/',
@@ -111,7 +112,7 @@ describe('delete Attachment', () => {
       const m = await mutate({
         mutation: CreateMessage,
         variables: {
-          roomId: room?.CreateRoom.id,
+          roomId,
           content: 'test messsage',
         },
       })

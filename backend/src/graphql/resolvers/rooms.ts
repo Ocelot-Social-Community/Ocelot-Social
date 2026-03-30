@@ -15,10 +15,11 @@ import Resolver from './helpers/Resolver'
 export const getUnreadRoomsCount = async (userId, session) => {
   return session.readTransaction(async (transaction) => {
     const unreadRoomsCypher = `
-      MATCH (user:User { id: $userId })-[:CHATS_IN]->(room:Room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
-      WHERE NOT sender.id = $userId AND NOT message.seen
-      AND NOT (user)-[:BLOCKED]->(sender)
-      AND NOT (user)-[:MUTED]->(sender)
+      MATCH (user:User { id: $userId })-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(room:Room)<-[:CHATS_IN]-(user)
+      OPTIONAL MATCH (message)<-[:CREATED]-(sender:User)
+      WHERE (user)-[:BLOCKED]->(sender) OR (user)-[:MUTED]->(sender)
+      WITH room, message, sender
+      WHERE sender IS NULL
       RETURN toString(COUNT(DISTINCT room)) AS count
     `
     const unreadRoomsTxResponse = await transaction.run(unreadRoomsCypher, { userId })
@@ -39,11 +40,83 @@ export default {
   },
   Query: {
     Room: async (object, params, context, resolveInfo) => {
-      if (!params.filter) params.filter = {}
-      params.filter.users_some = {
-        id: context.user.id,
+      // Single room lookup by userId or groupId
+      if (params.userId || params.groupId) {
+        const session = context.driver.session()
+        try {
+          const cypher = params.groupId
+            ? `
+              MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)-[:ROOM_FOR]->(group:Group { id: $groupId })
+              RETURN room { .* } AS room
+            `
+            : `
+              MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user:User { id: $userId })
+              WHERE NOT (room)-[:ROOM_FOR]->(:Group)
+              RETURN room { .* } AS room
+            `
+          const result = await session.readTransaction(async (transaction) => {
+            return transaction.run(cypher, {
+              currentUserId: context.user.id,
+              userId: params.userId || null,
+              groupId: params.groupId || null,
+            })
+          })
+          const rooms = result.records.map((record) => record.get('room'))
+          if (rooms.length === 0) return []
+          // Re-query via neo4jgraphql to get all computed fields
+          delete params.userId
+          delete params.groupId
+          params.filter = { users_some: { id: context.user.id } }
+          params.id = rooms[0].id
+          return neo4jgraphql(object, params, context, resolveInfo)
+        } finally {
+          await session.close()
+        }
       }
-      return neo4jgraphql(object, params, context, resolveInfo)
+
+      // Single room lookup by id
+      if (params.id) {
+        if (!params.filter) params.filter = {}
+        params.filter.users_some = { id: context.user.id }
+        return neo4jgraphql(object, params, context, resolveInfo)
+      }
+
+      // Room list with cursor-based pagination sorted by latest activity
+      const session = context.driver.session()
+      try {
+        const first = params.first || 10
+        const before = params.before || null
+        const result = await session.readTransaction(async (transaction) => {
+          const cypher = `
+            MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)
+            WITH room, COALESCE(room.lastMessageAt, room.createdAt) AS sortDate
+            ${before ? 'WHERE sortDate < $before' : ''}
+            RETURN room.id AS id
+            ORDER BY sortDate DESC
+            LIMIT toInteger($first)
+          `
+          return transaction.run(cypher, {
+            currentUserId: context.user.id,
+            first,
+            before,
+          })
+        })
+        const roomIds = result.records.map((record) => record.get('id'))
+        if (roomIds.length === 0) return []
+        // Re-query via neo4jgraphql to get computed fields for each room
+        const rooms = []
+        for (const roomId of roomIds) {
+          const roomParams = {
+            id: roomId,
+            filter: { users_some: { id: context.user.id } },
+          }
+          const [room] = await neo4jgraphql(object, roomParams, context, resolveInfo)
+          if (room) rooms.push(room)
+        }
+        return rooms
+      } finally {
+        await session.close()
+      }
     },
     UnreadRooms: async (_object, _params, context, _resolveInfo) => {
       const {
@@ -59,46 +132,51 @@ export default {
     },
   },
   Mutation: {
-    CreateRoom: async (_parent, params, context, _resolveInfo) => {
-      const { userId } = params
+    CreateGroupRoom: async (_parent, params, context, _resolveInfo) => {
+      const { groupId } = params
       const {
         user: { id: currentUserId },
       } = context
-      if (userId === currentUserId) {
-        throw new Error('Cannot create a room with self')
-      }
       const session = context.driver.session()
       try {
         const room = await session.writeTransaction(async (transaction) => {
-          const createRoomCypher = `
-            MATCH (currentUser:User { id: $currentUserId })
-            MATCH (user:User { id: $userId })
-            MERGE (currentUser)-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user)
+          // Step 1: Create/merge the room and add all active group members to it
+          const createGroupRoomCypher = `
+            MATCH (currentUser:User { id: $currentUserId })-[membership:MEMBER_OF]->(group:Group { id: $groupId })
+            WHERE membership.role IN ['usual', 'admin', 'owner']
+            MERGE (room:Room)-[:ROOM_FOR]->(group)
             ON CREATE SET
               room.createdAt = toString(datetime()),
               room.id = apoc.create.uuid()
-            WITH room, user, currentUser
-            OPTIONAL MATCH (room)<-[:INSIDE]-(message:Message)<-[:CREATED]-(sender:User)
-            WHERE NOT sender.id = $currentUserId AND NOT message.seen
-            WITH room, user, currentUser, message,
-            user.name AS roomName
+            WITH room, group, currentUser
+            MATCH (member:User)-[m:MEMBER_OF]->(group)
+            WHERE m.role IN ['usual', 'admin', 'owner']
+            MERGE (member)-[:CHATS_IN]->(room)
+            WITH room, group, currentUser, collect(properties(member)) AS members
+            OPTIONAL MATCH (currentUser)-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(room)
+            WITH room, group, members, COUNT(DISTINCT message) AS unread
+            OPTIONAL MATCH (group)-[:AVATAR_IMAGE]->(groupImg:Image)
             RETURN room {
               .*,
-              users: [properties(currentUser), properties(user)],
-              roomName: roomName,
-              unreadCount: toString(COUNT(DISTINCT message))
+              roomName: group.name,
+              avatar: groupImg.url,
+              isGroupRoom: true,
+              group: properties(group),
+              users: members,
+              unreadCount: toString(unread)
             }
           `
-          const createRoomTxResponse = await transaction.run(createRoomCypher, {
-            userId,
+          const createGroupRoomTxResponse = await transaction.run(createGroupRoomCypher, {
+            groupId,
             currentUserId,
           })
-          const [room] = createRoomTxResponse.records.map((record) => record.get('room'))
+          const [room] = createGroupRoomTxResponse.records.map((record) => record.get('room'))
           return room
         })
-        if (room) {
-          room.roomId = room.id
+        if (!room) {
+          throw new Error('Could not create group room. User may not be a member of the group.')
         }
+        room.roomId = room.id
         return room
       } finally {
         await session.close()
@@ -110,6 +188,9 @@ export default {
       undefinedToNull: ['lastMessageAt'],
       hasMany: {
         users: '<-[:CHATS_IN]-(related:User)',
+      },
+      hasOne: {
+        group: '-[:ROOM_FOR]->(related:Group)',
       },
     }),
   },

@@ -4,7 +4,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
-import CreateRoom from '@graphql/queries/messaging/CreateRoom.gql'
 import Room from '@graphql/queries/messaging/Room.gql'
 import UnreadRooms from '@graphql/queries/messaging/UnreadRooms.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
@@ -64,7 +63,7 @@ describe('Room', () => {
     ])
   })
 
-  describe('create room', () => {
+  describe('create room via CreateMessage with userId', () => {
     describe('unauthenticated', () => {
       beforeAll(() => {
         authenticatedUser = null
@@ -73,9 +72,10 @@ describe('Room', () => {
       it('throws authorization error', async () => {
         await expect(
           mutate({
-            mutation: CreateRoom,
+            mutation: CreateMessage,
             variables: {
               userId: 'some-id',
+              content: 'init',
             },
           }),
         ).resolves.toMatchObject({
@@ -93,15 +93,16 @@ describe('Room', () => {
         it('returns null', async () => {
           await expect(
             mutate({
-              mutation: CreateRoom,
+              mutation: CreateMessage,
               variables: {
                 userId: 'not-existing-user',
+                content: 'init',
               },
             }),
           ).resolves.toMatchObject({
             errors: undefined,
             data: {
-              CreateRoom: null,
+              CreateMessage: null,
             },
           })
         })
@@ -111,9 +112,10 @@ describe('Room', () => {
         it('throws error', async () => {
           await expect(
             mutate({
-              mutation: CreateRoom,
+              mutation: CreateMessage,
               variables: {
                 userId: 'chatting-user',
+                content: 'init',
               },
             }),
           ).resolves.toMatchObject({
@@ -123,60 +125,46 @@ describe('Room', () => {
       })
 
       describe('user id exists', () => {
-        it('returns the id of the room', async () => {
+        it('creates a room and returns the message with room id', async () => {
           const result = await mutate({
-            mutation: CreateRoom,
+            mutation: CreateMessage,
             variables: {
               userId: 'other-chatting-user',
+              content: 'init',
             },
           })
-          roomId = result.data.CreateRoom.id
+          roomId = result.data.CreateMessage.room.id
           expect(result).toMatchObject({
             errors: undefined,
             data: {
-              CreateRoom: {
+              CreateMessage: {
                 id: expect.any(String),
-                roomId: result.data.CreateRoom.id,
-                roomName: 'Other Chatting User',
-                unreadCount: 0,
-                users: expect.arrayContaining([
-                  {
-                    _id: 'chatting-user',
-                    id: 'chatting-user',
-                    name: 'Chatting User',
-                    avatar: {
-                      url: expect.any(String),
-                    },
-                  },
-                  {
-                    _id: 'other-chatting-user',
-                    id: 'other-chatting-user',
-                    name: 'Other Chatting User',
-                    avatar: {
-                      url: expect.any(String),
-                    },
-                  },
-                ]),
+                content: 'init',
+                room: {
+                  id: expect.any(String),
+                },
               },
             },
           })
         })
       })
 
-      describe('create room with same user id', () => {
-        it('returns the id of the room', async () => {
-          await expect(
-            mutate({
-              mutation: CreateRoom,
-              variables: {
-                userId: 'other-chatting-user',
-              },
-            }),
-          ).resolves.toMatchObject({
+      describe('send message to same user id again', () => {
+        it('returns the same room id', async () => {
+          const result = await mutate({
+            mutation: CreateMessage,
+            variables: {
+              userId: 'other-chatting-user',
+              content: 'another message',
+            },
+          })
+          expect(result).toMatchObject({
             errors: undefined,
             data: {
-              CreateRoom: {
-                id: roomId,
+              CreateMessage: {
+                room: {
+                  id: roomId,
+                },
               },
             },
           })
@@ -254,7 +242,7 @@ describe('Room', () => {
                   id: expect.any(String),
                   roomId: result.data.Room[0].id,
                   roomName: 'Chatting User',
-                  unreadCount: 0,
+                  unreadCount: 2,
                   users: expect.arrayContaining([
                     {
                       _id: 'chatting-user',
@@ -312,21 +300,12 @@ describe('Room', () => {
     })
 
     describe('authenticated', () => {
-      let otherRoomId: string
-
       beforeAll(async () => {
         authenticatedUser = await chattingUser.toJson()
-        const result = await mutate({
-          mutation: CreateRoom,
-          variables: {
-            userId: 'not-chatting-user',
-          },
-        })
-        otherRoomId = result.data.CreateRoom.roomId
         await mutate({
           mutation: CreateMessage,
           variables: {
-            roomId: otherRoomId,
+            userId: 'not-chatting-user',
             content: 'Message to not chatting user',
           },
         })
@@ -345,17 +324,10 @@ describe('Room', () => {
           },
         })
         authenticatedUser = await otherChattingUser.toJson()
-        const result2 = await mutate({
-          mutation: CreateRoom,
-          variables: {
-            userId: 'not-chatting-user',
-          },
-        })
-        otherRoomId = result2.data.CreateRoom.roomId
         await mutate({
           mutation: CreateMessage,
           variables: {
-            roomId: otherRoomId,
+            userId: 'not-chatting-user',
             content: 'Other message to not chatting user',
           },
         })
@@ -440,15 +412,17 @@ describe('Room', () => {
     beforeAll(async () => {
       authenticatedUser = await chattingUser.toJson()
       await mutate({
-        mutation: CreateRoom,
+        mutation: CreateMessage,
         variables: {
           userId: 'second-chatting-user',
+          content: 'init',
         },
       })
       await mutate({
-        mutation: CreateRoom,
+        mutation: CreateMessage,
         variables: {
           userId: 'third-chatting-user',
+          content: 'init',
         },
       })
     })
@@ -464,9 +438,12 @@ describe('Room', () => {
               id: expect.any(String),
               roomId: expect.any(String),
               roomName: 'Third Chatting User',
-              lastMessageAt: null,
+              lastMessageAt: expect.any(String),
               unreadCount: 0,
-              lastMessage: null,
+              lastMessage: expect.objectContaining({
+                content: 'init',
+                senderId: 'chatting-user',
+              }),
               users: expect.arrayContaining([
                 expect.objectContaining({
                   _id: 'chatting-user',
@@ -490,9 +467,12 @@ describe('Room', () => {
               id: expect.any(String),
               roomId: expect.any(String),
               roomName: 'Second Chatting User',
-              lastMessageAt: null,
+              lastMessageAt: expect.any(String),
               unreadCount: 0,
-              lastMessage: null,
+              lastMessage: expect.objectContaining({
+                content: 'init',
+                senderId: 'chatting-user',
+              }),
               users: expect.arrayContaining([
                 expect.objectContaining({
                   _id: 'chatting-user',
@@ -528,7 +508,7 @@ describe('Room', () => {
                 date: expect.any(String),
                 saved: true,
                 distributed: false,
-                seen: false,
+                seen: true,
               },
               users: expect.arrayContaining([
                 expect.objectContaining({

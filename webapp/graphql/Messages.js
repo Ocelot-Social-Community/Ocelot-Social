@@ -2,8 +2,8 @@ import gql from 'graphql-tag'
 
 export const createMessageMutation = () => {
   return gql`
-    mutation ($roomId: ID!, $content: String, $files: [FileInput]) {
-      CreateMessage(roomId: $roomId, content: $content, files: $files) {
+    mutation ($roomId: ID, $userId: ID, $content: String, $files: [FileInput]) {
+      CreateMessage(roomId: $roomId, userId: $userId, content: $content, files: $files) {
         #_id
         id
         indexId
@@ -35,8 +35,8 @@ export const createMessageMutation = () => {
 
 export const messageQuery = () => {
   return gql`
-    query ($roomId: ID!, $first: Int, $offset: Int) {
-      Message(roomId: $roomId, first: $first, offset: $offset, orderBy: indexId_desc) {
+    query ($roomId: ID!, $first: Int, $offset: Int, $beforeIndex: Int) {
+      Message(roomId: $roomId, first: $first, offset: $offset, beforeIndex: $beforeIndex, orderBy: indexId_desc) {
         _id
         id
         indexId
@@ -98,6 +98,18 @@ export const chatMessageAdded = () => {
           #duration
           #preview
         }
+      }
+    }
+  `
+}
+
+export const chatMessageStatusUpdated = () => {
+  return gql`
+    subscription chatMessageStatusUpdated {
+      chatMessageStatusUpdated {
+        roomId
+        messageIds
+        status
       }
     }
   `

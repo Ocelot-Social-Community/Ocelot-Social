@@ -12,7 +12,6 @@ import { Upload } from 'graphql-upload/public/index'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
-import CreateRoom from '@graphql/queries/messaging/CreateRoom.gql'
 import MarkMessagesAsSeen from '@graphql/queries/messaging/MarkMessagesAsSeen.gql'
 import Message from '@graphql/queries/messaging/Message.gql'
 import Room from '@graphql/queries/messaging/Room.gql'
@@ -125,13 +124,14 @@ describe('Message', () => {
       describe('room exists', () => {
         beforeEach(async () => {
           authenticatedUser = await chattingUser.toJson()
-          const room = await mutate({
-            mutation: CreateRoom,
+          const result = await mutate({
+            mutation: CreateMessage,
             variables: {
               userId: 'other-chatting-user',
+              content: 'init',
             },
           })
-          roomId = room.data.CreateRoom.id
+          roomId = result.data.CreateMessage.room.id
         })
 
         describe('user chats in room', () => {
@@ -156,7 +156,7 @@ describe('Message', () => {
                   date: expect.any(String),
                   saved: true,
                   distributed: false,
-                  seen: false,
+                  seen: true,
                 },
               },
             })
@@ -192,7 +192,7 @@ describe('Message', () => {
                         date: expect.any(String),
                         saved: true,
                         distributed: false,
-                        seen: false,
+                        seen: true,
                       }),
                     }),
                   ],
@@ -202,7 +202,7 @@ describe('Message', () => {
           })
 
           describe('unread count for other user', () => {
-            it('has unread count = 1', async () => {
+            it('has unread count = 2', async () => {
               authenticatedUser = await otherChattingUser.toJson()
               await expect(query({ query: Room })).resolves.toMatchObject({
                 errors: undefined,
@@ -210,7 +210,7 @@ describe('Message', () => {
                   Room: [
                     expect.objectContaining({
                       lastMessageAt: expect.any(String),
-                      unreadCount: 1,
+                      unreadCount: 2,
                       lastMessage: expect.objectContaining({
                         _id: expect.any(String),
                         id: expect.any(String),
@@ -275,7 +275,7 @@ describe('Message', () => {
                   date: expect.any(String),
                   saved: true,
                   distributed: false,
-                  seen: false,
+                  seen: true,
                   files: expect.arrayContaining([
                     { name: 'test1', type: 'application/json', url: expect.any(String) },
                     { name: 'test2', type: 'image/png', url: expect.any(String) },
@@ -329,7 +329,7 @@ describe('Message', () => {
             ).resolves.toMatchObject({
               errors: undefined,
               data: {
-                Message: [],
+                Message: [expect.objectContaining({ content: 'init' })],
               },
             })
           })
@@ -407,13 +407,14 @@ describe('Message', () => {
       describe('room exists with authenticated user chatting', () => {
         beforeEach(async () => {
           authenticatedUser = await chattingUser.toJson()
-          const room = await mutate({
-            mutation: CreateRoom,
+          const result = await mutate({
+            mutation: CreateMessage,
             variables: {
               userId: 'other-chatting-user',
+              content: 'init',
             },
           })
-          roomId = room.data.CreateRoom.id
+          roomId = result.data.CreateMessage.room.id
 
           await mutate({
             mutation: CreateMessage,
@@ -435,10 +436,15 @@ describe('Message', () => {
             errors: undefined,
             data: {
               Message: [
+                expect.objectContaining({
+                  indexId: 0,
+                  content: 'init',
+                  senderId: 'chatting-user',
+                }),
                 {
                   id: expect.any(String),
-                  _id: result.data?.Message[0].id,
-                  indexId: 0,
+                  _id: result.data?.Message[1].id,
+                  indexId: 1,
                   content: 'Some nice message to other chatting user',
                   senderId: 'chatting-user',
                   username: 'Chatting User',
@@ -446,7 +452,7 @@ describe('Message', () => {
                   date: expect.any(String),
                   saved: true,
                   distributed: false,
-                  seen: false,
+                  seen: true,
                 },
               ],
             },
@@ -486,8 +492,13 @@ describe('Message', () => {
               data: {
                 Message: [
                   expect.objectContaining({
-                    id: expect.any(String),
                     indexId: 0,
+                    content: 'init',
+                    senderId: 'chatting-user',
+                  }),
+                  expect.objectContaining({
+                    id: expect.any(String),
+                    indexId: 1,
                     content: 'Some nice message to other chatting user',
                     senderId: 'chatting-user',
                     username: 'Chatting User',
@@ -495,11 +506,11 @@ describe('Message', () => {
                     date: expect.any(String),
                     saved: true,
                     distributed: false,
-                    seen: false,
+                    seen: true,
                   }),
                   expect.objectContaining({
                     id: expect.any(String),
-                    indexId: 1,
+                    indexId: 2,
                     content: 'A nice response message to chatting user',
                     senderId: 'other-chatting-user',
                     username: 'Other Chatting User',
@@ -511,7 +522,7 @@ describe('Message', () => {
                   }),
                   expect.objectContaining({
                     id: expect.any(String),
-                    indexId: 2,
+                    indexId: 3,
                     content: 'And another nice message to other chatting user',
                     senderId: 'chatting-user',
                     username: 'Chatting User',
@@ -519,7 +530,7 @@ describe('Message', () => {
                     date: expect.any(String),
                     saved: true,
                     distributed: false,
-                    seen: false,
+                    seen: true,
                   }),
                 ],
               },
@@ -527,6 +538,8 @@ describe('Message', () => {
           })
 
           it('returns the messages paginated', async () => {
+            // Messages ordered by indexId DESC: 3, 2, 1, 0
+            // first: 2, offset: 0 → indexId 2 and 3 (reversed to ASC)
             await expect(
               query({
                 query: Message,
@@ -541,27 +554,20 @@ describe('Message', () => {
               data: {
                 Message: [
                   expect.objectContaining({
-                    id: expect.any(String),
-                    indexId: 1,
+                    indexId: 2,
                     content: 'A nice response message to chatting user',
                     senderId: 'other-chatting-user',
-                    username: 'Other Chatting User',
-                    avatar: expect.any(String),
-                    date: expect.any(String),
                   }),
                   expect.objectContaining({
-                    id: expect.any(String),
-                    indexId: 2,
+                    indexId: 3,
                     content: 'And another nice message to other chatting user',
                     senderId: 'chatting-user',
-                    username: 'Chatting User',
-                    avatar: expect.any(String),
-                    date: expect.any(String),
                   }),
                 ],
               },
             })
 
+            // first: 2, offset: 2 → indexId 0 and 1 (reversed to ASC)
             await expect(
               query({
                 query: Message,
@@ -576,13 +582,14 @@ describe('Message', () => {
               data: {
                 Message: [
                   expect.objectContaining({
-                    id: expect.any(String),
                     indexId: 0,
+                    content: 'init',
+                    senderId: 'chatting-user',
+                  }),
+                  expect.objectContaining({
+                    indexId: 1,
                     content: 'Some nice message to other chatting user',
                     senderId: 'chatting-user',
-                    username: 'Chatting User',
-                    avatar: expect.any(String),
-                    date: expect.any(String),
                   }),
                 ],
               },
@@ -639,13 +646,14 @@ describe('Message', () => {
       const messageIds: string[] = []
       beforeEach(async () => {
         authenticatedUser = await chattingUser.toJson()
-        const room = await mutate({
-          mutation: CreateRoom,
+        const result = await mutate({
+          mutation: CreateMessage,
           variables: {
             userId: 'other-chatting-user',
+            content: 'init',
           },
         })
-        roomId = room.data.CreateRoom.id
+        roomId = result.data.CreateMessage.room.id
         await mutate({
           mutation: CreateMessage,
           variables: {
@@ -713,7 +721,8 @@ describe('Message', () => {
           data: {
             Message: [
               expect.objectContaining({ seen: true }),
-              expect.objectContaining({ seen: false }),
+              expect.objectContaining({ seen: true }),
+              expect.objectContaining({ seen: true }),
               expect.objectContaining({ seen: true }),
             ],
           },

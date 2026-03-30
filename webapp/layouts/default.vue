@@ -12,7 +12,12 @@
     <div id="overlay" />
     <div v-if="getShowChat.showChat" class="chat-modul">
       <client-only>
-        <chat singleRoom :roomId="getShowChat.roomID" @close-single-room="closeSingleRoom" />
+        <chat
+          singleRoom
+          :userId="getShowChat.chatUserId"
+          :groupId="getShowChat.groupId"
+          @close-single-room="closeSingleRoom"
+        />
       </client-only>
     </div>
   </div>
@@ -43,11 +48,11 @@ export default {
       showChat: 'chat/SET_OPEN_CHAT',
     }),
     closeSingleRoom() {
-      this.showChat({ showChat: false, roomID: null })
+      this.showChat({ showChat: false, chatUserId: null, groupId: null })
     },
   },
   beforeCreate() {
-    this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, roomID: null })
+    this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, chatUserId: null, groupId: null })
   },
 }
 </script>

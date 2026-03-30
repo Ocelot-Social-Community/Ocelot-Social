@@ -70,13 +70,46 @@
     </div>
 
     <div slot="room-header-avatar">
-      <div
-        v-if="selectedRoom && selectedRoom.avatar"
-        class="vac-avatar"
-        :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
-      />
-      <div v-else-if="selectedRoom" class="vac-avatar">
-        <span class="initials">{{ getInitialsName(selectedRoom.roomName) }}</span>
+      <nuxt-link v-if="roomHeaderLink" :to="roomHeaderLink" class="chat-header-profile-link">
+        <profile-avatar
+          v-if="selectedRoom && selectedRoom.isGroupRoom"
+          :profile="selectedRoom.groupProfile"
+          class="vac-avatar-profile"
+          size="small"
+        />
+        <div
+          v-else-if="selectedRoom && selectedRoom.avatar"
+          class="vac-avatar"
+          :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
+        />
+        <div v-else-if="selectedRoom" class="vac-avatar">
+          <span class="initials">{{ getInitialsName(selectedRoom.roomName) }}</span>
+        </div>
+      </nuxt-link>
+      <template v-else>
+        <profile-avatar
+          v-if="selectedRoom && selectedRoom.isGroupRoom"
+          :profile="selectedRoom.groupProfile"
+          class="vac-avatar-profile"
+          size="small"
+        />
+        <div
+          v-else-if="selectedRoom && selectedRoom.avatar"
+          class="vac-avatar"
+          :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
+        />
+        <div v-else-if="selectedRoom" class="vac-avatar">
+          <span class="initials">{{ getInitialsName(selectedRoom.roomName) }}</span>
+        </div>
+      </template>
+    </div>
+
+    <div slot="room-header-info">
+      <div class="vac-room-name vac-text-ellipsis">
+        <nuxt-link v-if="roomHeaderLink" :to="roomHeaderLink" class="chat-header-profile-link">
+          {{ selectedRoom ? selectedRoom.roomName : '' }}
+        </nuxt-link>
+        <span v-else>{{ selectedRoom ? selectedRoom.roomName : '' }}</span>
       </div>
     </div>
 
@@ -92,8 +125,14 @@
     </div>
 
     <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
+      <profile-avatar
+        v-if="room.isGroupRoom"
+        :profile="room.groupProfile"
+        class="vac-avatar-profile"
+        size="small"
+      />
       <div
-        v-if="room.avatar"
+        v-else-if="room.avatar"
         class="vac-avatar"
         :style="{ 'background-image': `url('${room.avatar}')` }"
       />
@@ -107,11 +146,14 @@
 <script>
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import { roomQuery, createRoom, unreadRoomsQuery } from '~/graphql/Rooms'
+import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
+import locales from '~/locales/index.js'
+import { roomQuery, createGroupRoom, unreadRoomsQuery } from '~/graphql/Rooms'
 import {
   messageQuery,
   createMessageMutation,
   chatMessageAdded,
+  chatMessageStatusUpdated,
   markMessagesAsSeen,
 } from '~/graphql/Messages'
 import chatStyle from '~/constants/chat.js'
@@ -119,7 +161,7 @@ import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'Chat',
-  components: { OsButton, OsIcon },
+  components: { OsButton, OsIcon, ProfileAvatar },
   props: {
     theme: {
       type: String,
@@ -129,7 +171,11 @@ export default {
       type: Boolean,
       default: false,
     },
-    roomId: {
+    userId: {
+      type: String,
+      default: null,
+    },
+    groupId: {
       type: String,
       default: null,
     },
@@ -190,22 +236,44 @@ export default {
       responsiveBreakpoint: 600,
       rooms: [],
       roomsLoaded: false,
-      roomPage: 0,
+      roomCursor: null,
       roomPageSize: 10,
-      selectedRoom: this.roomId,
+      selectedRoom: null,
+      activeRoomId: null,
       loadingRooms: true,
       messagesLoaded: false,
-      messagePage: 0,
       messagePageSize: 20,
+      oldestLoadedIndexId: null,
       messages: [],
+      unseenMessageIds: new Set(),
     }
   },
   created() {
     this.icons = iconRegistry
   },
+  watch: {
+    groupId(newGroupId) {
+      if (this.singleRoom && newGroupId) {
+        this.newGroupRoom(newGroupId)
+      }
+    },
+    userId(newUserId) {
+      if (this.singleRoom && newUserId) {
+        this.newRoom(newUserId)
+      }
+    },
+    currentLocaleIso() {
+      this.messages = this.messages.map((m) => {
+        this.formatMessageDate(m)
+        return { ...m }
+      })
+    },
+  },
   mounted() {
-    if (this.singleRoom) {
-      this.newRoom(this.roomId)
+    if (this.singleRoom && this.groupId) {
+      this.newGroupRoom(this.groupId)
+    } else if (this.singleRoom && this.userId) {
+      this.newRoom(this.userId)
     } else {
       this.fetchRooms()
     }
@@ -221,30 +289,50 @@ export default {
         this.$toast.error(error)
       },
     })
+
+    const statusObserver = this.$apollo.subscribe({
+      query: chatMessageStatusUpdated(),
+    })
+    statusObserver.subscribe({
+      next: this.handleMessageStatusUpdated,
+    })
+
+  },
+  beforeDestroy() {
+    if (this._intersectionObserver) this._intersectionObserver.disconnect()
+    if (this._mutationObserver) this._mutationObserver.disconnect()
+    if (this._seenFlushTimer) clearTimeout(this._seenFlushTimer)
   },
   computed: {
     ...mapGetters({
       currentUser: 'auth/user',
-      getStoreRoomId: 'chat/roomID',
     }),
     computedChatStyle() {
       return chatStyle.STYLE.light
     },
     computedRoomId() {
-      let roomId = null
-
-      if (!this.singleRoom) {
-        roomId = this.roomId
-
-        if (this.getStoreRoomId.roomId) {
-          roomId = this.getStoreRoomId.roomId
-        }
-      }
-
-      return roomId
+      return this.activeRoomId || null
     },
     isSafari() {
       return /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+    },
+    currentLocaleIso() {
+      const code = this.$i18n.locale()
+      const locale = locales.find((l) => l.code === code)
+      return locale ? locale.iso : 'en-US'
+    },
+    roomHeaderLink() {
+      if (!this.selectedRoom) return null
+      if (this.selectedRoom.isGroupRoom && this.selectedRoom.groupProfile?.id) {
+        const { id, slug } = this.selectedRoom.groupProfile
+        return `/groups/${id}/${slug}`
+      }
+      const otherUser = this.selectedRoom.users?.find((u) => u.id !== this.currentUser.id)
+      if (otherUser) {
+        const slug = otherUser.name?.toLowerCase().replaceAll(' ', '-')
+        return `/profile/${otherUser.id}/${slug}`
+      }
+      return null
     },
     textMessages() {
       return {
@@ -266,45 +354,147 @@ export default {
   methods: {
     ...mapMutations({
       commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
-      commitRoomIdFromSingleRoom: 'chat/UPDATE_ROOM_ID',
     }),
+
+    markAsSeen(messageIds) {
+      if (!messageIds.length || !this.selectedRoom) return
+      const room = this.selectedRoom
+      // Update local messages to seen
+      const seenIds = new Set(messageIds)
+      this.messages = this.messages.map((m) => {
+        if (seenIds.has(m.id)) {
+          return { ...m, seen: true }
+        }
+        return m
+      })
+      // Update room unread count
+      const roomIndex = this.rooms.findIndex((r) => r.id === room.id)
+      if (roomIndex !== -1) {
+        const changedRoom = { ...this.rooms[roomIndex] }
+        changedRoom.unreadCount = Math.max(0, changedRoom.unreadCount - messageIds.length)
+        this.rooms[roomIndex] = changedRoom
+      }
+      // Persist to server
+      this.$apollo
+        .mutate({
+          mutation: markMessagesAsSeen(),
+          variables: { messageIds },
+        })
+        .then(() => {
+          this.$apollo
+            .query({ query: unreadRoomsQuery(), fetchPolicy: 'network-only' })
+            .then(({ data: { UnreadRooms } }) => {
+              this.commitUnreadRoomCount(UnreadRooms)
+            })
+        })
+    },
+
+    setupMessageVisibilityTracking() {
+      const shadowRoot = this.$el?.shadowRoot
+      if (!shadowRoot || this._mutationObserver) return
+      const scrollContainer = shadowRoot.querySelector('.vac-container-scroll')
+      if (!scrollContainer) return
+
+      this._seenBatch = []
+      this._seenFlushTimer = null
+
+      // IntersectionObserver: detects when unseen messages become visible
+      this._intersectionObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              const msgId = entry.target.dataset.unseenId
+              if (msgId && this.unseenMessageIds.has(msgId)) {
+                this.unseenMessageIds.delete(msgId)
+                this._seenBatch.push(msgId)
+                this._intersectionObserver.unobserve(entry.target)
+              }
+            }
+          }
+          if (this._seenBatch.length && !this._seenFlushTimer) {
+            this._seenFlushTimer = setTimeout(() => {
+              const batch = [...this._seenBatch]
+              this._seenBatch = []
+              this._seenFlushTimer = null
+              this.markAsSeen(batch)
+            }, 500)
+          }
+        },
+        { root: scrollContainer, threshold: 0.1 },
+      )
+
+      // MutationObserver: watches for new message elements in shadow DOM
+      this._mutationObserver = new MutationObserver(() => {
+        this.observeNewUnseenElements()
+      })
+      this._mutationObserver.observe(scrollContainer, { childList: true, subtree: true })
+    },
+
+    observeNewUnseenElements() {
+      if (this.unseenMessageIds.size === 0 || !this._intersectionObserver) return
+      const shadowRoot = this.$el?.shadowRoot
+      if (!shadowRoot) return
+      for (const msgId of this.unseenMessageIds) {
+        const msg = this.messages.find((m) => m.id === msgId)
+        if (!msg) continue
+        const el = shadowRoot.querySelector(`[id="${msg._id}"]`)
+        if (el && !el.dataset.unseenId) {
+          el.dataset.unseenId = msgId
+          this._intersectionObserver.observe(el)
+        }
+      }
+    },
+
+    scrollRoomsListToTop() {
+      const roomsList = this.$el?.shadowRoot?.querySelector('#rooms-list')
+      if (roomsList) roomsList.scrollTop = 0
+    },
+
+    formatMessageDate(m) {
+      const dateObj = new Date(m._rawDate)
+      m.timestamp = dateObj.toLocaleTimeString(this.currentLocaleIso, {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+      m.date = dateObj.toLocaleDateString(this.currentLocaleIso, {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    },
 
     async fetchRooms({ room } = {}) {
       this.roomsLoaded = false
-      const offset = this.roomPage * this.roomPageSize
       try {
+        const variables = room?.id
+          ? { id: room.id }
+          : { first: this.roomPageSize, before: this.roomCursor }
+
         const {
           data: { Room },
         } = await this.$apollo.query({
           query: roomQuery(),
-          variables: {
-            id: room?.id,
-            first: this.roomPageSize,
-            offset,
-          },
+          variables,
           fetchPolicy: 'no-cache',
         })
 
-        const rms = []
-        const rmsIds = []
-        ;[...Room, ...this.rooms].forEach((r) => {
-          if (!rmsIds.find((v) => v === r.id)) {
-            rms.push(this.fixRoomObject(r))
-            rmsIds.push(r.id)
-          }
-        })
-        this.rooms = rms
+        const existingIds = new Set(this.rooms.map((r) => r.id))
+        const newRooms = Room.filter((r) => !existingIds.has(r.id)).map((r) => this.fixRoomObject(r))
+        this.rooms = [...this.rooms, ...newRooms]
+
+        if (!room?.id && Room.length > 0) {
+          // Update cursor to the oldest room's sort date
+          const lastRoom = Room[Room.length - 1]
+          this.roomCursor = lastRoom.lastMessageAt || lastRoom.createdAt
+        }
 
         if (Room.length < this.roomPageSize) {
           this.roomsLoaded = true
         }
-        this.roomPage += 1
 
         if (this.singleRoom && this.rooms.length > 0) {
-          this.commitRoomIdFromSingleRoom(this.rooms[0].roomId)
-        } else if (this.getStoreRoomId.roomId) {
-          // reset store room id
-          this.commitRoomIdFromSingleRoom(null)
+          this.selectRoom(this.rooms[0])
         }
       } catch (error) {
         this.rooms = []
@@ -317,65 +507,63 @@ export default {
     async fetchMessages({ room, options = {} }) {
       if (this.selectedRoom?.id !== room.id) {
         this.messages = []
-        this.messagePage = 0
+        this.oldestLoadedIndexId = null
+        this.unseenMessageIds = new Set()
         this.selectedRoom = room
       }
+      // Virtual rooms have no messages on the server yet
+      if (!room.id || room.id.startsWith('temp-')) {
+        // Toggle messagesLoaded to ensure vue-advanced-chat's watcher fires
+        this.messagesLoaded = false
+        this.$nextTick(() => {
+          this.messagesLoaded = true
+        })
+        return
+      }
       this.messagesLoaded = options.refetch ? this.messagesLoaded : false
-      const offset = (options.refetch ? 0 : this.messagePage) * this.messagePageSize
+      const variables = {
+        roomId: room.id,
+        first: this.messagePageSize,
+      }
+      if (!options.refetch && this.oldestLoadedIndexId !== null) {
+        variables.beforeIndex = this.oldestLoadedIndexId
+      }
       try {
         const {
           data: { Message },
         } = await this.$apollo.query({
           query: messageQuery(),
-          variables: {
-            roomId: room.id,
-            first: this.messagePageSize,
-            offset,
-          },
+          variables,
           fetchPolicy: 'no-cache',
         })
 
         const newMsgIds = Message.filter(
           (m) => m.seen === false && m.senderId !== this.currentUser.id,
         ).map((m) => m.id)
-        if (newMsgIds.length) {
-          const roomIndex = this.rooms.findIndex((r) => r.id === room.id)
-          const changedRoom = { ...this.rooms[roomIndex] }
-          changedRoom.unreadCount = changedRoom.unreadCount - newMsgIds.length
-          this.rooms[roomIndex] = changedRoom
-          this.$apollo
-            .mutate({
-              mutation: markMessagesAsSeen(),
-              variables: {
-                messageIds: newMsgIds,
-              },
-            })
-            .then(() => {
-              this.$apollo
-                .query({
-                  query: unreadRoomsQuery(),
-                  fetchPolicy: 'network-only',
-                })
-                .then(({ data: { UnreadRooms } }) => {
-                  this.commitUnreadRoomCount(UnreadRooms)
-                })
-            })
-        }
+        newMsgIds.forEach((id) => this.unseenMessageIds.add(id))
 
         const msgs = []
         ;[...this.messages, ...Message].forEach((m) => {
-          if (m.senderId !== this.currentUser.id) m.seen = true
           m.content = m.content || ''
-          m.date = new Date(m.date).toDateString()
+          if (!m._rawDate) m._rawDate = m.date
+          this.formatMessageDate(m)
           m.avatar = m.avatar?.w320
           msgs[m.indexId] = m
         })
         this.messages = msgs.filter(Boolean)
 
+        // Update cursor to oldest loaded message
+        if (Message.length > 0 && !options.refetch) {
+          const oldestMsg = Message.reduce((min, m) => (m.indexId < min.indexId ? m : min), Message[0])
+          if (this.oldestLoadedIndexId === null || oldestMsg.indexId < this.oldestLoadedIndexId) {
+            this.oldestLoadedIndexId = oldestMsg.indexId
+          }
+        }
         if (Message.length < this.messagePageSize) {
           this.messagesLoaded = true
         }
-        this.messagePage += 1
+        // Ensure visibility tracking is running
+        this.$nextTick(() => this.setupMessageVisibilityTracking())
       } catch (error) {
         this.messages = []
         this.$toast.error(error.message)
@@ -383,26 +571,90 @@ export default {
     },
 
     async chatMessageAdded({ data }) {
-      const roomIndex = this.rooms.findIndex((r) => r.id === data.chatMessageAdded.room.id)
+      const msg = data.chatMessageAdded
+      let roomIndex = this.rooms.findIndex((r) => r.id === msg.room.id)
+      if (roomIndex === -1) {
+        // Room not in list yet — fetch it specifically
+        try {
+          const {
+            data: { Room },
+          } = await this.$apollo.query({
+            query: roomQuery(),
+            variables: { id: msg.room.id },
+            fetchPolicy: 'no-cache',
+          })
+          if (Room?.length) {
+            const newRoom = this.fixRoomObject(Room[0])
+            this.rooms = [newRoom, ...this.rooms]
+            roomIndex = 0
+          } else {
+            return
+          }
+        } catch {
+          return
+        }
+      }
       const changedRoom = { ...this.rooms[roomIndex] }
-      changedRoom.lastMessage = data.chatMessageAdded
-      changedRoom.lastMessage.content = (changedRoom.lastMessage.content || '')
-        .trim()
-        .substring(0, 30)
-      changedRoom.lastMessageAt = data.chatMessageAdded.date
-      // Move changed room to the top of the list
-      changedRoom.index = data.chatMessageAdded.date
-      changedRoom.unreadCount++
-      this.rooms[roomIndex] = changedRoom
-      if (data.chatMessageAdded.room.id === this.selectedRoom?.id) {
+      changedRoom.lastMessage = {
+        ...msg,
+        content: (msg.content || '').trim().substring(0, 30),
+      }
+      changedRoom.lastMessageAt = msg.date
+      changedRoom.index = new Date().toISOString()
+      const isCurrentRoom = msg.room.id === this.selectedRoom?.id
+      const isOwnMessage = msg.senderId === this.currentUser.id
+      if (!isCurrentRoom && !isOwnMessage) {
+        changedRoom.unreadCount++
+      }
+      // Reassign array to trigger Vue reactivity and vue-advanced-chat re-sort
+      this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== msg.room.id)]
+      if (isCurrentRoom) {
         this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
-      } else {
-        this.fetchRooms({ options: { refetch: true } })
+      }
+    },
+
+    async handleMessageStatusUpdated({ data }) {
+      const { roomId, messageIds, status } = data.chatMessageStatusUpdated
+      // Update loaded messages locally
+      if (this.selectedRoom?.id === roomId) {
+        const affectedIds = new Set(messageIds)
+        const statusUpdate = status === 'seen' ? { seen: true } : { distributed: true }
+        this.messages = this.messages.map((m) => {
+          if (affectedIds.has(m.id)) {
+            return { ...m, ...statusUpdate }
+          }
+          return m
+        })
+      }
+      // Refetch room to update lastMessage status in preview
+      const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
+      if (roomIndex !== -1) {
+        try {
+          const {
+            data: { Room },
+          } = await this.$apollo.query({
+            query: roomQuery(),
+            variables: { id: roomId },
+            fetchPolicy: 'no-cache',
+          })
+          if (Room?.length) {
+            const updatedRoom = this.fixRoomObject(Room[0])
+            updatedRoom.index = this.rooms[roomIndex].index
+            this.rooms = [
+              ...this.rooms.slice(0, roomIndex),
+              updatedRoom,
+              ...this.rooms.slice(roomIndex + 1),
+            ]
+          }
+        } catch {
+          // Ignore fetch errors
+        }
       }
     },
 
     async sendMessage(messageDetails) {
       const { roomId, content, files } = messageDetails
+      const isVirtualRoom = roomId.startsWith('temp-')
 
       const hasFiles = files && files.length > 0
 
@@ -419,65 +671,81 @@ export default {
           }))
         : null
 
-      const mutationVariables = {
-        roomId,
-        content,
-      }
-
-      if (filesToUpload && filesToUpload.length > 0) {
-        mutationVariables.files = filesToUpload
-      }
-
       // Immediately add new message
       const localMessage = {
         ...messageDetails,
         _id: 'new' + Math.random().toString(36).substring(2, 15),
         seen: false,
         saved: false,
-        date: new Date().toDateString(),
+        _rawDate: new Date().toISOString(),
         senderId: this.currentUser.id,
         files:
           messageDetails.files?.map((file) => ({
             ...file,
             url: URL.createObjectURL(new Blob([file.blob], { type: file.type })),
           })) ?? [],
-        // Custom property
         isUploading: true,
       }
+      this.formatMessageDate(localMessage)
       this.messages = [...this.messages, localMessage]
 
       const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
       if (roomIndex !== -1) {
         const changedRoom = { ...this.rooms[roomIndex] }
         changedRoom.lastMessage.content = (content || '').trim().substring(0, 30)
-
-        // Move changed room to the top of the list
-        changedRoom.index = changedRoom.lastMessage.date
+        changedRoom.index = new Date().toISOString()
         this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== roomId)]
+        this.$nextTick(() => {
+          this.scrollRoomsListToTop()
+        })
       }
 
       try {
+        // Build mutation variables — userId for virtual rooms, roomId for existing
+        const mutationVariables = { content }
+        if (isVirtualRoom) {
+          const virtualRoom = this.rooms.find((r) => r.id === roomId)
+          mutationVariables.userId = virtualRoom?._virtualUserId || roomId.replace('temp-', '')
+        } else {
+          mutationVariables.roomId = roomId
+        }
+        if (filesToUpload && filesToUpload.length > 0) {
+          mutationVariables.files = filesToUpload
+        }
+
         const { data } = await this.$apollo.mutate({
           mutation: createMessageMutation(),
           variables: mutationVariables,
         })
-        const createdMessagePayload = data.CreateMessage
+        const createdMessage = data.CreateMessage
 
-        if (createdMessagePayload && roomIndex !== -1) {
-          const changedRoom = { ...this.rooms[roomIndex] }
-          changedRoom.lastMessage.content = (createdMessagePayload.content || '')
-            .trim()
-            .substring(0, 30)
-          changedRoom.lastMessage.date = createdMessagePayload.date
+        if (isVirtualRoom && createdMessage?.room?.id) {
+          // Replace virtual room with real room by fetching the specific room
+          const realRoomId = createdMessage.room.id
+          this.rooms = this.rooms.filter((r) => r.id !== roomId)
+          const {
+            data: { Room },
+          } = await this.$apollo.query({
+            query: roomQuery(),
+            variables: { id: realRoomId },
+            fetchPolicy: 'no-cache',
+          })
+          if (Room?.length) {
+            const realRoom = this.fixRoomObject(Room[0])
+            this.rooms = [realRoom, ...this.rooms.filter((r) => r.id !== realRoomId)]
+            this.$nextTick(() => {
+              this.selectRoom(realRoom)
+            })
+          }
+        } else if (createdMessage) {
+          this.fetchMessages({
+            room: this.rooms.find((r) => r.roomId === messageDetails.roomId),
+            options: { refetch: true },
+          })
         }
       } catch (error) {
         this.$toast.error(error.message)
       }
-
-      this.fetchMessages({
-        room: this.rooms.find((r) => r.roomId === messageDetails.roomId),
-        options: { refetch: true },
-      })
     },
 
     getInitialsName(fullname) {
@@ -491,10 +759,21 @@ export default {
 
     fixRoomObject(room) {
       // This fixes the room object which arrives from the backend
+      const isGroupRoom = room.isGroupRoom || !!room.group
       const fixedRoom = {
         ...room,
+        isGroupRoom,
+        // For group rooms: provide group profile data for ProfileAvatar component
+        groupProfile: isGroupRoom
+          ? {
+              id: room.group?.id,
+              slug: room.group?.slug,
+              name: room.group?.name || room.roomName,
+              avatar: room.group?.avatar,
+            }
+          : null,
         index: room.lastMessage ? room.lastMessage.date : room.createdAt,
-        avatar: room.avatar?.w320,
+        avatar: room.avatar?.w320 || room.avatar,
         lastMessage: room.lastMessage
           ? {
               ...room.lastMessage,
@@ -506,36 +785,140 @@ export default {
         }),
       }
       if (!fixedRoom.avatar) {
-        // as long as we cannot query avatar on CreateRoom
-        fixedRoom.avatar = fixedRoom.users.find((u) => u.id !== this.currentUser.id).avatar
+        if (isGroupRoom) {
+          fixedRoom.avatar = room.group?.avatar?.w320 || room.group?.avatar || null
+        } else {
+          // as long as we cannot query avatar on CreateRoom
+          const otherUser = fixedRoom.users.find((u) => u.id !== this.currentUser.id)
+          fixedRoom.avatar = otherUser?.avatar
+        }
       }
       return fixedRoom
     },
 
-    newRoom(userId) {
-      this.$apollo
-        .mutate({
-          mutation: createRoom(),
-          variables: {
-            userId,
-          },
-        })
-        .then(({ data: { CreateRoom } }) => {
-          const roomIndex = this.rooms.findIndex((r) => r.id === CreateRoom.roomId)
-          const room = this.fixRoomObject(CreateRoom)
+    selectRoom(room) {
+      this.activeRoomId = room.roomId
+    },
 
-          if (roomIndex === -1) {
-            this.rooms = [room, ...this.rooms]
-          }
-          this.fetchMessages({ room, options: { refetch: true } })
-          this.$emit('show-chat', CreateRoom.id)
+    async newRoom(userOrId) {
+      // Accept either a user object { id, name } or just a userId string
+      const userId = typeof userOrId === 'string' ? userOrId : userOrId.id
+      const userName = typeof userOrId === 'string' ? userOrId : userOrId.name
+      const userAvatar =
+        typeof userOrId === 'string' ? null : userOrId.avatar?.w320 || userOrId.avatar?.url || null
+
+      // Check if a DM room with this user already exists locally
+      const existingRoom = this.rooms.find(
+        (r) => !r.isGroupRoom && r.users.some((u) => u.id === userId),
+      )
+      if (existingRoom) {
+        existingRoom.index = new Date().toISOString()
+        this.rooms = [existingRoom, ...this.rooms.filter((r) => r.id !== existingRoom.id)]
+        this.$nextTick(() => {
+          this.selectRoom(existingRoom)
         })
-        .catch((error) => {
-          this.$toast.error(error.message)
+        return
+      }
+
+      // Check if a DM room with this user exists on the server (not yet loaded locally)
+      try {
+        const {
+          data: { Room },
+        } = await this.$apollo.query({
+          query: roomQuery(),
+          variables: { userId },
+          fetchPolicy: 'no-cache',
         })
-        .finally(() => {
-          // this.loading = false
+        const serverRoom = Room?.[0]
+        if (serverRoom) {
+          const room = this.fixRoomObject(serverRoom)
+          room.index = new Date().toISOString()
+          this.rooms = [room, ...this.rooms.filter((r) => r.id !== room.id)]
+          this.$nextTick(() => {
+            this.selectRoom(room)
+          })
+          return
+        }
+      } catch {
+        // Fall through to virtual room creation
+      }
+
+      // Create a virtual room (no backend call — room is created on first message)
+      this.loadingRooms = false
+      const virtualRoom = {
+        id: `temp-${userId}`,
+        roomId: `temp-${userId}`,
+        roomName: userName,
+        isGroupRoom: false,
+        groupProfile: null,
+        avatar: userAvatar,
+        lastMessageAt: null,
+        createdAt: new Date().toISOString(),
+        unreadCount: 0,
+        index: new Date().toISOString(),
+        lastMessage: { content: '' },
+        users: [
+          { _id: this.currentUser.id, id: this.currentUser.id, username: this.currentUser.name },
+          { _id: userId, id: userId, username: userName, avatar: userAvatar },
+        ],
+        _virtualUserId: userId,
+      }
+      this.rooms = [virtualRoom, ...this.rooms]
+      this.$nextTick(() => {
+        this.selectRoom(virtualRoom)
+      })
+    },
+
+    async newGroupRoom(groupId) {
+      // Check if the group room already exists locally
+      const existingRoom = this.rooms.find(
+        (r) => r.isGroupRoom && r.groupProfile?.id === groupId,
+      )
+      if (existingRoom) {
+        existingRoom.index = new Date().toISOString()
+        this.rooms = [existingRoom, ...this.rooms.filter((r) => r.id !== existingRoom.id)]
+        this.$nextTick(() => {
+          this.selectRoom(existingRoom)
         })
+        return
+      }
+
+      // Check if the group room exists on the server (not yet loaded locally)
+      try {
+        const {
+          data: { Room },
+        } = await this.$apollo.query({
+          query: roomQuery(),
+          variables: { groupId },
+          fetchPolicy: 'no-cache',
+        })
+        if (Room?.length) {
+          const room = this.fixRoomObject(Room[0])
+          room.index = new Date().toISOString()
+          this.rooms = [room, ...this.rooms.filter((r) => r.id !== room.id)]
+          this.$nextTick(() => {
+            this.selectRoom(room)
+          })
+          return
+        }
+      } catch {
+        // Fall through to creation
+      }
+
+      // Room doesn't exist yet — create it
+      try {
+        const { data: { CreateGroupRoom } } = await this.$apollo.mutate({
+          mutation: createGroupRoom(),
+          variables: { groupId },
+        })
+        const room = this.fixRoomObject(CreateGroupRoom)
+        this.rooms = [room, ...this.rooms]
+        this.$nextTick(() => {
+          this.selectRoom(room)
+        })
+      } catch (error) {
+        this.$toast.error(error.message)
+      }
     },
 
     openFile: async function (file) {
@@ -598,7 +981,27 @@ export default {
   }
 }
 
+.vac-avatar-profile {
+  margin-right: 15px;
+}
+
 .ds-flex-item.single-chat-bubble {
   margin-right: 1em;
+}
+
+.chat-header-profile-link {
+  color: inherit !important;
+  text-decoration: none !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  line-height: 22px !important;
+  display: block !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+
+  &:hover {
+    color: $color-primary !important;
+  }
 }
 </style>

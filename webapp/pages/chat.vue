@@ -1,15 +1,17 @@
 <template>
   <div>
     <add-chat-room-by-user-search
-      v-if="showUserSearch"
+      v-if="showSearch"
+      ref="searchPanel"
       @add-chat-room="addChatRoom"
-      @close-user-search="showUserSearch = false"
+      @add-group-chat-room="addGroupChatRoom"
+      @close-user-search="showSearch = false"
     />
     <client-only>
       <chat
-        :roomId="getShowChat.showChat ? getShowChat.roomID : null"
+        :userId="getShowChat.showChat ? getShowChat.chatUserId : null"
         ref="chat"
-        @toggle-user-search="showUserSearch = !showUserSearch"
+        @toggle-user-search="toggleSearch"
         :show-room="showRoom"
       />
     </client-only>
@@ -28,11 +30,11 @@ export default {
   },
   data() {
     return {
-      showUserSearch: false,
+      showSearch: false,
     }
   },
   mounted() {
-    this.showChat({ showChat: false, roomID: null })
+    this.showChat({ showChat: false, chatUserId: null, groupId: null })
   },
   computed: {
     ...mapGetters({
@@ -43,11 +45,22 @@ export default {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
     }),
-    addChatRoom(userID) {
-      this.$refs.chat.newRoom(userID)
+    toggleSearch() {
+      this.showSearch = !this.showSearch
+      if (this.showSearch) {
+        this.$nextTick(() => {
+          this.$refs.searchPanel?.$el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        })
+      }
+    },
+    addChatRoom(user) {
+      this.$refs.chat.newRoom(user)
+    },
+    addGroupChatRoom(groupId) {
+      this.$refs.chat.newGroupRoom(groupId)
     },
     showRoom(roomId) {
-      this.showChat({ showChat: true, roomID: roomId })
+      this.showChat({ showChat: true, chatUserId: roomId })
     },
   },
 }

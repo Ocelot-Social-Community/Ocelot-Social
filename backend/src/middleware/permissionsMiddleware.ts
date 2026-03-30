@@ -426,6 +426,7 @@ export default shield(
     Query: {
       '*': deny,
       searchResults: allow,
+      searchChatTargets: isAuthenticated,
       searchPosts: allow,
       searchUsers: allow,
       searchGroups: allow,
@@ -524,7 +525,7 @@ export default shield(
       markTeaserAsViewed: allow,
       saveCategorySettings: isAuthenticated,
       updateOnlineStatus: isAuthenticated,
-      CreateRoom: isAuthenticated,
+      CreateGroupRoom: isAuthenticated,
       CreateMessage: isAuthenticated,
       MarkMessagesAsSeen: isAuthenticated,
       toggleObservePost: isAuthenticated,

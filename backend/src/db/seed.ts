@@ -15,8 +15,8 @@ import CreateComment from '@graphql/queries/comments/CreateComment.gql'
 import ChangeGroupMemberRole from '@graphql/queries/groups/ChangeGroupMemberRole.gql'
 import CreateGroup from '@graphql/queries/groups/CreateGroup.gql'
 import JoinGroup from '@graphql/queries/groups/JoinGroup.gql'
+import CreateGroupRoom from '@graphql/queries/messaging/CreateGroupRoom.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
-import CreateRoom from '@graphql/queries/messaging/CreateRoom.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 
@@ -1531,87 +1531,139 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     // eslint-disable-next-line no-console
     console.log('seed', 'chat')
+    // DM chat: Huey <-> Peter (first message creates room via userId)
     authenticatedUser = await huey.toJson()
-    const { data: roomHueyPeter } = await mutate({
-      mutation: CreateRoom,
+    const { data: firstMsgHueyPeter } = await mutate({
+      mutation: CreateMessage,
       variables: {
         userId: (await peterLustig.toJson()).id,
+        content: faker.lorem.sentence(),
       },
     })
+    const roomIdHueyPeter = firstMsgHueyPeter?.CreateMessage.room.id
 
-    for (let i = 0; i < 30; i++) {
-      authenticatedUser = await huey.toJson()
-      await mutate({
-        mutation: CreateMessage,
-        variables: {
-          roomId: roomHueyPeter?.CreateRoom.id,
-          content: faker.lorem.sentence(),
-        },
-      })
+    for (let i = 0; i < 29; i++) {
       authenticatedUser = await peterLustig.toJson()
       await mutate({
         mutation: CreateMessage,
-        variables: {
-          roomId: roomHueyPeter?.CreateRoom.id,
-          content: faker.lorem.sentence(),
-        },
+        variables: { roomId: roomIdHueyPeter, content: faker.lorem.sentence() },
       })
-    }
-
-    authenticatedUser = await huey.toJson()
-    const { data: roomHueyJenny } = await mutate({
-      mutation: CreateRoom,
-      variables: {
-        userId: (await jennyRostock.toJson()).id,
-      },
-    })
-    for (let i = 0; i < 1000; i++) {
       authenticatedUser = await huey.toJson()
       await mutate({
         mutation: CreateMessage,
-        variables: {
-          roomId: roomHueyJenny?.CreateRoom.id,
-          content: faker.lorem.sentence(),
-        },
+        variables: { roomId: roomIdHueyPeter, content: faker.lorem.sentence() },
       })
+    }
+
+    // DM chat: Huey <-> Jenny (first message creates room via userId)
+    authenticatedUser = await huey.toJson()
+    const { data: firstMsgHueyJenny } = await mutate({
+      mutation: CreateMessage,
+      variables: {
+        userId: (await jennyRostock.toJson()).id,
+        content: faker.lorem.sentence(),
+      },
+    })
+    const roomIdHueyJenny = firstMsgHueyJenny?.CreateMessage.room.id
+
+    for (let i = 0; i < 999; i++) {
       authenticatedUser = await jennyRostock.toJson()
       await mutate({
         mutation: CreateMessage,
+        variables: { roomId: roomIdHueyJenny, content: faker.lorem.sentence() },
+      })
+      authenticatedUser = await huey.toJson()
+      await mutate({
+        mutation: CreateMessage,
+        variables: { roomId: roomIdHueyJenny, content: faker.lorem.sentence() },
+      })
+    }
+
+    // DM chats: Jenny <-> additionalUsers
+    for (const user of additionalUsers.slice(0, 99)) {
+      authenticatedUser = await jennyRostock.toJson()
+      const { data: firstMsg } = await mutate({
+        mutation: CreateMessage,
         variables: {
-          roomId: roomHueyJenny?.CreateRoom.id,
+          userId: (await user.toJson()).id,
+          content: faker.lorem.sentence(),
+        },
+      })
+      const dmRoomId = firstMsg?.CreateMessage.room.id
+
+      for (let i = 0; i < 28; i++) {
+        authenticatedUser = await user.toJson()
+        await mutate({
+          mutation: CreateMessage,
+          variables: { roomId: dmRoomId, content: faker.lorem.sentence() },
+        })
+        authenticatedUser = await jennyRostock.toJson()
+        await mutate({
+          mutation: CreateMessage,
+          variables: { roomId: dmRoomId, content: faker.lorem.sentence() },
+        })
+      }
+    }
+
+    // eslint-disable-next-line no-console
+    console.log('seed', 'group chat')
+
+    // Group g1 (School For Citizens) - active members: Jenny(owner/creator), Peter(usual), Bob(usual), Dewey(admin), Louie(owner), Dagobert(usual)
+    // Create group room as Jenny (creator of g1)
+    authenticatedUser = await jennyRostock.toJson()
+    const { data: roomG1 } = await mutate({
+      mutation: CreateGroupRoom,
+      variables: { groupId: 'g1' },
+    })
+    const g1RoomId = roomG1?.CreateGroupRoom.id
+
+    // Members have a conversation
+    const g1Members = [
+      { user: jennyRostock, name: 'Jenny' },
+      { user: peterLustig, name: 'Peter' },
+      { user: dewey, name: 'Dewey' },
+      { user: louie, name: 'Louie' },
+    ]
+    for (let i = 0; i < 20; i++) {
+      const member = g1Members[i % g1Members.length]
+      authenticatedUser = await member.user.toJson()
+      await mutate({
+        mutation: CreateMessage,
+        variables: {
+          roomId: g1RoomId,
           content: faker.lorem.sentence(),
         },
       })
     }
 
-    for (const user of additionalUsers.slice(0, 99)) {
-      authenticatedUser = await jennyRostock.toJson()
-      const { data: room } = await mutate({
-        mutation: CreateRoom,
+    // Group g2 (Yoga Practice) - active members: Bob(owner/creator), Jenny(usual), Dewey(admin), Louie(usual), Dagobert(usual) - Huey is pending
+    authenticatedUser = await bobDerBaumeister.toJson()
+    const { data: roomG2 } = await mutate({
+      mutation: CreateGroupRoom,
+      variables: { groupId: 'g2' },
+    })
+    const g2RoomId = roomG2?.CreateGroupRoom.id
+
+    const g2Members = [
+      { user: bobDerBaumeister, name: 'Bob' },
+      { user: jennyRostock, name: 'Jenny' },
+      { user: dewey, name: 'Dewey' },
+      { user: louie, name: 'Louie' },
+      { user: dagobert, name: 'Dagobert' },
+    ]
+    for (let i = 0; i < 25; i++) {
+      const member = g2Members[i % g2Members.length]
+      authenticatedUser = await member.user.toJson()
+      await mutate({
+        mutation: CreateMessage,
         variables: {
-          userId: (await user.toJson()).id,
+          roomId: g2RoomId,
+          content: faker.lorem.sentence(),
         },
       })
-
-      for (let i = 0; i < 29; i++) {
-        authenticatedUser = await jennyRostock.toJson()
-        await mutate({
-          mutation: CreateMessage,
-          variables: {
-            roomId: room?.CreateRoom.id,
-            content: faker.lorem.sentence(),
-          },
-        })
-        authenticatedUser = await user.toJson()
-        await mutate({
-          mutation: CreateMessage,
-          variables: {
-            roomId: room?.CreateRoom.id,
-            content: faker.lorem.sentence(),
-          },
-        })
-      }
     }
+
+    // Group g0 (Investigative Journalism) - intentionally NO chat seeded
   } catch (err) {
     /* eslint-disable-next-line no-console */
     console.error(err)

@@ -9,7 +9,7 @@ import { withFilter } from 'graphql-subscriptions'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import CONFIG from '@config/index'
-import { CHAT_MESSAGE_ADDED } from '@constants/subscriptions'
+import { CHAT_MESSAGE_ADDED, CHAT_MESSAGE_STATUS_UPDATED } from '@constants/subscriptions'
 
 import { attachments } from './attachments/attachments'
 import Resolver from './helpers/Resolver'
@@ -21,13 +21,19 @@ const setMessagesAsDistributed = async (undistributedMessagesIds, session) => {
     const setDistributedCypher = `
       MATCH (m:Message) WHERE m.id IN $undistributedMessagesIds
       SET m.distributed = true
-      RETURN m { .* }
+      WITH m
+      MATCH (m)-[:INSIDE]->(room:Room)
+      MATCH (m)<-[:CREATED]-(author:User)
+      RETURN DISTINCT room.id AS roomId, author.id AS authorId, collect(m.id) AS messageIds
     `
-    const setDistributedTxResponse = await transaction.run(setDistributedCypher, {
+    const result = await transaction.run(setDistributedCypher, {
       undistributedMessagesIds,
     })
-    const messages = await setDistributedTxResponse.records.map((record) => record.get('m'))
-    return messages
+    return result.records.map((record) => ({
+      roomId: record.get('roomId'),
+      authorId: record.get('authorId'),
+      messageIds: record.get('messageIds'),
+    }))
   })
 }
 
@@ -36,22 +42,52 @@ export default {
     chatMessageAdded: {
       subscribe: withFilter(
         (_, __, context) => context.pubsub.asyncIterator(CHAT_MESSAGE_ADDED),
+        async (payload, variables, context) => {
+          const isRecipient = payload.userId === context.user?.id
+          if (isRecipient && payload.chatMessageAdded?.id) {
+            const session = context.driver.session()
+            try {
+              const results = await setMessagesAsDistributed(
+                [payload.chatMessageAdded.id],
+                session,
+              )
+              for (const { roomId, authorId, messageIds } of results) {
+                void context.pubsub.publish(CHAT_MESSAGE_STATUS_UPDATED, {
+                  authorId,
+                  chatMessageStatusUpdated: { roomId, messageIds, status: 'distributed' },
+                })
+              }
+            } finally {
+              await session.close()
+            }
+          }
+          return isRecipient
+        },
+      ),
+    },
+    chatMessageStatusUpdated: {
+      subscribe: withFilter(
+        (_, __, context) => context.pubsub.asyncIterator(CHAT_MESSAGE_STATUS_UPDATED),
         (payload, variables, context) => {
-          return payload.userId === context.user?.id
+          return payload.authorId === context.user?.id
         },
       ),
     },
   },
   Query: {
     Message: async (object, params, context, resolveInfo) => {
-      const { roomId } = params
+      const { roomId, beforeIndex } = params
       delete params.roomId
+      delete params.beforeIndex
       if (!params.filter) params.filter = {}
       params.filter.room = {
         id: roomId,
         users_some: {
           id: context.user.id,
         },
+      }
+      if (beforeIndex !== undefined && beforeIndex !== null) {
+        params.filter.indexId_lt = beforeIndex
       }
 
       const resolved = await neo4jgraphql(object, params, context, resolveInfo)
@@ -60,66 +96,117 @@ export default {
         const undistributedMessagesIds = resolved
           .filter((msg) => !msg.distributed && msg.senderId !== context.user.id)
           .map((msg) => msg.id)
-        const session = context.driver.session()
-        try {
-          if (undistributedMessagesIds.length > 0) {
-            await setMessagesAsDistributed(undistributedMessagesIds, session)
+        if (undistributedMessagesIds.length > 0) {
+          const session = context.driver.session()
+          try {
+            const results = await setMessagesAsDistributed(undistributedMessagesIds, session)
+            for (const { roomId, authorId, messageIds } of results) {
+              void context.pubsub.publish(CHAT_MESSAGE_STATUS_UPDATED, {
+                authorId,
+                chatMessageStatusUpdated: { roomId, messageIds, status: 'distributed' },
+              })
+            }
+          } finally {
+            await session.close()
           }
-        } finally {
-          await session.close()
         }
-        // send subscription to author to updated the messages
       }
       return resolved.reverse()
     },
   },
   Mutation: {
     CreateMessage: async (_parent, params, context, _resolveInfo) => {
-      const { roomId, content, files = [] } = params
+      const { roomId, userId, content, files = [] } = params
       const {
         user: { id: currentUserId },
       } = context
+
+      if (userId && userId === currentUserId) {
+        throw new Error('Cannot create a room with self')
+      }
+
+      if (!roomId && !userId) {
+        throw new Error('Either roomId or userId must be provided')
+      }
+
+      if (!content?.trim() && files.length === 0) {
+        throw new Error('Message must have content or files')
+      }
 
       const session = context.driver.session()
 
       try {
         return await session.writeTransaction(async (transaction) => {
+          // If userId is provided, find-or-create a DM room first
+          if (userId) {
+            await transaction.run(
+              `
+              MATCH (currentUser:User { id: $currentUserId })
+              MATCH (user:User { id: $userId })
+              OPTIONAL MATCH (currentUser)-[:CHATS_IN]->(existingRoom:Room)<-[:CHATS_IN]-(user)
+              WHERE NOT (existingRoom)-[:ROOM_FOR]->(:Group)
+              WITH currentUser, user, collect(existingRoom)[0] AS existingRoom
+              WITH currentUser, user, existingRoom
+              WHERE existingRoom IS NULL
+              CREATE (currentUser)-[:CHATS_IN]->(:Room {
+                createdAt: toString(datetime()),
+                id: apoc.create.uuid()
+              })<-[:CHATS_IN]-(user)
+              `,
+              { currentUserId, userId },
+            )
+          }
+
+          // Resolve the room — either by roomId or by finding the DM room with userId
+          const matchRoom = roomId
+            ? `MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })`
+            : `MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user:User { id: $userId })
+               WHERE NOT (room)-[:ROOM_FOR]->(:Group)`
+
           const createMessageCypher = `
-            MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+            ${matchRoom}
             OPTIONAL MATCH (currentUser)-[:AVATAR_IMAGE]->(image:Image)
-            OPTIONAL MATCH (m:Message)-[:INSIDE]->(room)
-            OPTIONAL MATCH (room)<-[:CHATS_IN]-(recipientUser:User)
-              WHERE NOT recipientUser.id = $currentUserId
-            WITH MAX(m.indexId) as maxIndex, room, currentUser, image, recipientUser
+            OPTIONAL MATCH (existing:Message)-[:INSIDE]->(room)
+            WITH room, currentUser, image, MAX(existing.indexId) AS maxIndex
+            SET room.messageCounter = CASE
+                  WHEN room.messageCounter IS NOT NULL THEN room.messageCounter + 1
+                  WHEN maxIndex IS NOT NULL THEN maxIndex + 2
+                  ELSE 1
+                END,
+                room.lastMessageAt = toString(datetime())
+            WITH room, currentUser, image
             CREATE (currentUser)-[:CREATED]->(message:Message {
               createdAt: toString(datetime()),
               id: apoc.create.uuid(),
-              indexId: CASE WHEN maxIndex IS NOT NULL THEN maxIndex + 1 ELSE 0 END,
+              indexId: room.messageCounter - 1,
               content: LEFT($content,2000),
               saved: true,
-              distributed: false,
-              seen: false
+              distributed: false
             })-[:INSIDE]->(room)
-            SET room.lastMessageAt = toString(datetime())
+            WITH message, currentUser, image, room
+            OPTIONAL MATCH (room)<-[:CHATS_IN]-(recipient:User)
+              WHERE NOT recipient.id = $currentUserId
+            WITH message, currentUser, image, collect(recipient) AS recipients
+            FOREACH (r IN recipients | CREATE (r)-[:HAS_NOT_SEEN]->(message))
             RETURN message {
               .*,
               indexId: toString(message.indexId),
-              recipientId: recipientUser.id,
               senderId: currentUser.id,
               username: currentUser.name,
               avatar: image.url,
-              date: message.createdAt
+              date: message.createdAt,
+              seen: true
             }
           `
-          const createMessageTxResponse = await transaction.run(createMessageCypher, {
+          const txResponse = await transaction.run(createMessageCypher, {
             currentUserId,
             roomId,
+            userId,
             content,
           })
 
-          const [message] = createMessageTxResponse.records.map((record) => record.get('message'))
+          const [message] = txResponse.records.map((record) => record.get('message'))
 
-          // this is the case if the room doesn't exist - requires refactoring for implicit rooms
           if (!message) {
             return null
           }
@@ -150,20 +237,30 @@ export default {
       const currentUserId = context.user.id
       const session = context.driver.session()
       try {
-        await session.writeTransaction(async (transaction) => {
-          const setSeenCypher = `
-            MATCH (m:Message)<-[:CREATED]-(user:User)
-            WHERE m.id IN $messageIds AND NOT user.id = $currentUserId
-            SET m.seen = true
-            RETURN m { .* }
+        const result = await session.writeTransaction(async (transaction) => {
+          const cypher = `
+            MATCH (user:User { id: $currentUserId })-[r:HAS_NOT_SEEN]->(m:Message)
+            WHERE m.id IN $messageIds
+            DELETE r
+            WITH m
+            MATCH (m)-[:INSIDE]->(room:Room)
+            MATCH (m)<-[:CREATED]-(author:User)
+            RETURN DISTINCT room.id AS roomId, author.id AS authorId
           `
-          const setSeenTxResponse = await transaction.run(setSeenCypher, {
+          return transaction.run(cypher, {
             messageIds,
             currentUserId,
           })
-          return setSeenTxResponse.records.map((record) => record.get('m'))
         })
-        // send subscription to author to updated the messages
+        // Notify message authors that their messages have been seen
+        for (const record of result.records) {
+          const roomId = record.get('roomId')
+          const authorId = record.get('authorId')
+          void context.pubsub.publish(CHAT_MESSAGE_STATUS_UPDATED, {
+            authorId,
+            chatMessageStatusUpdated: { roomId, messageIds, status: 'seen' },
+          })
+        }
         return true
       } finally {
         await session.close()

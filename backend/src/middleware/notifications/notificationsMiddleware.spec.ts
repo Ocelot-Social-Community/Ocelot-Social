@@ -13,7 +13,6 @@ import JoinGroup from '@graphql/queries/groups/JoinGroup.gql'
 import LeaveGroup from '@graphql/queries/groups/LeaveGroup.gql'
 import RemoveUserFromGroup from '@graphql/queries/groups/RemoveUserFromGroup.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
-import CreateRoom from '@graphql/queries/messaging/CreateRoom.gql'
 import markAsRead from '@graphql/queries/notifications/markAsRead.gql'
 import notifications from '@graphql/queries/notifications/notifications.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
@@ -886,13 +885,18 @@ describe('notifications', () => {
 
       authenticatedUser = await chatSender.toJson()
 
-      const room = await mutate({
-        mutation: CreateRoom,
+      const result = await mutate({
+        mutation: CreateMessage,
         variables: {
           userId: 'chatReceiver',
+          content: 'init',
         },
       })
-      roomId = room.data.CreateRoom.id
+      roomId = result.data.CreateMessage.room.id
+
+      // Reset mocks after init message to avoid contamination
+      pubsubSpy.mockClear()
+      ;(sendChatMessageMailMock as jest.Mock).mockClear()
     })
 
     describe('if the chatReceiver is online', () => {
