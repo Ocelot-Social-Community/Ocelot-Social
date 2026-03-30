@@ -921,8 +921,8 @@ describe('Chat.vue', () => {
     it('downloads non-video files', async () => {
       const clickMock = jest.fn()
       jest.spyOn(document, 'createElement').mockReturnValue({
-        set href(v) {},
-        set download(v) {},
+        href: '',
+        download: '',
         style: {},
         click: clickMock,
       })
