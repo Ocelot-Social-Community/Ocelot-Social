@@ -39,7 +39,7 @@ describe('NotificationMenu.vue', () => {
     it('renders as link without counter', () => {
       wrapper = Wrapper()
       expect(wrapper.classes('notifications-menu')).toBe(true)
-      expect(() => wrapper.get('.count')).toThrow()
+      expect(wrapper.find('.os-counter-icon__count').exists()).toBe(false)
     })
 
     it('no dropdown is rendered', () => {
@@ -74,7 +74,7 @@ describe('NotificationMenu.vue', () => {
       it('renders as link without counter', () => {
         wrapper = Wrapper()
         expect(wrapper.classes('notifications-menu')).toBe(true)
-        expect(() => wrapper.get('.count')).toThrow()
+        expect(wrapper.find('.os-counter-icon__count').exists()).toBe(false)
       })
 
       it('no dropdown is rendered', () => {
