@@ -27,7 +27,6 @@
     @fetch-messages="fetchMessages($event.detail[0])"
     @fetch-more-rooms="fetchRooms"
     @add-room="toggleUserSearch"
-    @show-demo-options="showDemoOptions = $event"
     @open-user-tag="redirectToUserProfile($event.detail[0])"
     @open-file="openFile($event.detail[0].file.file)"
   >
@@ -172,57 +171,10 @@ export default {
   },
   data() {
     return {
-      menuActions: [
-        /*
-            {
-            name: 'inviteUser',
-            title: 'Invite User',
-            },
-            {
-            name: 'removeUser',
-            title: 'Remove User',
-            },
-            {
-            name: 'deleteRoom',
-            title: 'Delete Room',
-            },
-          */
-      ],
-      messageActions: [
-        /*
-            {
-            name: 'addMessageToFavorite',
-            title: 'Add To Favorite',
-            },
-            {
-            name: 'shareMessage',
-            title: 'Share Message',
-            },
-          */
-      ],
-      templatesText: [
-        {
-          tag: 'help',
-          text: 'This is the help',
-        },
-        {
-          tag: 'action',
-          text: 'This is the action',
-        },
-      ],
-      roomActions: [
-        /*
-            {
-            name: 'archiveRoom',
-            title: 'Archive Room',
-            },
-            { name: 'inviteUser', title: 'Invite User' },
-            { name: 'removeUser', title: 'Remove User' },
-            { name: 'deleteRoom', title: 'Delete Room' },
-          */
-      ],
-
-      showDemoOptions: true,
+      menuActions: [],
+      messageActions: [],
+      templatesText: [],
+      roomActions: [],
       responsiveBreakpoint: 600,
       rooms: [],
       roomsLoaded: false,
@@ -270,26 +222,23 @@ export default {
     }
 
     // Subscriptions
-    const observer = this.$apollo.subscribe({
-      query: chatMessageAdded(),
-    })
+    this._subscriptions = []
 
-    observer.subscribe({
+    const messageObserver = this.$apollo.subscribe({ query: chatMessageAdded() })
+    const messageSub = messageObserver.subscribe({
       next: this.chatMessageAdded,
-      error(error) {
-        this.$toast.error(error)
-      },
+      error: (error) => this.$toast.error(error),
     })
+    this._subscriptions.push(messageSub)
 
-    const statusObserver = this.$apollo.subscribe({
-      query: chatMessageStatusUpdated(),
-    })
-    statusObserver.subscribe({
+    const statusObserver = this.$apollo.subscribe({ query: chatMessageStatusUpdated() })
+    const statusSub = statusObserver.subscribe({
       next: this.handleMessageStatusUpdated,
     })
-
+    this._subscriptions.push(statusSub)
   },
   beforeDestroy() {
+    this._subscriptions?.forEach((s) => s.unsubscribe())
     if (this._intersectionObserver) this._intersectionObserver.disconnect()
     if (this._mutationObserver) this._mutationObserver.disconnect()
     if (this._seenFlushTimer) clearTimeout(this._seenFlushTimer)
@@ -443,6 +392,22 @@ export default {
       }
     },
 
+    mergeMessages(newMessages) {
+      // Track unseen incoming messages
+      newMessages
+        .filter((m) => m.seen === false && m.senderId !== this.currentUser.id)
+        .forEach((m) => this.unseenMessageIds.add(m.id))
+      // Merge and sort by indexId, using prepareMessage for normalization
+      const msgs = []
+      ;[...this.messages, ...newMessages].forEach((m) => {
+        const prepared = m._rawDate ? m : this.prepareMessage(m)
+        msgs[prepared.indexId] = prepared
+      })
+      const filtered = msgs.filter(Boolean)
+      this.applyAvatarsOnList(filtered)
+      this.messages = filtered
+    },
+
     prepareMessage(msg) {
       const m = { ...msg }
       m.content = m.content || ''
@@ -461,11 +426,6 @@ export default {
         const isLastInChain = !next || next.senderId !== msg.senderId
         msg.avatar = isLastInChain ? msg._originalAvatar || null : null
       }
-    },
-
-    applyAvatars() {
-      this.applyAvatarsOnList(this.messages)
-      this.messages = [...this.messages]
     },
 
     replaceLocalMessage(localId, serverMsg) {
@@ -611,22 +571,7 @@ export default {
           fetchPolicy: 'no-cache',
         })
 
-        const newMsgIds = Message.filter(
-          (m) => m.seen === false && m.senderId !== this.currentUser.id,
-        ).map((m) => m.id)
-        newMsgIds.forEach((id) => this.unseenMessageIds.add(id))
-
-        const msgs = []
-        ;[...this.messages, ...Message].forEach((m) => {
-          m.content = m.content || ''
-          if (!m._rawDate) m._rawDate = m.date
-          this.formatMessageDate(m)
-          if (!m._originalAvatar) m._originalAvatar = m.avatar?.w320 || m.avatar
-          msgs[m.indexId] = m
-        })
-        const filtered = msgs.filter(Boolean)
-        this.applyAvatarsOnList(filtered)
-        this.messages = filtered
+        this.mergeMessages(Message)
 
         // Update cursor to oldest loaded message
         if (Message.length > 0 && !options.refetch) {
@@ -824,10 +769,7 @@ export default {
           })
           if (Room?.length) {
             const realRoom = this.fixRoomObject(Room[0])
-            this.rooms = [realRoom, ...this.rooms.filter((r) => r.id !== realRoomId)]
-            this.$nextTick(() => {
-              this.selectRoom(realRoom)
-            })
+            this.bringRoomToTopAndSelect(realRoom)
           }
         }
       } catch (error) {
@@ -887,6 +829,12 @@ export default {
       this.activeRoomId = room.roomId
     },
 
+    bringRoomToTopAndSelect(room) {
+      room.index = new Date().toISOString()
+      this.rooms = [room, ...this.rooms.filter((r) => r.id !== room.id)]
+      this.$nextTick(() => this.selectRoom(room))
+    },
+
     async newRoom(userOrId) {
       // Accept either a user object { id, name } or just a userId string
       const userId = typeof userOrId === 'string' ? userOrId : userOrId.id
@@ -899,11 +847,7 @@ export default {
         (r) => !r.isGroupRoom && r.users.some((u) => u.id === userId),
       )
       if (existingRoom) {
-        existingRoom.index = new Date().toISOString()
-        this.rooms = [existingRoom, ...this.rooms.filter((r) => r.id !== existingRoom.id)]
-        this.$nextTick(() => {
-          this.selectRoom(existingRoom)
-        })
+        this.bringRoomToTopAndSelect(existingRoom)
         return
       }
 
@@ -919,11 +863,7 @@ export default {
         const serverRoom = Room?.[0]
         if (serverRoom) {
           const room = this.fixRoomObject(serverRoom)
-          room.index = new Date().toISOString()
-          this.rooms = [room, ...this.rooms.filter((r) => r.id !== room.id)]
-          this.$nextTick(() => {
-            this.selectRoom(room)
-          })
+          this.bringRoomToTopAndSelect(room)
           return
         }
       } catch {
@@ -931,7 +871,7 @@ export default {
       }
 
       // Create a virtual room (no backend call — room is created on first message)
-      this.loadingRooms = false
+      // Create a virtual room (no backend call — room is created on first message)
       const virtualRoom = {
         id: `temp-${userId}`,
         roomId: `temp-${userId}`,
@@ -951,9 +891,8 @@ export default {
         _virtualUserId: userId,
       }
       this.rooms = [virtualRoom, ...this.rooms]
-      this.$nextTick(() => {
-        this.selectRoom(virtualRoom)
-      })
+      this.loadingRooms = false
+      this.$nextTick(() => this.selectRoom(virtualRoom))
     },
 
     async newGroupRoom(groupId) {
@@ -962,11 +901,7 @@ export default {
         (r) => r.isGroupRoom && r.groupProfile?.id === groupId,
       )
       if (existingRoom) {
-        existingRoom.index = new Date().toISOString()
-        this.rooms = [existingRoom, ...this.rooms.filter((r) => r.id !== existingRoom.id)]
-        this.$nextTick(() => {
-          this.selectRoom(existingRoom)
-        })
+        this.bringRoomToTopAndSelect(existingRoom)
         return
       }
 
@@ -981,11 +916,7 @@ export default {
         })
         if (Room?.length) {
           const room = this.fixRoomObject(Room[0])
-          room.index = new Date().toISOString()
-          this.rooms = [room, ...this.rooms.filter((r) => r.id !== room.id)]
-          this.$nextTick(() => {
-            this.selectRoom(room)
-          })
+          this.bringRoomToTopAndSelect(room)
           return
         }
       } catch {
@@ -999,10 +930,7 @@ export default {
           variables: { groupId },
         })
         const room = this.fixRoomObject(CreateGroupRoom)
-        this.rooms = [room, ...this.rooms]
-        this.$nextTick(() => {
-          this.selectRoom(room)
-        })
+        this.bringRoomToTopAndSelect(room)
       } catch (error) {
         this.$toast.error(error.message)
       }
