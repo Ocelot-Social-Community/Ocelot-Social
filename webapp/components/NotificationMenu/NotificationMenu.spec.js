@@ -166,7 +166,9 @@ describe('NotificationMenu.vue', () => {
 
       it('renders the counter in red', () => {
         wrapper = Wrapper()
-        expect(wrapper.find('.os-counter-icon__count').classes()).toContain('os-counter-icon__count--danger')
+        expect(wrapper.find('.os-counter-icon__count').classes()).toContain(
+          'os-counter-icon__count--danger',
+        )
       })
     })
   })
