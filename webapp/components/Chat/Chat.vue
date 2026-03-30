@@ -236,6 +236,7 @@ export default {
       oldestLoadedIndexId: null,
       messages: [],
       unseenMessageIds: new Set(),
+      pendingStatusUpdates: {},
     }
   },
   created() {
@@ -466,6 +467,51 @@ export default {
       if (el) el.style.opacity = '1'
     },
 
+    prepareMessage(msg) {
+      const m = { ...msg }
+      m.content = m.content || ''
+      if (!m._rawDate) m._rawDate = m.date
+      this.formatMessageDate(m)
+      m.avatar = m.avatar?.w320 || m.avatar
+      return m
+    },
+
+    replaceLocalMessage(localId, serverMsg) {
+      const prepared = this.prepareMessage(serverMsg)
+      const idx = this.messages.findIndex((m) => m._id === localId)
+      if (idx !== -1) {
+        const current = this.messages[idx]
+        // Status only advances forward (false→true), preserve any updates
+        // that arrived via socket before the mutation response
+        if (current.distributed) prepared.distributed = true
+        if (current.seen) prepared.seen = true
+        // Apply any queued status updates that arrived before this replace
+        const pending = this.pendingStatusUpdates[prepared.id]
+        if (pending) {
+          Object.assign(prepared, pending)
+          delete this.pendingStatusUpdates[prepared.id]
+        }
+        // Mutate in place to avoid triggering the library's messages watcher
+        Object.assign(current, prepared)
+      }
+    },
+
+    addSocketMessage(msg) {
+      const prepared = this.prepareMessage(msg)
+      // Avoid duplicates (own message already added locally, or duplicate socket event)
+      if (this.messages.some((m) => m._id === prepared._id || m.id === prepared.id)) return
+      this.messages = [...this.messages, prepared]
+
+      // Track unseen incoming messages
+      if (msg.senderId !== this.currentUser.id && !msg.seen) {
+        this.unseenMessageIds.add(msg.id)
+        this.$nextTick(() => {
+          this.setupMessageVisibilityTracking()
+          this.observeNewUnseenElements()
+        })
+      }
+    },
+
     scrollRoomsListToTop() {
       const roomsList = this.$el?.shadowRoot?.querySelector('#rooms-list')
       if (roomsList) roomsList.scrollTop = 0
@@ -629,46 +675,50 @@ export default {
       }
       // Reassign array to trigger Vue reactivity and vue-advanced-chat re-sort
       this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== msg.room.id)]
-      if (isCurrentRoom) {
-        this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
+      // Only add incoming messages to the chat — own messages are handled via mutation response
+      if (isCurrentRoom && !isOwnMessage) {
+        this.addSocketMessage(msg)
       }
     },
 
-    async handleMessageStatusUpdated({ data }) {
+    handleMessageStatusUpdated({ data }) {
       const { roomId, messageIds, status } = data.chatMessageStatusUpdated
+      const affectedIds = new Set(messageIds)
+      const statusUpdate = status === 'seen' ? { seen: true } : { distributed: true }
       // Update loaded messages locally
       if (this.selectedRoom?.id === roomId) {
-        const affectedIds = new Set(messageIds)
-        const statusUpdate = status === 'seen' ? { seen: true } : { distributed: true }
+        let foundAny = false
         this.messages = this.messages.map((m) => {
-          if (affectedIds.has(m.id)) {
+          if (affectedIds.has(m.id) || affectedIds.has(m._serverId)) {
+            foundAny = true
             return { ...m, ...statusUpdate }
           }
           return m
         })
+        // Queue status updates for messages not yet replaced by server response
+        if (!foundAny) {
+          for (const msgId of messageIds) {
+            this.pendingStatusUpdates[msgId] = {
+              ...this.pendingStatusUpdates[msgId],
+              ...statusUpdate,
+            }
+          }
+        }
       }
-      // Refetch room to update lastMessage status in preview
+      // Update room preview lastMessage status locally
       const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
       if (roomIndex !== -1) {
-        try {
-          const {
-            data: { Room },
-          } = await this.$apollo.query({
-            query: roomQuery(),
-            variables: { id: roomId },
-            fetchPolicy: 'no-cache',
-          })
-          if (Room?.length) {
-            const updatedRoom = this.fixRoomObject(Room[0])
-            updatedRoom.index = this.rooms[roomIndex].index
-            this.rooms = [
-              ...this.rooms.slice(0, roomIndex),
-              updatedRoom,
-              ...this.rooms.slice(roomIndex + 1),
-            ]
+        const room = this.rooms[roomIndex]
+        if (room.lastMessage && affectedIds.has(room.lastMessage.id)) {
+          const changedRoom = {
+            ...room,
+            lastMessage: { ...room.lastMessage, ...statusUpdate },
           }
-        } catch {
-          // Ignore fetch errors
+          this.rooms = [
+            ...this.rooms.slice(0, roomIndex),
+            changedRoom,
+            ...this.rooms.slice(roomIndex + 1),
+          ]
         }
       }
     },
@@ -697,7 +747,7 @@ export default {
         ...messageDetails,
         _id: 'new' + Math.random().toString(36).substring(2, 15),
         seen: false,
-        saved: false,
+        saved: true,
         _rawDate: new Date().toISOString(),
         senderId: this.currentUser.id,
         files:
@@ -741,6 +791,11 @@ export default {
         })
         const createdMessage = data.CreateMessage
 
+        if (createdMessage) {
+          // Replace local message with server response
+          this.replaceLocalMessage(localMessage._id, createdMessage)
+        }
+
         if (isVirtualRoom && createdMessage?.room?.id) {
           // Replace virtual room with real room by fetching the specific room
           const realRoomId = createdMessage.room.id
@@ -759,11 +814,6 @@ export default {
               this.selectRoom(realRoom)
             })
           }
-        } else if (createdMessage) {
-          this.fetchMessages({
-            room: this.rooms.find((r) => r.roomId === messageDetails.roomId),
-            options: { refetch: true },
-          })
         }
       } catch (error) {
         this.unstyleUploadingMessage(localMessage._id)
