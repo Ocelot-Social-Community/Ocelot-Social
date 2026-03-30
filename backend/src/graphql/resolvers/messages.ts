@@ -47,10 +47,7 @@ export default {
           if (isRecipient && payload.chatMessageAdded?.id) {
             const session = context.driver.session()
             try {
-              const results = await setMessagesAsDistributed(
-                [payload.chatMessageAdded.id],
-                session,
-              )
+              const results = await setMessagesAsDistributed([payload.chatMessageAdded.id], session)
               for (const { roomId, authorId, messageIds } of results) {
                 void context.pubsub.publish(CHAT_MESSAGE_STATUS_UPDATED, {
                   authorId,

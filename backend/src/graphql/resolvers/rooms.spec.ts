@@ -428,9 +428,7 @@ describe('Room', () => {
     })
 
     it('returns the rooms paginated', async () => {
-      await expect(
-        query({ query: Room, variables: { first: 3 } }),
-      ).resolves.toMatchObject({
+      await expect(query({ query: Room, variables: { first: 3 } })).resolves.toMatchObject({
         errors: undefined,
         data: {
           Room: expect.arrayContaining([
