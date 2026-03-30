@@ -69,7 +69,7 @@ export default {
 <style lang="scss">
 @media (max-width: 768px) {
   .layout-default:has(.chat-page) {
-    .ds-container {
+    > .ds-container {
       max-width: 100% !important;
       padding-left: 0 !important;
       padding-right: 0 !important;
