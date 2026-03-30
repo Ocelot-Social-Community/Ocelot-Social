@@ -753,7 +753,7 @@ describe('Message', () => {
         variables: { roomId: testRoomId, beforeIndex: 2 },
       })
       expect(result.errors).toBeUndefined()
-      const indexIds: number[] = result.data.Message.map((m: any) => m.indexId as number)
+      const indexIds: number[] = result.data.Message.map((m: { indexId: number }) => m.indexId)
       expect(indexIds.every((id: number) => id < 2)).toBe(true)
     })
   })
