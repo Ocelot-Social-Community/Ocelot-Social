@@ -436,37 +436,6 @@ export default {
       }
     },
 
-    styleUploadingMessage(messageId) {
-      const shadowRoot = this.$el?.shadowRoot
-      if (!shadowRoot) return
-      const tryStyle = () => {
-        const el = shadowRoot.querySelector(`[id="${messageId}"]`)
-        if (el) {
-          el.style.opacity = '0.5'
-          el.style.transition = 'opacity 0.3s'
-          return true
-        }
-        return false
-      }
-      if (!tryStyle()) {
-        // Web component might not have rendered yet — use MutationObserver
-        const observer = new MutationObserver(() => {
-          if (tryStyle()) observer.disconnect()
-        })
-        const container = shadowRoot.querySelector('.vac-container-scroll')
-        if (container) {
-          observer.observe(container, { childList: true, subtree: true })
-          // Cleanup after 5s
-          setTimeout(() => observer.disconnect(), 5000)
-        }
-      }
-    },
-
-    unstyleUploadingMessage(messageId) {
-      const el = this.$el?.shadowRoot?.querySelector(`[id="${messageId}"]`)
-      if (el) el.style.opacity = '1'
-    },
-
     prepareMessage(msg) {
       const m = { ...msg }
       m.content = m.content || ''
@@ -516,8 +485,9 @@ export default {
       const prepared = this.prepareMessage(msg)
       // Avoid duplicates (own message already added locally, or duplicate socket event)
       if (this.messages.some((m) => m._id === prepared._id || m.id === prepared.id)) return
-      this.messages = [...this.messages, prepared]
-      this.applyAvatars()
+      const updatedMessages = [...this.messages, prepared]
+      this.applyAvatarsOnList(updatedMessages)
+      this.messages = updatedMessages
 
       // Track unseen incoming messages
       if (msg.senderId !== this.currentUser.id && !msg.seen) {
@@ -766,7 +736,7 @@ export default {
         ...messageDetails,
         _id: 'new' + Math.random().toString(36).substring(2, 15),
         seen: false,
-        saved: true,
+        saved: false,
         _rawDate: new Date().toISOString(),
         _originalAvatar: this.selectedRoom?.users?.find((u) => u.id === this.currentUser.id)?.avatar || null,
         senderId: this.currentUser.id,
@@ -778,9 +748,9 @@ export default {
         isUploading: true,
       }
       this.formatMessageDate(localMessage)
-      this.messages = [...this.messages, localMessage]
-      this.applyAvatars()
-      this.$nextTick(() => this.styleUploadingMessage(localMessage._id))
+      const updatedMessages = [...this.messages, localMessage]
+      this.applyAvatarsOnList(updatedMessages)
+      this.messages = updatedMessages
 
       const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
       if (roomIndex !== -1) {
@@ -837,7 +807,6 @@ export default {
           }
         }
       } catch (error) {
-        this.unstyleUploadingMessage(localMessage._id)
         this.$toast.error(error.message)
       }
     },
