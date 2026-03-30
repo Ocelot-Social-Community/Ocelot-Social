@@ -76,14 +76,18 @@ export default {
   },
   Query: {
     Message: async (object, params, context, resolveInfo) => {
-      const { roomId } = params
+      const { roomId, beforeIndex } = params
       delete params.roomId
+      delete params.beforeIndex
       if (!params.filter) params.filter = {}
       params.filter.room = {
         id: roomId,
         users_some: {
           id: context.user.id,
         },
+      }
+      if (beforeIndex !== undefined && beforeIndex !== null) {
+        params.filter.indexId_lt = beforeIndex
       }
 
       const resolved = await neo4jgraphql(object, params, context, resolveInfo)

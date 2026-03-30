@@ -242,8 +242,8 @@ export default {
       activeRoomId: null,
       loadingRooms: true,
       messagesLoaded: false,
-      messagePage: 0,
       messagePageSize: 20,
+      oldestLoadedIndexId: null,
       messages: [],
     }
   },
@@ -411,7 +411,7 @@ export default {
     async fetchMessages({ room, options = {} }) {
       if (this.selectedRoom?.id !== room.id) {
         this.messages = []
-        this.messagePage = 0
+        this.oldestLoadedIndexId = null
         this.selectedRoom = room
       }
       // Virtual rooms have no messages on the server yet
@@ -424,17 +424,19 @@ export default {
         return
       }
       this.messagesLoaded = options.refetch ? this.messagesLoaded : false
-      const offset = (options.refetch ? 0 : this.messagePage) * this.messagePageSize
+      const variables = {
+        roomId: room.id,
+        first: this.messagePageSize,
+      }
+      if (!options.refetch && this.oldestLoadedIndexId !== null) {
+        variables.beforeIndex = this.oldestLoadedIndexId
+      }
       try {
         const {
           data: { Message },
         } = await this.$apollo.query({
           query: messageQuery(),
-          variables: {
-            roomId: room.id,
-            first: this.messagePageSize,
-            offset,
-          },
+          variables,
           fetchPolicy: 'no-cache',
         })
 
@@ -476,10 +478,16 @@ export default {
         })
         this.messages = msgs.filter(Boolean)
 
+        // Update cursor to oldest loaded message
+        if (Message.length > 0 && !options.refetch) {
+          const oldestMsg = Message.reduce((min, m) => (m.indexId < min.indexId ? m : min), Message[0])
+          if (this.oldestLoadedIndexId === null || oldestMsg.indexId < this.oldestLoadedIndexId) {
+            this.oldestLoadedIndexId = oldestMsg.indexId
+          }
+        }
         if (Message.length < this.messagePageSize) {
           this.messagesLoaded = true
         }
-        this.messagePage += 1
       } catch (error) {
         this.messages = []
         this.$toast.error(error.message)

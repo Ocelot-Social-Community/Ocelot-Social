@@ -35,8 +35,8 @@ export const createMessageMutation = () => {
 
 export const messageQuery = () => {
   return gql`
-    query ($roomId: ID!, $first: Int, $offset: Int) {
-      Message(roomId: $roomId, first: $first, offset: $offset, orderBy: indexId_desc) {
+    query ($roomId: ID!, $first: Int, $offset: Int, $beforeIndex: Int) {
+      Message(roomId: $roomId, first: $first, offset: $offset, beforeIndex: $beforeIndex, orderBy: indexId_desc) {
         _id
         id
         indexId
