@@ -113,16 +113,6 @@
       </div>
     </div>
 
-    <div
-      v-for="message in messages.filter((m) => m.isUploading)"
-      :slot="'message_' + message._id"
-      v-bind:key="message._id"
-      class="vac-format-message-wrapper"
-    >
-      <div class="markdown">
-        <p>{{ $t('chat.transmitting') }}</p>
-      </div>
-    </div>
 
     <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
       <profile-avatar
@@ -445,6 +435,37 @@ export default {
       }
     },
 
+    styleUploadingMessage(messageId) {
+      const shadowRoot = this.$el?.shadowRoot
+      if (!shadowRoot) return
+      const tryStyle = () => {
+        const el = shadowRoot.querySelector(`[id="${messageId}"]`)
+        if (el) {
+          el.style.opacity = '0.5'
+          el.style.transition = 'opacity 0.3s'
+          return true
+        }
+        return false
+      }
+      if (!tryStyle()) {
+        // Web component might not have rendered yet — use MutationObserver
+        const observer = new MutationObserver(() => {
+          if (tryStyle()) observer.disconnect()
+        })
+        const container = shadowRoot.querySelector('.vac-container-scroll')
+        if (container) {
+          observer.observe(container, { childList: true, subtree: true })
+          // Cleanup after 5s
+          setTimeout(() => observer.disconnect(), 5000)
+        }
+      }
+    },
+
+    unstyleUploadingMessage(messageId) {
+      const el = this.$el?.shadowRoot?.querySelector(`[id="${messageId}"]`)
+      if (el) el.style.opacity = '1'
+    },
+
     scrollRoomsListToTop() {
       const roomsList = this.$el?.shadowRoot?.querySelector('#rooms-list')
       if (roomsList) roomsList.scrollTop = 0
@@ -688,6 +709,7 @@ export default {
       }
       this.formatMessageDate(localMessage)
       this.messages = [...this.messages, localMessage]
+      this.$nextTick(() => this.styleUploadingMessage(localMessage._id))
 
       const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
       if (roomIndex !== -1) {
@@ -744,6 +766,7 @@ export default {
           })
         }
       } catch (error) {
+        this.unstyleUploadingMessage(localMessage._id)
         this.$toast.error(error.message)
       }
     },
