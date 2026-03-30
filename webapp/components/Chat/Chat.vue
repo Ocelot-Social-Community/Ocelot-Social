@@ -472,8 +472,24 @@ export default {
       m.content = m.content || ''
       if (!m._rawDate) m._rawDate = m.date
       this.formatMessageDate(m)
-      m.avatar = m.avatar?.w320 || m.avatar
+      m.avatar = m.avatar?.w320 || m.avatar || null
+      if (!m._originalAvatar) m._originalAvatar = m.avatar
       return m
+    },
+
+    applyAvatarsOnList(list) {
+      // Show avatar only on the last message of each consecutive sender chain
+      for (let i = 0; i < list.length; i++) {
+        const msg = list[i]
+        const next = list[i + 1]
+        const isLastInChain = !next || next.senderId !== msg.senderId
+        msg.avatar = isLastInChain ? msg._originalAvatar || null : null
+      }
+    },
+
+    applyAvatars() {
+      this.applyAvatarsOnList(this.messages)
+      this.messages = [...this.messages]
     },
 
     replaceLocalMessage(localId, serverMsg) {
@@ -501,6 +517,7 @@ export default {
       // Avoid duplicates (own message already added locally, or duplicate socket event)
       if (this.messages.some((m) => m._id === prepared._id || m.id === prepared.id)) return
       this.messages = [...this.messages, prepared]
+      this.applyAvatars()
 
       // Track unseen incoming messages
       if (msg.senderId !== this.currentUser.id && !msg.seen) {
@@ -614,10 +631,12 @@ export default {
           m.content = m.content || ''
           if (!m._rawDate) m._rawDate = m.date
           this.formatMessageDate(m)
-          m.avatar = m.avatar?.w320
+          if (!m._originalAvatar) m._originalAvatar = m.avatar?.w320 || m.avatar
           msgs[m.indexId] = m
         })
-        this.messages = msgs.filter(Boolean)
+        const filtered = msgs.filter(Boolean)
+        this.applyAvatarsOnList(filtered)
+        this.messages = filtered
 
         // Update cursor to oldest loaded message
         if (Message.length > 0 && !options.refetch) {
@@ -749,6 +768,7 @@ export default {
         seen: false,
         saved: true,
         _rawDate: new Date().toISOString(),
+        _originalAvatar: this.selectedRoom?.users?.find((u) => u.id === this.currentUser.id)?.avatar || null,
         senderId: this.currentUser.id,
         files:
           messageDetails.files?.map((file) => ({
@@ -759,6 +779,7 @@ export default {
       }
       this.formatMessageDate(localMessage)
       this.messages = [...this.messages, localMessage]
+      this.applyAvatars()
       this.$nextTick(() => this.styleUploadingMessage(localMessage._id))
 
       const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
