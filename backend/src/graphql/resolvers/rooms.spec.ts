@@ -7,6 +7,7 @@ import CreateGroupRoom from '@graphql/queries/messaging/CreateGroupRoom.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
 import Room from '@graphql/queries/messaging/Room.gql'
 import UnreadRooms from '@graphql/queries/messaging/UnreadRooms.gql'
+import { roomCountUpdatedFilter } from './rooms'
 import { createApolloTestSetup } from '@root/test/helpers'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -732,7 +733,6 @@ describe('Room', () => {
 })
 
 describe('roomCountUpdatedFilter', () => {
-  const { roomCountUpdatedFilter } = require('./rooms')
 
   it('returns true when payload userId matches context user', () => {
     expect(roomCountUpdatedFilter({ userId: 'u1' }, {}, { user: { id: 'u1' } })).toBe(true)

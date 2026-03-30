@@ -11,6 +11,7 @@ import { Upload } from 'graphql-upload/public/index'
 
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
+import { chatMessageAddedFilter, chatMessageStatusUpdatedFilter } from './messages'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
 import MarkMessagesAsSeen from '@graphql/queries/messaging/MarkMessagesAsSeen.gql'
 import Message from '@graphql/queries/messaging/Message.gql'
@@ -751,14 +752,12 @@ describe('Message', () => {
         variables: { roomId: testRoomId, beforeIndex: 2 },
       })
       expect(result.errors).toBeUndefined()
-      const indexIds = result.data.Message.map((m) => m.indexId)
-      expect(indexIds.every((id) => id < 2)).toBe(true)
+      const indexIds: number[] = result.data.Message.map((m: any) => m.indexId as number)
+      expect(indexIds.every((id: number) => id < 2)).toBe(true)
     })
   })
 
   describe('subscription filters', () => {
-    const { chatMessageAddedFilter, chatMessageStatusUpdatedFilter } = require('./messages')
-
     describe('chatMessageAddedFilter', () => {
       it('returns true for recipient and marks as distributed', async () => {
         const mockSession = {
@@ -767,18 +766,18 @@ describe('Message', () => {
             .mockResolvedValue([{ roomId: 'r1', authorId: 'a1', messageIds: ['m1'] }]),
           close: jest.fn(),
         }
-        const context = {
+        const filterContext = {
           user: { id: 'recipient' },
           driver: { session: () => mockSession },
           pubsub: { publish: jest.fn() },
         }
         const result = await chatMessageAddedFilter(
           { userId: 'recipient', chatMessageAdded: { id: 'm1' } },
-          context,
+          filterContext,
         )
         expect(result).toBe(true)
         expect(mockSession.writeTransaction).toHaveBeenCalled()
-        expect(context.pubsub.publish).toHaveBeenCalledWith(
+        expect(filterContext.pubsub.publish).toHaveBeenCalledWith(
           'CHAT_MESSAGE_STATUS_UPDATED',
           expect.objectContaining({
             chatMessageStatusUpdated: { roomId: 'r1', messageIds: ['m1'], status: 'distributed' },
