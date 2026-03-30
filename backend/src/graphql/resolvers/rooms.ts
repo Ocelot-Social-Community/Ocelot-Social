@@ -103,17 +103,17 @@ export default {
         })
         const roomIds = result.records.map((record) => record.get('id'))
         if (roomIds.length === 0) return []
-        // Re-query via neo4jgraphql to get computed fields for each room
-        const rooms = []
-        for (const roomId of roomIds) {
-          const roomParams = {
-            id: roomId,
-            filter: { users_some: { id: context.user.id } },
-          }
-          const [room] = await neo4jgraphql(object, roomParams, context, resolveInfo)
-          if (room) rooms.push(room)
+        // Batch query via neo4jgraphql with id_in filter (avoids N+1)
+        const roomParams = {
+          filter: {
+            id_in: roomIds,
+            users_some: { id: context.user.id },
+          },
         }
-        return rooms
+        const rooms = await neo4jgraphql(object, roomParams, context, resolveInfo)
+        // Preserve the sort order from the cursor query
+        const orderMap = new Map(roomIds.map((id, i) => [id, i]))
+        return (rooms || []).sort((a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0))
       } finally {
         await session.close()
       }

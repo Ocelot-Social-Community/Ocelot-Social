@@ -93,25 +93,20 @@ export default {
       const resolved = await neo4jgraphql(object, params, context, resolveInfo)
 
       if (resolved) {
+        // Mark undistributed messages as distributed (fallback for missed socket deliveries)
         const undistributedMessagesIds = resolved
           .filter((msg) => !msg.distributed && msg.senderId !== context.user.id)
           .map((msg) => msg.id)
         if (undistributedMessagesIds.length > 0) {
           const session = context.driver.session()
           try {
-            const results = await setMessagesAsDistributed(undistributedMessagesIds, session)
-            for (const { roomId, authorId, messageIds } of results) {
-              void context.pubsub.publish(CHAT_MESSAGE_STATUS_UPDATED, {
-                authorId,
-                chatMessageStatusUpdated: { roomId, messageIds, status: 'distributed' },
-              })
-            }
+            await setMessagesAsDistributed(undistributedMessagesIds, session)
           } finally {
             await session.close()
           }
         }
       }
-      return resolved.reverse()
+      return (resolved || []).reverse()
     },
   },
   Mutation: {
