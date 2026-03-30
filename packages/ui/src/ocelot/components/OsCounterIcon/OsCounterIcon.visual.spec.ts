@@ -26,9 +26,7 @@ test.describe('OsCounterIcon keyboard accessibility', () => {
 
     // CounterIcon should not receive focus — it's decorative
     const counterIcon = root.locator('.os-counter-icon').first()
-    const isFocused = await counterIcon.evaluate(
-      (el) => document.activeElement === el,
-    )
+    const isFocused = await counterIcon.evaluate((el) => document.activeElement === el)
 
     expect(isFocused).toBe(false)
   })
