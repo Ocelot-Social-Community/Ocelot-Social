@@ -375,15 +375,9 @@ export default {
           fetchPolicy: 'no-cache',
         })
 
-        const rms = []
-        const rmsIds = []
-        ;[...this.rooms, ...Room].forEach((r) => {
-          if (!rmsIds.find((v) => v === r.id)) {
-            rms.push(this.fixRoomObject(r))
-            rmsIds.push(r.id)
-          }
-        })
-        this.rooms = rms
+        const existingIds = new Set(this.rooms.map((r) => r.id))
+        const newRooms = Room.filter((r) => !existingIds.has(r.id)).map((r) => this.fixRoomObject(r))
+        this.rooms = [...this.rooms, ...newRooms]
 
         if (!room?.id && Room.length > 0) {
           // Update cursor to the oldest room's sort date
