@@ -161,12 +161,12 @@ describe('NotificationMenu.vue', () => {
 
       it('displays the number of unread notifications', () => {
         wrapper = Wrapper()
-        expect(wrapper.find('.count').text()).toEqual('2')
+        expect(wrapper.find('.os-counter-icon__count').text()).toEqual('2')
       })
 
       it('renders the counter in red', () => {
         wrapper = Wrapper()
-        expect(wrapper.find('.count').classes()).toContain('--danger')
+        expect(wrapper.find('.os-counter-icon__count').classes()).toContain('os-counter-icon__count--danger')
       })
     })
   })

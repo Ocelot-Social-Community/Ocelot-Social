@@ -3,10 +3,10 @@
     <p class="label">{{ option.title | truncate(70) }}</p>
     <div class="metadata">
       <span class="counts">
-        <counter-icon :icon="icons.comments" :count="option.commentsCount" soft />
-        <counter-icon :icon="icons.heartO" :count="option.shoutedCount" soft />
-        <counter-icon :icon="icons.handPointer" :count="option.clickedCount" soft />
-        <counter-icon :icon="icons.eye" :count="option.viewedTeaserCount" soft />
+        <os-counter-icon :icon="icons.comments" :count="option.commentsCount" soft />
+        <os-counter-icon :icon="icons.heartO" :count="option.shoutedCount" soft />
+        <os-counter-icon :icon="icons.handPointer" :count="option.clickedCount" soft />
+        <os-counter-icon :icon="icons.eye" :count="option.viewedTeaserCount" soft />
       </span>
       {{ option.author.name | truncate(32) }} - {{ option.createdAt | dateTime('dd.MM.yyyy') }}
     </div>
@@ -14,13 +14,13 @@
 </template>
 
 <script>
+import { OsCounterIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 
 export default {
   name: 'SearchPost',
   components: {
-    CounterIcon,
+    OsCounterIcon,
   },
   props: {
     option: { type: Object, required: true },
@@ -46,7 +46,7 @@ export default {
     color: $text-color-softer;
     font-size: $font-size-small;
 
-    > .counts > .counter-icon {
+    > .counts > .os-counter-icon {
       margin: 0 $space-x-small;
     }
   }

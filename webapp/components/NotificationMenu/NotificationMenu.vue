@@ -14,7 +14,7 @@
     }"
   >
     <template #icon>
-      <counter-icon :icon="icons.bell" :count="unreadNotificationsCount" danger />
+      <os-counter-icon :icon="icons.bell" :count="unreadNotificationsCount" danger />
     </template>
   </os-button>
   <dropdown
@@ -38,7 +38,7 @@
         @click="toggleMenu"
       >
         <template #icon>
-          <counter-icon :icon="icons.bell" :count="unreadNotificationsCount" danger />
+          <os-counter-icon :icon="icons.bell" :count="unreadNotificationsCount" danger />
         </template>
       </os-button>
     </template>
@@ -83,7 +83,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import unionBy from 'lodash/unionBy'
-import { OsButton, OsIcon } from '@ocelot-social/ui'
+import { OsCounterIcon, OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import {
   notificationQuery,
@@ -91,7 +91,6 @@ import {
   notificationAdded,
   markAllAsReadMutation,
 } from '~/graphql/User'
-import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import Dropdown from '~/components/Dropdown'
 import NotificationsTable from '../NotificationsTable/NotificationsTable.vue'
 
@@ -99,7 +98,7 @@ export default {
   name: 'NotificationMenu',
   components: {
     NotificationsTable,
-    CounterIcon,
+    OsCounterIcon,
     Dropdown,
     OsButton,
     OsIcon,

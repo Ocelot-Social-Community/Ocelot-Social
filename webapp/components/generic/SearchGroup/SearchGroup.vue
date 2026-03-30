@@ -30,7 +30,7 @@ export default {
     color: $text-color-softer;
     font-size: $font-size-small;
 
-    > .counts > .counter-icon {
+    > .counts > .os-counter-icon {
       margin: 0 $space-x-small;
     }
   }

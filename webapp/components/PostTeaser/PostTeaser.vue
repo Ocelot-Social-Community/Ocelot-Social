@@ -90,7 +90,7 @@
           />
         </div>
         <div v-else class="categories-placeholder"></div>
-        <counter-icon
+        <os-counter-icon
           :icon="icons.heartO"
           :count="post.shoutedCount"
           v-tooltip="{
@@ -98,7 +98,7 @@
             placement: 'bottom-start',
           }"
         />
-        <counter-icon
+        <os-counter-icon
           :icon="icons.comments"
           :count="post.commentsCount"
           v-tooltip="{
@@ -106,7 +106,7 @@
             placement: 'bottom-start',
           }"
         />
-        <counter-icon
+        <os-counter-icon
           :icon="icons.handPointer"
           :count="post.clickedCount"
           v-tooltip="{
@@ -114,7 +114,7 @@
             placement: 'bottom-start',
           }"
         />
-        <counter-icon
+        <os-counter-icon
           :icon="icons.eye"
           :count="post.viewedTeaserCount"
           v-tooltip="{
@@ -166,11 +166,10 @@
 </template>
 
 <script>
-import { OsCard, OsIcon } from '@ocelot-social/ui'
+import { OsCounterIcon, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import Category from '~/components/Category'
 import ContentMenu from '~/components/ContentMenu/ContentMenu'
-import CounterIcon from '~/components/_new/generic/CounterIcon/CounterIcon'
 import DateTimeRange from '~/components/DateTimeRange/DateTimeRange'
 import HcRibbon from '~/components/Ribbon'
 import LocationTeaser from '~/components/LocationTeaser/LocationTeaser'
@@ -188,9 +187,9 @@ export default {
   components: {
     Category,
     ContentMenu,
+    OsCounterIcon,
     OsCard,
     OsIcon,
-    CounterIcon,
     DateTimeRange,
     HcRibbon,
     LocationTeaser,
@@ -413,7 +412,7 @@ export default {
       flex-grow: 1;
     }
 
-    > .counter-icon {
+    > .os-counter-icon {
       display: block;
       margin-right: $space-small;
       opacity: $opacity-disabled;
