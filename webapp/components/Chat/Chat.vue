@@ -466,18 +466,31 @@ export default {
       // Store mapping without triggering reactivity
       if (!this._localToServerIds) this._localToServerIds = {}
       this._localToServerIds[serverId] = localId
+
+      const idx = this.messages.findIndex((m) => m._id === localId)
+      if (idx === -1) return
+
+      const msg = this.messages[idx]
+      const needsRender = msg.isUploading || this.pendingStatusUpdates[serverId]
+
+      // Update file URLs and clear upload state
+      if (msg.isUploading) {
+        msg.isUploading = false
+        if (serverMsg.files?.length) {
+          msg.files = serverMsg.files
+        }
+      }
+
       // Apply any queued status updates
       const pending = this.pendingStatusUpdates[serverId]
       if (pending) {
         delete this.pendingStatusUpdates[serverId]
-        // Find message and apply status — this triggers one render for the actual status change
-        const idx = this.messages.findIndex((m) => m._id === localId)
-        if (idx !== -1) {
-          const msg = this.messages[idx]
-          if (pending.distributed) msg.distributed = true
-          if (pending.seen) msg.seen = true
-          this.messages = [...this.messages]
-        }
+        if (pending.distributed) msg.distributed = true
+        if (pending.seen) msg.seen = true
+      }
+
+      if (needsRender) {
+        this.messages = [...this.messages]
       }
     },
 
