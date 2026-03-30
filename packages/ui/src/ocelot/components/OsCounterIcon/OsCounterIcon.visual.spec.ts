@@ -23,11 +23,14 @@ test.describe('OsCounterIcon keyboard accessibility', () => {
     await root.waitFor()
 
     await page.keyboard.press('Tab')
-    const focused = page.locator(':focus')
-    const tag = await focused.evaluate((el) => el.tagName).catch(() => null)
 
     // CounterIcon should not receive focus — it's decorative
-    expect(tag).not.toBe('SPAN')
+    const counterIcon = root.locator('.os-counter-icon').first()
+    const isFocused = await counterIcon.evaluate(
+      (el) => document.activeElement === el,
+    )
+
+    expect(isFocused).toBe(false)
   })
 })
 
