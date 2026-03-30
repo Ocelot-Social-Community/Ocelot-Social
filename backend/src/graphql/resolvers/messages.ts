@@ -9,7 +9,7 @@ import { withFilter } from 'graphql-subscriptions'
 import { neo4jgraphql } from 'neo4j-graphql-js'
 
 import CONFIG from '@config/index'
-import { CHAT_MESSAGE_ADDED } from '@constants/subscriptions'
+import { CHAT_MESSAGE_ADDED, CHAT_MESSAGES_SEEN } from '@constants/subscriptions'
 
 import { attachments } from './attachments/attachments'
 import Resolver from './helpers/Resolver'
@@ -38,6 +38,14 @@ export default {
         (_, __, context) => context.pubsub.asyncIterator(CHAT_MESSAGE_ADDED),
         (payload, variables, context) => {
           return payload.userId === context.user?.id
+        },
+      ),
+    },
+    chatMessagesSeen: {
+      subscribe: withFilter(
+        (_, __, context) => context.pubsub.asyncIterator(CHAT_MESSAGES_SEEN),
+        (payload, variables, context) => {
+          return payload.authorId === context.user?.id
         },
       ),
     },
@@ -196,19 +204,30 @@ export default {
       const currentUserId = context.user.id
       const session = context.driver.session()
       try {
-        await session.writeTransaction(async (transaction) => {
-          const deleteHasNotSeenCypher = `
+        const result = await session.writeTransaction(async (transaction) => {
+          const cypher = `
             MATCH (user:User { id: $currentUserId })-[r:HAS_NOT_SEEN]->(m:Message)
             WHERE m.id IN $messageIds
             DELETE r
-            RETURN count(r) AS deleted
+            WITH m
+            MATCH (m)-[:INSIDE]->(room:Room)
+            MATCH (m)<-[:CREATED]-(author:User)
+            RETURN DISTINCT room.id AS roomId, author.id AS authorId
           `
-          await transaction.run(deleteHasNotSeenCypher, {
+          return transaction.run(cypher, {
             messageIds,
             currentUserId,
           })
         })
-        // send subscription to author to updated the messages
+        // Notify message authors that their messages have been seen
+        for (const record of result.records) {
+          const roomId = record.get('roomId')
+          const authorId = record.get('authorId')
+          void context.pubsub.publish(CHAT_MESSAGES_SEEN, {
+            authorId,
+            chatMessagesSeen: { roomId, messageIds },
+          })
+        }
         return true
       } finally {
         await session.close()

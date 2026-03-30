@@ -30,9 +30,13 @@ type Message {
   seen: Boolean
     @cypher(
       statement: """
-      MATCH (u:User { id: $cypherParams.currentUserId })
-      OPTIONAL MATCH (u)-[r:HAS_NOT_SEEN]->(this)
-      RETURN r IS NULL
+      MATCH (this)<-[:CREATED]-(author:User)
+      OPTIONAL MATCH (unseer:User)-[:HAS_NOT_SEEN]->(this)
+      WHERE CASE
+        WHEN author.id = $cypherParams.currentUserId THEN true
+        ELSE unseer.id = $cypherParams.currentUserId
+      END
+      RETURN count(unseer) = 0
       """
     )
   files: [File]! @relation(name: "ATTACHMENT", direction: "OUT")
@@ -48,6 +52,12 @@ type Query {
   Message(roomId: ID!, first: Int, offset: Int, orderBy: [_MessageOrdering]): [Message]
 }
 
+type ChatMessagesSeenPayload {
+  roomId: ID!
+  messageIds: [String!]!
+}
+
 type Subscription {
   chatMessageAdded: Message
+  chatMessagesSeen: ChatMessagesSeenPayload
 }

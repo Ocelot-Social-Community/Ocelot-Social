@@ -153,6 +153,7 @@ import {
   messageQuery,
   createMessageMutation,
   chatMessageAdded,
+  chatMessagesSeen,
   markMessagesAsSeen,
 } from '~/graphql/Messages'
 import chatStyle from '~/constants/chat.js'
@@ -286,6 +287,13 @@ export default {
       error(error) {
         this.$toast.error(error)
       },
+    })
+
+    const seenObserver = this.$apollo.subscribe({
+      query: chatMessagesSeen(),
+    })
+    seenObserver.subscribe({
+      next: this.handleMessagesSeen,
     })
   },
   computed: {
@@ -436,7 +444,7 @@ export default {
         if (newMsgIds.length) {
           const roomIndex = this.rooms.findIndex((r) => r.id === room.id)
           const changedRoom = { ...this.rooms[roomIndex] }
-          changedRoom.unreadCount = changedRoom.unreadCount - newMsgIds.length
+          changedRoom.unreadCount = Math.max(0, changedRoom.unreadCount - newMsgIds.length)
           this.rooms[roomIndex] = changedRoom
           this.$apollo
             .mutate({
@@ -518,6 +526,38 @@ export default {
       this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== msg.room.id)]
       if (isCurrentRoom) {
         this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
+      }
+    },
+
+    async handleMessagesSeen({ data }) {
+      const { roomId } = data.chatMessagesSeen
+      // Refetch messages from server to get updated seen status
+      if (this.selectedRoom?.id === roomId) {
+        this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
+      }
+      // Refetch room to update lastMessage seen status in preview
+      const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
+      if (roomIndex !== -1) {
+        try {
+          const {
+            data: { Room },
+          } = await this.$apollo.query({
+            query: roomQuery(),
+            variables: { id: roomId },
+            fetchPolicy: 'no-cache',
+          })
+          if (Room?.length) {
+            const updatedRoom = this.fixRoomObject(Room[0])
+            updatedRoom.index = this.rooms[roomIndex].index
+            this.rooms = [
+              ...this.rooms.slice(0, roomIndex),
+              updatedRoom,
+              ...this.rooms.slice(roomIndex + 1),
+            ]
+          }
+        } catch {
+          // Ignore fetch errors
+        }
       }
     },
 

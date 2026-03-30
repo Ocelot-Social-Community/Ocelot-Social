@@ -103,6 +103,17 @@ export const chatMessageAdded = () => {
   `
 }
 
+export const chatMessagesSeen = () => {
+  return gql`
+    subscription chatMessagesSeen {
+      chatMessagesSeen {
+        roomId
+        messageIds
+      }
+    }
+  `
+}
+
 export const markMessagesAsSeen = () => {
   return gql`
     mutation ($messageIds: [String!]) {
