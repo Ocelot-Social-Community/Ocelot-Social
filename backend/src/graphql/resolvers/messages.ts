@@ -65,7 +65,7 @@ export default {
     chatMessageAdded: {
       subscribe: withFilter(
         (_, __, context) => context.pubsub.asyncIterator(CHAT_MESSAGE_ADDED),
-        (payload, variables, context) => chatMessageAddedFilter(payload, context),
+        async (payload, variables, context) => chatMessageAddedFilter(payload, context),
       ),
     },
     chatMessageStatusUpdated: {

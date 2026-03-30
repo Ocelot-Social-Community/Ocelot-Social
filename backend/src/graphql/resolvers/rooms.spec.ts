@@ -632,10 +632,14 @@ describe('Room', () => {
     let groupRoomId: string
 
     beforeAll(async () => {
-      await Factory.build('group', {
-        id: 'test-group',
-        name: 'Test Group',
-      }, { owner: chattingUser })
+      await Factory.build(
+        'group',
+        {
+          id: 'test-group',
+          name: 'Test Group',
+        },
+        { owner: chattingUser },
+      )
       // Add other user as member
       const session = database.driver.session()
       try {
@@ -728,7 +732,6 @@ describe('Room', () => {
 })
 
 describe('roomCountUpdatedFilter', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { roomCountUpdatedFilter } = require('./rooms')
 
   it('returns true when payload userId matches context user', () => {

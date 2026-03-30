@@ -757,15 +757,14 @@ describe('Message', () => {
   })
 
   describe('subscription filters', () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { chatMessageAddedFilter, chatMessageStatusUpdatedFilter } = require('./messages')
 
     describe('chatMessageAddedFilter', () => {
       it('returns true for recipient and marks as distributed', async () => {
         const mockSession = {
-          writeTransaction: jest.fn().mockResolvedValue([
-            { roomId: 'r1', authorId: 'a1', messageIds: ['m1'] },
-          ]),
+          writeTransaction: jest
+            .fn()
+            .mockResolvedValue([{ roomId: 'r1', authorId: 'a1', messageIds: ['m1'] }]),
           close: jest.fn(),
         }
         const context = {
@@ -808,11 +807,15 @@ describe('Message', () => {
 
     describe('chatMessageStatusUpdatedFilter', () => {
       it('returns true when authorId matches', () => {
-        expect(chatMessageStatusUpdatedFilter({ authorId: 'u1' }, { user: { id: 'u1' } })).toBe(true)
+        expect(chatMessageStatusUpdatedFilter({ authorId: 'u1' }, { user: { id: 'u1' } })).toBe(
+          true,
+        )
       })
 
       it('returns false when authorId does not match', () => {
-        expect(chatMessageStatusUpdatedFilter({ authorId: 'u1' }, { user: { id: 'u2' } })).toBe(false)
+        expect(chatMessageStatusUpdatedFilter({ authorId: 'u1' }, { user: { id: 'u2' } })).toBe(
+          false,
+        )
       })
     })
   })
