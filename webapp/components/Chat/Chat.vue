@@ -462,26 +462,21 @@ export default {
     },
 
     replaceLocalMessage(localId, serverMsg) {
-      const idx = this.messages.findIndex((m) => m._id === localId)
-      if (idx !== -1) {
-        const msg = this.messages[idx]
-        // Set server id for status update lookups, keep _id to avoid library re-keying
-        msg.id = serverMsg.id || serverMsg._id
-        msg.indexId = serverMsg.indexId
-        msg.saved = true
-        // Status only advances forward (false→true)
-        if (serverMsg.distributed || msg.distributed) msg.distributed = true
-        if (serverMsg.seen || msg.seen) msg.seen = true
-        // Update file URLs from server (uploads get final URLs)
-        if (serverMsg.files?.length) {
-          msg.files = serverMsg.files
-        }
-        // Apply any queued status updates that arrived before mutation response
-        const pending = this.pendingStatusUpdates[msg.id]
-        if (pending) {
+      const serverId = serverMsg.id || serverMsg._id
+      // Store mapping without triggering reactivity
+      if (!this._localToServerIds) this._localToServerIds = {}
+      this._localToServerIds[serverId] = localId
+      // Apply any queued status updates
+      const pending = this.pendingStatusUpdates[serverId]
+      if (pending) {
+        delete this.pendingStatusUpdates[serverId]
+        // Find message and apply status — this triggers one render for the actual status change
+        const idx = this.messages.findIndex((m) => m._id === localId)
+        if (idx !== -1) {
+          const msg = this.messages[idx]
           if (pending.distributed) msg.distributed = true
           if (pending.seen) msg.seen = true
-          delete this.pendingStatusUpdates[msg.id]
+          this.messages = [...this.messages]
         }
       }
     },
@@ -681,9 +676,13 @@ export default {
       const statusUpdate = status === 'seen' ? { seen: true } : { distributed: true }
       // Update loaded messages locally
       if (this.selectedRoom?.id === roomId) {
+        // Resolve server IDs to local _ids via mapping
+        const idMap = this._localToServerIds || {}
         let foundAny = false
         this.messages = this.messages.map((m) => {
-          if (affectedIds.has(m.id) || affectedIds.has(m._serverId)) {
+          const matchById = affectedIds.has(m.id)
+          const matchByMapping = messageIds.some((sid) => idMap[sid] === m._id)
+          if (matchById || matchByMapping) {
             foundAny = true
             return { ...m, ...statusUpdate }
           }
@@ -741,7 +740,7 @@ export default {
         ...messageDetails,
         _id: 'new' + Math.random().toString(36).substring(2, 15),
         seen: false,
-        saved: false,
+        saved: true,
         _rawDate: new Date().toISOString(),
         _originalAvatar: this.selectedRoom?.users?.find((u) => u.id === this.currentUser.id)?.avatar || null,
         senderId: this.currentUser.id,
