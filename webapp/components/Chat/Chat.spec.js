@@ -607,6 +607,344 @@ describe('Chat.vue', () => {
     })
   })
 
+  describe('sendMessage', () => {
+    beforeEach(() => {
+      wrapper = Wrapper()
+      wrapper.vm.selectedRoom = mockRoom()
+      wrapper.vm.rooms = [mockRoom()]
+      wrapper.vm.messages = []
+      mocks.$apollo.mutate.mockResolvedValue({
+        data: {
+          CreateMessage: {
+            id: 'server-msg-1',
+            _id: 'server-msg-1',
+            indexId: 0,
+            content: 'Hello',
+            senderId: 'current-user',
+            saved: true,
+            distributed: false,
+            seen: false,
+            files: [],
+            room: { id: 'room-1' },
+          },
+        },
+      })
+    })
+
+    it('adds local message immediately', async () => {
+      const promise = wrapper.vm.sendMessage({ roomId: 'room-1', content: 'Hello' })
+      expect(wrapper.vm.messages).toHaveLength(1)
+      expect(wrapper.vm.messages[0].content).toBe('Hello')
+      expect(wrapper.vm.messages[0].isUploading).toBe(true)
+      await promise
+    })
+
+    it('local message has saved=true and seen=false', async () => {
+      const promise = wrapper.vm.sendMessage({ roomId: 'room-1', content: 'Hi' })
+      expect(wrapper.vm.messages[0].saved).toBe(true)
+      expect(wrapper.vm.messages[0].seen).toBe(false)
+      await promise
+    })
+
+    it('calls CreateMessage mutation', async () => {
+      await wrapper.vm.sendMessage({ roomId: 'room-1', content: 'Hello' })
+      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: expect.objectContaining({ content: 'Hello', roomId: 'room-1' }),
+        }),
+      )
+    })
+
+    it('replaces local message with server response', async () => {
+      await wrapper.vm.sendMessage({ roomId: 'room-1', content: 'Hello' })
+      expect(wrapper.vm._localToServerIds['server-msg-1']).toBeDefined()
+    })
+
+    it('uses userId for virtual rooms', async () => {
+      wrapper.vm.rooms = [
+        mockRoom({ id: 'temp-user1', roomId: 'temp-user1', _virtualUserId: 'user1' }),
+      ]
+      mocks.$apollo.mutate.mockResolvedValue({
+        data: { CreateMessage: { id: 's1', room: { id: 'real-room' } } },
+      })
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      await wrapper.vm.sendMessage({ roomId: 'temp-user1', content: 'Hi' })
+      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: expect.objectContaining({ userId: 'user1' }),
+        }),
+      )
+    })
+
+    it('handles files', async () => {
+      global.URL.createObjectURL = jest.fn().mockReturnValue('blob:test')
+      const blob = new Blob(['test'], { type: 'text/plain' })
+      await wrapper.vm.sendMessage({
+        roomId: 'room-1',
+        content: 'with file',
+        files: [{ blob, name: 'test', type: 'text/plain', extension: 'txt' }],
+      })
+      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: expect.objectContaining({
+            files: expect.arrayContaining([
+              expect.objectContaining({ name: 'test', type: 'text/plain' }),
+            ]),
+          }),
+        }),
+      )
+      delete global.URL.createObjectURL
+    })
+
+    it('shows toast on error', async () => {
+      mocks.$apollo.mutate.mockRejectedValue(new Error('Send failed'))
+      await wrapper.vm.sendMessage({ roomId: 'room-1', content: 'Hello' })
+      expect(mocks.$toast.error).toHaveBeenCalledWith('Send failed')
+    })
+
+    it('moves room to top and scrolls', async () => {
+      const promise = wrapper.vm.sendMessage({ roomId: 'room-1', content: 'Hello' })
+      expect(wrapper.vm.rooms[0].id).toBe('room-1')
+      await promise
+    })
+  })
+
+  describe('newRoom', () => {
+    beforeEach(() => {
+      wrapper = Wrapper()
+      wrapper.vm.rooms = []
+    })
+
+    it('selects existing local room', async () => {
+      wrapper.vm.rooms = [mockRoom({ users: [{ id: 'current-user' }, { id: 'target-user' }] })]
+      await wrapper.vm.newRoom('target-user')
+      expect(wrapper.vm.activeRoomId).toBe('room-1')
+    })
+
+    it('fetches room from server if not local', async () => {
+      const serverRoom = mockRoom({ id: 'server-room', roomId: 'server-room', users: [{ id: 'current-user', name: 'Me' }, { id: 'target', name: 'Target' }] })
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [serverRoom] } })
+      await wrapper.vm.newRoom('target')
+      expect(wrapper.vm.rooms[0].id).toBe('server-room')
+    })
+
+    it('creates virtual room when server has none', async () => {
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      await wrapper.vm.newRoom({ id: 'new-user', name: 'New User' })
+      expect(wrapper.vm.rooms[0].id).toBe('temp-new-user')
+      expect(wrapper.vm.rooms[0]._virtualUserId).toBe('new-user')
+    })
+
+    it('accepts user object with avatar', async () => {
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      await wrapper.vm.newRoom({ id: 'u1', name: 'User', avatar: { w320: 'img.jpg' } })
+      expect(wrapper.vm.rooms[0].avatar).toBe('img.jpg')
+    })
+
+    it('handles server error gracefully', async () => {
+      mocks.$apollo.query.mockRejectedValue(new Error('network'))
+      await wrapper.vm.newRoom({ id: 'u1', name: 'User' })
+      expect(wrapper.vm.rooms[0].id).toBe('temp-u1')
+    })
+  })
+
+  describe('newGroupRoom', () => {
+    beforeEach(() => {
+      wrapper = Wrapper()
+      wrapper.vm.rooms = []
+    })
+
+    it('selects existing local group room', async () => {
+      wrapper.vm.rooms = [mockRoom({ id: 'gr-1', roomId: 'gr-1', isGroupRoom: true, groupProfile: { id: 'group-1' } })]
+      await wrapper.vm.newGroupRoom('group-1')
+      expect(wrapper.vm.activeRoomId).toBe('gr-1')
+    })
+
+    it('fetches group room from server', async () => {
+      const serverRoom = mockRoom({ id: 'gr-server', roomId: 'gr-server', isGroupRoom: true, group: { id: 'g1', name: 'G', slug: 'g' }, users: [{ id: 'current-user', name: 'Me' }] })
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [serverRoom] } })
+      await wrapper.vm.newGroupRoom('g1')
+      expect(wrapper.vm.rooms[0].id).toBe('gr-server')
+    })
+
+    it('creates group room via mutation when not found', async () => {
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      mocks.$apollo.mutate.mockResolvedValue({
+        data: {
+          CreateGroupRoom: mockRoom({
+            id: 'new-gr',
+            roomId: 'new-gr',
+            isGroupRoom: true,
+            group: { id: 'g1', name: 'G', slug: 'g' },
+            users: [{ id: 'current-user', name: 'Me' }],
+          }),
+        },
+      })
+      await wrapper.vm.newGroupRoom('g1')
+      expect(wrapper.vm.rooms[0].id).toBe('new-gr')
+    })
+
+    it('shows toast on creation error', async () => {
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      mocks.$apollo.mutate.mockRejectedValue(new Error('Create failed'))
+      await wrapper.vm.newGroupRoom('g1')
+      expect(mocks.$toast.error).toHaveBeenCalledWith('Create failed')
+    })
+  })
+
+  describe('singleRoom mode', () => {
+    it('mounts with groupId and calls newGroupRoom', () => {
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      mocks.$apollo.mutate.mockResolvedValue({
+        data: { CreateGroupRoom: mockRoom({ id: 'gr', roomId: 'gr', isGroupRoom: true, group: { id: 'g1', name: 'G' }, users: [{ id: 'current-user', name: 'Me' }] }) },
+      })
+      wrapper = Wrapper({ singleRoom: true, groupId: 'g1' })
+      // newGroupRoom first queries the server for existing room
+      expect(mocks.$apollo.query).toHaveBeenCalled()
+    })
+
+    it('mounts with userId and calls newRoom', () => {
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      wrapper = Wrapper({ singleRoom: true, userId: 'u1' })
+      expect(mocks.$apollo.query).toHaveBeenCalled()
+    })
+  })
+
+  describe('watchers', () => {
+    it('calls newGroupRoom when groupId changes in singleRoom mode', async () => {
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      mocks.$apollo.mutate.mockResolvedValue({
+        data: { CreateGroupRoom: mockRoom({ id: 'gr', roomId: 'gr', isGroupRoom: true, group: { id: 'g2', name: 'G2' }, users: [{ id: 'current-user', name: 'Me' }] }) },
+      })
+      wrapper = Wrapper({ singleRoom: true, groupId: 'g1' })
+      await wrapper.setProps({ groupId: 'g2' })
+      expect(mocks.$apollo.mutate).toHaveBeenCalled()
+    })
+
+    it('calls newRoom when userId changes in singleRoom mode', async () => {
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
+      wrapper = Wrapper({ singleRoom: true, userId: 'u1' })
+      await wrapper.setProps({ userId: 'u2' })
+      // newRoom is called, which queries the server
+      expect(mocks.$apollo.query).toHaveBeenCalled()
+    })
+  })
+
+  describe('openFile', () => {
+    beforeEach(() => {
+      wrapper = Wrapper()
+      global.fetch = jest.fn().mockResolvedValue({
+        blob: jest.fn().mockResolvedValue(new Blob(['test'])),
+      })
+      global.URL.createObjectURL = jest.fn().mockReturnValue('blob:test')
+    })
+
+    afterEach(() => {
+      delete global.fetch
+    })
+
+    it('skips null file', async () => {
+      await wrapper.vm.openFile(null)
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
+
+    it('skips file without url', async () => {
+      await wrapper.vm.openFile({ type: 'image/png' })
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
+
+    it('skips video files', async () => {
+      await wrapper.vm.openFile({ url: 'http://test.mp4', type: 'video/mp4' })
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
+
+    it('downloads non-video files', async () => {
+      const clickMock = jest.fn()
+      jest.spyOn(document, 'createElement').mockReturnValue({
+        set href(v) {},
+        set download(v) {},
+        style: {},
+        click: clickMock,
+      })
+      jest.spyOn(document.body, 'appendChild').mockImplementation(() => {})
+      jest.spyOn(document.body, 'removeChild').mockImplementation(() => {})
+      await wrapper.vm.openFile({ url: 'http://test.jpg', name: 'img', type: 'image/jpeg' })
+      expect(global.fetch).toHaveBeenCalledWith('http://test.jpg', expect.any(Object))
+      expect(clickMock).toHaveBeenCalled()
+      document.createElement.mockRestore()
+      document.body.appendChild.mockRestore()
+      document.body.removeChild.mockRestore()
+    })
+  })
+
+  describe('redirectToUserProfile', () => {
+    it('navigates to user profile', () => {
+      wrapper = Wrapper()
+      wrapper.vm.redirectToUserProfile({ user: { id: 'u1', name: 'John Doe' } })
+      expect(mocks.$router.push).toHaveBeenCalledWith({
+        path: '/profile/u1/john-doe',
+      })
+    })
+  })
+
+  describe('roomHeaderLink computed', () => {
+    beforeEach(() => {
+      wrapper = Wrapper()
+    })
+
+    it('returns null when no room selected', () => {
+      wrapper.vm.selectedRoom = null
+      expect(wrapper.vm.roomHeaderLink).toBeNull()
+    })
+
+    it('returns group link for group rooms', () => {
+      wrapper.vm.selectedRoom = mockRoom({
+        isGroupRoom: true,
+        groupProfile: { id: 'g1', slug: 'test-group' },
+      })
+      expect(wrapper.vm.roomHeaderLink).toBe('/groups/g1/test-group')
+    })
+
+    it('returns profile link for DM rooms', () => {
+      wrapper.vm.selectedRoom = mockRoom({
+        isGroupRoom: false,
+        users: [
+          { id: 'current-user', name: 'Me' },
+          { id: 'other', name: 'Other User' },
+        ],
+      })
+      expect(wrapper.vm.roomHeaderLink).toBe('/profile/other/other-user')
+    })
+  })
+
+  describe('fetchRooms', () => {
+    beforeEach(() => {
+      wrapper = Wrapper()
+      wrapper.vm.rooms = []
+    })
+
+    it('deduplicates rooms', async () => {
+      const room = mockRoom({ lastMessageAt: '2026-01-01' })
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [room] } })
+      await wrapper.vm.fetchRooms({})
+      await wrapper.vm.fetchRooms({})
+      // Same room loaded twice but only appears once
+      expect(wrapper.vm.rooms.filter((r) => r.id === 'room-1')).toHaveLength(1)
+    })
+
+    it('sets roomsLoaded when fewer than pageSize', async () => {
+      mocks.$apollo.query.mockResolvedValue({ data: { Room: [mockRoom()] } })
+      await wrapper.vm.fetchRooms({})
+      expect(wrapper.vm.roomsLoaded).toBe(true)
+    })
+
+    it('handles error', async () => {
+      mocks.$apollo.query.mockRejectedValue(new Error('Fetch failed'))
+      await wrapper.vm.fetchRooms({})
+      expect(mocks.$toast.error).toHaveBeenCalledWith('Fetch failed')
+    })
+  })
+
   describe('beforeDestroy', () => {
     it('unsubscribes from subscriptions', () => {
       wrapper = Wrapper()
