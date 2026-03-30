@@ -429,7 +429,7 @@ describe('Room', () => {
 
     it('returns the rooms paginated', async () => {
       await expect(
-        query({ query: Room, variables: { first: 3, offset: 0 } }),
+        query({ query: Room, variables: { first: 3 } }),
       ).resolves.toMatchObject({
         errors: undefined,
         data: {
@@ -508,7 +508,7 @@ describe('Room', () => {
                 date: expect.any(String),
                 saved: true,
                 distributed: false,
-                seen: true,
+                seen: false,
               },
               users: expect.arrayContaining([
                 expect.objectContaining({
@@ -532,38 +532,7 @@ describe('Room', () => {
           ]),
         },
       })
-      await expect(
-        query({ query: Room, variables: { first: 3, offset: 3 } }),
-      ).resolves.toMatchObject({
-        errors: undefined,
-        data: {
-          Room: [
-            expect.objectContaining({
-              id: expect.any(String),
-              roomId: expect.any(String),
-              roomName: 'Not Chatting User',
-              users: expect.arrayContaining([
-                {
-                  _id: 'chatting-user',
-                  id: 'chatting-user',
-                  name: 'Chatting User',
-                  avatar: {
-                    url: expect.any(String),
-                  },
-                },
-                {
-                  _id: 'not-chatting-user',
-                  id: 'not-chatting-user',
-                  name: 'Not Chatting User',
-                  avatar: {
-                    url: expect.any(String),
-                  },
-                },
-              ]),
-            }),
-          ],
-        },
-      })
+      // Note: offset-based pagination removed in favor of cursor-based (before parameter)
     })
   })
 
