@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Factory, { cleanDatabase } from '@db/factories'
+import CreateGroupRoom from '@graphql/queries/messaging/CreateGroupRoom.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
 import Room from '@graphql/queries/messaging/Room.gql'
 import UnreadRooms from '@graphql/queries/messaging/UnreadRooms.gql'
@@ -582,6 +583,144 @@ describe('Room', () => {
               Room: [],
             },
           })
+        })
+      })
+    })
+  })
+
+  describe('query room by userId', () => {
+    beforeAll(async () => {
+      authenticatedUser = await chattingUser.toJson()
+    })
+
+    it('returns the DM room with the specified user', async () => {
+      const result = await query({
+        query: Room,
+        variables: { userId: 'other-chatting-user' },
+      })
+      expect(result).toMatchObject({
+        errors: undefined,
+        data: {
+          Room: [
+            expect.objectContaining({
+              roomName: 'Other Chatting User',
+              users: expect.arrayContaining([
+                expect.objectContaining({ id: 'chatting-user' }),
+                expect.objectContaining({ id: 'other-chatting-user' }),
+              ]),
+            }),
+          ],
+        },
+      })
+    })
+
+    it('returns empty when no DM room exists', async () => {
+      const result = await query({
+        query: Room,
+        variables: { userId: 'non-existent-user' },
+      })
+      expect(result).toMatchObject({
+        errors: undefined,
+        data: {
+          Room: [],
+        },
+      })
+    })
+  })
+
+  describe('query room by groupId', () => {
+    let groupRoomId: string
+
+    beforeAll(async () => {
+      await Factory.build('group', {
+        id: 'test-group',
+        name: 'Test Group',
+      }, { owner: chattingUser })
+      // Add other user as member
+      const session = database.driver.session()
+      try {
+        await session.writeTransaction((txc) =>
+          txc.run(
+            `MATCH (u:User {id: 'other-chatting-user'}), (g:Group {id: 'test-group'})
+             MERGE (u)-[m:MEMBER_OF]->(g) SET m.role = 'usual', m.createdAt = toString(datetime())`,
+          ),
+        )
+      } finally {
+        await session.close()
+      }
+      authenticatedUser = await chattingUser.toJson()
+    })
+
+    describe('CreateGroupRoom', () => {
+      it('creates a group room', async () => {
+        const result = await mutate({
+          mutation: CreateGroupRoom,
+          variables: { groupId: 'test-group' },
+        })
+        expect(result).toMatchObject({
+          errors: undefined,
+          data: {
+            CreateGroupRoom: expect.objectContaining({
+              roomName: 'Test Group',
+              isGroupRoom: true,
+              users: expect.arrayContaining([
+                expect.objectContaining({ id: 'chatting-user' }),
+                expect.objectContaining({ id: 'other-chatting-user' }),
+              ]),
+            }),
+          },
+        })
+        groupRoomId = result.data.CreateGroupRoom.id
+      })
+
+      it('returns existing room on second call', async () => {
+        const result = await mutate({
+          mutation: CreateGroupRoom,
+          variables: { groupId: 'test-group' },
+        })
+        expect(result.data.CreateGroupRoom.id).toBe(groupRoomId)
+      })
+
+      it('fails for non-member', async () => {
+        authenticatedUser = await notChattingUser.toJson()
+        const result = await mutate({
+          mutation: CreateGroupRoom,
+          variables: { groupId: 'test-group' },
+        })
+        expect(result.errors).toBeDefined()
+        authenticatedUser = await chattingUser.toJson()
+      })
+    })
+
+    describe('query by groupId', () => {
+      it('returns the group room', async () => {
+        const result = await query({
+          query: Room,
+          variables: { groupId: 'test-group' },
+        })
+        expect(result).toMatchObject({
+          errors: undefined,
+          data: {
+            Room: [
+              expect.objectContaining({
+                id: groupRoomId,
+                roomName: 'Test Group',
+              }),
+            ],
+          },
+        })
+      })
+
+      it('returns empty for non-existent group', async () => {
+        const result = await query({
+          query: Room,
+          variables: { groupId: 'non-existent' },
+        })
+        expect(result).toMatchObject({
+          errors: undefined,
+          data: {
+            Room: [],
+          },
         })
       })
     })

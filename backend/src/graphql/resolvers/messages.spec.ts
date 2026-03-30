@@ -730,4 +730,62 @@ describe('Message', () => {
       })
     })
   })
+
+  describe('message query with beforeIndex', () => {
+    let testRoomId: string
+
+    beforeAll(async () => {
+      authenticatedUser = await chattingUser.toJson()
+      const result = await mutate({
+        mutation: CreateMessage,
+        variables: { userId: 'other-chatting-user', content: 'msg-0' },
+      })
+      testRoomId = result.data.CreateMessage.room.id
+      await mutate({ mutation: CreateMessage, variables: { roomId: testRoomId, content: 'msg-1' } })
+      await mutate({ mutation: CreateMessage, variables: { roomId: testRoomId, content: 'msg-2' } })
+    })
+
+    it('returns only messages with indexId less than beforeIndex', async () => {
+      const result = await query({
+        query: Message,
+        variables: { roomId: testRoomId, beforeIndex: 2 },
+      })
+      expect(result.errors).toBeUndefined()
+      const indexIds = result.data.Message.map((m) => m.indexId)
+      expect(indexIds.every((id) => id < 2)).toBe(true)
+    })
+  })
+
+  describe('create message validation', () => {
+    beforeAll(async () => {
+      authenticatedUser = await chattingUser.toJson()
+    })
+
+    it('rejects creating a room with self', async () => {
+      const result = await mutate({
+        mutation: CreateMessage,
+        variables: { userId: 'chatting-user', content: 'test' },
+      })
+      expect(result.errors).toBeDefined()
+      expect(result.errors?.[0].message).toContain('Cannot create a room with self')
+    })
+
+    it('rejects missing roomId and userId', async () => {
+      const result = await mutate({
+        mutation: CreateMessage,
+        variables: { content: 'test' },
+      })
+      expect(result.errors).toBeDefined()
+      expect(result.errors?.[0].message).toContain('Either roomId or userId must be provided')
+    })
+
+    it('rejects empty content without files', async () => {
+      const result = await mutate({
+        mutation: CreateMessage,
+        variables: { userId: 'other-chatting-user', content: '' },
+      })
+      expect(result.errors).toBeDefined()
+      expect(result.errors?.[0].message).toContain('Message must have content or files')
+    })
+  })
 })
