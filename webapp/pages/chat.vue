@@ -35,6 +35,10 @@ export default {
   },
   mounted() {
     this.showChat({ showChat: false, chatUserId: null, groupId: null })
+    this.openFromQuery()
+  },
+  watch: {
+    '$route.query': 'openFromQuery',
   },
   computed: {
     ...mapGetters({
@@ -52,6 +56,25 @@ export default {
           this.$refs.searchPanel?.$el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
         })
       }
+    },
+    openFromQuery() {
+      const { userId, groupId } = this.$route.query
+      if (!userId && !groupId) return
+      // Wait for client-only chat component to be available
+      const tryOpen = () => {
+        if (this.$refs.chat) {
+          if (groupId) {
+            this.$refs.chat.newGroupRoom(groupId)
+          } else if (userId) {
+            this.$refs.chat.newRoom(userId)
+          }
+          // Clean query params from URL
+          this.$router.replace({ path: '/chat', query: {} })
+        } else {
+          setTimeout(tryOpen, 100)
+        }
+      }
+      tryOpen()
     },
     addChatRoom(user) {
       this.$refs.chat.newRoom(user)

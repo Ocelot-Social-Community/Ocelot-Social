@@ -10,7 +10,7 @@
     </div>
     <page-footer class="desktop-footer" />
     <div id="overlay" />
-    <div v-if="getShowChat.showChat" class="chat-modul">
+    <div v-if="getShowChat.showChat && !isMobile" class="chat-modul">
       <client-only>
         <chat
           singleRoom
@@ -42,6 +42,23 @@ export default {
     ...mapGetters({
       getShowChat: 'chat/showChat',
     }),
+  },
+  watch: {
+    'getShowChat.showChat'(open) {
+      if (open && this.isMobile) {
+        const { chatUserId, groupId } = this.getShowChat
+        const query = {}
+        if (chatUserId) query.userId = chatUserId
+        if (groupId) query.groupId = groupId
+        this.showChat({ showChat: false, chatUserId: null, groupId: null })
+        if (this.$route.path === '/chat') {
+          // Already on chat page — update query to trigger openFromQuery watcher
+          this.$router.replace({ path: '/chat', query })
+        } else {
+          this.$router.push({ path: '/chat', query })
+        }
+      }
+    },
   },
   methods: {
     ...mapMutations({
