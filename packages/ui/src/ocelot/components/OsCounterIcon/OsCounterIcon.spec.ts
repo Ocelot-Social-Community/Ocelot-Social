@@ -74,7 +74,7 @@ describe('osCounterIcon', () => {
     it('renders as non-interactive span (decorative element)', () => {
       const wrapper = mount(OsCounterIcon, { props: defaultProps })
 
-      expect(wrapper.element.tagName).toBe('SPAN')
+      expect((wrapper.element as HTMLElement).tagName).toBe('SPAN')
     })
 
     it('is not focusable', () => {

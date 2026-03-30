@@ -35,7 +35,9 @@
       return () => {
         const icon = h(
           OsIcon,
-          /* v8 ignore next -- Vue 2 */ isVue2 ? { props: { icon: props.icon } } : { icon: props.icon },
+          /* v8 ignore next -- Vue 2 */ isVue2
+            ? { props: { icon: props.icon } }
+            : { icon: props.icon },
         )
 
         const children = [icon]
