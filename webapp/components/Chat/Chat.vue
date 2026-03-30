@@ -70,19 +70,46 @@
     </div>
 
     <div slot="room-header-avatar">
-      <profile-avatar
-        v-if="selectedRoom && selectedRoom.isGroupRoom"
-        :profile="selectedRoom.groupProfile"
-        class="vac-avatar-profile"
-        size="small"
-      />
-      <div
-        v-else-if="selectedRoom && selectedRoom.avatar"
-        class="vac-avatar"
-        :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
-      />
-      <div v-else-if="selectedRoom" class="vac-avatar">
-        <span class="initials">{{ getInitialsName(selectedRoom.roomName) }}</span>
+      <nuxt-link v-if="roomHeaderLink" :to="roomHeaderLink" class="chat-header-profile-link">
+        <profile-avatar
+          v-if="selectedRoom && selectedRoom.isGroupRoom"
+          :profile="selectedRoom.groupProfile"
+          class="vac-avatar-profile"
+          size="small"
+        />
+        <div
+          v-else-if="selectedRoom && selectedRoom.avatar"
+          class="vac-avatar"
+          :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
+        />
+        <div v-else-if="selectedRoom" class="vac-avatar">
+          <span class="initials">{{ getInitialsName(selectedRoom.roomName) }}</span>
+        </div>
+      </nuxt-link>
+      <template v-else>
+        <profile-avatar
+          v-if="selectedRoom && selectedRoom.isGroupRoom"
+          :profile="selectedRoom.groupProfile"
+          class="vac-avatar-profile"
+          size="small"
+        />
+        <div
+          v-else-if="selectedRoom && selectedRoom.avatar"
+          class="vac-avatar"
+          :style="{ 'background-image': `url('${selectedRoom.avatar}')` }"
+        />
+        <div v-else-if="selectedRoom" class="vac-avatar">
+          <span class="initials">{{ getInitialsName(selectedRoom.roomName) }}</span>
+        </div>
+      </template>
+    </div>
+
+    <div slot="room-header-info">
+      <div class="vac-room-name vac-text-ellipsis">
+        <nuxt-link v-if="roomHeaderLink" :to="roomHeaderLink" class="chat-header-profile-link">
+          {{ selectedRoom ? selectedRoom.roomName : '' }}
+        </nuxt-link>
+        <span v-else>{{ selectedRoom ? selectedRoom.roomName : '' }}</span>
       </div>
     </div>
 
@@ -266,6 +293,19 @@ export default {
     },
     isSafari() {
       return /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+    },
+    roomHeaderLink() {
+      if (!this.selectedRoom) return null
+      if (this.selectedRoom.isGroupRoom && this.selectedRoom.groupProfile?.id) {
+        const { id, slug } = this.selectedRoom.groupProfile
+        return `/groups/${id}/${slug}`
+      }
+      const otherUser = this.selectedRoom.users?.find((u) => u.id !== this.currentUser.id)
+      if (otherUser) {
+        const slug = otherUser.name?.toLowerCase().replaceAll(' ', '-')
+        return `/profile/${otherUser.id}/${slug}`
+      }
+      return null
     },
     textMessages() {
       return {
@@ -556,7 +596,12 @@ export default {
         isGroupRoom,
         // For group rooms: provide group profile data for ProfileAvatar component
         groupProfile: isGroupRoom
-          ? { name: room.group?.name || room.roomName, avatar: room.group?.avatar }
+          ? {
+              id: room.group?.id,
+              slug: room.group?.slug,
+              name: room.group?.name || room.roomName,
+              avatar: room.group?.avatar,
+            }
           : null,
         index: room.lastMessage ? room.lastMessage.date : room.createdAt,
         avatar: room.avatar?.w320 || room.avatar,
@@ -725,5 +770,21 @@ export default {
 
 .ds-flex-item.single-chat-bubble {
   margin-right: 1em;
+}
+
+.chat-header-profile-link {
+  color: inherit !important;
+  text-decoration: none !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  line-height: 22px !important;
+  display: block !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+
+  &:hover {
+    color: $color-primary !important;
+  }
 }
 </style>
