@@ -4,12 +4,16 @@ import AddChatRoomByUserSearch from './AddChatRoomByUserSearch.vue'
 const localVue = global.localVue
 
 const stubs = {
-  'os-button': { template: '<button @click="$listeners.click && $listeners.click()"><slot /><slot name="icon" /></button>' },
+  'os-button': {
+    template:
+      '<button @click="$listeners.click && $listeners.click()"><slot /><slot name="icon" /></button>',
+  },
   'os-icon': { template: '<span />' },
   'os-badge': { template: '<span><slot /></span>' },
   'profile-avatar': { template: '<div />' },
   'ocelot-select': {
-    template: '<div class="ocelot-select"><slot /><slot name="option" :option="{ name: \'test\' }" /></div>',
+    template:
+      '<div class="ocelot-select"><slot /><slot name="option" :option="{ name: \'test\' }" /></div>',
     props: ['value', 'options', 'loading', 'filter', 'placeholder', 'noOptionsAvailable'],
   },
 }

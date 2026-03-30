@@ -7,8 +7,18 @@ const localVue = global.localVue
 // Stub the web component to avoid shadow DOM issues in tests
 const stubs = {
   'vue-advanced-chat': {
-    template: '<div class="vac-stub"><slot /><slot name="room-options" /><slot name="room-header-avatar" /><slot name="room-header-info" /></div>',
-    props: ['rooms', 'messages', 'messagesLoaded', 'roomsLoaded', 'currentUserId', 'roomId', 'height', 'autoScroll'],
+    template:
+      '<div class="vac-stub"><slot /><slot name="room-options" /><slot name="room-header-avatar" /><slot name="room-header-info" /></div>',
+    props: [
+      'rooms',
+      'messages',
+      'messagesLoaded',
+      'roomsLoaded',
+      'currentUserId',
+      'roomId',
+      'height',
+      'autoScroll',
+    ],
   },
   'nuxt-link': { template: '<a><slot /></a>', props: ['to'] },
   'os-button': { template: '<button><slot /><slot name="icon" /></button>' },
@@ -70,9 +80,10 @@ describe('Chat.vue', () => {
         subscribe: jest.fn().mockImplementation(() => ({
           subscribe: jest.fn((handlers) => {
             // Capture subscription handlers for testing
-            const key = mocks.$apollo.subscribe.mock.calls.length <= 1
-              ? 'chatMessageAdded'
-              : 'chatMessageStatusUpdated'
+            const key =
+              mocks.$apollo.subscribe.mock.calls.length <= 1
+                ? 'chatMessageAdded'
+                : 'chatMessageStatusUpdated'
             subscriptionHandlers[key] = handlers
             return { unsubscribe: jest.fn() }
           }),
@@ -215,7 +226,14 @@ describe('Chat.vue', () => {
     beforeEach(() => {
       wrapper = Wrapper()
       wrapper.vm.messages = [
-        { _id: 'local-1', id: undefined, isUploading: true, files: [], distributed: false, seen: false },
+        {
+          _id: 'local-1',
+          id: undefined,
+          isUploading: true,
+          files: [],
+          distributed: false,
+          seen: false,
+        },
       ]
     })
 
@@ -306,7 +324,9 @@ describe('Chat.vue', () => {
     })
 
     it('updates room lastMessage status', () => {
-      wrapper.vm.rooms = [mockRoom({ lastMessage: { id: 'msg-1', content: 'hi', seen: false, distributed: false } })]
+      wrapper.vm.rooms = [
+        mockRoom({ lastMessage: { id: 'msg-1', content: 'hi', seen: false, distributed: false } }),
+      ]
       subscriptionHandlers.chatMessageStatusUpdated?.next?.({
         data: {
           chatMessageStatusUpdated: {
@@ -389,7 +409,9 @@ describe('Chat.vue', () => {
     })
 
     it('tracks unseen messages from other users', () => {
-      wrapper.vm.addSocketMessage(mockMessage({ id: 'unseen', senderId: 'other-user', seen: false }))
+      wrapper.vm.addSocketMessage(
+        mockMessage({ id: 'unseen', senderId: 'other-user', seen: false }),
+      )
       expect(wrapper.vm.unseenMessageIds.has('unseen')).toBe(true)
     })
 
@@ -572,7 +594,9 @@ describe('Chat.vue', () => {
 
     it('uses beforeIndex cursor for subsequent loads', async () => {
       const room = mockRoom({ id: 'r-cursor', roomId: 'r-cursor' })
-      const messages = Array.from({ length: 20 }, (_, i) => mockMessage({ indexId: i, id: `m${i}`, _id: `m${i}` }))
+      const messages = Array.from({ length: 20 }, (_, i) =>
+        mockMessage({ indexId: i, id: `m${i}`, _id: `m${i}` }),
+      )
       mocks.$apollo.query.mockResolvedValue({ data: { Message: messages } })
       await wrapper.vm.fetchMessages({ room })
       // Second fetch should use cursor
@@ -722,7 +746,14 @@ describe('Chat.vue', () => {
     })
 
     it('fetches room from server if not local', async () => {
-      const serverRoom = mockRoom({ id: 'server-room', roomId: 'server-room', users: [{ id: 'current-user', name: 'Me' }, { id: 'target', name: 'Target' }] })
+      const serverRoom = mockRoom({
+        id: 'server-room',
+        roomId: 'server-room',
+        users: [
+          { id: 'current-user', name: 'Me' },
+          { id: 'target', name: 'Target' },
+        ],
+      })
       mocks.$apollo.query.mockResolvedValue({ data: { Room: [serverRoom] } })
       await wrapper.vm.newRoom('target')
       expect(wrapper.vm.rooms[0].id).toBe('server-room')
@@ -755,13 +786,26 @@ describe('Chat.vue', () => {
     })
 
     it('selects existing local group room', async () => {
-      wrapper.vm.rooms = [mockRoom({ id: 'gr-1', roomId: 'gr-1', isGroupRoom: true, groupProfile: { id: 'group-1' } })]
+      wrapper.vm.rooms = [
+        mockRoom({
+          id: 'gr-1',
+          roomId: 'gr-1',
+          isGroupRoom: true,
+          groupProfile: { id: 'group-1' },
+        }),
+      ]
       await wrapper.vm.newGroupRoom('group-1')
       expect(wrapper.vm.activeRoomId).toBe('gr-1')
     })
 
     it('fetches group room from server', async () => {
-      const serverRoom = mockRoom({ id: 'gr-server', roomId: 'gr-server', isGroupRoom: true, group: { id: 'g1', name: 'G', slug: 'g' }, users: [{ id: 'current-user', name: 'Me' }] })
+      const serverRoom = mockRoom({
+        id: 'gr-server',
+        roomId: 'gr-server',
+        isGroupRoom: true,
+        group: { id: 'g1', name: 'G', slug: 'g' },
+        users: [{ id: 'current-user', name: 'Me' }],
+      })
       mocks.$apollo.query.mockResolvedValue({ data: { Room: [serverRoom] } })
       await wrapper.vm.newGroupRoom('g1')
       expect(wrapper.vm.rooms[0].id).toBe('gr-server')
@@ -796,7 +840,15 @@ describe('Chat.vue', () => {
     it('mounts with groupId and calls newGroupRoom', () => {
       mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
       mocks.$apollo.mutate.mockResolvedValue({
-        data: { CreateGroupRoom: mockRoom({ id: 'gr', roomId: 'gr', isGroupRoom: true, group: { id: 'g1', name: 'G' }, users: [{ id: 'current-user', name: 'Me' }] }) },
+        data: {
+          CreateGroupRoom: mockRoom({
+            id: 'gr',
+            roomId: 'gr',
+            isGroupRoom: true,
+            group: { id: 'g1', name: 'G' },
+            users: [{ id: 'current-user', name: 'Me' }],
+          }),
+        },
       })
       wrapper = Wrapper({ singleRoom: true, groupId: 'g1' })
       // newGroupRoom first queries the server for existing room
@@ -814,7 +866,15 @@ describe('Chat.vue', () => {
     it('calls newGroupRoom when groupId changes in singleRoom mode', async () => {
       mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
       mocks.$apollo.mutate.mockResolvedValue({
-        data: { CreateGroupRoom: mockRoom({ id: 'gr', roomId: 'gr', isGroupRoom: true, group: { id: 'g2', name: 'G2' }, users: [{ id: 'current-user', name: 'Me' }] }) },
+        data: {
+          CreateGroupRoom: mockRoom({
+            id: 'gr',
+            roomId: 'gr',
+            isGroupRoom: true,
+            group: { id: 'g2', name: 'G2' },
+            users: [{ id: 'current-user', name: 'Me' }],
+          }),
+        },
       })
       wrapper = Wrapper({ singleRoom: true, groupId: 'g1' })
       await wrapper.setProps({ groupId: 'g2' })

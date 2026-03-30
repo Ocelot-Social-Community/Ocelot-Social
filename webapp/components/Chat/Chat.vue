@@ -112,7 +112,6 @@
       </div>
     </div>
 
-
     <div v-for="room in rooms" :slot="'room-list-avatar_' + room.id" :key="room.id">
       <profile-avatar
         v-if="room.isGroupRoom"
@@ -514,7 +513,9 @@ export default {
         })
 
         const existingIds = new Set(this.rooms.map((r) => r.id))
-        const newRooms = Room.filter((r) => !existingIds.has(r.id)).map((r) => this.fixRoomObject(r))
+        const newRooms = Room.filter((r) => !existingIds.has(r.id)).map((r) =>
+          this.fixRoomObject(r),
+        )
         this.rooms = [...this.rooms, ...newRooms]
 
         if (!room?.id && Room.length > 0) {
@@ -575,7 +576,10 @@ export default {
 
         // Update cursor to oldest loaded message
         if (Message.length > 0 && !options.refetch) {
-          const oldestMsg = Message.reduce((min, m) => (m.indexId < min.indexId ? m : min), Message[0])
+          const oldestMsg = Message.reduce(
+            (min, m) => (m.indexId < min.indexId ? m : min),
+            Message[0],
+          )
           if (this.oldestLoadedIndexId === null || oldestMsg.indexId < this.oldestLoadedIndexId) {
             this.oldestLoadedIndexId = oldestMsg.indexId
           }
@@ -707,7 +711,8 @@ export default {
         seen: false,
         saved: true,
         _rawDate: new Date().toISOString(),
-        _originalAvatar: this.selectedRoom?.users?.find((u) => u.id === this.currentUser.id)?.avatar || null,
+        _originalAvatar:
+          this.selectedRoom?.users?.find((u) => u.id === this.currentUser.id)?.avatar || null,
         senderId: this.currentUser.id,
         files:
           messageDetails.files?.map((file) => ({
@@ -897,9 +902,7 @@ export default {
 
     async newGroupRoom(groupId) {
       // Check if the group room already exists locally
-      const existingRoom = this.rooms.find(
-        (r) => r.isGroupRoom && r.groupProfile?.id === groupId,
-      )
+      const existingRoom = this.rooms.find((r) => r.isGroupRoom && r.groupProfile?.id === groupId)
       if (existingRoom) {
         this.bringRoomToTopAndSelect(existingRoom)
         return
@@ -925,7 +928,9 @@ export default {
 
       // Room doesn't exist yet — create it
       try {
-        const { data: { CreateGroupRoom } } = await this.$apollo.mutate({
+        const {
+          data: { CreateGroupRoom },
+        } = await this.$apollo.mutate({
           mutation: createGroupRoom(),
           variables: { groupId },
         })
