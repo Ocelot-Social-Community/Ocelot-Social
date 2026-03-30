@@ -245,6 +245,7 @@ export default {
       messagePageSize: 20,
       oldestLoadedIndexId: null,
       messages: [],
+      unseenMessageIds: new Set(),
     }
   },
   created() {
@@ -295,6 +296,12 @@ export default {
     statusObserver.subscribe({
       next: this.handleMessageStatusUpdated,
     })
+
+  },
+  beforeDestroy() {
+    if (this._intersectionObserver) this._intersectionObserver.disconnect()
+    if (this._mutationObserver) this._mutationObserver.disconnect()
+    if (this._seenFlushTimer) clearTimeout(this._seenFlushTimer)
   },
   computed: {
     ...mapGetters({
@@ -348,6 +355,85 @@ export default {
     ...mapMutations({
       commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
     }),
+
+    markAsSeen(messageIds) {
+      if (!messageIds.length || !this.selectedRoom) return
+      const room = this.selectedRoom
+      const roomIndex = this.rooms.findIndex((r) => r.id === room.id)
+      if (roomIndex !== -1) {
+        const changedRoom = { ...this.rooms[roomIndex] }
+        changedRoom.unreadCount = Math.max(0, changedRoom.unreadCount - messageIds.length)
+        this.rooms[roomIndex] = changedRoom
+      }
+      this.$apollo
+        .mutate({
+          mutation: markMessagesAsSeen(),
+          variables: { messageIds },
+        })
+        .then(() => {
+          this.$apollo
+            .query({ query: unreadRoomsQuery(), fetchPolicy: 'network-only' })
+            .then(({ data: { UnreadRooms } }) => {
+              this.commitUnreadRoomCount(UnreadRooms)
+            })
+        })
+    },
+
+    setupMessageVisibilityTracking() {
+      const shadowRoot = this.$el?.shadowRoot
+      if (!shadowRoot || this._mutationObserver) return
+      const scrollContainer = shadowRoot.querySelector('.vac-container-scroll')
+      if (!scrollContainer) return
+
+      this._seenBatch = []
+      this._seenFlushTimer = null
+
+      // IntersectionObserver: detects when unseen messages become visible
+      this._intersectionObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              const msgId = entry.target.dataset.unseenId
+              if (msgId && this.unseenMessageIds.has(msgId)) {
+                this.unseenMessageIds.delete(msgId)
+                this._seenBatch.push(msgId)
+                this._intersectionObserver.unobserve(entry.target)
+              }
+            }
+          }
+          if (this._seenBatch.length && !this._seenFlushTimer) {
+            this._seenFlushTimer = setTimeout(() => {
+              const batch = [...this._seenBatch]
+              this._seenBatch = []
+              this._seenFlushTimer = null
+              this.markAsSeen(batch)
+            }, 500)
+          }
+        },
+        { root: scrollContainer, threshold: 0.1 },
+      )
+
+      // MutationObserver: watches for new message elements in shadow DOM
+      this._mutationObserver = new MutationObserver(() => {
+        this.observeNewUnseenElements()
+      })
+      this._mutationObserver.observe(scrollContainer, { childList: true, subtree: true })
+    },
+
+    observeNewUnseenElements() {
+      if (this.unseenMessageIds.size === 0 || !this._intersectionObserver) return
+      const shadowRoot = this.$el?.shadowRoot
+      if (!shadowRoot) return
+      for (const msgId of this.unseenMessageIds) {
+        const msg = this.messages.find((m) => m.id === msgId)
+        if (!msg) continue
+        const el = shadowRoot.querySelector(`[id="${msg._id}"]`)
+        if (el && !el.dataset.unseenId) {
+          el.dataset.unseenId = msgId
+          this._intersectionObserver.observe(el)
+        }
+      }
+    },
 
     scrollRoomsListToTop() {
       const roomsList = this.$el?.shadowRoot?.querySelector('#rooms-list')
@@ -412,6 +498,7 @@ export default {
       if (this.selectedRoom?.id !== room.id) {
         this.messages = []
         this.oldestLoadedIndexId = null
+        this.unseenMessageIds = new Set()
         this.selectedRoom = room
       }
       // Virtual rooms have no messages on the server yet
@@ -443,33 +530,10 @@ export default {
         const newMsgIds = Message.filter(
           (m) => m.seen === false && m.senderId !== this.currentUser.id,
         ).map((m) => m.id)
-        if (newMsgIds.length) {
-          const roomIndex = this.rooms.findIndex((r) => r.id === room.id)
-          const changedRoom = { ...this.rooms[roomIndex] }
-          changedRoom.unreadCount = Math.max(0, changedRoom.unreadCount - newMsgIds.length)
-          this.rooms[roomIndex] = changedRoom
-          this.$apollo
-            .mutate({
-              mutation: markMessagesAsSeen(),
-              variables: {
-                messageIds: newMsgIds,
-              },
-            })
-            .then(() => {
-              this.$apollo
-                .query({
-                  query: unreadRoomsQuery(),
-                  fetchPolicy: 'network-only',
-                })
-                .then(({ data: { UnreadRooms } }) => {
-                  this.commitUnreadRoomCount(UnreadRooms)
-                })
-            })
-        }
+        newMsgIds.forEach((id) => this.unseenMessageIds.add(id))
 
         const msgs = []
         ;[...this.messages, ...Message].forEach((m) => {
-          if (m.senderId !== this.currentUser.id) m.seen = true
           m.content = m.content || ''
           if (!m._rawDate) m._rawDate = m.date
           this.formatMessageDate(m)
@@ -488,6 +552,8 @@ export default {
         if (Message.length < this.messagePageSize) {
           this.messagesLoaded = true
         }
+        // Ensure visibility tracking is running
+        this.$nextTick(() => this.setupMessageVisibilityTracking())
       } catch (error) {
         this.messages = []
         this.$toast.error(error.message)
@@ -538,10 +604,17 @@ export default {
     },
 
     async handleMessageStatusUpdated({ data }) {
-      const { roomId, status } = data.chatMessageStatusUpdated
-      // Refetch messages from server to get updated status
+      const { roomId, messageIds, status } = data.chatMessageStatusUpdated
+      // Update loaded messages locally
       if (this.selectedRoom?.id === roomId) {
-        this.fetchMessages({ room: this.selectedRoom, options: { refetch: true } })
+        const affectedIds = new Set(messageIds)
+        const statusUpdate = status === 'seen' ? { seen: true } : { distributed: true }
+        this.messages = this.messages.map((m) => {
+          if (affectedIds.has(m.id)) {
+            return { ...m, ...statusUpdate }
+          }
+          return m
+        })
       }
       // Refetch room to update lastMessage status in preview
       const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
