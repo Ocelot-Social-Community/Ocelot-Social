@@ -359,12 +359,22 @@ export default {
     markAsSeen(messageIds) {
       if (!messageIds.length || !this.selectedRoom) return
       const room = this.selectedRoom
+      // Update local messages to seen
+      const seenIds = new Set(messageIds)
+      this.messages = this.messages.map((m) => {
+        if (seenIds.has(m.id)) {
+          return { ...m, seen: true }
+        }
+        return m
+      })
+      // Update room unread count
       const roomIndex = this.rooms.findIndex((r) => r.id === room.id)
       if (roomIndex !== -1) {
         const changedRoom = { ...this.rooms[roomIndex] }
         changedRoom.unreadCount = Math.max(0, changedRoom.unreadCount - messageIds.length)
         this.rooms[roomIndex] = changedRoom
       }
+      // Persist to server
       this.$apollo
         .mutate({
           mutation: markMessagesAsSeen(),
