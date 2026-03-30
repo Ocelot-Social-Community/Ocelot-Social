@@ -341,6 +341,11 @@ export default {
       commitUnreadRoomCount: 'chat/UPDATE_ROOM_COUNT',
     }),
 
+    scrollRoomsListToTop() {
+      const roomsList = this.$el?.shadowRoot?.querySelector('#rooms-list')
+      if (roomsList) roomsList.scrollTop = 0
+    },
+
     formatMessageDate(m) {
       const dateObj = new Date(m._rawDate)
       m.timestamp = dateObj.toLocaleTimeString(this.currentLocaleIso, {
@@ -559,8 +564,11 @@ export default {
       if (roomIndex !== -1) {
         const changedRoom = { ...this.rooms[roomIndex] }
         changedRoom.lastMessage.content = (content || '').trim().substring(0, 30)
-        changedRoom.index = changedRoom.lastMessage.date
+        changedRoom.index = new Date().toISOString()
         this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== roomId)]
+        this.$nextTick(() => {
+          this.scrollRoomsListToTop()
+        })
       }
 
       try {
