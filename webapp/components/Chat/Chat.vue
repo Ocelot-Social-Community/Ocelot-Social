@@ -136,6 +136,7 @@ import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import ProfileAvatar from '~/components/_new/generic/ProfileAvatar/ProfileAvatar'
 import locales from '~/locales/index.js'
+import gql from 'graphql-tag'
 import { roomQuery, createGroupRoom, unreadRoomsQuery } from '~/graphql/Rooms'
 import {
   messageQuery,
@@ -845,10 +846,39 @@ export default {
 
     async newRoom(userOrId) {
       // Accept either a user object { id, name } or just a userId string
-      const userId = typeof userOrId === 'string' ? userOrId : userOrId.id
-      const userName = typeof userOrId === 'string' ? userOrId : userOrId.name
-      const userAvatar =
+      let userId = typeof userOrId === 'string' ? userOrId : userOrId.id
+      let userName = typeof userOrId === 'string' ? null : userOrId.name
+      let userAvatar =
         typeof userOrId === 'string' ? null : userOrId.avatar?.w320 || userOrId.avatar?.url || null
+
+      // When called with just an ID (e.g. from query params), fetch user profile
+      if (typeof userOrId === 'string') {
+        try {
+          const { data } = await this.$apollo.query({
+            query: gql`
+              query ($id: ID!) {
+                User(id: $id) {
+                  id
+                  name
+                  avatar {
+                    url
+                  }
+                }
+              }
+            `,
+            variables: { id: userId },
+            fetchPolicy: 'no-cache',
+          })
+          const user = data.User?.[0]
+          if (user) {
+            userName = user.name
+            userAvatar = user.avatar?.url || null
+          }
+        } catch {
+          // Fall through with userId as display name
+        }
+        if (!userName) userName = userId
+      }
 
       // Check if a DM room with this user already exists locally
       const existingRoom = this.rooms.find(
@@ -878,7 +908,6 @@ export default {
         // Fall through to virtual room creation
       }
 
-      // Create a virtual room (no backend call — room is created on first message)
       // Create a virtual room (no backend call — room is created on first message)
       const virtualRoom = {
         id: `temp-${userId}`,

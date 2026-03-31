@@ -19,5 +19,6 @@ Feature: Direct Messages
   Scenario: Open a direct message via query parameter
     Given I am logged in as "alice"
     When I navigate to page "/chat?userId=bob"
-    And I send the message "Hi from link!" in the chat
+    Then I see the chat room with "Bob"
+    When I send the message "Hi from link!" in the chat
     Then I see the message "Hi from link!" in the chat
