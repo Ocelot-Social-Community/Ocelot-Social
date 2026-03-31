@@ -7,7 +7,7 @@ Feature: Chat Search
     Given the following "users" are in the database:
       | slug    | email              | password | id     | name          | termsAndConditionsAgreedVersion |
       | alice   | alice@example.org  | 1234     | alice  | Alice         | 0.0.4                          |
-      | bob     | bob@example.org    | 4321     | bob    | Bob           | 0.0.4                          |
+      | bob     | bob@example.org    | 1234     | bob    | Bob           | 0.0.4                          |
     And the following "groups" are in the database:
       | id          | name         | slug         | ownerId | groupType | description                                                                                                       |
       | test-group  | Test Group   | test-group   | alice   | public    | This is a test group for e2e testing of the chat search feature. It needs to be long enough to pass validation.    |

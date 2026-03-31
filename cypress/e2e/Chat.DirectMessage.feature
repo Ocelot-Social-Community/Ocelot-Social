@@ -7,7 +7,7 @@ Feature: Direct Messages
     Given the following "users" are in the database:
       | slug    | email              | password | id     | name          | termsAndConditionsAgreedVersion |
       | alice   | alice@example.org  | 1234     | alice  | Alice         | 0.0.4                          |
-      | bob     | bob@example.org    | 4321     | bob    | Bob           | 0.0.4                          |
+      | bob     | bob@example.org    | 1234     | bob    | Bob           | 0.0.4                          |
 
   Scenario: Send a direct message via chat page
     Given I am logged in as "alice"

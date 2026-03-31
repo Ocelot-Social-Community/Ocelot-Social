@@ -7,8 +7,8 @@ Feature: Chat Read Status
     Given the following "users" are in the database:
       | slug      | email                | password | id       | name          | termsAndConditionsAgreedVersion |
       | alice     | alice@example.org    | 1234     | alice    | Alice         | 0.0.4                          |
-      | bob       | bob@example.org      | 4321     | bob      | Bob           | 0.0.4                          |
-      | charlie   | charlie@example.org  | 5678     | charlie  | Charlie       | 0.0.4                          |
+      | bob       | bob@example.org      | 1234     | bob      | Bob           | 0.0.4                          |
+      | charlie   | charlie@example.org  | 1234     | charlie  | Charlie       | 0.0.4                          |
 
   Scenario: Messages are marked as read when opening a chat room
     Given "alice" sends a chat message "Hey Bob!" to "bob"
