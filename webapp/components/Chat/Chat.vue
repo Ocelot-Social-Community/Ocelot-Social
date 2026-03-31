@@ -778,6 +778,9 @@ export default {
           }
         }
       } catch (error) {
+        // Remove the optimistic local message so it doesn't linger as a ghost
+        this.messages = this.messages.filter((m) => m._id !== localMessage._id)
+        this.applyAvatarsOnList(this.messages)
         this.$toast.error(error.message)
       }
     },
