@@ -31,7 +31,8 @@ defineStep(
       })
       .then((result) => {
         const senderEmail = result.records[0].get('senderEmail')
-        return cy.authenticateAs({ email: senderEmail, password: '1234' }).then((client) => {
+        const password = (Cypress.env('userPasswords') || {})[senderSlug] || '1234'
+        return cy.authenticateAs({ email: senderEmail, password }).then((client) => {
           return client
             .request(createGroupRoomMutation, { groupId })
             .then((roomData) => {

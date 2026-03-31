@@ -24,6 +24,11 @@ defineStep('the following {string} are in the database:', (table,data) => {
       break
     case 'users':
       data.hashes().forEach( entry => {
+        if (entry.slug && entry.password) {
+          const passwords = Cypress.env('userPasswords') || {}
+          passwords[entry.slug] = entry.password
+          Cypress.env('userPasswords', passwords)
+        }
         cy.factory().build('user', entry, entry)
       })
       break
