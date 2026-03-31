@@ -863,6 +863,7 @@ describe('notifications', () => {
 
     beforeEach(async () => {
       jest.clearAllMocks()
+      isUserOnlineMock = jest.fn().mockReturnValue(false)
 
       chatSender = await Factory.build(
         'user',
