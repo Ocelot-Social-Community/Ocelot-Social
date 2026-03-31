@@ -101,7 +101,13 @@ export default {
         if (undistributedMessagesIds.length > 0) {
           const session = context.driver.session()
           try {
-            await setMessagesAsDistributed(undistributedMessagesIds, session)
+            const results = await setMessagesAsDistributed(undistributedMessagesIds, session)
+            for (const { roomId, authorId, messageIds } of results) {
+              void context.pubsub.publish(CHAT_MESSAGE_STATUS_UPDATED, {
+                authorId,
+                chatMessageStatusUpdated: { roomId, messageIds, status: 'distributed' },
+              })
+            }
           } finally {
             await session.close()
           }
