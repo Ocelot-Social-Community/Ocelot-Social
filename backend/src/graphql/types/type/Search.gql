@@ -1,4 +1,5 @@
 union SearchResult = Post | User | Tag | Group
+union ChatTarget = User | Group
 
 type postSearchResults {
   postCount: Int
@@ -26,5 +27,5 @@ type Query {
   searchGroups(query: String!, firstGroups: Int, groupsOffset: Int): groupSearchResults!
   searchHashtags(query: String!, firstHashtags: Int, hashtagsOffset: Int): hashtagSearchResults!
   searchResults(query: String!, limit: Int = 5): [SearchResult]!
-  searchChatTargets(query: String!, limit: Int = 10): [SearchResult]!
+  searchChatTargets(query: String!, limit: Int = 10): [ChatTarget]!
 }
