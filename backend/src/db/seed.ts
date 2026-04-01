@@ -1328,6 +1328,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     const jennyInviteSession = database.driver.session()
     try {
       for (let i = 0; i < Math.min(99, additionalUsers.length); i++) {
+        // eslint-disable-next-line security/detect-object-injection
         const userObj = await additionalUsers[i].toJson()
         const userId = userObj.id as string
         await jennyInviteSession.writeTransaction((txc) =>
