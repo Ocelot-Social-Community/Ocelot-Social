@@ -15,7 +15,7 @@
           @click.prevent="toggleMenu()"
         >
           <template #icon>
-            <os-icon :icon="icons.language" />
+            <os-icon :icon="icons.language" size="lg" />
           </template>
         </os-button>
       </template>
