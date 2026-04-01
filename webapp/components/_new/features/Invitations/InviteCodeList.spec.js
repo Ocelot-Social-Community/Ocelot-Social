@@ -1,5 +1,4 @@
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { mount } from '@vue/test-utils'
 import '@testing-library/jest-dom'
 
 import InviteCodeList from './InviteCodeList.vue'

@@ -13,7 +13,9 @@ describe('embeds.vue', () => {
   let store
 
   beforeEach(() => {
-    axios.get.mockResolvedValue({ data: [{ provider_name: 'YouTube', provider_url: 'https://youtube.com' }] })
+    axios.get.mockResolvedValue({
+      data: [{ provider_name: 'YouTube', provider_url: 'https://youtube.com' }],
+    })
     mocks = {
       $t: jest.fn((v) => v),
       $apollo: {

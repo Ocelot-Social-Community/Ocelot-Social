@@ -78,8 +78,11 @@ describe('my-social-media.vue', () => {
       describe('success', () => {
         beforeEach(async () => {
           mocks.$apollo.mutate.mockImplementation(({ update }) => {
-            if (update) update(null, { data: { CreateSocialMedia: { id: 's2', url: newSocialMediaUrl } } })
-            return Promise.resolve({ data: { CreateSocialMedia: { id: 's2', url: newSocialMediaUrl } } })
+            if (update)
+              update(null, { data: { CreateSocialMedia: { id: 's2', url: newSocialMediaUrl } } })
+            return Promise.resolve({
+              data: { CreateSocialMedia: { id: 's2', url: newSocialMediaUrl } },
+            })
           })
           input.setValue(newSocialMediaUrl)
           form.trigger('submit')

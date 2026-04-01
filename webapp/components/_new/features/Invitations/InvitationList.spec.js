@@ -117,5 +117,4 @@ describe('InvitationList.vue', () => {
     await fireEvent.click(generateButton)
     expect(generateButton).toBeInTheDocument()
   })
-
 })
