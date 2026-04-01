@@ -156,6 +156,7 @@ exports[`settings.vue given badges are disabled renders 1`] = `
         class="settings-menu-mobile"
       >
         <select
+          aria-label="settings.name"
           class="settings-select"
         >
           <option
@@ -421,6 +422,7 @@ exports[`settings.vue given badges are enabled renders 1`] = `
         class="settings-menu-mobile"
       >
         <select
+          aria-label="settings.name"
           class="settings-select"
         >
           <option
