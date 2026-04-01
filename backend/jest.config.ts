@@ -27,7 +27,7 @@ export default {
   ],
   coverageThreshold: {
     global: {
-      lines: 92,
+      lines: 93,
     },
   },
   testMatch: ['**/src/**/?(*.)+(spec|test).ts?(x)'],
