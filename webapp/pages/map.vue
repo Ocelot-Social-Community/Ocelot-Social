@@ -64,9 +64,8 @@ import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import { mapGetters } from 'vuex'
-import { profileUserQuery, mapUserQuery } from '~/graphql/User'
-import { groupQuery } from '~/graphql/groups'
-import { filterMapPosts } from '~/graphql/PostQuery.js'
+import { profileUserQuery } from '~/graphql/User'
+import { mapQuery } from '~/graphql/MapQuery'
 import mobile from '~/mixins/mobile'
 import Empty from '~/components/Empty/Empty'
 import MapStylesButtons from '~/components/Map/MapStylesButtons'
@@ -363,7 +362,7 @@ export default {
       if (this.isPreparedForMarkers) {
         // add markers for "users"
         this.users.forEach((user) => {
-          if (user.id !== this.currentUser.id && user.location) {
+          if (user.id !== this.currentUser.id) {
             this.markers.geoJSON.push({
               type: 'Feature',
               properties: {
@@ -403,45 +402,41 @@ export default {
         }
         // add markers for "groups"
         this.groups.forEach((group) => {
-          if (group.location) {
-            this.markers.geoJSON.push({
-              type: 'Feature',
-              properties: {
-                type: 'group',
-                iconName: 'marker-red',
-                iconRotate: 0.0,
-                id: group.id,
-                slug: group.slug,
-                name: group.name,
-                description: group.about ? group.about : undefined,
-              },
-              geometry: {
-                type: 'Point',
-                coordinates: this.getCoordinates(group.location),
-              },
-            })
-          }
+          this.markers.geoJSON.push({
+            type: 'Feature',
+            properties: {
+              type: 'group',
+              iconName: 'marker-red',
+              iconRotate: 0.0,
+              id: group.id,
+              slug: group.slug,
+              name: group.name,
+              description: group.about ? group.about : undefined,
+            },
+            geometry: {
+              type: 'Point',
+              coordinates: this.getCoordinates(group.location),
+            },
+          })
         })
         // add markers for "posts", post type "Event" with location coordinates
         this.posts.forEach((post) => {
-          if (post.postType.includes('Event') && post.eventLocation) {
-            this.markers.geoJSON.push({
-              type: 'Feature',
-              properties: {
-                type: 'event',
-                iconName: 'marker-purple',
-                iconRotate: 0.0,
-                id: post.id,
-                slug: post.slug,
-                name: post.title,
-                description: this.$filters.removeHtml(post.content),
-              },
-              geometry: {
-                type: 'Point',
-                coordinates: this.getCoordinates(post.eventLocation),
-              },
-            })
-          }
+          this.markers.geoJSON.push({
+            type: 'Feature',
+            properties: {
+              type: 'event',
+              iconName: 'marker-purple',
+              iconRotate: 0.0,
+              id: post.id,
+              slug: post.slug,
+              name: post.title,
+              description: this.$filters.removeHtml(post.content),
+            },
+            geometry: {
+              type: 'Point',
+              coordinates: this.getCoordinates(post.eventLocation),
+            },
+          })
         })
 
         this.markers.isGeoJSON = true
@@ -514,47 +509,24 @@ export default {
     },
   },
   apollo: {
-    User: {
+    mapData: {
       query() {
-        return mapUserQuery(this.$i18n)
-      },
-      variables() {
-        return {}
-      },
-      update({ User }) {
-        this.users = User
-        this.addMarkersOnCheckPrepared()
-      },
-      fetchPolicy: 'cache-and-network',
-    },
-    Group: {
-      query() {
-        return groupQuery(this.$i18n)
-      },
-      variables() {
-        return {}
-      },
-      update({ Group }) {
-        this.groups = Group
-        this.addMarkersOnCheckPrepared()
-      },
-      fetchPolicy: 'cache-and-network',
-    },
-    Post: {
-      query() {
-        return filterMapPosts(this.$i18n)
+        return mapQuery(this.$i18n)
       },
       variables() {
         return {
-          filter: {
+          postFilter: {
             postType_in: ['Event'],
             eventStart_gte: new Date(),
-            // would be good to just query for events with defined "eventLocation". couldn't get it working
+            hasLocation: true,
           },
         }
       },
-      update({ Post }) {
+      update({ User, Group, Post }) {
+        this.users = User
+        this.groups = Group
         this.posts = Post
+        this.addMarkersOnCheckPrepared()
       },
       fetchPolicy: 'cache-and-network',
     },

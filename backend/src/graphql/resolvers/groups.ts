@@ -23,7 +23,7 @@ import type { Context } from '@src/context'
 export default {
   Query: {
     Group: async (_object, params, context: Context, _resolveInfo) => {
-      const { isMember, id, slug, first, offset } = params
+      const { isMember, hasLocation, id, slug, first, offset } = params
       const session = context.driver.session()
       try {
         return await session.readTransaction(async (txc) => {
@@ -35,10 +35,13 @@ export default {
           if (slug !== undefined) matchFilters.push('group.slug = $slug')
           const matchWhere = matchFilters.length ? `WHERE ${matchFilters.join(' AND ')}` : ''
 
+          const locationMatch = hasLocation === true ? 'MATCH (group)-[:IS_IN]->(:Location)' : ''
+
           const transactionResponse = await txc.run(
             `
             MATCH (group:Group)
             ${matchWhere}
+            ${locationMatch}
             OPTIONAL MATCH (:User {id: $userId})-[membership:MEMBER_OF]->(group)
             WITH group, membership
             ${(isMember === true && "WHERE membership IS NOT NULL AND (group.groupType IN ['public', 'closed']) OR (group.groupType = 'hidden' AND membership.role IN ['usual', 'admin', 'owner'])") || ''}

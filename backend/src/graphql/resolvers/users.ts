@@ -12,6 +12,7 @@ import { getNeode } from '@db/neo4j'
 import { UserInputError, ForbiddenError } from '@graphql/errors'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
+import { filterUsersHasLocation } from './helpers/filterHasLocation'
 import normalizeEmail from './helpers/normalizeEmail'
 import Resolver from './helpers/Resolver'
 import { images } from './images/images'
@@ -66,6 +67,7 @@ export default {
           await session.close()
         }
       }
+      args = await filterUsersHasLocation(args, context)
       return neo4jgraphql(object, args, context, resolveInfo)
     },
   },

@@ -13,6 +13,7 @@ import { UserInputError } from '@graphql/errors'
 
 import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
+import { filterPostsHasLocation } from './helpers/filterHasLocation'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
 import Resolver from './helpers/Resolver'
@@ -61,6 +62,7 @@ export default {
       params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
       params = filterEventDates(params)
+      params = await filterPostsHasLocation(params, context)
       params = await maintainPinnedPosts(params)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
