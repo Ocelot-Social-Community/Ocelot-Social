@@ -1,4 +1,4 @@
-query Post($filter: _PostFilter) {
+query PostWithLocationFilter($filter: _PostFilter) {
   Post(filter: $filter) {
     id
     eventLocation {

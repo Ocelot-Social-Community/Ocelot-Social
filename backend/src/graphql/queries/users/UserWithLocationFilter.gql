@@ -1,4 +1,4 @@
-query User($filter: _UserFilter) {
+query UserWithLocationFilter($filter: _UserFilter) {
   User(filter: $filter) {
     id
     location {

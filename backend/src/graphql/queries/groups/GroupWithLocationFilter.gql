@@ -1,4 +1,4 @@
-query Group($hasLocation: Boolean) {
+query GroupWithLocationFilter($hasLocation: Boolean) {
   Group(hasLocation: $hasLocation) {
     id
     location {

@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Factory, { cleanDatabase } from '@db/factories'
 import GroupWithLocationFilter from '@graphql/queries/groups/GroupWithLocationFilter.gql'
 import PostWithLocationFilter from '@graphql/queries/posts/PostWithLocationFilter.gql'
