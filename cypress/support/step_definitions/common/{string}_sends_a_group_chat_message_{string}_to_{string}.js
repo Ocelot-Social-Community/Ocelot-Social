@@ -31,7 +31,8 @@ defineStep(
       })
       .then((result) => {
         const senderEmail = result.records[0].get('senderEmail')
-        const password = (Cypress.env('userPasswords') || {})[senderSlug] || '1234'
+        const password = (Cypress.env('userPasswords') || {})[senderSlug]
+        expect(password, `No password found for user "${senderSlug}"`).to.exist
         return cy.authenticateAs({ email: senderEmail, password }).then((client) => {
           return client
             .request(createGroupRoomMutation, { groupId })

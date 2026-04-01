@@ -21,7 +21,8 @@ defineStep('{string} opens the group chat for {string}', (userSlug, groupId) => 
     })
     .then((result) => {
       const email = result.records[0].get('email')
-      const password = (Cypress.env('userPasswords') || {})[userSlug] || '1234'
+      const password = (Cypress.env('userPasswords') || {})[userSlug]
+      expect(password, `No password found for user "${userSlug}"`).to.exist
       return cy.authenticateAs({ email, password }).then((client) => {
         return client.request(createGroupRoomMutation, { groupId })
       })
