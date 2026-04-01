@@ -96,10 +96,11 @@ describe('index.vue', () => {
       expect(Wrapper().element.tagName).toBe('FORM')
     })
 
-    it('formSchema computed returns schema with locationName and name', () => {
+    it('formSchema computed returns schema with name and locationName', () => {
       const wrapper = Wrapper()
       expect(wrapper.vm.formSchema).toHaveProperty('name')
       expect(wrapper.vm.formSchema.name).toEqual({ required: true, min: 3 })
+      expect(wrapper.vm.formSchema).toHaveProperty('locationName')
     })
 
     describe('given form validation errors', () => {
