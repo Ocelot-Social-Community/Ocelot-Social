@@ -1168,7 +1168,13 @@
       }
     },
     "invites": {
-      "name": "Приглашения"
+      "name": "Приглашения",
+      "total-invited": "Вы пригласили {count} человек.",
+      "codes-active": "{active} из {max} кодов приглашения активны.",
+      "invited-users": "Приглашённые пользователи",
+      "via-code": "через {code}",
+      "deactivated": "деактивирован",
+      "expired-codes": "{count} деактивированных кодов"
     },
     "languages": {
       "name": "Языки"

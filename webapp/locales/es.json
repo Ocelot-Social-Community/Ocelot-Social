@@ -1168,7 +1168,13 @@
       }
     },
     "invites": {
-      "name": "Invita"
+      "name": "Invita",
+      "total-invited": "Has invitado a {count} personas.",
+      "codes-active": "{active} de {max} códigos de invitación activos.",
+      "invited-users": "Usuarios invitados",
+      "via-code": "vía {code}",
+      "deactivated": "desactivado",
+      "expired-codes": "{count} códigos desactivados"
     },
     "languages": {
       "name": "Idiomas"

@@ -1168,7 +1168,13 @@
       }
     },
     "invites": {
-      "name": "Zaproszenia"
+      "name": "Zaproszenia",
+      "total-invited": "Zaprosiłeś/aś {count} osób.",
+      "codes-active": "{active} z {max} kodów zaproszeń aktywnych.",
+      "invited-users": "Zaproszeni użytkownicy",
+      "via-code": "przez {code}",
+      "deactivated": "dezaktywowany",
+      "expired-codes": "{count} dezaktywowanych kodów"
     },
     "languages": {
       "name": "Języki"
