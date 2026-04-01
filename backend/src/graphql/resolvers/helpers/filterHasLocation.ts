@@ -1,5 +1,3 @@
-import { mergeWith, isArray } from 'lodash'
-
 import type { Context } from '@src/context'
 
 interface FilterParams {
@@ -31,6 +29,11 @@ const getIdsWithLocation = async (context: Context, label: AllowedLabel): Promis
   }
 }
 
+const mergeIdIn = (existing: string[] | undefined, incoming: string[]): string[] => {
+  if (!existing) return incoming
+  return existing.filter((id) => incoming.includes(id))
+}
+
 export const filterUsersHasLocation = async (
   params: FilterParams,
   context: Context,
@@ -38,15 +41,7 @@ export const filterUsersHasLocation = async (
   if (!params.filter?.hasLocation) return params
   delete params.filter.hasLocation
   const userIds = await getIdsWithLocation(context, 'User')
-  params.filter = mergeWith(
-    params.filter,
-    { id_in: userIds },
-    (objValue: unknown, srcValue: unknown) => {
-      if (isArray(objValue)) {
-        return (objValue as unknown[]).concat(srcValue)
-      }
-    },
-  )
+  params.filter.id_in = mergeIdIn(params.filter.id_in, userIds)
   return params
 }
 
@@ -57,14 +52,6 @@ export const filterPostsHasLocation = async (
   if (!params.filter?.hasLocation) return params
   delete params.filter.hasLocation
   const postIds = await getIdsWithLocation(context, 'Post')
-  params.filter = mergeWith(
-    params.filter,
-    { id_in: postIds },
-    (objValue: unknown, srcValue: unknown) => {
-      if (isArray(objValue)) {
-        return (objValue as unknown[]).concat(srcValue)
-      }
-    },
-  )
+  params.filter.id_in = mergeIdIn(params.filter.id_in, postIds)
   return params
 }
