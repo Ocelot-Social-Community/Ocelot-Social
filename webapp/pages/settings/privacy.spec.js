@@ -63,6 +63,10 @@ describe('privacy.vue', () => {
       store.commit = jest.fn()
       await wrapper.find('#allow-shouts').setChecked(false)
       await wrapper.find('button').trigger('click')
+      expect(store.commit).toHaveBeenCalledWith(
+        'auth/SET_USER',
+        expect.objectContaining({ showShoutsPublicly: false }),
+      )
       expect(mocks.$toast.success).toHaveBeenCalled()
     })
 
