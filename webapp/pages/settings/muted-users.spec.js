@@ -54,6 +54,7 @@ describe('muted-users.vue', () => {
 
       describe('click unmute', () => {
         beforeEach(() => {
+          mocks.$apollo.mutate.mockResolvedValue({})
           wrapper.find('[data-test="unmute-btn"]').trigger('click')
         })
 
@@ -62,6 +63,18 @@ describe('muted-users.vue', () => {
             mutation: unmuteUser(),
             variables: { id: 'u1' },
           })
+        })
+      })
+
+      describe('when unmute fails', () => {
+        beforeEach(async () => {
+          mocks.$apollo.mutate.mockRejectedValue(new Error('Network error'))
+          await wrapper.find('[data-test="unmute-btn"]').trigger('click')
+          await wrapper.vm.$nextTick()
+        })
+
+        it('shows error toast', () => {
+          expect(mocks.$toast.error).toHaveBeenCalledWith('Network error')
         })
       })
     })

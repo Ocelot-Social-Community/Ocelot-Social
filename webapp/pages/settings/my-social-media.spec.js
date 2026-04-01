@@ -28,7 +28,7 @@ describe('my-social-media.vue', () => {
     }
     getters = {
       'auth/user': () => {
-        return {}
+        return { socialMedia: [] }
       },
     }
   })
@@ -38,6 +38,7 @@ describe('my-social-media.vue', () => {
     const Wrapper = () => {
       const store = new Vuex.Store({
         getters,
+        mutations: { 'auth/SET_USER': jest.fn() },
       })
       return mount(MySocialMedia, {
         store,
@@ -76,8 +77,9 @@ describe('my-social-media.vue', () => {
 
       describe('success', () => {
         beforeEach(async () => {
-          mocks.$apollo.mutate.mockResolvedValue({
-            data: { CreateSocialMedia: { id: 's2', url: newSocialMediaUrl } },
+          mocks.$apollo.mutate.mockImplementation(({ update }) => {
+            if (update) update(null, { data: { CreateSocialMedia: { id: 's2', url: newSocialMediaUrl } } })
+            return Promise.resolve({ data: { CreateSocialMedia: { id: 's2', url: newSocialMediaUrl } } })
           })
           input.setValue(newSocialMediaUrl)
           form.trigger('submit')
@@ -101,6 +103,24 @@ describe('my-social-media.vue', () => {
           const submitButton = wrapper.find('button[data-test="add-save-button"]')
           expect(submitButton.text()).not.toContain('settings.social-media.submit')
         })
+      })
+    })
+
+    describe('handleInputValid', () => {
+      beforeEach(() => {
+        wrapper = Wrapper()
+      })
+
+      it('disables list when socialMediaUrl is empty', () => {
+        const thisList = { disabled: false }
+        wrapper.vm.handleInputValid(thisList, { socialMediaUrl: '' })
+        expect(thisList.disabled).toBe(true)
+      })
+
+      it('enables list when socialMediaUrl has value', () => {
+        const thisList = { disabled: true }
+        wrapper.vm.handleInputValid(thisList, { socialMediaUrl: 'https://example.com' })
+        expect(thisList.disabled).toBe(false)
       })
     })
 
@@ -166,8 +186,9 @@ describe('my-social-media.vue', () => {
 
         describe('when user confirms deletion', () => {
           beforeEach(async () => {
-            mocks.$apollo.mutate.mockResolvedValue({
-              data: { DeleteSocialMedia: { id: 's1' } },
+            mocks.$apollo.mutate.mockImplementation(({ update }) => {
+              if (update) update(null, { data: { DeleteSocialMedia: { id: 's1' } } })
+              return Promise.resolve({ data: { DeleteSocialMedia: { id: 's1' } } })
             })
             const mySomethingList = wrapper.findComponent(MySomethingList)
             mySomethingList.vm.currentModalData.buttons.confirm.callback()

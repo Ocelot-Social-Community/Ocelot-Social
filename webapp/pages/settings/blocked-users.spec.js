@@ -54,6 +54,7 @@ describe('blocked-users.vue', () => {
 
       describe('click unblock', () => {
         beforeEach(() => {
+          mocks.$apollo.mutate.mockResolvedValue({})
           wrapper.find('[data-test="unblock-btn"]').trigger('click')
         })
 
@@ -62,6 +63,18 @@ describe('blocked-users.vue', () => {
             mutation: unblockUser(),
             variables: { id: 'u1' },
           })
+        })
+      })
+
+      describe('when unblock fails', () => {
+        beforeEach(async () => {
+          mocks.$apollo.mutate.mockRejectedValue(new Error('Network error'))
+          await wrapper.find('[data-test="unblock-btn"]').trigger('click')
+          await wrapper.vm.$nextTick()
+        })
+
+        it('shows error toast', () => {
+          expect(mocks.$toast.error).toHaveBeenCalledWith('Network error')
         })
       })
     })

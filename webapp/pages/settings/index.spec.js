@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import flushPromises from 'flush-promises'
 import index from './index.vue'
 import Vuex from 'vuex'
 import LocationSelect from '~/components/Select/LocationSelect'
@@ -82,6 +83,7 @@ describe('index.vue', () => {
     const Wrapper = () => {
       store = new Vuex.Store({
         getters,
+        mutations: { 'auth/SET_USER': jest.fn() },
       })
       return mount(index, { store, mocks, localVue, ...options })
     }
@@ -92,6 +94,12 @@ describe('index.vue', () => {
 
     it('renders', () => {
       expect(Wrapper().element.tagName).toBe('FORM')
+    })
+
+    it('formSchema computed returns schema with locationName and name', () => {
+      const wrapper = Wrapper()
+      expect(wrapper.vm.formSchema).toHaveProperty('name')
+      expect(wrapper.vm.formSchema.name).toEqual({ required: true, min: 3 })
     })
 
     describe('given form validation errors', () => {
@@ -136,6 +144,51 @@ describe('index.vue', () => {
             expect.objectContaining({
               variables: expect.objectContaining({
                 name: 'Peter',
+              }),
+            }),
+          )
+        })
+
+        it('successful submit calls update callback and shows success toast', async () => {
+          mocks.$apollo.mutate = jest.fn().mockImplementation(({ update }) => {
+            if (update)
+              update(null, {
+                data: { UpdateUser: { id: 'u1', name: 'Peter', slug: 'peter' } },
+              })
+            return Promise.resolve()
+          })
+          const wrapper = Wrapper()
+
+          wrapper.find('#name').setValue('Peter')
+          wrapper.find('form').trigger('submit')
+          await flushPromises()
+
+          expect(mocks.$toast.success).toHaveBeenCalled()
+        })
+
+        it('failed submit shows error toast', async () => {
+          mocks.$apollo.mutate = jest.fn().mockRejectedValue(new Error('Ouch'))
+          const wrapper = Wrapper()
+
+          wrapper.find('#name').setValue('Peter')
+          wrapper.find('form').trigger('submit')
+          await flushPromises()
+
+          expect(mocks.$toast.error).toHaveBeenCalledWith('Ouch')
+        })
+      })
+
+      describe('given location with label property', () => {
+        it('extracts label from locationName', () => {
+          const wrapper = Wrapper()
+          wrapper.setData({ formData: { locationName: { label: 'Berlin, Germany' } } })
+          wrapper.find('#name').setValue('Peter')
+          wrapper.find('form').trigger('submit')
+
+          expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({
+              variables: expect.objectContaining({
+                locationName: 'Berlin, Germany',
               }),
             }),
           )

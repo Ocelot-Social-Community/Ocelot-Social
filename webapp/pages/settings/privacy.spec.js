@@ -26,7 +26,6 @@ describe('privacy.vue', () => {
           return {
             id: 'u343',
             name: 'MyAccount',
-            showShoutsPublicly: true,
           }
         },
       },
@@ -54,6 +53,17 @@ describe('privacy.vue', () => {
       await wrapper.find('#allow-shouts').setChecked(false)
       await wrapper.find('button').trigger('click')
       expect(wrapper.vm.shoutsAllowed).toBe(false)
+    })
+
+    it('successful submit calls setCurrentUser and shows success toast', async () => {
+      mocks.$apollo.mutate = jest.fn().mockImplementation(({ update }) => {
+        update(null, { data: { UpdateUser: { showShoutsPublicly: false } } })
+        return Promise.resolve()
+      })
+      store.commit = jest.fn()
+      await wrapper.find('#allow-shouts').setChecked(false)
+      await wrapper.find('button').trigger('click')
+      expect(mocks.$toast.success).toHaveBeenCalled()
     })
 
     it('clicking on submit with a server error shows a toast and shoutsAllowed is still true', async () => {
