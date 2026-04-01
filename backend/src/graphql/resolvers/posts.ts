@@ -70,6 +70,7 @@ export default {
       params = await filterPostsOfMyGroups(params, context)
       params = await filterInvisiblePosts(params, context)
       params = await filterForMutedUsers(params, context)
+      params = await filterPostsHasLocation(params, context)
       params = await maintainGroupPinnedPosts(params)
       return neo4jgraphql(object, params, context, resolveInfo)
     },
