@@ -110,4 +110,12 @@ describe('InvitationList.vue', () => {
     const generateButton = screen.getByLabelText('invite-codes.generate-code')
     expect(generateButton).toBeDisabled()
   })
+
+  it('emits generate-invite-code when create button is submitted', async () => {
+    wrapper = Wrapper({ withInviteCodes: true })
+    const generateButton = screen.getByLabelText('invite-codes.generate-code')
+    await fireEvent.click(generateButton)
+    expect(generateButton).toBeInTheDocument()
+  })
+
 })

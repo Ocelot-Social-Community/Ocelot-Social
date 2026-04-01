@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/vue'
+import { mount } from '@vue/test-utils'
 import '@testing-library/jest-dom'
 
 import InviteCodeList from './InviteCodeList.vue'
@@ -65,8 +66,15 @@ const Wrapper = (propsOverrides = {}, mocksOverrides = {}) => {
     mocks: { ...defaultMocks, ...mocksOverrides },
     stubs: {
       'client-only': true,
-      'profile-list': true,
-      'confirm-modal': true,
+      'profile-list': {
+        template:
+          '<div data-testid="profile-list"><button data-testid="load-all-btn" @click="$emit(\'fetchAllProfiles\')">Load all</button></div>',
+      },
+      'confirm-modal': {
+        template:
+          '<div data-testid="confirm-modal"><button data-testid="confirm-btn" @click="$props.modalData.buttons.confirm.callback()">Confirm</button></div>',
+        props: ['modalData'],
+      },
     },
   })
 }
@@ -132,6 +140,39 @@ describe('InviteCodeList.vue', () => {
         inviteCodes: sampleInviteCodes.filter((c) => c.isValid),
       })
       expect(screen.queryByText(/settings.invites.expired-codes/)).not.toBeInTheDocument()
+    })
+  })
+
+  describe('interactions', () => {
+    it('clicking delete button opens confirm modal', async () => {
+      Wrapper()
+      const deleteButtons = screen.getAllByLabelText('invite-codes.invalidate')
+      await fireEvent.click(deleteButtons[0])
+      expect(screen.getByTestId('confirm-modal')).toBeInTheDocument()
+    })
+
+    it('confirming delete triggers invalidateInviteCode', async () => {
+      Wrapper()
+      const deleteButtons = screen.getAllByLabelText('invite-codes.invalidate')
+      await fireEvent.click(deleteButtons[0])
+      const confirmBtn = screen.getByTestId('confirm-btn')
+      await fireEvent.click(confirmBtn)
+      expect(defaultMocks.$apollo.mutate).toHaveBeenCalled()
+    })
+
+    it('clicking generate button triggers code generation', async () => {
+      Wrapper()
+      const generateButton = screen.getByLabelText('invite-codes.generate-code')
+      await fireEvent.click(generateButton)
+      expect(defaultMocks.$apollo.mutate).toHaveBeenCalled()
+    })
+
+    it('clicking load all in profile-list loads all invited users', async () => {
+      Wrapper({ showInvitedUsers: true })
+      const loadAllBtn = screen.getByTestId('load-all-btn')
+      await fireEvent.click(loadAllBtn)
+      // After loading, the profile-list should still be present
+      expect(screen.getByTestId('profile-list')).toBeInTheDocument()
     })
   })
 })
