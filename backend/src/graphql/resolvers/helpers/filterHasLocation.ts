@@ -11,7 +11,10 @@ interface FilterParams {
   [key: string]: unknown
 }
 
-const getIdsWithLocation = async (context: Context, label: string): Promise<string[]> => {
+const ALLOWED_LABELS = ['User', 'Post'] as const
+type AllowedLabel = (typeof ALLOWED_LABELS)[number]
+
+const getIdsWithLocation = async (context: Context, label: AllowedLabel): Promise<string[]> => {
   const session = context.driver.session()
   try {
     const result = await session.readTransaction(async (transaction) => {
