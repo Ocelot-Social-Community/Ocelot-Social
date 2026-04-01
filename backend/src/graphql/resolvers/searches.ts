@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { queryString } from './searches/queryString'
 
@@ -15,9 +16,9 @@ const cypherTemplate = (setup) => `
   ${setup.match}
   ${setup.whereClause}
   ${setup.withClause}
-  RETURN 
+  RETURN
   ${setup.returnClause}
-  AS result
+  AS result${setup.returnScore === false ? '' : ', score'}
   SKIP toInteger($skip)
   ${setup.limit}
 `
@@ -37,9 +38,9 @@ const searchPostsSetup = {
           MATCH (user:User {id: $userId})
           OPTIONAL MATCH (user)-[block:MUTED]->(author)
           OPTIONAL MATCH (user)-[restriction:CANNOT_SEE]->(resource)
-          WITH user, resource, author, block, restriction`,
+          WITH user, resource, author, block, restriction, score`,
   whereClause: postWhereClause,
-  withClause: `WITH resource, author,
+  withClause: `WITH resource, author, score,
   [(resource)<-[:COMMENTS]-(comment:Comment) | comment] AS comments,
   [(resource)<-[:SHOUTED]-(user:User) | user] AS shouter`,
   returnClause: `resource {
@@ -77,18 +78,32 @@ const searchGroupsSetup = {
   match: `MATCH (resource:Group)
           MATCH (user:User {id: $userId})
           OPTIONAL MATCH (user)-[membership:MEMBER_OF]->(resource)
-          WITH user, resource, membership`,
+          WITH user, resource, membership, score`,
   whereClause: `WHERE score >= 0.0
                 AND NOT (resource.deleted = true OR resource.disabled = true)
                 AND (resource.groupType IN ['public', 'closed']
                   OR membership.role IN ['usual', 'admin', 'owner'])`,
-  withClause: 'WITH resource, membership',
+  withClause: 'WITH resource, membership, score',
+  returnClause: `resource { .*, myRole: membership.role, __typename: 'Group' }`,
+  limit: 'LIMIT toInteger($limit)',
+}
+
+const searchMyGroupsSetup = {
+  fulltextIndex: 'group_fulltext_search',
+  match: `MATCH (resource:Group)
+          MATCH (user:User {id: $userId})-[membership:MEMBER_OF]->(resource)
+          WITH user, resource, membership, score`,
+  whereClause: `WHERE score >= 0.0
+                AND NOT (resource.deleted = true OR resource.disabled = true)
+                AND membership.role IN ['usual', 'admin', 'owner']`,
+  withClause: 'WITH resource, membership, score',
   returnClause: `resource { .*, myRole: membership.role, __typename: 'Group' }`,
   limit: 'LIMIT toInteger($limit)',
 }
 
 const countSetup = {
   returnClause: 'toString(size(collect(resource)))',
+  returnScore: false,
   limit: '',
 }
 
@@ -116,7 +131,10 @@ const searchResultPromise = async (session, setup, params) => {
 }
 
 const searchResultCallback = (result) => {
-  const response = result.records.map((r) => r.get('result'))
+  const response = result.records.map((r) => ({
+    ...r.get('result'),
+    _score: r.has('score') ? r.get('score') : 0,
+  }))
   if (Array.isArray(response) && response.length && response[0].__typename === 'Post') {
     response.forEach((post) => {
       post.postType = [post.postType]
@@ -231,6 +249,23 @@ export default {
           userId,
         }),
       }
+    },
+    searchChatTargets: async (_parent, args, context, _resolveInfo) => {
+      const { query } = args
+      const limit = Math.max(1, Math.min(Number(args.limit) || 10, 50))
+      const userId = context.user?.id || null
+      const params = {
+        query: queryString(query),
+        skip: 0,
+        limit,
+        userId,
+      }
+      const results = [
+        ...(await getSearchResults(context, searchUsersSetup, params)),
+        ...(await getSearchResults(context, searchMyGroupsSetup, params)),
+      ]
+      results.sort((a, b) => (b._score || 0) - (a._score || 0))
+      return results.slice(0, limit)
     },
     searchResults: async (_parent, args, context, _resolveInfo) => {
       const { query, limit } = args

@@ -123,23 +123,33 @@
     }
   },
   "chat": {
+    "addGroupRoomHeadline": "Zoek groep voor nieuwe chat",
     "addRoomHeadline": "Zoek gebruiker voor nieuwe chat",
     "cancelSelectMessage": "Annuleren",
     "closeChat": "Chat sluiten",
     "conversationStarted": "Gesprek gestart op:",
     "expandChat": "Chat uitvouwen",
+    "groupChatButton": {
+      "label": "Groepschat",
+      "tooltip": "Chat met groep \"{name}\""
+    },
     "isOnline": "is online",
     "isTyping": "is aan het typen...",
     "lastSeen": "laatst gezien ",
     "messageDeleted": "Dit bericht is verwijderd",
     "messagesEmpty": "Geen berichten",
     "newMessages": "Nieuwe berichten",
+    "noGroupsFound": "Geen groepen gevonden",
     "page": {
       "headline": "Chat"
     },
     "roomEmpty": "Geen ruimte geselecteerd",
     "roomsEmpty": "Geen ruimtes",
     "search": "Chatruimtes filteren",
+    "searchBadgeGroup": "Groep",
+    "searchBadgeUser": "Gebruiker",
+    "searchGroupPlaceholder": "Groep zoeken…",
+    "searchPlaceholder": "Gebruiker of groep zoeken…",
     "transmitting": "Bericht verzenden …",
     "typeMessage": "Typ een bericht",
     "userProfileButton": {

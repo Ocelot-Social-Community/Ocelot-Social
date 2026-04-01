@@ -123,23 +123,33 @@
     }
   },
   "chat": {
+    "addGroupRoomHeadline": "Search group for new chat",
     "addRoomHeadline": "Search User for new Chat",
     "cancelSelectMessage": "Cancel",
     "closeChat": "Close chat",
     "conversationStarted": "Conversation started on:",
     "expandChat": "Expand chat",
+    "groupChatButton": {
+      "label": "Group Chat",
+      "tooltip": "Chat with group “{name}”"
+    },
     "isOnline": "is online",
     "isTyping": "is writing...",
     "lastSeen": "last seen ",
     "messageDeleted": "This message was deleted",
     "messagesEmpty": "No messages",
     "newMessages": "New Messages",
+    "noGroupsFound": "No groups found",
     "page": {
       "headline": "Chat"
     },
     "roomEmpty": "No room selected",
     "roomsEmpty": "No rooms",
     "search": "Filter chat rooms",
+    "searchBadgeGroup": "Group",
+    "searchBadgeUser": "User",
+    "searchGroupPlaceholder": "Search group…",
+    "searchPlaceholder": "Search user or group…",
     "transmitting": "Transmitting message ...",
     "typeMessage": "Type message",
     "userProfileButton": {

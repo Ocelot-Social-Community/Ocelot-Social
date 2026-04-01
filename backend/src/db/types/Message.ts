@@ -7,7 +7,6 @@ export interface MessageDbProperties {
   id: string
   indexId: number
   saved: boolean
-  seen: boolean
 }
 
 export type Message = Node<Integer, MessageDbProperties>

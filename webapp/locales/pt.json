@@ -123,23 +123,33 @@
     }
   },
   "chat": {
+    "addGroupRoomHeadline": "Procurar grupo para novo chat",
     "addRoomHeadline": "Buscar usuário para novo chat",
     "cancelSelectMessage": "Cancelar",
     "closeChat": "Fechar chat",
     "conversationStarted": "Conversa iniciada em:",
     "expandChat": "Expandir chat",
+    "groupChatButton": {
+      "label": "Chat de grupo",
+      "tooltip": "Chat com o grupo \"{name}\""
+    },
     "isOnline": "está online",
     "isTyping": "está escrevendo...",
     "lastSeen": "visto por último ",
     "messageDeleted": "Esta mensagem foi excluída",
     "messagesEmpty": "Sem mensagens",
     "newMessages": "Novas mensagens",
+    "noGroupsFound": "Nenhum grupo encontrado",
     "page": {
       "headline": "Chat"
     },
     "roomEmpty": "Nenhuma sala selecionada",
     "roomsEmpty": "Sem salas",
     "search": "Filtrar salas de chat",
+    "searchBadgeGroup": "Grupo",
+    "searchBadgeUser": "Utilizador",
+    "searchGroupPlaceholder": "Procurar grupo…",
+    "searchPlaceholder": "Procurar utilizador ou grupo…",
     "transmitting": "Enviando mensagem ...",
     "typeMessage": "Escreva uma mensagem",
     "userProfileButton": {

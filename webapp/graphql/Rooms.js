@@ -1,18 +1,27 @@
 import gql from 'graphql-tag'
 import { imageUrls } from './fragments/imageUrls'
 
-export const createRoom = () => gql`
+export const createGroupRoom = () => gql`
   ${imageUrls}
 
-  mutation ($userId: ID!) {
-    CreateRoom(userId: $userId) {
+  mutation ($groupId: ID!) {
+    CreateGroupRoom(groupId: $groupId) {
       id
       roomId
       roomName
+      avatar
+      isGroupRoom
       lastMessageAt
       createdAt
       unreadCount
-      #avatar
+      group {
+        id
+        name
+        slug
+        avatar {
+          ...imageUrls
+        }
+      }
       users {
         _id
         id
@@ -28,15 +37,24 @@ export const createRoom = () => gql`
 export const roomQuery = () => gql`
   ${imageUrls}
 
-  query Room($first: Int, $offset: Int, $id: ID) {
-    Room(first: $first, offset: $offset, id: $id, orderBy: [createdAt_desc, lastMessageAt_desc]) {
+  query Room($first: Int, $before: String, $id: ID, $userId: ID, $groupId: ID) {
+    Room(first: $first, before: $before, id: $id, userId: $userId, groupId: $groupId) {
       id
       roomId
       roomName
       avatar
+      isGroupRoom
       lastMessageAt
       createdAt
       unreadCount
+      group {
+        id
+        name
+        slug
+        avatar {
+          ...imageUrls
+        }
+      }
       lastMessage {
         _id
         id

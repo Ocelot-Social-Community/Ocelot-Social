@@ -1,11 +1,14 @@
-mutation CreateMessage($roomId: ID!, $content: String!, $files: [FileInput]) {
-  CreateMessage(roomId: $roomId, content: $content, files: $files) {
+mutation CreateMessage($roomId: ID, $userId: ID, $content: String, $files: [FileInput]) {
+  CreateMessage(roomId: $roomId, userId: $userId, content: $content, files: $files) {
     id
     content
     senderId
     username
     avatar
     date
+    room {
+      id
+    }
     saved
     distributed
     seen

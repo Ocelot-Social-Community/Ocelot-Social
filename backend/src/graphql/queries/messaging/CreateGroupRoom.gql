@@ -1,18 +1,15 @@
-mutation CreateRoom($userId: ID!) {
-  CreateRoom(userId: $userId) {
+mutation CreateGroupRoom($groupId: ID!) {
+  CreateGroupRoom(groupId: $groupId) {
     id
     roomId
     roomName
+    isGroupRoom
     lastMessageAt
     unreadCount
-    #avatar
     users {
       _id
       id
       name
-      avatar {
-        url
-      }
     }
   }
 }

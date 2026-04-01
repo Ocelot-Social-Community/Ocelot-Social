@@ -123,23 +123,33 @@
     }
   },
   "chat": {
+    "addGroupRoomHeadline": "Поиск группы для нового чата",
     "addRoomHeadline": "Поиск пользователя для нового чата",
     "cancelSelectMessage": "Отмена",
     "closeChat": "Закрыть чат",
     "conversationStarted": "Беседа начата:",
     "expandChat": "Развернуть чат",
+    "groupChatButton": {
+      "label": "Групповой чат",
+      "tooltip": "Чат с группой «{name}»"
+    },
     "isOnline": "в сети",
     "isTyping": "пишет...",
     "lastSeen": "был в сети ",
     "messageDeleted": "Это сообщение было удалено",
     "messagesEmpty": "Нет сообщений",
     "newMessages": "Новые сообщения",
+    "noGroupsFound": "Группы не найдены",
     "page": {
       "headline": "Чат"
     },
     "roomEmpty": "Комната не выбрана",
     "roomsEmpty": "Нет комнат",
     "search": "Фильтр комнат чата",
+    "searchBadgeGroup": "Группа",
+    "searchBadgeUser": "Пользователь",
+    "searchGroupPlaceholder": "Искать группу…",
+    "searchPlaceholder": "Искать пользователя или группу…",
     "transmitting": "Отправка сообщения ...",
     "typeMessage": "Напиши сообщение",
     "userProfileButton": {

@@ -1,12 +1,3 @@
-# input _RoomFilter {
-#   AND: [_RoomFilter!]
-#   OR: [_RoomFilter!]
-#   id: ID
-#   users_some: _UserFilter
-# }
-
-# TODO change this to last message date
-
 enum _RoomOrdering {
   lastMessageAt_desc
   createdAt_desc
@@ -18,19 +9,36 @@ type Room {
   updatedAt: String
 
   users: [User]! @relation(name: "CHATS_IN", direction: "IN")
+  group: Group @relation(name: "ROOM_FOR", direction: "OUT")
 
   roomId: String! @cypher(statement: "RETURN this.id")
+  isGroupRoom: Boolean!
+    @cypher(
+      statement: """
+      OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
+      RETURN g IS NOT NULL
+      """
+    )
   roomName: String!
     @cypher(
-      statement: "MATCH (this)<-[:CHATS_IN]-(user:User) WHERE NOT user.id = $cypherParams.currentUserId RETURN user.name"
+      statement: """
+      OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
+      WITH this, g
+      OPTIONAL MATCH (this)<-[:CHATS_IN]-(user:User)
+      WHERE g IS NULL AND NOT user.id = $cypherParams.currentUserId
+      RETURN COALESCE(g.name, user.name)
+      """
     )
   avatar: String
     @cypher(
       statement: """
-      MATCH (this)<-[:CHATS_IN]-(user:User)
-      WHERE NOT user.id = $cypherParams.currentUserId
-      OPTIONAL MATCH (user)-[:AVATAR_IMAGE]->(image:Image)
-      RETURN image.url
+      OPTIONAL MATCH (this)-[:ROOM_FOR]->(g:Group)
+      OPTIONAL MATCH (g)-[:AVATAR_IMAGE]->(groupImg:Image)
+      WITH this, g, groupImg
+      OPTIONAL MATCH (this)<-[:CHATS_IN]-(user:User)
+      WHERE g IS NULL AND NOT user.id = $cypherParams.currentUserId
+      OPTIONAL MATCH (user)-[:AVATAR_IMAGE]->(userImg:Image)
+      RETURN COALESCE(groupImg.url, userImg.url)
       """
     )
 
@@ -45,23 +53,24 @@ type Room {
       """
     )
 
+  "Count unread messages, excluding those from blocked/muted senders"
   unreadCount: Int
     @cypher(
       statement: """
-      MATCH (this)<-[:INSIDE]-(message:Message)<-[:CREATED]-(user:User)
-      WHERE NOT user.id = $cypherParams.currentUserId
-        AND NOT message.seen
+      MATCH (u:User { id: $cypherParams.currentUserId })-[:HAS_NOT_SEEN]->(message:Message)-[:INSIDE]->(this)
+      MATCH (message)<-[:CREATED]-(sender:User)
+      WHERE NOT (u)-[:BLOCKED]->(sender) AND NOT (u)-[:MUTED]->(sender)
       RETURN count(message)
       """
     )
 }
 
 type Mutation {
-  CreateRoom(userId: ID!): Room
+  CreateGroupRoom(groupId: ID!): Room
 }
 
 type Query {
-  Room(id: ID, orderBy: [_RoomOrdering]): [Room]
+  Room(id: ID, userId: ID, groupId: ID, first: Int, before: String, orderBy: [_RoomOrdering]): [Room]
   UnreadRooms: Int
 }
 

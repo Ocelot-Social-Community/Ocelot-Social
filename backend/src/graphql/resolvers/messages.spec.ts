@@ -12,11 +12,12 @@ import { Upload } from 'graphql-upload/public/index'
 import pubsubContext from '@context/pubsub'
 import Factory, { cleanDatabase } from '@db/factories'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
-import CreateRoom from '@graphql/queries/messaging/CreateRoom.gql'
 import MarkMessagesAsSeen from '@graphql/queries/messaging/MarkMessagesAsSeen.gql'
 import Message from '@graphql/queries/messaging/Message.gql'
 import Room from '@graphql/queries/messaging/Room.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+
+import { chatMessageAddedFilter, chatMessageStatusUpdatedFilter } from './messages'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -125,13 +126,14 @@ describe('Message', () => {
       describe('room exists', () => {
         beforeEach(async () => {
           authenticatedUser = await chattingUser.toJson()
-          const room = await mutate({
-            mutation: CreateRoom,
+          const result = await mutate({
+            mutation: CreateMessage,
             variables: {
               userId: 'other-chatting-user',
+              content: 'init',
             },
           })
-          roomId = room.data.CreateRoom.id
+          roomId = result.data.CreateMessage.room.id
         })
 
         describe('user chats in room', () => {
@@ -202,7 +204,7 @@ describe('Message', () => {
           })
 
           describe('unread count for other user', () => {
-            it('has unread count = 1', async () => {
+            it('has unread count = 2', async () => {
               authenticatedUser = await otherChattingUser.toJson()
               await expect(query({ query: Room })).resolves.toMatchObject({
                 errors: undefined,
@@ -210,7 +212,7 @@ describe('Message', () => {
                   Room: [
                     expect.objectContaining({
                       lastMessageAt: expect.any(String),
-                      unreadCount: 1,
+                      unreadCount: 2,
                       lastMessage: expect.objectContaining({
                         _id: expect.any(String),
                         id: expect.any(String),
@@ -329,7 +331,7 @@ describe('Message', () => {
             ).resolves.toMatchObject({
               errors: undefined,
               data: {
-                Message: [],
+                Message: [expect.objectContaining({ content: 'init' })],
               },
             })
           })
@@ -407,13 +409,14 @@ describe('Message', () => {
       describe('room exists with authenticated user chatting', () => {
         beforeEach(async () => {
           authenticatedUser = await chattingUser.toJson()
-          const room = await mutate({
-            mutation: CreateRoom,
+          const result = await mutate({
+            mutation: CreateMessage,
             variables: {
               userId: 'other-chatting-user',
+              content: 'init',
             },
           })
-          roomId = room.data.CreateRoom.id
+          roomId = result.data.CreateMessage.room.id
 
           await mutate({
             mutation: CreateMessage,
@@ -435,10 +438,15 @@ describe('Message', () => {
             errors: undefined,
             data: {
               Message: [
+                expect.objectContaining({
+                  indexId: 0,
+                  content: 'init',
+                  senderId: 'chatting-user',
+                }),
                 {
                   id: expect.any(String),
-                  _id: result.data?.Message[0].id,
-                  indexId: 0,
+                  _id: result.data?.Message[1].id,
+                  indexId: 1,
                   content: 'Some nice message to other chatting user',
                   senderId: 'chatting-user',
                   username: 'Chatting User',
@@ -486,8 +494,13 @@ describe('Message', () => {
               data: {
                 Message: [
                   expect.objectContaining({
-                    id: expect.any(String),
                     indexId: 0,
+                    content: 'init',
+                    senderId: 'chatting-user',
+                  }),
+                  expect.objectContaining({
+                    id: expect.any(String),
+                    indexId: 1,
                     content: 'Some nice message to other chatting user',
                     senderId: 'chatting-user',
                     username: 'Chatting User',
@@ -499,7 +512,7 @@ describe('Message', () => {
                   }),
                   expect.objectContaining({
                     id: expect.any(String),
-                    indexId: 1,
+                    indexId: 2,
                     content: 'A nice response message to chatting user',
                     senderId: 'other-chatting-user',
                     username: 'Other Chatting User',
@@ -511,7 +524,7 @@ describe('Message', () => {
                   }),
                   expect.objectContaining({
                     id: expect.any(String),
-                    indexId: 2,
+                    indexId: 3,
                     content: 'And another nice message to other chatting user',
                     senderId: 'chatting-user',
                     username: 'Chatting User',
@@ -527,6 +540,8 @@ describe('Message', () => {
           })
 
           it('returns the messages paginated', async () => {
+            // Messages ordered by indexId DESC: 3, 2, 1, 0
+            // first: 2, offset: 0 → indexId 2 and 3 (reversed to ASC)
             await expect(
               query({
                 query: Message,
@@ -541,27 +556,20 @@ describe('Message', () => {
               data: {
                 Message: [
                   expect.objectContaining({
-                    id: expect.any(String),
-                    indexId: 1,
+                    indexId: 2,
                     content: 'A nice response message to chatting user',
                     senderId: 'other-chatting-user',
-                    username: 'Other Chatting User',
-                    avatar: expect.any(String),
-                    date: expect.any(String),
                   }),
                   expect.objectContaining({
-                    id: expect.any(String),
-                    indexId: 2,
+                    indexId: 3,
                     content: 'And another nice message to other chatting user',
                     senderId: 'chatting-user',
-                    username: 'Chatting User',
-                    avatar: expect.any(String),
-                    date: expect.any(String),
                   }),
                 ],
               },
             })
 
+            // first: 2, offset: 2 → indexId 0 and 1 (reversed to ASC)
             await expect(
               query({
                 query: Message,
@@ -576,13 +584,14 @@ describe('Message', () => {
               data: {
                 Message: [
                   expect.objectContaining({
-                    id: expect.any(String),
                     indexId: 0,
+                    content: 'init',
+                    senderId: 'chatting-user',
+                  }),
+                  expect.objectContaining({
+                    indexId: 1,
                     content: 'Some nice message to other chatting user',
                     senderId: 'chatting-user',
-                    username: 'Chatting User',
-                    avatar: expect.any(String),
-                    date: expect.any(String),
                   }),
                 ],
               },
@@ -639,13 +648,14 @@ describe('Message', () => {
       const messageIds: string[] = []
       beforeEach(async () => {
         authenticatedUser = await chattingUser.toJson()
-        const room = await mutate({
-          mutation: CreateRoom,
+        const result = await mutate({
+          mutation: CreateMessage,
           variables: {
             userId: 'other-chatting-user',
+            content: 'init',
           },
         })
-        roomId = room.data.CreateRoom.id
+        roomId = result.data.CreateMessage.room.id
         await mutate({
           mutation: CreateMessage,
           variables: {
@@ -713,12 +723,133 @@ describe('Message', () => {
           data: {
             Message: [
               expect.objectContaining({ seen: true }),
+              expect.objectContaining({ seen: true }),
               expect.objectContaining({ seen: false }),
               expect.objectContaining({ seen: true }),
             ],
           },
         })
       })
+    })
+  })
+
+  describe('message query with beforeIndex', () => {
+    let testRoomId: string
+
+    beforeAll(async () => {
+      authenticatedUser = await chattingUser.toJson()
+      const result = await mutate({
+        mutation: CreateMessage,
+        variables: { userId: 'other-chatting-user', content: 'msg-0' },
+      })
+      testRoomId = result.data.CreateMessage.room.id
+      await mutate({ mutation: CreateMessage, variables: { roomId: testRoomId, content: 'msg-1' } })
+      await mutate({ mutation: CreateMessage, variables: { roomId: testRoomId, content: 'msg-2' } })
+    })
+
+    it('returns only messages with indexId less than beforeIndex', async () => {
+      const result = await query({
+        query: Message,
+        variables: { roomId: testRoomId, beforeIndex: 2 },
+      })
+      expect(result.errors).toBeUndefined()
+      const indexIds: number[] = result.data.Message.map((m: { indexId: number }) => m.indexId)
+      expect(indexIds.every((id: number) => id < 2)).toBe(true)
+    })
+  })
+
+  describe('subscription filters', () => {
+    describe('chatMessageAddedFilter', () => {
+      it('returns true for recipient and marks as distributed', async () => {
+        const mockSession = {
+          writeTransaction: jest
+            .fn()
+            .mockResolvedValue([{ roomId: 'r1', authorId: 'a1', messageIds: ['m1'] }]),
+          close: jest.fn(),
+        }
+        const filterContext = {
+          user: { id: 'recipient' },
+          driver: { session: () => mockSession },
+          pubsub: { publish: jest.fn() },
+        }
+        const result = await chatMessageAddedFilter(
+          { userId: 'recipient', chatMessageAdded: { id: 'm1' } },
+          filterContext,
+        )
+        expect(result).toBe(true)
+        expect(mockSession.writeTransaction).toHaveBeenCalled()
+        expect(filterContext.pubsub.publish).toHaveBeenCalledWith(
+          'CHAT_MESSAGE_STATUS_UPDATED',
+          expect.objectContaining({
+            chatMessageStatusUpdated: { roomId: 'r1', messageIds: ['m1'], status: 'distributed' },
+          }),
+        )
+      })
+
+      it('returns false for non-recipient', async () => {
+        const result = await chatMessageAddedFilter(
+          { userId: 'other', chatMessageAdded: { id: 'm1' } },
+          { user: { id: 'me' } },
+        )
+        expect(result).toBe(false)
+      })
+
+      it('skips distributed marking when no message id', async () => {
+        const mockSession = { writeTransaction: jest.fn(), close: jest.fn() }
+        const result = await chatMessageAddedFilter(
+          { userId: 'me', chatMessageAdded: {} },
+          { user: { id: 'me' }, driver: { session: () => mockSession } },
+        )
+        expect(result).toBe(true)
+        expect(mockSession.writeTransaction).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('chatMessageStatusUpdatedFilter', () => {
+      it('returns true when authorId matches', () => {
+        expect(chatMessageStatusUpdatedFilter({ authorId: 'u1' }, { user: { id: 'u1' } })).toBe(
+          true,
+        )
+      })
+
+      it('returns false when authorId does not match', () => {
+        expect(chatMessageStatusUpdatedFilter({ authorId: 'u1' }, { user: { id: 'u2' } })).toBe(
+          false,
+        )
+      })
+    })
+  })
+
+  describe('create message validation', () => {
+    beforeAll(async () => {
+      authenticatedUser = await chattingUser.toJson()
+    })
+
+    it('rejects creating a room with self', async () => {
+      const result = await mutate({
+        mutation: CreateMessage,
+        variables: { userId: 'chatting-user', content: 'test' },
+      })
+      expect(result.errors).toBeDefined()
+      expect(result.errors?.[0].message).toContain('Cannot create a room with self')
+    })
+
+    it('rejects missing roomId and userId', async () => {
+      const result = await mutate({
+        mutation: CreateMessage,
+        variables: { content: 'test' },
+      })
+      expect(result.errors).toBeDefined()
+      expect(result.errors?.[0].message).toContain('Either roomId or userId must be provided')
+    })
+
+    it('rejects empty content without files', async () => {
+      const result = await mutate({
+        mutation: CreateMessage,
+        variables: { userId: 'other-chatting-user', content: '' },
+      })
+      expect(result.errors).toBeDefined()
+      expect(result.errors?.[0].message).toContain('Message must have content or files')
     })
   })
 })

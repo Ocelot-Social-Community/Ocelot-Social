@@ -2,17 +2,9 @@ import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 import './../../commands'
 import './../../factories'
 
-const createRoomMutation = `
-  mutation ($userId: ID!) {
-    CreateRoom(userId: $userId) {
-      id
-    }
-  }
-`
-
 const createMessageMutation = `
-  mutation ($roomId: ID!, $content: String) {
-    CreateMessage(roomId: $roomId, content: $content) {
+  mutation ($userId: ID, $content: String) {
+    CreateMessage(userId: $userId, content: $content) {
       id
     }
   }
@@ -35,11 +27,10 @@ defineStep(
           `No users found for sender "${senderSlug}" or recipient "${recipientSlug}"`)
         const senderEmail = result.records[0].get('senderEmail')
         const recipientId = result.records[0].get('recipientId')
-        return cy.authenticateAs({ email: senderEmail, password: '1234' }).then((client) => {
-          return client.request(createRoomMutation, { userId: recipientId }).then((roomData) => {
-            const roomId = roomData.CreateRoom.id
-            return client.request(createMessageMutation, { roomId, content: message })
-          })
+        const password = (Cypress.env('userPasswords') || {})[senderSlug]
+        expect(password, `No password found for user "${senderSlug}"`).to.exist
+        return cy.authenticateAs({ email: senderEmail, password }).then((client) => {
+          return client.request(createMessageMutation, { userId: recipientId, content: message })
         })
       })
   },

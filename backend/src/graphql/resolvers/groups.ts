@@ -286,9 +286,14 @@ export default {
             RETURN user {.*}, membership {.*}
           `
           const transactionResponse = await transaction.run(joinGroupCypher, { groupId, userId })
-          return transactionResponse.records.map((record) => {
+          const records = transactionResponse.records.map((record) => {
             return { user: record.get('user'), membership: record.get('membership') }
           })
+          // Add user to group chat room if they are an active member (not pending)
+          if (records[0]?.membership?.role && records[0].membership.role !== 'pending') {
+            await addUserToGroupChatRoom(transaction, groupId, userId)
+          }
+          return records
         })
         if (!result[0]) {
           throw new UserInputError('Could not find User or Group')
@@ -348,6 +353,12 @@ export default {
           const [member] = transactionResponse.records.map((record) => {
             return { user: record.get('user'), membership: record.get('membership') }
           })
+          // Manage group chat room membership based on role
+          if (['usual', 'admin', 'owner'].includes(roleInGroup)) {
+            await addUserToGroupChatRoom(transaction, groupId, userId)
+          } else {
+            await removeUserFromGroupChatRoom(transaction, groupId, userId)
+          }
           return member
         })
       } finally {
@@ -503,6 +514,29 @@ export default {
   },
 }
 
+const addUserToGroupChatRoom = async (transaction, groupId, userId) => {
+  await transaction.run(
+    `
+    OPTIONAL MATCH (room:Room)-[:ROOM_FOR]->(group:Group {id: $groupId})
+    WITH room
+    WHERE room IS NOT NULL
+    MATCH (user:User {id: $userId})
+    MERGE (user)-[:CHATS_IN]->(room)
+    `,
+    { groupId, userId },
+  )
+}
+
+const removeUserFromGroupChatRoom = async (transaction, groupId, userId) => {
+  await transaction.run(
+    `
+    OPTIONAL MATCH (user:User {id: $userId})-[chatsIn:CHATS_IN]->(room:Room)-[:ROOM_FOR]->(group:Group {id: $groupId})
+    DELETE chatsIn
+    `,
+    { groupId, userId },
+  )
+}
+
 const removeUserFromGroupWriteTxResultPromise = async (session, groupId, userId) => {
   return session.writeTransaction(async (transaction) => {
     const removeUserFromGroupCypher = `
@@ -510,7 +544,7 @@ const removeUserFromGroupWriteTxResultPromise = async (session, groupId, userId)
       DELETE membership
       WITH user, group
       OPTIONAL MATCH (author:User)-[:WROTE]->(p:Post)-[:IN]->(group)
-      WHERE NOT group.groupType = 'public' 
+      WHERE NOT group.groupType = 'public'
         AND NOT author.id = $userId
       WITH user, collect(p) AS posts
       FOREACH (post IN posts |
@@ -528,6 +562,8 @@ const removeUserFromGroupWriteTxResultPromise = async (session, groupId, userId)
     if (!result) {
       throw new UserInputError('User is not a member of this group')
     }
+    // Remove user from group chat room
+    await removeUserFromGroupChatRoom(transaction, groupId, userId)
     return result
   })
 }

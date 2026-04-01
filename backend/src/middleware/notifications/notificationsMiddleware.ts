@@ -459,17 +459,28 @@ const handleCreateMessage: IMiddlewareResolver = async (
   const message = await resolve(root, args, context, resolveInfo)
 
   // Query Parameters
-  const { roomId } = args
+  const roomId = args.roomId || message?.room?.id
   const {
     user: { id: currentUserId },
   } = context
 
-  // Find Recipient
+  // For CreateRoomWithMessage, roomId is not in args — query it from the message
   const session = context.driver.session()
   try {
-    const { senderUser, recipientUser, email } = await session.readTransaction(
-      async (transaction) => {
-        const messageRecipientCypher = `
+    let resolvedRoomId = roomId
+    if (!resolvedRoomId && message?.id) {
+      const roomResult = await session.readTransaction((transaction) => {
+        return transaction.run(
+          `MATCH (m:Message { id: $messageId })-[:INSIDE]->(room:Room) RETURN room.id AS roomId`,
+          { messageId: message.id },
+        )
+      })
+      resolvedRoomId = roomResult.records[0]?.get('roomId')
+    }
+    if (!resolvedRoomId) return message
+
+    const { senderUser, recipients } = await session.readTransaction(async (transaction) => {
+      const messageRecipientsCypher = `
           MATCH (senderUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
           MATCH (room)<-[:CHATS_IN]-(recipientUser:User)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
             WHERE NOT recipientUser.id = $currentUserId
@@ -477,20 +488,25 @@ const handleCreateMessage: IMiddlewareResolver = async (
             AND NOT (recipientUser)-[:MUTED]->(senderUser)
           RETURN senderUser {.*}, recipientUser {.*}, emailAddress {.email}
         `
-        const txResponse = await transaction.run(messageRecipientCypher, {
-          currentUserId,
-          roomId,
-        })
+      const txResponse = await transaction.run(messageRecipientsCypher, {
+        currentUserId,
+        roomId: resolvedRoomId,
+      })
 
-        return {
-          senderUser: txResponse.records.map((record) => record.get('senderUser'))[0],
-          recipientUser: txResponse.records.map((record) => record.get('recipientUser'))[0],
-          email: txResponse.records.map((record) => record.get('emailAddress'))[0]?.email,
-        }
-      },
-    )
+      return {
+        senderUser: txResponse.records.map((record) => record.get('senderUser'))[0],
+        recipients: txResponse.records.map((record) => ({
+          user: record.get('recipientUser'),
+          email: record.get('emailAddress')?.email,
+        })),
+      }
+    })
 
-    if (recipientUser) {
+    // Send subscriptions and emails to all recipients
+    for (const recipient of recipients) {
+      const recipientUser = recipient.user
+      const { email } = recipient
+
       // send subscriptions
       const roomCountUpdated = await getUnreadRoomsCount(recipientUser.id, session)
 
@@ -499,12 +515,16 @@ const handleCreateMessage: IMiddlewareResolver = async (
         userId: recipientUser.id,
       })
       void context.pubsub.publish(CHAT_MESSAGE_ADDED, {
-        chatMessageAdded: message,
+        chatMessageAdded: { ...message, seen: false },
         userId: recipientUser.id,
       })
 
       // Send EMail if we found a user(not blocked) and he is not considered online
-      if (recipientUser.emailNotificationsChatMessage !== false && !isUserOnline(recipientUser)) {
+      if (
+        email &&
+        recipientUser.emailNotificationsChatMessage !== false &&
+        !isUserOnline(recipientUser)
+      ) {
         void sendChatMessageMail({ email, senderUser, recipientUser })
       }
     }

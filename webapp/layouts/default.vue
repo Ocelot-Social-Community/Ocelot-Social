@@ -10,9 +10,14 @@
     </div>
     <page-footer class="desktop-footer" />
     <div id="overlay" />
-    <div v-if="getShowChat.showChat" class="chat-modul">
+    <div v-if="getShowChat.showChat && !isMobile" class="chat-modul">
       <client-only>
-        <chat singleRoom :roomId="getShowChat.roomID" @close-single-room="closeSingleRoom" />
+        <chat
+          singleRoom
+          :userId="getShowChat.chatUserId"
+          :groupId="getShowChat.groupId"
+          @close-single-room="closeSingleRoom"
+        />
       </client-only>
     </div>
   </div>
@@ -38,16 +43,33 @@ export default {
       getShowChat: 'chat/showChat',
     }),
   },
+  watch: {
+    'getShowChat.showChat'(open) {
+      if (open && this.isMobile) {
+        const { chatUserId, groupId } = this.getShowChat
+        const query = {}
+        if (chatUserId) query.userId = chatUserId
+        if (groupId) query.groupId = groupId
+        this.showChat({ showChat: false, chatUserId: null, groupId: null })
+        if (this.$route.path === '/chat') {
+          // Already on chat page — update query to trigger openFromQuery watcher
+          this.$router.replace({ path: '/chat', query })
+        } else {
+          this.$router.push({ path: '/chat', query })
+        }
+      }
+    },
+  },
   methods: {
     ...mapMutations({
       showChat: 'chat/SET_OPEN_CHAT',
     }),
     closeSingleRoom() {
-      this.showChat({ showChat: false, roomID: null })
+      this.showChat({ showChat: false, chatUserId: null, groupId: null })
     },
   },
   beforeCreate() {
-    this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, roomID: null })
+    this.$store.commit('chat/SET_OPEN_CHAT', { showChat: false, chatUserId: null, groupId: null })
   },
 }
 </script>
