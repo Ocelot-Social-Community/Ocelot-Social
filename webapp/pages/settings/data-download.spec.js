@@ -50,6 +50,7 @@ describe('data-download.vue', () => {
 
     describe('onClick', () => {
       it('creates a download link and clicks it', () => {
+        const originalCreateObjectURL = window.URL.createObjectURL
         const mockUrl = 'blob:test'
         window.URL.createObjectURL = jest.fn().mockReturnValue(mockUrl)
         const appendSpy = jest.spyOn(document.body, 'appendChild').mockImplementation(() => {})
@@ -60,13 +61,16 @@ describe('data-download.vue', () => {
           click: clickSpy,
         })
 
-        wrapper.vm.onClick({ data: '{"test": true}', type: 'json' })
+        try {
+          wrapper.vm.onClick({ data: '{"test": true}', type: 'json' })
 
-        expect(window.URL.createObjectURL).toHaveBeenCalled()
-        expect(clickSpy).toHaveBeenCalled()
-
-        appendSpy.mockRestore()
-        document.createElement.mockRestore()
+          expect(window.URL.createObjectURL).toHaveBeenCalled()
+          expect(clickSpy).toHaveBeenCalled()
+        } finally {
+          window.URL.createObjectURL = originalCreateObjectURL
+          appendSpy.mockRestore()
+          document.createElement.mockRestore()
+        }
       })
     })
 
