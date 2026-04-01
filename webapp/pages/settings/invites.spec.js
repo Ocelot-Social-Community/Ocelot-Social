@@ -50,7 +50,7 @@ describe('invites.vue', () => {
 
     it('passes inviteCodes to InviteCodeList', () => {
       const inviteCodeList = wrapper.find('invite-code-list-stub')
-      expect(inviteCodeList.exists()).toBe(true)
+      expect(inviteCodeList.attributes('invitecodes')).toBeDefined()
     })
   })
 })
