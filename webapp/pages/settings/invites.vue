@@ -1,7 +1,7 @@
 <template>
   <os-card>
     <invite-code-list
-      :inviteCodes="user.inviteCodes"
+      :inviteCodes="user.inviteCodes || []"
       :copy-message="
         $t('invite-codes.invite-link-message-personal', {
           network: $env.NETWORK_NAME,
