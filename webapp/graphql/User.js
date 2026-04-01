@@ -423,6 +423,9 @@ export const currentUserQuery = gql`
           id
           name
           slug
+          avatar {
+            url
+          }
         }
         comment
         redeemedByCount

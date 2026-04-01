@@ -35,9 +35,7 @@
       </h3>
       <ul class="invited-users-list">
         <li v-for="invited in invitedUsers" :key="invited.id" class="invited-user">
-          <nuxt-link :to="`/profile/${invited.id}/${invited.slug}`" class="invited-user-link">
-            <span class="invited-user-name">{{ invited.name }}</span>
-          </nuxt-link>
+          <user-teaser :user="invited" />
           <span class="invited-user-code">
             {{ $t('settings.invites.via-code', { code: invited.code }) }}
             <span v-if="!invited.codeIsValid" class="code-invalid">
@@ -81,6 +79,7 @@ import { mapGetters } from 'vuex'
 import { OsCard } from '@ocelot-social/ui'
 import InvitationList from '~/components/_new/features/Invitations/InvitationList.vue'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
+import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import { useInviteCode } from '~/composables/useInviteCode'
 import scrollToContent from './scroll-to-content.js'
 
@@ -90,6 +89,7 @@ export default {
     OsCard,
     InvitationList,
     ConfirmModal,
+    UserTeaser,
   },
   data() {
     return {
@@ -123,6 +123,7 @@ export default {
               id: u.id,
               name: u.name,
               slug: u.slug,
+              avatar: u.avatar,
               code: inviteCode.code,
               codeIsValid: inviteCode.isValid,
             })
@@ -193,13 +194,6 @@ export default {
   border-bottom: 1px dotted #e5e3e8;
 }
 
-.invited-user-link {
-  text-decoration: none;
-}
-
-.invited-user-name {
-  font-weight: bold;
-}
 
 .invited-user-code {
   color: $text-color-soft;
