@@ -92,6 +92,7 @@ input _PostFilter {
   postType_in: [PostType]
   eventStart_gte: String
   eventEnd_gte: String
+  hasLocation: Boolean
 }
 
 enum _PostOrdering {

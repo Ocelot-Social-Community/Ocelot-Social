@@ -158,6 +158,7 @@ type User {
 input _UserFilter {
   AND: [_UserFilter!]
   OR: [_UserFilter!]
+  hasLocation: Boolean
   name_contains: String
   about_contains: String
   slug_contains: String

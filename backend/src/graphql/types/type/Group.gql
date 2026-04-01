@@ -79,6 +79,7 @@ input _GroupFilter {
 type Query {
   Group(
     isMember: Boolean # if 'undefined' or 'null' then get all groups
+    hasLocation: Boolean # if 'true' then only groups with a location
     id: ID
     slug: String
     first: Int
