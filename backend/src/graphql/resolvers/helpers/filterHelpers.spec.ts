@@ -200,6 +200,5 @@ describe('filterInvisiblePosts', () => {
       expect(ids).toContain('public-post')
       expect(ids).not.toContain('closed-group-post')
     })
-
   })
 })
