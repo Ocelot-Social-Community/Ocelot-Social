@@ -515,6 +515,8 @@ export default {
       },
       variables() {
         return {
+          userFilter: { hasLocation: true },
+          groupHasLocation: true,
           postFilter: {
             postType_in: ['Event'],
             eventStart_gte: new Date(),

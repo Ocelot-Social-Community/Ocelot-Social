@@ -3,8 +3,8 @@ import gql from 'graphql-tag'
 export const mapQuery = (i18n) => {
   const lang = i18n.locale().toUpperCase()
   return gql`
-    query MapData($postFilter: _PostFilter) {
-      User(filter: { hasLocation: true }) {
+    query MapData($userFilter: _UserFilter, $groupHasLocation: Boolean, $postFilter: _PostFilter) {
+      User(filter: $userFilter) {
         id
         slug
         name
@@ -16,7 +16,7 @@ export const mapQuery = (i18n) => {
           lat
         }
       }
-      Group(hasLocation: true) {
+      Group(hasLocation: $groupHasLocation) {
         id
         slug
         name
