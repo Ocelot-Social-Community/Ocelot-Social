@@ -570,7 +570,6 @@ import CustomButton from '~/components/CustomButton/CustomButton'
 import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
 import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
 import headerMenuBranded from '~/constants/headerMenuBranded.js'
-import ConfirmModal from '~/components/Modal/ConfirmModal'
 import Dropdown from '~/components/Dropdown'
 import InviteCodeList from '~/components/_new/features/Invitations/InviteCodeList.vue'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
@@ -593,7 +592,6 @@ export default {
     CustomButton,
     FilterMenu,
     FilterMenuComponent,
-    ConfirmModal,
     Dropdown,
     InviteCodeList,
     LocaleSwitch,
