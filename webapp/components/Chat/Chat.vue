@@ -35,7 +35,7 @@
         <div class="ds-flex-item single-chat-bubble" style="align-self: center">
           <os-button
             as="nuxt-link"
-            :to="{ name: 'chat' }"
+            :to="expandChatLink"
             variant="primary"
             appearance="ghost"
             circle
@@ -267,6 +267,17 @@ export default {
       const code = this.$i18n.locale()
       const locale = locales.find((l) => l.code === code)
       return locale ? locale.iso : 'en-US'
+    },
+    expandChatLink() {
+      if (!this.selectedRoom) return { name: 'chat' }
+      const query = {}
+      if (this.selectedRoom.isGroupRoom && this.selectedRoom.groupProfile?.id) {
+        query.groupId = this.selectedRoom.groupProfile.id
+      } else {
+        const otherUser = this.selectedRoom.users?.find((u) => u.id !== this.currentUser.id)
+        if (otherUser) query.userId = otherUser.id
+      }
+      return { name: 'chat', query }
     },
     roomHeaderLink() {
       if (!this.selectedRoom) return null
