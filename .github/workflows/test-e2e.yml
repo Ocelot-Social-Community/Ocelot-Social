@@ -149,7 +149,7 @@ jobs:
       - name: List feature files
         id: list
         run: |
-          FEATURES=$(find cypress/e2e/ -maxdepth 1 -name "*.feature" -printf '%f\n' | sort | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          FEATURES=$(cd cypress && find e2e/ -name "*.feature" -printf '%P\n' | sort | jq -R -s -c 'split("\n") | map(select(length > 0))')
           echo "features=$FEATURES" >> $GITHUB_OUTPUT
 
   fullstack_tests:
