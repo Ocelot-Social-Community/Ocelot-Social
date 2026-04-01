@@ -11,6 +11,7 @@
         <select
           class="settings-select"
           :value="$route.path"
+          :aria-label="$t('settings.name')"
           @change="$router.push($event.target.value)"
         >
           <option v-for="route in routes" :key="route.path" :value="route.path">
