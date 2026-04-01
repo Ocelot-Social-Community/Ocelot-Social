@@ -134,7 +134,7 @@ describe('filterForMutedUsers', () => {
 })
 
 describe('filterPostsOfMyGroups', () => {
-  describe('when user is not authenticated', () => {
+  describe('when user has no group memberships', () => {
     it('returns empty for postsInMyGroups filter', async () => {
       const author = await Factory.build('user', { id: 'author', name: 'Author' })
       authenticatedUser = await author.toJson()
