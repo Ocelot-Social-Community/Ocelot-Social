@@ -9,8 +9,7 @@ interface FilterParams {
   [key: string]: unknown
 }
 
-const ALLOWED_LABELS = ['User', 'Post'] as const
-type AllowedLabel = (typeof ALLOWED_LABELS)[number]
+type AllowedLabel = 'User' | 'Post'
 
 const getIdsWithLocation = async (context: Context, label: AllowedLabel): Promise<string[]> => {
   const session = context.driver.session()
