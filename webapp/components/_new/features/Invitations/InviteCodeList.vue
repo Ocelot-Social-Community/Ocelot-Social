@@ -20,12 +20,7 @@
       <profile-list
         class="invite-code-list__profile-list"
         uniqueName="invitedUsersFilter"
-        :title="
-          $t('settings.invites.invited-users') +
-          ' (' +
-          totalInvitedCount +
-          ')'
-        "
+        :title="$t('settings.invites.invited-users') + ' (' + totalInvitedCount + ')'"
         :title-nobody="$t('settings.invites.nobody-invited')"
         :all-profiles-count="totalInvitedCount"
         :profiles="visibleInvitedUsers"
@@ -38,16 +33,16 @@
           <span>
             {{ $t('settings.invites.expired-codes', { count: expiredCodes.length }) }}
           </span>
-          <span class="invite-code-list__expired-chevron" :class="{ open: showExpired }"
-            >&#9660;</span
-          >
+          <span class="invite-code-list__expired-chevron" :class="{ open: showExpired }">
+            &#9660;
+          </span>
         </button>
         <ul v-if="showExpired" class="invite-code-list__expired-list">
           <li v-for="code in expiredCodes" :key="code.code" class="invite-code-list__expired-code">
             <span class="invite-code-list__expired-code-text">{{ code.code }}</span>
-            <span v-if="code.comment" class="invite-code-list__expired-code-comment"
-              >— {{ code.comment }}</span
-            >
+            <span v-if="code.comment" class="invite-code-list__expired-code-comment">
+              — {{ code.comment }}
+            </span>
             <span class="invite-code-list__expired-code-redeemed">
               {{ $t('invite-codes.redeemed-count', { count: code.redeemedByCount }) }}
             </span>
