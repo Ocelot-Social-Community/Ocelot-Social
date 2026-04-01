@@ -111,10 +111,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.settings-page {
-  padding-bottom: $space-x-small;
-}
-
 .settings-header {
   margin-top: $space-base;
   margin-bottom: $space-x-small;

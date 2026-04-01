@@ -397,6 +397,12 @@ export default {
   display: none;
 }
 
+@media (max-width: 810px) {
+  .feed-top-row {
+    padding-top: $space-small;
+  }
+}
+
 .hashtag-filter-bar {
   margin-top: -$space-x-small;
   margin-bottom: $space-small;
