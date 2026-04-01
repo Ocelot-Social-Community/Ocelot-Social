@@ -1,22 +1,9 @@
 <template>
   <os-card>
-    <h2 class="title">{{ $t('settings.invites.name') }}</h2>
-
-    <div class="invite-summary">
-      <p class="summary-text">
-        {{ $t('settings.invites.total-invited', { count: totalInvitedCount }) }}
-      </p>
-      <p class="summary-text">
-        {{
-          $t('settings.invites.codes-active', {
-            active: validInviteCodes.length,
-            max: maxLinks,
-          })
-        }}
-      </p>
-    </div>
-
-    <h3 class="section-title">{{ $t('invite-codes.my-invite-links') }}</h3>
+    <h2 class="title">
+      {{ $t('invite-codes.my-invite-links') }}
+      <span class="title-count">({{ validInviteCodes.length }}/{{ maxLinks }})</span>
+    </h2>
     <invitation-list
       @generate-invite-code="generatePersonalInviteCode"
       @invalidate-invite-code="invalidateInviteCode"
@@ -32,6 +19,7 @@
     <div v-if="invitedUsers.length" class="invited-users-section">
       <h3 class="section-title">
         {{ $t('settings.invites.invited-users') }}
+        <span class="title-count">({{ totalInvitedCount }})</span>
       </h3>
       <ul class="invited-users-list">
         <li v-for="invited in invitedUsers" :key="invited.id" class="invited-user">
@@ -49,9 +37,7 @@
     <div v-if="expiredCodes.length" class="expired-section">
       <button class="expired-toggle" @click="showExpired = !showExpired">
         <span>
-          {{
-            $t('settings.invites.expired-codes', { count: expiredCodes.length })
-          }}
+          {{ $t('settings.invites.expired-codes', { count: expiredCodes.length }) }}
         </span>
         <span class="expired-chevron" :class="{ open: showExpired }">&#9660;</span>
       </button>
@@ -159,16 +145,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.invite-summary {
-  margin-bottom: $space-large;
-  padding: $space-base;
-  background-color: $color-neutral-90;
-  border-radius: $border-radius-base;
-}
-
-.summary-text {
-  margin: 0;
-  line-height: 1.6;
+.title-count {
+  font-weight: normal;
+  color: $text-color-soft;
 }
 
 .section-title {
@@ -193,7 +172,6 @@ export default {
   padding: $space-x-small 0;
   border-bottom: 1px dotted #e5e3e8;
 }
-
 
 .invited-user-code {
   color: $text-color-soft;

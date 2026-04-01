@@ -1169,8 +1169,6 @@
     },
     "invites": {
       "name": "Uitnodigingen",
-      "total-invited": "Je hebt {count} mensen uitgenodigd.",
-      "codes-active": "{active} van {max} uitnodigingscodes actief.",
       "invited-users": "Uitgenodigde gebruikers",
       "via-code": "via {code}",
       "deactivated": "gedeactiveerd",

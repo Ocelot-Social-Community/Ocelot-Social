@@ -1169,8 +1169,6 @@
     },
     "invites": {
       "name": "Convites",
-      "total-invited": "Convidaste {count} pessoas.",
-      "codes-active": "{active} de {max} códigos de convite ativos.",
       "invited-users": "Utilizadores convidados",
       "via-code": "via {code}",
       "deactivated": "desativado",

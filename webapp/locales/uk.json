@@ -1169,8 +1169,6 @@
     },
     "invites": {
       "name": "Запрошення",
-      "total-invited": "Ви запросили {count} осіб.",
-      "codes-active": "{active} з {max} кодів запрошення активні.",
       "invited-users": "Запрошені користувачі",
       "via-code": "через {code}",
       "deactivated": "деактивовано",

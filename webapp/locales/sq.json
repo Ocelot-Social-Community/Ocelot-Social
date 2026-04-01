@@ -1169,8 +1169,6 @@
     },
     "invites": {
       "name": "Ftesat",
-      "total-invited": "Ke ftuar {count} persona.",
-      "codes-active": "{active} nga {max} kode ftesash aktive.",
       "invited-users": "Përdoruesit e ftuar",
       "via-code": "nëpërmjet {code}",
       "deactivated": "i çaktivizuar",
