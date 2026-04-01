@@ -1170,9 +1170,8 @@
     "invites": {
       "name": "Uitnodigingen",
       "invited-users": "Uitgenodigde gebruikers",
-      "via-code": "via {code}",
-      "deactivated": "gedeactiveerd",
-      "expired-codes": "{count} gedeactiveerde codes"
+      "expired-codes": "{count} gedeactiveerde codes",
+      "nobody-invited": "Nog niemand uitgenodigd."
     },
     "languages": {
       "name": "Talen"

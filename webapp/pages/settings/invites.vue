@@ -16,23 +16,21 @@
       "
     />
 
-    <div v-if="invitedUsers.length" class="invited-users-section">
-      <h3 class="section-title">
-        {{ $t('settings.invites.invited-users') }}
-        <span class="title-count">({{ totalInvitedCount }})</span>
-      </h3>
-      <ul class="invited-users-list">
-        <li v-for="invited in invitedUsers" :key="invited.id" class="invited-user">
-          <user-teaser :user="invited" />
-          <span class="invited-user-code">
-            {{ $t('settings.invites.via-code', { code: invited.code }) }}
-            <span v-if="!invited.codeIsValid" class="code-invalid">
-              ({{ $t('settings.invites.deactivated') }})
-            </span>
-          </span>
-        </li>
-      </ul>
-    </div>
+    <profile-list
+      class="embedded-profile-list"
+      uniqueName="invitedUsersFilter"
+      :title="
+        $t('settings.invites.invited-users') +
+        ' (' +
+        totalInvitedCount +
+        ')'
+      "
+      :title-nobody="$t('settings.invites.nobody-invited')"
+      :all-profiles-count="totalInvitedCount"
+      :profiles="visibleInvitedUsers"
+      :loading="loadingAll"
+      @fetchAllProfiles="loadAllInvitedUsers"
+    />
 
     <div v-if="expiredCodes.length" class="expired-section">
       <button class="expired-toggle" @click="showExpired = !showExpired">
@@ -65,7 +63,9 @@ import { mapGetters } from 'vuex'
 import { OsCard } from '@ocelot-social/ui'
 import InvitationList from '~/components/_new/features/Invitations/InvitationList.vue'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
-import UserTeaser from '~/components/UserTeaser/UserTeaser'
+import ProfileList, {
+  profileListVisibleCount,
+} from '~/components/features/ProfileList/ProfileList.vue'
 import { useInviteCode } from '~/composables/useInviteCode'
 import scrollToContent from './scroll-to-content.js'
 
@@ -75,13 +75,15 @@ export default {
     OsCard,
     InvitationList,
     ConfirmModal,
-    UserTeaser,
+    ProfileList,
   },
   data() {
     return {
       showConfirmModal: false,
       modalData: null,
       showExpired: false,
+      showAllInvited: false,
+      loadingAll: false,
     }
   },
   computed: {
@@ -100,7 +102,7 @@ export default {
     totalInvitedCount() {
       return this.user.inviteCodes.reduce((sum, c) => sum + (c.redeemedByCount || 0), 0)
     },
-    invitedUsers() {
+    allInvitedUsers() {
       const users = []
       this.user.inviteCodes.forEach((inviteCode) => {
         if (inviteCode.redeemedBy) {
@@ -110,13 +112,15 @@ export default {
               name: u.name,
               slug: u.slug,
               avatar: u.avatar,
-              code: inviteCode.code,
-              codeIsValid: inviteCode.isValid,
             })
           })
         }
       })
       return users
+    },
+    visibleInvitedUsers() {
+      if (this.showAllInvited) return this.allInvitedUsers
+      return this.allInvitedUsers.slice(0, profileListVisibleCount)
     },
   },
   created() {
@@ -140,6 +144,13 @@ export default {
       this.modalData = modalData
       this.showConfirmModal = true
     },
+    loadAllInvitedUsers() {
+      this.loadingAll = true
+      this.showAllInvited = true
+      this.$nextTick(() => {
+        this.loadingAll = false
+      })
+    },
   },
 }
 </script>
@@ -150,37 +161,6 @@ export default {
   color: $text-color-soft;
 }
 
-.section-title {
-  margin-top: $space-large;
-  margin-bottom: $space-small;
-}
-
-.invited-users-section {
-  margin-top: $space-large;
-}
-
-.invited-users-list {
-  list-style: none;
-  padding: 0;
-}
-
-.invited-user {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: $space-x-small;
-  padding: $space-x-small 0;
-  border-bottom: 1px dotted #e5e3e8;
-}
-
-.invited-user-code {
-  color: $text-color-soft;
-  font-size: $font-size-small;
-}
-
-.code-invalid {
-  color: $color-danger;
-}
 
 .expired-section {
   margin-top: $space-large;
@@ -236,5 +216,16 @@ export default {
 
 .code-redeemed {
   font-size: $font-size-small;
+}
+</style>
+
+<style lang="scss">
+.embedded-profile-list.profile-list.os-card {
+  padding: 0 !important;
+  margin: $space-large 0 0;
+  box-shadow: none !important;
+  border: none;
+  border-radius: 0;
+  background: transparent !important;
 }
 </style>

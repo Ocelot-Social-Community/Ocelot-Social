@@ -424,7 +424,7 @@ export const currentUserQuery = gql`
           name
           slug
           avatar {
-            url
+            ...imageUrls
           }
         }
         comment

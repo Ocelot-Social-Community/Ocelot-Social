@@ -1170,9 +1170,8 @@
     "invites": {
       "name": "Запрошення",
       "invited-users": "Запрошені користувачі",
-      "via-code": "через {code}",
-      "deactivated": "деактивовано",
-      "expired-codes": "{count} деактивованих кодів"
+      "expired-codes": "{count} деактивованих кодів",
+      "nobody-invited": "Ще нікого не запрошено."
     },
     "languages": {
       "name": "Мови"

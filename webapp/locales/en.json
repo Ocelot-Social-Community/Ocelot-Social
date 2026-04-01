@@ -1170,9 +1170,8 @@
     "invites": {
       "name": "Invites",
       "invited-users": "Invited users",
-      "via-code": "via {code}",
-      "deactivated": "deactivated",
-      "expired-codes": "{count} deactivated codes"
+      "expired-codes": "{count} deactivated codes",
+      "nobody-invited": "No one invited yet."
     },
     "languages": {
       "name": "Languages"

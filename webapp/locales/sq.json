@@ -1170,9 +1170,8 @@
     "invites": {
       "name": "Ftesat",
       "invited-users": "Përdoruesit e ftuar",
-      "via-code": "nëpërmjet {code}",
-      "deactivated": "i çaktivizuar",
-      "expired-codes": "{count} kode të çaktivizuara"
+      "expired-codes": "{count} kode të çaktivizuara",
+      "nobody-invited": "Ende nuk keni ftuar askënd."
     },
     "languages": {
       "name": "Gjuhët"
