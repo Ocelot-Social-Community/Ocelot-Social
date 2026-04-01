@@ -1,0 +1,8 @@
+query User($filter: _UserFilter) {
+  User(filter: $filter) {
+    id
+    location {
+      id
+    }
+  }
+}

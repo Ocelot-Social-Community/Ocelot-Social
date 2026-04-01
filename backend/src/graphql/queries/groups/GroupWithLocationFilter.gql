@@ -1,0 +1,8 @@
+query Group($hasLocation: Boolean) {
+  Group(hasLocation: $hasLocation) {
+    id
+    location {
+      id
+    }
+  }
+}
