@@ -33,6 +33,7 @@ reviews:
     - "!**/package-lock.json"
     - "!**/yarn.lock"
     - "!**/*.snap"
+    - "!**/*.png"
     - "!**/coverage/**"
     - "!**/dist/**"
     - "!**/node_modules/**"
@@ -40,6 +41,9 @@ reviews:
     - "!**/*.min.css"
     - "!**/.git/**"
     - "!**/storybook-static/**"
+    # TODO: Temporär - nach Merge des Cypress-Refactoring-PRs entfernen
+    - "!cypress/support/step_definitions/**"
+    - "!cypress/e2e/**/*.feature"
 
   # Instruktionen für spezifische Pfade
   path_instructions:
