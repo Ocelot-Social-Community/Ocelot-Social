@@ -1169,7 +1169,7 @@
       }
     },
     "invites": {
-      "name": "Invita",
+      "name": "Invitaciones",
       "invited-users": "Usuarios invitados",
       "expired-codes": "{count} códigos desactivados",
       "nobody-invited": "Aún no has invitado a nadie."
