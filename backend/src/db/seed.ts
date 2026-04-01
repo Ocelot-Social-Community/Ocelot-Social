@@ -864,10 +864,16 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       { code: 'JENNY3', comment: 'For Dagobert' },
       { generatedBy: jennyRostock },
     )
+    // Jenny's shared code (used by additional users)
+    await Factory.build(
+      'inviteCode',
+      { code: 'ABCDEF', comment: 'Share link' },
+      { generatedBy: jennyRostock },
+    )
     // Jenny's unused code (still active)
     await Factory.build(
       'inviteCode',
-      { code: 'ABCDEF' },
+      { code: 'JNEW01' },
       { generatedBy: jennyRostock },
     )
     // Jenny's invalidated code (was used once, then deactivated)
@@ -876,6 +882,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       { code: 'JENNY0', comment: 'Old link', expiresAt: new Date().toISOString() },
       { generatedBy: jennyRostock },
     )
+    // Jenny total: JENNY1, JENNY2, JENNY3, ABCDEF, JNEW01 (5 active) + JENNY0 (1 expired) = 6 codes
 
     // Create REDEEMED and INVITED relationships via Cypher
     const inviteSession = database.driver.session()
@@ -1307,27 +1314,21 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       })
     }
 
-    // Jenny invited the first 99 additional users (her chat partners)
+    // Jenny's first 99 additional users all redeemed code ABCDEF
     // eslint-disable-next-line no-console
-    console.log('seed', 'invite codes for additional users')
+    console.log('seed', 'invite redemptions for additional users')
     const jennyInviteSession = database.driver.session()
     try {
       for (let i = 0; i < Math.min(99, additionalUsers.length); i++) {
         const userId = await additionalUsers[i].toJson().then((u) => u.id)
-        const code = `JADD${String(i + 1).padStart(3, '0')}`
-        await Factory.build(
-          'inviteCode',
-          { code, comment: `Additional user ${i + 1}` },
-          { generatedBy: jennyRostock },
-        )
         await jennyInviteSession.writeTransaction((txc) =>
           txc.run(
             `
-            MATCH (user:User {id: $userId}), (inviteCode:InviteCode {code: $code}), (jenny:User {id: 'u3'})
+            MATCH (user:User {id: $userId}), (inviteCode:InviteCode {code: 'ABCDEF'}), (jenny:User {id: 'u3'})
             MERGE (user)-[:REDEEMED {createdAt: toString(datetime())}]->(inviteCode)
             MERGE (jenny)-[:INVITED {createdAt: toString(datetime())}]->(user)
             `,
-            { userId, code },
+            { userId },
           ),
         )
       }
