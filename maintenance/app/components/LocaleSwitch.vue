@@ -8,7 +8,7 @@
       :title="t('localeSwitch.tooltip')"
     >
       <template #icon>
-        <OsIcon :icon="languageIcon" />
+        <OsIcon :icon="languageIcon" size="lg" />
       </template>
     </OsButton>
 
