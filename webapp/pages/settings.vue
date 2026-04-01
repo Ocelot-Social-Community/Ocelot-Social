@@ -73,11 +73,6 @@ export default {
         },
         // TODO implement
         /* {
-            name: this.$t('settings.invites.name'),
-            path: `/settings/invites`
-            }, */
-        // TODO implement
-        /* {
             name: this.$t('settings.organizations.name'),
             path: `/settings/my-organizations`
             }, */
@@ -93,6 +88,13 @@ export default {
         routes.splice(2, 0, {
           name: this.$t('settings.badges.name'),
           path: `/settings/badges`,
+        })
+      }
+
+      if (this.$env.INVITE_REGISTRATION === true) {
+        routes.push({
+          name: this.$t('settings.invites.name'),
+          path: `/settings/invites`,
         })
       }
 
