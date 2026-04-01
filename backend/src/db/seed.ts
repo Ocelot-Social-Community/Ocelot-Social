@@ -832,16 +832,44 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     console.log('seed', 'invitecodes')
 
     // Peter invited the core users: Jenny, Bob, Huey
-    await Factory.build('inviteCode', { code: 'PETER1', comment: 'For Jenny' }, { generatedBy: peterLustig })
-    await Factory.build('inviteCode', { code: 'PETER2', comment: 'For Bob' }, { generatedBy: peterLustig })
-    await Factory.build('inviteCode', { code: 'PETER3', comment: 'For Huey' }, { generatedBy: peterLustig })
+    await Factory.build(
+      'inviteCode',
+      { code: 'PETER1', comment: 'For Jenny' },
+      { generatedBy: peterLustig },
+    )
+    await Factory.build(
+      'inviteCode',
+      { code: 'PETER2', comment: 'For Bob' },
+      { generatedBy: peterLustig },
+    )
+    await Factory.build(
+      'inviteCode',
+      { code: 'PETER3', comment: 'For Huey' },
+      { generatedBy: peterLustig },
+    )
 
     // Jenny invited Dewey, Louie, Dagobert
-    await Factory.build('inviteCode', { code: 'JENNY1', comment: 'For Dewey' }, { generatedBy: jennyRostock })
-    await Factory.build('inviteCode', { code: 'JENNY2', comment: 'For Louie' }, { generatedBy: jennyRostock })
-    await Factory.build('inviteCode', { code: 'JENNY3', comment: 'For Dagobert' }, { generatedBy: jennyRostock })
+    await Factory.build(
+      'inviteCode',
+      { code: 'JENNY1', comment: 'For Dewey' },
+      { generatedBy: jennyRostock },
+    )
+    await Factory.build(
+      'inviteCode',
+      { code: 'JENNY2', comment: 'For Louie' },
+      { generatedBy: jennyRostock },
+    )
+    await Factory.build(
+      'inviteCode',
+      { code: 'JENNY3', comment: 'For Dagobert' },
+      { generatedBy: jennyRostock },
+    )
     // Jenny's shared code (used by additional users)
-    await Factory.build('inviteCode', { code: 'ABCDEF', comment: 'Share link' }, { generatedBy: jennyRostock })
+    await Factory.build(
+      'inviteCode',
+      { code: 'ABCDEF', comment: 'Share link' },
+      { generatedBy: jennyRostock },
+    )
     // Jenny's unused code (still active)
     await Factory.build('inviteCode', { code: 'JNEW01' }, { generatedBy: jennyRostock })
     // Jenny's invalidated code (was used once, then deactivated)
