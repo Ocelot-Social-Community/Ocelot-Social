@@ -857,7 +857,7 @@ export default {
 
     async newRoom(userOrId) {
       // Accept either a user object { id, name } or just a userId string
-      let userId = typeof userOrId === 'string' ? userOrId : userOrId.id
+      const userId = typeof userOrId === 'string' ? userOrId : userOrId.id
       let userName = typeof userOrId === 'string' ? null : userOrId.name
       let userAvatar =
         typeof userOrId === 'string' ? null : userOrId.avatar?.w320 || userOrId.avatar?.url || null
