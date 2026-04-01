@@ -84,6 +84,11 @@ export default {
 }
 
 @media (max-width: 810px) {
+  .main-container {
+    padding-top: 4rem;
+    padding-bottom: 0;
+  }
+
   .desktop-footer {
     display: none;
   }
