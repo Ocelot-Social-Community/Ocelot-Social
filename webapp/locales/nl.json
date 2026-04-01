@@ -707,12 +707,12 @@
     "invite-link-message-group": "Je bent uitgenodigd om lid te worden van de groep “{groupName}” op {network}.",
     "invite-link-message-hidden-group": "Je bent uitgenodigd om lid te worden van een verborgen groep op {network}.",
     "invite-link-message-personal": "Je bent uitgenodigd om lid te worden van {network}.",
+    "invited-count": "Je hebt al {count} mensen uitgenodigd.",
     "limit-reached": "Je hebt het maximale aantal uitnodigingslinks bereikt.",
     "my-invite-links": "Mijn uitnodigingslinks",
     "no-links": "Nog geen uitnodigingslinks aangemaakt.",
     "redeemed-count": "Deze code is {count} keer gebruikt.",
-    "redeemed-count-0": "Niemand heeft deze code nog gebruikt.",
-    "invited-count": "Je hebt al {count} mensen uitgenodigd."
+    "redeemed-count-0": "Niemand heeft deze code nog gebruikt."
   },
   "layout": {
     "toggle": {
@@ -1169,9 +1169,9 @@
       }
     },
     "invites": {
-      "name": "Uitnodigingen",
-      "invited-users": "Uitgenodigde gebruikers",
       "expired-codes": "{count} gedeactiveerde codes",
+      "invited-users": "Uitgenodigde gebruikers",
+      "name": "Uitnodigingen",
       "nobody-invited": "Nog niemand uitgenodigd."
     },
     "languages": {

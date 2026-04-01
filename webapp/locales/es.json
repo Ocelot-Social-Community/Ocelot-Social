@@ -707,12 +707,12 @@
     "invite-link-message-group": "Has sido invitado a unirte al grupo “{groupName}” en {network}.",
     "invite-link-message-hidden-group": "Has sido invitado a unirte a un grupo oculto en {network}.",
     "invite-link-message-personal": "Has sido invitado a unirte a {network}.",
+    "invited-count": "Ya has invitado a {count} personas.",
     "limit-reached": "Has alcanzado el número máximo de enlaces de invitación.",
     "my-invite-links": "Mis enlaces de invitación",
     "no-links": "Aún no se han creado enlaces de invitación.",
     "redeemed-count": "Este código se ha usado {count} veces.",
-    "redeemed-count-0": "Nadie ha usado este código todavía.",
-    "invited-count": "Ya has invitado a {count} personas."
+    "redeemed-count-0": "Nadie ha usado este código todavía."
   },
   "layout": {
     "toggle": {
@@ -1169,9 +1169,9 @@
       }
     },
     "invites": {
-      "name": "Invitaciones",
-      "invited-users": "Usuarios invitados",
       "expired-codes": "{count} códigos desactivados",
+      "invited-users": "Usuarios invitados",
+      "name": "Invitaciones",
       "nobody-invited": "Aún no has invitado a nadie."
     },
     "languages": {

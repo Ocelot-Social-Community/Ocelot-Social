@@ -707,12 +707,12 @@
     "invite-link-message-group": "Вас запрошено приєднатися до групи «{groupName}» у мережі {network}.",
     "invite-link-message-hidden-group": "Вас запрошено приєднатися до прихованої групи у мережі {network}.",
     "invite-link-message-personal": "Вас запрошено приєднатися до {network}.",
+    "invited-count": "Ви вже запросили {count} осіб.",
     "limit-reached": "Ви досягли максимальної кількості посилань для запрошення.",
     "my-invite-links": "Мої посилання для запрошення",
     "no-links": "Посилання для запрошення ще не створено.",
     "redeemed-count": "Цей код було використано {count} разів.",
-    "redeemed-count-0": "Ніхто ще не використав цей код.",
-    "invited-count": "Ви вже запросили {count} осіб."
+    "redeemed-count-0": "Ніхто ще не використав цей код."
   },
   "layout": {
     "toggle": {
@@ -1169,9 +1169,9 @@
       }
     },
     "invites": {
-      "name": "Запрошення",
-      "invited-users": "Запрошені користувачі",
       "expired-codes": "{count} деактивованих кодів",
+      "invited-users": "Запрошені користувачі",
+      "name": "Запрошення",
       "nobody-invited": "Ще нікого не запрошено."
     },
     "languages": {

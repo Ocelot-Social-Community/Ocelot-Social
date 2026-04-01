@@ -707,12 +707,12 @@
     "invite-link-message-group": "Тебя пригласили вступить в группу “{groupName}” на {network}.",
     "invite-link-message-hidden-group": "Тебя пригласили вступить в скрытую группу на {network}.",
     "invite-link-message-personal": "Тебя пригласили присоединиться к {network}.",
+    "invited-count": "Вы уже пригласили {count} человек.",
     "limit-reached": "Ты достиг максимального количества ссылок приглашения.",
     "my-invite-links": "Мои ссылки приглашения",
     "no-links": "Ссылки приглашения ещё не созданы.",
     "redeemed-count": "Этот код был использован {count} раз.",
-    "redeemed-count-0": "Никто ещё не использовал этот код.",
-    "invited-count": "Вы уже пригласили {count} человек."
+    "redeemed-count-0": "Никто ещё не использовал этот код."
   },
   "layout": {
     "toggle": {
@@ -1169,9 +1169,9 @@
       }
     },
     "invites": {
-      "name": "Приглашения",
-      "invited-users": "Приглашённые пользователи",
       "expired-codes": "{count} деактивированных кодов",
+      "invited-users": "Приглашённые пользователи",
+      "name": "Приглашения",
       "nobody-invited": "Ещё никого не приглашено."
     },
     "languages": {
