@@ -83,9 +83,7 @@ describe('InviteCodeList.vue', () => {
   describe('without showInvitedUsers (popup mode)', () => {
     it('shows invited-count summary text', () => {
       Wrapper()
-      expect(
-        screen.getByText('invite-codes.invited-count:{"count":3}'),
-      ).toBeInTheDocument()
+      expect(screen.getByText('invite-codes.invited-count:{"count":3}')).toBeInTheDocument()
     })
 
     it('does not show invited-count when no one invited', () => {
@@ -112,9 +110,7 @@ describe('InviteCodeList.vue', () => {
 
     it('shows expired codes toggle', () => {
       Wrapper({ showInvitedUsers: true })
-      expect(
-        screen.getByText('settings.invites.expired-codes:{"count":1}'),
-      ).toBeInTheDocument()
+      expect(screen.getByText('settings.invites.expired-codes:{"count":1}')).toBeInTheDocument()
     })
 
     it('expired codes list is hidden by default', () => {
