@@ -711,7 +711,8 @@
     "my-invite-links": "Meine Einladungslinks",
     "no-links": "Keine Links vorhanden",
     "redeemed-count": "{count} mal eingelöst",
-    "redeemed-count-0": "Noch von niemandem eingelöst"
+    "redeemed-count-0": "Noch von niemandem eingelöst",
+    "invited-count": "Du hast bereits {count} Personen eingeladen."
   },
   "layout": {
     "toggle": {

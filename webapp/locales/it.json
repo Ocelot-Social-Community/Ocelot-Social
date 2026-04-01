@@ -711,7 +711,8 @@
     "my-invite-links": "I miei link di invito",
     "no-links": "Nessun link di invito creato ancora.",
     "redeemed-count": "Questo codice è stato usato {count} volte.",
-    "redeemed-count-0": "Nessuno ha ancora usato questo codice."
+    "redeemed-count-0": "Nessuno ha ancora usato questo codice.",
+    "invited-count": "Hai già invitato {count} persone."
   },
   "layout": {
     "toggle": {

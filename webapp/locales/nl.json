@@ -711,7 +711,8 @@
     "my-invite-links": "Mijn uitnodigingslinks",
     "no-links": "Nog geen uitnodigingslinks aangemaakt.",
     "redeemed-count": "Deze code is {count} keer gebruikt.",
-    "redeemed-count-0": "Niemand heeft deze code nog gebruikt."
+    "redeemed-count-0": "Niemand heeft deze code nog gebruikt.",
+    "invited-count": "Je hebt al {count} mensen uitgenodigd."
   },
   "layout": {
     "toggle": {

@@ -711,7 +711,8 @@
     "my-invite-links": "Lidhjet e mia të ftesës",
     "no-links": "Nuk janë krijuar ende lidhje ftese.",
     "redeemed-count": "Ky kod është përdorur {count} herë.",
-    "redeemed-count-0": "Askush nuk e ka përdorur ende këtë kod."
+    "redeemed-count-0": "Askush nuk e ka përdorur ende këtë kod.",
+    "invited-count": "Ke ftuar tashmë {count} persona."
   },
   "layout": {
     "toggle": {

@@ -92,11 +92,7 @@
                     </template>
                     <template #popover>
                       <div class="invite-list">
-                        <h2>{{ $t('invite-codes.my-invite-links') }}</h2>
-                        <invitation-list
-                          @generate-invite-code="generatePersonalInviteCode"
-                          @invalidate-invite-code="invalidateInviteCode"
-                          @open-delete-modal="openInviteDeleteModal"
+                        <invite-code-list
                           :inviteCodes="user.inviteCodes"
                           :copy-message="
                             $t('invite-codes.invite-link-message-personal', {
@@ -107,11 +103,6 @@
                       </div>
                     </template>
                   </dropdown>
-                  <confirm-modal
-                    v-if="showInviteConfirmModal"
-                    :modalData="inviteModalData"
-                    @close="showInviteConfirmModal = false"
-                  />
                 </client-only>
               </div>
               <!-- group button -->
@@ -581,8 +572,7 @@ import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
 import headerMenuBranded from '~/constants/headerMenuBranded.js'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
 import Dropdown from '~/components/Dropdown'
-import InvitationList from '~/components/_new/features/Invitations/InvitationList.vue'
-import { useInviteCode } from '~/composables/useInviteCode'
+import InviteCodeList from '~/components/_new/features/Invitations/InviteCodeList.vue'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
 import Logo from '~/components/Logo/Logo'
 import SearchField from '~/components/features/SearchField/SearchField.vue'
@@ -605,7 +595,7 @@ export default {
     FilterMenuComponent,
     ConfirmModal,
     Dropdown,
-    InvitationList,
+    InviteCodeList,
     LocaleSwitch,
     Logo,
     NotificationMenu,
@@ -632,8 +622,6 @@ export default {
       mobileFilterMenuOpen: false,
       mobileLocaleMenuOpen: false,
       inviteRegistration: this.$env.INVITE_REGISTRATION === true, // for 'false' in .env INVITE_REGISTRATION is of type undefined and not(!) boolean false, because of internal handling,
-      showInviteConfirmModal: false,
-      inviteModalData: null,
     }
   },
   computed: {
@@ -720,27 +708,8 @@ export default {
   created() {
     this.icons = iconRegistry
     this.throttledMouseMove = throttle(this.handleMouseMove, 100)
-    const { generatePersonalInviteCode, invalidateInviteCode } = useInviteCode({
-      apollo: this.$apollo,
-      toast: this.$toast,
-      t: (key, ...args) => this.$t(key, ...args),
-      store: this.$store,
-    })
-    this._generateInviteCode = generatePersonalInviteCode
-    this._invalidateInviteCode = invalidateInviteCode
   },
   methods: {
-    async generatePersonalInviteCode(comment) {
-      await this._generateInviteCode(comment)
-    },
-    async invalidateInviteCode(code) {
-      await this._invalidateInviteCode(code)
-    },
-    openInviteDeleteModal(modalData) {
-      this.$refs.inviteDropdown.isPopoverOpen = false
-      this.inviteModalData = modalData
-      this.showInviteConfirmModal = true
-    },
     handleScroll() {
       if (this.toggleMobileMenu) return
       const currentScrollPos = window.pageYOffset
