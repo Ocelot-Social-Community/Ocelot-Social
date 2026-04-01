@@ -29,7 +29,12 @@
       />
 
       <div v-if="expiredCodes.length" class="invite-code-list__expired">
-        <button class="invite-code-list__expired-toggle" @click="showExpired = !showExpired">
+        <button
+          class="invite-code-list__expired-toggle"
+          :aria-expanded="String(showExpired)"
+          aria-controls="expired-codes-list"
+          @click="showExpired = !showExpired"
+        >
           <span>
             {{ $t('settings.invites.expired-codes', { count: expiredCodes.length }) }}
           </span>
@@ -37,7 +42,7 @@
             &#9660;
           </span>
         </button>
-        <ul v-if="showExpired" class="invite-code-list__expired-list">
+        <ul v-if="showExpired" id="expired-codes-list" class="invite-code-list__expired-list">
           <li v-for="code in expiredCodes" :key="code.code" class="invite-code-list__expired-code">
             <span class="invite-code-list__expired-code-text">{{ code.code }}</span>
             <span v-if="code.comment" class="invite-code-list__expired-code-comment">
