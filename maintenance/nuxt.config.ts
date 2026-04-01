@@ -52,7 +52,7 @@ export default defineNuxtConfig({
       rollupOptions: {
         // Exclude pre-built UI library from Rollup re-bundling in production
         // (minified tailwind-merge variable `h` collides with Vue's `h`)
-        external: [/^@ocelot-social\/ui/],
+        external: [/^@ocelot-social\/ui(?!.*\.css)/],
       },
     },
   },
