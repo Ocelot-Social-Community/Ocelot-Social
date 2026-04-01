@@ -143,6 +143,10 @@ describe('InviteCodeList.vue', () => {
   })
 
   describe('interactions', () => {
+    beforeEach(() => {
+      defaultMocks.$apollo.mutate.mockClear()
+    })
+
     it('clicking delete button opens confirm modal', async () => {
       Wrapper()
       const deleteButtons = screen.getAllByLabelText('invite-codes.invalidate')
@@ -156,14 +160,14 @@ describe('InviteCodeList.vue', () => {
       await fireEvent.click(deleteButtons[0])
       const confirmBtn = screen.getByTestId('confirm-btn')
       await fireEvent.click(confirmBtn)
-      expect(defaultMocks.$apollo.mutate).toHaveBeenCalled()
+      expect(defaultMocks.$apollo.mutate).toHaveBeenCalledTimes(1)
     })
 
     it('clicking generate button triggers code generation', async () => {
       Wrapper()
       const generateButton = screen.getByLabelText('invite-codes.generate-code')
       await fireEvent.click(generateButton)
-      expect(defaultMocks.$apollo.mutate).toHaveBeenCalled()
+      expect(defaultMocks.$apollo.mutate).toHaveBeenCalledTimes(1)
     })
 
     it('clicking load all in profile-list loads all invited users', async () => {
