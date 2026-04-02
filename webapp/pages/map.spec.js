@@ -872,14 +872,49 @@ describe('map', () => {
             expect(bobFeature.geometry.coordinates[1]).toBe(groupFeature.geometry.coordinates[1])
           })
 
-          it('does not nudge markers of the same type', () => {
-            // Both users u2 and u3 are different types at different locations
-            // but if they were at the same location with same type, no nudge
+          it('does not nudge markers of the same type at the same location', async () => {
+            // Reset geoJSON and flags to re-run with custom data
+            wrapper.vm.markers.geoJSON = []
+            wrapper.vm.markers.isGeoJSON = false
+            wrapper.vm.markers.isSourceAndLayerAdded = true
+            wrapper.vm.markers.isFlyToCenter = true
+
+            const sameLocationUsers = [
+              {
+                id: 'u10',
+                slug: 'alice',
+                name: 'Alice',
+                about: null,
+                location: { id: 'loc2', name: 'Hamburg', lng: 10.0, lat: 53.55 },
+              },
+              {
+                id: 'u11',
+                slug: 'charlie',
+                name: 'Charlie',
+                about: null,
+                location: { id: 'loc2', name: 'Hamburg', lng: 10.0, lat: 53.55 },
+              },
+            ]
+            await wrapper.setData({
+              users: sameLocationUsers,
+              groups: [],
+              posts: [],
+              currentUserCoordinates: null,
+              currentUserLocation: null,
+            })
+            wrapper.vm.addMarkersOnCheckPrepared()
+
             const userFeatures = wrapper.vm.markers.geoJSON.filter(
               (f) => f.properties.type === 'user',
             )
-            // These are at different locations, so no nudging needed
             expect(userFeatures.length).toBe(2)
+            // Same type at same location — coordinates must remain identical
+            expect(userFeatures[0].geometry.coordinates[0]).toBe(
+              userFeatures[1].geometry.coordinates[0],
+            )
+            expect(userFeatures[0].geometry.coordinates[1]).toBe(
+              userFeatures[1].geometry.coordinates[1],
+            )
           })
         })
       })
