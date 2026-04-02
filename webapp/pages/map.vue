@@ -339,55 +339,79 @@ export default {
           coordinates[0] += lngLat.lng > coordinates[0] ? 360 : -360
         }
 
-        // Build description for all features at this location
-        const locationName = features[0].properties.locationName
-        const locationHeader = locationName
-          ? `<div class="map-popup-header">${locationName}</div>`
-          : ''
-        const items = features
-          .map((feature) => {
-            const markerTypeLabel = this.$t(`map.markerTypes.${feature.properties.type}`)
-            const markerProfile = {
-              theUser: {
-                linkTitle: '@' + feature.properties.slug,
-                link: `/profile/${feature.properties.id}/${feature.properties.slug}`,
-              },
-              user: {
-                linkTitle: '@' + feature.properties.slug,
-                link: `/profile/${feature.properties.id}/${feature.properties.slug}`,
-              },
-              group: {
-                linkTitle: '&' + feature.properties.slug,
-                link: `/groups/${feature.properties.id}/${feature.properties.slug}`,
-              },
-              event: {
-                linkTitle: feature.properties.slug,
-                link: `/post/${feature.properties.id}/${feature.properties.slug}`,
-              },
-            }
-            const markerProfileLinkTitle = markerProfile[feature.properties.type].linkTitle
-            const markerProfileLink = markerProfile[feature.properties.type].link
-            let html = `
-              <div>
-                <div>
-                  <b>${feature.properties.name}</b> <i>(${markerTypeLabel})</i>
-                </div>
-                <div>
-                  <a href="${markerProfileLink}" target="_blank">${markerProfileLinkTitle}</a>
-                </div>
-              </div>`
-            if (feature.properties.description && feature.properties.description.length > 0) {
-              html += `
-              <div style="margin-top: 4px;">
-                ${feature.properties.description}
-              </div>`
-            }
-            return html
-          })
-          .join('<hr>')
-        const description = locationHeader + `<div class="map-popup-body">${items}</div>`
+        // Build popup content safely using DOM nodes (no raw HTML interpolation)
+        const container = document.createElement('div')
+        container.className = 'map-popup-container'
 
-        this.markers.popup.setLngLat(coordinates).setHTML(description).addTo(this.map)
+        const locationName = features[0].properties.locationName
+        if (locationName) {
+          const header = document.createElement('div')
+          header.className = 'map-popup-header'
+          header.textContent = locationName
+          container.appendChild(header)
+        }
+
+        const body = document.createElement('div')
+        body.className = 'map-popup-body'
+
+        features.forEach((feature, index) => {
+          if (index > 0) {
+            body.appendChild(document.createElement('hr'))
+          }
+
+          const markerTypeLabel = this.$t(`map.markerTypes.${feature.properties.type}`)
+          const markerProfile = {
+            theUser: {
+              linkTitle: '@' + feature.properties.slug,
+              link: `/profile/${feature.properties.id}/${feature.properties.slug}`,
+            },
+            user: {
+              linkTitle: '@' + feature.properties.slug,
+              link: `/profile/${feature.properties.id}/${feature.properties.slug}`,
+            },
+            group: {
+              linkTitle: '&' + feature.properties.slug,
+              link: `/groups/${feature.properties.id}/${feature.properties.slug}`,
+            },
+            event: {
+              linkTitle: feature.properties.slug,
+              link: `/post/${feature.properties.id}/${feature.properties.slug}`,
+            },
+          }
+          const profile = markerProfile[feature.properties.type]
+
+          const item = document.createElement('div')
+
+          const nameRow = document.createElement('div')
+          const nameB = document.createElement('b')
+          nameB.textContent = feature.properties.name
+          const typeI = document.createElement('i')
+          typeI.textContent = ` (${markerTypeLabel})`
+          nameRow.appendChild(nameB)
+          nameRow.appendChild(typeI)
+          item.appendChild(nameRow)
+
+          const linkRow = document.createElement('div')
+          const link = document.createElement('a')
+          link.href = profile.link
+          link.target = '_blank'
+          link.rel = 'noopener noreferrer'
+          link.textContent = profile.linkTitle
+          linkRow.appendChild(link)
+          item.appendChild(linkRow)
+
+          body.appendChild(item)
+
+          if (feature.properties.description && feature.properties.description.length > 0) {
+            const desc = document.createElement('div')
+            desc.style.marginTop = '4px'
+            desc.textContent = feature.properties.description
+            body.appendChild(desc)
+          }
+        })
+
+        container.appendChild(body)
+        this.markers.popup.setLngLat(coordinates).setDOMContent(container).addTo(this.map)
       }
 
       // Query all features at the clicked/hovered point
@@ -697,11 +721,16 @@ export default {
 }
 
 .mapboxgl-popup-content {
-  display: flex;
-  flex-direction: column;
   max-height: 40vh;
   overflow: hidden;
   padding: 10px;
+}
+
+.map-popup-container {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(40vh - 20px);
+  overflow: hidden;
 }
 
 .mapboxgl-popup-close-button {

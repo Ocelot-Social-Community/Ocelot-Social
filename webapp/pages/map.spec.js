@@ -15,6 +15,7 @@ jest.mock('mapbox-gl', () => {
     remove: jest.fn(),
     setLngLat: jest.fn(() => popupInstance),
     setHTML: jest.fn(() => popupInstance),
+    setDOMContent: jest.fn(() => popupInstance),
     addTo: jest.fn(() => popupInstance),
   }
   return {
@@ -489,6 +490,8 @@ describe('map', () => {
           },
         ]
 
+        const getPopupDOM = () => mapboxgl.__popupInstance.setDOMContent.mock.calls[0][0]
+
         it('shows popup when features found', () => {
           mapQueryRenderedFeaturesMock.mockReturnValueOnce(features)
           onEventMocks.mouseenter({
@@ -496,7 +499,7 @@ describe('map', () => {
             lngLat: { lng: 10.0, lat: 53.55 },
           })
           expect(mapboxgl.__popupInstance.setLngLat).toHaveBeenCalled()
-          expect(mapboxgl.__popupInstance.setHTML).toHaveBeenCalled()
+          expect(mapboxgl.__popupInstance.setDOMContent).toHaveBeenCalled()
           expect(mapboxgl.__popupInstance.addTo).toHaveBeenCalledWith(mapMock)
         })
 
@@ -515,9 +518,10 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
-          const html = mapboxgl.__popupInstance.setHTML.mock.calls[0][0]
-          expect(html).toContain('map-popup-header')
-          expect(html).toContain('Hamburg')
+          const dom = getPopupDOM()
+          const header = dom.querySelector('.map-popup-header')
+          expect(header).toBeTruthy()
+          expect(header.textContent).toBe('Hamburg')
         })
 
         it('popup includes user name and profile link', () => {
@@ -526,10 +530,12 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
-          const html = mapboxgl.__popupInstance.setHTML.mock.calls[0][0]
-          expect(html).toContain('Bob')
-          expect(html).toContain('@bob')
-          expect(html).toContain('/profile/u2/bob')
+          const dom = getPopupDOM()
+          expect(dom.textContent).toContain('Bob')
+          const link = dom.querySelector('a')
+          expect(link.textContent).toBe('@bob')
+          expect(link.getAttribute('href')).toBe('/profile/u2/bob')
+          expect(link.getAttribute('rel')).toBe('noopener noreferrer')
         })
 
         it('popup includes description when present', () => {
@@ -538,8 +544,8 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
-          const html = mapboxgl.__popupInstance.setHTML.mock.calls[0][0]
-          expect(html).toContain('Builder')
+          const dom = getPopupDOM()
+          expect(dom.textContent).toContain('Builder')
         })
 
         it('popup shows multiple features separated by hr', () => {
@@ -562,10 +568,11 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
-          const html = mapboxgl.__popupInstance.setHTML.mock.calls[0][0]
-          expect(html).toContain('<hr>')
-          expect(html).toContain('&journalism')
-          expect(html).toContain('/groups/g1/journalism')
+          const dom = getPopupDOM()
+          expect(dom.querySelectorAll('hr').length).toBe(1)
+          const links = dom.querySelectorAll('a')
+          expect(links[1].textContent).toBe('&journalism')
+          expect(links[1].getAttribute('href')).toBe('/groups/g1/journalism')
         })
 
         it('clears pending leave timeout', () => {
@@ -671,6 +678,8 @@ describe('map', () => {
       })
 
       describe('popup content for different marker types', () => {
+        const getPopupDOMForType = () => mapboxgl.__popupInstance.setDOMContent.mock.calls[0][0]
+
         it('generates correct link for event type', () => {
           const eventFeatures = [
             {
@@ -690,9 +699,10 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 9.17, lat: 48.78 },
           })
-          const html = mapboxgl.__popupInstance.setHTML.mock.calls[0][0]
-          expect(html).toContain('/post/e1/party')
-          expect(html).toContain('party')
+          const dom = getPopupDOMForType()
+          const link = dom.querySelector('a')
+          expect(link.getAttribute('href')).toBe('/post/e1/party')
+          expect(link.textContent).toBe('party')
         })
 
         it('generates correct link for theUser type', () => {
@@ -714,9 +724,10 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 13.38, lat: 52.52 },
           })
-          const html = mapboxgl.__popupInstance.setHTML.mock.calls[0][0]
-          expect(html).toContain('/profile/u1/peter')
-          expect(html).toContain('@peter')
+          const dom = getPopupDOMForType()
+          const link = dom.querySelector('a')
+          expect(link.getAttribute('href')).toBe('/profile/u1/peter')
+          expect(link.textContent).toBe('@peter')
         })
 
         it('omits location header when locationName is empty', () => {
@@ -738,8 +749,8 @@ describe('map', () => {
             point: { x: 100, y: 200 },
             lngLat: { lng: 10.0, lat: 53.55 },
           })
-          const html = mapboxgl.__popupInstance.setHTML.mock.calls[0][0]
-          expect(html).not.toContain('map-popup-header')
+          const dom = getPopupDOMForType()
+          expect(dom.querySelector('.map-popup-header')).toBeNull()
         })
       })
 
