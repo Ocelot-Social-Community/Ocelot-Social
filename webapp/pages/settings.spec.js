@@ -13,7 +13,9 @@ describe('settings.vue', () => {
 
   beforeEach(() => {
     mocks = {
-      $t: jest.fn(),
+      $t: jest.fn((key) => key),
+      $route: { path: '/settings' },
+      $router: { push: jest.fn() },
     }
   })
 

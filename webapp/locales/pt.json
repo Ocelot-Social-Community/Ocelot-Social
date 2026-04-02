@@ -707,6 +707,7 @@
     "invite-link-message-group": "Você foi convidado a entrar no grupo “{groupName}” em {network}.",
     "invite-link-message-hidden-group": "Você foi convidado a entrar em um grupo oculto em {network}.",
     "invite-link-message-personal": "Você foi convidado a entrar em {network}.",
+    "invited-count": "Já convidaste {count} pessoas.",
     "limit-reached": "Você atingiu o número máximo de links de convite.",
     "my-invite-links": "Meus links de convite",
     "no-links": "Nenhum link de convite criado ainda.",
@@ -1168,7 +1169,10 @@
       }
     },
     "invites": {
-      "name": "Convites"
+      "expired-codes": "{count} códigos desativados",
+      "invited-users": "Utilizadores convidados",
+      "name": "Convites",
+      "nobody-invited": "Ainda ninguém convidado."
     },
     "languages": {
       "name": "Idiomas"

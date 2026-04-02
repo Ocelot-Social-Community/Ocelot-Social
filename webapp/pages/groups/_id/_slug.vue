@@ -670,6 +670,11 @@ export default {
   margin: auto;
   margin-top: -60px;
 }
+@media (max-width: 810px) {
+  .group-profile {
+    padding-top: $space-large;
+  }
+}
 .group-profile {
   .group-layout__sidebar .group-profile-content-menu {
     position: absolute;

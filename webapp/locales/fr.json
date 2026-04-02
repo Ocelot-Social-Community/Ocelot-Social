@@ -707,6 +707,7 @@
     "invite-link-message-group": "Tu as été invité à rejoindre le groupe “{groupName}” sur {network}.",
     "invite-link-message-hidden-group": "Tu as été invité à rejoindre un groupe caché sur {network}.",
     "invite-link-message-personal": "Tu as été invité à rejoindre {network}.",
+    "invited-count": "Vous avez déjà invité {count} personnes.",
     "limit-reached": "Tu as atteint le nombre maximum de liens d'invitation.",
     "my-invite-links": "Mes liens d'invitation",
     "no-links": "Aucun lien d'invitation créé pour l'instant.",
@@ -1168,7 +1169,10 @@
       }
     },
     "invites": {
-      "name": "Invite"
+      "expired-codes": "{count} codes désactivés",
+      "invited-users": "Utilisateurs invités",
+      "name": "Invitations",
+      "nobody-invited": "Personne invité pour le moment."
     },
     "languages": {
       "name": "Langues"

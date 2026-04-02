@@ -707,6 +707,7 @@
     "invite-link-message-group": "Je ftuar të bashkohesh me grupin “{groupName}” në {network}.",
     "invite-link-message-hidden-group": "Je ftuar të bashkohesh me një grup të fshehur në {network}.",
     "invite-link-message-personal": "Je ftuar të bashkohesh me {network}.",
+    "invited-count": "Ke ftuar tashmë {count} persona.",
     "limit-reached": "Ke arritur numrin maksimal të lidhjeve të ftesës.",
     "my-invite-links": "Lidhjet e mia të ftesës",
     "no-links": "Nuk janë krijuar ende lidhje ftese.",
@@ -1168,7 +1169,10 @@
       }
     },
     "invites": {
-      "name": "Ftesat"
+      "expired-codes": "{count} kode të çaktivizuara",
+      "invited-users": "Përdoruesit e ftuar",
+      "name": "Ftesat",
+      "nobody-invited": "Ende nuk keni ftuar askënd."
     },
     "languages": {
       "name": "Gjuhët"

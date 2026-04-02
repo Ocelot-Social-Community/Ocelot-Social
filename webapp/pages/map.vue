@@ -1,7 +1,7 @@
 <!-- Example Reference: https://codesandbox.io/s/v-mapbox-with-nuxt-lbrt6?file=/pages/index.vue -->
 <template>
-  <div>
-    <div class="ds-my-small">
+  <div class="map-page">
+    <div class="map-header">
       <h1 class="ds-heading ds-heading-h1">{{ $t('map.pageTitle') }}</h1>
       <small>
         <div>
@@ -17,8 +17,6 @@
         </div>
       </small>
     </div>
-
-    <div class="ds-my-small"></div>
     <client-only v-if="!isEmpty($env.MAPBOX_TOKEN)">
       <map-styles-buttons
         v-if="isMobile"
@@ -543,7 +541,26 @@ export default {
 @import 'mapbox-gl/dist/mapbox-gl.css';
 @import 'v-mapbox/dist/v-mapbox.css';
 
+.map-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 4rem - #{$space-x-small});
+  overflow: hidden;
+}
+
+.map-header {
+  flex-shrink: 0;
+  padding: 0 0 $space-xx-small;
+}
+
 .mgl-map-wrapper {
-  height: 70vh;
+  flex: 1;
+  min-height: 0;
+}
+
+@media (min-width: 811px) {
+  .map-page {
+    height: calc(100vh - 6rem - 8rem);
+  }
 }
 </style>

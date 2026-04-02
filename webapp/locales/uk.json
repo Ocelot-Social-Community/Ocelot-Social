@@ -707,6 +707,7 @@
     "invite-link-message-group": "Вас запрошено приєднатися до групи «{groupName}» у мережі {network}.",
     "invite-link-message-hidden-group": "Вас запрошено приєднатися до прихованої групи у мережі {network}.",
     "invite-link-message-personal": "Вас запрошено приєднатися до {network}.",
+    "invited-count": "Ви вже запросили {count} осіб.",
     "limit-reached": "Ви досягли максимальної кількості посилань для запрошення.",
     "my-invite-links": "Мої посилання для запрошення",
     "no-links": "Посилання для запрошення ще не створено.",
@@ -1168,7 +1169,10 @@
       }
     },
     "invites": {
-      "name": "Запрошення"
+      "expired-codes": "{count} деактивованих кодів",
+      "invited-users": "Запрошені користувачі",
+      "name": "Запрошення",
+      "nobody-invited": "Ще нікого не запрошено."
     },
     "languages": {
       "name": "Мови"

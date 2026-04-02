@@ -103,48 +103,33 @@ describe('notifications.vue', () => {
     })
 
     it('clicking on submit keeps set values and shows success message', async () => {
-      mocks.$apollo.mutate = jest.fn().mockResolvedValue({
-        data: {
-          UpdateUser: {
-            emailNotificationSettings: [
-              {
-                type: 'post',
-                settings: [
-                  {
-                    name: 'commentOnObservedPost',
-                    value: false,
-                  },
-                  {
-                    name: 'mention',
-                    value: false,
-                  },
-                ],
-              },
-              {
-                type: 'group',
-                settings: [
-                  {
-                    name: 'groupMemberJoined',
-                    value: true,
-                  },
-                  {
-                    name: 'groupMemberLeft',
-                    value: true,
-                  },
-                  {
-                    name: 'groupMemberRemoved',
-                    value: false,
-                  },
-                  {
-                    name: 'groupMemberRoleChanged',
-                    value: true,
-                  },
-                ],
-              },
-            ],
-          },
+      const updateData = {
+        UpdateUser: {
+          emailNotificationSettings: [
+            {
+              type: 'post',
+              settings: [
+                { name: 'commentOnObservedPost', value: false },
+                { name: 'mention', value: false },
+              ],
+            },
+            {
+              type: 'group',
+              settings: [
+                { name: 'groupMemberJoined', value: true },
+                { name: 'groupMemberLeft', value: true },
+                { name: 'groupMemberRemoved', value: false },
+                { name: 'groupMemberRoleChanged', value: true },
+              ],
+            },
+          ],
         },
+      }
+      mocks.$apollo.mutate = jest.fn().mockImplementation(({ update }) => {
+        if (update) update(null, { data: updateData })
+        return Promise.resolve({ data: updateData })
       })
+      store.commit = jest.fn()
 
       // Change some value to enable save button
       const checkbox = screen.getAllByRole('checkbox')[0]

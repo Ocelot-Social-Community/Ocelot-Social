@@ -115,5 +115,14 @@ describe('Invitation.vue', () => {
       expect(wrapper.emitted()['open-delete-modal']).toBeTruthy()
       expect(wrapper.emitted()['open-delete-modal'][0][0]).toHaveProperty('buttons')
     })
+
+    it('confirm callback emits invalidate-invite-code', async () => {
+      const deleteButton = screen.getByLabelText('invite-codes.invalidate')
+      await fireEvent.click(deleteButton)
+      const modalData = wrapper.emitted()['open-delete-modal'][0][0]
+      modalData.buttons.confirm.callback()
+      expect(wrapper.emitted()['invalidate-invite-code']).toBeTruthy()
+      expect(wrapper.emitted()['invalidate-invite-code'][0][0]).toBe('test-invite-code')
+    })
   })
 })

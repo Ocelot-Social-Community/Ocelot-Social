@@ -417,9 +417,15 @@ export const currentUserQuery = gql`
       ...user
       inviteCodes {
         code
+        createdAt
         isValid
         redeemedBy {
           id
+          name
+          slug
+          avatar {
+            ...imageUrls
+          }
         }
         comment
         redeemedByCount

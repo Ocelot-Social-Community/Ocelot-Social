@@ -707,6 +707,7 @@
     "invite-link-message-group": "Zostałeś/aś zaproszony/a do dołączenia do grupy “{groupName}” w sieci {network}.",
     "invite-link-message-hidden-group": "Zostałeś/aś zaproszony/a do dołączenia do ukrytej grupy w sieci {network}.",
     "invite-link-message-personal": "Zostałeś/aś zaproszony/a do dołączenia do {network}.",
+    "invited-count": "Zaprosiłeś/aś już {count} osób.",
     "limit-reached": "Osiągnąłeś/aś maksymalną liczbę linków zaproszeń.",
     "my-invite-links": "Moje linki zaproszeń",
     "no-links": "Nie utworzono jeszcze żadnych linków zaproszeń.",
@@ -1168,7 +1169,10 @@
       }
     },
     "invites": {
-      "name": "Zaproszenia"
+      "expired-codes": "{count} dezaktywowanych kodów",
+      "invited-users": "Zaproszeni użytkownicy",
+      "name": "Zaproszenia",
+      "nobody-invited": "Jeszcze nikogo nie zaproszono."
     },
     "languages": {
       "name": "Języki"

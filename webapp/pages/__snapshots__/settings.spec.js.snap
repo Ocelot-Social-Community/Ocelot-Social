@@ -2,26 +2,24 @@
 
 exports[`settings.vue given badges are disabled renders 1`] = `
 <div>
-  <div>
+  <div
+    class="settings-page"
+  >
     <div
-      class="ds-my-small"
+      class="settings-header"
     >
       <h1
         class="ds-heading ds-heading-h1"
       >
-        
+        settings.name
       </h1>
     </div>
      
     <div
-      class="ds-my-large"
-    />
-     
-    <div
-      class="ds-flex ds-flex-gap-small"
+      class="settings-layout"
     >
       <div
-        class="menu-container"
+        class="settings-menu-desktop"
       >
         <nav
           class="os-menu"
@@ -36,7 +34,9 @@ exports[`settings.vue given badges are disabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings"
                 to="/settings"
-              />
+              >
+                settings.data.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -45,7 +45,9 @@ exports[`settings.vue given badges are disabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/my-email-address"
                 to="/settings/my-email-address"
-              />
+              >
+                settings.email.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -54,7 +56,9 @@ exports[`settings.vue given badges are disabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/security"
                 to="/settings/security"
-              />
+              >
+                settings.security.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -63,7 +67,9 @@ exports[`settings.vue given badges are disabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/privacy"
                 to="/settings/privacy"
-              />
+              >
+                settings.privacy.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -72,7 +78,9 @@ exports[`settings.vue given badges are disabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/my-social-media"
                 to="/settings/my-social-media"
-              />
+              >
+                settings.social-media.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -81,7 +89,9 @@ exports[`settings.vue given badges are disabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/muted-users"
                 to="/settings/muted-users"
-              />
+              >
+                settings.muted-users.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -90,7 +100,9 @@ exports[`settings.vue given badges are disabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/blocked-users"
                 to="/settings/blocked-users"
-              />
+              >
+                settings.blocked-users.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -99,7 +111,9 @@ exports[`settings.vue given badges are disabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/embeds"
                 to="/settings/embeds"
-              />
+              >
+                settings.embeds.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -108,7 +122,9 @@ exports[`settings.vue given badges are disabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/notifications"
                 to="/settings/notifications"
-              />
+              >
+                settings.notifications.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -117,7 +133,9 @@ exports[`settings.vue given badges are disabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/data-download"
                 to="/settings/data-download"
-              />
+              >
+                settings.download.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -126,10 +144,99 @@ exports[`settings.vue given badges are disabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/delete-account"
                 to="/settings/delete-account"
-              />
+              >
+                settings.deleteUserAccount.name
+              </a>
             </li>
           </ul>
         </nav>
+      </div>
+       
+      <div
+        class="settings-menu-mobile"
+      >
+        <select
+          aria-label="settings.name"
+          class="settings-select"
+        >
+          <option
+            value="/settings"
+          >
+            
+          settings.data.name
+        
+          </option>
+          <option
+            value="/settings/my-email-address"
+          >
+            
+          settings.email.name
+        
+          </option>
+          <option
+            value="/settings/security"
+          >
+            
+          settings.security.name
+        
+          </option>
+          <option
+            value="/settings/privacy"
+          >
+            
+          settings.privacy.name
+        
+          </option>
+          <option
+            value="/settings/my-social-media"
+          >
+            
+          settings.social-media.name
+        
+          </option>
+          <option
+            value="/settings/muted-users"
+          >
+            
+          settings.muted-users.name
+        
+          </option>
+          <option
+            value="/settings/blocked-users"
+          >
+            
+          settings.blocked-users.name
+        
+          </option>
+          <option
+            value="/settings/embeds"
+          >
+            
+          settings.embeds.name
+        
+          </option>
+          <option
+            value="/settings/notifications"
+          >
+            
+          settings.notifications.name
+        
+          </option>
+          <option
+            value="/settings/data-download"
+          >
+            
+          settings.download.name
+        
+          </option>
+          <option
+            value="/settings/delete-account"
+          >
+            
+          settings.deleteUserAccount.name
+        
+          </option>
+        </select>
       </div>
        
       <div
@@ -150,26 +257,24 @@ exports[`settings.vue given badges are disabled renders 1`] = `
 
 exports[`settings.vue given badges are enabled renders 1`] = `
 <div>
-  <div>
+  <div
+    class="settings-page"
+  >
     <div
-      class="ds-my-small"
+      class="settings-header"
     >
       <h1
         class="ds-heading ds-heading-h1"
       >
-        
+        settings.name
       </h1>
     </div>
      
     <div
-      class="ds-my-large"
-    />
-     
-    <div
-      class="ds-flex ds-flex-gap-small"
+      class="settings-layout"
     >
       <div
-        class="menu-container"
+        class="settings-menu-desktop"
       >
         <nav
           class="os-menu"
@@ -184,7 +289,9 @@ exports[`settings.vue given badges are enabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings"
                 to="/settings"
-              />
+              >
+                settings.data.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -193,7 +300,9 @@ exports[`settings.vue given badges are enabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/my-email-address"
                 to="/settings/my-email-address"
-              />
+              >
+                settings.email.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -202,7 +311,9 @@ exports[`settings.vue given badges are enabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/badges"
                 to="/settings/badges"
-              />
+              >
+                settings.badges.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -211,7 +322,9 @@ exports[`settings.vue given badges are enabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/security"
                 to="/settings/security"
-              />
+              >
+                settings.security.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -220,7 +333,9 @@ exports[`settings.vue given badges are enabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/privacy"
                 to="/settings/privacy"
-              />
+              >
+                settings.privacy.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -229,7 +344,9 @@ exports[`settings.vue given badges are enabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/my-social-media"
                 to="/settings/my-social-media"
-              />
+              >
+                settings.social-media.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -238,7 +355,9 @@ exports[`settings.vue given badges are enabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/muted-users"
                 to="/settings/muted-users"
-              />
+              >
+                settings.muted-users.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -247,7 +366,9 @@ exports[`settings.vue given badges are enabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/blocked-users"
                 to="/settings/blocked-users"
-              />
+              >
+                settings.blocked-users.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -256,7 +377,9 @@ exports[`settings.vue given badges are enabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/embeds"
                 to="/settings/embeds"
-              />
+              >
+                settings.embeds.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -265,7 +388,9 @@ exports[`settings.vue given badges are enabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/notifications"
                 to="/settings/notifications"
-              />
+              >
+                settings.notifications.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -274,7 +399,9 @@ exports[`settings.vue given badges are enabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/data-download"
                 to="/settings/data-download"
-              />
+              >
+                settings.download.name
+              </a>
             </li>
             <li
               class="os-menu-item os-menu-item-level-0"
@@ -283,10 +410,106 @@ exports[`settings.vue given badges are enabled renders 1`] = `
                 class="os-menu-item-link"
                 href="/settings/delete-account"
                 to="/settings/delete-account"
-              />
+              >
+                settings.deleteUserAccount.name
+              </a>
             </li>
           </ul>
         </nav>
+      </div>
+       
+      <div
+        class="settings-menu-mobile"
+      >
+        <select
+          aria-label="settings.name"
+          class="settings-select"
+        >
+          <option
+            value="/settings"
+          >
+            
+          settings.data.name
+        
+          </option>
+          <option
+            value="/settings/my-email-address"
+          >
+            
+          settings.email.name
+        
+          </option>
+          <option
+            value="/settings/badges"
+          >
+            
+          settings.badges.name
+        
+          </option>
+          <option
+            value="/settings/security"
+          >
+            
+          settings.security.name
+        
+          </option>
+          <option
+            value="/settings/privacy"
+          >
+            
+          settings.privacy.name
+        
+          </option>
+          <option
+            value="/settings/my-social-media"
+          >
+            
+          settings.social-media.name
+        
+          </option>
+          <option
+            value="/settings/muted-users"
+          >
+            
+          settings.muted-users.name
+        
+          </option>
+          <option
+            value="/settings/blocked-users"
+          >
+            
+          settings.blocked-users.name
+        
+          </option>
+          <option
+            value="/settings/embeds"
+          >
+            
+          settings.embeds.name
+        
+          </option>
+          <option
+            value="/settings/notifications"
+          >
+            
+          settings.notifications.name
+        
+          </option>
+          <option
+            value="/settings/data-download"
+          >
+            
+          settings.download.name
+        
+          </option>
+          <option
+            value="/settings/delete-account"
+          >
+            
+          settings.deleteUserAccount.name
+        
+          </option>
+        </select>
       </div>
        
       <div

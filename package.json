@@ -10,7 +10,7 @@
   },
   "cypress-cucumber-preprocessor": {
     "stepDefinitions": [
-      "cypress/support/step_definitions/[filepart]/**/*.js",
+      "cypress/support/step_definitions/[filepath]/**/*.js",
       "cypress/support/step_definitions/common/**/*.js"
     ],
     "json": {

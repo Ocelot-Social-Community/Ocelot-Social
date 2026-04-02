@@ -624,6 +624,11 @@ export default {
   margin: auto;
   margin-top: -60px;
 }
+@media (max-width: 810px) {
+  .profile-layout {
+    padding-top: $space-large;
+  }
+}
 .badge-edit-link {
   transition: all 0.2s ease-out;
   &:hover {

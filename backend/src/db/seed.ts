@@ -830,15 +830,103 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
     // eslint-disable-next-line no-console
     console.log('seed', 'invitecodes')
+
+    // Peter invited the core users: Jenny, Bob, Huey
     await Factory.build(
       'inviteCode',
-      {
-        code: 'ABCDEF',
-      },
-      {
-        generatedBy: jennyRostock,
-      },
+      { code: 'PETER1', comment: 'For Jenny' },
+      { generatedBy: peterLustig },
     )
+    await Factory.build(
+      'inviteCode',
+      { code: 'PETER2', comment: 'For Bob' },
+      { generatedBy: peterLustig },
+    )
+    await Factory.build(
+      'inviteCode',
+      { code: 'PETER3', comment: 'For Huey' },
+      { generatedBy: peterLustig },
+    )
+
+    // Jenny invited Dewey, Louie, Dagobert
+    await Factory.build(
+      'inviteCode',
+      { code: 'JENNY1', comment: 'For Dewey' },
+      { generatedBy: jennyRostock },
+    )
+    await Factory.build(
+      'inviteCode',
+      { code: 'JENNY2', comment: 'For Louie' },
+      { generatedBy: jennyRostock },
+    )
+    await Factory.build(
+      'inviteCode',
+      { code: 'JENNY3', comment: 'For Dagobert' },
+      { generatedBy: jennyRostock },
+    )
+    // Jenny's shared code (used by additional users)
+    await Factory.build(
+      'inviteCode',
+      { code: 'ABCDEF', comment: 'Share link' },
+      { generatedBy: jennyRostock },
+    )
+    // Jenny's unused code (still active)
+    await Factory.build('inviteCode', { code: 'JNEW01' }, { generatedBy: jennyRostock })
+    // Jenny's invalidated code (was used once, then deactivated)
+    await Factory.build(
+      'inviteCode',
+      { code: 'JENNY0', comment: 'Old link', expiresAt: new Date().toISOString() },
+      { generatedBy: jennyRostock },
+    )
+    // Jenny total: JENNY1, JENNY2, JENNY3, ABCDEF, JNEW01 (5 active) + JENNY0 (1 expired) = 6 codes
+
+    // Create REDEEMED and INVITED relationships via Cypher
+    const inviteSession = database.driver.session()
+    try {
+      await inviteSession.writeTransaction((txc) =>
+        txc.run(`
+          // Peter's invitations
+          MATCH (jenny:User {id: 'u3'}), (code1:InviteCode {code: 'PETER1'}), (peter:User {id: 'u1'})
+          MERGE (jenny)-[:REDEEMED {createdAt: toString(datetime())}]->(code1)
+          MERGE (peter)-[:INVITED {createdAt: toString(datetime())}]->(jenny)
+          MERGE (jenny)-[:FOLLOWS {createdAt: toString(datetime())}]->(peter)
+          MERGE (peter)-[:FOLLOWS {createdAt: toString(datetime())}]->(jenny)
+          WITH 1 AS dummy
+          MATCH (bob:User {id: 'u2'}), (code2:InviteCode {code: 'PETER2'}), (peter:User {id: 'u1'})
+          MERGE (bob)-[:REDEEMED {createdAt: toString(datetime())}]->(code2)
+          MERGE (peter)-[:INVITED {createdAt: toString(datetime())}]->(bob)
+          MERGE (bob)-[:FOLLOWS {createdAt: toString(datetime())}]->(peter)
+          MERGE (peter)-[:FOLLOWS {createdAt: toString(datetime())}]->(bob)
+          WITH 1 AS dummy
+          MATCH (huey:User {id: 'u4'}), (code3:InviteCode {code: 'PETER3'}), (peter:User {id: 'u1'})
+          MERGE (huey)-[:REDEEMED {createdAt: toString(datetime())}]->(code3)
+          MERGE (peter)-[:INVITED {createdAt: toString(datetime())}]->(huey)
+          MERGE (huey)-[:FOLLOWS {createdAt: toString(datetime())}]->(peter)
+          MERGE (peter)-[:FOLLOWS {createdAt: toString(datetime())}]->(huey)
+          WITH 1 AS dummy
+          // Jenny's invitations
+          MATCH (dewey:User {id: 'u5'}), (code4:InviteCode {code: 'JENNY1'}), (jenny:User {id: 'u3'})
+          MERGE (dewey)-[:REDEEMED {createdAt: toString(datetime())}]->(code4)
+          MERGE (jenny)-[:INVITED {createdAt: toString(datetime())}]->(dewey)
+          MERGE (dewey)-[:FOLLOWS {createdAt: toString(datetime())}]->(jenny)
+          MERGE (jenny)-[:FOLLOWS {createdAt: toString(datetime())}]->(dewey)
+          WITH 1 AS dummy
+          MATCH (louie:User {id: 'u6'}), (code5:InviteCode {code: 'JENNY2'}), (jenny:User {id: 'u3'})
+          MERGE (louie)-[:REDEEMED {createdAt: toString(datetime())}]->(code5)
+          MERGE (jenny)-[:INVITED {createdAt: toString(datetime())}]->(louie)
+          MERGE (louie)-[:FOLLOWS {createdAt: toString(datetime())}]->(jenny)
+          MERGE (jenny)-[:FOLLOWS {createdAt: toString(datetime())}]->(louie)
+          WITH 1 AS dummy
+          MATCH (dagobert:User {id: 'u7'}), (code6:InviteCode {code: 'JENNY3'}), (jenny:User {id: 'u3'})
+          MERGE (dagobert)-[:REDEEMED {createdAt: toString(datetime())}]->(code6)
+          MERGE (jenny)-[:INVITED {createdAt: toString(datetime())}]->(dagobert)
+          MERGE (dagobert)-[:FOLLOWS {createdAt: toString(datetime())}]->(jenny)
+          MERGE (jenny)-[:FOLLOWS {createdAt: toString(datetime())}]->(dagobert)
+        `),
+      )
+    } finally {
+      await inviteSession.close()
+    }
 
     authenticatedUser = await louie.toJson()
     const mention1 =
@@ -1232,6 +1320,32 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
           userId: userObj.id,
         },
       })
+    }
+
+    // Jenny's first 99 additional users all redeemed code ABCDEF
+    // eslint-disable-next-line no-console
+    console.log('seed', 'invite redemptions for additional users')
+    const jennyInviteSession = database.driver.session()
+    try {
+      for (let i = 0; i < Math.min(99, additionalUsers.length); i++) {
+        // eslint-disable-next-line security/detect-object-injection
+        const userObj = await additionalUsers[i].toJson()
+        const userId = userObj.id as string
+        await jennyInviteSession.writeTransaction((txc) =>
+          txc.run(
+            `
+            MATCH (user:User {id: $userId}), (inviteCode:InviteCode {code: 'ABCDEF'}), (jenny:User {id: 'u3'})
+            MERGE (user)-[:REDEEMED {createdAt: toString(datetime())}]->(inviteCode)
+            MERGE (jenny)-[:INVITED {createdAt: toString(datetime())}]->(user)
+            MERGE (user)-[:FOLLOWS {createdAt: toString(datetime())}]->(jenny)
+            MERGE (jenny)-[:FOLLOWS {createdAt: toString(datetime())}]->(user)
+            `,
+            { userId },
+          ),
+        )
+      }
+    } finally {
+      await jennyInviteSession.close()
     }
 
     // Jenny users
