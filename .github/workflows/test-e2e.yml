@@ -249,12 +249,17 @@ jobs:
           cd cypress/
           node create-cucumber-html-report.js
 
+      - name: Full stack tests | if tests failed, compute artifact name
+        id: artifact-name
+        if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
+        run: echo "name=e2e-report-$(echo '${{ matrix.feature }}' | tr '/' '-')" >> $GITHUB_OUTPUT
+
       - name: Full stack tests | if tests failed, upload report
         id: e2e-report
         if: ${{ failure() && steps.e2e-tests.conclusion == 'failure' }}
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
-          name: e2e-report-${{ matrix.feature }}
+          name: ${{ steps.artifact-name.outputs.name }}
           path: /home/runner/work/Ocelot-Social/Ocelot-Social/cypress/reports/cucumber_html_report
 
   e2e_status:
