@@ -768,7 +768,8 @@
       "dark": "Dark",
       "outdoors": "Outdoors",
       "satellite": "Satellite",
-      "streets": "Streets"
+      "streets": "Streets",
+      "title": "Map style"
     }
   },
   "modals": {

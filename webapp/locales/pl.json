@@ -768,7 +768,8 @@
       "dark": "Ciemny",
       "outdoors": "Na zewnątrz",
       "satellite": "Satelita",
-      "streets": "Ulice"
+      "streets": "Ulice",
+      "title": "Styl mapy"
     }
   },
   "modals": {

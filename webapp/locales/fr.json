@@ -768,7 +768,8 @@
       "dark": "Sombre",
       "outdoors": "Plein air",
       "satellite": "Satellite",
-      "streets": "Rues"
+      "streets": "Rues",
+      "title": "Style de carte"
     }
   },
   "modals": {

@@ -768,7 +768,8 @@
       "dark": "Donker",
       "outdoors": "Buiten",
       "satellite": "Satelliet",
-      "streets": "Straten"
+      "streets": "Straten",
+      "title": "Kaartstijl"
     }
   },
   "modals": {

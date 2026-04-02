@@ -22,11 +22,16 @@
         <MglGeolocateControl position="top-right" />
         <MglScaleControl />
         <div class="map-legend" :class="{ 'map-legend--open': legendOpen }">
-          <button class="map-legend-toggle" @click="legendOpen = !legendOpen">
+          <button
+            class="map-legend-toggle"
+            :aria-expanded="String(legendOpen)"
+            aria-controls="map-legend-content"
+            @click="legendOpen = !legendOpen"
+          >
             {{ $t('map.legend.title') }}
-            <span class="map-legend-arrow">{{ legendOpen ? '▼' : '▲' }}</span>
+            <span class="map-legend-arrow" aria-hidden="true">{{ legendOpen ? '▼' : '▲' }}</span>
           </button>
-          <div v-show="legendOpen || !isMobile" class="map-legend-content">
+          <div id="map-legend-content" v-show="legendOpen || !isMobile" class="map-legend-content" role="region" :aria-label="$t('map.legend.title')">
             <div v-for="type in markers.types" :key="type.id" class="map-legend-item">
               <img
                 :alt="$t('map.legend.' + type.id)"
@@ -245,23 +250,29 @@ export default {
           container.className = 'mapboxgl-ctrl map-style-switcher'
 
           // Icon button (layers icon as SVG)
+          const styleLabel = this.$t('map.styles.title') || 'Map style'
           const toggle = document.createElement('button')
           toggle.type = 'button'
           toggle.className = 'map-style-switcher-toggle'
-          toggle.title = this.$t('map.styles.title') || 'Map style'
+          toggle.title = styleLabel
+          toggle.setAttribute('aria-label', styleLabel)
+          toggle.setAttribute('aria-expanded', 'false')
           toggle.innerHTML =
-            '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">' +
+            '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">' +
             '<path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/>' +
             '</svg>'
           toggle.addEventListener('click', (e) => {
             e.stopPropagation()
-            popover.classList.toggle('map-style-popover--open')
+            const isOpen = popover.classList.toggle('map-style-popover--open')
+            toggle.setAttribute('aria-expanded', String(isOpen))
           })
           container.appendChild(toggle)
 
           // Popover with style options
           const popover = document.createElement('div')
           popover.className = 'map-style-popover'
+          popover.setAttribute('role', 'listbox')
+          popover.setAttribute('aria-label', styleLabel)
 
           Object.entries(this.availableStyles).forEach(([key, style]) => {
             const btn = document.createElement('button')
@@ -269,17 +280,22 @@ export default {
             btn.title = style.title
             btn.textContent = style.title
             btn.className = 'map-style-popover-btn'
+            btn.setAttribute('role', 'option')
             if (this.mapOptions.style === style.url) {
               btn.classList.add('map-style-popover-btn--active')
+              btn.setAttribute('aria-selected', 'true')
             }
             btn.addEventListener('click', (e) => {
               e.stopPropagation()
               this.setStyle(style.url)
               popover.querySelectorAll('.map-style-popover-btn').forEach((b) => {
                 b.classList.remove('map-style-popover-btn--active')
+                b.setAttribute('aria-selected', 'false')
               })
               btn.classList.add('map-style-popover-btn--active')
+              btn.setAttribute('aria-selected', 'true')
               popover.classList.remove('map-style-popover--open')
+              toggle.setAttribute('aria-expanded', 'false')
             })
             popover.appendChild(btn)
           })
@@ -288,6 +304,7 @@ export default {
           // Close popover when clicking elsewhere on the map
           this.map.getContainer().addEventListener('click', () => {
             popover.classList.remove('map-style-popover--open')
+            toggle.setAttribute('aria-expanded', 'false')
           })
 
           return container

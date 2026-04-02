@@ -768,7 +768,8 @@
       "dark": "Dunkel",
       "outdoors": "Landschaft",
       "satellite": "Satellit",
-      "streets": "Straßen"
+      "streets": "Straßen",
+      "title": "Kartenstil"
     }
   },
   "modals": {

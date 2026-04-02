@@ -768,7 +768,8 @@
       "dark": "Escuro",
       "outdoors": "Ao ar livre",
       "satellite": "Satélite",
-      "streets": "Ruas"
+      "streets": "Ruas",
+      "title": "Estilo do mapa"
     }
   },
   "modals": {
