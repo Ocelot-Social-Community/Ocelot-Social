@@ -182,7 +182,7 @@ export default {
           url: 'mapbox://styles/mapbox/dark-v10?optimize=true',
         },
       }
-      Object.keys(availableStyles).map((key) => {
+      Object.keys(availableStyles).forEach((key) => {
         availableStyles[key].title = this.$t('map.styles.' + key)
       })
       return availableStyles
