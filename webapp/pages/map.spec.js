@@ -457,14 +457,20 @@ describe('map', () => {
           expect(popover.classList.contains('map-style-popover--open')).toBe(false)
         })
 
-        it('clicking style button sets style and closes popover', () => {
+        it('clicking style button sets correct style and closes popover', () => {
           const buttons = container.querySelectorAll('.map-style-popover-btn')
           const popover = container.querySelector('.map-style-popover')
           popover.classList.add('map-style-popover--open')
+          // Click "streets" button (index 1)
           buttons[1].click()
-          expect(mapSetStyleMock).toHaveBeenCalled()
+          expect(mapSetStyleMock).toHaveBeenCalledWith(
+            wrapper.vm.availableStyles.streets.url,
+          )
+          expect(wrapper.vm.activeStyle).toBe(wrapper.vm.availableStyles.streets.url)
           expect(popover.classList.contains('map-style-popover--open')).toBe(false)
           expect(buttons[1].classList.contains('map-style-popover-btn--active')).toBe(true)
+          // Previous active button should no longer be active
+          expect(buttons[0].classList.contains('map-style-popover-btn--active')).toBe(false)
         })
       })
 
