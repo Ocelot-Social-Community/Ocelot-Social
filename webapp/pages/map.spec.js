@@ -464,9 +464,7 @@ describe('map', () => {
           popover.classList.add('map-style-popover--open')
           // Click "streets" button (index 1)
           buttons[1].click()
-          expect(mapSetStyleMock).toHaveBeenCalledWith(
-            wrapper.vm.availableStyles.streets.url,
-          )
+          expect(mapSetStyleMock).toHaveBeenCalledWith(wrapper.vm.availableStyles.streets.url)
           expect(wrapper.vm.activeStyle).toBe(wrapper.vm.availableStyles.streets.url)
           expect(popover.classList.contains('map-style-popover--open')).toBe(false)
           expect(buttons[1].classList.contains('map-style-popover-btn--active')).toBe(true)

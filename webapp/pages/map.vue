@@ -31,7 +31,13 @@
             {{ $t('map.legend.title') }}
             <span class="map-legend-arrow" aria-hidden="true">{{ legendOpen ? '▼' : '▲' }}</span>
           </button>
-          <div id="map-legend-content" v-show="legendOpen || !isMobile" class="map-legend-content" role="region" :aria-label="$t('map.legend.title')">
+          <div
+            id="map-legend-content"
+            v-show="legendOpen || !isMobile"
+            class="map-legend-content"
+            role="region"
+            :aria-label="$t('map.legend.title')"
+          >
             <div v-for="type in markers.types" :key="type.id" class="map-legend-item">
               <img
                 :alt="$t('map.legend.' + type.id)"
