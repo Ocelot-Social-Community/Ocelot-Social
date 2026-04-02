@@ -3,19 +3,6 @@
   <div class="map-page">
     <div class="map-header">
       <h1 class="ds-heading ds-heading-h1">{{ $t('map.pageTitle') }}</h1>
-      <small>
-        <div>
-          <span v-for="type in markers.types" :key="type.id">
-            <img
-              :alt="$t('map.legend.' + type.id)"
-              :src="'/img/mapbox/marker-icons/' + type.icon.legendName"
-              width="15"
-            />
-            {{ $t('map.legend.' + type.id) }}
-            &nbsp;&nbsp;
-          </span>
-        </div>
-      </small>
     </div>
     <client-only v-if="!isEmpty($env.MAPBOX_TOKEN)">
       <map-styles-buttons
@@ -49,6 +36,22 @@
         <MglNavigationControl position="top-right" />
         <MglGeolocateControl position="top-right" />
         <MglScaleControl />
+        <div class="map-legend" :class="{ 'map-legend--open': legendOpen }">
+          <button class="map-legend-toggle" @click="legendOpen = !legendOpen">
+            {{ $t('map.legend.title') }}
+            <span class="map-legend-arrow">{{ legendOpen ? '▼' : '▲' }}</span>
+          </button>
+          <div v-show="legendOpen || !isMobile" class="map-legend-content">
+            <div v-for="type in markers.types" :key="type.id" class="map-legend-item">
+              <img
+                :alt="$t('map.legend.' + type.id)"
+                :src="'/img/mapbox/marker-icons/' + type.icon.legendName"
+                width="15"
+              />
+              {{ $t('map.legend.' + type.id) }}
+            </div>
+          </div>
+        </div>
       </mgl-map>
     </client-only>
     <empty v-else icon="alert" :message="$t('map.alertMessage')" />
@@ -87,6 +90,7 @@ export default {
     return {
       isEmpty,
       mapboxgl,
+      legendOpen: false,
       activeStyle: null,
       defaultCenter: [10.452764, 51.165707], // center of Germany: https://www.gpskoordinaten.de/karte/land/DE
       currentUserLocation: null,
@@ -605,6 +609,61 @@ export default {
 .mapboxgl-popup-close-button {
   font-size: 1.2rem;
   padding: 2px 6px;
+}
+
+.map-legend {
+  position: absolute;
+  bottom: 30px;
+  left: 10px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(4px);
+  border-radius: 4px;
+  z-index: 1;
+  font-size: 0.8rem;
+  color: $color-neutral-10;
+}
+
+.map-legend-toggle {
+  display: none;
+  width: 100%;
+  padding: 4px 8px;
+  border: none;
+  background: rgba(0, 0, 0, 0.45);
+  color: $color-neutral-100;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  text-align: left;
+
+  &:hover,
+  &:active {
+    background: rgba(0, 0, 0, 0.55);
+  }
+}
+
+.map-legend-arrow {
+  float: right;
+  font-size: 0.7rem;
+}
+
+.map-legend-content {
+  padding: 4px 8px;
+}
+
+.map-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+@media (max-width: 639px) {
+  .map-legend-toggle {
+    display: block;
+  }
+
+  .map-legend--open .map-legend-content {
+    border-top: 1px solid #eee;
+  }
 }
 
 @media (min-width: 811px) {

@@ -754,6 +754,7 @@
       "event": "Evento",
       "group": "Gruppo",
       "theUser": "La mia posizione",
+      "title": "Legenda",
       "user": "Utente"
     },
     "markerTypes": {
