@@ -41,8 +41,6 @@ reviews:
     - "!**/*.min.css"
     - "!**/.git/**"
     - "!**/storybook-static/**"
-    # TODO: Temporär - nach Merge des Cypress-Refactoring-PRs entfernen
-    - "!cypress/support/step_definitions/**"
 
   # Instruktionen für spezifische Pfade
   path_instructions:
