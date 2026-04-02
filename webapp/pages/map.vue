@@ -127,11 +127,17 @@ export default {
     }
   },
   async mounted() {
+    this.updateMapPosition()
+    window.addEventListener('resize', this.updateMapPosition)
+
     this.currentUserLocation = await this.getUserLocation(this.currentUser.id)
     this.currentUserCoordinates = this.currentUserLocation
       ? this.getCoordinates(this.currentUserLocation)
       : null
     this.addMarkersOnCheckPrepared()
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.updateMapPosition)
   },
   computed: {
     ...mapGetters({
@@ -195,6 +201,19 @@ export default {
     },
   },
   methods: {
+    updateMapPosition() {
+      const navbar = document.getElementById('navbar')
+      const footer = document.getElementById('footer')
+      const el = this.$el
+      if (navbar) {
+        el.style.top = navbar.offsetHeight + 'px'
+      }
+      if (footer && window.getComputedStyle(footer).display !== 'none') {
+        el.style.bottom = footer.offsetHeight + 'px'
+      } else {
+        el.style.bottom = '0px'
+      }
+    },
     onMapLoad({ map }) {
       this.map = map
 
@@ -628,10 +647,15 @@ export default {
 @import 'v-mapbox/dist/v-mapbox.css';
 
 .map-page {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 4rem - #{$space-x-small});
   overflow: hidden;
+  z-index: 1;
 }
 
 .mgl-map-wrapper {
@@ -764,9 +788,4 @@ export default {
   }
 }
 
-@media (min-width: 811px) {
-  .map-page {
-    height: calc(100vh - 6rem - 8rem);
-  }
-}
 </style>
