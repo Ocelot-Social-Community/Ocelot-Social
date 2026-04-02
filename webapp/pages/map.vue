@@ -300,6 +300,7 @@ export default {
       this.markers.popup = new mapboxgl.Popup({
         closeButton: true,
         closeOnClick: true,
+        maxWidth: '300px',
       })
 
       // show popup for given features at coordinates
@@ -322,7 +323,11 @@ export default {
         }
 
         // Build description for all features at this location
-        const description = features
+        const locationName = features[0].properties.locationName
+        const locationHeader = locationName
+          ? `<div class="map-popup-header">${locationName}</div>`
+          : ''
+        const items = features
           .map((feature) => {
             const markerTypeLabel = this.$t(`map.markerTypes.${feature.properties.type}`)
             const markerProfile = {
@@ -363,6 +368,7 @@ export default {
             return html
           })
           .join('<hr>')
+        const description = locationHeader + `<div class="map-popup-body">${items}</div>`
 
         this.markers.popup.setLngLat(coordinates).setHTML(description).addTo(this.map)
       }
@@ -451,6 +457,7 @@ export default {
                 id: user.id,
                 slug: user.slug,
                 name: user.name,
+                locationName: user.location.name,
                 description: user.about ? user.about : undefined,
               },
               geometry: {
@@ -471,6 +478,7 @@ export default {
               id: this.currentUser.id,
               slug: this.currentUser.slug,
               name: this.currentUser.name,
+              locationName: this.currentUserLocation.name,
               description: this.currentUser.about ? this.currentUser.about : undefined,
             },
             geometry: {
@@ -490,6 +498,7 @@ export default {
               id: group.id,
               slug: group.slug,
               name: group.name,
+              locationName: group.location.name,
               description: group.about ? group.about : undefined,
             },
             geometry: {
@@ -509,6 +518,7 @@ export default {
               id: post.id,
               slug: post.slug,
               name: post.title,
+              locationName: post.eventLocation.name,
               description: this.$filters.removeHtml(post.content),
             },
             geometry: {
@@ -665,9 +675,36 @@ export default {
   min-height: 0;
 }
 
+.mgl-map-wrapper {
+  overflow: hidden;
+}
+
+.mapboxgl-popup-content {
+  display: flex;
+  flex-direction: column;
+  max-height: 40vh;
+  overflow: hidden;
+  padding: 10px;
+}
+
 .mapboxgl-popup-close-button {
   font-size: 1.2rem;
   padding: 2px 6px;
+  z-index: 1;
+}
+
+.map-popup-header {
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-bottom: 4px;
+  padding-right: 16px;
+  flex-shrink: 0;
+}
+
+.map-popup-body {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 // Smaller geocoder on mobile (expanded)
