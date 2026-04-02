@@ -233,87 +233,105 @@ export default {
         }),
       )
 
-      // example for popup: https://docs.mapbox.com/mapbox-gl-js/example/popup-on-hover/
       // create a popup, but don't add it to the map yet
       this.markers.popup = new mapboxgl.Popup({
-        closeButton: false,
+        closeButton: true,
         closeOnClick: true,
       })
 
-      this.map.on('mouseenter', 'markers', (e) => {
-        // if (e.features[0].properties.type !== 'theUser') {}
+      // show popup for given features at coordinates
+      const showPopup = (features, lngLat) => {
         if (this.popupOnLeaveTimeoutId) {
           clearTimeout(this.popupOnLeaveTimeoutId)
           this.popupOnLeaveTimeoutId = null
         }
         if (this.markers.popup.isOpen()) {
-          this.map.getCanvas().style.cursor = ''
           this.markers.popup.remove()
         }
 
-        // Change the cursor style as a UI indicator.
         this.map.getCanvas().style.cursor = 'pointer'
 
-        // Copy coordinates array.
-        const coordinates = e.features[0].geometry.coordinates.slice()
-        const markerTypeLabel = this.$t(`map.markerTypes.${e.features[0].properties.type}`)
-        const markerProfile = {
-          theUser: {
-            linkTitle: '@' + e.features[0].properties.slug,
-            link: `/profile/${e.features[0].properties.id}/${e.features[0].properties.slug}`,
-          },
-          user: {
-            linkTitle: '@' + e.features[0].properties.slug,
-            link: `/profile/${e.features[0].properties.id}/${e.features[0].properties.slug}`,
-          },
-          group: {
-            linkTitle: '&' + e.features[0].properties.slug,
-            link: `/groups/${e.features[0].properties.id}/${e.features[0].properties.slug}`,
-          },
-          event: {
-            linkTitle: e.features[0].properties.slug,
-            link: `/post/${e.features[0].properties.id}/${e.features[0].properties.slug}`,
-          },
-        }
-        const markerProfileLinkTitle = markerProfile[e.features[0].properties.type].linkTitle
-        const markerProfileLink = markerProfile[e.features[0].properties.type].link
-        let description = `
-          <div>
-            <div>
-              <b>${e.features[0].properties.name}</b> <i>(${markerTypeLabel})</i>
-            </div>
-            <div>
-              <a href="${markerProfileLink}" target="_blank">${markerProfileLinkTitle}</a>
-            </div>
-          </div>
-           `
-        description +=
-          e.features[0].properties.description && e.features[0].properties.description.length > 0
-            ? `
-            <hr>
-            <div>
-              ${e.features[0].properties.description}
-            </div>`
-            : ''
+        const coordinates = features[0].geometry.coordinates.slice()
 
-        // Ensure that if the map is zoomed out such that multiple
-        // copies of the feature are visible, the popup appears
-        // over the copy being pointed to.
-        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
+        // Ensure popup appears over the correct copy when map is zoomed out
+        while (Math.abs(lngLat.lng - coordinates[0]) > 180) {
+          coordinates[0] += lngLat.lng > coordinates[0] ? 360 : -360
         }
 
-        // Populate the popup and set its coordinates
-        // based on the feature found.
+        // Build description for all features at this location
+        const description = features
+          .map((feature) => {
+            const markerTypeLabel = this.$t(`map.markerTypes.${feature.properties.type}`)
+            const markerProfile = {
+              theUser: {
+                linkTitle: '@' + feature.properties.slug,
+                link: `/profile/${feature.properties.id}/${feature.properties.slug}`,
+              },
+              user: {
+                linkTitle: '@' + feature.properties.slug,
+                link: `/profile/${feature.properties.id}/${feature.properties.slug}`,
+              },
+              group: {
+                linkTitle: '&' + feature.properties.slug,
+                link: `/groups/${feature.properties.id}/${feature.properties.slug}`,
+              },
+              event: {
+                linkTitle: feature.properties.slug,
+                link: `/post/${feature.properties.id}/${feature.properties.slug}`,
+              },
+            }
+            const markerProfileLinkTitle = markerProfile[feature.properties.type].linkTitle
+            const markerProfileLink = markerProfile[feature.properties.type].link
+            let html = `
+              <div>
+                <div>
+                  <b>${feature.properties.name}</b> <i>(${markerTypeLabel})</i>
+                </div>
+                <div>
+                  <a href="${markerProfileLink}" target="_blank">${markerProfileLinkTitle}</a>
+                </div>
+              </div>`
+            if (feature.properties.description && feature.properties.description.length > 0) {
+              html += `
+              <div style="margin-top: 4px;">
+                ${feature.properties.description}
+              </div>`
+            }
+            return html
+          })
+          .join('<hr>')
+
         this.markers.popup.setLngLat(coordinates).setHTML(description).addTo(this.map)
+      }
+
+      // Query all features at the clicked/hovered point
+      const getFeaturesAtPoint = (point) => {
+        return this.map.queryRenderedFeatures(point, { layers: ['markers'] })
+      }
+
+      // Desktop: show popup on hover
+      this.map.on('mouseenter', 'markers', (e) => {
+        const features = getFeaturesAtPoint(e.point)
+        if (features.length > 0) {
+          showPopup(features, e.lngLat)
+        }
       })
 
-      this.map.on('mouseleave', 'markers', (e) => {
+      this.map.on('mouseleave', 'markers', () => {
         if (this.markers.popup.isOpen()) {
           this.popupOnLeaveTimeoutId = setTimeout(() => {
             this.map.getCanvas().style.cursor = ''
             this.markers.popup.remove()
           }, 3000)
+        }
+      })
+
+      // Mobile: show popup on click/tap
+      this.map.on('click', 'markers', (e) => {
+        const features = getFeaturesAtPoint(e.point)
+        if (features.length > 0) {
+          showPopup(features, e.lngLat)
+          e.originalEvent.stopPropagation()
         }
       })
 
@@ -556,6 +574,11 @@ export default {
 .mgl-map-wrapper {
   flex: 1;
   min-height: 0;
+}
+
+.mapboxgl-popup-close-button {
+  font-size: 1.2rem;
+  padding: 2px 6px;
 }
 
 @media (min-width: 811px) {
