@@ -49,7 +49,7 @@ const defaultMocks = {
     mutate: jest.fn().mockResolvedValue({}),
   },
   $store: {
-    getters: { 'auth/user': { inviteCodes: sampleInviteCodes } },
+    getters: { 'auth/user': {} },
     commit: jest.fn(),
   },
 }
