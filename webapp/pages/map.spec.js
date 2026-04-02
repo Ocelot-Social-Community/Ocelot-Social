@@ -736,11 +736,10 @@ describe('map', () => {
         })
 
         it('calls language to set label layers', () => {
-          expect(mapSetLayoutPropertyMock).toHaveBeenCalledWith(
-            'some-label',
-            'text-field',
-            ['get', 'name'],
-          )
+          expect(mapSetLayoutPropertyMock).toHaveBeenCalledWith('some-label', 'text-field', [
+            'get',
+            'name',
+          ])
         })
 
         it('does not set layout on non-label layers', () => {
@@ -836,20 +835,14 @@ describe('map', () => {
         describe('coordinate nudging for overlapping markers', () => {
           it('nudges markers of different types at same coordinates', () => {
             // User Bob and Group are both at Hamburg (10.0, 53.55)
-            const bobFeature = wrapper.vm.markers.geoJSON.find(
-              (f) => f.properties.id === 'u2',
-            )
-            const groupFeature = wrapper.vm.markers.geoJSON.find(
-              (f) => f.properties.id === 'g1',
-            )
+            const bobFeature = wrapper.vm.markers.geoJSON.find((f) => f.properties.id === 'u2')
+            const groupFeature = wrapper.vm.markers.geoJSON.find((f) => f.properties.id === 'g1')
             // They should have different lng coordinates after nudging
             expect(bobFeature.geometry.coordinates[0]).not.toBe(
               groupFeature.geometry.coordinates[0],
             )
             // But same lat
-            expect(bobFeature.geometry.coordinates[1]).toBe(
-              groupFeature.geometry.coordinates[1],
-            )
+            expect(bobFeature.geometry.coordinates[1]).toBe(groupFeature.geometry.coordinates[1])
           })
 
           it('does not nudge markers of the same type', () => {

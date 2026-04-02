@@ -767,7 +767,6 @@ export default {
   }
 }
 
-
 .map-legend {
   position: absolute;
   bottom: 30px;
@@ -897,5 +896,4 @@ export default {
     background: rgba(0, 0, 0, 0.08);
   }
 }
-
 </style>
