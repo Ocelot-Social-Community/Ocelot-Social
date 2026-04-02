@@ -1,6 +1,6 @@
 import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
-import './../../commands'
-import './../../factories'
+import './../../../commands'
+import './../../../factories'
 import 'cypress-network-idle'
 
 defineStep('somebody reported the following posts:', table => {
