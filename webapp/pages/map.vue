@@ -1,16 +1,7 @@
 <!-- Example Reference: https://codesandbox.io/s/v-mapbox-with-nuxt-lbrt6?file=/pages/index.vue -->
 <template>
   <div class="map-page">
-    <div class="map-header">
-      <h1 class="ds-heading ds-heading-h1">{{ $t('map.pageTitle') }}</h1>
-    </div>
     <client-only v-if="!isEmpty($env.MAPBOX_TOKEN)">
-      <map-styles-buttons
-        v-if="isMobile"
-        :styles="styles"
-        :actualStyle="mapOptions.style"
-        :setStyle="setStyle"
-      />
       <mgl-map
         :mapbox-gl="mapboxgl"
         :access-token="mapOptions.accessToken"
@@ -26,12 +17,6 @@
         :max-pitch="60"
         @load="onMapLoad"
       >
-        <map-styles-buttons
-          v-if="!isMobile"
-          :styles="styles"
-          :actualStyle="mapOptions.style"
-          :setStyle="setStyle"
-        />
         <MglFullscreenControl />
         <MglNavigationControl position="top-right" />
         <MglGeolocateControl position="top-right" />
@@ -60,7 +45,7 @@
 
 <!-- eslint-disable vue/no-reserved-component-names -->
 <script>
-import { isEmpty, toArray } from 'lodash'
+import { isEmpty } from 'lodash'
 import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
@@ -69,7 +54,6 @@ import { profileUserQuery } from '~/graphql/User'
 import { mapQuery } from '~/graphql/MapQuery'
 import mobile from '~/mixins/mobile'
 import Empty from '~/components/Empty/Empty'
-import MapStylesButtons from '~/components/Map/MapStylesButtons'
 
 const maxMobileWidth = 639 // on this width and smaller the mapbox 'MapboxGeocoder' search gets bigger
 
@@ -78,7 +62,6 @@ export default {
   mixins: [mobile(maxMobileWidth)],
   components: {
     Empty,
-    MapStylesButtons,
   },
   head() {
     return {
@@ -164,9 +147,6 @@ export default {
         this.posts
       )
     },
-    styles() {
-      return toArray(this.availableStyles)
-    },
     availableStyles() {
       // https://docs.mapbox.com/api/maps/styles/
       const availableStyles = {
@@ -236,6 +216,64 @@ export default {
           marker: false,
         }),
       )
+
+      // add style switcher control
+      const styleSwitcher = {
+        onAdd: () => {
+          const container = document.createElement('div')
+          container.className = 'mapboxgl-ctrl map-style-switcher'
+
+          // Icon button (layers icon as SVG)
+          const toggle = document.createElement('button')
+          toggle.type = 'button'
+          toggle.className = 'map-style-switcher-toggle'
+          toggle.title = this.$t('map.styles.title') || 'Map style'
+          toggle.innerHTML =
+            '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">' +
+            '<path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/>' +
+            '</svg>'
+          toggle.addEventListener('click', (e) => {
+            e.stopPropagation()
+            popover.classList.toggle('map-style-popover--open')
+          })
+          container.appendChild(toggle)
+
+          // Popover with style options
+          const popover = document.createElement('div')
+          popover.className = 'map-style-popover'
+
+          Object.entries(this.availableStyles).forEach(([key, style]) => {
+            const btn = document.createElement('button')
+            btn.type = 'button'
+            btn.title = style.title
+            btn.textContent = style.title
+            btn.className = 'map-style-popover-btn'
+            if (this.mapOptions.style === style.url) {
+              btn.classList.add('map-style-popover-btn--active')
+            }
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation()
+              this.setStyle(style.url)
+              popover.querySelectorAll('.map-style-popover-btn').forEach((b) => {
+                b.classList.remove('map-style-popover-btn--active')
+              })
+              btn.classList.add('map-style-popover-btn--active')
+              popover.classList.remove('map-style-popover--open')
+            })
+            popover.appendChild(btn)
+          })
+          container.appendChild(popover)
+
+          // Close popover when clicking elsewhere on the map
+          this.map.getContainer().addEventListener('click', () => {
+            popover.classList.remove('map-style-popover--open')
+          })
+
+          return container
+        },
+        onRemove: () => {},
+      }
+      this.map.addControl(styleSwitcher, 'top-right')
 
       // create a popup, but don't add it to the map yet
       this.markers.popup = new mapboxgl.Popup({
@@ -596,11 +634,6 @@ export default {
   overflow: hidden;
 }
 
-.map-header {
-  flex-shrink: 0;
-  padding: 0 0 $space-xx-small;
-}
-
 .mgl-map-wrapper {
   flex: 1;
   min-height: 0;
@@ -663,6 +696,71 @@ export default {
 
   .map-legend--open .map-legend-content {
     border-top: 1px solid #eee;
+  }
+}
+
+.map-style-switcher {
+  position: relative;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.map-style-switcher-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 29px;
+  height: 29px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #333;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+}
+
+.map-style-popover {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 100%;
+  margin-right: 6px;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+  overflow: hidden;
+
+  &--open {
+    display: block;
+  }
+}
+
+.map-style-popover-btn {
+  display: block;
+  width: 100%;
+  padding: 6px 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  text-align: left;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid #eee;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  &--active {
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0.08);
   }
 }
 
