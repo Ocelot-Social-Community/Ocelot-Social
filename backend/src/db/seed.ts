@@ -1383,7 +1383,7 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     ]
 
     // Create village location nodes (one per village, shared by all users in that village)
-    const villageLocationNodes: typeof Hamburg[] = []
+    const villageLocationNodes: (typeof Hamburg)[] = []
     for (const village of zwingenbergVillages) {
       const location = await Factory.build('location', {
         id: village.id,
