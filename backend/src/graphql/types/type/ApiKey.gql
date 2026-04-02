@@ -1,0 +1,50 @@
+type ApiKey {
+  id: ID!
+  name: String!
+  keyPrefix: String!
+  createdAt: String!
+  lastUsedAt: String
+  expiresAt: String
+  disabled: Boolean!
+  owner: User @relation(name: "HAS_API_KEY", direction: "IN")
+}
+
+type ApiKeyWithSecret {
+  apiKey: ApiKey!
+  secret: String!
+}
+
+type ApiKeyWithActivity {
+  apiKey: ApiKey!
+  owner: User!
+  postsCount: Int!
+  commentsCount: Int!
+  lastContentAt: String
+}
+
+type ApiKeyContent {
+  posts: [Post!]!
+  comments: [Comment!]!
+}
+
+enum ApiKeyOrder {
+  LAST_USED
+  LAST_CONTENT
+  CREATED_AT
+  POSTS_COUNT
+  COMMENTS_COUNT
+}
+
+type Query {
+  myApiKeys: [ApiKey!]!
+  allApiKeys(orderBy: ApiKeyOrder, first: Int, offset: Int): [ApiKeyWithActivity!]!
+  contentByApiKey(apiKeyId: ID!): ApiKeyContent!
+}
+
+type Mutation {
+  createApiKey(name: String!, expiresInDays: Int): ApiKeyWithSecret!
+  updateApiKey(id: ID!, name: String!): ApiKey!
+  revokeApiKey(id: ID!): Boolean!
+  adminRevokeApiKey(id: ID!): Boolean!
+  adminRevokeUserApiKeys(userId: ID!): Int!
+}

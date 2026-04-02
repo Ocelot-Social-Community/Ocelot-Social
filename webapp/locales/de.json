@@ -86,6 +86,44 @@
       "name": "Nutzer einladen",
       "title": "Leute einladen"
     },
+    "api-keys": {
+      "name": "API Keys",
+      "sort-by": "Sortieren nach",
+      "empty": "Keine API Keys gefunden.",
+      "never": "nie",
+      "revoked": "widerrufen",
+      "show-content": "Inhalte anzeigen",
+      "revoke-key": "Key widerrufen",
+      "revoke-all": "Alle Keys dieses Nutzers widerrufen",
+      "revoke-all-short": "Alle widerrufen",
+      "content-title": "{posts} Beiträge, {comments} Kommentare",
+      "order": {
+        "last-used": "Letzte Nutzung",
+        "last-content": "Letzter Inhalt",
+        "created": "Erstellt am",
+        "posts": "Anzahl Beiträge",
+        "comments": "Anzahl Kommentare"
+      },
+      "table": {
+        "prefix": "Key",
+        "name": "Name",
+        "user": "Nutzer",
+        "last-used": "Letzte Nutzung",
+        "posts": "Beiträge",
+        "comments": "Kommentare",
+        "actions": "Aktionen"
+      },
+      "revoke": {
+        "title": "API Key widerrufen",
+        "message": "Möchtest du den API Key \"{name}\" von {user} wirklich widerrufen?",
+        "confirm": "Widerrufen",
+        "success": "API Key wurde widerrufen"
+      },
+      "revoke-all-title": "Alle API Keys widerrufen",
+      "revoke-all-message": "Möchtest du wirklich ALLE API Keys von {user} widerrufen? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "revoke-all-confirm": "Alle widerrufen",
+      "revoke-all-success": "{count} API Keys von {user} wurden widerrufen"
+    },
     "name": "Systemverwaltung",
     "notifications": {
       "name": "Benachrichtigungen"
@@ -1175,6 +1213,44 @@
       "invited-users": "Eingeladene Nutzer",
       "name": "Einladungen",
       "nobody-invited": "Noch niemand eingeladen."
+    },
+    "api-keys": {
+      "name": "API Keys",
+      "create": {
+        "title": "Neuen API Key erstellen",
+        "name-label": "Name",
+        "expiry-label": "Gültigkeit",
+        "expiry-never": "Kein Ablaufdatum",
+        "expiry-days": "{days} Tage",
+        "submit": "Key erstellen",
+        "success": "API Key wurde erstellt"
+      },
+      "secret": {
+        "title": "Dein neuer API Key (nur einmal sichtbar!)",
+        "copy": "Kopieren",
+        "copied": "API Key in die Zwischenablage kopiert",
+        "copy-failed": "Kopieren fehlgeschlagen",
+        "warning": "Speichere diesen Key jetzt. Du kannst ihn nach dem Schließen dieser Seite nicht mehr einsehen."
+      },
+      "list": {
+        "title": "Meine API Keys",
+        "name": "Name",
+        "prefix": "Key",
+        "created": "Erstellt",
+        "last-used": "Letzte Nutzung",
+        "actions": "Aktionen",
+        "never": "nie",
+        "revoked": "widerrufen",
+        "expired": "abgelaufen",
+        "revoke": "Key widerrufen",
+        "empty": "Du hast noch keine API Keys."
+      },
+      "revoke": {
+        "title": "API Key widerrufen",
+        "message": "Möchtest du den API Key \"{name}\" wirklich widerrufen? Diese Aktion kann nicht rückgängig gemacht werden.",
+        "confirm": "Widerrufen",
+        "success": "API Key \"{name}\" wurde widerrufen"
+      }
     },
     "languages": {
       "name": "Sprachen"

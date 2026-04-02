@@ -64,6 +64,9 @@ export default {
           name: this.$t('admin.donations.name'),
           path: '/admin/donations',
         },
+        ...(this.$env.API_KEYS_ENABLED === true
+          ? [{ name: this.$t('admin.api-keys.name'), path: `/admin/api-keys` }]
+          : []),
         // TODO implement
         /* {
           name: this.$t('admin.settings.name'),

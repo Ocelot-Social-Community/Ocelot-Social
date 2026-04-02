@@ -30,6 +30,7 @@ export default {
             CREATE (comment:Comment $params)
             SET comment.createdAt = toString(datetime())
             SET comment.updatedAt = toString(datetime())
+            SET comment.createdByApiKey = $apiKeyId
             MERGE (post)<-[:COMMENTS]-(comment)<-[:WROTE]-(author)
             WITH post, author, comment
             MERGE (post)<-[obs:OBSERVES]-(author)
@@ -39,7 +40,7 @@ export default {
               obs.updatedAt = toString(datetime())      
             RETURN comment
           `,
-          { userId: user.id, postId, params },
+          { userId: user.id, postId, params, apiKeyId: user.apiKeyId || null },
         )
         return createCommentTransactionResponse.records.map(
           (record) => record.get('comment').properties,
