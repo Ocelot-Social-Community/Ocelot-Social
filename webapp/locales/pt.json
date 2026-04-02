@@ -86,6 +86,44 @@
       "name": "Convidar usuários",
       "title": "Convidar pessoas"
     },
+    "api-keys": {
+      "name": "API Keys",
+      "sort-by": "Sort by",
+      "empty": "No API keys found.",
+      "never": "never",
+      "revoked": "revoked",
+      "show-content": "Show content",
+      "revoke-key": "Revoke key",
+      "revoke-all": "Revoke all keys of this user",
+      "revoke-all-short": "Revoke all",
+      "content-title": "{posts} Posts, {comments} Comments",
+      "order": {
+        "last-used": "Last used",
+        "last-content": "Last content",
+        "created": "Created",
+        "posts": "Posts count",
+        "comments": "Comments count"
+      },
+      "table": {
+        "prefix": "Key",
+        "name": "Name",
+        "user": "User",
+        "last-used": "Last used",
+        "posts": "Posts",
+        "comments": "Comments",
+        "actions": "Actions"
+      },
+      "revoke": {
+        "title": "Revoke API Key",
+        "message": "Are you sure you want to revoke the API key \"{name}\" of {user}?",
+        "confirm": "Revoke",
+        "success": "API key revoked successfully"
+      },
+      "revoke-all-title": "Revoke all API Keys",
+      "revoke-all-message": "Are you sure you want to revoke ALL API keys of {user}? This action cannot be undone.",
+      "revoke-all-confirm": "Revoke all",
+      "revoke-all-success": "{count} API keys of {user} have been revoked"
+    },
     "name": "Administração",
     "notifications": {
       "name": "Notificações"
@@ -1175,6 +1213,44 @@
       "invited-users": "Utilizadores convidados",
       "name": "Convites",
       "nobody-invited": "Ainda ninguém convidado."
+    },
+    "api-keys": {
+      "name": "API Keys",
+      "create": {
+        "title": "Create new API Key",
+        "name-label": "Name",
+        "expiry-label": "Expiry",
+        "expiry-never": "No expiry",
+        "expiry-days": "{days} days",
+        "submit": "Create key",
+        "success": "API key created successfully"
+      },
+      "secret": {
+        "title": "Your new API Key (visible only once!)",
+        "copy": "Copy",
+        "copied": "API key copied to clipboard",
+        "copy-failed": "Failed to copy to clipboard",
+        "warning": "Save this key now. You will not be able to see it again after closing this page."
+      },
+      "list": {
+        "title": "My API Keys",
+        "name": "Name",
+        "prefix": "Key",
+        "created": "Created",
+        "last-used": "Last used",
+        "actions": "Actions",
+        "never": "never",
+        "revoked": "revoked",
+        "expired": "expired",
+        "revoke": "Revoke key",
+        "empty": "You have no API keys yet."
+      },
+      "revoke": {
+        "title": "Revoke API Key",
+        "message": "Are you sure you want to revoke the API key \"{name}\"? This action cannot be undone.",
+        "confirm": "Revoke",
+        "success": "API key \"{name}\" has been revoked"
+      }
     },
     "languages": {
       "name": "Idiomas"
