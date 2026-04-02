@@ -455,6 +455,32 @@ export default {
           })
         })
 
+        // Nudge markers of different types sharing the same coordinates
+        const coordGroups = {}
+        this.markers.geoJSON.forEach((feature) => {
+          const key = feature.geometry.coordinates.join(',')
+          if (!coordGroups[key]) coordGroups[key] = []
+          coordGroups[key].push(feature)
+        })
+        const lngOffset = 0.0002 // small longitude offset (~15m at mid-latitudes)
+        Object.values(coordGroups).forEach((group) => {
+          // Deduplicate by type — only offset distinct types
+          const uniqueTypes = [...new Set(group.map((f) => f.properties.type))]
+          if (uniqueTypes.length <= 1) return
+          const totalWidth = (uniqueTypes.length - 1) * lngOffset
+          uniqueTypes.forEach((type, index) => {
+            const offset = -totalWidth / 2 + index * lngOffset
+            group
+              .filter((f) => f.properties.type === type)
+              .forEach((feature) => {
+                feature.geometry.coordinates = [
+                  feature.geometry.coordinates[0] + offset,
+                  feature.geometry.coordinates[1],
+                ]
+              })
+          })
+        })
+
         this.markers.isGeoJSON = true
       }
 
