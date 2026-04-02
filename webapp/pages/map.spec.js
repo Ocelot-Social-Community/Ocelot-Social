@@ -88,7 +88,7 @@ const stubs = {
     template: '<div><slot /></div>',
   },
   'mgl-map': {
-    template: '<div><slot /></div>',
+    template: '<div class="mgl-map-stub"><slot /></div>',
   },
   MglFullscreenControl: true,
   MglNavigationControl: true,
@@ -205,7 +205,7 @@ describe('map', () => {
     })
 
     it('does not render map', () => {
-      expect(wrapper.find('mgl-map').exists()).toBe(false)
+      expect(wrapper.find('.mgl-map-stub').exists()).toBe(false)
     })
   })
 
@@ -375,12 +375,33 @@ describe('map', () => {
           expect(mapLoadImageMock).toHaveBeenCalledTimes(4)
         })
 
-        it('resets isSourceAndLayerAdded so layer can be re-added', () => {
+        it('re-adds source and layer after style change when markers exist', async () => {
+          // Prepare marker data so addMarkersOnCheckPrepared adds source/layer
+          await wrapper.setData({
+            users: otherUsers,
+            groups,
+            posts,
+            currentUserCoordinates: null,
+            currentUserLocation: null,
+          })
+          wrapper.vm.markers.isGeoJSON = true
           wrapper.vm.markers.isSourceAndLayerAdded = true
+
+          mapAddSourceMock.mockClear()
+          mapAddLayerMock.mockClear()
+
           onEventMocks['style.load']()
-          // After style.load, loadMarkersIconsAndAddMarkers runs which may re-add
-          // The important thing is isSourceAndLayerAdded was reset before reload
-          expect(mapLoadImageMock).toHaveBeenCalled()
+
+          // loadMarkersIconsAndAddMarkers uses Promise.all().then() — flush microtasks
+          await wrapper.vm.$nextTick()
+
+          // After style.load, isSourceAndLayerAdded is reset and icons reload,
+          // then addMarkersOnCheckPrepared re-adds source and layer
+          expect(wrapper.vm.markers.isSourceAndLayerAdded).toBe(true)
+          expect(mapAddSourceMock).toHaveBeenCalledWith('markers', expect.any(Object))
+          expect(mapAddLayerMock).toHaveBeenCalledWith(
+            expect.objectContaining({ id: 'markers', type: 'symbol' }),
+          )
         })
       })
 
