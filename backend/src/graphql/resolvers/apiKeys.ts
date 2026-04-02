@@ -3,6 +3,14 @@ import { v4 as uuid } from 'uuid'
 
 import type { Context } from '@src/context'
 
+function normalizeApiKey(raw: Record<string, unknown>) {
+  return {
+    ...raw,
+    lastUsedAt: raw.lastUsedAt ?? null,
+    expiresAt: raw.expiresAt ?? null,
+  }
+}
+
 function generateApiKey(): { key: string; hash: string; prefix: string } {
   const bytes = randomBytes(32)
   const key = 'oak_' + bytes.toString('base64url')
@@ -22,7 +30,7 @@ export default {
         `,
         variables: { userId: context.user?.id },
       })
-      return result.records.map((r) => r.get('k'))
+      return result.records.map((r) => normalizeApiKey(r.get('k')))
     },
 
     allApiKeys: async (_parent, args, context: Context) => {
@@ -58,7 +66,7 @@ export default {
         variables: { offset, first },
       })
       return result.records.map((r) => ({
-        apiKey: r.get('apiKey'),
+        apiKey: normalizeApiKey(r.get('apiKey')),
         owner: r.get('owner'),
         postsCount: r.get('postsCount').toNumber(),
         commentsCount: r.get('commentsCount').toNumber(),
@@ -93,7 +101,7 @@ export default {
       const countResult = await context.database.query({
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey)
-          WHERE k.disabled = false
+          WHERE NOT k.disabled
           RETURN count(k) AS count
         `,
         variables: { userId: context.user?.id },
@@ -140,7 +148,7 @@ export default {
       })
 
       return {
-        apiKey: result.records[0].get('k'),
+        apiKey: normalizeApiKey(result.records[0].get('k')),
         secret: key,
       }
     },
@@ -157,7 +165,7 @@ export default {
       if (result.records.length === 0) {
         throw new Error('API key not found')
       }
-      return result.records[0].get('k')
+      return normalizeApiKey(result.records[0].get('k'))
     },
 
     revokeApiKey: async (_parent, args, context: Context) => {
@@ -188,7 +196,7 @@ export default {
       const result = await context.database.write({
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey)
-          WHERE k.disabled = false
+          WHERE NOT k.disabled
           SET k.disabled = true
           RETURN count(k) AS count
         `,

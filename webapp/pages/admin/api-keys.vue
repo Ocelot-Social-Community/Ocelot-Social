@@ -202,7 +202,7 @@ export default {
   },
   apollo: {
     allApiKeys: {
-      query: allApiKeysQuery,
+      query: allApiKeysQuery(),
       variables() {
         return {
           orderBy: this.orderBy,
@@ -332,7 +332,7 @@ export default {
   font-size: $font-size-base;
   border: 1px solid $color-neutral-80;
   border-radius: $border-radius-base;
-  background-color: white;
+  background-color: $background-color-base;
 }
 
 .disabled-row {
@@ -352,7 +352,7 @@ export default {
 }
 
 .detail-cell {
-  background-color: $color-neutral-95;
+  background-color: $color-neutral-90;
   padding: $space-small;
 }
 </style>

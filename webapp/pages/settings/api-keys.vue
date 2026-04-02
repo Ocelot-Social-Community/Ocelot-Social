@@ -168,19 +168,20 @@ export default {
     }
   },
   apollo: {
-    myApiKeys: { query: myApiKeysQuery, fetchPolicy: 'cache-and-network' },
+    myApiKeys: { query: myApiKeysQuery(), fetchPolicy: 'cache-and-network' },
   },
   methods: {
     async createKey() {
       if (!this.name.trim()) return
       this.creating = true
       try {
+        const variables = { name: this.name.trim() }
+        if (this.expiresInDays) {
+          variables.expiresInDays = Number(this.expiresInDays)
+        }
         const result = await this.$apollo.mutate({
           mutation: createApiKeyMutation(),
-          variables: {
-            name: this.name.trim(),
-            expiresInDays: this.expiresInDays,
-          },
+          variables,
         })
         this.newSecret = result.data.createApiKey.secret
         this.name = ''
@@ -246,8 +247,8 @@ export default {
 
 <style scoped lang="scss">
 .secret-banner {
-  background-color: $color-warning-100;
-  border: 1px solid $color-warning-300;
+  background-color: $color-warning-inverse;
+  border: 1px solid $color-warning;
 }
 
 .secret-display {
@@ -260,7 +261,7 @@ export default {
 .secret-code {
   flex: 1;
   padding: $space-x-small;
-  background: white;
+  background: $background-color-base;
   border: 1px solid $color-neutral-80;
   border-radius: $border-radius-base;
   word-break: break-all;
@@ -268,7 +269,7 @@ export default {
 }
 
 .secret-warning {
-  color: $color-warning-500;
+  color: $color-warning;
   font-style: italic;
 }
 
@@ -288,6 +289,6 @@ export default {
   font-size: $font-size-base;
   border: 1px solid $color-neutral-80;
   border-radius: $border-radius-base;
-  background-color: white;
+  background-color: $background-color-base;
 }
 </style>
