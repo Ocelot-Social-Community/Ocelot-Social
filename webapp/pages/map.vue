@@ -233,7 +233,9 @@ export default {
           accessToken: this.$env.MAPBOX_TOKEN,
           mapboxgl: this.mapboxgl,
           marker: false,
+          collapsed: window.innerWidth <= 810,
         }),
+        'top-right',
       )
 
       // add style switcher control
@@ -667,6 +669,67 @@ export default {
   font-size: 1.2rem;
   padding: 2px 6px;
 }
+
+// Smaller geocoder on mobile (expanded)
+@media (max-width: 810px) {
+  .mapboxgl-ctrl-geocoder {
+    font-size: 13px;
+    line-height: 18px;
+    min-width: 180px;
+    max-width: 240px;
+  }
+
+  .mapboxgl-ctrl-geocoder--input {
+    height: 29px;
+    padding: 4px 28px;
+  }
+
+  .mapboxgl-ctrl-geocoder--icon-search {
+    width: 15px;
+    height: 15px;
+    top: 7px;
+    left: 7px;
+  }
+
+  .mapboxgl-ctrl-geocoder--button {
+    width: 22px;
+    height: 22px;
+    top: 4px;
+    right: 4px;
+  }
+
+  .mapboxgl-ctrl-geocoder--icon-close {
+    width: 14px;
+    height: 14px;
+  }
+
+  .mapboxgl-ctrl-geocoder.mapboxgl-ctrl-geocoder--collapsed {
+    width: 29px;
+    height: 29px;
+    min-width: 29px;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+
+    .mapboxgl-ctrl-geocoder--icon-search {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 17px;
+      height: 17px;
+    }
+
+    .mapboxgl-ctrl-geocoder--input {
+      display: none;
+    }
+
+    .mapboxgl-ctrl-geocoder--pin-right > * {
+      display: none;
+    }
+  }
+}
+
 
 .map-legend {
   position: absolute;
