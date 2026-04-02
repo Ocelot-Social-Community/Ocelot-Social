@@ -1656,7 +1656,7 @@ Bei der Migration werden:
 | 2026-02-08 | **OsButton: outline primary** | Grüner Rahmen + grüner Text + hellgrüner Hintergrund-Tint (rgba(25,122,49,0.18)) |
 | 2026-02-08 | **OsButton: ghost primary** | Transparenter Hintergrund, grüner Text, Hover füllt grün, Active dunkler |
 | 2026-02-08 | **OsButton: Focus Style** | `focus:outline-dashed focus:outline-1` statt ring (wie base-button) |
-| 2026-02-08 | **OsButton: Active State** | `active:bg-[var(--color-*-hover)]` für dunkleren Hintergrund beim Drücken |
+| 2026-02-08 | **OsButton: Active State** | active:bg-[var(--color-VARIANT-hover)] für dunkleren Hintergrund beim Drücken |
 | 2026-02-08 | **Visuelle Validierung** | Tracking-Tabelle in PROJEKT.md für manuelle Button-Vergleiche (4/16 validiert) |
 | 2026-02-08 | **Storybook Grayscale Theme** | Vollständige CSS-Variablen: default, active-states, contrast-inverse |
 | 2026-02-08 | **Tailwind Source Filter** | `@import "tailwindcss" source(none)` - verhindert Markdown-Scanning |
