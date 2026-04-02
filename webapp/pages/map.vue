@@ -748,16 +748,17 @@ export default {
   width: 100%;
   padding: 4px 8px;
   border: none;
-  background: rgba(0, 0, 0, 0.45);
-  color: $color-neutral-100;
+  background: rgba(0, 0, 0, 0.05);
+  color: $color-neutral-10;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.8rem;
   text-align: left;
+  order: 1;
 
   &:hover,
   &:active {
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -767,7 +768,7 @@ export default {
 }
 
 .map-legend-content {
-  padding: 4px 8px;
+  padding: 4px 8px 2px;
 }
 
 .map-legend-item {
@@ -777,12 +778,21 @@ export default {
 }
 
 @media (max-width: 639px) {
+  .map-legend {
+    display: flex;
+    flex-direction: column;
+  }
+
   .map-legend-toggle {
     display: block;
   }
 
+  .map-legend-content {
+    order: 0;
+  }
+
   .map-legend--open .map-legend-content {
-    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
   }
 }
 
