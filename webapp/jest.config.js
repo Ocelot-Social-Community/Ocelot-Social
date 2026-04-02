@@ -18,7 +18,7 @@ module.exports = {
   ],
   coverageThreshold: {
     global: {
-      lines: 86,
+      lines: 87,
     },
   },
   coverageProvider: 'v8',
