@@ -754,6 +754,7 @@
       "event": "Événement",
       "group": "Groupe",
       "theUser": "Ma position",
+      "title": "Légende",
       "user": "Utilisateur"
     },
     "markerTypes": {
@@ -767,7 +768,8 @@
       "dark": "Sombre",
       "outdoors": "Plein air",
       "satellite": "Satellite",
-      "streets": "Rues"
+      "streets": "Rues",
+      "title": "Style de carte"
     }
   },
   "modals": {

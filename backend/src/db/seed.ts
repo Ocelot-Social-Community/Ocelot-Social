@@ -1301,13 +1301,123 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     })
 
     // eslint-disable-next-line no-console
-    console.log('seed', 'users additional')
+    console.log('seed', 'users additional with map locations around Zwingenberg')
+
+    // Region Hessen (Mapbox-compatible hierarchy: place -> region -> country)
+    const Hessen = await Factory.build('location', {
+      id: 'region.8967011281068080',
+      name: 'Hessen',
+      type: 'region',
+      lng: 8.6528,
+      lat: 50.6521,
+      nameDE: 'Hessen',
+      nameEN: 'Hesse',
+      nameES: 'Hesse',
+      nameFR: 'Hesse',
+      nameIT: 'Assia',
+      namePT: 'Hessen',
+      nameNL: 'Hessen',
+      namePL: 'Hesja',
+      nameRU: 'Гессен',
+    })
+    await Hessen.relateTo(Germany, 'isIn')
+
+    // 50 villages around Zwingenberg (64673), Zwingenberg excluded
+    // Mapbox-compatible: type 'place', realistic IDs
+    const zwingenbergVillages = [
+      // Bergstraße (west)
+      { id: 'place.8652241', name: 'Alsbach-Hähnlein', lat: 49.7389, lng: 8.6331 },
+      { id: 'place.8652242', name: 'Bickenbach', lat: 49.7567, lng: 8.6178 },
+      { id: 'place.8652243', name: 'Seeheim-Jugenheim', lat: 49.7631, lng: 8.6506 },
+      { id: 'place.8652244', name: 'Bensheim', lat: 49.6812, lng: 8.6167 },
+      { id: 'place.8652245', name: 'Auerbach', lat: 49.7053, lng: 8.6389 },
+      { id: 'place.8652246', name: 'Heppenheim', lat: 49.6428, lng: 8.6392 },
+      { id: 'place.8652247', name: 'Lorsch', lat: 49.6539, lng: 8.5678 },
+      { id: 'place.8652248', name: 'Einhausen', lat: 49.6775, lng: 8.5578 },
+      { id: 'place.8652249', name: 'Gernsheim', lat: 49.7528, lng: 8.4906 },
+      { id: 'place.8652250', name: 'Pfungstadt', lat: 49.8056, lng: 8.6042 },
+      // Odenwald (east)
+      { id: 'place.8652251', name: 'Reichenbach', lat: 49.725, lng: 8.67 },
+      { id: 'place.8652252', name: 'Lautertal', lat: 49.7253, lng: 8.6914 },
+      { id: 'place.8652253', name: 'Lindenfels', lat: 49.6836, lng: 8.7781 },
+      { id: 'place.8652254', name: 'Modautal', lat: 49.7736, lng: 8.7258 },
+      { id: 'place.8652255', name: 'Mühltal', lat: 49.8003, lng: 8.6917 },
+      { id: 'place.8652256', name: 'Ober-Ramstadt', lat: 49.8306, lng: 8.7486 },
+      { id: 'place.8652257', name: 'Reinheim', lat: 49.8289, lng: 8.8356 },
+      { id: 'place.8652258', name: 'Groß-Bieberau', lat: 49.7906, lng: 8.8281 },
+      { id: 'place.8652259', name: 'Fränkisch-Crumbach', lat: 49.745, lng: 8.8444 },
+      { id: 'place.8652260', name: 'Brensbach', lat: 49.7742, lng: 8.8819 },
+      // Ried (west/southwest)
+      { id: 'place.8652261', name: 'Bürstadt', lat: 49.6433, lng: 8.4506 },
+      { id: 'place.8652262', name: 'Lampertheim', lat: 49.5978, lng: 8.47 },
+      { id: 'place.8652263', name: 'Biblis', lat: 49.6878, lng: 8.4531 },
+      { id: 'place.8652264', name: 'Groß-Rohrheim', lat: 49.7228, lng: 8.4822 },
+      { id: 'place.8652265', name: 'Riedstadt', lat: 49.835, lng: 8.4944 },
+      { id: 'place.8652266', name: 'Stockstadt am Rhein', lat: 49.8094, lng: 8.4656 },
+      { id: 'place.8652267', name: 'Biebesheim', lat: 49.7806, lng: 8.4672 },
+      { id: 'place.8652268', name: 'Trebur', lat: 49.9211, lng: 8.4081 },
+      { id: 'place.8652269', name: 'Nauheim', lat: 49.9456, lng: 8.4494 },
+      { id: 'place.8652270', name: 'Griesheim', lat: 49.8619, lng: 8.5722 },
+      // Darmstadt area (north)
+      { id: 'place.8652271', name: 'Roßdorf', lat: 49.8572, lng: 8.7578 },
+      { id: 'place.8652272', name: 'Messel', lat: 49.9333, lng: 8.75 },
+      { id: 'place.8652273', name: 'Eppertshausen', lat: 49.95, lng: 8.85 },
+      { id: 'place.8652274', name: 'Münster', lat: 49.9253, lng: 8.8653 },
+      { id: 'place.8652275', name: 'Dieburg', lat: 49.8983, lng: 8.8467 },
+      { id: 'place.8652276', name: 'Babenhausen', lat: 49.965, lng: 8.9511 },
+      { id: 'place.8652277', name: 'Schaafheim', lat: 49.9244, lng: 8.9703 },
+      { id: 'place.8652278', name: 'Groß-Umstadt', lat: 49.8667, lng: 8.9333 },
+      { id: 'place.8652279', name: 'Otzberg', lat: 49.82, lng: 8.91 },
+      { id: 'place.8652280', name: 'Höchst im Odenwald', lat: 49.7994, lng: 8.9986 },
+      // Further south
+      { id: 'place.8652281', name: 'Mörlenbach', lat: 49.5969, lng: 8.7378 },
+      { id: 'place.8652282', name: 'Rimbach', lat: 49.6256, lng: 8.7611 },
+      { id: 'place.8652283', name: 'Fürth', lat: 49.6522, lng: 8.7789 },
+      { id: 'place.8652284', name: 'Grasellenbach', lat: 49.6353, lng: 8.8531 },
+      { id: 'place.8652285', name: 'Wald-Michelbach', lat: 49.57, lng: 8.83 },
+      { id: 'place.8652286', name: 'Abtsteinach', lat: 49.5536, lng: 8.78 },
+      { id: 'place.8652287', name: 'Gorxheimertal', lat: 49.5322, lng: 8.7322 },
+      { id: 'place.8652288', name: 'Viernheim', lat: 49.5403, lng: 8.5783 },
+      { id: 'place.8652289', name: 'Weinheim', lat: 49.5489, lng: 8.6639 },
+      { id: 'place.8652290', name: 'Hemsbach', lat: 49.59, lng: 8.65 },
+    ]
+
+    // Create village location nodes (one per village, shared by all users in that village)
+    const villageLocationNodes: (typeof Hamburg)[] = []
+    for (const village of zwingenbergVillages) {
+      const location = await Factory.build('location', {
+        id: village.id,
+        name: village.name,
+        type: 'place',
+        lng: village.lng,
+        lat: village.lat,
+        nameDE: village.name,
+        nameEN: village.name,
+        nameES: village.name,
+        nameFR: village.name,
+        nameIT: village.name,
+        namePT: village.name,
+        nameNL: village.name,
+        namePL: village.name,
+        nameRU: village.name,
+      })
+      await location.relateTo(Hessen, 'isIn')
+      villageLocationNodes.push(location)
+    }
+
+    // Create 1000 additional users with locations assigned during creation
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const additionalUsers: any[] = []
     for (let i = 0; i < 1000; i++) {
+      if (i % 100 === 0) {
+        // eslint-disable-next-line no-console
+        console.log('seed', `additional users ${i}/1000`)
+      }
       const user = await Factory.build('user')
       await jennyRostock.relateTo(user, 'following')
       await user.relateTo(jennyRostock, 'following')
+      // Assign village location (round-robin across 50 villages = ~20 users per village)
+      await user.relateTo(villageLocationNodes[i % villageLocationNodes.length], 'isIn')
       additionalUsers.push(user)
 
       const userObj = await user.toJson()
@@ -1321,6 +1431,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       })
     }
+    // eslint-disable-next-line no-console
+    console.log('seed', 'additional users 1000/1000 done')
 
     // Jenny's first 99 additional users all redeemed code ABCDEF
     // eslint-disable-next-line no-console

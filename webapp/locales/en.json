@@ -754,6 +754,7 @@
       "event": "Event",
       "group": "Group",
       "theUser": "My position",
+      "title": "Legend",
       "user": "User"
     },
     "markerTypes": {
@@ -767,7 +768,8 @@
       "dark": "Dark",
       "outdoors": "Outdoors",
       "satellite": "Satellite",
-      "streets": "Streets"
+      "streets": "Streets",
+      "title": "Map style"
     }
   },
   "modals": {

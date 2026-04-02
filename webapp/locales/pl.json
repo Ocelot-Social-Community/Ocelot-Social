@@ -754,6 +754,7 @@
       "event": "Wydarzenie",
       "group": "Grupa",
       "theUser": "Moja pozycja",
+      "title": "Legenda",
       "user": "Użytkownik"
     },
     "markerTypes": {
@@ -767,7 +768,8 @@
       "dark": "Ciemny",
       "outdoors": "Na zewnątrz",
       "satellite": "Satelita",
-      "streets": "Ulice"
+      "streets": "Ulice",
+      "title": "Styl mapy"
     }
   },
   "modals": {

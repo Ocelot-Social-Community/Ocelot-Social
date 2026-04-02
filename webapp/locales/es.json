@@ -754,6 +754,7 @@
       "event": "Evento",
       "group": "Grupo",
       "theUser": "Mi posición",
+      "title": "Leyenda",
       "user": "Usuario"
     },
     "markerTypes": {
@@ -767,7 +768,8 @@
       "dark": "Oscuro",
       "outdoors": "Exterior",
       "satellite": "Satélite",
-      "streets": "Calles"
+      "streets": "Calles",
+      "title": "Estilo de mapa"
     }
   },
   "modals": {

@@ -754,6 +754,7 @@
       "event": "Ngjarje",
       "group": "Grup",
       "theUser": "Pozicioni im",
+      "title": "Legjenda",
       "user": "Përdorues"
     },
     "markerTypes": {
@@ -767,7 +768,8 @@
       "dark": "E errët",
       "outdoors": "Jashtë",
       "satellite": "Satelit",
-      "streets": "Rrugë"
+      "streets": "Rrugë",
+      "title": "Stili i hartës"
     }
   },
   "modals": {
