@@ -250,6 +250,7 @@ export default {
       )
 
       // add style switcher control
+      let closePopoverHandler = null
       const styleSwitcher = {
         onAdd: () => {
           const container = document.createElement('div')
@@ -308,14 +309,20 @@ export default {
           container.appendChild(popover)
 
           // Close popover when clicking elsewhere on the map
-          this.map.getContainer().addEventListener('click', () => {
+          closePopoverHandler = () => {
             popover.classList.remove('map-style-popover--open')
             toggle.setAttribute('aria-expanded', 'false')
-          })
+          }
+          this.map.getContainer().addEventListener('click', closePopoverHandler)
 
           return container
         },
-        onRemove: () => {},
+        onRemove: () => {
+          if (closePopoverHandler) {
+            this.map.getContainer().removeEventListener('click', closePopoverHandler)
+            closePopoverHandler = null
+          }
+        },
       }
       this.map.addControl(styleSwitcher, 'top-right')
 
