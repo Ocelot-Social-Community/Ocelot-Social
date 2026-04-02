@@ -158,6 +158,7 @@ describe('map', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     MapboxGeocoder.mockClear()
+    containerClickHandlers.length = 0
 
     // Reset popup mock
     mapboxgl.__popupInstance.isOpen.mockReturnValue(false)
