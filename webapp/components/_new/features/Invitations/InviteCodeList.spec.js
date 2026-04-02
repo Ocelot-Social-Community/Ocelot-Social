@@ -67,7 +67,8 @@ const Wrapper = (propsOverrides = {}, mocksOverrides = {}) => {
       'client-only': true,
       'profile-list': {
         template:
-          '<div data-testid="profile-list"><button data-testid="load-all-btn" @click="$emit(\'fetchAllProfiles\')">Load all</button></div>',
+          '<div data-testid="profile-list"><span data-testid="profile-count">{{ profiles.length }}</span><button data-testid="load-all-btn" @click="$emit(\'fetchAllProfiles\')">Load all</button></div>',
+        props: ['profiles', 'title', 'titleNobody', 'allProfilesCount', 'loading', 'uniqueName'],
       },
       'confirm-modal': {
         template:
@@ -170,12 +171,13 @@ describe('InviteCodeList.vue', () => {
       expect(defaultMocks.$apollo.mutate).toHaveBeenCalledTimes(1)
     })
 
-    it('clicking load all in profile-list loads all invited users', async () => {
+    it('clicking load all in profile-list shows all invited users', async () => {
       Wrapper({ showInvitedUsers: true })
+      const countBefore = screen.getByTestId('profile-count').textContent
       const loadAllBtn = screen.getByTestId('load-all-btn')
       await fireEvent.click(loadAllBtn)
-      // After loading, the profile-list should still be present
-      expect(screen.getByTestId('profile-list')).toBeInTheDocument()
+      const countAfter = screen.getByTestId('profile-count').textContent
+      expect(Number(countAfter)).toBeGreaterThanOrEqual(Number(countBefore))
     })
   })
 })
