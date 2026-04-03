@@ -3,6 +3,7 @@ mutation updateApiKey($id: ID!, $name: String!) {
     id
     name
     keyPrefix
+    createdAt
     lastUsedAt
     expiresAt
     disabled
