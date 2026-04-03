@@ -1039,10 +1039,13 @@ describe('map', () => {
     })
 
     describe('beforeDestroy', () => {
-      it('removes resize listener', () => {
+      it('removes resize listeners', () => {
+        wrapper.vm.onMapLoad({ map: mapMock })
         const spy = jest.spyOn(window, 'removeEventListener')
+        const geocoderHandler = wrapper.vm.geocoderCollapseHandler
         wrapper.destroy()
         expect(spy).toHaveBeenCalledWith('resize', wrapper.vm.updateMapPosition)
+        expect(spy).toHaveBeenCalledWith('resize', geocoderHandler)
         spy.mockRestore()
       })
     })
