@@ -7,6 +7,8 @@ services:
       target: test
     environment:
       - NODE_ENV=test
+      - API_KEYS_ENABLED=true
+      - API_KEYS_MAX_PER_USER=5
     volumes:
       - ./coverage:/app/coverage
 
