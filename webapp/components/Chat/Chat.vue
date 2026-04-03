@@ -565,9 +565,31 @@ export default {
     async searchRooms(event) {
       const value = typeof event === 'string' ? event : event?.value
       this.roomSearch = value || ''
-      this.rooms = []
       this.roomCursor = null
-      await this.fetchRooms({ search: this.roomSearch || undefined })
+      this.roomsLoaded = false
+      this.roomSearchGeneration = (this.roomSearchGeneration || 0) + 1
+      const generation = this.roomSearchGeneration
+      try {
+        const variables = { first: this.roomPageSize, ...(this.roomSearch && { search: this.roomSearch }) }
+        const { data: { Room } } = await this.$apollo.query({
+          query: roomQuery(),
+          variables,
+          fetchPolicy: 'no-cache',
+        })
+        if (generation !== this.roomSearchGeneration) return
+        this.rooms = Room.map((r) => this.fixRoomObject(r))
+        if (Room.length > 0) {
+          const lastRoom = Room[Room.length - 1]
+          this.roomCursor = lastRoom.lastMessageAt || lastRoom.createdAt
+        }
+        if (Room.length < this.roomPageSize) {
+          this.roomsLoaded = true
+        }
+      } catch (error) {
+        if (generation !== this.roomSearchGeneration) return
+        this.rooms = []
+        this.$toast.error(error.message)
+      }
     },
 
     fetchMoreRooms() {
