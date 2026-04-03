@@ -1223,7 +1223,8 @@
         "expiry-never": "Kein Ablaufdatum",
         "expiry-days": "{days} Tage",
         "submit": "Key erstellen",
-        "success": "API Key wurde erstellt"
+        "success": "API Key wurde erstellt",
+        "limit-reached": "Du hast das Maximum von {max} aktiven API Keys erreicht. Widerrufe einen bestehenden Key, um einen neuen zu erstellen."
       },
       "secret": {
         "title": "Dein neuer API Key (nur einmal sichtbar!)",
@@ -1236,7 +1237,9 @@
         "title": "Meine API Keys",
         "name": "Name",
         "prefix": "Key",
-        "created": "Erstellt",
+        "created-at": "Erstellt am",
+        "expires": "Läuft ab",
+        "never-expires": "nie",
         "last-used": "Letzte Nutzung",
         "actions": "Aktionen",
         "never": "nie",
@@ -1250,6 +1253,10 @@
         "message": "Möchtest du den API Key \"{name}\" wirklich widerrufen? Diese Aktion kann nicht rückgängig gemacht werden.",
         "confirm": "Widerrufen",
         "success": "API Key \"{name}\" wurde widerrufen"
+      },
+      "revoked-list": {
+        "title": "Widerrufene Keys ({count})",
+        "revoked-at": "Widerrufen am"
       }
     },
     "languages": {

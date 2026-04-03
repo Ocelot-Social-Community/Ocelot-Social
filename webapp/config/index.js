@@ -62,6 +62,7 @@ const options = {
     ? 1
     : Number(process.env.MAX_GROUP_PINNED_POSTS),
   API_KEYS_ENABLED: process.env.API_KEYS_ENABLED === 'true' || false,
+  API_KEYS_MAX_PER_USER: Number(process.env.API_KEYS_MAX_PER_USER) || 5,
 }
 
 const language = {

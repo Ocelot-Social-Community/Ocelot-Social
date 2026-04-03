@@ -8,6 +8,7 @@ function normalizeApiKey(raw: Record<string, unknown>) {
     ...raw,
     lastUsedAt: raw.lastUsedAt ?? null,
     expiresAt: raw.expiresAt ?? null,
+    disabledAt: raw.disabledAt ?? null,
   }
 }
 
@@ -172,7 +173,7 @@ export default {
       const result = await context.database.write({
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey { id: $keyId })
-          SET k.disabled = true
+          SET k.disabled = true, k.disabledAt = toString(datetime())
           RETURN k
         `,
         variables: { userId: context.user?.id, keyId: args.id },
@@ -184,7 +185,7 @@ export default {
       const result = await context.database.write({
         query: `
           MATCH (k:ApiKey { id: $keyId })
-          SET k.disabled = true
+          SET k.disabled = true, k.disabledAt = toString(datetime())
           RETURN k
         `,
         variables: { keyId: args.id },
@@ -197,7 +198,7 @@ export default {
         query: `
           MATCH (u:User { id: $userId })-[:HAS_API_KEY]->(k:ApiKey)
           WHERE NOT k.disabled
-          SET k.disabled = true
+          SET k.disabled = true, k.disabledAt = toString(datetime())
           RETURN count(k) AS count
         `,
         variables: { userId: args.userId },

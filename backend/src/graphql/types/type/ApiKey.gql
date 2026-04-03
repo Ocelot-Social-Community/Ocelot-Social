@@ -6,6 +6,7 @@ type ApiKey {
   lastUsedAt: String
   expiresAt: String
   disabled: Boolean!
+  disabledAt: String
   owner: User @relation(name: "HAS_API_KEY", direction: "IN")
 }
 

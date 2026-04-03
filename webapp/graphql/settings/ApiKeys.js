@@ -11,6 +11,7 @@ export const myApiKeysQuery = () => {
         lastUsedAt
         expiresAt
         disabled
+        disabledAt
       }
     }
   `

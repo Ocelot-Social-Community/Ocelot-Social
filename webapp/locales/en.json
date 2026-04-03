@@ -1223,7 +1223,8 @@
         "expiry-never": "No expiry",
         "expiry-days": "{days} days",
         "submit": "Create key",
-        "success": "API key created successfully"
+        "success": "API key created successfully",
+        "limit-reached": "You have reached the maximum of {max} active API keys. Revoke an existing key to create a new one."
       },
       "secret": {
         "title": "Your new API Key (visible only once!)",
@@ -1236,7 +1237,9 @@
         "title": "My API Keys",
         "name": "Name",
         "prefix": "Key",
-        "created": "Created",
+        "created-at": "Created at",
+        "expires": "Expires",
+        "never-expires": "never",
         "last-used": "Last used",
         "actions": "Actions",
         "never": "never",
@@ -1250,6 +1253,10 @@
         "message": "Are you sure you want to revoke the API key \"{name}\"? This action cannot be undone.",
         "confirm": "Revoke",
         "success": "API key \"{name}\" has been revoked"
+      },
+      "revoked-list": {
+        "title": "Revoked keys ({count})",
+        "revoked-at": "Revoked at"
       }
     },
     "languages": {

@@ -8,6 +8,7 @@
           <ocelot-input
             id="api-key-name"
             model="name"
+            :value="name"
             :label="$t('settings.api-keys.create.name-label')"
             @input="name = $event"
           />
@@ -24,10 +25,13 @@
             <option :value="365">{{ $t('settings.api-keys.create.expiry-days', { days: 365 }) }}</option>
           </select>
         </div>
+        <p v-if="activeKeys.length >= maxKeys" class="ds-text ds-text-small limit-warning">
+          {{ $t('settings.api-keys.create.limit-reached', { max: maxKeys }) }}
+        </p>
         <os-button
           variant="primary"
           type="submit"
-          :disabled="!name.trim()"
+          :disabled="!name.trim() || activeKeys.length >= maxKeys"
           :loading="creating"
         >
           {{ $t('settings.api-keys.create.submit') }}
@@ -56,10 +60,13 @@
       </p>
     </os-card>
 
-    <!-- Key list -->
-    <os-card v-if="myApiKeys && myApiKeys.length">
-      <h2 class="title">{{ $t('settings.api-keys.list.title') }}</h2>
-      <div class="ds-table-wrap">
+    <!-- Active keys -->
+    <os-card class="ds-mb-large">
+      <h2 class="title">
+        {{ $t('settings.api-keys.list.title') }}
+        <span class="key-counter">({{ activeKeys.length }}/{{ maxKeys }})</span>
+      </h2>
+      <div v-if="activeKeys.length" class="ds-table-wrap">
         <table class="ds-table ds-table-condensed ds-table-bordered">
           <thead>
             <tr>
@@ -70,7 +77,7 @@
                 {{ $t('settings.api-keys.list.prefix') }}
               </th>
               <th scope="col" class="ds-table-head-col">
-                {{ $t('settings.api-keys.list.created') }}
+                {{ $t('settings.api-keys.list.expires') }}
               </th>
               <th scope="col" class="ds-table-head-col">
                 {{ $t('settings.api-keys.list.last-used') }}
@@ -81,46 +88,103 @@
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="key in myApiKeys"
-              :key="key.id"
-              :class="{ 'disabled-row': key.disabled || isExpired(key) }"
-            >
-              <td class="ds-table-col">{{ key.name }}</td>
-              <td class="ds-table-col"><code>{{ key.keyPrefix }}...</code></td>
-              <td class="ds-table-col">{{ key.createdAt | dateTime }}</td>
+            <tr v-for="key in activeKeys" :key="key.id">
+              <td class="ds-table-col" :title="$t('settings.api-keys.list.created-at') + ': ' + $options.filters.dateTime(key.createdAt)">
+                {{ key.name }}
+              </td>
+              <td class="ds-table-col" :title="$t('settings.api-keys.list.created-at') + ': ' + $options.filters.dateTime(key.createdAt)">
+                <code>{{ key.keyPrefix }}...</code>
+              </td>
+              <td class="ds-table-col">
+                <template v-if="isExpired(key)">
+                  <span class="status-label">{{ $t('settings.api-keys.list.expired') }}</span>
+                </template>
+                <template v-else-if="key.expiresAt">
+                  {{ key.expiresAt | dateTime }}
+                </template>
+                <template v-else>
+                  {{ $t('settings.api-keys.list.never-expires') }}
+                </template>
+              </td>
               <td class="ds-table-col">
                 {{ key.lastUsedAt ? $options.filters.dateTime(key.lastUsedAt) : $t('settings.api-keys.list.never') }}
               </td>
               <td class="ds-table-col">
-                <template v-if="key.disabled">
-                  <span class="status-label">{{ $t('settings.api-keys.list.revoked') }}</span>
-                </template>
-                <template v-else-if="isExpired(key)">
-                  <span class="status-label">{{ $t('settings.api-keys.list.expired') }}</span>
-                </template>
-                <template v-else>
-                  <os-button
-                    variant="danger"
-                    appearance="outline"
-                    circle
-                    size="sm"
-                    :loading="revokingKeyId === key.id"
-                    :aria-label="$t('settings.api-keys.list.revoke')"
-                    @click="confirmRevoke(key)"
-                  >
-                    <template #icon><os-icon :icon="icons.trash" /></template>
-                  </os-button>
-                </template>
+                <os-button
+                  variant="danger"
+                  appearance="outline"
+                  circle
+                  size="sm"
+                  :loading="revokingKeyId === key.id"
+                  :aria-label="$t('settings.api-keys.list.revoke')"
+                  @click="confirmRevoke(key)"
+                >
+                  <template #icon><os-icon :icon="icons.trash" /></template>
+                </os-button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-    </os-card>
-    <os-card v-else>
-      <div class="ds-placeholder">
+      <div v-else class="ds-placeholder">
         {{ $t('settings.api-keys.list.empty') }}
+      </div>
+
+      <!-- Revoked keys (collapsible) -->
+      <div v-if="revokedKeys.length" class="revoked-section">
+        <button
+          class="revoked-toggle"
+          :aria-expanded="String(showRevoked)"
+          aria-controls="revoked-keys-list"
+          @click="showRevoked = !showRevoked"
+        >
+          <span>
+            {{ $t('settings.api-keys.revoked-list.title', { count: revokedKeys.length }) }}
+          </span>
+          <span class="revoked-chevron" :class="{ open: showRevoked }">&#9660;</span>
+        </button>
+        <div v-if="showRevoked" id="revoked-keys-list" class="ds-table-wrap">
+          <table class="ds-table ds-table-condensed ds-table-bordered revoked-table">
+            <thead>
+              <tr>
+                <th scope="col" class="ds-table-head-col">
+                  {{ $t('settings.api-keys.list.name') }}
+                </th>
+                <th scope="col" class="ds-table-head-col">
+                  {{ $t('settings.api-keys.list.prefix') }}
+                </th>
+                <th scope="col" class="ds-table-head-col">
+                  {{ $t('settings.api-keys.revoked-list.revoked-at') }}
+                </th>
+                <th scope="col" class="ds-table-head-col">
+                  {{ $t('settings.api-keys.list.last-used') }}
+                </th>
+                <th scope="col" class="ds-table-head-col">
+                  {{ $t('settings.api-keys.list.actions') }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="key in revokedKeys" :key="key.id">
+                <td class="ds-table-col" :title="$t('settings.api-keys.list.created-at') + ': ' + $options.filters.dateTime(key.createdAt)">
+                  {{ key.name }}
+                </td>
+                <td class="ds-table-col" :title="$t('settings.api-keys.list.created-at') + ': ' + $options.filters.dateTime(key.createdAt)">
+                  <code>{{ key.keyPrefix }}...</code>
+                </td>
+                <td class="ds-table-col">
+                  {{ key.disabledAt ? $options.filters.dateTime(key.disabledAt) : '–' }}
+                </td>
+                <td class="ds-table-col">
+                  {{ key.lastUsedAt ? $options.filters.dateTime(key.lastUsedAt) : $t('settings.api-keys.list.never') }}
+                </td>
+                <td class="ds-table-col">
+                  <span class="status-label">{{ $t('settings.api-keys.list.revoked') }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </os-card>
 
@@ -165,7 +229,19 @@ export default {
       revokingKeyId: null,
       showRevokeModal: false,
       revokeModalData: null,
+      showRevoked: false,
     }
+  },
+  computed: {
+    maxKeys() {
+      return this.$env.API_KEYS_MAX_PER_USER || 5
+    },
+    activeKeys() {
+      return (this.myApiKeys || []).filter((k) => !k.disabled)
+    },
+    revokedKeys() {
+      return (this.myApiKeys || []).filter((k) => k.disabled)
+    },
   },
   apollo: {
     myApiKeys: { query: myApiKeysQuery(), fetchPolicy: 'cache-and-network' },
@@ -273,14 +349,66 @@ export default {
   font-style: italic;
 }
 
-.disabled-row {
-  opacity: 0.5;
+.key-counter {
+  font-weight: normal;
+  font-size: $font-size-base;
+  color: $color-neutral-50;
+}
+
+.limit-warning {
+  color: $color-warning;
+  margin-bottom: $space-x-small;
 }
 
 .status-label {
   font-size: $font-size-small;
-  color: $color-neutral-60;
+  color: $text-color-soft;
   font-style: italic;
+}
+
+.revoked-section {
+  margin-top: $space-large;
+}
+
+.revoked-toggle {
+  display: flex;
+  align-items: center;
+  gap: $space-x-small;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $text-color-soft;
+  padding: $space-x-small 0;
+  font-size: $font-size-base;
+
+  &:hover {
+    color: $text-color-base;
+  }
+}
+
+.revoked-chevron {
+  font-size: $font-size-small;
+  transition: transform 0.2s;
+
+  &.open {
+    transform: rotate(180deg);
+  }
+}
+
+.ds-table-wrap {
+  overflow-x: auto;
+}
+
+tr > th:last-child,
+tr > td:last-child {
+  position: sticky;
+  right: 0;
+  background-color: $background-color-base;
+  text-align: center;
+}
+
+.revoked-table {
+  opacity: 0.6;
 }
 
 .settings-select {

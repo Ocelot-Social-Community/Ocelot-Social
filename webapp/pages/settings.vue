@@ -61,7 +61,7 @@ export default {
         ...(this.$env.INVITE_REGISTRATION === true
           ? [{ name: this.$t('settings.invites.name'), path: `/settings/invites` }]
           : []),
-        ...(this.$env.API_KEYS_ENABLED === true
+        ...(this.$env.API_KEYS_ENABLED
           ? [{ name: this.$t('settings.api-keys.name'), path: `/settings/api-keys` }]
           : []),
         {
