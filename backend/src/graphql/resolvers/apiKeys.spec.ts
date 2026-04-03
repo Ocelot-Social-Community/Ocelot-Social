@@ -150,8 +150,6 @@ describe('createApiKey', () => {
       })
       expect(errors?.[0]).toHaveProperty('message', 'Not Authorized!')
       void setup.server.stop()
-      void setup.database.driver.close()
-      setup.database.neode.close()
     })
   })
 })
