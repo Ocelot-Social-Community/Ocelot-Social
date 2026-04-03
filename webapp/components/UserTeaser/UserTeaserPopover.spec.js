@@ -2,11 +2,14 @@ import { render } from '@testing-library/vue'
 import { RouterLinkStub } from '@vue/test-utils'
 import UserTeaserPopover from './UserTeaserPopover.vue'
 
-window.matchMedia = jest.fn().mockImplementation(() => ({
-  matches: false,
-  addEventListener: jest.fn(),
-  removeEventListener: jest.fn(),
-}))
+const mockMatchMedia = (matches = false) => {
+  window.matchMedia = jest.fn().mockImplementation(() => ({
+    matches,
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+  }))
+}
+mockMatchMedia(false)
 
 const localVue = global.localVue
 
@@ -57,10 +60,7 @@ describe('UserTeaserPopover', () => {
     onTouchScreen = false,
     userData = user,
   }) => {
-    const mockIsTouchDevice = onTouchScreen
-    jest.mock('../utils/isTouchDevice', () => ({
-      isTouchDevice: jest.fn(() => mockIsTouchDevice),
-    }))
+    mockMatchMedia(onTouchScreen)
     return render(UserTeaserPopover, {
       localVue,
       propsData: {

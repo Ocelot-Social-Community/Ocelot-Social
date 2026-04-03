@@ -48,8 +48,10 @@ export default {
         if (typeof document === 'undefined') return
         if (isOpen) {
           document.body.classList.add('dropdown-open')
+          this.addOverlayClickHandler()
         } else {
           document.body.classList.remove('dropdown-open')
+          this.removeOverlayClickHandler()
         }
       },
     },
@@ -57,6 +59,7 @@ export default {
   beforeDestroy() {
     clearTimeout(mouseEnterTimer)
     clearTimeout(mouseLeaveTimer)
+    this.removeOverlayClickHandler()
     if (this.isPopoverOpen) {
       this.isPopoverOpen = false
       if (typeof document !== 'undefined') {
@@ -115,6 +118,29 @@ export default {
     clearTimeouts() {
       clearTimeout(mouseEnterTimer)
       clearTimeout(mouseLeaveTimer)
+    },
+    addOverlayClickHandler() {
+      this.overlayClickHandler = (e) => {
+        // Allow clicks inside the popover content
+        const popover = this.$el.querySelector('.tooltip-inner, [slot="popover"]')
+        if (popover && popover.contains(e.target)) return
+        // Allow clicks on the trigger itself
+        if (this.$el.contains(e.target)) return
+        e.stopPropagation()
+        e.preventDefault()
+        this.isPopoverOpen = false
+      }
+      // Capture phase fires before any other handler
+      setTimeout(() => {
+        if (this.isPopoverOpen && this.overlayClickHandler) {
+          document.addEventListener('click', this.overlayClickHandler, true)
+        }
+      }, 0)
+    },
+    removeOverlayClickHandler() {
+      if (!this.overlayClickHandler) return
+      document.removeEventListener('click', this.overlayClickHandler, true)
+      this.overlayClickHandler = null
     },
   },
 }
