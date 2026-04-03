@@ -206,6 +206,18 @@ describe('settings/api-keys.vue', () => {
       expect(wrapper.text()).not.toContain('settings.api-keys.create.limit-reached')
     })
 
+    it('does not count revoked keys toward the limit', () => {
+      const keys = [
+        ...Array.from({ length: 4 }, (_, i) => activeKey({ id: `k${i}`, name: `Key ${i}` })),
+        revokedKey(),
+      ]
+      wrapper = Wrapper({ myApiKeys: keys })
+      wrapper.setData({ name: 'New Key' })
+      const submitBtn = wrapper.find('button[type="submit"]')
+      expect(submitBtn.attributes('disabled')).toBeUndefined()
+      expect(wrapper.text()).not.toContain('settings.api-keys.create.limit-reached')
+    })
+
     it('calls createApiKey mutation on submit', async () => {
       wrapper = Wrapper()
       wrapper.setData({ name: 'My Key' })
