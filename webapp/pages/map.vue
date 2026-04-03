@@ -33,7 +33,7 @@
           </button>
           <div
             id="map-legend-content"
-            v-show="legendOpen || !isMobile"
+            :class="{ 'map-legend-content--hidden': isMobile && !legendOpen }"
             class="map-legend-content"
             role="region"
             :aria-label="$t('map.legend.title')"
@@ -871,6 +871,8 @@ export default {
   font-size: $font-size-base;
   text-align: left;
   order: 1;
+  align-items: center;
+  justify-content: space-between;
 
   &:hover,
   &:active {
@@ -879,8 +881,8 @@ export default {
 }
 
 .map-legend-arrow {
-  float: right;
   font-size: $font-size-small;
+  line-height: 1;
 }
 
 .map-legend-content {
@@ -900,15 +902,27 @@ export default {
   }
 
   .map-legend-toggle {
-    display: block;
+    display: flex;
   }
 
   .map-legend-content {
     order: 0;
   }
 
+  .map-legend-content--hidden {
+    visibility: hidden;
+    height: 0;
+    padding: 0 8px;
+    overflow: hidden;
+  }
+
   .map-legend--open .map-legend-content {
     border-bottom: 1px solid #eee;
+  }
+
+  .map-legend--open .map-legend-toggle {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
 }
 
