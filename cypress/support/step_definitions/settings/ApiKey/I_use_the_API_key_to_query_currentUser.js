@@ -1,10 +1,9 @@
 import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 import { GraphQLClient } from 'graphql-request'
-import CONFIG from '../../../../../backend/build/src/config'
 
 defineStep('I use the API key to query currentUser', () => {
   cy.task('getValue', 'apiKeySecret').then((secret) => {
-    const client = new GraphQLClient(CONFIG.GRAPHQL_URI, {
+    const client = new GraphQLClient(Cypress.env('GRAPHQL_URI'), {
       headers: { authorization: `Bearer ${secret}` },
     })
     const query = `query { currentUser { id name } }`
