@@ -213,11 +213,17 @@ describe('admin/api-keys.vue', () => {
     it('discards stale response when user switches during load', async () => {
       let resolveFirst
       queryMock
-        .mockReturnValueOnce(new Promise((resolve) => { resolveFirst = resolve }))
+        .mockReturnValueOnce(
+          new Promise((resolve) => {
+            resolveFirst = resolve
+          }),
+        )
         .mockResolvedValueOnce({
           data: { apiKeysForUser: [activeKeyDetail({ id: 'ak-second', name: 'Second' })] },
         })
-      wrapper = Wrapper({ apiKeyUsers: [userEntry(), userEntry({ user: { id: 'u2', name: 'Bob', slug: 'bob' } })] })
+      wrapper = Wrapper({
+        apiKeyUsers: [userEntry(), userEntry({ user: { id: 'u2', name: 'Bob', slug: 'bob' } })],
+      })
       // Start loading user u1
       const firstToggle = wrapper.vm.toggleUser('u1')
       await wrapper.vm.$nextTick()
@@ -237,7 +243,11 @@ describe('admin/api-keys.vue', () => {
 
     it('sets detailLoading on the expand button', async () => {
       let resolveQuery
-      queryMock.mockReturnValue(new Promise((resolve) => { resolveQuery = resolve }))
+      queryMock.mockReturnValue(
+        new Promise((resolve) => {
+          resolveQuery = resolve
+        }),
+      )
       wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
       const togglePromise = wrapper.vm.toggleUser('u1')
       await wrapper.vm.$nextTick()

@@ -310,7 +310,11 @@ describe('settings/api-keys.vue', () => {
 
     it('sets creating to true during mutation', async () => {
       let resolveMutate
-      mutateMock.mockReturnValue(new Promise((resolve) => { resolveMutate = resolve }))
+      mutateMock.mockReturnValue(
+        new Promise((resolve) => {
+          resolveMutate = resolve
+        }),
+      )
       wrapper = Wrapper()
       await wrapper.setData({ name: 'Loading Test' })
       const submitPromise = wrapper.find('form').trigger('submit')
@@ -373,7 +377,11 @@ describe('settings/api-keys.vue', () => {
 
     it('sets revokingKeyId during mutation', async () => {
       let resolveMutate
-      mutateMock.mockReturnValue(new Promise((resolve) => { resolveMutate = resolve }))
+      mutateMock.mockReturnValue(
+        new Promise((resolve) => {
+          resolveMutate = resolve
+        }),
+      )
       wrapper = Wrapper({ myApiKeys: [activeKey()] })
       const revokePromise = wrapper.vm.revokeKey({ id: 'k1', name: 'CI Bot' })
       await wrapper.vm.$nextTick()

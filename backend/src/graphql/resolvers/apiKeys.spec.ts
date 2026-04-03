@@ -242,6 +242,21 @@ describe('updateApiKey', () => {
     })
     expect(errors?.[0].message).toContain('API key not found')
   })
+
+  it("throws error for another user's key", async () => {
+    const otherUser = await database.neode.create('User', {
+      id: 'u-stranger',
+      name: 'Stranger',
+      slug: 'stranger',
+      role: 'user',
+    })
+    authenticatedUser = (await otherUser.toJson()) as Context['user']
+    const { errors } = await mutate({
+      mutation: updateApiKey,
+      variables: { id: keyId, name: 'Stolen' },
+    })
+    expect(errors?.[0].message).toContain('API key not found')
+  })
 })
 
 describe('revokeApiKey', () => {
@@ -293,7 +308,7 @@ describe('revokeApiKey', () => {
     expect(after.myApiKeys.find((k) => k.id === keyId).disabledAt).toBe(originalDisabledAt)
   })
 
-  it('returns false for another user\'s key', async () => {
+  it("returns false for another user's key", async () => {
     const otherUser = await database.neode.create('User', {
       id: 'u4-other',
       name: 'Other',
@@ -303,33 +318,6 @@ describe('revokeApiKey', () => {
     authenticatedUser = (await otherUser.toJson()) as Context['user']
     const { data } = await mutate({ mutation: revokeApiKey, variables: { id: keyId } })
     expect(data.revokeApiKey).toBe(false)
-  })
-})
-
-describe('updateApiKey', () => {
-  it('throws error for another user\'s key', async () => {
-    const user1 = await database.neode.create('User', {
-      id: 'u-owner',
-      name: 'Owner',
-      slug: 'owner',
-      role: 'user',
-    })
-    authenticatedUser = (await user1.toJson()) as Context['user']
-    const { data } = await mutate({ mutation: createApiKey, variables: { name: 'Owned Key' } })
-    const ownedKeyId = data.createApiKey.apiKey.id
-
-    const user2 = await database.neode.create('User', {
-      id: 'u-stranger',
-      name: 'Stranger',
-      slug: 'stranger',
-      role: 'user',
-    })
-    authenticatedUser = (await user2.toJson()) as Context['user']
-    const { errors } = await mutate({
-      mutation: updateApiKey,
-      variables: { id: ownedKeyId, name: 'Stolen' },
-    })
-    expect(errors?.[0].message).toContain('API key not found')
   })
 })
 
