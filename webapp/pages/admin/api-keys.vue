@@ -348,6 +348,7 @@ export default {
         this.$toast.success(this.$t('admin.api-keys.revoke.success'))
       } catch (error) {
         this.$toast.error(error.message)
+        throw error
       }
     },
     async revokeAllKeys(userId, userName) {
@@ -363,6 +364,7 @@ export default {
         this.$toast.success(this.$t('admin.api-keys.revoke-all-success', { count, user: userName }))
       } catch (error) {
         this.$toast.error(error.message)
+        throw error
       }
     },
   },

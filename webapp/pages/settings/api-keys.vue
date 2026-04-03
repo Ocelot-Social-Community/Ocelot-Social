@@ -357,6 +357,7 @@ export default {
         this.$toast.success(this.$t('settings.api-keys.revoke.success', { name: key.name }))
       } catch (error) {
         this.$toast.error(error.message)
+        throw error
       } finally {
         this.revokingKeyId = null
       }
