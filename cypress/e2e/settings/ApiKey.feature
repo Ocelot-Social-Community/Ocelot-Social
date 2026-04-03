@@ -5,8 +5,8 @@ Feature: API Key Authentication
 
   Background:
     Given the following "users" are in the database:
-      | email                | password | id              | name      | slug      | role  | termsAndConditionsAgreedVersion |
-      | peterpan@example.org | 123      | id-of-peter-pan | Peter Pan | peter-pan | admin | 0.0.4                           |
+      | email                | password | id              | name      | slug      | role | termsAndConditionsAgreedVersion |
+      | peterpan@example.org | 123      | id-of-peter-pan | Peter Pan | peter-pan | user | 0.0.4                           |
 
   Scenario: Create an API key and use it to query the API
     Given I am logged in as "peter-pan"
