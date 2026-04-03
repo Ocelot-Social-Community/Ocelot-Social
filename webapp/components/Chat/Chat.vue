@@ -244,6 +244,7 @@ export default {
   beforeDestroy() {
     this._subscriptions?.forEach((s) => s.unsubscribe())
     if (this._intersectionObserver) this._intersectionObserver.disconnect()
+    if (this._roomLoaderObserver) this._roomLoaderObserver.disconnect()
     if (this._mutationObserver) this._mutationObserver.disconnect()
     if (this._seenFlushTimer) clearTimeout(this._seenFlushTimer)
   },
@@ -593,16 +594,36 @@ export default {
         this.$toast.error(error.message)
       }
       // Re-init IntersectionObserver after it was disabled by roomsLoaded=true.
-      // The library only calls initIntersectionObserver on loadingRooms true→false.
-      // We can only toggle loadingRooms when the search is empty (otherwise the
-      // search input gets destroyed). The dirty flag persists across searches until cleared.
-      if (this.roomObserverDirty && !this.roomsLoaded && !this.roomSearch) {
+      // The library only calls initIntersectionObserver on loadingRooms true→false,
+      // but toggling loadingRooms destroys the search input. Instead, we directly
+      // access the web component's shadow DOM to re-enable the loader and observer.
+      if (this.roomObserverDirty && !this.roomsLoaded) {
         this.roomObserverDirty = false
-        this.loadingRooms = true
         this.$nextTick(() => {
-          this.loadingRooms = false
+          this.reinitRoomLoader()
         })
       }
+    },
+
+    reinitRoomLoader() {
+      const shadow = this.$el?.shadowRoot
+      if (!shadow) return
+      const loader = shadow.querySelector('#infinite-loader-rooms')
+      const roomsList = shadow.querySelector('#rooms-list')
+      if (!loader || !roomsList) return
+      // Make loader visible (library hides it via v-show when showLoader=false)
+      loader.style.display = ''
+      // Create a new IntersectionObserver to trigger pagination on scroll
+      if (this._roomLoaderObserver) this._roomLoaderObserver.disconnect()
+      this._roomLoaderObserver = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && !this.roomsLoaded) {
+            this.fetchMoreRooms()
+          }
+        },
+        { root: roomsList, threshold: 0 },
+      )
+      this._roomLoaderObserver.observe(loader)
     },
 
     fetchMoreRooms() {
