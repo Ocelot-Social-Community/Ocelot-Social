@@ -168,7 +168,7 @@ describe('admin/api-keys.vue', () => {
 
     it('collapses on second click', async () => {
       wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
-      wrapper.setData({
+      await wrapper.setData({
         expandedUserId: 'u1',
         userKeys: [activeKeyDetail()],
       })
@@ -285,7 +285,7 @@ describe('admin/api-keys.vue', () => {
     it('collapses detail after revoke', async () => {
       mutateMock.mockResolvedValue({ data: { adminRevokeApiKey: true } })
       wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
-      wrapper.setData({ expandedUserId: 'u1' })
+      await wrapper.setData({ expandedUserId: 'u1' })
       await wrapper.vm.revokeKey('ak1', 'u1')
       await flushPromises()
       expect(wrapper.vm.expandedUserId).toBeNull()
@@ -323,7 +323,7 @@ describe('admin/api-keys.vue', () => {
     it('collapses detail and clears keys after bulk revoke', async () => {
       mutateMock.mockResolvedValue({ data: { adminRevokeUserApiKeys: 2 } })
       wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
-      wrapper.setData({ expandedUserId: 'u1', userKeys: [activeKeyDetail()] })
+      await wrapper.setData({ expandedUserId: 'u1', userKeys: [activeKeyDetail()] })
       await wrapper.vm.revokeAllKeys('u1', 'Peter')
       await flushPromises()
       expect(wrapper.vm.expandedUserId).toBeNull()
@@ -346,9 +346,9 @@ describe('admin/api-keys.vue', () => {
       expect(wrapper.vm.offset).toBe(20)
     })
 
-    it('back decrements offset', () => {
+    it('back decrements offset', async () => {
       wrapper = Wrapper()
-      wrapper.setData({ offset: 20 })
+      await wrapper.setData({ offset: 20 })
       wrapper.vm.back()
       expect(wrapper.vm.offset).toBe(0)
     })
@@ -364,9 +364,9 @@ describe('admin/api-keys.vue', () => {
       expect(wrapper.vm.hasPrevious).toBe(false)
     })
 
-    it('hasPrevious is true at offset > 0', () => {
+    it('hasPrevious is true at offset > 0', async () => {
       wrapper = Wrapper()
-      wrapper.setData({ offset: 20 })
+      await wrapper.setData({ offset: 20 })
       expect(wrapper.vm.hasPrevious).toBe(true)
     })
 
