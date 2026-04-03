@@ -183,6 +183,7 @@ export default {
       roomCursor: null,
       roomPageSize: 10,
       roomSearch: '',
+      roomObserverDirty: false,
       selectedRoom: null,
       activeRoomId: null,
       loadingRooms: true,
@@ -566,6 +567,7 @@ export default {
       const value = typeof event === 'string' ? event : event?.value
       this.roomSearch = value || ''
       this.roomCursor = null
+      if (this.roomsLoaded) this.roomObserverDirty = true
       this.roomsLoaded = false
       this.roomSearchGeneration = (this.roomSearchGeneration || 0) + 1
       const generation = this.roomSearchGeneration
@@ -589,6 +591,17 @@ export default {
         if (generation !== this.roomSearchGeneration) return
         this.rooms = []
         this.$toast.error(error.message)
+      }
+      // Re-init IntersectionObserver after it was disabled by roomsLoaded=true.
+      // The library only calls initIntersectionObserver on loadingRooms true→false.
+      // We can only toggle loadingRooms when the search is empty (otherwise the
+      // search input gets destroyed). The dirty flag persists across searches until cleared.
+      if (this.roomObserverDirty && !this.roomsLoaded && !this.roomSearch) {
+        this.roomObserverDirty = false
+        this.loadingRooms = true
+        this.$nextTick(() => {
+          this.loadingRooms = false
+        })
       }
     },
 
