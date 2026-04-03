@@ -39,6 +39,7 @@
         <os-button
           variant="primary"
           type="submit"
+          data-test="create-api-key-submit"
           :disabled="!name.trim() || activeKeys.length >= maxKeys"
           :loading="creating"
         >
