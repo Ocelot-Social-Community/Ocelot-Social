@@ -148,6 +148,9 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.updateMapPosition)
+    if (this.geocoderCollapseHandler) {
+      window.removeEventListener('resize', this.geocoderCollapseHandler)
+    }
   },
   computed: {
     ...mapGetters({
@@ -211,6 +214,21 @@ export default {
     },
   },
   methods: {
+    addGeocoder() {
+      this.geocoder = new MapboxGeocoder({
+        accessToken: this.$env.MAPBOX_TOKEN,
+        mapboxgl: this.mapboxgl,
+        marker: false,
+        collapsed: this.geocoderCollapsed,
+      })
+      this.map.addControl(this.geocoder, 'top-right')
+      // Ensure geocoder stays at the top of the control group
+      const container = this.geocoder.container
+      const parent = container.parentNode
+      if (parent && parent.firstChild !== container) {
+        parent.insertBefore(container, parent.firstChild)
+      }
+    },
     updateMapPosition() {
       const navbar = document.getElementById('navbar')
       const footer = document.getElementById('footer')
@@ -238,15 +256,17 @@ export default {
       })
 
       // add search field for locations
-      this.map.addControl(
-        new MapboxGeocoder({
-          accessToken: this.$env.MAPBOX_TOKEN,
-          mapboxgl: this.mapboxgl,
-          marker: false,
-          collapsed: window.innerWidth <= 810,
-        }),
-        'top-right',
-      )
+      this.geocoderCollapsed = window.innerWidth <= 810
+      this.addGeocoder()
+      this.geocoderCollapseHandler = () => {
+        const shouldCollapse = window.innerWidth <= 810
+        if (shouldCollapse !== this.geocoderCollapsed) {
+          this.geocoderCollapsed = shouldCollapse
+          this.map.removeControl(this.geocoder)
+          this.addGeocoder()
+        }
+      }
+      window.addEventListener('resize', this.geocoderCollapseHandler)
 
       // add style switcher control
       let closePopoverHandler = null

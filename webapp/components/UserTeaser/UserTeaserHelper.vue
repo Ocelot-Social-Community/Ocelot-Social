@@ -34,12 +34,15 @@ export default {
     return {
       hoverTimer: null,
       isHovering: false,
+      isTouchDevice: isTouchDevice(),
     }
   },
-  computed: {
-    isTouchDevice() {
-      return isTouchDevice()
-    },
+  mounted() {
+    this.pointerQuery = window.matchMedia('(pointer: coarse)')
+    this.onPointerChange = () => {
+      this.isTouchDevice = isTouchDevice()
+    }
+    this.pointerQuery.addEventListener('change', this.onPointerChange)
   },
   methods: {
     handleMouseEnter() {
@@ -82,6 +85,9 @@ export default {
 
   beforeDestroy() {
     this.clearHoverTimer()
+    if (this.pointerQuery && this.onPointerChange) {
+      this.pointerQuery.removeEventListener('change', this.onPointerChange)
+    }
   },
 }
 </script>
