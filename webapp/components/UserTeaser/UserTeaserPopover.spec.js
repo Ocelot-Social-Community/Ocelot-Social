@@ -2,6 +2,12 @@ import { render } from '@testing-library/vue'
 import { RouterLinkStub } from '@vue/test-utils'
 import UserTeaserPopover from './UserTeaserPopover.vue'
 
+window.matchMedia = jest.fn().mockImplementation(() => ({
+  matches: false,
+  addEventListener: jest.fn(),
+  removeEventListener: jest.fn(),
+}))
+
 const localVue = global.localVue
 
 const user = {

@@ -2,8 +2,12 @@ import { render, waitFor, fireEvent } from '@testing-library/vue'
 import { RouterLinkStub } from '@vue/test-utils'
 import UserTeaserHelper from './UserTeaserHelper.vue'
 
+let mockMatchMediaMatches = false
 const mockMatchMediaListeners = []
 window.matchMedia = jest.fn().mockImplementation(() => ({
+  get matches() {
+    return mockMatchMediaMatches
+  },
   addEventListener: jest.fn((event, handler) => mockMatchMediaListeners.push(handler)),
   removeEventListener: jest.fn(),
 }))
@@ -15,12 +19,6 @@ const userLink = {
   params: { slug: 'slug', id: 'id' },
 }
 
-let mockIsTouchDevice
-
-jest.mock('../utils/isTouchDevice', () => ({
-  isTouchDevice: jest.fn(() => mockIsTouchDevice),
-}))
-
 describe('UserTeaserHelper', () => {
   const Wrapper = ({
     withLinkToProfile = true,
@@ -28,7 +26,7 @@ describe('UserTeaserHelper', () => {
     withPopoverEnabled = true,
     hoverDelay = 500,
   }) => {
-    mockIsTouchDevice = onTouchScreen
+    mockMatchMediaMatches = onTouchScreen
 
     return render(UserTeaserHelper, {
       localVue,

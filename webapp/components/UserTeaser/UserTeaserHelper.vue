@@ -20,8 +20,6 @@
 </template>
 
 <script>
-import { isTouchDevice } from '../utils/isTouchDevice'
-
 export default {
   name: 'UserTeaserHelper',
   props: {
@@ -31,18 +29,22 @@ export default {
     hoverDelay: { type: Number, default: 500 },
   },
   data() {
+    const pointerQuery =
+      typeof window !== 'undefined' ? window.matchMedia('(pointer: coarse)') : null
     return {
       hoverTimer: null,
       isHovering: false,
-      isTouchDevice: isTouchDevice(),
+      isTouchDevice: pointerQuery ? pointerQuery.matches : false,
+      pointerQuery,
     }
   },
   mounted() {
-    this.pointerQuery = window.matchMedia('(pointer: coarse)')
-    this.onPointerChange = () => {
-      this.isTouchDevice = isTouchDevice()
+    if (this.pointerQuery) {
+      this.onPointerChange = (e) => {
+        this.isTouchDevice = e.matches
+      }
+      this.pointerQuery.addEventListener('change', this.onPointerChange)
     }
-    this.pointerQuery.addEventListener('change', this.onPointerChange)
   },
   methods: {
     handleMouseEnter() {

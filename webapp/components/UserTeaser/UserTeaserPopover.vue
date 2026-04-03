@@ -44,7 +44,6 @@
 import { OsButton, OsNumber } from '@ocelot-social/ui'
 import Badges from '~/components/Badges.vue'
 import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
-import { isTouchDevice } from '~/components/utils/isTouchDevice'
 import { userTeaserQuery } from '~/graphql/User.js'
 
 export default {
@@ -59,10 +58,28 @@ export default {
     userId: { type: String },
     userLink: { type: Object },
   },
+  data() {
+    const pointerQuery =
+      typeof window !== 'undefined' ? window.matchMedia('(pointer: coarse)') : null
+    return {
+      isTouchDevice: pointerQuery ? pointerQuery.matches : false,
+      pointerQuery,
+    }
+  },
+  mounted() {
+    if (this.pointerQuery) {
+      this.onPointerChange = (e) => {
+        this.isTouchDevice = e.matches
+      }
+      this.pointerQuery.addEventListener('change', this.onPointerChange)
+    }
+  },
+  beforeDestroy() {
+    if (this.pointerQuery && this.onPointerChange) {
+      this.pointerQuery.removeEventListener('change', this.onPointerChange)
+    }
+  },
   computed: {
-    isTouchDevice() {
-      return isTouchDevice()
-    },
     user() {
       return (this.User && this.User[0]) ?? null
     },
