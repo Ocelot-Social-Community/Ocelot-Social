@@ -47,11 +47,7 @@
             <template v-for="entry in apiKeyUsers">
               <tr :key="entry.user.id">
                 <td class="ds-table-col">
-                  <nuxt-link
-                    :to="{ name: 'profile-id-slug', params: { id: entry.user.id, slug: entry.user.slug } }"
-                  >
-                    <b>@{{ entry.user.slug }}</b>
-                  </nuxt-link>
+                  <user-teaser :user="entry.user" :show-slug="true" />
                 </td>
                 <td class="ds-table-col ds-table-col-right">{{ entry.activeCount }}</td>
                 <td class="ds-table-col ds-table-col-right">{{ entry.revokedCount }}</td>
@@ -71,7 +67,7 @@
                       @click="toggleUser(entry.user.id)"
                     >
                       <template #icon>
-                        <span class="expand-chevron" :class="{ open: expandedUserId === entry.user.id }">&#9660;</span>
+                        <os-icon :icon="expandedUserId === entry.user.id ? icons.angleUp : icons.angleDown" />
                       </template>
                     </os-button>
                     <os-button
@@ -187,6 +183,7 @@ import { OsButton, OsCard, OsIcon, OsSpinner } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import PaginationButtons from '~/components/_new/generic/PaginationButtons/PaginationButtons'
 import ConfirmModal from '~/components/Modal/ConfirmModal'
+import UserTeaser from '~/components/UserTeaser/UserTeaser'
 import {
   apiKeyUsersQuery,
   apiKeysForUserQuery,
@@ -202,6 +199,7 @@ export default {
     OsSpinner,
     PaginationButtons,
     ConfirmModal,
+    UserTeaser,
   },
   created() {
     this.icons = iconRegistry
@@ -372,6 +370,15 @@ export default {
   align-items: center;
 }
 
+.ds-table-wrap {
+  overflow: visible;
+}
+
+.ds-table {
+  width: auto;
+  min-width: 100%;
+}
+
 .detail-cell {
   background-color: $color-neutral-90;
   padding: $space-small;
@@ -385,13 +392,4 @@ export default {
   color: $text-color-soft;
 }
 
-.expand-chevron {
-  display: inline-block;
-  font-size: $font-size-small;
-  transition: transform 0.2s;
-
-  &.open {
-    transform: rotate(180deg);
-  }
-}
 </style>

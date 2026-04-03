@@ -1,13 +1,19 @@
 import gql from 'graphql-tag'
+import { imageUrls } from '../fragments/imageUrls'
 
 export const apiKeyUsersQuery = () => {
   return gql`
+    ${imageUrls}
+
     query ($orderBy: ApiKeyUserOrder, $first: Int, $offset: Int) {
       apiKeyUsers(orderBy: $orderBy, first: $first, offset: $offset) {
         user {
           id
           name
           slug
+          avatar {
+            ...imageUrls
+          }
         }
         activeCount
         revokedCount
