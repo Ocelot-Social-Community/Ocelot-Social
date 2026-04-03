@@ -1,0 +1,12 @@
+query apiKeysForUser($userId: ID!) {
+  apiKeysForUser(userId: $userId) {
+    id
+    name
+    keyPrefix
+    createdAt
+    lastUsedAt
+    expiresAt
+    disabled
+    disabledAt
+  }
+}
