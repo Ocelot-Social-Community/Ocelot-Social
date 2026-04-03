@@ -1,3 +1,4 @@
+// Global mock for matchMedia (used by touchDevice mixin, drag detection, etc.)
 import Vue from 'vue'
 import { createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
@@ -6,6 +7,14 @@ import Filters from '~/plugins/vue-filters'
 import InfiniteLoading from '~/plugins/vue-infinite-loading'
 import Directives from '~/plugins/vue-directives'
 import VueObserveVisibility from '~/plugins/vue-observe-visibility'
+
+window.matchMedia =
+  window.matchMedia ||
+  jest.fn().mockImplementation((query) => ({
+    matches: query === '(pointer: fine)' || query === '(min-width: 640px)',
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+  }))
 require('intersection-observer')
 
 // Fail tests on Vue warnings

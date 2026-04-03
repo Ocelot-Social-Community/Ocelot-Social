@@ -140,7 +140,7 @@ hr {
     transition-delay: 0;
     transition: opacity 80ms ease-out;
 
-    @media(hover: none) {
+    @media(pointer: coarse) {
       pointer-events: all;
     }
   }

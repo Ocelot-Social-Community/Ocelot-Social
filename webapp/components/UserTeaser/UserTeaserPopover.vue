@@ -44,11 +44,12 @@
 import { OsButton, OsNumber } from '@ocelot-social/ui'
 import Badges from '~/components/Badges.vue'
 import LocationInfo from '~/components/LocationInfo/LocationInfo.vue'
-import { isTouchDevice } from '~/components/utils/isTouchDevice'
+import touchDevice from '~/mixins/touchDevice'
 import { userTeaserQuery } from '~/graphql/User.js'
 
 export default {
   name: 'UserTeaserPopover',
+  mixins: [touchDevice],
   components: {
     Badges,
     LocationInfo,
@@ -60,9 +61,6 @@ export default {
     userLink: { type: Object },
   },
   computed: {
-    isTouchDevice() {
-      return isTouchDevice()
-    },
     user() {
       return (this.User && this.User[0]) ?? null
     },

@@ -5,17 +5,18 @@ import Vuex from 'vuex'
 
 const localVue = global.localVue
 
+window.matchMedia = jest.fn().mockImplementation(() => ({
+  matches: false,
+  addEventListener: jest.fn(),
+  removeEventListener: jest.fn(),
+}))
+
 // Mock Math.random, used in Dropdown
 Object.assign(Math, {
   random: () => 0,
 })
 
 const waitForPopover = async () => await new Promise((resolve) => setTimeout(resolve, 1000))
-
-let mockIsTouchDevice
-jest.mock('../utils/isTouchDevice', () => ({
-  isTouchDevice: jest.fn(() => mockIsTouchDevice),
-}))
 
 const userTilda = {
   name: 'Tilda Swinton',
@@ -65,7 +66,11 @@ describe('UserTeaser', () => {
     user = userTilda,
     withPopoverEnabled = true,
   }) => {
-    mockIsTouchDevice = onTouchScreen
+    window.matchMedia.mockImplementation(() => ({
+      matches: onTouchScreen,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    }))
 
     const store = new Vuex.Store({
       getters: {

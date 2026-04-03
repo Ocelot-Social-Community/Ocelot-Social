@@ -33,17 +33,19 @@
           </button>
           <div
             id="map-legend-content"
-            v-show="legendOpen || !isMobile"
+            :class="{ 'map-legend-content--hidden': isMobile && !legendOpen }"
             class="map-legend-content"
             role="region"
             :aria-label="$t('map.legend.title')"
           >
             <div v-for="type in markers.types" :key="type.id" class="map-legend-item">
-              <img
-                :alt="$t('map.legend.' + type.id)"
-                :src="'/img/mapbox/marker-icons/' + type.icon.legendName"
-                width="15"
-              />
+              <span :style="{ color: type.color }">
+                <os-icon
+                  :icon="icons.mapPinFilled"
+                  size="xl"
+                  :aria-label="$t('map.legend.' + type.id)"
+                />
+              </span>
               {{ $t('map.legend.' + type.id) }}
             </div>
           </div>
@@ -61,6 +63,8 @@ import mapboxgl from 'mapbox-gl'
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
 import { mapGetters } from 'vuex'
+import { OsIcon } from '@ocelot-social/ui'
+import { iconRegistry } from '~/utils/iconRegistry'
 import { profileUserQuery } from '~/graphql/User'
 import { mapQuery } from '~/graphql/MapQuery'
 import mobile from '~/mixins/mobile'
@@ -73,6 +77,7 @@ export default {
   mixins: [mobile(maxMobileWidth)],
   components: {
     Empty,
+    OsIcon,
   },
   head() {
     return {
@@ -96,33 +101,33 @@ export default {
         types: [
           {
             id: 'theUser',
+            color: '#f79640',
             icon: {
               id: 'marker-orange',
-              legendName: 'mapbox-marker-icon-orange.svg',
               mapName: 'mapbox-marker-icon-20px-orange.png',
             },
           },
           {
             id: 'user',
+            color: '#33c377',
             icon: {
               id: 'marker-green',
-              legendName: 'mapbox-marker-icon-green.svg',
               mapName: 'mapbox-marker-icon-20px-green.png',
             },
           },
           {
             id: 'group',
+            color: '#f84d4d',
             icon: {
               id: 'marker-red',
-              legendName: 'mapbox-marker-icon-red.svg',
               mapName: 'mapbox-marker-icon-20px-red.png',
             },
           },
           {
             id: 'event',
+            color: '#7753eb',
             icon: {
               id: 'marker-purple',
-              legendName: 'mapbox-marker-icon-purple.svg',
               mapName: 'mapbox-marker-icon-20px-purple.png',
             },
           },
@@ -133,9 +138,11 @@ export default {
         isSourceAndLayerAdded: false,
         isFlyToCenter: false,
         popup: null,
-        popupOnLeaveTimeoutId: null,
       },
     }
+  },
+  created() {
+    this.icons = iconRegistry
   },
   async mounted() {
     this.updateMapPosition()
@@ -149,6 +156,9 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.updateMapPosition)
+    if (this.geocoderCollapseHandler) {
+      window.removeEventListener('resize', this.geocoderCollapseHandler)
+    }
   },
   computed: {
     ...mapGetters({
@@ -212,6 +222,21 @@ export default {
     },
   },
   methods: {
+    addGeocoder() {
+      this.geocoder = new MapboxGeocoder({
+        accessToken: this.$env.MAPBOX_TOKEN,
+        mapboxgl: this.mapboxgl,
+        marker: false,
+        collapsed: this.geocoderCollapsed,
+      })
+      this.map.addControl(this.geocoder, 'top-right')
+      // Ensure geocoder stays at the top of the control group
+      const container = this.geocoder.container
+      const parent = container.parentNode
+      if (parent && parent.firstChild !== container) {
+        parent.insertBefore(container, parent.firstChild)
+      }
+    },
     updateMapPosition() {
       const navbar = document.getElementById('navbar')
       const footer = document.getElementById('footer')
@@ -239,15 +264,17 @@ export default {
       })
 
       // add search field for locations
-      this.map.addControl(
-        new MapboxGeocoder({
-          accessToken: this.$env.MAPBOX_TOKEN,
-          mapboxgl: this.mapboxgl,
-          marker: false,
-          collapsed: window.innerWidth <= 810,
-        }),
-        'top-right',
-      )
+      this.geocoderCollapsed = window.innerWidth <= 810
+      this.addGeocoder()
+      this.geocoderCollapseHandler = () => {
+        const shouldCollapse = window.innerWidth <= 810
+        if (shouldCollapse !== this.geocoderCollapsed) {
+          this.geocoderCollapsed = shouldCollapse
+          this.map.removeControl(this.geocoder)
+          this.addGeocoder()
+        }
+      }
+      window.addEventListener('resize', this.geocoderCollapseHandler)
 
       // add style switcher control
       let closePopoverHandler = null
@@ -335,10 +362,6 @@ export default {
 
       // show popup for given features at coordinates
       const showPopup = (features, lngLat) => {
-        if (this.popupOnLeaveTimeoutId) {
-          clearTimeout(this.popupOnLeaveTimeoutId)
-          this.popupOnLeaveTimeoutId = null
-        }
         if (this.markers.popup.isOpen()) {
           this.markers.popup.remove()
         }
@@ -441,12 +464,7 @@ export default {
       })
 
       this.map.on('mouseleave', 'markers', () => {
-        if (this.markers.popup.isOpen()) {
-          this.popupOnLeaveTimeoutId = setTimeout(() => {
-            this.map.getCanvas().style.cursor = ''
-            this.markers.popup.remove()
-          }, 3000)
-        }
+        this.map.getCanvas().style.cursor = ''
       })
 
       // Mobile: show popup on click/tap
@@ -722,6 +740,8 @@ export default {
   flex-direction: column;
   overflow: hidden;
   z-index: 1;
+  font-family: $font-family-text;
+  font-size: $font-size-base;
 }
 
 .mgl-map-wrapper {
@@ -733,10 +753,22 @@ export default {
   overflow: hidden;
 }
 
+.mapboxgl-ctrl-attrib.mapboxgl-compact {
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0;
+}
+
+.mapboxgl-ctrl-attrib-button {
+  position: static;
+}
+
 .mapboxgl-popup-content {
   max-height: 40vh;
   overflow: hidden;
   padding: 10px;
+  border-radius: $border-radius-x-large;
 }
 
 .map-popup-container {
@@ -747,14 +779,14 @@ export default {
 }
 
 .mapboxgl-popup-close-button {
-  font-size: 1.2rem;
+  font-size: $font-size-large;
   padding: 2px 6px;
   z-index: 1;
 }
 
 .map-popup-header {
   font-weight: bold;
-  font-size: 1.1em;
+  font-size: $font-size-large;
   margin-bottom: 4px;
   padding-right: 16px;
   flex-shrink: 0;
@@ -804,7 +836,7 @@ export default {
     height: 29px;
     min-width: 29px;
     background-color: white;
-    border-radius: 4px;
+    border-radius: $border-radius-x-large;
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 
@@ -832,9 +864,9 @@ export default {
   left: 10px;
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(4px);
-  border-radius: 4px;
+  border-radius: $border-radius-x-large;
   z-index: 1;
-  font-size: 0.8rem;
+  font-size: $font-size-base;
   color: $color-neutral-10;
 }
 
@@ -845,11 +877,13 @@ export default {
   border: none;
   background: rgba(0, 0, 0, 0.05);
   color: $color-neutral-10;
-  border-radius: 4px;
+  border-radius: $border-radius-x-large;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: $font-size-base;
   text-align: left;
   order: 1;
+  align-items: center;
+  justify-content: space-between;
 
   &:hover,
   &:active {
@@ -858,8 +892,8 @@ export default {
 }
 
 .map-legend-arrow {
-  float: right;
-  font-size: 0.7rem;
+  font-size: $font-size-small;
+  line-height: 1;
 }
 
 .map-legend-content {
@@ -879,22 +913,34 @@ export default {
   }
 
   .map-legend-toggle {
-    display: block;
+    display: flex;
   }
 
   .map-legend-content {
     order: 0;
   }
 
+  .map-legend-content--hidden {
+    visibility: hidden;
+    height: 0;
+    padding: 0 8px;
+    overflow: hidden;
+  }
+
   .map-legend--open .map-legend-content {
     border-bottom: 1px solid #eee;
+  }
+
+  .map-legend--open .map-legend-toggle {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
 }
 
 .map-style-switcher {
   position: relative;
   background: white;
-  border-radius: 4px;
+  border-radius: $border-radius-x-large;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 }
 
@@ -922,7 +968,7 @@ export default {
   right: 100%;
   margin-right: 6px;
   background: white;
-  border-radius: 4px;
+  border-radius: $border-radius-x-large;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
   white-space: nowrap;
   overflow: hidden;
@@ -939,7 +985,7 @@ export default {
   border: none;
   background: none;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: $font-size-base;
   text-align: left;
 
   &:not(:last-child) {

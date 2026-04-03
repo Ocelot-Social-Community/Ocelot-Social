@@ -20,10 +20,11 @@
 </template>
 
 <script>
-import { isTouchDevice } from '../utils/isTouchDevice'
+import touchDevice from '~/mixins/touchDevice'
 
 export default {
   name: 'UserTeaserHelper',
+  mixins: [touchDevice],
   props: {
     userLink: { type: Object, default: null },
     linkToProfile: { type: Boolean, default: true },
@@ -35,11 +36,6 @@ export default {
       hoverTimer: null,
       isHovering: false,
     }
-  },
-  computed: {
-    isTouchDevice() {
-      return isTouchDevice()
-    },
   },
   methods: {
     handleMouseEnter() {
