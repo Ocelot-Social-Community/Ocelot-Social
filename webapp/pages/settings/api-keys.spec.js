@@ -16,6 +16,7 @@ describe('settings/api-keys.vue', () => {
 
     mocks = {
       $t: jest.fn((key) => key),
+      $env: { API_KEYS_MAX_PER_USER: 5 },
       $toast: {
         success: jest.fn(),
         error: jest.fn(),
@@ -31,6 +32,30 @@ describe('settings/api-keys.vue', () => {
     }
   })
 
+  const activeKey = (overrides = {}) => ({
+    id: 'k1',
+    name: 'CI Bot',
+    keyPrefix: 'oak_abc12345',
+    createdAt: '2026-04-01T00:00:00Z',
+    lastUsedAt: '2026-04-02T10:00:00Z',
+    expiresAt: null,
+    disabled: false,
+    disabledAt: null,
+    ...overrides,
+  })
+
+  const revokedKey = (overrides = {}) => ({
+    id: 'k-revoked',
+    name: 'Old Key',
+    keyPrefix: 'oak_old12345',
+    createdAt: '2025-01-01T00:00:00Z',
+    lastUsedAt: '2025-05-01T00:00:00Z',
+    expiresAt: null,
+    disabled: true,
+    disabledAt: '2025-06-01T00:00:00Z',
+    ...overrides,
+  })
+
   const Wrapper = (data = {}) => {
     return mount(ApiKeys, {
       mocks,
@@ -38,6 +63,7 @@ describe('settings/api-keys.vue', () => {
       stubs: {
         'nuxt-link': true,
         'confirm-modal': true,
+        'date-time': { template: '<span>{{ dateTime }}</span>', props: ['dateTime'] },
       },
       data: () => ({
         myApiKeys: [],
@@ -58,39 +84,82 @@ describe('settings/api-keys.vue', () => {
       expect(wrapper.text()).toContain('settings.api-keys.list.empty')
     })
 
-    it('shows key list when keys exist', () => {
-      wrapper = Wrapper({
-        myApiKeys: [
-          {
-            id: 'k1',
-            name: 'CI Bot',
-            keyPrefix: 'oak_abc12345',
-            createdAt: '2026-04-01T00:00:00Z',
-            lastUsedAt: null,
-            expiresAt: null,
-            disabled: false,
-          },
-        ],
-      })
+    it('shows active key list', () => {
+      wrapper = Wrapper({ myApiKeys: [activeKey()] })
       expect(wrapper.text()).toContain('CI Bot')
       expect(wrapper.text()).toContain('oak_abc12345')
     })
 
-    it('shows revoked label for disabled keys', () => {
+    it('shows key counter', () => {
+      wrapper = Wrapper({ myApiKeys: [activeKey(), activeKey({ id: 'k2', name: 'Key 2' })] })
+      expect(wrapper.text()).toContain('(2/5)')
+    })
+
+    it('shows "never" for keys without lastUsedAt', () => {
+      wrapper = Wrapper({ myApiKeys: [activeKey({ lastUsedAt: null })] })
+      expect(wrapper.text()).toContain('settings.api-keys.list.never')
+    })
+
+    it('shows "never-expires" for keys without expiresAt', () => {
+      wrapper = Wrapper({ myApiKeys: [activeKey()] })
+      expect(wrapper.text()).toContain('settings.api-keys.list.never-expires')
+    })
+
+    it('shows expired label for expired keys', () => {
       wrapper = Wrapper({
-        myApiKeys: [
-          {
-            id: 'k1',
-            name: 'Old Key',
-            keyPrefix: 'oak_old12345',
-            createdAt: '2026-01-01T00:00:00Z',
-            lastUsedAt: null,
-            expiresAt: null,
-            disabled: true,
-          },
-        ],
+        myApiKeys: [activeKey({ expiresAt: '2020-01-01T00:00:00Z' })],
       })
+      expect(wrapper.text()).toContain('settings.api-keys.list.expired')
+    })
+  })
+
+  describe('revoked keys section', () => {
+    it('is hidden when no revoked keys', () => {
+      wrapper = Wrapper({ myApiKeys: [activeKey()] })
+      expect(wrapper.find('.revoked-toggle').exists()).toBe(false)
+    })
+
+    it('shows toggle when revoked keys exist', () => {
+      wrapper = Wrapper({ myApiKeys: [revokedKey()] })
+      expect(wrapper.find('.revoked-toggle').exists()).toBe(true)
+      expect(wrapper.text()).toContain('settings.api-keys.revoked-list.title')
+    })
+
+    it('is collapsed by default', () => {
+      wrapper = Wrapper({ myApiKeys: [revokedKey()] })
+      expect(wrapper.find('#revoked-keys-list').exists()).toBe(false)
+    })
+
+    it('expands on toggle click', async () => {
+      wrapper = Wrapper({ myApiKeys: [revokedKey()] })
+      await wrapper.find('.revoked-toggle').trigger('click')
+      expect(wrapper.find('#revoked-keys-list').exists()).toBe(true)
+      expect(wrapper.text()).toContain('Old Key')
+    })
+
+    it('shows revoked status label', async () => {
+      wrapper = Wrapper({ myApiKeys: [revokedKey()] })
+      await wrapper.find('.revoked-toggle').trigger('click')
       expect(wrapper.text()).toContain('settings.api-keys.list.revoked')
+    })
+  })
+
+  describe('computed properties', () => {
+    it('activeKeys filters out disabled keys', () => {
+      wrapper = Wrapper({ myApiKeys: [activeKey(), revokedKey()] })
+      expect(wrapper.vm.activeKeys).toHaveLength(1)
+      expect(wrapper.vm.activeKeys[0].id).toBe('k1')
+    })
+
+    it('revokedKeys filters to disabled keys only', () => {
+      wrapper = Wrapper({ myApiKeys: [activeKey(), revokedKey()] })
+      expect(wrapper.vm.revokedKeys).toHaveLength(1)
+      expect(wrapper.vm.revokedKeys[0].id).toBe('k-revoked')
+    })
+
+    it('maxKeys reads from $env', () => {
+      wrapper = Wrapper()
+      expect(wrapper.vm.maxKeys).toBe(5)
     })
   })
 
@@ -99,14 +168,7 @@ describe('settings/api-keys.vue', () => {
       mutateMock.mockResolvedValue({
         data: {
           createApiKey: {
-            apiKey: {
-              id: 'new-key',
-              name: 'My Key',
-              keyPrefix: 'oak_newkey12',
-              createdAt: '2026-04-02T00:00:00Z',
-              expiresAt: null,
-              disabled: false,
-            },
+            apiKey: activeKey({ id: 'new-key', name: 'My Key' }),
             secret: 'oak_fullsecretkey123',
           },
         },
@@ -117,6 +179,25 @@ describe('settings/api-keys.vue', () => {
       wrapper = Wrapper()
       const submitBtn = wrapper.find('button[type="submit"]')
       expect(submitBtn.attributes('disabled')).toBeDefined()
+    })
+
+    it('submit button is disabled when limit reached', () => {
+      const keys = Array.from({ length: 5 }, (_, i) => activeKey({ id: `k${i}`, name: `Key ${i}` }))
+      wrapper = Wrapper({ myApiKeys: keys })
+      wrapper.setData({ name: 'New Key' })
+      const submitBtn = wrapper.find('button[type="submit"]')
+      expect(submitBtn.attributes('disabled')).toBeDefined()
+    })
+
+    it('shows limit warning when max keys reached', () => {
+      const keys = Array.from({ length: 5 }, (_, i) => activeKey({ id: `k${i}`, name: `Key ${i}` }))
+      wrapper = Wrapper({ myApiKeys: keys })
+      expect(wrapper.text()).toContain('settings.api-keys.create.limit-reached')
+    })
+
+    it('does not show limit warning when under limit', () => {
+      wrapper = Wrapper({ myApiKeys: [activeKey()] })
+      expect(wrapper.text()).not.toContain('settings.api-keys.create.limit-reached')
     })
 
     it('calls createApiKey mutation on submit', async () => {
@@ -132,14 +213,26 @@ describe('settings/api-keys.vue', () => {
       )
     })
 
-    it('sends expiresInDays when expiry is selected', async () => {
+    it('sends expiresInDays as number when selected', async () => {
       wrapper = Wrapper()
-      wrapper.setData({ name: 'Expiring Key', expiresInDays: 30 })
+      wrapper.setData({ name: 'Expiring', expiresInDays: 30 })
       await wrapper.find('form').trigger('submit')
       await flushPromises()
       expect(mutateMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          variables: { name: 'Expiring Key', expiresInDays: 30 },
+          variables: { name: 'Expiring', expiresInDays: 30 },
+        }),
+      )
+    })
+
+    it('does not send expiresInDays when null', async () => {
+      wrapper = Wrapper()
+      wrapper.setData({ name: 'No Expiry', expiresInDays: null })
+      await wrapper.find('form').trigger('submit')
+      await flushPromises()
+      expect(mutateMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          variables: { name: 'No Expiry' },
         }),
       )
     })
@@ -151,6 +244,7 @@ describe('settings/api-keys.vue', () => {
       await flushPromises()
       expect(wrapper.vm.newSecret).toBe('oak_fullsecretkey123')
       expect(wrapper.text()).toContain('settings.api-keys.secret.title')
+      expect(wrapper.text()).toContain('oak_fullsecretkey123')
     })
 
     it('refetches key list after creation', async () => {
@@ -161,21 +255,12 @@ describe('settings/api-keys.vue', () => {
       expect(refetchMock).toHaveBeenCalled()
     })
 
-    it('shows success toast after creation', async () => {
+    it('shows success toast', async () => {
       wrapper = Wrapper()
       wrapper.setData({ name: 'My Key' })
       await wrapper.find('form').trigger('submit')
       await flushPromises()
       expect(mocks.$toast.success).toHaveBeenCalledWith('settings.api-keys.create.success')
-    })
-
-    it('shows error toast on failure', async () => {
-      mutateMock.mockRejectedValue(new Error('Maximum of 5 active API keys reached'))
-      wrapper = Wrapper()
-      wrapper.setData({ name: 'Too Many' })
-      await wrapper.find('form').trigger('submit')
-      await flushPromises()
-      expect(mocks.$toast.error).toHaveBeenCalledWith('Maximum of 5 active API keys reached')
     })
 
     it('resets form after creation', async () => {
@@ -186,72 +271,60 @@ describe('settings/api-keys.vue', () => {
       expect(wrapper.vm.name).toBe('')
       expect(wrapper.vm.expiresInDays).toBeNull()
     })
+
+    it('shows error toast on failure', async () => {
+      mutateMock.mockRejectedValue(new Error('Maximum of 5 active API keys reached'))
+      wrapper = Wrapper()
+      wrapper.setData({ name: 'Too Many' })
+      await wrapper.find('form').trigger('submit')
+      await flushPromises()
+      expect(mocks.$toast.error).toHaveBeenCalledWith('Maximum of 5 active API keys reached')
+    })
   })
 
   describe('revoke key', () => {
-    it('opens confirm modal when revoke button is clicked', async () => {
-      wrapper = Wrapper({
-        myApiKeys: [
-          {
-            id: 'k1',
-            name: 'To Revoke',
-            keyPrefix: 'oak_revoke12',
-            createdAt: '2026-04-01T00:00:00Z',
-            lastUsedAt: null,
-            expiresAt: null,
-            disabled: false,
-          },
-        ],
-      })
+    it('opens confirm modal', async () => {
+      wrapper = Wrapper({ myApiKeys: [activeKey()] })
       await wrapper.find('button[aria-label="settings.api-keys.list.revoke"]').trigger('click')
       expect(wrapper.vm.showRevokeModal).toBe(true)
-      expect(wrapper.vm.revokeModalData).toBeTruthy()
-      expect(wrapper.vm.revokeModalData.messageParams.name).toBe('To Revoke')
+      expect(wrapper.vm.revokeModalData.messageParams.name).toBe('CI Bot')
     })
 
     it('calls revokeApiKey mutation and refetches', async () => {
       mutateMock.mockResolvedValue({ data: { revokeApiKey: true } })
-      wrapper = Wrapper({
-        myApiKeys: [
-          {
-            id: 'k1',
-            name: 'To Revoke',
-            keyPrefix: 'oak_revoke12',
-            createdAt: '2026-04-01T00:00:00Z',
-            lastUsedAt: null,
-            expiresAt: null,
-            disabled: false,
-          },
-        ],
-      })
-      await wrapper.vm.revokeKey({ id: 'k1', name: 'To Revoke' })
+      wrapper = Wrapper({ myApiKeys: [activeKey()] })
+      await wrapper.vm.revokeKey({ id: 'k1', name: 'CI Bot' })
       await flushPromises()
       expect(mutateMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          variables: { id: 'k1' },
-        }),
+        expect.objectContaining({ variables: { id: 'k1' } }),
       )
       expect(refetchMock).toHaveBeenCalled()
       expect(mocks.$toast.success).toHaveBeenCalled()
     })
+
+    it('shows error toast on revoke failure', async () => {
+      mutateMock.mockRejectedValue(new Error('Network error'))
+      wrapper = Wrapper({ myApiKeys: [activeKey()] })
+      await wrapper.vm.revokeKey({ id: 'k1', name: 'CI Bot' })
+      await flushPromises()
+      expect(mocks.$toast.error).toHaveBeenCalledWith('Network error')
+    })
   })
 
-  describe('expired keys', () => {
-    it('shows expired label for expired keys', () => {
-      wrapper = Wrapper({
-        myApiKeys: [
-          {
-            id: 'k-exp',
-            name: 'Expired',
-            keyPrefix: 'oak_expired1',
-            createdAt: '2025-01-01T00:00:00Z',
-            lastUsedAt: null,
-            expiresAt: '2025-06-01T00:00:00Z',
-            disabled: false,
-          },
-        ],
-      })
-      expect(wrapper.text()).toContain('settings.api-keys.list.expired')
+  describe('isExpired', () => {
+    it('returns true for past expiresAt', () => {
+      wrapper = Wrapper()
+      expect(wrapper.vm.isExpired({ expiresAt: '2020-01-01T00:00:00Z' })).toBe(true)
+    })
+
+    it('returns false for future expiresAt', () => {
+      wrapper = Wrapper()
+      expect(wrapper.vm.isExpired({ expiresAt: '2099-01-01T00:00:00Z' })).toBe(false)
+    })
+
+    it('returns false for null expiresAt', () => {
+      wrapper = Wrapper()
+      expect(wrapper.vm.isExpired({ expiresAt: null })).toBeFalsy()
     })
   })
 })

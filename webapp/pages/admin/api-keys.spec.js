@@ -11,38 +11,49 @@ describe('admin/api-keys.vue', () => {
   const refetchMock = jest.fn()
   const queryMock = jest.fn()
 
-  const sampleKeys = [
-    {
-      apiKey: {
-        id: 'k1',
-        name: 'CI Bot',
-        keyPrefix: 'oak_cibot123',
-        createdAt: '2026-03-01T00:00:00Z',
-        lastUsedAt: '2026-04-01T12:00:00Z',
-        expiresAt: null,
-        disabled: false,
-      },
-      owner: { id: 'u1', name: 'Peter', slug: 'peter' },
-      postsCount: 142,
-      commentsCount: 891,
-      lastContentAt: '2026-04-01T12:00:00Z',
-    },
-    {
-      apiKey: {
-        id: 'k2',
-        name: 'Backup Script',
-        keyPrefix: 'oak_backup12',
-        createdAt: '2026-03-15T00:00:00Z',
-        lastUsedAt: null,
-        expiresAt: null,
-        disabled: true,
-      },
-      owner: { id: 'u2', name: 'Maria', slug: 'maria' },
-      postsCount: 5,
-      commentsCount: 12,
-      lastContentAt: '2026-03-20T00:00:00Z',
-    },
-  ]
+  const userEntry = (overrides = {}) => ({
+    user: { id: 'u1', name: 'Peter', slug: 'peter' },
+    activeCount: 2,
+    revokedCount: 1,
+    postsCount: 42,
+    commentsCount: 15,
+    lastActivity: '2026-04-02T12:00:00Z',
+    ...overrides,
+  })
+
+  const userEntryNeverUsed = () =>
+    userEntry({
+      user: { id: 'u2', name: 'Bob', slug: 'bob' },
+      activeCount: 1,
+      revokedCount: 0,
+      postsCount: 0,
+      commentsCount: 0,
+      lastActivity: null,
+    })
+
+  const activeKeyDetail = (overrides = {}) => ({
+    id: 'ak1',
+    name: 'CI Bot',
+    keyPrefix: 'oak_cibot123',
+    createdAt: '2026-03-01T00:00:00Z',
+    lastUsedAt: '2026-04-02T12:00:00Z',
+    expiresAt: null,
+    disabled: false,
+    disabledAt: null,
+    ...overrides,
+  })
+
+  const revokedKeyDetail = (overrides = {}) => ({
+    id: 'ak-old',
+    name: 'Old Script',
+    keyPrefix: 'oak_old12345',
+    createdAt: '2025-01-01T00:00:00Z',
+    lastUsedAt: '2025-05-01T00:00:00Z',
+    expiresAt: null,
+    disabled: true,
+    disabledAt: '2025-06-01T00:00:00Z',
+    ...overrides,
+  })
 
   beforeEach(() => {
     mutateMock.mockReset()
@@ -59,7 +70,7 @@ describe('admin/api-keys.vue', () => {
         mutate: mutateMock,
         query: queryMock,
         queries: {
-          allApiKeys: {
+          apiKeyUsers: {
             refetch: refetchMock,
           },
         },
@@ -75,93 +86,131 @@ describe('admin/api-keys.vue', () => {
         'nuxt-link': true,
         'confirm-modal': true,
         'pagination-buttons': true,
+        'user-teaser': { template: '<span>@{{ user.slug }}</span>', props: ['user'] },
+        'date-time': { template: '<span>{{ dateTime }}</span>', props: ['dateTime'] },
+        'os-spinner': true,
       },
       data: () => ({
-        allApiKeys: [],
+        apiKeyUsers: [],
         ...data,
       }),
     })
   }
 
   describe('renders', () => {
-    it('shows sort dropdown', () => {
+    it('shows title', () => {
       wrapper = Wrapper()
-      expect(wrapper.find('#api-key-order').exists()).toBe(true)
+      expect(wrapper.text()).toContain('admin.api-keys.name')
     })
 
-    it('shows empty state when no keys exist', () => {
+    it('shows empty state when no users', () => {
       wrapper = Wrapper()
       expect(wrapper.text()).toContain('admin.api-keys.empty')
     })
 
-    it('shows table when keys exist', () => {
-      wrapper = Wrapper({ allApiKeys: sampleKeys })
-      expect(wrapper.text()).toContain('CI Bot')
+    it('shows user table', () => {
+      wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
       expect(wrapper.text()).toContain('@peter')
-      expect(wrapper.text()).toContain('142')
-      expect(wrapper.text()).toContain('891')
+      expect(wrapper.text()).toContain('42')
+      expect(wrapper.text()).toContain('15')
     })
 
-    it('shows revoked label for disabled keys', () => {
-      wrapper = Wrapper({ allApiKeys: sampleKeys })
-      expect(wrapper.text()).toContain('admin.api-keys.revoked')
+    it('shows "never" for null lastActivity', () => {
+      wrapper = Wrapper({ apiKeyUsers: [userEntryNeverUsed()] })
+      expect(wrapper.text()).toContain('admin.api-keys.never')
     })
 
-    it('does not show revoke buttons for disabled keys', () => {
+    it('shows revoke-all button only when active keys exist', () => {
       wrapper = Wrapper({
-        allApiKeys: [sampleKeys[1]], // disabled key only
+        apiKeyUsers: [
+          userEntry({ activeCount: 0, revokedCount: 3 }),
+        ],
       })
-      expect(
-        wrapper.find('button[aria-label="admin.api-keys.revoke-key"]').exists(),
-      ).toBe(false)
+      expect(wrapper.find('button[aria-label="admin.api-keys.revoke-all"]').exists()).toBe(false)
+    })
+
+    it('shows revoke-all button when active keys exist', () => {
+      wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
+      expect(wrapper.find('button[aria-label="admin.api-keys.revoke-all"]').exists()).toBe(true)
     })
   })
 
-  describe('sort', () => {
-    it('changes orderBy when sort dropdown changes', async () => {
-      wrapper = Wrapper({ allApiKeys: sampleKeys })
-      await wrapper.find('#api-key-order').setValue('POSTS_COUNT')
-      expect(wrapper.vm.orderBy).toBe('POSTS_COUNT')
-    })
-
-    it('resets pagination when sort changes', async () => {
-      wrapper = Wrapper({ allApiKeys: sampleKeys })
-      wrapper.setData({ offset: 20 })
-      await wrapper.find('#api-key-order').setValue('CREATED_AT')
-      expect(wrapper.vm.offset).toBe(0)
-    })
-  })
-
-  describe('detail view', () => {
-    it('expands detail when clicking show-content button', async () => {
+  describe('expand user detail', () => {
+    it('loads keys on expand click', async () => {
       queryMock.mockResolvedValue({
         data: {
-          contentByApiKey: {
-            posts: [{ id: 'p1', title: 'Test Post', slug: 'test', createdAt: '2026-04-01T00:00:00Z' }],
-            comments: [],
-          },
+          apiKeysForUser: [activeKeyDetail(), revokedKeyDetail()],
         },
       })
-      wrapper = Wrapper({ allApiKeys: sampleKeys })
-      await wrapper.find('button[aria-label="admin.api-keys.show-content"]').trigger('click')
+      wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
+      await wrapper.find('button[aria-label="admin.api-keys.show-keys"]').trigger('click')
       await flushPromises()
-      expect(wrapper.vm.expandedKeyId).toBe('k1')
-      expect(wrapper.vm.detailContent).toBeTruthy()
-      expect(wrapper.vm.detailContent.posts).toHaveLength(1)
+      expect(wrapper.vm.expandedUserId).toBe('u1')
+      expect(wrapper.vm.userKeys).toHaveLength(2)
     })
 
-    it('collapses detail when clicking again', async () => {
-      wrapper = Wrapper({ allApiKeys: sampleKeys })
-      wrapper.setData({ expandedKeyId: 'k1', detailContent: { posts: [], comments: [] } })
-      await wrapper.vm.toggleDetail('k1')
-      expect(wrapper.vm.expandedKeyId).toBeNull()
+    it('separates active and revoked keys', async () => {
+      queryMock.mockResolvedValue({
+        data: {
+          apiKeysForUser: [activeKeyDetail(), revokedKeyDetail()],
+        },
+      })
+      wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
+      await wrapper.find('button[aria-label="admin.api-keys.show-keys"]').trigger('click')
+      await flushPromises()
+      expect(wrapper.vm.activeUserKeys).toHaveLength(1)
+      expect(wrapper.vm.activeUserKeys[0].name).toBe('CI Bot')
+      expect(wrapper.vm.revokedUserKeys).toHaveLength(1)
+      expect(wrapper.vm.revokedUserKeys[0].name).toBe('Old Script')
+    })
+
+    it('collapses on second click', async () => {
+      wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
+      wrapper.setData({
+        expandedUserId: 'u1',
+        userKeys: [activeKeyDetail()],
+      })
+      await wrapper.vm.toggleUser('u1')
+      expect(wrapper.vm.expandedUserId).toBeNull()
+      expect(wrapper.vm.userKeys).toBeNull()
+    })
+
+    it('shows detail section with active keys heading', async () => {
+      queryMock.mockResolvedValue({
+        data: { apiKeysForUser: [activeKeyDetail()] },
+      })
+      wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
+      await wrapper.vm.toggleUser('u1')
+      await flushPromises()
+      expect(wrapper.text()).toContain('admin.api-keys.detail.active')
+      expect(wrapper.text()).toContain('CI Bot')
+    })
+
+    it('shows revoked keys heading in detail', async () => {
+      queryMock.mockResolvedValue({
+        data: { apiKeysForUser: [revokedKeyDetail()] },
+      })
+      wrapper = Wrapper({ apiKeyUsers: [userEntry({ activeCount: 0, revokedCount: 1 })] })
+      await wrapper.vm.toggleUser('u1')
+      await flushPromises()
+      expect(wrapper.text()).toContain('admin.api-keys.detail.revoked')
+    })
+
+    it('shows error toast on query failure', async () => {
+      queryMock.mockRejectedValue(new Error('Query failed'))
+      wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
+      await wrapper.vm.toggleUser('u1')
+      await flushPromises()
+      expect(mocks.$toast.error).toHaveBeenCalledWith('Query failed')
     })
   })
 
-  describe('revoke key', () => {
-    it('opens confirm modal for single key revoke', async () => {
-      wrapper = Wrapper({ allApiKeys: [sampleKeys[0]] })
-      await wrapper.find('button[aria-label="admin.api-keys.revoke-key"]').trigger('click')
+  describe('revoke single key', () => {
+    it('opens confirm modal', () => {
+      wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
+      const key = activeKeyDetail()
+      const entry = userEntry()
+      wrapper.vm.confirmRevokeKey(key, entry)
       expect(wrapper.vm.showModal).toBe(true)
       expect(wrapper.vm.modalData.messageParams).toEqual({
         name: 'CI Bot',
@@ -169,84 +218,104 @@ describe('admin/api-keys.vue', () => {
       })
     })
 
-    it('calls adminRevokeApiKey mutation', async () => {
+    it('calls adminRevokeApiKey and refetches', async () => {
       mutateMock.mockResolvedValue({ data: { adminRevokeApiKey: true } })
-      wrapper = Wrapper({ allApiKeys: [sampleKeys[0]] })
-      await wrapper.vm.revokeKey('k1')
+      wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
+      await wrapper.vm.revokeKey('ak1', 'u1')
       await flushPromises()
       expect(mutateMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          variables: { id: 'k1' },
-        }),
+        expect.objectContaining({ variables: { id: 'ak1' } }),
       )
       expect(refetchMock).toHaveBeenCalled()
       expect(mocks.$toast.success).toHaveBeenCalled()
     })
+
+    it('collapses detail after revoke', async () => {
+      mutateMock.mockResolvedValue({ data: { adminRevokeApiKey: true } })
+      wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
+      wrapper.setData({ expandedUserId: 'u1' })
+      await wrapper.vm.revokeKey('ak1', 'u1')
+      await flushPromises()
+      expect(wrapper.vm.expandedUserId).toBeNull()
+    })
+
+    it('shows error toast on failure', async () => {
+      mutateMock.mockRejectedValue(new Error('Revoke failed'))
+      wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
+      await wrapper.vm.revokeKey('ak1', 'u1')
+      await flushPromises()
+      expect(mocks.$toast.error).toHaveBeenCalledWith('Revoke failed')
+    })
   })
 
   describe('revoke all keys', () => {
-    it('opens confirm modal for bulk revoke', async () => {
-      wrapper = Wrapper({ allApiKeys: [sampleKeys[0]] })
-      await wrapper
-        .find('button[aria-label="admin.api-keys.revoke-all"]')
-        .trigger('click')
+    it('opens confirm modal', () => {
+      wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
+      wrapper.vm.confirmRevokeAll(userEntry())
       expect(wrapper.vm.showModal).toBe(true)
       expect(wrapper.vm.modalData.messageParams).toEqual({ user: 'Peter' })
     })
 
-    it('calls adminRevokeUserApiKeys mutation', async () => {
-      mutateMock.mockResolvedValue({ data: { adminRevokeUserApiKeys: 3 } })
-      wrapper = Wrapper({ allApiKeys: [sampleKeys[0]] })
+    it('calls adminRevokeUserApiKeys and refetches', async () => {
+      mutateMock.mockResolvedValue({ data: { adminRevokeUserApiKeys: 2 } })
+      wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
       await wrapper.vm.revokeAllKeys('u1', 'Peter')
       await flushPromises()
       expect(mutateMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          variables: { userId: 'u1' },
-        }),
+        expect.objectContaining({ variables: { userId: 'u1' } }),
       )
       expect(refetchMock).toHaveBeenCalled()
-      expect(mocks.$toast.success).toHaveBeenCalledWith(
-        'admin.api-keys.revoke-all-success',
-      )
-    })
-  })
-
-  describe('error handling', () => {
-    it('shows error toast when revoke fails', async () => {
-      mutateMock.mockRejectedValue(new Error('Network error'))
-      wrapper = Wrapper({ allApiKeys: [sampleKeys[0]] })
-      await wrapper.vm.revokeKey('k1')
-      await flushPromises()
-      expect(mocks.$toast.error).toHaveBeenCalledWith('Network error')
+      expect(mocks.$toast.success).toHaveBeenCalledWith('admin.api-keys.revoke-all-success')
     })
 
-    it('shows error toast when detail query fails', async () => {
-      queryMock.mockRejectedValue(new Error('Query failed'))
-      wrapper = Wrapper({ allApiKeys: sampleKeys })
-      await wrapper.vm.toggleDetail('k1')
+    it('collapses detail and clears keys after bulk revoke', async () => {
+      mutateMock.mockResolvedValue({ data: { adminRevokeUserApiKeys: 2 } })
+      wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
+      wrapper.setData({ expandedUserId: 'u1', userKeys: [activeKeyDetail()] })
+      await wrapper.vm.revokeAllKeys('u1', 'Peter')
       await flushPromises()
-      expect(mocks.$toast.error).toHaveBeenCalledWith('Query failed')
+      expect(wrapper.vm.expandedUserId).toBeNull()
+      expect(wrapper.vm.userKeys).toBeNull()
+    })
+
+    it('shows error toast on failure', async () => {
+      mutateMock.mockRejectedValue(new Error('Bulk revoke failed'))
+      wrapper = Wrapper({ apiKeyUsers: [userEntry()] })
+      await wrapper.vm.revokeAllKeys('u1', 'Peter')
+      await flushPromises()
+      expect(mocks.$toast.error).toHaveBeenCalledWith('Bulk revoke failed')
     })
   })
 
   describe('pagination', () => {
     it('next increments offset', () => {
-      wrapper = Wrapper({ allApiKeys: sampleKeys })
+      wrapper = Wrapper()
       wrapper.vm.next()
       expect(wrapper.vm.offset).toBe(20)
     })
 
     it('back decrements offset', () => {
-      wrapper = Wrapper({ allApiKeys: sampleKeys })
+      wrapper = Wrapper()
       wrapper.setData({ offset: 20 })
       wrapper.vm.back()
       expect(wrapper.vm.offset).toBe(0)
     })
 
     it('back does not go below 0', () => {
-      wrapper = Wrapper({ allApiKeys: sampleKeys })
+      wrapper = Wrapper()
       wrapper.vm.back()
       expect(wrapper.vm.offset).toBe(0)
+    })
+
+    it('hasPrevious is false at offset 0', () => {
+      wrapper = Wrapper()
+      expect(wrapper.vm.hasPrevious).toBe(false)
+    })
+
+    it('hasPrevious is true at offset > 0', () => {
+      wrapper = Wrapper()
+      wrapper.setData({ offset: 20 })
+      expect(wrapper.vm.hasPrevious).toBe(true)
     })
   })
 })
