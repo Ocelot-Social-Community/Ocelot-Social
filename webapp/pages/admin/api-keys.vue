@@ -370,10 +370,8 @@ export default {
 
 .action-buttons {
   display: flex;
-  flex-direction: row;
   gap: $space-xx-small;
   align-items: center;
-  margin: 0;
 }
 
 .detail-cell {

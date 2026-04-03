@@ -665,8 +665,8 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.profile-page-avatar.profile-avatar {
+<style scoped lang="scss">
+::v-deep .profile-page-avatar.profile-avatar {
   margin: auto;
   margin-top: -60px;
 }
@@ -675,12 +675,10 @@ export default {
     padding-top: $space-large;
   }
 }
-.group-profile {
-  .group-layout__sidebar .group-profile-content-menu {
-    position: absolute;
-    top: $space-x-small;
-    right: $space-x-small;
-  }
+.group-layout__sidebar ::v-deep .group-profile-content-menu {
+  position: absolute;
+  top: $space-x-small;
+  right: $space-x-small;
 }
 .group-layout__sidebar,
 .group-layout__main {
@@ -712,7 +710,7 @@ export default {
     flex: 3 0 0;
   }
 }
-.profile-post-add-button {
+::v-deep .profile-post-add-button {
   box-shadow: $box-shadow-x-large;
 }
 .action-buttons {
@@ -728,7 +726,7 @@ export default {
 .chip {
   margin-bottom: $space-x-small;
 }
-.group-description.os-card {
+::v-deep .group-description.os-card {
   display: flex;
   flex-direction: column;
   height: 100%;
