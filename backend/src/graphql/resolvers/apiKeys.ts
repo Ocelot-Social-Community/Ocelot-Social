@@ -61,17 +61,18 @@ export default {
         query: `
           MATCH (u:User)-[:HAS_API_KEY]->(k:ApiKey)
           WITH u, collect(k) AS keys
-          WITH u,
+          WITH u, keys,
             size([k IN keys WHERE NOT k.disabled]) AS activeCount,
             size([k IN keys WHERE k.disabled]) AS revokedCount,
-            reduce(m = null, k IN keys | CASE WHEN k.lastUsedAt IS NOT NULL AND (m IS NULL OR k.lastUsedAt > m) THEN k.lastUsedAt ELSE m END) AS lastActivity,
+            reduce(m = null, k IN keys | CASE WHEN k.lastUsedAt IS NOT NULL AND (m IS NULL OR k.lastUsedAt > m) THEN k.lastUsedAt ELSE m END) AS lastActivity
+          ORDER BY lastActivity IS NULL, lastActivity DESC
+          SKIP toInteger($offset) LIMIT toInteger($first)
+          WITH u, keys, activeCount, revokedCount, lastActivity,
             [k IN keys | k.id] AS keyIds
           OPTIONAL MATCH (p:Post) WHERE p.createdByApiKey IN keyIds
           WITH u, activeCount, revokedCount, lastActivity, keyIds, count(p) AS postsCount
           OPTIONAL MATCH (c:Comment) WHERE c.createdByApiKey IN keyIds
           RETURN u {.*} AS user, activeCount, revokedCount, postsCount, count(c) AS commentsCount, lastActivity
-          ORDER BY lastActivity IS NULL, lastActivity DESC
-          SKIP toInteger($offset) LIMIT toInteger($first)
         `,
         variables: { offset, first },
       })
