@@ -883,12 +883,6 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
               })`,
       variables: {},
     })
-    // Mark all Huey's posts as created via API key
-    await database.write({
-      query: `MATCH (u:User { id: 'u4' })-[:WROTE]->(p:Post)
-              SET p.createdByApiKey = 'ak-huey-auto'`,
-      variables: {},
-    })
 
     // API Key for Bob (moderator) — active
     await database.write({
@@ -1869,6 +1863,14 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       )
     }
+
+    // Mark all Huey's posts and comments as created via API key
+    await database.write({
+      query: `MATCH (u:User { id: 'u4' })-[:WROTE]->(content)
+              WHERE content:Post OR content:Comment
+              SET content.createdByApiKey = 'ak-huey-auto'`,
+      variables: {},
+    })
 
     await Factory.build('donations')
 
