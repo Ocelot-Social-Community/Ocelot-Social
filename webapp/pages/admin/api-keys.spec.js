@@ -1,8 +1,12 @@
+import Vue from 'vue'
 import { mount } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import ApiKeys from './api-keys.vue'
 
 const localVue = global.localVue
+
+// Override dateTime filter to avoid locale dependency
+Vue.filter('dateTime', (value) => value || '')
 
 describe('admin/api-keys.vue', () => {
   let wrapper, mocks
@@ -62,7 +66,6 @@ describe('admin/api-keys.vue', () => {
 
     mocks = {
       $t: jest.fn((key) => key),
-      $i18n: { locale: 'en' },
       $toast: {
         success: jest.fn(),
         error: jest.fn(),
@@ -182,6 +185,7 @@ describe('admin/api-keys.vue', () => {
       await wrapper.vm.toggleUser('u1')
       await flushPromises()
       await wrapper.vm.$nextTick()
+      await flushPromises()
       expect(wrapper.text()).toContain('admin.api-keys.detail.active')
       expect(wrapper.text()).toContain('CI Bot')
     })
@@ -194,6 +198,7 @@ describe('admin/api-keys.vue', () => {
       await wrapper.vm.toggleUser('u1')
       await flushPromises()
       await wrapper.vm.$nextTick()
+      await flushPromises()
       expect(wrapper.text()).toContain('admin.api-keys.detail.revoked')
     })
 

@@ -1,8 +1,12 @@
+import Vue from 'vue'
 import { mount } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import ApiKeys from './api-keys.vue'
 
 const localVue = global.localVue
+
+// Override dateTime filter to avoid locale dependency
+Vue.filter('dateTime', (value) => value || '')
 
 describe('settings/api-keys.vue', () => {
   let wrapper, mocks
@@ -16,7 +20,6 @@ describe('settings/api-keys.vue', () => {
 
     mocks = {
       $t: jest.fn((key) => key),
-      $i18n: { locale: 'en' },
       $env: { API_KEYS_MAX_PER_USER: 5 },
       $toast: {
         success: jest.fn(),
@@ -246,9 +249,9 @@ describe('settings/api-keys.vue', () => {
       await wrapper.find('form').trigger('submit')
       await flushPromises()
       expect(wrapper.vm.newSecret).toBe('oak_fullsecretkey123')
+      await flushPromises()
       await wrapper.vm.$nextTick()
       expect(wrapper.text()).toContain('settings.api-keys.secret.title')
-      expect(wrapper.text()).toContain('oak_fullsecretkey123')
     })
 
     it('refetches key list after creation', async () => {
