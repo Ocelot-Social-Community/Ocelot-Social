@@ -24,16 +24,9 @@ type ApiKeyUserSummary {
   lastActivity: String
 }
 
-enum ApiKeyUserOrder {
-  LAST_ACTIVITY
-  ACTIVE_KEYS
-  POSTS_COUNT
-  COMMENTS_COUNT
-}
-
 type Query {
   myApiKeys: [ApiKey!]!
-  apiKeyUsers(orderBy: ApiKeyUserOrder, first: Int, offset: Int): [ApiKeyUserSummary!]!
+  apiKeyUsers(first: Int, offset: Int): [ApiKeyUserSummary!]!
   apiKeysForUser(userId: ID!): [ApiKey!]!
 }
 

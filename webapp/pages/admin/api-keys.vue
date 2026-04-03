@@ -2,17 +2,6 @@
   <div class="admin-api-keys">
     <os-card>
       <h2 class="title">{{ $t('admin.api-keys.name') }}</h2>
-      <div class="ds-mb-small">
-        <label class="ds-label" for="api-key-order">
-          {{ $t('admin.api-keys.sort-by') }}
-        </label>
-        <select id="api-key-order" v-model="orderBy" class="admin-select" @change="resetPagination">
-          <option value="LAST_ACTIVITY">{{ $t('admin.api-keys.order.last-used') }}</option>
-          <option value="ACTIVE_KEYS">{{ $t('admin.api-keys.order.active-keys') }}</option>
-          <option value="POSTS_COUNT">{{ $t('admin.api-keys.order.posts') }}</option>
-          <option value="COMMENTS_COUNT">{{ $t('admin.api-keys.order.comments') }}</option>
-        </select>
-      </div>
     </os-card>
 
     <os-card v-if="apiKeyUsers && apiKeyUsers.length">
@@ -214,7 +203,6 @@ export default {
     const pageSize = 20
     return {
       apiKeyUsers: [],
-      orderBy: 'LAST_ACTIVITY',
       offset: 0,
       pageSize,
       first: pageSize,
@@ -231,7 +219,6 @@ export default {
       query: apiKeyUsersQuery(),
       variables() {
         return {
-          orderBy: this.orderBy,
           first: this.first + 1,
           offset: this.offset,
         }
@@ -255,9 +242,6 @@ export default {
     },
   },
   methods: {
-    resetPagination() {
-      this.offset = 0
-    },
     next() {
       this.offset += this.pageSize
     },
@@ -361,15 +345,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.admin-select {
-  width: auto;
-  padding: $space-x-small;
-  font-size: $font-size-base;
-  border: 1px solid $color-neutral-80;
-  border-radius: $border-radius-base;
-  background-color: $background-color-base;
-}
-
 .table-no-clip {
   overflow: visible;
 }

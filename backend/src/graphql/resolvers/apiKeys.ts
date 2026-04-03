@@ -35,13 +35,6 @@ export default {
     },
 
     apiKeyUsers: async (_parent, args, context: Context) => {
-      const orderClauses: Record<string, string> = {
-        LAST_ACTIVITY: 'lastActivity DESC',
-        ACTIVE_KEYS: 'activeCount DESC',
-        POSTS_COUNT: 'postsCount DESC',
-        COMMENTS_COUNT: 'commentsCount DESC',
-      }
-      const order = orderClauses[args.orderBy as string] || 'lastActivity DESC'
       const first = (args.first as number) || 50
       const offset = (args.offset as number) || 0
 
@@ -57,7 +50,7 @@ export default {
             count(DISTINCT c) AS commentsCount,
             max(k.lastUsedAt) AS lastActivity
           RETURN u {.*} AS user, activeCount, revokedCount, postsCount, commentsCount, lastActivity
-          ORDER BY ${order}
+          ORDER BY lastActivity IS NULL, lastActivity DESC
           SKIP toInteger($offset) LIMIT toInteger($first)
         `,
         variables: { offset, first },
