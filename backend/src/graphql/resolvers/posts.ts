@@ -189,6 +189,7 @@ export default {
             SET post.sortDate = toString(datetime())
             SET post.clickedCount = 0
             SET post.viewedTeaserCount = 0
+            SET post.createdByApiKey = $apiKeyId
             SET post:${params.postType}
             WITH post
             MATCH (author:User {id: $userId})
@@ -201,7 +202,7 @@ export default {
             ${groupCypher}
             RETURN post {.*, postType: [l IN labels(post) WHERE NOT l = 'Post'] }
           `,
-          { userId: user.id, categoryIds, groupId, params },
+          { userId: user.id, categoryIds, groupId, params, apiKeyId: user.apiKeyId || null },
         )
         const [post] = createPostTransactionResponse.records.map((record) => record.get('post'))
         if (imageInput) {

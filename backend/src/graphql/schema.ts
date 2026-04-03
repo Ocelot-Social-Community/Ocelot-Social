@@ -12,6 +12,9 @@ export default makeAugmentedSchema({
   config: {
     query: {
       exclude: [
+        'ApiKey',
+        'ApiKeyWithSecret',
+        'ApiKeyUserSummary',
         'Badge',
         'Embed',
         'EmailNotificationSettings',

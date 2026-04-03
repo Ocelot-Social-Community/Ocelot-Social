@@ -619,8 +619,8 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.profile-page-avatar.profile-avatar {
+<style scoped lang="scss">
+::v-deep .profile-page-avatar.profile-avatar {
   margin: auto;
   margin-top: -60px;
 }
@@ -635,12 +635,10 @@ export default {
     opacity: 0.7;
   }
 }
-.page-name-profile-id-slug {
-  .profile-layout__sidebar .content-menu {
-    position: absolute;
-    top: $space-x-small;
-    right: $space-x-small;
-  }
+.profile-layout__sidebar ::v-deep .content-menu {
+  position: absolute;
+  top: $space-x-small;
+  right: $space-x-small;
 }
 .profile-layout__sidebar,
 .profile-layout__main {
@@ -677,7 +675,7 @@ export default {
   justify-content: center;
   margin: $space-small 0;
 }
-.profile-post-add-button {
+::v-deep .profile-post-add-button {
   box-shadow: $box-shadow-x-large !important;
 }
 .action-buttons {

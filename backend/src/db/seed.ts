@@ -829,6 +829,118 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     )
 
     // eslint-disable-next-line no-console
+    console.log('seed', 'api-keys')
+
+    // API Keys for Peter (admin) — active keys
+    await database.write({
+      query: `MATCH (u:User { id: 'u1' })
+              CREATE (u)-[:HAS_API_KEY]->(k:ApiKey {
+                id: 'ak-peter-ci', name: 'CI Bot', keyPrefix: 'oak_peterCI',
+                keyHash: 'seed-hash-peter-ci', createdAt: toString(datetime() - duration('P30D')),
+                lastUsedAt: toString(datetime() - duration('PT2H')), disabled: false
+              })`,
+      variables: {},
+    })
+    await database.write({
+      query: `MATCH (u:User { id: 'u1' })
+              CREATE (u)-[:HAS_API_KEY]->(k:ApiKey {
+                id: 'ak-peter-backup', name: 'Backup Script', keyPrefix: 'oak_peterBU',
+                keyHash: 'seed-hash-peter-backup', createdAt: toString(datetime() - duration('P14D')),
+                lastUsedAt: toString(datetime() - duration('P3D')), disabled: false
+              })`,
+      variables: {},
+    })
+    // Peter's revoked key
+    await database.write({
+      query: `MATCH (u:User { id: 'u1' })
+              CREATE (u)-[:HAS_API_KEY]->(k:ApiKey {
+                id: 'ak-peter-old', name: 'Old Script', keyPrefix: 'oak_peterOL',
+                keyHash: 'seed-hash-peter-old', createdAt: '2025-01-01T00:00:00.000Z',
+                lastUsedAt: '2025-05-15T00:00:00.000Z',
+                disabled: true, disabledAt: '2025-06-01T00:00:00.000Z'
+              })`,
+      variables: {},
+    })
+
+    // API Key for Jenny (user) — active, with expiry
+    await database.write({
+      query: `MATCH (u:User { id: 'u3' })
+              CREATE (u)-[:HAS_API_KEY]->(k:ApiKey {
+                id: 'ak-jenny-bot', name: 'Weather Bot', keyPrefix: 'oak_jennyWB',
+                keyHash: 'seed-hash-jenny-bot', createdAt: toString(datetime() - duration('P7D')),
+                lastUsedAt: toString(datetime() - duration('PT30M')), disabled: false,
+                expiresAt: toString(datetime() + duration('P365D'))
+              })`,
+      variables: {},
+    })
+
+    // API Key for Huey (user) — active, all his posts created via this key
+    await database.write({
+      query: `MATCH (u:User { id: 'u4' })
+              CREATE (u)-[:HAS_API_KEY]->(k:ApiKey {
+                id: 'ak-huey-auto', name: 'Auto Publisher', keyPrefix: 'oak_hueyAUT',
+                keyHash: 'seed-hash-huey-auto', createdAt: toString(datetime() - duration('P60D')),
+                lastUsedAt: toString(datetime() - duration('PT5M')), disabled: false
+              })`,
+      variables: {},
+    })
+
+    // API Key for Bob (moderator) — active
+    await database.write({
+      query: `MATCH (u:User { id: 'u2' })
+              CREATE (u)-[:HAS_API_KEY]->(k:ApiKey {
+                id: 'ak-bob-monitor', name: 'Monitoring', keyPrefix: 'oak_bobMON',
+                keyHash: 'seed-hash-bob-monitor', createdAt: toString(datetime()),
+                disabled: false
+              })`,
+      variables: {},
+    })
+
+    // Create some posts via API key (Peter's CI Bot)
+    authenticatedUser = { ...(await peterLustig.toJson()), apiKeyId: 'ak-peter-ci' }
+    await mutate({
+      mutation: CreatePost,
+      variables: {
+        id: 'p-api-1',
+        title: 'Automated Daily Report',
+        content: 'This post was created automatically via API key by the CI Bot.',
+        categoryIds: ['cat16'],
+      },
+    })
+    await mutate({
+      mutation: CreatePost,
+      variables: {
+        id: 'p-api-2',
+        title: 'Weekly Statistics Summary',
+        content: 'Automated weekly summary of community statistics.',
+        categoryIds: ['cat9'],
+      },
+    })
+
+    // Jenny's Weather Bot creates a post
+    authenticatedUser = { ...(await jennyRostock.toJson()), apiKeyId: 'ak-jenny-bot' }
+    await mutate({
+      mutation: CreatePost,
+      variables: {
+        id: 'p-api-3',
+        title: 'Weather Report Paris',
+        content: 'Sunny, 22°C. Perfect day for a walk along the Seine.',
+        categoryIds: ['cat4'],
+      },
+    })
+    // Jenny's bot also comments
+    await mutate({
+      mutation: CreateComment,
+      variables: {
+        id: 'c-api-1',
+        postId: 'p-api-1',
+        content: 'Automated cross-reference: See also the weather report.',
+      },
+    })
+
+    authenticatedUser = null
+
+    // eslint-disable-next-line no-console
     console.log('seed', 'invitecodes')
 
     // Peter invited the core users: Jenny, Bob, Huey
@@ -1752,6 +1864,14 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         },
       )
     }
+
+    // Mark all Huey's posts and comments as created via API key
+    await database.write({
+      query: `MATCH (u:User { id: 'u4' })-[:WROTE]->(content)
+              WHERE content:Post OR content:Comment
+              SET content.createdByApiKey = 'ak-huey-auto'`,
+      variables: {},
+    })
 
     await Factory.build('donations')
 

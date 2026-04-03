@@ -42,6 +42,200 @@ describe('decode', () => {
     await expect(decode(context)(authorizationHeader)).resolves.toBeNull()
   }
 
+  describe('given API key with oak_ prefix', () => {
+    describe('and valid API key in database', () => {
+      beforeEach(async () => {
+        await Factory.build('user', {
+          id: 'api-user',
+          name: 'API User',
+          slug: 'api-user',
+          role: 'user',
+        })
+        // Create API key node with known hash
+        // SHA-256 of 'oak_testkey123' = known hash
+        const crypto = await import('node:crypto')
+        const keyHash = crypto.createHash('sha256').update('oak_testkey123').digest('hex')
+        const session = driver.session()
+        await session.writeTransaction(async (tx) => {
+          await tx.run(
+            `MATCH (u:User { id: $userId })
+             CREATE (u)-[:HAS_API_KEY]->(k:ApiKey {
+               id: 'ak1',
+               name: 'Test Key',
+               keyHash: $keyHash,
+               keyPrefix: 'oak_testke',
+               createdAt: toString(datetime()),
+               disabled: false
+             })`,
+            { userId: 'api-user', keyHash },
+          )
+        })
+        await session.close()
+      })
+
+      it('returns user object with authMethod apiKey', async () => {
+        await expect(decode(context)('Bearer oak_testkey123')).resolves.toMatchObject({
+          id: 'api-user',
+          name: 'API User',
+          authMethod: 'apiKey',
+          apiKeyId: 'ak1',
+        })
+      })
+
+      it('updates lastUsedAt on the API key', async () => {
+        await decode(context)('Bearer oak_testkey123')
+        // Give fire-and-forget time to complete
+        const { setTimeout: delay } = await import('node:timers/promises')
+        await delay(500)
+        const session = driver.session()
+        const result = await session.readTransaction(async (tx) => {
+          return tx.run(`MATCH (k:ApiKey { id: 'ak1' }) RETURN k.lastUsedAt AS lastUsedAt`)
+        })
+        await session.close()
+        expect(result.records[0].get('lastUsedAt')).toBeTruthy()
+      })
+    })
+
+    describe('and disabled API key', () => {
+      beforeEach(async () => {
+        await Factory.build('user', {
+          id: 'disabled-key-user',
+          name: 'DK User',
+          slug: 'dk-user',
+          role: 'user',
+        })
+        const crypto = await import('node:crypto')
+        const keyHash = crypto.createHash('sha256').update('oak_disabledkey').digest('hex')
+        const session = driver.session()
+        await session.writeTransaction(async (tx) => {
+          await tx.run(
+            `MATCH (u:User { id: $userId })
+             CREATE (u)-[:HAS_API_KEY]->(k:ApiKey {
+               id: 'ak-disabled',
+               name: 'Disabled Key',
+               keyHash: $keyHash,
+               keyPrefix: 'oak_disabl',
+               createdAt: toString(datetime()),
+               disabled: true
+             })`,
+            { userId: 'disabled-key-user', keyHash },
+          )
+        })
+        await session.close()
+        authorizationHeader = 'Bearer oak_disabledkey'
+      })
+
+      it('returns null', returnsNull)
+    })
+
+    describe('and expired API key', () => {
+      beforeEach(async () => {
+        await Factory.build('user', {
+          id: 'expired-key-user',
+          name: 'EK User',
+          slug: 'ek-user',
+          role: 'user',
+        })
+        const crypto = await import('node:crypto')
+        const keyHash = crypto.createHash('sha256').update('oak_expiredkey').digest('hex')
+        const session = driver.session()
+        await session.writeTransaction(async (tx) => {
+          await tx.run(
+            `MATCH (u:User { id: $userId })
+             CREATE (u)-[:HAS_API_KEY]->(k:ApiKey {
+               id: 'ak-expired',
+               name: 'Expired Key',
+               keyHash: $keyHash,
+               keyPrefix: 'oak_expire',
+               createdAt: toString(datetime()),
+               expiresAt: '2020-01-01T00:00:00.000Z',
+               disabled: false
+             })`,
+            { userId: 'expired-key-user', keyHash },
+          )
+        })
+        await session.close()
+        authorizationHeader = 'Bearer oak_expiredkey'
+      })
+
+      it('returns null', returnsNull)
+    })
+
+    describe('and nonexistent API key', () => {
+      beforeEach(() => {
+        authorizationHeader = 'Bearer oak_doesnotexist'
+      })
+
+      it('returns null', returnsNull)
+    })
+
+    describe('and API key belonging to disabled user', () => {
+      beforeEach(async () => {
+        await Factory.build('user', {
+          id: 'disabled-user',
+          name: 'Disabled User',
+          slug: 'disabled-user',
+          role: 'user',
+          disabled: true,
+        })
+        const crypto = await import('node:crypto')
+        const keyHash = crypto.createHash('sha256').update('oak_disableduser').digest('hex')
+        const session = driver.session()
+        await session.writeTransaction(async (tx) => {
+          await tx.run(
+            `MATCH (u:User { id: $userId })
+             CREATE (u)-[:HAS_API_KEY]->(k:ApiKey {
+               id: 'ak-disabled-user',
+               name: 'Key of Disabled User',
+               keyHash: $keyHash,
+               keyPrefix: 'oak_disabl',
+               createdAt: toString(datetime()),
+               disabled: false
+             })`,
+            { userId: 'disabled-user', keyHash },
+          )
+        })
+        await session.close()
+        authorizationHeader = 'Bearer oak_disableduser'
+      })
+
+      it('returns null', returnsNull)
+    })
+
+    describe('and API key belonging to deleted user', () => {
+      beforeEach(async () => {
+        await Factory.build('user', {
+          id: 'deleted-user',
+          name: 'Deleted User',
+          slug: 'deleted-user',
+          role: 'user',
+          deleted: true,
+        })
+        const crypto = await import('node:crypto')
+        const keyHash = crypto.createHash('sha256').update('oak_deleteduser').digest('hex')
+        const session = driver.session()
+        await session.writeTransaction(async (tx) => {
+          await tx.run(
+            `MATCH (u:User { id: $userId })
+             CREATE (u)-[:HAS_API_KEY]->(k:ApiKey {
+               id: 'ak-deleted-user',
+               name: 'Key of Deleted User',
+               keyHash: $keyHash,
+               keyPrefix: 'oak_delete',
+               createdAt: toString(datetime()),
+               disabled: false
+             })`,
+            { userId: 'deleted-user', keyHash },
+          )
+        })
+        await session.close()
+        authorizationHeader = 'Bearer oak_deleteduser'
+      })
+
+      it('returns null', returnsNull)
+    })
+  })
+
   describe('given `null` as JWT Bearer token', () => {
     beforeEach(() => {
       authorizationHeader = null

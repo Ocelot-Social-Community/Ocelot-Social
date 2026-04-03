@@ -14,6 +14,48 @@
     "search": "Cerca"
   },
   "admin": {
+    "api-keys": {
+      "detail": {
+        "active": "Keys attive ({count})",
+        "revoked": "Keys revocate ({count})"
+      },
+      "empty": "Nessun utente con API Keys trovato.",
+      "name": "API Keys",
+      "never": "mai",
+      "order": {
+        "active-keys": "Keys attive",
+        "comments": "Numero di commenti",
+        "last-used": "Ultima attività",
+        "posts": "Numero di post"
+      },
+      "revoke": {
+        "confirm": "Revoca",
+        "message": "Sei sicuro di voler revocare l'API Key \"{name}\" di {user}?",
+        "success": "API Key revocata con successo",
+        "title": "Revoca API Key"
+      },
+      "revoke-all": "Revoca tutte le keys di questo utente",
+      "revoke-all-confirm": "Revoca tutte",
+      "revoke-all-message": "Sei sicuro di voler revocare TUTTE le API Keys di {user}? Questa azione non può essere annullata.",
+      "revoke-all-short": "Revoca tutte",
+      "revoke-all-success": "{count} API Keys di {user} sono state revocate",
+      "revoke-all-title": "Revoca tutte le API Keys",
+      "revoke-key": "Revoca key",
+      "revoked-at": "Revocata il",
+      "show-keys": "Mostra keys",
+      "sort-by": "Ordina per",
+      "table": {
+        "actions": "Azioni",
+        "active": "Attive",
+        "comments": "Commenti",
+        "last-activity": "Ultima attività",
+        "name": "Nome",
+        "posts": "Post",
+        "prefix": "Key",
+        "revoked-count": "Revocate",
+        "user": "Utente"
+      }
+    },
     "badges": {
       "description": "Configura i badge disponibili per questo utente",
       "noBadges": "Non ci sono badge disponibili",
@@ -1064,6 +1106,51 @@
     "title": "Risultati della ricerca"
   },
   "settings": {
+    "api-keys": {
+      "create": {
+        "expiry-days": "{days} giorni",
+        "expiry-label": "Validità",
+        "expiry-never": "Nessuna scadenza",
+        "limit-reached": "Hai raggiunto il massimo di {max} API Keys attive. Revoca una key esistente per crearne una nuova.",
+        "name-label": "Nome",
+        "submit": "Crea key",
+        "success": "API Key creata con successo",
+        "title": "Crea nuovo API Key"
+      },
+      "list": {
+        "actions": "Azioni",
+        "created-at": "Creata il",
+        "empty": "Non hai ancora API Keys.",
+        "expired": "scaduta",
+        "expires": "Scade",
+        "last-used": "Ultimo utilizzo",
+        "name": "Nome",
+        "never": "mai",
+        "never-expires": "mai",
+        "prefix": "Key",
+        "revoke": "Revoca key",
+        "revoked": "revocata",
+        "title": "Le mie API Keys"
+      },
+      "name": "API Keys",
+      "revoke": {
+        "confirm": "Revoca",
+        "message": "Sei sicuro di voler revocare l'API Key \"{name}\"? Questa azione non può essere annullata.",
+        "success": "L'API Key \"{name}\" è stata revocata",
+        "title": "Revoca API Key"
+      },
+      "revoked-list": {
+        "revoked-at": "Revocata il",
+        "title": "Keys revocate ({count})"
+      },
+      "secret": {
+        "copied": "API Key copiata negli appunti",
+        "copy": "Copia",
+        "copy-failed": "Copia negli appunti non riuscita",
+        "title": "Il tuo nuovo API Key (visibile solo una volta!)",
+        "warning": "Salva questa key ora. Non potrai vederla di nuovo dopo aver chiuso questa pagina."
+      }
+    },
     "badges": {
       "click-to-select": "Clicca su uno spazio vuoto per aggiungere un badge.",
       "click-to-use": "Clicca su un badge per posizionarlo nello spazio selezionato.",

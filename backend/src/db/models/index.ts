@@ -4,6 +4,7 @@
 // We use static imports instead of dynamic require() to ensure compatibility
 // with both Node.js and Webpack (used by Cypress cucumber preprocessor).
 
+import ApiKey from './ApiKey'
 import Badge from './Badge'
 import Category from './Category'
 import Comment from './Comment'
@@ -29,6 +30,7 @@ import type Neode from 'neode'
 // SchemaObject type with PropertyTypes union. The Neode type definitions are
 // incomplete/incorrect, so we use double assertion to bypass the check.
 export default {
+  ApiKey,
   Badge,
   Category,
   Comment,

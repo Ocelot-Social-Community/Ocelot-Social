@@ -14,6 +14,48 @@
     "search": "Pesquisar"
   },
   "admin": {
+    "api-keys": {
+      "detail": {
+        "active": "Keys ativas ({count})",
+        "revoked": "Keys revogadas ({count})"
+      },
+      "empty": "Nenhum utilizador com API Keys encontrado.",
+      "name": "API Keys",
+      "never": "nunca",
+      "order": {
+        "active-keys": "Keys ativas",
+        "comments": "Número de comentários",
+        "last-used": "Última atividade",
+        "posts": "Número de publicações"
+      },
+      "revoke": {
+        "confirm": "Revogar",
+        "message": "Tens a certeza de que queres revogar o API Key \"{name}\" de {user}?",
+        "success": "API Key revogada com sucesso",
+        "title": "Revogar API Key"
+      },
+      "revoke-all": "Revogar todas as keys deste utilizador",
+      "revoke-all-confirm": "Revogar todas",
+      "revoke-all-message": "Tens a certeza de que queres revogar TODAS as API Keys de {user}? Esta ação não pode ser desfeita.",
+      "revoke-all-short": "Revogar todas",
+      "revoke-all-success": "{count} API Keys de {user} foram revogadas",
+      "revoke-all-title": "Revogar todas as API Keys",
+      "revoke-key": "Revogar key",
+      "revoked-at": "Revogada em",
+      "show-keys": "Mostrar keys",
+      "sort-by": "Ordenar por",
+      "table": {
+        "actions": "Ações",
+        "active": "Ativas",
+        "comments": "Comentários",
+        "last-activity": "Última atividade",
+        "name": "Nome",
+        "posts": "Publicações",
+        "prefix": "Key",
+        "revoked-count": "Revogadas",
+        "user": "Utilizador"
+      }
+    },
     "badges": {
       "description": "Configurar os emblemas disponíveis para este usuário",
       "noBadges": "Não há emblemas disponíveis",
@@ -1064,6 +1106,51 @@
     "title": "Resultados da busca"
   },
   "settings": {
+    "api-keys": {
+      "create": {
+        "expiry-days": "{days} dias",
+        "expiry-label": "Validade",
+        "expiry-never": "Sem data de expiração",
+        "limit-reached": "Atingiste o máximo de {max} API Keys ativas. Revoga uma key existente para criar uma nova.",
+        "name-label": "Nome",
+        "submit": "Criar key",
+        "success": "API Key criada com sucesso",
+        "title": "Criar novo API Key"
+      },
+      "list": {
+        "actions": "Ações",
+        "created-at": "Criada em",
+        "empty": "Ainda não tens API Keys.",
+        "expired": "expirada",
+        "expires": "Expira",
+        "last-used": "Última utilização",
+        "name": "Nome",
+        "never": "nunca",
+        "never-expires": "nunca",
+        "prefix": "Key",
+        "revoke": "Revogar key",
+        "revoked": "revogada",
+        "title": "As minhas API Keys"
+      },
+      "name": "API Keys",
+      "revoke": {
+        "confirm": "Revogar",
+        "message": "Tens a certeza de que queres revogar o API Key \"{name}\"? Esta ação não pode ser desfeita.",
+        "success": "API Key \"{name}\" foi revogada",
+        "title": "Revogar API Key"
+      },
+      "revoked-list": {
+        "revoked-at": "Revogada em",
+        "title": "Keys revogadas ({count})"
+      },
+      "secret": {
+        "copied": "API Key copiada para a área de transferência",
+        "copy": "Copiar",
+        "copy-failed": "Falha ao copiar para a área de transferência",
+        "title": "O teu novo API Key (visível apenas uma vez!)",
+        "warning": "Guarda esta key agora. Não a poderás ver novamente depois de fechar esta página."
+      }
+    },
     "badges": {
       "click-to-select": "Clique num espaço vazio para adicionar uma medalha.",
       "click-to-use": "Clique numa medalha para a colocar no espaço selecionado.",

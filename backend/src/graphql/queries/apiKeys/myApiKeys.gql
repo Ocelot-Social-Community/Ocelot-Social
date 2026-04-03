@@ -1,0 +1,12 @@
+query myApiKeys {
+  myApiKeys {
+    id
+    name
+    keyPrefix
+    createdAt
+    lastUsedAt
+    expiresAt
+    disabled
+    disabledAt
+  }
+}

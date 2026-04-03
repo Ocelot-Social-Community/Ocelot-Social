@@ -14,6 +14,48 @@
     "search": "Поиск"
   },
   "admin": {
+    "api-keys": {
+      "detail": {
+        "active": "Активные keys ({count})",
+        "revoked": "Отозванные keys ({count})"
+      },
+      "empty": "Пользователи с API Keys не найдены.",
+      "name": "API Keys",
+      "never": "никогда",
+      "order": {
+        "active-keys": "Активные keys",
+        "comments": "Количество комментариев",
+        "last-used": "Последняя активность",
+        "posts": "Количество постов"
+      },
+      "revoke": {
+        "confirm": "Отозвать",
+        "message": "Ты уверен, что хочешь отозвать API Key \"{name}\" пользователя {user}?",
+        "success": "API Key успешно отозван",
+        "title": "Отозвать API Key"
+      },
+      "revoke-all": "Отозвать все keys этого пользователя",
+      "revoke-all-confirm": "Отозвать все",
+      "revoke-all-message": "Ты уверен, что хочешь отозвать ВСЕ API Keys пользователя {user}? Это действие нельзя отменить.",
+      "revoke-all-short": "Отозвать все",
+      "revoke-all-success": "{count} API Keys пользователя {user} были отозваны",
+      "revoke-all-title": "Отозвать все API Keys",
+      "revoke-key": "Отозвать key",
+      "revoked-at": "Отозван",
+      "show-keys": "Показать keys",
+      "sort-by": "Сортировать по",
+      "table": {
+        "actions": "Действия",
+        "active": "Активные",
+        "comments": "Комментарии",
+        "last-activity": "Последняя активность",
+        "name": "Имя",
+        "posts": "Посты",
+        "prefix": "Key",
+        "revoked-count": "Отозванные",
+        "user": "Пользователь"
+      }
+    },
     "badges": {
       "description": "Настроить доступные значки для этого пользователя",
       "noBadges": "Нет доступных значков",
@@ -1064,6 +1106,51 @@
     "title": "Результаты поиска"
   },
   "settings": {
+    "api-keys": {
+      "create": {
+        "expiry-days": "{days} дней",
+        "expiry-label": "Срок действия",
+        "expiry-never": "Без срока действия",
+        "limit-reached": "Ты достиг максимума в {max} активных API Keys. Отзови существующий key, чтобы создать новый.",
+        "name-label": "Имя",
+        "submit": "Создать key",
+        "success": "API Key успешно создан",
+        "title": "Создать новый API Key"
+      },
+      "list": {
+        "actions": "Действия",
+        "created-at": "Создан",
+        "empty": "У тебя ещё нет API Keys.",
+        "expired": "истёк",
+        "expires": "Истекает",
+        "last-used": "Последнее использование",
+        "name": "Имя",
+        "never": "никогда",
+        "never-expires": "никогда",
+        "prefix": "Key",
+        "revoke": "Отозвать key",
+        "revoked": "отозван",
+        "title": "Мои API Keys"
+      },
+      "name": "API Keys",
+      "revoke": {
+        "confirm": "Отозвать",
+        "message": "Ты уверен, что хочешь отозвать API Key \"{name}\"? Это действие нельзя отменить.",
+        "success": "API Key \"{name}\" был отозван",
+        "title": "Отозвать API Key"
+      },
+      "revoked-list": {
+        "revoked-at": "Отозван",
+        "title": "Отозванные keys ({count})"
+      },
+      "secret": {
+        "copied": "API Key скопирован в буфер обмена",
+        "copy": "Копировать",
+        "copy-failed": "Не удалось скопировать в буфер обмена",
+        "title": "Твой новый API Key (виден только один раз!)",
+        "warning": "Сохрани этот key сейчас. Ты не сможешь увидеть его снова после закрытия этой страницы."
+      }
+    },
     "badges": {
       "click-to-select": "Нажмите на пустое место, чтобы добавить награду.",
       "click-to-use": "Нажмите на награду, чтобы поместить её в выбранное место.",

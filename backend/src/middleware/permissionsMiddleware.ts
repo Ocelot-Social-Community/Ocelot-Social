@@ -34,6 +34,14 @@ const isAdmin = rule()(async (_parent, _args, { user }: Context, _info) => {
   return !!(user?.role === 'admin')
 })
 
+const apiKeysEnabled = rule({ cache: 'contextual' })(async (
+  _parent,
+  _args,
+  { config }: Context,
+) => {
+  return config.API_KEYS_ENABLED
+})
+
 const onlyYourself = rule({
   cache: 'no_cache',
 })(async (_parent, args, context: Context, _info) => {
@@ -462,6 +470,11 @@ export default shield(
 
       // Invite Code
       validateInviteCode: allow,
+
+      // API Keys
+      myApiKeys: and(isAuthenticated, apiKeysEnabled),
+      apiKeyUsers: isAdmin,
+      apiKeysForUser: isAdmin,
     },
     Mutation: {
       '*': deny,
@@ -520,6 +533,13 @@ export default shield(
       generateGroupInviteCode: isAllowedToGenerateGroupInviteCode,
       invalidateInviteCode: isAuthenticated,
       redeemInviteCode: isAuthenticated,
+
+      // API Keys
+      createApiKey: and(isAuthenticated, apiKeysEnabled),
+      updateApiKey: isAuthenticated,
+      revokeApiKey: isAuthenticated,
+      adminRevokeApiKey: isAdmin,
+      adminRevokeUserApiKeys: isAdmin,
 
       switchUserRole: isAdmin,
       markTeaserAsViewed: allow,

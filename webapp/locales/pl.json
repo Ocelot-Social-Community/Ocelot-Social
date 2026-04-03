@@ -14,6 +14,48 @@
     "search": "Szukaj"
   },
   "admin": {
+    "api-keys": {
+      "detail": {
+        "active": "Aktywne keys ({count})",
+        "revoked": "Unieważnione keys ({count})"
+      },
+      "empty": "Nie znaleziono użytkowników z API Keys.",
+      "name": "API Keys",
+      "never": "nigdy",
+      "order": {
+        "active-keys": "Aktywne keys",
+        "comments": "Liczba komentarzy",
+        "last-used": "Ostatnia aktywność",
+        "posts": "Liczba postów"
+      },
+      "revoke": {
+        "confirm": "Unieważnij",
+        "message": "Czy na pewno chcesz unieważnić API Key \"{name}\" użytkownika {user}?",
+        "success": "API Key został unieważniony",
+        "title": "Unieważnij API Key"
+      },
+      "revoke-all": "Unieważnij wszystkie keys tego użytkownika",
+      "revoke-all-confirm": "Unieważnij wszystkie",
+      "revoke-all-message": "Czy na pewno chcesz unieważnić WSZYSTKIE API Keys użytkownika {user}? Tej akcji nie można cofnąć.",
+      "revoke-all-short": "Unieważnij wszystkie",
+      "revoke-all-success": "{count} API Keys użytkownika {user} zostało unieważnionych",
+      "revoke-all-title": "Unieważnij wszystkie API Keys",
+      "revoke-key": "Unieważnij key",
+      "revoked-at": "Unieważniony",
+      "show-keys": "Pokaż keys",
+      "sort-by": "Sortuj według",
+      "table": {
+        "actions": "Akcje",
+        "active": "Aktywne",
+        "comments": "Komentarze",
+        "last-activity": "Ostatnia aktywność",
+        "name": "Nazwa",
+        "posts": "Posty",
+        "prefix": "Key",
+        "revoked-count": "Unieważnione",
+        "user": "Użytkownik"
+      }
+    },
     "badges": {
       "description": "Skonfiguruj dostępne odznaki dla tego użytkownika",
       "noBadges": "Brak dostępnych odznak",
@@ -1064,6 +1106,51 @@
     "title": "Wyniki wyszukiwania"
   },
   "settings": {
+    "api-keys": {
+      "create": {
+        "expiry-days": "{days} dni",
+        "expiry-label": "Ważność",
+        "expiry-never": "Bez daty wygaśnięcia",
+        "limit-reached": "Osiągnąłeś maksymalną liczbę {max} aktywnych API Keys. Unieważnij istniejący key, aby utworzyć nowy.",
+        "name-label": "Nazwa",
+        "submit": "Utwórz key",
+        "success": "API Key został utworzony",
+        "title": "Utwórz nowy API Key"
+      },
+      "list": {
+        "actions": "Akcje",
+        "created-at": "Utworzony",
+        "empty": "Nie masz jeszcze żadnych API Keys.",
+        "expired": "wygasły",
+        "expires": "Wygasa",
+        "last-used": "Ostatnie użycie",
+        "name": "Nazwa",
+        "never": "nigdy",
+        "never-expires": "nigdy",
+        "prefix": "Key",
+        "revoke": "Unieważnij key",
+        "revoked": "unieważniony",
+        "title": "Moje API Keys"
+      },
+      "name": "API Keys",
+      "revoke": {
+        "confirm": "Unieważnij",
+        "message": "Czy na pewno chcesz unieważnić API Key \"{name}\"? Tej akcji nie można cofnąć.",
+        "success": "API Key \"{name}\" został unieważniony",
+        "title": "Unieważnij API Key"
+      },
+      "revoked-list": {
+        "revoked-at": "Unieważniony",
+        "title": "Unieważnione keys ({count})"
+      },
+      "secret": {
+        "copied": "API Key skopiowany do schowka",
+        "copy": "Kopiuj",
+        "copy-failed": "Nie udało się skopiować do schowka",
+        "title": "Twój nowy API Key (widoczny tylko raz!)",
+        "warning": "Zapisz ten key teraz. Nie będziesz mógł go zobaczyć ponownie po zamknięciu tej strony."
+      }
+    },
     "badges": {
       "click-to-select": "Kliknij na puste miejsce, aby dodać odznakę.",
       "click-to-use": "Kliknij na odznakę, aby umieścić ją w wybranym miejscu.",

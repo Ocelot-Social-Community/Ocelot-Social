@@ -14,6 +14,48 @@
     "search": "Search"
   },
   "admin": {
+    "api-keys": {
+      "detail": {
+        "active": "Active keys ({count})",
+        "revoked": "Revoked keys ({count})"
+      },
+      "empty": "No users with API keys found.",
+      "name": "API Keys",
+      "never": "never",
+      "order": {
+        "active-keys": "Active keys",
+        "comments": "Comments count",
+        "last-used": "Last activity",
+        "posts": "Posts count"
+      },
+      "revoke": {
+        "confirm": "Revoke",
+        "message": "Are you sure you want to revoke the API key \"{name}\" of {user}?",
+        "success": "API key revoked successfully",
+        "title": "Revoke API Key"
+      },
+      "revoke-all": "Revoke all keys of this user",
+      "revoke-all-confirm": "Revoke all",
+      "revoke-all-message": "Are you sure you want to revoke ALL API keys of {user}? This action cannot be undone.",
+      "revoke-all-short": "Revoke all",
+      "revoke-all-success": "{count} API keys of {user} have been revoked",
+      "revoke-all-title": "Revoke all API Keys",
+      "revoke-key": "Revoke key",
+      "revoked-at": "Revoked at",
+      "show-keys": "Show keys",
+      "sort-by": "Sort by",
+      "table": {
+        "actions": "Actions",
+        "active": "Active",
+        "comments": "Comments",
+        "last-activity": "Last activity",
+        "name": "Name",
+        "posts": "Posts",
+        "prefix": "Key",
+        "revoked-count": "Revoked",
+        "user": "User"
+      }
+    },
     "badges": {
       "description": "Configure the available badges for this user",
       "noBadges": "There are no badges available",
@@ -1064,6 +1106,51 @@
     "title": "Search Results"
   },
   "settings": {
+    "api-keys": {
+      "create": {
+        "expiry-days": "{days} days",
+        "expiry-label": "Expiry",
+        "expiry-never": "No expiry",
+        "limit-reached": "You have reached the maximum of {max} active API keys. Revoke an existing key to create a new one.",
+        "name-label": "Name",
+        "submit": "Create key",
+        "success": "API key created successfully",
+        "title": "Create new API Key"
+      },
+      "list": {
+        "actions": "Actions",
+        "created-at": "Created at",
+        "empty": "You have no API keys yet.",
+        "expired": "expired",
+        "expires": "Expires",
+        "last-used": "Last used",
+        "name": "Name",
+        "never": "never",
+        "never-expires": "never",
+        "prefix": "Key",
+        "revoke": "Revoke key",
+        "revoked": "revoked",
+        "title": "My API Keys"
+      },
+      "name": "API Keys",
+      "revoke": {
+        "confirm": "Revoke",
+        "message": "Are you sure you want to revoke the API key \"{name}\"? This action cannot be undone.",
+        "success": "API key \"{name}\" has been revoked",
+        "title": "Revoke API Key"
+      },
+      "revoked-list": {
+        "revoked-at": "Revoked at",
+        "title": "Revoked keys ({count})"
+      },
+      "secret": {
+        "copied": "API key copied to clipboard",
+        "copy": "Copy",
+        "copy-failed": "Failed to copy to clipboard",
+        "title": "Your new API Key (visible only once!)",
+        "warning": "Save this key now. You will not be able to see it again after closing this page."
+      }
+    },
     "badges": {
       "click-to-select": "Click on an empty space to add a badge.",
       "click-to-use": "Click on a badge to use it in the selected slot.",

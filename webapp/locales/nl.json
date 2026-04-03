@@ -14,6 +14,48 @@
     "search": "Zoeken"
   },
   "admin": {
+    "api-keys": {
+      "detail": {
+        "active": "Actieve keys ({count})",
+        "revoked": "Ingetrokken keys ({count})"
+      },
+      "empty": "Geen gebruikers met API Keys gevonden.",
+      "name": "API Keys",
+      "never": "nooit",
+      "order": {
+        "active-keys": "Actieve keys",
+        "comments": "Aantal reacties",
+        "last-used": "Laatste activiteit",
+        "posts": "Aantal berichten"
+      },
+      "revoke": {
+        "confirm": "Intrekken",
+        "message": "Weet je zeker dat je de API Key \"{name}\" van {user} wilt intrekken?",
+        "success": "API Key is ingetrokken",
+        "title": "API Key intrekken"
+      },
+      "revoke-all": "Alle keys van deze gebruiker intrekken",
+      "revoke-all-confirm": "Alles intrekken",
+      "revoke-all-message": "Weet je zeker dat je ALLE API Keys van {user} wilt intrekken? Deze actie kan niet ongedaan worden gemaakt.",
+      "revoke-all-short": "Alles intrekken",
+      "revoke-all-success": "{count} API Keys van {user} zijn ingetrokken",
+      "revoke-all-title": "Alle API Keys intrekken",
+      "revoke-key": "Key intrekken",
+      "revoked-at": "Ingetrokken op",
+      "show-keys": "Keys tonen",
+      "sort-by": "Sorteren op",
+      "table": {
+        "actions": "Acties",
+        "active": "Actief",
+        "comments": "Reacties",
+        "last-activity": "Laatste activiteit",
+        "name": "Naam",
+        "posts": "Berichten",
+        "prefix": "Key",
+        "revoked-count": "Ingetrokken",
+        "user": "Gebruiker"
+      }
+    },
     "badges": {
       "description": "Configureer de beschikbare badges voor deze gebruiker",
       "noBadges": "Er zijn geen badges beschikbaar",
@@ -1064,6 +1106,51 @@
     "title": "Zoekresultaten"
   },
   "settings": {
+    "api-keys": {
+      "create": {
+        "expiry-days": "{days} dagen",
+        "expiry-label": "Geldigheid",
+        "expiry-never": "Geen vervaldatum",
+        "limit-reached": "Je hebt het maximum van {max} actieve API Keys bereikt. Trek een bestaande key in om een nieuwe aan te maken.",
+        "name-label": "Naam",
+        "submit": "Key aanmaken",
+        "success": "API Key is aangemaakt",
+        "title": "Nieuwe API Key aanmaken"
+      },
+      "list": {
+        "actions": "Acties",
+        "created-at": "Aangemaakt op",
+        "empty": "Je hebt nog geen API Keys.",
+        "expired": "verlopen",
+        "expires": "Verloopt",
+        "last-used": "Laatst gebruikt",
+        "name": "Naam",
+        "never": "nooit",
+        "never-expires": "nooit",
+        "prefix": "Key",
+        "revoke": "Key intrekken",
+        "revoked": "ingetrokken",
+        "title": "Mijn API Keys"
+      },
+      "name": "API Keys",
+      "revoke": {
+        "confirm": "Intrekken",
+        "message": "Weet je zeker dat je de API Key \"{name}\" wilt intrekken? Deze actie kan niet ongedaan worden gemaakt.",
+        "success": "API Key \"{name}\" is ingetrokken",
+        "title": "API Key intrekken"
+      },
+      "revoked-list": {
+        "revoked-at": "Ingetrokken op",
+        "title": "Ingetrokken keys ({count})"
+      },
+      "secret": {
+        "copied": "API Key naar klembord gekopieerd",
+        "copy": "Kopiëren",
+        "copy-failed": "Kopiëren naar klembord mislukt",
+        "title": "Je nieuwe API Key (slechts één keer zichtbaar!)",
+        "warning": "Sla deze key nu op. Je kunt hem na het sluiten van deze pagina niet meer zien."
+      }
+    },
     "badges": {
       "click-to-select": "Klik op een lege plek om een badge toe te voegen.",
       "click-to-use": "Klik op een badge om deze in de geselecteerde plek te plaatsen.",

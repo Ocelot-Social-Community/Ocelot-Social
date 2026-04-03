@@ -14,6 +14,48 @@
     "search": "Kërko"
   },
   "admin": {
+    "api-keys": {
+      "detail": {
+        "active": "Keys aktive ({count})",
+        "revoked": "Keys të revokuara ({count})"
+      },
+      "empty": "Nuk u gjetën përdorues me API Keys.",
+      "name": "API Keys",
+      "never": "kurrë",
+      "order": {
+        "active-keys": "Keys aktive",
+        "comments": "Numri i komenteve",
+        "last-used": "Aktiviteti i fundit",
+        "posts": "Numri i postimeve"
+      },
+      "revoke": {
+        "confirm": "Revoko",
+        "message": "A je i sigurt që dëshiron të revokosh API Key \"{name}\" të {user}?",
+        "success": "API Key u revokua me sukses",
+        "title": "Revoko API Key"
+      },
+      "revoke-all": "Revoko të gjitha keys e këtij përdoruesi",
+      "revoke-all-confirm": "Revoko të gjitha",
+      "revoke-all-message": "A je i sigurt që dëshiron të revokosh TË GJITHA API Keys e {user}? Ky veprim nuk mund të zhbëhet.",
+      "revoke-all-short": "Revoko të gjitha",
+      "revoke-all-success": "{count} API Keys të {user} u revokuan",
+      "revoke-all-title": "Revoko të gjitha API Keys",
+      "revoke-key": "Revoko key",
+      "revoked-at": "Revokuar më",
+      "show-keys": "Shfaq keys",
+      "sort-by": "Rendit sipas",
+      "table": {
+        "actions": "Veprime",
+        "active": "Aktive",
+        "comments": "Komente",
+        "last-activity": "Aktiviteti i fundit",
+        "name": "Emri",
+        "posts": "Postime",
+        "prefix": "Key",
+        "revoked-count": "Revokuara",
+        "user": "Përdoruesi"
+      }
+    },
     "badges": {
       "description": "Konfiguro embelemat e disponueshme për këtë përdorues",
       "noBadges": "Nuk ka emblema të disponueshme",
@@ -1064,6 +1106,51 @@
     "title": "Rezultatet e kërkimit"
   },
   "settings": {
+    "api-keys": {
+      "create": {
+        "expiry-days": "{days} ditë",
+        "expiry-label": "Vlefshmëria",
+        "expiry-never": "Pa datë skadimi",
+        "limit-reached": "Ke arritur maksimumin e {max} API Keys aktive. Revoko një key ekzistues për të krijuar një të ri.",
+        "name-label": "Emri",
+        "submit": "Krijo key",
+        "success": "API Key u krijua me sukses",
+        "title": "Krijo API Key të ri"
+      },
+      "list": {
+        "actions": "Veprime",
+        "created-at": "Krijuar më",
+        "empty": "Nuk ke ende API Keys.",
+        "expired": "skaduar",
+        "expires": "Skadon",
+        "last-used": "Përdorimi i fundit",
+        "name": "Emri",
+        "never": "kurrë",
+        "never-expires": "kurrë",
+        "prefix": "Key",
+        "revoke": "Revoko key",
+        "revoked": "revokuar",
+        "title": "API Keys e mia"
+      },
+      "name": "API Keys",
+      "revoke": {
+        "confirm": "Revoko",
+        "message": "A je i sigurt që dëshiron të revokosh API Key \"{name}\"? Ky veprim nuk mund të zhbëhet.",
+        "success": "API Key \"{name}\" u revokua",
+        "title": "Revoko API Key"
+      },
+      "revoked-list": {
+        "revoked-at": "Revokuar më",
+        "title": "Keys të revokuara ({count})"
+      },
+      "secret": {
+        "copied": "API Key u kopjua në clipboard",
+        "copy": "Kopjo",
+        "copy-failed": "Kopjimi në clipboard dështoi",
+        "title": "API Key yt i ri (i dukshëm vetëm një herë!)",
+        "warning": "Ruaje këtë key tani. Nuk do të mundesh ta shohësh përsëri pasi të mbyllësh këtë faqe."
+      }
+    },
     "badges": {
       "click-to-select": "Kliko në një hapësirë boshe për të shtuar një emblemë.",
       "click-to-use": "Kliko mbi një emblemë për ta përdorur në hapësirën e zgjedhur.",
