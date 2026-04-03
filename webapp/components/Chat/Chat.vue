@@ -325,6 +325,17 @@ export default {
       })
     },
 
+    lastMessageContent(content, files) {
+      const text = (content || '').trim()
+      if (text) return text.substring(0, 30)
+      if (!files?.length) return ''
+      const f = files[0]
+      const isAudio = f.type?.startsWith('audio/') || f.audio
+      if (isAudio) return ''
+      const name = f.extension ? `${f.name}.${f.extension}` : f.name || ''
+      return `\uD83D\uDCCE ${name}`
+    },
+
     markAsSeen(messageIds) {
       if (!messageIds.length || !this.selectedRoom) return
       const room = this.selectedRoom
@@ -645,7 +656,7 @@ export default {
       const changedRoom = { ...this.rooms[roomIndex] }
       changedRoom.lastMessage = {
         ...msg,
-        content: (msg.content || '').trim().substring(0, 30),
+        content: this.lastMessageContent(msg.content, msg.files),
         files: this.lastMessageFiles(msg.files),
       }
       changedRoom.lastMessageAt = msg.date
@@ -754,7 +765,7 @@ export default {
       const roomIndex = this.rooms.findIndex((r) => r.id === roomId)
       if (roomIndex !== -1) {
         const changedRoom = { ...this.rooms[roomIndex] }
-        changedRoom.lastMessage.content = (content || '').trim().substring(0, 30)
+        changedRoom.lastMessage.content = this.lastMessageContent(content, files)
         changedRoom.lastMessage.files = this.lastMessageFiles(files)
         changedRoom.index = new Date().toISOString()
         this.rooms = [changedRoom, ...this.rooms.filter((r) => r.id !== roomId)]
@@ -840,7 +851,7 @@ export default {
         lastMessage: room.lastMessage
           ? {
               ...room.lastMessage,
-              content: (room.lastMessage?.content || '').trim().substring(0, 30),
+              content: this.lastMessageContent(room.lastMessage?.content, room.lastMessage?.files),
               files: this.lastMessageFiles(room.lastMessage?.files),
             }
           : { content: '' },
