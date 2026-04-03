@@ -343,7 +343,8 @@ export default {
           variables: { id: keyId },
         })
         this.$apollo.queries.apiKeyUsers.refetch()
-        await this.toggleUser(null) // collapse
+        this.expandedUserId = null
+        this.userKeys = null
         this.$toast.success(this.$t('admin.api-keys.revoke.success'))
       } catch (error) {
         this.$toast.error(error.message)
