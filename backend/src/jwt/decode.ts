@@ -85,7 +85,7 @@ const decodeApiKey = async (driver: Driver, key: string): Promise<DecodedUser | 
 
     // Update lastUsedAt asynchronously (non-blocking, separate session)
     const updateSession = driver.session()
-    updateSession
+    void updateSession
       .writeTransaction(async (transaction) => {
         await transaction.run(
           `MATCH (k:ApiKey { id: $keyId }) SET k.lastUsedAt = toString(datetime())`,
@@ -93,7 +93,7 @@ const decodeApiKey = async (driver: Driver, key: string): Promise<DecodedUser | 
         )
       })
       .catch(() => {})
-      .finally(() => updateSession.close())
+      .finally(async () => updateSession.close())
 
     return {
       ...user,

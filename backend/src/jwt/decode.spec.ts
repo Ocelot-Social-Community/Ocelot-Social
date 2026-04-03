@@ -85,7 +85,8 @@ describe('decode', () => {
       it('updates lastUsedAt on the API key', async () => {
         await decode(context)('Bearer oak_testkey123')
         // Give fire-and-forget time to complete
-        await new Promise((resolve) => setTimeout(resolve, 500))
+        const { setTimeout: delay } = await import('node:timers/promises')
+        await delay(500)
         const session = driver.session()
         const result = await session.readTransaction(async (tx) => {
           return tx.run(`MATCH (k:ApiKey { id: 'ak1' }) RETURN k.lastUsedAt AS lastUsedAt`)

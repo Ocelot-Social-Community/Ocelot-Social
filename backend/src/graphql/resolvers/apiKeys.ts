@@ -54,8 +54,8 @@ export default {
     },
 
     apiKeyUsers: async (_parent: unknown, args: ApiKeyArgs, context: Context) => {
-      const first = args.first || 50
-      const offset = args.offset || 0
+      const first = args.first ?? 50
+      const offset = args.offset ?? 0
 
       const result = await context.database.query({
         query: `
